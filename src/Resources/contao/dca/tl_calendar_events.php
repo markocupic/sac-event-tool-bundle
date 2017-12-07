@@ -647,7 +647,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = arr
 
 
 // allowEdititingOnFirstReleaseLevelOnly - fields
-$allowEdititingOnFirstReleaseLevelOnly = array('eventType', 'title', 'author', 'organizers', 'instructor', 'mountainguide', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'repeatFixedDates', 'durationInfo', 'tourType', 'tourTechDifficulty', 'disableOnlineRegistration');
+$allowEdititingOnFirstReleaseLevelOnly = array('eventType', 'title', 'author', 'organizers', 'instructor', 'mountainguide', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'repeatFixedDates', 'durationInfo', 'tourType', 'tourTechDifficulty');
 foreach ($allowEdititingOnFirstReleaseLevelOnly as $field)
 {
     $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['allowEdititingOnFirstReleaseLevelOnly'] = true;
