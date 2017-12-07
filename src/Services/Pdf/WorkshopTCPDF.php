@@ -14,10 +14,9 @@ namespace Markocupic\SacEventToolBundle\Services\Pdf;
 use Contao\System;
 
 /**
- * Class PDFController
- * @package Sacpilatus
+ * Class WorkshopTCPDF
+ * @package Markocupic\SacEventToolBundle\Services\Pdf
  */
-
 class WorkshopTCPDF extends \TCPDF
 {
 	/**

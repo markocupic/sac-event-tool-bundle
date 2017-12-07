@@ -50,7 +50,7 @@ class ModuleSacEventToolMemberDashboard extends Module
      * Template
      * @var string
      */
-    protected $strTemplate = 'mod_sacpilatus_member_dashboard';
+    protected $strTemplate = 'mod_sac_event_tool_member_dashboard';
 
     /**
      * @var
@@ -75,7 +75,7 @@ class ModuleSacEventToolMemberDashboard extends Module
             /** @var BackendTemplate|object $objTemplate */
             $objTemplate = new BackendTemplate('be_wildcard');
 
-            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['sacpilatusEventStory'][0]) . ' ###';
+            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['eventToolFrontendUserDashboard'][0]) . ' ###';
             $objTemplate->title = $this->headline;
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
@@ -103,7 +103,7 @@ class ModuleSacEventToolMemberDashboard extends Module
         if (strlen(Input::get('action')))
         {
             $this->action = Input::get('action');
-            $this->strTemplate = 'mod_sacpilatus_' . $this->action;
+            $this->strTemplate = 'mod_sac_event_tool_' . $this->action;
         }
         else
         {

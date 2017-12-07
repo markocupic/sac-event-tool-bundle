@@ -45,7 +45,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
      * Template
      * @var string
      */
-    protected $strTemplate = 'mod_sacpilatus_event_registration_form';
+    protected $strTemplate = 'mod_sac_event_tool_event_registration_form';
 
     /**
      * @var

@@ -29,5 +29,5 @@ $GLOBALS['TL_LANG']['MOD']['sac_event_journey_tool'] = array('Event Anreise-Art-
 $GLOBALS['TL_LANG']['FMD']['sac_event_tool_fe_modules'] = array('SAC Frontend Module');
 $GLOBALS['TL_LANG']['FMD']['eventToolFrontendUserDashboard'] = array('SAC Mitglieder Dashboard');
 $GLOBALS['TL_LANG']['FMD']['eventToolEventRegistrationForm'] = array('SAC Event Registrierungsformular');
-$GLOBALS['TL_LANG']['FMD']['calendarEventsStoryList'] = array('SAC Tourenberichte Listen Modul');
-$GLOBALS['TL_LANG']['FMD']['calendarEventsStoryReader'] = array('SAC Tourenberichte Reader Modul');
+$GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryList'] = array('SAC Tourenberichte Listen Modul');
+$GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryReader'] = array('SAC Tourenberichte Reader Modul');

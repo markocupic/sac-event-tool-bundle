@@ -9,7 +9,7 @@
 
 
 // notification_center_config.php
-$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['sacpilatus'] = array
+$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['sac_event_tool'] = array
 (
 	// Type
 	'receipt_event_registration' => array
@@ -51,4 +51,3 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['sacpilatus'] = array
 		'email_text' => array('event_name', 'participant_name', 'participant_email', 'sac_member_id', 'instructor_name', 'instructor_email', 'event_link_detail'),
 	)
 );
-?>

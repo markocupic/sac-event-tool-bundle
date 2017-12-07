@@ -43,7 +43,7 @@ class ModuleSacEventToolCalendarEventStoryList extends Module
      * Template
      * @var string
      */
-    protected $strTemplate = 'mod_calendar_events_story_list';
+    protected $strTemplate = 'mod_event_tool_calendar_event_story_list';
 
 
     /**
@@ -56,7 +56,7 @@ class ModuleSacEventToolCalendarEventStoryList extends Module
             /** @var BackendTemplate|object $objTemplate */
             $objTemplate = new BackendTemplate('be_wildcard');
 
-            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['calendarEventsStoryList'][0]) . ' ###';
+            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryList'][0]) . ' ###';
             $objTemplate->title = $this->headline;
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;

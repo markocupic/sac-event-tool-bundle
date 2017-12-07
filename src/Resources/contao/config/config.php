@@ -28,7 +28,7 @@ require_once($rootDir . '/vendor/markocupic/sac-event-tool-bundle/src/Resources/
 if (TL_MODE == 'BE')
 {
     // Add Backend CSS
-    $GLOBALS['TL_CSS'][] = 'bundles/markocupicsaceventtool/css/be_sac-pilatus-bundle.css';
+    $GLOBALS['TL_CSS'][] = 'bundles/markocupicsaceventtool/css/be_sac-event_tool-bundle.css';
 }
 
 
@@ -82,8 +82,8 @@ $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
 $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
     'eventToolFrontendUserDashboard' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolMemberDashboard',
     'eventToolEventRegistrationForm' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventRegistrationForm',
-    'calendarEventsStoryList' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryList',
-    'calendarEventsStoryReader' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryReader'
+    'eventToolCalendarEventStoryList' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryList',
+    'eventToolCalendarEventStoryReader' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryReader'
 );
 
 // Content Elements

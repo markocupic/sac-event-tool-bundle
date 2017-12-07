@@ -56,7 +56,7 @@ class ExportEvents2Ical
         $objTemplate->items = $arrItems;
 
 
-        $tmpFile = 'system/tmp/sac-pilatus-kurse-' . time() . '.ical';
+        $tmpFile = 'system/tmp/kurse-' . time() . '.ical';
         $objFile = new File($tmpFile);
         $fcontent = $objTemplate->parse();
         $objFile->append($fcontent);
@@ -64,7 +64,7 @@ class ExportEvents2Ical
         sleep(1);
 
         header('Content-type: text/calendar; charset=utf-8');
-        header('Content-Disposition: attachment; filename=sac_pilatus_calendar.ical');
+        header('Content-Disposition: attachment; filename=course_calendar.ical');
         echo $objFile->getContent();
         exit();
 

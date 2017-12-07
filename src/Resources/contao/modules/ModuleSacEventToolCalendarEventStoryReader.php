@@ -42,7 +42,7 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
      * Template
      * @var string
      */
-    protected $strTemplate = 'mod_calendar_events_story_reader';
+    protected $strTemplate = 'mod_event_tool_calendar_event_story_reader';
 
 
     /**
@@ -57,7 +57,7 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
             /** @var BackendTemplate|object $objTemplate */
             $objTemplate = new BackendTemplate('be_wildcard');
 
-            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['calendarEventsStoryReader'][0]) . ' ###';
+            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryReader'][0]) . ' ###';
             $objTemplate->title = $this->headline;
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
