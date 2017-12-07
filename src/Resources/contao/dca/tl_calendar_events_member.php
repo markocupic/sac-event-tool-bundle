@@ -196,6 +196,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['stateOfSubscription'],
             'filter' => true,
             'inputType' => 'select',
+            'save_callback' => array(array('tl_calendar_events_member', 'saveCallbackStateOfSubscription')),
             'default' => 'subscription-not-confirmed',
             'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
             'options' => array('subscription-not-confirmed', 'subscription-accepted', 'subscription-refused', 'subscription-waitlisted'),

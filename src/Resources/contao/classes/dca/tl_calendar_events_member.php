@@ -1,6 +1,7 @@
 <?php
 
 use Markocupic\ExportTable\ExportTable;
+use NotificationCenter\Model\Notification;
 
 /**
  * Class tl_calendar_events_member
@@ -262,18 +263,18 @@ class tl_calendar_events_member extends Backend
                 if (Validator::isEmail($objEventMemberModel->email))
                 {
                     // Use terminal42/notification_center
-                    $objNotification = Notification::findOneByType('state_of_subscription_state_changed');
+                    $objNotification = Notification::findOneByType('onchange_state_of_subscription');
                     if ($objNotification !== null)
                     {
                         $arrTokens = array(
-                            'participant_state_of_subscription' => html_entity_decode($GLOBALS['TL_LANG']['tl_calendar_events_member'][$objEventMemberModel->stateOfSubscription]),
+                            'participant_state_of_subscription' => html_entity_decode($GLOBALS['TL_LANG']['tl_calendar_events_member'][$varValue]),
                             'event_name' => html_entity_decode($objEvent->title),
                             'participant_name' => html_entity_decode($objEventMemberModel->firstname . ' ' . $objEventMemberModel->lastname),
                             'participant_email' => $objEventMemberModel->email,
                             'event_link_detail' => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($objEvent),
                         );
                         $objNotification->send($arrTokens, 'de');
-                        Message::addInfo(sprintf('Der Teilnehmer "%s %s" wurde per E-Mail über die &Auml;nderung seines Teilnehmestatus benachrichtigt.', $objEventMemberModel->firstname, $objEventMemberModel->lastname));
+                        //Message::addInfo(sprintf('Der Teilnehmer "%s %s" wurde per E-Mail über die &Auml;nderung seines Teilnehmestatus benachrichtigt.', $objEventMemberModel->firstname, $objEventMemberModel->lastname));
                     }
                 }
             }

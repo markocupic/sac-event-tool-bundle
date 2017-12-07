@@ -12,14 +12,14 @@
 $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['sac_event_tool'] = array
 (
     // Type
-    'state_of_subscription_state_changed' => array
+    'onchange_state_of_subscription' => array
     (
         // Field in tl_nc_language
-        'email_sender_name' => array(),
-        'email_sender_address' => array(),
+        //'email_sender_name' => array(),
+        //'email_sender_address' => array(),
         'recipients' => array('participant_email'),
-        'email_replyTo' => array(),
-        'email_recipient_cc' => array(),
+        //'email_replyTo' => array(),
+        //'email_recipient_cc' => array(),
         'email_subject' => array('event_name'),
         'email_text' => array('event_name', 'participant_state_of_subscription', 'participant_name', 'event_link_detail'),
         'email_html' => array('event_name', 'participant_state_of_subscription', 'participant_name', 'event_link_detail'),
