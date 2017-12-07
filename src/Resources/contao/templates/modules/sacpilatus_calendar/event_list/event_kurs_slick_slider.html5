@@ -1,0 +1,21 @@
+<?php $this->href = str_replace($this->alias, $this->id, $this->href); ?>
+
+
+<div class="slider-item">
+    <div class="slider-item-inner">
+
+        <div class="slider-image-container">
+            {{picture::<?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventImagePath($this->id) ?>?size=20&alt=<?= $this->title ?>}}
+        </div>
+    </div>
+    <div class="slider-image-overlay"></div>
+
+    <div class="info-text">
+        <h6 class="ce_headline event-date-span"><?=  Markocupic\SacEventToolBundle\CalendarSacEvents::getEventPeriod($this->id) ?></h6>
+        <h4 class="ce_headline"><?= $this->title ?></h4>
+        {{br}}
+        <div class="button-container">
+            <a href="<?= $this->href ?>" class="btn btn-sm btn-danger">MEHR</a>
+        </div>
+    </div>
+</div>

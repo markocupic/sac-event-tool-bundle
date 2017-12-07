@@ -1,0 +1,4 @@
+parameters:
+
+    # event stories (Tourenberichte)
+    event_stories_upload_path: files/sac_pilatus/events/stories

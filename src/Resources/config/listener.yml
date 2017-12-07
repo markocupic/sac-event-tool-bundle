@@ -1,0 +1,48 @@
+services:
+
+
+    # Validate Forms
+    markocupic_sac_event_tool.contao_hooks.validate_forms:
+            class: Markocupic\SacEventToolBundle\ContaoHooks\ValidateForms
+            arguments:
+                - "@contao.framework"
+                - "%event_stories_upload_path%"
+
+    # Post Login Hook
+    markocupic_sac_event_tool.contao_hooks.post_login:
+            class: Markocupic\SacEventToolBundle\ContaoHooks\PostLogin
+            arguments:
+                - "@contao.framework"
+
+    # Initialize System Hook
+    markocupic_sac_event_tool.contao_hooks.initialize_system:
+            class: Markocupic\SacEventToolBundle\ContaoHooks\InitializeSystem
+            arguments:
+                - "@contao.framework"
+
+    # Generate Page Hook
+    markocupic_sac_event_tool.contao_hooks.generate_page:
+            class: Markocupic\SacEventToolBundle\ContaoHooks\GeneratePage
+            arguments:
+                - "@contao.framework"
+
+    # Parse Backend Template
+    markocupic_sac_event_tool.contao_hooks.parse_backend_template:
+            class: Markocupic\SacEventToolBundle\ContaoHooks\ParseBackendTemplate
+            arguments:
+                - "@contao.framework"
+
+
+    # Execute Pre Actions
+    markocupic_sac_event_tool.contao_hooks.execute_pre_actions:
+            class: Markocupic\SacEventToolBundle\ContaoHooks\ExecutePreActions
+            arguments:
+                - "@contao.framework"
+
+
+    # Execute Pre Actions
+    markocupic_sac_event_tool.contao_hooks.add_custom_regexp:
+            class: Markocupic\SacEventToolBundle\ContaoHooks\AddCustomRegexp
+            arguments:
+                - "@contao.framework"
+

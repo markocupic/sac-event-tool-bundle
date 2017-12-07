@@ -1,0 +1,3 @@
+ajax_frontend:
+    resource: "@MarkocupicSacEventToolBundle/Controller"
+    type: annotation

@@ -1,0 +1,32 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:<?= $this->calname ?>
+
+X-WR-TIMEZONE:Europe/Zurich
+X-WR-CALDESC:
+<?php foreach($this->items as $item): ?>
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:<?= $item['dtstart'] ?>
+
+DTEND;VALUE=DATE:<?= $item['dtend'] ?>
+
+DTSTAMP:<?= $item['dtstamp'] ?>
+
+CLASS:PUBLIC
+CREATED: <?= $item['dtstamp'] ?>
+
+DESCRIPTION:<?= $item['description'] ?>
+
+LAST-MODIFIED:<?= $item['dtstamp'] ?>
+
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:<?= $item['summary'] ?>
+
+END:VEVENT
+<?php endforeach; ?>
+END:VCALENDAR
+

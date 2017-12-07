@@ -1,0 +1,11 @@
+Hallo <?= $this->firstname ?>
+
+Leider kann ich dir für den Event: "<?= $this->eventname ?>" im Moment noch keine Zusage erteilen. Du wurdest auf die Warteliste gesetzt und sollte ein Platz frei werden, wirst du wieder kontaktiert.
+Ich danke dir für dein Verständnis.
+
+Freundliche Grüsse
+
+<?= $this->nameGuide ?>
+
+
+Dies ist eine automatisch generierte Nachricht. Wende dich per E-Mail an den Kurs-/Tourenleiter, um genauere Informationen zu bekommen.

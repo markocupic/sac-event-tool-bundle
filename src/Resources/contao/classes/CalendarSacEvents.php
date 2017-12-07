@@ -1,0 +1,565 @@
+<?php
+
+/**
+ * SAC Event Tool Web Plugin for Contao
+ * Copyright (c) 2008-2017 Marko Cupic
+ * @package sac-event-tool-bundle
+ * @author Marko Cupic m.cupic@gmx.ch, 2017
+ * @link    https://sac-kurse.kletterkader.com
+ */
+
+namespace Markocupic\SacEventToolBundle;
+
+use Contao\CalendarEventsMemberModel;
+use Contao\EventOrganizerModel;
+use Contao\StringUtil;
+use Contao\Database;
+use Contao\CalendarEventsModel;
+use Contao\TourDifficultyModel;
+use Contao\TourTypeModel;
+use Contao\FilesModel;
+use Contao\UserModel;
+use Contao\MemberModel;
+use Contao\Calendar;
+use Contao\Date;
+use Contao\ContentModel;
+use Contao\System;
+use Contao\Controller;
+
+/**
+ * Class CalendarSacEvents
+ * @package Markocupic\SacEventToolBundle
+ */
+class CalendarSacEvents extends System
+{
+
+
+    /**
+     * @param $id
+     * @return string
+     * @throws \Exception
+     */
+    public static function getEventDuration($id)
+    {
+
+        $objDb = Database::getInstance();
+        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
+        if ($objEvent->numRows === null)
+        {
+            throw new \Exception(sprintf('Calendar Event with ID %s not found.', $id));
+        }
+
+        $arrDates = StringUtil::deserialize($objEvent->repeatFixedDates);
+
+        if ($objEvent->durationInfo != '')
+        {
+            return (string)$objEvent->durationInfo;
+        }
+        elseif (is_array($arrDates) && !empty($arrDates))
+        {
+            return sprintf('%s Tage', count($arrDates));
+        }
+        else
+        {
+            return '';
+        }
+
+    }
+
+
+    /**
+     * @param $id
+     * @return string
+     * @throws \Exception
+     */
+    public static function getEventState($id)
+    {
+        $objEvent = CalendarEventsModel::findByPk($id);
+        if ($objEvent === null)
+        {
+            throw new \Exception(sprintf('Calendar Event with ID %s not found.', $id));
+        }
+
+        $objDb = Database::getInstance();
+        $objEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? AND stateOfSubscription=?')->execute($id, 'subscription-accepted');
+        $registrationCount = $objEventsMember->numRows;
+
+        // Event canceled
+        if ($objEvent->eventCanceled)
+        {
+            return 'event_status_4';
+        }
+
+        // Event is fully booked
+        if ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers)
+        {
+            return 'event_status_3'; // fa-circle red
+        }
+
+        // Event is over or booking in no more possible
+        if ($objEvent->startDate <= time() || ($objEvent->setRegistrationPeriod && $objEvent->registrationEndDate < time()))
+        {
+            return 'event_status_2';
+        }
+
+        // Booking not possible yet
+        if ($objEvent->setRegistrationPeriod && $objEvent->registrationStartDate > time())
+        {
+            return 'event_status_5'; // fa-circle orange
+        }
+
+        return 'event_status_1';
+
+    }
+
+
+    /**
+     * @param $id
+     * @return string
+     */
+    public static function getMainInstructorName($id)
+    {
+
+        $objDb = Database::getInstance();
+        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
+        if ($objEvent->numRows)
+        {
+            if ($objEvent->instructor != '')
+            {
+                $arrUsers = StringUtil::deserialize($objEvent->instructor, true);
+                $objUser = UserModel::findByPk($arrUsers[0]);
+                if ($objUser !== null)
+                {
+                    return $objUser->name;
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     * @param $id
+     * @return string
+     */
+    public static function getMainQualifikation($id)
+    {
+        $strQuali = '';
+        $objUser = UserModel::findByPk($id);
+        if ($objUser !== null)
+        {
+            $arrQuali = StringUtil::deserialize($objUser->leiterQualifikation, true);
+            if (!empty($arrQuali[0]))
+            {
+                $strQuali = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'][$arrQuali[0]];
+            }
+        }
+        return $strQuali;
+    }
+
+
+    /**
+     * @param $id
+     * @return array|bool
+     */
+    public static function getEventTimestamps($id)
+    {
+        $arrRepeats = array();
+        $objDb = Database::getInstance();
+        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
+        if ($objEvent->numRows)
+        {
+            $arrDates = StringUtil::deserialize($objEvent->repeatFixedDates);
+            if (!is_array($arrDates) || empty($arrDates))
+            {
+                return false;
+            }
+
+            foreach ($arrDates as $v)
+            {
+                $arrRepeats[] = $v['new_repeat'];
+            }
+        }
+        return $arrRepeats;
+
+    }
+
+    /**
+     * @param $arrData
+     * @return string
+     */
+    public static function getGallery($arrData)
+    {
+        $arrData['type'] = 'gallery';
+
+        if (!isset($arrData['perRow']) || $arrData['perRow'] < 1)
+        {
+            $arrData['perRow'] = 1;
+        }
+
+        $objModel = new ContentModel();
+        $objModel->setRow($arrData);
+
+        $objGallery = new \ContentGallery($objModel);
+        $strBuffer = $objGallery->generate();
+
+        // HOOK: add custom logic
+        if (isset($GLOBALS['TL_HOOKS']['getContentElement']) && is_array($GLOBALS['TL_HOOKS']['getContentElement']))
+        {
+            foreach ($GLOBALS['TL_HOOKS']['getContentElement'] as $callback)
+            {
+                $strBuffer = static::importStatic($callback[0])->{$callback[1]}($objModel, $strBuffer, $objGallery);
+            }
+        }
+        return $strBuffer;
+    }
+
+    /**
+     * @param $id
+     * @return string
+     */
+    public static function getEventImagePath($id)
+    {
+        // Get root dir
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+
+        $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
+        if ($objEvent->numRows)
+        {
+            if ($objEvent->singleSRC != '')
+            {
+                $objFile = FilesModel::findByUuid($objEvent->singleSRC);
+
+                if ($objFile !== null && is_file($rootDir . '/' . $objFile->path))
+                {
+                    return $objFile->path;
+                }
+            }
+        }
+
+        return SACP_EVENT_DEFALUT_PREVIEW_IMAGE_SRC;
+
+    }
+
+    /**
+     * @param $id
+     * @return string
+     */
+    public static function getEventPeriod($id)
+    {
+        //return self::getEventDuration($id) . ' ' . Calendar::calculateSpan(self::getStartDate($id), self::getEndDate($id));
+        $span = Calendar::calculateSpan(self::getStartDate($id), self::getEndDate($id)) + 1;
+        if (self::getEventDuration($id) == 1)
+        {
+            return Date::parse('d.m.Y', self::getStartDate($id)) . ' (' . self::getEventDuration($id) . ')';
+        }
+        elseif ($span == self::getEventDuration($id))
+        {
+            return Date::parse('d.m.', self::getStartDate($id)) . ' - ' . Date::parse('d.m.Y', self::getEndDate($id)) . ' (' . self::getEventDuration($id) . ')';
+        }
+        else
+        {
+            $arrDates = array_map(function ($tstamp) {
+                return Date::parse('d.m.Y', $tstamp);
+            }, self::getEventTimestamps($id));
+            return Date::parse('d.m.Y', self::getStartDate($id)) . ' (' . self::getEventDuration($id) . ')<br><a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Kursdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
+        }
+    }
+
+    /**
+     * @param $eventId
+     * @return int
+     */
+    public static function getStartDate($eventId)
+    {
+        $tstamp = 0;
+        $objDb = Database::getInstance();
+        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($eventId);
+        if ($objEvent->numRows)
+        {
+            $arrDates = StringUtil::deserialize($objEvent->repeatFixedDates);
+            if (!is_array($arrDates) || empty($arrDates))
+            {
+                return $tstamp;
+            }
+            $tstamp = $arrDates[0]['new_repeat'];
+        }
+        return $tstamp;
+
+    }
+
+    /**
+     * @param $eventId
+     * @return int
+     */
+    public static function getEndDate($eventId)
+    {
+        $tstamp = 0;
+        $objDb = Database::getInstance();
+        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($eventId);
+        if ($objEvent->numRows)
+        {
+            $arrDates = StringUtil::deserialize($objEvent->repeatFixedDates);
+            if (!is_array($arrDates) || empty($arrDates))
+            {
+                return $tstamp;
+            }
+            $tstamp = $arrDates[count($arrDates) - 1]['new_repeat'];
+        }
+        return $tstamp;
+
+    }
+
+
+    /**
+     * @param $field
+     * @param $value
+     * @param $strTable
+     * @param $dataRecord
+     * @param $dca
+     * @return string
+     */
+    public function exportRegistrationListHook($field, $value, $strTable, $dataRecord, $dca)
+    {
+        if ($strTable === 'tl_calendar_events_member')
+        {
+            if ($field === 'dateOfBirth' || $field === 'addedOn')
+            {
+                if (intval($value))
+                {
+                    $value = Date::parse('Y-m-d', $value);
+                }
+            }
+            if ($field === 'phone' || $field === 'phone')
+            {
+                $value = str_replace(' ', '', $value);
+                if (strlen($value) == 10)
+                {
+                    // Format phone numbers to 0xx xxx xx xx
+                    $value = preg_replace('/^0(\d{2})(\d{3})(\d{2})(\d{2})/', '0${1} ${2} ${3} ${4}', $value, -1, $count);
+                }
+            }
+
+            if ($field === 'vegetarian')
+            {
+                $value = $value == 'true' ? 'Ja' : 'Nein';
+            }
+
+            if ($field === 'stateOfSubscription')
+            {
+                Controller::loadLanguageFile('tl_calendar_events_member');
+                if (strlen($value) && isset($GLOBALS['TL_LANG']['tl_calendar_events_member'][$value]))
+                {
+                    $value = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$value];
+                }
+            }
+
+        }
+        return $value;
+    }
+
+
+    /**
+     * @param $eventId
+     * @return array
+     */
+    public static function getTourTechDifficultiesAsArray($eventId)
+    {
+        $arrReturn = array();
+        $objEventModel = CalendarEventsModel::findByPk($eventId);
+        if($objEventModel !== null)
+        {
+            $arrValues = StringUtil::deserialize($objEventModel->tourTechDifficulty, true);
+            if (!empty($arrValues) && is_array($arrValues))
+            {
+                foreach ($arrValues as $id)
+                {
+                    $objModel = TourDifficultyModel::findByPk($id);
+                    if ($objModel !== null)
+                    {
+                        $arrReturn[] = $objModel->shortcut;
+                    }
+                }
+            }
+        }
+        return $arrReturn;
+    }
+
+    /**
+     * @param $eventId
+     * @param string $field
+     * @return array
+     */
+    public static function getTourTypesAsArray($eventId, $field = 'shortcut')
+    {
+        $arrReturn = array();
+
+        $objEventModel = CalendarEventsModel::findByPk($eventId);
+        if($objEventModel !== null)
+        {
+            $arrValues = StringUtil::deserialize($objEventModel->tourType, true);
+            if (!empty($arrValues) && is_array($arrValues))
+            {
+                foreach ($arrValues as $id)
+                {
+                    $objModel = TourTypeModel::findByPk($id);
+                    if ($objModel !== null)
+                    {
+                        $arrReturn[] = $objModel->{$field};
+                    }
+                }
+            }
+        }
+
+        return $arrReturn;
+    }
+
+
+
+    /**
+     * Return a bootstrap badge with some booking count information
+     * @param $eventId
+     * @return string
+     */
+    public static function getBookingCounter($eventId)
+    {
+        $strBadge = '<span class="badge badge-pill badge-%s" title="%s">%s</span>';
+        $objDb = Database::getInstance();
+        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($eventId);
+        if ($objEvent->numRows)
+        {
+            $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
+            $memberCount = $calendarEventsMember->numRows;
+
+            if (!$objEvent->disableOnlineRegistration)
+            {
+                if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0)
+                {
+                    if ($memberCount >= $objEvent->maxMembers)
+                    {
+                        // Event fully booked
+                        return sprintf($strBadge, 'danger', 'ausgebucht', $memberCount . '/' . $objEvent->maxMembers);
+                    }
+                    if ($memberCount < $objEvent->maxMembers)
+                    {
+                        // Free places
+                        return sprintf($strBadge, 'success', 'noch freie Pl&auml;tze', $memberCount . '/' . $objEvent->maxMembers);
+                    }
+                }
+                else
+                {
+                    if ($memberCount > 0)
+                    {
+                        // There is no booking limit. Show registered members
+                        return sprintf($strBadge, 'success', $memberCount . 'Anmeldungen', $memberCount);
+                    }
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     * @param $val
+     * @return array
+     */
+    public static function getTourTypeAsArray($val)
+    {
+        $arrReturn = array();
+        $arrValues = StringUtil::deserialize($val, true);
+        if (!empty($arrValues) && is_array($arrValues))
+        {
+            foreach ($arrValues as $id)
+            {
+                $objModel = TourTypeModel::findByPk($id);
+                if ($objModel !== null)
+                {
+                    $arrReturn[] = $objModel->title;
+                }
+            }
+        }
+        return $arrReturn;
+    }
+
+    /**
+     * @param $val
+     * @return array
+     */
+    public static function getEventOrganizersAsArray($val)
+    {
+        $arrReturn = array();
+        $arrValues = StringUtil::deserialize($val, true);
+        if (!empty($arrValues) && is_array($arrValues))
+        {
+            foreach ($arrValues as $id)
+            {
+                $objModel = EventOrganizerModel::findByPk($id);
+                if ($objModel !== null)
+                {
+                    $arrReturn[] = $objModel->title;
+                }
+            }
+        }
+        return $arrReturn;
+    }
+
+
+    /**
+     * Check if event dates are not already occupied by an other booked event
+     * @param $eventId
+     * @param $memberId
+     * @return bool
+     */
+    public static function areBookingDatesOccupied($eventId, $memberId)
+    {
+        $objEvent = CalendarEventsModel::findByPk($eventId);
+        $objMember = MemberModel::findByPk($memberId);
+        if ($objEvent === null || $objMember === null)
+        {
+            return true;
+        }
+
+        $arrEventDates = array();
+        $arrEventRepeats = StringUtil::deserialize($objEvent->repeatFixedDates, true);
+        if (!empty($arrEventRepeats) && is_array($arrEventRepeats))
+        {
+            foreach ($arrEventRepeats as $eventRepeat)
+            {
+                if (isset($eventRepeat['new_repeat']) && !empty($eventRepeat['new_repeat']))
+                {
+                    $arrEventDates[] = $eventRepeat['new_repeat'];
+                }
+            }
+        }
+
+        $arrOccupiedDates = array();
+        // Get all future events of the member
+        $objMemberEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE pid!=? AND contaoMemberId=? AND stateOfSubscription=? AND hasParticipated=?')
+            ->execute($objEvent->id, $objMember->id, 'subscription-accepted', '');
+        while ($objMemberEvents->next())
+        {
+
+            $objMemberEvent = CalendarEventsModel::findByPk($objMemberEvents->pid);
+            if ($objMemberEvent !== null)
+            {
+                $arrRepeats = StringUtil::deserialize($objMemberEvent->repeatFixedDates, true);
+                if (!empty($arrRepeats) && is_array($arrRepeats))
+                {
+                    foreach ($arrRepeats as $repeat)
+                    {
+                        if (isset($repeat['new_repeat']) && !empty($repeat['new_repeat']))
+                        {
+                            if (in_array($repeat['new_repeat'], $arrEventDates))
+                            {
+                                // This date is already occupied (do not allow booking)
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+}

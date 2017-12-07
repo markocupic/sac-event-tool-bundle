@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * SAC Event Tool Web Plugin for Contao
+ * Copyright (c) 2008-2017 Marko Cupic
+ * @package sac-event-tool-bundle
+ * @author Marko Cupic m.cupic@gmx.ch, 2017
+ * @link    https://sac-kurse.kletterkader.com
+ */
+
+
+
+// Backend Modules
+$GLOBALS['TL_LANG']['MOD']['sac_be_modules'] = array('SAC Module');
+$GLOBALS['TL_LANG']['MOD']['sac_course_main_types_tool'] = array('Kurs-Hauptkategorien');
+$GLOBALS['TL_LANG']['MOD']['sac_course_sub_types_tool'] = array('Kurs-Unterkategorien');
+$GLOBALS['TL_LANG']['MOD']['sac_calendar_events_tool'] = array('SAC Event-Tool');
+$GLOBALS['TL_LANG']['MOD']['sac_member_database'] = array('SAC Mitgliederdatenbank');
+$GLOBALS['TL_LANG']['MOD']['sac_calendar_events_stories_tool'] = array('Touren-/Kursberichte Tool');
+$GLOBALS['TL_LANG']['MOD']['sac_tour_difficulty_tool'] = array('Schwierigkeitsgrade f&uuml;r Touren');
+$GLOBALS['TL_LANG']['MOD']['sac_tour_type_tool'] = array('Tourentypen');
+$GLOBALS['TL_LANG']['MOD']['sac_event_release_tool'] = array('Event-Freigabestufen-Tool');
+$GLOBALS['TL_LANG']['MOD']['sac_event_organizer_tool'] = array('Organisierende Gruppen');
+$GLOBALS['TL_LANG']['MOD']['sac_event_journey_tool'] = array('Event Anreise-Art-Tool');
+
+
+
+// Frontend modules
+$GLOBALS['TL_LANG']['FMD']['sac_event_tool_fe_modules'] = array('SAC Frontend Module');
+$GLOBALS['TL_LANG']['FMD']['eventToolFrontendUserDashboard'] = array('SAC Mitglieder Dashboard');
+$GLOBALS['TL_LANG']['FMD']['eventToolEventRegistrationForm'] = array('SAC Event Registrierungsformular');
+$GLOBALS['TL_LANG']['FMD']['calendarEventsStoryList'] = array('SAC Tourenberichte Listen Modul');
+$GLOBALS['TL_LANG']['FMD']['calendarEventsStoryReader'] = array('SAC Tourenberichte Reader Modul');

@@ -1,0 +1,41 @@
+<?php
+// tl_module.cal_format has to be set to "show all events"!!!!!
+if(\Input::get('year') == '')
+{
+    if($this->endDate < time())
+    {
+        return;
+    }
+}
+else
+{
+    $eventYear = \Date::parse('Y', $this->endDate);
+    if($eventYear != \Input::get('year') )
+    {
+        return;
+    }
+}
+?>
+<?php $eventState = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($this->id); ?>
+<?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][$eventState]; ?>
+
+<?php $arrTourTypes = \StringUtil::deserialize($this->tourType,true); ?>
+<tr class="event-item-tour event" data-id="<?= $this->id ?>" data-tourType="<?= implode(',', $arrTourTypes) ?>">
+    <td>
+        <?= \Date::parse('d.m.Y', $this->startDate) ?>
+    </td>
+
+    <td>
+        <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($this->id) ?>
+    </td>
+
+    <td>
+        <i class="fa fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
+        <a href="{{event_url::<?php echo $this->id; ?>}}">{{event_title::<?= $this->id ?>}}</a>
+    </td>
+    <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($this->id) ?></td>
+
+    <td class="tourTechDifficulty"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($this->id)) ?></td>
+    <td class="tourType"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($this->id, 'shortcut')) ?></td>
+    <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getMainInstructorName($this->id) ?></td>
+</tr>

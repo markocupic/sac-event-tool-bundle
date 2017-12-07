@@ -1,0 +1,192 @@
+<p class="back"><a href="javascript:history.go(-1)" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
+
+<div class="event event-detailview layout_full block<?= $this->class ?>">
+
+        <h1 class="ce_headline"><?= $this->title ?></h1>
+
+    <?php if($this->teaser != ''): ?>
+    <div class="teaser event-detail lead font-weight-bold">
+        <?= nl2br($this->teaser) ?>
+    </div>
+    <?php endif; ?>
+
+    <div class="row">
+        <div class="col-12 col-xl-4">
+            <div class="eventdate event-detail event-info-box icon-box-small">
+                <h3>Datum/Dauer</h3>
+                <p>
+                    <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($this->id) ?>
+                    <br>
+                    <?php foreach(Markocupic\SacEventToolBundle\CalendarSacEvents::getEventTimestamps($this->id) as $tstamp): ?>
+                    <time datetime="<?= \Date::parse('Y-m-d', $tstamp) ?>"><?= \Date::parse('D, d.m.Y', $tstamp) ?></time>
+                    <?php endforeach; ?>
+                </p>
+            </div>
+        </div>
+
+        <?php if($this->tourType != ''): ?>
+        <div class="col-12 col-xl-4">
+            <div class="location event-detail event-info-box icon-box-small">
+                <h3>Tourentyp</h3>
+                <p><?= implode('<br>', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypeAsArray($this->tourType)) ?></p>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <?php $organizers = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventOrganizersAsArray($this->organizers); ?>
+        <?php if(!empty($organizers)): ?>
+        <div class="col-12 col-xl-4">
+            <div class="organizers event-detail event-info-box icon-box-small">
+                <h3>Organisierende Gruppe</h3>
+                <p>
+                    <?= implode('<br>', $organizers) ?>
+                </p>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+
+    <?php $arrInstructors = StringUtil::deserialize($this->instructor, true); ?>
+    <?php if(!empty($organizers)): ?>
+    <div class="instructor event-detail event-info-box icon-box-small">
+        <h3>Leitung</h3>
+        <div class="row">
+            <?php foreach($arrInstructors as $userId): ?>
+            <div class="col-sm-6 col-md-4 col-xl-3">
+                <div class="row">
+                    <?php if(\UserModel::findByPk($userId) !== null): ?>
+                    <div class="image_container portrait col-xs-4 col-sm-5 col-md-12 col-lg-12">
+                        <a href="leiter-portrait?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
+                            <figure class="avatar-large">
+                                <?php $this->insert('picture_default', generateAvatar($userId, 18) ); ?>
+                            </figure>
+                        </a>
+                    </div>
+                    <div class="instructor-name col-xs-8 col-sm-7 col-md-12 col-lg-12">
+                        <?php $strQuali = Markocupic\SacEventToolBundle\CalendarSacEvents::getMainQualifikation($userId) != '' ? ' (' . Markocupic\SacEventToolBundle\CalendarSacEvents::getMainQualifikation($userId) . ')' : ''; ?>
+                        <a href="leiter-portrait?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
+                            <?= \UserModel::findByPk($userId)->name. $strQuali ?>
+                        </a>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <?php if($this->tourDetailText != ''): ?>
+    <div class="tour-detail-text event-detail event-info-box icon-box-small">
+        <h3>Route/Details</h3>
+        <p>
+            <?= nl2br($this->tourDetailText) ?>
+        </p>
+    </div>
+    <?php endif; ?>
+
+
+    <div class="requirements event-detail event-info-box icon-box-small">
+        <h3>Voraussetzungen/Anforderungen</h3>
+        <p class="tech-difficulty"><strong>Schwierigkeit: </strong><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($this->id)) ?></p>
+        <?php if($this->requirements != ''): ?>
+        <p class="requirements-text"><?= nl2br($this->requirements) ?></p>
+        <?php endif; ?>
+        <?php if($this->altitudeDifference): ?>
+        <p class="max-altitudeDifference"><strong>Maximale H&ouml;hendifferenz pro Tag:</strong> <?= $this->altitudeDifference ?> m
+        <p>
+            <?php endif; ?>
+    </div>
+
+
+    <?php if($this->leistungen != ''): ?>
+    <div class="price event-detail event-info-box icon-box-small">
+        <h3>Leistungen/Preis</h3>
+        <p>
+            <?= nl2br($this->leistungen) ?>
+        </p>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($this->journey != '' && \CalendarEventsJourneyModel::findByPk($this->journey) !== null): ?>
+        <div class="journey event-detail event-info-box icon-box-small">
+            <h3>Anreise mit:</h3>
+            <p><?= \CalendarEventsJourneyModel::findByPk($this->journey)->title ?></p>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($this->equipment != ''): ?>
+    <div class="equipment event-detail event-info-box icon-box-small">
+        <h3>Ben&ouml;tigtes Material</h3>
+        <p><?= nl2br($this->equipment) ?></p>
+    </div>
+    <?php endif; ?>
+
+
+    <?php if ($this->miscellaneous != ''): ?>
+    <div class="miscellaneous event-detail event-info-box icon-box-small last">
+        <h3>Sonstiges</h3>
+        <p><?= nl2br($this->miscellaneous) ?></p>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($this->meetingPoint != ''): ?>
+    <div class="meeting-point event-detail event-info-box icon-box-small">
+        <h3>Zeit und Treffpunkt</h3>
+        <p><?= nl2br($this->meetingPoint) ?></p>
+    </div>
+    <?php endif; ?>
+
+
+    <?php if ($this->setRegistrationPeriod): ?>
+    <div class="booking-text event-detail event-info-box icon-box-small">
+        <h3>Anmeldung möglich</h3>
+        <p>Vom <?= \Date::parse('d.m.Y', $this->registrationStartDate) ?> bis zum <?= \Date::parse('d.m.Y', $this->registrationEndDate) ?></p>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($this->bookingEvent != ''): ?>
+    <div class="booking-text event-detail event-info-box icon-box-small">
+        <h3>Anmeldung</h3>
+        <p><?= nl2br($this->bookingEvent) ?></p>
+    </div>
+    <?php endif; ?>
+
+    <!--
+          <div>
+            {{br}}{{br}}
+            <a class="btn btn-outline-primary" href="?printSACWorkshops=true&amp;eventId=<?= $this->id ?>">Detailinfos drucken</a>
+          </div>
+    -->
+
+
+    <!-- Weitere Inhaltselemente -->
+    <?php if ($this->hasDetails): ?>
+    <?php //echo $this->details; ?>
+    <?php endif; ?>
+
+    <?php if ($this->enclosure): ?>
+    <div class="enclosure">
+        <?php foreach ($this->enclosure as $enclosure): ?>
+        <p><img src="<?= $enclosure['icon'] ?>" width="18" height="18" alt="<?= $enclosure['mime'] ?>" class="mime_icon"> <a href="<?= $enclosure['href'] ?>" title="<?= $enclosure['title'] ?>"><?= $enclosure['link'] ?> <span class="size">(<?= $enclosure['filesize'] ?>)</span></a></p>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
+
+    <?php if($this->addGallery): ?>
+    <?php $arrData = array(); ?>
+    <?php $arrData['multiSRC'] = $this->multiSRC; ?>
+    <?php $arrData['orderSRC'] = $this->orderSRC; ?>
+    <?php $arrData['sortBy'] = 'custom'; ?>
+    <?php $arrData['perRow'] = 4; ?>
+    <?php $arrData['size'] = serialize(array(400,400,'center_center','proportional')); ?>
+    <?php $arrData['fullsize'] = true; ?>
+
+    <?php $arrData['galleryTpl'] = 'gallery_bootstrap_col-4'; ?>
+    <?php echo Markocupic\SacEventToolBundle\CalendarSacEvents::getGallery($arrData); ?>
+    <?php endif; ?>
+
+
+</div>
+{{br}}

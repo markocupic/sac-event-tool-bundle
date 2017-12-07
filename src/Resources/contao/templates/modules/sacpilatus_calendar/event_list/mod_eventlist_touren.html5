@@ -1,0 +1,39 @@
+<div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
+<?php $this->block('headline'); ?>
+<?php if ($this->headline): ?>
+<<?= $this->hl ?>><?= $this->headline ?></<?= $this->hl ?>>
+<?php endif; ?>
+<?php $this->endblock(); ?>
+
+
+
+
+<table class="table layout-table table-responsive">
+<tr>
+    <th>Datum</th>
+    <th>Dauer</th>
+    <th>Tour</th>
+    <th></th>
+    <th>Anf.</th>
+    <th>Art</th>
+    <th>Leitung</th>
+
+</tr>
+<?= $this->events ?>
+</table>
+
+
+
+
+<?php $this->block('content'); ?>
+<?php $this->endblock(); ?>
+
+
+
+
+
+
+</div>
+
+
+

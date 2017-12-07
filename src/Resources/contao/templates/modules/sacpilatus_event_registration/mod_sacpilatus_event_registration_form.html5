@@ -1,0 +1,53 @@
+<div class="event-detail event-info-box">
+
+    <?php $this->extend('block_searchable'); ?>
+
+    <?php $this->block('content'); ?>
+
+
+    <?php if ($this->hasErrorMessage): ?>
+        <div class="alert alert-danger" role="alert">
+            <?= $this->errorMessage ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($this->hasInfoMessage): ?>
+        <div class="alert alert-info" role="alert">
+            <?= $this->infoMessage ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!FE_USER_LOGGED_IN): ?>
+        <a href="{{link_url::member-login}}" class="btn btn-link">LOGIN</a>
+    <?php endif; ?>
+
+
+    <?php if ($this->form): ?>
+        <h2 class="ce_headline">Anmeldeformular</h2>
+        <div>
+            <span class="font-weight-bold">{{user::firstname}} {{user::lastname}}{{br}}</span>
+            {{user::street}}{{br}}
+            {{user::postal}} {{user::city}}{{br}}
+            {{user::email}}{{br}}
+            {{user::phone}}{{br}}
+            SAC-Mitglieder-Nr. {{user::sacMemberId}}{{br}}
+        </div>
+        {{br}}
+        <?php if ($this->eventFullyBooked): ?>
+            <div class="alert alert-info" role="alert">
+                Die maximale Teilnehmerzahl für diesen Event ist bereits erreicht. Wenn Sie sich jetzt noch anmelden,
+                gelangen Sie auf die Warteliste.
+            </div>
+        <?php endif; ?>
+
+        <?php if ($this->hasBookingError): ?>
+            <div class="alert alert-info" role="alert">
+                <?= $this->bookingErrorMdg ?>
+            </div>
+        <?php endif; ?>
+
+        <?= $this->form ?>
+    <?php endif; ?>
+
+
+<?php $this->endblock(); ?>

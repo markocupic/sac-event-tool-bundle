@@ -1,0 +1,108 @@
+<?php if(\Environment::get('isAjaxRequest') && \Input::get('xhrAction') == 'switchLayout')
+{
+  if(isset($_SESSION['layout_table'])){
+  unset($_SESSION['layout_table']);
+  }else{
+    $_SESSION['layout_table'] = true;
+  }
+  echo json_encode(array('status' => 'success'));
+  exit;
+}
+?>
+<div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
+<?php $this->block('headline'); ?>
+<?php if ($this->headline): ?>
+<<?= $this->hl ?>><?= $this->headline ?></<?= $this->hl ?>>
+<?php endif; ?>
+<?php $this->endblock(); ?>
+
+<!-- indexer::stop -->
+<!-- button bar -->
+<div class="button-bar">
+<ul>
+    <li>
+        <button class="btn btn-danger switch-layout" title="Switch Layout">
+          <?php if($_SESSION['layout_table']): ?>
+            <i class="fa fa-fw fa-list"></i>
+          <?php else: ?>
+            <i class="fa fa-fw fa-th"></i>
+          <?php endif; ?>
+        </button>
+    </li>
+
+<li>
+	<a href="{{env::url}}/?action=downloadKursbroschuere&year=2017&cat=0">
+		<button class="text-right btn btn-success" title="Kursprogramm als pdf Brosch&uuml; herunterladen">
+		    <i class="fa fa-fw fa-file-pdf-o"></i>
+		</button>
+    </a>
+</li>
+    <li>
+        <a href="{{env::url}}/?action=exportEvents2Docx&calendarId=6&year={{date::Y}}">
+            <button class="text-right btn btn-primary" title="Kursprogramm herunterladen im docx Format herunterladen">
+                <i class="fa fa-fw fa-file-word-o"></i>
+            </button>
+        </a>
+    </li>
+    <li>
+        <button class="btn btn-outline-success" onclick="FixedTabsAside._openMenu();FixedTabsAside.openItem(0);"><i class="fa fa-filter"></i> Kurs-Filter öffnen</button>
+    </li>
+
+</ul>
+</div>
+<!-- end button bar -->
+<!-- indexer::continue -->
+
+
+<?php if($_SESSION['layout_table']): ?>
+<table class="table layout-table table-responsive">
+    <tr>
+        <th>Datum</th>
+        <th>Dauer</th>
+        <th>Kurs</th>
+        <th>Leitung</th>
+    </tr>
+<?php endif; ?>
+
+
+
+{{br}}
+<div <?php if(!$_SESSION['layout_table']): ?>class="row"<?php endif; ?>>
+<?= $this->events ?>
+</div>
+
+<?= $this->pagination ?>
+
+
+<?php $this->block('content'); ?>
+<?php $this->endblock(); ?>
+
+<?php if($_SESSION['layout_table']): ?>
+</table>
+<?php endif; ?>
+
+
+
+
+</div>
+
+
+<script>
+  (function ($) {
+      $(document).ready(function () {
+          $(".switch-layout").click(function(){
+              console.log(window.location.href);
+              var data = {
+                  'xhrAction': 'switchLayout'
+              };
+              $.getJSON(window.location.href, data, function(response){
+                  console.log(response);
+                  if(response['status'] == 'success'){
+                      window.location.href = window.location.href;
+                  }
+              });
+          });
+      });
+  })(jQuery);
+</script>
+<!-- indexer::continue -->

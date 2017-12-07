@@ -1,0 +1,43 @@
+{
+  "name": "markocupic/sac-event-tool-bundle",
+  "type": "contao-bundle",
+  "description": "Contao 4 Event tool bundle for SAC (Swiss Alpine Club Sections)",
+  "license": "LGPL-3.0+",
+  "authors": [
+    {
+      "name": "Marko Cupic",
+      "homepage": "https://github.com/markocupic"
+    }
+  ],
+  "require": {
+    "contao/core-bundle": ">=4.4",
+    "terminal42/notification_center": ">=1.4.1",
+    "cloudconvert/cloudconvert-php": ">=2.2.0.0,<2.3-dev",
+    "phpoffice/phpword": "v0.13.*",
+    "markocupic/export_table": ">=1.2.0",
+    "menatwork/contao-multicolumnwizard": ">=3.3.14"
+  },
+  "autoload": {
+    "psr-4": {
+      "Markocupic\\SacEventToolBundle\\": "src/"
+    },
+    "classmap": [
+      "src/Resources/contao",
+      "src/ContaoHooks",
+      "src/Services",
+      "src/Controller"
+    ],
+    "exclude-from-classmap": [
+      "src/Resources/contao/assets",
+      "src/Resources/contao/config",
+      "src/Resources/contao/dca",
+      "src/Resources/contao/fonts",
+      "src/Resources/contao/functions",
+      "src/Resources/contao/languages",
+      "src/Resources/contao/templates"
+    ]
+  },
+  "extra": {
+    "contao-manager-plugin": "Markocupic\\SacEventToolBundle\\ContaoManager\\Plugin"
+  }
+ }

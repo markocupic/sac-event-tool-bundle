@@ -1,0 +1,36 @@
+<div class="clr widget">
+    <h3><label for="ctrl_subject"><span class="invisible">Pflichtfeld </span>Betreff<span class="mandatory">*</span></label></h3>
+    <input type="text" name="subject" id="ctrl_subject" class="tl_text" required="" value="<?= $this->emailSubject ?>" maxlength="255" onfocus="Backend.getScrollOffset()">
+    <p class="tl_help tl_tip" title="">Geben Sie den Betreff ein.</p>
+</div>
+
+
+<div class="clr widget">
+    <h3><label for="ctrl_text"><span class="invisible">Pflichtfeld </span>Nachricht<span class="mandatory">*</span></label> <img src="system/themes/flexible/icons/wrap.svg" width="14" height="14" alt="Zeilenumbruch" title="" class="toggleWrap" onclick="Backend.toggleWrap('ctrl_message')"></h3>
+    <textarea name="text" id="ctrl_text" class="tl_textarea" rows="12" cols="80" required="" onfocus="Backend.getScrollOffset()" style="height: 30px;"><?= $this->emailText ?></textarea>
+
+    <p class="tl_help tl_tip" title="">Geben Sie hier Ihre Nachricht ein.</p>
+</div>
+
+
+<div class="clr widget">
+    <br>
+    <div class="send_email_button_container">
+        <button type="submit" name="save" id="save" class="tl_submit" accesskey="s" onclick="hideButtonOnSubmit(); return false">Nachricht absenden</button>
+    </div>
+</div>
+<script>
+    /**
+     * Prevent multiple clicks
+     * Disable Submit Button Upon Form Submission
+     */
+    window.addEvent('domready', function() {
+        $('tl_calendar_events_member').addEvent('submit', function(){
+            if($$('input[name="subject"]').get('value') != '' && $$('textarea[name="text"]').get('value') != '')
+            {
+                document.getElementById('save').disabled = 1;
+            }
+        });
+    });
+
+</script>
