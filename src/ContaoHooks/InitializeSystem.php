@@ -29,7 +29,7 @@ class InitializeSystem
 
 
     /**
-     * Constructor.
+     * Constructor
      *
      * @param ContaoFrameworkInterface $framework
      */

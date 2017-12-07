@@ -17,25 +17,27 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 
 /**
- * Class SacEventToolExtension
+ * Class MarkocupicSacEventToolExtension
  * @package Markocupic\SacEventToolBundle\DependencyInjection
  */
-class SacEventToolExtension extends Extension
+class MarkocupicSacEventToolExtension extends Extension
 {
     /**
      * {@inheritdoc}
      */
     public function load(array $mergedConfig, ContainerBuilder $container)
     {
+        // Load Sensitive outsourced data
+        require_once(__DIR__ . '/../../../../../sac_event_tool_parameters.php');
+
+
         $loader = new YamlFileLoader(
             $container,
             new FileLocator(__DIR__ . '/../Resources/config')
         );
 
-        // Load Sensitive outsourced data
-        require_once(__DIR__ . '/../../../../../sac_event_tool_parameters.php');
-        $loader->load('parameters.yml');
         $loader->load('listener.yml');
+        $loader->load('parameters.yml');
         $loader->load('services.yml');
     }
 }

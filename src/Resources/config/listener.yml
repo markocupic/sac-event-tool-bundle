@@ -1,6 +1,5 @@
 services:
 
-
     # Validate Forms
     markocupic_sac_event_tool.contao_hooks.validate_forms:
             class: Markocupic\SacEventToolBundle\ContaoHooks\ValidateForms
