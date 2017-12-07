@@ -248,6 +248,41 @@ class tl_calendar_events_member extends Backend
     }
 
     /**
+     * @param $varValue
+     * @param DC_Table $dc
+     */
+    public function saveCallbackStateOfSubscription($varValue, DC_Table $dc)
+    {
+        $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
+        if ($objEventMemberModel !== null)
+        {
+            $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->pid);
+            if ($objEvent !== null && $objEventMemberModel->stateOfSubscription != $varValue)
+            {
+                if (Validator::isEmail($objEventMemberModel->email))
+                {
+                    // Use terminal42/notification_center
+                    $objNotification = Notification::findOneByType('state_of_subscription_state_changed');
+                    if ($objNotification !== null)
+                    {
+                        $arrTokens = array(
+                            'participant_state_of_subscription' => html_entity_decode($GLOBALS['TL_LANG']['tl_calendar_events_member'][$objEventMemberModel->stateOfSubscription]),
+                            'event_name' => html_entity_decode($objEvent->title),
+                            'participant_name' => html_entity_decode($objEventMemberModel->firstname . ' ' . $objEventMemberModel->lastname),
+                            'participant_email' => $objEventMemberModel->email,
+                            'event_link_detail' => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($objEvent),
+                        );
+                        $objNotification->send($arrTokens, 'de');
+                        Message::addInfo(sprintf('Der Teilnehmer "%s %s" wurde per E-Mail über die &Auml;nderung seines Teilnehmestatus benachrichtigt.', $objEventMemberModel->firstname, $objEventMemberModel->lastname));
+                    }
+                }
+            }
+        }
+
+        return $varValue;
+    }
+
+    /**
      * @param DC_Table $dc
      */
     public function onsubmitCallback(DC_Table $dc)
@@ -256,6 +291,14 @@ class tl_calendar_events_member extends Backend
         $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
         if ($objEventMemberModel !== null)
         {
+
+            // Set correct addedOn timestamp
+            if (!$objEventMemberModel->addedOn)
+            {
+                $objEventMemberModel->addedOn = time();
+                $objEventMemberModel->save();
+            }
+
             $objEventModel = CalendarEventsModel::findByPk($objEventMemberModel->pid);
             if ($objEventModel !== null)
             {
