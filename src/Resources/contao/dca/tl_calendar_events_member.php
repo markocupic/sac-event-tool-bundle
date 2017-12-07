@@ -122,11 +122,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
                     'options' => [
                         [
                             'value' => '',
-                            'icon' => SACP_ASSETS_DIR . '/icons/has-not-participated.svg'
+                            'icon' => SAC_EVT_ASSETS_DIR . '/icons/has-not-participated.svg'
                         ],
                         [
                             'value' => '1',
-                            'icon' => SACP_ASSETS_DIR . '/icons/has-participated.svg'
+                            'icon' => SAC_EVT_ASSETS_DIR . '/icons/has-participated.svg'
                         ]
                     ]
                 ]

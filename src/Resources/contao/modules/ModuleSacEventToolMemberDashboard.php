@@ -150,7 +150,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                             }
 
                             // Log
-                            System::log(sprintf('New event confirmation download. SAC-User-ID: %s. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__ . ' Line: ' . __LINE__, SACP_LOG_EVENT_CONFIRMATION_DOWNLOAD);
+                            System::log(sprintf('New event confirmation download. SAC-User-ID: %s. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__ . ' Line: ' . __LINE__, SAC_EVT_LOG_EVENT_CONFIRMATION_DOWNLOAD);
 
 
                             // Build up $arrData;
@@ -170,13 +170,13 @@ class ModuleSacEventToolMemberDashboard extends Module
                             $arrData[] = array('key' => 'eventName', 'value' => htmlspecialchars(html_entity_decode($objEvent->title)));
                             $arrData[] = array('key' => 'regId', 'value' => $objRegistration->id);
 
-                            $filename = sprintf(SACP_COURSE_CONFIRMATION_FILE_NAME_PATTERN, $objMember->sacMemberId, $objEvent->id, 'docx');
+                            $filename = sprintf(SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN, $objMember->sacMemberId, $objEvent->id, 'docx');
 
                             // Generate docxPhpOffice\PhpWord;
-                            TemplateProcessorExtended::create($arrData, SACP_COURSE_CONFIRMATION_TEMPLATE_SRC, SACP_TEMP_PATH, $filename, false);
+                            TemplateProcessorExtended::create($arrData, SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC, SAC_EVT_TEMP_PATH, $filename, false);
 
                             // Generate pdf
-                            DocxToPdfConversion::convert(SACP_TEMP_PATH . '/' . $filename, SACP_CLOUDCONVERT_API_KEY, true);
+                            DocxToPdfConversion::convert(SAC_EVT_TEMP_PATH . '/' . $filename, SAC_EVT_CLOUDCONVERT_API_KEY, true);
 
                             exit();
                         }
@@ -399,7 +399,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                 if($objEventsMember->stateOfSubscription === 'subscription-refused')
                 {
                     $objEventsMember->delete();
-                    System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->pid, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, SACP_LOG_EVENT_UNSUBSCRIPTION);
+                    System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->pid, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, SAC_EVT_LOG_EVENT_UNSUBSCRIPTION);
                     return;
                 }
                 elseif (!$objEvent->allowDeregistration)
@@ -442,7 +442,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                     Message::add('Du hast dich vom Event "' . $objEventsMember->eventName . '" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.', 'TL_INFO', TL_MODE);
 
                     // Log
-                    System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->pid, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, SACP_LOG_EVENT_UNSUBSCRIPTION);
+                    System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->pid, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, SAC_EVT_LOG_EVENT_UNSUBSCRIPTION);
 
                     $objNotification->send($arrTokens, 'de');
 
@@ -499,13 +499,13 @@ class ModuleSacEventToolMemberDashboard extends Module
         $objWidget = $objForm->getWidget('avatar');
         $objWidget->extensions = 'jpg,jpeg';
         $objWidget->storeFile = true;
-        $objWidget->uploadFolder = FilesModel::findByPath(SACP_FE_USER_AVATAR_DIRECTORY)->uuid;
+        $objWidget->uploadFolder = FilesModel::findByPath(SAC_EVT_FE_USER_AVATAR_DIRECTORY)->uuid;
         $objWidget->addAttribute('accept', '.jpg,.jpeg');
 
         // Delete avatar
         if (Input::post('FORM_SUBMIT') === 'form-avatar-upload' && Input::post('delete-avatar'))
         {
-            $objFile = new File(SACP_FE_USER_AVATAR_DIRECTORY . '/avatar-' . $this->objUser->id . '.jpeg', true);
+            $objFile = new File(SAC_EVT_FE_USER_AVATAR_DIRECTORY . '/avatar-' . $this->objUser->id . '.jpeg', true);
             if($objFile->exists())
             {
                 $objFile->delete();

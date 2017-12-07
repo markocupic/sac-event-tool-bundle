@@ -21,19 +21,19 @@ class PreparePluginEnvironment
     public static function createPluginDirectories()
     {
         // Create FE-USER-HOME-DIR
-        new Folder(SACP_FE_USER_DIRECTORY_ROOT);
-        Dbafs::addResource(SACP_FE_USER_DIRECTORY_ROOT);
+        new Folder(SAC_EVT_FE_USER_DIRECTORY_ROOT);
+        Dbafs::addResource(SAC_EVT_FE_USER_DIRECTORY_ROOT);
 
         // Create FE-USER-AVATAR-DIR
-        new Folder(SACP_FE_USER_AVATAR_DIRECTORY);
-        Dbafs::addResource(SACP_FE_USER_AVATAR_DIRECTORY);
+        new Folder(SAC_EVT_FE_USER_AVATAR_DIRECTORY);
+        Dbafs::addResource(SAC_EVT_FE_USER_AVATAR_DIRECTORY);
 
         // Create BE-USER-HOME-DIR
-        new Folder(SACP_BE_USER_DIRECTORY_ROOT);
-        Dbafs::addResource(SACP_BE_USER_DIRECTORY_ROOT);
+        new Folder(SAC_EVT_BE_USER_DIRECTORY_ROOT);
+        Dbafs::addResource(SAC_EVT_BE_USER_DIRECTORY_ROOT);
 
         // Create tmp folder
-        new Folder(SACP_TEMP_PATH);
-        Dbafs::addResource(SACP_TEMP_PATH);
+        new Folder(SAC_EVT_TEMP_PATH);
+        Dbafs::addResource(SAC_EVT_TEMP_PATH);
     }
 }

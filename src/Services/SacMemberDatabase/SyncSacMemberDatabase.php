@@ -73,7 +73,7 @@ class SyncSacMemberDatabase
 
 
         // Run once per day
-        $objDbLog = Database::getInstance()->prepare('SELECT * FROM tl_log WHERE action=? ORDER BY tstamp DESC')->limit(1)->execute(SACP_LOG_SAC_MEMBER_DATABASE_SYNC);
+        $objDbLog = Database::getInstance()->prepare('SELECT * FROM tl_log WHERE action=? ORDER BY tstamp DESC')->limit(1)->execute(SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC);
         if ($objDbLog->numRows)
         {
             if (Date::parse('Y-m-d', $objDbLog->tstamp) === Date::parse('Y-m-d', time()))
@@ -114,7 +114,7 @@ class SyncSacMemberDatabase
 
 
         // Run once per day
-        $objDbLog = Database::getInstance()->prepare('SELECT * FROM tl_log WHERE action=? ORDER BY tstamp DESC')->limit(1)->execute(SACP_LOG_SAC_MEMBER_DATABASE_SYNC);
+        $objDbLog = Database::getInstance()->prepare('SELECT * FROM tl_log WHERE action=? ORDER BY tstamp DESC')->limit(1)->execute(SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC);
         if ($objDbLog->numRows)
         {
             if (Date::parse('Y-m-d', $objDbLog->tstamp) === Date::parse('Y-m-d', time()))
@@ -212,7 +212,7 @@ class SyncSacMemberDatabase
             {
                 // Add new user
                 Database::getInstance()->prepare('INSERT INTO tl_member %s')->set($arrValues)->execute();
-                System::log(sprintf('Insert new SAC-member with SAC-User-ID: %s to tl_member.', $arrValues['sacMemberId']), __FILE__ . ' Line: ' . __LINE__, SACP_LOG_ADD_NEW_MEMBER);
+                System::log(sprintf('Insert new SAC-member with SAC-User-ID: %s to tl_member.', $arrValues['sacMemberId']), __FILE__ . ' Line: ' . __LINE__, SAC_EVT_LOG_ADD_NEW_MEMBER);
             }
             else
             {
@@ -228,7 +228,7 @@ class SyncSacMemberDatabase
                 $duration = time() - $startTime;
 
                 // Log
-                System::log('Finished syncing SAC member database with tl_member. Synced ' . count($arrMember) . ' entries. Duration: ' . $duration . ' s', __FILE__ . ' Line: ' . __LINE__, SACP_LOG_SAC_MEMBER_DATABASE_SYNC);
+                System::log('Finished syncing SAC member database with tl_member. Synced ' . count($arrMember) . ' entries. Duration: ' . $duration . ' s', __FILE__ . ' Line: ' . __LINE__, SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC);
             }
         }
 
@@ -243,7 +243,7 @@ class SyncSacMemberDatabase
             Database::getInstance()->prepare('UPDATE tl_member %s WHERE id=?')->set($set)->execute($objDisabledMember->id);
 
             // Log
-            System::log(sprintf('Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. The user can not be found in the SAC main database from Bern.', $objDisabledMember->firstname, $objDisabledMember->lastname, $objDisabledMember->sacMemberId), __FILE__ . ' Line: ' . __LINE__, SACP_LOG_DISABLE_MEMBER);
+            System::log(sprintf('Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. The user can not be found in the SAC main database from Bern.', $objDisabledMember->firstname, $objDisabledMember->lastname, $objDisabledMember->sacMemberId), __FILE__ . ' Line: ' . __LINE__, SAC_EVT_LOG_DISABLE_MEMBER);
         }
     }
 }

@@ -80,7 +80,7 @@ class ValidateForms
     {
         $this->framework = $framework;
 
-        $this->eventStoriesUploadPath = SACP_EVENT_STORIES_UPLOAD_PATH;
+        $this->eventStoriesUploadPath = SAC_EVT_EVENT_STORIES_UPLOAD_PATH;
 
         $this->input = $this->framework->getAdapter(\Contao\Input::class);
 

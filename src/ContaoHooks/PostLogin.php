@@ -64,19 +64,19 @@ class PostLogin
             // Create user directories
             while ($objUser->next())
             {
-                new Folder(SACP_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id);
-                new Folder(SACP_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/avatar');
-                new Folder(SACP_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/documents');
-                new Folder(SACP_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/images');
+                new Folder(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id);
+                new Folder(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/avatar');
+                new Folder(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/documents');
+                new Folder(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/images');
 
                 // Copy default avatar
-                if (!is_file($rootDir . '/' . SACP_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/avatar/default.jpg'))
+                if (!is_file($rootDir . '/' . SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/avatar/default.jpg'))
                 {
-                    Files::getInstance()->copy(SACP_BE_USER_DIRECTORY_ROOT . '/new/avatar/default.jpg', SACP_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/avatar/default.jpg');
+                    Files::getInstance()->copy(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/new/avatar/default.jpg', SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/avatar/default.jpg');
                 }
 
                 // Add filemount for the user directory
-                $strFolder = SACP_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id;
+                $strFolder = SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id;
                 $objFile = FilesModel::findByPath($strFolder);
                 $arrFileMounts = unserialize($objUser->filemounts);
                 $arrFileMounts[] = $objFile->uuid;
@@ -90,7 +90,7 @@ class PostLogin
             }
 
             // Scan for unused old directories
-            $scanDir = scan(SACP_BE_USER_DIRECTORY_ROOT, true);
+            $scanDir = scan(SAC_EVT_BE_USER_DIRECTORY_ROOT, true);
             if (!empty($scanDir) && is_array($scanDir))
             {
                 foreach ($scanDir as $userDir)
@@ -100,18 +100,18 @@ class PostLogin
                         continue;
                     }
 
-                    if (is_dir($rootDir . '/' . SACP_BE_USER_DIRECTORY_ROOT . '/' . $userDir))
+                    if (is_dir($rootDir . '/' . SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $userDir))
                     {
                         if (!UserModel::findByPk($userDir))
                         {
-                            $objFolder = new Folder(SACP_BE_USER_DIRECTORY_ROOT . '/' . $userDir);
+                            $objFolder = new Folder(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $userDir);
                             if ($objFolder)
                             {
-                                $objFolder->renameTo(SACP_BE_USER_DIRECTORY_ROOT . '/old__' . $userDir);
-                                $objFileModel = FilesModel::findByPath(SACP_BE_USER_DIRECTORY_ROOT . '/' . $userDir);
+                                $objFolder->renameTo(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/old__' . $userDir);
+                                $objFileModel = FilesModel::findByPath(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $userDir);
                                 if ($objFileModel !== null)
                                 {
-                                    $objFileModel->path = SACP_BE_USER_DIRECTORY_ROOT . '/old__' . $userDir;
+                                    $objFileModel->path = SAC_EVT_BE_USER_DIRECTORY_ROOT . '/old__' . $userDir;
                                     $objFileModel->save();
                                 }
                             }

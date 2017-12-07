@@ -203,7 +203,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                 $this->Template->hasErrorMessage = true;
                 $session = System::getContainer()->get('session')->getFlashBag()->get('contao.FE.error');
                 $this->Template->errorMessage = $session[0];
-                System::log(sprintf('Event registration error: "%s"', $session[0]), __FILE__ . ' Line: ' . __LINE__, SACP_LOG_EVENT_SUBSCRIPTION_ERROR);
+                System::log(sprintf('Event registration error: "%s"', $session[0]), __FILE__ . ' Line: ' . __LINE__, SAC_EVT_LOG_EVENT_SUBSCRIPTION_ERROR);
             }
             if (Message::hasInfo())
             {
@@ -364,7 +364,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                     $objEventRegistration = new CalendarEventsMemberModel();
                     $objEventRegistration->setRow($arrData);
                     $objEventRegistration->save();
-                    System::log(sprintf('New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").', $objMemberModel->firstname, $objMemberModel->lastname, $objMemberModel->id, $this->objEvent->id, $this->objEvent->title), __FILE__ . ' Line: ' . __LINE__, SACP_LOG_EVENT_SUBSCRIPTION);
+                    System::log(sprintf('New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").', $objMemberModel->firstname, $objMemberModel->lastname, $objMemberModel->id, $this->objEvent->id, $this->objEvent->title), __FILE__ . ' Line: ' . __LINE__, SAC_EVT_LOG_EVENT_SUBSCRIPTION);
 
 
                     $notified = $this->notifyMember($arrData, $objMemberModel, $strRegistrationGoesTo);

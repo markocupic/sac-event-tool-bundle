@@ -213,7 +213,7 @@ class PrintWorkshopsAsPdf
             $this->pdf->endTOCPage();
         }
 
-        $fileSRC = sprintf(SACP_WORKSHOP_FLYER_SRC, $this->year);
+        $fileSRC = sprintf(SAC_EVT_WORKSHOP_FLYER_SRC, $this->year);
 
         if (Input::get('cronjob'))
         {

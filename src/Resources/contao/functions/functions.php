@@ -70,17 +70,17 @@ function getAvatar($userId, $mode = 'BE')
     {
         if ($objUser !== null)
         {
-            if (is_file($rootDir . '/' . SACP_FE_USER_AVATAR_DIRECTORY . '/avatar-' . $objUser->id . '.jpeg'))
+            if (is_file($rootDir . '/' . SAC_EVT_FE_USER_AVATAR_DIRECTORY . '/avatar-' . $objUser->id . '.jpeg'))
             {
-                return SACP_FE_USER_AVATAR_DIRECTORY . '/avatar-' . $objUser->id . '.jpeg';
+                return SAC_EVT_FE_USER_AVATAR_DIRECTORY . '/avatar-' . $objUser->id . '.jpeg';
             }
             else
             {
                 if($objUser->gender === 'female')
                 {
-                    return SACP_AVATAR_FEMALE;
+                    return SAC_EVT_AVATAR_FEMALE;
                 }
-                return SACP_AVATAR_MALE;
+                return SAC_EVT_AVATAR_MALE;
             }
         }
         else
@@ -117,17 +117,17 @@ function getAvatar($userId, $mode = 'BE')
 
         if ($objUser->gender === 'female')
         {
-            if (is_file($rootDir . '/' . SACP_AVATAR_FEMALE))
+            if (is_file($rootDir . '/' . SAC_EVT_AVATAR_FEMALE))
             {
-                return SACP_AVATAR_FEMALE;
+                return SAC_EVT_AVATAR_FEMALE;
             }
 
         }
         else
         {
-            if (is_file($rootDir . '/' . SACP_AVATAR_MALE))
+            if (is_file($rootDir . '/' . SAC_EVT_AVATAR_MALE))
             {
-                return SACP_AVATAR_MALE;
+                return SAC_EVT_AVATAR_MALE;
             }
         }
     }

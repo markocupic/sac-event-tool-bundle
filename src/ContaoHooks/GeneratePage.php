@@ -60,8 +60,8 @@ class GeneratePage
         // Für Downloads z.B. Downloadlink auf www.sac-pilatus.ch/kurse
         if (Input::get('action') === 'downloadKursbroschuere' && Input::get('year') != '')
         {
-            System::log('The course booklet has been downloaded.', __FILE__ . ' Line: ' . __LINE__, SACP_LOG_COURSE_BOOKLET_DOWNLOAD);
-            $fileSRC = sprintf(SACP_WORKSHOP_FLYER_SRC, Input::get('year'));
+            System::log('The course booklet has been downloaded.', __FILE__ . ' Line: ' . __LINE__, SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD);
+            $fileSRC = sprintf(SAC_EVT_WORKSHOP_FLYER_SRC, Input::get('year'));
             Controller::sendFileToBrowser($fileSRC);
         }
 
@@ -93,7 +93,7 @@ class GeneratePage
         // Sync SAC member database with tl_member
         if (Input::get('cronjob') === 'true' && Input::get('action') === 'syncSacMemberDatabase')
         {
-            $objSync = new SyncSacMemberDatabase($GLOBALS['TL_CONFIG']['SACP_SAC_SECTION_IDS'], $GLOBALS['TL_CONFIG']['SACP_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'], $GLOBALS['TL_CONFIG']['SACP_FTPSERVER_MEMBER_DB_BERN_USERNAME'], $GLOBALS['TL_CONFIG']['SACP_FTPSERVER_MEMBER_DB_BERN_PASSWORD']);
+            $objSync = new SyncSacMemberDatabase($GLOBALS['TL_CONFIG']['SAC_EVT_SAC_SECTION_IDS'], $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'], $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'], $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD']);
             // Load files fromftp
             $objSync->loadDataFromFtp();
             // Then sync with tl_member
