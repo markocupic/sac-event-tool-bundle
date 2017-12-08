@@ -139,13 +139,13 @@ var SacCourseFilter =  {
             catch (e) {
                 console.log('Session Storage is disabled or not supported on this browser.')
             }
-
-            var url = window.location.href;
+            var url = 'ajax';
             var request = $.ajax({
                 method: 'post',
                 url: url,
                 data: {
-                    xhrAction: 'filterCourseList',
+                    action: 'filterCourseList',
+                    year: SacCourseFilter.getUrlParam('year'),
                     REQUEST_TOKEN: request_token,
                     ids: JSON.stringify(arrIds),
                     kursart: idKursart,
@@ -158,7 +158,6 @@ var SacCourseFilter =  {
             request.done(function (json) {
                 if (json) {
                     SacCourseFilter.hideLoadingIcon();
-
                     $.each(json.filter, function (key, id) {
                         $('.event-item-course[data-id="' + id + '"]').each(function () {
                             //intFound++;

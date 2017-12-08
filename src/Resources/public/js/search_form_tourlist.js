@@ -140,13 +140,14 @@ var SacTourFilter =  {
                 console.log('Session Storage is disabled or not supported on this browser.')
             }
 
-            var url = window.location.href;
+            var url = 'ajax';
             var request = $.ajax({
                 method: 'post',
                 url: url,
                 data: {
-                    xhrAction: 'filterTourList',
+                    action: 'filterTourList',
                     REQUEST_TOKEN: request_token,
+                    year: SacTourFilter.getUrlParam('year'),
                     ids: JSON.stringify(arrIds),
                     tourtype: idTourType,
                     ogs: JSON.stringify(arrOGS),

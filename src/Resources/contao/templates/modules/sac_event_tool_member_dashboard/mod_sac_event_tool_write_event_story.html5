@@ -60,15 +60,15 @@
     jQuery(document).ready(function () {
       $('#publishEventStory').change(function() {
         var publishState = this.value;
-        var jqxhr = $.post(window.location.href, {
-          'REQUEST_TOKEN': '{{request_token}}',
-          'xhrAction': 'setPublishState',
-          'publishState': publishState
+        var jqxhr = $.post('ajax', {
+            'REQUEST_TOKEN': '{{request_token}}',
+            'action': 'setPublishState',
+            'eventId': '<?= \Input::get('eventId') ?>',
+            'publishState': publishState
         }).always(function() {
           window.location.reload();
         });
       });
-
     });
   })(jQuery);
 </script>
@@ -115,9 +115,10 @@
           {
             var uuid = $(elImage).data('file-uuid');
             if(uuid !== undefined){
-              var jqxhr = $.post(window.location.href, {
+              var jqxhr = $.post('ajax', {
                 'REQUEST_TOKEN': '{{request_token}}',
-                'xhrAction': 'removeImage',
+                'eventId': '<?= \Input::get('eventId') ?>',
+                'action': 'removeImage',
                 'uuid': uuid
               }).done(function() {
                 elImage.fadeOut(400, function(){
@@ -140,10 +141,11 @@
             $(collection).each(function (index) {
               arrUuid.push($(this).data('fileUuid'));
             });
-            var jqxhr = $.post(window.location.href, {
-              'REQUEST_TOKEN': '{{request_token}}',
-              'xhrAction': 'sortGallery',
-              'uuids': JSON.stringify(arrUuid)
+            var jqxhr = $.post('ajax', {
+                'REQUEST_TOKEN': '{{request_token}}',
+                'eventId': '<?= \Input::get('eventId') ?>',
+                'action': 'sortGallery',
+                'uuids': JSON.stringify(arrUuid)
             });
           }
         });

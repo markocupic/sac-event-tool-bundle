@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Contao\Input;
 use Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase;
 use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
-
+use Markocupic\SacEventToolBundle\Services\Newsletter\SendNewsletter;
 
 
 /**
@@ -50,6 +50,13 @@ class CronjobController extends Controller
         {
             $objPrint = new PrintWorkshopsAsPdf(Input::get('year'), Input::get('id'), Input::get('eventId'), false);
             $objPrint->printWorkshopsAsPdf();
+            exit();
+        }
+
+        // Send sacpilatus survey newsletter
+        if (Input::get('action') === 'sendSurveyNewsletter')
+        {
+            SendNewsletter::sendSurveyNewsletter(25);
             exit();
         }
 

@@ -17,10 +17,8 @@ use Contao\Controller;
 use Contao\System;
 use Contao\Environment;
 use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
-use Markocupic\SacEventToolBundle\FrontendAjax;
 use Markocupic\SacEventToolBundle\ExportEvents2Docx;
 use Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase;
-use Markocupic\SacEventToolBundle\Newsletter\SendNewsletter;
 
 /**
  * Class GeneratePage
@@ -74,24 +72,7 @@ class GeneratePage
             ExportEvents2Docx::sendToBrowser(Input::get('calendarId'), Input::get('year'), Input::get('eventId'));
         }
 
-
-        // Trigger ajax requests
-        if (Environment::get('isAjaxRequest') && (Input::get('xhrAction') || Input::post('xhrAction')))
-        {
-            $objXhr = new FrontendAjax();
-            $objXhr->generateAjax();
-            exit();
-        }
-
-
-
-        // Send sacpilatus survey newsletter
-        if (Input::get('cronjob') === 'true' && Input::get('action') === 'sendSurveyNewsletter')
-        {
-            SendNewsletter::sendSurveyNewsletter(25);
-        }
     }
-
 
 }
 

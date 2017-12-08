@@ -8,7 +8,7 @@
  * @link    https://sac-kurse.kletterkader.com
  */
 
-namespace Markocupic\SacEventToolBundle\Newsletter;
+namespace Markocupic\SacEventToolBundle\Services\Newsletter;
 
 
 use Contao\Email;
@@ -19,7 +19,7 @@ use Contao\Validator;
 
 /**
  * Class SendNewsletter
- * @package Markocupic\SacEventToolBundle\Newsletter
+ * @package Markocupic\SacEventToolBundle\Services\Newsletter
  */
 class SendNewsletter
 {
@@ -34,7 +34,7 @@ class SendNewsletter
             $limit = 25;
         }
 
-        $objMember = Database::getInstance()->prepare("SELECT * FROM tl_member WHERE email != ? AND newsletterSent=?")->limit($limit)->execute('', '');
+        $objMember = Database::getInstance()->prepare("SELECT * FROM tl_member WHERE isSacMember = ? AND email != ? AND newsletterSent=?")->limit($limit)->execute('1', '', '');
         if (!$objMember->numRows)
         {
             return;

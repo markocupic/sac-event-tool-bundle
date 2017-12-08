@@ -1,6 +1,9 @@
 ajax_frontend:
     resource: "@MarkocupicSacEventToolBundle/Controller"
     type: annotation
+    defaults:
+        _scope: frontend
+        _token_check: true
 
 cronjob:
     resource: "@MarkocupicSacEventToolBundle/Controller"

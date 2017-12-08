@@ -30,51 +30,11 @@ use Contao\Email;
  */
 class FrontendAjax
 {
-    /**
-     * FrontendAjax constructor.
-     */
-    public function __construct()
-    {
-        //
-    }
-
-
-    public function __call($strMethod, $args)
-    {
-        return;
-    }
-
-    public function generateAjax()
-    {
-        // xhrAction=filterKursliste
-        // xhrAction=sortGallery
-        // xhrAction=setPublishState
-        // xhrAction=removeImage
-        // xhrAction=setPublishState
-
-        // GET xhrAction param from GET or POST
-        $xhrAction = null;
-        if (Input::post('xhrAction'))
-        {
-            $xhrAction = Input::post('xhrAction');
-        }
-        elseif (Input::get('xhrAction'))
-        {
-            $xhrAction = Input::get('xhrAction');
-        }
-
-
-        if (Environment::get('isAjaxRequest') && $xhrAction != '')
-        {
-            $this->{$xhrAction}();
-            exit;
-        }
-    }
 
     /**
      * Course list filter
      */
-    protected function filterTourList()
+    public function filterTourList()
     {
         $visibleItems = array();
         $arrIDS = json_decode(Input::post('ids'));
@@ -85,7 +45,7 @@ class FrontendAjax
 
         if ($intStartDate < 1)
         {
-            if (!Input::get('year') || Input::get('year') < 1)
+            if (!Input::post('year') || Input::post('year') < 1)
             {
                 $intStartDate = time() - 24 * 60 * 60;
             }
@@ -201,7 +161,7 @@ class FrontendAjax
     /**
      * Course list filter
      */
-    protected function filterCourseList()
+    public function filterCourseList()
     {
         $visibleItems = array();
         $arrIDS = json_decode(Input::post('ids'));
@@ -210,11 +170,12 @@ class FrontendAjax
         $idKursart = Input::post('kursart');
         $intStartDate = round(Input::post('startDate'));
 
+
         if ($intStartDate < 1)
         {
-            if (!Input::get('year') || Input::get('year') < 1)
+            if (!Input::post('year') || Input::post('year') < 1)
             {
-                $intStartDate = time() - 24 * 60 * 60;
+                $intStartDate = (int)time() - (24 * 60 * 60);
             }
         }
 
@@ -345,10 +306,10 @@ class FrontendAjax
      * Ajax call
      * Sort pictures of the gallery in the event story module in the member dashboard
      */
-    protected function sortGallery()
+    public function sortGallery()
     {
 
-        if (!Input::post('uuids') || !Input::get('eventId') || !FE_USER_LOGGED_IN)
+        if (Input::post('action') !== 'sortGallery' || !Input::post('uuids') || !Input::post('eventId') || !FE_USER_LOGGED_IN)
         {
             return;
         }
@@ -360,7 +321,7 @@ class FrontendAjax
         }
 
         // Save new image order to db
-        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? AND pid=?')->limit(1)->execute($objUser->sacMemberId, Input::get('eventId'));
+        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? AND pid=?')->limit(1)->execute($objUser->sacMemberId, Input::post('eventId'));
         if (!$objDb->numRows)
         {
             return;
@@ -384,9 +345,10 @@ class FrontendAjax
      * Ajax call
      * Set the publish state of the event story in the event story module in the member dashboard
      */
-    protected function setPublishState()
+    public function setPublishState()
     {
-        if (!Input::post('publishState') || !Input::get('eventId') || !FE_USER_LOGGED_IN)
+
+        if (Input::post('action') !== 'setPublishState' || !Input::post('eventId') || !FE_USER_LOGGED_IN)
         {
             return;
         }
@@ -398,7 +360,7 @@ class FrontendAjax
         }
 
         // Save new image order to db
-        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=? && publishState<?')->limit(1)->execute($objUser->sacMemberId, Input::get('eventId'), 3);
+        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=? && publishState<?')->limit(1)->execute($objUser->sacMemberId, Input::post('eventId'), 3);
         if (!$objDb->numRows)
         {
             return;
@@ -417,9 +379,9 @@ class FrontendAjax
      * Ajax call
      * Remove image from collection in the event story module in the member dashboard
      */
-    protected function removeImage()
+    public function removeImage()
     {
-        if (!Input::get('eventId') || !Input::post('uuid') || !FE_USER_LOGGED_IN)
+        if (!Input::post('eventId') || !Input::post('uuid') || !FE_USER_LOGGED_IN)
         {
             return;
         }
@@ -430,7 +392,7 @@ class FrontendAjax
             return;
         }
         // Save new image order to db
-        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=? && publishState<?')->limit(1)->execute($objUser->sacMemberId, Input::get('eventId'), 3);
+        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=? && publishState<?')->limit(1)->execute($objUser->sacMemberId, Input::post('eventId'), 3);
         if (!$objDb->numRows)
         {
             return;

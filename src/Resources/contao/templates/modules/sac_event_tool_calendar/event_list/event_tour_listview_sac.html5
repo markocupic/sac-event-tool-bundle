@@ -1,6 +1,6 @@
 <?php
 // tl_module.cal_format has to be set to "show all events"!!!!!
-if(\Input::get('year') == '')
+if(\Input::get('year') == '' || \Input::get('year') < 1)
 {
     if($this->endDate < time())
     {
