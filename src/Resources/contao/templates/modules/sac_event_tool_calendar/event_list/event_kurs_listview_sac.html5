@@ -1,22 +1,3 @@
-<?php
-// tl_module.cal_format has to be set to "show all events"!!!!!
-if(\Input::get('year') == '' || \Input::get('year') < 1)
-{
-    if($this->endDate < time())
-    {
-        return;
-    }
-}
-else
-{
-    $eventYear = \Date::parse('Y', $this->endDate);
-    if($eventYear != \Input::get('year') )
-    {
-        return;
-    }
-}
-?>
-
 <?php if(!$_SESSION['layout_table']): ?>
 <div class="col-xl-6 event-item-course event layout_upcoming<?php echo $this->classUpcoming; ?>" data-id="<?= $this->id ?>" data-courseTypeLevel1="<?= $this->courseTypeLevel1 ?>">
     <div class="row">

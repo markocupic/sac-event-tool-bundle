@@ -45,3 +45,8 @@ services:
             arguments:
                 - "@contao.framework"
 
+    # Get All Events
+    markocupic_sac_event_tool.contao_hooks.get_all_events:
+            class: Markocupic\SacEventToolBundle\ContaoHooks\GetAllEvents
+            arguments:
+                - "@contao.framework"

@@ -180,6 +180,10 @@ $GLOBALS['TL_HOOKS']['executePreActions'][] = array('markocupic_sac_event_tool.c
 /*** Handle custom rgxp in the backend **/
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic_sac_event_tool.contao_hooks.add_custom_regexp', 'addCustomRegexp');
 
+/*** Handle event listing **/
+$GLOBALS['TL_HOOKS']['getAllEvents'][] = array('markocupic_sac_event_tool.contao_hooks.get_all_events', 'getAllEvents');
+
+
 
 
 // Form HOOKS (f.ex. Kursanmeldung)
