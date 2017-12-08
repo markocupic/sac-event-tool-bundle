@@ -262,6 +262,7 @@ class tl_calendar_events_instructor_invoice extends Backend
                                 array('key' => 'firstname', 'value' => $objUserModel->name, 'options' => array('multiline' => false)),
                                 array('key' => 'lastname', 'value' => '', 'options' => array('multiline' => false)),
                                 array('key' => 'sacMemberId', 'value' => 'Mitgl. No. ' . $objUserModel->sacMemberId, 'options' => array('multiline' => false)),
+                                array('key' => 'isNotSacMember', 'value' => $objUserModel->isSacMember ? ' ' : '!inaktiv/kein Mitglied', 'options' => array('multiline' => false)),
                                 array('key' => 'street', 'value' => $objUserModel->street, 'options' => array('multiline' => false)),
                                 array('key' => 'postal', 'value' => $objUserModel->postal, 'options' => array('multiline' => false)),
                                 array('key' => 'city', 'value' => $objUserModel->city, 'options' => array('multiline' => false)),
@@ -278,12 +279,25 @@ class tl_calendar_events_instructor_invoice extends Backend
                 while ($objEventMember->next())
                 {
                     $i++;
+                    $strIsActiveMember = '!inaktiv/keinMItglied';
+                    if($objEventMember->sacMemberId != '')
+                    {
+                        $objMemberModel = MemberModel::findBySacMemberId($objEventMember->sacMemberId);
+                        if($objMemberModel !== null)
+                        {
+                            if($objMemberModel->isSacMember)
+                            {
+                                $strIsActiveMember = ' ';
+                            }
+                        }
+                    }
                     $rows[] = array(
                         array('key' => 'i', 'value' => $i, 'options' => array('multiline' => false)),
                         array('key' => 'role', 'value' => 'TN', 'options' => array('multiline' => false)),
                         array('key' => 'firstname', 'value' => $objEventMember->firstname, 'options' => array('multiline' => false)),
                         array('key' => 'lastname', 'value' => $objEventMember->lastname, 'options' => array('multiline' => false)),
                         array('key' => 'sacMemberId', 'value' => 'Mitgl. No. ' . $objEventMember->sacMemberId, 'options' => array('multiline' => false)),
+                        array('key' => 'isNotSacMember', 'value' => $strIsActiveMember, 'options' => array('multiline' => false)),
                         array('key' => 'street', 'value' => $objEventMember->street, 'options' => array('multiline' => false)),
                         array('key' => 'postal', 'value' => $objEventMember->postal, 'options' => array('multiline' => false)),
                         array('key' => 'city', 'value' => $objEventMember->city, 'options' => array('multiline' => false)),

@@ -72,9 +72,11 @@ class PrintWorkshopsAsPdf
      * @param null $year
      * @param null $calendarId
      * @param null $eventId
+     * @param bool $download
      */
-    public function __construct($year = null, $calendarId = null, $eventId = null)
+    public function __construct($year = null, $calendarId = null, $eventId = null, $download=true)
     {
+        $this->download = $download;
         if ($year > 2016 && $calendarId > 0)
         {
             $this->calendarId = $calendarId;
@@ -215,7 +217,7 @@ class PrintWorkshopsAsPdf
 
         $fileSRC = sprintf(SAC_EVT_WORKSHOP_FLYER_SRC, $this->year);
 
-        if (Input::get('cronjob'))
+        if ($this->download === false)
         {
             // Close and output PDF document
             if (file_exists($rootDir . '/' . $fileSRC))

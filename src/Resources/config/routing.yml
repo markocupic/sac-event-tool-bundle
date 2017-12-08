@@ -1,3 +1,7 @@
 ajax_frontend:
     resource: "@MarkocupicSacEventToolBundle/Controller"
     type: annotation
+
+cronjob:
+    resource: "@MarkocupicSacEventToolBundle/Controller"
+    type: annotation

@@ -65,13 +65,6 @@ class GeneratePage
             Controller::sendFileToBrowser($fileSRC);
         }
 
-        // Service: Download Kursbroschuere
-        if (Input::get('printSACWorkshops') == 'true')
-        {
-            $objPrint = new PrintWorkshopsAsPdf(Input::get('year'), Input::get('id'), Input::get('eventId'));
-            $objPrint->printWorkshopsAsPdf();
-            exit();
-        }
 
         // Download Events as docx file
         // ?action=exportEvents2Docx&calendarId=6&year=2017
@@ -90,15 +83,7 @@ class GeneratePage
             exit();
         }
 
-        // Sync SAC member database with tl_member
-        if (Input::get('cronjob') === 'true' && Input::get('action') === 'syncSacMemberDatabase')
-        {
-            $objSync = new SyncSacMemberDatabase($GLOBALS['TL_CONFIG']['SAC_EVT_SAC_SECTION_IDS'], $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'], $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'], $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD']);
-            // Load files fromftp
-            $objSync->loadDataFromFtp();
-            // Then sync with tl_member
-            $objSync->syncContaoDatabase();
-        }
+
 
         // Send sacpilatus survey newsletter
         if (Input::get('cronjob') === 'true' && Input::get('action') === 'sendSurveyNewsletter')
