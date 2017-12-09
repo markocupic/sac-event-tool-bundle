@@ -16,6 +16,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolFrontendUserDashboard'] = 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolEventRegistrationForm'] = '{title_legend},name,headline,type;{jumpTo_legend},jumpTo;{notification_legend},receiptEventRegistrationNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventStoryList'] = '{title_legend},name,headline,type;{jumpTo_legend},jumpTo;{pagination_legend},story_limit,perPage;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventStoryReader'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventlist'] = $GLOBALS['TL_DCA']['tl_module']['palettes']['eventlist'];
 
 // Fields
 $GLOBALS['TL_DCA']['tl_module']['fields']['unregisterFromEventNotificationId'] = array(

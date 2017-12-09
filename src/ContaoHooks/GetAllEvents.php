@@ -48,6 +48,11 @@ class GetAllEvents
      */
     public function getAllEvents($arrEvents, $arrCalendars, $intStart, $intEnd, Module $objModule)
     {
+
+        return $arrEvents;
+
+        // Disabled
+
         // Special handling for tour and course calendar
         // Do not ignore $_GET['year'] parameter if cal_format is set to 'cal_all'
         if ($objModule->cal_format === 'cal_all')

@@ -31,3 +31,5 @@ $GLOBALS['TL_LANG']['FMD']['eventToolFrontendUserDashboard'] = array('SAC Mitgli
 $GLOBALS['TL_LANG']['FMD']['eventToolEventRegistrationForm'] = array('SAC Event Registrierungsformular');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryList'] = array('SAC Tourenberichte Listen Modul');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryReader'] = array('SAC Tourenberichte Reader Modul');
+$GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventlist'] = array('SAC Touren- und Kurse-Auflistungs Modul');
+

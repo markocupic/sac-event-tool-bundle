@@ -83,7 +83,8 @@ $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
     'eventToolFrontendUserDashboard' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolMemberDashboard',
     'eventToolEventRegistrationForm' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventRegistrationForm',
     'eventToolCalendarEventStoryList' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryList',
-    'eventToolCalendarEventStoryReader' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryReader'
+    'eventToolCalendarEventStoryReader' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryReader',
+    'eventToolCalendarEventlist' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventlist'
 );
 
 // Content Elements
