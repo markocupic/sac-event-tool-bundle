@@ -1,7 +1,7 @@
 <p class="back"><a href="javascript:history.go(-1)" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
 
 <div class="event event-detailview layout_full block<?= $this->class ?>">
-
+        <?php if($this->eventType === 'lastMinuteTour'): ?><h4 class="ce_headline last-minute-tour">Last minute tour (Spontantour)</h4><?php endif; ?>
         <h1 class="ce_headline"><?= $this->title ?></h1>
 
     <?php if($this->teaser != ''): ?>

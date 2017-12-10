@@ -54,7 +54,6 @@ class PostLogin
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
-
         if ($user instanceof BackendUser)
         {
 

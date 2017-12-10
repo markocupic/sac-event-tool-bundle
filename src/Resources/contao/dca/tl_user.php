@@ -227,7 +227,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['avatarSRC'] = array(
     'label'         => &$GLOBALS['TL_LANG']['tl_user']['avatarSRC'],
     'exclude'       => true,
     'inputType'     => 'fileTree',
-    'eval'          => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => ''),
+    'eval'          => array('doNotCopy' => true, 'filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => ''),
     'load_callback' => array(
         array('tl_user_sac_event_tool', 'setSingleSrcFlags'),
     ),

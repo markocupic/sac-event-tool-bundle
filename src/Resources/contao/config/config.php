@@ -104,6 +104,7 @@ $GLOBALS['TL_NOINDEX_KEYS'][] = 'xhrAction';
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'] = array(
     'course' => 'Kurs',
     'tour' => 'Tour',
+    'lastMinuteTour' => 'Last Minute Tour'
 );
 
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['USER-FUNCTIONS'] = array(
@@ -184,7 +185,8 @@ $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic_sac_event_tool.con
 /*** Handle event listing **/
 $GLOBALS['TL_HOOKS']['getAllEvents'][] = array('markocupic_sac_event_tool.contao_hooks.get_all_events', 'getAllEvents');
 
-
+/*** Prepare USer accounts (create user directories, etc. **/
+$GLOBALS['TL_HOOKS']['postLogin'][] = array('markocupic_sac_event_tool.contao_hooks.post_login', 'prepareBeUserAccount');
 
 
 // Form HOOKS (f.ex. Kursanmeldung)
