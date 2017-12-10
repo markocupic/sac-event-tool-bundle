@@ -24,13 +24,13 @@
             </div>
 
             <div class="detail-item">
-                <i class="fa fa-fw fa-calendar-o"></i><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventPeriod($this->id) ?>
+                <i class="fa fa-fw fa-calendar-alt"></i><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventPeriod($this->id) ?>
             </div>
 
             <div class="detail-item">
                 <?php $eventState = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($this->id); ?>
                 <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($this->id)]; ?>
-                <i class="fa fa-fw <?= $eventState ?>" aria-label="<?= $eventStateLabel ?>" title="<?= $eventStateLabel ?>"></i><?= $eventStateLabel ?>
+                <i class="fa-fw event-state-icon <?= $eventState ?>" aria-label="<?= $eventStateLabel ?>" title="<?= $eventStateLabel ?>"></i><?= $eventStateLabel ?>
             </div>
 
         </div>

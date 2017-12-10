@@ -115,7 +115,7 @@
                     <tr>
                         <td><?= $event['dateSpan'] ?></td>
                         <td><?= $event['objEvent']->title ?></td>
-                        <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Kursbericht verfassen" class="btn btn-sm btn-success<?php if(!$event['canWriteStory']): ?> disabled<?php endif; ?>"<?php if(!$event['canWriteStory']): ?> aria-disabled="true"<?php endif; ?>><i class="fa fa-fw fa-newspaper-o"></a></td>
+                        <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Kursbericht verfassen" class="btn btn-sm btn-success<?php if(!$event['canWriteStory']): ?> disabled<?php endif; ?>"<?php if(!$event['canWriteStory']): ?> aria-disabled="true"<?php endif; ?>><i class="fa fa-fw fa-newspaper"></a></td>
                         <td class="text-center"><a href="<?= $event['downloadCourseConfirmationLink'] ?>" title="Kursbestätigung downloaden" class="btn btn-sm btn-info"><i class="fa fa-fw fa-download"></a></td>
                     </tr>
                 <?php endif; ?>
@@ -132,7 +132,7 @@
                     <tr>
                         <td><?= $event['dateSpan'] ?></td>
                         <td><?= $event['objEvent']->title ?></td>
-                        <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Tourenbericht verfassen" class="btn btn-sm btn-success<?php if(!$event['canWriteStory']): ?> disabled<?php endif; ?>"<?php if(!$event['canWriteStory']): ?> aria-disabled="true"<?php endif; ?>><i class="fa fa-fw fa-newspaper-o"></a></td>
+                        <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Tourenbericht verfassen" class="btn btn-sm btn-success<?php if(!$event['canWriteStory']): ?> disabled<?php endif; ?>"<?php if(!$event['canWriteStory']): ?> aria-disabled="true"<?php endif; ?>><i class="fa fa-fw fa-newspaper"></a></td>
                         <!--<td class="text-center"><a href="<?= $event['downloadCourseConfirmationLink'] ?>" title="Kursbestätigung downloaden" class="btn btn-sm btn-info"><i class="fa fa-fw fa-download"></a></td>-->
                     </tr>
                 <?php endif; ?>

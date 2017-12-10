@@ -13,8 +13,8 @@
     </td>
 
     <td>
-        <?php if($this->eventType === 'lastMinuteTour'): ?><span class="last-minute-tour small"><i class="fa fa-clock-o"></i> LAST MINUTE TOUR</span><br><?php endif; ?>
-        <i class="fa fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
+        <?php if($this->eventType === 'lastMinuteTour'): ?><span class="last-minute-tour small"><i class="fa fa-clock"></i> LAST MINUTE TOUR</span><br><?php endif; ?>
+        <i class="event-state-icon fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
         <a href="{{event_url::<?php echo $this->id; ?>}}">{{event_title::<?= $this->id ?>}}</a>
     </td>
     <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($this->id) ?></td>

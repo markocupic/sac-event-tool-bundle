@@ -170,7 +170,7 @@ var SacTourFilter =  {
                     });
                     if (itemsFound == 0 && $('.alert-no-results-found').length == 0) {
 
-                        $('.mod_eventlist').append('<div class="alert alert-danger alert-no-results-found text-lg" role="alert"><h4><i class="fa fa-meh-o" aria-hidden="true"></i> Leider wurden zu deiner Suchanfrage keine Events gefunden. &Uuml;berp&uuml;fe bitte die Filtereinstellungen.</h4></div>');
+                        $('.mod_eventlist').append('<div class="alert alert-danger alert-no-results-found text-lg" role="alert"><h4><i class="fa fa-meh" aria-hidden="true"></i> Leider wurden zu deiner Suchanfrage keine Events gefunden. &Uuml;berp&uuml;fe bitte die Filtereinstellungen.</h4></div>');
                     }
                 }
             });
