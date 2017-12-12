@@ -21,7 +21,7 @@ class AjaxController extends Controller
     /**
      * Handles ajax requests.
      * @return JsonResponse
-     * @Route("/ajax", name="ajax_frontend", defaults={"_scope" = "frontend", "_token_check" = true})
+     * @Route("/ajax", name="sac_event_tool_ajax_frontend", defaults={"_scope" = "frontend", "_token_check" = true})
      */
     public function ajaxAction()
     {

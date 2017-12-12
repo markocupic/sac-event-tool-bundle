@@ -12,6 +12,7 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Input;
+use Contao\Database;
 use Markocupic\SacEventToolBundle\ExportEvents2Typo3;
 use Markocupic\SacEventToolBundle\PreparePluginEnvironment;
 

@@ -26,7 +26,7 @@ class CronjobController extends Controller
 {
     /**
      * Handles cronjob requests.
-     * @Route("/cronjob", name="cronjob", defaults={"_scope" = "frontend", "_token_check" = false})
+     * @Route("/cronjob", name="sac_event_tool_cronjob", defaults={"_scope" = "frontend", "_token_check" = false})
      */
     public function cronjobAction()
     {

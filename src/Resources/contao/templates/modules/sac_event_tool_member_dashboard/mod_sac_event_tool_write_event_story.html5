@@ -15,7 +15,7 @@
 
   <?php if($this->publishState < 2): ?>
     <div class="mr-2"><button class="btn btn-primary" data-toggle="modal" data-target=".write-story-text-and-yt"><i class="fa fa-pencil"></i> Bericht bearbeiten</button></div>
-    <div class="mr-2"><button class="btn btn-primary" data-toggle="modal" data-target=".write-story-fotoupload"><i class="fa fa-photo"></i> Foto-Upload</button></div>
+    <div class="mr-2"><button class="btn btn-primary" data-toggle="modal" data-target=".write-story-fotoupload"><i class="fa fa-images"></i> Foto-Upload</button></div>
   <?php endif; ?>
 
   <?php if($this->text != '' && $this->publishState < 2): ?>
@@ -93,7 +93,7 @@
       <div class="col-12 col-sm-6 col-md-3 thumbnail <?php if($this->publishState < 2): ?>sortable-item <?php endif; ?>responsive" data-file-uuid="<?= \StringUtil::binToUuid($arrFile['uuid']) ?>" title="Sortierung mit Drag and Drop &auml;ndern">
         {{image::<?= Contao\StringUtil::binToUuid($arrFile['uuid']) ?>?width=400&height=400&mode=crop}}
         <?php if($this->publishState < 2): ?>
-        <button class="btn btn-danger remove-image" title="Bild löschen"><i class="fa fa-trash-o"></i></button>
+        <button class="btn btn-danger remove-image" title="Bild löschen"><i class="fa fa-trash"></i></button>
         <?php endif; ?>
       </div>
       <?php endforeach; ?>
