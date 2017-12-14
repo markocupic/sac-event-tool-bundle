@@ -56,7 +56,7 @@
                 <div class="row">
                     <?php if(\UserModel::findByPk($userId) !== null): ?>
                     <div class="image_container portrait col-xs-4 col-sm-5 col-md-12 col-lg-12">
-                        <a href="leiter-portrait?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
+                        <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
                             <figure class="avatar-large">
                                 <?php $this->insert('picture_default', generateAvatar($userId, 18) ); ?>
                             </figure>
@@ -64,7 +64,7 @@
                     </div>
                     <div class="instructor-name col-xs-8 col-sm-7 col-md-12 col-lg-12">
                         <?php $strQuali = Markocupic\SacEventToolBundle\CalendarSacEvents::getMainQualifikation($userId) != '' ? ' (' . Markocupic\SacEventToolBundle\CalendarSacEvents::getMainQualifikation($userId) . ')' : ''; ?>
-                        <a href="leiter-portrait?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
+                        <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
                             <?= \UserModel::findByPk($userId)->name. $strQuali ?>
                         </a>
                     </div>
