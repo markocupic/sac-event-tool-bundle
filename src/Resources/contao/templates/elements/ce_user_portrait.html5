@@ -61,7 +61,7 @@
             </td>
 
             <td>
-                <i class="fa fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
+                <i class="fa-fw event-state-icon <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
                 <a href="{{event_url::<?php echo $event['id']; ?>}}">{{event_title::<?= $event['id'] ?>}}</a>
             </td>
             <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($event['id']) ?></td>
