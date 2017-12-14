@@ -10,6 +10,7 @@
 
 namespace Markocupic\SacEventToolBundle;
 
+use Contao\Environment;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 use Contao\Controller;
@@ -21,7 +22,8 @@ use Contao\UserModel;
 use Contao\StringUtil;
 use Contao\Date;
 use Contao\EventOrganizerModel;
-
+use Contao\Folder;
+use Contao\System;
 
 /**
  * Class ExportEvents2Docx
@@ -52,6 +54,9 @@ class ExportEvents2Docx
      */
     public static function sendToBrowser($calendarId, $year, $eventId = null)
     {
+
+        // Get root dir
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
         self::$strTable = 'tl_calendar_events';
         Controller::loadDataContainer('tl_calendar_events');
@@ -115,8 +120,8 @@ class ExportEvents2Docx
             $table->addRow();
             $cell = $table->addCell(4500);
             $textrun = $cell->addTextRun();
-            $textrun->addLink('https://sac-kurse.kletterkader.com/', htmlspecialchars('KURSPROGRAMM ' . $year, ENT_COMPAT, 'UTF-8'), $fStyleMediumRed);
-            $table->addCell(4500)->addImage(TL_ROOT . '/files/sac_pilatus/page_assets/kursbroschuere/logo-sac-pilatus.png', array('height' => 40, 'align' => 'right'));
+            $textrun->addLink(Environment::get('host') . '/', htmlspecialchars('KURSPROGRAMM ' . $year, ENT_COMPAT, 'UTF-8'), $fStyleMediumRed);
+            $table->addCell(4500)->addImage($rootDir . '/files/sac_pilatus/page_assets/kursbroschuere/logo-sac-pilatus.png', array('height' => 40, 'align' => 'right'));
 
             // Add footer
             //$footer = $section->addFooter();
@@ -172,9 +177,10 @@ class ExportEvents2Docx
         }
         // Saving the document as OOXML file...
         $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
-        $objWriter->save('files/jahresprogramm/downloads/sac-jahresprogramm.docx');
+        new Folder(SAC_EVT_TEMP_PATH);
+        $objWriter->save($rootDir . '/' . SAC_EVT_TEMP_PATH . '/sac-jahresprogramm.docx');
         sleep(1);
-        Controller::sendFileToBrowser('files/jahresprogramm/downloads/sac-jahresprogramm.docx');
+        Controller::sendFileToBrowser(SAC_EVT_TEMP_PATH . '/sac-jahresprogramm.docx');
 
         exit();
 
@@ -268,7 +274,8 @@ class ExportEvents2Docx
                 {
                     $arrValue = array_map(function ($v) {
                         $objOrganizer = EventOrganizerModel::findByPk($v);
-                        if($objOrganizer !== null){
+                        if ($objOrganizer !== null)
+                        {
                             $v = $objOrganizer->title;
                         }
                         return $v;
