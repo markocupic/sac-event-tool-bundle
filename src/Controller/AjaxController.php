@@ -10,14 +10,17 @@
 
 namespace Markocupic\SacEventToolBundle\Controller;
 
+use Contao\Environment;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Contao\Input;
-use Markocupic\SacEventToolBundle\FrontendAjax;
+use Markocupic\SacEventToolBundle\FrontendAjax\FrontendAjax;
 
 class AjaxController extends Controller
 {
+
+
     /**
      * Handles ajax requests.
      * @return JsonResponse
@@ -26,8 +29,11 @@ class AjaxController extends Controller
     public function ajaxAction()
     {
         $this->container->get('contao.framework')->initialize();
-
-
+        if (Environment::get(isAjaxRequest) === false)
+        {
+            throw $this->createNotFoundException('The route "/ajax" is allowed to xhr requests only.');
+        }
+        
         // Course Filter
         if (Input::post('action') === 'filterTourList')
         {
@@ -64,10 +70,6 @@ class AjaxController extends Controller
         }
 
 
-        //$controller = new FrontendAjax();
-        //$data = ['bla'];
-        //$response = new JsonResponse(array('result' => 'success', 'data' => $data));
-        //$response->send();
         exit();
     }
 }

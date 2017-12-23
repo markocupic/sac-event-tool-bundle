@@ -1,222 +1,211 @@
 <?php $this->extend('block_unsearchable'); ?>
 
 <?php $this->block('content'); ?>
-<p class="mt-0 mb-0">Dein Bericht für:<p>
-  <h2 class="mt-1"><?= $this->eventName ?></h2>
-<time class="small">Datum: <?= $this->eventPeriod ?></time>
-<br>
-<hr>
-<br>
-<!-- Large modal -->
-<p><strong>Veröffentlichungsstatus:</strong> <?= $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][$this->publishState] ?></p>
+    <p class="mt-0 mb-0">Dein Bericht für:<p>
+    <h2 class="mt-1"><?= $this->eventName ?></h2>
+    <time class="small">Datum: <?= $this->eventPeriod ?></time>
+    <br>
+    <hr>
+    <br>
+    <!-- Large modal -->
+    <p>
+        <strong>Ver&ouml;ffentlichungsstatus:</strong> <?= $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][$this->publishState] ?>
+    </p>
 
-<?php if($this->publishState < 3): ?>
-<div class="d-flex flex-row align-items-center">
+<?php if ($this->publishState < 3): ?>
+    <div class="d-flex flex-row align-items-center">
 
-  <?php if($this->publishState < 2): ?>
-    <div class="mr-2"><button class="btn btn-primary" data-toggle="modal" data-target=".write-story-text-and-yt"><i class="fa fa-pencil"></i> Bericht bearbeiten</button></div>
-    <div class="mr-2"><button class="btn btn-primary" data-toggle="modal" data-target=".write-story-fotoupload"><i class="fa fa-images"></i> Foto-Upload</button></div>
-  <?php endif; ?>
-
-  <?php if($this->text != '' && $this->publishState < 2): ?>
-  <div class="mr-2">Status: </div>
-  <div class="mr-2">
-    <select class="form-control" name="publishEventStory" id="publishEventStory">
-      <option value="1"<?php if($this->publishState < 2): ?> selected<?php endif; ?>>In Bearbeitung</option>
-      <option value="2"<?php if($this->publishState == 2): ?> selected<?php endif; ?>>Bericht veröffentlichen</option>
-    </select>
-  </div>
-  <?php endif; ?>
-
-</div>
-
-
-<!-- Modal Boxes -->
-<div class="modal fade write-story-text-and-yt" tabindex="-1" role="dialog" aria-labelledby="ModalUploadTextAndYt" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Bericht erstellen</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <i aria-hidden="true" class="fal fa-times"></i>
+        <?php if ($this->publishState < 2): ?>
+            <div class="mr-2">
+                <button class="btn btn-primary" data-toggle="modal" data-target=".write-story-text-and-yt"><i
+                            class="fa fa-pencil"></i> Bericht bearbeiten
                 </button>
             </div>
-            <div class="modal-body">    {{insert_form::18}}
+            <div class="mr-2">
+                <button class="btn btn-primary" data-toggle="modal" data-target=".write-story-fotoupload"><i
+                            class="fa fa-images"></i> Foto-Upload
+                </button>
             </div>
-            <!--
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-            -->
-        </div>
-    </div>
-</div>
-<div class="modal fade write-story-fotoupload" tabindex="-1" role="dialog" aria-labelledby="ModalUploadFoto" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Fotoupload</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <i aria-hidden="true" class="fal fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-body">
-            {{insert_form::19}}
-        </div>
-        <!--
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-        -->
-    </div>
-  </div>
-</div>
-<?php endif; ?>
-
-
-
-<?php if($this->publishState < 3): ?>
-<script>
-  (function ($) {
-    jQuery(document).ready(function () {
-      $('#publishEventStory').change(function() {
-        var publishState = this.value;
-        var jqxhr = $.post('ajax', {
-            'REQUEST_TOKEN': '{{request_token}}',
-            'action': 'setPublishState',
-            'eventId': '<?= \Input::get('eventId') ?>',
-            'publishState': publishState
-        }).always(function() {
-          window.location.reload();
-        });
-      });
-    });
-  })(jQuery);
-</script>
-<?php endif; ?>
-
-
-<br>
-
-
-<h3>Vorschau</h3>
-<?php if(strlen($this->text) > 0): ?>
-<div class="ce_text block">
-    <?= nl2br($this->text) ?>
-</div>
-<?php endif; ?>
-
-
-<?php if(count($this->images)): ?>
-{{br}}
-  <div id="dashboardEventStoryGallery" class="<?php if($this->publishState < 2): ?>sortable-thumbnail-container <?php endif; ?> dashboard-event-story-gallery row">
-      <?php foreach($this->images as $arrFile): ?>
-      <div class="col-12 col-sm-6 col-md-3 thumbnail <?php if($this->publishState < 2): ?>sortable-item <?php endif; ?>responsive" data-file-uuid="<?= \StringUtil::binToUuid($arrFile['uuid']) ?>" title="Sortierung mit Drag and Drop &auml;ndern">
-        {{image::<?= Contao\StringUtil::binToUuid($arrFile['uuid']) ?>?width=400&height=400&mode=crop}}
-        <?php if($this->publishState < 2): ?>
-        <button class="btn btn-danger remove-image" title="Bild löschen"><i class="fa fa-trash"></i></button>
         <?php endif; ?>
-      </div>
-      <?php endforeach; ?>
-  </div>
+
+        <?php if ($this->text != '' && $this->publishState < 2): ?>
+            <div class="mr-2">Status:</div>
+            <div class="mr-2">
+                <select class="form-control" name="publishEventStory" id="publishEventStory">
+                    <option value="1"<?php if ($this->publishState < 2): ?> selected<?php endif; ?>>In Bearbeitung
+                    </option>
+                    <option value="2"<?php if ($this->publishState == 2): ?> selected<?php endif; ?>>Bericht
+                        veröffentlichen
+                    </option>
+                </select>
+            </div>
+        <?php endif; ?>
+
+    </div>
 
 
-  <?php if($this->publishState < 2): ?>
-  <script>
-    /**
-     * Remove image from collection
-     */
-    (function ($) {
-      $(document).ready(function () {
-        "use strict";
-        $('.remove-image').on('click touchmove', function (e) {
-          e.preventDefault();
-          var elImage = $(this).closest('[data-file-uuid]');
-          if(elImage.length)
-          {
-            var uuid = $(elImage).data('file-uuid');
-            if(uuid !== undefined){
-              var jqxhr = $.post('ajax', {
-                'REQUEST_TOKEN': '{{request_token}}',
-                'eventId': '<?= \Input::get('eventId') ?>',
-                'action': 'removeImage',
-                'uuid': uuid
-              }).done(function() {
-                elImage.fadeOut(400, function(){
-                    $(this).remove();
-                });
-              });
-            }
-          }
-        });
-
-        var container = document.getElementById("dashboardEventStoryGallery");
-        var sort = Sortable.create(container, {
-          animation: 50, // ms, animation speed moving items when sorting, `0` — without animation
-          //handle: ".sortable-item", // Restricts sort start click/touch to the specified element
-          draggable: ".sortable-item", // Specifies which items inside the element should be sortable
-          onUpdate: function (event) {
-            var item = event.item; // the current dragged HTMLElement
-            var arrUuid = [];
-            var collection = $(item).closest('.sortable-thumbnail-container').find('.sortable-item');
-            $(collection).each(function (index) {
-              arrUuid.push($(this).data('fileUuid'));
-            });
-            var jqxhr = $.post('ajax', {
-                'REQUEST_TOKEN': '{{request_token}}',
-                'eventId': '<?= \Input::get('eventId') ?>',
-                'action': 'sortGallery',
-                'uuids': JSON.stringify(arrUuid)
-            });
-          }
-        });
-      });
-    })(jQuery);
-
-
-
-    /**
-     * Sort image order by jQuery Drag & Drop
-     * And send via xhr to save new order in the db
-     * Requires https://rubaxa.github.io/Sortable/
-     */
-    (function ($) {
-      $(document).ready(function () {
-        "use strict";
-        var container = document.getElementById("dashboardEventStoryGallery");
-        var sort = Sortable.create(container, {
-          animation: 50, // ms, animation speed moving items when sorting, `0` — without animation
-          //handle: ".sortable-item", // Restricts sort start click/touch to the specified element
-          draggable: ".sortable-item", // Specifies which items inside the element should be sortable
-          onUpdate: function (event) {
-            var item = event.item; // the current dragged HTMLElement
-            var arrUuid = [];
-            var collection = $(item).closest('.sortable-thumbnail-container').find('.sortable-item');
-            $(collection).each(function (index) {
-              arrUuid.push($(this).data('fileUuid'));
-            });
-            var jqxhr = $.post(window.location.href, {
-              'REQUEST_TOKEN': '{{request_token}}',
-              'xhrAction': 'sortGallery',
-              'uuids': JSON.stringify(arrUuid)
-            });
-          }
-        });
-      });
-    })(jQuery);
-  </script>
-  <?php endif; ?>
+    <!-- Modal Boxes -->
+    <div class="modal fade write-story-text-and-yt" tabindex="-1" role="dialog" aria-labelledby="ModalUploadTextAndYt"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Bericht erstellen</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i aria-hidden="true" class="fal fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{insert_form::18}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade write-story-fotoupload" tabindex="-1" role="dialog" aria-labelledby="ModalUploadFoto"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Fotoupload</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i aria-hidden="true" class="fal fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{insert_form::19}}
+                </div>
+            </div>
+        </div>
+    </div>
 <?php endif; ?>
 
-<?php if($this->youtubeId): ?>
-{{br}}
-<div class="ce_bootstrapYoutubeResponsiveEmbed block">
-    <div class="embed-responsive embed-responsive-16by9">
-        <iframe class="embed-responsive-item" src="//www.youtube.com/embed/<?= $this->youtubeId ?>?rel=0" allowfullscreen=""></iframe>
+
+<?php if ($this->publishState < 3): ?>
+    <script>
+        (function ($) {
+            jQuery(document).ready(function () {
+                $('#publishEventStory').change(function () {
+                    var publishState = this.value;
+                    var jqxhr = $.post('ajax', {
+                        'REQUEST_TOKEN': '{{request_token}}',
+                        'action': 'setPublishState',
+                        'eventId': '<?= Contao\Input::get('eventId') ?>',
+                        'publishState': publishState
+                    }).done(function (json) {
+                        if (json.status != 'success') {
+                            console.log(json);
+                        }
+                    }).always(function () {
+                        window.location.reload();
+                    });
+                });
+            });
+        })(jQuery);
+    </script>
+<?php endif; ?>
+
+
+    <br>
+
+
+    <h3>Vorschau</h3>
+<?php if (strlen($this->text) > 0): ?>
+    <div class="ce_text block">
+        <?= nl2br($this->text) ?>
     </div>
-</div>
+<?php endif; ?>
+
+
+<?php if (count($this->images)): ?>
+    {{br}}
+    <div id="dashboardEventStoryGallery"
+         class="<?php if ($this->publishState < 2): ?>sortable-thumbnail-container <?php endif; ?> dashboard-event-story-gallery row">
+        <?php foreach ($this->images as $arrFile): ?>
+            <div class="col-12 col-sm-6 col-md-3 thumbnail <?php if ($this->publishState < 2): ?>sortable-item <?php endif; ?>responsive"
+                 data-file-uuid="<?= \StringUtil::binToUuid($arrFile['uuid']) ?>"
+                 title="Sortierung mit Drag and Drop &auml;ndern">
+                {{image::<?= Contao\StringUtil::binToUuid($arrFile['uuid']) ?>?width=400&height=400&mode=crop}}
+                <?php if ($this->publishState < 2): ?>
+                    <button class="btn btn-danger remove-image" title="Bild löschen"><i class="fa fa-trash"></i></button>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+
+    <?php if ($this->publishState < 2): ?>
+        <script>
+            /**
+             * Remove image from collection
+             */
+            (function ($) {
+                $(document).ready(function () {
+                    "use strict";
+                    $('.remove-image').on('click touchmove', function (e) {
+                        e.preventDefault();
+                        var elImage = $(this).closest('[data-file-uuid]');
+                        if (elImage.length) {
+                            var uuid = $(elImage).data('file-uuid');
+                            if (uuid !== undefined) {
+                                var jqxhr = $.post('ajax', {
+                                    'REQUEST_TOKEN': '{{request_token}}',
+                                    'eventId': '<?= Contao\Input::get('eventId') ?>',
+                                    'action': 'removeImage',
+                                    'uuid': uuid
+                                }).done(function (json) {
+                                    if (json.status != 'success') {
+                                        console.log(json);
+                                    }
+                                    elImage.fadeOut(400, function () {
+                                        $(this).remove();
+                                    });
+                                });
+                            }
+                        }
+                    });
+
+                    /**
+                     * Image drag and drop sorting
+                     * @type {Element|*}
+                     */
+                    var container = document.getElementById("dashboardEventStoryGallery");
+                    var sort = Sortable.create(container, {
+                        animation: 50, // ms, animation speed moving items when sorting, `0` — without animation
+                        //handle: ".sortable-item", // Restricts sort start click/touch to the specified element
+                        draggable: ".sortable-item", // Specifies which items inside the element should be sortable
+                        onUpdate: function (event) {
+                            var item = event.item; // the current dragged HTMLElement
+                            var arrUuid = [];
+                            var collection = $(item).closest('.sortable-thumbnail-container').find('.sortable-item');
+                            $(collection).each(function (index) {
+                                arrUuid.push($(this).data('fileUuid'));
+                            });
+                            var jqxhr = $.post('ajax', {
+                                'REQUEST_TOKEN': '{{request_token}}',
+                                'eventId': '<?= Contao\Input::get('eventId') ?>',
+                                'action': 'sortGallery',
+                                'uuids': JSON.stringify(arrUuid)
+                            }).done(function (json) {
+                                if (json.status != 'success') {
+                                    console.log(json);
+                                }
+                            });
+                        }
+                    });
+                });
+            })(jQuery);
+        </script>
+    <?php endif; ?>
+<?php endif; ?>
+
+<?php if ($this->youtubeId): ?>
+    {{br}}
+    <div class="ce_bootstrapYoutubeResponsiveEmbed block">
+        <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" src="//www.youtube.com/embed/<?= $this->youtubeId ?>?rel=0"
+                    allowfullscreen=""></iframe>
+        </div>
+    </div>
 <?php endif; ?>
 
 

@@ -8,25 +8,26 @@
  * @link    https://sac-kurse.kletterkader.com
  */
 
-namespace Markocupic\SacEventToolBundle;
+declare(strict_types=1);
+
+namespace Markocupic\SacEventToolBundle\FrontendAjax;
 
 use Contao\Input;
 use Contao\CalendarEventsModel;
 use Contao\StringUtil;
 use Contao\UserModel;
-use Contao\Environment;
 use Contao\CalendarEventsStoryModel;
 use Contao\Validator;
 use Contao\Database;
 use Contao\FrontendUser;
 use Contao\File;
 use Contao\FilesModel;
-use Contao\Email;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 /**
  * Class FrontendAjax
- * @package Markocupic\SacEventToolBundle
+ * @package Markocupic\SacEventToolBundle\FrontendAjax
  */
 class FrontendAjax
 {
@@ -153,8 +154,10 @@ class FrontendAjax
                 }
             }
         }
-        echo json_encode(array('filter' => $visibleItems));
-        exit;
+
+        $response = new JsonResponse(array('status' => 'success', 'filter' => $visibleItems));
+        return $response->send();
+
     }
 
 
@@ -274,8 +277,10 @@ class FrontendAjax
                 }
             }
         }
-        echo json_encode(array('filter' => $visibleItems));
-        exit;
+
+        $response = new JsonResponse(array('status' => 'success', 'filter' => $visibleItems));
+        return $response->send();
+
     }
 
 
@@ -311,26 +316,32 @@ class FrontendAjax
 
         if (Input::post('action') !== 'sortGallery' || !Input::post('uuids') || !Input::post('eventId') || !FE_USER_LOGGED_IN)
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
 
         $objUser = FrontendUser::getInstance();
         if ($objUser === null)
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
 
         // Save new image order to db
         $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? AND pid=?')->limit(1)->execute($objUser->sacMemberId, Input::post('eventId'));
         if (!$objDb->numRows)
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
+
         $objStory = CalendarEventsStoryModel::findByPk($objDb->id);
         if ($objStory === null)
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
+
         $arrSorting = json_decode(Input::post('uuids'));
         $arrSorting = array_map(function ($uuid) {
             return StringUtil::uuidToBin($uuid);
@@ -338,6 +349,10 @@ class FrontendAjax
 
         $objStory->orderSRC = serialize($arrSorting);
         $objStory->save();
+
+        $response = new JsonResponse(array('status' => 'success'));
+        return $response->send();
+
     }
 
 
@@ -350,29 +365,37 @@ class FrontendAjax
 
         if (Input::post('action') !== 'setPublishState' || !Input::post('eventId') || !FE_USER_LOGGED_IN)
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
 
         $objUser = FrontendUser::getInstance();
         if ($objUser === null)
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
 
         // Save new image order to db
         $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=? && publishState<?')->limit(1)->execute($objUser->sacMemberId, Input::post('eventId'), 3);
         if (!$objDb->numRows)
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
+
         $objStory = CalendarEventsStoryModel::findByPk($objDb->id);
         if ($objStory === null)
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
 
         $objStory->publishState = Input::post('publishState');
         $objStory->save();
+
+        $response = new JsonResponse(array('status' => 'success'));
+        return $response->send();
     }
 
     /**
@@ -383,24 +406,28 @@ class FrontendAjax
     {
         if (!Input::post('eventId') || !Input::post('uuid') || !FE_USER_LOGGED_IN)
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
 
         $objUser = FrontendUser::getInstance();
         if ($objUser === null)
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
         // Save new image order to db
         $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=? && publishState<?')->limit(1)->execute($objUser->sacMemberId, Input::post('eventId'), 3);
         if (!$objDb->numRows)
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
         $objStory = CalendarEventsStoryModel::findByPk($objDb->id);
         if ($objStory === null)
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
         $multiSrc = deserialize($objStory->multiSRC, true);
         $orderSrc = deserialize($objStory->orderSRC, true);
@@ -409,7 +436,8 @@ class FrontendAjax
 
         if (!Validator::isUuid($uuid))
         {
-            return;
+            $response = new JsonResponse(array('status' => 'error'));
+            return $response->send();
         }
 
         $key = array_search($uuid, $multiSrc);
@@ -439,6 +467,7 @@ class FrontendAjax
             $oFile->delete();
             $objFile->delete();
         }
-        return;
+        $response = new JsonResponse(array('status' => 'success'));
+        return $response->send();
     }
 }
