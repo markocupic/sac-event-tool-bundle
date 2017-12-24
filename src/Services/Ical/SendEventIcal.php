@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Services\Ical;
 
 use Contao\CalendarEventsModel;
+use Contao\Controller;
 use Contao\Environment;
 use Eluceo\iCal\Component\Calendar;
 use Eluceo\iCal\Component\Event;
@@ -34,24 +35,16 @@ class SendEventIcal
         $vEvent
             ->setDtStart(\DateTime::createFromFormat('d.m.Y - H:i:s', date('d.m.Y - H:i:s', (int) $objEvent->startTime)))
             ->setDtEnd(\DateTime::createFromFormat('d.m.Y - H:i:s', date('d.m.Y - H:i:s', (int) $objEvent->endTime)))
-            ->setSummary(strip_tags($this->replaceInsertTags($objEvent->title)))
+            ->setSummary(strip_tags(Controller::replaceInsertTags($objEvent->title)))
             ->setUseUtc(false)
             ->setLocation($objEvent->location)
             ->setNoTime($noTime)
         ;
-        // HOOK: modify the vEvent
-        if (isset($GLOBALS['TL_HOOKS']['modifyIcsFile']) && is_array($GLOBALS['TL_HOOKS']['modifyIcsFile'])) {
-            foreach ($GLOBALS['TL_HOOKS']['modifyIcsFile'] as $callback) {
-                $this->import($callback[0]);
-                $this->{$callback[0]}->{$callback[1]}($vEvent, $objEvent, $this);
-            }
-        }
+
         $vCalendar->addComponent($vEvent);
         header('Content-Type: text/calendar; charset=utf-8');
         header('Content-Disposition: attachment; filename="'.$objEvent->alias.'.ics"');
         echo $vCalendar->render();
         exit;
     }
-
-
 }

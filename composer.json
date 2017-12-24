@@ -16,7 +16,7 @@
     "phpoffice/phpword": "v0.13.*",
     "markocupic/export_table": ">=1.2.0",
     "menatwork/contao-multicolumnwizard": "^3.3",
-    "1up-lab/contao-ical-export": "^2.0"
+    "eluceo/ical": "~0.6"
   },
   "autoload": {
     "psr-4": {
