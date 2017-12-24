@@ -11,6 +11,7 @@
 namespace Markocupic\SacEventToolBundle\Services\Docx;
 
 use Contao\Environment;
+use Markocupic\SacEventToolBundle\CalendarSacEvents;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 use Contao\Controller;
@@ -24,6 +25,7 @@ use Contao\Date;
 use Contao\EventOrganizerModel;
 use Contao\Folder;
 use Contao\System;
+
 
 /**
  * Class ExportEvents2Docx
@@ -296,6 +298,7 @@ class ExportEvents2Docx
             // Kusdatendaten in der Form d.m.Y, d.m.Y, ...
             if ($field == 'repeatFixedDates')
             {
+
                 $arr = CalendarSacEvents::getEventTimestamps(self::$arrDatarecord['id']);
                 $arr = array_map(function ($tstamp) {
                     return Date::parse('d.m.Y', $tstamp);
