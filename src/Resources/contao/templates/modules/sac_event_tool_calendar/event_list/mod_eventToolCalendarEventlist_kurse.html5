@@ -32,7 +32,7 @@
 
 <li>
 	<a href="{{env::url}}/?action=downloadKursbroschuere&year=2017&cat=0">
-		<button class="text-right btn btn-success" title="Kursprogramm als pdf Brosch&uuml; herunterladen">
+		<button class="text-right btn btn-success" title="Kursprogramm als pdf Brosch&uuml;re herunterladen">
 		    <i class="fa fa-fw fa-file-pdf"></i>
 		</button>
     </a>
