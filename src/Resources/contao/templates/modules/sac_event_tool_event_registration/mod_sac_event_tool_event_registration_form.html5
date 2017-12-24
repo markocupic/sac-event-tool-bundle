@@ -18,7 +18,7 @@
     <?php endif; ?>
 
     <?php if (!FE_USER_LOGGED_IN): ?>
-        <a href="{{link_url::member-login}}" class="btn btn-link">LOGIN</a>
+        <a href="{{link_url::member-login}}" class="trigger-login-modal btn btn-link">LOGIN</a>
     <?php endif; ?>
 
 

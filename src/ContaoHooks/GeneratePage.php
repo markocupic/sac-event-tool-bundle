@@ -15,10 +15,7 @@ use Contao\Automator;
 use Contao\Input;
 use Contao\Controller;
 use Contao\System;
-use Contao\Environment;
-use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
 use Markocupic\SacEventToolBundle\Services\Docx\ExportEvents2Docx;
-use Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase;
 
 /**
  * Class GeneratePage
