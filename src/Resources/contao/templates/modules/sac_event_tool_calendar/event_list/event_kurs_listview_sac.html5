@@ -50,7 +50,7 @@
     <td>
         <?php $eventState = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($this->id); ?>
         <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($this->id)]; ?>
-        <i class="fa fa-fw <?= $eventState ?>" aria-label="<?= $eventStateLabel ?>" title="<?= $eventStateLabel ?>"></i>
+        <i class="event-state-icon fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
         <a href="{{event_url::<?php echo $this->id; ?>}}">{{event_title::<?= $this->id ?>}}</a>
     </td>
     <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getMainInstructorName($this->id) ?></td>
