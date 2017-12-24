@@ -5,6 +5,12 @@ sac_event_tool_ajax_frontend:
         _scope: frontend
         _token_check: true
 
+
+sac_event_tool_ical_frontend:
+    resource: "@MarkocupicSacEventToolBundle/Controller"
+    type: annotation
+
+
 sac_event_tool_cronjob:
     resource: "@MarkocupicSacEventToolBundle/Controller"
     type: annotation
