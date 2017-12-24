@@ -8,7 +8,7 @@
  * @link    https://sac-kurse.kletterkader.com
  */
 
-namespace Markocupic\SacEventToolBundle;
+namespace Markocupic\SacEventToolBundle\Services\Docx;
 
 use Contao\Environment;
 use PhpOffice\PhpWord\PhpWord;

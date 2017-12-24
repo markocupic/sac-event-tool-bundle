@@ -4,6 +4,10 @@
 
     <h1 class="ce_headline"><?= $this->title ?></h1>
 
+    <div class="event-detail-buttons mb-4">
+        <a href="/ical?eventId=<?= $this->id ?>" title="Event in Kalender importieren" class="btn btn-outline-primary"><i class="fal fa-calendar-plus"></i> iCal download</a>
+    </div>
+
   <?php if($this->teaser != ''): ?>
   <div class="teaser event-detail lead font-weight-bold">
     <p><?= nl2br($this->teaser) ?></p>

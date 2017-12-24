@@ -4,7 +4,9 @@
         <?php if($this->eventType === 'lastMinuteTour'): ?><h4 class="ce_headline last-minute-tour">Last minute tour (Spontantour)</h4><?php endif; ?>
         <h1 class="ce_headline"><?= $this->title ?></h1>
 
-    <a href="/ical?eventId=<?= $this->id ?>" class="btn btn-outline-primary"><i class="fal fa-calendar-plus"> ICS Datei herunterladen</i></a>
+    <div class="event-detail-buttons mb-4">
+        <a href="/ical?eventId=<?= $this->id ?>" title="Event in Kalender importieren" class="btn btn-outline-primary"><i class="fal fa-calendar-plus"></i> iCal download</a>
+    </div>
 
     <?php if($this->teaser != ''): ?>
     <div class="teaser event-detail lead font-weight-bold">
