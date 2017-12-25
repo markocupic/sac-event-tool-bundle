@@ -9,9 +9,7 @@
 
 namespace Markocupic\SacEventToolBundle;
 
-use Contao\Folder;
-use Contao\Dbafs;
-
+use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 
 
 class PreparePluginEnvironment
@@ -21,9 +19,9 @@ class PreparePluginEnvironment
 
     /**
      * PreparePluginEnvironment constructor.
-     * @param $framework
+     * @param ContaoFrameworkInterface $framework
      */
-    public function __construct($framework)
+    public function __construct(ContaoFrameworkInterface $framework)
     {
         $this->framework = $framework;
         $this->framework->initialize();
@@ -36,23 +34,32 @@ class PreparePluginEnvironment
      */
     public function createPluginDirectories()
     {
+
+        $dbafs = $this->framework->getAdapter(\Contao\Dbafs::class);
+
         // Create FE-USER-HOME-DIR
-        new Folder(SAC_EVT_FE_USER_DIRECTORY_ROOT);
-        Dbafs::addResource(SAC_EVT_FE_USER_DIRECTORY_ROOT);
+        $this->framework->createInstance(\Contao\Folder::class, array(SAC_EVT_FE_USER_DIRECTORY_ROOT));
+        $dbafs->addResource(SAC_EVT_FE_USER_DIRECTORY_ROOT);
 
         // Create FE-USER-AVATAR-DIR
-        new Folder(SAC_EVT_FE_USER_AVATAR_DIRECTORY);
-        Dbafs::addResource(SAC_EVT_FE_USER_AVATAR_DIRECTORY);
+        $this->framework->createInstance(\Contao\Folder::class, array(SAC_EVT_FE_USER_AVATAR_DIRECTORY));
+        $dbafs->addResource(SAC_EVT_FE_USER_AVATAR_DIRECTORY);
 
         // Create BE-USER-HOME-DIR
-        new Folder(SAC_EVT_BE_USER_DIRECTORY_ROOT);
-        Dbafs::addResource(SAC_EVT_BE_USER_DIRECTORY_ROOT);
+        $this->framework->createInstance(\Contao\Folder::class, array(SAC_EVT_BE_USER_DIRECTORY_ROOT));
+        $dbafs->addResource(SAC_EVT_BE_USER_DIRECTORY_ROOT);
 
         // Create tmp folder
-        new Folder(SAC_EVT_TEMP_PATH);
-        Dbafs::addResource(SAC_EVT_TEMP_PATH);
+        $this->framework->createInstance(\Contao\Folder::class, array(SAC_EVT_TEMP_PATH));
+        $dbafs->addResource(SAC_EVT_TEMP_PATH);
+
     }
 
+    /**
+     * Playground for UnitTest
+     * @param $bla
+     * @return mixed
+     */
     public function getName($bla)
     {
         return $bla;
