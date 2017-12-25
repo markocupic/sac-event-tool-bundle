@@ -27,7 +27,10 @@ $GLOBALS['TL_DCA']['tl_calendar']['list']['operations']['cut'] = array
 
 
 // Palettes
-$GLOBALS['TL_DCA']['tl_calendar']['palettes']['default'] = str_replace('{protected_legend','{access_permission_legend},useLevelAccessPermissions;{protected_legend', $GLOBALS['TL_DCA']['tl_calendar']['palettes']['default']);
+Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+    ->addLegend('access_permission_legend', 'protected_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addField(array('useLevelAccessPermissions'), 'access_permission_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('default', 'tl_calendar');
 
 // Selectors
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'useLevelAccessPermissions';
@@ -42,8 +45,6 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['pid'] = array(
     'sql' => "int(10) unsigned NOT NULL default '0'",
     'relation' => array('type' => 'belongsTo', 'load' => 'eager')
 );
-
-
 
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['levelAccessPermissionPackage'] = array(
     'label' => &$GLOBALS['TL_LANG']['tl_calendar']['levelAccessPermissionPackage'],

@@ -9,10 +9,10 @@
  */
 
 
-/**
- * Extend default palette
- */
-$GLOBALS['TL_DCA']['tl_user_group']['palettes']['default'] = str_replace('{calendars_legend},', '{calendars_legend},calendar_containers,calendar_containerp,', $GLOBALS['TL_DCA']['tl_user_group']['palettes']['default']);
+// Extend default palette
+Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+    ->addField(array('calendar_containers', 'calendar_containerp'), 'calendars_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
+    ->applyToPalette('default', 'tl_user_group');
 
 
 /**
@@ -20,22 +20,22 @@ $GLOBALS['TL_DCA']['tl_user_group']['palettes']['default'] = str_replace('{calen
  */
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['calendar_containers'] = array
 (
-	'label'                   => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containers'],
-	'exclude'                 => true,
-	'inputType'               => 'checkbox',
-	'foreignKey'              => 'tl_calendar_container.title',
-	'eval'                    => array('multiple'=>true),
-	'sql'                     => "blob NULL"
+    'label' => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containers'],
+    'exclude' => true,
+    'inputType' => 'checkbox',
+    'foreignKey' => 'tl_calendar_container.title',
+    'eval' => array('multiple' => true),
+    'sql' => "blob NULL"
 );
 
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['calendar_containerp'] = array
 (
-	'label'                   => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containerp'],
-	'exclude'                 => true,
-	'inputType'               => 'checkbox',
-	'options'                 => array('create', 'delete'),
-	'reference'               => &$GLOBALS['TL_LANG']['MSC'],
-	'eval'                    => array('multiple'=>true),
-	'sql'                     => "blob NULL"
+    'label' => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containerp'],
+    'exclude' => true,
+    'inputType' => 'checkbox',
+    'options' => array('create', 'delete'),
+    'reference' => &$GLOBALS['TL_LANG']['MSC'],
+    'eval' => array('multiple' => true),
+    'sql' => "blob NULL"
 );
 
