@@ -12,13 +12,29 @@ namespace Markocupic\SacEventToolBundle;
 use Contao\Folder;
 use Contao\Dbafs;
 
+
+
 class PreparePluginEnvironment
 {
+    private $framework;
+
+
+    /**
+     * PreparePluginEnvironment constructor.
+     * @param $framework
+     */
+    public function __construct($framework)
+    {
+        $this->framework = $framework;
+        $this->framework->initialize();
+    }
+
+
     /**
      * Prepare the plugin environment
      * Create directories
      */
-    public static function createPluginDirectories()
+    public function createPluginDirectories()
     {
         // Create FE-USER-HOME-DIR
         new Folder(SAC_EVT_FE_USER_DIRECTORY_ROOT);
@@ -35,5 +51,10 @@ class PreparePluginEnvironment
         // Create tmp folder
         new Folder(SAC_EVT_TEMP_PATH);
         Dbafs::addResource(SAC_EVT_TEMP_PATH);
+    }
+
+    public function getName($bla)
+    {
+        return $bla;
     }
 }

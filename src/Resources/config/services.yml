@@ -1,2 +1,7 @@
 services:
+    markocupic.sac_event_tool_bundle.prepare_plugin_environment:
+        class: Markocupic\SacEventToolBundle\PreparePluginEnvironment
+        arguments:
+            - "@contao.framework"
+
 

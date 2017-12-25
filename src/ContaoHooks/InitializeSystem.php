@@ -12,6 +12,7 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Input;
+use Contao\System;
 use Contao\Database;
 use Markocupic\SacEventToolBundle\ExportEvents2Typo3;
 use Markocupic\SacEventToolBundle\PreparePluginEnvironment;
@@ -47,7 +48,9 @@ class InitializeSystem
     {
 
         // Prepare Plugin environment, create folders, etc.
-        PreparePluginEnvironment::createPluginDirectories();
+        $objPluginEnv = System::getContainer()->get('markocupic.sac_event_tool_bundle.prepare_plugin_environment');
+
+        $objPluginEnv->createPluginDirectories();
 
 
         // Convert events to typo3 html export file
