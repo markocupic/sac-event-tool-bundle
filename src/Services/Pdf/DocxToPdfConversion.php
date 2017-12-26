@@ -42,7 +42,7 @@ class DocxToPdfConversion
         $pdfSRC = $tmpDir . '/' . $filename . '.pdf';
 
         // Convert docx file to pdf if it can not bee found in the cache
-        if (!is_file($rootDir . '/' . $pdfSRC) || $blnUncached === true)
+        if (!is_file($rootDir . '/' . $pdfSRC || $blnUncached === true))
         {
             // Be sure the folder exists
             new Folder($tmpDir);
