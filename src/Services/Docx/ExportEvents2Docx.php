@@ -25,6 +25,7 @@ use Contao\Date;
 use Contao\EventOrganizerModel;
 use Contao\Folder;
 use Contao\System;
+use Contao\Config;
 
 
 /**
@@ -179,13 +180,12 @@ class ExportEvents2Docx
         }
         // Saving the document as OOXML file...
         $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
-        new Folder(SAC_EVT_TEMP_PATH);
-        $objWriter->save($rootDir . '/' . SAC_EVT_TEMP_PATH . '/sac-jahresprogramm.docx');
+        new Folder(Config::get('SAC_EVT_TEMP_PATH'));
+        $objWriter->save($rootDir . '/' . Config::get('SAC_EVT_TEMP_PATH') . '/sac-jahresprogramm.docx');
         sleep(1);
-        Controller::sendFileToBrowser(SAC_EVT_TEMP_PATH . '/sac-jahresprogramm.docx');
+        Controller::sendFileToBrowser(Config::get('SAC_EVT_TEMP_PATH') . '/sac-jahresprogramm.docx');
 
         exit();
-
 
     }
 

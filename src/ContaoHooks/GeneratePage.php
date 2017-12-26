@@ -15,6 +15,7 @@ use Contao\Automator;
 use Contao\Input;
 use Contao\Controller;
 use Contao\System;
+use Contao\Config;
 use Markocupic\SacEventToolBundle\Services\Docx\ExportEvents2Docx;
 
 /**
@@ -55,8 +56,8 @@ class GeneratePage
         // Für Downloads z.B. Downloadlink auf www.sac-pilatus.ch/kurse
         if (Input::get('action') === 'downloadKursbroschuere' && Input::get('year') != '')
         {
-            System::log('The course booklet has been downloaded.', __FILE__ . ' Line: ' . __LINE__, SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD);
-            $fileSRC = sprintf(SAC_EVT_WORKSHOP_FLYER_SRC, Input::get('year'));
+            System::log('The course booklet has been downloaded.', __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'));
+            $fileSRC = sprintf(Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'), Input::get('year'));
             Controller::sendFileToBrowser($fileSRC);
         }
 

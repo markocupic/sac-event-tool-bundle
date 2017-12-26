@@ -20,7 +20,7 @@ use Contao\Database;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Date;
-use Contao\Input;
+use Contao\Config;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
 use Contao\UserModel;
@@ -215,7 +215,7 @@ class PrintWorkshopsAsPdf
             $this->pdf->endTOCPage();
         }
 
-        $fileSRC = sprintf(SAC_EVT_WORKSHOP_FLYER_SRC, $this->year);
+        $fileSRC = sprintf(Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'), $this->year);
 
         if ($this->download === false)
         {

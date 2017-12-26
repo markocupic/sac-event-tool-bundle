@@ -88,7 +88,7 @@ class tl_calendar_events_story extends Backend
         {
             // Full access to admins
         }
-        elseif (array_intersect(StringUtil::deserialize($this->User->groups, true), array(SAC_EVT_GRUPPE_EVENTERFASSUNG_HAUPTREDAKTOREN)))
+        elseif (array_intersect(StringUtil::deserialize($this->User->groups, true), array(Config::get('SAC_EVT_GRUPPE_EVENTERFASSUNG_HAUPTREDAKTOREN'))))
         {
             // If user belongs to group "Hauptredaktor" grant full rights.
         }
@@ -143,7 +143,7 @@ class tl_calendar_events_story extends Backend
         if ($this->User->isAdmin)
         {
         }
-        elseif (array_intersect(StringUtil::deserialize($this->User->groups, true), array(SAC_EVT_GRUPPE_EVENTERFASSUNG_HAUPTREDAKTOREN)))
+        elseif (array_intersect(StringUtil::deserialize($this->User->groups, true), array(Config::get('SAC_EVT_GRUPPE_EVENTERFASSUNG_HAUPTREDAKTOREN'))))
         {
             // If user belongs to group "Hauptredaktor" grant full rights.
         }

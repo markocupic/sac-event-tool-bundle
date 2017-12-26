@@ -428,7 +428,7 @@ class tl_calendar_events_member extends Backend
     public function addIcon($row, $label, DataContainer $dc, $args)
     {
         $icon = 'icons/' . $row['stateOfSubscription'] . '.svg';
-        $args[0] = sprintf('<div><img src="%s/%s" alt="%s" width="16" height=16"></div>', SAC_EVT_ASSETS_DIR, $icon, $row['stateOfSubscription']);
+        $args[0] = sprintf('<div><img src="%s/%s" alt="%s" width="16" height=16"></div>', Config::get('SAC_EVT_ASSETS_DIR'), $icon, $row['stateOfSubscription']);
         return $args;
     }
 

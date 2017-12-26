@@ -19,6 +19,7 @@ use Contao\File;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
+use Contao\Config;
 
 /**
  * Class ValidateForms
@@ -80,7 +81,7 @@ class ValidateForms
     {
         $this->framework = $framework;
 
-        $this->eventStoriesUploadPath = SAC_EVT_EVENT_STORIES_UPLOAD_PATH;
+        $this->eventStoriesUploadPath = Config::get('SAC_EVT_EVENT_STORIES_UPLOAD_PATH');
 
         $this->input = $this->framework->getAdapter(\Contao\Input::class);
 

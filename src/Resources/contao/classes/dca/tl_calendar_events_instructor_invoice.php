@@ -127,12 +127,12 @@ class tl_calendar_events_instructor_invoice extends Backend
             // Delete tmp files older the 1 week
             // Get root dir
             $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-            $arrScan = scan($rootDir . '/' . SAC_EVT_TEMP_PATH);
+            $arrScan = scan($rootDir . '/' . Config::get('SAC_EVT_TEMP_PATH'));
             foreach ($arrScan as $file)
             {
-                if (is_file($rootDir . '/' . SAC_EVT_TEMP_PATH . '/' . $file))
+                if (is_file($rootDir . '/' . Config::get('SAC_EVT_TEMP_PATH') . '/' . $file))
                 {
-                    $objFile = new File(SAC_EVT_TEMP_PATH . '/' . $file);
+                    $objFile = new File(Config::get('SAC_EVT_TEMP_PATH') . '/' . $file);
                     if ($objFile !== null)
                     {
                         if ($objFile->mtime + 60 * 60 * 24 * 7 < time())
@@ -328,17 +328,17 @@ class tl_calendar_events_instructor_invoice extends Backend
                 $arrData[] = array('key' => 'eventId', 'value' => $objEvent->id);
 
                 // Generate filename
-                $filename = sprintf(SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN, time(), 'docx');
+                $filename = sprintf(Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'), time(), 'docx');
 
-                // Create SAC_EVT_TEMP_PATH
-                new Folder(SAC_EVT_TEMP_PATH);
-                Dbafs::addResource(SAC_EVT_TEMP_PATH);
+                // Create temporary file path
+                new Folder(Config::get('SAC_EVT_TEMP_PATH'));
+                Dbafs::addResource(Config::get('SAC_EVT_TEMP_PATH'));
 
                 // Generate docxPhpOffice\PhpWord;
-                PhpOffice\PhpWord\TemplateProcessorExtended::create($arrData, SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC, SAC_EVT_TEMP_PATH, $filename, false);
+                PhpOffice\PhpWord\TemplateProcessorExtended::create($arrData, Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), Config::get('SAC_EVT_TEMP_PATH'), $filename, false);
 
                 // Generate pdf
-                Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion::convert(SAC_EVT_TEMP_PATH . '/' . $filename, SAC_EVT_CLOUDCONVERT_API_KEY, true);
+                Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion::convert(Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'), true);
                 exit();
             }
         }

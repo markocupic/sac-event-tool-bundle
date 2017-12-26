@@ -10,7 +10,6 @@
 
 namespace Markocupic\SacEventToolBundle;
 
-use Contao\CalendarEventsMemberModel;
 use Contao\EventOrganizerModel;
 use Contao\StringUtil;
 use Contao\Database;
@@ -25,6 +24,7 @@ use Contao\Date;
 use Contao\ContentModel;
 use Contao\System;
 use Contao\Controller;
+use Contao\Config;
 
 /**
  * Class CalendarSacEvents
@@ -236,7 +236,7 @@ class CalendarSacEvents extends System
             }
         }
 
-        return SAC_EVT_EVENT_DEFALUT_PREVIEW_IMAGE_SRC;
+        return Config::get('SAC_EVT_EVENT_DEFALUT_PREVIEW_IMAGE_SRC');
 
     }
 

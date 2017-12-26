@@ -21,6 +21,7 @@ use Contao\User;
 use Contao\BackendUser;
 use Contao\UserModel;
 use Contao\System;
+use Contao\Config;
 
 
 /**
@@ -63,19 +64,19 @@ class PostLogin
             // Create user directories
             while ($objUser->next())
             {
-                new Folder(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id);
-                new Folder(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/avatar');
-                new Folder(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/documents');
-                new Folder(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/images');
+                new Folder(Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $objUser->id);
+                new Folder(Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $objUser->id . '/avatar');
+                new Folder(Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $objUser->id . '/documents');
+                new Folder(Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $objUser->id . '/images');
 
                 // Copy default avatar
-                if (!is_file($rootDir . '/' . SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/avatar/default.jpg'))
+                if (!is_file($rootDir . '/' . Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $objUser->id . '/avatar/default.jpg'))
                 {
-                    Files::getInstance()->copy(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/new/avatar/default.jpg', SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id . '/avatar/default.jpg');
+                    Files::getInstance()->copy(Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/new/avatar/default.jpg', Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $objUser->id . '/avatar/default.jpg');
                 }
 
                 // Add filemount for the user directory
-                $strFolder = SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $objUser->id;
+                $strFolder = Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $objUser->id;
                 $objFile = FilesModel::findByPath($strFolder);
                 $arrFileMounts = unserialize($objUser->filemounts);
                 $arrFileMounts[] = $objFile->uuid;
@@ -89,7 +90,7 @@ class PostLogin
             }
 
             // Scan for unused old directories
-            $scanDir = scan(SAC_EVT_BE_USER_DIRECTORY_ROOT, true);
+            $scanDir = scan(Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT'), true);
             if (!empty($scanDir) && is_array($scanDir))
             {
                 foreach ($scanDir as $userDir)
@@ -99,18 +100,18 @@ class PostLogin
                         continue;
                     }
 
-                    if (is_dir($rootDir . '/' . SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $userDir))
+                    if (is_dir($rootDir . '/' . Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $userDir))
                     {
                         if (!UserModel::findByPk($userDir))
                         {
-                            $objFolder = new Folder(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $userDir);
+                            $objFolder = new Folder(Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $userDir);
                             if ($objFolder)
                             {
-                                $objFolder->renameTo(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/old__' . $userDir);
-                                $objFileModel = FilesModel::findByPath(SAC_EVT_BE_USER_DIRECTORY_ROOT . '/' . $userDir);
+                                $objFolder->renameTo(Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/old__' . $userDir);
+                                $objFileModel = FilesModel::findByPath(Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $userDir);
                                 if ($objFileModel !== null)
                                 {
-                                    $objFileModel->path = SAC_EVT_BE_USER_DIRECTORY_ROOT . '/old__' . $userDir;
+                                    $objFileModel->path = Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/old__' . $userDir;
                                     $objFileModel->save();
                                 }
                             }

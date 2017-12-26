@@ -10,7 +10,9 @@
 namespace Markocupic\SacEventToolBundle;
 
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
-
+use Contao\Config;
+use Contao\Folder;
+use Contao\Dbafs;
 
 class PreparePluginEnvironment
 {
@@ -35,33 +37,24 @@ class PreparePluginEnvironment
     public function createPluginDirectories()
     {
 
-        $dbafs = $this->framework->getAdapter(\Contao\Dbafs::class);
+        $dbafs = $this->framework->getAdapter(Dbafs::class);
 
         // Create FE-USER-HOME-DIR
-        $this->framework->createInstance(\Contao\Folder::class, array(SAC_EVT_FE_USER_DIRECTORY_ROOT));
-        $dbafs->addResource(SAC_EVT_FE_USER_DIRECTORY_ROOT);
+        $this->framework->createInstance(Folder::class, array(Config::get('SAC_EVT_FE_USER_DIRECTORY_ROOT')));
+        $dbafs->addResource(Config::get('SAC_EVT_FE_USER_DIRECTORY_ROOT'));
 
         // Create FE-USER-AVATAR-DIR
-        $this->framework->createInstance(\Contao\Folder::class, array(SAC_EVT_FE_USER_AVATAR_DIRECTORY));
-        $dbafs->addResource(SAC_EVT_FE_USER_AVATAR_DIRECTORY);
+        $this->framework->createInstance(Folder::class, array(Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY')));
+        $dbafs->addResource(Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY'));
 
         // Create BE-USER-HOME-DIR
-        $this->framework->createInstance(\Contao\Folder::class, array(SAC_EVT_BE_USER_DIRECTORY_ROOT));
-        $dbafs->addResource(SAC_EVT_BE_USER_DIRECTORY_ROOT);
+        $this->framework->createInstance(Folder::class, array(Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT')));
+        $dbafs->addResource(Config::get('SAC_EVT_BE_USER_DIRECTORY_ROOT'));
 
         // Create tmp folder
-        $this->framework->createInstance(\Contao\Folder::class, array(SAC_EVT_TEMP_PATH));
-        $dbafs->addResource(SAC_EVT_TEMP_PATH);
+        $this->framework->createInstance(Folder::class, array(Config::get('SAC_EVT_TEMP_PATH')));
+        $dbafs->addResource(Config::get('SAC_EVT_TEMP_PATH'));
 
     }
 
-    /**
-     * Playground for UnitTest
-     * @param $bla
-     * @return mixed
-     */
-    public function getName($bla)
-    {
-        return $bla;
-    }
 }
