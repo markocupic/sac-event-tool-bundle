@@ -17,7 +17,10 @@ use Contao\Environment;
 use Eluceo\iCal\Component\Calendar;
 use Eluceo\iCal\Component\Event;
 
-
+/**
+ * Class SendEventIcal
+ * @package Markocupic\SacEventToolBundle\Services\Ical
+ */
 class SendEventIcal
 {
 

@@ -29,8 +29,9 @@ class DocxToPdfConversion
      * @param $docxSRC
      * @param $apiKey
      * @param bool $sendToBrowser
+     * @param bool $blnUncached
      */
-    public static function convert($docxSRC, $apiKey, $sendToBrowser = false)
+    static function convert($docxSRC, $apiKey, $sendToBrowser = false, $blnUncached = false)
     {
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
@@ -41,7 +42,7 @@ class DocxToPdfConversion
         $pdfSRC = $tmpDir . '/' . $filename . '.pdf';
 
         // Convert docx file to pdf if it can not bee found in the cache
-        if (!is_file($rootDir . '/' . $pdfSRC))
+        if (!is_file($rootDir . '/' . $pdfSRC || $blnUncached === true))
         {
             // Be sure the folder exists
             new Folder($tmpDir);

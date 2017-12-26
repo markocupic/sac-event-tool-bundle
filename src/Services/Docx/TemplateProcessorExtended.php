@@ -7,6 +7,8 @@
  * @link    https://sac-kurse.kletterkader.com
  */
 
+declare(strict_types=1);
+
 namespace PhpOffice\PhpWord;
 
 use Contao\Folder;
@@ -54,15 +56,16 @@ class TemplateProcessorExtended extends TemplateProcessor
      * @param $tempSRC
      * @param $filename
      * @param bool $sendToBrowser
+     * @param bool $blnUncached
      */
-    public static function create($arrData, $templSRC, $tempSRC, $filename, $sendToBrowser = false)
+    public static function create($arrData, $templSRC, $tempSRC, $filename, $sendToBrowser = false, $blnUncached=false): void
     {
-       
+
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
-        // Create docx file if it can not bee found in the cache
-        if (!is_file($rootDir . '/' . $tempSRC . '/' . $filename))
+        // Create docx file if it can not bee found in the cache or if $blnUncached is set to true
+        if (!is_file($rootDir . '/' . $tempSRC . '/' . $filename) || $blnUncached === true)
         {
             // Instantiate the Template processor
             $templateProcessor = new TemplateProcessorExtended($rootDir . '/' . $templSRC);

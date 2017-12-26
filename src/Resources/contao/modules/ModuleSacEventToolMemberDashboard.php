@@ -173,10 +173,10 @@ class ModuleSacEventToolMemberDashboard extends Module
                             $filename = sprintf(Config::get('SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'), $objMember->sacMemberId, $objEvent->id, 'docx');
 
                             // Generate docxPhpOffice\PhpWord;
-                            TemplateProcessorExtended::create($arrData, Config::get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'), Config::get('SAC_EVT_TEMP_PATH'), $filename, false);
+                            TemplateProcessorExtended::create($arrData, Config::get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'), Config::get('SAC_EVT_TEMP_PATH'), $filename, false, false);
 
                             // Generate pdf
-                            DocxToPdfConversion::convert(Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'), true);
+                            DocxToPdfConversion::convert(Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'), true, false);
 
                             exit();
                         }

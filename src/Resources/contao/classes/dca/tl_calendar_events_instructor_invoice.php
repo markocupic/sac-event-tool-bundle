@@ -335,10 +335,10 @@ class tl_calendar_events_instructor_invoice extends Backend
                 Dbafs::addResource(Config::get('SAC_EVT_TEMP_PATH'));
 
                 // Generate docxPhpOffice\PhpWord;
-                PhpOffice\PhpWord\TemplateProcessorExtended::create($arrData, Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), Config::get('SAC_EVT_TEMP_PATH'), $filename, false);
+                PhpOffice\PhpWord\TemplateProcessorExtended::create($arrData, Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), Config::get('SAC_EVT_TEMP_PATH'), $filename, false, true);
 
                 // Generate pdf
-                Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion::convert(Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'), true);
+                Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion::convert(Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'), true, true);
                 exit();
             }
         }

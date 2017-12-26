@@ -8,6 +8,8 @@
  * @link    https://sac-kurse.kletterkader.com
  */
 
+declare(strict_types=1);
+
 namespace Markocupic\SacEventToolBundle\Services\Docx;
 
 use Contao\Environment;
@@ -55,7 +57,7 @@ class ExportEvents2Docx
      * @param $year
      * @param null $eventId
      */
-    public static function sendToBrowser($calendarId, $year, $eventId = null)
+    public static function sendToBrowser($calendarId, $year, $eventId = null): void
     {
 
         // Get root dir
@@ -133,7 +135,7 @@ class ExportEvents2Docx
 
 
             // Add the title
-            $title = htmlspecialchars(self::manipulateValue('title', $objEvent->title, $objEvent));
+            $title = htmlspecialchars(self::formatValue('title', $objEvent->title, $objEvent));
             $phpWord->addTitleStyle(1, $fStyleTitle, null);
             $section->addTitle(htmlspecialchars($title, ENT_COMPAT, 'UTF-8'), 1);
 
@@ -166,7 +168,7 @@ class ExportEvents2Docx
                 $table->addRow();
                 $table->addCell($widthCol_1)->addText(htmlspecialchars($label . ":"), 'fStyleBold', 'pStyle');
                 $objCell = $table->addCell($widthCol_2);
-                $value = self::manipulateValue($fieldname, $objEvent->{$fieldname}, $objEvent);
+                $value = self::formatValue($fieldname, $objEvent->{$fieldname}, $objEvent);
                 // Add multiline text
                 self::addMultilineText($objCell, $value);
             }
@@ -193,7 +195,7 @@ class ExportEvents2Docx
      * @param $objCell
      * @param $textlines
      */
-    public static function addMultilineText($objCell, $textlines)
+    public static function addMultilineText($objCell, $textlines): void
     {
 
         foreach (explode("\n", $textlines) as $line)
@@ -206,9 +208,9 @@ class ExportEvents2Docx
      * @param $field
      * @param string $value
      * @param $objEvent
-     * @return array|null|string
+     * @return string
      */
-    public static function manipulateValue($field, $value = '', $objEvent)
+    public static function formatValue($field, $value = '', $objEvent): string
     {
         $table = self::$strTable;
         $dataRecord = self::$arrDatarecord;
