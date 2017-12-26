@@ -107,13 +107,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'] = array(
     'lastMinuteTour' => 'Last Minute Tour'
 );
 
-$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['USER-FUNCTIONS'] = array(
-    1 => 'Vorstand',
-    2 => 'Kursleiter',
-    3 => 'Tourenleiter',
-);
-
-$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['role'] =array(
+$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['role'] = array(
     'tourguide',
     'courseguide',
     'president',
@@ -148,7 +142,6 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = array(
     14 => "3 - 5",
     15 => "4 - 5",
 );
-
 
 
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'] = array(
