@@ -45,21 +45,6 @@ class InitializeSystem
     public function initializeSystem()
     {
 
-        $Users = \Contao\UserModel::findAll();
-        while ($Users->next())
-        {
-            $arrGroups = deserialize($Users->groups,true);
-            $arrRole = deserialize($Users->groups,true);
-
-            if(in_array(3, $arrGroups))
-            {
-                $arrRole[] = 'courseguide';
-                $arrRole = array_unique($arrRole);
-                $Users->role = serialize($arrRole);
-                $Users->save();
-            }
-        }
-
         // Prepare Plugin environment, create folders, etc.
         $objPluginEnv = System::getContainer()->get('markocupic.sac_event_tool_bundle.prepare_plugin_environment');
 

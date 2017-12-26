@@ -40,7 +40,6 @@ class PreparePluginEnvironmentTest extends ContaoTestCase
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_SAC_SECTION_IDS']));
 
 
-        $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_GRUPPE_KURSLEITER']));
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_SECTION_NAME']));
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_TEMP_PATH']));
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_AVATAR_MALE']));

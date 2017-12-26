@@ -229,6 +229,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['leiterQualifikation'] = array(
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['role'] = array(
     'label' => &$GLOBALS['TL_LANG']['tl_user']['role'],
+    'reference' => &$GLOBALS['TL_LANG']['tl_user'],
     'exclude' => true,
     'search' => true,
     'filter' => true,

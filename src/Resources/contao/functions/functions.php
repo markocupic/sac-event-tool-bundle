@@ -76,7 +76,7 @@ function getAvatar($userId, $mode = 'BE')
             }
             else
             {
-                if($objUser->gender === 'female')
+                if ($objUser->gender === 'female')
                 {
                     return \Config::get('SAC_EVT_AVATAR_FEMALE');
                 }
@@ -88,7 +88,6 @@ function getAvatar($userId, $mode = 'BE')
             return '';
         }
     }
-
 
 
     if ($mode === 'BE')
@@ -147,6 +146,25 @@ function generateAvatar($userId, $size, $mode = 'BE')
     return \Picture::create($path, $size)->getTemplateData();
 }
 
+/**
+ * Check if user has a certain role
+ * @param $userId
+ * @param $strRole
+ * @return bool
+ */
+function userHasRole($userId, $strRole)
+{
+    $objUser = \UserModel::findByPk($userId);
+    if ($objUser !== null)
+    {
+        $arrRole = \StringUtil::deserialize($objUser->role, true);
+        if (in_array($strRole, $arrRole))
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 
 
