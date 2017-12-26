@@ -113,6 +113,15 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['USER-FUNCTIONS'] = array(
     3 => 'Tourenleiter',
 );
 
+$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['role'] =array(
+    'tourguide',
+    'courseguide',
+    'president',
+    'executivemember',
+    'tourchief',
+    'coursechief'
+);
+
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = array(
     1 => "Tourenleiter SAC",
     2 => "Bergführer IVBV",

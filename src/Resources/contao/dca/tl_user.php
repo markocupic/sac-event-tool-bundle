@@ -23,7 +23,9 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('frontend_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('instructor_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
-    ->addField(array('sacMemberId', 'firstname', 'lastname', 'dateOfBirth', 'gender', 'street', 'postal', 'city', 'state', 'country', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addLegend('role_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('instructor_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addField(array('role'), 'role_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('avatarSRC'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('iban', 'leiterQualifikation'), 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('calendar_containers', 'calendar_containerp'), 'calendars_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
@@ -222,6 +224,17 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['leiterQualifikation'] = array(
     'inputType' => 'checkboxWizard',
     'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'],
     'eval' => array('tl_class' => '', 'multiple' => true, 'orderField' => 'orderLeiterQualifikation'),
+    'sql' => "blob NULL",
+);
+
+$GLOBALS['TL_DCA']['tl_user']['fields']['role'] = array(
+    'label' => &$GLOBALS['TL_LANG']['tl_user']['role'],
+    'exclude' => true,
+    'search' => true,
+    'filter' => true,
+    'inputType' => 'checkboxWizard',
+    'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['role'],
+    'eval' => array('tl_class' => '', 'multiple' => true),
     'sql' => "blob NULL",
 );
 
