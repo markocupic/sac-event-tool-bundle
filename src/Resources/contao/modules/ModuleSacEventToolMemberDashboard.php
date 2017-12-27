@@ -176,7 +176,9 @@ class ModuleSacEventToolMemberDashboard extends Module
                             TemplateProcessorExtended::create($arrData, Config::get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'), Config::get('SAC_EVT_TEMP_PATH'), $filename, false, false);
 
                             // Generate pdf
-                            DocxToPdfConversion::convert(Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'), true, false);
+                            DocxToPdfConversion::create(Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
+                            ->sendToBrowser(true)
+                            ->convert();
 
                             exit();
                         }

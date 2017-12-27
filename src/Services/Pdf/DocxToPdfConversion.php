@@ -8,6 +8,8 @@
  * @link    https://sac-kurse.kletterkader.com
  */
 
+declare(strict_types=1);
+
 namespace Markocupic\SacEventToolBundle\Services\Pdf;
 
 use CloudConvert\Api;
@@ -19,6 +21,8 @@ use Contao\File;
 use Contao\System;
 
 /**
+ * Converts docx to pdf using the Cloudconvert Api
+ *
  * Class DocxToPdfConversion
  * @package Markocupic\SacEventToolBundle\Services\Pdf
  */
@@ -26,28 +30,87 @@ class DocxToPdfConversion
 {
 
     /**
-     * @param $docxSRC
-     * @param $apiKey
-     * @param bool $sendToBrowser
-     * @param bool $blnUncached
+     * @var
      */
-    static function convert($docxSRC, $apiKey, $sendToBrowser = false, $blnUncached = false)
+    private $apiKey;
+
+
+    /**
+     * @var
+     */
+    private $docxSrc;
+
+
+    /**
+     * @var bool
+     */
+    private $sendToBrowser = false;
+
+
+    /**
+     * @var bool
+     */
+    private $createUncached = false;
+
+
+    /**
+     * Creates a new object instance.
+     *
+     * @param string $docxSrc
+     * @param string $apiKey
+     * @return static
+     */
+    public static function create(string $docxSrc, string $apiKey)
+    {
+        $objConv = new static();
+        $objConv->docxSrc = $docxSrc;
+        $objConv->apiKey = $apiKey;
+        return $objConv;
+    }
+
+
+    /**
+     * @param bool $blnSendToBrowser
+     * @return static
+     */
+    public function sendToBrowser($blnSendToBrowser = false)
+    {
+        $this->sendToBrowser = $blnSendToBrowser;
+        return $this;
+    }
+
+
+    /**
+     * @param bool $blnUncached
+     * @return static
+     */
+    public function createUncached($blnUncached = false)
+    {
+        $this->createUncached = $blnUncached;
+        return $this;
+    }
+
+
+    /**
+     *
+     */
+    public function convert(): void
     {
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
-        $pathParts = pathinfo($docxSRC);
+        $pathParts = pathinfo($this->docxSrc);
         $tmpDir = $pathParts['dirname'];
         $filename = $pathParts['filename'];
         $pdfSRC = $tmpDir . '/' . $filename . '.pdf';
 
         // Convert docx file to pdf if it can not bee found in the cache
-        if (!is_file($rootDir . '/' . $pdfSRC) || $blnUncached === true)
+        if (!is_file($rootDir . '/' . $pdfSRC) || $this->createUncached === true)
         {
             // Be sure the folder exists
             new Folder($tmpDir);
 
-            $api = new Api($apiKey);
+            $api = new Api($this->apiKey);
             try
             {
                 // https://cloudconvert.com/api/console
@@ -55,7 +118,7 @@ class DocxToPdfConversion
                     'inputformat' => 'docx',
                     'outputformat' => 'pdf',
                     'input' => 'upload',
-                    'file' => fopen($rootDir . '/' . $docxSRC, 'r'),
+                    'file' => fopen($rootDir . '/' . $this->docxSrc, 'r'),
                 ])->wait()->download($rootDir . '/' . $pdfSRC);
             }
                 // Exception handling
@@ -79,7 +142,7 @@ class DocxToPdfConversion
             }
         }
 
-        if ($sendToBrowser)
+        if ($this->sendToBrowser)
         {
             // Send converted file to the browser
             sleep(1);

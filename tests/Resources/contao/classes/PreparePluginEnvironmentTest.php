@@ -1,9 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Marko
- * Date: 25.12.2017
- * Time: 13:10
+ * SAC Event Tool Web Plugin for Contao
+ * Copyright (c) 2008-2017 Marko Cupic
+ * @package sac-event-tool-bundle
+ * @author Marko Cupic m.cupic@gmx.ch, 2017
+ * @link    https://sac-kurse.kletterkader.com
  */
 
 namespace Markocupic\SacEventToolBundle;
@@ -18,20 +19,16 @@ use Contao\TestCase\ContaoTestCase;
 class PreparePluginEnvironmentTest extends ContaoTestCase
 {
 
-    public function setUp()
-    {
-    }
-
     /**
-     * My first unit test
+     * Check if parameter file exists and parameters are laoded
      */
     public function testEventToolParametersFileIsLoaded()
     {
-        //$rootDir = \Contao\System::getContainer()->getParameter('kernel.project_dir');
+        $rootDir = __DIR__ . '/../../../../../../../';
 
         // Check for parameter file
-        $this->assertTrue(\is_file(__DIR__ . '/../../../../../../../sac_event_tool_parameters.php'));
-        require_once __DIR__ . '/../../../../../../../sac_event_tool_parameters.php';
+        $this->assertTrue(\is_file($rootDir . '/sac_event_tool_parameters.php'));
+        require_once $rootDir . '/sac_event_tool_parameters.php';
 
         // FTP Credentials SAC Switzerland link: Daniel Fernandez Daniel.Fernandez@sac-cas.ch
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME']));
