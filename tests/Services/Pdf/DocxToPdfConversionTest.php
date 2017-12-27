@@ -10,6 +10,7 @@
 namespace Markocupic\SacEventToolBundle\Services\Pdf;
 
 use Contao\TestCase\ContaoTestCase;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 
 class DocxToPdfConversionTest extends ContaoTestCase
@@ -32,9 +33,9 @@ class DocxToPdfConversionTest extends ContaoTestCase
      */
     public function testCanBeInstantiated()
     {
-        $dtpc = DocxToPdfConversion::create('foo', 'bar');
 
-        $this->assertInstanceOf($this->instanceOf, $dtpc);
+        $this->expectException(FileNotFoundException::class);
+        DocxToPdfConversion::create('foo', 'bar');
     }
 
     /**
@@ -42,8 +43,17 @@ class DocxToPdfConversionTest extends ContaoTestCase
      */
     public function testSendToBrowserCanBeCalled()
     {
-        $dtpc = DocxToPdfConversion::create('foo', 'bar')->sendToBrowser(true);
-        $this->assertInstanceOf($this->instanceOf, $dtpc);
+
+        // Create a stub for the SomeClass class.
+        $stub = $this->createMock(DocxToPdfConversion::class);
+
+        // Configure the stub.
+        $stub->method('sendToBrowser')
+            ->willReturn(null);
+
+        // Calling $stub->sendToBrowser() will now return
+        // null
+        $this->assertNull($stub->sendToBrowser());
     }
 
     /**
@@ -51,8 +61,17 @@ class DocxToPdfConversionTest extends ContaoTestCase
      */
     public function testCreateUncachedCanBeCalled()
     {
-        $dtpc = DocxToPdfConversion::create('foo', 'bar')->createUncached(true);
-        $this->assertInstanceOf($this->instanceOf, $dtpc);
+
+        // Create a stub for the SomeClass class.
+        $stub = $this->createMock(DocxToPdfConversion::class);
+
+        // Configure the stub.
+        $stub->method('createUncached')
+            ->willReturn(null);
+
+        // Calling $stub->createUncached() will now return
+        // null
+        $this->assertNull($stub->createUncached());
     }
 
     /**
@@ -70,7 +89,6 @@ class DocxToPdfConversionTest extends ContaoTestCase
         // Calling $stub->convert() will now return
         // null
         $this->assertNull($stub->convert());
-
     }
 
 }

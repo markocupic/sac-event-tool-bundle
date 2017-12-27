@@ -280,12 +280,12 @@ class tl_calendar_events_instructor_invoice extends Backend
                 {
                     $i++;
                     $strIsActiveMember = '!inaktiv/keinMItglied';
-                    if($objEventMember->sacMemberId != '')
+                    if ($objEventMember->sacMemberId != '')
                     {
                         $objMemberModel = MemberModel::findBySacMemberId($objEventMember->sacMemberId);
-                        if($objMemberModel !== null)
+                        if ($objMemberModel !== null)
                         {
-                            if($objMemberModel->isSacMember)
+                            if ($objMemberModel->isSacMember)
                             {
                                 $strIsActiveMember = ' ';
                             }
@@ -328,20 +328,25 @@ class tl_calendar_events_instructor_invoice extends Backend
                 $arrData[] = array('key' => 'eventId', 'value' => $objEvent->id);
 
                 // Generate filename
-                $filename = sprintf(Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'), time(), 'docx');
+                $targetFile = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf(Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'), time(), 'docx');
 
-                // Create temporary file path
+                // Create temporary folder, if it not exists.
                 new Folder(Config::get('SAC_EVT_TEMP_PATH'));
                 Dbafs::addResource(Config::get('SAC_EVT_TEMP_PATH'));
 
-                // Generate docxPhpOffice\PhpWord;
-                PhpOffice\PhpWord\TemplateProcessorExtended::create($arrData, Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), Config::get('SAC_EVT_TEMP_PATH'), $filename, false, true);
+                // Generate Docx file from template;
+                PhpOffice\PhpWord\CreateDocxFromTemplate::create($arrData, Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), $targetFile)
+                    ->generateUncached(true)
+                    ->sendToBrowser(false)
+                    ->generate()
+                ;
 
                 // Generate pdf
-                Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion::create(Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
-                ->sendToBrowser(true)
-                ->createUncached(true)
-                ->convert();
+                Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion::create($targetFile, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
+                    ->sendToBrowser(true)
+                    ->createUncached(true)
+                    ->convert()
+                ;
                 exit();
             }
         }

@@ -19,6 +19,8 @@ use CloudConvert\Exceptions\ApiTemporaryUnavailableException;
 use Contao\Folder;
 use Contao\File;
 use Contao\System;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
+
 
 /**
  * Converts docx to pdf using the Cloudconvert Api
@@ -62,6 +64,12 @@ class DocxToPdfConversion
      */
     public static function create(string $docxSrc, string $apiKey)
     {
+        $rootDir = dirname(__DIR__ . '/../../../../../../../');
+        if (!file_exists($rootDir . '/' . $docxSrc))
+        {
+            throw new FileNotFoundException(sprintf('Docx file "%s" not found. Conversion aborted.', $docxSrc));
+        }
+
         $objConv = new static();
         $objConv->docxSrc = $docxSrc;
         $objConv->apiKey = $apiKey;

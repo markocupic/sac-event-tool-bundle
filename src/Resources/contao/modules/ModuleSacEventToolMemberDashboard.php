@@ -35,7 +35,7 @@ use Contao\MemberModel;
 use Contao\CalendarEventsMemberModel;
 use NotificationCenter\Model\Notification;
 use Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion;
-use PhpOffice\PhpWord\TemplateProcessorExtended;
+use PhpOffice\PhpWord\CreateDocxFromTemplate;
 use Haste\Form\Form;
 
 /**
@@ -171,14 +171,20 @@ class ModuleSacEventToolMemberDashboard extends Module
                             $arrData[] = array('key' => 'regId', 'value' => $objRegistration->id);
 
                             $filename = sprintf(Config::get('SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'), $objMember->sacMemberId, $objEvent->id, 'docx');
+                            $targetSrc = Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename;
+                            $docxTemplateSrc = Config::get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC');
 
                             // Generate docxPhpOffice\PhpWord;
-                            TemplateProcessorExtended::create($arrData, Config::get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'), Config::get('SAC_EVT_TEMP_PATH'), $filename, false, false);
+                            CreateDocxFromTemplate::create($arrData, $docxTemplateSrc, $targetSrc)
+                                ->generateUncached(false)
+                                ->sendToBrowser(false)
+                                ->generate();
 
                             // Generate pdf
-                            DocxToPdfConversion::create(Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
-                            ->sendToBrowser(true)
-                            ->convert();
+                            DocxToPdfConversion::create($targetSrc, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
+                                ->sendToBrowser(true)
+                                ->createUncached(false)
+                                ->convert();
 
                             exit();
                         }
@@ -199,7 +205,7 @@ class ModuleSacEventToolMemberDashboard extends Module
     protected function compile()
     {
 
-        if($this->objUser->email == '' || !Validator::isEmail($this->objUser->email))
+        if ($this->objUser->email == '' || !Validator::isEmail($this->objUser->email))
         {
             Message::addInfo('Leider wurde f&uuml;r dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschr&auml;nkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
         }
@@ -383,7 +389,7 @@ class ModuleSacEventToolMemberDashboard extends Module
         $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event abgemeldet werden. Bitte nimm mit dem verantwortlichen Leiter Kontakt auf.';
 
         $objEventsMember = CalendarEventsMemberModel::findByPk($registrationId);
-        if($objEventsMember === null)
+        if ($objEventsMember === null)
         {
             Message::add($errorMsg, 'TL_ERROR', TL_MODE);
             return;
@@ -398,7 +404,7 @@ class ModuleSacEventToolMemberDashboard extends Module
             if ($objEvent !== null)
             {
                 $objInstructor = $objEvent->getRelated('mainInstructor');
-                if($objEventsMember->stateOfSubscription === 'subscription-refused')
+                if ($objEventsMember->stateOfSubscription === 'subscription-refused')
                 {
                     $objEventsMember->delete();
                     System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->pid, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
@@ -508,7 +514,7 @@ class ModuleSacEventToolMemberDashboard extends Module
         if (Input::post('FORM_SUBMIT') === 'form-avatar-upload' && Input::post('delete-avatar'))
         {
             $objFile = new File(Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/avatar-' . $this->objUser->id . '.jpeg', true);
-            if($objFile->exists())
+            if ($objFile->exists())
             {
                 $objFile->delete();
             }
@@ -543,7 +549,7 @@ class ModuleSacEventToolMemberDashboard extends Module
         $objForm->addFormField('vegetarian', array(
             'label' => 'Vegetarier',
             'inputType' => 'select',
-            'options' => array('false'=> 'Nein', 'true' => 'Ja'),
+            'options' => array('false' => 'Nein', 'true' => 'Ja'),
             'eval' => array('mandatory' => true)
         ));
         $objForm->addFormField('emergencyPhone', array(
@@ -580,7 +586,8 @@ class ModuleSacEventToolMemberDashboard extends Module
         $objForm->bindModel($objModel);
 
 
-        if ($objForm->validate()) {
+        if ($objForm->validate())
+        {
             // The model will now contain the changes so you can save it
             $objModel->save();
         }
