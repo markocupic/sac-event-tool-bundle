@@ -49,6 +49,8 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
     {
         // Get the root dir
         $this->rootDir = __DIR__ . '/../../../../../../';
+
+
     }
 
     /**
@@ -56,15 +58,40 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
      */
     public function testClassInstantiation()
     {
-        $objDatabaseSync = new SyncSacMemberDatabase(array('999', '888'), 'someHost', 'someUser', 'somePassword');
+
+    // Create a stub for the SomeClass class.
+    $stub = $this->createMock(SyncSacMemberDatabase::class);
+
+    // Configure the stub.
+    $stub->method('openFtpConnection')
+    ->willReturn(null);
+    // Calling $stub->convert() will now return null
+    $this->assertNull($stub->openFtpConnection());
+     /**
+     * $container = $this->mockContainer();
+        $loader = new YamlFileLoader(
+            $container,
+            new FileLocator(__DIR__ . '/../../../src/Resources/config')
+        );
+
+        $loader->load('listener.yml');
+        $loader->load('parameters.yml');
+        $loader->load('services.yml');
+
+        $container = $this->_getFtpConnectionParams($container);
+
+
+        $objDatabaseSync = $container->get('markocupic.sac_event_tool_bundle.sync_sac_member_database');
 
         // Check class instantiation
         $this->assertInstanceOf(SyncSacMemberDatabase::class, $objDatabaseSync);
+        die();
+      * **/
     }
 
 
+
     /**
-     * @depends testClassInstantiation
      */
     public function testFtpConnection()
     {
@@ -111,10 +138,11 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
      */
     private function _getFtpConnectionParams()
     {
+        $container = $this->mockContainer();
         // Load the configuration file
         require_once $this->rootDir . '/sac_event_tool_parameters.php';
 
-        $container = $this->mockContainer();
+        //$container = $this->mockContainer();
         $loader = new YamlFileLoader(
             $container,
             new FileLocator(__DIR__ . '/../../../src/Resources/config')
@@ -147,6 +175,8 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
         $this->hostname = $container->getParameter('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME');
         $this->username = $container->getParameter('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME');
         $this->password = $container->getParameter('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD');
+
+        return $container;
     }
 
     /**

@@ -4,4 +4,14 @@ services:
         arguments:
             - "@contao.framework"
 
-
+    markocupic.sac_event_tool_bundle.sync_sac_member_database:
+        class: Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase
+        arguments:
+            - "@contao.framework"
+            - "@database_connection"
+            - "@filesystem"
+            - "%kernel.project_dir%"
+            - "%SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME%"
+            - "%SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME%"
+            - "%SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD%"
+            - "%SAC_EVT_SAC_SECTION_IDS%"

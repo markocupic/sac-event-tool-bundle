@@ -36,7 +36,9 @@ class CronjobController extends Controller
         // Sync SAC member database with tl_member
         if (Input::get('action') === 'syncSacMemberDatabase')
         {
-            $objSync = new SyncSacMemberDatabase($GLOBALS['TL_CONFIG']['SAC_EVT_SAC_SECTION_IDS'], $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'], $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'], $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD']);
+            $container = \System::getContainer();
+            $objSync = $container->get('markocupic.sac_event_tool_bundle.sync_sac_member_database');
+
             // Load files fromftp
             $objSync->loadDataFromFtp();
             // Then sync with tl_member
