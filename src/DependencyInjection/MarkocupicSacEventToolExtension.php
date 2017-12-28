@@ -39,5 +39,24 @@ class MarkocupicSacEventToolExtension extends Extension
         $loader->load('listener.yml');
         $loader->load('parameters.yml');
         $loader->load('services.yml');
+
+        // Merge parameters
+        if (!empty($GLOBALS['TL_CONFIG']) && is_array($GLOBALS['TL_CONFIG']))
+        {
+            foreach ($GLOBALS['TL_CONFIG'] as $key => $value)
+            {
+                if (strpos($key, 'SAC_EVT_') !== false)
+                {
+                    if (!empty($value) && is_array($value))
+                    {
+                        $container->setParameter($key, \json_encode($value));
+                    }
+                    else
+                    {
+                        $container->setParameter($key, $value);
+                    }
+                }
+            }
+        }
     }
 }

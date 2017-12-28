@@ -170,9 +170,11 @@ class ModuleSacEventToolMemberDashboard extends Module
                             $arrData[] = array('key' => 'eventName', 'value' => htmlspecialchars(html_entity_decode($objEvent->title)));
                             $arrData[] = array('key' => 'regId', 'value' => $objRegistration->id);
 
-                            $filename = sprintf(Config::get('SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'), $objMember->sacMemberId, $objEvent->id, 'docx');
-                            $targetSrc = Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename;
-                            $docxTemplateSrc = Config::get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC');
+                            $container = System::getContainer();
+                            $filenamePattern = str_replace('%%s', '%s', $container->getParameter('SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'));
+                            $filename = sprintf($filenamePattern, $objMember->sacMemberId, $objEvent->id, 'docx');
+                            $targetSrc = $container->getParameter('SAC_EVT_TEMP_PATH') . '/' . $filename;
+                            $docxTemplateSrc = $container->getParameter('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC');
 
                             // Generate docxPhpOffice\PhpWord;
                             CreateDocxFromTemplate::create($arrData, $docxTemplateSrc, $targetSrc)
@@ -181,7 +183,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                                 ->generate();
 
                             // Generate pdf
-                            DocxToPdfConversion::create($targetSrc, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
+                            DocxToPdfConversion::create($targetSrc, $container->getParameter('SAC_EVT_CLOUDCONVERT_API_KEY'))
                                 ->sendToBrowser(true)
                                 ->createUncached(false)
                                 ->convert();

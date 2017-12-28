@@ -57,7 +57,9 @@ class GeneratePage
         if (Input::get('action') === 'downloadKursbroschuere' && Input::get('year') != '')
         {
             System::log('The course booklet has been downloaded.', __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'));
-            $fileSRC = sprintf(Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'), Input::get('year'));
+            $container = System::getContainer();
+            $filenamePattern = str_replace('%%s', '%s', $container->getParameter('SAC_EVT_WORKSHOP_FLYER_SRC'));
+            $fileSRC = sprintf($filenamePattern, Input::get('year'));
             Controller::sendFileToBrowser($fileSRC);
         }
 

@@ -328,7 +328,9 @@ class tl_calendar_events_instructor_invoice extends Backend
                 $arrData[] = array('key' => 'eventId', 'value' => $objEvent->id);
 
                 // Generate filename
-                $targetFile = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf(Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'), time(), 'docx');
+                $container = \Contao\System::getContainer();
+                $filenamePattern = str_replace('%%s', '%s',$container->getParameter('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
+                $targetFile = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
 
                 // Create temporary folder, if it not exists.
                 new Folder(Config::get('SAC_EVT_TEMP_PATH'));

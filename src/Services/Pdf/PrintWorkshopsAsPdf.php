@@ -215,7 +215,9 @@ class PrintWorkshopsAsPdf
             $this->pdf->endTOCPage();
         }
 
-        $fileSRC = sprintf(Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'), $this->year);
+        $container = System::getContainer();
+        $filenamePattern = str_replace('%%s', '%s', $container->getParameter('SAC_EVT_WORKSHOP_FLYER_SRC'));
+        $fileSRC = sprintf($filenamePattern, $this->year);
 
         if ($this->download === false)
         {

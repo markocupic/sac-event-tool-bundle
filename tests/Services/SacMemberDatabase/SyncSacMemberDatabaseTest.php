@@ -12,6 +12,8 @@ namespace Markocupic\SacEventToolBundle\Services\SacMemberDatabase;
 use Contao\TestCase\ContaoTestCase;
 use Markocupic\SacEventToolBundle\Services\SacMemberDatabase;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class SyncSacMemberDatabaseTest extends ContaoTestCase
 {
@@ -109,13 +111,42 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
      */
     private function _getFtpConnectionParams()
     {
+        // Load the configuration file
         require_once $this->rootDir . '/sac_event_tool_parameters.php';
 
+        $container = $this->mockContainer();
+        $loader = new YamlFileLoader(
+            $container,
+            new FileLocator(__DIR__ . '/../../../src/Resources/config')
+        );
+
+        $loader->load('listener.yml');
+        $loader->load('parameters.yml');
+        $loader->load('services.yml');
+
+        if (!empty($GLOBALS['TL_CONFIG']) && is_array($GLOBALS['TL_CONFIG']))
+        {
+            foreach ($GLOBALS['TL_CONFIG'] as $key => $value)
+            {
+                if (strpos($key, 'SAC_EVT_') !== false)
+                {
+                    if (!empty($value) && is_array($value))
+                    {
+                        $container->setParameter($key, \json_encode($value));
+                    }
+                    else
+                    {
+                        $container->setParameter($key, $value);
+                    }
+                }
+            }
+        }
+
         // FTP Credentials SAC Switzerland link: Daniel Fernandez Daniel.Fernandez@sac-cas.ch
-        $this->arrSectionIds = $GLOBALS['TL_CONFIG']['SAC_EVT_SAC_SECTION_IDS'];
-        $this->hostname = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'];
-        $this->username = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'];
-        $this->password = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD'];
+        $this->arrSectionIds = json_decode($container->getParameter('SAC_EVT_SAC_SECTION_IDS'));
+        $this->hostname = $container->getParameter('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME');
+        $this->username = $container->getParameter('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME');
+        $this->password = $container->getParameter('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD');
     }
 
     /**
