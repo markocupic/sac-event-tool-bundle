@@ -5,6 +5,7 @@
  * @package sac-event-tool-bundle
  * @author Marko Cupic m.cupic@gmx.ch, 2017
  * @link    https://sac-kurse.kletterkader.com
+ * @link https://jtreminio.com/2013/03/unit-testing-tutorial-introduction-to-phpunit/
  */
 
 namespace Markocupic\SacEventToolBundle\Services\Pdf;
@@ -44,7 +45,7 @@ class DocxToPdfConversionTest extends ContaoTestCase
     public function testSendToBrowserCanBeCalled()
     {
 
-        // Create a stub for the SomeClass class.
+        // Create a stub for the DocxToPdfConversion class.
         $stub = $this->createMock(DocxToPdfConversion::class);
 
         // Configure the stub.
@@ -62,7 +63,7 @@ class DocxToPdfConversionTest extends ContaoTestCase
     public function testCreateUncachedCanBeCalled()
     {
 
-        // Create a stub for the SomeClass class.
+        // Create a stub for the DocxToPdfConversion class.
         $stub = $this->createMock(DocxToPdfConversion::class);
 
         // Configure the stub.
@@ -79,7 +80,7 @@ class DocxToPdfConversionTest extends ContaoTestCase
      */
     public function testConvertCanBeCalled()
     {
-        // Create a stub for the SomeClass class.
+        // Create a stub for the DocxToPdfConversion class.
         $stub = $this->createMock(DocxToPdfConversion::class);
 
         // Configure the stub.

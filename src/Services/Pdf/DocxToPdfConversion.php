@@ -98,6 +98,15 @@ class DocxToPdfConversion
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public  function bla()
+    {
+        new \Contao\Folder('files/bla');
+        return 'foo';
+    }
+
 
     /**
      *

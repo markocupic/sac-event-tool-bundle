@@ -62,6 +62,31 @@ class SyncSacMemberDatabase
         $this->ftp_password = $ftp_password;
     }
 
+    /**
+     * @param $hostname
+     * @param $username
+     * @param $password
+     * @return resource
+     */
+    public function openFtpConnection()
+    {
+        $connId = \ftp_connect($this->ftp_hostname);
+        \ftp_login($connId, $this->ftp_username, $this->ftp_password);
+        return $connId;
+    }
+
+
+    /**
+     * @param $connId
+     * @param $localFile
+     * @param $remoteFile
+     * @return bool
+     */
+    public function loadFileFromFtp($connId, $localFile, $remoteFile)
+    {
+        return ftp_get($connId, $localFile, $remoteFile, FTP_BINARY);
+    }
+
 
     /**
      * @throws \Exception
@@ -83,17 +108,15 @@ class SyncSacMemberDatabase
             }
         }
 
-
-        $connId = ftp_connect($this->ftp_hostname);
-        ftp_login($connId, $this->ftp_username, $this->ftp_password);
+        // Open FTP connection
+        $connId = $this->openFtpConnection();
 
         foreach ($this->sectionIds as $sectionId)
         {
             $localFile = $rootDir . '/system/tmp/Adressen_0000' . $sectionId . '.csv';
             $remoteFile = 'Adressen_0000' . $sectionId . '.csv';
 
-
-            if (ftp_get($connId, $localFile, $remoteFile, FTP_BINARY))
+            if ($this->loadFileFromFtp($connId, $localFile, $remoteFile))
             {
                 // Write csv file to the tmp folder
             }
