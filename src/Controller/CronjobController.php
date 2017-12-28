@@ -37,12 +37,12 @@ class CronjobController extends Controller
         if (Input::get('action') === 'syncSacMemberDatabase')
         {
             $container = \System::getContainer();
-            $objSync = $container->get('markocupic.sac_event_tool_bundle.sync_sac_member_database');
-
-            // Load files fromftp
-            $objSync->loadDataFromFtp();
-            // Then sync with tl_member
-            $objSync->syncContaoDatabase();
+            $objSync = $container->get('markocupic.sac_event_tool_bundle.sync_sac_member_database')
+                // Load files fromftp
+                ->loadDataFromFtp()
+                // Then sync with tl_member
+                ->syncContaoDatabase()
+            ;
             echo "Successfully synced SAC member database.";
             exit();
         }

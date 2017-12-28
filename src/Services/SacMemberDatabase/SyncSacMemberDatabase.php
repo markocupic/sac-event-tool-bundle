@@ -136,9 +136,9 @@ class SyncSacMemberDatabase
     }
 
 
-    /**
-     * @throws \Exception
-     */
+   /**
+    *
+    */
     public function loadDataFromFtp(): void
     {
         // Run once per day
@@ -173,12 +173,14 @@ class SyncSacMemberDatabase
             }
         }
         \ftp_close($connId);
+
+        return $this;
     }
 
     /**
-     *
+     * @return $this
      */
-    public function syncContaoDatabase(): void
+    public function syncContaoDatabase()
     {
         $startTime = \time();
 
@@ -326,6 +328,8 @@ class SyncSacMemberDatabase
                 self::SAC_EVT_LOG_DISABLE_MEMBER
             );
         }
+
+        return $this;
     }
 
     /**
