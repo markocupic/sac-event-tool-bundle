@@ -147,7 +147,7 @@ class SyncSacMemberDatabase
         {
             if (Date::parse('Y-m-d', $objLog->tstamp) === Date::parse('Y-m-d', \time()))
             {
-                //return;
+                return;
             }
         }
 
