@@ -139,7 +139,7 @@ class SyncSacMemberDatabase
    /**
     *
     */
-    public function loadDataFromFtp(): void
+    public function loadDataFromFtp()
     {
         // Run once per day
         $statement = $this->connection->executeQuery('SELECT * FROM tl_log WHERE action = ? ORDER BY tstamp DESC LIMIT 0,1', array(self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC));
