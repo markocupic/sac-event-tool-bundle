@@ -1,4 +1,32 @@
 parameters:
 
-    # event stories (Tourenberichte)
-    event_stories_upload_path: files/sac_pilatus/events/stories
+    # SAC Member Sync: these params will be overwritten
+    SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME: "top-secret.ch"
+    SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME: "useruser"
+    SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD: "topsecret"
+    SAC_EVT_SAC_SECTION_IDS: "[4250,4251,4252,4253,4254]"
+
+    SAC_EVT_SECTION_NAME: "SAC Sektion Pilatus"
+    SAC_EVT_TEMP_PATH: "files/sac_pilatus/tmp"
+    SAC_EVT_AVATAR_MALE: "files/sac_pilatus/fe_user_home_directories/avatars/avatar-default-male.png"
+    SAC_EVT_AVATAR_FEMALE: "files/sac_pilatus/fe_user_home_directories/avatars/avatar-default-female.png"
+    SAC_EVT_BE_USER_DIRECTORY_ROOT: "files/sac_pilatus/be_user_home_directories"
+    SAC_EVT_FE_USER_DIRECTORY_ROOT: "files/sac_pilatus/fe_user_home_directories"
+    SAC_EVT_FE_USER_AVATAR_DIRECTORY: "files/sac_pilatus/fe_user_home_directories/avatars"
+    SAC_EVT_EVENT_STORIES_UPLOAD_PATH: "files/sac_pilatus/events/stories"
+    SAC_EVT_EVENT_DEFALUT_PREVIEW_IMAGE_SRC: "files/theme-sac-pilatus/images/event-module/default_event_preview_image.svg"
+    SAC_EVT_WORKSHOP_FLYER_SRC: "files/service/jahresprogramm/SAC_Sektion_Pilatus_Kursprogramm_%%s.pdf"
+    SAC_EVT_ASSETS_DIR: "bundles/markocupicsaceventtool"
+    SAC_EVT_CLOUDCONVERT_API_KEY: "NrccfwMpOvgrOhBv-27NeGkYzmQ7jCjpW82olayc8RxFhWZghkpPwFDbXSiQGO0IXMU-Cul5gSTprM0REEKjqg"
+    SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC: "vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/modules/sac_event_tool_member_dashboard/course_confirmation.docx"
+    SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN: "SAC_Sektion_Pilatus_Kursbestaetigung-%%s-eventId-%%s.%%s"
+    SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC: "vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/backend/tl_calendar_events_instructor_invoice/event_instructor_invoice_tour.docx"
+    SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN: "SAC_Sektion_Pilatus_Verguetungsformular-%%s.%%s"
+    SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC: "MEMBER_DATABASE_SYNC"
+    SAC_EVT_LOG_ADD_NEW_MEMBER: "ADD_NEW_MEMBER"
+    SAC_EVT_LOG_DISABLE_MEMBER: "DISABLE_MEMBER"
+    SAC_EVT_LOG_EVENT_CONFIRMATION_DOWNLOAD: "EVENT_CONFIRMATION_DOWNLOAD"
+    SAC_EVT_LOG_EVENT_UNSUBSCRIPTION: "EVENT_UNSUBSCRIPTION"
+    SAC_EVT_LOG_EVENT_SUBSCRIPTION: "EVENT_SUBSCRIPTION"
+    SAC_EVT_LOG_EVENT_SUBSCRIPTION_ERROR: "EVENT_SUBSCRIPTION_ERROR"
+    SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD: "COURSE_BOOKLET_DOWNLOAD"

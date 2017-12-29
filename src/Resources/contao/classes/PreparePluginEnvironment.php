@@ -13,6 +13,9 @@ use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Config;
 use Contao\Folder;
 use Contao\Dbafs;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class PreparePluginEnvironment
 {
@@ -36,6 +39,30 @@ class PreparePluginEnvironment
      */
     public function createPluginDirectories()
     {
+
+        // Store all params in $GLOBALS['TL_CONFIG']
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader(
+            $container,
+            new FileLocator(__DIR__ . '/../../config')
+        );
+
+        $loader->load('listener.yml');
+        $loader->load('parameters.yml');
+        $loader->load('services.yml');
+
+        $parameters = $container->getParameterBag()->all();
+        foreach($parameters as $key => $value)
+        {
+            if(strpos($key, 'SAC_EVT_') !== false)
+            {
+                if(is_array(json_decode($value)))
+                {
+                    $value = json_decode($value);
+                }
+                $GLOBALS['TL_CONFIG'][$key] = $value;
+            }
+        }
 
         $dbafs = $this->framework->getAdapter(Dbafs::class);
 

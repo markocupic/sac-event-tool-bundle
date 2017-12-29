@@ -5,7 +5,7 @@ services:
             class: Markocupic\SacEventToolBundle\ContaoHooks\ValidateForms
             arguments:
                 - "@contao.framework"
-                - "%event_stories_upload_path%"
+                - "%SAC_EVT_EVENT_STORIES_UPLOAD_PATH%"
 
     # Post Login Hook
     markocupic_sac_event_tool.contao_hooks.post_login:

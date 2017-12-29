@@ -72,7 +72,6 @@ class ModuleSacEventToolCalendarEventStoryList extends Module
             return '';
         }
 
-
         return parent::generate();
     }
 
