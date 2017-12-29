@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -15,7 +16,6 @@ namespace Markocupic\SacEventToolBundle\Services\SacMemberDatabase;
 use Contao\System;
 use Contao\Date;
 use Contao\File;
-use Symfony\Component\Filesystem\Filesystem;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Doctrine\DBAL\Connection;
 
@@ -48,17 +48,12 @@ class SyncSacMemberDatabase
     /**
      * @var
      */
-    private $conection;
+    private $connection;
 
     /**
      * @var
      */
-    private $filesystem;
-
-    /**
-     * @var
-     */
-    private $sectionIds;
+    private $section_ids;
 
     /**
      * @var
@@ -84,18 +79,16 @@ class SyncSacMemberDatabase
      * SyncSacMemberDatabase constructor.
      * @param ContaoFrameworkInterface $framework
      * @param Connection $connection
-     * @param Filesystem $filesystem
      * @param $root_dir
      * @param $ftp_hostname
      * @param $ftp_username
      * @param $ftp_password
      * @param $section_ids
      */
-    public function __construct(ContaoFrameworkInterface $framework, Connection $connection, Filesystem $filesystem, $root_dir, $ftp_hostname, $ftp_username, $ftp_password, $section_ids)
+    public function __construct(ContaoFrameworkInterface $framework, Connection $connection, $root_dir, $ftp_hostname, $ftp_username, $ftp_password, $section_ids)
     {
         $this->framework = $framework;
         $this->connection = $connection;
-        $this->filesystem = $filesystem;
         $this->root_dir = $root_dir;
         $this->ftp_hostname = $ftp_hostname;
         $this->ftp_username = $ftp_username;
@@ -103,42 +96,11 @@ class SyncSacMemberDatabase
         $this->section_ids = \json_decode($section_ids);
     }
 
-    /**
-     * @return resource
-     * @throws \Exception
-     */
-    public function openFtpConnection()
-    {
-        $connId = \ftp_connect($this->ftp_hostname);
-        if (!\ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId)
-        {
-            throw new \Exception('Could not establish ftp connection.');
-        }
-        return $connId;
-    }
-
 
     /**
-     * @param $connId
-     * @param $localFile
-     * @param $remoteFile
-     * @return bool
+     * @return $this
      * @throws \Exception
      */
-    public function loadFileFromFtp($connId, $localFile, $remoteFile)
-    {
-        $connId = \ftp_get($connId, $localFile, $remoteFile, FTP_BINARY);
-        if (!$connId)
-        {
-            throw new \Exception('Could not download files from ftp server.');
-        }
-        return $connId;
-    }
-
-
-   /**
-    *
-    */
     public function loadDataFromFtp()
     {
         // Run once per day
@@ -159,7 +121,7 @@ class SyncSacMemberDatabase
             $localFile = $this->root_dir . '/system/tmp/Adressen_0000' . $sectionId . '.csv';
             $remoteFile = 'Adressen_0000' . $sectionId . '.csv';
 
-            if ($this->loadFileFromFtp($connId, $localFile, $remoteFile))
+            if ($this->downloadFileFromFtp($connId, $localFile, $remoteFile))
             {
                 // Write csv file to the tmp folder
             }
@@ -208,7 +170,7 @@ class SyncSacMemberDatabase
                 foreach ($arrFile as $line)
                 {
                     // End of line
-                    if (strpos($line, '* * * Dateiende * * *') !== false)
+                    if (\strpos($line, '* * * Dateiende * * *') !== false)
                     {
                         continue;
                     }
@@ -249,11 +211,11 @@ class SyncSacMemberDatabase
                     $set['isSacMember'] = '1';
 
 
-                    $set = array_map(function ($value) {
-                        if (!is_array($value))
+                    $set = \array_map(function ($value) {
+                        if (!\is_array($value))
                         {
-                            $value = is_string($value) ? trim($value) : $value;
-                            $value = is_string($value) ? utf8_encode($value) : $value;
+                            $value = \is_string($value) ? \trim($value) : $value;
+                            $value = \is_string($value) ? \utf8_encode($value) : $value;
                             return $value;
                         }
                         return $value;
@@ -315,11 +277,11 @@ class SyncSacMemberDatabase
         $statement = $this->connection->executeQuery('SELECT * FROM tl_member WHERE disable=? AND isSacMember=?', array('', ''));
         while (false !== ($objDisabledMember = $statement->fetch(\PDO::FETCH_OBJ)))
         {
-            $set = array(
+            $arrSet = array(
                 'tstamp' => \time(),
                 'disable' => '1'
             );
-            $this->connection->update('tl_member', $set, array('id' => $objDisabledMember->id));
+            $this->connection->update('tl_member', $arrSet, array('id' => $objDisabledMember->id));
 
             // Log
             $this->log(
@@ -331,6 +293,41 @@ class SyncSacMemberDatabase
 
         return $this;
     }
+
+
+    /**
+     * @return resource
+     * @throws \Exception
+     */
+    private function openFtpConnection()
+    {
+        $connId = \ftp_connect($this->ftp_hostname);
+        if (!\ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId)
+        {
+            throw new \Exception('Could not establish ftp connection.');
+        }
+        return $connId;
+    }
+
+
+    /**
+     * Download files from ftp server
+     * @param $connId
+     * @param $localFile
+     * @param $remoteFile
+     * @return bool
+     * @throws \Exception
+     */
+    private function downloadFileFromFtp($connId, $localFile, $remoteFile)
+    {
+        $connId = \ftp_get($connId, $localFile, $remoteFile, FTP_BINARY);
+        if (!$connId)
+        {
+            throw new \Exception('Could not download files from ftp server.');
+        }
+        return $connId;
+    }
+
 
     /**
      * @param $text
