@@ -50,12 +50,7 @@ class CronjobController extends Controller
         // Generate the current Course booklet and save it to the webserver
         if ($input->get('action') === 'printSACWorkshops')
         {
-            /**
-             * @todo Remove this hack if we go on production (the link on sac-pilatus.ch/kurse ist static and set to year=2017)
-             */
-            $year = $input->get('year') == '2017' ? '2018' : $input->get('year');
-
-            $objPrint = new PrintWorkshopsAsPdf($input->get('year'), $year, $input->get('eventId'), false);
+            $objPrint = new PrintWorkshopsAsPdf($input->get('year'), $input->get('id'), $input->get('eventId'), false);
             $objPrint->printWorkshopsAsPdf();
             exit();
         }

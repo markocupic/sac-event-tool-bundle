@@ -56,10 +56,14 @@ class GeneratePage
         // Für Downloads z.B. Downloadlink auf www.sac-pilatus.ch/kurse
         if (Input::get('action') === 'downloadKursbroschuere' && Input::get('year') != '')
         {
+            /**
+             * @todo Remove this hack if we go on production (the link on sac-pilatus.ch/kurse ist static and set to year=2017)
+             */
+            $year = Input::get('year') == '2017' ? '2018' : Input::get('year');
             System::log('The course booklet has been downloaded.', __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'));
             $container = System::getContainer();
             $filenamePattern = str_replace('%%s', '%s', $container->getParameter('SAC_EVT_WORKSHOP_FLYER_SRC'));
-            $fileSRC = sprintf($filenamePattern, Input::get('year'));
+            $fileSRC = sprintf($filenamePattern, $year);
             Controller::sendFileToBrowser($fileSRC);
         }
 
