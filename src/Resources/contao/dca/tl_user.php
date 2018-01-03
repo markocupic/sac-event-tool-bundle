@@ -8,6 +8,16 @@
  * @link    https://sac-kurse.kletterkader.com
  */
 
+
+// Remove unwanted fields from palette
+foreach ($GLOBALS['TL_DCA']['tl_user']['palettes'] as $key => $value) {
+    if ($key != '__selector__')
+    {
+        $GLOBALS['TL_DCA']['tl_user']['palettes'][$key] = str_replace('alternate_email', '', $GLOBALS['TL_DCA']['tl_user']['palettes'][$key]);
+        $GLOBALS['TL_DCA']['tl_user']['palettes'][$key] = str_replace('alternate_email_2', '', $GLOBALS['TL_DCA']['tl_user']['palettes'][$key]);
+    }
+}
+
 // Manipulate palettes
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('frontend_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
