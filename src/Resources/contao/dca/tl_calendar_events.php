@@ -86,7 +86,7 @@ PaletteManipulator::create()
     ->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('source'), 'source_legend:hide', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('source'), 'source_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('cssClass', 'noComments'), 'expert_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_calendar_events');
 
@@ -105,7 +105,7 @@ PaletteManipulator::create()
     ->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('source'), 'source_legend:hide', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('source'), 'source_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('cssClass', 'noComments'), 'expert_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('tour', 'tl_calendar_events')
     ->applyToPalette('lastMinuteTour', 'tl_calendar_events');
@@ -126,7 +126,7 @@ PaletteManipulator::create()
     ->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('source'), 'source_legend:hide', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('source'), 'source_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('cssClass', 'noComments'), 'expert_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('course', 'tl_calendar_events');
 
