@@ -43,6 +43,28 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         return parent::__construct();
     }
 
+
+    /**
+     * Manipulate palette when creating a new datarecord
+     *
+     * @param DataContainer $dc
+     *
+     */
+    public function setPaletteWhenCreatingNew(DataContainer $dc)
+    {
+        if(Input::get('act') === 'edit')
+        {
+            $objCalendarEventsModel = CalendarEventsModel::findByPk($dc->id);
+            if ($objCalendarEventsModel !== null)
+            {
+                if ($objCalendarEventsModel->tstamp == 0 && $objCalendarEventsModel->eventType == '')
+                {
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = 'eventType';
+                }
+            }
+        }
+    }
+
     /**
      * onload_callback onloadCallback
      * @param DataContainer $dc
@@ -59,6 +81,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         if (!$this->User->isAdmin)
         {
             unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['show']);
+
             /**
              * @todo delete this operation in summer 2018
              */
@@ -408,7 +431,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         // Check if user is allowed
         if (EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $dc->activeRecord->id))
         {
-            if ($objEvent->eventType === 'tour')
+            if ($objEvent->eventType === 'tour' || $objEvent->eventType === 'lastMinuteTour')
             {
                 $allow = true;
                 $objTemplate->allowTourReportButton = true;

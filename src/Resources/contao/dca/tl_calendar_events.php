@@ -8,6 +8,7 @@
  * @link    https://sac-kurse.kletterkader.com
  */
 
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
 /**
  * Table tl_calendar_events
@@ -20,6 +21,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventReleaseL
 
 // Callbacks
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'onloadCallback');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'setPaletteWhenCreatingNew');
+
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'triggerGlobalOperations');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'setPalettes');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['oncreate_callback'][] = array('tl_calendar_events_sac_event_tool', 'oncreateCallback');
@@ -38,23 +41,101 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['disableGrouping'] =
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['fields'] = array('startDate ASC');
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['child_record_callback'] = array('tl_calendar_events_sac_event_tool', 'listEvents');
 
-// Palettes
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = '{event_type_legend},eventType';
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['course'] = 'dashboard;{event_type_legend},eventType;{broschuere_legend:hide},singleSRCBroschuere;{title_legend},inTypo3,title,alias,author,instructor,organizers,mountainguide,courseLevel,courseTypeLevel0,courseTypeLevel1;{date_legend:hide},repeatFixedDates,durationInfo,eventCanceled;{recurring_legend},recurring;{details_legend:hide},teaser,terms,issues,location,journey,requirements,leistungen,equipment,meetingPoint,bookingEvent,miscellaneous;{min_max_member_legend},addMinAndMaxMembers;{registration_legend},disableOnlineRegistration,setRegistrationPeriod,registrationGoesTo;{deregistration_legend:hide},allowDeregistration;{image_legend:hide},addImage;{gallery_legend:hide},addGallery;{enclosure_legend:hide},addEnclosure;{source_legend:hide},source;{expert_legend:hide},cssClass,noComments;';
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour'] = 'dashboard;{event_type_legend},eventType;{title_legend},title,alias,author,instructor,mountainguide,organizers,tourType,tourTechDifficulty,teaser;{date_legend:hide},repeatFixedDates,durationInfo,eventCanceled;{recurring_legend},recurring;{details_legend:hide},location,journey,tourDetailText,altitudeDifference,requirements,leistungen,equipment,meetingPoint,bookingEvent,miscellaneous;{min_max_member_legend},addMinAndMaxMembers;{registration_legend},disableOnlineRegistration,setRegistrationPeriod,registrationGoesTo;{deregistration_legend:hide},allowDeregistration;{gallery_legend:hide},addGallery;{enclosure_legend:hide},addEnclosure;{source_legend:hide},source;{expert_legend:hide},cssClass,noComments;';
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['lastMinuteTour'] = 'dashboard;{event_type_legend},eventType;{title_legend},title,alias,author,instructor,mountainguide,organizers,tourType,tourTechDifficulty,teaser;{date_legend:hide},repeatFixedDates,durationInfo,eventCanceled;{recurring_legend},recurring;{details_legend:hide},location,journey,tourDetailText,altitudeDifference,requirements,leistungen,equipment,meetingPoint,bookingEvent,miscellaneous;{min_max_member_legend},addMinAndMaxMembers;{registration_legend},disableOnlineRegistration,setRegistrationPeriod,registrationGoesTo;{deregistration_legend:hide},allowDeregistration;{gallery_legend:hide},addGallery;{enclosure_legend:hide},addEnclosure;{source_legend:hide},source;{expert_legend:hide},cssClass,noComments;';
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour_report'] = 'tourReportDashboard;{tour_report_legend},eventCanceled,tourHasExecutedLikePredicted,tourSubstitutionText,tourWeatherConditions,tourAvalancheConditions,tourSpecialIncidents;';
-
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'allowDeregistration';
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addMinAndMaxMembers';
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addGallery';
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'setRegistrationPeriod';
 
 // Subpalettes
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['allowDeregistration'] = 'deregistrationLimit';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addGallery'] = 'multiSRC';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['setRegistrationPeriod'] = 'registrationStartDate,registrationEndDate';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addMinAndMaxMembers'] = 'minMembers,maxMembers';
+
+// Reset palettes
+$strLegends = '
+{tour_report_dashboard_legend};{tour_report_legend};{dashboard_legend};{event_type_legend};
+{broschuere_legend:hide};{title_legend:hide};{date_legend:hide};{recurring_legend:hide};{details_legend:hide};
+{min_max_member_legend:hide};{deregistration_legend:hide};{image_legend:hide};{gallery_legend:hide};
+{enclosure_legend:hide};{source_legend:hide};{expert_legend:hide};
+';
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $strLegends;
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour'] = $strLegends;
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['lastMinuteTour'] = $strLegends;
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['course'] = $strLegends;
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour_report'] = $strLegends;
+
+// Define selectors
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'allowDeregistration';
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addMinAndMaxMembers';
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addGallery';
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'setRegistrationPeriod';
+
+
+// Default palettes (define it for any case, f.ex edit all mode)
+// Put here all defined fields in the dca
+PaletteManipulator::create()
+    ->addField(array('dashboard'), 'dashboard_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('singleSRCBroschuere'), 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('inTypo3', 'title', 'alias', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('repeatFixedDates', 'durationInfo', 'eventCanceled'), 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('location', 'journey', 'tourDetailText', 'altitudeDifference', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('terms', 'issues'), 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('source'), 'source_legend:hide', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('cssClass', 'noComments'), 'expert_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('default', 'tl_calendar_events');
+
+
+// Tour and lastMinuteTour palette
+PaletteManipulator::create()
+    ->addField(array('dashboard'), 'dashboard_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('title', 'alias', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('repeatFixedDates', 'durationInfo', 'eventCanceled'), 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('location', 'journey', 'tourDetailText', 'altitudeDifference', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('source'), 'source_legend:hide', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('cssClass', 'noComments'), 'expert_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('tour', 'tl_calendar_events')
+    ->applyToPalette('lastMinuteTour', 'tl_calendar_events');
+
+
+// Course palette
+PaletteManipulator::create()
+    //->addField(array(), 'dashboard_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('singleSRCBroschuere'), 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('inTypo3', 'title', 'alias', 'author', 'instructor', 'mountainguide', 'organizers', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('repeatFixedDates', 'durationInfo', 'eventCanceled'), 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('teaser', 'terms', 'issues', 'location', 'journey', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('source'), 'source_legend:hide', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('cssClass', 'noComments'), 'expert_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('course', 'tl_calendar_events');
+
+
+// Tour report palette
+PaletteManipulator::create()
+    ->addField(array('tourReportDashboard'), 'tour_report_dashboard_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('eventCanceled', 'tourHasExecutedLikePredicted', 'tourSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents'), 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('tour_report', 'tl_calendar_events');
 
 
 // Global operations
@@ -586,7 +667,7 @@ if (!Input::get('act') || Input::get('act') === 'select')
 
 
 /********* tour report *******/
-// This field is autofilles, if a user has filled in the event report
+// This field is autofillef, if a user has filled in the event report
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = array(
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['filledInEventReportForm'],
     'exclude' => false,
