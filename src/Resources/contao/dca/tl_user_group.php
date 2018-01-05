@@ -15,27 +15,28 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->applyToPalette('default', 'tl_user_group');
 
 
-/**
- * Add fields to tl_user_group
- */
+// Fields
+
+// calendar_containers
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['calendar_containers'] = array
 (
-    'label' => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containers'],
-    'exclude' => true,
-    'inputType' => 'checkbox',
+    'label'      => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containers'],
+    'exclude'    => true,
+    'inputType'  => 'checkbox',
     'foreignKey' => 'tl_calendar_container.title',
-    'eval' => array('multiple' => true),
-    'sql' => "blob NULL"
+    'eval'       => array('multiple' => true),
+    'sql'        => "blob NULL",
 );
 
+// calendar_containerp
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['calendar_containerp'] = array
 (
-    'label' => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containerp'],
-    'exclude' => true,
+    'label'     => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containerp'],
+    'exclude'   => true,
     'inputType' => 'checkbox',
-    'options' => array('create', 'delete'),
+    'options'   => array('create', 'delete'),
     'reference' => &$GLOBALS['TL_LANG']['MSC'],
-    'eval' => array('multiple' => true),
-    'sql' => "blob NULL"
+    'eval'      => array('multiple' => true),
+    'sql'       => "blob NULL",
 );
 

@@ -1,6 +1,14 @@
 <?php
 
 /**
+ * SAC Event Tool Web Plugin for Contao
+ * Copyright (c) 2008-2017 Marko Cupic
+ * @package sac-event-tool-bundle
+ * @author Marko Cupic m.cupic@gmx.ch, 2017
+ * @link    https://sac-kurse.kletterkader.com
+ */
+
+/**
  * Class tl_calendar_events_sac_event_tool
  */
 class tl_calendar_events_sac_event_tool extends tl_calendar_events

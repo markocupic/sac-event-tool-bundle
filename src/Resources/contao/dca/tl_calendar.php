@@ -21,8 +21,8 @@ $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['disableGrouping'] = true;
 $GLOBALS['TL_DCA']['tl_calendar']['list']['operations']['cut'] = array
 (
     'label' => &$GLOBALS['TL_LANG']['tl_calendar']['cut'],
-    'href' => 'act=paste&amp;mode=cut',
-    'icon' => 'cut.svg'
+    'href'  => 'act=paste&amp;mode=cut',
+    'icon'  => 'cut.svg'
 );
 
 
@@ -40,28 +40,31 @@ $GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['useLevelAccessPermissions'] = 
 
 
 // Fields
+// pid
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['pid'] = array(
     'foreignKey' => 'tl_calendar_container.title',
-    'sql' => "int(10) unsigned NOT NULL default '0'",
-    'relation' => array('type' => 'belongsTo', 'load' => 'eager')
+    'sql'        => "int(10) unsigned NOT NULL default '0'",
+    'relation'   => array('type' => 'belongsTo', 'load' => 'eager')
 );
 
+// levelAccessPermissionPackage
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['levelAccessPermissionPackage'] = array(
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar']['levelAccessPermissionPackage'],
-    'exclude' => true,
-    'inputType' => 'select',
-    'relation' => array('type' => 'belongsTo', 'load' => 'eager'),
+    'label'      => &$GLOBALS['TL_LANG']['tl_calendar']['levelAccessPermissionPackage'],
+    'exclude'    => true,
+    'inputType'  => 'select',
+    'relation'   => array('type' => 'belongsTo', 'load' => 'eager'),
     'foreignKey' => 'tl_event_release_level_policy_package.title',
-    'sql' => "int(10) unsigned NOT NULL default '0'",
-    'eval' => array('includeBlankOption' => false, 'mandatory' => true, 'tl_class' => 'clr')
+    'sql'        => "int(10) unsigned NOT NULL default '0'",
+    'eval'       => array('includeBlankOption' => false, 'mandatory' => true, 'tl_class' => 'clr')
 );
 
+// useLevelAccessPermissions
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['useLevelAccessPermissions'] = array(
 
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar']['useLevelAccessPermissions'],
-    'exclude' => true,
-    'filter' => true,
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['useLevelAccessPermissions'],
+    'exclude'   => true,
+    'filter'    => true,
     'inputType' => 'checkbox',
-    'eval' => array('submitOnChange' => true),
-    'sql' => "char(1) NOT NULL default ''"
+    'eval'      => array('submitOnChange' => true),
+    'sql'       => "char(1) NOT NULL default ''"
 );

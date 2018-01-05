@@ -9,7 +9,6 @@
  */
 
 
-
 $GLOBALS['TL_DCA']['tl_course_sub_type'] = array(
 
     'config'   => array(

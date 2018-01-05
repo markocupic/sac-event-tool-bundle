@@ -9,19 +9,16 @@
  */
 
 
-
 $GLOBALS['TL_DCA']['tl_event_organizer'] = array
 (
-    /************************************************************************************
-     *         CONFIGURATIONS
-     ************************************************************************************/
+
     'config' => array
     (
-        'dataContainer' => 'Table',
+        'dataContainer'    => 'Table',
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
-        'switchToEdit' => true,
-        'sql' => array
+        'switchToEdit'     => true,
+        'sql'              => array
         (
             'keys' => array
             (
@@ -30,56 +27,56 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
         )
     ),
 
-    'list' => array
+    'list'     => array
     (
-        'sorting' => array
+        'sorting'           => array
         (
-            'mode' => 2,
-            'fields' => array('title ASC'),
-            'flag' => 1,
+            'mode'        => 2,
+            'fields'      => array('title ASC'),
+            'flag'        => 1,
             'panelLayout' => 'filter;sort,search,limit'
         ),
-        'label' => array
+        'label'             => array
         (
-            'fields' => array('title'),
+            'fields'      => array('title'),
             'showColumns' => true,
         ),
         'global_operations' => array
         (
             'all' => array
             (
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
+                'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
+                'href'       => 'act=select',
+                'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"'
             )
         ),
-        'operations' => array
+        'operations'        => array
         (
-            'edit' => array
+            'edit'   => array
             (
                 'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['edit'],
-                'href' => 'act=edit',
-                'icon' => 'edit.gif'
+                'href'  => 'act=edit',
+                'icon'  => 'edit.gif'
             ),
-            'copy' => array
+            'copy'   => array
             (
                 'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['copy'],
-                'href' => 'act=copy',
-                'icon' => 'copy.gif'
+                'href'  => 'act=copy',
+                'icon'  => 'copy.gif'
             ),
             'delete' => array
             (
-                'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['delete'],
-                'href' => 'act=delete',
-                'icon' => 'delete.gif',
+                'label'      => &$GLOBALS['TL_LANG']['tl_event_organizer']['delete'],
+                'href'       => 'act=delete',
+                'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"'
             ),
-            'show' => array
+            'show'   => array
             (
-                'label'               => &$GLOBALS['TL_LANG']['tl_event_organizer']['show'],
-                'href'                => 'act=show',
-                'icon'                => 'show.svg'
+                'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['show'],
+                'href'  => 'act=show',
+                'icon'  => 'show.svg'
             )
         )
     ),
@@ -90,7 +87,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
 
     'fields' => array
     (
-        'id' => array
+        'id'     => array
         (
             'sql' => "int(10) unsigned NOT NULL auto_increment"
         ),
@@ -98,15 +95,15 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'"
         ),
-        'title' => array
+        'title'  => array
         (
-            'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['title'],
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+            'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['title'],
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => array('mandatory' => true, 'maxlength' => 255),
-            'sql' => "varchar(255) NOT NULL default ''"
+            'eval'      => array('mandatory' => true, 'maxlength' => 255),
+            'sql'       => "varchar(255) NOT NULL default ''"
         ),
     )
 );

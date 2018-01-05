@@ -1,6 +1,14 @@
 <?php
 
 /**
+ * SAC Event Tool Web Plugin for Contao
+ * Copyright (c) 2008-2017 Marko Cupic
+ * @package sac-event-tool-bundle
+ * @author Marko Cupic m.cupic@gmx.ch, 2017
+ * @link    https://sac-kurse.kletterkader.com
+ */
+
+/**
  * Class tl_tour_difficulty_category
  */
 class tl_tour_difficulty_category extends Backend
