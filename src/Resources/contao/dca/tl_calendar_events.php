@@ -659,7 +659,7 @@ if (!Input::get('act') || Input::get('act') === 'select')
 
 
 // Tour report fields:
-// This field is autofillef, if a user has filled in the event report
+// This field is autofilled, if a user has filled in the event report
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = array(
     'label'   => &$GLOBALS['TL_LANG']['tl_calendar_events']['filledInEventReportForm'],
     'exclude' => false,
