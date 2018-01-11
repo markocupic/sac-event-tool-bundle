@@ -81,7 +81,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['firstname'] = array(
     'sorting'   => true,
     'flag'      => 1,
     'inputType' => 'text',
-    'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
+    'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
     'sql'       => "varchar(255) NOT NULL default ''",
 );
 
@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['lastname'] = array(
     'sorting'   => true,
     'flag'      => 1,
     'inputType' => 'text',
-    'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
+    'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
     'sql'       => "varchar(255) NOT NULL default ''",
 );
 
@@ -105,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['iban'] = array(
     'sorting'   => true,
     'flag'      => 1,
     'inputType' => 'text',
-    'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
+    'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
     'sql'       => "varchar(255) NOT NULL default ''",
 );
 
@@ -117,7 +117,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['sacMemberId'] = array(
     'sorting'   => true,
     'flag'      => 1,
     'inputType' => 'text',
-    'eval'      => array('doNotCopy' => true, 'readonly' => false, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'rgxp' => 'natural'),
+    'eval'      => array('doNotCopy' => true, 'readonly' => false, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr', 'rgxp' => 'natural'),
     'sql'       => "int(10) unsigned NOT NULL default '0'",
 );
 
@@ -126,7 +126,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['dateOfBirth'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_user']['dateOfBirth'],
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => array('rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'),
+    'eval'      => array('rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'clr wizard'),
     'sql'       => "varchar(11) NOT NULL default ''",
 );
 
@@ -137,7 +137,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['gender'] = array(
     'inputType' => 'select',
     'options'   => array('male', 'female'),
     'reference' => &$GLOBALS['TL_LANG']['MSC'],
-    'eval'      => array('includeBlankOption' => true, 'tl_class' => 'w50'),
+    'eval'      => array('includeBlankOption' => true, 'tl_class' => 'clr'),
     'sql'       => "varchar(32) NOT NULL default ''",
 );
 
@@ -147,7 +147,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['street'] = array(
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => array('maxlength' => 255, 'tl_class' => 'w50'),
+    'eval'      => array('maxlength' => 255, 'tl_class' => 'clr'),
     'sql'       => "varchar(255) NOT NULL default ''",
 );
 
@@ -158,7 +158,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['postal'] = array(
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => array('maxlength' => 32, 'tl_class' => 'w50'),
+    'eval'      => array('maxlength' => 32, 'tl_class' => 'clr'),
     'sql'       => "varchar(32) NOT NULL default ''",
 );
 
@@ -170,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['city'] = array(
     'search'    => true,
     'sorting'   => true,
     'inputType' => 'text',
-    'eval'      => array('maxlength' => 255, 'tl_class' => 'w50'),
+    'eval'      => array('maxlength' => 255, 'tl_class' => 'clr'),
     'sql'       => "varchar(255) NOT NULL default ''",
 );
 
@@ -180,7 +180,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['state'] = array(
     'exclude'   => true,
     'sorting'   => true,
     'inputType' => 'text',
-    'eval'      => array('maxlength' => 64, 'tl_class' => 'w50'),
+    'eval'      => array('maxlength' => 64, 'tl_class' => 'clr'),
     'sql'       => "varchar(64) NOT NULL default ''",
 );
 
@@ -192,7 +192,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['country'] = array(
     'sorting'   => true,
     'inputType' => 'select',
     'options'   => System::getCountries(),
-    'eval'      => array('includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'),
+    'eval'      => array('includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
     'sql'       => "varchar(2) NOT NULL default ''",
 );
 
@@ -202,7 +202,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['phone'] = array(
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'),
+    'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'clr'),
     'sql'       => "varchar(64) NOT NULL default ''",
 );
 
@@ -212,7 +212,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['emergencyPhone'] = array(
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'mandatory' => true, 'decodeEntities' => true, 'tl_class' => 'w50'),
+    'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'mandatory' => true, 'decodeEntities' => true, 'tl_class' => 'clr'),
     'sql'       => "varchar(64) NOT NULL default ''",
 );
 
@@ -222,7 +222,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['emergencyPhoneName'] = array(
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => array('maxlength' => 64, 'mandatory' => true, 'decodeEntities' => true, 'tl_class' => 'w50'),
+    'eval'      => array('maxlength' => 64, 'mandatory' => true, 'decodeEntities' => true, 'tl_class' => 'clr'),
     'sql'       => "varchar(64) NOT NULL default ''",
 );
 
@@ -232,7 +232,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['mobile'] = array(
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'),
+    'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'clr'),
     'sql'       => "varchar(64) NOT NULL default ''",
 );
 
@@ -242,7 +242,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['website'] = array(
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => array('rgxp' => 'url', 'maxlength' => 255, 'tl_class' => 'w50'),
+    'eval'      => array('rgxp' => 'url', 'maxlength' => 255, 'tl_class' => 'clr'),
     'sql'       => "varchar(255) NOT NULL default ''",
 );
 
@@ -254,7 +254,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['leiterQualifikation'] = array(
     'filter'    => true,
     'inputType' => 'checkboxWizard',
     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'],
-    'eval'      => array('tl_class' => '', 'multiple' => true, 'orderField' => 'orderLeiterQualifikation'),
+    'eval'      => array('tl_class' => 'clr', 'multiple' => true, 'orderField' => 'orderLeiterQualifikation'),
     'sql'       => "blob NULL",
 );
 
@@ -267,7 +267,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['role'] = array(
     'filter'    => true,
     'inputType' => 'checkboxWizard',
     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['role'],
-    'eval'      => array('tl_class' => '', 'multiple' => true),
+    'eval'      => array('tl_class' => 'clr', 'multiple' => true),
     'sql'       => "blob NULL",
 );
 
