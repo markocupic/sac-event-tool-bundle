@@ -9,49 +9,68 @@
  */
 
 
-// Remove unwanted fields from palette
-foreach ($GLOBALS['TL_DCA']['tl_user']['palettes'] as $key => $value)
-{
-    if ($key != '__selector__')
-    {
-        $GLOBALS['TL_DCA']['tl_user']['palettes'][$key] = str_replace('alternate_email', '', $GLOBALS['TL_DCA']['tl_user']['palettes'][$key]);
-        $GLOBALS['TL_DCA']['tl_user']['palettes'][$key] = str_replace('alternate_email_2', '', $GLOBALS['TL_DCA']['tl_user']['palettes'][$key]);
-    }
-}
+// Onload callbacks
+$GLOBALS['TL_DCA']['tl_user']['config']['onload_callback'][] = array('tl_user_sac_event_tool', 'onloadCallback');
 
-// Manipulate palettes
+
+// Manipulate palette default
+Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+    ->addLegend('frontend_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('bank_account_legend', 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('role_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('instructor_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('emergency_phone_legend', 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addField(array('iban'), 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('firstname', 'lastname', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('role'), 'role_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('leiterQualifikation'), 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('emergencyPhone', 'emergencyPhoneName'), 'emergency_phone_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('avatarSRC'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('calendar_containers', 'calendar_containerp'), 'calendars_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
+    ->applyToPalette('default', 'tl_user');
+
+
+// Manipulate palette extend
+$arrRemove = array('alternate_email', 'alternate_email_2');
+foreach ($arrRemove as $field)
+{
+    $GLOBALS['TL_DCA']['tl_user']['palettes']['extend'] = str_replace(',' . $field, '', $GLOBALS['TL_DCA']['tl_user']['palettes']['extend']);
+}
+Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+    ->addLegend('frontend_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('bank_account_legend', 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('role_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('instructor_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addField(array('iban'), 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('firstname', 'lastname', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('role'), 'role_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('leiterQualifikation'), 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('extend', 'tl_user');
+
+
+// Manipulate palette login
+$arrRemove = array('name', 'alternate_email', 'alternate_email_2');
+foreach ($arrRemove as $field)
+{
+    $GLOBALS['TL_DCA']['tl_user']['palettes']['login'] = str_replace(',' . $field, '', $GLOBALS['TL_DCA']['tl_user']['palettes']['login']);
+}
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('frontend_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('bank_account_legend', 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('emergency_phone_legend', 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
-    ->addField(array('dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('firstname', 'lastname', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
     ->addField(array('emergencyPhone', 'emergencyPhoneName'), 'emergency_phone_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('iban'), 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('avatarSRC'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('login', 'tl_user');
 
 
-Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-    ->addLegend('frontend_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
-    ->addLegend('instructor_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
-    ->addLegend('role_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
-    ->addLegend('instructor_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
-    ->addField(array('role'), 'role_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('avatarSRC'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('iban', 'leiterQualifikation'), 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('calendar_containers', 'calendar_containerp'), 'calendars_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
-    ->applyToPalette('admin', 'tl_user')
-    ->applyToPalette('default', 'tl_user')
-    ->applyToPalette('group', 'tl_user')
-    ->applyToPalette('extend', 'tl_user')
-    ->applyToPalette('custom', 'tl_user');
-
-
-// Onload callbacks
-$GLOBALS['TL_DCA']['tl_user']['config']['onload_callback'][] = array('tl_user_sac_event_tool', 'onloadCallback');
-
-
 // Fields
+$GLOBALS['TL_DCA']['tl_user']['fields']['username']['eval']['tl_class'] = 'clr';
+$GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['tl_class'] = 'clr';
+$GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['tl_class'] = 'clr';
+
+
 // calendar_containers
 $GLOBALS['TL_DCA']['tl_user']['fields']['calendar_containers'] = array(
     'label'      => &$GLOBALS['TL_LANG']['tl_user']['calendar_containers'],
@@ -288,3 +307,4 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['avatarSRC'] = array(
     ),
     'sql'           => "binary(16) NULL",
 );
+

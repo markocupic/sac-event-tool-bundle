@@ -28,7 +28,6 @@ class tl_user_sac_event_tool extends Backend
      */
     public function onloadCallback(DataContainer $dc)
     {
-
         // Sync tl_user with tl_member
         $objUser = $this->Database->prepare('SELECT * FROM tl_user WHERE sacMemberId>?')->execute(0);
         while($objUser->next())
