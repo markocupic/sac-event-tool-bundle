@@ -18,9 +18,9 @@
             </a>
             <?php endif; ?>
             <div class="card-body">
-                <p class="card-date m-0"><?= \Date::parse('d.m.Y', $story['addedOn']) ?></p>
-                <h4 class="card-title mt-0"><?= $story['title'] ?></h4>
-                <a href="<?= $story['href'] ?>" class="btn mt-4 btn-outline-primary">weiterlesen</a>
+                <p class="card-date m-0"><small><?= \Date::parse('d.m.Y', $story['addedOn']) ?></small></p>
+                <h6 class="card-title mt-0"><?= $story['title'] ?></h6>
+                <a href="<?= $story['href'] ?>" class="btn mt-4 btn-sm btn-outline-primary">weiterlesen</a>
             </div>
         </div>
 
@@ -32,14 +32,14 @@
                 <p class="card-text small ml-2"><?= $story['authorName'] ?></p>
             </div>
             <?php if($story['singleSRC']): ?>
-            <a href="<?= $story['href'] ?>">
-                {{image::<?= $story['singleSRC']['uuid'] ?>?width=450&height=300&mode=crop&class=card-img-top}}
-            </a>
+                <a href="<?= $story['href'] ?>">
+                    {{image::<?= $story['singleSRC']['uuid'] ?>?width=450&height=300&mode=crop&class=card-img-top}}
+                </a>
             <?php endif; ?>
             <div class="card-body">
-                <p class="card-date m-0"><?= \Date::parse('d.m.Y', $story['addedOn']) ?></p>
-                <h4 class="card-title mt-0"><?= $story['title'] ?></h4>
-                <a href="<?= $story['href'] ?>" class="btn mt-4 btn-outline-primary">weiterlesen</a>
+                <p class="card-date m-0"><small><?= \Date::parse('d.m.Y', $story['addedOn']) ?></small></p>
+                <h6 class="card-title mt-0"><?= $story['title'] ?></h6>
+                <a href="<?= $story['href'] ?>" class="btn mt-4 btn-sm btn-outline-primary">weiterlesen</a>
             </div>
         </div>
 
@@ -50,23 +50,16 @@
                 <p class="card-text small ml-2"><?= $story['authorName'] ?></p>
             </div>
             <?php if($story['singleSRC']): ?>
-            <a href="<?= $story['href'] ?>">
-                {{image::<?= $story['singleSRC']['uuid'] ?>?width=450&height=300&mode=crop&class=card-img-top}}
-            </a>
+                <a href="<?= $story['href'] ?>">
+                    {{image::<?= $story['singleSRC']['uuid'] ?>?width=450&height=300&mode=crop&class=card-img-top}}
+                </a>
             <?php endif; ?>
             <div class="card-body">
-                <p class="card-date m-0"><?= \Date::parse('d.m.Y', $story['addedOn']) ?></p>
-                <h4 class="card-title mt-0"><?= $story['title'] ?></h4>
-                <a href="<?= $story['href'] ?>" class="btn mt-4 btn-outline-primary">weiterlesen</a>
+                <p class="card-date m-0"><small><?= \Date::parse('d.m.Y', $story['addedOn']) ?></small></p>
+                <h6 class="card-title mt-0"><?= $story['title'] ?></h6>
+                <a href="<?= $story['href'] ?>" class="btn mt-4 btn-sm btn-outline-primary">weiterlesen</a>
             </div>
         </div>
-
-
-
-
-
-
-
 
         <?php endforeach; ?>
     </div>

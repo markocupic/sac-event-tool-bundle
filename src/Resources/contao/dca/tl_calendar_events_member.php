@@ -248,7 +248,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['notes'],
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => array('tl_class' => 'clr', 'mandatory' => true),
+            'eval'      => array('tl_class' => 'clr', 'mandatory' => false),
             'sql'       => "text NULL",
         ),
         'firstname'           => array
