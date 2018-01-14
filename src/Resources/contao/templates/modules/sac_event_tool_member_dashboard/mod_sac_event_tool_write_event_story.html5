@@ -47,7 +47,7 @@
     <!-- Modal Boxes -->
     <div class="modal fade write-story-text-and-yt" tabindex="-1" role="dialog" aria-labelledby="ModalUploadTextAndYt"
          aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Bericht erstellen</h5>
@@ -63,7 +63,7 @@
     </div>
     <div class="modal fade write-story-fotoupload" tabindex="-1" role="dialog" aria-labelledby="ModalUploadFoto"
          aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Fotoupload</h5>
