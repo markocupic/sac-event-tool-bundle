@@ -84,6 +84,7 @@ class PrintWorkshopsAsPdf
         }
         elseif ($eventId > 0)
         {
+
             $this->calendarId = null;
             $this->eventId = $eventId;
         }

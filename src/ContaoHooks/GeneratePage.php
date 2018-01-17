@@ -10,13 +10,17 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Automator;
-use Contao\Input;
-use Contao\Controller;
-use Contao\System;
 use Contao\Config;
+use Contao\Controller;
+use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\Input;
+use Contao\System;
+use Contao\Date;
+use Contao\CoreBundle\Monolog\ContaoContext;
+use Psr\Log\LogLevel;
 use Markocupic\SacEventToolBundle\Services\Docx\ExportEvents2Docx;
+use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
 
 /**
  * Class GeneratePage
@@ -60,11 +64,28 @@ class GeneratePage
              * @todo Remove this hack if we go on production (the link on sac-pilatus.ch/kurse ist static and set to year=2017)
              */
             $year = Input::get('year') == '2017' ? '2018' : Input::get('year');
-            System::log('The course booklet has been downloaded.', __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'));
+
+            if(Input::get('year') === 'current')
+            {
+                $year = Date::parse('Y', time());
+            }
+
+            // Log download
             $container = System::getContainer();
+            $logger = $container->get('monolog.logger.contao');
+            $logger->log(LogLevel::INFO, 'The course booklet has been downloaded.', array('contao' => new ContaoContext(__FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'))));
+
             $filenamePattern = str_replace('%%s', '%s', $container->getParameter('SAC_EVT_WORKSHOP_FLYER_SRC'));
             $fileSRC = sprintf($filenamePattern, $year);
             Controller::sendFileToBrowser($fileSRC);
+        }
+
+        // Generate a selected course description
+        if (Input::get('printSACWorkshops') === 'true' && Input::get('eventId'))
+        {
+            $objPrint = new PrintWorkshopsAsPdf(0, 0, Input::get('eventId'), true);
+            $objPrint->printWorkshopsAsPdf();
+            exit();
         }
 
 
