@@ -2,7 +2,7 @@
   "name": "markocupic/sac-event-tool-bundle",
   "type": "contao-bundle",
   "description": "Contao 4 Event tool bundle for SAC (Swiss Alpine Club Sections)",
-  "license": "LGPL-3.0+",
+  "license": "MIT",
   "authors": [
     {
       "name": "Marko Cupic",
