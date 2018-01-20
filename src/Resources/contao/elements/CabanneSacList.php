@@ -16,17 +16,17 @@ use Contao\Database;
 
 
 /**
- * Class CabanneSacDetail
+ * Class CabanneSacList
  * @package Markocupic\SacEventToolBundle
  */
-class CabanneSacDetail extends ContentElement
+class CabanneSacList extends ContentElement
 {
 
     /**
      * Template
      * @var string
      */
-    protected $strTemplate = 'ce_cabanne_sac_detail';
+    protected $strTemplate = 'ce_cabanne_sac_list';
 
     /**
      * Files model
@@ -61,7 +61,7 @@ class CabanneSacDetail extends ContentElement
         {
             $arrData = $objDb->fetchAssoc();
             //die(print_r($arrData,true));
-            $skip = array('id', 'tstamp');
+            $skip = array('id', 'tstamp', 'singleSRC');
             foreach ($arrData as $k => $v)
             {
                 if (!in_array($k, $skip))

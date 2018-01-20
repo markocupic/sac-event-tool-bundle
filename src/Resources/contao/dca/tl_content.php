@@ -18,18 +18,32 @@ if (Input::get('do') == 'sac_calendar_events_tool')
 }
 
 $GLOBALS['TL_DCA']['tl_content']['palettes']['ce_user_portrait'] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
-$GLOBALS['TL_DCA']['tl_content']['palettes']['cabanneSacDetail'] = '{type_legend},type,headline,cabanne;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes']['cabanneSacList'] = '{type_legend},type,headline,cabanneSac;{image_legend},singleSRC,size,imagemargin,fullsize,overwriteMeta;{link_legend},jumpTo;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes']['cabanneSacDetail'] = '{type_legend},type,headline,cabanneSac;{image_legend},singleSRC,size,imagemargin,fullsize,overwriteMeta;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
 
 // Fields
 $GLOBALS['TL_DCA']['tl_content']['fields']['cabanneSac'] = array
 (
-    'label'     => &$GLOBALS['TL_LANG']['tl_content']['cabanneSac'],
+    'label'            => &$GLOBALS['TL_LANG']['tl_content']['cabanneSac'],
+    'exclude'          => true,
+    'search'           => true,
+    'inputType'        => 'select',
+    'options_callback' => array('tl_content_sac_event_tool', 'getCabannes'),
+    'eval'             => array('mandatory' => true, 'maxlength' => 200, 'tl_class' => 'w50 clr'),
+    'sql'              => "int(10) unsigned NOT NULL default '0'",
+);
+$GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = array
+(
+    'label'     => &$GLOBALS['TL_LANG']['tl_content']['jumpTo'],
     'exclude'   => true,
     'search'    => true,
-    'inputType' => 'select',
-    'options'   => array('tl_content_sac_event_tool', 'getCabannes'),
-    'eval'      => array('mandatory' => true, 'maxlength' => 200, 'tl_class' => 'w50 clr'),
-    'sql'       => "int(10) unsigned NOT NULL default '0'",
-);
+    'inputType' => 'text',
+    'eval'      => array('mandatory' => true, 'rgxp' => 'url', 'decodeEntities' => true, 'maxlength' => 255, 'fieldType' => 'radio', 'filesOnly' => true, 'tl_class' => 'w50 wizard'),
+    'wizard'    => array
+    (
+        array('tl_content', 'pagePicker'),
+    ),
+    'sql'       => "varchar(255) NOT NULL default ''",
 
+);

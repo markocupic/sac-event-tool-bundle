@@ -96,8 +96,8 @@ $GLOBALS['TL_CTE']['sac_calendar_newsletter'] = array(
 );
 $GLOBALS['TL_CTE']['sac_content_elements'] = array(
     'ce_user_portrait' => 'Markocupic\SacEventToolBundle\ContentUserPortrait',
-    'cabanneSacDetail' => 'Markocupic\CabanneSacDetail',
-
+    'cabanneSacList' => 'Markocupic\SacEventToolBundle\CabanneSacList',
+    'cabanneSacDetail' => 'Markocupic\SacEventToolBundle\CabanneSacDetail',
 );
 
 // Do not index a page if one of the following parameters is set

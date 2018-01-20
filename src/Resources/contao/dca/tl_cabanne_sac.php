@@ -142,7 +142,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => array('rgxp' => 'phone', 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
+            'eval'      => array('rgxp' => 'phone', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'email'        => array
@@ -152,7 +152,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => array('rgxp' => 'email', 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
+            'eval'      => array('rgxp' => 'email', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'url'          => array
