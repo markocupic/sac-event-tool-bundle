@@ -71,6 +71,9 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = array(
     'sac_event_journey_tool' => array(
         'tables' => array('tl_calendar_events_journey'),
     ),
+    'sac_cabanne_tool' => array(
+        'tables' => array('tl_cabanne_sac'),
+    ),
 );
 
 // Add permissions
