@@ -34,44 +34,44 @@ if (TL_MODE == 'BE')
 
 $GLOBALS['BE_MOD']['content']['calendar']['tables'] = array('tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member');
 $GLOBALS['BE_MOD']['sac_be_modules'] = array(
-    'sac_calendar_events_tool' => array
+    'sac_calendar_events_tool'         => array
     (
         'tables' => array('tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'),
-        'table' => array('TableWizard', 'importTable'),
-        'list' => array('ListWizard', 'importList')
+        'table'  => array('TableWizard', 'importTable'),
+        'list'   => array('ListWizard', 'importList'),
     ),
     'sac_calendar_events_stories_tool' => array(
         'tables' => array('tl_calendar_events_story'),
     ),
-    'sac_course_main_types_tool' => array(
+    'sac_course_main_types_tool'       => array(
         'tables' => array('tl_course_main_type'),
     ),
-    'sac_course_sub_types_tool' => array(
+    'sac_course_sub_types_tool'        => array(
         'tables' => array('tl_course_sub_type'),
     ),
 
     'sac_tour_difficulty_tool' => array(
         'tables' => array('tl_tour_difficulty_category', 'tl_tour_difficulty'),
-        'table' => array('TableWizard', 'importTable'),
-        'list' => array('ListWizard', 'importList')
+        'table'  => array('TableWizard', 'importTable'),
+        'list'   => array('ListWizard', 'importList'),
     ),
-    'sac_tour_type_tool' => array(
+    'sac_tour_type_tool'       => array(
         'tables' => array('tl_tour_type'),
     ),
-    'sac_event_release_tool' => array(
+    'sac_event_release_tool'   => array(
         'tables' => array('tl_event_release_level_policy_package', 'tl_event_release_level_policy'),
-        'table' => array('TableWizard', 'importTable'),
-        'list' => array('ListWizard', 'importList')
+        'table'  => array('TableWizard', 'importTable'),
+        'list'   => array('ListWizard', 'importList'),
     ),
     'sac_event_organizer_tool' => array(
         'tables' => array('tl_event_organizer'),
-        'table' => array('TableWizard', 'importTable'),
-        'list' => array('ListWizard', 'importList')
+        'table'  => array('TableWizard', 'importTable'),
+        'list'   => array('ListWizard', 'importList'),
     ),
-    'sac_event_journey_tool' => array(
+    'sac_event_journey_tool'   => array(
         'tables' => array('tl_calendar_events_journey'),
     ),
-    'sac_cabanne_tool' => array(
+    'sac_cabanne_tool'         => array(
         'tables' => array('tl_cabanne_sac'),
     ),
 );
@@ -83,21 +83,22 @@ $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
 
 // Frontend Modules
 $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
-    'eventToolFrontendUserDashboard' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolMemberDashboard',
-    'eventToolEventRegistrationForm' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventRegistrationForm',
-    'eventToolCalendarEventStoryList' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryList',
+    'eventToolFrontendUserDashboard'    => 'Markocupic\SacEventToolBundle\ModuleSacEventToolMemberDashboard',
+    'eventToolEventRegistrationForm'    => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventRegistrationForm',
+    'eventToolCalendarEventStoryList'   => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryList',
     'eventToolCalendarEventStoryReader' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryReader',
-    'eventToolCalendarEventlist' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventlist'
+    'eventToolCalendarEventlist'        => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventlist',
 );
 
 // Content Elements
 $GLOBALS['TL_CTE']['sac_calendar_newsletter'] = array(
-    'calendar_newsletter' => 'CalendarNewsletter'
+    'calendar_newsletter' => 'CalendarNewsletter',
 );
 $GLOBALS['TL_CTE']['sac_content_elements'] = array(
     'ce_user_portrait' => 'Markocupic\SacEventToolBundle\ContentUserPortrait',
-);
+    'cabanneSacDetail' => 'Markocupic\CabanneSacDetail',
 
+);
 
 // Do not index a page if one of the following parameters is set
 $GLOBALS['TL_NOINDEX_KEYS'][] = 'xhrAction';
@@ -105,9 +106,9 @@ $GLOBALS['TL_NOINDEX_KEYS'][] = 'xhrAction';
 
 // TL_CONFIG
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'] = array(
-    'course' => 'Kurs',
-    'tour' => 'Tour',
-    'lastMinuteTour' => 'Last Minute Tour'
+    'course'         => 'Kurs',
+    'tour'           => 'Tour',
+    'lastMinuteTour' => 'Last Minute Tour',
 );
 
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['role'] = array(
@@ -116,7 +117,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['role'] = array(
     'president',
     'executivemember',
     'tourchief',
-    'coursechief'
+    'coursechief',
 );
 
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = array(
@@ -129,15 +130,15 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = array(
 
 // TL_CONFIG
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = array(
-    1 => "1",
-    2 => "2",
-    3 => "3",
-    4 => "4",
-    5 => "5",
-    6 => "1 - 2",
-    7 => "1 - 3",
-    8 => "1 - 4",
-    9 => "1 - 5",
+    1  => "1",
+    2  => "2",
+    3  => "3",
+    4  => "4",
+    5  => "5",
+    6  => "1 - 2",
+    7  => "1 - 3",
+    8  => "1 - 4",
+    9  => "1 - 5",
     10 => "2 - 3",
     11 => "2 - 4",
     12 => "2 - 5",

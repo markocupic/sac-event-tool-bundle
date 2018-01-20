@@ -22,6 +22,7 @@ $GLOBALS['TL_LANG']['MOD']['sac_tour_type_tool'] = array('Tourentypen');
 $GLOBALS['TL_LANG']['MOD']['sac_event_release_tool'] = array('Event-Freigabestufen-Tool');
 $GLOBALS['TL_LANG']['MOD']['sac_event_organizer_tool'] = array('Organisierende Gruppen');
 $GLOBALS['TL_LANG']['MOD']['sac_event_journey_tool'] = array('Event Anreise-Art-Tool');
+$GLOBALS['TL_LANG']['MOD']['sac_cabanne_tool'] = array('H&uuml;tten-Tool');
 
 
 
