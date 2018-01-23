@@ -15,6 +15,9 @@
 $GLOBALS['TL_DCA']['tl_member']['list']['sorting']['fields'] = array('lastname ASC');
 $GLOBALS['TL_DCA']['tl_member']['config']['ondelete_callback'][] = array('tl_member_sac_bundle', 'ondeleteCallback');
 
+// Add tl_member.sacMemberId to index
+$GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index';
+
 
 // Fields
 // isSacMember
