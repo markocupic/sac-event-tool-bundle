@@ -1,0 +1,24 @@
+
+<?php $eventState = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($this->id); ?>
+<?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][$eventState]; ?>
+
+<?php $arrTourTypes = \StringUtil::deserialize($this->tourType,true); ?>
+
+
+<div class="row">
+    <div class="col-2 col-sm-1">
+        <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($this->id) ?>
+    </div>
+    <div class="col-3 col-sm-3">
+        <?= \Date::parse('d.m.Y', $this->startDate) ?>
+    </div>
+    <div class="col-5 col-sm-6">
+        <?php if($this->eventType === 'lastMinuteTour'): ?><span class="last-minute-tour small"><i class="fa fa-clock"></i> LAST MINUTE TOUR</span><br><?php endif; ?>
+        <i class="event-state-icon fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
+        <a href="{{event_url::<?php echo $this->id; ?>}}">{{event_title::<?= $this->id ?>}}</a>
+    </div>
+    <div class="col-2 col-sm-2">
+        <?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($this->id, 'shortcut')) ?>
+    </div>
+
+</div>

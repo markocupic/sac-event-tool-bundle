@@ -13,8 +13,16 @@
             <?php endif; ?>
             <div class="card-body">
                 <p class="card-date m-0"><small><?= \Date::parse('d.m.Y', $story['addedOn']) ?></small></p>
-                <h6 class="card-title mt-0"><?= $story['title'] ?></h6>
+
+                <a href="<?= $story['href'] ?>" title="weiterlesen">
+                    <h6 class="card-title mt-0"><?= $story['title'] ?></h6>
+                </a>
+
+                <p class="card-news-teaser"><?= \StringUtil::substr($story['text'],80) ?></p>
+
+                <!--
                 <a href="<?= $story['href'] ?>" class="btn mt-4 btn-sm btn-outline-primary">Weiterlesen</a>
+                -->
             </div>
         </div>
     </div>

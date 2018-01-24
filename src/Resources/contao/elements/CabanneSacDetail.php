@@ -72,7 +72,6 @@ class CabanneSacDetail extends ContentElement
 
             }
         }
-//die(print_r($this->arrData,true));
         $objFile = FilesModel::findByUuid($objDb->singleSRC);
 
         if ($objFile !== null && is_file(TL_ROOT . '/' . $objFile->path))
@@ -83,6 +82,13 @@ class CabanneSacDetail extends ContentElement
             $this->addImageToTemplate($this->Template, $this->arrData, null, null, $this->objFilesModel);
         }
 
+        // coordsCH1903
+        if(strpos($this->coordsCH1903, '/') !== false)
+        {
+            $arrCoord = explode('/', $this->coordsCH1903);
+            $this->Template->coordsCH1903X = trim($arrCoord[0]);
+            $this->Template->coordsCH1903Y = trim($arrCoord[1]);
+        }
 
     }
 }

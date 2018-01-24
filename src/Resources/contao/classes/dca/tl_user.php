@@ -30,24 +30,26 @@ class tl_user_sac_event_tool extends Backend
     {
         // Sync tl_user with tl_member
         $objUser = $this->Database->prepare('SELECT * FROM tl_user WHERE sacMemberId>?')->execute(0);
-        while($objUser->next())
+        while ($objUser->next())
         {
-            $objSAC = $this->Database->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')->execute($objUser->sacMemberId);
-            if($objSAC->numRows == 1)
+            $objSAC = $this->Database->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')->limit(1)->execute($objUser->sacMemberId);
+            if ($objSAC->numRows)
             {
                 $set = array(
-                    'firstname' => $objSAC->firstname != '' ? $objSAC->firstname :  $objUser->firstname,
-                    'lastname' => $objSAC->lastname != '' ? $objSAC->lastname :  $objUser->lastname,
-                    'dateOfBirth' => $objSAC->dateOfBirth > 0 ? $objSAC->dateOfBirth :  $objUser->dateOfBirth,
-                    'email' => $objSAC->email != '' ? $objSAC->email :  $objUser->email,
-                    'street' => $objSAC->street != '' ? $objSAC->street :  $objUser->street,
-                    'postal' => $objSAC->postal != '' ? $objSAC->postal :  $objUser->postal,
-                    'city' => $objSAC->city != '' ? $objSAC->city :  $objUser->city,
-                    'country' => $objSAC->country != '' ? $objSAC->country :  $objUser->country,
-                    'gender' => $objSAC->gender != '' ? $objSAC->gender :  $objUser->gender,
+                    'firstname'   => $objSAC->firstname != '' ? $objSAC->firstname : $objUser->firstname,
+                    'lastname'    => $objSAC->lastname != '' ? $objSAC->lastname : $objUser->lastname,
+                    'dateOfBirth' => $objSAC->dateOfBirth != '' ? $objSAC->dateOfBirth : $objUser->dateOfBirth,
+                    'email'       => $objSAC->email != '' ? $objSAC->email : $objUser->email,
+                    'street'      => $objSAC->street != '' ? $objSAC->street : $objUser->street,
+                    'postal'      => $objSAC->postal != '' ? $objSAC->postal : $objUser->postal,
+                    'city'        => $objSAC->city != '' ? $objSAC->city : $objUser->city,
+                    'country'     => $objSAC->country != '' ? $objSAC->country : $objUser->country,
+                    'gender'      => $objSAC->gender != '' ? $objSAC->gender : $objUser->gender,
                 );
                 $this->Database->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objUser->id);
-            }else{
+            }
+            else
+            {
                 $this->Database->prepare('UPDATE tl_user SET sacMemberId=? WHERE id=?')->execute(0, $objUser->id);
             }
         }

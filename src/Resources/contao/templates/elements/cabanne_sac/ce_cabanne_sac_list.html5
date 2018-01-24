@@ -13,9 +13,13 @@
         <?php endif; ?>
         <div class="card-body">
             <p class="card-date m-0"><small></small></p>
-            <h6 class="card-title mt-0"><?= $this->name ?></h6>
+            <a href="<?= $this->jumpTo ?>" title="weiterlesen">
+                <h6 class="card-title mt-0"><?= $this->name ?></h6>
+            </a>
             <p><small><?= $this->altitude ?> m.ü.M.</small></p>
+            <!--
             <a href="<?= $this->jumpTo ?>" class="btn mt-4 btn-sm btn-outline-primary">Weiterlesen</a>
+            -->
         </div>
     </div>
 

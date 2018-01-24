@@ -28,21 +28,27 @@
                     <table class="table">
 
                         <tr>
-                            <td>H&uuml;ttenwart:</td>
+                            <td><strong>H&uuml;ttenwart:</strong></td>
                             <td><?= nl2br($this->huettenwart) ?></td>
                         </tr>
                         <tr>
-                            <td>Hüttentelefon:</td>
+                            <td><strong>Hüttentelefon:</strong></td>
                             <td><?= $this->phone ?></td>
                         </tr>
                         <tr>
-                            <td>E-Mail:</td>
+                            <td><strong>E-Mail:</strong></td>
                             <td><?= $this->email ?></td>
                         </tr>
                         <?php if($this->url): ?>
                             <tr>
-                                <td>Webseite:</td>
-                                <td><a href="<?= $this->url ?>">Link</a></td>
+                                <td><strong>Webseite:</strong></td>
+                                <td><a href="<?= $this->url ?>" target="_blank">Link</a></td>
+                            </tr>
+                        <?php endif; ?>
+                        <?php if($this->bookingMethod): ?>
+                            <tr>
+                                <td><strong>Anfrage/Buchung:</strong></td>
+                                <td><?= nl2br($this->bookingMethod) ?></td>
                             </tr>
                         <?php endif; ?>
                     </table>
@@ -52,19 +58,19 @@
                 <div class="tab-pane fade show" id="details" role="tabpanel" aria-labelledby="details-tab">
                     <table class="table">
                         <tr>
-                            <td>Hüttenchef:</td>
+                            <td><strong>Hüttenchef:</strong></td>
                             <td><?= nl2br($this->huettenchef) ?></td>
                         </tr>
                         <tr>
-                            <td>Kapazität:</td>
+                            <td><strong>Kapazität:</strong></td>
                             <td><?= nl2br($this->capacity) ?></td>
                         </tr>
                         <tr>
-                            <td>Höhe:</td>
+                            <td><strong>Höhe:</strong></td>
                             <td><?= $this->altitude ?> m.ü.M.</td>
                         </tr>
                         <tr>
-                            <td>Koordinaten:</td>
+                            <td><strong>Koordinaten:</strong></td>
                             <td><?= $this->coordsCH1903 ?> (CH1903/LV03)<br><?= $this->coordsWGS84 ?> (WGS84)</td>
                         </tr>
                     </table>
@@ -75,7 +81,7 @@
                 <div class="tab-pane fade show" id="bewartung" role="tabpanel" aria-labelledby="bewartung-tab">
                     <table class="table">
                         <tr>
-                            <td>Bewartung:</td>
+                            <td><strong>Bewartung:</strong></td>
                             <td><?= nl2br($this->openingTime) ?></td>
                         </tr>
                     </table>
@@ -89,6 +95,5 @@
         </div>
 
     </div>
-
-
+    <iframe src='https://map.geo.admin.ch/embed.html?lang=de&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.swisstopo.zeitreihen,ch.bfs.gebaeude_wohnungs_register,ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege&layers_visibility=false,false,false,false&layers_timestamp=18641231,,,&E=<?= $this->coordsCH1903X ?>.00&N=<?= $this->coordsCH1903Y ?>.00&zoom=9' width='400' height='300' frameborder='0' style='border:0'></iframe>
 <?php $this->endblock(); ?>

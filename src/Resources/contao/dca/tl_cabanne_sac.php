@@ -82,20 +82,20 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
     ),
     'palettes' => array
     (
-        'default' => '{contact_legend},name,canton,altitude,huettenwart,phone,email,url;{image_legend},singleSRC;{details_legend},huettenchef,capacity,coordsCH1903,coordsWGS84,geoadminlink,openingTime',
+        'default' => '{contact_legend},name,canton,altitude,huettenwart,phone,email,url,bookingMethod;{image_legend},singleSRC;{details_legend},huettenchef,capacity,coordsCH1903,coordsWGS84,geoadminlink,openingTime',
     ),
 
     'fields' => array
     (
-        'id'           => array
+        'id'            => array
         (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
         ),
-        'tstamp'       => array
+        'tstamp'        => array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
-        'name'         => array
+        'name'          => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['name'],
             'exclude'   => true,
@@ -105,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'canton'       => array
+        'canton'        => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['canton'],
             'exclude'   => true,
@@ -115,7 +115,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'altitude'     => array
+        'altitude'      => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['altitude'],
             'exclude'   => true,
@@ -125,7 +125,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('rgxp' => 'natural', 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'huettenwart'  => array
+        'huettenwart'   => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['huettenwart'],
             'exclude'   => true,
@@ -135,7 +135,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('rgxp' => '', 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'phone'        => array
+        'phone'         => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['contact'],
             'exclude'   => true,
@@ -145,7 +145,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('rgxp' => 'phone', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'email'        => array
+        'email'         => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['email'],
             'exclude'   => true,
@@ -155,7 +155,17 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('rgxp' => 'email', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'url'          => array
+        'bookingMethod' => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['bookingMethod'],
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
+            'inputType' => 'textarea',
+            'eval'      => array('mandatory' => false, 'tl_class' => 'clr'),
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ),
+        'url'           => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['url'],
             'exclude'   => true,
@@ -165,15 +175,15 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('rgxp' => 'url', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'singleSRC'  => array
+        'singleSRC'     => array
         (
-            'label'                   => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['singleSRC'],
-            'exclude'                 => true,
-            'inputType'               => 'fileTree',
-            'eval'                    => array('fieldType'=>'radio', 'filesOnly'=>true, 'extensions'=>Config::get('validImageTypes'), 'mandatory'=>true),
-            'sql'                     => "binary(16) NULL"
+            'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['singleSRC'],
+            'exclude'   => true,
+            'inputType' => 'fileTree',
+            'eval'      => array('fieldType' => 'radio', 'filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'mandatory' => true),
+            'sql'       => "binary(16) NULL",
         ),
-        'huettenchef'  => array
+        'huettenchef'   => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['huettenwart'],
             'exclude'   => true,
@@ -183,7 +193,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'capacity'     => array
+        'capacity'      => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['capacity'],
             'exclude'   => true,
@@ -193,7 +203,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'coordsCH1903'       => array
+        'coordsCH1903'  => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['coordsCH1903'],
             'exclude'   => true,
@@ -203,7 +213,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'coordsWGS84'       => array
+        'coordsWGS84'   => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['coordsWGS84'],
             'exclude'   => true,
@@ -213,7 +223,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'openingTime'  => array
+        'openingTime'   => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['openingTime'],
             'exclude'   => true,
