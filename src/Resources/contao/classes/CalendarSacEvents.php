@@ -376,6 +376,12 @@ class CalendarSacEvents extends System
             $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
             $memberCount = $calendarEventsMember->numRows;
 
+            if($objEvent->eventCanceled)
+            {
+                // Event canceled
+                return '';
+            }
+
             if (!$objEvent->disableOnlineRegistration)
             {
                 if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0)
@@ -415,6 +421,11 @@ class CalendarSacEvents extends System
         {
             $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
             $memberCount = $calendarEventsMember->numRows;
+
+            if($objEvent->eventCanceled)
+            {
+                return false;
+            }
 
             if (!$objEvent->disableOnlineRegistration)
             {

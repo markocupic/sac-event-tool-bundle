@@ -361,6 +361,8 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                     $strRegistrationGoesTo = implode(',', $arrRegistrationGoesTo);
 
                     $objEventRegistration = new CalendarEventsMemberModel();
+                    unset($arrData['id']);
+                    $arrData = array_filter($arrData);
                     $objEventRegistration->setRow($arrData);
                     $objEventRegistration->save();
                     System::log(sprintf('New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").', $objMemberModel->firstname, $objMemberModel->lastname, $objMemberModel->id, $this->objEvent->id, $this->objEvent->title), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_SUBSCRIPTION'));
