@@ -258,6 +258,11 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             'inputType' => 'textarea',
             'eval' => array('mandatory' => true, 'rows' => 10)
         ));
+        $objForm->addFormField('agb', array(
+            'label' => array('', 'Ich akzeptiere die <a href="#" data-toggle="modal" data-target="#agbModal">allg. Gesch&auml;ftsbedingungen.</a>'),
+            'inputType' => 'checkbox',
+            'eval' => array('mandatory' => true)
+        ));
 
         // Let's add  a submit button
         $objForm->addFormField('submit', array(

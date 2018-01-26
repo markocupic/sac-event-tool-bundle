@@ -40,12 +40,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             (
                 'id'        => 'primary',
                 'email,pid' => 'index',
-            )
-        )
+            ),
+        ),
     ),
     // Buttons callback
     'edit'        => array(
-        'buttons_callback' => array(array('tl_calendar_events_member', 'buttonsCallback'))
+        'buttons_callback' => array(array('tl_calendar_events_member', 'buttonsCallback')),
     ),
 
     // List
@@ -56,13 +56,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'mode'        => 2,
             'fields'      => array('stateOfSubscription, addedOn'),
             'flag'        => 1,
-            'panelLayout' => 'filter;sort,search'
+            'panelLayout' => 'filter;sort,search',
         ),
         'label'             => array
         (
             'fields'         => array('stateOfSubscription', 'firstname', 'lastname', 'street', 'city'),
             'showColumns'    => true,
-            'label_callback' => array('tl_calendar_events_member', 'addIcon')
+            'label_callback' => array('tl_calendar_events_member', 'addIcon'),
         ),
         'global_operations' => array
         (
@@ -71,7 +71,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
-                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ),
             'downloadRegistrationList' => array
             (
@@ -79,7 +79,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
                 'href'       => 'act=downloadRegistrationList',
                 'class'      => 'download_registration_list',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',
-                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ),
             'sendEmail'                => array
             (
@@ -97,7 +97,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             (
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['edit'],
                 'href'  => 'act=edit',
-                'icon'  => 'edit.svg'
+                'icon'  => 'edit.svg',
             ),
 
             'delete'                     => array
@@ -105,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"',
             ),
             // Regular "toggle" operation but without "icon" and with the haste specific params
             'toggleStateOfParticipation' => array
@@ -117,23 +117,23 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
                     'options' => [
                         [
                             'value' => '',
-                            'icon'  => Config::get('SAC_EVT_ASSETS_DIR') . '/icons/has-not-participated.svg'
+                            'icon'  => Config::get('SAC_EVT_ASSETS_DIR') . '/icons/has-not-participated.svg',
                         ],
                         [
                             'value' => '1',
-                            'icon'  => Config::get('SAC_EVT_ASSETS_DIR') . '/icons/has-participated.svg'
-                        ]
-                    ]
-                ]
+                            'icon'  => Config::get('SAC_EVT_ASSETS_DIR') . '/icons/has-participated.svg',
+                        ],
+                    ],
+                ],
             ),
             'show'                       => array
             (
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['show'],
                 'href'  => 'act=show',
-                'icon'  => 'show.svg'
-            )
+                'icon'  => 'show.svg',
+            ),
 
-        )
+        ),
     ),
 
     // Palettes
@@ -156,7 +156,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
     (
         'id'                  => array
         (
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int(10) unsigned NOT NULL auto_increment",
         ),
         'pid'                 => array
         (
@@ -176,14 +176,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         ),
         'tstamp'              => array
         (
-            'sql' => "int(10) unsigned NOT NULL default '0'"
+            'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
         'addedOn'             => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['addedOn'],
             'inputType' => 'text',
             'eval'      => array('rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'),
-            'sql'       => "varchar(10) NOT NULL default ''"
+            'sql'       => "varchar(10) NOT NULL default ''",
         ),
         'stateOfSubscription' => array
         (
@@ -195,14 +195,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'reference'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
             'options'       => array('subscription-not-confirmed', 'subscription-accepted', 'subscription-refused', 'subscription-waitlisted'),
             'eval'          => array('doNotShow' => false, 'readonly' => false, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
-            'sql'           => "varchar(255) NOT NULL default ''"
+            'sql'           => "varchar(255) NOT NULL default ''",
         ),
         'hasParticipated'     => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['hasParticipated'],
             'inputType' => 'checkbox',
             'eval'      => array('submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true,),
-            'sql'       => "char(1) NOT NULL default ''"
+            'sql'       => "char(1) NOT NULL default ''",
         ),
         'dashboard'           => array
         (
@@ -210,7 +210,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'inputType'            => 'text',
             'input_field_callback' => array('tl_calendar_events_member', 'inputFieldCallbackDashboard'),
             'eval'                 => array('doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
-            'sql'                  => "varchar(255) NOT NULL default ''"
+            'sql'                  => "varchar(255) NOT NULL default ''",
         ),
         'refuseWithEmail'     => array
         (
@@ -218,7 +218,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'inputType'            => 'text',
             'input_field_callback' => array('tl_calendar_events_member', 'inputFieldCallbackRefuseWithEmail'),
             'eval'                 => array('doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
-            'sql'                  => "varchar(255) NOT NULL default ''"
+            'sql'                  => "varchar(255) NOT NULL default ''",
         ),
         'acceptWithEmail'     => array
         (
@@ -226,7 +226,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'inputType'            => 'text',
             'input_field_callback' => array('tl_calendar_events_member', 'inputFieldCallbackAcceptWithEmail'),
             'eval'                 => array('doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
-            'sql'                  => "varchar(255) NOT NULL default ''"
+            'sql'                  => "varchar(255) NOT NULL default ''",
         ),
         'addToWaitlist'       => array
         (
@@ -234,14 +234,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'inputType'            => 'text',
             'input_field_callback' => array('tl_calendar_events_member', 'inputFieldCallbackAddToWaitlist'),
             'eval'                 => array('doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
-            'sql'                  => "varchar(255) NOT NULL default ''"
+            'sql'                  => "varchar(255) NOT NULL default ''",
         ),
         'eventName'           => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['eventName'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
-            'sql'       => "varchar(255) NOT NULL default ''"
+            'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'notes'               => array
         (
@@ -256,14 +256,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['firstname'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
-            'sql'       => "varchar(255) NOT NULL default ''"
+            'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'lastname'            => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['lastname'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
-            'sql'       => "varchar(255) NOT NULL default ''"
+            'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'gender'              => array
         (
@@ -272,70 +272,70 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'options'   => array('male', 'female'),
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
             'eval'      => array('mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'),
-            'sql'       => "varchar(32) NOT NULL default ''"
+            'sql'       => "varchar(32) NOT NULL default ''",
         ),
         'dateOfBirth'         => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['dateOfBirth'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'),
-            'sql'       => "varchar(10) NOT NULL default ''"
+            'sql'       => "varchar(10) NOT NULL default ''",
         ),
         'street'              => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['street'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'),
-            'sql'       => "varchar(255) NOT NULL default ''"
+            'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'postal'              => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['postal'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 32, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'),
-            'sql'       => "varchar(32) NOT NULL default ''"
+            'sql'       => "varchar(32) NOT NULL default ''",
         ),
         'city'                => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['city'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'),
-            'sql'       => "varchar(255) NOT NULL default ''"
+            'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'phone'               => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['phone'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
-            'sql'       => "varchar(64) NOT NULL default ''"
+            'sql'       => "varchar(64) NOT NULL default ''",
         ),
         'emergencyPhone'      => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['emergencyPhone'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
-            'sql'       => "varchar(64) NOT NULL default ''"
+            'sql'       => "varchar(64) NOT NULL default ''",
         ),
         'emergencyPhoneName'  => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['emergencyPhoneName'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 64, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
-            'sql'       => "varchar(64) NOT NULL default ''"
+            'sql'       => "varchar(64) NOT NULL default ''",
         ),
         'email'               => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['email'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
-            'sql'       => "varchar(255) NOT NULL default ''"
+            'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'sacMemberId'         => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['sacMemberId'],
             'inputType' => 'text',
             'eval'      => array('doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'),
-            'sql'       => "varchar(255) NOT NULL default ''"
+            'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'vegetarian'          => array
         (
@@ -343,7 +343,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'inputType' => 'select',
             'options'   => array('false' => 'Nein', 'true' => 'Ja'),
             'eval'      => array('doNotShow' => false, 'doNotCopy' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
-            'sql'       => "varchar(32) NOT NULL default ''"
+            'sql'       => "varchar(32) NOT NULL default ''",
         ),
         // Send E-mail
         'emailRecipients'     => array
@@ -359,22 +359,29 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['emailSubject'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''),
-            'sql'       => "varchar(255) NOT NULL default ''"
+            'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'emailText'           => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['emailText'],
             'inputType' => 'textarea',
             'eval'      => array('mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'rows' => 6, 'style' => 'height:50px', 'tl_class' => ''),
-            'sql'       => "mediumtext NULL"
+            'sql'       => "mediumtext NULL",
         ),
         'emailSendCopy'       => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['emailSendCopy'],
             'inputType' => 'checkbox',
             'eval'      => array('doNotShow' => true, 'doNotCopy' => true,),
-            'sql'       => "char(1) NOT NULL default ''"
+            'sql'       => "char(1) NOT NULL default ''",
         ),
-    )
+        'agb'                 => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['agb'],
+            'inputType' => 'checkbox',
+            'eval'      => array('doNotShow' => true, 'doNotCopy' => true,),
+            'sql'       => "char(1) NOT NULL default ''",
+        ),
+    ),
 );
 
