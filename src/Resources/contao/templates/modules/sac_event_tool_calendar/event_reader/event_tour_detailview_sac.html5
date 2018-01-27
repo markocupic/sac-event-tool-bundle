@@ -54,7 +54,7 @@
     <?php if(!empty($organizers)): ?>
     <div class="instructor event-detail event-info-box icon-box-small">
         <h3>Leitung</h3>
-        <div class="row">
+        <div class="row tiny-gutter">
             <?php foreach($arrInstructors as $userId): ?>
             <div class="col-sm-6 col-md-4 col-xl-3">
                 <div class="row">

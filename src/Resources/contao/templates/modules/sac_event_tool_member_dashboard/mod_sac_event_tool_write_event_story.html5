@@ -118,12 +118,9 @@
 
 <?php if (count($this->images)): ?>
     {{br}}
-    <div id="dashboardEventStoryGallery"
-         class="<?php if ($this->publishState < 2): ?>sortable-thumbnail-container <?php endif; ?> dashboard-event-story-gallery row">
+    <div id="dashboardEventStoryGallery" class="<?php if ($this->publishState < 2): ?>sortable-thumbnail-container <?php endif; ?> dashboard-event-story-gallery row tiny-gutter">
         <?php foreach ($this->images as $arrFile): ?>
-            <div class="col-12 col-sm-6 col-md-3 thumbnail <?php if ($this->publishState < 2): ?>sortable-item <?php endif; ?>responsive"
-                 data-file-uuid="<?= \StringUtil::binToUuid($arrFile['uuid']) ?>"
-                 title="Sortierung mit Drag and Drop &auml;ndern">
+            <div class="col-12 col-sm-6 col-md-3 thumbnail <?php if ($this->publishState < 2): ?>sortable-item <?php endif; ?>responsive" data-file-uuid="<?= \StringUtil::binToUuid($arrFile['uuid']) ?>" title="Sortierung mit Drag and Drop &auml;ndern">
                 {{image::<?= Contao\StringUtil::binToUuid($arrFile['uuid']) ?>?width=400&height=400&mode=crop}}
                 <?php if ($this->publishState < 2): ?>
                     <button class="btn btn-danger remove-image" title="Bild löschen"><i class="fa fa-trash"></i></button>

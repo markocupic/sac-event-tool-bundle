@@ -27,35 +27,6 @@ class EventReleaseLevelPolicyModel extends \Model
      */
     protected static $strTable = 'tl_event_release_level_policy';
 
-
-    /**
-     * @param $levelId
-     * @return null|static
-     */
-    public static function findPrevLevel($levelId)
-    {
-        $eventReleaseLevelModel = static::findByPk($levelId);
-        if ($eventReleaseLevelModel !== null)
-        {
-            $eventReleasePackageModel = $eventReleaseLevelModel->getRelated('pid');
-            if ($eventReleasePackageModel !== null)
-            {
-
-                $arrColumns = array(static::$strTable . '.pid=?');
-                $arrColumns[] = static::$strTable . '.level<?';
-                $arrInt = array($eventReleasePackageModel->id, $eventReleaseLevelModel->level);
-                $arrOpt = array('order' => 'tl_event_release_level_policy.level DESC');
-                $objModel = static::findOneBy($arrColumns, $arrInt, $arrOpt);
-                if ($objModel !== null)
-                {
-                    return $objModel;
-                }
-            }
-        }
-        return null;
-    }
-
-
     /**
      * @param $eventReleaseRecordId
      * @return null|static
@@ -82,7 +53,6 @@ class EventReleaseLevelPolicyModel extends \Model
         }
         return null;
     }
-
 
     /**
      * @param $eventId
@@ -116,7 +86,7 @@ class EventReleaseLevelPolicyModel extends \Model
         }
 
         $options = array(
-            'order' => 'level ASC'
+            'order' => 'level ASC',
         );
         $objReleaseLevelModel = self::findOneBy(array('tl_event_release_level_policy.pid=?'), array($objEventReleaseLevelPolicyPackageModel->id), $options);
         if ($objReleaseLevelModel === null)
@@ -160,7 +130,7 @@ class EventReleaseLevelPolicyModel extends \Model
         }
 
         $options = array(
-            'order' => 'level DESC'
+            'order' => 'level DESC',
         );
         $objReleaseLevelModel = self::findOneBy(array('tl_event_release_level_policy.pid=?'), array($objEventReleaseLevelPolicyPackageModel->id), $options);
         if ($objReleaseLevelModel === null)
@@ -254,6 +224,32 @@ class EventReleaseLevelPolicyModel extends \Model
         return $allow;
     }
 
+    /**
+     * @param $levelId
+     * @return null|static
+     */
+    public static function findPrevLevel($levelId)
+    {
+        $eventReleaseLevelModel = static::findByPk($levelId);
+        if ($eventReleaseLevelModel !== null)
+        {
+            $eventReleasePackageModel = $eventReleaseLevelModel->getRelated('pid');
+            if ($eventReleasePackageModel !== null)
+            {
+
+                $arrColumns = array(static::$strTable . '.pid=?');
+                $arrColumns[] = static::$strTable . '.level<?';
+                $arrInt = array($eventReleasePackageModel->id, $eventReleaseLevelModel->level);
+                $arrOpt = array('order' => 'tl_event_release_level_policy.level DESC');
+                $objModel = static::findOneBy($arrColumns, $arrInt, $arrOpt);
+                if ($objModel !== null)
+                {
+                    return $objModel;
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * Writing/editing an event is allowed for:
@@ -422,6 +418,7 @@ class EventReleaseLevelPolicyModel extends \Model
         return $allow;
 
     }
+
 
     /**
      * @param $eventId

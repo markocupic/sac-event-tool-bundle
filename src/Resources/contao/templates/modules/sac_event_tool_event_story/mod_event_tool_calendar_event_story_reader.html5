@@ -9,7 +9,7 @@
 
     <?php if ($this->images): ?>
         <div class="ce_gallery">
-            <div class="row">
+            <div class="row tiny-gutter">
               <?php foreach ($this->images as $image): ?>
                   <figure class="col-12 col-sm-6 col-md-3 image_container thumbnail responsive">
                     <a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement">

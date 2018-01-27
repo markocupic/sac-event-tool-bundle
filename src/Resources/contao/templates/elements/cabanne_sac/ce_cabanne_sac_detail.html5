@@ -95,5 +95,5 @@
         </div>
 
     </div>
-    <iframe src='https://map.geo.admin.ch/embed.html?lang=de&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.swisstopo.zeitreihen,ch.bfs.gebaeude_wohnungs_register,ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege&layers_visibility=false,false,false,false&layers_timestamp=18641231,,,&E=<?= $this->coordsCH1903X ?>.00&N=<?= $this->coordsCH1903Y ?>.00&zoom=9' width='400' height='300' frameborder='0' style='border:0'></iframe>
+    <iframe src='https://map.geo.admin.ch/embed.html?lang=de&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.swisstopo.zeitreihen,ch.bfs.gebaeude_wohnungs_register,ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege&layers_visibility=false,false,false,false&layers_timestamp=18641231,,,&E=<?= $this->coordsCH1903X ?>.00&N=<?= $this->coordsCH1903Y ?>.00&zoom=6&crosshair=marker' width='400' height='300' frameborder='0' style='border:0'></iframe>
 <?php $this->endblock(); ?>
