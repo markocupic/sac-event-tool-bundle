@@ -7,7 +7,8 @@
         <div class="col-lg-6 col-xl-8 mb-4 mb-0-lg">
             <figure class="image_container"<?php if ($this->margin): ?> style="<?= $this->margin ?>"<?php endif; ?> itemscope itemtype="http://schema.org/ImageObject">
                 <?php $this->insert('picture_default', $this->picture); ?>
-            </figure>        </div>
+            </figure>
+        </div>
         <div class="col-lg-6  col-xl-4">
 
             <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -39,13 +40,13 @@
                             <td><strong>E-Mail:</strong></td>
                             <td><?= $this->email ?></td>
                         </tr>
-                        <?php if($this->url): ?>
+                        <?php if ($this->url): ?>
                             <tr>
                                 <td><strong>Webseite:</strong></td>
                                 <td><a href="<?= $this->url ?>" target="_blank">Link</a></td>
                             </tr>
                         <?php endif; ?>
-                        <?php if($this->bookingMethod): ?>
+                        <?php if ($this->bookingMethod): ?>
                             <tr>
                                 <td><strong>Anfrage/Buchung:</strong></td>
                                 <td><?= nl2br($this->bookingMethod) ?></td>
@@ -90,11 +91,20 @@
             </div>
 
 
-
-
         </div>
 
-    </div>
-<?php $geoLink = 'https://map.geo.admin.ch/?lang=de&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.swisstopo.zeitreihen,ch.bfs.gebaeude_wohnungs_register,ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege&layers_visibility=false,false,true,true&layers_timestamp=18641231,,,&zoom=7&E=%s.00&N=%s.00&crosshair=marker'; ?>
-    <iframe src="<?= sprintf($geoLink, $this->coordsCH1903X, $this->coordsCH1903Y) ?> width="400" height="300" frameborder="0" style="border:0"></iframe>
+        <div class="col-lg-6 col-xl-8 mb-4 mb-0-lg">
+            <!-- Zugang -->
+        </div>
+
+
+        <div class="col-lg-6  col-xl-4">
+            <?php $geoLink = '//map.geo.admin.ch/embed.html?lang=de&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege&E=%s.00&N=%s.00&zoom=7&crosshair=marker'; ?>
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe src="<?= sprintf($geoLink, $this->coordsCH1903X, $this->coordsCH1903Y) ?>" frameborder="0" style="border:0"></iframe>
+            </div>
+        </div>
+    </div><!-- end row -->
+
+
 <?php $this->endblock(); ?>
