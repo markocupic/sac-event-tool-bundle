@@ -49,12 +49,12 @@
                             Mitglieder-Nr. {{user::sacMemberId}}
                             {{br}}{{br}}
 
-                            <a href="{{link_url::passwort-aendern}}" class="btn btn-outline-info btn-sm">{{link_title::passwort-aendern}}</a>
+                            <a href="{{link_url::passwort-aendern}}" class="btn btn-outline-primary">{{link_title::passwort-aendern}}</a>
                             {{br}}{{br}}
 
-                            <p class="bg-light p-2">
+                            <p class="alert alert-danger p-2">
                                 &Auml;nderungen an Adresse, Telefonnummer, etc. m&uuml;ssen auf der Webseite des Zentralverbandes gemacht werden.{{br}}{{br}}
-                                <a href="http://www.sac-cas.ch/metanav/mein-konto.html" class="btn btn-outline-info btn-sm" title="Diese Angaben &auml;ndern">Angaben &auml;ndern</a>
+                                <a href="http://www.sac-cas.ch/metanav/mein-konto.html" class="btn btn-danger btn-sm" title="Diese Angaben &auml;ndern">Angaben &auml;ndern</a>
                             </p>
                             {{br}}
                             <hr>
