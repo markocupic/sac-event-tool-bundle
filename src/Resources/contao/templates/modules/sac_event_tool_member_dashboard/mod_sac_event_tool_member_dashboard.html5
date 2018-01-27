@@ -26,6 +26,7 @@
                 <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-past-workshops" role="tab" aria-controls="nav-profile" aria-selected="false">Absolvierte Kurse</a>
                 <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-past-tours" role="tab" aria-controls="nav-profile" aria-selected="false">Absolvierte Touren</a>
             </nav>
+            {{br}}{{br}}
         </div>
 
 
@@ -34,11 +35,11 @@
             <div class="tab-content" id="nav-tabContent">
                 <!-- tab-pane-1 -->
                 <div class="tab-pane fade show active" id="nav-profile" role="tabpanel" aria-labelledby="nav-home-tab">
-                    <h3 class="mt-0">Persönliche Einstellungen</h3>
+                    <h2 class="mt-0">Persönliche Einstellungen</h2>
 
                     <div class="row">
                         <div class="col-12">
-                            <h4>Personalien</h4>
+                            <h3>Personalien</h3>
                             {{user::firstname}} {{user::lastname}}{{br}}
                             {{user::street}}{{br}}
                             {{user::postal}} {{user::city}}
@@ -63,13 +64,13 @@
 
 
                         <div class="col-12">
-                            <h4>Weiteres</h4>
+                            <h3>Weiteres</h3>
                             <?= $this->userProfileForm ?>
                             <hr>
                         </div>
 
                         <div class="col-12">
-                            <h4>Avatar Einstellungen</h4>
+                            <h3>Avatar Einstellungen</h3>
                             <div class="row">
                                 <div class="col-9">
                                     <?= $this->avatarForm ?>
@@ -90,7 +91,7 @@
 
                 <!-- tab-pane-2 -->
                 <div class="tab-pane fade" id="nav-next-events" role="tabpanel" aria-labelledby="nav-profile-tab">
-                    <h3 class="mt-0">Deine nächsten Events</h3>
+                    <h2 class="mt-0">Deine nächsten Events</h2>
                     <table class="table layout-table table-responsive table-striped">
                         <tr>
                             <th>Datum</th>
@@ -122,7 +123,7 @@
 
                 <!-- tab-pane-3 -->
                 <div class="tab-pane fade" id="nav-past-workshops" role="tabpanel" aria-labelledby="nav-profile-tab">
-                    <h3 class="mt-0">Absolvierte Kurse</h3>
+                    <h2 class="mt-0">Absolvierte Kurse</h2>
                     <table class="table layout-table table-responsive table-striped">
                         <?php foreach ($this->arrPastEvents as $event): ?>
                             <?php if ($event['eventType'] == 'course'): ?>
@@ -139,7 +140,7 @@
 
                 <!-- tab-pane-4 -->
                 <div class="tab-pane fade" id="nav-past-tours" role="tabpanel" aria-labelledby="nav-profile-tab">
-                    <h3 class="mt-0">Absolvierte Touren</h3>
+                    <h2 class="mt-0">Absolvierte Touren</h2>
                     <table class="table layout-table table-responsive table-striped">
                         <?php foreach ($this->arrPastEvents as $event): ?>
                             <?php if ($event['eventType'] == 'tour'): ?>
