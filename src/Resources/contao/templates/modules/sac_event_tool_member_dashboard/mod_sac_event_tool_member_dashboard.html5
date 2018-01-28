@@ -39,7 +39,6 @@
 
                     <div class="row">
                         <div class="col-12">
-                            <h3>Personalien</h3>
                             {{user::firstname}} {{user::lastname}}{{br}}
                             {{user::street}}{{br}}
                             {{user::postal}} {{user::city}}
