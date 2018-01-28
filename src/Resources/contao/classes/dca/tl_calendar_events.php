@@ -60,7 +60,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function setPaletteWhenCreatingNew(DataContainer $dc)
     {
-        if(Input::get('act') === 'edit')
+        if (Input::get('act') === 'edit')
         {
             $objCalendarEventsModel = CalendarEventsModel::findByPk($dc->id);
             if ($objCalendarEventsModel !== null)
@@ -119,6 +119,46 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     $objEv->mainInstructor = $arrGuides[0];
                     $objEv->save();
                 }
+            }
+        }
+
+
+        // Special treatment for tl_calendar_events.eventReleaseLevel
+        // Do not allow multi edit on tl_calendar_events.eventReleaseLevel, if user has not write permissions on every level
+        if (Input::get('act') === 'editAll' || Input::get('act') === 'overrideAll')
+        {
+            $allow = true;
+            $objCalendar = \Contao\CalendarModel::findByPk(CURRENT_ID);
+            if ($objCalendar !== null)
+            {
+                if ($objCalendar->levelAccessPermissionPackage)
+                {
+                    $objEventReleaseLevelPolicyPackageModel = $objCalendar->getRelated('levelAccessPermissionPackage');
+                    if ($objEventReleaseLevelPolicyPackageModel !== null)
+                    {
+                        $objReleaseLevelModel = \Contao\EventReleaseLevelPolicyModel::findByPid($objEventReleaseLevelPolicyPackageModel->id);
+                        if ($objReleaseLevelModel !== null)
+                        {
+                            while ($objReleaseLevelModel->next())
+                            {
+
+                                $arrGroupsUserBelongsTo = \StringUtil::deserialize($this->User->groups, true);
+                                $arrAllowedGroups = \StringUtil::deserialize($objReleaseLevelModel->groups, true);
+
+                                if (!array_intersect($arrGroupsUserBelongsTo, $arrAllowedGroups))
+                                {
+                                    $allow = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if ($this->User->isAdmin || $allow === true)
+            {
+                \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+                    ->addField(array('eventReleaseLevel'), 'title_legend', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+                    ->applyToPalette('default', 'tl_calendar_events');
             }
         }
 
@@ -316,6 +356,8 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     }
                 }
             }
+
+
         }
     }
 
@@ -326,6 +368,10 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function setPalettes(DataContainer $dc)
     {
+        if (\Input::get('act') === 'editAll' || \Input::get('act') === 'overrideAll')
+        {
+            return;
+        }
 
 
         if ($dc->id > 0)
@@ -981,12 +1027,12 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
         $columnFields = array(
             'new_repeat' => array(
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['kurstage'],
-                'exclude' => true,
+                'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['kurstage'],
+                'exclude'   => true,
                 'inputType' => 'text',
-                'default' => time(),
-                'eval' => array('rgxp' => 'date', 'datepicker' => true, 'doNotCopy' => false, 'style' => 'width:100px', 'tl_class' => 'wizard'),
-            )
+                'default'   => time(),
+                'eval'      => array('rgxp' => 'date', 'datepicker' => true, 'doNotCopy' => false, 'style' => 'width:100px', 'tl_class' => 'wizard'),
+            ),
         );
 
         return $columnFields;
@@ -1242,58 +1288,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * save_callback saveCallbackEventReleaseLevel()
-     * Publish or unpublish events if eventReleaseLevel has reached the highest/last level
-     * @param $newEventReleaseLevelId
-     * @param DC_Table $dc
-     * @param null $eventId
-     * @return mixed
-     */
-    public function saveCallbackEventReleaseLevel($newEventReleaseLevelId, DC_Table $dc = null, $eventId = null)
-    {
-        // Get event id
-        if ($dc->activeRecord->id > 0)
-        {
-            $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
-        }
-        elseif ($eventId > 0)
-        {
-            $objEvent = CalendarEventsModel::findByPk($eventId);
-        }
-        if ($objEvent !== null)
-        {
-            $lastEventReleaseModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
-            if ($lastEventReleaseModel !== null)
-            {
-
-                // Display message in the backend
-                Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'], $objEvent->id, EventReleaseLevelPolicyModel::findByPk($newEventReleaseLevelId)->level));
-
-                // Display message in the backend if event is published or unpublished now
-                if ($lastEventReleaseModel->id == $newEventReleaseLevelId)
-                {
-                    if (!$objEvent->published)
-                    {
-                        Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
-                    }
-                    $objEvent->published = '1';
-                }
-                else
-                {
-                    if ($objEvent->published)
-                    {
-                        Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
-                    }
-                    $objEvent->published = '';
-                }
-                $objEvent->save();
-            }
-        }
-        return $newEventReleaseLevelId;
-
-    }
-
-    /**
      * button_callback toggleIcon()
      * Return the "toggle visibility" button
      *
@@ -1328,116 +1322,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         }
 
         return '<a href="' . $this->addToUrl($href) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, 'data-state="' . ($row['published'] ? 1 : 0) . '"') . '</a> ';
-    }
-
-    /**
-     * Push event to the next release level
-     * @param $row
-     * @param $href
-     * @param $label
-     * @param $title
-     * @param $icon
-     * @param $attributes
-     * @return string
-     */
-    public function releaseLevelNext($row, $href, $label, $title, $icon, $attributes)
-    {
-        $canSendToNextReleaseLevel = false;
-        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
-        $nextReleaseLevel = null;
-        if ($objReleaseLevelModel !== null)
-        {
-            $nextReleaseLevel = $objReleaseLevelModel->level + 1;
-        }
-        // Save to database
-        if (Input::get('action') === 'releaseLevelNext' && Input::get('eventId') == $row['id'])
-        {
-
-            if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id']) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel) === true)
-            {
-                $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
-                if ($objEvent !== null)
-                {
-                    $objReleaseLevelModel = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
-                    if ($objReleaseLevelModel !== null)
-                    {
-                        $objEvent->eventReleaseLevel = $objReleaseLevelModel->id;
-                        $objEvent->save();
-                        $this->saveCallbackEventReleaseLevel($objEvent->eventReleaseLevel, null, $objEvent->id);
-
-                    }
-                }
-            }
-            $this->redirect($this->getReferer());
-        }
-
-        if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id']) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel) === true)
-        {
-            $canSendToNextReleaseLevel = true;
-        }
-
-        if ($canSendToNextReleaseLevel === false)
-        {
-            return '';
-        }
-
-        return '<a href="' . $this->addToUrl($href . '&amp;eventId=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ';
-
-    }
-
-    /**
-     * Pull event to the previous release level
-     * @param $row
-     * @param $href
-     * @param $label
-     * @param $title
-     * @param $icon
-     * @param $attributes
-     * @return string
-     */
-    public function releaseLevelPrev($row, $href, $label, $title, $icon, $attributes)
-    {
-        $canSendToNextReleaseLevel = false;
-        $prevReleaseLevel = null;
-        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
-        if ($objReleaseLevelModel !== null)
-        {
-            $prevReleaseLevel = $objReleaseLevelModel->level - 1;
-        }
-
-        // Save to database
-        if (Input::get('action') === 'releaseLevelPrev' && Input::get('eventId') == $row['id'])
-        {
-
-            if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id']) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel) === true)
-            {
-                $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
-                if ($objEvent !== null)
-                {
-                    $objReleaseLevelModel = EventReleaseLevelPolicyModel::findPrevLevel($objEvent->eventReleaseLevel);
-                    if ($objReleaseLevelModel !== null)
-                    {
-                        $objEvent->eventReleaseLevel = $objReleaseLevelModel->id;
-                        $objEvent->save();
-                        $this->saveCallbackEventReleaseLevel($objEvent->eventReleaseLevel, null, $objEvent->id);
-                    }
-                }
-            }
-            $this->redirect($this->getReferer());
-        }
-
-        if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id']) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel) === true)
-        {
-            $canSendToNextReleaseLevel = true;
-        }
-
-        if ($canSendToNextReleaseLevel === false)
-        {
-            return '';
-        }
-
-        return '<a href="' . $this->addToUrl($href . '&amp;eventId=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ';
-
     }
 
     /**
@@ -1498,6 +1382,168 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         sleep(1);
         $this->import('Calendar');
         $this->Calendar->generateFeedsByCalendar(CURRENT_ID);
+    }
+
+    /**
+     * Push event to the next release level
+     * @param $row
+     * @param $href
+     * @param $label
+     * @param $title
+     * @param $icon
+     * @param $attributes
+     * @return string
+     */
+    public function releaseLevelNext($row, $href, $label, $title, $icon, $attributes)
+    {
+        $canSendToNextReleaseLevel = false;
+        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
+        $nextReleaseLevel = null;
+        if ($objReleaseLevelModel !== null)
+        {
+            $nextReleaseLevel = $objReleaseLevelModel->level + 1;
+        }
+        // Save to database
+        if (Input::get('action') === 'releaseLevelNext' && Input::get('eventId') == $row['id'])
+        {
+
+            if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id']) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel) === true)
+            {
+                $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
+                if ($objEvent !== null)
+                {
+                    $objReleaseLevelModel = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
+                    if ($objReleaseLevelModel !== null)
+                    {
+                        $objEvent->eventReleaseLevel = $objReleaseLevelModel->id;
+                        $objEvent->save();
+                        $this->saveCallbackEventReleaseLevel($objEvent->eventReleaseLevel, null, $objEvent->id);
+
+                    }
+                }
+            }
+            $this->redirect($this->getReferer());
+        }
+
+        if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id']) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel) === true)
+        {
+            $canSendToNextReleaseLevel = true;
+        }
+
+        if ($canSendToNextReleaseLevel === false)
+        {
+            return '';
+        }
+
+        return '<a href="' . $this->addToUrl($href . '&amp;eventId=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ';
+
+    }
+
+    /**
+     * save_callback saveCallbackEventReleaseLevel()
+     * Publish or unpublish events if eventReleaseLevel has reached the highest/last level
+     * @param $newEventReleaseLevelId
+     * @param DC_Table $dc
+     * @param null $eventId
+     * @return mixed
+     */
+    public function saveCallbackEventReleaseLevel($newEventReleaseLevelId, DC_Table $dc = null, $eventId = null)
+    {
+        // Get event id
+        if ($dc->activeRecord->id > 0)
+        {
+            $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
+        }
+        elseif ($eventId > 0)
+        {
+            $objEvent = CalendarEventsModel::findByPk($eventId);
+        }
+        if ($objEvent !== null)
+        {
+            $lastEventReleaseModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
+            if ($lastEventReleaseModel !== null)
+            {
+
+                // Display message in the backend
+                Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'], $objEvent->id, EventReleaseLevelPolicyModel::findByPk($newEventReleaseLevelId)->level));
+
+                // Display message in the backend if event is published or unpublished now
+                if ($lastEventReleaseModel->id == $newEventReleaseLevelId)
+                {
+                    if (!$objEvent->published)
+                    {
+                        Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
+                    }
+                    $objEvent->published = '1';
+                }
+                else
+                {
+                    if ($objEvent->published)
+                    {
+                        Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
+                    }
+                    $objEvent->published = '';
+                }
+                $objEvent->save();
+            }
+        }
+        return $newEventReleaseLevelId;
+
+    }
+
+    /**
+     * Pull event to the previous release level
+     * @param $row
+     * @param $href
+     * @param $label
+     * @param $title
+     * @param $icon
+     * @param $attributes
+     * @return string
+     */
+    public function releaseLevelPrev($row, $href, $label, $title, $icon, $attributes)
+    {
+        $canSendToNextReleaseLevel = false;
+        $prevReleaseLevel = null;
+        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
+        if ($objReleaseLevelModel !== null)
+        {
+            $prevReleaseLevel = $objReleaseLevelModel->level - 1;
+        }
+
+        // Save to database
+        if (Input::get('action') === 'releaseLevelPrev' && Input::get('eventId') == $row['id'])
+        {
+
+            if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id']) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel) === true)
+            {
+                $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
+                if ($objEvent !== null)
+                {
+                    $objReleaseLevelModel = EventReleaseLevelPolicyModel::findPrevLevel($objEvent->eventReleaseLevel);
+                    if ($objReleaseLevelModel !== null)
+                    {
+                        $objEvent->eventReleaseLevel = $objReleaseLevelModel->id;
+                        $objEvent->save();
+                        $this->saveCallbackEventReleaseLevel($objEvent->eventReleaseLevel, null, $objEvent->id);
+                    }
+                }
+            }
+            $this->redirect($this->getReferer());
+        }
+
+        if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id']) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel) === true)
+        {
+            $canSendToNextReleaseLevel = true;
+        }
+
+        if ($canSendToNextReleaseLevel === false)
+        {
+            return '';
+        }
+
+        return '<a href="' . $this->addToUrl($href . '&amp;eventId=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ';
+
     }
 
     /**
