@@ -82,7 +82,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
     ),
     'palettes' => array
     (
-        'default' => '{contact_legend},name,canton,altitude,huettenwart,phone,email,url,bookingMethod;{image_legend},singleSRC;{details_legend},huettenchef,capacity,coordsCH1903,coordsWGS84,geoadminlink,openingTime',
+        'default' => '{contact_legend},name,canton,altitude,huettenwart,phone,email,url,bookingMethod;{image_legend},singleSRC;{details_legend},huettenchef,capacity,coordsCH1903,coordsWGS84,geoadminlink,openingTime;{approach_legend},approach',
     ),
 
     'fields' => array
@@ -232,6 +232,81 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'inputType' => 'textarea',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
+        ),
+        'approach'      => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approach'],
+            'exclude'   => true,
+            'inputType' => 'multiColumnWizard',
+            'eval'      => array
+            (
+                'columnFields' => array
+                (
+                    'approachDescription' => array
+                    (
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approachDescription'],
+                        'exclude'   => true,
+                        'inputType' => 'textarea',
+                        'eval'      => array
+                        (
+                            'style' => 'width:150px',
+                        ),
+                    ),
+                    'approachTime'        => array
+                    (
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approachTime'],
+                        'exclude'   => true,
+                        'inputType' => 'text',
+                        'eval'      => array
+                        (
+                            'style' => 'width:80px',
+                        ),
+                    ),
+                    'approachDifficulty'  => array
+                    (
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approachDifficulty'],
+                        'exclude'   => true,
+                        'inputType' => 'textarea',
+                        'eval'      => array
+                        (
+                            'style' => 'width:80px',
+                        ),
+                    ),
+                    'approachSummer'      => array
+                    (
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approachSummer'],
+                        'exclude'   => true,
+                        'inputType' => 'select',
+                        'options'   => array(true, false),
+                        'eval'      => array
+                        (
+                            'style' => 'width:50px',
+                        ),
+                    ),
+                    'approachWinter'      => array
+                    (
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approachWinter'],
+                        'exclude'   => true,
+                        'inputType' => 'select',
+                        'options'   => array(true, false),
+                        'eval'      => array
+                        (
+                            'style' => 'width:50px',
+                        ),
+                    ),
+                    'approachComment'     => array
+                    (
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approachComment'],
+                        'exclude'   => true,
+                        'inputType' => 'textarea',
+                        'eval'      => array
+                        (
+                            'style' => 'width:150px',
+                        ),
+                    ),
+                ),
+            ),
+            'sql'       => "blob NULL",
         ),
 
     ),

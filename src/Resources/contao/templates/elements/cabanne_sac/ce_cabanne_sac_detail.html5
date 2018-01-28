@@ -93,15 +93,40 @@
 
         </div>
 
-        <div class="col-lg-6 col-xl-8 mb-4 mb-0-lg">
-            <!-- Zugang -->
+
+        <div class="col-12">
+            <h2 class="ce_headline">Zustiegsm&ouml;glichkeiten</h2>
+        </div>
+
+        <div class="col-xl-8 mb-4 mb-0-lg">
+            <table class="table responsive">
+                <tr>
+                    <th>Beschreibung</th>
+                    <th>Zustiegszeit</th>
+                    <th>Schwierigkeit</th>
+                    <th>Sommer</th>
+                    <th>Winter</th>
+                    <th>Kommentar</th>
+                </tr>
+
+                <?php foreach (\StringUtil::deserialize($this->approach, true) as $approach): ?>
+                    <tr>
+                        <td><?= nl2br($approach['approachDescription']) ?></td>
+                        <td><?= nl2br($approach['approachTime']) ?></td>
+                        <td><?= nl2br($approach['approachDifficulty']) ?></td>
+                        <td><?= $approach['approachSummer'] == 'true' ? 'Ja' : 'Nein' ?></td>
+                        <td><?= $approach['approachWinter'] == 'true' ? 'Ja' : 'Nein' ?></td>
+                        <td><?= nl2br($approach['approachComment']) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
         </div>
 
 
-        <div class="col-lg-6  col-xl-4">
+        <div class="col-xl-4">
             <?php $geoLink = '//map.geo.admin.ch/embed.html?lang=de&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege&E=%s.00&N=%s.00&zoom=7&crosshair=marker'; ?>
-            <div class="embed-responsive embed-responsive-16by9">
-                <iframe src="<?= sprintf($geoLink, $this->coordsCH1903X, $this->coordsCH1903Y) ?>" frameborder="0" style="border:0"></iframe>
+            <div class="embed-responsive embed-responsive-4by3">
+                <iframe src="<?= sprintf($geoLink, $this->coordsCH1903X, $this->coordsCH1903Y) ?>"></iframe>
             </div>
         </div>
     </div><!-- end row -->
