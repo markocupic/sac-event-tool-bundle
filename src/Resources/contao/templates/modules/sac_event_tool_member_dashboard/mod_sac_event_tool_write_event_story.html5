@@ -13,7 +13,7 @@
     </p>
 
 <?php if ($this->publishState < 3): ?>
-    <div class="d-flex flex-row align-items-center">
+    <div class="event-story-form-buttons d-flex flex-row align-items-center">
 
         <?php if ($this->publishState < 2): ?>
             <div class="mr-2">
@@ -39,8 +39,16 @@
                     </option>
                 </select>
             </div>
-        <?php endif; ?>
 
+        <?php endif; ?>
+    </div>
+
+    <div class="form-sent-please-wait d-flex justify-content-center">
+        <div class="form-sent-please-wait-content text-center mt-5 mb-2 d-none">
+            <i class="fal fa-spin fa-4x fa-spinner" aria-hidden="true"></i>
+            {{br}}{{br}}
+            <span>Bitte warten. Deine Anfrage wird gesendet.</span>
+        </div>
     </div>
 
 
@@ -85,12 +93,16 @@
         (function ($) {
             jQuery(document).ready(function () {
                 $('#publishEventStory').change(function () {
+                    // Show spinner icon and hide form buttons
+                    $('.form-sent-please-wait-content').removeClass('d-none');
+                    $('.event-story-form-buttons').removeClass('d-flex').addClass('d-none');
                     var publishState = this.value;
                     var jqxhr = $.post('ajax', {
                         'REQUEST_TOKEN': '{{request_token}}',
                         'action': 'setPublishState',
                         'eventId': '<?= Contao\Input::get('eventId') ?>',
-                        'publishState': publishState
+                        'publishState': publishState,
+                        'moduleId': '<?= $this->id ?>'
                     }).done(function (json) {
                         if (json.status != 'success') {
                             console.log(json);

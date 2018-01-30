@@ -12,16 +12,19 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\FrontendAjax;
 
-use Contao\Input;
 use Contao\CalendarEventsModel;
-use Contao\StringUtil;
-use Contao\UserModel;
 use Contao\CalendarEventsStoryModel;
-use Contao\Validator;
 use Contao\Database;
-use Contao\FrontendUser;
+use Contao\Environment;
 use Contao\File;
 use Contao\FilesModel;
+use Contao\FrontendUser;
+use Contao\Input;
+use Contao\ModuleModel;
+use Contao\StringUtil;
+use Contao\UserModel;
+use Contao\Validator;
+use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 
@@ -160,6 +163,27 @@ class FrontendAjax
 
     }
 
+    /**
+     * Helper method of filterKursliste
+     * @param $strNeedle
+     * @param $strHaystack
+     * @return bool
+     */
+    private function _textSearch($strNeedle = '', $strHaystack = '')
+    {
+        if (trim($strNeedle) == '')
+        {
+            return true;
+        }
+        else
+        {
+            if (stripos($strHaystack, trim($strNeedle)) !== false)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Course list filter
@@ -283,30 +307,6 @@ class FrontendAjax
 
     }
 
-
-    /**
-     * Helper method of filterKursliste
-     * @param $strNeedle
-     * @param $strHaystack
-     * @return bool
-     */
-    private function _textSearch($strNeedle = '', $strHaystack = '')
-    {
-        if (trim($strNeedle) == '')
-        {
-            return true;
-        }
-        else
-        {
-            if (stripos($strHaystack, trim($strNeedle)) !== false)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
     /**
      * Ajax call
      * Sort pictures of the gallery in the event story module in the member dashboard
@@ -390,7 +390,53 @@ class FrontendAjax
             $response = new JsonResponse(array('status' => 'error'));
             return $response->send();
         }
+        // Notify office if there is a new story
+        if (Input::post('publishState') == 2 && $objStory->publishState < 2 && Input::post('moduleId'))
+        {
+            $objModule = ModuleModel::findByPk(Input::post('moduleId'));
+            if ($objModule !== null)
+            {
+                // Use terminal42/notification_center
+                $objNotification = Notification::findByPk($objModule->notifyOnEventStoryPublishedNotificationId);
+            }
 
+            if (null !== $objNotification && null !== $objUser && Input::post('eventId') > 0)
+            {
+
+                $objEvent = CalendarEventsModel::findByPk(Input::post('eventId'));
+                $objInstructor = UserModel::findByPk($objEvent->mainInstructor);
+                $instructorName = '';
+                $instructorEmail = '';
+                if ($objInstructor !== null)
+                {
+                    $instructorName = $objInstructor->name;
+                    $instructorEmail = $objInstructor->email;
+                }
+
+                if ($objEvent !== null)
+                {
+                    $arrTokens = array(
+                        'event_title'          => $objEvent->title,
+                        'event_id'             => $objEvent->id,
+                        'instructor_name'      => $instructorName != '' ? $instructorName : 'keine Angabe',
+                        'instructor_email'     => $instructorEmail != '' ? $instructorEmail : 'keine Angabe',
+                        'author_name'          => $objUser->firstname . ' ' . $objUser->lastname,
+                        'author_email'         => $objUser->email,
+                        'author_sac_member_id' => $objUser->sacMemberId,
+                        'hostname'             => Environment::get('host'),
+                        'story_link'           => Environment::get('url') . '/contao?do=sac_calendar_events_stories_tool&act=edit&id=' . $objStory->id,
+                        'story_title'          => $objStory->title,
+                        'story_text'           => $objStory->text,
+                    );
+                }
+
+                // Send notification
+                $objNotification->send($arrTokens, 'de');
+            }
+        }
+
+
+        // Save publis state
         $objStory->publishState = Input::post('publishState');
         $objStory->save();
 
