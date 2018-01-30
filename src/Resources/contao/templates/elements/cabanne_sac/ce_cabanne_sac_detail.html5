@@ -109,14 +109,14 @@
                     <th>Kommentar</th>
                 </tr>
 
-                <?php foreach (\StringUtil::deserialize($this->approach, true) as $approach): ?>
+                <?php foreach (\StringUtil::deserialize($this->ascent, true) as $ascent): ?>
                     <tr>
-                        <td><?= nl2br($approach['approachDescription']) ?></td>
-                        <td><?= nl2br($approach['approachTime']) ?></td>
-                        <td><?= nl2br($approach['approachDifficulty']) ?></td>
-                        <td><?= $approach['approachSummer'] == 'true' ? 'Ja' : 'Nein' ?></td>
-                        <td><?= $approach['approachWinter'] == 'true' ? 'Ja' : 'Nein' ?></td>
-                        <td><?= nl2br($approach['approachComment']) ?></td>
+                        <td><?= nl2br($ascent['ascentDescription']) ?></td>
+                        <td><?= nl2br($ascent['ascentTime']) ?></td>
+                        <td><?= nl2br($ascent['ascentDifficulty']) ?></td>
+                        <td><?= $ascent['ascentSummer'] == 'true' ? 'Ja' : 'Nein' ?></td>
+                        <td><?= $ascent['ascentWinter'] == 'true' ? 'Ja' : 'Nein' ?></td>
+                        <td><?= nl2br($ascent['ascentComment']) ?></td>
                     </tr>
                 <?php endforeach; ?>
             </table>

@@ -82,7 +82,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
     ),
     'palettes' => array
     (
-        'default' => '{contact_legend},name,canton,altitude,huettenwart,phone,email,url,bookingMethod;{image_legend},singleSRC;{details_legend},huettenchef,capacity,coordsCH1903,coordsWGS84,geoadminlink,openingTime;{approach_legend},approach',
+        'default' => '{contact_legend},name,canton,altitude,huettenwart,phone,email,url,bookingMethod;{image_legend},singleSRC;{details_legend},huettenchef,capacity,coordsCH1903,coordsWGS84,geoadminlink,openingTime;{ascent_legend},ascent',
     ),
 
     'fields' => array
@@ -233,18 +233,18 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'approach'      => array
+        'ascent'      => array
         (
-            'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approach'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascent'],
             'exclude'   => true,
             'inputType' => 'multiColumnWizard',
             'eval'      => array
             (
                 'columnFields' => array
                 (
-                    'approachDescription' => array
+                    'ascentDescription' => array
                     (
-                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approachDescription'],
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentDescription'],
                         'exclude'   => true,
                         'inputType' => 'textarea',
                         'eval'      => array
@@ -252,9 +252,9 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
                             'style' => 'width:150px',
                         ),
                     ),
-                    'approachTime'        => array
+                    'ascentTime'        => array
                     (
-                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approachTime'],
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentTime'],
                         'exclude'   => true,
                         'inputType' => 'text',
                         'eval'      => array
@@ -262,9 +262,9 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
                             'style' => 'width:80px',
                         ),
                     ),
-                    'approachDifficulty'  => array
+                    'ascentDifficulty'  => array
                     (
-                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approachDifficulty'],
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentDifficulty'],
                         'exclude'   => true,
                         'inputType' => 'textarea',
                         'eval'      => array
@@ -272,9 +272,9 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
                             'style' => 'width:80px',
                         ),
                     ),
-                    'approachSummer'      => array
+                    'ascentSummer'      => array
                     (
-                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approachSummer'],
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentSummer'],
                         'exclude'   => true,
                         'inputType' => 'select',
                         'options'   => array(true, false),
@@ -283,9 +283,9 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
                             'style' => 'width:50px',
                         ),
                     ),
-                    'approachWinter'      => array
+                    'ascentWinter'      => array
                     (
-                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approachWinter'],
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentWinter'],
                         'exclude'   => true,
                         'inputType' => 'select',
                         'options'   => array(true, false),
@@ -294,9 +294,9 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
                             'style' => 'width:50px',
                         ),
                     ),
-                    'approachComment'     => array
+                    'ascentComment'     => array
                     (
-                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['approachComment'],
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentComment'],
                         'exclude'   => true,
                         'inputType' => 'textarea',
                         'eval'      => array
