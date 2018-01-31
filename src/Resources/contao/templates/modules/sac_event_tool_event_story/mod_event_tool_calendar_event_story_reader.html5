@@ -12,8 +12,8 @@
             <div class="row tiny-gutter">
               <?php foreach ($this->images as $image): ?>
                   <figure class="col-12 col-sm-6 col-md-3 image_container thumbnail responsive">
-                    <a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement">
-                      {{image::<?= Contao\StringUtil::binToUuid($image['uuid']) ?>?width=400&height=400&mode=crop}}
+                    <a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement" title="<?= $image['caption'] ?>">
+                      {{image::<?= Contao\StringUtil::binToUuid($image['uuid']) ?>?width=400&height=400&mode=crop&alt=<?= $image['alt'] ?>}}
                     </a>
                   </figure>
               <?php endforeach; ?>

@@ -516,4 +516,85 @@ class FrontendAjax
         $response = new JsonResponse(array('status' => 'success'));
         return $response->send();
     }
+
+    /**
+     * Ajax call
+     * Get caption of an image in the event story module in the member dashboard
+     */
+    public function getCaption()
+    {
+        if (Input::post('action') === 'getCaption' && Input::post('fileUuid') != '' && FE_USER_LOGGED_IN)
+        {
+            $objUser = FrontendUser::getInstance();
+            if ($objUser === null)
+            {
+                $response = new JsonResponse(array('status' => 'error'));
+                return $response->send();
+            }
+
+            $objFile = FilesModel::findByUuid(Input::post('fileUuid'));
+            if ($objFile !== null)
+            {
+                $arrMeta = \StringUtil::deserialize($objFile->meta, true);
+                if (!isset($arrMeta['de']['caption']))
+                {
+                    $caption = '';
+                }else
+                {
+                    $caption = $arrMeta['de']['caption'];
+                }
+
+                $response = new JsonResponse(array(
+                    'status' => 'success',
+                    'caption' => html_entity_decode($caption)
+                ));
+                return $response->send();
+            }
+        }
+        $response = new JsonResponse(array('status' => 'error'));
+        return $response->send();
+
+    }
+
+    /**
+     * Ajax call
+     * Set caption of an image in the event story module in the member dashboard
+     */
+    public function setCaption()
+    {
+        if (Input::post('action') === 'setCaption' && Input::post('fileUuid') != '' && FE_USER_LOGGED_IN)
+        {
+            $objUser = FrontendUser::getInstance();
+            if ($objUser === null)
+            {
+                $response = new JsonResponse(array('status' => 'error'));
+                return $response->send();
+            }
+
+            $objFile = FilesModel::findByUuid(Input::post('fileUuid'));
+            if ($objFile !== null)
+            {
+                $arrMeta = \StringUtil::deserialize($objFile->meta, true);
+                if (!isset($arrMeta['de']))
+                {
+                    $arrMeta['de'] = array(
+                        'title'   => '',
+                        'alt'     => '',
+                        'link'    => '',
+                        'caption' => '',
+                    );
+                }
+                $arrMeta['de']['caption'] = Input::post('caption');
+                $objFile->meta = serialize($arrMeta);
+                $objFile->save();
+                $response = new JsonResponse(array(
+                    'status' => 'success'
+                ));
+                return $response->send();
+            }
+        }
+        $response = new JsonResponse(array('status' => 'error'));
+        return $response->send();
+
+    }
 }

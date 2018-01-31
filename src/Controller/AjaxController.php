@@ -69,6 +69,20 @@ class AjaxController extends Controller
             $controller->removeImage();
         }
 
+        // Event story
+        if (Input::post('action') === 'getCaption')
+        {
+            $controller = new FrontendAjax();
+            $controller->getCaption();
+        }
+
+        // Event story
+        if (Input::post('action') === 'setCaption')
+        {
+            $controller = new FrontendAjax();
+            $controller->setCaption();
+        }
+
 
         exit();
     }

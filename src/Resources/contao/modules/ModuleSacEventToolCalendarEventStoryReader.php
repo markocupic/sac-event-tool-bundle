@@ -10,20 +10,20 @@
 
 namespace Markocupic\SacEventToolBundle;
 
-use Patchwork\Utf8;
-use Contao\Module;
 use Contao\BackendTemplate;
-use Contao\Config;
-use Contao\Input;
-use Contao\CalendarEventsStoryModel;
 use Contao\CalendarEventsModel;
-use Contao\MemberModel;
-use Contao\StringUtil;
-use Contao\FilesModel;
-use Contao\Validator;
+use Contao\CalendarEventsStoryModel;
+use Contao\Config;
 use Contao\File;
+use Contao\FilesModel;
+use Contao\Input;
+use Contao\MemberModel;
+use Contao\Module;
 use Contao\PageModel;
+use Contao\StringUtil;
 use Contao\System;
+use Contao\Validator;
+use Patchwork\Utf8;
 
 
 /**
@@ -127,15 +127,30 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
 
                         if ($objFile->isImage)
                         {
+                            $arrMeta = StringUtil::deserialize($objFiles->meta, true);
+                            $title = '';
+                            $alt = '';
+                            $caption = '';
+
+                            if (isset($arrMeta['de']))
+                            {
+                                $title = $arrMeta['de']['title'];
+                                $alt = $arrMeta['de']['alt'];
+                                $caption = $arrMeta['de']['caption'];
+                            }
+
                             $images[$objFiles->path] = array
                             (
-                                'id' => $objFiles->id,
-                                'path' => $objFiles->path,
-                                'uuid' => $objFiles->uuid,
-                                'name' => $objFile->basename,
-                                'singleSRC' => $objFiles->path,
-                                'title' => StringUtil::specialchars($objFile->basename),
+                                'id'         => $objFiles->id,
+                                'path'       => $objFiles->path,
+                                'uuid'       => $objFiles->uuid,
+                                'name'       => $objFile->basename,
+                                'singleSRC'  => $objFiles->path,
+                                'title'      => StringUtil::specialchars($objFile->basename),
                                 'filesModel' => $objFiles->current(),
+                                'caption'    => StringUtil::specialchars($caption),
+                                'alt'        => StringUtil::specialchars($alt),
+                                'title'      => StringUtil::specialchars($title),
                             );
                         }
                     }
