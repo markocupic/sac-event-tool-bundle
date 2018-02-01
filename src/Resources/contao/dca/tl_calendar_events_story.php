@@ -27,7 +27,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
         ),
         'onload_callback'   => array
         (
-            array('tl_calendar_events_story', 'onloadCallback'),
+            array('tl_calendar_events_story', 'deleteUnfinishedAndOldEntries'),
         ),
         'ondelete_callback' => array
         (//

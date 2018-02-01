@@ -1,4 +1,4 @@
-Hallo <?= $this->firstname ?>
+Hallo <?= $this->firstname ?> <?= $this->lastname ?>
 
 Leider kann ich dir für den Event: "<?= $this->eventname ?>" im Moment noch keine Zusage erteilen. Du wurdest auf die Warteliste gesetzt und sollte ein Platz frei werden, wirst du wieder kontaktiert.
 Ich danke dir für dein Verständnis.

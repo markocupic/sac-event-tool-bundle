@@ -21,10 +21,11 @@
     <div class="row">
         <div class="col-12 col-md-4 col-xl-3">
             <nav class="nav nav-tabs" id="dashboardTab" role="tablist">
-                <a class="list-group-item list-group-item-action active" id="nav-home-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-home" aria-selected="true">Profil</a>
-                <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-next-events" role="tab" aria-controls="nav-profile" aria-selected="false">Buchungen</a>
-                <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-past-workshops" role="tab" aria-controls="nav-profile" aria-selected="false">Absolvierte Kurse</a>
-                <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-past-tours" role="tab" aria-controls="nav-profile" aria-selected="false">Absolvierte Touren</a>
+                <a class="list-group-item list-group-item-action active" id="nav-home-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fal fa-fw fa-cog"></i> Profil</a>
+                <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-next-events" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-cart-arrow-down"></i> Buchungen</a>
+                <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-past-workshops" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-thumbs-up"></i> Absolvierte Kurse</a>
+                <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-past-tours" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-star"></i> Absolvierte Touren</a>
+                <a class="list-group-item list-group-item-action" id="nav-my-blogs-tab" data-toggle="tab" href="#nav-my-blogs" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-pencil"></i> Meine Tourenberichte</a>
             </nav>
             {{br}}{{br}}
         </div>
@@ -129,8 +130,8 @@
                                 <tr>
                                     <td><?= $event['dateSpan'] ?></td>
                                     <td><?= $event['objEvent']->title ?></td>
-                                    <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Kursbericht verfassen" class="btn btn-sm btn-success<?php if (!$event['canWriteStory']): ?> disabled<?php endif; ?>"<?php if (!$event['canWriteStory']): ?> aria-disabled="true"<?php endif; ?>><i class="fa fa-fw fa-newspaper"></a></td>
-                                    <td class="text-center"><a href="<?= $event['downloadCourseConfirmationLink'] ?>" title="Kursbestätigung downloaden" class="btn btn-sm btn-info"><i class="fa fa-fw fa-download"></a></td>
+                                    <td class="text-center"><?php if ($event['canWriteStory']): ?><a href="<?= $event['objStoryLink'] ?>" role="button" title="Kursbericht verfassen" class="btn btn-sm btn-success"><i class="fa fa-fw fa-newspaper"></a><?php endif; ?></td>
+                                    <td class="text-center"><a href="<?= $event['downloadCourseConfirmationLink'] ?>" title="Kursbestätigung downloaden" class="btn btn-sm btn-info"><i class="fal fa-fw fa-download"></a></td>
                                 </tr>
                             <?php endif; ?>
                         <?php endforeach; ?>
@@ -146,7 +147,23 @@
                                 <tr>
                                     <td><?= $event['dateSpan'] ?></td>
                                     <td><?= $event['objEvent']->title ?></td>
-                                    <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Tourenbericht verfassen" class="btn btn-sm btn-success<?php if (!$event['canWriteStory']): ?> disabled<?php endif; ?>"<?php if (!$event['canWriteStory']): ?> aria-disabled="true"<?php endif; ?>><i class="fa fa-fw fa-newspaper"></a></td>
+                                    <td class="text-center"><?php if ($event['canWriteStory']): ?><a href="<?= $event['objStoryLink'] ?>" role="button" title="Tourenbericht verfassen" class="btn btn-sm btn-success"><i class="fal fa-fw fa-newspaper"></a><?php endif; ?></td>
+                                </tr>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </table>
+                </div>
+
+                <!-- tab-pane-4 -->
+                <div class="tab-pane fade" id="nav-my-blogs" role="tabpanel" aria-labelledby="nav-profile-tab">
+                    <h2 class="mt-0">Meine Tourenberichte</h2>
+                    <table class="table layout-table table-responsive table-striped">
+                        <?php foreach ($this->arrPastEvents as $event): ?>
+                            <?php if ($event['objStory'] !== null): ?>
+                                <tr>
+                                    <td><?= $event['dateSpan'] ?></td>
+                                    <td><?= $event['objEvent']->title ?></td>
+                                    <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Touren-/Kursbericht verfassen" class="btn btn-sm btn-success<?php if (!$event['canWriteStory']): ?> disabled<?php endif; ?>"<?php if (!$event['canWriteStory']): ?> aria-disabled="true"<?php endif; ?>><i class="fal fa-fw fa-pencil"></a></td>
                                     <!--<td class="text-center"><a href="<?= $event['downloadCourseConfirmationLink'] ?>" title="Kursbestätigung downloaden" class="btn btn-sm btn-info"><i class="fa fa-fw fa-download"></a></td>-->
                                 </tr>
                             <?php endif; ?>

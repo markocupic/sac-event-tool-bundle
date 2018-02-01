@@ -28,11 +28,21 @@ class tl_calendar_events_story extends Backend
     /**
      *
      * OnLoad Callback
+     * deleteUnfinishedAndOldEntries
      */
-    public function onloadCallback()
+    public function deleteUnfinishedAndOldEntries()
     {
+        // Delete old and unpublished stories
+        $limit = time() - 60 * 60 * 24 * 30;
+        Database::getInstance()->prepare('DELETE FROM tl_calendar_events_story WHERE tstamp<? AND publishState<?')->execute($limit, 3);
+
+
+        // Delete unfinished stories older the 14 days
+        $limit = time() - 60 * 60 * 24 * 14;
+        Database::getInstance()->prepare('DELETE FROM tl_calendar_events_story WHERE tstamp<? AND text=? AND youtubeId=? AND multiSRC=?')->execute($limit, '', '', null);
 
     }
+
 
     /**
      * @param $strContent

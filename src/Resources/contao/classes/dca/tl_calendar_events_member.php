@@ -77,9 +77,9 @@ class tl_calendar_events_member extends Backend
             // Delete E-Mail fields
             $opt = array(
                 'emailRecipients' => '',
-                'emailSubject' => '',
-                'emailText' => '',
-                'emailSendCopy' => ''
+                'emailSubject'    => '',
+                'emailText'       => '',
+                'emailSendCopy'   => '',
             );
             $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($opt)->execute(Input::get('id'));
         }
@@ -242,14 +242,14 @@ class tl_calendar_events_member extends Backend
             {
                 $set = array(
                     'contaoMemberId' => $objMemberModel->id,
-                    'gender' => $objMemberModel->gender,
-                    'firstname' => $objMemberModel->firstname,
-                    'lastname' => $objMemberModel->lastname,
-                    'street' => $objMemberModel->street,
-                    'email' => $objMemberModel->email,
-                    'postal' => $objMemberModel->postal,
-                    'city' => $objMemberModel->city,
-                    'phone' => $objMemberModel->phone
+                    'gender'         => $objMemberModel->gender,
+                    'firstname'      => $objMemberModel->firstname,
+                    'lastname'       => $objMemberModel->lastname,
+                    'street'         => $objMemberModel->street,
+                    'email'          => $objMemberModel->email,
+                    'postal'         => $objMemberModel->postal,
+                    'city'           => $objMemberModel->city,
+                    'phone'          => $objMemberModel->phone,
                 );
                 $objEventMember = $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($objDb->id);
             }
@@ -276,10 +276,10 @@ class tl_calendar_events_member extends Backend
                     {
                         $arrTokens = array(
                             'participant_state_of_subscription' => html_entity_decode($GLOBALS['TL_LANG']['tl_calendar_events_member'][$varValue]),
-                            'event_name' => html_entity_decode($objEvent->title),
-                            'participant_name' => html_entity_decode($objEventMemberModel->firstname . ' ' . $objEventMemberModel->lastname),
-                            'participant_email' => $objEventMemberModel->email,
-                            'event_link_detail' => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($objEvent),
+                            'event_name'                        => html_entity_decode($objEvent->title),
+                            'participant_name'                  => html_entity_decode($objEventMemberModel->firstname . ' ' . $objEventMemberModel->lastname),
+                            'participant_email'                 => $objEventMemberModel->email,
+                            'event_link_detail'                 => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($objEvent),
                         );
                         $objNotification->send($arrTokens, 'de');
                         //Message::addInfo(sprintf('Der Teilnehmer "%s %s" wurde per E-Mail über die &Auml;nderung seines Teilnehmestatus benachrichtigt.', $objEventMemberModel->firstname, $objEventMemberModel->lastname));
@@ -519,6 +519,7 @@ class tl_calendar_events_member extends Backend
             // Build email text from template
             $objEmailTemplate = new BackendTemplate('be_email_templ_refuse_registration');
             $objEmailTemplate->firstname = $objRegistration->firstname;
+            $objEmailTemplate->lastname = $objRegistration->lastname;
             $objEmailTemplate->eventname = $objRegistration->getRelated('pid')->title;
             $objEmailTemplate->nameGuide = $this->User->name;
 
@@ -591,6 +592,7 @@ class tl_calendar_events_member extends Backend
             // Build email text from template
             $objEmailTemplate = new BackendTemplate('be_email_templ_accept_registration');
             $objEmailTemplate->firstname = $objRegistration->firstname;
+            $objEmailTemplate->lastname = $objRegistration->lastname;
             $objEmailTemplate->eventname = $objRegistration->getRelated('pid')->title;
             $objEmailTemplate->nameGuide = $this->User->name;
 
@@ -660,6 +662,7 @@ class tl_calendar_events_member extends Backend
             // Build email text from template
             $objEmailTemplate = new BackendTemplate('be_email_templ_added_to_waitlist');
             $objEmailTemplate->firstname = $objRegistration->firstname;
+            $objEmailTemplate->lastname = $objRegistration->lastname;
             $objEmailTemplate->eventname = $objRegistration->getRelated('pid')->title;
             $objEmailTemplate->nameGuide = $this->User->name;
 

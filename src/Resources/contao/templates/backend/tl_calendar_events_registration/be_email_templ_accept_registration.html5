@@ -1,4 +1,4 @@
-Hallo <?= $this->firstname ?>
+Hallo <?= $this->firstname ?> <?= $this->lastname ?>
 
 Du bist für den Event: "<?= $this->eventname ?>" definitiv angemeldet und deine Anmeldung ist bestätigt.
 

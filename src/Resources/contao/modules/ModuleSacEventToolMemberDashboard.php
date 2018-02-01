@@ -344,7 +344,7 @@ class ModuleSacEventToolMemberDashboard extends Module
 
 
                 // Past events
-                $arrEvents = CalendarEventsMemberModel::findPastEventsByMemberId($this->objUser->id);
+                $arrEvents = CalendarEventsMemberModel::findPastEventsBySacMemberId($this->objUser->sacMemberId);
                 foreach ($arrEvents as $k => $event)
                 {
 
@@ -377,6 +377,17 @@ class ModuleSacEventToolMemberDashboard extends Module
                 $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
                 if ($objEvent !== null)
                 {
+
+                    // Do not allow blogging for old events
+                    if ($objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 < time())
+                    {
+                        if(null === CalendarEventsStoryModel::findOneBySacMemberIdAndEventId($this->objUser->sacMemberId, $objEvent->id))
+                        {
+                        Message::addError('F&uuml;r diesen Event kann kein Bericht mehr erstellt werden. Das Eventdatum liegt schon zu lange zur&uuml;ck');
+                        Controller::redirect(Controller::getReferer());
+                        }
+
+                    }
 
                     $this->Template->eventName = $objEvent->title;
                     $this->Template->eventPeriod = CalendarSacEvents::getEventPeriod($objEvent->id);

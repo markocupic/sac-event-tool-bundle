@@ -91,10 +91,10 @@ class CalendarEventsMemberModel extends \Model
      * @param $memberId
      * @return array
      */
-    public static function findPastEventsByMemberId($memberId)
+    public static function findPastEventsBySacMemberId($sacMemberId)
     {
         $arrEvents = array();
-        $objMember = \MemberModel::findByPk($memberId);
+        $objMember = \MemberModel::findBySacMemberId($sacMemberId);
 
         if ($objMember === null)
         {
