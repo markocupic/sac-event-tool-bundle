@@ -29,11 +29,11 @@ class AjaxController extends Controller
     public function ajaxAction()
     {
         $this->container->get('contao.framework')->initialize();
-        if (Environment::get(isAjaxRequest) === false)
+        if (Environment::get('isAjaxRequest') === false)
         {
             throw $this->createNotFoundException('The route "/ajax" is allowed to xhr requests only.');
         }
-        
+
         // Course Filter
         if (Input::post('action') === 'filterTourList')
         {
