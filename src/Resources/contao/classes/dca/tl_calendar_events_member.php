@@ -339,6 +339,10 @@ class tl_calendar_events_member extends Backend
      */
     public function setStateOfSubscription(DC_Table $dc)
     {
+
+        // start session
+        session_start();
+
         if (Input::get('call') === 'refuseWithEmail')
         {
             // Show another palette
@@ -470,6 +474,8 @@ class tl_calendar_events_member extends Backend
      */
     public function inputFieldCallbackRefuseWithEmail(DC_Table $dc)
     {
+        // Start session
+        session_start();
 
         if (Input::post('FORM_SUBMIT') === 'tl_calendar_events_member')
         {
@@ -540,6 +546,9 @@ class tl_calendar_events_member extends Backend
      */
     public function inputFieldCallbackAcceptWithEmail(DC_Table $dc)
     {
+
+        // Start session
+        session_start();
 
         if (Input::post('FORM_SUBMIT') === 'tl_calendar_events_member')
         {
@@ -613,6 +622,9 @@ class tl_calendar_events_member extends Backend
      */
     public function inputFieldCallbackAddToWaitlist(DC_Table $dc)
     {
+
+        // Start session
+        session_start();
 
         if (Input::post('FORM_SUBMIT') === 'tl_calendar_events_member')
         {

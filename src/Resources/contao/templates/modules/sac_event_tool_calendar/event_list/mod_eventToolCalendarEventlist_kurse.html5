@@ -1,13 +1,16 @@
-<?php if(\Environment::get('isAjaxRequest') && \Input::get('xhrAction') == 'switchLayout')
-{
-  if(isset($_SESSION['layout_table'])){
-  unset($_SESSION['layout_table']);
-  }else{
-    $_SESSION['layout_table'] = true;
-  }
-  echo json_encode(array('status' => 'success'));
-  exit;
-}
+<?php
+    // Start session
+    session_start();
+    if(\Environment::get('isAjaxRequest') && \Input::get('xhrAction') === 'switchLayout')
+    {
+      if(isset($_SESSION['layout_table'])){
+      unset($_SESSION['layout_table']);
+      }else{
+        $_SESSION['layout_table'] = true;
+      }
+      echo json_encode(array('status' => 'success'));
+      exit;
+    }
 ?>
 <div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
 <?php $this->block('headline'); ?>
