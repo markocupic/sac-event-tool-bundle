@@ -10,7 +10,6 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
-
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Input;
 use Contao\FilesModel;
@@ -41,11 +40,13 @@ class PostLogin
      *
      * @param ContaoFrameworkInterface $framework
      */
+    /**
     public function __construct(ContaoFrameworkInterface $framework)
     {
         $this->framework = $framework;
         $this->input = $this->framework->getAdapter(Input::class);
     }
+     **/
 
     /**
      * @param User $user

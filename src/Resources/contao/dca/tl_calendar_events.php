@@ -53,7 +53,6 @@ $strLegends = '
 {enclosure_legend:hide};{source_legend:hide};{expert_legend:hide}
 ';
 
-
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $strLegends;
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour'] = $strLegends;
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['lastMinuteTour'] = $strLegends;
@@ -756,3 +755,5 @@ foreach ($allowEdititingOnFirstReleaseLevelOnly as $field)
 {
     $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['allowEdititingOnFirstReleaseLevelOnly'] = true;
 }
+
+

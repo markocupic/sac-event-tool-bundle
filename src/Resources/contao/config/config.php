@@ -191,8 +191,10 @@ $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic_sac_event_tool.con
 /*** Handle event listing **/
 $GLOBALS['TL_HOOKS']['getAllEvents'][] = array('markocupic_sac_event_tool.contao_hooks.get_all_events', 'getAllEvents');
 
-/*** Prepare USer accounts (create user directories, etc. **/
-$GLOBALS['TL_HOOKS']['postLogin'][] = array('markocupic_sac_event_tool.contao_hooks.post_login', 'prepareBeUserAccount');
+/*** Prepare User accounts (create user directories, etc.
+ *@deprecated PostLogin Hook will be be removed in Contao 5.0.
+ **/
+$GLOBALS['TL_HOOKS']['postLogin'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\PostLogin', 'prepareBeUserAccount');
 
 
 // Form HOOKS (f.ex. Kursanmeldung)

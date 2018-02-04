@@ -33,7 +33,7 @@ class AjaxController extends Controller
         {
             throw $this->createNotFoundException('The route "/ajax" is allowed to xhr requests only.');
         }
-
+        
         // Course Filter
         if (Input::post('action') === 'filterTourList')
         {
