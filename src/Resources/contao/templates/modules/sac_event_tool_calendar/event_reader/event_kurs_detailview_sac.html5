@@ -9,7 +9,7 @@
     </div>
 
   <?php if($this->teaser != ''): ?>
-  <div class="teaser event-detail lead font-weight-bold">
+  <div class="teaser event-detail font-weight-bold">
     <p><?= nl2br($this->teaser) ?></p>
   </div>
   <?php endif; ?>
@@ -23,17 +23,17 @@
         <h3>Kursleitung</h3>
         <div class="row tiny-gutter">
           <?php foreach(StringUtil::deserialize($this->instructor, true) as $userId): ?>
-          <div class="col-sm-6 col-md-4">
-            <div class="row">
+          <div class="col-6 col-sm-4 col-md-4 col-xl-3">
+            <div class="">
               <?php if(\UserModel::findByPk($userId) !== null): ?>
-              <div class="image_container portrait col-xs-4 col-sm-5 col-md-12 col-lg-12">
+              <div class="image_container portrait">
                 <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
                   <figure class="avatar-large">
                     <?php $this->insert('picture_default', generateAvatar($userId, 18) ); ?>
                   </figure>
                 </a>
               </div>
-              <div class="instructor-name col-xs-8 col-sm-7 col-md-12 col-lg-12">
+              <div class="instructor-name">
                 <?php $strQuali = Markocupic\SacEventToolBundle\CalendarSacEvents::getMainQualifikation($userId) != '' ? ' (' . Markocupic\SacEventToolBundle\CalendarSacEvents::getMainQualifikation($userId) . ')' : ''; ?>
                 <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
                   <?= \UserModel::findByPk($userId)->name. $strQuali ?>

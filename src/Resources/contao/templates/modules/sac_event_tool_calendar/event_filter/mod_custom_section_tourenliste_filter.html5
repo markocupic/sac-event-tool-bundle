@@ -5,58 +5,62 @@
 </script>
 
 <div class="filter-board" data-event-type="tour">
-    <label for="ctrl_eventYear">Jahr</label>
-    <select class="form-control filter-select" name="year" id="ctrl_eventYear">
-        <option value="0"<?= !\Input::get('year') ? ' selected' : '' ?>>alle zuk&uuml;nfige Evens zeigen</option>
-        <?php for ($i = intval(\Date::parse('Y')) + 1; $i > 2015; $i--): ?>
-            <?php if (\Input::get('year') != '')
-            {
-                $selected = \Input::get('year') == $i ? ' selected' : '';
-            }
-            ?>
-            <option value="<?= $i ?>"<?= $selected ?>>Jahr <?= $i ?></option>
-        <?php endfor; ?>
-    </select>
-    <br>
+  <div class="d-block d-lg-none text-right">
+    <button class="btn btn-link close-event-filter-button"><i class="fal fa-times"></i> Filter schliessen</button>
+    {{br}}{{br}}
+  </div>
+  <label for="ctrl_eventYear">Jahr</label>
+  <select class="form-control filter-select" name="year" id="ctrl_eventYear">
+    <option value="0"<?= !\Input::get('year') ? ' selected' : '' ?>>alle zuk&uuml;nfige Evens zeigen</option>
+      <?php for ($i = intval(\Date::parse('Y')) + 1; $i > 2015; $i--): ?>
+          <?php if (\Input::get('year') != '')
+          {
+              $selected = \Input::get('year') == $i ? ' selected' : '';
+          }
+          ?>
+        <option value="<?= $i ?>"<?= $selected ?>>Jahr <?= $i ?></option>
+      <?php endfor; ?>
+  </select>
+  <br>
 
-    <label for="ctrl_courseTypeLevel1">Was m&ouml;chtest Du unternehmen?</label>
-    <select class="form-control filter-select" name="kursart" id="ctrl_tourType">
-        <option value="0">alle Touren zeigen</option>
-        <?php $tourTypes = TourTypeModel::findAll(); ?>
-        <?php if($tourTypes !== null): ?>
-        <?php while ($tourTypes->next()): ?>
-            <option value="<?= $tourTypes->id ?>"> <?= $tourTypes->title ?></option>
-        <?php endwhile; ?>
-        <?php endif; ?>
-    </select>
-    <br>
+  <label for="ctrl_courseTypeLevel1">Was m&ouml;chtest Du unternehmen?</label>
+  <select class="form-control filter-select" name="kursart" id="ctrl_tourType">
+    <option value="0">alle Touren zeigen</option>
+      <?php $tourTypes = TourTypeModel::findAll(); ?>
+      <?php if ($tourTypes !== null): ?>
+          <?php while ($tourTypes->next()): ?>
+          <option value="<?= $tourTypes->id ?>"> <?= $tourTypes->title ?></option>
+          <?php endwhile; ?>
+      <?php endif; ?>
+  </select>
+  <br>
 
-    <!--<h4>Organisierende Sektion ausw&auml;hlen:</h4>-->
-    <div id="organizers">
-        <?php $objOrganizers = \EventOrganizerModel::findAll(); ?>
-        <?php if($objOrganizers !== null): ?>
-        <?php while ($objOrganizers->next()): ?>
-            <div class="checkbox-container"><label><input class="ctrl_sektion" type="checkbox" name="og" value="<?= $objOrganizers->id ?>" checked> <?= $objOrganizers->title ?></label></div>
-        <?php endwhile; ?>
-        <?php endif; ?>
+  <!--<h4>Organisierende Sektion ausw&auml;hlen:</h4>-->
+  <div id="organizers">
+      <?php $objOrganizers = \EventOrganizerModel::findAll(); ?>
+      <?php if ($objOrganizers !== null): ?>
+          <?php while ($objOrganizers->next()): ?>
+          <div class="checkbox-container"><label><input class="ctrl_sektion" type="checkbox" name="og" value="<?= $objOrganizers->id ?>" checked> <?= $objOrganizers->title ?></label></div>
+          <?php endwhile; ?>
+      <?php endif; ?>
+  </div>
+  <br>
+
+  <div class="form-group">
+    <label for="ctrl_suche">Im Text suchen:</label>
+    <input type="text" class="form-control" name="textsuche" id="ctrl_suche" placeholder="Suchen">
+  </div>
+
+
+  <label for="ctrl_dateStart">Kurse anzeigen ab:</label>
+  <input type="hidden" id="ctrl_dateStartHidden" value="0">
+
+  <div class="input-group date">
+    <input type="text" id="ctrl_dateStart" class="form-control" data-date-now="<?= \Date::parse('d-m-Y') ?>" placeholder="dd-mm-yyyy" value="">
+    <div class="input-group-append">
+      <button class="btn btn-primary" type="button"><i class="fa fa-th"></i></button>
     </div>
-    <br>
-
-    <div class="form-group">
-        <label for="ctrl_suche">Im Text suchen:</label>
-        <input type="text" class="form-control" name="textsuche" id="ctrl_suche" placeholder="Suchen">
-    </div>
-
-
-    <label for="ctrl_dateStart">Kurse anzeigen ab:</label>
-    <input type="hidden" id="ctrl_dateStartHidden" value="0">
-
-    <div class="input-group date">
-        <input type="text" id="ctrl_dateStart" class="form-control" data-date-now="<?= \Date::parse('d-m-Y') ?>" placeholder="dd-mm-yyyy" value="">
-        <div class="input-group-append">
-            <button class="btn btn-primary" type="button"><i class="fa fa-th"></i></button>
-        </div>
-    </div>
+  </div>
 </div>
 
 

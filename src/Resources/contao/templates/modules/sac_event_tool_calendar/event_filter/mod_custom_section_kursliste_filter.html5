@@ -5,6 +5,10 @@
 </script>
 
 <div class="filter-board" data-event-type="course">
+    <div class="d-block d-lg-none text-right">
+      <button class="btn btn-link close-event-filter-button"><i class="fal fa-times"></i> Filter schliessen</button>
+      {{br}}{{br}}
+    </div>
     <label for="ctrl_eventYear">Jahr</label>
     <select class="form-control filter-select" name="year" id="ctrl_eventYear">
         <option value="0"<?= !\Input::get('year') ? ' selected' : '' ?>>alle zuk&uuml;nfige Evens zeigen</option>

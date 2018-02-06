@@ -1,9 +1,51 @@
-<div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
+<div class="<?= $this->class ?> pr-4 pl-4 block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
 <?php $this->block('headline'); ?>
 <?php if ($this->headline): ?>
-<<?= $this->hl ?>><?= $this->headline ?></<?= $this->hl ?>>
+<<?= $this->hl ?> class="ce_headline"><?= $this->headline ?></<?= $this->hl ?>>
 <?php endif; ?>
 <?php $this->endblock(); ?>
+
+
+
+
+<!-- indexer::stop -->
+<!-- button bar -->
+<div class="button-bar">
+  <ul>
+    <li>
+      <button class="d-block d-lg-none btn btn-outline-success toggle-filter-btn" onclick=""><i class="fa fa-filter"></i> Tour-Filter öffnen</button>
+    </li>
+  </ul>
+</div>
+
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            $('.close-event-filter-button').click(function(){
+                $('.event-filter-overlay').remove();
+                $('.col-event-filter').removeClass('expanded');
+            });
+            $(".toggle-filter-btn").click(function(){
+                $('.col-event-filter').toggleClass('expanded');
+                if($('.col-event-filter').hasClass('expanded'))
+                {
+                    $('.event-filter-overlay').remove();
+                    $('<div class="event-filter-overlay"></div>').prependTo('body');
+                    $('.event-filter-overlay').click(function(){
+                        $('.event-filter-overlay').remove();
+                        $('.col-event-filter').removeClass('expanded');
+                    });
+                }else{
+                    $('.event-filter-overlay').remove();
+                }
+            });
+        });
+    })(jQuery);
+</script>
+<!-- end button bar -->
+<!-- indexer::continue -->
+
+
 
 
 
