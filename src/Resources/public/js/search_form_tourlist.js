@@ -216,9 +216,29 @@ $().ready(function () {
         alert('Please set the modEventFilterListId in the template');
     }
 
+
+    // You can set the filter by url query param like this:
+    // https://somehost.ch/kurse.html?organizer=2
+    // https://somehost.ch/kurse.html?organizer=2,3,4
+    try {
+        if (typeof window.sessionStorage !== 'undefined') {
+            if (SacTourFilter.getUrlParam('organizer') !== 0) {
+                var arrOrganizers = SacTourFilter.getUrlParam('organizer').split(",");
+                // Store filter in the sessionStorrage and reload page without the query string
+                sessionStorage.setItem('ctrl_organizers_' + modEventFilterListId, JSON.stringify(arrOrganizers));
+                var arrUrl = window.location.href.split("?");
+                window.location.href = arrUrl[0];
+            }
+        }
+    }catch (e) {
+        console.log('Session Storage is disabled or not supported for this browser.');
+    }
+
+
     // filter List if there are some values in the browser's sessionStorage
     try {
         if (typeof window.sessionStorage !== 'undefined') {
+
             var blnFilterList = false;
             if (sessionStorage.getItem('ctrl_search_' + modEventFilterListId) !== null) {
                 $('#ctrl_search').val(sessionStorage.getItem('ctrl_search_' + modEventFilterListId));
@@ -253,7 +273,7 @@ $().ready(function () {
         }
     }
     catch (e) {
-        console.log('Session Storage is disabled or not supported for this browser.')
+        console.log('Session Storage is disabled or not supported for this browser.');
     }
 
 
@@ -321,7 +341,7 @@ $().ready(function () {
     // Entferne die Suchoptionen im Select-Menu, wenn ohnehin keine Events dazu existieren
     var arrTourTypes = [];
     $('.event-item-tour').each(function () {
-        if ($(this).attr('data-tourType') != '') {
+        if ($(this).attr('data-tourType') !== '') {
             var arten = $(this).attr('data-tourType').split(',');
             jQuery.each(arten, function (i, val) {
                 arrTourTypes.push(val);

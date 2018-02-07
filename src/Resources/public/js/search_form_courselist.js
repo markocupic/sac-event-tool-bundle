@@ -213,6 +213,26 @@ $().ready(function () {
         alert('Please set the modEventFilterListId in the template');
     }
 
+
+    // You can set the filter by url query param like this:
+    // https://somehost.ch/kurse.html?organizer=2
+    // https://somehost.ch/kurse.html?organizer=2,3,4
+    try {
+        if (typeof window.sessionStorage !== 'undefined') {
+            if (SacCourseFilter.getUrlParam('organizer') !== 0) {
+                var arrOrganizers = SacCourseFilter.getUrlParam('organizer').split(",");
+                // Store filter in the sessionStorrage and reload page without the query string
+                sessionStorage.setItem('ctrl_organizers_' + modEventFilterListId, JSON.stringify(arrOrganizers));
+                var arrUrl = window.location.href.split("?");
+                window.location.href = arrUrl[0];
+            }
+        }
+    }catch (e) {
+        console.log('Session Storage is disabled or not supported for this browser.');
+    }
+
+
+
     // filter List if there are some values in the browser's sessionStorage
     try {
         if (typeof window.sessionStorage !== 'undefined') {
@@ -250,7 +270,7 @@ $().ready(function () {
         }
     }
     catch (e) {
-        console.log('Session Storage is disabled or not supported for this browser.')
+        console.log('Session Storage is disabled or not supported for this browser.');
     }
 
 
@@ -330,3 +350,8 @@ $().ready(function () {
         }
     });
 });
+
+
+
+
+
