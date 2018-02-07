@@ -1,11 +1,9 @@
 <div class="<?= $this->class ?> pr-4 pl-4 block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
-<?php $this->block('headline'); ?>
-<?php if ($this->headline): ?>
-<<?= $this->hl ?> class="ce_headline"><?= $this->headline ?></<?= $this->hl ?>>
+    <?php $this->block('headline'); ?>
+    <?php if ($this->headline): ?>
+  <<?= $this->hl ?> class="ce_headline"><?= $this->headline ?></<?= $this->hl ?>>
 <?php endif; ?>
 <?php $this->endblock(); ?>
-
-
 
 
 <!-- indexer::stop -->
@@ -21,21 +19,20 @@
 <script>
     (function ($) {
         $(document).ready(function () {
-            $('.close-event-filter-button').click(function(){
+            $('.close-event-filter-button').click(function () {
                 $('.event-filter-overlay').remove();
                 $('.col-event-filter').removeClass('expanded');
             });
-            $(".toggle-filter-btn").click(function(){
+            $(".toggle-filter-btn").click(function () {
                 $('.col-event-filter').toggleClass('expanded');
-                if($('.col-event-filter').hasClass('expanded'))
-                {
+                if ($('.col-event-filter').hasClass('expanded')) {
                     $('.event-filter-overlay').remove();
                     $('<div class="event-filter-overlay"></div>').prependTo('body');
-                    $('.event-filter-overlay').click(function(){
+                    $('.event-filter-overlay').click(function () {
                         $('.event-filter-overlay').remove();
                         $('.col-event-filter').removeClass('expanded');
                     });
-                }else{
+                } else {
                     $('.event-filter-overlay').remove();
                 }
             });
@@ -46,33 +43,23 @@
 <!-- indexer::continue -->
 
 
-
-
-
-
 <table class="table layout-table table-responsive">
-<tr>
+  <tr>
     <th>Datum</th>
     <th>Dauer</th>
+    <th></th>
     <th>Tour</th>
     <th></th>
     <th>Anf.</th>
     <th>Art</th>
     <th>Leitung</th>
-
-</tr>
-<?= $this->events ?>
+  </tr>
+    <?= $this->events ?>
 </table>
-
-
 
 
 <?php $this->block('content'); ?>
 <?php $this->endblock(); ?>
-
-
-
-
 
 
 </div>

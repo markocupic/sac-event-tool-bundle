@@ -1,25 +1,25 @@
-
 <?php $eventState = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($this->id); ?>
 <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][$eventState]; ?>
 
-<?php $arrTourTypes = \StringUtil::deserialize($this->tourType,true); ?>
+<?php $arrTourTypes = \StringUtil::deserialize($this->tourType, true); ?>
 <tr class="event-item-tour event" data-id="<?= $this->id ?>" data-tourType="<?= implode(',', $arrTourTypes) ?>">
-    <td>
-        <?= \Date::parse('d.m.Y', $this->startDate) ?>
-    </td>
+  <td>
+      <?= \Date::parse('d.m.Y', $this->startDate) ?>
+  </td>
 
-    <td>
-        <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($this->id) ?>
-    </td>
+  <td>
+      <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($this->id) ?>
+  </td>
+  <td>
+    <?php if ($this->eventType === 'lastMinuteTour'): ?><span class="last-minute-tour small"><i class="fa fa-clock"></i> LAST MINUTE TOUR</span><br><?php endif; ?>
+    <i class="event-state-icon fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
+  </td>
+  <td>
+    <a href="{{event_url::<?php echo $this->id; ?>}}">{{event_title::<?= $this->id ?>}}</a>
+  </td>
+  <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($this->id) ?></td>
 
-    <td>
-        <?php if($this->eventType === 'lastMinuteTour'): ?><span class="last-minute-tour small"><i class="fa fa-clock"></i> LAST MINUTE TOUR</span><br><?php endif; ?>
-        <i class="event-state-icon fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
-        <a href="{{event_url::<?php echo $this->id; ?>}}">{{event_title::<?= $this->id ?>}}</a>
-    </td>
-    <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($this->id) ?></td>
-
-    <td class="tourTechDifficulty"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($this->id)) ?></td>
-    <td class="tourType"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($this->id, 'shortcut')) ?></td>
-    <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getMainInstructorName($this->id) ?></td>
+  <td class="tourTechDifficulty"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($this->id)) ?></td>
+  <td class="tourType"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($this->id, 'shortcut')) ?></td>
+  <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getMainInstructorName($this->id) ?></td>
 </tr>

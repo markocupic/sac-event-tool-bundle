@@ -1,77 +1,79 @@
 <?php
-    // Start session
-    session_start();
-    if(\Environment::get('isAjaxRequest') && \Input::get('xhrAction') === 'switchLayout')
+// Start session
+session_start();
+if (\Environment::get('isAjaxRequest') && \Input::get('xhrAction') === 'switchLayout')
+{
+    if (isset($_SESSION['layout_table']))
     {
-      if(isset($_SESSION['layout_table'])){
-      unset($_SESSION['layout_table']);
-      }else{
-        $_SESSION['layout_table'] = true;
-      }
-      echo json_encode(array('status' => 'success'));
-      exit;
+        unset($_SESSION['layout_table']);
     }
+    else
+    {
+        $_SESSION['layout_table'] = true;
+    }
+    echo json_encode(array('status' => 'success'));
+    exit;
+}
 ?>
 <div class="pl-4 pr-4 <?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
-<?php $this->block('headline'); ?>
-<?php if ($this->headline): ?>
-<<?= $this->hl ?> class="ce_headline"><?= $this->headline ?></<?= $this->hl ?>>
+    <?php $this->block('headline'); ?>
+    <?php if ($this->headline): ?>
+  <<?= $this->hl ?> class="ce_headline"><?= $this->headline ?></<?= $this->hl ?>>
 <?php endif; ?>
 <?php $this->endblock(); ?>
 
 <!-- indexer::stop -->
 <!-- button bar -->
 <div class="button-bar">
-<ul>
+  <ul>
     <li>
-        <button class="btn btn-danger switch-layout" title="Switch Layout">
-          <?php if($_SESSION['layout_table']): ?>
+      <button class="btn btn-danger switch-layout" title="Switch Layout">
+          <?php if ($_SESSION['layout_table']): ?>
             <i class="fa fa-fw fa-list"></i>
           <?php else: ?>
             <i class="fa fa-fw fa-th"></i>
           <?php endif; ?>
-        </button>
+      </button>
     </li>
 
-<li>
-	<a href="{{env::url}}/?action=downloadKursbroschuere&year=current&cat=0">
-		<button class="text-right btn btn-success" title="Kursprogramm als pdf Brosch&uuml;re herunterladen">
-		    <i class="fa fa-fw fa-file-pdf"></i>
-		</button>
-    </a>
-</li>
     <li>
-        <a href="{{env::url}}/?action=exportEvents2Docx&calendarId=6&year={{date::Y}}">
-            <button class="text-right btn btn-primary" title="Kursprogramm herunterladen im docx Format herunterladen">
-                <i class="fa fa-fw fa-file-word"></i>
-            </button>
-        </a>
+      <a href="{{env::url}}/?action=downloadKursbroschuere&year=current&cat=0">
+        <button class="text-right btn btn-success" title="Kursprogramm als pdf Brosch&uuml;re herunterladen">
+          <i class="fa fa-fw fa-file-pdf"></i>
+        </button>
+      </a>
+    </li>
+    <li>
+      <a href="{{env::url}}/?action=exportEvents2Docx&calendarId=6&year={{date::Y}}">
+        <button class="text-right btn btn-primary" title="Kursprogramm herunterladen im docx Format herunterladen">
+          <i class="fa fa-fw fa-file-word"></i>
+        </button>
+      </a>
     </li>
     <li>
       <button class="d-block d-lg-none btn btn-outline-success toggle-filter-btn" onclick=""><i class="fa fa-filter"></i> Kurs-Filter öffnen</button>
     </li>
 
-</ul>
+  </ul>
 </div>
 
 <script>
     (function ($) {
         $(document).ready(function () {
-            $('.close-event-filter-button').click(function(){
+            $('.close-event-filter-button').click(function () {
                 $('.event-filter-overlay').remove();
                 $('.col-event-filter').removeClass('expanded');
             });
-            $(".toggle-filter-btn").click(function(){
+            $(".toggle-filter-btn").click(function () {
                 $('.col-event-filter').toggleClass('expanded');
-                if($('.col-event-filter').hasClass('expanded'))
-                {
+                if ($('.col-event-filter').hasClass('expanded')) {
                     $('.event-filter-overlay').remove();
                     $('<div class="event-filter-overlay"></div>').prependTo('body');
-                    $('.event-filter-overlay').click(function(){
+                    $('.event-filter-overlay').click(function () {
                         $('.event-filter-overlay').remove();
                         $('.col-event-filter').removeClass('expanded');
                     });
-                }else{
+                } else {
                     $('.event-filter-overlay').remove();
                 }
             });
@@ -82,55 +84,49 @@
 <!-- indexer::continue -->
 
 
-<?php if($_SESSION['layout_table']): ?>
+<?php if ($_SESSION['layout_table']): ?>
 <table class="table layout-table table-responsive">
-    <tr>
-        <th>Datum</th>
-        <th>Dauer</th>
-        <th>Kurs</th>
-        <th>Leitung</th>
-    </tr>
+  <tr>
+    <th>Datum</th>
+    <th>Dauer</th>
+    <th></th>
+    <th>Kurs</th>
+    <th>Leitung</th>
+  </tr>
 <?php endif; ?>
 
+  <div <?php if (!$_SESSION['layout_table']): ?>class="row"<?php endif; ?>>
+      <?= $this->events ?>
+  </div>
 
+    <?= $this->pagination ?>
+    <?php $this->block('content'); ?>
+    <?php $this->endblock(); ?>
 
-{{br}}
-<div <?php if(!$_SESSION['layout_table']): ?>class="row"<?php endif; ?>>
-<?= $this->events ?>
-</div>
-
-<?= $this->pagination ?>
-
-
-<?php $this->block('content'); ?>
-<?php $this->endblock(); ?>
-
-<?php if($_SESSION['layout_table']): ?>
+<?php if ($_SESSION['layout_table']): ?>
 </table>
 <?php endif; ?>
-
-
 
 
 </div>
 
 
 <script>
-  (function ($) {
-      $(document).ready(function () {
-          $(".switch-layout").click(function(){
-              console.log(window.location.href);
-              var data = {
-                  'xhrAction': 'switchLayout'
-              };
-              $.getJSON(window.location.href, data, function(response){
-                  console.log(response);
-                  if(response['status'] == 'success'){
-                      window.location.href = window.location.href;
-                  }
-              });
-          });
-      });
-  })(jQuery);
+    (function ($) {
+        $(document).ready(function () {
+            $(".switch-layout").click(function () {
+                console.log(window.location.href);
+                var data = {
+                    'xhrAction': 'switchLayout'
+                };
+                $.getJSON(window.location.href, data, function (response) {
+                    console.log(response);
+                    if (response['status'] == 'success') {
+                        window.location.href = window.location.href;
+                    }
+                });
+            });
+        });
+    })(jQuery);
 </script>
 <!-- indexer::continue -->

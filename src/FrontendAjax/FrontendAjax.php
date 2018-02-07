@@ -42,8 +42,8 @@ class FrontendAjax
     {
         $visibleItems = array();
         $arrIDS = json_decode(Input::post('ids'));
-        $arrOGS = json_decode(Input::post('ogs'));
-        $strSuchbegriff = trim(Input::post('suchbegriff'));
+        $arrOrganizers = json_decode(Input::post('organizers'));
+        $strSearchterm = trim(Input::post('searchterm'));
         $idTourType = Input::post('tourtype');
         $intStartDate = round(Input::post('startDate'));
 
@@ -85,7 +85,7 @@ class FrontendAjax
                 // ogs
                 if ($filter === false)
                 {
-                    if (count(array_intersect($arrOGS, StringUtil::deserialize($objEvent->organizers, true))) < 1)
+                    if (count(array_intersect($arrOrganizers, StringUtil::deserialize($objEvent->organizers, true))) < 1)
                     {
                         $filter = true;
                     }
@@ -96,48 +96,57 @@ class FrontendAjax
                 if ($filter === false)
                 {
 
-                    if ($strSuchbegriff != '')
+                    if ($strSearchterm != '')
                     {
 
                         $treffer = 0;
 
-                        // Suche nach Namen des Kursleiters
-                        $strLeiter = implode(', ', array_map(function ($userId) {
-                            return UserModel::findByPk($userId)->name;
-                        }, StringUtil::deserialize($objEvent->instructor, true)));
 
-                        if ($treffer == 0)
+                        foreach (explode(' ', $strSearchterm) as $strNeedle)
                         {
-                            if ($this->_textSearch($strSuchbegriff, $strLeiter))
+                            if ($treffer)
                             {
-                                $treffer++;
+                                continue;
                             }
-                        }
 
-                        if ($treffer == 0)
-                        {
-                            // Suchbegriff im Titel suchen
-                            if ($this->_textSearch($strSuchbegriff, $objEvent->title))
+                            // Suche nach Namen des Kursleiters
+                            $strLeiter = implode(', ', array_map(function ($userId) {
+                                return UserModel::findByPk($userId)->name;
+                            }, StringUtil::deserialize($objEvent->instructor, true)));
+
+                            if ($treffer == 0)
                             {
-                                $treffer++;
+                                if ($this->_textSearch($strNeedle, $strLeiter))
+                                {
+                                    $treffer++;
+                                }
                             }
-                        }
 
-                        if ($treffer == 0)
-                        {
-                            // Suchbegriff im Teaser suchen
-                            if ($this->_textSearch($strSuchbegriff, $objEvent->teaser))
+                            if ($treffer == 0)
                             {
-                                $treffer++;
+                                // Suchbegriff im Titel suchen
+                                if ($this->_textSearch($strNeedle, $objEvent->title))
+                                {
+                                    $treffer++;
+                                }
                             }
-                        }
 
-                        if ($treffer == 0)
-                        {
-                            // Suchbegriff im tourDetailText suchen
-                            if ($this->_textSearch($strSuchbegriff, $objEvent->tourDetailText))
+                            if ($treffer == 0)
                             {
-                                $treffer++;
+                                // Suchbegriff im Teaser suchen
+                                if ($this->_textSearch($strNeedle, $objEvent->teaser))
+                                {
+                                    $treffer++;
+                                }
+                            }
+
+                            if ($treffer == 0)
+                            {
+                                // Suchbegriff im tourDetailText suchen
+                                if ($this->_textSearch($strNeedle, $objEvent->tourDetailText))
+                                {
+                                    $treffer++;
+                                }
                             }
                         }
 
@@ -192,9 +201,9 @@ class FrontendAjax
     {
         $visibleItems = array();
         $arrIDS = json_decode(Input::post('ids'));
-        $arrOGS = json_decode(Input::post('ogs'));
-        $strSuchbegriff = trim(Input::post('suchbegriff'));
-        $idKursart = Input::post('kursart');
+        $arrOrganizers = json_decode(Input::post('organizers'));
+        $strSearchterm = trim(Input::post('searchterm'));
+        $courseTypeId = Input::post('courseType');
         $intStartDate = round(Input::post('startDate'));
 
 
@@ -223,22 +232,20 @@ class FrontendAjax
                 }
 
 
-                // kursart
+                // courseType
                 if ($filter === false)
                 {
-                    if ($idKursart > 0 && !in_array($idKursart,
-                            StringUtil::deserialize($objEvent->courseTypeLevel1, true))
-                    )
+                    if ($courseTypeId > 0 && !in_array($courseTypeId, StringUtil::deserialize($objEvent->courseTypeLevel1, true)))
                     {
                         $filter = true;
                     }
                 }
 
 
-                // ogs
+                // organizers
                 if ($filter === false)
                 {
-                    if (count(array_intersect($arrOGS, StringUtil::deserialize($objEvent->organizers, true))) < 1)
+                    if (count(array_intersect($arrOrganizers, StringUtil::deserialize($objEvent->organizers, true))) < 1)
                     {
                         $filter = true;
                     }
@@ -249,39 +256,47 @@ class FrontendAjax
                 if ($filter === false)
                 {
 
-                    if ($strSuchbegriff != '')
+                    if ($strSearchterm != '')
                     {
-
                         $treffer = 0;
 
-                        // Suche nach Namen des Kursleiters
-                        $strLeiter = implode(', ', array_map(function ($userId) {
-                            return UserModel::findByPk($userId)->name;
-                        }, StringUtil::deserialize($objEvent->instructor, true)));
-
-                        if ($treffer == 0)
+                        foreach (explode(' ', $strSearchterm) as $strNeedle)
                         {
-                            if ($this->_textSearch($strSuchbegriff, $strLeiter))
+                            if ($treffer)
                             {
-                                $treffer++;
+                                continue;
                             }
-                        }
 
-                        if ($treffer == 0)
-                        {
-                            // Suchbegriff im Titel suchen
-                            if ($this->_textSearch($strSuchbegriff, $objEvent->title))
+
+                            // Suche nach Namen des Kursleiters
+                            $strLeiter = implode(', ', array_map(function ($userId) {
+                                return UserModel::findByPk($userId)->name;
+                            }, StringUtil::deserialize($objEvent->instructor, true)));
+
+                            if ($treffer == 0)
                             {
-                                $treffer++;
+                                if ($this->_textSearch($strNeedle, $strLeiter))
+                                {
+                                    $treffer++;
+                                }
                             }
-                        }
 
-                        if ($treffer == 0)
-                        {
-                            // Suchbegriff im Teaser suchen
-                            if ($this->_textSearch($strSuchbegriff, $objEvent->teaser))
+                            if ($treffer == 0)
                             {
-                                $treffer++;
+                                // Suchbegriff im Titel suchen
+                                if ($this->_textSearch($strNeedle, $objEvent->title))
+                                {
+                                    $treffer++;
+                                }
+                            }
+
+                            if ($treffer == 0)
+                            {
+                                // Suchbegriff im Teaser suchen
+                                if ($this->_textSearch($strNeedle, $objEvent->teaser))
+                                {
+                                    $treffer++;
+                                }
                             }
                         }
 
@@ -290,6 +305,7 @@ class FrontendAjax
                         {
                             $filter = true;
                         }
+
                     }
                 }
 
@@ -539,14 +555,15 @@ class FrontendAjax
                 if (!isset($arrMeta['de']['caption']))
                 {
                     $caption = '';
-                }else
+                }
+                else
                 {
                     $caption = $arrMeta['de']['caption'];
                 }
 
                 $response = new JsonResponse(array(
-                    'status' => 'success',
-                    'caption' => html_entity_decode($caption)
+                    'status'  => 'success',
+                    'caption' => html_entity_decode($caption),
                 ));
                 return $response->send();
             }
@@ -588,7 +605,7 @@ class FrontendAjax
                 $objFile->meta = serialize($arrMeta);
                 $objFile->save();
                 $response = new JsonResponse(array(
-                    'status' => 'success'
+                    'status' => 'success',
                 ));
                 return $response->send();
             }

@@ -118,14 +118,14 @@ var SacTourFilter =  {
             }
 
             // Sektionen
-            var arrOGS = [];
-            $('.ctrl_sektion:checked').each(function () {
-                arrOGS.push(this.value);
+            var arrOrganizers = [];
+            $('.ctrl_organizers:checked').each(function () {
+                arrOrganizers.push(this.value);
             });
 
             try {
                 // Save Input to sessionStorage
-                sessionStorage.setItem('ctrl_sektion_' + modEventFilterListId, JSON.stringify(arrOGS));
+                sessionStorage.setItem('ctrl_organizers_' + modEventFilterListId, JSON.stringify(arrOrganizers));
             }
             catch (e) {
                 console.log('Session Storage is disabled or not supported on this browser.')
@@ -136,10 +136,10 @@ var SacTourFilter =  {
             intStartDate = Math.round(intStartDate);
 
             // Textsuche
-            var strSuchbegriff = $('#ctrl_suche').val();
+            var strSearchterm = $('#ctrl_search').val();
             // Save Input to sessionStorage
             try {
-                sessionStorage.setItem('ctrl_suche_' + modEventFilterListId, strSuchbegriff);
+                sessionStorage.setItem('ctrl_search_' + modEventFilterListId, strSearchterm);
             }
             catch (e) {
                 console.log('Session Storage is disabled or not supported on this browser.')
@@ -155,8 +155,8 @@ var SacTourFilter =  {
                     year: SacTourFilter.getUrlParam('year'),
                     ids: JSON.stringify(arrIds),
                     tourtype: idTourType,
-                    ogs: JSON.stringify(arrOGS),
-                    suchbegriff: strSuchbegriff,
+                    organizers: JSON.stringify(arrOrganizers),
+                    searchterm: strSearchterm,
                     startDate: intStartDate
                 },
                 dataType: 'json'
@@ -220,15 +220,15 @@ $().ready(function () {
     try {
         if (typeof window.sessionStorage !== 'undefined') {
             var blnFilterList = false;
-            if (sessionStorage.getItem('ctrl_suche_' + modEventFilterListId) !== null) {
-                $('#ctrl_suche').val(sessionStorage.getItem('ctrl_suche_' + modEventFilterListId));
+            if (sessionStorage.getItem('ctrl_search_' + modEventFilterListId) !== null) {
+                $('#ctrl_search').val(sessionStorage.getItem('ctrl_search_' + modEventFilterListId));
                 blnFilterList = true;
             }
 
-            if (sessionStorage.getItem('ctrl_sektion_' + modEventFilterListId) !== null) {
-                var arrSektionen = JSON.parse(sessionStorage.getItem('ctrl_sektion_' + modEventFilterListId));
+            if (sessionStorage.getItem('ctrl_organizers_' + modEventFilterListId) !== null) {
+                var arrSektionen = JSON.parse(sessionStorage.getItem('ctrl_organizers_' + modEventFilterListId));
                 if (arrSektionen.length) {
-                    $('.ctrl_sektion').each(function () {
+                    $('.ctrl_organizers').each(function () {
                         if (jQuery.inArray($(this).attr('value'), arrSektionen) > -1) {
                             $(this).prop('checked', true);
                         } else {
@@ -277,11 +277,11 @@ $().ready(function () {
         window.location.href = arrUrl[0] + '?year=' + $(this).prop('value');
     });
 
-    $('#ctrl_tourType, .ctrl_sektion').on('change', function () {
+    $('#ctrl_tourType, .ctrl_organizers').on('change', function () {
         SacTourFilter.queueRequest();
     });
 
-    $('#ctrl_suche').on('keyup', function () {
+    $('#ctrl_search').on('keyup', function () {
         SacTourFilter.queueRequest();
     });
 
