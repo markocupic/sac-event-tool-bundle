@@ -195,7 +195,6 @@ var SacTourFilter =  {
             if (results === null) return 0;
             return results[1] || 0;
         }
-
 }
 
 
@@ -228,6 +227,7 @@ $().ready(function () {
                 sessionStorage.setItem('ctrl_organizers_' + modEventFilterListId, JSON.stringify(arrOrganizers));
                 var arrUrl = window.location.href.split("?");
                 window.location.href = arrUrl[0];
+                return;
             }
         }
     }catch (e) {
