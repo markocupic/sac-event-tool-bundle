@@ -199,6 +199,7 @@ var SacCourseFilter = {
 
 $().ready(function () {
 
+    console.log(sessionStorage);
     if ($('.filter-board[data-event-type="course"]').length < 1) {
         // Add a valid filter board
         return;
@@ -273,6 +274,52 @@ $().ready(function () {
     catch (e) {
         console.log('Session Storage is disabled or not supported for this browser.');
     }
+
+
+
+    // Select all or unselect all organizers
+    $('.select-organizer-all').click(function (e) {
+        e.preventDefault();
+        var toggler = this;
+        var arrOrganizers = [];
+
+        var i = 0;
+        var check = true;
+        $('.ctrl_organizers').each(function () {
+            if ($(this).prop('checked')) {
+                i++;
+            }
+            arrOrganizers.push($(this).prop('value'));
+        });
+        if (i === $('.ctrl_organizers').length) {
+            check = false;
+        } else if (i === 0) {
+            check = true;
+        }
+
+        if (check === true) {
+            $('.ctrl_organizers').each(function () {
+                $(this).iCheck('check');
+            });
+        } else {
+            $('.ctrl_organizers').each(function () {
+                $(this).iCheck('uncheck');
+            });
+        }
+
+        $('.ctrl_organizers').each(function () {
+            if (check === true) {
+                $(this).iCheck('check');
+                sessionStorage.setItem('ctrl_organizers_' + modEventFilterListId, JSON.stringify(arrOrganizers));
+            } else {
+                $(this).iCheck('uncheck');
+                sessionStorage.removeItem('ctrl_organizers_' + modEventFilterListId);
+            }
+        });
+        SacCourseFilter.queueRequest();
+        return false;
+    });
+
 
 
     // Init iCheck

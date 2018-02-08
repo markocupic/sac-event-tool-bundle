@@ -19,3 +19,5 @@ $GLOBALS['TL_LANG']['tl_event_organizer']['show'] = array("Ansehen", "Gruppe mit
 
 // Fields
 $GLOBALS['TL_LANG']['tl_event_organizer']['title'] = array("Gruppenbezeichnung", "Geben Sie eine Bezeichnung f&uuml;r die Gruppe/OG an.");
+$GLOBALS['TL_LANG']['tl_event_organizer']['sorting'] = array("Sortierrang", "Geben Sie einen Sortierrang an.");
+

@@ -9,199 +9,198 @@
 
 //Provides methods for filtering the kursliste
 
-var SacTourFilter =  {
-        /**
-         * globalEventId
-         * This is used in self.queueRequest
-         */
-        globalEventId: 0,
+var SacTourFilter = {
+    /**
+     * globalEventId
+     * This is used in self.queueRequest
+     */
+    globalEventId: 0,
 
-        /**
-         * time to wait before launching the xhr request, when making changes to the filter form
-         */
-        delay: 1000,
-
-
-        /**
-         * queueRequest
-         */
-        queueRequest: function () {
-            SacTourFilter.showLoadingIcon();
-            SacTourFilter.resetEventList();
-            SacTourFilter.globalEventId++;
-            var eventId = SacTourFilter.globalEventId;
-            window.setTimeout(function () {
-                if (eventId == SacTourFilter.globalEventId) {
-                    SacTourFilter.fireXHR();
-                }
-            }, SacTourFilter.delay);
-        },
-
-        /**
-         * Reset/Remove List
-         */
-        resetEventList: function () {
-            $('.alert-no-results-found').remove();
-            $('.event-item-tour').each(function () {
-                $(this).hide();
-                $(this).removeClass('visible');
-            });
-        },
+    /**
+     * time to wait before launching the xhr request, when making changes to the filter form
+     */
+    delay: 1000,
 
 
-        /**
-         * Show the loading icon
-         */
-        showLoadingIcon: function () {
-            // Add loading icon
-            $('.loading-icon-lg').remove();
-            // See https://fontawesome.com/how-to-use/font-awesome-api#icon
-            var iconDefinition = FontAwesome.findIconDefinition({prefix: 'fal', iconName: 'circle-notch'});
-            var icon = FontAwesome.icon(iconDefinition, {
-                classes: ['fa-spin', 'fa-3x']
-            }).html;
-            $('.mod_eventToolCalendarEventlist').append('<div class="loading-icon-lg"><div>' + icon + '</div></div>');
-        },
-
-        /**
-         * Hide the loading icon
-         */
-        hideLoadingIcon: function () {
-            // Add loading icon
-            $('.loading-icon-lg').remove();
-        },
-
-        /**
-         * List events starting from a certain date
-         * @param dateStart
-         */
-        listEventsStartingFromDate: function (dateStart) {
-            var regex = /^(.*)-(.*)-(.*)$/g;
-            var match = regex.exec(dateStart);
-            if (match) {
-                // JavaScript counts months from 0 to 11. January is 0. December is 11.
-                var date = new Date(match[3], match[2] - 1, match[1]);
-                var tstamp = Math.round(date.getTime() / 1000);
-                if (!isNaN(tstamp)) {
-                    $('#ctrl_dateStartHidden').val(tstamp);
-                    $('#ctrl_dateStartHidden').attr('value', tstamp);
-                    SacTourFilter.queueRequest();
-                    return;
-                }
+    /**
+     * queueRequest
+     */
+    queueRequest: function () {
+        SacTourFilter.showLoadingIcon();
+        SacTourFilter.resetEventList();
+        SacTourFilter.globalEventId++;
+        var eventId = SacTourFilter.globalEventId;
+        window.setTimeout(function () {
+            if (eventId == SacTourFilter.globalEventId) {
+                SacTourFilter.fireXHR();
             }
-            $('#ctrl_dateStartHidden').attr('value', '0');
-            $('#ctrl_dateStartHidden').val('0');
-            SacTourFilter.queueRequest();
-        },
+        }, SacTourFilter.delay);
+    },
+
+    /**
+     * Reset/Remove List
+     */
+    resetEventList: function () {
+        $('.alert-no-results-found').remove();
+        $('.event-item-tour').each(function () {
+            $(this).hide();
+            $(this).removeClass('visible');
+        });
+    },
 
 
-        /**
-         * filterRequest
-         */
-        fireXHR: function () {
-            var itemsFound = 0;
+    /**
+     * Show the loading icon
+     */
+    showLoadingIcon: function () {
+        // Add loading icon
+        $('.loading-icon-lg').remove();
+        // See https://fontawesome.com/how-to-use/font-awesome-api#icon
+        var iconDefinition = FontAwesome.findIconDefinition({prefix: 'fal', iconName: 'circle-notch'});
+        var icon = FontAwesome.icon(iconDefinition, {
+            classes: ['fa-spin', 'fa-3x']
+        }).html;
+        $('.mod_eventToolCalendarEventlist').append('<div class="loading-icon-lg"><div>' + icon + '</div></div>');
+    },
 
-            // Event-items
-            var arrIds = [];
-            $('.event-item-tour').each(function () {
-                arrIds.push($(this).attr('data-id'));
-            });
+    /**
+     * Hide the loading icon
+     */
+    hideLoadingIcon: function () {
+        // Add loading icon
+        $('.loading-icon-lg').remove();
+    },
 
-            // Tour type
-            var idTourType = $('#ctrl_tourType').val();
-            // Save Input to sessionStorage
-            try {
-                sessionStorage.setItem('ctrl_tourType_' + modEventFilterListId, idTourType);
+    /**
+     * List events starting from a certain date
+     * @param dateStart
+     */
+    listEventsStartingFromDate: function (dateStart) {
+        var regex = /^(.*)-(.*)-(.*)$/g;
+        var match = regex.exec(dateStart);
+        if (match) {
+            // JavaScript counts months from 0 to 11. January is 0. December is 11.
+            var date = new Date(match[3], match[2] - 1, match[1]);
+            var tstamp = Math.round(date.getTime() / 1000);
+            if (!isNaN(tstamp)) {
+                $('#ctrl_dateStartHidden').val(tstamp);
+                $('#ctrl_dateStartHidden').attr('value', tstamp);
+                SacTourFilter.queueRequest();
+                return;
             }
-            catch (e) {
-                console.log('Session Storage is disabled or not supported on this browser.')
-            }
-
-            // Sektionen
-            var arrOrganizers = [];
-            $('.ctrl_organizers:checked').each(function () {
-                arrOrganizers.push(this.value);
-            });
-
-            try {
-                // Save Input to sessionStorage
-                sessionStorage.setItem('ctrl_organizers_' + modEventFilterListId, JSON.stringify(arrOrganizers));
-            }
-            catch (e) {
-                console.log('Session Storage is disabled or not supported on this browser.')
-            }
-
-            // StartDate
-            var intStartDate = Math.round($('#ctrl_dateStartHidden').val()) > 0 ? $('#ctrl_dateStartHidden').val() : 0;
-            intStartDate = Math.round(intStartDate);
-
-            // Textsuche
-            var strSearchterm = $('#ctrl_search').val();
-            // Save Input to sessionStorage
-            try {
-                sessionStorage.setItem('ctrl_search_' + modEventFilterListId, strSearchterm);
-            }
-            catch (e) {
-                console.log('Session Storage is disabled or not supported on this browser.')
-            }
-
-            var url = 'ajax';
-            var request = $.ajax({
-                method: 'post',
-                url: url,
-                data: {
-                    action: 'filterTourList',
-                    REQUEST_TOKEN: request_token,
-                    year: SacTourFilter.getUrlParam('year'),
-                    ids: JSON.stringify(arrIds),
-                    tourtype: idTourType,
-                    organizers: JSON.stringify(arrOrganizers),
-                    searchterm: strSearchterm,
-                    startDate: intStartDate
-                },
-                dataType: 'json'
-            });
-            request.done(function (json) {
-                if (json) {
-                    SacTourFilter.hideLoadingIcon();
-
-                    $.each(json.filter, function (key, id) {
-                        $('.event-item-tour[data-id="' + id + '"]').each(function () {
-                            //intFound++;
-                            $(this).show();
-                            $(this).addClass('visible');
-                            itemsFound++;
-                        });
-                    });
-                    if (itemsFound == 0 && $('.alert-no-results-found').length == 0) {
-
-                        $('.mod_eventToolCalendarEventlist').append('<div class="alert alert-danger alert-no-results-found text-lg" role="alert"><h4><i class="fal fa-meh" aria-hidden="true"></i> Leider wurden zu deiner Suchanfrage keine Events gefunden. &Uuml;berp&uuml;fe bitte die Filtereinstellungen.</h4></div>');
-                    }
-                }
-            });
-            request.fail(function (jqXHR, textStatus, errorThrown) {
-                SacTourFilter.hideLoadingIcon();
-                console.log(jqXHR);
-                alert('Fehler: Die Anfrage konnte nicht bearbeitet werden! Überprüfe Sie die Internetverbindung.');
-            });
-        },
-        /**
-         * get url param
-         * @param strParam
-         * @returns {*|number}
-         */
-        getUrlParam: function (strParam) {
-            var results = new RegExp('[\?&]' + strParam + '=([^&#]*)').exec(window.location.href);
-            if (results === null) return 0;
-            return results[1] || 0;
         }
-}
+        $('#ctrl_dateStartHidden').attr('value', '0');
+        $('#ctrl_dateStartHidden').val('0');
+        SacTourFilter.queueRequest();
+    },
 
+
+    /**
+     * filterRequest
+     */
+    fireXHR: function () {
+        var itemsFound = 0;
+
+        // Event-items
+        var arrIds = [];
+        $('.event-item-tour').each(function () {
+            arrIds.push($(this).attr('data-id'));
+        });
+
+        // Tour type
+        var idTourType = $('#ctrl_tourType').val();
+        // Save Input to sessionStorage
+        try {
+            sessionStorage.setItem('ctrl_tourType_' + modEventFilterListId, idTourType);
+        }
+        catch (e) {
+            console.log('Session Storage is disabled or not supported on this browser.')
+        }
+
+        // Sektionen
+        var arrOrganizers = [];
+        $('.ctrl_organizers:checked').each(function () {
+            arrOrganizers.push(this.value);
+        });
+
+        try {
+            // Save Input to sessionStorage
+            sessionStorage.setItem('ctrl_organizers_' + modEventFilterListId, JSON.stringify(arrOrganizers));
+        }
+        catch (e) {
+            console.log('Session Storage is disabled or not supported on this browser.')
+        }
+
+        // StartDate
+        var intStartDate = Math.round($('#ctrl_dateStartHidden').val()) > 0 ? $('#ctrl_dateStartHidden').val() : 0;
+        intStartDate = Math.round(intStartDate);
+
+        // Textsuche
+        var strSearchterm = $('#ctrl_search').val();
+        // Save Input to sessionStorage
+        try {
+            sessionStorage.setItem('ctrl_search_' + modEventFilterListId, strSearchterm);
+        }
+        catch (e) {
+            console.log('Session Storage is disabled or not supported on this browser.')
+        }
+
+        var url = 'ajax';
+        var request = $.ajax({
+            method: 'post',
+            url: url,
+            data: {
+                action: 'filterTourList',
+                REQUEST_TOKEN: request_token,
+                year: SacTourFilter.getUrlParam('year'),
+                ids: JSON.stringify(arrIds),
+                tourtype: idTourType,
+                organizers: JSON.stringify(arrOrganizers),
+                searchterm: strSearchterm,
+                startDate: intStartDate
+            },
+            dataType: 'json'
+        });
+        request.done(function (json) {
+            if (json) {
+                SacTourFilter.hideLoadingIcon();
+
+                $.each(json.filter, function (key, id) {
+                    $('.event-item-tour[data-id="' + id + '"]').each(function () {
+                        //intFound++;
+                        $(this).show();
+                        $(this).addClass('visible');
+                        itemsFound++;
+                    });
+                });
+                if (itemsFound == 0 && $('.alert-no-results-found').length == 0) {
+
+                    $('.mod_eventToolCalendarEventlist').append('<div class="alert alert-danger alert-no-results-found text-lg" role="alert"><h4><i class="fal fa-meh" aria-hidden="true"></i> Leider wurden zu deiner Suchanfrage keine Events gefunden. &Uuml;berp&uuml;fe bitte die Filtereinstellungen.</h4></div>');
+                }
+            }
+        });
+        request.fail(function (jqXHR, textStatus, errorThrown) {
+            SacTourFilter.hideLoadingIcon();
+            console.log(jqXHR);
+            alert('Fehler: Die Anfrage konnte nicht bearbeitet werden! Überprüfe Sie die Internetverbindung.');
+        });
+    },
+    /**
+     * get url param
+     * @param strParam
+     * @returns {*|number}
+     */
+    getUrlParam: function (strParam) {
+        var results = new RegExp('[\?&]' + strParam + '=([^&#]*)').exec(window.location.href);
+        if (results === null) return 0;
+        return results[1] || 0;
+    }
+}
 
 
 $().ready(function () {
 
-    if($('.filter-board[data-event-type="tour"]').length < 1) {
+    if ($('.filter-board[data-event-type="tour"]').length < 1) {
         // Add a valid filter board
         return;
     }
@@ -230,7 +229,7 @@ $().ready(function () {
                 return;
             }
         }
-    }catch (e) {
+    } catch (e) {
         console.log('Session Storage is disabled or not supported for this browser.');
     }
 
@@ -278,6 +277,48 @@ $().ready(function () {
 
 
 
+    // Select all or unselect all organizers
+    $('.select-organizer-all').click(function (e) {
+        e.preventDefault();
+        var toggler = this;
+        var arrOrganizers = [];
+
+        var i = 0;
+        var check = true;
+        $('.ctrl_organizers').each(function () {
+            if ($(this).prop('checked')) {
+                i++;
+            }
+            arrOrganizers.push($(this).prop('value'));
+        });
+        if (i === $('.ctrl_organizers').length) {
+            check = false;
+        } else if (i === 0) {
+            check = true;
+        }
+
+        if (check === true) {
+            $('.ctrl_organizers').each(function () {
+                $(this).iCheck('check');
+            });
+        } else {
+            $('.ctrl_organizers').each(function () {
+                $(this).iCheck('uncheck');
+            });
+        }
+
+        $('.ctrl_organizers').each(function () {
+            if (check === true) {
+                $(this).iCheck('check');
+                sessionStorage.setItem('ctrl_organizers_' + modEventFilterListId, JSON.stringify(arrOrganizers));
+            } else {
+                $(this).iCheck('uncheck');
+                sessionStorage.removeItem('ctrl_organizers_' + modEventFilterListId);
+            }
+        });
+        SacTourFilter.queueRequest();
+        return false;
+    });
 
 
     // Init iCheck
@@ -287,7 +328,6 @@ $().ready(function () {
         radioClass: 'iradio_square-grey',
         increaseArea: '20%' // optional
     });
-
 
 
     /** Trigger Filter **/
@@ -335,7 +375,6 @@ $().ready(function () {
         var dateStart = $('#ctrl_dateStart').val();
         SacTourFilter.listEventsStartingFromDate(dateStart);
     });
-
 
 
     // Entferne die Suchoptionen im Select-Menu, wenn ohnehin keine Events dazu existieren
