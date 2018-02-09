@@ -299,36 +299,26 @@ $().ready(function () {
 
         if (check === true) {
             $('.ctrl_organizers').each(function () {
-                $(this).iCheck('check');
+                $(this).prop('checked',true);
             });
         } else {
             $('.ctrl_organizers').each(function () {
-                $(this).iCheck('uncheck');
+                $(this).prop('checked',false);
             });
         }
 
         $('.ctrl_organizers').each(function () {
             if (check === true) {
-                $(this).iCheck('check');
+                $(this).prop('checked',true);
                 sessionStorage.setItem('ctrl_organizers_' + modEventFilterListId, JSON.stringify(arrOrganizers));
             } else {
-                $(this).iCheck('uncheck');
+                $(this).prop('checked',false);
                 sessionStorage.removeItem('ctrl_organizers_' + modEventFilterListId);
             }
         });
         SacTourFilter.queueRequest();
         return false;
     });
-
-
-    // Init iCheck
-    // http://icheck.fronteed.com/
-    $('#organizers input').iCheck({
-        checkboxClass: 'icheckbox_square-green',
-        radioClass: 'iradio_square-grey',
-        increaseArea: '20%' // optional
-    });
-
 
     /** Trigger Filter **/
     // Redirect to selected year

@@ -42,13 +42,15 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/search_form_cou
     </select>
     <br>
 
-    <!--<h4>Organisierende Sektion ausw&auml;hlen:</h4>-->
     <div id="organizers">
         <?php $objOrganizers = \EventOrganizerModel::findAll(array('order' => 'sorting ASC')); ?>
         <?php if($objOrganizers !== null): ?>
             <a href="#" class="select-organizer-all">Alle</a>
             <?php while ($objOrganizers->next()): ?>
-            <div class="checkbox-container"><label><input class="ctrl_organizers" type="checkbox" name="organizer" value="<?= $objOrganizers->id ?>" checked> <?= $objOrganizers->title ?></label></div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="ctrl_organizers custom-control-input" name="organizer" id="organizerCheck<?= $objOrganizers->id ?>" value="<?= $objOrganizers->id ?>" checked>
+              <label class="custom-control-label" for="organizerCheck<?= $objOrganizers->id ?>"><?= $objOrganizers->title ?></label>
+            </div>
         <?php endwhile; ?>
         <?php endif; ?>
     </div>
