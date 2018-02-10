@@ -2,7 +2,7 @@
 <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][$eventState]; ?>
 
 <?php $arrTourTypes = \StringUtil::deserialize($this->tourType, true); ?>
-<tr class="event-item-tour event" data-id="<?= $this->id ?>" data-tourType="<?= implode(',', $arrTourTypes) ?>">
+<tr class="event-item event-item-tour event" data-id="<?= $this->id ?>" data-tourType="<?= implode(',', $arrTourTypes) ?>">
   <td>
       <?= \Date::parse('d.m.Y', $this->startDate) ?>
   </td>

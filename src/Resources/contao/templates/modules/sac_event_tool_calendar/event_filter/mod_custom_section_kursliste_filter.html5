@@ -1,9 +1,14 @@
 <?php
-$GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/search_form_courselist.js|static";
+$GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/search_form_courselist.js";
 ?>
 <script>
-    var request_token = '<?= REQUEST_TOKEN ?>';
-    var modEventFilterListId = <?= $this->id ?>;
+    $().ready(function () {
+        "use strict";
+        /**
+         * Initialize filter board
+         */
+        SacCourseFilter.initialize(<?= $this->id ?>,'<?= REQUEST_TOKEN ?>',FontAwesome);
+    });
 </script>
 
 <div class="filter-board" data-event-type="course">
@@ -43,16 +48,15 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/search_form_cou
     <br>
 
     <div id="organizers">
-        <?php $objOrganizers = \EventOrganizerModel::findAll(array('order' => 'sorting ASC')); ?>
-        <?php if($objOrganizers !== null): ?>
-            <a href="#" class="select-organizer-all">Alle</a>
-            <?php while ($objOrganizers->next()): ?>
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="ctrl_organizers custom-control-input" name="organizer" id="organizerCheck<?= $objOrganizers->id ?>" value="<?= $objOrganizers->id ?>" checked>
-              <label class="custom-control-label" for="organizerCheck<?= $objOrganizers->id ?>"><?= $objOrganizers->title ?></label>
-            </div>
-        <?php endwhile; ?>
-        <?php endif; ?>
+      <?php $objOrganizers = \EventOrganizerModel::findAll(array('order' => 'sorting ASC')); ?>
+      <?php if($objOrganizers !== null): ?>
+        <a href="#" class="reset-select-organizer">Filter aufheben</a>
+        <select data-placeholder="Organisierende Gruppe..." chosen style="width:100%" id="ctrl_organizers" multiple tabindex="3">
+      <?php while ($objOrganizers->next()): ?>
+        <option value="<?= $objOrganizers->id ?>" id="organizator-select-option-<?= $objOrganizers->id ?>"><?= $objOrganizers->title ?></option>
+      <?php endwhile; ?>
+      </select>
+      <?php endif; ?>
     </div>
     <br>
 

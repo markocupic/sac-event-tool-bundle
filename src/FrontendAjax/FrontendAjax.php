@@ -245,9 +245,12 @@ class FrontendAjax
                 // organizers
                 if ($filter === false)
                 {
-                    if (count(array_intersect($arrOrganizers, StringUtil::deserialize($objEvent->organizers, true))) < 1)
+                    if(count($arrOrganizers) > 0)
                     {
-                        $filter = true;
+                        if (count(array_intersect($arrOrganizers, StringUtil::deserialize($objEvent->organizers, true))) < 1)
+                        {
+                            $filter = true;
+                        }
                     }
                 }
 
