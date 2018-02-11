@@ -6,9 +6,13 @@
  * @link https://sac-kurse.kletterkader.com
  */
 
-//Provides methods for filtering the kursliste
-var SacCourseFilter = {
+//Provides methods for filtering the event list
+var EventFilter = {
 
+    /**
+     * Options
+     */
+    options: null,
 
     /**
      * globalEventId
@@ -17,25 +21,20 @@ var SacCourseFilter = {
     globalEventId: 0,
 
     /**
-     * time to wait before launching the xhr request, when making changes to the filter form
-     */
-    delay: 1000,
-
-    /**
-     * FilterBoard Id is used for the session storrage
-     */
-    filterBoardId: null,
-
-    /**
-     * Contao request token for ajax calls
-     */
-    requestToken: null,
-
-    /**
      * The FontAwesome object
      * https://fontawesome.com/how-to-use/font-awesome-api
      */
     objFontAwesome: null,
+
+    /**
+     * The eventlist
+     */
+    $eventList: 0,
+
+    /**
+     * The filter board
+     */
+    $filterBoard: null,
 
     /**
      * The year select
@@ -55,7 +54,7 @@ var SacCourseFilter = {
     /**
      * Course type level select
      */
-    $ctrlCourseTypeLevel1: null,
+    $ctrlEventType: null,
 
     /**
      * The date start input
@@ -83,7 +82,7 @@ var SacCourseFilter = {
             if (eventId === self.globalEventId) {
                 self.fireXHR();
             }
-        }, self.delay);
+        }, self.options.delay);
     },
 
     /**
@@ -109,11 +108,11 @@ var SacCourseFilter = {
         // Add loading icon
         $('.loading-icon-lg').remove();
         // See https://fontawesome.com/how-to-use/font-awesome-api#icon
-        var iconDefinition = self.objFontAwesome.findIconDefinition({prefix: 'fal', iconName: 'circle-notch'});
+        var iconDefinition = self.objFontAwesome.findIconDefinition({prefix: 'fal', iconName: self.options.loadingIcon.iconName});
         var icon = self.objFontAwesome.icon(iconDefinition, {
-            classes: ['fa-spin', 'fa-3x']
+            classes: self.options.loadingIcon.iconClasses
         }).html;
-        $('.mod_eventToolCalendarEventlist').append('<div class="loading-icon-lg"><div>' + icon + '</div></div>');
+        self.$eventList.first().append(self.options.loadingIcon.html.replace('%s', icon));
     },
 
     /**
@@ -169,9 +168,9 @@ var SacCourseFilter = {
         });
 
         // Kursart
-        var idKursart = self.$ctrlCourseTypeLevel1.val();
+        var eventTypeId = self.$ctrlEventType.val();
         // Save Input to sessionStorage
-        self.sessionStorageSet('ctrl_courseTypeLevel1', idKursart);
+        self.sessionStorageSet('ctrl_eventType', eventTypeId);
 
         // Sektionen
         var arrOrganizers = self.$ctrlOrganizers.val();
@@ -188,17 +187,18 @@ var SacCourseFilter = {
         // Save Input to sessionStorage
         self.sessionStorageSet('ctrl_search', strSearchterm);
 
+        // Get url from options
+        var url = self.options.xhr.action.split('?');
 
-        var url = 'ajax';
         var request = $.ajax({
             method: 'post',
-            url: url,
+            url: url[0],
             data: {
-                action: 'filterCourseList',
+                action: url[1],
                 year: self.getUrlParam('year'),
-                REQUEST_TOKEN: self.requestToken,
+                REQUEST_TOKEN: self.options.requestToken,
                 ids: JSON.stringify(arrIds),
-                courseType: idKursart,
+                eventType: eventTypeId,
                 organizers: JSON.stringify(arrOrganizers),
                 searchterm: strSearchterm,
                 startDate: intStartDate
@@ -218,14 +218,18 @@ var SacCourseFilter = {
                 });
                 if (itemsFound === 0 && $('.alert-no-results-found').length === 0) {
 
-                    $('.mod_eventToolCalendarEventlist').append('<div class="alert alert-primary alert-no-results-found text-lg" role="alert"><h5><i class="fal fa-meh" aria-hidden="true"></i> Leider wurden zu deiner Suchanfrage keine Events gefunden. &Uuml;berp&uuml;fe bitte die Filtereinstellungen.</h5></div>');
+                    self.$eventList.first().append(self.options.noResult.html);
                 }
+
+                $('html, body').animate({
+                    scrollTop: (self.$filterBoard.offset().top)
+                }, 500);
             }
         });
         request.fail(function (jqXHR) {
             self.hideLoadingIcon();
             window.console.log(jqXHR);
-            window.alert('Fehler: Die Anfrage konnte nicht bearbeitet werden! Überprüfen Sie die Internetverbindung.');
+            //window.alert('Fehler: Die Anfrage konnte nicht bearbeitet werden! Überprüfen Sie die Internetverbindung.');
         });
     },
     /**
@@ -253,7 +257,7 @@ var SacCourseFilter = {
 
         try {
             if (typeof sessionStorage !== 'undefined') {
-                var value = sessionStorage.getItem(key + '_' + self.filterBoardId);
+                var value = sessionStorage.getItem(key + '_' + self.options.filterBoardId);
                 if (value === '' || value === null || value === 'undefined') {
                     return null;
                 }
@@ -277,7 +281,7 @@ var SacCourseFilter = {
 
         try {
             if (typeof window.sessionStorage !== 'undefined') {
-                sessionStorage.setItem(key + '_' + self.filterBoardId, value);
+                sessionStorage.setItem(key + '_' + self.options.filterBoardId, value);
             }
         } catch (e) {
             window.console.log('Session Storage is disabled or not supported for this browser.');
@@ -287,58 +291,69 @@ var SacCourseFilter = {
 
 
     /**
-     * Initialize filter board
-     * @param filterBoardId
-     * @param requestToken
-     * @param FontAwesome
+     *
      */
-    initialize: function (filterBoardId, requestToken, FontAwesome) {
+    resetForm: function () {
+        "use strict";
+
+        var self = this;
+        self.sessionStorageSet('ctrl_organizers', JSON.stringify([]));
+        self.sessionStorageSet('ctrl_search', '');
+        self.sessionStorageSet('ctrl_eventType', 0);
+        self.sessionStorageSet('ctrl_eventYear', 0);
+        self.sessionStorageSet('ctrl_dateStart', '');
+
+        // Reload the page
+        var arrUrl = window.location.href.split("?");
+        window.location.href = arrUrl[0];
+    },
+
+
+    /**
+     * Initialize filter board
+     * @param eventList
+     * @param options
+     */
+    initialize: function (eventList, options) {
         "use strict";
         var self = this;
 
-        self.filterBoardId = filterBoardId;
-        self.requestToken = requestToken;
-        self.objFontAwesome = FontAwesome;
+        self.$eventList = eventList;
+        self.options = options;
 
+        self.objFontAwesome = options.objFontAwesome;
+        self.$filterBoard = $('#eventFilterBoard');
         self.$ctrlOrganizers = $('#ctrl_organizers');
         self.$ctrlSearch = $('#ctrl_search');
-        self.$ctrlCourseTypeLevel1 = $('#ctrl_courseTypeLevel1');
+        self.$ctrlEventType = $('#ctrl_eventType');
         self.$ctrlEventYear = $('#ctrl_eventYear');
         self.$ctrlDateStart = $('#ctrl_dateStart');
         self.$ctrlDateStartHidden = $('#ctrl_dateStartHidden');
 
-
-        // Check if the request token is set in the template
-        if (!self.requestToken) {
-            window.alert('Please set the request-token in the template');
-        }
-
-        // Check if the request token is set in the template
-        if (!self.filterBoardId) {
-            window.alert('Please set the filterBoardId in the template');
-        }
-
-
-        // Initialize select2 for the organizer select menu
-        // https://select2.org
-        self.$ctrlOrganizers.select2();
-        self.$ctrlOrganizers.on('select2:unselect', function () {
-            self.$ctrlOrganizers.select2('destroy').select2();
-        });
-
-        // Trigger on change event and update session storrage item
-        self.$ctrlOrganizers.on('change', function () {
-            self.sessionStorageSet('ctrl_organizers', JSON.stringify($(this).val()));
-            self.queueRequest();
-        });
-
         // Reset organizer filter and reset session storrage item
-        $('.reset-select-organizer').click(function (e) {
+        $('.reset-form').click(function (e) {
             e.preventDefault();
-            self.$ctrlOrganizers.val([]);
-            self.$ctrlOrganizers.trigger('change');
-            self.sessionStorageSet('ctrl_organizers', JSON.stringify([]));
-            self.queueRequest();
+            self.resetForm();
+        });
+
+        // hide filter board
+        $('.close-event-filter-button').click(function () {
+            self.$filterBoard.closest('.mod_article').addClass('d-none');
+            $('.toggle-filter-btn').removeClass('d-none');
+            $('.toggle-filter-btn').addClass('d-block');
+            $('html, body').animate({
+                scrollTop: (self.$filterBoard.offset().bottom)
+            }, 500);
+        });
+
+        // Show filter
+        $('.toggle-filter-btn').click(function () {
+            self.$filterBoard.closest('.mod_article').removeClass('d-none');
+            $('.toggle-filter-btn').addClass('d-none');
+            $('.toggle-filter-btn').removeClass('d-block');
+            $('html, body').animate({
+                scrollTop: (self.$filterBoard.offset().top)
+            }, 500);
         });
 
 
@@ -355,52 +370,79 @@ var SacCourseFilter = {
         }
 
 
-        // filter List if there are some values in the browser's sessionStorage
-        var blnFilterList = false;
+        // Initialize select2 for the organizer select menu
+        // https://select2.org
+        var select2Options = {
+            placeholder: "organisierende Gruppe"
+        };
+        self.$ctrlOrganizers.select2(select2Options);
+        // Close dropdown on deselect
+        self.$ctrlOrganizers.on('select2:unselect', function () {
+            window.setTimeout(function () {
+                self.$ctrlOrganizers.select2('close');
+            }, 100);
+        });
+
+
+        // Disable search field (important if using the plugin with mobile devices)
+        // https://select2.org/searching
+        self.$ctrlOrganizers.on('select2:opening select2:closing', function (event) {
+            var $searchfield = $(this).parent().find('.select2-search__field');
+            $searchfield.prop('disabled', true);
+        });
+
+
+        // Get from session storage
         if (self.sessionStorageGet('ctrl_search') !== null) {
             self.$ctrlSearch.val(self.sessionStorageGet('ctrl_search'));
-            blnFilterList = true;
         }
+
+        // Get from session storage
         var arrSektionen = JSON.parse(self.sessionStorageGet('ctrl_organizers'));
         if (arrSektionen !== null) {
             if (arrSektionen.length) {
                 self.$ctrlOrganizers.val(arrSektionen);
                 self.$ctrlOrganizers.trigger('change');
-                blnFilterList = true;
             }
         }
 
-        if (self.sessionStorageGet('ctrl_courseTypeLevel1') !== null) {
-            self.$ctrlCourseTypeLevel1.val(self.sessionStorageGet('ctrl_courseTypeLevel1'));
-            blnFilterList = true;
+        // Get from session storage
+        if (self.sessionStorageGet('ctrl_eventType') !== null) {
+            self.$ctrlEventType.val(self.sessionStorageGet('ctrl_eventType'));
         }
 
 
-        // Filter list, if there are some filter stored in the sessionStorage
-        if (blnFilterList) {
-            self.resetEventList();
-            self.queueRequest();
-        }
-
-
-        /** Trigger Filter **/
+        // Trigger on change event
         // Redirect to selected year
         self.$ctrlEventYear.on('change', function () {
             var arrUrl = window.location.href.split("?");
             window.location.href = arrUrl[0] + '?year=' + $(this).prop('value');
         });
 
-        self.$ctrlCourseTypeLevel1.on('change', function () {
+        // Trigger on change event
+        self.$ctrlEventType.on('change', function () {
             self.queueRequest();
         });
 
+        // Trigger on change event
+        self.$ctrlOrganizers.on('change', function () {
+            self.sessionStorageSet('ctrl_organizers', JSON.stringify($(this).val()));
+            self.queueRequest();
+        });
+
+        // Trigger on change event
         self.$ctrlSearch.on('keyup', function () {
             self.queueRequest();
         });
 
 
+        // Datepicker
         // List events starting from a certain date
-        var dateStart = self.$ctrlDateStart.val();
+        var dateStart = self.sessionStorageGet('ctrl_dateStart');
+        if (dateStart === null) {
+            dateStart = self.$ctrlDateStart.val();
+        }
+        self.$ctrlDateStart.val(dateStart);
         self.listEventsStartingFromDate(dateStart);
 
 
@@ -420,14 +462,15 @@ var SacCourseFilter = {
         $('.filter-board .input-group.date').datepicker(opt).on('changeDate', function () {
             var dateStart = self.$ctrlDateStart.val();
             self.listEventsStartingFromDate(dateStart);
+            self.sessionStorageSet('ctrl_dateStart', dateStart);
         });
 
 
         // Entferne die Suchoptionen im Select-Menu, wenn ohnehin keine Events dazu existieren
         var arrCourseType = [];
         $('.event-item').each(function () {
-            if ($(this).attr('data-courseTypeLevel1') !== '') {
-                var $arrCourseType = $(this).attr('data-courseTypeLevel1').split(',');
+            if ($(this).attr('data-event-type') !== '') {
+                var $arrCourseType = $(this).attr('data-event-type').split(',');
                 jQuery.each($arrCourseType, function (i, val) {
                     arrCourseType.push(val);
                 });
@@ -435,13 +478,18 @@ var SacCourseFilter = {
         });
 
         arrCourseType = jQuery.unique(arrCourseType);
-        self.$ctrlCourseTypeLevel1.find('option').each(function () {
+        self.$ctrlEventType.find('option').each(function () {
             if ($(this).attr('value') > 0) {
                 var id = $(this).attr('value');
                 if (jQuery.inArray(id, arrCourseType) < 0) {
-                    $(this).remove();
+                    $(this).prop('disabled', true);
                 }
             }
         });
+
+
+        // Finally reset and send request to apply settings found in the session storage
+        self.resetEventList();
+        self.queueRequest();
     }
 };

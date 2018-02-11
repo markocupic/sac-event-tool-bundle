@@ -44,7 +44,7 @@ class FrontendAjax
         $arrIDS = json_decode(Input::post('ids'));
         $arrOrganizers = json_decode(Input::post('organizers'));
         $strSearchterm = trim(Input::post('searchterm'));
-        $idTourType = Input::post('tourtype');
+        $eventTypeId = Input::post('eventType');
         $intStartDate = round(Input::post('startDate'));
 
         if ($intStartDate < 1)
@@ -75,19 +75,22 @@ class FrontendAjax
                 // tourtype (climbing, ski, via ferrata, etc) multiple=true
                 if ($filter === false)
                 {
-                    if ($idTourType > 0 && !in_array($idTourType, StringUtil::deserialize($objEvent->tourType, true)))
+                    if ($eventTypeId > 0 && !in_array($eventTypeId, StringUtil::deserialize($objEvent->tourType, true)))
                     {
                         $filter = true;
                     }
                 }
 
 
-                // ogs
+                // organizers
                 if ($filter === false)
                 {
-                    if (count(array_intersect($arrOrganizers, StringUtil::deserialize($objEvent->organizers, true))) < 1)
+                    if (count($arrOrganizers) > 0)
                     {
-                        $filter = true;
+                        if (count(array_intersect($arrOrganizers, StringUtil::deserialize($objEvent->organizers, true))) < 1)
+                        {
+                            $filter = true;
+                        }
                     }
                 }
 
@@ -203,7 +206,7 @@ class FrontendAjax
         $arrIDS = json_decode(Input::post('ids'));
         $arrOrganizers = json_decode(Input::post('organizers'));
         $strSearchterm = trim(Input::post('searchterm'));
-        $courseTypeId = Input::post('courseType');
+        $eventTypeId = Input::post('eventType');
         $intStartDate = round(Input::post('startDate'));
 
 
@@ -235,7 +238,7 @@ class FrontendAjax
                 // courseType
                 if ($filter === false)
                 {
-                    if ($courseTypeId > 0 && !in_array($courseTypeId, StringUtil::deserialize($objEvent->courseTypeLevel1, true)))
+                    if ($eventTypeId > 0 && !in_array($eventTypeId, StringUtil::deserialize($objEvent->courseTypeLevel1, true)))
                     {
                         $filter = true;
                     }
@@ -245,7 +248,7 @@ class FrontendAjax
                 // organizers
                 if ($filter === false)
                 {
-                    if(count($arrOrganizers) > 0)
+                    if (count($arrOrganizers) > 0)
                     {
                         if (count(array_intersect($arrOrganizers, StringUtil::deserialize($objEvent->organizers, true))) < 1)
                         {
