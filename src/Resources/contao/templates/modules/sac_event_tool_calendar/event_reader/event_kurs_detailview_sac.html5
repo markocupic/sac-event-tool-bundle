@@ -3,13 +3,13 @@
 
   <h1 class="ce_headline"><?= $this->title ?></h1>
 
-  <div class="row no-gutter">
-    <div class="col-lg-6 bg-light">
+  <div class="row">
+    <div class="col-lg-6">
       {{picture::<?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventImagePath($this->id) ?>?class=img-fluid&size=20&alt=<?= $this->title ?>}}
     </div>
 
-    <div class="col-lg-6 mt-3 mt-lg-0 bg-light"><!--start col left-->
-      <div class="p-3">
+    <div class="col-lg-6 mt-3 mt-lg-0"><!--start col left-->
+      <div class="">
 
           <?php if ($this->teaser != ''): ?>
             <div class="teaser event-detail font-weight-bold">
@@ -54,12 +54,12 @@
     </div><!--end col right-->
 
 
-    <div class="col-12">
+    <div class="col-12 mt-4">
       <hr>
     </div>
 
     <div class="col-md-6"><!--start col left-->
-      <div class="m-0 pr-md-3">
+      <div class="m-0">
           <?php if ($this->issues != ''): ?>
             <div class="topics event-detail event-info-box icon-box-small">
               <h3>Kursinhalte</h3>
@@ -100,8 +100,8 @@
     </div>
 
 
-    <div class="col-md-6 bg-light"><!--start col right-->
-      <div class="m-3">
+    <div class="col-md-6"><!--start col right-->
+      <div class="">
         <div class="instructor event-detail event-info-box icon-box-small">
           <h3>Kursleitung</h3>
           <div class="row tiny-gutter">
