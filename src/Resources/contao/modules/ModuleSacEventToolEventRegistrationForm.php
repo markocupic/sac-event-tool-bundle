@@ -234,7 +234,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
     protected function generateForm()
     {
 
-        $objForm = new Form('form-course-registration', 'POST', function ($objHaste) {
+        $objForm = new Form('form-event-registration', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
@@ -256,7 +256,8 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         $objForm->addFormField('notes', array(
             'label' => 'Anmerkungen/Erfahrungen/Referenztouren',
             'inputType' => 'textarea',
-            'eval' => array('mandatory' => true, 'rows' => 10)
+            'eval' => array('mandatory' => true, 'rows' => 4),
+            'class' => 'bla'
         ));
         $objForm->addFormField('agb', array(
             'label' => array('', 'Ich akzeptiere die <a href="#" data-toggle="modal" data-target="#agbModal">allg. Gesch&auml;ftsbedingungen.</a>'),
@@ -289,7 +290,6 @@ class ModuleSacEventToolEventRegistrationForm extends Module
 
         $objWidget = $objForm->getWidget('notes');
         $objWidget->addAttribute('placeholder', 'Bitte geben Sie in ein paar S&auml;tzen Ihr Leistungsniveau an oder machen Sie Angaben &uuml;ber bereits absolvierte Referenztouren.');
-
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate())
