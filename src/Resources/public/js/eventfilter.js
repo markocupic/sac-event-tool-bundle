@@ -108,7 +108,7 @@ var EventFilter = {
         // Add loading icon
         $('.loading-icon-lg').remove();
         // See https://fontawesome.com/how-to-use/font-awesome-api#icon
-        var iconDefinition = self.objFontAwesome.findIconDefinition({prefix: 'fal', iconName: self.options.loadingIcon.iconName});
+        var iconDefinition = self.objFontAwesome.findIconDefinition({prefix: self.options.loadingIcon.iconPrefix, iconName: self.options.loadingIcon.iconName});
         var icon = self.objFontAwesome.icon(iconDefinition, {
             classes: self.options.loadingIcon.iconClasses
         }).html;
@@ -167,12 +167,12 @@ var EventFilter = {
             arrIds.push($(this).attr('data-id'));
         });
 
-        // Kursart
+        // Event type
         var eventTypeId = self.$ctrlEventType.val();
         // Save Input to sessionStorage
         self.sessionStorageSet('ctrl_eventType', eventTypeId);
 
-        // Sektionen
+        // SAC OG's/organizers
         var arrOrganizers = self.$ctrlOrganizers.val();
         // Save Input to sessionStorage
         self.sessionStorageSet('ctrl_organizers', JSON.stringify(arrOrganizers));
@@ -182,7 +182,7 @@ var EventFilter = {
         var intStartDate = Math.round(dateStartHidden.val()) > 0 ? dateStartHidden.val() : 0;
         intStartDate = Math.round(intStartDate);
 
-        // Textsuche
+        // Text search
         var strSearchterm = self.$ctrlSearch.val();
         // Save Input to sessionStorage
         self.sessionStorageSet('ctrl_search', strSearchterm);
@@ -247,7 +247,7 @@ var EventFilter = {
     },
 
     /**
-     * Get session storrage value
+     * Get session storage value
      * @param key
      * @returns {null}
      */
@@ -270,7 +270,7 @@ var EventFilter = {
     },
 
     /**
-     * Set session storrage value
+     * Set session storage value
      * @param key
      * @param value
      * @returns {null}
@@ -291,7 +291,7 @@ var EventFilter = {
 
 
     /**
-     *
+     * Reset form
      */
     resetForm: function () {
         "use strict";
@@ -330,7 +330,7 @@ var EventFilter = {
         self.$ctrlDateStart = $('#ctrl_dateStart');
         self.$ctrlDateStartHidden = $('#ctrl_dateStartHidden');
 
-        // Reset organizer filter and reset session storrage item
+        // Reset organizer filter and reset session storage item
         $('.reset-form').click(function (e) {
             e.preventDefault();
             self.resetForm();
@@ -466,7 +466,7 @@ var EventFilter = {
         });
 
 
-        // Entferne die Suchoptionen im Select-Menu, wenn ohnehin keine Events dazu existieren
+        // Remove options from select if there are no such events
         var arrCourseType = [];
         $('.event-item').each(function () {
             if ($(this).attr('data-event-type') !== '') {
@@ -482,7 +482,9 @@ var EventFilter = {
             if ($(this).attr('value') > 0) {
                 var id = $(this).attr('value');
                 if (jQuery.inArray(id, arrCourseType) < 0) {
-                    $(this).prop('disabled', true);
+                    //$(this).prop('disabled', true);
+                    // Remove option from select
+                    $(this).remove();
                 }
             }
         });
