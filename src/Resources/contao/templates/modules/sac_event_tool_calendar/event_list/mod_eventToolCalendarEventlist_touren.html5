@@ -11,7 +11,10 @@
 <div class="button-bar">
   <ul>
     <li>
-      <button class="d-none d-lg-none btn btn-outline-success toggle-filter-btn" onclick=""><i class="fa fa-filter"></i> Filter öffnen</button>
+      <button class="btn btn-outline-success" data-toggle="modal" data-target="#tourDifficultiesModal"><i class="fal fa-question"></i> Schwierigkeitsgrade</button>
+    </li>
+    <li>
+      <button class="d-none d-lg-none btn btn-success toggle-filter-btn" onclick=""><i class="fal fa-filter"></i> Filter öffnen</button>
     </li>
   </ul>
 </div>

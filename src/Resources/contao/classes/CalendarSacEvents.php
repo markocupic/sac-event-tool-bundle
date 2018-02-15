@@ -310,7 +310,7 @@ class CalendarSacEvents extends System
      * @param $eventId
      * @return array
      */
-    public static function getTourTechDifficultiesAsArray($eventId)
+    public static function getTourTechDifficultiesAsArray($eventId, $tooltip = false)
     {
         $arrReturn = array();
         $objEventModel = CalendarEventsModel::findByPk($eventId);
@@ -324,7 +324,15 @@ class CalendarSacEvents extends System
                     $objModel = TourDifficultyModel::findByPk($id);
                     if ($objModel !== null)
                     {
-                        $arrReturn[] = $objModel->shortcut;
+                        if ($tooltip)
+                        {
+                            $html = '<span class="badge badge-pill badge-primary" data-toggle="tooltip" data-placement="top" title="Techn. Schwierigkeit: %s">%s</span>';
+                            $arrReturn[] = sprintf($html, $objModel->title, $objModel->shortcut);
+                        }
+                        else
+                        {
+                            $arrReturn[] = $objModel->shortcut;
+                        }
                     }
                 }
             }
@@ -337,7 +345,7 @@ class CalendarSacEvents extends System
      * @param string $field
      * @return array
      */
-    public static function getTourTypesAsArray($eventId, $field = 'shortcut')
+    public static function getTourTypesAsArray($eventId, $field = 'shortcut', $tooltip = false)
     {
         $arrReturn = array();
 
@@ -352,7 +360,15 @@ class CalendarSacEvents extends System
                     $objModel = TourTypeModel::findByPk($id);
                     if ($objModel !== null)
                     {
-                        $arrReturn[] = $objModel->{$field};
+                        if ($tooltip)
+                        {
+                            $html = '<span class="badge badge-pill badge-secondary" data-toggle="tooltip" data-placement="top" title="Typ: %s">%s</span>';
+                            $arrReturn[] = sprintf($html, $objModel->{'title'}, $objModel->{$field});
+                        }
+                        else
+                        {
+                            $arrReturn[] = $objModel->{$field};
+                        }
                     }
                 }
             }
@@ -368,7 +384,7 @@ class CalendarSacEvents extends System
      */
     public static function getBookingCounter($eventId)
     {
-        $strBadge = '<span class="badge badge-pill badge-%s" title="%s">%s</span>';
+        $strBadge = '<span class="badge badge-pill badge-%s" data-toggle="tooltip" data-placement="top" title="%s">%s</span>';
         $objDb = Database::getInstance();
         $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($eventId);
         if ($objEvent->numRows)
@@ -376,7 +392,7 @@ class CalendarSacEvents extends System
             $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
             $memberCount = $calendarEventsMember->numRows;
 
-            if($objEvent->eventCanceled)
+            if ($objEvent->eventCanceled)
             {
                 // Event canceled
                 return '';
@@ -394,13 +410,13 @@ class CalendarSacEvents extends System
                     if ($memberCount < $objEvent->maxMembers)
                     {
                         // Free places
-                        return sprintf($strBadge, 'success', 'noch freie Pl&auml;tze', $memberCount . '/' . $objEvent->maxMembers);
+                        return sprintf($strBadge, 'success', sprintf('noch %s freie Pl&auml;tze', $objEvent->maxMembers - $memberCount), $memberCount . '/' . $objEvent->maxMembers);
                     }
                 }
                 else
                 {
                     // There is no booking limit. Show registered members
-                    return sprintf($strBadge, 'success', $memberCount . 'Anmeldungen', $memberCount);
+                    return sprintf($strBadge, 'success', $memberCount . ' Anmeldungen', $memberCount);
                 }
             }
         }
@@ -422,7 +438,7 @@ class CalendarSacEvents extends System
             $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
             $memberCount = $calendarEventsMember->numRows;
 
-            if($objEvent->eventCanceled)
+            if ($objEvent->eventCanceled)
             {
                 return false;
             }

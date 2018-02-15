@@ -83,11 +83,12 @@ $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
 
 // Frontend Modules
 $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
-    'eventToolFrontendUserDashboard'    => 'Markocupic\SacEventToolBundle\ModuleSacEventToolMemberDashboard',
-    'eventToolEventRegistrationForm'    => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventRegistrationForm',
-    'eventToolCalendarEventStoryList'   => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryList',
-    'eventToolCalendarEventStoryReader' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryReader',
-    'eventToolCalendarEventlist'        => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventlist',
+    'eventToolFrontendUserDashboard'     => 'Markocupic\SacEventToolBundle\ModuleSacEventToolMemberDashboard',
+    'eventToolEventRegistrationForm'     => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventRegistrationForm',
+    'eventToolCalendarEventStoryList'    => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryList',
+    'eventToolCalendarEventStoryReader'  => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryReader',
+    'eventToolCalendarEventlist'         => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventlist',
+    'eventTourDifficultyExplanationList' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolTourDifficultyExplanationList',
 );
 
 // Content Elements
@@ -96,7 +97,7 @@ $GLOBALS['TL_CTE']['sac_calendar_newsletter'] = array(
 );
 $GLOBALS['TL_CTE']['sac_content_elements'] = array(
     'ce_user_portrait' => 'Markocupic\SacEventToolBundle\ContentUserPortrait',
-    'cabanneSacList' => 'Markocupic\SacEventToolBundle\CabanneSacList',
+    'cabanneSacList'   => 'Markocupic\SacEventToolBundle\CabanneSacList',
     'cabanneSacDetail' => 'Markocupic\SacEventToolBundle\CabanneSacDetail',
 );
 
@@ -192,7 +193,7 @@ $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic_sac_event_tool.con
 $GLOBALS['TL_HOOKS']['getAllEvents'][] = array('markocupic_sac_event_tool.contao_hooks.get_all_events', 'getAllEvents');
 
 /*** Prepare User accounts (create user directories, etc.
- *@deprecated PostLogin Hook will be be removed in Contao 5.0.
+ * @deprecated PostLogin Hook will be be removed in Contao 5.0.
  **/
 $GLOBALS['TL_HOOKS']['postLogin'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\PostLogin', 'prepareBeUserAccount');
 
