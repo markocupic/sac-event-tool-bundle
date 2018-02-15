@@ -33,6 +33,6 @@ $GLOBALS['TL_LANG']['FMD']['eventToolEventRegistrationForm'] = array('SAC Event 
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryList'] = array('SAC Tourenberichte Listen Modul');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryReader'] = array('SAC Tourenberichte Reader Modul');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventlist'] = array('SAC Touren- und Kurse-Auflistungs Modul');
-$GLOBALS['TL_LANG']['FMD']['eventTourDifficultyExplanationList'] = array('Schwierikeitsgrade Tabelle mit Erklärungen als Modalfenster');
+$GLOBALS['TL_LANG']['FMD']['eventTourDifficultyExplanationList'] = array('Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster');
 
 
