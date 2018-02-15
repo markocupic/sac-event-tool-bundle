@@ -41,8 +41,8 @@ class FrontendAjax
     public function filterTourList()
     {
         $visibleItems = array();
-        $arrIDS = json_decode(Input::post('ids'));
-        $arrOrganizers = json_decode(Input::post('organizers'));
+        $arrIDS = Input::post('ids') != '' ? json_decode(Input::post('ids')) : array();
+        $arrOrganizers = Input::post('organizers') != '' ? json_decode(Input::post('organizers')) : array();
         $strSearchterm = trim(Input::post('searchterm'));
         $eventTypeId = Input::post('eventType');
         $intStartDate = round(Input::post('startDate'));
@@ -85,7 +85,7 @@ class FrontendAjax
                 // organizers
                 if ($filter === false)
                 {
-                    if (count($arrOrganizers) > 0)
+                    if (is_array($arrOrganizers))
                     {
                         if (count(array_intersect($arrOrganizers, StringUtil::deserialize($objEvent->organizers, true))) < 1)
                         {
@@ -203,8 +203,8 @@ class FrontendAjax
     public function filterCourseList()
     {
         $visibleItems = array();
-        $arrIDS = json_decode(Input::post('ids'));
-        $arrOrganizers = json_decode(Input::post('organizers'));
+        $arrIDS = Input::post('ids') != '' ? json_decode(Input::post('ids')) : array();
+        $arrOrganizers = Input::post('organizers') != '' ? json_decode(Input::post('organizers')) : array();
         $strSearchterm = trim(Input::post('searchterm'));
         $eventTypeId = Input::post('eventType');
         $intStartDate = round(Input::post('startDate'));
@@ -248,7 +248,7 @@ class FrontendAjax
                 // organizers
                 if ($filter === false)
                 {
-                    if (count($arrOrganizers) > 0)
+                    if (is_array($arrOrganizers))
                     {
                         if (count(array_intersect($arrOrganizers, StringUtil::deserialize($objEvent->organizers, true))) < 1)
                         {
