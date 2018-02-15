@@ -386,7 +386,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = array(
     'search'    => true,
     'filter'    => true,
     'exclude'   => true,
-    'search'    => true,
     'inputType' => 'select',
     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'],
     'eval'      => array('tl_class' => 'clr m12', 'mandatory' => true),
@@ -643,7 +642,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = array(
     'eval'             => array('doNotCopy' => true, 'mandatory' => true, 'tl_class' => 'clr m12'),
     'sql'              => "int(10) unsigned NOT NULL default '0'",
 );
-if (!Input::get('act') || Input::get('act') === 'select')
+if (!Contao\Input::get('act') || Contao\Input::get('act') === 'select')
 {
     // Display the field correctly in the filter menu
     $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel']['options_callback'] = null;
