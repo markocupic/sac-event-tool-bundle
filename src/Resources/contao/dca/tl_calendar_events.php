@@ -194,16 +194,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['delete']['button
 
 // Fields
 
-// DoNotCopy Fields - Settings
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['author']['eval']['doNotCopy'] = false;
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startDate']['eval']['doNotCopy'] = false;
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['endDate']['eval']['doNotCopy'] = false;
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startTime']['eval']['doNotCopy'] = false;
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['endTime']['eval']['doNotCopy'] = false;
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel']['eval']['doNotCopy'] = false;
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod']['eval']['doNotCopy'] = true;
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate']['eval']['doNotCopy'] = true;
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate']['eval']['doNotCopy'] = true;
+
 
 
 // alias
@@ -518,7 +509,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod'] = ar
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['setRegistrationPeriod'],
     'exclude'   => true,
     'inputType' => 'checkbox',
-    'eval'      => array('doNotCopy' => false, 'submitOnChange' => true),
+    'eval'      => array('submitOnChange' => true),
     'sql'       => "char(1) NOT NULL default ''"
 );
 
@@ -528,7 +519,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = ar
     'default'   => time(),
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => false, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
+    'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
     'sql'       => "int(10) unsigned NULL"
 );
 
@@ -538,7 +529,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = arra
     'default'   => time(),
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => false, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
+    'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
     'sql'       => "int(10) unsigned NULL"
 );
 
@@ -755,5 +746,18 @@ foreach ($allowEdititingOnFirstReleaseLevelOnly as $field)
 {
     $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['allowEdititingOnFirstReleaseLevelOnly'] = true;
 }
+
+// DoNotCopy Fields - Settings
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['author']['eval']['doNotCopy'] = false;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startDate']['eval']['doNotCopy'] = false;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['endDate']['eval']['doNotCopy'] = false;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startTime']['eval']['doNotCopy'] = false;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['endTime']['eval']['doNotCopy'] = false;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel']['eval']['doNotCopy'] = false;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod']['eval']['doNotCopy'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate']['eval']['doNotCopy'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate']['eval']['doNotCopy'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventCanceled']['eval']['doNotCopy'] = true;
+
 
 
