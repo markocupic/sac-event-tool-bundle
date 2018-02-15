@@ -22,7 +22,7 @@
               <tr>
                 <td><?= $difficulty['shortcut'] ?></td>
                 <td><?= $difficulty['title'] ?></td>
-                <td><?= $difficulty['description'] ?></td>
+                <td><?= htmlspecialchars_decode($difficulty['description']) ?></td>
               </tr>
             <?php endforeach; ?>
         </table>
