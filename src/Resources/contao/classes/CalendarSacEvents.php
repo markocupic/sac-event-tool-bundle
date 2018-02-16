@@ -319,19 +319,52 @@ class CalendarSacEvents extends System
             $arrValues = StringUtil::deserialize($objEventModel->tourTechDifficulty, true);
             if (!empty($arrValues) && is_array($arrValues))
             {
-                foreach ($arrValues as $id)
+                $arrDiff = array();
+                foreach ($arrValues as $difficulty)
                 {
-                    $objModel = TourDifficultyModel::findByPk($id);
-                    if ($objModel !== null)
+                    $strDiff = '';
+                    $strDiffTitle = '';
+                    if (strlen($difficulty['tourTechDifficultyMin']) && strlen($difficulty['tourTechDifficultyMax']))
+                    {
+                        $objDiff = TourDifficultyModel::findByPk(intval($difficulty['tourTechDifficultyMin']));
+                        if ($objDiff !== null)
+                        {
+                            $strDiff = $objDiff->shortcut;
+                            $strDiffTitle = $objDiff->title;
+
+                        }
+                        $objDiff = TourDifficultyModel::findByPk(intval($difficulty['tourTechDifficultyMax']));
+                        if ($objDiff !== null)
+                        {
+                            $max = $objDiff->shortcut;
+                            $strDiff .= ' - ' . $max;
+                            $strDiffTitle .= ' - ' . $objDiff->title;
+                        }
+                    }
+                    elseif (strlen($difficulty['tourTechDifficultyMin']))
+                    {
+                        $objDiff = TourDifficultyModel::findByPk(intval($difficulty['tourTechDifficultyMin']));
+                        if ($objDiff !== null)
+                        {
+                            $strDiff = $objDiff->shortcut;
+                            $strDiffTitle = $objDiff->title;
+
+                        }
+                        $arrDiff[] = $strDiff;
+                    }
+
+
+
+                    if ($strDiff !== '')
                     {
                         if ($tooltip)
                         {
                             $html = '<span class="badge badge-pill badge-primary" data-toggle="tooltip" data-placement="top" title="Techn. Schwierigkeit: %s">%s</span>';
-                            $arrReturn[] = sprintf($html, $objModel->title, $objModel->shortcut);
+                            $arrReturn[] = sprintf($html, $strDiffTitle, $strDiff);
                         }
                         else
                         {
-                            $arrReturn[] = $objModel->shortcut;
+                            $arrReturn[] = $strDiff;
                         }
                     }
                 }

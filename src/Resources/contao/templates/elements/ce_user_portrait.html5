@@ -2,92 +2,92 @@
 
 <?php $this->block('content'); ?>
 
-<div class="row">
+  <div class="row">
     <div class="image_container portrait col-sm-4 col-lg-3">
-        {{image::<?= getAvatar($this->user['id'] , 'BE') ?>?mode=crop&width=160&height=200}}
+      {{image::<?= getAvatar($this->user['id'], 'BE') ?>?mode=crop&width=160&height=200}}
     </div>
 
     <div class="col-sm-8 col-lg-9">
-        <div class="ce_user_portrait_name font-weight-bold">
+      <div class="ce_user_portrait_name font-weight-bold">
 
-            <?= $this->user['name'] ?>
-        </div>
-        <div class="ce_user_portrait_qualification">
-            <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getMainQualifikation($this->user['id']) ?>
-        </div>
-        <div class="ce_user_portrait_street">
-            <?= $this->user['street'] ?>
-        </div>
-        <div class="ce_user_portrait_city">
-            <?= $this->user['postal'] ?> <?= $this->user['city'] ?>
-        </div>
-        <div class="ce_user_portrait_phone">
-            <?= $this->user['phone'] ?>
-        </div>
-        <div class="ce_user_portrait_email">
-            {{email::<?= $this->user['email'] ?>}}
-        </div>
+          <?= $this->user['name'] ?>
+      </div>
+      <div class="ce_user_portrait_qualification">
+          <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getMainQualifikation($this->user['id']) ?>
+      </div>
+      <div class="ce_user_portrait_street">
+          <?= $this->user['street'] ?>
+      </div>
+      <div class="ce_user_portrait_city">
+          <?= $this->user['postal'] ?> <?= $this->user['city'] ?>
+      </div>
+      <div class="ce_user_portrait_phone">
+          <?= $this->user['phone'] ?>
+      </div>
+      <div class="ce_user_portrait_email">
+        {{email::<?= $this->user['email'] ?>}}
+      </div>
     </div>
-</div>
-<br>
-<br>
+  </div>
+  <br>
+  <br>
 <?php $arrEvents = $this->events; ?>
-<?php if(!empty($arrEvents['tour']) && is_array($arrEvents['tour'])): ?>
-<h2>Die n&auml;chsten Touren mit <?= $this->user['name'] ?></h2>
-<table class="table">
+<?php if (!empty($arrEvents['tour']) && is_array($arrEvents['tour'])): ?>
+  <h2>Die n&auml;chsten Touren mit <?= $this->user['name'] ?></h2>
+  <table class="table">
     <tr>
-        <th>Datum</th>
-        <th>Dauer</th>
-        <th>Tour</th>
-        <th></th>
-        <th>Anf.</th>
-        <th>Art</th>
-        <th>Leitung</th>
+      <th>Datum</th>
+      <th>Dauer</th>
+      <th>Tour</th>
+      <th></th>
+      <th>Anf.</th>
+      <th>Art</th>
+      <th>Leitung</th>
 
     </tr>
-    <?php foreach($arrEvents['tour'] as $event): ?>
+      <?php foreach ($arrEvents['tour'] as $event): ?>
 
-        <?php $eventState = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($event['id']); ?>
-        <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][$eventState]; ?>
+          <?php $eventState = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($event['id']); ?>
+          <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][$eventState]; ?>
 
-        <?php $arrTourTypes = \StringUtil::deserialize($event['tourType'],true); ?>
+          <?php $arrTourTypes = \StringUtil::deserialize($event['tourType'], true); ?>
         <tr class="event-item-tour event" data-id="<?= $event['id'] ?>" data-tourType="<?= implode(',', $arrTourTypes) ?>">
-            <td>
-                <?= \Date::parse('d.m.Y', $event['startDate']) ?>
-            </td>
+          <td>
+              <?= \Date::parse('d.m.Y', $event['startDate']) ?>
+          </td>
 
-            <td>
-                <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($event['id']) ?>
-            </td>
+          <td>
+              <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($event['id']) ?>
+          </td>
 
-            <td>
-                <i class="fa-fw event-state-icon <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
-                <a href="{{event_url::<?php echo $event['id']; ?>}}">{{event_title::<?= $event['id'] ?>}}</a>
-            </td>
-            <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($event['id']) ?></td>
+          <td>
+            <i class="fa-fw event-state-icon <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
+            <a href="{{event_url::<?php echo $event['id']; ?>}}">{{event_title::<?= $event['id'] ?>}}</a>
+          </td>
+          <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($event['id']) ?></td>
 
-            <td class="tourTechDifficulty"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($event['id'])) ?></td>
-            <td class="tourType"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($event['id'], 'shortcut')) ?></td>
-            <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getMainInstructorName($event['id']) ?></td>
+          <td class="tourTechDifficulty"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($event['id'], true)) ?></td>
+          <td class="tourType"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($event['id'], 'shortcut', true)) ?></td>
+          <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getMainInstructorName($event['id']) ?></td>
         </tr>
-    <?php endforeach; ?>
-</table>
+      <?php endforeach; ?>
+  </table>
 <?php endif; ?>
 
-<?php if(!empty($arrEvents['course']) && is_array($arrEvents['course'])): ?>
-<h2>Die n&auml;chsten Kurse mit <?= $this->user['name'] ?></h2>
-<table class="table">
-    <?php foreach($arrEvents['course'] as $event): ?>
+<?php if (!empty($arrEvents['course']) && is_array($arrEvents['course'])): ?>
+  <h2>Die n&auml;chsten Kurse mit <?= $this->user['name'] ?></h2>
+  <table class="table">
+      <?php foreach ($arrEvents['course'] as $event): ?>
         <tr>
-            <td><?= \Date::parse('Y-m-d', $event['startDate']) ?></td>
-            <td>
-                <a href="{{event_url::<?= $event['id'] ?>}}" title="<?= $event['title'] ?>">
-                    <?= $event['title'] ?>
-                </a>
-            </td>
+          <td><?= \Date::parse('Y-m-d', $event['startDate']) ?></td>
+          <td>
+            <a href="{{event_url::<?= $event['id'] ?>}}" title="<?= $event['title'] ?>">
+                <?= $event['title'] ?>
+            </a>
+          </td>
         </tr>
-    <?php endforeach; ?>
-</table>
+      <?php endforeach; ?>
+  </table>
 <?php endif; ?>
 
 <?php $this->endblock(); ?>

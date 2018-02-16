@@ -19,7 +19,7 @@
   </td>
   <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($this->id) ?></td>
 
-  <td class="tourTechDifficulty"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($this->id, true)) ?></td>
+  <td class="tourTechDifficulty"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($this->id, true)) ?></td>
   <td class="tourType"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($this->id, 'shortcut', true)) ?></td>
   <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getMainInstructorName($this->id) ?></td>
 </tr>

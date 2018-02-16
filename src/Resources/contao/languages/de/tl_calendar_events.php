@@ -74,6 +74,8 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['registrationEndDate'] = array("Anmeld
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventReleaseLevel'] = array("Freigabestufe", "Definieren Sie hier die Freigabestufe.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourType'] = array("Touren-Typ:", "Definieren Sie hier den Tourentyp.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'] = array("Technische Schwierigkeiten:", "Definieren Sie hier die technischen Schwierigkeiten.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'] = array("Schwierigkeiten Minimum:", "Definieren Sie hier den minimalen technischen Schwierigkeitsgrad.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'] = array("Schwierigkeiten Maximum:", "Definieren Sie hier den maximalen technischen Schwierigkeitsgrad.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['altitudeDifference'] = array("H&ouml;henmeter im Aufstieg pro Tag", "Definieren Sie die maximalen H&ouml;henmeter im Aufstieg pro Tag.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourDetailText'] = array("Details zur Tour/Route", "Geben Sie hier weitere Details zur Tour an.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourHasExecutedLikePredicted'] = array("Tour wie ausgeschrieben durchgef&uuml;hrt", "Geben Sie an, ob der Event, wie im Jahresprogramm angek&uuml;ndigt durchgef&uuml;hrt werden konnte.");
@@ -82,6 +84,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourWeatherConditions'] = array("Anga
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourAvalancheConditions'] = array("Lawinensituation", "Geben Sie hier Angaben zur Lawinensituation ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourSpecialIncidents'] = array("Besondere Vorkommnisse", "Geben Sie hier Informationen zu besonderen Vorkommnissen ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['filledInEventReportForm'] = array("Event Rapport ausgef&uuml;llt", "Event Rapport wurde ausgef&uuml;llt.");
+
 
 
 

@@ -143,7 +143,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year
     'href'       => 'transformDates=+52weeks',
     'class'      => 'global_op_icon_class',
     'icon'       => 'bundles/markocupicsaceventtool/icons/calendar-plus.svg',
-    'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] . '\'))return false;Backend.getScrollOffset()" accesskey="e"'
+    'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
 );
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year'] = array
@@ -152,7 +152,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
     'href'       => 'transformDates=-52weeks',
     'class'      => 'global_op_icon_class',
     'icon'       => 'bundles/markocupicsaceventtool/icons/calendar-minus.svg',
-    'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] . '\'))return false;Backend.getScrollOffset()" accesskey="e"'
+    'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
 );
 
 // Operations
@@ -160,7 +160,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle'] = array
     'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events']['toggle'],
     'icon'            => 'visible.svg',
     'attributes'      => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-    'button_callback' => array('tl_calendar_events_sac_event_tool', 'toggleIcon')
+    'button_callback' => array('tl_calendar_events_sac_event_tool', 'toggleIcon'),
 );
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['typo3export'] = array(
@@ -172,29 +172,27 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['typo3export'] = 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = array(
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrations'],
     'href'  => 'table=tl_calendar_events_member',
-    'icon'  => 'bundles/markocupicsaceventtool/icons/group.png'
+    'icon'  => 'bundles/markocupicsaceventtool/icons/group.png',
 );
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelPrev'] = array(
     'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelPrev'],
     'href'            => 'action=releaseLevelPrev',
     'icon'            => 'bundles/markocupicsaceventtool/icons/arrow_down.png',
-    'button_callback' => array('tl_calendar_events_sac_event_tool', 'releaseLevelPrev')
+    'button_callback' => array('tl_calendar_events_sac_event_tool', 'releaseLevelPrev'),
 );
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelNext'] = array(
     'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelNext'],
     'href'            => 'action=releaseLevelNext',
     'icon'            => 'bundles/markocupicsaceventtool/icons/arrow_up.png',
-    'button_callback' => array('tl_calendar_events_sac_event_tool', 'releaseLevelNext')
+    'button_callback' => array('tl_calendar_events_sac_event_tool', 'releaseLevelNext'),
 );
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['delete']['button_callback'] = array('tl_calendar_events_sac_event_tool', 'deleteIcon');
 
 
 // Fields
-
-
 
 
 // alias
@@ -399,7 +397,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addMinAndMaxMembers'] = arra
     'filter'    => true,
     'inputType' => 'checkbox',
     'eval'      => array('submitOnChange' => true),
-    'sql'       => "char(1) NOT NULL default ''"
+    'sql'       => "char(1) NOT NULL default ''",
 );
 
 // minMembers
@@ -459,7 +457,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventCanceled'] = array(
     'exclude'   => true,
     'inputType' => 'checkbox',
     'eval'      => array('doNotCopy' => true),
-    'sql'       => "char(1) NOT NULL default ''"
+    'sql'       => "char(1) NOT NULL default ''",
 );
 
 // meetingPoint
@@ -488,7 +486,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration'] 
     'exclude'   => true,
     'inputType' => 'checkbox',
     'eval'      => array('doNotCopy' => false, 'submitOnChange' => false),
-    'sql'       => "char(1) NOT NULL default ''"
+    'sql'       => "char(1) NOT NULL default ''",
 );
 
 // registrationGoesTo
@@ -509,7 +507,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod'] = ar
     'exclude'   => true,
     'inputType' => 'checkbox',
     'eval'      => array('submitOnChange' => true),
-    'sql'       => "char(1) NOT NULL default ''"
+    'sql'       => "char(1) NOT NULL default ''",
 );
 
 // Set registration start date
@@ -519,7 +517,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = ar
     'exclude'   => true,
     'inputType' => 'text',
     'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
-    'sql'       => "int(10) unsigned NULL"
+    'sql'       => "int(10) unsigned NULL",
 );
 
 // Set registration end date
@@ -529,7 +527,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = arra
     'exclude'   => true,
     'inputType' => 'text',
     'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
-    'sql'       => "int(10) unsigned NULL"
+    'sql'       => "int(10) unsigned NULL",
 );
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['allowDeregistration'] = array(
@@ -539,7 +537,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['allowDeregistration'] = arra
     'filter'    => true,
     'inputType' => 'checkbox',
     'eval'      => array('submitOnChange' => true),
-    'sql'       => "char(1) NOT NULL default ''"
+    'sql'       => "char(1) NOT NULL default ''",
 );
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['deregistrationLimit'] = array(
@@ -559,7 +557,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addGallery'] = array(
     'filter'    => true,
     'inputType' => 'checkbox',
     'eval'      => array('submitOnChange' => true),
-    'sql'       => "char(1) NOT NULL default ''"
+    'sql'       => "char(1) NOT NULL default ''",
 );
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['multiSRC'] = array(
@@ -567,12 +565,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['multiSRC'] = array(
     'exclude'   => true,
     'inputType' => 'fileTree',
     'eval'      => array('multiple' => true, 'extensions' => 'jpg,jpeg,png', 'fieldType' => 'checkbox', 'orderField' => 'orderSRC', 'files' => true, 'filesOnly' => true, 'mandatory' => true),
-    'sql'       => "blob NULL"
+    'sql'       => "blob NULL",
 );
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['orderSRC'] = array(
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['orderSRC'],
-    'sql'   => "blob NULL"
+    'sql'   => "blob NULL",
 );
 
 // dashboard
@@ -580,7 +578,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['dashboard'] = array(
     'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events']['dashboard'],
     'input_field_callback' => array('tl_calendar_events_sac_event_tool', 'inputFieldCallbackEventDashboard'),
     'eval'                 => array('doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
-    'sql'                  => "varchar(255) NOT NULL default ''"
+    'sql'                  => "varchar(255) NOT NULL default ''",
 );
 
 // tour type
@@ -595,18 +593,51 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType'] = array(
     'sql'        => "blob NULL",
 );
 
-// tourRechDifficulty
+
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = array(
-    'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'],
-    'exclude'          => true,
-    'filter'           => true,
-    'inputType'        => 'select',
-    'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbTourDifficulties'),
-    'relation'         => array('type' => 'hasMany', 'load' => 'eager'),
-    'foreignKey'       => 'tl_tour_difficulty.shortcut',
-    'eval'             => array('multiple' => true, 'chosen' => true, 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr m12'),
-    'sql'              => "blob NULL",
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'],
+    'exclude'   => true,
+    'inputType' => 'multiColumnWizard',
+    'eval'      => array
+    (
+        'mandatory'    => true,
+        'columnFields' => array
+        (
+            'tourTechDifficultyMin' => array
+            (
+                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'],
+                'exclude'          => true,
+                'inputType'        => 'select',
+                'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+                'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbTourDifficulties'),
+                'relation'         => array('type' => 'hasMany', 'load' => 'eager'),
+                'foreignKey'       => 'tl_tour_difficulty.shortcut',
+                'eval'             => array
+                (
+                    'style'              => 'width:150px',
+                    'mandatory'          => true,
+                    'includeBlankOption' => true,
+                ),
+            ),
+            'tourTechDifficultyMax' => array
+            (
+                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'],
+                'exclude'          => true,
+                'inputType'        => 'select',
+                'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+                'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbTourDifficulties'),
+                'relation'         => array('type' => 'hasMany', 'load' => 'eager'),
+                'foreignKey'       => 'tl_tour_difficulty.shortcut',
+                'eval'             => array
+                (
+                    'style'              => 'width:150px',
+                    'mandatory'          => false,
+                    'includeBlankOption' => true,
+                ),
+            ),
+        ),
+    ),
+    'sql'       => "blob NULL",
 );
 
 // altitudeDifference
@@ -655,7 +686,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = 
     'label'   => &$GLOBALS['TL_LANG']['tl_calendar_events']['filledInEventReportForm'],
     'exclude' => false,
     'eval'    => array('doNotShow' => true, 'doNotCopy' => true),
-    'sql'     => "char(1) NOT NULL default ''"
+    'sql'     => "char(1) NOT NULL default ''",
 );
 
 // tourReportDashboard
@@ -675,7 +706,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = array(
     'foreignKey' => 'tl_calendar_events_journey.title',
     'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
     'eval'       => array('doNotCopy' => false, 'multiple' => false, 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr m12'),
-    'sql'        => "varchar(255) NOT NULL default ''"
+    'sql'        => "varchar(255) NOT NULL default ''",
 );
 
 // tourHasExecutedLikePredicted
@@ -685,7 +716,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourHasExecutedLikePredicted
     'filter'    => true,
     'inputType' => 'checkbox',
     'eval'      => array('doNotCopy' => true),
-    'sql'       => "char(1) NOT NULL default ''"
+    'sql'       => "char(1) NOT NULL default ''",
 );
 
 // tourSubstitutionText
@@ -739,7 +770,7 @@ $allowEdititingOnFirstReleaseLevelOnly = array(
     'repeatFixedDates',
     'durationInfo',
     'tourType',
-    'tourTechDifficulty'
+    'tourTechDifficulty',
 );
 foreach ($allowEdititingOnFirstReleaseLevelOnly as $field)
 {

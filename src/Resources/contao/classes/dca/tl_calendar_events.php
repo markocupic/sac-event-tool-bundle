@@ -372,8 +372,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         {
             return;
         }
-
-
+        
         if ($dc->id > 0)
         {
             if (\Input::get('call') === 'writeTourReport')
@@ -620,6 +619,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
             $value = \StringUtil::deserialize($row[$i]);
 
+
             // Decrypt the value
             if ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['encrypt'])
             {
@@ -638,6 +638,46 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         $arrDate[] = \Date::parse('D, d.m.Y', $arrTstamp['new_repeat']);
                     }
                     $row[$i] = implode('<br>', $arrDate);
+                }
+            }
+            elseif ($i === 'tourTechDifficulty')
+            {
+                // Special treatment for tourTechDifficulty
+                $arrDiff = array();
+                foreach ($value as $difficulty)
+                {
+                    $strDiff = '';
+                    if (strlen($difficulty['tourTechDifficultyMin']) && strlen($difficulty['tourTechDifficultyMax']))
+                    {
+                        $objDiff = $this->Database->prepare('SELECT * FROM tl_tour_difficulty WHERE id=?')->limit(1)->execute(intval($difficulty['tourTechDifficultyMin']));
+                        if ($objDiff->numRows)
+                        {
+                            $strDiff = $objDiff->shortcut;
+                        }
+                        $objDiff = $this->Database->prepare('SELECT * FROM tl_tour_difficulty WHERE id=?')->limit(1)->execute(intval($difficulty['tourTechDifficultyMax']));
+                        if ($objDiff->numRows)
+                        {
+                            $max = $objDiff->shortcut;
+                            $strDiff .= ' - ' . $max;
+                        }
+
+                        $arrDiff[] = $strDiff;
+
+                    }
+                    elseif (strlen($difficulty['tourTechDifficultyMin']))
+                    {
+                        $objDiff = $this->Database->prepare('SELECT * FROM tl_tour_difficulty WHERE id=?')->limit(1)->execute(intval($difficulty['tourTechDifficultyMin']));
+                        if ($objDiff->numRows)
+                        {
+                            $strDiff = $objDiff->shortcut;
+                        }
+                        $arrDiff[] = $strDiff;
+                    }
+                }
+
+                if (!empty($arrDiff))
+                {
+                    $row[$i] = implode(', ', $arrDiff);
                 }
             }
             elseif (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['foreignKey']))
@@ -744,26 +784,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             else
             {
                 $row[$i] = $value;
-            }
-
-
-            // Special treatment for tourTechDifficulty
-            if ($i === 'tourTechDifficulty')
-            {
-                $arrDiff = array();
-                foreach ($value as $difficulty)
-                {
-                    $objDiff = $this->Database->prepare('SELECT * FROM tl_tour_difficulty WHERE code=?')->limit(1)->execute($difficulty);
-                    if ($objDiff->numRows)
-                    {
-                        $arrDiff[] = $objDiff->shortcut;
-                    }
-                }
-
-                if (!empty($arrDiff))
-                {
-                    $row[$i] = implode(', ', $arrDiff);
-                }
             }
 
 
