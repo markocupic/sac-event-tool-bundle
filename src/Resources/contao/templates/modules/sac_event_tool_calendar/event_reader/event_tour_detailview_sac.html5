@@ -17,7 +17,7 @@
     <div class="row">
         <div class="col-12 col-xl-4">
             <div class="eventdate event-detail event-info-box icon-box-small">
-                <h3>Datum/Dauer</h3>
+                <h5>Datum/Dauer</h5>
                 <p>
                     <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($this->id) ?>
                     <br>
@@ -31,7 +31,7 @@
         <?php if($this->tourType != ''): ?>
         <div class="col-12 col-xl-4">
             <div class="location event-detail event-info-box icon-box-small">
-                <h3>Tourentyp</h3>
+                <h5>Tourentyp</h5>
                 <p><?= implode('<br>', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypeAsArray($this->tourType)) ?></p>
             </div>
         </div>
@@ -41,7 +41,7 @@
         <?php if(!empty($organizers)): ?>
         <div class="col-12 col-xl-4">
             <div class="organizers event-detail event-info-box icon-box-small">
-                <h3>Organisierende Gruppe</h3>
+                <h5>Organisierende Gruppe</h5>
                 <p>
                     <?= implode('<br>', $organizers) ?>
                 </p>
@@ -53,7 +53,7 @@
     <?php $arrInstructors = StringUtil::deserialize($this->instructor, true); ?>
     <?php if(!empty($organizers)): ?>
     <div class="instructor event-detail event-info-box icon-box-small">
-        <h3>Leitung</h3>
+        <h5>Leitung</h5>
         <div class="row mt-3 tiny-gutter">
             <?php foreach($arrInstructors as $userId): ?>
             <div class="col-6 col-sm-4 col-md-3 col-xl-2">
@@ -82,7 +82,7 @@
 
     <?php if($this->tourDetailText != ''): ?>
     <div class="tour-detail-text event-detail event-info-box icon-box-small">
-        <h3>Route/Details</h3>
+        <h5>Route/Details</h5>
         <p>
             <?= nl2br($this->tourDetailText) ?>
         </p>
@@ -91,7 +91,7 @@
 
 
     <div class="requirements event-detail event-info-box icon-box-small">
-        <h3>Voraussetzungen/Anforderungen</h3>
+        <h5>Voraussetzungen/Anforderungen</h5>
         <p class="tech-difficulty"><strong>Schwierigkeit: </strong><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($this->id)) ?></p>
         <?php if($this->requirements != ''): ?>
         <p class="requirements-text"><?= nl2br($this->requirements) ?></p>
@@ -105,7 +105,7 @@
 
     <?php if($this->leistungen != ''): ?>
     <div class="price event-detail event-info-box icon-box-small">
-        <h3>Leistungen/Preis</h3>
+        <h5>Leistungen/Preis</h5>
         <p>
             <?= nl2br($this->leistungen) ?>
         </p>
@@ -114,14 +114,14 @@
 
     <?php if ($this->journey != '' && \CalendarEventsJourneyModel::findByPk($this->journey) !== null): ?>
         <div class="journey event-detail event-info-box icon-box-small">
-            <h3>Anreise mit:</h3>
+            <h5>Anreise mit:</h5>
             <p><?= \CalendarEventsJourneyModel::findByPk($this->journey)->title ?></p>
         </div>
     <?php endif; ?>
 
     <?php if ($this->equipment != ''): ?>
     <div class="equipment event-detail event-info-box icon-box-small">
-        <h3>Ben&ouml;tigtes Material</h3>
+        <h5>Ben&ouml;tigtes Material</h5>
         <p><?= nl2br($this->equipment) ?></p>
     </div>
     <?php endif; ?>
@@ -129,14 +129,14 @@
 
     <?php if ($this->miscellaneous != ''): ?>
     <div class="miscellaneous event-detail event-info-box icon-box-small last">
-        <h3>Sonstiges</h3>
+        <h5>Sonstiges</h5>
         <p><?= nl2br($this->miscellaneous) ?></p>
     </div>
     <?php endif; ?>
 
     <?php if ($this->meetingPoint != ''): ?>
     <div class="meeting-point event-detail event-info-box icon-box-small">
-        <h3>Zeit und Treffpunkt</h3>
+        <h5>Zeit und Treffpunkt</h5>
         <p><?= nl2br($this->meetingPoint) ?></p>
     </div>
     <?php endif; ?>
@@ -144,14 +144,14 @@
 
     <?php if ($this->setRegistrationPeriod): ?>
     <div class="booking-text event-detail event-info-box icon-box-small">
-        <h3>Anmeldung möglich</h3>
+        <h5>Anmeldung möglich</h5>
         <p>Vom <?= \Date::parse('d.m.Y', $this->registrationStartDate) ?> bis zum <?= \Date::parse('d.m.Y', $this->registrationEndDate) ?></p>
     </div>
     <?php endif; ?>
 
     <?php if ($this->bookingEvent != ''): ?>
     <div class="booking-text event-detail event-info-box icon-box-small">
-        <h3>Anmeldung</h3>
+        <h5>Anmeldung</h5>
         <p><?= nl2br($this->bookingEvent) ?></p>
     </div>
     <?php endif; ?>

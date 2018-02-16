@@ -155,11 +155,11 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         }
         elseif (!FE_USER_LOGGED_IN)
         {
-            Message::addInfo('Bitte melden Sie sich mit Ihrem Benutzerkonto an, um sich f&uuml;r den Event anzumelden.', TL_MODE);
+            Message::addInfo('Bitte melde dich mit deinem Benutzerkonto an, um dich f&uuml;r den Event anzumelden.', TL_MODE);
         }
         elseif (FE_USER_LOGGED_IN && true === CalendarEventsMemberModel::isRegistered($this->objUser->id, $this->objEvent->id))
         {
-            Message::addInfo('Sie haben sich bereits f&uuml;r diesen Event angemeldet.', TL_MODE);
+            Message::addInfo('Du hast dich bereits f&uuml;r diesen Event angemeldet.', TL_MODE);
         }
         elseif ($this->objEvent->setRegistrationPeriod && $this->objEvent->registrationStartDate > time())
         {
@@ -179,19 +179,19 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         }
         elseif ($this->objInstructor === null)
         {
-            Message::addError('Der Hauptleiter mit ID ' . $this->objEvent->mainInstructor . ' wurde nicht in der Datenbank gefunden. Bitte nehmen Sie pers&ouml;nlich Kontakt mit dem Leiter auf.', TL_MODE);
+            Message::addError('Der Hauptleiter mit ID ' . $this->objEvent->mainInstructor . ' wurde nicht in der Datenbank gefunden. Bitte nimm pers&ouml;nlich Kontakt mit dem Leiter auf.', TL_MODE);
         }
         elseif ($this->objInstructor->email == '' || !Validator::isEmail($this->objInstructor->email))
         {
-            Message::addError('Dem Hauptleiter mit ID ' . $this->objEvent->mainInstructor . ' ist keine g&uuml;ltige E-Mail zugewiesen. Bitte nehmen Sie pers&ouml;nlich mit dem Leiter Kontakt auf.', TL_MODE);
+            Message::addError('Dem Hauptleiter mit ID ' . $this->objEvent->mainInstructor . ' ist keine g&uuml;ltige E-Mail zugewiesen. Bitte nimm pers&ouml;nlich mit dem Leiter Kontakt auf.', TL_MODE);
         }
         elseif ($this->objUser->email == '' || !Validator::isEmail($this->objUser->email))
         {
-            Message::addError('Leider wurde f&uuml;r dieses Mitgliederkonto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschr&auml;nkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
+            Message::addError('Leider wurde f&uuml;r dieses Mitgliederkonto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschr&auml;nkt zur Verf&uuml;gung. Bitte hinterlege auf auf der Internetseite des Zentralverbands deine E-Mail-Adresse.');
         }
         elseif ($this->objNotification === null)
         {
-            Message::addError('Systemfehler: F&uuml;r das Modul ist keine Benachrichtigung (terminal42/notification_center) eingestellt worden. Bitte melden Sie sich bei der Gesch&auml;ftsstelle der Sektion.', TL_MODE);
+            Message::addError('Systemfehler: F&uuml;r das Modul ist keine Benachrichtigung (terminal42/notification_center) eingestellt worden. Bitte melde den Fehler bei der Gesch&auml;ftsstelle der Sektion.', TL_MODE);
         }
 
         // Add messages to the template
@@ -289,7 +289,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
 
 
         $objWidget = $objForm->getWidget('notes');
-        $objWidget->addAttribute('placeholder', 'Bitte geben Sie in ein paar S&auml;tzen Ihr Leistungsniveau an oder machen Sie Angaben &uuml;ber bereits absolvierte Referenztouren.');
+        $objWidget->addAttribute('placeholder', 'Bitte beschreibe in wenigen S&auml;tzen dein Leistungsniveau oder mache Angaben &uuml;ber bereits absolvierte Referenztouren.');
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate())

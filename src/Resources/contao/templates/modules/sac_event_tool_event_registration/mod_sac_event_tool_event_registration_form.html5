@@ -37,8 +37,7 @@
       <div class="col-md-6">
           <?php if ($this->eventFullyBooked): ?>
             <div class="alert alert-info" role="alert">
-              Die maximale Teilnehmerzahl für diesen Event ist bereits erreicht. Wenn Sie sich jetzt noch anmelden,
-              gelangen Sie auf die Warteliste.
+              Die maximale Teilnehmerzahl für diesen Event ist bereits erreicht. Wenn du dich anmeldest, gelangst du auf die Warteliste.
             </div>
           <?php endif; ?>
 
