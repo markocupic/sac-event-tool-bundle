@@ -497,8 +497,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationGoesTo'] = array
     'inputType'  => 'select',
     'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
     'foreignKey' => 'tl_user.name',
-    'eval'       => array('multiple' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'),
-    'sql'        => "blob NULL",
+    'eval'       => array('multiple' => false, 'chosen' => false, 'includeBlankOption' => true, 'tl_class' => 'clr'),
+    'sql'        => "int(10) unsigned NOT NULL default '0'",
 );
 
 // Set registration period

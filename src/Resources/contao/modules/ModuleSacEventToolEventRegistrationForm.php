@@ -11,27 +11,27 @@
 namespace Markocupic\SacEventToolBundle;
 
 
-use Contao\CalendarEventsMemberModel;
-use Contao\Validator;
-use Patchwork\Utf8;
-use Contao\System;
-use Contao\Module;
 use Contao\BackendTemplate;
-use Contao\Input;
-use Contao\UserModel;
-use Contao\MemberModel;
-use Contao\Date;
-use Contao\Database;
-use Contao\Controller;
-use Contao\FrontendUser;
+use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
-use Contao\Events;
-use Contao\PageModel;
-use Contao\Environment;
-use Contao\Message;
 use Contao\Config;
-use NotificationCenter\Model\Notification;
+use Contao\Controller;
+use Contao\Database;
+use Contao\Date;
+use Contao\Environment;
+use Contao\Events;
+use Contao\FrontendUser;
+use Contao\Input;
+use Contao\MemberModel;
+use Contao\Message;
+use Contao\Module;
+use Contao\PageModel;
+use Contao\System;
+use Contao\UserModel;
+use Contao\Validator;
 use Haste\Form\Form;
+use NotificationCenter\Model\Notification;
+use Patchwork\Utf8;
 
 /**
  * Class ModuleSacEventToolEventRegistrationForm
@@ -222,9 +222,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             {
                 $this->Template->eventFullyBooked = true;
             }
-
         }
-
     }
 
 
@@ -242,33 +240,33 @@ class ModuleSacEventToolEventRegistrationForm extends Module
 
         // Now let's add form fields:
         $objForm->addFormField('emergencyPhone', array(
-            'label' => 'Notfalltelefonnummer/In Notf&auml;llen zu kontaktieren',
+            'label'     => 'Notfalltelefonnummer/In Notf&auml;llen zu kontaktieren',
             'inputType' => 'text',
-            'default' => $this->User->emergencyPhone,
-            'eval' => array('mandatory' => true, 'rgxp' => 'phone')
+            'default'   => $this->User->emergencyPhone,
+            'eval'      => array('mandatory' => true, 'rgxp' => 'phone'),
         ));
         $objForm->addFormField('emergencyPhoneName', array(
-            'label' => 'Name der angeh&ouml;rigen Person, welche im Notfall zu kontaktieren ist',
+            'label'     => 'Name der angeh&ouml;rigen Person, welche im Notfall zu kontaktieren ist',
             'inputType' => 'text',
-            'default' => $this->User->emergencyPhoneName,
-            'eval' => array('mandatory' => true)
+            'default'   => $this->User->emergencyPhoneName,
+            'eval'      => array('mandatory' => true),
         ));
         $objForm->addFormField('notes', array(
-            'label' => 'Anmerkungen/Erfahrungen/Referenztouren',
+            'label'     => 'Anmerkungen/Erfahrungen/Referenztouren',
             'inputType' => 'textarea',
-            'eval' => array('mandatory' => true, 'rows' => 4),
-            'class' => 'bla'
+            'eval'      => array('mandatory' => true, 'rows' => 4),
+            'class'     => 'bla',
         ));
         $objForm->addFormField('agb', array(
-            'label' => array('', 'Ich akzeptiere die <a href="#" data-toggle="modal" data-target="#agbModal">allg. Gesch&auml;ftsbedingungen.</a>'),
+            'label'     => array('', 'Ich akzeptiere die <a href="#" data-toggle="modal" data-target="#agbModal">allg. Gesch&auml;ftsbedingungen.</a>'),
             'inputType' => 'checkbox',
-            'eval' => array('mandatory' => true)
+            'eval'      => array('mandatory' => true),
         ));
 
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
-            'label' => 'F&uuml;r Event anmelden',
-            'inputType' => 'submit'
+            'label'     => 'F&uuml;r Event anmelden',
+            'inputType' => 'submit',
         ));
 
         // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields.
@@ -351,20 +349,6 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                         $objMemberModel->save();
                     }
 
-
-                    $arrRegistrationGoesTo = \StringUtil::deserialize($this->objEvent->registrationGoesTo, true);
-                    $arrRegistrationGoesTo = array_map(function ($userId) {
-                        $objUser = UserModel::findByPk($userId);
-                        if ($objUser !== null)
-                        {
-                            if ($objUser->email != '')
-                            {
-                                return $objUser->email;
-                            }
-                        }
-                    }, $arrRegistrationGoesTo);
-                    $strRegistrationGoesTo = implode(',', $arrRegistrationGoesTo);
-
                     $objEventRegistration = new CalendarEventsMemberModel();
                     unset($arrData['id']);
                     $arrData = array_filter($arrData);
@@ -373,7 +357,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                     System::log(sprintf('New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").', $objMemberModel->firstname, $objMemberModel->lastname, $objMemberModel->id, $this->objEvent->id, $this->objEvent->title), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_SUBSCRIPTION'));
 
 
-                    $notified = $this->notifyMember($arrData, $objMemberModel, $strRegistrationGoesTo);
+                    $notified = $this->notifyMember($arrData, $objMemberModel, $this->objEvent);
 
                     if ($this->jumpTo)
                     {
@@ -397,31 +381,56 @@ class ModuleSacEventToolEventRegistrationForm extends Module
      * @param $objMember
      * @return bool
      */
-    protected function notifyMember($arrData, $objMember, $strRegistrationGoesTo = '')
+    protected function notifyMember($arrData, $objMember, $objEvent)
     {
         $hasError = false;
+
+        // Switch sender/recipient if the main instructor has delegated event registrations administration work to somebody else
+        $bypassRegistration = false;
+        if ($objEvent->registrationGoesTo)
+        {
+            $strRegistrationGoesToName = '';
+            $strRegistrationGoesToEmail = '';
+            $userId = $objEvent->registrationGoesTo;
+
+            $objUser = UserModel::findByPk($userId);
+            if ($objUser !== null)
+            {
+                if ($objUser->email != '')
+                {
+                    $strRegistrationGoesToName = $objUser->name;
+                    $strRegistrationGoesToEmail = $objUser->email;
+                }
+            }
+
+            if ($strRegistrationGoesToEmail !== '' && $strRegistrationGoesToName !== '')
+            {
+                $bypassRegistration = true;
+            }
+        }
+
+
         // Use terminal42/notification_center
         if ($this->objNotification !== null)
         {
             $arrTokens = array(
-                'event_name' => html_entity_decode($this->objEvent->title),
-                'instructor_name' => html_entity_decode($this->objInstructor->name),
-                'instructor_email' => html_entity_decode($this->objInstructor->email),
-                'registration_goes_to' => $strRegistrationGoesTo,
-                'participant_name' => html_entity_decode($objMember->firstname . ' ' . $objMember->lastname),
-                'participant_email' => $objMember->email != $arrData['email'] ? $arrData['email'] : $objMember->email,
-                'participant_emergency_phone' => $arrData['emergencyPhone'],
+                'event_name'                       => html_entity_decode($this->objEvent->title),
+                'instructor_name'                  => $bypassRegistration ? html_entity_decode($strRegistrationGoesToName) : html_entity_decode($this->objInstructor->name),
+                'instructor_email'                 => $bypassRegistration ? html_entity_decode($strRegistrationGoesToEmail) : html_entity_decode($this->objInstructor->email),
+                'participant_name'                 => html_entity_decode($objMember->firstname . ' ' . $objMember->lastname),
+                'participant_email'                => $objMember->email != $arrData['email'] ? $arrData['email'] : $objMember->email,
+                'participant_emergency_phone'      => $arrData['emergencyPhone'],
                 'participant_emergency_phone_name' => html_entity_decode($arrData['emergencyPhoneName']),
-                'participant_street' => html_entity_decode($objMember->street),
-                'participant_postal' => $objMember->postal,
-                'participant_city' => html_entity_decode($objMember->city),
-                'participant_contao_member_id' => $objMember->id,
-                'participant_sac_member_id' => $objMember->sacMemberId,
-                'participant_phone' => $arrData['phone'],
-                'participant_date_of_birth' => $arrData['dateOfBirth'],
-                'participant_vegetarian' => $arrData['vegetarian'] == 'true' ? 'Ja' : 'Nein',
-                'participant_notes' => html_entity_decode($arrData['notes']),
-                'event_link_detail' => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($this->objEvent),
+                'participant_street'               => html_entity_decode($objMember->street),
+                'participant_postal'               => $objMember->postal,
+                'participant_city'                 => html_entity_decode($objMember->city),
+                'participant_contao_member_id'     => $objMember->id,
+                'participant_sac_member_id'        => $objMember->sacMemberId,
+                'participant_phone'                => $arrData['phone'],
+                'participant_date_of_birth'        => $arrData['dateOfBirth'] > 0 ? Date::parse('d.m.Y', $arrData['dateOfBirth']) : '---',
+                'participant_vegetarian'           => $arrData['vegetarian'] == 'true' ? 'Ja' : 'Nein',
+                'participant_notes'                => html_entity_decode($arrData['notes']),
+                'event_link_detail'                => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($this->objEvent),
             );
 
 
