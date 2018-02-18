@@ -80,11 +80,18 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = array
                 'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"'
             ),
-            'generateInvoice' => array
+            'generateInvoicePdf' => array
             (
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoice'],
-                'href'       => 'action=generateInvoice',
-                'icon'       => 'bundles/markocupicsaceventtool/icons/pdf.svg',
+                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoicePdf'],
+                'href'       => 'action=generateInvoicePdf',
+                'icon'       => 'bundles/markocupicsaceventtool/icons/pdf.png',
+                'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['generateInvoice'] . '\')) return false; Backend.getScrollOffset();"'
+            ),
+            'generateInvoiceDocx' => array
+            (
+                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoiceDocx'],
+                'href'       => 'action=generateInvoiceDocx',
+                'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['generateInvoice'] . '\')) return false; Backend.getScrollOffset();"'
             )
         )

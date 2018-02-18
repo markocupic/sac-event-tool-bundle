@@ -14,7 +14,8 @@ $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['new'] = array("Neu
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['edit'] = array("Verg&uuml;tungsformular bearbeiten", "Verg&uuml;tungsformular mit ID %s bearbeiten.");
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['delete'] = array("Verg&uuml;tungsformular l&ouml;schen", "Verg&uuml;tungsformular mit ID %s l&ouml;schen.");
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['copy'] = array("Verg&uuml;tungsformular kopieren", "Verg&uuml;tungsformular mit ID %s kopieren.");
-$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoice'] = array("Verg&uuml;tungsformular drucken", "Verg&uuml;tungsformular mit ID %s ausdrucken.");
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoicePdf'] = array("Verg&uuml;tungsformular drucken", "Verg&uuml;tungsformular mit ID %s ausdrucken.");
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoiceDocx'] = array("Verg&uuml;tungsformular drucken", "Verg&uuml;tungsformular mit ID %s ausdrucken.");
 
 
 // Legends

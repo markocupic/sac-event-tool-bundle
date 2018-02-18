@@ -73,12 +73,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ),
-            'downloadRegistrationList' => array
+            'downloadEventMemberList' => array
             (
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['downloadRegistrationList'],
-                'href'       => 'act=downloadRegistrationList',
+                'label'      => &$GLOBALS['TL_LANG']['MSC']['downloadEventMemberList'],
+                'href'       => 'act=downloadEventMemberList',
                 'class'      => 'download_registration_list',
-                'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',
+                'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ),
             'sendEmail'                => array

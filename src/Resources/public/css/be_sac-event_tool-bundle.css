@@ -106,7 +106,8 @@ div.legend-box li {
     min-height: 37px;
 }
 .tl_content_right .invoice img,
-.tl_content_right .generateInvoice img
+.tl_content_right .generateInvoicePdf img,
+.tl_content_right .generateInvoiceDocx img
 {
     width: 16px !important;
     height:auto !important;

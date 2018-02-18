@@ -27,7 +27,7 @@ $GLOBALS['TL_LANG']['MSC']['courseLevel'][4] = 'Tourenleiter Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][5] = 'Tourenleiter Fortbildungskurs';
 
 // Buttons
-$GLOBALS['TL_LANG']['MSC']['downloadRegistrationList'] = 'Teilnehmerliste downloaden';
+$GLOBALS['TL_LANG']['MSC']['downloadEventMemberList'] = 'Teilnehmerliste downloaden';
 $GLOBALS['TL_LANG']['MSC']['sendEmail'] = 'E-Mail senden';
 $GLOBALS['TL_LANG']['MSC']['plus1year'] = '+1 Jahr';
 $GLOBALS['TL_LANG']['MSC']['minus1year'] = '-1 Jahr';

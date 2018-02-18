@@ -114,7 +114,7 @@ class tl_calendar_events_member extends Backend
                     {
                         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCreatable'];
                         unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['all']);
-                        unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['downloadRegistrationList']);
+                        unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['downloadEventMemberList']);
                         unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail']);
                         unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['operations']['edit']);
                         unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['operations']['delete']);
@@ -156,17 +156,11 @@ class tl_calendar_events_member extends Backend
         }
 
 
-        // Download the registration list as a csv spreadsheet
-        if (Input::get('act') === 'downloadRegistrationList')
+        // Download the registration list as a docx file
+        if (Input::get('act') === 'downloadEventMemberList')
         {
-            $opt = array();
-            $opt['arrSelectedFields'] = array('stateOfSubscription', 'hasParticipated', 'addedOn', 'eventName', 'firstname', 'lastname', 'sacMemberId', 'gender', 'street', 'postal', 'city', 'phone', 'emergencyPhone', 'emergencyPhoneName', 'email', 'dateOfBirth', 'vegetarian');
-            $opt['useLabelForHeadline'] = 'de';
-            $opt['exportType'] = 'csv';
-            $opt['arrFilter'][] = array('pid=?', Input::get('id'));
-            $opt['strDestinationCharset'] = 'windows-1252';
-            $GLOBALS['TL_HOOKS']['exportTable'][] = array('Markocupic\SacEventToolBundle\CalendarSacEvents', 'exportRegistrationListHook');
-            ExportTable::exportTable('tl_calendar_events_member', $opt);
+            $objMemberList = new Markocupic\SacEventToolBundle\EventRapport();
+            $objMemberList->generateMemberList(Input::get('id'), 'docx');
             exit;
         }
 
