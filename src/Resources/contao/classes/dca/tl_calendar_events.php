@@ -372,7 +372,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         {
             return;
         }
-        
+
         if ($dc->id > 0)
         {
             if (\Input::get('call') === 'writeTourReport')
@@ -640,6 +640,29 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     $row[$i] = implode('<br>', $arrDate);
                 }
             }
+            elseif ($i === 'tourProfile')
+            {
+                // Special treatment for tourProfile
+                $arrProfile = array();
+                $m = 0;
+                foreach ($value as $profile)
+                {
+                    $m++;
+                    if (count($value) > 1)
+                    {
+                        $pattern = $m . '. Tag &nbsp;&nbsp;&nbsp; Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                    }
+                    else
+                    {
+                        $pattern = 'Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                    }
+                    $arrProfile[] = sprintf($pattern, $profile['tourProfileAscentMeters'], $profile['tourProfileAscentTime'], $profile['tourProfileDescentMeters'], $profile['tourProfileDescentTime']);
+                }
+                if (!empty($arrProfile))
+                {
+                    $row[$i] = implode('<br>', $arrProfile);
+                }
+            }
             elseif ($i === 'tourTechDifficulty')
             {
                 // Special treatment for tourTechDifficulty
@@ -795,6 +818,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             }
             else
             {
+                echo $i . ' ';
                 $label = is_array($GLOBALS['TL_LANG']['MSC'][$i]) ? $GLOBALS['TL_LANG']['MSC'][$i][0] : $GLOBALS['TL_LANG']['MSC'][$i];
                 $help = is_array($GLOBALS['TL_LANG']['MSC'][$i]) ? $GLOBALS['TL_LANG']['MSC'][$i][1] : $GLOBALS['TL_LANG']['MSC'][$i];
             }

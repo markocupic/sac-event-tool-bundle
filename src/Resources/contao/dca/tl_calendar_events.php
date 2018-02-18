@@ -76,7 +76,7 @@ PaletteManipulator::create()
     ->addField(array('courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('repeatFixedDates', 'durationInfo', 'eventCanceled'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('location', 'journey', 'tourDetailText', 'altitudeDifference', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('terms', 'issues'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
@@ -96,7 +96,7 @@ PaletteManipulator::create()
     ->addField(array('title', 'alias', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('repeatFixedDates', 'durationInfo', 'eventCanceled'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('location', 'journey', 'tourDetailText', 'altitudeDifference', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
@@ -640,14 +640,65 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = array
     'sql'       => "blob NULL",
 );
 
-// altitudeDifference
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['altitudeDifference'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['altitudeDifference'],
+
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfile'],
     'exclude'   => true,
-    'filter'    => true,
-    'inputType' => 'text',
-    'eval'      => array('mandatory' => false, 'tl_class' => 'clr m12', 'rgxp' => 'natural', 'maxlength' => 4),
-    'sql'       => "int(10) unsigned NULL",
+    'inputType' => 'multiColumnWizard',
+    'eval'      => array
+    (
+        'mandatory'    => false,
+        'columnFields' => array
+        (
+            'tourProfileAscentMeters' => array
+            (
+                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'],
+                'inputType'        => 'text',
+                'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+                'eval'             => array
+                (
+                    'rgxp' => 'natural',
+                    'style'              => 'width:150px',
+                    'mandatory'          => false,
+                ),
+            ),
+            'tourProfileAscentTime' => array
+            (
+                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'],
+                'inputType'        => 'text',
+                'eval'             => array
+                (
+                    'rgxp' => 'numeric',
+                    'style'              => 'width:150px',
+                    'mandatory'          => false,
+                ),
+            ),
+            'tourProfileDescentMeters' => array
+            (
+                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'],
+                'inputType'        => 'text',
+                'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+                'eval'             => array
+                (
+                    'rgxp' => 'natural',
+                    'style'              => 'width:150px',
+                    'mandatory'          => false,
+                ),
+            ),
+            'tourProfileDescentTime' => array
+            (
+                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'],
+                'inputType'        => 'text',
+                'eval'             => array
+                (
+                    'rgxp' => 'numeric',
+                    'style'              => 'width:150px',
+                    'mandatory'          => false,
+                ),
+            ),
+        ),
+    ),
+    'sql'       => "blob NULL",
 );
 
 // requirements

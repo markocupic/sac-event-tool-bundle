@@ -354,7 +354,6 @@ class CalendarSacEvents extends System
                     }
 
 
-
                     if ($strDiff !== '')
                     {
                         if ($tooltip)
@@ -602,6 +601,40 @@ class CalendarSacEvents extends System
         }
         return false;
     }
+
+    /**
+     * Get tour profile as array
+     * @param $eventId
+     * @return array
+     */
+    public function getTourProfileAsArray($eventId)
+    {
+        $arrProfile = array();
+        $objEventModel = CalendarEventsModel::findByPk($eventId);
+        if ($objEventModel !== null)
+        {
+            if (!empty($objEventModel->tourProfile) && is_array(deserialize($objEventModel->tourProfile)))
+            {
+                $m = 0;
+                $arrTourProfile = StringUtil::deserialize($objEventModel->tourProfile, true);
+                foreach ($arrTourProfile as $profile)
+                {
+                    $m++;
+                    if (count($arrTourProfile) > 1)
+                    {
+                        $pattern = $m . '. Tag &nbsp;&nbsp;&nbsp; Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                    }
+                    else
+                    {
+                        $pattern = 'Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                    }
+                    $arrProfile[] = sprintf($pattern, $profile['tourProfileAscentMeters'], $profile['tourProfileAscentTime'], $profile['tourProfileDescentMeters'], $profile['tourProfileDescentTime']);
+                }
+            }
+        }
+        return $arrProfile;
+    }
+
 
     /**
      * @param $field

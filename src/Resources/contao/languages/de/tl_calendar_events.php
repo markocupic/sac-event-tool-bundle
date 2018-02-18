@@ -76,7 +76,6 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourType'] = array("Touren-Typ:", "De
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'] = array("Technische Schwierigkeiten:", "Definieren Sie hier die technischen Schwierigkeiten.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'] = array("Schwierigkeiten Minimum:", "Definieren Sie hier den minimalen technischen Schwierigkeitsgrad.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'] = array("Schwierigkeiten Maximum:", "Definieren Sie hier den maximalen technischen Schwierigkeitsgrad.");
-$GLOBALS['TL_LANG']['tl_calendar_events']['altitudeDifference'] = array("H&ouml;henmeter im Aufstieg pro Tag", "Definieren Sie die maximalen H&ouml;henmeter im Aufstieg pro Tag.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourDetailText'] = array("Details zur Tour/Route", "Geben Sie hier weitere Details zur Tour an.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourHasExecutedLikePredicted'] = array("Tour wie ausgeschrieben durchgef&uuml;hrt", "Geben Sie an, ob der Event, wie im Jahresprogramm angek&uuml;ndigt durchgef&uuml;hrt werden konnte.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourSubstitutionText'] = array("Ersatz-/Ausweichtour, falls die Tour nicht wie ausgeschrieben durchgef&uuml;hrt wurde", "Geben Sie, falls n&ouml;tig Informationen zur Ersatz-/Ausweichtour an.");
@@ -84,6 +83,11 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourWeatherConditions'] = array("Anga
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourAvalancheConditions'] = array("Lawinensituation", "Geben Sie hier Angaben zur Lawinensituation ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourSpecialIncidents'] = array("Besondere Vorkommnisse", "Geben Sie hier Informationen zu besonderen Vorkommnissen ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['filledInEventReportForm'] = array("Event Rapport ausgef&uuml;llt", "Event Rapport wurde ausgef&uuml;llt.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfile'] = array("H&ouml;henunterschied und Zeitbedarf pro Tag", "Machen Sie hier zu jedem Tag Angaben zum Profil der Tour.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'] = array("H&ouml;henunterschied im Aufstieg", "Machen Sie hier Angaben zum H&ouml;henunterschied im Aufstieg.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'] = array("Zeitbedarf im Aufstieg in h", "Machen Sie hier Angaben zum Zeitbedarf im Aufstieg.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'] = array("H&ouml;henunterschied im Abstieg", "Machen Sie hier Angaben zum H&ouml;henunterschied im Abstieg.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = array("Zeitbedarf im Abstieg in h", "Machen Sie hier Angaben zum Zeitbedarf im Abstieg.");
 
 
 
