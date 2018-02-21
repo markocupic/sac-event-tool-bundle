@@ -106,12 +106,47 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year']);
         }
 
+        /** @var Migration Code
+        $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events')->execute();
+        while ($objEvent->next())
+        {
+            $arrOrder = \Contao\StringUtil::deserialize($objEvent->orderInstructor, true);
+            $arrInst = \Contao\StringUtil::deserialize($objEvent->instructor_old, true);
+            $new = [];
+            foreach ($arrOrder as $id)
+            {
+                if (in_array($id, $arrInst))
+                {
+                    $new[] = $id;
+                }
+            }
+            foreach ($arrInst as $id)
+            {
+                if (!in_array($id, $arrOrder))
+                {
+                    $new[] = $id;
+                }
+            }
+
+            $set = array();
+            $set['instructor'] = array();
+            if(!empty($new))
+            {
+                foreach ($new as $id)
+                {
+                    $set['instructor'][] = array('instructorId' => $id);
+                }
+            }
+            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
+        }
+        **/
+
+        
         // Set tl_calendar_events.mainInstructor from tl_calendar_events.instructor
         // First instructor in the list will be the main instructor
         $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events')->execute();
         while ($objEvent->next())
         {
-
             $arrGuides = \Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorsAsArray($objEvent->id);
             if (count($arrGuides) > 0)
             {
@@ -119,7 +154,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 if ($objEv !== null)
                 {
                     // First instructor in the list will be the main instructor
-                    $objEv->mainInstructor = $arrGuides[0]['instructorId'];
+                    $objEv->mainInstructor = $arrGuides[0];
                     $objEv->save();
                 }
             }
