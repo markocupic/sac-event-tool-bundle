@@ -260,15 +260,11 @@ class ExportEvents2Docx
 
             if ($field == 'instructor')
             {
-                //echo $value . '<br>';
-                $value = StringUtil::deserialize($value, true);
-                if (is_array(StringUtil::deserialize($value)) && !empty($value))
-                {
-                    $arrValue = array_map(function ($v) {
-                        return UserModel::findByPk($v)->name;
-                    }, StringUtil::deserialize($value));
-                    $value = implode(', ', $arrValue);
-                }
+                $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+                $arrValue = array_map(function ($v) {
+                    return UserModel::findByPk($v)->name;
+                }, $arrInstructors);
+                $value = implode(', ', $arrValue);
             }
 
             if ($field == 'organizers')
