@@ -24,6 +24,7 @@ use Contao\ModuleModel;
 use Contao\StringUtil;
 use Contao\UserModel;
 use Contao\Validator;
+use Markocupic\SacEventToolBundle\CalendarSacEvents;
 use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -112,10 +113,11 @@ class FrontendAjax
                                 continue;
                             }
 
+                            $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
                             // Suche nach Namen des Kursleiters
                             $strLeiter = implode(', ', array_map(function ($userId) {
                                 return UserModel::findByPk($userId)->name;
-                            }, StringUtil::deserialize($objEvent->instructor, true)));
+                            }, $arrInstructors));
 
                             if ($treffer == 0)
                             {
@@ -275,9 +277,10 @@ class FrontendAjax
 
 
                             // Suche nach Namen des Kursleiters
+                            $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
                             $strLeiter = implode(', ', array_map(function ($userId) {
                                 return UserModel::findByPk($userId)->name;
-                            }, StringUtil::deserialize($objEvent->instructor, true)));
+                            }, $arrInstructors));
 
                             if ($treffer == 0)
                             {

@@ -95,13 +95,13 @@ class ExportEvents2Typo3
                 $output .= "</p>";
             }
 
-            if (count(StringUtil::deserialize($objEvent->instructor, true)) > 0)
+            $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+            if (count($arrInstructors) > 0)
             {
-                $arrLeiter = StringUtil::deserialize($objEvent->instructor, true);
                 $arrName = array_map(function ($id) {
                     $strQuali = CalendarSacEvents::getMainQualifikation($id) != '' ? ' (' . CalendarSacEvents::getMainQualifikation($id) . ')' : '';
                     return UserModel::findByPk($id)->name . $strQuali;
-                }, $arrLeiter);
+                }, $arrInstructors);
 
                 $output .= "<p>";
                 $output .= "<b>Kursleitung</b><br>";

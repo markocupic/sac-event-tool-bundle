@@ -22,12 +22,12 @@ session_start();
           <h5><?= \CourseMainTypeModel::findByPk($this->courseTypeLevel0)->name ?>: <?= \CourseSubTypeModel::findByPk($this->courseTypeLevel1)->name ?></h5>
 
         </div>
-
+        <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorsAsArray($this->id); ?>
         <div class="detail-item">
           <i class="fa fa-fw fa-user"></i>Leitung: <?= implode(', ', array_map(function ($id) {
                 $strQuali = Markocupic\SacEventToolBundle\CalendarSacEvents::getMainQualifikation($id) != '' ? ' (' . Markocupic\SacEventToolBundle\CalendarSacEvents::getMainQualifikation($id) . ')' : '';
                 return \UserModel::findByPk($id)->name . $strQuali;
-            }, \StringUtil::deserialize($this->instructor))) ?>
+            }, $arrInstructors)) ?>
         </div>
 
         <div class="detail-item">

@@ -111,7 +111,8 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events')->execute();
         while ($objEvent->next())
         {
-            $arrGuides = StringUtil::deserialize($objEvent->instructor, true);
+
+            $arrGuides = \Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorsAsArray($objEvent->id);
             if (count($arrGuides) > 0)
             {
                 $objEv = CalendarEventsModel::findByPk($objEvent->id);

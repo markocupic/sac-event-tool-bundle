@@ -90,17 +90,42 @@ class CalendarSacEvents extends System
         $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
         if ($objEvent->numRows)
         {
-            if ($objEvent->instructor != '')
+
+            $arrInstructors = static::getInstructorsAsArray($objEvent->id);
+            $objUser = UserModel::findByPk($arrInstructors[0]);
+            if ($objUser !== null)
             {
-                $arrInstructors = static::getInstructorsAsArray($objEvent->id);
-                $objUser = UserModel::findByPk($arrInstructors[0]);
-                if ($objUser !== null)
-                {
-                    return $objUser->name;
-                }
+                return $objUser->name;
             }
         }
         return '';
+    }
+
+    /**
+     * Get instructors as array
+     * @param $eventId
+     * @return array
+     */
+    public static function getInstructorsAsArray($eventId)
+    {
+        $arrInstructors = array();
+        $objEvent = \CalendarEventsModel::findByPk($eventId);
+        if ($objEvent !== null)
+        {
+            $arrInstr = StringUtil::deserialize($objEvent->instructor, true);
+            foreach ($arrInstr as $arrUser)
+            {
+                if (isset($arrUser['instructorId']))
+                {
+                    $objUser = UserModel::findByPk($arrUser['instructorId']);
+                    if ($objUser !== null)
+                    {
+                        $arrInstructors[] = $arrUser['instructorId'];
+                    }
+                }
+            }
+        }
+        return $arrInstructors;
     }
 
     /**
@@ -542,30 +567,6 @@ class CalendarSacEvents extends System
             }
         }
         return $arrReturn;
-    }
-
-
-    /**
-     * Get instructors as array
-     * @param $eventId
-     * @return array
-     */
-    public static function getInstructorsAsArray($eventId)
-    {
-        $arrInstructors = array();
-        $objEvent = \CalendarEventsModel::findByPk($eventId);
-        if ($objEvent !== null)
-        {
-            $arrInstr = StringUtil::deserialize($objEvent->instructor,true);
-            foreach($arrInstr as $arrUser)
-            {
-                if(isset($arrUser['instructorId']))
-                {
-                    $arrInstructors[] = $arrUser['instructorId'];
-                }
-            }
-        }
-        return $arrInstructors;
     }
 
     /**

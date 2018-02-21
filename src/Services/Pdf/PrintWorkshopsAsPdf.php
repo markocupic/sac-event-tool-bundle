@@ -11,19 +11,18 @@
 
 namespace Markocupic\SacEventToolBundle\Services\Pdf;
 
-use Contao\EventOrganizerModel;
-use TCPDF_FONTS;
-use Markocupic\SacEventToolBundle\CalendarSacEvents;
 use Contao\CalendarEventsModel;
-use Contao\FrontendTemplate;
-use Contao\Database;
-use Contao\StringUtil;
-use Contao\System;
-use Contao\Date;
-use Contao\Config;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
+use Contao\Database;
+use Contao\Date;
+use Contao\EventOrganizerModel;
+use Contao\FrontendTemplate;
+use Contao\StringUtil;
+use Contao\System;
 use Contao\UserModel;
+use Markocupic\SacEventToolBundle\CalendarSacEvents;
+use TCPDF_FONTS;
 
 /**
  * Class PrintWorkshopsAsPdf
@@ -74,7 +73,7 @@ class PrintWorkshopsAsPdf
      * @param null $eventId
      * @param bool $download
      */
-    public function __construct($year = null, $calendarId = null, $eventId = null, $download=true)
+    public function __construct($year = null, $calendarId = null, $eventId = null, $download = true)
     {
         $this->download = $download;
         if ($year > 2016 && $calendarId > 0)
@@ -278,7 +277,8 @@ class PrintWorkshopsAsPdf
         // organisierende Gruppen
         $arrItems = array_map(function ($item) {
             $objOrganizer = EventOrganizerModel::findByPk($item);
-            if($objOrganizer !== null){
+            if ($objOrganizer !== null)
+            {
                 $item = $objOrganizer->title;
             }
             return $item;
@@ -305,6 +305,7 @@ class PrintWorkshopsAsPdf
         $objPartial->mountainguide = $objCalendar->mountainguide;
 
         // Instructors
+        $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objCalendar->id);
         $arrItems = array_map(function ($userId) {
             $objUser = UserModel::findByPk($userId);
             if ($objUser !== null)
@@ -313,7 +314,7 @@ class PrintWorkshopsAsPdf
                 return $objUser->name . $strQuali;
             }
             return '';
-        }, StringUtil::deserialize($objCalendar->instructor, true));
+        }, $arrInstructors);
         $objPartial->instructor = implode(', ', $arrItems);
 
 
