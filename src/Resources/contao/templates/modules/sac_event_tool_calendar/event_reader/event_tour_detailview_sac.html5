@@ -50,7 +50,7 @@
       <?php endif; ?>
   </div>
 
-    <?php $arrInstructors = StringUtil::deserialize($this->instructor, true); ?>
+    <?php $arrInstructors = \Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorsAsArray($this->id) ?>
     <?php if (!empty($organizers)): ?>
       <div class="instructor event-detail event-info-box icon-box-small">
         <h5>Leitung</h5>

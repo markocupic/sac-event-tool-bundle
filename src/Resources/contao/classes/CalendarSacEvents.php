@@ -92,8 +92,8 @@ class CalendarSacEvents extends System
         {
             if ($objEvent->instructor != '')
             {
-                $arrUsers = StringUtil::deserialize($objEvent->instructor, true);
-                $objUser = UserModel::findByPk($arrUsers[0]);
+                $arrInstructors = static::getInstructorsAsArray($objEvent->id);
+                $objUser = UserModel::findByPk($arrInstructors[0]);
                 if ($objUser !== null)
                 {
                     return $objUser->name;
@@ -542,6 +542,30 @@ class CalendarSacEvents extends System
             }
         }
         return $arrReturn;
+    }
+
+
+    /**
+     * Get instructors as array
+     * @param $eventId
+     * @return array
+     */
+    public static function getInstructorsAsArray($eventId)
+    {
+        $arrInstructors = array();
+        $objEvent = \CalendarEventsModel::findByPk($eventId);
+        if ($objEvent !== null)
+        {
+            $arrInstr = StringUtil::deserialize($objEvent->instructor,true);
+            foreach($arrInstr as $arrUser)
+            {
+                if(isset($arrUser['instructorId']))
+                {
+                    $arrInstructors[] = $arrUser['instructorId'];
+                }
+            }
+        }
+        return $arrInstructors;
     }
 
     /**

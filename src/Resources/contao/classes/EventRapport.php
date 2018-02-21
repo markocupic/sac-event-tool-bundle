@@ -23,7 +23,6 @@ use Contao\File;
 use Contao\Folder;
 use Contao\MemberModel;
 use Contao\Message;
-use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion;
@@ -153,7 +152,8 @@ class EventRapport
     {
 
         $countParticipants = $objEventMember->numRows;
-        $countInstructors = count(StringUtil::deserialize($objEvent->instructor, true));
+        $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+        $countInstructors = count($arrInstructors);
         $countParticipantsTotal = $countParticipants + $countInstructors;
 
 
@@ -262,7 +262,7 @@ class EventRapport
         $rows = array();
 
         // TL
-        $arrInstructors = StringUtil::deserialize($objEvent->instructor, true);
+        $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
         if (!empty($arrInstructors) && is_array($arrInstructors))
         {
             foreach ($arrInstructors as $userId)
@@ -270,6 +270,17 @@ class EventRapport
                 $objUserModel = UserModel::findByPk($userId);
                 if ($objUserModel !== null)
                 {
+                    // Check club membership
+                    $isMember = false;
+                    $objMember = MemberModel::findBySacMemberId($objUserModel->sacMemberId);
+                    if ($objMember !== null)
+                    {
+                        if ($objMember->isSacMember && !$objMember->disable)
+                        {
+                            $isMember = true;
+                        }
+                    }
+
                     $i++;
                     $rows[] = array(
                         array('key' => 'i', 'value' => $i, 'options' => array('multiline' => false)),
@@ -277,7 +288,7 @@ class EventRapport
                         array('key' => 'firstname', 'value' => $objUserModel->name, 'options' => array('multiline' => false)),
                         array('key' => 'lastname', 'value' => '', 'options' => array('multiline' => false)),
                         array('key' => 'sacMemberId', 'value' => 'Mitgl. No. ' . $objUserModel->sacMemberId, 'options' => array('multiline' => false)),
-                        array('key' => 'isNotSacMember', 'value' => $objUserModel->isSacMember ? ' ' : '!inaktiv/kein Mitglied', 'options' => array('multiline' => false)),
+                        array('key' => 'isNotSacMember', 'value' => $isMember ? ' ' : '!inaktiv/kein Mitglied', 'options' => array('multiline' => false)),
                         array('key' => 'street', 'value' => $objUserModel->street, 'options' => array('multiline' => false)),
                         array('key' => 'postal', 'value' => $objUserModel->postal, 'options' => array('multiline' => false)),
                         array('key' => 'city', 'value' => $objUserModel->city, 'options' => array('multiline' => false)),
@@ -295,13 +306,15 @@ class EventRapport
         while ($objEventMember->next())
         {
             $i++;
+
+            // Check club membership
             $strIsActiveMember = '!inaktiv/keinMitglied';
             if ($objEventMember->sacMemberId != '')
             {
                 $objMemberModel = MemberModel::findBySacMemberId($objEventMember->sacMemberId);
                 if ($objMemberModel !== null)
                 {
-                    if ($objMemberModel->isSacMember)
+                    if ($objMemberModel->isSacMember && !$objMemberModel->disable)
                     {
                         $strIsActiveMember = ' ';
                     }
@@ -332,13 +345,15 @@ class EventRapport
         );
 
         // Event instructors
+        $aInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+
         $arrInstructors = array_map(function ($id) {
             $objUser = \UserModel::findByPk($id);
             if ($objUser !== null)
             {
                 return $objUser->name;
             }
-        }, StringUtil::deserialize($objEvent->instructor, true));
+        }, $aInstructors);
         $arrData[] = array('key' => 'eventInstructors', 'value' => htmlspecialchars(html_entity_decode(implode(', ', $arrInstructors))));
 
         // Event Id

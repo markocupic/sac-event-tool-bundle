@@ -13,6 +13,7 @@
  */
 
 namespace Contao;
+use Markocupic\SacEventToolBundle\CalendarSacEvents;
 
 /**
  * Class EventReleaseLevelPolicyModel
@@ -197,6 +198,8 @@ class EventReleaseLevelPolicyModel extends \Model
 
         $arrAllowedGroups = \StringUtil::deserialize($objReleaseLevelModel->groups, true);
 
+        $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+
         // Check if user has permission
         if ($objBackendUser->admin)
         {
@@ -212,7 +215,7 @@ class EventReleaseLevelPolicyModel extends \Model
             // The event is on the first level and the user is author and is allowed to write on this level
             $allow = true;
         }
-        elseif (static::findPrevLevel($objEvent->eventReleaseLevel) === null && $objReleaseLevelModel->allowWriteAccessToInstructors && in_array($objBackendUser->id, \StringUtil::deserialize($objEvent->instructor, true)))
+        elseif (static::findPrevLevel($objEvent->eventReleaseLevel) === null && $objReleaseLevelModel->allowWriteAccessToInstructors && in_array($objBackendUser->id, $arrInstructors))
         {
             // The event is on the first level and the user is set as a instructor in the current event
             $allow = true;
@@ -223,6 +226,7 @@ class EventReleaseLevelPolicyModel extends \Model
         }
         return $allow;
     }
+
 
     /**
      * @param $levelId
@@ -307,6 +311,8 @@ class EventReleaseLevelPolicyModel extends \Model
 
         $arrAllowedGroups = \StringUtil::deserialize($objReleaseLevelModel->groups, true);
 
+        $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+
         // Check if user has permission
         if ($objBackendUser->admin)
         {
@@ -322,7 +328,7 @@ class EventReleaseLevelPolicyModel extends \Model
             // User is author and is allowed to write on this level
             $allow = true;
         }
-        elseif ($objReleaseLevelModel->allowWriteAccessToInstructors && in_array($objBackendUser->id, \StringUtil::deserialize($objEvent->instructor, true)))
+        elseif ($objReleaseLevelModel->allowWriteAccessToInstructors && in_array($objBackendUser->id, $arrInstructors))
         {
             // User is set as a instructor in the current event
             $allow = true;
@@ -391,6 +397,8 @@ class EventReleaseLevelPolicyModel extends \Model
 
         $arrAllowedGroups = \StringUtil::deserialize($objReleaseLevelModel->groups, true);
 
+        $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+
         // Check if user has permission
         if ($objBackendUser->admin)
         {
@@ -406,7 +414,7 @@ class EventReleaseLevelPolicyModel extends \Model
             // User is author and has write access on this level and the level is 1
             $allow = true;
         }
-        elseif ($objReleaseLevelModel->allowWriteAccessToInstructors && in_array($objBackendUser->id, \StringUtil::deserialize($objEvent->instructor, true)) && $objReleaseLevelModel->level == 1)
+        elseif ($objReleaseLevelModel->allowWriteAccessToInstructors && in_array($objBackendUser->id, $arrInstructors) && $objReleaseLevelModel->level == 1)
         {
             // User is set as a instructor in the current event
             $allow = true;

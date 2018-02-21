@@ -79,7 +79,8 @@ class ContentUserPortrait extends ContentElement
             $eventModel = CalendarEventsModel::findByPk($objEvent->id);
             if ($eventModel !== null)
             {
-                if (in_array($this->objUser->id, StringUtil::deserialize($objEvent->instructor, true)))
+                $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+                if (in_array($this->objUser->id, $arrInstructors))
                 {
                     $arrEvents[$objEvent->eventType][] = $objEvent->row();
                 }

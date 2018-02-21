@@ -3,6 +3,11 @@ table#ctrl_repeatFixedDates thead tr:first-child {
     display: none;
 }
 
+/** Highlight main instructor **/
+#tl_calendar_events #ctrl_instructor tr:first-child td #ctrl_instructor_row0_instructorId_chzn {
+    background-color: #abd289;
+}
+
 #tl_navigation .group-sac_be_modules {
     background: url(../../markocupicsaceventtool/icons/sun.svg) 3px 2px no-repeat;
 }

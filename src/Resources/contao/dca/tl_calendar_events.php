@@ -263,21 +263,57 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mainInstructor'] = array(
 );
 
 // instructor
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
-    'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructor'],
-    'exclude'    => true,
-    'filter'     => true,
-    'inputType'  => 'checkboxWizard',
-    'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
-    'foreignKey' => 'tl_user.name',
-    'eval'       => array('multiple' => true, 'chosen' => true, 'orderField' => 'orderInstructor', 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr'),
-    'sql'        => "blob NULL",
-);
+/**
+ * $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
+ * 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructor'],
+ * 'exclude'    => true,
+ * 'filter'     => true,
+ * 'inputType'  => 'checkboxWizard',
+ * 'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
+ * 'foreignKey' => 'tl_user.name',
+ * 'eval'       => array('multiple' => true, 'chosen' => true, 'orderField' => 'orderInstructor', 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr'),
+ * 'sql'        => "blob NULL",
+ * );
+ *
+ * // orderInstructor
+ * $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['orderInstructor'] = array(
+ * 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['orderInstructor'],
+ * 'sql'   => "blob NULL",
+ * );
+ **/
 
-// orderInstructor
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['orderInstructor'] = array(
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['orderInstructor'],
-    'sql'   => "blob NULL",
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructor'],
+    'exclude'   => true,
+    'search'    => true,
+    'inputType' => 'multiColumnWizard',
+    'eval'      => array
+    (
+        'mandatory'    => true,
+        'columnFields' => array
+        (
+            'instructorId' => array
+            (
+                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructorId'],
+                'exclude'    => true,
+                'inputType'  => 'select',
+                'filter' => true,
+                'reference'  => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+                //'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbTourDifficulties'),
+                'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
+                'foreignKey' => 'tl_user.name',
+                'eval'       => array
+                (
+                    'style'              => 'width:200px',
+                    'mandatory'          => true,
+                    'includeBlankOption' => true,
+                    'chosen'             => true,
+                    'multiple'           => false,
+                ),
+            ),
+        ),
+    ),
+    'sql'       => "blob NULL",
 );
 
 // Terms/Ziele
@@ -650,50 +686,50 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = array(
         'mandatory'    => false,
         'columnFields' => array
         (
-            'tourProfileAscentMeters' => array
+            'tourProfileAscentMeters'  => array
             (
-                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'],
-                'inputType'        => 'text',
-                'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'eval'             => array
+                'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'],
+                'inputType' => 'text',
+                'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+                'eval'      => array
                 (
-                    'rgxp' => 'natural',
-                    'style'              => 'width:150px',
-                    'mandatory'          => false,
+                    'rgxp'      => 'natural',
+                    'style'     => 'width:150px',
+                    'mandatory' => false,
                 ),
             ),
-            'tourProfileAscentTime' => array
+            'tourProfileAscentTime'    => array
             (
-                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'],
-                'inputType'        => 'text',
-                'eval'             => array
+                'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'],
+                'inputType' => 'text',
+                'eval'      => array
                 (
-                    'rgxp' => 'numeric',
-                    'style'              => 'width:150px',
-                    'mandatory'          => false,
+                    'rgxp'      => 'numeric',
+                    'style'     => 'width:150px',
+                    'mandatory' => false,
                 ),
             ),
             'tourProfileDescentMeters' => array
             (
-                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'],
-                'inputType'        => 'text',
-                'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'eval'             => array
+                'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'],
+                'inputType' => 'text',
+                'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+                'eval'      => array
                 (
-                    'rgxp' => 'natural',
-                    'style'              => 'width:150px',
-                    'mandatory'          => false,
+                    'rgxp'      => 'natural',
+                    'style'     => 'width:150px',
+                    'mandatory' => false,
                 ),
             ),
-            'tourProfileDescentTime' => array
+            'tourProfileDescentTime'   => array
             (
-                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'],
-                'inputType'        => 'text',
-                'eval'             => array
+                'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'],
+                'inputType' => 'text',
+                'eval'      => array
                 (
-                    'rgxp' => 'numeric',
-                    'style'              => 'width:150px',
-                    'mandatory'          => false,
+                    'rgxp'      => 'numeric',
+                    'style'     => 'width:150px',
+                    'mandatory' => false,
                 ),
             ),
         ),

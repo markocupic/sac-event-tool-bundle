@@ -48,6 +48,8 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         }
 
         $this->import('BackendUser', 'User');
+
+
         return parent::__construct();
     }
 
@@ -116,7 +118,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 if ($objEv !== null)
                 {
                     // First instructor in the list will be the main instructor
-                    $objEv->mainInstructor = $arrGuides[0];
+                    $objEv->mainInstructor = $arrGuides[0]['instructorId'];
                     $objEv->save();
                 }
             }
@@ -606,6 +608,8 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         // Show all allowed fields
         foreach ($fields as $i)
         {
+
+
             if (!in_array($i, $allowedFields) || $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] == 'password' || $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['doNotShow'] || $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['hideInput'])
             {
                 continue;
@@ -626,6 +630,9 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 $value = \Encryption::decrypt($value);
             }
 
+            // Default value
+            $row[$i] = '';
+
 
             // Get the field value
             if ($i === 'repeatFixedDates')
@@ -645,22 +652,48 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 // Special treatment for tourProfile
                 $arrProfile = array();
                 $m = 0;
-                foreach ($value as $profile)
+                if (!empty($value) && is_array($value))
                 {
-                    $m++;
-                    if (count($value) > 1)
+                    foreach ($value as $profile)
                     {
-                        $pattern = $m . '. Tag &nbsp;&nbsp;&nbsp; Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                        $m++;
+                        if (count($value) > 1)
+                        {
+                            $pattern = $m . '. Tag &nbsp;&nbsp;&nbsp; Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                        }
+                        else
+                        {
+                            $pattern = 'Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                        }
+                        $arrProfile[] = sprintf($pattern, $profile['tourProfileAscentMeters'], $profile['tourProfileAscentTime'], $profile['tourProfileDescentMeters'], $profile['tourProfileDescentTime']);
                     }
-                    else
-                    {
-                        $pattern = 'Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
-                    }
-                    $arrProfile[] = sprintf($pattern, $profile['tourProfileAscentMeters'], $profile['tourProfileAscentTime'], $profile['tourProfileDescentMeters'], $profile['tourProfileDescentTime']);
                 }
                 if (!empty($arrProfile))
                 {
                     $row[$i] = implode('<br>', $arrProfile);
+                }
+            }
+            elseif ($i === 'instructor')
+            {
+                // Special treatment for instructor
+                $arrInstructors = array();
+                foreach ($value as $arrInstructor)
+                {
+                    if ($arrInstructor['instructorId'] > 0)
+                    {
+                        $objUser = UserModel::findByPk($arrInstructor['instructorId']);
+                        {
+                            if ($objUser !== null)
+                            {
+                                $arrInstructors[] = $objUser->name;
+                            }
+                        }
+                    }
+                }
+
+                if (!empty($arrInstructors))
+                {
+                    $row[$i] = implode('<br>', $arrInstructors);
                 }
             }
             elseif ($i === 'tourTechDifficulty')
