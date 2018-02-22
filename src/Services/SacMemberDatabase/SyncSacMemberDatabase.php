@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\Services\SacMemberDatabase;
 use Contao\System;
 use Contao\Date;
 use Contao\File;
+use Contao\Input;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Doctrine\DBAL\Connection;
 
@@ -76,6 +77,11 @@ class SyncSacMemberDatabase
     private $root_dir;
 
     /**
+     * @var
+     */
+    private $test_mode;
+
+    /**
      * SyncSacMemberDatabase constructor.
      * @param ContaoFrameworkInterface $framework
      * @param Connection $connection
@@ -94,6 +100,7 @@ class SyncSacMemberDatabase
         $this->ftp_username = $ftp_username;
         $this->ftp_password = $ftp_password;
         $this->section_ids = \json_decode($section_ids);
+        $this->test_mode = Input::get('test_mode') ? true : false;
     }
 
 
@@ -103,6 +110,9 @@ class SyncSacMemberDatabase
      */
     public function loadDataFromFtp()
     {
+        if(!$this->test_mode)
+        {
+
         // Run once per day
         $statement = $this->connection->executeQuery('SELECT * FROM tl_log WHERE action = ? ORDER BY tstamp DESC LIMIT 0,1', array(self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC));
         while (false !== ($objLog = $statement->fetch(\PDO::FETCH_OBJ)))
@@ -111,6 +121,7 @@ class SyncSacMemberDatabase
             {
                 return $this;
             }
+        }
         }
 
         // Open FTP connection
@@ -146,13 +157,16 @@ class SyncSacMemberDatabase
     {
         $startTime = \time();
 
-        // Run once per day
-        $statement = $this->connection->executeQuery('SELECT * FROM tl_log WHERE action = ? ORDER BY tstamp DESC LIMIT 0,1', array(self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC));
-        while (false !== ($objLog = $statement->fetch(\PDO::FETCH_OBJ)))
+        if(!$this->test_mode)
         {
-            if (Date::parse('Y-m-d', $objLog->tstamp) === Date::parse('Y-m-d', \time()))
+            // Run once per day
+            $statement = $this->connection->executeQuery('SELECT * FROM tl_log WHERE action = ? ORDER BY tstamp DESC LIMIT 0,1', array(self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC));
+            while (false !== ($objLog = $statement->fetch(\PDO::FETCH_OBJ)))
             {
-                return $this;
+                if (Date::parse('Y-m-d', $objLog->tstamp) === Date::parse('Y-m-d', \time()))
+                {
+                    return $this;
+                }
             }
         }
 
@@ -260,17 +274,7 @@ class SyncSacMemberDatabase
 
             // Log, if sync has finished without errors (max script execution time!!!!)
             $i++;
-            if ($i == count($arrMember))
-            {
-                $duration = \time() - $startTime;
 
-                // Log
-                $this->log(
-                    'Finished syncing SAC member database with tl_member. Synced ' . \count($arrMember) . ' entries. Duration: ' . $duration . ' s',
-                    __FILE__ . ' Line: ' . __LINE__,
-                    self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC
-                );
-            }
         }
 
         // Set tl_member.disable to true if member was not found in the csv-file
@@ -289,6 +293,25 @@ class SyncSacMemberDatabase
                 __FILE__ . ' Line: ' . __LINE__,
                 self::SAC_EVT_LOG_DISABLE_MEMBER
             );
+        }
+
+        if ($i == count($arrMember))
+        {
+            $duration = \time() - $startTime;
+
+            // Log
+            $this->log(
+                'Finished syncing SAC member database with tl_member. Synced ' . \count($arrMember) . ' entries. Duration: ' . $duration . ' s',
+                __FILE__ . ' Line: ' . __LINE__,
+                self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC
+            );
+        }
+
+
+        if($this->test_mode)
+        {
+            echo 'Finished syncing SAC member database with tl_member. Synced ' . \count($arrMember) . ' entries. Duration: ' . $duration . ' s';
+            exit;
         }
 
         return $this;
