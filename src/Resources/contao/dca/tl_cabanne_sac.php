@@ -132,7 +132,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'textarea',
-            'eval'      => array('rgxp' => '', 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
+            'eval'      => array('rgxp' => '', 'mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'),
             'sql'       => "varchar(512) NOT NULL default ''",
         ),
         'phone'         => array
@@ -162,7 +162,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'textarea',
-            'eval'      => array('mandatory' => false, 'tl_class' => 'clr'),
+            'eval'      => array('mandatory' => false, 'maxlength' => 512, 'tl_class' => 'clr'),
             'sql'       => "varchar(512) NOT NULL default ''",
         ),
         'url'           => array
@@ -190,7 +190,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'textarea',
-            'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
+            'eval'      => array('mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'),
             'sql'       => "varchar(512) NOT NULL default ''",
         ),
         'capacity'      => array
@@ -200,7 +200,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'textarea',
-            'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
+            'eval'      => array('mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'),
             'sql'       => "varchar(512) NOT NULL default ''",
         ),
         'coordsCH1903'  => array
@@ -230,7 +230,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'textarea',
-            'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
+            'eval'      => array('mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'),
             'sql'       => "varchar(512) NOT NULL default ''",
         ),
         'ascent'      => array
