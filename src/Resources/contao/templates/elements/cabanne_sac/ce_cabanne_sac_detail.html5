@@ -27,30 +27,39 @@
                 <!-- Contact -->
                 <div class="tab-pane fade show active" id="kontakt" role="tabpanel" aria-labelledby="kontakt-tab">
                     <table class="table">
-
+                        <?php if($this->huettenwart): ?>
                         <tr>
                             <td><strong>H&uuml;ttenwart:</strong></td>
                             <td><?= nl2br($this->huettenwart) ?></td>
                         </tr>
+                        <?php endif; ?>
+
+                        <?php if($this->phone): ?>
                         <tr>
                             <td><strong>Hüttentelefon:</strong></td>
                             <td><?= $this->phone ?></td>
                         </tr>
+                        <?php endif; ?>
+
+                        <?php if($this->email): ?>
                         <tr>
                             <td><strong>E-Mail:</strong></td>
                             <td><?= $this->email ?></td>
                         </tr>
-                        <?php if ($this->url): ?>
-                            <tr>
-                                <td><strong>Webseite:</strong></td>
-                                <td><a href="<?= $this->url ?>" target="_blank">Link</a></td>
-                            </tr>
                         <?php endif; ?>
+
+                        <?php if ($this->url): ?>
+                        <tr>
+                            <td><strong>Webseite:</strong></td>
+                            <td><a href="<?= $this->url ?>" target="_blank">Link</a></td>
+                        </tr>
+                        <?php endif; ?>
+
                         <?php if ($this->bookingMethod): ?>
-                            <tr>
-                                <td><strong>Anfrage/Buchung:</strong></td>
-                                <td><?= nl2br($this->bookingMethod) ?></td>
-                            </tr>
+                        <tr>
+                            <td><strong>Anfrage/Buchung:</strong></td>
+                            <td><?= nl2br($this->bookingMethod) ?></td>
+                        </tr>
                         <?php endif; ?>
                     </table>
                 </div>

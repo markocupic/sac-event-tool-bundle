@@ -133,7 +133,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'sorting'   => true,
             'inputType' => 'textarea',
             'eval'      => array('rgxp' => '', 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql'       => "varchar(512) NOT NULL default ''",
         ),
         'phone'         => array
         (
@@ -163,7 +163,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'sorting'   => true,
             'inputType' => 'textarea',
             'eval'      => array('mandatory' => false, 'tl_class' => 'clr'),
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql'       => "varchar(512) NOT NULL default ''",
         ),
         'url'           => array
         (
@@ -191,7 +191,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'sorting'   => true,
             'inputType' => 'textarea',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql'       => "varchar(512) NOT NULL default ''",
         ),
         'capacity'      => array
         (
@@ -201,7 +201,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'sorting'   => true,
             'inputType' => 'textarea',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql'       => "varchar(512) NOT NULL default ''",
         ),
         'coordsCH1903'  => array
         (
@@ -231,7 +231,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'sorting'   => true,
             'inputType' => 'textarea',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql'       => "varchar(512) NOT NULL default ''",
         ),
         'ascent'      => array
         (
