@@ -112,6 +112,32 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'] = array(
     'lastMinuteTour' => 'Last Minute Tour',
 );
 
+// Event state
+$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-STATE'] = array(
+    'event_fully_booked',
+    'event_canceled',
+    'event_deferred',
+);
+
+// Tour report
+$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EXECUTION-STATE'] = array(
+    'event_executed_like_predicted',
+    'event_adapted',
+    'event_canceled',
+    'event_deferred',
+);
+
+// Backend user roles
+$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'] = array(
+    'avalanche_level_0',
+    'avalanche_level_1',
+    'avalanche_level_2',
+    'avalanche_level_3',
+    'avalanche_level_4',
+    'avalanche_level_5',
+);
+
+// Backend user roles
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['role'] = array(
     'tourguide',
     'courseguide',
@@ -121,6 +147,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['role'] = array(
     'coursechief',
 );
 
+// Guide qualifications
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = array(
     1 => "Tourenleiter SAC",
     2 => "Bergführer IVBV",

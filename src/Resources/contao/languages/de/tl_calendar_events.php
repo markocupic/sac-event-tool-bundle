@@ -59,7 +59,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['bookingEvent'] = array("Anmeldung", "
 $GLOBALS['TL_LANG']['tl_calendar_events']['miscellaneous'] = array("Sonstiges", "Geben Sie bitte weitere/sonstige Informationen ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['repeatFixedDates'] = array("Eventdaten", "Geben Sie bitte die Eventdaten ein. F&uuml;r jeden Tag eine Zeile.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'] = array("Dauer", "Hier kann die Kursdauer angegeben werden.");
-$GLOBALS['TL_LANG']['tl_calendar_events']['eventCanceled'] = array("Event abgesagt", "Diesen Event als 'abgesagt' markieren.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['eventState'] = array("Event Status", "Geben Sie optional einen Event-Status an. !!!Teilnehmer m&uuml;ssen informiert werden.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['singleSRCBroschuere'] = array("Hintergrundbild fuer Broschuere", "W&auml;hlen Sie bitte ein Bild aus.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['allowDeregistration'] = array("Angemeldeter Teilnehmer darf sich online vom Event abmelden", "Geben Sie dem angemeldeten Teilnehmer die M&ouml;glichkeit unter Einhaltung einer definierten Abmeldefrist sich online vom Event abzumelden.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['deregistrationLimit'] = array("Abmeldefrist in Tagen", "Definieren Sie den Zeitraum in Tagen, bis zu dem sich ein bereits angemeldeter Teilnehmer wieder online vom Event abmelden kann.");
@@ -78,7 +78,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'] = array("Technis
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'] = array("Schwierigkeiten Minimum:", "Definieren Sie hier den minimalen technischen Schwierigkeitsgrad.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'] = array("Schwierigkeiten Maximum:", "Definieren Sie hier den maximalen technischen Schwierigkeitsgrad.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourDetailText'] = array("Details zur Tour/Route", "Geben Sie hier weitere Details zur Tour an.");
-$GLOBALS['TL_LANG']['tl_calendar_events']['tourHasExecutedLikePredicted'] = array("Tour wie ausgeschrieben durchgef&uuml;hrt", "Geben Sie an, ob der Event, wie im Jahresprogramm angek&uuml;ndigt durchgef&uuml;hrt werden konnte.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['executionState'] = array("Durchf&uuml;hrungsstatus", "Geben Sie an, ob der Event durchgef&uuml;hrt werden konnte.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourSubstitutionText'] = array("Ersatz-/Ausweichtour, falls die Tour nicht wie ausgeschrieben durchgef&uuml;hrt wurde", "Geben Sie, falls n&ouml;tig Informationen zur Ersatz-/Ausweichtour an.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourWeatherConditions'] = array("Angaben zum Wetter", "Geben Sie hier Angaben zum Wetter ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourAvalancheConditions'] = array("Lawinensituation", "Geben Sie hier Angaben zur Lawinensituation ein.");
@@ -105,6 +105,19 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['viaFerrata'] = array('Klettersteig');
 $GLOBALS['TL_LANG']['tl_calendar_events']['snowShoeTour'] = array('Schneeschuhtour');
 $GLOBALS['TL_LANG']['tl_calendar_events']['endurance'] = array('Konditionelle Anforderungen');
 $GLOBALS['TL_LANG']['tl_calendar_events']['iceClimbing'] = array('Eisklettern');
+$GLOBALS['TL_LANG']['tl_calendar_events']['event_fully_booked'] = array('Event ausgebucht');
+$GLOBALS['TL_LANG']['tl_calendar_events']['event_canceled'] = array('Event abgesagt');
+$GLOBALS['TL_LANG']['tl_calendar_events']['event_deferred'] = array('Event verschoben');
+$GLOBALS['TL_LANG']['tl_calendar_events']['event_executed_like_predicted'] = array('Event wie ausgeschrieben durchgef&uuml;hrt.');
+$GLOBALS['TL_LANG']['tl_calendar_events']['event_adapted'] = array('Ausweichtour-/event');
+$GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_0'] = array('Keine Lawinengefahr');
+$GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_1'] = array('Geringe Lawinengefahr');
+$GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_2'] = array('Mässige Lawinengefahr');
+$GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_3'] = array('Erhebliche Lawinengefahr');
+$GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_4'] = array('Grosse Lawinengefahr');
+$GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_5'] = array('Sehr grosse Lawinengefahr');
+
+
 
 
 

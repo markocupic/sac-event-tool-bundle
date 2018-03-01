@@ -1,8 +1,15 @@
 <p class="back"><a href="javascript:history.go(-1)" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
 
 <div class="event event-detailview layout_full block<?= $this->class ?>">
-    <?php if ($this->eventType === 'lastMinuteTour'): ?><h4 class="ce_headline last-minute-tour">Last minute tour (Spontantour)</h4><?php endif; ?>
+    <?php if ($this->eventState): ?>
+      <h4 class="event-state-headline"><?= $GLOBALS['TL_LANG']['CTE']['calendar_events'][$this->eventState] ?></h4>
+    <?php endif; ?>
   <h1 class="ce_headline"><?= $this->title ?></h1>
+
+    <?php if ($this->eventType === 'lastMinuteTour'): ?>
+      <h4 class="ce_headline last-minute-tour">Last minute tour (Spontantour)</h4>
+    <?php endif; ?>
+
 
   <div class="event-detail-buttons mb-4">
     <a href="/ical?eventId=<?= $this->id ?>" title="Event in Kalender importieren" class="btn btn-outline-primary"><i class="fal fa-calendar-plus"></i> iCal download</a>
@@ -92,16 +99,16 @@
 
   <div class="requirements event-detail event-info-box icon-box-small">
     <h5>Voraussetzungen/Anforderungen</h5>
-    <?php if ($this->requirements != ''): ?>
-      <p class="requirements-text"><?= nl2br($this->requirements) ?></p>
-    <?php endif; ?>
-    
+      <?php if ($this->requirements != ''): ?>
+        <p class="requirements-text"><?= nl2br($this->requirements) ?></p>
+      <?php endif; ?>
+
     <p class="tech-difficulty"><strong>Schwierigkeit: </strong><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($this->id)) ?></p>
 
-    <?php $arrTourProfile = Markocupic\SacEventToolBundle\CalendarSacEvents::getTourProfileAsArray($this->id); ?>
-    <?php if (count($arrTourProfile) > 1): ?>
+      <?php $arrTourProfile = Markocupic\SacEventToolBundle\CalendarSacEvents::getTourProfileAsArray($this->id); ?>
+      <?php if (count($arrTourProfile) > 1): ?>
     <p class="tour-profile"><strong>Profil:</strong><br> <?= implode('<br>', $arrTourProfile) ?><p>
-    <?php endif; ?>
+          <?php endif; ?>
   </div>
 
 

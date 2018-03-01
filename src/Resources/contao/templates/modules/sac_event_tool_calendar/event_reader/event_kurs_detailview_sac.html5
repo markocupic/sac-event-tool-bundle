@@ -1,6 +1,10 @@
 <p class="back m-0"><a href="javascript:history.go(-1)" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
 <div class="event event-detailview layout_full block<?= $this->class ?>">
 
+  <?php if($this->eventState): ?>
+  <h4 class="event-state-headline"><?= $GLOBALS['TL_LANG']['CTE']['calendar_events'][$this->eventState] ?></h4>
+  <?php endif; ?>
+
   <h1 class="ce_headline"><?= $this->title ?></h1>
 
   <div class="row">

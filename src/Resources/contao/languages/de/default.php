@@ -17,6 +17,11 @@ $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_2'] = 'Anmeldefrist/
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_3'] = 'Event ausgebucht.';
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_4'] = 'Event abgesagt.';
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_5'] = 'Anmeldungen noch nicht m&ouml;glich.';
+$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_6'] = 'Event verschoben.';
+
+$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_fully_booked'] = 'Event ausgebucht!';
+$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_canceled'] = 'Event abgesagt!';
+$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_deferred'] = 'Event verschoben!';
 
 
 // References

@@ -161,6 +161,18 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         {
             Message::addInfo('Du hast dich bereits f&uuml;r diesen Event angemeldet.', TL_MODE);
         }
+        elseif ($this->objEvent->eventState === 'event_fully_booked')
+        {
+            Message::addInfo('Dieser Anlass ist ausgebucht.', TL_MODE);
+        }
+        elseif ($this->objEvent->eventState === 'event_canceled')
+        {
+            Message::addInfo('Dieser Anlass ist abgesagt worden.', TL_MODE);
+        }
+        elseif ($this->objEvent->eventState === 'event_deferred')
+        {
+            Message::addInfo('Dieser Anlass ist verschoben worden.', TL_MODE);
+        }
         elseif ($this->objEvent->setRegistrationPeriod && $this->objEvent->registrationStartDate > time())
         {
             Message::addInfo(sprintf('Anmeldungen f&uuml;r <strong>"%s"</strong> sind erst ab dem %s m&ouml;glich.', $this->objEvent->title, Date::parse('d.m.Y', $this->objEvent->registrationStartDate)), TL_MODE);
@@ -169,6 +181,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         {
             Message::addInfo('Die Anmeldefrist f&uuml;r diesen Event ist abgelaufen.', TL_MODE);
         }
+
         elseif ($this->objEvent->startDate - 60 * 60 * 24 < time())
         {
             Message::addInfo('Die Anmeldefrist f&uuml;r diesen Event ist abgelaufen.', TL_MODE);

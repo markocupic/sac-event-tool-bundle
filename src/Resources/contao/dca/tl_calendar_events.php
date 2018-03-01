@@ -13,7 +13,7 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
 // Keys
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['mountainguide'] = 'index';
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventCanceled'] = 'index';
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventState'] = 'index';
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventReleaseLevel'] = 'index';
 
 
@@ -72,9 +72,9 @@ PaletteManipulator::create()
     ->addField(array('dashboard'), 'dashboard_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('singleSRCBroschuere'), 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('inTypo3', 'title', 'alias', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('repeatFixedDates', 'durationInfo', 'eventCanceled'), 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('terms', 'issues'), 'details_legend', PaletteManipulator::POSITION_APPEND)
@@ -93,8 +93,8 @@ PaletteManipulator::create()
 PaletteManipulator::create()
     ->addField(array('dashboard'), 'dashboard_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('title', 'alias', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('repeatFixedDates', 'durationInfo', 'eventCanceled'), 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
@@ -114,8 +114,8 @@ PaletteManipulator::create()
     //->addField(array(), 'dashboard_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('singleSRCBroschuere'), 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('inTypo3', 'title', 'alias', 'author', 'instructor', 'mountainguide', 'organizers', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('repeatFixedDates', 'durationInfo', 'eventCanceled'), 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('teaser', 'terms', 'issues', 'location', 'journey', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
@@ -132,7 +132,7 @@ PaletteManipulator::create()
 // Tour report palette
 PaletteManipulator::create()
     ->addField(array('tourReportDashboard'), 'tour_report_dashboard_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('eventCanceled', 'tourHasExecutedLikePredicted', 'tourSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents'), 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('executionState', 'tourSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents'), 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('tour_report', 'tl_calendar_events');
 
 
@@ -297,7 +297,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructorId'],
                 'exclude'    => true,
                 'inputType'  => 'select',
-                'filter' => true,
+                'filter'     => true,
                 'reference'  => &$GLOBALS['TL_LANG']['tl_calendar_events'],
                 //'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbTourDifficulties'),
                 'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
@@ -487,13 +487,16 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['repeatFixedDates'] = array(
     'sql'       => "blob NULL",
 );
 
-// eventCanceled
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventCanceled'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventCanceled'],
+// eventState
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventState'],
     'exclude'   => true,
-    'inputType' => 'checkbox',
-    'eval'      => array('doNotCopy' => true),
-    'sql'       => "char(1) NOT NULL default ''",
+    'filter'    => true,
+    'inputType' => 'select',
+    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-STATE'],
+    'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+    'eval'      => array('includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false),
+    'sql'       => "varchar(32) NOT NULL default ''",
 );
 
 // meetingPoint
@@ -521,7 +524,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration'] 
     'sorting'   => true,
     'exclude'   => true,
     'inputType' => 'checkbox',
-    'eval'      => array('doNotCopy' => false, 'submitOnChange' => false),
+    'eval'      => array('submitOnChange' => false),
     'sql'       => "char(1) NOT NULL default ''",
 );
 
@@ -772,8 +775,20 @@ if (!Contao\Input::get('act') || Contao\Input::get('act') === 'select')
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = array(
     'label'   => &$GLOBALS['TL_LANG']['tl_calendar_events']['filledInEventReportForm'],
     'exclude' => false,
-    'eval'    => array('doNotShow' => true, 'doNotCopy' => true),
+    'eval'    => array('doNotShow' => true),
     'sql'     => "char(1) NOT NULL default ''",
+);
+
+// executionState
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['executionState'],
+    'exclude'   => true,
+    'filter'    => true,
+    'inputType' => 'select',
+    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EXECUTION-STATE'],
+    'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+    'eval'      => array('includeBlankOption' => true, 'doNotShow' => true, 'tl_class' => 'clr m12', 'mandatory' => true),
+    'sql'       => "varchar(32) NOT NULL default ''",
 );
 
 // tourReportDashboard
@@ -792,26 +807,17 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = array(
     'inputType'  => 'select',
     'foreignKey' => 'tl_calendar_events_journey.title',
     'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
-    'eval'       => array('doNotCopy' => false, 'multiple' => false, 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr m12'),
+    'eval'       => array('multiple' => false, 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr m12'),
     'sql'        => "varchar(255) NOT NULL default ''",
 );
 
-// tourHasExecutedLikePredicted
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourHasExecutedLikePredicted'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourHasExecutedLikePredicted'],
-    'exclude'   => true,
-    'filter'    => true,
-    'inputType' => 'checkbox',
-    'eval'      => array('doNotCopy' => true),
-    'sql'       => "char(1) NOT NULL default ''",
-);
 
 // tourSubstitutionText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSubstitutionText'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourSubstitutionText'],
     'exclude'   => true,
     'inputType' => 'textarea',
-    'eval'      => array('doNotCopy' => true, 'tl_class' => 'clr m12', 'mandatory' => false),
+    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
     'sql'       => "text NULL",
 );
 
@@ -820,7 +826,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions'] = ar
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourWeatherConditions'],
     'exclude'   => true,
     'inputType' => 'textarea',
-    'eval'      => array('doNotCopy' => true, 'tl_class' => 'clr m12', 'mandatory' => false),
+    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
     'sql'       => "text NULL",
 );
 
@@ -828,9 +834,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions'] = ar
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourAvalancheConditions'],
     'exclude'   => true,
-    'inputType' => 'textarea',
-    'eval'      => array('doNotCopy' => true, 'tl_class' => 'clr m12', 'mandatory' => false),
-    'sql'       => "text NULL",
+    'inputType' => 'select',
+    'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'],
+    'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+    'eval'       => array('multiple' => false, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr m12'),
+    'sql'        => "varchar(255) NOT NULL default ''",
 );
 
 // tourSpecialIncidents
@@ -838,7 +846,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = arr
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourSpecialIncidents'],
     'exclude'   => true,
     'inputType' => 'textarea',
-    'eval'      => array('doNotCopy' => true, 'tl_class' => 'clr m12', 'mandatory' => false),
+    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
     'sql'       => "text NULL",
 );
 
@@ -874,7 +882,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel']['eval'][
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate']['eval']['doNotCopy'] = true;
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventCanceled']['eval']['doNotCopy'] = true;
-
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState']['eval']['doNotCopy'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState']['eval']['doNotCopy'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions']['eval']['doNotCopy'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents']['eval']['doNotCopy'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions']['eval']['doNotCopy'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSubstitutionText']['eval']['doNotCopy'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm']['eval']['doNotCopy'] = true;
 
 

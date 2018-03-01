@@ -72,7 +72,7 @@ class EventRapport
             if ($objEvent !== null && $objBiller !== null)
             {
                 // Check if tour report has filled in
-                if (!$objEvent->filledInEventReportForm)
+                if (!$objEvent->filledInEventReportForm || $objEvent->tourAvalancheConditions === '')
                 {
                     Message::addError('Bitte f&uuml;llen Sie den Touren-Rapport vollst&auml;ndig aus, bevor Sie das Verg&uuml;tungsformular herunterladen.');
                     Controller::redirect(System::getReferer());
@@ -150,6 +150,7 @@ class EventRapport
      */
     protected function getTourRapportData($arrData, $objEvent, $objEventMember, $objEventInvoice, $objBiller)
     {
+        Controller::loadLanguageFile('tl_calendar_events');
 
         $countParticipants = $objEventMember->numRows;
         $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
@@ -159,9 +160,9 @@ class EventRapport
 
         $transport = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : 'keine Angabe';
         $arrData[] = array('key' => 'eventTransport', 'value' => htmlspecialchars(html_entity_decode($transport)));
-        $arrData[] = array('key' => 'eventCanceled', 'value' => $objEvent->eventCanceled ? 'Ja' : 'Nein');
-        $arrData[] = array('key' => 'eventHasExecuted', 'value' => $objEvent->tourHasExecutedLikePredicted ? 'Ja' : 'Nein');
-        $substitutionText = $objEvent->tourSubstitutionText != '' ? $objEvent->tourSubstitutionText : '---';
+        $arrData[] = array('key' => 'eventCanceled', 'value' => $objEvent->eventState === 'event_canceled' ? 'Ja' : 'Nein');
+        $arrData[] = array('key' => 'eventHasExecuted', 'value' => $objEvent->executionState === 'event_executed_like_predicted'  ? 'Ja' : 'Nein');
+        $substitutionText = $objEvent->tourSubstitutionText !== '' ? $objEvent->tourSubstitutionText : '---';
         $arrData[] = array('key' => 'eventSubstitutionText', 'value' => htmlspecialchars(html_entity_decode($substitutionText)));
         $arrData[] = array('key' => 'eventDuration', 'value' => htmlspecialchars(html_entity_decode($objEventInvoice->eventDuration)));
 
@@ -174,7 +175,7 @@ class EventRapport
 
 
         $arrData[] = array('key' => 'weatherConditions', 'value' => htmlspecialchars(html_entity_decode($objEvent->tourWeatherConditions)));
-        $arrData[] = array('key' => 'avalancheConditions', 'value' => htmlspecialchars(html_entity_decode($objEvent->tourAvalancheConditions)));
+        $arrData[] = array('key' => 'avalancheConditions', 'value' => htmlspecialchars(html_entity_decode($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->tourAvalancheConditions][0])));
         $arrData[] = array('key' => 'specialIncidents', 'value' => htmlspecialchars(html_entity_decode($objEvent->tourSpecialIncidents)));
 
 

@@ -52,30 +52,39 @@ class CalendarSacEvents extends System
         $registrationCount = $objEventsMember->numRows;
 
         // Event canceled
-        if ($objEvent->eventCanceled)
+        if ($objEvent->eventState === 'event_canceled')
         {
             return 'event_status_4';
         }
 
+        // Event deferred
+        elseif ($objEvent->eventState === 'event_deferred')
+        {
+            return 'event_status_6';
+        }
+
         // Event is fully booked
-        if ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers)
+        elseif ($objEvent->eventState === 'event_fully_booked' || ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers))
         {
             return 'event_status_3'; // fa-circle red
         }
 
         // Event is over or booking in no more possible
-        if ($objEvent->startDate <= time() || ($objEvent->setRegistrationPeriod && $objEvent->registrationEndDate < time()))
+        elseif ($objEvent->startDate <= time() || ($objEvent->setRegistrationPeriod && $objEvent->registrationEndDate < time()))
         {
             return 'event_status_2';
         }
 
         // Booking not possible yet
-        if ($objEvent->setRegistrationPeriod && $objEvent->registrationStartDate > time())
+        elseif ($objEvent->setRegistrationPeriod && $objEvent->registrationStartDate > time())
         {
             return 'event_status_5'; // fa-circle orange
         }
 
-        return 'event_status_1';
+        else
+        {
+            return 'event_status_1';
+        }
 
     }
 
@@ -449,7 +458,7 @@ class CalendarSacEvents extends System
             $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
             $memberCount = $calendarEventsMember->numRows;
 
-            if ($objEvent->eventCanceled)
+            if ($objEvent->eventState === 'event_canceled')
             {
                 // Event canceled
                 return '';
@@ -495,7 +504,7 @@ class CalendarSacEvents extends System
             $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
             $memberCount = $calendarEventsMember->numRows;
 
-            if ($objEvent->eventCanceled)
+            if ($objEvent->eventState === 'event_canceled')
             {
                 return false;
             }
