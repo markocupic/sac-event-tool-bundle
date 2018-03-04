@@ -73,7 +73,7 @@ PaletteManipulator::create()
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('singleSRCBroschuere'), 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('suitableForBeginners', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
@@ -93,7 +93,7 @@ PaletteManipulator::create()
 PaletteManipulator::create()
     ->addField(array('dashboard'), 'dashboard_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'suitableForBeginners', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
@@ -217,15 +217,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['rte'] = nu
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['mandatory'] = true;
 
 
-// inTypo3
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['inTypo3'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['inTypo3'],
+// suitableForBeginners
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['suitableForBeginners'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['suitableForBeginners'],
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'checkbox',
     'sql'       => "char(1) NOT NULL default ''",
 );
-
 
 // eventType
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = array(
@@ -835,10 +834,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = 
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourAvalancheConditions'],
     'exclude'   => true,
     'inputType' => 'select',
-    'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'],
+    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'],
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval'       => array('multiple' => false, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr m12'),
-    'sql'        => "varchar(255) NOT NULL default ''",
+    'eval'      => array('multiple' => false, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr m12'),
+    'sql'       => "varchar(255) NOT NULL default ''",
 );
 
 // tourSpecialIncidents
@@ -853,6 +852,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = arr
 
 // For these fields allow allow edititing on first release level only
 $allowEdititingOnFirstReleaseLevelOnly = array(
+    'suitableForBeginners',
     'eventType',
     'title',
     'author',
