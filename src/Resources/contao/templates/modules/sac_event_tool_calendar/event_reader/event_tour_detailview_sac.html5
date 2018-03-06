@@ -96,7 +96,7 @@
       </div>
     <?php endif; ?>
 
-    <?php if ($this->tourDetailText != ''): ?>
+    <?php if ($this->eventType === 'tour' && $this->tourDetailText != ''): ?>
       <div class="tour-detail-text event-detail event-info-box icon-box-small">
         <h5>Route/Details</h5>
         <p>
@@ -105,21 +105,30 @@
       </div>
     <?php endif; ?>
 
+    <?php if ($this->eventType === 'generalEvent' && $this->generalEventDetailText != ''): ?>
+      <div class="general-event-detail-text event-detail event-info-box icon-box-small">
+        <h5>Details</h5>
+        <p>
+            <?= nl2br($this->generalEventDetailText) ?>
+        </p>
+      </div>
+    <?php endif; ?>
 
-  <div class="requirements event-detail event-info-box icon-box-small">
-    <h5>Voraussetzungen/Anforderungen</h5>
-      <?php if ($this->requirements != ''): ?>
-        <p class="requirements-text"><?= nl2br($this->requirements) ?></p>
-      <?php endif; ?>
-
-    <p class="tech-difficulty"><strong>Schwierigkeit: </strong><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($this->id)) ?></p>
-
-      <?php $arrTourProfile = Markocupic\SacEventToolBundle\CalendarSacEvents::getTourProfileAsArray($this->id); ?>
-      <?php if (count($arrTourProfile) > 1): ?>
-    <p class="tour-profile"><strong>Profil:</strong><br> <?= implode('<br>', $arrTourProfile) ?><p>
+    <?php if ($this->eventType === 'tour'): ?>
+      <div class="requirements event-detail event-info-box icon-box-small">
+        <h5>Voraussetzungen/Anforderungen</h5>
+          <?php if ($this->requirements != ''): ?>
+            <p class="requirements-text"><?= nl2br($this->requirements) ?></p>
           <?php endif; ?>
-  </div>
 
+        <p class="tech-difficulty"><strong>Schwierigkeit: </strong><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($this->id)) ?></p>
+
+          <?php $arrTourProfile = Markocupic\SacEventToolBundle\CalendarSacEvents::getTourProfileAsArray($this->id); ?>
+          <?php if (count($arrTourProfile) > 1): ?>
+        <p class="tour-profile"><strong>Profil:</strong><br> <?= implode('<br>', $arrTourProfile) ?><p>
+              <?php endif; ?>
+      </div>
+    <?php endif; ?>
 
     <?php if ($this->leistungen != ''): ?>
       <div class="price event-detail event-info-box icon-box-small">
@@ -188,7 +197,7 @@
     <?php endif; ?>
 
 
-    <!-- enclosures/downloads -->
+  <!-- enclosures/downloads -->
     <?php if ($this->enclosure): ?>
       <div class="event-eclosures event-detail event-info-box icon-box-small">
         <h5>Downloads/weitere Informationen</h5>

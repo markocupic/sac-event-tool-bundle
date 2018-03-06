@@ -110,6 +110,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'] = array(
     'course'         => 'Kurs',
     'tour'           => 'Tour',
     'lastMinuteTour' => 'Last Minute Tour',
+    'generalEvent' => 'Veranstaltung (Kultur, Vorträge + sektionsübergreifende Events)'
 );
 
 // Event state

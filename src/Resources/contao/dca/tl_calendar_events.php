@@ -57,6 +57,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $strLegends;
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour'] = $strLegends;
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['lastMinuteTour'] = $strLegends;
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['course'] = $strLegends;
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['generalEvent'] = $strLegends;
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour_report'] = $strLegends;
 
 // Define selectors
@@ -108,6 +109,26 @@ PaletteManipulator::create()
     ->applyToPalette('tour', 'tl_calendar_events')
     ->applyToPalette('lastMinuteTour', 'tl_calendar_events');
 
+
+// generalEvent
+// same like tour but remove Fields: 'suitableForBeginners', 'tourTechDifficulty', 'tourProfile', 'mountainguide','tourDetailText', 'requirements'
+// Add field: 'generalEventDetailText'
+PaletteManipulator::create()
+    ->addField(array('dashboard'), 'dashboard_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'organizers', 'tourType', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('location', 'journey', 'generalEventDetailText', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('source'), 'source_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('cssClass', 'noComments'), 'expert_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('generalEvent', 'tl_calendar_events');
 
 // Course palette
 PaletteManipulator::create()
@@ -739,12 +760,21 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = array(
     'sql'       => "blob NULL",
 );
 
-// requirements
+// tourDetailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourDetailText'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourDetailText'],
     'exclude'   => true,
     'inputType' => 'textarea',
     'eval'      => array('tl_class' => 'clr m12', 'mandatory' => true),
+    'sql'       => "text NULL",
+);
+
+// generalEventDetailText
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generalEventDetailText'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['generalEventDetailText'],
+    'exclude'   => true,
+    'inputType' => 'textarea',
+    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
     'sql'       => "text NULL",
 );
 

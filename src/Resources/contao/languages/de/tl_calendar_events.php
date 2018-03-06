@@ -78,6 +78,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'] = array("Technis
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'] = array("Schwierigkeiten Minimum:", "Definieren Sie hier den minimalen technischen Schwierigkeitsgrad.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'] = array("Schwierigkeiten Maximum (optional):", "Definieren Sie hier den maximalen technischen Schwierigkeitsgrad.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourDetailText'] = array("Details zur Tour/Route", "Geben Sie hier weitere Details zur Tour an.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['generalEventDetailText'] = array("Details zum Anlass", "Geben Sie hier weitere Details zum Anlass an.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['executionState'] = array("Durchf&uuml;hrungsstatus", "Geben Sie an, ob der Event durchgef&uuml;hrt werden konnte.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourSubstitutionText'] = array("Ersatz-/Ausweichtour, falls die Tour nicht wie ausgeschrieben durchgef&uuml;hrt wurde", "Geben Sie, falls n&ouml;tig Informationen zur Ersatz-/Ausweichtour an.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourWeatherConditions'] = array("Angaben zum Wetter", "Geben Sie hier Angaben zum Wetter ein.");
