@@ -64,7 +64,7 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addField(array('firstname', 'lastname', 'sacMemberId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
     ->addField(array('emergencyPhone', 'emergencyPhoneName'), 'emergency_phone_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('iban'), 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('avatarSRC'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('avatarSRC', 'hobbies', 'introducing'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('login', 'tl_user');
 
 
@@ -267,6 +267,30 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['website'] = array(
     'eval'      => array('rgxp' => 'url', 'maxlength' => 255, 'tl_class' => 'clr'),
     'sql'       => "varchar(255) NOT NULL default ''",
 );
+
+
+// hobbies
+$GLOBALS['TL_DCA']['tl_user']['fields']['hobbies'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_user']['hobbies'],
+    'exclude'   => true,
+    'inputType' => 'textarea',
+    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
+    'sql'       => "text NULL",
+);
+
+
+// introducing
+$GLOBALS['TL_DCA']['tl_user']['fields']['introducing'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_user']['introducing'],
+    'exclude'   => true,
+    'inputType' => 'textarea',
+    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
+    'sql'       => "text NULL",
+);
+
+
+
+
 
 // leiterQualifikation
 $GLOBALS['TL_DCA']['tl_user']['fields']['leiterQualifikation'] = array(
