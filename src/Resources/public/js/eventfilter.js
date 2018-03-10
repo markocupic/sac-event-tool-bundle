@@ -21,12 +21,6 @@ var EventFilter = {
     globalEventId: 0,
 
     /**
-     * The FontAwesome object
-     * https://fontawesome.com/how-to-use/font-awesome-api
-     */
-    objFontAwesome: null,
-
-    /**
      * The eventlist
      */
     $eventList: 0,
@@ -107,12 +101,7 @@ var EventFilter = {
 
         // Add loading icon
         $('.loading-icon-lg').remove();
-        // See https://fontawesome.com/how-to-use/font-awesome-api#icon
-        var iconDefinition = self.objFontAwesome.findIconDefinition({prefix: self.options.loadingIcon.iconPrefix, iconName: self.options.loadingIcon.iconName});
-        var icon = self.objFontAwesome.icon(iconDefinition, {
-            classes: self.options.loadingIcon.iconClasses
-        }).html;
-        self.$eventList.first().append(self.options.loadingIcon.html.replace('%s', icon));
+        self.$eventList.first().append(self.options.loadingIcon.html);
     },
 
     /**
@@ -321,7 +310,6 @@ var EventFilter = {
         self.$eventList = eventList;
         self.options = options;
 
-        self.objFontAwesome = options.objFontAwesome;
         self.$filterBoard = $('#eventFilterBoard');
         self.$ctrlOrganizers = $('#ctrl_organizers');
         self.$ctrlSearch = $('#ctrl_search');

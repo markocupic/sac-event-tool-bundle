@@ -10,16 +10,12 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.min
         EventFilter.initialize($('.mod_eventToolCalendarEventlist'), {
             filterBoardId: <?= $this->id ?>,
             requestToken: '<?= REQUEST_TOKEN ?>',
-            objFontAwesome: FontAwesome,
             xhr: {
                 action: 'ajax?filterTourList'
             },
-            delay: 1000,
+            delay: 1500,
             loadingIcon: {
-                html: '<div class="loading-icon-lg"><div>%s</div></div>',
-                iconPrefix: 'fal',
-                iconClasses: ['fa-spin', 'fa-3x'],
-                iconName: 'circle-notch'
+                html: '<div class="loading-icon-lg"><div class="preloader-icon"></div></div>'
             },
             noResult:{
                 html: '<div class="alert alert-primary alert-no-results-found text-lg" role="alert"><h5><i class="fal fa-meh" aria-hidden="true"></i> Leider wurden zu deiner Suchanfrage keine Events gefunden. &Uuml;berp&uuml;fe bitte die Filtereinstellungen.</h5></div>'
