@@ -253,6 +253,7 @@ class SyncSacMemberDatabase
         $this->connection->executeUpdate('UPDATE tl_member SET isSacMember = ?', array(''));
 
         $i = 0;
+        $this->connection->begin_transaction();
         foreach ($arrMember as $sacMemberId => $arrValues)
         {
             $arrValues['sectionId'] = \serialize($arrValues['sectionId']);
@@ -275,7 +276,9 @@ class SyncSacMemberDatabase
             // Log, if sync has finished without errors (max script execution time!!!!)
             $i++;
 
-        }
+        } 
+        $this->connection->commit_transaction();
+
 
         // Set tl_member.disable to true if member was not found in the csv-file
         $statement = $this->connection->executeQuery('SELECT * FROM tl_member WHERE disable=? AND isSacMember=?', array('', ''));
