@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Services\SacMemberDatabase;
 
-use Contao\System;
+use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Date;
 use Contao\File;
 use Contao\Input;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\System;
 use Doctrine\DBAL\Connection;
 
 /**
@@ -110,18 +110,18 @@ class SyncSacMemberDatabase
      */
     public function loadDataFromFtp()
     {
-        if(!$this->test_mode)
+        if (!$this->test_mode)
         {
 
-        // Run once per day
-        $statement = $this->connection->executeQuery('SELECT * FROM tl_log WHERE action = ? ORDER BY tstamp DESC LIMIT 0,1', array(self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC));
-        while (false !== ($objLog = $statement->fetch(\PDO::FETCH_OBJ)))
-        {
-            if (Date::parse('Y-m-d', $objLog->tstamp) === Date::parse('Y-m-d', \time()))
+            // Run once per day
+            $statement = $this->connection->executeQuery('SELECT * FROM tl_log WHERE action = ? ORDER BY tstamp DESC LIMIT 0,1', array(self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC));
+            while (false !== ($objLog = $statement->fetch(\PDO::FETCH_OBJ)))
             {
-                return $this;
+                if (Date::parse('Y-m-d', $objLog->tstamp) === Date::parse('Y-m-d', \time()))
+                {
+                    return $this;
+                }
             }
-        }
         }
 
         // Open FTP connection
@@ -151,13 +151,56 @@ class SyncSacMemberDatabase
     }
 
     /**
+     * @return resource
+     * @throws \Exception
+     */
+    private function openFtpConnection()
+    {
+        $connId = \ftp_connect($this->ftp_hostname);
+        if (!\ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId)
+        {
+            throw new \Exception('Could not establish ftp connection.');
+        }
+        return $connId;
+    }
+
+    /**
+     * Download files from ftp server
+     * @param $connId
+     * @param $localFile
+     * @param $remoteFile
+     * @return bool
+     * @throws \Exception
+     */
+    private function downloadFileFromFtp($connId, $localFile, $remoteFile)
+    {
+        $connId = \ftp_get($connId, $localFile, $remoteFile, FTP_BINARY);
+        if (!$connId)
+        {
+            throw new \Exception('Could not download files from ftp server.');
+        }
+        return $connId;
+    }
+
+    /**
+     * @param $text
+     * @param $method
+     * @param $type
+     */
+    private function log($text, $method, $type): void
+    {
+        $adapter = $this->framework->getAdapter(System::class);
+        $adapter->log($text, $method, $type);
+    }
+
+    /**
      * @return $this
      */
     public function syncContaoDatabase()
     {
         $startTime = \time();
 
-        if(!$this->test_mode)
+        if (!$this->test_mode)
         {
             // Run once per day
             $statement = $this->connection->executeQuery('SELECT * FROM tl_log WHERE action = ? ORDER BY tstamp DESC LIMIT 0,1', array(self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC));
@@ -252,32 +295,47 @@ class SyncSacMemberDatabase
         // Set tl_member.isSacMember to ''
         $this->connection->executeUpdate('UPDATE tl_member SET isSacMember = ?', array(''));
 
-        $i = 0;
-        $this->connection->begin_transaction();
-        foreach ($arrMember as $sacMemberId => $arrValues)
+        // Start transaction (big thank to cyon.ch)
+        $this->connection->beginTransaction();
+        try
         {
-            $arrValues['sectionId'] = \serialize($arrValues['sectionId']);
-            if (!in_array($sacMemberId, $arrMemberIDS))
+            $i = 0;
+            foreach ($arrMember as $sacMemberId => $arrValues)
             {
-                // Add new user
-                $this->connection->insert('tl_member', $arrValues);
-                $this->log(
-                    \sprintf('Insert new SAC-member with SAC-User-ID: %s to tl_member.', $arrValues['sacMemberId']),
-                    __FILE__ . ' Line: ' . __LINE__,
-                    self::SAC_EVT_LOG_ADD_NEW_MEMBER
-                );
-            }
-            else
-            {
-                // Sync datarecord
-                $this->connection->update('tl_member', $arrValues, array('sacMemberId' => $sacMemberId));
-            }
+                $arrValues['sectionId'] = \serialize($arrValues['sectionId']);
+                if (!in_array($sacMemberId, $arrMemberIDS))
+                {
+                    // Add new user
+                    $this->connection->insert('tl_member', $arrValues);
+                    $this->log(
+                        \sprintf('Insert new SAC-member with SAC-User-ID: %s to tl_member.', $arrValues['sacMemberId']),
+                        __FILE__ . ' Line: ' . __LINE__,
+                        self::SAC_EVT_LOG_ADD_NEW_MEMBER
+                    );
+                }
+                else
+                {
+                    // Sync datarecord
+                    $this->connection->update('tl_member', $arrValues, array('sacMemberId' => $sacMemberId));
+                }
 
-            // Log, if sync has finished without errors (max script execution time!!!!)
-            $i++;
+                // Log, if sync has finished without errors (max script execution time!!!!)
+                $i++;
+            }
+            $this->connection->commit();
 
-        } 
-        $this->connection->commit_transaction();
+        }
+        catch (\Exception $e)
+        {
+            $this->log(
+                'Error during the database sync process. Starting transaction rollback, now.',
+                __FILE__ . ' Line: ' . __LINE__,
+                self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC
+            );
+            //transaction rollback
+            $this->connection->rollBack();
+            throw $e;
+        }
 
 
         // Set tl_member.disable to true if member was not found in the csv-file
@@ -285,8 +343,8 @@ class SyncSacMemberDatabase
         while (false !== ($objDisabledMember = $statement->fetch(\PDO::FETCH_OBJ)))
         {
             $arrSet = array(
-                'tstamp' => \time(),
-                'disable' => '1'
+                'tstamp'  => \time(),
+                'disable' => '1',
             );
             $this->connection->update('tl_member', $arrSet, array('id' => $objDisabledMember->id));
 
@@ -311,58 +369,12 @@ class SyncSacMemberDatabase
         }
 
 
-        if($this->test_mode)
+        if ($this->test_mode)
         {
             echo 'Finished syncing SAC member database with tl_member. Synced ' . \count($arrMember) . ' entries. Duration: ' . $duration . ' s';
             exit;
         }
 
         return $this;
-    }
-
-
-    /**
-     * @return resource
-     * @throws \Exception
-     */
-    private function openFtpConnection()
-    {
-        $connId = \ftp_connect($this->ftp_hostname);
-        if (!\ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId)
-        {
-            throw new \Exception('Could not establish ftp connection.');
-        }
-        return $connId;
-    }
-
-
-    /**
-     * Download files from ftp server
-     * @param $connId
-     * @param $localFile
-     * @param $remoteFile
-     * @return bool
-     * @throws \Exception
-     */
-    private function downloadFileFromFtp($connId, $localFile, $remoteFile)
-    {
-        $connId = \ftp_get($connId, $localFile, $remoteFile, FTP_BINARY);
-        if (!$connId)
-        {
-            throw new \Exception('Could not download files from ftp server.');
-        }
-        return $connId;
-    }
-
-
-    /**
-     * @param $text
-     * @param $method
-     * @param $type
-     */
-    private function log($text, $method, $type): void
-    {
-        $adapter = $this->framework->getAdapter(System::class);
-        $adapter->log($text, $method, $type);
     }
 }
