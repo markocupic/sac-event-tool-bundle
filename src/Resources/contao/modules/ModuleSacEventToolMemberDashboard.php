@@ -18,10 +18,12 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\Database;
 use Contao\Date;
+use Contao\Dbafs;
 use Contao\Environment;
 use Contao\Events;
 use Contao\File;
 use Contao\FilesModel;
+use Contao\Folder;
 use Contao\Frontend;
 use Contao\FrontendUser;
 use Contao\Input;
@@ -233,7 +235,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                 }
                 elseif (!$objEvent->allowDeregistration)
                 {
-                    $errorMsg = $objEvent->allowDeregistration . 'Du kannst dich vom Event "' . $objEvent->title . '" nicht abmelden. Die Anmeldung ist definitiv. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
+                    $errorMsg = $objEvent->allowDeregistration . 'Du kannst dich vom Event "' . $objEvent->title . '" nicht abmelden. Die Anmeldung ist definitiv. Nimm Kontakt mit dem Event-Organisator auf.';
                     $blnHasError = true;
                 }
                 elseif ($objEvent->startDate < time())
@@ -381,10 +383,10 @@ class ModuleSacEventToolMemberDashboard extends Module
                     // Do not allow blogging for old events
                     if ($objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 < time())
                     {
-                        if(null === CalendarEventsStoryModel::findOneBySacMemberIdAndEventId($this->objUser->sacMemberId, $objEvent->id))
+                        if (null === CalendarEventsStoryModel::findOneBySacMemberIdAndEventId($this->objUser->sacMemberId, $objEvent->id))
                         {
-                        Message::addError('F&uuml;r diesen Event kann kein Bericht mehr erstellt werden. Das Eventdatum liegt schon zu lange zur&uuml;ck');
-                        Controller::redirect(Controller::getReferer());
+                            Message::addError('F&uuml;r diesen Event kann kein Bericht mehr erstellt werden. Das Eventdatum liegt schon zu lange zur&uuml;ck');
+                            Controller::redirect(Controller::getReferer());
                         }
 
                     }
@@ -513,34 +515,42 @@ class ModuleSacEventToolMemberDashboard extends Module
 
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
-            'label'      => 'Speichern',
-            'inputType'  => 'submit',
-            'extensions' => 'jpg,jpeg',
+            'label'     => 'Speichern',
+            'inputType' => 'submit',
         ));
 
+        // Create the folder if it not exists
+        $objUploadFolder = new Folder(Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/' . $this->objUser->id);
+        Dbafs::addResource($objUploadFolder->path);
 
         $objWidget = $objForm->getWidget('avatar');
-        $objWidget->extensions = 'jpg,jpeg';
+        $objWidget->extensions = 'jpg,jpeg,png,gif,svg';
         $objWidget->storeFile = true;
-        $objWidget->uploadFolder = FilesModel::findByPath(Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY'))->uuid;
-        $objWidget->addAttribute('accept', '.jpg,.jpeg');
+        $objWidget->uploadFolder = FilesModel::findByPath($objUploadFolder->path)->uuid;
+        $objWidget->addAttribute('accept', '.jpg,.jpeg,.png,.gif,.svg');
 
         // Delete avatar
         if (Input::post('FORM_SUBMIT') === 'form-avatar-upload' && Input::post('delete-avatar'))
         {
-            $objFile = new File(Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/avatar-' . $this->objUser->id . '.jpeg', true);
-            if ($objFile->exists())
-            {
-                $objFile->delete();
-            }
+            $objUploadFolder->purge();
         }
 
         // Standardize name
         if (Input::post('FORM_SUBMIT') === 'form-avatar-upload' && !empty($_FILES['avatar']['tmp_name']))
         {
-            $_FILES['avatar']['name'] = 'avatar-' . $this->objUser->id . '.jpeg';
+            $objUploadFolder->purge();
+            $objFile = new File($_FILES['avatar']['name']);
+            $_FILES['avatar']['name'] = 'avatar-' . $this->objUser->id . '.' . strtolower($objFile->extension);
         }
-        $objForm->validate();
+
+        if ($objForm->validate())
+        {
+            // Reload page after uploads
+            if (Input::post('FORM_SUBMIT') === 'form-avatar-upload')
+            {
+                Controller::reload();
+            }
+        }
 
 
         return $objForm->generate();

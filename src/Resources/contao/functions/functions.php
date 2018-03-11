@@ -70,16 +70,26 @@ function getAvatar($userId, $mode = 'BE')
     {
         if ($objUser !== null)
         {
-            if (is_file($rootDir . '/' . \Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/avatar-' . $objUser->id . '.jpeg'))
+            $uploadFolder = Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/' . $objUser->id;
+            if (is_dir($rootDir . '/' . $uploadFolder))
             {
-                return \Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/avatar-' . $objUser->id . '.jpeg';
+                $arrRes = scan($rootDir . '/' . $uploadFolder);
+                foreach ($arrRes as $file)
+                {
+                    if (is_file($rootDir . '/' . $uploadFolder . '/' . $file))
+                    {
+                        // Return first file
+                        return $uploadFolder . '/' . $file;
+                    }
+                }
+            }
+
+            if ($objUser->gender === 'female')
+            {
+                return \Config::get('SAC_EVT_AVATAR_FEMALE');
             }
             else
             {
-                if ($objUser->gender === 'female')
-                {
-                    return \Config::get('SAC_EVT_AVATAR_FEMALE');
-                }
                 return \Config::get('SAC_EVT_AVATAR_MALE');
             }
         }
