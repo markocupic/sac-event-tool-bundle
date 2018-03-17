@@ -2,6 +2,11 @@
 
 <?php $this->block('content'); ?>
 
+
+  <!-- indexer::stop -->
+  <p class="back"><a href="{{env::referer}}" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
+  <!-- indexer::continue -->
+
   <div class="row">
     <div class="image_container portrait col-sm-4 col-lg-3">
       {{image::<?= getAvatar($this->user['id'], 'BE') ?>?mode=crop&width=160&height=200}}
