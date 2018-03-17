@@ -142,7 +142,7 @@ class CalendarSacEvents extends System
      * @param $eventId
      * @return array
      */
-    public static function getInstructorNamesAsArray($eventId)
+    public static function getInstructorNamesAsArray($eventId, $blnAddMainQualification = false)
     {
         $arrInstructors = array();
         $objEvent = \CalendarEventsModel::findByPk($eventId);
@@ -156,7 +156,14 @@ class CalendarSacEvents extends System
                     $objUser = UserModel::findByPk($arrUser['instructorId']);
                     if ($objUser !== null)
                     {
-                        $arrInstructors[] = $objUser->name;
+                        if ($blnAddMainQualification && static::getMainQualifikation($objUser->id) != '')
+                        {
+                            $arrInstructors[] = $objUser->name . ' (' . static::getMainQualifikation($objUser->id) . ')';
+                        }
+                        else
+                        {
+                            $arrInstructors[] = $objUser->name;
+                        }
                     }
                 }
             }

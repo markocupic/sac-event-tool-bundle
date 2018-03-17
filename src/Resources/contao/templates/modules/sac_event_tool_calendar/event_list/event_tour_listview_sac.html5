@@ -6,7 +6,6 @@
   <td>
       <?= \Date::parse('d.m.Y', $this->startDate) ?>
   </td>
-
   <td>
       <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($this->id) ?>
   </td>
@@ -18,8 +17,8 @@
     <a href="{{event_url::<?php echo $this->id; ?>}}">{{event_title::<?= $this->id ?>}}</a>
   </td>
   <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($this->id) ?></td>
-
   <td class="tourTechDifficulty"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($this->id, true)) ?></td>
   <td class="tourType"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($this->id, 'shortcut', true)) ?></td>
   <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorNamesAsArray($this->id); ?>
-  <td><?= implode(', ', $arrInstructors) ?></td></tr>
+  <td><?= implode(', ', $arrInstructors) ?></td>
+</tr>

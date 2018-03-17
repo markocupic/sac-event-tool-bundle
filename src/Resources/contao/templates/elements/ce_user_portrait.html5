@@ -47,7 +47,6 @@
               <?= nl2br($this->user['introducing']) ?>
           </div>
         <?php endif; ?>
-
     </div>
   </div>
   <br>
@@ -64,33 +63,24 @@
       <th>Anf.</th>
       <th>Art</th>
       <th>Leitung</th>
-
     </tr>
       <?php foreach ($arrEvents['tour'] as $event): ?>
-
           <?php $eventState = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($event['id']); ?>
           <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][$eventState]; ?>
-
           <?php $arrTourTypes = \StringUtil::deserialize($event['tourType'], true); ?>
         <tr class="event-item-tour event" data-id="<?= $event['id'] ?>" data-tourType="<?= implode(',', $arrTourTypes) ?>">
-          <td>
-              <?= \Date::parse('d.m.Y', $event['startDate']) ?>
-          </td>
-
-          <td>
-              <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($event['id']) ?>
-          </td>
-
+          <td><?= \Date::parse('d.m.Y', $event['startDate']) ?></td>
+          <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($event['id']) ?></td>
           <td>
             <i class="fa-fw event-state-icon <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
             <a href="{{event_url::<?php echo $event['id']; ?>}}">{{event_title::<?= $event['id'] ?>}}</a>
           </td>
           <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($event['id']) ?></td>
-
           <td class="tourTechDifficulty"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($event['id'], true)) ?></td>
           <td class="tourType"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($event['id'], 'shortcut', true)) ?></td>
-          <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorNamesAsArray($event['id']); ?>
-          <td><?= implode(', ', $arrInstructors) ?></td>        </tr>
+            <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorNamesAsArray($event['id']); ?>
+          <td><?= implode(', ', $arrInstructors) ?></td>
+        </tr>
       <?php endforeach; ?>
   </table>
 <?php endif; ?>
@@ -100,12 +90,8 @@
   <table class="table">
       <?php foreach ($arrEvents['course'] as $event): ?>
         <tr class="event-item event-item-course event" data-id="<?= $event['id'] ?>" data-event-type="<?= $event['courseTypeLevel1'] ?>">
-          <td>
-              <?= \Date::parse('d.m.Y', $event['startDate']) ?>
-          </td>
-          <td>
-              <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($event['id']) ?>
-          </td>
+          <td><?= \Date::parse('d.m.Y', $event['startDate']) ?></td>
+          <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($event['id']) ?></td>
           <td>
               <?php $eventState = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($event['id']); ?>
               <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($event['id'])]; ?>
@@ -114,7 +100,7 @@
             <a href="{{event_url::<?php echo $event['id']; ?>}}">{{event_title::<?= $event['id'] ?>}}</a>
           </td>
           <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($event['id']) ?></td>
-          <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorNamesAsArray($event['id']); ?>
+            <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorNamesAsArray($event['id']); ?>
           <td><?= implode(', ', $arrInstructors) ?></td>
         </tr>
       <?php endforeach; ?>
