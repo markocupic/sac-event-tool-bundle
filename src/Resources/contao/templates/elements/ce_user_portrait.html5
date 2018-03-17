@@ -40,7 +40,7 @@
               <?= nl2br($this->user['hobbies']) ?>
           </div>
         <?php endif; ?>
-      
+
         <?php if ($this->user['introducing'] != ''): ?>
           <h5 class="ce_headline">Selbstportrait</h5>
           <div class="ce_user_portrait_introducing">
@@ -89,8 +89,8 @@
 
           <td class="tourTechDifficulty"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($event['id'], true)) ?></td>
           <td class="tourType"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($event['id'], 'shortcut', true)) ?></td>
-          <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getMainInstructorName($event['id']) ?></td>
-        </tr>
+          <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorNamesAsArray($event['id']); ?>
+          <td><?= implode(', ', $arrInstructors) ?></td>        </tr>
       <?php endforeach; ?>
   </table>
 <?php endif; ?>
@@ -113,7 +113,9 @@
           <td>
             <a href="{{event_url::<?php echo $event['id']; ?>}}">{{event_title::<?= $event['id'] ?>}}</a>
           </td>
-          <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getMainInstructorName($event['id']) ?></td>
+          <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($event['id']) ?></td>
+          <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorNamesAsArray($event['id']); ?>
+          <td><?= implode(', ', $arrInstructors) ?></td>
         </tr>
       <?php endforeach; ?>
   </table>

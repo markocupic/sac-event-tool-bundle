@@ -138,6 +138,33 @@ class CalendarSacEvents extends System
     }
 
     /**
+     * Get instructors names as array
+     * @param $eventId
+     * @return array
+     */
+    public static function getInstructorNamesAsArray($eventId)
+    {
+        $arrInstructors = array();
+        $objEvent = \CalendarEventsModel::findByPk($eventId);
+        if ($objEvent !== null)
+        {
+            $arrInstr = StringUtil::deserialize($objEvent->instructor, true);
+            foreach ($arrInstr as $arrUser)
+            {
+                if (isset($arrUser['instructorId']))
+                {
+                    $objUser = UserModel::findByPk($arrUser['instructorId']);
+                    if ($objUser !== null)
+                    {
+                        $arrInstructors[] = $objUser->name;
+                    }
+                }
+            }
+        }
+        return $arrInstructors;
+    }
+
+    /**
      * @param $id
      * @return string
      */
