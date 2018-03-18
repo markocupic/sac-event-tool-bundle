@@ -22,9 +22,9 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
         (
             'keys' => array
             (
-                'id' => 'primary'
-            )
-        )
+                'id' => 'primary',
+            ),
+        ),
     ),
 
     'list'     => array
@@ -36,7 +36,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
             'panelLayout'           => 'filter;search,limit',
             'headerFields'          => array('level', 'title'),
             'disableGrouping'       => true,
-            'child_record_callback' => array('tl_event_release_level_policy', 'listReleaseLevels')
+            'child_record_callback' => array('tl_event_release_level_policy', 'listReleaseLevels'),
         ),
         'label'             => array
         (
@@ -50,8 +50,8 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
-                'attributes' => 'onclick="Backend.getScrollOffset();"'
-            )
+                'attributes' => 'onclick="Backend.getScrollOffset();"',
+            ),
         ),
         'operations'        => array
         (
@@ -59,43 +59,43 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
             (
                 'label' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['edit'],
                 'href'  => 'act=edit',
-                'icon'  => 'edit.gif'
+                'icon'  => 'edit.gif',
             ),
             'copy'   => array
             (
                 'label' => &$GLOBALS['TL_LANG']['tl_news']['copy'],
                 'href'  => 'act=copy',
-                'icon'  => 'copy.gif'
+                'icon'  => 'copy.gif',
             ),
             'delete' => array
             (
                 'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
-                'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"'
-            )
-        )
+                'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"',
+            ),
+        ),
     ),
     'palettes' => array
     (
-        'default' => 'level,title,description,allowWriteAccessToAuthor,allowWriteAccessToInstructors,groups'
+        'default' => 'level,title,description,allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowSwitchingToPrevLevel,allowSwitchingToNextLevel,groups',
     ),
 
     'fields' => array
     (
         'id'                            => array
         (
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => "int(10) unsigned NOT NULL auto_increment",
         ),
         'pid'                           => array
         (
             'foreignKey' => 'tl_event_release_level_policy_package.title',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => array('type' => 'belongsTo', 'load' => 'eager')
+            'relation'   => array('type' => 'belongsTo', 'load' => 'eager'),
         ),
         'tstamp'                        => array
         (
-            'sql' => "int(10) unsigned NOT NULL default '0'"
+            'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
         'level'                         => array
         (
@@ -104,7 +104,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
             'inputType' => 'select',
             'options'   => range(1, 10),
             'eval'      => array('mandatory' => true, 'tl_class' => 'clr'),
-            'sql'       => "smallint(2) unsigned NOT NULL default '0'"
+            'sql'       => "smallint(2) unsigned NOT NULL default '0'",
         ),
         'title'                         => array
         (
@@ -112,7 +112,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
             'exclude'   => true,
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
-            'sql'       => "varchar(255) NOT NULL default ''"
+            'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'description'                   => array
         (
@@ -132,6 +132,30 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
             'eval'       => array('multiple' => true, 'chosen' => true, 'mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'clr'),
             'sql'        => "blob NULL",
         ),
+        'allowSwitchingToPrevLevel'     => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowSwitchingToPrevLevel'],
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'checkbox',
+            'sql'       => "char(1) NOT NULL default ''",
+        ),
+        'allowSwitchingToNextLevel'     => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowSwitchingToNextLevel'],
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'checkbox',
+            'sql'       => "char(1) NOT NULL default ''",
+        ),
+        'allowWriteAccessToAuthor'      => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowWriteAccessToAuthor'],
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'checkbox',
+            'sql'       => "char(1) NOT NULL default ''",
+        ),
         'allowWriteAccessToAuthor'      => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowWriteAccessToAuthor'],
@@ -148,6 +172,6 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
             'inputType' => 'checkbox',
             'sql'       => "char(1) NOT NULL default ''",
         ),
-    )
+    ),
 );
 

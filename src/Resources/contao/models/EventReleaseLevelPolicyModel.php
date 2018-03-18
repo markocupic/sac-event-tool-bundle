@@ -341,18 +341,23 @@ class EventReleaseLevelPolicyModel extends \Model
 
     }
 
+
+
     /**
+     *
      * Switching to the next/prev level is allowed for:
      * - admins on each level
      * - for super users (defined in each level in tl_event_release_level_policy.groups)
-     * - for authors if he is allowed and the level is 1
-     * - for instructors if they are allowed and the level is 1
+     * - for authors if he is allowed
+     * - for instructors if they are allowed
      *
      * @param $userId
      * @param $eventId
+     * @param $direction
      * @return bool
+     * @throws \Exception
      */
-    public static function allowSwitchingEventReleaseLevel($userId, $eventId)
+    public static function allowSwitchingEventReleaseLevel($userId, $eventId, $direction)
     {
         $objBackendUser = \UserModel::findByPk($userId);
         if ($objBackendUser === null)
@@ -409,15 +414,29 @@ class EventReleaseLevelPolicyModel extends \Model
             // User is in a group that is permitted
             $allow = true;
         }
-        elseif ($objBackendUser->id == $objEvent->author && $objReleaseLevelModel->allowWriteAccessToAuthor && $objReleaseLevelModel->level == 1)
+        elseif ($objBackendUser->id == $objEvent->author && $objReleaseLevelModel->allowWriteAccessToAuthor)
         {
-            // User is author and has write access on this level and the level is 1
-            $allow = true;
+            // User is author and is allowed to switch up/down
+            if($direction === 'up' && $objReleaseLevelModel->allowSwitchingToNextLevel)
+            {
+                $allow = true;
+            }
+            if($direction === 'down')
+            {
+                $allow = true;
+            }
         }
-        elseif ($objReleaseLevelModel->allowWriteAccessToInstructors && in_array($objBackendUser->id, $arrInstructors) && $objReleaseLevelModel->level == 1)
+        elseif (in_array($objBackendUser->id, $arrInstructors))
         {
-            // User is set as a instructor in the current event
-            $allow = true;
+            // User is set as a instructor in the current event and is allowed to switch up/down
+            if($direction === 'up' && $objReleaseLevelModel->allowSwitchingToNextLevel)
+            {
+                $allow = true;
+            }
+            if($direction === 'down')
+            {
+                $allow = true;
+            }
         }
         else
         {

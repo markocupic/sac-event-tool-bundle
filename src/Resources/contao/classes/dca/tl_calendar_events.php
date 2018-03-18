@@ -107,41 +107,41 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         }
 
         /** @var Migration Code
-        $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events')->execute();
-        while ($objEvent->next())
-        {
-            $arrOrder = \Contao\StringUtil::deserialize($objEvent->orderInstructor, true);
-            $arrInst = \Contao\StringUtil::deserialize($objEvent->instructor_old, true);
-            $new = [];
-            foreach ($arrOrder as $id)
-            {
-                if (in_array($id, $arrInst))
-                {
-                    $new[] = $id;
-                }
-            }
-            foreach ($arrInst as $id)
-            {
-                if (!in_array($id, $arrOrder))
-                {
-                    $new[] = $id;
-                }
-            }
+         * $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events')->execute();
+         * while ($objEvent->next())
+         * {
+         * $arrOrder = \Contao\StringUtil::deserialize($objEvent->orderInstructor, true);
+         * $arrInst = \Contao\StringUtil::deserialize($objEvent->instructor_old, true);
+         * $new = [];
+         * foreach ($arrOrder as $id)
+         * {
+         * if (in_array($id, $arrInst))
+         * {
+         * $new[] = $id;
+         * }
+         * }
+         * foreach ($arrInst as $id)
+         * {
+         * if (!in_array($id, $arrOrder))
+         * {
+         * $new[] = $id;
+         * }
+         * }
+         *
+         * $set = array();
+         * $set['instructor'] = array();
+         * if(!empty($new))
+         * {
+         * foreach ($new as $id)
+         * {
+         * $set['instructor'][] = array('instructorId' => $id);
+         * }
+         * }
+         * $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
+         * }
+         **/
 
-            $set = array();
-            $set['instructor'] = array();
-            if(!empty($new))
-            {
-                foreach ($new as $id)
-                {
-                    $set['instructor'][] = array('instructorId' => $id);
-                }
-            }
-            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
-        }
-        **/
 
-        
         // Set tl_calendar_events.mainInstructor from tl_calendar_events.instructor
         // First instructor in the list will be the main instructor
         $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events')->execute();
@@ -939,6 +939,8 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         {
             // Set logged in User as author
             $objEventsModel->author = $this->User->id;
+            $objEventsModel->mainInstructor = $this->User->id;
+            $objEventsModel->instructor = serialize(array(array('instructorId' => $this->User->id)));
             $objEventsModel->save();
 
 
@@ -1421,6 +1423,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $this->redirect($this->getReferer());
         }
 
+
         // Check permissions AFTER checking the tid, so hacking attempts are logged
         if (!$this->User->hasAccess('tl_calendar_events::published', 'alexf'))
         {
@@ -1520,7 +1523,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         if (Input::get('action') === 'releaseLevelNext' && Input::get('eventId') == $row['id'])
         {
 
-            if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id']) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel) === true)
+            if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id'], 'up') === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel) === true)
             {
                 $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
                 if ($objEvent !== null)
@@ -1538,7 +1541,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $this->redirect($this->getReferer());
         }
 
-        if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id']) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel) === true)
+        if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id'], 'up') === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel) === true)
         {
             $canSendToNextReleaseLevel = true;
         }
@@ -1628,7 +1631,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         if (Input::get('action') === 'releaseLevelPrev' && Input::get('eventId') == $row['id'])
         {
 
-            if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id']) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel) === true)
+            if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id'], 'down') === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel) === true)
             {
                 $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
                 if ($objEvent !== null)
@@ -1645,7 +1648,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $this->redirect($this->getReferer());
         }
 
-        if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id']) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel) === true)
+        if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id'], 'down') === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel) === true)
         {
             $canSendToNextReleaseLevel = true;
         }

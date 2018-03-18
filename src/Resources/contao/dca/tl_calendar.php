@@ -18,12 +18,17 @@ $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['mode'] = 4;
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['child_record_callback'] = array('tl_calendar_sac_event_tool', 'listCalendars');
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['headerFields'] = array('title');
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['disableGrouping'] = true;
-$GLOBALS['TL_DCA']['tl_calendar']['list']['operations']['cut'] = array
-(
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar']['cut'],
-    'href'  => 'act=paste&amp;mode=cut',
-    'icon'  => 'cut.svg'
-);
+
+if(BackendUser::getInstance()->isAdmin)
+{
+    $GLOBALS['TL_DCA']['tl_calendar']['list']['operations']['cut'] = array
+    (
+        'label' => &$GLOBALS['TL_LANG']['tl_calendar']['cut'],
+        'href'  => 'act=paste&amp;mode=cut',
+        'icon'  => 'cut.svg'
+    );
+}
+
 
 
 // Palettes

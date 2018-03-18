@@ -30,3 +30,7 @@ $GLOBALS['TL_LANG']['tl_event_release_level_policy']['description'] = array("Bes
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['groups'] = array("Die (neben dem Autor) schreibberechtigten Gruppen", "Geben Sie die schreibberechtigten Gruppen an. Der Autor muss nicht angegeben werden.");
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowWriteAccessToAuthor'] = array("Dem Autor Scheibzugriff auf diesem Level gew&auml;hren.", "Mit dieser Einstellung gew&auml;hren Sie auf diesem Level dem Autor Schreibugriff.");
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowWriteAccessToInstructors'] = array("Den Event-Leitern Scheibzugriff auf diesem Level gew&auml;hren.", "Mit dieser Einstellung gew&auml;hren Sie auf diesem Level den Event-Leitern Schreibugriff.");
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowSwitchingToPrevLevel'] = array("Dem Autor und dem Leiter erlauben die Veröffentlichungsstufe herunterzustufen", "");
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowSwitchingToNextLevel'] = array("Dem Autor und dem Leiter erlauben die Veröffentlichungsstufe hochzustufen", "");
+
+

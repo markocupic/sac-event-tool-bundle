@@ -315,6 +315,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructorId'],
                 'exclude'    => true,
                 'inputType'  => 'select',
+                'default'    => BackendUser::getInstance()->id,
                 'filter'     => true,
                 'reference'  => &$GLOBALS['TL_LANG']['tl_calendar_events'],
                 //'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbTourDifficulties'),
