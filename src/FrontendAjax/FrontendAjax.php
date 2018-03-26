@@ -185,19 +185,32 @@ class FrontendAjax
      */
     private function _textSearch($strNeedle = '', $strHaystack = '')
     {
-        if (trim($strNeedle) == '')
+        if ($strNeedle == '')
         {
             return true;
         }
+        elseif (trim($strNeedle) == '')
+        {
+            return true;
+        }
+        elseif ($strHaystack == '')
+        {
+            return false;
+        }
+        elseif (trim($strHaystack) == '')
+        {
+            return false;
+        }
         else
         {
-            if (stripos($strHaystack, trim($strNeedle)) !== false)
+            if (preg_match('/' . $strNeedle . '/i', $strHaystack))
             {
                 return true;
             }
         }
         return false;
     }
+
 
     /**
      * Course list filter
