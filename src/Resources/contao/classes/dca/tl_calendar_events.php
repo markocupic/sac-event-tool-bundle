@@ -76,6 +76,15 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
+     * onload_callback deleteInvalidEvents
+     * @param DataContainer $dc
+     */
+    public function deleteInvalidEvents(DataContainer $dc)
+    {
+        $this->Database->prepare('DELETE FROM tl_calendar_events WHERE tstamp<? AND title=?')->execute(time() - 24 * 3600, '');
+    }
+
+    /**
      * onload_callback onloadCallback
      * @param DataContainer $dc
      */

@@ -22,6 +22,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array(
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'setPaletteWhenCreatingNew');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'triggerGlobalOperations');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'setPalettes');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'deleteInvalidEvents');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['oncreate_callback'][] = array('tl_calendar_events_sac_event_tool', 'oncreateCallback');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['oncopy_callback'][] = array('tl_calendar_events_sac_event_tool', 'oncopyCallback');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['ondelete_callback'][] = array('tl_calendar_events_sac_event_tool', 'ondeleteCallback');
