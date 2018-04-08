@@ -220,6 +220,9 @@ $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic_sac_event_tool.con
 /*** Handle event listing **/
 $GLOBALS['TL_HOOKS']['getAllEvents'][] = array('markocupic_sac_event_tool.contao_hooks.get_all_events', 'getAllEvents');
 
+/** Allow event preview from the backend if the event token is passed to the url */
+$GLOBALS['TL_HOOKS']['getContentElement'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\GetContentElement', 'getContentElement');
+
 /*** Prepare User accounts (create user directories, etc.
  * @deprecated PostLogin Hook will be be removed in Contao 5.0.
  **/

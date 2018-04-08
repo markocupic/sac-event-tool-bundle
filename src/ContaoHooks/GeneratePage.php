@@ -11,16 +11,17 @@
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\Automator;
+use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\Date;
 use Contao\Input;
 use Contao\System;
-use Contao\Date;
-use Contao\CoreBundle\Monolog\ContaoContext;
-use Psr\Log\LogLevel;
 use Markocupic\SacEventToolBundle\Services\Docx\ExportEvents2Docx;
 use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
+use Psr\Log\LogLevel;
 
 /**
  * Class GeneratePage
@@ -57,6 +58,9 @@ class GeneratePage
             $objAutomator->purgeScriptCache();
         }
 
+
+
+
         // Für Downloads z.B. Downloadlink auf www.sac-pilatus.ch/kurse
         if (Input::get('action') === 'downloadKursbroschuere' && Input::get('year') != '')
         {
@@ -65,7 +69,7 @@ class GeneratePage
              */
             $year = Input::get('year') == '2017' ? '2018' : Input::get('year');
 
-            if(Input::get('year') === 'current')
+            if (Input::get('year') === 'current')
             {
                 $year = Date::parse('Y', time());
             }

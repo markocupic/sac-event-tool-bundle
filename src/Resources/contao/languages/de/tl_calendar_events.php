@@ -16,8 +16,6 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelPrev'] = array("Freigabes
 
 
 // Legends
-$GLOBALS['TL_LANG']['tl_calendar_events']['dashboard_legend'] = "Mini-Dashboard";
-$GLOBALS['TL_LANG']['tl_calendar_events']['tour_report_dashboard_legend'] = "Mini-Dashboard";
 $GLOBALS['TL_LANG']['tl_calendar_events']['title_legend'] = "Basis-Einstellungen";
 $GLOBALS['TL_LANG']['tl_calendar_events']['broschuere_legend'] = "Einstellungen f&uuml;r die PDF-Brosch&uuml;re";
 $GLOBALS['TL_LANG']['tl_calendar_events']['deregistration_legend'] = "Einstellungen f&uuml;r Event-Abmeldungen";

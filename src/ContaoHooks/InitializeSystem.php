@@ -13,6 +13,7 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Input;
 use Contao\System;
+use Contao\CalendarEventsModel;
 use Markocupic\SacEventToolBundle\ExportEvents2Typo3;
 
 
@@ -44,7 +45,6 @@ class InitializeSystem
      */
     public function initializeSystem()
     {
-
         // Prepare Plugin environment, create folders, etc.
         $objPluginEnv = System::getContainer()->get('markocupic.sac_event_tool_bundle.prepare_plugin_environment');
 

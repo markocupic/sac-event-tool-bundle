@@ -216,7 +216,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         }
 
 
-        // Forbid cutting an editing
+        // Do not allow cutting an editing
         $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['edit'] = null;
         $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['cut'] = null;
 
@@ -270,7 +270,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             {
                 if (!EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objEventsModel->id))
                 {
-                    // User has no wrie access to the datarecord, so present field values without the form input
+                    // User has no write access to the datarecord, so present field values without the form input
                     foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] as $field => $dca)
                     {
                         $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['input_field_callback'] = array('tl_calendar_events_sac_event_tool', 'showFieldValue');
@@ -531,79 +531,24 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         // Check if user is allowed
         if (EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $dc->activeRecord->id))
         {
+
             if ($objEvent->eventType === 'tour' || $objEvent->eventType === 'lastMinuteTour')
             {
-                $allow = true;
                 $objTemplate->allowTourReportButton = true;
                 $objTemplate->allowInvoiceListButton = true;
-                $objTemplate->allowParticipantListButton = true;
             }
 
-            if ($objEvent->eventType === 'course')
-            {
-                $allow = true;
-                $objTemplate->allowParticipantListButton = true;
-            }
+            $objTemplate->allowParticipantListButton = true;
+
+
         }
+
+        $objTemplate->allowEventPreviewButton = true;
+        $objTemplate->eventPreviewUrl = Contao\Events::generateEventUrl($objEvent);
         return $objTemplate->parse();
 
     }
 
-    /**
-     * input_field_callback inputFieldCallbackTourReportDashboard
-     * @param DC_Table $dc
-     * @return string
-     */
-    public function inputFieldCallbackTourReportDashboard(DC_Table $dc)
-    {
-        if (!strlen($dc->activeRecord->id))
-        {
-            return '';
-        }
-        $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
-        if ($objEvent === null)
-        {
-            return '';
-        }
-
-        $objCalendar = $objEvent->getRelated('pid');
-        if ($objCalendar === null)
-        {
-            return '';
-        }
-
-        $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
-        $module = Input::get('do');
-
-
-        $objTemplate = new BackendTemplate('be_calendar_events_tour_report_dashboard');
-        $objTemplate->objEvent = $objEvent;
-        // Set button href
-        $objTemplate->eventListHref = sprintf('contao?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, REQUEST_TOKEN, $refererId);
-        $objTemplate->editEventHref = sprintf('contao?do=%s&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
-        $objTemplate->participantListHref = sprintf('contao?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
-        $objTemplate->invoiceListHref = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
-
-        // Check if user is allowed
-        if (EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $dc->activeRecord->id))
-        {
-
-            if ($objEvent->eventType === 'tour')
-            {
-                $allow = true;
-                $objTemplate->allowEventEditButton = true;
-                $objTemplate->allowInvoiceListButton = true;
-                $objTemplate->allowParticipantListButton = true;
-            }
-
-            if ($objEvent->eventType === 'course')
-            {
-                $allow = true;
-                $objTemplate->allowParticipantListButton = true;
-            }
-        }
-        return $objTemplate->parse();
-    }
 
     /**
      * input_field_callback showFieldValue
@@ -654,7 +599,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         foreach ($fields as $i)
         {
 
-
             if (!in_array($i, $allowedFields) || $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] == 'password' || $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['doNotShow'] || $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['hideInput'])
             {
                 continue;
@@ -678,9 +622,16 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             // Default value
             $row[$i] = '';
 
-
             // Get the field value
-            if ($i === 'repeatFixedDates')
+            if ($i === 'eventType')
+            {
+                $row[$i] = $value;
+            }
+            elseif ($i === 'eventState')
+            {
+                $row[$i] = $value === '' ? '---' : $value;
+            }
+            elseif ($i === 'repeatFixedDates')
             {
                 if (!empty($value) && is_array($value))
                 {
@@ -1160,6 +1111,31 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         );
 
         return $columnFields;
+    }
+
+    /**
+     * onsubmit_callback setEventToken()
+     * @param DataContainer $dc
+     */
+    public function setEventToken(DataContainer $dc)
+    {
+        // Return if there is no active record (override all)
+        if (!$dc->activeRecord)
+        {
+            return;
+        }
+
+        // Set event Token for all event without an eventToken
+        $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE eventToken=?')->execute('');
+        while($objDb->next())
+        {
+            $strToken = md5(rand(1000000000000,99999999999999999)) . $objDb->id;
+            $this->Database->prepare('UPDATE tl_calendar_events SET eventToken=? WHERE id=?')->execute($strToken, $objDb->id);
+        }
+
+        $arrSet['eventToken'] = md5(rand(1000000000000,99999999999999999)) . $dc->id;
+        $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($dc->activeRecord->id);
+
     }
 
     /**

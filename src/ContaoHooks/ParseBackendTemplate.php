@@ -10,10 +10,16 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
-use Contao\Controller;
-use Contao\Input;
+use Contao\BackendTemplate;
+use Contao\BackendUser;
+use Contao\CalendarEventsModel;
 use Contao\Config;
+use Contao\Controller;
+use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\EventReleaseLevelPolicyModel;
+use Contao\Events;
+use Contao\Input;
+use Contao\System;
 
 class ParseBackendTemplate
 {
@@ -38,6 +44,32 @@ class ParseBackendTemplate
     {
         if ($strTemplate === 'be_main')
         {
+
+            // Add icon explanation legend to tl_calendar_events_member
+            if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('table') === 'tl_calendar_events' && Input::get('act') === 'edit')
+            {
+
+                if (preg_match('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $strBuffer, $matches))
+                {
+
+                    if (Input::get('call') !== 'writeTourReport')
+                    {
+                        $strDashboard = $this->generateEventDashboard();
+                        $strBuffer = preg_replace('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $matches[0] . $strDashboard, $strBuffer);
+
+                    }
+                    else
+                    {
+
+                        $strDashboard = $this->generateEventDashboard();
+                        $strBuffer = preg_replace('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $matches[0] . $strDashboard, $strBuffer);
+
+                    }
+                }
+
+            }
+
+
             // Add icon explanation legend to tl_calendar_events_member
             if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('table') === 'tl_calendar_events_member')
             {
@@ -86,4 +118,57 @@ class ParseBackendTemplate
 
         return $strBuffer;
     }
+
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    private function generateEventDashboard()
+    {
+        $objUser = BackendUser::getInstance();
+
+        $objEvent = CalendarEventsModel::findByPk(Input::get('id'));
+        if ($objEvent === null)
+        {
+            return '';
+        }
+
+        $objCalendar = $objEvent->getRelated('pid');
+        if ($objCalendar === null)
+        {
+            return '';
+        }
+
+        $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
+        $module = Input::get('do');
+
+        $objTemplate = new BackendTemplate('be_calendar_events_event_dashboard');
+        $objTemplate->objEvent = $objEvent;
+        // Set button href
+        $objTemplate->eventListHref = sprintf('contao?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, REQUEST_TOKEN, $refererId);
+        $objTemplate->writeTourReportHref = Controller::addToUrl('call=writeTourReport&rt=' . REQUEST_TOKEN, true);
+        $objTemplate->participantListHref = sprintf('contao?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
+        $objTemplate->invoiceListHref = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
+
+        // Check if user is allowed
+        if (EventReleaseLevelPolicyModel::hasWritePermission($objUser->id, $objEvent->id))
+        {
+
+            if ($objEvent->eventType === 'tour' || $objEvent->eventType === 'lastMinuteTour')
+            {
+                $objTemplate->allowTourReportButton = true;
+                $objTemplate->allowInvoiceListButton = true;
+            }
+
+            $objTemplate->allowParticipantListButton = true;
+
+
+        }
+
+        $objTemplate->allowEventPreviewButton = true;
+        $objTemplate->eventPreviewUrl = Events::generateEventUrl($objEvent);
+        return $objTemplate->parse();
+    }
+
+
 }

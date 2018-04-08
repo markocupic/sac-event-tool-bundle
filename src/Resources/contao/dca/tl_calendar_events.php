@@ -31,6 +31,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = arra
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'adjustRegistrationPeriod');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'adjustImageSize');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'adjustEventReleaseLevel');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'setEventToken');
 
 
 // List
@@ -48,7 +49,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addMinAndMaxMembers'] =
 
 // Reset palettes
 $strLegends = '
-{tour_report_dashboard_legend};{tour_report_legend};{dashboard_legend};{event_type_legend};
+{tour_report_legend:hide};{event_type_legend};
 {broschuere_legend:hide};{title_legend:hide};{date_legend:hide};{recurring_legend:hide};{details_legend:hide};
 {min_max_member_legend:hide};{registration_legend:hide};{deregistration_legend:hide};{image_legend:hide};{gallery_legend:hide};
 {enclosure_legend:hide};{source_legend:hide};{expert_legend:hide}
@@ -71,7 +72,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'setReg
 // Default palettes (define it for any case, f.ex edit all mode)
 // Put here all defined fields in the dca
 PaletteManipulator::create()
-    ->addField(array('dashboard'), 'dashboard_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('singleSRCBroschuere'), 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
@@ -93,7 +93,6 @@ PaletteManipulator::create()
 
 // Tour and lastMinuteTour palette
 PaletteManipulator::create()
-    ->addField(array('dashboard'), 'dashboard_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'suitableForBeginners', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
@@ -114,7 +113,6 @@ PaletteManipulator::create()
 // same like tour but remove Fields: 'suitableForBeginners', 'tourTechDifficulty', 'tourProfile', 'mountainguide','tourDetailText', 'requirements'
 // Add field: 'generalEventDetailText'
 PaletteManipulator::create()
-    ->addField(array('dashboard'), 'dashboard_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'organizers', 'tourType', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
@@ -131,7 +129,6 @@ PaletteManipulator::create()
 
 // Course palette
 PaletteManipulator::create()
-    //->addField(array(), 'dashboard_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('singleSRCBroschuere'), 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
@@ -151,7 +148,6 @@ PaletteManipulator::create()
 
 // Tour report palette
 PaletteManipulator::create()
-    ->addField(array('tourReportDashboard'), 'tour_report_dashboard_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('executionState', 'tourSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents'), 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('tour_report', 'tl_calendar_events');
 
@@ -236,6 +232,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startDate']['flag'] = 5;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['rte'] = null;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['mandatory'] = true;
 
+
+// tourAvalancheConditions
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventToken'] = array(
+    'sql'       => "varchar(255) NOT NULL default ''",
+);
 
 // suitableForBeginners
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['suitableForBeginners'] = array(
@@ -632,13 +633,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['orderSRC'] = array(
     'sql'   => "blob NULL",
 );
 
-// dashboard
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['dashboard'] = array(
-    'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events']['dashboard'],
-    'input_field_callback' => array('tl_calendar_events_sac_event_tool', 'inputFieldCallbackEventDashboard'),
-    'eval'                 => array('doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
-    'sql'                  => "varchar(255) NOT NULL default ''",
-);
 
 // tour type
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType'] = array(
@@ -820,14 +814,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = array(
     'sql'       => "varchar(32) NOT NULL default ''",
 );
 
-// tourReportDashboard
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourReportDashboard'] = array(
-    'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourReportDashboard'],
-    'input_field_callback' => array('tl_calendar_events_sac_event_tool', 'inputFieldCallbackTourReportDashboard'),
-    'eval'                 => array('doNotShow' => true, 'doNotCopy' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
-    //'sql' => "varchar(255) NOT NULL default ''"
-);
-
 // journey
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = array(
     'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['journey'],
@@ -880,7 +866,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = arr
 );
 
 
-// For these fields allow allow edititing on first release level only
+// For these fields allow editing on first release level only
 $allowEdititingOnFirstReleaseLevelOnly = array(
     'suitableForBeginners',
     'eventType',
@@ -902,7 +888,7 @@ foreach ($allowEdititingOnFirstReleaseLevelOnly as $field)
     $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['allowEdititingOnFirstReleaseLevelOnly'] = true;
 }
 
-// DoNotCopy Fields - Settings
+// DoNotCopy - Settings
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['author']['eval']['doNotCopy'] = false;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startDate']['eval']['doNotCopy'] = false;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['endDate']['eval']['doNotCopy'] = false;
@@ -919,5 +905,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents']['eval
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSubstitutionText']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm']['eval']['doNotCopy'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventToken']['eval']['doNotCopy'] = true;
 
 
