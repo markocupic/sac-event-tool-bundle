@@ -125,10 +125,16 @@ class ParseBackendTemplate
      */
     private function generateEventDashboard()
     {
+
         $objUser = BackendUser::getInstance();
 
         $objEvent = CalendarEventsModel::findByPk(Input::get('id'));
         if ($objEvent === null)
+        {
+            return '';
+        }
+
+        if (!$objEvent->tstamp || $objEvent->title === '')
         {
             return '';
         }

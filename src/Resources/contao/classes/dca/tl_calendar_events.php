@@ -81,7 +81,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function deleteInvalidEvents(DataContainer $dc)
     {
-        $this->Database->prepare('DELETE FROM tl_calendar_events WHERE tstamp<? AND title=?')->execute(time() - 24 * 3600, '');
+        $this->Database->prepare('DELETE FROM tl_calendar_events WHERE tstamp<? AND tstamp>? AND title=?')->execute(time() - 24 * 3600, 0, '');
     }
 
     /**
@@ -491,62 +491,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             // Redirect
             $this->redirect($this->getReferer());
         }
-    }
-
-    /**
-     * input_field_callback inputFieldCallbackEventDashboard
-     * @param DC_Table $dc
-     * @return string
-     */
-    public function inputFieldCallbackEventDashboard(DC_Table $dc)
-    {
-        if (!strlen($dc->activeRecord->id))
-        {
-            return '';
-        }
-        $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
-        if ($objEvent === null)
-        {
-            return '';
-        }
-
-        $objCalendar = $objEvent->getRelated('pid');
-        if ($objCalendar === null)
-        {
-            return '';
-        }
-
-        $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
-        $module = Input::get('do');
-
-
-        $objTemplate = new BackendTemplate('be_calendar_events_tour_dashboard');
-        $objTemplate->objEvent = $objEvent;
-        // Set button href
-        $objTemplate->eventListHref = sprintf('contao?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, REQUEST_TOKEN, $refererId);
-        $objTemplate->writeTourReportHref = $this->addToUrl('call=writeTourReport');
-        $objTemplate->participantListHref = sprintf('contao?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
-        $objTemplate->invoiceListHref = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
-
-        // Check if user is allowed
-        if (EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $dc->activeRecord->id))
-        {
-
-            if ($objEvent->eventType === 'tour' || $objEvent->eventType === 'lastMinuteTour')
-            {
-                $objTemplate->allowTourReportButton = true;
-                $objTemplate->allowInvoiceListButton = true;
-            }
-
-            $objTemplate->allowParticipantListButton = true;
-
-
-        }
-
-        $objTemplate->allowEventPreviewButton = true;
-        $objTemplate->eventPreviewUrl = Contao\Events::generateEventUrl($objEvent);
-        return $objTemplate->parse();
-
     }
 
 
@@ -1127,13 +1071,13 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
         // Set event Token for all event without an eventToken
         $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE eventToken=?')->execute('');
-        while($objDb->next())
+        while ($objDb->next())
         {
-            $strToken = md5(rand(1000000000000,99999999999999999)) . $objDb->id;
+            $strToken = md5(rand(100000000, 999999999)) . $objDb->id;
             $this->Database->prepare('UPDATE tl_calendar_events SET eventToken=? WHERE id=?')->execute($strToken, $objDb->id);
         }
 
-        $arrSet['eventToken'] = md5(rand(1000000000000,99999999999999999)) . $dc->id;
+        $arrSet['eventToken'] = md5(rand(100000000, 999999999)) . $dc->id;
         $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($dc->activeRecord->id);
 
     }
