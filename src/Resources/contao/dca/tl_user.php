@@ -268,7 +268,6 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['website'] = array(
     'sql'       => "varchar(255) NOT NULL default ''",
 );
 
-
 // hobbies
 $GLOBALS['TL_DCA']['tl_user']['fields']['hobbies'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_user']['hobbies'],
@@ -278,7 +277,6 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['hobbies'] = array(
     'sql'       => "text NULL",
 );
 
-
 // introducing
 $GLOBALS['TL_DCA']['tl_user']['fields']['introducing'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_user']['introducing'],
@@ -287,10 +285,6 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['introducing'] = array(
     'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
     'sql'       => "text NULL",
 );
-
-
-
-
 
 // leiterQualifikation
 $GLOBALS['TL_DCA']['tl_user']['fields']['leiterQualifikation'] = array(
