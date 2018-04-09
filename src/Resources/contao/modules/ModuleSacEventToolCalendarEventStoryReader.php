@@ -137,20 +137,23 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
                                 $title = $arrMeta['de']['title'];
                                 $alt = $arrMeta['de']['alt'];
                                 $caption = $arrMeta['de']['caption'];
+                                $photographer = $arrMeta['de']['photographer'];
+
                             }
 
                             $images[$objFiles->path] = array
                             (
-                                'id'         => $objFiles->id,
-                                'path'       => $objFiles->path,
-                                'uuid'       => $objFiles->uuid,
-                                'name'       => $objFile->basename,
-                                'singleSRC'  => $objFiles->path,
-                                'title'      => StringUtil::specialchars($objFile->basename),
-                                'filesModel' => $objFiles->current(),
-                                'caption'    => StringUtil::specialchars($caption),
-                                'alt'        => StringUtil::specialchars($alt),
-                                'title'      => StringUtil::specialchars($title),
+                                'id'           => $objFiles->id,
+                                'path'         => $objFiles->path,
+                                'uuid'         => $objFiles->uuid,
+                                'name'         => $objFile->basename,
+                                'singleSRC'    => $objFiles->path,
+                                'title'        => StringUtil::specialchars($objFile->basename),
+                                'filesModel'   => $objFiles->current(),
+                                'caption'      => StringUtil::specialchars($caption),
+                                'alt'          => StringUtil::specialchars($alt),
+                                'title'        => StringUtil::specialchars($title),
+                                'photographer' => StringUtil::specialchars($photographer),
                             );
                         }
                     }

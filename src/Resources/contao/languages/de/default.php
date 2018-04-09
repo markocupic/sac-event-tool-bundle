@@ -68,3 +68,8 @@ $GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'M&ouml;chten Sie das Verg&uuml;
 // Miscelaneous
 $GLOBALS['TL_LANG']['MSC']['published'] = 'ver&ouml;ffentlicht';
 $GLOBALS['TL_LANG']['MSC']['unpublished'] = 'unver&ouml;ffentlicht';
+
+
+// Meta wizard
+$GLOBALS['TL_LANG']['MSC']['aw_photographer'] = 'Photograph';
+

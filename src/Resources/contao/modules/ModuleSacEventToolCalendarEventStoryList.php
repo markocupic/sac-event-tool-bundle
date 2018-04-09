@@ -64,13 +64,25 @@ class ModuleSacEventToolCalendarEventStoryList extends Module
 
             return $objTemplate->parse();
         }
+        $arrIDS = array();
         $arrOptions = array('order' => 'addedOn DESC');
-        $this->stories = CalendarEventsStoryModel::findBy(array('tl_calendar_events_story.publishState=?'), array('3'), $arrOptions);
+        $objStories = CalendarEventsStoryModel::findBy(array('tl_calendar_events_story.publishState=?'), array('3'), $arrOptions);
+        while($objStories->next())
+        {
+            $arrOrganizers = StringUtil::deserialize($objStories->organizers,true);
+            if(count(array_intersect($arrOrganizers, StringUtil::deserialize($this->story_eventOrganizers, true))) > 0)
+            {
+                $arrIDS[] = $objStories->id;
+            }
+        }
+
+        $this->stories = CalendarEventsStoryModel::findMultipleByIds($arrIDS, $arrOptions);
 
         if ($this->stories === null)
         {
             return '';
         }
+
 
         return parent::generate();
     }

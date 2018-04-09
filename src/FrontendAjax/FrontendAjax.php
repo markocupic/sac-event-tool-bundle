@@ -557,7 +557,7 @@ class FrontendAjax
 
     /**
      * Ajax call
-     * Get caption of an image in the event story module in the member dashboard
+     * Get caption and the photographer of an image in the event story module in the member dashboard
      */
     public function getCaption()
     {
@@ -583,9 +583,23 @@ class FrontendAjax
                     $caption = $arrMeta['de']['caption'];
                 }
 
+                if (!isset($arrMeta['de']['photographer']))
+                {
+                    $photographer = $objUser->firstname . ' ' . $objUser->lastname;
+                }
+                else
+                {
+                    $photographer = $arrMeta['de']['photographer'];
+                    if($photographer === '')
+                    {
+                        $photographer = $objUser->firstname . ' ' . $objUser->lastname;
+                    }
+                }
+
                 $response = new JsonResponse(array(
                     'status'  => 'success',
                     'caption' => html_entity_decode($caption),
+                    'photographer' => $photographer,
                 ));
                 return $response->send();
             }
@@ -621,9 +635,12 @@ class FrontendAjax
                         'alt'     => '',
                         'link'    => '',
                         'caption' => '',
+                        'photographer' => '',
                     );
                 }
                 $arrMeta['de']['caption'] = Input::post('caption');
+                $arrMeta['de']['photographer'] = Input::post('photographer')?: $objUser->firstname . ' ' . $objUser->lastname;
+
                 $objFile->meta = serialize($arrMeta);
                 $objFile->save();
                 $response = new JsonResponse(array(

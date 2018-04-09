@@ -23,5 +23,6 @@ $GLOBALS['TL_LANG']['tl_module']['events_story_legend'] = 'Touren- und Kursberic
 $GLOBALS['TL_LANG']['tl_module']['unregisterFromEventNotificationId'] = array('Notification Center: Benachrichtigungs-ID bei Eventabsage eines Mitglieds','Geben Sie eine Benachrichtigung aus dem Notification Center ein.');
 $GLOBALS['TL_LANG']['tl_module']['timeSpanForCreatingNewEventStory'] = array('Frist in Tagen wie lange nach Event-Ende noch Berichte er&ouml;ffnet werden können','Geben Sie in Tagen an, wie lange nach Event-Ende es möglich sein soll, Berichte zu einem Event schreiben zu können.');
 $GLOBALS['TL_LANG']['tl_module']['story_limit'] = array('Gesamtzahl der Beitr&auml;ge','Hier k&ouml;nnen Sie die Gesamtzahl der Beitr&auml;ge begrenzen. Geben Sie 0 ein, um alle anzuzeigen.');
+$GLOBALS['TL_LANG']['tl_module']['story_eventOrganizers'] = array("Veranstalter\Ortsgruppen einsch&auml;nken", "W&auml;hlen Sie hier die Event-Veranstalter aus, deren Berichte angezeigt werden sollen.");
 
 

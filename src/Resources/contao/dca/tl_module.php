@@ -14,16 +14,15 @@
  */
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolFrontendUserDashboard'] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},unregisterFromEventNotificationId;{events_story_legend},timeSpanForCreatingNewEventStory,notifyOnEventStoryPublishedNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolEventRegistrationForm'] = '{title_legend},name,headline,type;{jumpTo_legend},jumpTo;{notification_legend},receiptEventRegistrationNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventStoryList'] = '{title_legend},name,headline,type;{jumpTo_legend},jumpTo;{pagination_legend},story_limit,perPage;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventStoryList'] = '{title_legend},name,headline,type;{config_legend},story_eventOrganizers;{jumpTo_legend},jumpTo;{pagination_legend},story_limit,perPage;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventStoryReader'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventlist'] = $GLOBALS['TL_DCA']['tl_module']['palettes']['eventlist'];
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventTourDifficultyExplanationList'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventPreviewReader'] = '{title_legend},name,headline,type;{template_legend:hide},cal_template,customTpl;{image_legend},imgSize;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-
+$GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolEventStoryList'] = '{title_legend},name,headline,type;{config_legend},numberOfItems,skipFirst,perPage;{template_legend:hide},eventStoryListTemplate;{image_legend:hide},imgSize;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
 
 // Fields
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['unregisterFromEventNotificationId'] = array(
     'label'      => &$GLOBALS['TL_LANG']['tl_module']['unregisterFromEventNotificationId'],
     'exclude'    => true,
@@ -72,4 +71,17 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['story_limit'] = array
     'inputType' => 'text',
     'eval'      => array('rgxp' => 'natural', 'tl_class' => 'w50'),
     'sql'       => "smallint(5) unsigned NOT NULL default '0'",
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['story_eventOrganizers'] = array(
+    'label'      => &$GLOBALS['TL_LANG']['tl_module']['story_eventOrganizers'],
+    'exclude'    => true,
+    'search'     => true,
+    'filter'     => true,
+    'sorting'    => true,
+    'inputType'  => 'checkbox',
+    'foreignKey' => 'tl_event_organizer.title',
+    'relation'   => array('type' => 'hasMany', 'load' => 'lazy'),
+    'eval'       => array('multiple' => true, 'mandatory' => false, 'tl_class' => 'clr m12'),
+    'sql'        => "blob NULL",
 );
