@@ -30,6 +30,11 @@ $GLOBALS['TL_LANG']['MSC']['courseLevel'][2] = 'Grundstufe';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][3] = 'Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][4] = 'Tourenleiter Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][5] = 'Tourenleiter Fortbildungskurs';
+$GLOBALS['TL_LANG']['MSC']['course'] = 'Kurs';
+$GLOBALS['TL_LANG']['MSC']['tour'] = 'Tour';
+$GLOBALS['TL_LANG']['MSC']['lastMinuteTour'] = 'Last Minute Tour';
+$GLOBALS['TL_LANG']['MSC']['generalEvent'] = 'Veranstaltung (Kultur, Vorträge + sektionsübergreifende Events)';
+
 
 // Buttons
 $GLOBALS['TL_LANG']['MSC']['downloadEventMemberList'] = 'Teilnehmerliste downloaden';

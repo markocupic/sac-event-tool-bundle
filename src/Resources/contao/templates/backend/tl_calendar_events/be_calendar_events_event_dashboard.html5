@@ -3,7 +3,7 @@
     <a href="<?= $this->eventListHref ?>" role="button" class="tl_submit">Zur Eventliste</a>
 
       <?php if ($this->allowEventPreviewButton): ?>
-        <a href="<?= $this->eventPreviewUrl ?>?eventToken=<?= $this->objEvent->eventToken ?>" target="_blank" role="button" class="tl_submit">Vorschau</a>
+        <a href="<?= $this->eventPreviewUrl ?>" target="_blank" role="button" class="tl_submit">Vorschau</a>
       <?php endif; ?>
 
       <?php if ($this->allowParticipantListButton): ?>

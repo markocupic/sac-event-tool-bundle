@@ -25,6 +25,9 @@ use Contao\System;
 use Contao\TourDifficultyModel;
 use Contao\TourTypeModel;
 use Contao\UserModel;
+use Contao\PageModel;
+use Haste\Util\Url;
+
 
 /**
  * Class CalendarSacEvents
@@ -671,6 +674,25 @@ class CalendarSacEvents extends System
     }
 
     /**
+     * @param $objEvent
+     * @return null|string|string[]
+     */
+    public static function generateEventPreviewUrl($objEvent)
+    {
+        $strUrl = '';
+        $objPage = PageModel::findByPk($objEvent->getRelated('pid')->previewPage);
+
+        if ($objPage instanceof PageModel)
+        {
+            $params = (Config::get('useAutoItem') ? '/' : '/events/') . ($objEvent->alias ?: $objEvent->id);
+            $strUrl = ampersand($objPage->getFrontendUrl($params));
+            $strUrl = Url::addQueryString('eventToken=' . $objEvent->eventToken, $strUrl);
+        }
+
+        return $strUrl;
+    }
+
+    /**
      * Get tour profile as array
      * @param $eventId
      * @return array
@@ -702,7 +724,6 @@ class CalendarSacEvents extends System
         }
         return $arrProfile;
     }
-
 
     /**
      * @param $field

@@ -18,9 +18,12 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventStoryList'] =
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventStoryReader'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventlist'] = $GLOBALS['TL_DCA']['tl_module']['palettes']['eventlist'];
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventTourDifficultyExplanationList'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventPreviewHandler'] = '{title_legend},name,type;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventPreviewReader'] = '{title_legend},name,headline,type;{template_legend:hide},cal_template,customTpl;{image_legend},imgSize;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+
+
 
 // Fields
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['unregisterFromEventNotificationId'] = array(
     'label'      => &$GLOBALS['TL_LANG']['tl_module']['unregisterFromEventNotificationId'],
     'exclude'    => true,

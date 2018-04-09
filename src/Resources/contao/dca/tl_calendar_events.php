@@ -235,7 +235,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['mandatory'
 
 // tourAvalancheConditions
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventToken'] = array(
-    'sql'       => "varchar(255) NOT NULL default ''",
+    'sql' => "varchar(255) NOT NULL default ''",
 );
 
 // suitableForBeginners
@@ -249,13 +249,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['suitableForBeginners'] = arr
 
 // eventType
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventType'],
-    'exclude'   => true,
-    'filter'    => true,
-    'inputType' => 'select',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-    'eval'      => array('submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => true),
-    'sql'       => "varchar(32) NOT NULL default ''",
+    'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventType'],
+    'reference'        => &$GLOBALS['TL_LANG']['MSC'],
+    'exclude'          => true,
+    'filter'           => true,
+    'inputType'        => 'select',
+    'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbEventType'),
+    'eval'             => array('submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => true),
+    'sql'              => "varchar(32) NOT NULL default ''",
 );
 
 // mountainguide

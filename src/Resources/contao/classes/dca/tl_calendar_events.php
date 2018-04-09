@@ -928,7 +928,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      * options_callback optionsCbTourDifficulties()
      * @return array
      */
-    public function optionsCbTourDifficulties()
+    public function optionsCbTourDifficulties(MultiColumnWizard $dc)
     {
         $options = array();
         $objDb = $this->Database->execute('SELECT * FROM tl_tour_difficulty ORDER BY pid ASC, code ASC');
@@ -953,6 +953,25 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
         return $options;
     }
+
+    /**
+     * @param DataContainer $dc
+     * @return array
+     */
+    public function optionsCbEventType(DataContainer $dc)
+    {
+
+        $arrEventTypes = array();
+        $objCalendar = CalendarModel::findByPk(CURRENT_ID);
+        if ($objCalendar !== null)
+        {
+            $arrEventTypes = \Contao\StringUtil::deserialize($objCalendar->allowedEventTypes, true);
+        }
+
+
+        return $arrEventTypes;
+    }
+
 
     /**
      * options_callback optionsCbCourseSubType()
