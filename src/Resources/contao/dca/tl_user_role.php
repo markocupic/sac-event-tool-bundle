@@ -9,7 +9,7 @@
  */
 
 
-$GLOBALS['TL_DCA']['tl_tour_type'] = array
+$GLOBALS['TL_DCA']['tl_user_role'] = array
 (
     'config'   => array
     (
@@ -33,12 +33,12 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = array
             'fields'                => array('sorting'),
             'flag'                  => 1,
             'panelLayout'           => 'filter;search,limit',
-            'paste_button_callback' => array('tl_tour_type', 'pasteTag'),
+            'paste_button_callback' => array('tl_user_role', 'pasteTag'),
         ),
         'label'             => array
         (
-            'fields' => array('shortcut', 'title'),
-            'format' => '%s %s',
+            'fields' => array('title'),
+            'format' => '%s',
         ),
         'global_operations' => array
         (
@@ -54,13 +54,13 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = array
         (
             'edit'   => array
             (
-                'label' => &$GLOBALS['TL_LANG']['tl_tour_type']['edit'],
+                'label' => &$GLOBALS['TL_LANG']['tl_user_role']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.gif',
             ),
             'copy'   => array
             (
-                'label' => &$GLOBALS['TL_LANG']['tl_tour_type']['copy'],
+                'label' => &$GLOBALS['TL_LANG']['tl_user_role']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.gif',
             ),
@@ -73,7 +73,7 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = array
             ),
             'delete' => array
             (
-                'label'      => &$GLOBALS['TL_LANG']['tl_tour_type']['delete'],
+                'label'      => &$GLOBALS['TL_LANG']['tl_user_role']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"',
@@ -82,57 +82,42 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = array
     ),
     'palettes' => array
     (
-        'default' => 'shortcut,title,description',
+        'default' => 'title,sorting',
     ),
 
     'fields' => array
     (
-        'id'          => array
+        'id'      => array
         (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
         ),
-        'tstamp'      => array
+        'pid'     => array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
-        'pid'         => array
+        'sorting' => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['sorting'],
+            'exclude'   => true,
+            'search'    => false,
+            'sorting'   => true,
+            'inputType' => 'text',
+            'eval'      => array('mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 10),
+            'sql'       => "int(10) unsigned NOT NULL default '0'",
+        ),
+        'tstamp'  => array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
-        'sorting'     => array
+        'title'   => array
         (
-            'sql' => "int(10) unsigned NOT NULL default '0'",
-        ),
-        'title'       => array
-        (
-            'label'     => &$GLOBALS['TL_LANG']['tl_tour_type']['title'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['title'],
             'exclude'   => true,
             'search'    => true,
-            'sorting'   => false,
+            'sorting'   => true,
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 255),
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'shortcut'    => array
-        (
-            'label'     => &$GLOBALS['TL_LANG']['tl_tour_type']['shortcut'],
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => false,
-            'inputType' => 'text',
-            'eval'      => array('mandatory' => true, 'maxlength' => 255),
-            'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'description' => array
-        (
-            'label'     => &$GLOBALS['TL_LANG']['tl_tour_type']['description'],
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => false,
-            'inputType' => 'textarea',
-            'eval'      => array('mandatory' => false),
-            'sql'       => "text NULL",
         ),
     ),
 );
-

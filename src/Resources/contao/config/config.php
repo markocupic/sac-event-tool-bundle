@@ -74,6 +74,9 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = array(
     'sac_cabanne_tool'         => array(
         'tables' => array('tl_cabanne_sac'),
     ),
+    'sac_user_role_tool'         => array(
+        'tables' => array('tl_user_role'),
+    ),
 );
 
 // Add permissions
