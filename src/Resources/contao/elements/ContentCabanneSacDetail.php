@@ -16,17 +16,17 @@ use Contao\Database;
 
 
 /**
- * Class CabanneSacList
+ * Class ContentCabanneSacDetail
  * @package Markocupic\SacEventToolBundle
  */
-class CabanneSacList extends ContentElement
+class ContentCabanneSacDetail extends ContentElement
 {
 
     /**
      * Template
      * @var string
      */
-    protected $strTemplate = 'ce_cabanne_sac_list';
+    protected $strTemplate = 'ce_cabanne_sac_detail';
 
     /**
      * Files model
@@ -61,7 +61,7 @@ class CabanneSacList extends ContentElement
         {
             $arrData = $objDb->fetchAssoc();
             //die(print_r($arrData,true));
-            $skip = array('id', 'tstamp', 'singleSRC');
+            $skip = array('id', 'tstamp');
             foreach ($arrData as $k => $v)
             {
                 if (!in_array($k, $skip))
@@ -72,7 +72,6 @@ class CabanneSacList extends ContentElement
 
             }
         }
-//die(print_r($this->arrData,true));
         $objFile = FilesModel::findByUuid($objDb->singleSRC);
 
         if ($objFile !== null && is_file(TL_ROOT . '/' . $objFile->path))
@@ -83,6 +82,13 @@ class CabanneSacList extends ContentElement
             $this->addImageToTemplate($this->Template, $this->arrData, null, null, $this->objFilesModel);
         }
 
+        // coordsCH1903
+        if(strpos($this->coordsCH1903, '/') !== false)
+        {
+            $arrCoord = explode('/', $this->coordsCH1903);
+            $this->Template->coordsCH1903X = trim($arrCoord[0]);
+            $this->Template->coordsCH1903Y = trim($arrCoord[1]);
+        }
 
     }
 }

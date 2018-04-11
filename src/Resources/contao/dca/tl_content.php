@@ -17,7 +17,13 @@ if (Input::get('do') == 'sac_calendar_events_tool')
     $GLOBALS['TL_DCA']['tl_content']['list']['operations']['toggle']['button_callback'] = array('tl_content_calendar', 'toggleIcon');
 }
 
-$GLOBALS['TL_DCA']['tl_content']['palettes']['ce_user_portrait'] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+// Callbacks
+$GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array('tl_content_sac_event_tool', 'setPalette');
+
+
+// Palettes
+$GLOBALS['TL_DCA']['tl_content']['palettes']['userPortraitList'] = 'name,type,headline;{config_legend},userList_selectMode,userList_users,userList_userRoles,userList_queryType;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes']['userPortrait'] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['cabanneSacList'] = '{type_legend},type,headline,cabanneSac;{image_legend},singleSRC,size,imagemargin,fullsize,overwriteMeta;{link_legend},jumpTo;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['cabanneSacDetail'] = '{type_legend},type,headline,cabanneSac;{image_legend},singleSRC,size,imagemargin,fullsize,overwriteMeta;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
@@ -33,6 +39,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['cabanneSac'] = array
     'eval'             => array('mandatory' => true, 'maxlength' => 200, 'tl_class' => 'w50 clr'),
     'sql'              => "int(10) unsigned NOT NULL default '0'",
 );
+
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = array
 (
     'label'     => &$GLOBALS['TL_LANG']['tl_content']['jumpTo'],
@@ -45,5 +52,49 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = array
         array('tl_content', 'pagePicker'),
     ),
     'sql'       => "varchar(255) NOT NULL default ''",
+);
 
+$GLOBALS['TL_DCA']['tl_content']['fields']['userList_selectMode'] = array
+(
+    'label'     => &$GLOBALS['TL_LANG']['tl_content']['userList_selectMode'],
+    'exclude'   => true,
+    'filter'    => true,
+    'inputType' => 'select',
+    'options'   => array('selectUserRoles', 'selectUsers'),
+    'eval'      => array('submitOnChange' => true, 'tl_class' => 'clr'),
+    'sql'       => "char(128) NOT NULL default ''",
+);
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['userList_users'] = array(
+    'label'      => &$GLOBALS['TL_LANG']['tl_content']['userList_users'],
+    'exclude'    => true,
+    'search'     => true,
+    'filter'     => true,
+    'inputType'  => 'select',
+    'foreignKey' => "tl_user.name",
+    'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
+    'eval'       => array('chosen' => true, 'tl_class' => 'clr m12', 'includeBlankOption' => true, 'multiple' => true, 'mandatory' => true),
+    'sql'        => "blob NULL",
+);
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['userList_userRoles'] = array
+(
+    'label'            => &$GLOBALS['TL_LANG']['tl_content']['userList_userRoles'],
+    'exclude'          => true,
+    'filter'           => true,
+    'inputType'        => 'select',
+    'options_callback' => array('tl_content_sac_event_tool', 'optionsCallbackUserRoles'),
+    'eval'             => array('multiple' => true, 'chosen' => true, 'tl_class' => 'clr'),
+    'sql'              => "blob NULL",
+);
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['userList_queryType'] = array
+(
+    'label'     => &$GLOBALS['TL_LANG']['tl_content']['userList_queryType'],
+    'exclude'   => true,
+    'filter'    => true,
+    'inputType' => 'select',
+    'options'   => array('AND', 'OR'),
+    'eval'      => array('tl_class' => 'clr'),
+    'sql'       => "varchar(10) NOT NULL default ''",
 );

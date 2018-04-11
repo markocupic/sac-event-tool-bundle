@@ -74,7 +74,7 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = array(
     'sac_cabanne_tool'         => array(
         'tables' => array('tl_cabanne_sac'),
     ),
-    'sac_user_role_tool'         => array(
+    'sac_user_role_tool'       => array(
         'tables' => array('tl_user_role'),
     ),
 );
@@ -100,9 +100,10 @@ $GLOBALS['TL_CTE']['sac_calendar_newsletter'] = array(
     'calendar_newsletter' => 'CalendarNewsletter',
 );
 $GLOBALS['TL_CTE']['sac_content_elements'] = array(
-    'ce_user_portrait' => 'Markocupic\SacEventToolBundle\ContentUserPortrait',
-    'cabanneSacList'   => 'Markocupic\SacEventToolBundle\CabanneSacList',
-    'cabanneSacDetail' => 'Markocupic\SacEventToolBundle\CabanneSacDetail',
+    'userPortrait'     => 'Markocupic\SacEventToolBundle\ContentUserPortrait',
+    'userPortraitList' => 'Markocupic\SacEventToolBundle\ContentUserPortraitList',
+    'cabanneSacList'   => 'Markocupic\SacEventToolBundle\ContentCabanneSacList',
+    'cabanneSacDetail' => 'Markocupic\SacEventToolBundle\ContentCabanneSacDetail',
 );
 
 // Do not index a page if one of the following parameters is set
@@ -142,15 +143,6 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL']
     'avalanche_level_5',
 );
 
-// Backend user roles
-$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['role'] = array(
-    'tourguide',
-    'courseguide',
-    'president',
-    'executivemember',
-    'tourchief',
-    'coursechief',
-);
 
 // Guide qualifications
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = array(

@@ -21,7 +21,7 @@ $GLOBALS['TL_LANG']['tl_user']['role_legend'] = 'Aufgaben/Rollen im Verein';
 
 
 // Fields
-$GLOBALS['TL_LANG']['tl_user']['role'] = array('Rolle/Funktion im Verein','Geben Sie hier bitte eine oder mehrere Rollen/Funktionen an.');
+$GLOBALS['TL_LANG']['tl_user']['userRole'] = array('Rolle/Funktion im Verein','Geben Sie hier bitte eine oder mehrere Rollen/Funktionen an.');
 $GLOBALS['TL_LANG']['tl_user']['sacMemberId'] = array('SAC-Mitgliedernummer','');
 $GLOBALS['TL_LANG']['tl_user']['firstname'] = array('Vorname','');
 $GLOBALS['TL_LANG']['tl_user']['lastname'] = array('Nachname','');
@@ -50,11 +50,5 @@ $GLOBALS['TL_LANG']['tl_user']['calendar_containers'] = array('Erlaubte SAC-Even
 $GLOBALS['TL_LANG']['tl_user']['calendar_containerp'] = array('SAC-Event-Jahrescontainer Rechte','');
 
 
-// Reference
-$GLOBALS['TL_LANG']['tl_user']['tourguide'] = 'SAC-Tourenleiter';
-$GLOBALS['TL_LANG']['tl_user']['courseguide'] = 'SAC-Kursleiter';
-$GLOBALS['TL_LANG']['tl_user']['president'] = 'Pr&auml;sident';
-$GLOBALS['TL_LANG']['tl_user']['executivemember'] = 'Mitglied Vorstand';
-$GLOBALS['TL_LANG']['tl_user']['tourchief'] = 'Tourenchef';
-$GLOBALS['TL_LANG']['tl_user']['coursechief'] = 'Kurschef';
+
 

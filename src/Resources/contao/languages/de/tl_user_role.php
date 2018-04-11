@@ -15,3 +15,4 @@ $GLOBALS['TL_LANG']['tl_user_role']['new'] = array("Neue Funktion anlegen", "Leg
 // Fields
 $GLOBALS['TL_LANG']['tl_user_role']['sorting'] = array("Sortierrang", "Geben Sie einen Sortierrang ein.");
 $GLOBALS['TL_LANG']['tl_user_role']['title'] = array("Funktion im Verein", "Geben Sie eine Funktion ein.");
+$GLOBALS['TL_LANG']['tl_user_role']['belongsToExecutiveBoard'] = array('Vorstandsfunktion', 'Geben Sie an, ob es sich bei dieser Aufgabe um eine Vorstandsfunktion handelt.');

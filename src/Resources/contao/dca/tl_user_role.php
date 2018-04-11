@@ -82,20 +82,20 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
     ),
     'palettes' => array
     (
-        'default' => 'title,sorting',
+        'default' => 'title,belongsToExecutiveBoard',
     ),
 
     'fields' => array
     (
-        'id'      => array
+        'id'                  => array
         (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
         ),
-        'pid'     => array
+        'pid'                 => array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
-        'sorting' => array
+        'sorting'             => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['sorting'],
             'exclude'   => true,
@@ -105,19 +105,29 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'eval'      => array('mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 10),
             'sql'       => "int(10) unsigned NOT NULL default '0'",
         ),
-        'tstamp'  => array
+        'tstamp'              => array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
-        'title'   => array
+        'title'               => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['title'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true, 'maxlength' => 255),
+            'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
+        ),
+        'belongsToExecutiveBoard' => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['belongsToExecutiveBoard'],
+            'exclude'   => true,
+            'filter'    => true,
+            'sorting'   => true,
+            'inputType' => 'checkbox',
+            'eval'      => array('mandatory' => false, 'tl_class' => 'clr'),
+            'sql'       => "char(1) NOT NULL default ''",
         ),
     ),
 );

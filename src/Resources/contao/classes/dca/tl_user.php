@@ -101,4 +101,21 @@ class tl_user_sac_event_tool extends Backend
         return $varValue;
     }
 
+    /**
+     * @return array
+     */
+    public function optionsCallbackUserRoles()
+    {
+
+        $options = array();
+        $objDb = \Database::getInstance()->prepare('SELECT * FROM tl_user_role ORDER BY sorting ASC')->execute();
+        while ($objDb->next())
+        {
+            $options[$objDb->id] = $objDb->title;
+        }
+
+        return $options;
+
+    }
+
 }
