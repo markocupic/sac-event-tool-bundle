@@ -1,0 +1,22 @@
+<div class="col-12 col-md-6 col-xl-4 mb-4">
+  <div class="row">
+    <div class="col-5 col-sm-5 col-md-5 col-xl-6">
+        <?php if ($this->addImage): ?>
+            <?php $this->insert('image', $this->arrData); ?>
+        <?php endif; ?>
+    </div>
+    <div class="col-7 col-sm-7 col-md-7 col-xl-6 ">
+      <small>
+        <strong><?php if ($this->name != ''): ?><?= $this->name ?>{{br}}<?php endif; ?></strong>
+          <?php if ($this->street != ''): ?><?= $this->street ?>{{br}}<?php endif; ?>
+          <?php if ($this->postal != ''): ?><?= $this->postal ?>&nbsp;<?php endif; ?>
+          <?php if ($this->city != ''): ?><?= $this->city ?>{{br}}<?php endif; ?>
+          <?php if ($this->phone != ''): ?>P: <?= $this->phone ?>{{br}}<?php endif; ?>
+          <?php if ($this->mobile != ''): ?>M: <?= $this->mobile ?>{{br}}<?php endif; ?>
+          <?php if ($this->email != ''): ?>{{email::<?= $this->email ?>}}{{br}}<?php endif; ?>
+          <?php if ($this->jumpTo != ''): ?><a href="<?= $this->jumpTo ?>?username=<?= $this->username ?>" title="Portrait">Portrait</a><?php endif; ?>
+      </small>
+    </div>
+  </div>
+</div>
+

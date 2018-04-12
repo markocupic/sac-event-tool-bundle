@@ -22,7 +22,7 @@ $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array('tl_cont
 
 
 // Palettes
-$GLOBALS['TL_DCA']['tl_content']['palettes']['userPortraitList'] = 'name,type,headline;{config_legend},userList_selectMode,userList_users,userList_userRoles,userList_queryType;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes']['userPortraitList'] = 'name,type,headline;{config_legend},userList_selectMode,userList_users,userList_userRoles,userList_queryType;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['userPortrait'] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['cabanneSacList'] = '{type_legend},type,headline,cabanneSac;{image_legend},singleSRC,size,imagemargin,fullsize,overwriteMeta;{link_legend},jumpTo;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['cabanneSacDetail'] = '{type_legend},type,headline,cabanneSac;{image_legend},singleSRC,size,imagemargin,fullsize,overwriteMeta;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
@@ -60,6 +60,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_selectMode'] = array
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'select',
+    'reference' => &$GLOBALS['TL_LANG']['tl_content'],
     'options'   => array('selectUserRoles', 'selectUsers'),
     'eval'      => array('submitOnChange' => true, 'tl_class' => 'clr'),
     'sql'       => "char(128) NOT NULL default ''",
@@ -97,4 +98,17 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_queryType'] = array
     'options'   => array('AND', 'OR'),
     'eval'      => array('tl_class' => 'clr'),
     'sql'       => "varchar(10) NOT NULL default ''",
+);
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['imgSize'] = array
+(
+    'label'            => &$GLOBALS['TL_LANG']['tl_module']['imgSize'],
+    'exclude'          => true,
+    'inputType'        => 'imageSize',
+    'reference'        => &$GLOBALS['TL_LANG']['MSC'],
+    'eval'             => array('rgxp' => 'natural', 'includeBlankOption' => true, 'nospace' => true, 'helpwizard' => true, 'tl_class' => 'w50'),
+    'options_callback' => function () {
+        return System::getContainer()->get('contao.image.image_sizes')->getOptionsForUser(BackendUser::getInstance());
+    },
+    'sql'              => "varchar(64) NOT NULL default ''",
 );

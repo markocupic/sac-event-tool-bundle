@@ -13,6 +13,7 @@ namespace Markocupic\SacEventToolBundle;
 use Contao\ContentElement;
 use Contao\FilesModel;
 use Contao\Database;
+use Contao\UserModel;
 
 
 /**
@@ -55,6 +56,7 @@ class ContentCabanneSacList extends ContentElement
      */
     protected function compile()
     {
+
         // Add data to template
         $objDb = Database::getInstance()->prepare('SELECT * FROM tl_cabanne_sac WHERE id=?')->execute($this->cabanneSac);
         if ($objDb->numRows)
@@ -72,7 +74,6 @@ class ContentCabanneSacList extends ContentElement
 
             }
         }
-//die(print_r($this->arrData,true));
         $objFile = FilesModel::findByUuid($objDb->singleSRC);
 
         if ($objFile !== null && is_file(TL_ROOT . '/' . $objFile->path))
