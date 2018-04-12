@@ -2,8 +2,10 @@
   <div class="row">
     <div class="col-5 col-sm-5 col-md-5 col-xl-6">
         <?php if ($this->addImage): ?>
-            <?php $this->insert('image', $this->arrData); ?>
-        <?php endif; ?>
+      <a href="<?= $this->jumpTo ?>?username=<?= $this->username ?>" title="Portrait">
+          <?php $this->insert('image', $this->arrData); ?>
+          <?php endif; ?>
+      </a>
     </div>
     <div class="col-7 col-sm-7 col-md-7 col-xl-6 ">
       <small>
@@ -14,7 +16,6 @@
           <?php if ($this->phone != ''): ?>P: <?= $this->phone ?>{{br}}<?php endif; ?>
           <?php if ($this->mobile != ''): ?>M: <?= $this->mobile ?>{{br}}<?php endif; ?>
           <?php if ($this->email != ''): ?>{{email::<?= $this->email ?>}}{{br}}<?php endif; ?>
-          <?php if ($this->jumpTo != ''): ?><a href="<?= $this->jumpTo ?>?username=<?= $this->username ?>" title="Portrait">Portrait</a><?php endif; ?>
       </small>
     </div>
   </div>

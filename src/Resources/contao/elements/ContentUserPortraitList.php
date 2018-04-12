@@ -34,15 +34,10 @@ class ContentUserPortraitList extends ContentElement
     protected $strTemplate = 'ce_user_portrait_list';
 
     /**
+     * Partial template
      * @var string
      */
     protected $strTemplatePartial = 'user_portrait_list_partial';
-
-    /**
-     * Files model
-     * @var FilesModel
-     */
-    protected $objFilesModel;
 
 
     /**
@@ -127,27 +122,28 @@ class ContentUserPortraitList extends ContentElement
 
         $objUser = UserModel::findMultipleByIds($arrIDS);
 
-        $strItems = '';
-
         if ($objUser !== null)
         {
 
+            $strItems = '';
             while ($objUser->next())
             {
-
-                $objPartial = new \stdClass();
 
                 $objTemplate = new FrontendTemplate($this->strTemplatePartial);
                 $objTemplate->setData($objUser->row());
                 $objTemplate->jumpTo = $this->jumpTo;
 
+                // Get users avatar
                 $strAvatarSRC = getAvatar($objUser->id);
 
+                // Add image to template
                 if (strlen($strAvatarSRC))
                 {
                     $objModel = FilesModel::findByPath($strAvatarSRC);
                     if ($objModel !== null && is_file(TL_ROOT . '/' . $objModel->path))
                     {
+                        // Create partial object
+                        $objPartial = new \stdClass();
                         $objPartial->uuid = $objModel->uuid;
 
                         if ($this->imgSize != '')
@@ -165,14 +161,11 @@ class ContentUserPortraitList extends ContentElement
                         $objTemplate->addImage = true;
 
                         $this->addImageToTemplate($objTemplate, $arrUser, null, null, $objModel);
-                        $strItems .= $objTemplate->parse();
                     }
                 }
-
-                $this->Template->items = $strItems;
+                $strItems .= $objTemplate->parse();
             }
+            $this->Template->items = $strItems;
         }
-
-
     }
 }
