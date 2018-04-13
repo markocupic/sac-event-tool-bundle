@@ -1199,25 +1199,30 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         {
             return;
         }
-        if ($dc->activeRecord->setRegistrationPeriod)
+
+        $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($dc->activeRecord->id);
+        if ($objDb->numRows > 0)
         {
-            $regEndDate = $dc->activeRecord->registrationEndDate;
-            $regStartDate = $dc->activeRecord->registrationStartDate;
-
-            if ($regEndDate > $dc->activeRecord->startDate)
+            if ($objDb->setRegistrationPeriod)
             {
-                $regEndDate = $dc->activeRecord->startDate;
-                Message::addInfo($GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck']);
-            }
+                $regEndDate = $objDb->registrationEndDate;
+                $regStartDate = $objDb->registrationStartDate;
 
-            if ($regStartDate > $regEndDate)
-            {
-                $regStartDate = $regEndDate - 86400;
-                Message::addInfo($GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck'], TL_MODE);
+                if ($regEndDate > $objDb->startDate)
+                {
+                    $regEndDate = $objDb->startDate;
+                    Message::addInfo($GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck'], TL_MODE);
+                }
+
+                if ($regStartDate > $regEndDate)
+                {
+                    $regStartDate = $regEndDate - 86400;
+                    Message::addInfo($GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck'], TL_MODE);
+                }
+                $arrSet['registrationStartDate'] = $regStartDate;
+                $arrSet['registrationEndDate'] = $regEndDate;
+                $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($objDb->id);
             }
-            $arrSet['registrationStartDate'] = $regStartDate;
-            $arrSet['registrationEndDate'] = $regEndDate;
-            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($dc->activeRecord->id);
         }
     }
 

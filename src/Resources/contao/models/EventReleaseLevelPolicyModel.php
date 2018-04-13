@@ -421,7 +421,7 @@ class EventReleaseLevelPolicyModel extends \Model
             {
                 $allow = true;
             }
-            if($direction === 'down')
+            if($direction === 'down' && $objReleaseLevelModel->allowSwitchingToPrevLevel)
             {
                 $allow = true;
             }
@@ -433,7 +433,7 @@ class EventReleaseLevelPolicyModel extends \Model
             {
                 $allow = true;
             }
-            if($direction === 'down')
+            if($direction === 'down' && $objReleaseLevelModel->allowSwitchingToPrevLevel)
             {
                 $allow = true;
             }

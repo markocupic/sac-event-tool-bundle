@@ -1,36 +1,43 @@
 <div class="block <?= $this->class ?>">
 
-    <p class="small mb-0">Verfasst von: <strong><?= $this->authorName ?></strong>, <?= \Date::parse('d.m.Y', $this->addedOn) ?></p>
-    <h1 class="ce_headline"><?= $this->title ?></h1>
+  <p class="small mb-0">Verfasst von: <strong><?= $this->authorName ?></strong>, <?= \Date::parse('d.m.Y', $this->addedOn) ?></p>
+  <h1 class="ce_headline"><?= $this->title ?></h1>
 
-    <div>
-        <p><?= nl2br($this->text) ?></p>
-    </div>
+  <div>
+    <p><?= nl2br($this->text) ?></p>
+  </div>
 
     <?php if ($this->images): ?>
-        <div class="ce_gallery">
-            <div class="row tiny-gutter">
-              <?php foreach ($this->images as $image): ?>
-                  <figure class="col-12 col-sm-6 col-md-3 image_container thumbnail responsive">
-                    <?php $photographer = $image['photographer'] != '' ? ' (Foto: ' . $image['photographer'] . ')' : ''; ?>
-                    <?php $photographer = Contao\StringUtil::specialchars($photographer); ?>
-                    <a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement" title="<?= $image['caption'] . $photographer ?>">
-                      {{image::<?= Contao\StringUtil::binToUuid($image['uuid']) ?>?width=400&height=400&mode=crop&alt=<?= $image['alt'] ?>}}
-                    </a>
-                    <figcaption class="caption"><?= $image['caption'] . $photographer ?></figcaption>
-                  </figure>
-              <?php endforeach; ?>
-            </div>
+      <div class="ce_gallery">
+        <div class="row tiny-gutter">
+            <?php foreach ($this->images as $image): ?>
+              <figure class="col-12 col-sm-6 col-md-3 image_container thumbnail responsive">
+                  <?php $arrFigureCaption = array(); ?>
+                  <?php if ($image['caption'] != '') {
+                      $arrFigureCaption[] = $image['caption'];
+                  } ?>
+                  <?php $photographer = $image['photographer'] != '' ? ' (Foto: ' . $image['photographer'] . ')' : ''; ?>
+                  <?php $photographer = Contao\StringUtil::specialchars($photographer); ?>
+                  <?php if ($photographer != '') {
+                      $arrFigureCaption[] = $photographer;
+                  } ?>
+                <a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement" title="<?= $image['caption'] . $photographer ?>">
+                  {{image::<?= Contao\StringUtil::binToUuid($image['uuid']) ?>?width=400&height=400&mode=crop&alt=<?= $image['alt'] ?>}}
+                </a>
+                <figcaption class="figure-caption"><?= implode('<br>', $arrFigureCaption) ?></figcaption>
+              </figure>
+            <?php endforeach; ?>
         </div>
+      </div>
     <?php endif; ?>
 
-    <?php if($this->youtubeId): ?>
-        {{br}}
-        <div class="ce_bootstrapYoutubeResponsiveEmbed block">
-            <div class="embed-responsive embed-responsive-16by9">
-                <iframe class="embed-responsive-item" src="//www.youtube.com/embed/<?= $this->youtubeId ?>?rel=0" allowfullscreen=""></iframe>
-            </div>
+    <?php if ($this->youtubeId): ?>
+      {{br}}
+      <div class="ce_bootstrapYoutubeResponsiveEmbed block">
+        <div class="embed-responsive embed-responsive-16by9">
+          <iframe class="embed-responsive-item" src="//www.youtube.com/embed/<?= $this->youtubeId ?>?rel=0" allowfullscreen=""></iframe>
         </div>
+      </div>
     <?php endif; ?>
 
 </div>

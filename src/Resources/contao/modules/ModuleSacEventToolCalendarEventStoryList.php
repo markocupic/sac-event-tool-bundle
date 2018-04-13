@@ -10,21 +10,21 @@
 
 namespace Markocupic\SacEventToolBundle;
 
-use Contao\CoreBundle\Exception\PageNotFoundException;
-use Contao\Module;
 use Contao\BackendTemplate;
 use Contao\CalendarEventsStoryModel;
-use Contao\PageModel;
-use Contao\MemberModel;
-use Contao\FilesModel;
-use Contao\StringUtil;
-use Contao\Pagination;
-use Contao\Input;
-use Contao\Environment;
 use Contao\Config;
+use Contao\CoreBundle\Exception\PageNotFoundException;
+use Contao\Environment;
+use Contao\FilesModel;
+use Contao\Input;
+use Contao\MemberModel;
+use Contao\Module;
+use Contao\PageModel;
+use Contao\Pagination;
+use Contao\StringUtil;
+use Contao\System;
 use Contao\Validator;
 use Patchwork\Utf8;
-use Contao\System;
 
 
 /**
@@ -67,10 +67,10 @@ class ModuleSacEventToolCalendarEventStoryList extends Module
         $arrIDS = array();
         $arrOptions = array('order' => 'addedOn DESC');
         $objStories = CalendarEventsStoryModel::findBy(array('tl_calendar_events_story.publishState=?'), array('3'), $arrOptions);
-        while($objStories->next())
+        while ($objStories->next())
         {
-            $arrOrganizers = StringUtil::deserialize($objStories->organizers,true);
-            if(count(array_intersect($arrOrganizers, StringUtil::deserialize($this->story_eventOrganizers, true))) > 0)
+            $arrOrganizers = StringUtil::deserialize($objStories->organizers, true);
+            if (count(array_intersect($arrOrganizers, StringUtil::deserialize($this->story_eventOrganizers, true))) > 0)
             {
                 $arrIDS[] = $objStories->id;
             }
@@ -127,12 +127,12 @@ class ModuleSacEventToolCalendarEventStoryList extends Module
                         if (is_file($rootDir . '/' . $objFiles->path))
                         {
                             $arrStory['singleSRC'] = array(
-                                'id' => $objFiles->id,
-                                'path' => $objFiles->path,
-                                'uuid' => StringUtil::binToUuid($objFiles->uuid),
-                                'name' => $objFiles->name,
-                                'singleSRC' => $objFiles->path,
-                                'title' => StringUtil::specialchars($objFiles->name),
+                                'id'         => $objFiles->id,
+                                'path'       => $objFiles->path,
+                                'uuid'       => StringUtil::binToUuid($objFiles->uuid),
+                                'name'       => $objFiles->name,
+                                'singleSRC'  => $objFiles->path,
+                                'title'      => StringUtil::specialchars($objFiles->name),
                                 'filesModel' => $objFiles->current(),
                             );
                         }
@@ -176,6 +176,10 @@ class ModuleSacEventToolCalendarEventStoryList extends Module
         $arrStories = [];
         for ($i = $offset; $i < $offset + $limit; $i++)
         {
+            if (!isset($arrAllStories[$i]) || !is_array($arrAllStories[$i]))
+            {
+                continue;
+            }
             $arrStories[] = $arrAllStories[$i];
         }
 

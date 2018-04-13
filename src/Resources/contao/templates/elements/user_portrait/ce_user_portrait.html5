@@ -77,7 +77,7 @@
           </td>
           <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($event['id']) ?></td>
           <td class="tourTechDifficulty"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($event['id'], true)) ?></td>
-          <td class="tourType"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($event['id'], 'shortcut', true)) ?></td>
+          <td class="tourType"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($event['id'], 'shortcut', true)) ?></td>
             <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorNamesAsArray($event['id']); ?>
           <td><?= implode(', ', $arrInstructors) ?></td>
         </tr>
