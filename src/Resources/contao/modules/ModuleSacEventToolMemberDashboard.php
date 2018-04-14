@@ -354,22 +354,28 @@ class ModuleSacEventToolMemberDashboard extends Module
                     $arrEvents[$k]['objEvent'] = $objEvent;
                     $arrEvents[$k]['objStory'] = CalendarEventsStoryModel::findOneBySacMemberIdAndEventId($this->objUser->sacMemberId, $event['id']);
 
-                    $canWriteStory = false;
-                    if ($arrEvents[$k]['objStory'] !== null)
+                    $arrEvents[$k]['canOpenStory'] = false;
+                    $arrEvents[$k]['canEditStory'] = false;
+
+
+                    if ($arrEvents[$k]['objStory'] !== null && $objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
                     {
-                        $canWriteStory = true;
+                        $arrEvents[$k]['canEditStory'] = true;
+                        $arrEvents[$k]['faLayer'] = '<span class="fa-layers-text" data-fa-transform="up-20 right-13" style="font-size:9px;color:#fff;font-weight:900">EDIT</span>';
+
                     }
                     elseif ($arrEvents[$k]['objStory'] === null && $objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
                     {
-                        $canWriteStory = true;
+                        $arrEvents[$k]['canOpenStory'] = true;
+                        $arrEvents[$k]['faLayer'] = '<span class="fa-layers-text" data-fa-transform="up-20 right-13" style="font-size:9px;color:#fff;font-weight:900">NEW</span>';
                     }
 
                     // Generate links
-                    $arrEvents[$k]['objStoryLink'] = $canWriteStory ? Frontend::addToUrl('action=write_event_story&amp;eventId=' . $event['id']) : '#';
+                    $arrEvents[$k]['objStoryLink'] = ($arrEvents[$k]['objStory'] !== null || $arrEvents[$k]['canEditStory'] || $arrEvents[$k]['canOpenStory']) ? Frontend::addToUrl('action=write_event_story&amp;eventId=' . $event['id']) : '#';
                     $arrEvents[$k]['downloadCourseConfirmationLink'] = Frontend::addToUrl('action=download_course_confirmation&amp;id=' . $event['registrationId']);
-                    $arrEvents[$k]['canWriteStory'] = $canWriteStory;
                 }
 
+                $this->Template->timeSpanForCreatingNewEventStory = $this->timeSpanForCreatingNewEventStory;
                 $this->Template->arrPastEvents = $arrEvents;
 
                 break;

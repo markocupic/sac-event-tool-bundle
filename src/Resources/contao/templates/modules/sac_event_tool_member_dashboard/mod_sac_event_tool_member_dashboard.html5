@@ -124,13 +124,14 @@
                 <!-- tab-pane-3 -->
                 <div class="tab-pane fade" id="nav-past-workshops" role="tabpanel" aria-labelledby="nav-profile-tab">
                     <h2 class="mt-0">Absolvierte Kurse</h2>
+                    <small>Kursberichte k&ouml;nnen bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Ablauf des Events erstellt werden.</small>
                     <table class="table layout-table table-responsive table-striped">
                         <?php foreach ($this->arrPastEvents as $event): ?>
-                            <?php if ($event['eventType'] == 'course'): ?>
+                            <?php if ($event['eventType'] === 'course'): ?>
                                 <tr>
                                     <td><?= $event['dateSpan'] ?></td>
                                     <td><?= $event['objEvent']->title ?></td>
-                                    <td class="text-center"><?php if ($event['canWriteStory']): ?><a href="<?= $event['objStoryLink'] ?>" role="button" title="Kursbericht verfassen" class="btn btn-sm btn-success"><i class="fa fa-fw fa-newspaper"></a><?php endif; ?></td>
+                                    <td class="text-center"><?php if ($event['canEditStory'] || $event['canOpenStory']): ?><a href="<?= $event['objStoryLink'] ?>" role="button" title="Kursbericht <?php if ($event['canEditStory']): ?>bearbeiten<?php else: ?>erstellen<?php endif; ?>" class="btn btn-sm btn-danger"><span class="fa-layers fa-fw"><i class="fal fa-fw fa-newspaper"></i><?= $event['faLayer'] ?></span></a><?php endif; ?></td>
                                     <td class="text-center"><a href="<?= $event['downloadCourseConfirmationLink'] ?>" title="Kursbestätigung downloaden" class="btn btn-sm btn-info"><i class="fal fa-fw fa-download"></a></td>
                                 </tr>
                             <?php endif; ?>
@@ -141,17 +142,18 @@
                 <!-- tab-pane-4 -->
                 <div class="tab-pane fade" id="nav-past-tours" role="tabpanel" aria-labelledby="nav-profile-tab">
                     <h2 class="mt-0">Absolvierte Touren</h2>
-                    <table class="table layout-table table-responsive table-striped">
-                        <?php foreach ($this->arrPastEvents as $event): ?>
-                            <?php if ($event['eventType'] == 'tour'): ?>
-                                <tr>
-                                    <td><?= $event['dateSpan'] ?></td>
-                                    <td><?= $event['objEvent']->title ?></td>
-                                    <td class="text-center"><?php if ($event['canWriteStory']): ?><a href="<?= $event['objStoryLink'] ?>" role="button" title="Tourenbericht verfassen" class="btn btn-sm btn-success"><i class="fal fa-fw fa-newspaper"></a><?php endif; ?></td>
-                                </tr>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </table>
+                  <small>Tourberichte k&ouml;nnen bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Ablauf des Events erstellt werden.</small>
+                  <table class="table layout-table table-responsive table-striped">
+                      <?php foreach ($this->arrPastEvents as $event): ?>
+                          <?php if ($event['eventType'] === 'tour'): ?>
+                          <tr>
+                            <td><?= $event['dateSpan'] ?></td>
+                            <td><?= $event['objEvent']->title ?></td>
+                            <td class="text-center"><?php if ($event['canEditStory'] || $event['canOpenStory']): ?><a href="<?= $event['objStoryLink'] ?>" role="button" title="Tourenbericht <?php if ($event['canEditStory']): ?>bearbeiten<?php else: ?>erstellen<?php endif; ?>" class="btn btn-sm btn-danger"><span class="fa-layers fa-fw"><i class="fal fa-fw fa-newspaper"></i><?= $event['faLayer'] ?></span></a><?php endif; ?></td>
+                          </tr>
+                          <?php endif; ?>
+                      <?php endforeach; ?>
+                  </table>
                 </div>
 
                 <!-- tab-pane-4 -->
@@ -162,9 +164,8 @@
                             <?php if ($event['objStory'] !== null): ?>
                                 <tr>
                                     <td><?= $event['dateSpan'] ?></td>
-                                    <td><?= $event['objEvent']->title ?></td>
-                                    <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Touren-/Kursbericht verfassen" class="btn btn-sm btn-success<?php if (!$event['canWriteStory']): ?> disabled<?php endif; ?>"<?php if (!$event['canWriteStory']): ?> aria-disabled="true"<?php endif; ?>><i class="fal fa-fw fa-pencil"></a></td>
-                                    <!--<td class="text-center"><a href="<?= $event['downloadCourseConfirmationLink'] ?>" title="Kursbestätigung downloaden" class="btn btn-sm btn-info"><i class="fa fa-fw fa-download"></a></td>-->
+                                    <td><?= $event['objStory']->eventTitle ?></td>
+                                    <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Touren-/Kursbericht verfassen/ansehen" class="btn btn-sm btn-success"><i class="fal fa-fw fa-pencil"></a></td>
                                 </tr>
                             <?php endif; ?>
                         <?php endforeach; ?>
