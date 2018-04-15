@@ -4,177 +4,199 @@
 
 
 <?php if ($this->hasInfoMessage): ?>
-    <div class="alert alert-info" role="alert">
-        <?= $this->infoMessage ?>
-    </div>
+  <div class="alert alert-info" role="alert">
+      <?= $this->infoMessage ?>
+  </div>
 <?php endif; ?>
 
 <?php if ($this->hasErrorMessage): ?>
-    <div class="alert alert-danger" role="alert">
-        <?= $this->errorMessage ?>
-    </div>
+  <div class="alert alert-danger" role="alert">
+      <?= $this->errorMessage ?>
+  </div>
 <?php endif; ?>
 
-    <h1 class="ce_headline first">Mein Bereich</h1>
+  <h1 class="ce_headline first">Mein Bereich</h1>
 
 
-    <div class="row">
-        <div class="col-12 col-md-4 col-xl-3">
-            <nav class="nav nav-tabs" id="dashboardTab" role="tablist">
-                <a class="list-group-item list-group-item-action active" id="nav-home-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fal fa-fw fa-cog"></i> Profil</a>
-                <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-next-events" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-cart-arrow-down"></i> Buchungen</a>
-                <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-past-workshops" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-thumbs-up"></i> Absolvierte Kurse</a>
-                <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-past-tours" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-star"></i> Absolvierte Touren</a>
-                <a class="list-group-item list-group-item-action" id="nav-my-blogs-tab" data-toggle="tab" href="#nav-my-blogs" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-pencil"></i> Meine Tourenberichte</a>
-            </nav>
-            {{br}}{{br}}
+  <div class="row">
+    <div class="col-12 col-md-4 col-xl-3">
+      <nav class="nav nav-tabs" id="dashboardTab" role="tablist">
+        <a class="list-group-item list-group-item-action active" id="nav-home-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-home" aria-selected="true"><i class="fal fa-fw fa-cog"></i> Profil</a>
+        <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-next-events" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-cart-arrow-down"></i> Buchungen</a>
+        <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-past-workshops" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-thumbs-up"></i> Absolvierte Kurse</a>
+        <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-past-tours" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-star"></i> Absolvierte Touren</a>
+        <a class="list-group-item list-group-item-action" id="nav-my-blogs-tab" data-toggle="tab" href="#nav-my-blogs" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-pencil"></i> Meine Tourenberichte</a>
+      </nav>
+      {{br}}{{br}}
+    </div>
+
+
+    <div class="col-12 col-md-8 col-xl-9">
+
+      <div class="tab-content" id="nav-tabContent">
+        <!-- tab-pane-1 -->
+        <div class="tab-pane fade show active" id="nav-profile" role="tabpanel" aria-labelledby="nav-home-tab">
+          <h2 class="mt-0">Persönliche Einstellungen</h2>
+
+          <div class="row">
+            <div class="col-12">
+              {{user::firstname}} {{user::lastname}}{{br}}
+              {{user::street}}{{br}}
+              {{user::postal}} {{user::city}}
+              <br><br>
+              Telefon: {{user::phone}}{{br}}
+              E-Mail: {{user::email}}
+              <br><br>
+              Mitglieder-Nr. {{user::sacMemberId}}
+              {{br}}{{br}}
+
+              <a href="{{link_url::passwort-aendern}}" class="btn btn-outline-primary">{{link_title::passwort-aendern}}</a>
+              {{br}}{{br}}
+
+              <p class="alert alert-danger p-2">
+                &Auml;nderungen an Adresse, Telefonnummer, etc. m&uuml;ssen auf der Webseite des Zentralverbandes gemacht werden.{{br}}{{br}}
+                <a href="http://www.sac-cas.ch/metanav/mein-konto.html" class="btn btn-danger btn-sm" title="Diese Angaben &auml;ndern">Angaben &auml;ndern</a>
+              </p>
+              {{br}}
+              <hr>
+            </div>
+
+
+            <div class="col-12">
+              <h3>Weiteres</h3>
+                <?= $this->userProfileForm ?>
+              <hr>
+            </div>
+
+            <div class="col-12">
+              <h3>Avatar Einstellungen</h3>
+              <div class="row">
+                <div class="col-9">
+                    <?= $this->avatarForm ?>
+                </div>
+                <div class="col-3">
+                  <figure class="responsive thumbnail image_container">
+                    {{image::<?= getAvatar($this->objUser->id, 'FE') ?>?width=300}}
+                  </figure>
+                </div>
+              </div>
+              {{br}}{{br}}
+            </div>
+
+
+          </div>
         </div>
 
 
-        <div class="col-12 col-md-8 col-xl-9">
+        <!-- tab-pane-2 -->
+        <div class="tab-pane fade" id="nav-next-events" role="tabpanel" aria-labelledby="nav-profile-tab">
+          <h2 class="mt-0">Deine nächsten Events</h2>
+          <table class="table layout-table table-responsive table-striped">
+            <tr>
+              <th>Datum</th>
+              <th>Event-Name</th>
+              <th>Anmeldestatus</th>
+              <th>Abmelden</th>
+            </tr>
+              <?php foreach ($this->arrUpcomingEvents as $event): ?>
+                  <?php $stateOfSubscription = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$event['eventRegistrationModel']->stateOfSubscription]; ?>
+                <tr>
+                  <td><?= $event['dateSpan'] ?></td>
+                  <td><a href="<?= $event['eventUrl'] ?>" title="zum Event"><?= $event['eventModel']->title ?></a></td>
+                  <td><?= $stateOfSubscription ?></td>
+                  <td class="text-center"><a href="<?= $event['unregisterUrl'] ?>" role="button" title="Von Event abmelden" class="sign-out-from-event-button btn btn-sm btn-danger"><i class="fa fa-fw fa-times"></a></td>
+                </tr>
+              <?php endforeach; ?>
+          </table>
 
-            <div class="tab-content" id="nav-tabContent">
-                <!-- tab-pane-1 -->
-                <div class="tab-pane fade show active" id="nav-profile" role="tabpanel" aria-labelledby="nav-home-tab">
-                    <h2 class="mt-0">Persönliche Einstellungen</h2>
-
-                    <div class="row">
-                        <div class="col-12">
-                            {{user::firstname}} {{user::lastname}}{{br}}
-                            {{user::street}}{{br}}
-                            {{user::postal}} {{user::city}}
-                            <br><br>
-                            Telefon: {{user::phone}}{{br}}
-                            E-Mail: {{user::email}}
-                            <br><br>
-                            Mitglieder-Nr. {{user::sacMemberId}}
-                            {{br}}{{br}}
-
-                            <a href="{{link_url::passwort-aendern}}" class="btn btn-outline-primary">{{link_title::passwort-aendern}}</a>
-                            {{br}}{{br}}
-
-                            <p class="alert alert-danger p-2">
-                                &Auml;nderungen an Adresse, Telefonnummer, etc. m&uuml;ssen auf der Webseite des Zentralverbandes gemacht werden.{{br}}{{br}}
-                                <a href="http://www.sac-cas.ch/metanav/mein-konto.html" class="btn btn-danger btn-sm" title="Diese Angaben &auml;ndern">Angaben &auml;ndern</a>
-                            </p>
-                            {{br}}
-                            <hr>
-                        </div>
-
+          <script>
+              $('.sign-out-from-event-button').click(function (e) {
+                  if (!confirm('Willst du dich wirklich vom Event abmelden und dich von der Teilnehmerliste streichen lassen?')) {
+                      e.preventDefault();
+                  }
+              });
+          </script>
 
 
-                        <div class="col-12">
-                            <h3>Weiteres</h3>
-                            <?= $this->userProfileForm ?>
-                            <hr>
-                        </div>
+        </div>
 
-                        <div class="col-12">
-                            <h3>Avatar Einstellungen</h3>
-                            <div class="row">
-                                <div class="col-9">
-                                    <?= $this->avatarForm ?>
-                                </div>
-                                <div class="col-3">
-                                    <figure class="responsive thumbnail image_container">
-                                        {{image::<?= getAvatar($this->objUser->id, 'FE') ?>?width=300}}
-                                    </figure>
-                                </div>
-                            </div>
-                            {{br}}{{br}}
-                        </div>
+        <!-- tab-pane-3 -->
+        <div class="tab-pane fade" id="nav-past-workshops" role="tabpanel" aria-labelledby="nav-profile-tab">
+          <h2 class="mt-0">Absolvierte Kurse</h2>
+          <small>Kursberichte k&ouml;nnen bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Ablauf des Events erstellt werden.</small>
+          <table class="table layout-table table-responsive table-striped">
+              <?php foreach ($this->arrPastEvents as $event): ?>
+                  <?php if ($event['eventType'] === 'course'): ?>
+                  <tr>
+                    <td><?= $event['dateSpan'] ?></td>
+                    <td><?= $event['objEvent']->title ?></td>
+                    <td class="text-center">
+                        <?php if ($event['canEditStory'] || $event['canOpenStory']): ?>
+                          <a href="<?= $event['objStoryLink'] ?>" role="button" title="Kursbericht <?php if ($event['canEditStory']): ?>bearbeiten<?php else: ?>erstellen<?php endif; ?>" class="btn btn-sm btn-danger">
+                            <span class="fa-layers fa-fw">
+                              <i class="fal fa-fw fa-newspaper"></i>
+                              <span class="fa-layers-text" data-fa-transform="up-20 right-13" style="font-size:9px;color:#fff;font-weight:900"><?php if ($event['canEditStory']): ?>EDIT<?php else: ?>NEW<?php endif; ?></span>
+                            </span>
+                          </a>
+                        <?php endif; ?>
+                    </td>
+                    <td class="text-center"><a href="<?= $event['downloadCourseConfirmationLink'] ?>" title="Kursbestätigung downloaden" class="btn btn-sm btn-info"><i class="fal fa-fw fa-download"></a></td>
+                  </tr>
+                  <?php endif; ?>
+              <?php endforeach; ?>
+          </table>
+        </div>
 
+        <!-- tab-pane-4 -->
+        <div class="tab-pane fade" id="nav-past-tours" role="tabpanel" aria-labelledby="nav-profile-tab">
+          <h2 class="mt-0">Absolvierte Touren</h2>
+          <small>Tourberichte k&ouml;nnen bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Ablauf des Events erstellt werden.</small>
+          <table class="table layout-table table-responsive table-striped">
+              <?php foreach ($this->arrPastEvents as $event): ?>
+                  <?php if ($event['eventType'] === 'tour'): ?>
+                  <tr>
+                    <td><?= $event['dateSpan'] ?></td>
+                    <td>
+                        <?= $event['objEvent']->title ?>
+                        <?php if($event['executionState'] === 'event_adapted'): ?>
+                        <br><small><span style="color:red">Ausweichtour: <?= $event['eventSubstitutionText'] ?></span></small>
+                        <?php endif; ?>
+                    </td>
+                    <td class="text-center">
+                        <?php if ($event['canEditStory'] || $event['canOpenStory']): ?>
+                          <a href="<?= $event['objStoryLink'] ?>" role="button" title="Tourbericht <?php if ($event['canEditStory']): ?>bearbeiten<?php else: ?>erstellen<?php endif; ?>" class="btn btn-sm btn-danger">
+                            <span class="fa-layers fa-fw">
+                              <i class="fal fa-fw fa-newspaper"></i>
+                              <span class="fa-layers-text" data-fa-transform="up-20 right-13" style="font-size:9px;color:#fff;font-weight:900"><?php if ($event['canEditStory']): ?>EDIT<?php else: ?>NEW<?php endif; ?></span>
+                            </span>
+                          </a>
+                        <?php endif; ?>
+                    </td>
+                  </tr>
+                  <?php endif; ?>
+              <?php endforeach; ?>
+          </table>
+        </div>
 
-                    </div>
-                </div>
+        <!-- tab-pane-4 -->
+        <div class="tab-pane fade" id="nav-my-blogs" role="tabpanel" aria-labelledby="nav-profile-tab">
+          <h2 class="mt-0">Meine Tourenberichte</h2>
+          <table class="table layout-table table-responsive table-striped">
+              <?php foreach ($this->arrPastEvents as $event): ?>
+                  <?php if ($event['objStory'] !== null): ?>
+                  <tr>
+                    <td><?= $event['dateSpan'] ?></td>
+                    <td><?= $event['objStory']->eventTitle ?></td>
+                    <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Touren-/Kursbericht verfassen/ansehen" class="btn btn-sm btn-success"><i class="fal fa-fw fa-pencil"></a></td>
+                  </tr>
+                  <?php endif; ?>
+              <?php endforeach; ?>
+          </table>
+        </div>
+      </div>
+    </div> <!-- end col -->
 
-
-                <!-- tab-pane-2 -->
-                <div class="tab-pane fade" id="nav-next-events" role="tabpanel" aria-labelledby="nav-profile-tab">
-                    <h2 class="mt-0">Deine nächsten Events</h2>
-                    <table class="table layout-table table-responsive table-striped">
-                        <tr>
-                            <th>Datum</th>
-                            <th>Event-Name</th>
-                            <th>Anmeldestatus</th>
-                            <th>Abmelden</th>
-                        </tr>
-                        <?php foreach ($this->arrUpcomingEvents as $event): ?>
-                            <?php $stateOfSubscription = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$event['eventRegistrationModel']->stateOfSubscription]; ?>
-                            <tr>
-                                <td><?= $event['dateSpan'] ?></td>
-                                <td><a href="<?= $event['eventUrl'] ?>" title="zum Event"><?= $event['eventModel']->title ?></a></td>
-                                <td><?= $stateOfSubscription ?></td>
-                                <td class="text-center"><a href="<?= $event['unregisterUrl'] ?>" role="button" title="Von Event abmelden" class="sign-out-from-event-button btn btn-sm btn-danger"><i class="fa fa-fw fa-times"></a></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </table>
-
-                    <script>
-                        $('.sign-out-from-event-button').click(function (e) {
-                            if (!confirm('Willst du dich wirklich vom Event abmelden und dich von der Teilnehmerliste streichen lassen?')) {
-                                e.preventDefault();
-                            }
-                        });
-                    </script>
-
-
-                </div>
-
-                <!-- tab-pane-3 -->
-                <div class="tab-pane fade" id="nav-past-workshops" role="tabpanel" aria-labelledby="nav-profile-tab">
-                    <h2 class="mt-0">Absolvierte Kurse</h2>
-                    <small>Kursberichte k&ouml;nnen bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Ablauf des Events erstellt werden.</small>
-                    <table class="table layout-table table-responsive table-striped">
-                        <?php foreach ($this->arrPastEvents as $event): ?>
-                            <?php if ($event['eventType'] === 'course'): ?>
-                                <tr>
-                                    <td><?= $event['dateSpan'] ?></td>
-                                    <td><?= $event['objEvent']->title ?></td>
-                                    <td class="text-center"><?php if ($event['canEditStory'] || $event['canOpenStory']): ?><a href="<?= $event['objStoryLink'] ?>" role="button" title="Kursbericht <?php if ($event['canEditStory']): ?>bearbeiten<?php else: ?>erstellen<?php endif; ?>" class="btn btn-sm btn-danger"><span class="fa-layers fa-fw"><i class="fal fa-fw fa-newspaper"></i><?= $event['faLayer'] ?></span></a><?php endif; ?></td>
-                                    <td class="text-center"><a href="<?= $event['downloadCourseConfirmationLink'] ?>" title="Kursbestätigung downloaden" class="btn btn-sm btn-info"><i class="fal fa-fw fa-download"></a></td>
-                                </tr>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </table>
-                </div>
-
-                <!-- tab-pane-4 -->
-                <div class="tab-pane fade" id="nav-past-tours" role="tabpanel" aria-labelledby="nav-profile-tab">
-                    <h2 class="mt-0">Absolvierte Touren</h2>
-                  <small>Tourberichte k&ouml;nnen bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Ablauf des Events erstellt werden.</small>
-                  <table class="table layout-table table-responsive table-striped">
-                      <?php foreach ($this->arrPastEvents as $event): ?>
-                          <?php if ($event['eventType'] === 'tour'): ?>
-                          <tr>
-                            <td><?= $event['dateSpan'] ?></td>
-                            <td><?= $event['objEvent']->title ?></td>
-                            <td class="text-center"><?php if ($event['canEditStory'] || $event['canOpenStory']): ?><a href="<?= $event['objStoryLink'] ?>" role="button" title="Tourenbericht <?php if ($event['canEditStory']): ?>bearbeiten<?php else: ?>erstellen<?php endif; ?>" class="btn btn-sm btn-danger"><span class="fa-layers fa-fw"><i class="fal fa-fw fa-newspaper"></i><?= $event['faLayer'] ?></span></a><?php endif; ?></td>
-                          </tr>
-                          <?php endif; ?>
-                      <?php endforeach; ?>
-                  </table>
-                </div>
-
-                <!-- tab-pane-4 -->
-                <div class="tab-pane fade" id="nav-my-blogs" role="tabpanel" aria-labelledby="nav-profile-tab">
-                    <h2 class="mt-0">Meine Tourenberichte</h2>
-                    <table class="table layout-table table-responsive table-striped">
-                        <?php foreach ($this->arrPastEvents as $event): ?>
-                            <?php if ($event['objStory'] !== null): ?>
-                                <tr>
-                                    <td><?= $event['dateSpan'] ?></td>
-                                    <td><?= $event['objStory']->eventTitle ?></td>
-                                    <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Touren-/Kursbericht verfassen/ansehen" class="btn btn-sm btn-success"><i class="fal fa-fw fa-pencil"></a></td>
-                                </tr>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </table>
-                </div>
-            </div>
-        </div> <!-- end col -->
-
-    </div> <!-- end row -->
+  </div> <!-- end row -->
 
 
 <?php $this->endblock(); ?>

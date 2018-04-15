@@ -3,6 +3,10 @@
 <?php $this->block('content'); ?>
   <p class="mt-0 mb-0">Dein Bericht für:<p>
   <h2 class="mt-1"><?= $this->eventName ?></h2>
+  <?php if($this->executionState === 'event_adapted' && $this->eventSubstitutionText != ''): ?>
+  <h4 class="mt-2" style="color: red">Ausweichtour: <?= $this->eventSubstitutionText ?></h4>
+  <?php endif; ?>
+
   <time class="small">Datum: <?= $this->eventPeriod ?></time>
   <br>
   <hr>

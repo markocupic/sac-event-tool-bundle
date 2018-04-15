@@ -106,7 +106,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
     // Palettes
     'palettes'    => array
     (
-        'default' => '{publishState_legend},publishState;{author_legend},addedOn,sacMemberId,authorName;{event_legend},pid,title,eventTitle,organizers,text,youtubeId,multiSRC;',
+        'default' => '{publishState_legend},publishState;{author_legend},addedOn,sacMemberId,authorName;{event_legend},pid,title,eventTitle,eventSubstitutionText,organizers,text,youtubeId,multiSRC;',
     ),
 
     // Subpalettes
@@ -117,11 +117,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
     // Fields
     'fields'      => array
     (
-        'id'             => array
+        'id'                    => array
         (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
         ),
-        'pid'            => array
+        'pid'                   => array
         (
             'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['pid'],
             'foreignKey' => 'tl_calendar_events.title',
@@ -129,7 +129,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
             'relation'   => array('type' => 'belongsTo', 'load' => 'eager'),
             'eval'       => array('readonly' => true),
         ),
-        'addedOn'        => array
+        'addedOn'               => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['addedOn'],
             'default'   => time(),
@@ -139,11 +139,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
             'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => false, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
             'sql'       => "int(10) unsigned NULL",
         ),
-        'tstamp'         => array
+        'tstamp'                => array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
-        'publishState'   => array
+        'publishState'          => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['publishState'],
             'filter'    => true,
@@ -154,7 +154,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
             'eval'      => array('tl_class' => 'clr', 'submitOnChange' => true),
             'sql'       => "char(1) NOT NULL default '1'",
         ),
-        'authorName'     => array
+        'authorName'            => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['authorName'],
             'filter'    => true,
@@ -163,54 +163,61 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
             'eval'      => array('doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'readonly' => true),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'eventTitle'     => array
+        'eventTitle'            => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['eventTitle'],
             'inputType' => 'text',
             'eval'      => array('doNotCopy' => true, 'mandatory' => true, 'readonly' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'eventStartDate' => array
+        'eventSubstitutionText' => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['eventSubstitutionText'],
+            'inputType' => 'text',
+            'eval'      => array('doNotCopy' => true, 'mandatory' => false, 'readonly' => true, 'maxlength' => 64, 'tl_class' => 'clr'),
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ),
+        'eventStartDate'        => array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
-        'eventEndDate'   => array
+        'eventEndDate'          => array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
-        'eventDates'     => array
+        'eventDates'            => array
         (
             'sql' => "blob NULL",
         ),
-        'title'          => array
+        'title'                 => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['title'],
             'inputType' => 'text',
             'eval'      => array('doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'text'           => array
+        'text'                  => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['text'],
             'inputType' => 'textarea',
             'eval'      => array('doNotCopy' => true, 'mandatory' => true, 'tl_class' => 'clr'),
             'sql'       => "mediumtext NULL",
         ),
-        'youtubeId'      => array
+        'youtubeId'             => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['youtubeId'],
             'inputType' => 'text',
             'eval'      => array('doNotCopy' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'sacMemberId'    => array
+        'sacMemberId'           => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['sacMemberId'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'readonly' => true),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'multiSRC'       => array
+        'multiSRC'              => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['multiSRC'],
             'exclude'   => true,
@@ -218,13 +225,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
             'eval'      => array('doNotCopy' => true, 'isGallery' => true, 'extensions' => 'jpg,jpeg', 'multiple' => true, 'fieldType' => 'checkbox', 'orderField' => 'orderSRC', 'files' => true, 'mandatory' => false, 'tl_class' => 'clr'),
             'sql'       => "blob NULL",
         ),
-        'orderSRC'       => array
+        'orderSRC'              => array
         (
             'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['orderSRC'],
             'eval'  => array('doNotCopy' => true),
             'sql'   => "blob NULL",
         ),
-        'organizers' => array(
+        'organizers'            => array(
             'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['organizers'],
             'exclude'    => true,
             'search'     => true,
@@ -235,7 +242,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
             'relation'   => array('type' => 'hasMany', 'load' => 'lazy'),
             'eval'       => array('multiple' => true, 'chosen' => true, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr m12'),
             'sql'        => "blob NULL",
-        )
+        ),
     ),
 );
 

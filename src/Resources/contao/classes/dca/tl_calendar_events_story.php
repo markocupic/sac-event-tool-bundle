@@ -43,20 +43,21 @@ class tl_calendar_events_story extends Backend
 
 
         $objStory = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story')->execute();
-        while($objStory->next())
+        while ($objStory->next())
         {
             $objStoryModel = \Contao\CalendarEventsStoryModel::findByPk($objStory->id);
             $objEvent = $objStoryModel->getRelated('pid');
-            if($objEvent !== null)
+            if ($objEvent !== null)
             {
                 $objStoryModel->eventTitle = $objEvent->title;
+                $objStoryModel->substitutionEvent = ($objEvent->executionState === 'event_adapted' && $objEvent->eventSubstitutionText != '') ? $objEvent->eventSubstitutionText : '';
                 $objStoryModel->eventStartDate = $objEvent->startDate;
                 $objStoryModel->eventEndDate = $objEvent->endDate;
                 $objStoryModel->organizers = $objEvent->organizers;
 
                 $arrD = [];
-                $arrDates = \Contao\StringUtil::deserialize($objEvent->repeatFixedDates,true);
-                foreach($arrDates as $arrDate)
+                $arrDates = \Contao\StringUtil::deserialize($objEvent->repeatFixedDates, true);
+                foreach ($arrDates as $arrDate)
                 {
                     $arrD[] = $arrDate['new_repeat'];
                 }

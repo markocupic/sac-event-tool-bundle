@@ -148,7 +148,7 @@ PaletteManipulator::create()
 
 // Tour report palette
 PaletteManipulator::create()
-    ->addField(array('executionState', 'tourSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents'), 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('executionState', 'eventSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents'), 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('tour_report', 'tl_calendar_events');
 
 
@@ -828,13 +828,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = array(
 );
 
 
-// tourSubstitutionText
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSubstitutionText'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourSubstitutionText'],
+// eventSubstitutionText
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventSubstitutionText'],
     'exclude'   => true,
-    'inputType' => 'textarea',
-    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
-    'sql'       => "text NULL",
+    'inputType' => 'text',
+    'eval'      => array('tl_class' => 'clr m12', 'maxlength' => '64', 'mandatory' => false),
+    'sql'       => "varchar(255) NOT NULL default ''",
 );
 
 // tourWeatherConditions
@@ -904,7 +904,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState']['eval']['do
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions']['eval']['doNotCopy'] = true;
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSubstitutionText']['eval']['doNotCopy'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventToken']['eval']['doNotCopy'] = true;
 

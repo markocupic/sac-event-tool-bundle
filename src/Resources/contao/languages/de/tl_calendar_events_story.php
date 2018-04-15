@@ -23,7 +23,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][3] = 'Bericht
 
 // Fields
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['addedOn'] = array("Erstellungsdatum", "Geben Sie das Erstellungsdatum en.");
-$GLOBALS['TL_LANG']['tl_calendar_events_story']['publishState'] = array("Ver&ouml;ffentlichungsstatus des Berichts", "Geben Sie den Status ein.");
+$GLOBALS['TL_LANG']['tl_calendar_events_story']['publishState'] = array("Ver&ouml;ffentlichungsstatus", "Geben Sie den Veröffenlichungslevel ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['sacMemberId'] = array("SAC-Mitgliedernummer des Autors", "");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['authorName'] = array("Name des Autors", "Geben Sie den Namen des Autors an.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['pid'] = array("Event-ID", "Geben Sie die Event-ID an.");
@@ -33,5 +33,6 @@ $GLOBALS['TL_LANG']['tl_calendar_events_story']['text'] = array("Bericht", "Gebe
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['youtubeId'] = array("Youtube Movie ID", "Geben Sie bitte die Youtube Movie ID ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['multiSRC'] = array("Bilder ausw&auml;hlen", "W&auml;hlen Sie hier die Bilder aus.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['organizers'] = array("Veranstalter\Ortsgruppe", "W&auml;hlen Sie hier den Veranstalter des Events aus.");
+$GLOBALS['TL_LANG']['tl_calendar_events_story']['eventSubstitutionText'] = array("Ausweichtour", "Geben Sie eine allf&auml;llige Ausweichtour an.");
 
 

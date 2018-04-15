@@ -162,7 +162,7 @@ class EventRapport
         $arrData[] = array('key' => 'eventTransport', 'value' => htmlspecialchars(html_entity_decode($transport)));
         $arrData[] = array('key' => 'eventCanceled', 'value' => $objEvent->eventState === 'event_canceled' ? 'Ja' : 'Nein');
         $arrData[] = array('key' => 'eventHasExecuted', 'value' => $objEvent->executionState === 'event_executed_like_predicted'  ? 'Ja' : 'Nein');
-        $substitutionText = $objEvent->tourSubstitutionText !== '' ? $objEvent->tourSubstitutionText : '---';
+        $substitutionText = $objEvent->eventSubstitutionText !== '' ? $objEvent->eventSubstitutionText : '---';
         $arrData[] = array('key' => 'eventSubstitutionText', 'value' => htmlspecialchars(html_entity_decode($substitutionText)));
         $arrData[] = array('key' => 'eventDuration', 'value' => htmlspecialchars(html_entity_decode($objEventInvoice->eventDuration)));
 

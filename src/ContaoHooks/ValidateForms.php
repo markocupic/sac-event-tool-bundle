@@ -212,9 +212,10 @@ class ValidateForms
             {
 
                 $set = array(
-                    'pid'         => $this->input->get('eventId'),
-                    'sacMemberId' => $this->feUser->sacMemberId,
-                    'tstamp'      => time(),
+                    'pid'                   => $this->input->get('eventId'),
+                    'sacMemberId'           => $this->feUser->sacMemberId,
+                    'tstamp'                => time(),
+                    'eventSubstitutionText' => ($oEvent->executionState === 'event_adapted' && $oEvent->eventSubstitutionText != '') ? $oEvent->eventSubstitutionText : '',
                 );
 
                 if ($arrSubmitted['youtubeId'])

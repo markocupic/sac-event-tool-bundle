@@ -361,13 +361,10 @@ class ModuleSacEventToolMemberDashboard extends Module
                     if ($arrEvents[$k]['objStory'] !== null && $objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
                     {
                         $arrEvents[$k]['canEditStory'] = true;
-                        $arrEvents[$k]['faLayer'] = '<span class="fa-layers-text" data-fa-transform="up-20 right-13" style="font-size:9px;color:#fff;font-weight:900">EDIT</span>';
-
                     }
                     elseif ($arrEvents[$k]['objStory'] === null && $objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
                     {
                         $arrEvents[$k]['canOpenStory'] = true;
-                        $arrEvents[$k]['faLayer'] = '<span class="fa-layers-text" data-fa-transform="up-20 right-13" style="font-size:9px;color:#fff;font-weight:900">NEW</span>';
                     }
 
                     // Generate links
@@ -399,6 +396,10 @@ class ModuleSacEventToolMemberDashboard extends Module
 
                     $this->Template->eventName = $objEvent->title;
                     $this->Template->eventPeriod = CalendarSacEvents::getEventPeriod($objEvent->id);
+                    $this->Template->executionState = $objEvent->executionState;
+                    $this->Template->eventSubstitutionText = $objEvent->eventSubstitutionText;
+
+
                     $objStory = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=?')->execute($this->objUser->sacMemberId, Input::get('eventId'));
                     if ($objStory->numRows)
                     {

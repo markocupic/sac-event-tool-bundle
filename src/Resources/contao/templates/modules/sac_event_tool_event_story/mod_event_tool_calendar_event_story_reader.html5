@@ -2,6 +2,9 @@
 
   <p class="small mb-0">Verfasst von: <strong><?= $this->authorName ?></strong>, <?= \Date::parse('d.m.Y', $this->addedOn) ?></p>
   <h1 class="ce_headline"><?= $this->title ?></h1>
+  <?php if($this->eventSubstitutionText != ''): ?>
+    <h4 class="mt-0 mb-3" style="color: red">Ausweichtour: <?= $this->eventSubstitutionText ?></h4>
+  <?php endif; ?>
 
   <div>
     <p><?= nl2br($this->text) ?></p>
