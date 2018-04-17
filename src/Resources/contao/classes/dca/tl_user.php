@@ -24,6 +24,53 @@ class tl_user_sac_event_tool extends Backend
     }
 
     /**
+     * Seet readonly fields
+     * @param DataContainer $dc
+     */
+    public function addReadonlyAttributeToSyncedFields(DataContainer $dc)
+    {
+        // User profile
+        if (Input::get('do') === 'login')
+        {
+            $id = $this->User->id;
+        }
+        else
+        {
+            $id = $dc->id;
+        }
+
+        if (!$this->User->admin && $id > 0)
+        {
+            $objUser = UserModel::findByPk($id);
+            if ($objUser !== null)
+            {
+                if ($objUser->sacMemberId > 0)
+                {
+                    $objMember = MemberModel::findBySacMemberId($objUser->sacMemberId);
+                    if ($objMember !== null)
+                    {
+                        if (!$objMember->disable)
+                        {
+                            $GLOBALS['TL_DCA']['tl_user']['fields']['gender']['eval']['readonly'] = true;
+                            $GLOBALS['TL_DCA']['tl_user']['fields']['firstname']['eval']['readonly'] = true;
+                            $GLOBALS['TL_DCA']['tl_user']['fields']['lastname']['eval']['readonly'] = true;
+                            $GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['readonly'] = true;
+                            $GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['readonly'] = true;
+                            $GLOBALS['TL_DCA']['tl_user']['fields']['phone']['eval']['readonly'] = true;
+                            $GLOBALS['TL_DCA']['tl_user']['fields']['mobile']['eval']['readonly'] = true;
+                            $GLOBALS['TL_DCA']['tl_user']['fields']['street']['eval']['readonly'] = true;
+                            $GLOBALS['TL_DCA']['tl_user']['fields']['postal']['eval']['readonly'] = true;
+                            $GLOBALS['TL_DCA']['tl_user']['fields']['city']['eval']['readonly'] = true;
+                            $GLOBALS['TL_DCA']['tl_user']['fields']['dateOfBirth']['eval']['readonly'] = true;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    /**
      * @param DataContainer $dc
      */
     public function onloadCallback(DataContainer $dc)

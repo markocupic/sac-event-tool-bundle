@@ -14,6 +14,8 @@ $GLOBALS['TL_DCA']['tl_user']['config']['sql']['keys']['sacMemberId'] = 'index';
 
 // Onload callbacks
 $GLOBALS['TL_DCA']['tl_user']['config']['onload_callback'][] = array('tl_user_sac_event_tool', 'onloadCallback');
+$GLOBALS['TL_DCA']['tl_user']['config']['onload_callback'][] = array('tl_user_sac_event_tool', 'addReadonlyAttributeToSyncedFields');
+
 
 
 // Manipulate palette default
