@@ -75,7 +75,7 @@ class ContentUserPortraitList extends ContentElement
             $queryType = $this->userList_queryType;
             if (count($arrUserRoles) > 0)
             {
-                $objDb = Database::getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname ASC, firstname ASC');
+                $objDb = Database::getInstance()->prepare('SELECT * FROM tl_user  WHERE disable=? AND hideInFrontendListings =? ORDER BY lastname ASC, firstname ASC')->execute('', '');
 
                 if ($queryType === 'OR')
                 {
