@@ -15,7 +15,7 @@
           <?php if ($this->city != ''): ?><?= $this->city ?>{{br}}<?php endif; ?>
           <?php if ($this->phone != ''): ?>P: <?= $this->phone ?>{{br}}<?php endif; ?>
           <?php if ($this->mobile != ''): ?>M: <?= $this->mobile ?>{{br}}<?php endif; ?>
-          <?php if ($this->email != ''): ?>{{email::<?= $this->email ?>}}{{br}}<?php endif; ?>
+          <?php if ($this->email != ''): ?>{{email_open::<?= $this->email ?>}}E-Mail senden</a>{{br}}<?php endif; ?>
       </small>
     </div>
   </div>
