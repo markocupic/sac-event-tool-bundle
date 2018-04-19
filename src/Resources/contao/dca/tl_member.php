@@ -59,7 +59,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = array(
     'inputType' => 'checkbox',
     'filter'    => true,
     'eval'      => array('multiple' => true),
-    'options'   => range(4250, 4254),
+    'options'   => Config::get('SAC_EVT_SAC_SECTION_IDS'),
     'sql'       => "blob NULL",
 );
 

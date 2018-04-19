@@ -237,7 +237,7 @@ class SyncSacMemberDatabase
                     $set['sacMemberId'] = \intval($arrLine[0]);
                     $set['username'] = \intval($arrLine[0]);
                     // Mehrere Sektionsmitgliedschaften möglich
-                    $set['sectionId'] = array(\intval($arrLine[1]));
+                    $set['sectionId'] = array((string)ltrim($arrLine[1], '0'));
                     $set['lastname'] = $arrLine[2];
                     $set['firstname'] = $arrLine[3];
                     $set['addressExtra'] = $arrLine[4];
@@ -303,6 +303,7 @@ class SyncSacMemberDatabase
             foreach ($arrMember as $sacMemberId => $arrValues)
             {
                 $arrValues['sectionId'] = \serialize($arrValues['sectionId']);
+
                 if (!in_array($sacMemberId, $arrMemberIDS))
                 {
                     // Add new user

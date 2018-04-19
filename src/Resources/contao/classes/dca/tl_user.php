@@ -39,35 +39,37 @@ class tl_user_sac_event_tool extends Backend
             $id = $dc->id;
         }
 
-        if (!$this->User->admin && $id > 0)
+        if ($id > 0)
         {
-            $objUser = UserModel::findByPk($id);
-            if ($objUser !== null)
+            if (!$this->User->admin)
             {
-                if ($objUser->sacMemberId > 0)
+                $objUser = UserModel::findByPk($id);
+                if ($objUser !== null)
                 {
-                    $objMember = MemberModel::findBySacMemberId($objUser->sacMemberId);
-                    if ($objMember !== null)
+                    if ($objUser->sacMemberId > 0)
                     {
-                        if (!$objMember->disable)
+                        $objMember = MemberModel::findBySacMemberId($objUser->sacMemberId);
+                        if ($objMember !== null)
                         {
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['gender']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['firstname']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['lastname']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['phone']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['mobile']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['street']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['postal']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['city']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['dateOfBirth']['eval']['readonly'] = true;
+                            if (!$objMember->disable)
+                            {
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['gender']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['firstname']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['lastname']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['readonly'] = false;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['phone']['eval']['readonly'] = false;
+                                //$GLOBALS['TL_DCA']['tl_user']['fields']['mobile']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['street']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['postal']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['city']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['dateOfBirth']['eval']['readonly'] = true;
+                            }
                         }
                     }
                 }
             }
         }
-
     }
 
     /**
@@ -85,6 +87,7 @@ class tl_user_sac_event_tool extends Backend
                 $set = array(
                     'firstname'   => $objSAC->firstname != '' ? $objSAC->firstname : $objUser->firstname,
                     'lastname'    => $objSAC->lastname != '' ? $objSAC->lastname : $objUser->lastname,
+                    'sectionId'   => $objSAC->sectionId != '' ? $objSAC->sectionId : serialize(array()),
                     'dateOfBirth' => $objSAC->dateOfBirth != '' ? $objSAC->dateOfBirth : $objUser->dateOfBirth,
                     'email'       => $objSAC->email != '' ? $objSAC->email : $objUser->email,
                     'street'      => $objSAC->street != '' ? $objSAC->street : $objUser->street,
@@ -92,6 +95,8 @@ class tl_user_sac_event_tool extends Backend
                     'city'        => $objSAC->city != '' ? $objSAC->city : $objUser->city,
                     'country'     => $objSAC->country != '' ? $objSAC->country : $objUser->country,
                     'gender'      => $objSAC->gender != '' ? $objSAC->gender : $objUser->gender,
+                    'phone'       => $objSAC->phone != '' ? $objSAC->phone : $objUser->phone,
+                    'mobile'      => $objSAC->mobile != '' ? $objSAC->mobile : $objUser->mobile,
                 );
                 $this->Database->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objUser->id);
             }

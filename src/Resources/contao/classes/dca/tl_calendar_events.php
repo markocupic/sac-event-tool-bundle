@@ -268,7 +268,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $objEventsModel = CalendarEventsModel::findOneById(Input::get('id'));
             if ($objEventsModel !== null)
             {
-                if (!EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objEventsModel->id))
+                if (!EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objEventsModel->id) && $this->User->id !== $objEventsModel->registrationGoesTo)
                 {
                     // User has no write access to the datarecord, so present field values without the form input
                     foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] as $field => $dca)

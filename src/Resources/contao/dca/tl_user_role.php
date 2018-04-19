@@ -29,7 +29,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
     (
         'sorting'           => array
         (
-            'mode'                  => 5,
             'fields'                => array('title'),
             'flag'                  => 1,
             'panelLayout'           => 'filter;search,limit',
@@ -37,8 +36,9 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
         ),
         'label'             => array
         (
-            'fields' => array('title'),
-            'format' => '%s',
+            'fields'         => array('title'),
+            'showColumns'    => true,
+            'label_callback' => array('tl_user_role', 'checkForUsage'),
         ),
         'global_operations' => array
         (
@@ -82,7 +82,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
     ),
     'palettes' => array
     (
-        'default' => 'title,belongsToExecutiveBoard',
+        'default' => 'title,belongsToExecutiveBoard,belongsToBeauftragteStammsektion',
     ),
 
     'fields' => array
@@ -129,5 +129,15 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'eval'      => array('mandatory' => false, 'tl_class' => 'clr'),
             'sql'       => "char(1) NOT NULL default ''",
         ),
+        'belongsToBeauftragteStammsektion' => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['belongsToBeauftragteStammsektion'],
+            'exclude'   => true,
+            'filter'    => true,
+            'sorting'   => true,
+            'inputType' => 'checkbox',
+            'eval'      => array('mandatory' => false, 'tl_class' => 'clr'),
+            'sql'       => "char(1) NOT NULL default ''",
+        )
     ),
 );

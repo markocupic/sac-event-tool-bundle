@@ -25,7 +25,7 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('instructor_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('emergency_phone_legend', 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addField(array('iban'), 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('firstname', 'lastname', 'sacMemberId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('firstname', 'lastname', 'sacMemberId', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('admin', 'userRole'), 'role_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('leiterQualifikation'), 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('emergencyPhone', 'emergencyPhoneName'), 'emergency_phone_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
@@ -46,7 +46,7 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('role_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('instructor_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addField(array('iban'), 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('firstname', 'lastname', 'sacMemberId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('firstname', 'lastname', 'sacMemberId', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('admin', 'hideInFrontendListings', 'userRole'), 'role_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('leiterQualifikation'), 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('extend', 'tl_user');
@@ -89,7 +89,7 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
 $GLOBALS['TL_DCA']['tl_user']['fields']['username']['eval']['tl_class'] = 'clr';
 $GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['tl_class'] = 'clr';
 $GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['tl_class'] = 'clr';
-
+$GLOBALS['TL_DCA']['tl_user']['fields']['email']['sorting'] = true;
 
 // calendar_containers
 $GLOBALS['TL_DCA']['tl_user']['fields']['calendar_containers'] = array(
@@ -158,6 +158,19 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['sacMemberId'] = array(
     'inputType' => 'text',
     'eval'      => array('doNotCopy' => true, 'readonly' => false, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr', 'rgxp' => 'natural'),
     'sql'       => "int(10) unsigned NOT NULL default '0'",
+);
+
+// sectionId
+$GLOBALS['TL_DCA']['tl_user']['fields']['sectionId'] = array(
+    'filter'    => true,
+    'sorting'   => true,
+    'label'     => &$GLOBALS['TL_LANG']['tl_user']['sectionId'],
+    'reference' => &$GLOBALS['TL_LANG']['tl_user']['section'],
+    'inputType' => 'checkboxWizard',
+    'filter'    => true,
+    'eval'      => array('multiple' => true, 'tl_class' => true),
+    'options'   => array(4250, 4251, 4252, 4253, 4254),
+    'sql'       => "blob NULL",
 );
 
 // dateOfBirth
@@ -327,18 +340,6 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['leiterQualifikation'] = array(
     'sql'       => "blob NULL",
 );
 
-// role
-$GLOBALS['TL_DCA']['tl_user']['fields']['role'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_user']['role'],
-    'reference' => &$GLOBALS['TL_LANG']['tl_user'],
-    'exclude'   => true,
-    'search'    => true,
-    'filter'    => true,
-    'inputType' => 'checkboxWizard',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['role'],
-    'eval'      => array('tl_class' => 'clr', 'multiple' => true),
-    'sql'       => "blob NULL",
-);
 
 // orderLeiterQualifikation
 $GLOBALS['TL_DCA']['tl_user']['fields']['orderLeiterQualifikation'] = array(

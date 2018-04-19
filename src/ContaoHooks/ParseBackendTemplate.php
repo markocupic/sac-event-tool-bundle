@@ -158,7 +158,7 @@ class ParseBackendTemplate
         $objTemplate->invoiceListHref = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
 
         // Check if user is allowed
-        if (EventReleaseLevelPolicyModel::hasWritePermission($objUser->id, $objEvent->id))
+        if (EventReleaseLevelPolicyModel::hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id)
         {
 
             if ($objEvent->eventType === 'tour' || $objEvent->eventType === 'lastMinuteTour')

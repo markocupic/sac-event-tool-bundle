@@ -22,7 +22,7 @@ $GLOBALS['TL_DCA']['tl_user_temp'] = array
         'enableVersioning'  => true,
         'onload_callback'   => array
         (
-            array('tl_user_temp', 'getSacMemberId'),
+            //array('tl_user_temp', 'getSacMemberId'),
         ),
         'onsubmit_callback' => array
         (//array('tl_user_temp', 'storeDateAdded')

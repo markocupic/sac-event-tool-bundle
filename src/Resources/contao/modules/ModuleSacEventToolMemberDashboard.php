@@ -33,6 +33,7 @@ use Contao\Module;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
+use Contao\UserModel;
 use Contao\Validator;
 use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion;
@@ -261,6 +262,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                 elseif ($objInstructor !== null)
                 {
 
+
                     $arrTokens = array(
                         'event_name'        => $objEvent->title,
                         'instructor_name'   => $objInstructor->name,
@@ -270,6 +272,23 @@ class ModuleSacEventToolMemberDashboard extends Module
                         'event_link_detail' => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($objEvent),
                         'sac_member_id'     => $objEventsMember->sacMemberId != '' ? $objEventsMember->sacMemberId : 'keine',
                     );
+
+                    if ($objEvent->registrationGoesTo > 0)
+                    {
+                        $objUser = UserModel::findByPk($objEvent->registrationGoesTo);
+                        if ($objUser !== null)
+                        {
+                            if ($objUser->email != '')
+                            {
+                                if (Validator::isEmail($objUser->email))
+                                {
+                                    $arrTokens['instructor_name'] = $objUser->name;
+                                    $arrTokens['instructor_email'] = $objUser->email;
+                                }
+                            }
+                        }
+                    }
+
                     Message::add('Du hast dich vom Event "' . $objEventsMember->eventName . '" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.', 'TL_INFO', TL_MODE);
 
                     // Log
