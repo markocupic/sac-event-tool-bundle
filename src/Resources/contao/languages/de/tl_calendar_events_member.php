@@ -18,7 +18,6 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['delete'] = array("L&ouml;schen
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['show'] = array("Details", "Details des Teilnehmers mit ID %s anzeigen.");
 
 
-
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['stateOfSubscription_legend'] = "Anmeldestatus-Einstellungen";
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['stateOfParticipation_legend'] = "Abschliessende Einstellungen zum Teilnahmestatus";
@@ -29,7 +28,6 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['contact_legend'] = "Kontaktang
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['sendEmail_legend'] = "E-Mail an Teilnehmer versenden";
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['emergency_phone_legend'] = "Notfall Kontaktangaben";
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['sac_member_id_legend'] = "SAC-Mitgliedernummer";
-
 
 
 // Fields
@@ -56,6 +54,8 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['emailRecipients'] = array("E-M
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['emailSubject'] = array("E-Mail Betreff", "Schreiben Sie hier bitte den E-Mail Betreff.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['emailText'] = array("E-Mail Text", "Schreiben Sie hier bitte den E-Mail Text.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['emailSendCopy'] = array("Kopie der Nachricht an mich senden", "W&auml;hlen Sie diese Option aus, wenn Sie eine Kopie der Nachricht erhalten m&ouml;chten.");
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['addEmailAttachment'] = array("Dateianlage hinzuf&uuml;gen", "");
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['emailAttachment'] = array("Dateien ausw&auml;hlen", "W&auml;hlen Sie die Dateien aus dem Dateibaum aus.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['eventName'] = array("Eventname", "Geben Sie bitte den Eventnamen ein.");
 
 

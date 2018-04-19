@@ -139,8 +139,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
     // Palettes
     'palettes'    => array
     (
+        '__selector__' => array('addEmailAttachment'),
         'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn;{notes_legend}, notes;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,vegetarian;{address_legend:hide},street,postal,city;{contact_legend},phone,email;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;',
-        'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,emailSendCopy;',
+        'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy;',
         'refuseWithEmail' => 'refuseWithEmail;',
         'acceptWithEmail' => 'acceptWithEmail;',
         'addToWaitlist'   => 'addToWaitlist;',
@@ -148,7 +149,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
 
     // Subpalettes
     'subpalettes' => array
-    (//
+    (
+        'addEmailAttachment' => 'emailAttachment',
     ),
 
     // Fields
@@ -367,6 +369,23 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'inputType' => 'textarea',
             'eval'      => array('mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'rows' => 6, 'style' => 'height:50px', 'tl_class' => ''),
             'sql'       => "mediumtext NULL",
+        ),
+        'addEmailAttachment'           => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['addEmailAttachment'],
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'checkbox',
+            'eval'      => array('submitOnChange' => true),
+            'sql'       => "char(1) NOT NULL default ''",
+        ),
+        'emailAttachment'           => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['emailAttachment'],
+            'exclude'   => true,
+            'inputType' => 'fileTree',
+            'eval'      => array('multiple' => true, 'fieldType' => 'checkbox', Config::get('allowedDownload'), 'files' => true, 'filesOnly' => true, 'mandatory' => true),
+            'sql'       => "binary(16) NULL",
         ),
         'emailSendCopy'       => array
         (

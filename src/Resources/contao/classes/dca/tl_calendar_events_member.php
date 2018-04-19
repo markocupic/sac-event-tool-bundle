@@ -8,7 +8,6 @@
  * @link https://sac-kurse.kletterkader.com
  */
 
-use Markocupic\ExportTable\ExportTable;
 use NotificationCenter\Model\Notification;
 
 /**
@@ -76,10 +75,12 @@ class tl_calendar_events_member extends Backend
         {
             // Delete E-Mail fields
             $opt = array(
-                'emailRecipients' => '',
-                'emailSubject'    => '',
-                'emailText'       => '',
-                'emailSendCopy'   => '',
+                'emailRecipients'    => '',
+                'emailSubject'       => '',
+                'emailText'          => '',
+                'emailSendCopy'      => '',
+                'addEmailAttachment' => '',
+                'emailAttachment'    => '',
             );
             $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($opt)->execute(Input::get('id'));
         }
@@ -171,38 +172,85 @@ class tl_calendar_events_member extends Backend
             // Set Recipient Array for the checkbox list
             $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['sendEmail'];
             $options = array();
+
+            // First get instructors
+            $objEvent = \Contao\CalendarEventsModel::findByPk(Input::get('eventId'));
+            if ($objEvent !== null)
+            {
+                $arrGuideIDS = \Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+                foreach ($arrGuideIDS as $userId)
+                {
+                    $objInstructor = \Contao\UserModel::findByPk($userId);
+                    if ($objInstructor !== null)
+                    {
+                        if ($objInstructor->email !== '')
+                        {
+                            if (\Contao\Validator::isEmail($objInstructor->email))
+                            {
+                                $options['tl_user-' . $objInstructor->id] = $objInstructor->firstname . ' ' . $objInstructor->lastname . ' (Leiter)';
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Then get event participants
             $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? ORDER BY stateOfSubscription, firstname')->execute(Input::get('eventId'));
             while ($objDb->next())
             {
-                if ($objDb->stateOfSubscription === 'subscription-not-confirmed')
+                if (\Contao\Validator::isEmail($objDb->email))
                 {
-                    $options[$objDb->id] = $objDb->firstname . ' ' . $objDb->lastname . ' (unbest&auml;tigt)';
+                    if ($objDb->stateOfSubscription === 'subscription-not-confirmed')
+                    {
+                        $options['tl_calendar_events_member-' . $objDb->id] = $objDb->firstname . ' ' . $objDb->lastname . ' (unbest&auml;tigt)';
 
-                }
-                elseif ($objDb->stateOfSubscription === 'subscription-refused')
-                {
-                    $options[$objDb->id] = $objDb->firstname . ' ' . $objDb->lastname . ' (Teilnahme abgelehnt)';
-                }
-                else
-                {
-                    $options[$objDb->id] = $objDb->firstname . ' ' . $objDb->lastname . ' (Teilnahme best&auml;tigt)';
+                    }
+                    elseif ($objDb->stateOfSubscription === 'subscription-refused')
+                    {
+                        $options['tl_calendar_events_member-' . $objDb->id] = $objDb->firstname . ' ' . $objDb->lastname . ' (Teilnahme abgelehnt)';
+                    }
+                    else
+                    {
+                        $options['tl_calendar_events_member-' . $objDb->id] = $objDb->firstname . ' ' . $objDb->lastname . ' (Teilnahme best&auml;tigt)';
+                    }
                 }
             }
+
             $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields']['emailRecipients']['options'] = $options;
 
             // Send E-Mail
             if (Input::post('FORM_SUBMIT') === 'tl_calendar_events_member' && isset($_POST['saveNclose']))
             {
                 $arrRecipients = array();
-                foreach (Input::post('emailRecipients') as $id)
+                foreach (Input::post('emailRecipients') as $key)
                 {
-                    $objRecipient = CalendarEventsMemberModel::findByPk($id);
-                    if ($objRecipient !== null)
+                    if (strpos($key, 'tl_user-') !== false)
                     {
-                        $arrRecipients[] = $objRecipient->email;
+                        $id = str_replace('tl_user-', '', $key);
+                        $objInstructor = \Contao\UserModel::findByPk($id);
+                        if ($objInstructor !== null)
+                        {
+                            if (\Contao\Validator::isEmail($objInstructor->email))
+                            {
+                                $arrRecipients[] = $objInstructor->email;
+                            }
+                        }
+                    }
+                    elseif (strpos($key, 'tl_calendar_events_member-') !== false)
+                    {
+                        $id = str_replace('tl_calendar_events_member-', '', $key);
+                        $objEventMember = \Contao\CalendarEventsMemberModel::findByPk($id);
+                        if ($objEventMember !== null)
+                        {
+                            if (\Contao\Validator::isEmail($objEventMember->email))
+                            {
+                                $arrRecipients[] = $objEventMember->email;
+                            }
+                        }
                     }
                 }
 
+                // Send e-mail
                 $objEmail = new Email();
                 $objEmail->from = $this->User->email;
                 $objEmail->fromName = html_entity_decode($this->User->name);
@@ -212,6 +260,29 @@ class tl_calendar_events_member extends Backend
                 if (Input::post('emailSendCopy'))
                 {
                     $objEmail->sendBcc($this->User->email);
+                }
+
+                // Add attachment
+                if (Input::post('addEmailAttachment'))
+                {
+                    if (Input::post('emailAttachment') !== '')
+                    {
+                        $arrUUID = explode(',', Input::post('emailAttachment'));
+                        if (is_array($arrUUID) && !empty($arrUUID))
+                        {
+                            foreach ($arrUUID as $uuid)
+                            {
+                                $objFile = \Contao\FilesModel::findByUuid($uuid);
+                                if ($objFile !== null)
+                                {
+                                    if (is_file(TL_ROOT . '/' . $objFile->path))
+                                    {
+                                        $objEmail->attachFile(TL_ROOT . '/' . $objFile->path);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 $arrRecipients = array_unique($arrRecipients);
                 if (count($arrRecipients) > 0)
