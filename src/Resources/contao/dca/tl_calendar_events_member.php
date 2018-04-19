@@ -66,7 +66,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         ),
         'global_operations' => array
         (
-            'all'                      => array
+            'all'                     => array
             (
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
@@ -81,7 +81,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
                 'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ),
-            'sendEmail'                => array
+            'sendEmail'               => array
             (
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['sendEmail'],
                 'href'       => 'act=edit&call=sendEmail',
@@ -139,7 +139,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
     // Palettes
     'palettes'    => array
     (
-        '__selector__' => array('addEmailAttachment'),
+        '__selector__'    => array('addEmailAttachment'),
         'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn;{notes_legend}, notes;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,vegetarian;{address_legend:hide},street,postal,city;{contact_legend},phone,email;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;',
         'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy;',
         'refuseWithEmail' => 'refuseWithEmail;',
@@ -370,7 +370,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'eval'      => array('mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'rows' => 6, 'style' => 'height:50px', 'tl_class' => ''),
             'sql'       => "mediumtext NULL",
         ),
-        'addEmailAttachment'           => array
+        'addEmailAttachment'  => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['addEmailAttachment'],
             'exclude'   => true,
@@ -379,12 +379,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'eval'      => array('submitOnChange' => true),
             'sql'       => "char(1) NOT NULL default ''",
         ),
-        'emailAttachment'           => array
+        'emailAttachment'     => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['emailAttachment'],
             'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval'      => array('multiple' => true, 'fieldType' => 'checkbox', Config::get('allowedDownload'), 'files' => true, 'filesOnly' => true, 'mandatory' => true),
+            'eval'      => array('multiple' => true, 'fieldType' => 'checkbox', 'extensions' => Config::get('allowedDownload'), 'files' => true, 'filesOnly' => true, 'mandatory' => true),
             'sql'       => "binary(16) NULL",
         ),
         'emailSendCopy'       => array
