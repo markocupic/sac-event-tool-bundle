@@ -555,8 +555,9 @@ class tl_calendar_events_member extends Backend
                     $objEmail->replyTo($this->User->email);
                     $objEmail->subject = Input::post('subject');
                     $objEmail->text = strip_tags(Input::post('text'));
+
                     // Send copy to instructor
-                    $objEmail->sendBcc($this->User->email);
+                    // $objEmail->sendBcc($this->User->email);
 
                     // Send email
                     if (Validator::isEmail($objRegistration->email))
@@ -630,8 +631,9 @@ class tl_calendar_events_member extends Backend
                     $objEmail->replyTo($this->User->email);
                     $objEmail->subject = Input::post('subject');
                     $objEmail->text = strip_tags(Input::post('text'));
+
                     // Send copy to instructor
-                    $objEmail->sendBcc($this->User->email);
+                    // $objEmail->sendBcc($this->User->email);
 
                     // Send email
                     if (Validator::isEmail($objRegistration->email))
@@ -704,8 +706,9 @@ class tl_calendar_events_member extends Backend
                     $objEmail->replyTo($this->User->email);
                     $objEmail->subject = Input::post('subject');
                     $objEmail->text = strip_tags(Input::post('text'));
+
                     // Send copy to instructor
-                    $objEmail->sendBcc($this->User->email);
+                    // $objEmail->sendBcc($this->User->email);
 
                     // Send email
                     if (Validator::isEmail($objRegistration->email))
