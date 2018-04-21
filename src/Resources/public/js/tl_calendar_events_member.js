@@ -21,8 +21,16 @@ window.addEvent('domready', function () {
                 new Request.JSON({
                     url: window.location.href,
                     onSuccess: function (json, txt) {
-                        if (json['status'] == 'success' && json['sacMemberId'] == sacMemberId) {
-                            $('ctrl_sacMemberId').hide();
+                        if (json['status'] === 'success' && json['sacMemberId'] === sacMemberId) {
+
+                            if ($('acceptAutocompleteBox') !== null) {
+                                $('acceptAutocompleteBox').destroy();
+                            }
+
+                            if ($('ctrl_sacMemberId') !== null) {
+                                $('ctrl_sacMemberId').hide();
+                            }
+
                             // Inject html
                             var acceptAutocomplete = new Element('div', {id: 'acceptAutocompleteBox'});
                             acceptAutocomplete.inject($('ctrl_sacMemberId'), 'before');
