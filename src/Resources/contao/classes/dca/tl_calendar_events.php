@@ -76,6 +76,44 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
+     * Do not show the same filters for different event types
+     * @param DataContainer $dc
+     */
+    public function setFilterSearchAndSortingBoard(DataContainer $dc)
+    {
+
+        if (CURRENT_ID > 0)
+        {
+            $objCalendar = \Contao\CalendarModel::findByPk(CURRENT_ID);
+            if ($objCalendar !== null)
+            {
+                $arrAllowedEventTypes = \Contao\StringUtil::deserialize($objCalendar->allowedEventTypes, true);
+                if (!in_array('tour', $arrAllowedEventTypes) && !in_array('lastMinuteTour', $arrAllowedEventTypes))
+                {
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType']['filter'] = false;
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType']['search'] = false;
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType']['sorting'] = false;
+                }
+
+                if (!in_array('course', $arrAllowedEventTypes))
+                {
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0']['filter'] = false;
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0']['search'] = false;
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0']['sorting'] = false;
+
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1']['filter'] = false;
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1']['search'] = false;
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1']['sorting'] = false;
+
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel']['filter'] = false;
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel']['search'] = false;
+                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel']['sorting'] = false;
+                }
+            }
+        }
+    }
+
+    /**
      * onload_callback deleteInvalidEvents
      * @param DataContainer $dc
      */
