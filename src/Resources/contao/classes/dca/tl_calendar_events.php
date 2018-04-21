@@ -858,6 +858,29 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
+     * @param $arrValues
+     * @param \Contao\DC_Table $dc
+     * @return array|null|string
+     */
+    public function loadCallbackRepeatFixedDates($arrValues, Contao\DC_Table $dc)
+    {
+        if ($arrValues !== '')
+        {
+            $arrValues = Contao\StringUtil::deserialize($arrValues, true);
+            if (isset($arrValues[0]))
+            {
+                if ($arrValues[0]['new_repeat'] <= 0)
+                {
+                    // Replace invalid date to empty string
+                    $arrValues = '';
+                }
+            }
+        }
+
+        return $arrValues;
+    }
+
+    /**
      * buttons_callback buttonsCallback
      * @param $arrButtons
      * @param $dc

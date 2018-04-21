@@ -502,6 +502,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['repeatFixedDates'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['repeatFixedDates'],
     'exclude'   => true,
     'inputType' => 'multiColumnWizard',
+    'load_callback' => array(array('tl_calendar_events_sac_event_tool', 'loadCallbackRepeatFixedDates')),
     'eval'      => array(
         'columnsCallback' => array('tl_calendar_events_sac_event_tool', 'listFixedDates'),
         'buttons'         => array('up' => false, 'down' => false),
