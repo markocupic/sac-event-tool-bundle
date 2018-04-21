@@ -11,8 +11,8 @@
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\Input;
+use Contao\System;
 use Contao\UserModel;
-
 
 /**
  * Class ImportUser
@@ -38,15 +38,20 @@ class ImportUser
                 $objUser = UserModel::findBySacMemberId($strUsername);
                 if ($objUser !== null)
                 {
-                    if ($objUser->sacMemberId > 0 && $objUser->sacMemberId == $strUsername)
+
+                    if ($objUser->sacMemberId > 0 && $objUser->sacMemberId === $strUsername)
                     {
+                        // Used for password recovery
+                        /** @var Request $request */
+                        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
+                        $request->request->set('username', $objUser->username);
+
+                        // Used for backend login
                         Input::setPost('username', $objUser->username);
                         return true;
                     }
                 }
             }
-
-
         }
 
         return false;
