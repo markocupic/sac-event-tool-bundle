@@ -123,7 +123,9 @@
         <!-- tab-pane-3 -->
         <div class="tab-pane fade" id="nav-past-workshops" role="tabpanel" aria-labelledby="nav-profile-tab">
           <h2 class="mt-0">Absolvierte Kurse</h2>
-          <small>Kursberichte k&ouml;nnen bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Ablauf des Events erstellt werden.</small>
+            <?php if ($this->eventCounter['tour'] > 0 || $this->eventCounter['lastMinuteTour'] > 0): ?>
+              <small>Kursberichte k&ouml;nnen bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Ablauf des Events erstellt werden.</small>
+            <?php endif; ?>
           <table class="table layout-table table-responsive table-striped">
               <?php foreach ($this->arrPastEvents as $event): ?>
                   <?php if ($event['eventType'] === 'course'): ?>
@@ -150,16 +152,19 @@
         <!-- tab-pane-4 -->
         <div class="tab-pane fade" id="nav-past-tours" role="tabpanel" aria-labelledby="nav-profile-tab">
           <h2 class="mt-0">Absolvierte Touren</h2>
-          <small>Tourberichte k&ouml;nnen bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Ablauf des Events erstellt werden.</small>
+            <?php if ($this->eventCounter['tour'] > 0 || $this->eventCounter['lastMinuteTour'] > 0): ?>
+              <small>Tourberichte k&ouml;nnen bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Ablauf des Events erstellt werden.</small>
+            <?php endif; ?>
           <table class="table layout-table table-responsive table-striped">
               <?php foreach ($this->arrPastEvents as $event): ?>
-                  <?php if ($event['eventType'] === 'tour'): ?>
+                  <?php if ($event['eventType'] === 'tour' || $event['eventType'] === 'lastMinuteTour'): ?>
                   <tr>
                     <td><?= $event['dateSpan'] ?></td>
                     <td>
-                        <?= $event['objEvent']->title ?>
-                        <?php if($event['executionState'] === 'event_adapted'): ?>
-                        <br><small><span style="color:red">Ausweichtour: <?= $event['eventSubstitutionText'] ?></span></small>
+                        <?= $event['objEvent']->title ?><?php if ($event['eventType'] === 'lastMinuteTour'): ?> <span style="color:green">(Last Minute)</span><?php endif; ?>
+                        <?php if ($event['executionState'] === 'event_adapted'): ?>
+                          <br>
+                          <small><span style="color:red">Ausweichtour: <?= $event['eventSubstitutionText'] ?></span></small>
                         <?php endif; ?>
                     </td>
                     <td class="text-center">

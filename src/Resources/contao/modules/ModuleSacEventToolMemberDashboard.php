@@ -363,6 +363,9 @@ class ModuleSacEventToolMemberDashboard extends Module
                 // Upcoming events
                 $this->Template->arrUpcomingEvents = CalendarEventsMemberModel::findUpcomingEventsByMemberId($this->objUser->id);
 
+                // Count events
+                $eventCounter = array();
+
 
                 // Past events
                 $arrEvents = CalendarEventsMemberModel::findPastEventsBySacMemberId($this->objUser->sacMemberId);
@@ -375,6 +378,13 @@ class ModuleSacEventToolMemberDashboard extends Module
 
                     $arrEvents[$k]['canOpenStory'] = false;
                     $arrEvents[$k]['canEditStory'] = false;
+
+                    // Count events
+                    if(!isset($eventCounter[$objEvent->eventType]))
+                    {
+                        $eventCounter[$objEvent->eventType] = 0;
+                    }
+                    $eventCounter[$objEvent->eventType]++;
 
 
                     if ($arrEvents[$k]['objStory'] !== null && $objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
@@ -393,6 +403,7 @@ class ModuleSacEventToolMemberDashboard extends Module
 
                 $this->Template->timeSpanForCreatingNewEventStory = $this->timeSpanForCreatingNewEventStory;
                 $this->Template->arrPastEvents = $arrEvents;
+                $this->Template->eventCounter = $eventCounter;
 
                 break;
 
