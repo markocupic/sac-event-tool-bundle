@@ -65,9 +65,9 @@ if (\Environment::get('isAjaxRequest') && \Input::get('xhrAction') === 'switchLa
   <tr>
     <th>Datum</th>
     <th>Dauer</th>
-    <th></th>
+    <th>Status</th>
     <th>Kurs</th>
-    <th></th>
+    <th>Anz.</th>
     <th>Leitung</th>
   </tr>
 <?php endif; ?>
