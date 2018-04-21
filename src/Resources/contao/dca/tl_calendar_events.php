@@ -205,10 +205,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelNext
     'button_callback' => array('tl_calendar_events_sac_event_tool', 'releaseLevelNext'),
 );
 
+
+// Operations Button Callbacks
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['delete']['button_callback'] = array('tl_calendar_events_sac_event_tool', 'deleteIcon');
-
-
-// Fields
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['copy']['button_callback'] = array('tl_calendar_events_sac_event_tool', 'copyIcon');
 
 
 // alias

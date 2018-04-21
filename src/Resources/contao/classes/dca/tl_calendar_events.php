@@ -218,7 +218,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
         // Do not allow cutting an editing
         $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['edit'] = null;
-        $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['cut'] = null;
+
 
         // Limit filter fields
         foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] as $k => $v)
@@ -1637,4 +1637,26 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         }
         return '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ';
     }
+
+    /**
+     * @param $row
+     * @param $href
+     * @param $label
+     * @param $title
+     * @param $icon
+     * @param $attributes
+     * @return string
+     */
+    public function copyIcon($row, $href, $label, $title, $icon, $attributes)
+    {
+
+        $blnAllow = \Contao\EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $row['id']);
+
+        if (!$blnAllow)
+        {
+            return '';
+        }
+        return '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ';
+    }
+
 }
