@@ -597,7 +597,11 @@ class tl_calendar_events_member extends Backend
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_refuse_with_email');
-            $objTemplate->emailSubject = 'Absage für Event ' . $objRegistration->getRelated('pid')->title;
+
+            // Get event type
+            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType] . ': ' : 'Event: ';
+
+            $objTemplate->emailSubject = 'Absage für ' . $eventType .  $objRegistration->getRelated('pid')->title;
             $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
             return $objTemplate->parse();
         }
@@ -674,7 +678,11 @@ class tl_calendar_events_member extends Backend
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_accept_with_email');
-            $objTemplate->emailSubject = 'Zusage für Event ' . $objRegistration->getRelated('pid')->title;
+
+            // Get event type
+            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType] . ': ' : 'Event: ';
+
+            $objTemplate->emailSubject = 'Zusage für ' . $eventType .  $objRegistration->getRelated('pid')->title;
             $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
             return $objTemplate->parse();
         }
@@ -748,7 +756,11 @@ class tl_calendar_events_member extends Backend
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_added_to_waitlist');
-            $objTemplate->emailSubject = 'Auf Warteliste für Event ' . $objRegistration->getRelated('pid')->title;
+
+            // Get event type
+            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType] . ': ' : 'Event: ';
+
+            $objTemplate->emailSubject = 'Auf Warteliste für ' . $eventType .  $objRegistration->getRelated('pid')->title;
             $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
             return $objTemplate->parse();
         }

@@ -426,8 +426,13 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         // Use terminal42/notification_center
         if ($this->objNotification !== null)
         {
+
+            // Get the event type
+            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$this->objEvent->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$this->objEvent->eventType] . ': ' : '';
+
+            // Set token array
             $arrTokens = array(
-                'event_name'                       => html_entity_decode($this->objEvent->title),
+                'event_name'                       => html_entity_decode($eventType . $this->objEvent->title),
                 'instructor_name'                  => $bypassRegistration ? html_entity_decode($strRegistrationGoesToName) : html_entity_decode($this->objInstructor->name),
                 'instructor_email'                 => $bypassRegistration ? html_entity_decode($strRegistrationGoesToEmail) : html_entity_decode($this->objInstructor->email),
                 'participant_name'                 => html_entity_decode($objMember->firstname . ' ' . $objMember->lastname),
