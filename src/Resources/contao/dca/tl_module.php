@@ -12,7 +12,7 @@
 /**
  * Table tl_module
  */
-$GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolFrontendUserDashboard'] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},unregisterFromEventNotificationId;{events_story_legend},timeSpanForCreatingNewEventStory,notifyOnEventStoryPublishedNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolFrontendUserDashboard'] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},unregisterFromEventNotificationId;{events_story_legend},timeSpanForCreatingNewEventStory,notifyOnEventStoryPublishedNotificationId,eventStoryJumpTo;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolEventRegistrationForm'] = '{title_legend},name,headline,type;{jumpTo_legend},jumpTo;{notification_legend},receiptEventRegistrationNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventStoryList'] = '{title_legend},name,headline,type;{config_legend},story_eventOrganizers;{jumpTo_legend},jumpTo;{pagination_legend},story_limit,perPage;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventStoryReader'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
@@ -56,6 +56,17 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['notifyOnEventStoryPublishedNotificati
     'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
 );
 
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryJumpTo'] = array(
+
+    'label'      => &$GLOBALS['TL_LANG']['tl_module']['eventStoryJumpTo'],
+    'exclude'    => true,
+    'inputType'  => 'pageTree',
+    'foreignKey' => 'tl_page.title',
+    'eval'       => array('mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'),
+    'sql'        => "int(10) unsigned NOT NULL default '0'",
+    'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
+);
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['timeSpanForCreatingNewEventStory'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_module']['timeSpanForCreatingNewEventStory'],
     'inputType' => 'select',
@@ -85,3 +96,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['story_eventOrganizers'] = array(
     'eval'       => array('multiple' => true, 'mandatory' => false, 'tl_class' => 'clr m12'),
     'sql'        => "blob NULL",
 );
+
+
+

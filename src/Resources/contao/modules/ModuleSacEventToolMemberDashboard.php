@@ -380,7 +380,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                     $arrEvents[$k]['canEditStory'] = false;
 
                     // Count events
-                    if(!isset($eventCounter[$objEvent->eventType]))
+                    if (!isset($eventCounter[$objEvent->eventType]))
                     {
                         $eventCounter[$objEvent->eventType] = 0;
                     }
@@ -511,13 +511,22 @@ class ModuleSacEventToolMemberDashboard extends Module
                     else
                     {
                         $set = array(
-                            'addedOn'     => time(),
                             'title'       => $objEvent->title,
                             'authorName'  => $this->objUser->firstname . ' ' . $this->objUser->lastname,
                             'sacMemberId' => $this->objUser->sacMemberId,
                             'pid'         => Input::get('eventId'),
+                            'tstamp'      => time(),
                         );
-                        Database::getInstance()->prepare('INSERT INTO tl_calendar_events_story %s')->set($set)->execute();
+                        $objInsertStmt = Database::getInstance()->prepare('INSERT INTO tl_calendar_events_story %s')->set($set)->execute();
+
+                        if ($objInsertStmt->affectedRows)
+                        {
+                            // Add security token
+                            $insertId = $objInsertStmt->insertId;
+                            $set = array();
+                            $set['securityToken'] = md5(rand(100000000, 999999999)) . $insertId;
+                            Database::getInstance()->prepare('UPDATE tl_calendar_events_story %s WHERE id=?')->set($set)->execute($insertId);
+                        }
                     }
                 }
                 break;

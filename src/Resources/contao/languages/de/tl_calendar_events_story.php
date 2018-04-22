@@ -9,7 +9,6 @@
  */
 
 
-
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishState_legend'] = "Status Einstellungen";
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['author_legend'] = "Autor";
@@ -34,5 +33,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_story']['youtubeId'] = array("Youtube Mo
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['multiSRC'] = array("Bilder ausw&auml;hlen", "W&auml;hlen Sie hier die Bilder aus.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['organizers'] = array("Veranstalter\Ortsgruppe", "W&auml;hlen Sie hier den Veranstalter des Events aus.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['eventSubstitutionText'] = array("Ausweichtour", "Geben Sie eine allf&auml;llige Ausweichtour an.");
+$GLOBALS['TL_LANG']['tl_calendar_events_story']['eventStartDate'] = array("Event-Datum", "");
+
 
 

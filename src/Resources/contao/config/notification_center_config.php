@@ -67,8 +67,8 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['sac_event_tool'] = array
     (
         // Field in tl_nc_language
         'email_recipient_cc' => array('author_email', 'instructor_email'),
-        'email_subject'      => array('hostname', 'story_title', 'story_text', 'story_link', 'event_title', 'author_name', 'author_name', 'author_email', 'author_sac_member_id', 'instructor_name', 'instructor_email'),
-        'email_text'         => array('hostname', 'story_title', 'story_text', 'story_link', 'event_title', 'author_name', 'author_name', 'author_email', 'author_sac_member_id', 'instructor_name', 'instructor_email'),
+        'email_subject'      => array('hostname', 'story_title', 'story_text', 'story_link_backend', 'story_link_frontend', 'event_title', 'author_name', 'author_name', 'author_email', 'author_sac_member_id', 'instructor_name', 'instructor_email'),
+        'email_text'         => array('hostname', 'story_title', 'story_text', 'story_link_backend', 'story_link_frontend', 'event_title', 'author_name', 'author_name', 'author_email', 'author_sac_member_id', 'instructor_name', 'instructor_email'),
     ),
 
 );

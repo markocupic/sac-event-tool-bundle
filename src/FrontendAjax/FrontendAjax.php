@@ -14,6 +14,7 @@ namespace Markocupic\SacEventToolBundle\FrontendAjax;
 
 use Contao\CalendarEventsModel;
 use Contao\CalendarEventsStoryModel;
+use Contao\Config;
 use Contao\Database;
 use Contao\Environment;
 use Contao\File;
@@ -21,9 +22,11 @@ use Contao\FilesModel;
 use Contao\FrontendUser;
 use Contao\Input;
 use Contao\ModuleModel;
+use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\UserModel;
 use Contao\Validator;
+use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\CalendarSacEvents;
 use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -451,6 +454,19 @@ class FrontendAjax
                     $instructorEmail = $objInstructor->email;
                 }
 
+                // Generate frontend preview link
+                $previewLink = '';
+                if ($objModule->eventStoryJumpTo > 0)
+                {
+                    $objTarget = PageModel::findByPk($objModule->eventStoryJumpTo);
+                    if ($objTarget !== null)
+                    {
+                        $previewLink = ampersand($objTarget->getFrontendUrl(Config::get('useAutoItem') ? '/%s' : '/items/%s'));
+                        $previewLink = sprintf($previewLink, $objStory->id);
+                        $previewLink = Environment::get('url') . '/' . Url::addQueryString('securityToken=' . $objStory->securityToken, $previewLink);
+                    }
+                }
+
                 if ($objEvent !== null)
                 {
                     $arrTokens = array(
@@ -462,7 +478,8 @@ class FrontendAjax
                         'author_email'         => $objUser->email,
                         'author_sac_member_id' => $objUser->sacMemberId,
                         'hostname'             => Environment::get('host'),
-                        'story_link'           => Environment::get('url') . '/contao?do=sac_calendar_events_stories_tool&act=edit&id=' . $objStory->id,
+                        'story_link_backend'   => Environment::get('url') . '/contao?do=sac_calendar_events_stories_tool&act=edit&id=' . $objStory->id,
+                        'story_link_frontend'  => $previewLink,
                         'story_title'          => $objStory->title,
                         'story_text'           => $objStory->text,
                     );
@@ -474,7 +491,7 @@ class FrontendAjax
         }
 
 
-        // Save publis state
+        // Save publish state
         $objStory->publishState = Input::post('publishState');
         $objStory->save();
 
@@ -590,15 +607,15 @@ class FrontendAjax
                 else
                 {
                     $photographer = $arrMeta['de']['photographer'];
-                    if($photographer === '')
+                    if ($photographer === '')
                     {
                         $photographer = $objUser->firstname . ' ' . $objUser->lastname;
                     }
                 }
 
                 $response = new JsonResponse(array(
-                    'status'  => 'success',
-                    'caption' => html_entity_decode($caption),
+                    'status'       => 'success',
+                    'caption'      => html_entity_decode($caption),
                     'photographer' => $photographer,
                 ));
                 return $response->send();
@@ -631,15 +648,15 @@ class FrontendAjax
                 if (!isset($arrMeta['de']))
                 {
                     $arrMeta['de'] = array(
-                        'title'   => '',
-                        'alt'     => '',
-                        'link'    => '',
-                        'caption' => '',
+                        'title'        => '',
+                        'alt'          => '',
+                        'link'         => '',
+                        'caption'      => '',
                         'photographer' => '',
                     );
                 }
                 $arrMeta['de']['caption'] = Input::post('caption');
-                $arrMeta['de']['photographer'] = Input::post('photographer')?: $objUser->firstname . ' ' . $objUser->lastname;
+                $arrMeta['de']['photographer'] = Input::post('photographer') ?: $objUser->firstname . ' ' . $objUser->lastname;
 
                 $objFile->meta = serialize($arrMeta);
                 $objFile->save();

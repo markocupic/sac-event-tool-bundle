@@ -228,17 +228,11 @@ class ValidateForms
                     $set['text'] = $this->input->post('text');
                 }
 
-                $objStory = $this->database->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=?')->execute($this->feUser->sacMemberId, $this->input->get('eventId'));
+                $objStory = $this->database->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=?')->limit(1)->execute($this->feUser->sacMemberId, $this->input->get('eventId'));
                 if ($objStory->numRows)
                 {
-
+                    $set['addedOn'] = time();
                     $this->database->prepare('UPDATE tl_calendar_events_story %s WHERE id=?')->set($set)->execute($objStory->id);
-
-                }
-                else
-                {
-                    //$set['addedOn'] = time();
-                    $this->database->prepare('INSERT INTO tl_calendar_events_story %s')->set($set)->execute();
                 }
             }
 

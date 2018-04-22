@@ -85,8 +85,24 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
             return '';
         }
 
-        $arrColumns = array('tl_calendar_events_story.publishState=? AND tl_calendar_events_story.id=?');
-        $this->story = CalendarEventsStoryModel::findBy($arrColumns, array('3', Input::get('items')));
+        $objStory = CalendarEventsStoryModel::findAll();
+        while($objStory->next())
+        {
+            //$objStory->securityToken = md5(rand(100000000, 999999999)) . $objStory->id;
+            //$objStory->save();
+        }
+
+
+        if(strlen(Input::get('securityToken')))
+        {
+            $arrColumns = array('tl_calendar_events_story.securityToken=? AND tl_calendar_events_story.id=?');
+            $arrValues = array(Input::get('securityToken'), Input::get('items'));
+        }else{
+            $arrColumns = array('tl_calendar_events_story.publishState=? AND tl_calendar_events_story.id=?');
+            $arrValues = array('3', Input::get('items'));
+        }
+
+        $this->story = CalendarEventsStoryModel::findBy($arrColumns, $arrValues);
 
         if ($this->story === null)
         {

@@ -48,7 +48,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
         'sorting'           => array
         (
             'mode'        => 2,
-            'fields'      => array('title'),
+            'fields'      => array('eventEndDate'),
             'flag'        => 1,
             'panelLayout' => 'filter;sort,search',
         ),
@@ -129,16 +129,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
             'relation'   => array('type' => 'belongsTo', 'load' => 'eager'),
             'eval'       => array('readonly' => true),
         ),
-        'addedOn'               => array
-        (
-            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['addedOn'],
-            'default'   => time(),
-            'flag'      => 8,
-            'sorting'   => true,
-            'inputType' => 'text',
-            'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => false, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
-            'sql'       => "int(10) unsigned NULL",
-        ),
         'tstamp'                => array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'",
@@ -179,7 +169,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
         ),
         'eventStartDate'        => array
         (
-            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'label'   => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['eventStartDate'],
+            'sorting' => true,
+            'flag'    => 8,
+            'sql'     => "int(10) unsigned NOT NULL default '0'",
         ),
         'eventEndDate'          => array
         (
@@ -242,6 +235,19 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
             'relation'   => array('type' => 'hasMany', 'load' => 'lazy'),
             'eval'       => array('multiple' => true, 'chosen' => true, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr m12'),
             'sql'        => "blob NULL",
+        ),
+        'securityToken'         => array(
+            'sql' => "varchar(255) NOT NULL default ''",
+        ),
+        'addedOn'               => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['addedOn'],
+            'default'   => time(),
+            'flag'      => 8,
+            'sorting'   => true,
+            'inputType' => 'text',
+            'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => false, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
+            'sql'       => "int(10) unsigned NULL",
         ),
     ),
 );

@@ -234,7 +234,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['rte'] = nu
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['mandatory'] = true;
 
 
-// tourAvalancheConditions
+// eventToken
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventToken'] = array(
     'sql' => "varchar(255) NOT NULL default ''",
 );
