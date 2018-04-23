@@ -19,7 +19,6 @@ use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\EventReleaseLevelPolicyModel;
 use Contao\Input;
 use Contao\System;
-
 use Markocupic\SacEventToolBundle\CalendarSacEvents;
 
 class ParseBackendTemplate
@@ -74,6 +73,7 @@ class ParseBackendTemplate
             // Add icon explanation legend to tl_calendar_events_member
             if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('table') === 'tl_calendar_events_member')
             {
+
                 if (preg_match('/<table class=\"tl_listing(.*)<\/table>/sU', $strBuffer))
                 {
                     Controller::loadDataContainer('tl_calendar_events_member');
@@ -146,7 +146,10 @@ class ParseBackendTemplate
             return '';
         }
 
+        // Get the refererId
         $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
+
+        // Get the backend module name
         $module = Input::get('do');
 
         $objTemplate = new BackendTemplate('be_calendar_events_event_dashboard');

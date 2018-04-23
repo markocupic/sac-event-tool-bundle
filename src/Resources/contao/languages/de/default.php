@@ -45,6 +45,9 @@ $GLOBALS['TL_LANG']['MSC']['plus1year'] = '+1 Jahr';
 $GLOBALS['TL_LANG']['MSC']['minus1year'] = '-1 Jahr';
 $GLOBALS['TL_LANG']['MSC']['plusOneReleaseLevel'] = 'Freigabestufe ++';
 $GLOBALS['TL_LANG']['MSC']['minusOneReleaseLevel'] = 'Freigabestufe --';
+$GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'] = 'Verg&uuml;tungsformular';
+$GLOBALS['TL_LANG']['MSC']['writeTourReportButton'] = 'Tourenrapport';
+
 
 
 // Confirm messages

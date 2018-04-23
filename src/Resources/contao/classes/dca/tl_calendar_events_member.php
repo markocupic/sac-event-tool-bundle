@@ -10,6 +10,7 @@
 
 use NotificationCenter\Model\Notification;
 
+
 /**
  * Class tl_calendar_events_member
  */
@@ -494,6 +495,61 @@ class tl_calendar_events_member extends Backend
     }
 
     /**
+     * @param DC_Table $dc
+     */
+    public function setGlobalOperations(DC_Table $dc)
+    {
+        // Remove edit_all (mehrere bearbeiten) button
+        if ($this->User->admin)
+        {
+            unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['all']);
+        }
+
+
+        // Generate href for $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']
+        // Generate href for  $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']
+
+        $blnAllowTourReportButton = false;
+        $blnAllowInstructorInvoiceButton = false;
+
+        // Get the refererId
+        $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
+
+        // Get the backend module name
+        $module = Input::get('do');
+
+        $eventId = Input::get('id');
+        $objEvent = \Contao\CalendarEventsModel::findByPk($eventId);
+        if ($objEvent !== null)
+        {
+            // Check if backend user is allowed
+            if (EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objEvent->id) || $objEvent->registrationGoesTo === $this->User->id)
+            {
+                if ($objEvent->eventType === 'tour' || $objEvent->eventType === 'lastMinuteTour')
+                {
+
+                    $url = sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&call=writeTourReport&rt=%s&ref=%s', $eventId, REQUEST_TOKEN, $refererId);
+                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'] = $url;
+                    $blnAllowTourReportButton = true;
+
+                    $url = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
+                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'] = $url;
+                    $blnAllowInstructorInvoiceButton = true;
+                }
+            }
+        }
+
+        if (!$blnAllowTourReportButton)
+        {
+            unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']);
+        }
+        if (!$blnAllowInstructorInvoiceButton)
+        {
+            unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']);
+        }
+    }
+
+    /**
      * Add an image to each record
      * @param array $row
      * @param string $label
@@ -601,7 +657,7 @@ class tl_calendar_events_member extends Backend
             // Get event type
             $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType] . ': ' : 'Event: ';
 
-            $objTemplate->emailSubject = 'Absage für ' . $eventType .  $objRegistration->getRelated('pid')->title;
+            $objTemplate->emailSubject = 'Absage für ' . $eventType . $objRegistration->getRelated('pid')->title;
             $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
             return $objTemplate->parse();
         }
@@ -682,7 +738,7 @@ class tl_calendar_events_member extends Backend
             // Get event type
             $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType] . ': ' : 'Event: ';
 
-            $objTemplate->emailSubject = 'Zusage für ' . $eventType .  $objRegistration->getRelated('pid')->title;
+            $objTemplate->emailSubject = 'Zusage für ' . $eventType . $objRegistration->getRelated('pid')->title;
             $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
             return $objTemplate->parse();
         }
@@ -760,7 +816,7 @@ class tl_calendar_events_member extends Backend
             // Get event type
             $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType] . ': ' : 'Event: ';
 
-            $objTemplate->emailSubject = 'Auf Warteliste für ' . $eventType .  $objRegistration->getRelated('pid')->title;
+            $objTemplate->emailSubject = 'Auf Warteliste für ' . $eventType . $objRegistration->getRelated('pid')->title;
             $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
             return $objTemplate->parse();
         }

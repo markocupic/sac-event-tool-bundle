@@ -26,6 +26,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             array('tl_calendar_events_member', 'setStateOfSubscription'),
             array('tl_calendar_events_member', 'onloadCallback'),
             array('tl_calendar_events_member', 'setContaoMemberIdFromSacMemberId'),
+            array('tl_calendar_events_member', 'setGlobalOperations'),
         ),
         'onsubmit_callback' => array
         (
@@ -78,6 +79,22 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['downloadEventMemberList'],
                 'href'       => 'act=downloadEventMemberList',
                 'class'      => 'download_registration_list',
+                'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+            ),
+            'writeTourReport'         => array
+            (
+                'label'      => &$GLOBALS['TL_LANG']['MSC']['writeTourReportButton'],
+                'href'       => '',
+                'class'      => 'writeTourRapport',
+                'icon'       => 'edit.svg',
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+            ),
+            'printInstructorInvoice'  => array
+            (
+                'label'      => &$GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'],
+                'href'       => '',
+                'class'      => 'printInstructorInvoice',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ),
