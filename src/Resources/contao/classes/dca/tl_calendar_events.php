@@ -119,7 +119,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function deleteInvalidEvents(DataContainer $dc)
     {
-        $this->Database->prepare('DELETE FROM tl_calendar_events WHERE tstamp<? AND tstamp>? AND title=?')->execute(time() - 24 * , 0, '');
+        $this->Database->prepare('DELETE FROM tl_calendar_events WHERE tstamp<? AND tstamp>? AND title=?')->execute(time() - 24 * 60 * 60, 0, '');
     }
 
     /**

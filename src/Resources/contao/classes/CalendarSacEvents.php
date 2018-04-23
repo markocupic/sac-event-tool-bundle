@@ -20,12 +20,12 @@ use Contao\Date;
 use Contao\EventOrganizerModel;
 use Contao\FilesModel;
 use Contao\MemberModel;
+use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\TourDifficultyModel;
 use Contao\TourTypeModel;
 use Contao\UserModel;
-use Contao\PageModel;
 use Haste\Util\Url;
 
 
@@ -500,7 +500,7 @@ class CalendarSacEvents extends System
                 // Event canceled
                 return '';
             }
-
+            // At the moment "diableOnlineREgistration" is deactivated anyway
             if (!$objEvent->disableOnlineRegistration)
             {
                 if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0)
@@ -546,6 +546,7 @@ class CalendarSacEvents extends System
                 return false;
             }
 
+            // At the moment "diableOnlineREgistration" is deactivated anyway
             if (!$objEvent->disableOnlineRegistration)
             {
                 if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0)
