@@ -16,8 +16,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['mountainguide
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventState'] = 'index';
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventReleaseLevel'] = 'index';
 
-// Child tables
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['ctable'][] = 'tl_calendar_events_member';
+
 
 // Callbacks
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'onloadCallback');

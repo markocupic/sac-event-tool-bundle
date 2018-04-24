@@ -51,7 +51,7 @@ class CalendarSacEvents extends System
         }
 
         $objDb = Database::getInstance();
-        $objEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? AND stateOfSubscription=?')->execute($id, 'subscription-accepted');
+        $objEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($id, 'subscription-accepted');
         $registrationCount = $objEventsMember->numRows;
 
         // Event canceled
@@ -492,7 +492,7 @@ class CalendarSacEvents extends System
         $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($eventId);
         if ($objEvent->numRows)
         {
-            $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
+            $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
             $memberCount = $calendarEventsMember->numRows;
 
             if ($objEvent->eventState === 'event_canceled')
@@ -538,7 +538,7 @@ class CalendarSacEvents extends System
         $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($eventId);
         if ($objEvent->numRows)
         {
-            $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
+            $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
             $memberCount = $calendarEventsMember->numRows;
 
             if ($objEvent->eventState === 'event_canceled')
@@ -646,12 +646,12 @@ class CalendarSacEvents extends System
 
         $arrOccupiedDates = array();
         // Get all future events of the member
-        $objMemberEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE pid!=? AND contaoMemberId=? AND stateOfSubscription=? AND hasParticipated=?')
+        $objMemberEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId!=? AND contaoMemberId=? AND stateOfSubscription=? AND hasParticipated=?')
             ->execute($objEvent->id, $objMember->id, 'subscription-accepted', '');
         while ($objMemberEvents->next())
         {
 
-            $objMemberEvent = CalendarEventsModel::findByPk($objMemberEvents->pid);
+            $objMemberEvent = CalendarEventsModel::findByPk($objMemberEvents->eventId);
             if ($objMemberEvent !== null)
             {
                 $arrRepeats = StringUtil::deserialize($objMemberEvent->repeatFixedDates, true);

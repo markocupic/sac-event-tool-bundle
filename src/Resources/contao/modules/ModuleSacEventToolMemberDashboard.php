@@ -146,10 +146,10 @@ class ModuleSacEventToolMemberDashboard extends Module
                         {
 
                             $objMember = MemberModel::findBySacMemberId($this->objUser->sacMemberId);
-                            $objEvent = $objRegistration->getRelated('pid');
+                            $objEvent = $objRegistration->getRelated('eventId');
                             if ($objEvent === null)
                             {
-                                throw new \Exception('Event with ID ' . $objRegistration->pid . ' not found in tl_calendar_events.');
+                                throw new \Exception('Event with ID ' . $objRegistration->eventId . ' not found in tl_calendar_events.');
                             }
 
                             // Log
@@ -169,7 +169,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                             $arrData[] = array('key' => 'lastname', 'value' => htmlspecialchars(html_entity_decode($objMember->lastname)));
                             $arrData[] = array('key' => 'memberId', 'value' => $objMember->sacMemberId);
                             $arrData[] = array('key' => 'eventYear', 'value' => Date::parse('Y', $objEvent->startDate));
-                            $arrData[] = array('key' => 'eventId', 'value' => htmlspecialchars(html_entity_decode($objRegistration->pid)));
+                            $arrData[] = array('key' => 'eventId', 'value' => htmlspecialchars(html_entity_decode($objRegistration->eventId)));
                             $arrData[] = array('key' => 'eventName', 'value' => htmlspecialchars(html_entity_decode($objEvent->title)));
                             $arrData[] = array('key' => 'regId', 'value' => $objRegistration->id);
 
@@ -224,14 +224,14 @@ class ModuleSacEventToolMemberDashboard extends Module
 
         if (null !== $objNotification && null !== $objEventsMember)
         {
-            $objEvent = $objEventsMember->getRelated('pid');
+            $objEvent = $objEventsMember->getRelated('eventId');
             if ($objEvent !== null)
             {
                 $objInstructor = $objEvent->getRelated('mainInstructor');
                 if ($objEventsMember->stateOfSubscription === 'subscription-refused')
                 {
                     $objEventsMember->delete();
-                    System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->pid, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
+                    System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
                     return;
                 }
                 elseif (!$objEvent->allowDeregistration)
@@ -292,7 +292,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                     Message::add('Du hast dich vom Event "' . $objEventsMember->eventName . '" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.', 'TL_INFO', TL_MODE);
 
                     // Log
-                    System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->pid, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
+                    System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
 
                     $objNotification->send($arrTokens, 'de');
 

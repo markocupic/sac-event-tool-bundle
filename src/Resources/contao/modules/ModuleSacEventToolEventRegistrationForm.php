@@ -145,7 +145,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         $this->Template->bookingErrorMsg = '';
 
         // Count accepted registrations
-        $objMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? AND stateOfSubscription=? AND contaoMemberId IN (SELECT id FROM tl_member WHERE disable=?)')->execute($this->objEvent->id, 'subscription-accepted', '');
+        $objMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=? AND contaoMemberId IN (SELECT id FROM tl_member WHERE disable=?)')->execute($this->objEvent->id, 'subscription-accepted', '');
         $countAcceptedRegistrations = $objMember->numRows;
         $this->Template->countAcceptedRegistrations = $countAcceptedRegistrations;
 
@@ -317,7 +317,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             if (!$hasError)
             {
                 // Prevent duplicate entries
-                $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? AND contaoMemberId=?')->execute(Input::get('events'), $this->objUser->id);
+                $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND contaoMemberId=?')->execute(Input::get('events'), $this->objUser->id);
                 if ($objDb->numRows)
                 {
                     $this->Template->bookingErrorMsg = 'F&uuml;r diesen Event liegt von dir bereits eine Anmeldung vor.';
@@ -346,7 +346,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                     $arrData = array_merge($objMemberModel->row(), $arrData);
                     $arrData['contaoMemberId'] = $objMemberModel->id;
                     $arrData['eventName'] = $this->objEvent->title;
-                    $arrData['pid'] = $this->objEvent->id;
+                    $arrData['eventId'] = $this->objEvent->id;
                     $arrData['addedOn'] = time();
                     $arrData['stateOfSubscription'] = 'subscription-not-confirmed';
 

@@ -62,7 +62,7 @@ class tl_calendar_events_member extends Backend
         }
 
 
-        $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=?')->limit(1)->execute(Input::get('id'));
+        $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=?')->limit(1)->execute(Input::get('id'));
         if ($objDb->numRows)
         {
             $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail']['href'] = str_replace('sendEmail', 'sendEmail&id=' . $objDb->id . '&eventId=' . Input::get('id'), $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail']['href']);
@@ -134,7 +134,7 @@ class tl_calendar_events_member extends Backend
                 }
                 else
                 {
-                    $objEvent = CalendarEventsMemberModel::findByPk($id)->getRelated('pid');
+                    $objEvent = CalendarEventsMemberModel::findByPk($id)->getRelated('eventId');
                 }
 
 
@@ -196,7 +196,7 @@ class tl_calendar_events_member extends Backend
             }
 
             // Then get event participants
-            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? ORDER BY stateOfSubscription, firstname')->execute(Input::get('eventId'));
+            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY stateOfSubscription, firstname')->execute(Input::get('eventId'));
             while ($objDb->next())
             {
                 if (\Contao\Validator::isEmail($objDb->email))
@@ -331,7 +331,7 @@ class tl_calendar_events_member extends Backend
         $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
         if ($objEventMemberModel !== null)
         {
-            $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->pid);
+            $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
             if ($objEvent !== null && $objEventMemberModel->stateOfSubscription != $varValue)
             {
                 if (Validator::isEmail($objEventMemberModel->email))
@@ -374,7 +374,7 @@ class tl_calendar_events_member extends Backend
                 $objEventMemberModel->save();
             }
 
-            $objEventModel = CalendarEventsModel::findByPk($objEventMemberModel->pid);
+            $objEventModel = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
             if ($objEventModel !== null)
             {
                 // Set correct event title
@@ -500,7 +500,7 @@ class tl_calendar_events_member extends Backend
     public function setGlobalOperations(DC_Table $dc)
     {
         // Remove edit_all (mehrere bearbeiten) button
-        if ($this->User->admin)
+        if (!$this->User->admin)
         {
             unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['all']);
         }
@@ -648,16 +648,16 @@ class tl_calendar_events_member extends Backend
             $objEmailTemplate = new BackendTemplate('be_email_templ_refuse_registration');
             $objEmailTemplate->firstname = $objRegistration->firstname;
             $objEmailTemplate->lastname = $objRegistration->lastname;
-            $objEmailTemplate->eventname = $objRegistration->getRelated('pid')->title;
+            $objEmailTemplate->eventname = $objRegistration->getRelated('eventId')->title;
             $objEmailTemplate->nameGuide = $this->User->name;
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_refuse_with_email');
 
             // Get event type
-            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType] . ': ' : 'Event: ';
+            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('eventId')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('eventId')->eventType] . ': ' : 'Event: ';
 
-            $objTemplate->emailSubject = 'Absage für ' . $eventType . $objRegistration->getRelated('pid')->title;
+            $objTemplate->emailSubject = 'Absage für ' . $eventType . $objRegistration->getRelated('eventId')->title;
             $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
             return $objTemplate->parse();
         }
@@ -729,16 +729,16 @@ class tl_calendar_events_member extends Backend
             $objEmailTemplate = new BackendTemplate('be_email_templ_accept_registration');
             $objEmailTemplate->firstname = $objRegistration->firstname;
             $objEmailTemplate->lastname = $objRegistration->lastname;
-            $objEmailTemplate->eventname = $objRegistration->getRelated('pid')->title;
+            $objEmailTemplate->eventname = $objRegistration->getRelated('eventId')->title;
             $objEmailTemplate->nameGuide = $this->User->name;
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_accept_with_email');
 
             // Get event type
-            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType] . ': ' : 'Event: ';
+            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('eventId')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('eventId')->eventType] . ': ' : 'Event: ';
 
-            $objTemplate->emailSubject = 'Zusage für ' . $eventType . $objRegistration->getRelated('pid')->title;
+            $objTemplate->emailSubject = 'Zusage für ' . $eventType . $objRegistration->getRelated('eventId')->title;
             $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
             return $objTemplate->parse();
         }
@@ -807,16 +807,16 @@ class tl_calendar_events_member extends Backend
             $objEmailTemplate = new BackendTemplate('be_email_templ_added_to_waitlist');
             $objEmailTemplate->firstname = $objRegistration->firstname;
             $objEmailTemplate->lastname = $objRegistration->lastname;
-            $objEmailTemplate->eventname = $objRegistration->getRelated('pid')->title;
+            $objEmailTemplate->eventname = $objRegistration->getRelated('eventId')->title;
             $objEmailTemplate->nameGuide = $this->User->name;
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_added_to_waitlist');
 
             // Get event type
-            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('pid')->eventType] . ': ' : 'Event: ';
+            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('eventId')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('eventId')->eventType] . ': ' : 'Event: ';
 
-            $objTemplate->emailSubject = 'Auf Warteliste für ' . $eventType . $objRegistration->getRelated('pid')->title;
+            $objTemplate->emailSubject = 'Auf Warteliste für ' . $eventType . $objRegistration->getRelated('eventId')->title;
             $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
             return $objTemplate->parse();
         }

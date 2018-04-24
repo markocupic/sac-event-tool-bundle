@@ -980,7 +980,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
         if (!$this->User->admin)
         {
-            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=?')->execute($dc->activeRecord->id);
+            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=?')->execute($dc->activeRecord->id);
             if ($objDb->numRows)
             {
                 Message::addError(sprintf($GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'], $dc->activeRecord->id));
@@ -990,10 +990,10 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         /**
         else
         {
-            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=?')->execute($dc->activeRecord->id);
+            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=?')->execute($dc->activeRecord->id);
             while ($objDb->next())
             {
-                $this->Database->prepare('UPDATE tl_calendar_events_member SET pid=? WHERE id=?')->execute(0, $objDb->id);
+                $this->Database->prepare('UPDATE tl_calendar_events_member SET eventId=? WHERE id=?')->execute(0, $objDb->id);
             }
         }
          *
@@ -1369,7 +1369,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         $intRefused = 0;
         $intWaitlisted = 0;
 
-        $eventsMemberModel = CalendarEventsMemberModel::findByPid($arrRow['id']);
+        $eventsMemberModel = CalendarEventsMemberModel::findByEventId($arrRow['id']);
         if ($eventsMemberModel !== null)
         {
             while ($eventsMemberModel->next())

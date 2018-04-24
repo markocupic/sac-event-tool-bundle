@@ -18,11 +18,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
     'config'      => array
     (
         'dataContainer'      => 'Table',
-        'ptable'             => 'tl_calendar_events',
         'notCopyable'        => true,
         // Do not copy nor delete records, if an item has been deleted!
-        'doNotCopyRecords'   => true,
-        'doNotDeleteRecords' => true,
         'onload_callback'    => array
         (
             array('tl_calendar_events_member', 'setStateOfSubscription'),
@@ -42,7 +39,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'keys' => array
             (
                 'id'        => 'primary',
-                'email,pid' => 'index',
+                'email,eventId' => 'index',
             ),
         ),
     ),
@@ -60,6 +57,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'fields'      => array('stateOfSubscription, addedOn'),
             'flag'        => 1,
             'panelLayout' => 'filter;sort,search',
+            'filter' => array(array('eventId=?', Input::get('id')))
         ),
         'label'             => array
         (
@@ -179,9 +177,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
         ),
-        'pid'                 => array
+        'eventId'                 => array
         (
-            'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['pid'],
+            'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['eventId'],
             'foreignKey' => 'tl_calendar_events.title',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
             'relation'   => array('type' => 'belongsTo', 'load' => 'eager'),

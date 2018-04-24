@@ -39,7 +39,7 @@ class CalendarEventsMemberModel extends \Model
         {
             if ($objMember->sacMemberId != '')
             {
-                $objEventsMembers = \Database::getInstance()->prepare('SELECT * FROM ' . static::$strTable . ' WHERE pid=? AND sacMemberId=?')->execute($eventId, $objMember->sacMemberId);
+                $objEventsMembers = \Database::getInstance()->prepare('SELECT * FROM ' . static::$strTable . ' WHERE eventId=? AND sacMemberId=?')->execute($eventId, $objMember->sacMemberId);
                 if ($objEventsMembers->numRows)
                 {
                     return true;
@@ -67,7 +67,7 @@ class CalendarEventsMemberModel extends \Model
         $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE endDate>? ORDER BY startDate')->execute(time());
         while ($objEvents->next())
         {
-            $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND pid=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id);
+            $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id);
             if ($objJoinedEvents->numRows)
             {
                 $objEventsModel = \CalendarEventsModel::findByPk($objEvents->id);
@@ -104,7 +104,7 @@ class CalendarEventsMemberModel extends \Model
         $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate<? ORDER BY startDate DESC')->execute(time());
         while ($objEvents->next())
         {
-            $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND pid=? AND hasParticipated=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id, '1');
+            $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=? AND hasParticipated=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id, '1');
             if ($objJoinedEvents->numRows)
             {
                 $arr = $objEvents->row();

@@ -78,7 +78,7 @@ class EventRapport
                     Controller::redirect(System::getReferer());
                 }
 
-                $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? AND hasParticipated=?')->execute($objEvent->id, '1');
+                $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND hasParticipated=?')->execute($objEvent->id, '1');
                 if (!$objEventMember->numRows)
                 {
                     // Send error message if there are no members assigned to the event
@@ -188,7 +188,7 @@ class EventRapport
         $carTaxes = 0;
         if ($objEventInvoice->countCars > 0 && $objEventInvoice->carTaxesKm > 0)
         {
-            $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? AND hasParticipated=?')->execute($objEvent->id, '1');
+            $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND hasParticipated=?')->execute($objEvent->id, '1');
             if ($objEventMember->numRows)
             {
                 $carTaxes = $objEventInvoice->countCars * 0.6 / $countParticipantsTotal * $objEventInvoice->carTaxesKm;
@@ -376,7 +376,7 @@ class EventRapport
 
         if ($objEvent !== null)
         {
-            $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=? AND stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
+            $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
             if (!$objEventMember->numRows)
             {
                 // Send error message if there are no members assigned to the event
