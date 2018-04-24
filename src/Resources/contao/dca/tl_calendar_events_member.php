@@ -17,28 +17,29 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
 
     'config'      => array
     (
-        'dataContainer'      => 'Table',
-        'notCopyable'        => true,
+        'dataContainer'     => 'Table',
+        'notCopyable'       => true,
         // Do not copy nor delete records, if an item has been deleted!
-        'onload_callback'    => array
+        'onload_callback'   => array
         (
             array('tl_calendar_events_member', 'setStateOfSubscription'),
             array('tl_calendar_events_member', 'onloadCallback'),
+            array('tl_calendar_events_member', 'reviseTable'),
             array('tl_calendar_events_member', 'setContaoMemberIdFromSacMemberId'),
             array('tl_calendar_events_member', 'setGlobalOperations'),
         ),
-        'onsubmit_callback'  => array
+        'onsubmit_callback' => array
         (
             array('tl_calendar_events_member', 'onsubmitCallback'),
         ),
-        'ondelete_callback'  => array
+        'ondelete_callback' => array
         (//
         ),
-        'sql'                => array
+        'sql'               => array
         (
             'keys' => array
             (
-                'id'        => 'primary',
+                'id'            => 'primary',
                 'email,eventId' => 'index',
             ),
         ),
@@ -57,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'fields'      => array('stateOfSubscription, addedOn'),
             'flag'        => 1,
             'panelLayout' => 'filter;sort,search',
-            'filter' => array(array('eventId=?', Input::get('id')))
+            'filter'      => array(array('eventId=?', Input::get('id'))),
         ),
         'label'             => array
         (
@@ -177,7 +178,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
         ),
-        'eventId'                 => array
+        'eventId'             => array
         (
             'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['eventId'],
             'foreignKey' => 'tl_calendar_events.title',

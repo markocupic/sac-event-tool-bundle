@@ -88,6 +88,7 @@ class tl_calendar_events_member extends Backend
 
     }
 
+
     /**
      *
      * OnLoad Callback
@@ -295,6 +296,34 @@ class tl_calendar_events_member extends Backend
     }
 
     /**
+     * onload_callback
+     * Delete orphaned records
+     */
+    public function reviseTable()
+    {
+        $reload = false;
+
+        // Delete orphaned records
+        $objStmt = $this->Database->prepare('DELETE FROM tl_calendar_events_member WHERE tl_calendar_events_member.sacMemberId > ? AND tstamp > ? AND NOT EXISTS (SELECT * FROM tl_member WHERE tl_calendar_events_member.sacMemberId = tl_member.sacMemberId)')->execute(0, 0);
+        if ($objStmt->affectedRows > 0)
+        {
+            $reload = true;
+        }
+
+        // Delete event members without sacMemberId that are not related to an event
+        $objStmt = $this->Database->prepare('DELETE FROM tl_calendar_events_member WHERE (tl_calendar_events_member.sacMemberId < ? OR tl_calendar_events_member.sacMemberId = ?) AND tstamp > ? AND NOT EXISTS (SELECT * FROM tl_calendar_events WHERE tl_calendar_events_member.eventId = tl_calendar_events.id)')->execute(1, '', 0);
+        if ($objStmt->affectedRows > 0)
+        {
+            $reload = true;
+        }
+
+        if ($reload)
+        {
+            $this->reload();
+        }
+    }
+
+    /**
      * This method is used when an instructor signs in a member manualy
      * @param DC_Table $dc
      */
@@ -374,11 +403,16 @@ class tl_calendar_events_member extends Backend
                 $objEventMemberModel->save();
             }
 
-            $objEventModel = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
+            $eventId = $objEventMemberModel->eventId > 0 ? $objEventMemberModel->eventId : CURRENT_ID;
+
+            $objEventModel = CalendarEventsModel::findByPk($eventId);
             if ($objEventModel !== null)
             {
-                // Set correct event title
+                // Set correct event title and eventId
                 $objEventMemberModel->eventName = $objEventModel->title;
+                $objEventMemberModel->eventId = $eventId;
+
+
                 if ($objEventMemberModel->sacMemberId != '')
                 {
                     $objMemberModel = MemberModel::findBySacMemberId($objEventMemberModel->sacMemberId);
@@ -395,7 +429,7 @@ class tl_calendar_events_member extends Backend
             }
             else
             {
-                $objEventMemberModel->delete();
+                //$objEventMemberModel->delete();
             }
         }
     }
