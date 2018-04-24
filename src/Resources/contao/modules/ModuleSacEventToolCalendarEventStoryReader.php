@@ -86,18 +86,20 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
         }
 
         $objStory = CalendarEventsStoryModel::findAll();
-        while($objStory->next())
+        while ($objStory->next())
         {
             //$objStory->securityToken = md5(rand(100000000, 999999999)) . $objStory->id;
             //$objStory->save();
         }
 
 
-        if(strlen(Input::get('securityToken')))
+        if (strlen(Input::get('securityToken')))
         {
             $arrColumns = array('tl_calendar_events_story.securityToken=? AND tl_calendar_events_story.id=?');
             $arrValues = array(Input::get('securityToken'), Input::get('items'));
-        }else{
+        }
+        else
+        {
             $arrColumns = array('tl_calendar_events_story.publishState=? AND tl_calendar_events_story.id=?');
             $arrValues = array('3', Input::get('items'));
         }
@@ -121,10 +123,15 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
-        $objEvent = CalendarEventsModel::findByPk($this->story->pid);
-        $objAuthor = MemberModel::findBySacMemberId($this->story->sacMemberId);
+        // Set data
         $this->Template->setData($this->story->row());
+
+        // Fallback if author is no more findable in tl_member
+        $objAuthor = MemberModel::findBySacMemberId($this->story->sacMemberId);
         $this->Template->authorName = $objAuthor !== null ? $objAuthor->firstname . ' ' . $objAuthor->lastname : $this->story->authorName;
+
+        // !!! $objEvent can be NULL, if the related event no more exists
+        $objEvent = CalendarEventsModel::findByPk($this->story->eventId);
         $this->Template->objEvent = $objEvent;
 
         // Add gallery
@@ -154,7 +161,6 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
                                 $alt = $arrMeta['de']['alt'];
                                 $caption = $arrMeta['de']['caption'];
                                 $photographer = $arrMeta['de']['photographer'];
-
                             }
 
                             $images[$objFiles->path] = array

@@ -19,7 +19,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
     'config'      => array
     (
         'dataContainer'     => 'Table',
-        'ptable'            => 'tl_calendar_events',
         'enableVersioning'  => true,
         'notCopyable'       => true,
         'onsubmit_callback' => array
@@ -36,8 +35,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
         (
             'keys' => array
             (
-                'id'  => 'primary',
-                'pid' => 'index',
+                'id'      => 'primary',
+                'eventId' => 'index',
             ),
         ),
     ),
@@ -99,14 +98,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
                 'href'  => 'act=show',
                 'icon'  => 'show.svg',
             ),
-
         ),
     ),
 
     // Palettes
     'palettes'    => array
     (
-        'default' => '{publishState_legend},publishState;{author_legend},addedOn,sacMemberId,authorName;{event_legend},pid,title,eventTitle,eventSubstitutionText,organizers,text,youtubeId,multiSRC;',
+        'default' => '{publishState_legend},publishState;{author_legend},addedOn,sacMemberId,authorName;{event_legend},eventId,title,eventTitle,eventSubstitutionText,organizers,text,youtubeId,multiSRC;',
     ),
 
     // Subpalettes
@@ -121,9 +119,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
         (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
         ),
-        'pid'                   => array
+        'eventId'               => array
         (
-            'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['pid'],
+            'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['eventId'],
             'foreignKey' => 'tl_calendar_events.title',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
             'relation'   => array('type' => 'belongsTo', 'load' => 'eager'),

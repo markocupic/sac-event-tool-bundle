@@ -16,6 +16,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['mountainguide
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventState'] = 'index';
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventReleaseLevel'] = 'index';
 
+// Child tables
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['ctable'][] = 'tl_calendar_events_member';
 
 // Callbacks
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'onloadCallback');
@@ -499,16 +501,16 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['miscellaneous'] = array(
 
 // repeatFixedDates
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['repeatFixedDates'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['repeatFixedDates'],
-    'exclude'   => true,
-    'inputType' => 'multiColumnWizard',
+    'label'         => &$GLOBALS['TL_LANG']['tl_calendar_events']['repeatFixedDates'],
+    'exclude'       => true,
+    'inputType'     => 'multiColumnWizard',
     'load_callback' => array(array('tl_calendar_events_sac_event_tool', 'loadCallbackRepeatFixedDates')),
-    'eval'      => array(
+    'eval'          => array(
         'columnsCallback' => array('tl_calendar_events_sac_event_tool', 'listFixedDates'),
         'buttons'         => array('up' => false, 'down' => false),
         'mandatory'       => true,
     ),
-    'sql'       => "blob NULL",
+    'sql'           => "blob NULL",
 );
 
 // eventState
@@ -844,7 +846,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions'] = ar
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourWeatherConditions'],
     'exclude'   => true,
     'inputType' => 'textarea',
-    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
+    'eval'      => array('mandatory' => true, 'tl_class' => 'clr m12'),
     'sql'       => "text NULL",
 );
 

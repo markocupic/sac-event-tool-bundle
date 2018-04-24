@@ -136,7 +136,7 @@ class ValidateForms
             $oEvent = $this->calendarEventsModelAdapter->findByPk($this->input->get('eventId'));
             if ($this->feUser !== null && $oEvent !== null)
             {
-                $objStory = $this->database->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=?')->execute($this->feUser->sacMemberId, $this->input->get('eventId'));
+                $objStory = $this->database->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=?')->execute($this->feUser->sacMemberId, $this->input->get('eventId'));
                 if ($objStory->numRows)
                 {
                     if ($objWidget->name == 'text')
@@ -212,7 +212,7 @@ class ValidateForms
             {
 
                 $set = array(
-                    'pid'                   => $this->input->get('eventId'),
+                    'eventId'                   => $this->input->get('eventId'),
                     'sacMemberId'           => $this->feUser->sacMemberId,
                     'tstamp'                => time(),
                     'eventSubstitutionText' => ($oEvent->executionState === 'event_adapted' && $oEvent->eventSubstitutionText != '') ? $oEvent->eventSubstitutionText : '',
@@ -228,7 +228,7 @@ class ValidateForms
                     $set['text'] = $this->input->post('text');
                 }
 
-                $objStory = $this->database->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=?')->limit(1)->execute($this->feUser->sacMemberId, $this->input->get('eventId'));
+                $objStory = $this->database->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=?')->limit(1)->execute($this->feUser->sacMemberId, $this->input->get('eventId'));
                 if ($objStory->numRows)
                 {
                     $set['addedOn'] = time();
@@ -245,7 +245,7 @@ class ValidateForms
                     if ($this->input->post('attachfiles'))
                     {
                         $eventId = $this->input->get('eventId');
-                        $objStory = $this->database->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=?')->execute($this->feUser->sacMemberId, $eventId);
+                        $objStory = $this->database->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=?')->execute($this->feUser->sacMemberId, $eventId);
                         if ($objStory->numRows)
                         {
                             $oStoryModel = CalendarEventsStoryModel::findByPk($objStory->id);

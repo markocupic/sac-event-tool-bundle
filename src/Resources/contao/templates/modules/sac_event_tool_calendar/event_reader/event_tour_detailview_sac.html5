@@ -54,22 +54,23 @@
       <?php endif; ?>
 
       <?php $organizers = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventOrganizersAsArray($this->organizers); ?>
-      <?php if (!empty($organizers)): ?>
+
         <div class="col-12 col-xl-4">
           <div class="organizers event-detail event-info-box icon-box-small">
             <h5>Organisierende Gruppe</h5>
             <p>
-                <?= implode('<br>', $organizers) ?>
+                <?php if (!empty($organizers)): ?><?= implode('<br>', $organizers) ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
             </p>
           </div>
         </div>
-      <?php endif; ?>
+
   </div>
 
     <?php $arrInstructors = \Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorsAsArray($this->id) ?>
-    <?php if (!empty($organizers)): ?>
+
       <div class="instructor event-detail event-info-box icon-box-small">
         <h5>Leitung</h5>
+          <?php if (!empty($arrInstructors)): ?>
         <div class="row mt-3 tiny-gutter">
             <?php foreach ($arrInstructors as $userId): ?>
               <div class="col-6 col-sm-4 col-md-3 col-xl-2">
@@ -93,8 +94,11 @@
               </div>
             <?php endforeach; ?>
         </div>
+          <?php else: ?>
+          Leiter wurde gel&ouml;scht.
+          <?php endif; ?>
+
       </div>
-    <?php endif; ?>
 
     <?php if ($this->eventType === 'tour' && $this->tourDetailText != ''): ?>
       <div class="tour-detail-text event-detail event-info-box icon-box-small">

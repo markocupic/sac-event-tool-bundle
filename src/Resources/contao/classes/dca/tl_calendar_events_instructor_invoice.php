@@ -53,6 +53,26 @@ class tl_calendar_events_instructor_invoice extends Backend
         return parent::__construct();
     }
 
+    /**
+     * onload_callback
+     * Delete orphaned records
+     */
+    public function reviseTable()
+    {
+        $reload = false;
+
+        // Delete orphaned records
+        $objStmt = $this->Database->execute('DELETE FROM tl_calendar_events_instructor_invoice WHERE NOT EXISTS (SELECT * FROM tl_user WHERE tl_calendar_events_instructor_invoice.userPid = tl_user.id)');
+        if ($objStmt->affectedRows > 0)
+        {
+            $reload = true;
+        }
+
+        if ($reload)
+        {
+            $this->reload();
+        }
+    }
 
     /**
      * Onload_callback
@@ -87,7 +107,7 @@ class tl_calendar_events_instructor_invoice extends Backend
             if ($objEvent !== null)
             {
                 $blnAllow = EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objEvent->id);
-                if($objEvent->registrationGoesTo === $this->User->id)
+                if ($objEvent->registrationGoesTo === $this->User->id)
                 {
                     $blnAllow = true;
                 }

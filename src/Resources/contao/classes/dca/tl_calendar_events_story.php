@@ -46,7 +46,7 @@ class tl_calendar_events_story extends Backend
         while ($objStory->next())
         {
             $objStoryModel = \Contao\CalendarEventsStoryModel::findByPk($objStory->id);
-            $objEvent = $objStoryModel->getRelated('pid');
+            $objEvent = $objStoryModel->getRelated('eventId');
             if ($objEvent !== null)
             {
                 $objStoryModel->eventTitle = $objEvent->title;
@@ -63,11 +63,8 @@ class tl_calendar_events_story extends Backend
                 }
                 $objStoryModel->eventDates = serialize($arrD);
                 $objStoryModel->save();
-
             }
-
         }
-
     }
 
 

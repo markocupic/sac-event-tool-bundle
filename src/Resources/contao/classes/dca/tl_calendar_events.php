@@ -966,7 +966,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
     /**
      * ondelete_callback ondeleteCallback
-     * Do not allow deleting records if there are childs (registrations) in tl_calendar_events_member
+     * Do not allow non-admins deleting records if there are child records (registrations) in tl_calendar_events_member
      * @param DataContainer $dc
      */
     public function ondeleteCallback(DataContainer $dc)
@@ -977,12 +977,27 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             return;
         }
 
-        $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=?')->execute($dc->activeRecord->id);
-        if ($objDb->numRows)
+
+        if (!$this->User->admin)
         {
-            Message::addError(sprintf($GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'], $dc->activeRecord->id));
-            $this->redirect($this->getReferer());
+            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=?')->execute($dc->activeRecord->id);
+            if ($objDb->numRows)
+            {
+                Message::addError(sprintf($GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'], $dc->activeRecord->id));
+                $this->redirect($this->getReferer());
+            }
         }
+        /**
+        else
+        {
+            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE pid=?')->execute($dc->activeRecord->id);
+            while ($objDb->next())
+            {
+                $this->Database->prepare('UPDATE tl_calendar_events_member SET pid=? WHERE id=?')->execute(0, $objDb->id);
+            }
+        }
+         *
+         * **/
     }
 
     /**

@@ -27,7 +27,7 @@ class CalendarEventsStoryModel extends \Model
 	 */
 	public static function findOneBySacMemberIdAndEventId($sacMemberId, $eventId)
 	{
-		return self::findOneBy(array('tl_calendar_events_story.sacMemberId=? AND tl_calendar_events_story.pid=?'), array($sacMemberId, $eventId));
+		return self::findOneBy(array('tl_calendar_events_story.sacMemberId=? AND tl_calendar_events_story.eventId=?'), array($sacMemberId, $eventId));
 	}
 
 }

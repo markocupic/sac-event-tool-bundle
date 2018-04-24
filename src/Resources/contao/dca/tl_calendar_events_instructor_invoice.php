@@ -22,6 +22,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = array
             array('tl_calendar_events_instructor_invoice', 'checkAccesRights'),
             array('tl_calendar_events_instructor_invoice', 'routeActions'),
             array('tl_calendar_events_instructor_invoice', 'warnIfReportFormHasNotFilledIn'),
+            array('tl_calendar_events_instructor_invoice', 'reviseTable'),
         ),
         'sql'              => array
         (
@@ -109,7 +110,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = array
         ),
         'pid'               => array
         (
-            'foreignKey' => 'tl_event_release_level_policy_package.title',
+            'foreignKey' => 'tl_calendar_events.title',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
             'relation'   => array('type' => 'belongsTo', 'load' => 'eager')
         ),

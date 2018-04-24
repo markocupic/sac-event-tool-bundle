@@ -369,7 +369,7 @@ class FrontendAjax
         }
 
         // Save new image order to db
-        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? AND pid=?')->limit(1)->execute($objUser->sacMemberId, Input::post('eventId'));
+        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? AND eventId=?')->limit(1)->execute($objUser->sacMemberId, Input::post('eventId'));
         if (!$objDb->numRows)
         {
             $response = new JsonResponse(array('status' => 'error'));
@@ -418,7 +418,7 @@ class FrontendAjax
         }
 
         // Save new image order to db
-        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=? && publishState<?')->limit(1)->execute($objUser->sacMemberId, Input::post('eventId'), 3);
+        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=? && publishState<?')->limit(1)->execute($objUser->sacMemberId, Input::post('eventId'), 3);
         if (!$objDb->numRows)
         {
             $response = new JsonResponse(array('status' => 'error'));
@@ -518,7 +518,7 @@ class FrontendAjax
             return $response->send();
         }
         // Save new image order to db
-        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=? && publishState<?')->limit(1)->execute($objUser->sacMemberId, Input::post('eventId'), 3);
+        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=? && publishState<?')->limit(1)->execute($objUser->sacMemberId, Input::post('eventId'), 3);
         if (!$objDb->numRows)
         {
             $response = new JsonResponse(array('status' => 'error'));

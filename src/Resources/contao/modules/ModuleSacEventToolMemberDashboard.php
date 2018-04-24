@@ -430,7 +430,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                     $this->Template->eventSubstitutionText = $objEvent->eventSubstitutionText;
 
 
-                    $objStory = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && pid=?')->execute($this->objUser->sacMemberId, Input::get('eventId'));
+                    $objStory = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=?')->execute($this->objUser->sacMemberId, Input::get('eventId'));
                     if ($objStory->numRows)
                     {
                         $this->Template->youtubeId = $objStory->youtubeId;
@@ -514,7 +514,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                             'title'       => $objEvent->title,
                             'authorName'  => $this->objUser->firstname . ' ' . $this->objUser->lastname,
                             'sacMemberId' => $this->objUser->sacMemberId,
-                            'pid'         => Input::get('eventId'),
+                            'eventId'         => Input::get('eventId'),
                             'tstamp'      => time(),
                         );
                         $objInsertStmt = Database::getInstance()->prepare('INSERT INTO tl_calendar_events_story %s')->set($set)->execute();
