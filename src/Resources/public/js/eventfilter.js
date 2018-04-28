@@ -445,6 +445,14 @@ var EventFilter = {
         if (self.getUrlParam('year') > 0) {
             opt.startDate = "01-01-" + self.getUrlParam('year');
             opt.endDate = "31-12-" + self.getUrlParam('year');
+        } else {
+            var today = new Date();
+            var mm = today.getMonth() + 1;
+            var dd = today.getDate();
+            var YYYY = today.getFullYear();
+            opt.startDate = dd + '-' + mm + '-' + YYYY;
+            YYYY = YYYY + 2;
+            opt.endDate = dd + '-' + mm + '-' + YYYY;
         }
 
         $('.filter-board .input-group.date').datepicker(opt).on('changeDate', function () {
