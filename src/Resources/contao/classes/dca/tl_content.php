@@ -75,5 +75,26 @@ class tl_content_sac_event_tool extends tl_content
         return $options;
 
     }
+
+    /**
+     * Return all user portrait list templates as array
+     *
+     * @return array
+     */
+    public function getUserListTemplates()
+    {
+        return $this->getTemplateGroup('ce_user_portrait_list_');
+    }
+
+
+    /**
+     * Return all user portrait list partial templates as array
+     *
+     * @return array
+     */
+    public function getUserListPartialTemplates()
+    {
+        return $this->getTemplateGroup('user_portrait_list_partial_');
+    }
 }
 

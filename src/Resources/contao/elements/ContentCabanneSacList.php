@@ -44,9 +44,6 @@ class ContentCabanneSacList extends ContentElement
     public function generate()
     {
 
-
-
-
         return parent::generate();
     }
 

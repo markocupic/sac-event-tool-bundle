@@ -31,13 +31,13 @@ class ContentUserPortraitList extends ContentElement
      * Template
      * @var string
      */
-    protected $strTemplate = 'ce_user_portrait_list';
+    protected $strTemplate = 'ce_user_portrait_list_multiple';
 
     /**
      * Partial template
      * @var string
      */
-    protected $strTemplatePartial = 'user_portrait_list_partial';
+    protected $strTemplatePartial = 'user_portrait_list_partial_multiple';
 
 
     /**
@@ -48,6 +48,19 @@ class ContentUserPortraitList extends ContentElement
     public function generate()
     {
 
+
+        // Get template
+        if($this->userList_template != '')
+        {
+            $this->strTemplate = $this->userList_template;
+        }
+
+        // Get partial template
+        if($this->userList_partial_template != '')
+        {
+            $this->strTemplatePartial = $this->userList_partial_template;
+        }
+
         if (TL_MODE == 'BE')
         {
             /** @var BackendTemplate|object $objTemplate */
@@ -56,6 +69,8 @@ class ContentUserPortraitList extends ContentElement
             $objTemplate->title = $this->headline;
             return $objTemplate->parse();
         }
+
+
 
 
         return parent::generate();
