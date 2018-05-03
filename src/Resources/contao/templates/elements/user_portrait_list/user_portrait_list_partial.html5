@@ -13,9 +13,12 @@
           <?php if ($this->street != ''): ?><?= $this->street ?>{{br}}<?php endif; ?>
           <?php if ($this->postal != ''): ?><?= $this->postal ?>&nbsp;<?php endif; ?>
           <?php if ($this->city != ''): ?><?= $this->city ?>{{br}}<?php endif; ?>
-          <?php if ($this->phone != ''): ?>P: <?= $this->phone ?>{{br}}<?php endif; ?>
-          <?php if ($this->mobile != ''): ?>M: <?= $this->mobile ?>{{br}}<?php endif; ?>
-          <?php if ($this->email != ''): ?>{{email_open::<?= $this->email ?>}}E-Mail senden</a>{{br}}<?php endif; ?>
+          <?php if (FE_USER_LOGGED_IN): ?>
+            <!-- Show personal data to logged users only -->
+              <?php if ($this->phone != ''): ?>P: <?= $this->phone ?>{{br}}<?php endif; ?>
+              <?php if ($this->mobile != ''): ?>M: <?= $this->mobile ?>{{br}}<?php endif; ?>
+              <?php if ($this->email != ''): ?>{{email_open::<?= $this->email ?>}}E-Mail senden</a>{{br}}<?php endif; ?>
+          <?php endif; ?>
       </small>
     </div>
   </div>

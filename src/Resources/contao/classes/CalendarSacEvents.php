@@ -546,7 +546,7 @@ class CalendarSacEvents extends System
                 return false;
             }
 
-            // At the moment "diableOnlineREgistration" is deactivated anyway
+
             if (!$objEvent->disableOnlineRegistration)
             {
                 if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0)

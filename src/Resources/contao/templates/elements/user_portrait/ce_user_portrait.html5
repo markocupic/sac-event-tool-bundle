@@ -25,15 +25,16 @@
       <div class="ce_user_portrait_city">
           <?= $this->user['postal'] ?> <?= $this->user['city'] ?>
       </div>
+        <?php if (FE_USER_LOGGED_IN): ?>
+          <!-- Show personal data to logged users only -->
+          <div class="ce_user_portrait_phone">
+              <?= $this->user['phone'] ?>
+          </div>
 
-      <div class="ce_user_portrait_phone">
-          <?= $this->user['phone'] ?>
-      </div>
-
-      <div class="ce_user_portrait_email">
-        {{email::<?= $this->user['email'] ?>}}
-      </div>
-
+          <div class="ce_user_portrait_email">
+            {{email::<?= $this->user['email'] ?>}}
+          </div>
+        <?php endif; ?>
         <?php if ($this->user['hobbies'] != ''): ?>
           <div class="ce_user_portrait_hobbies">
             <h5 class="ce_headline">Hobbys</h5>
