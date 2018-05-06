@@ -211,14 +211,8 @@ class ValidateForms
             if ($this->feUser !== null && $oEvent !== null)
             {
 
-                $set = array(
-                    'eventId'               => $this->input->get('eventId'),
-                    'sacMemberId'           => $this->feUser->sacMemberId,
-                    'tstamp'                => time(),
-                    'eventTitle'            => $oEvent->title,
-                    'eventSubstitutionText' => ($oEvent->executionState === 'event_adapted' && $oEvent->eventSubstitutionText != '') ? $oEvent->eventSubstitutionText : '',
-                );
-
+                // !!!! The insert is done in ModuleSacEventToolMemberDashboard LINE 520
+                $set = array();
                 if ($arrSubmitted['youtubeId'])
                 {
                     $set['youtubeId'] = $this->input->post('youtubeId');
@@ -252,6 +246,24 @@ class ValidateForms
                             $oStoryModel = CalendarEventsStoryModel::findByPk($objStory->id);
                             if ($oStoryModel !== null)
                             {
+
+                                // First delete old and no more used folders
+                                // Get root dir
+                                $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+                                $arrScan = scan($rootDir . '/' . $this->eventStoriesUploadPath);
+                                foreach ($arrScan as $folder)
+                                {
+                                    if (is_dir($rootDir . '/' . $this->eventStoriesUploadPath . '/' . $folder))
+                                    {
+                                        $objFolder = new Folder($this->eventStoriesUploadPath . '/' . $folder);
+                                        if (null === CalendarEventsStoryModel::findByPk($folder))
+                                        {
+                                            $objFolder->delete();
+                                        }
+                                    }
+                                }
+
+
                                 $widgetId = $this->input->post('attachfiles');
                                 $objFile = json_decode($widgetId[0]);
                                 $arrFiles = $objFile->files;

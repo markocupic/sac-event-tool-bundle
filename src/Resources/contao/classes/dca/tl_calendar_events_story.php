@@ -41,7 +41,7 @@ class tl_calendar_events_story extends Backend
         $limit = time() - 60 * 60 * 24 * 14;
         Database::getInstance()->prepare('DELETE FROM tl_calendar_events_story WHERE tstamp<? AND text=? AND youtubeId=? AND multiSRC=?')->execute($limit, '', '', null);
 
-
+        // Keep stories up to date, if events are renamed f.ex.
         $objStory = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story')->execute();
         while ($objStory->next())
         {
@@ -55,13 +55,13 @@ class tl_calendar_events_story extends Backend
                 $objStoryModel->eventEndDate = $objEvent->endDate;
                 $objStoryModel->organizers = $objEvent->organizers;
 
-                $arrD = [];
+                $aDates = [];
                 $arrDates = \Contao\StringUtil::deserialize($objEvent->repeatFixedDates, true);
                 foreach ($arrDates as $arrDate)
                 {
-                    $arrD[] = $arrDate['new_repeat'];
+                    $aDates[] = $arrDate['new_repeat'];
                 }
-                $objStoryModel->eventDates = serialize($arrD);
+                $objStoryModel->eventDates = serialize($aDates);
                 $objStoryModel->save();
             }
         }

@@ -374,8 +374,11 @@ class ModuleSacEventToolMemberDashboard extends Module
 
                     $objEvent = \CalendarEventsModel::findByPk($event['id']);
                     $arrEvents[$k]['objEvent'] = $objEvent;
-                    $arrEvents[$k]['objStory'] = CalendarEventsStoryModel::findOneBySacMemberIdAndEventId($this->objUser->sacMemberId, $event['id']);
 
+                    $objEventStory = CalendarEventsStoryModel::findOneBySacMemberIdAndEventId($this->objUser->sacMemberId, $event['id']);
+
+                    // $arrEvents[$k]['objStory'] can be null
+                    $arrEvents[$k]['objStory'] = $objEventStory;
                     $arrEvents[$k]['canOpenStory'] = false;
                     $arrEvents[$k]['canEditStory'] = false;
 
@@ -391,7 +394,10 @@ class ModuleSacEventToolMemberDashboard extends Module
                      */
                     if ($arrEvents[$k]['objStory'] !== null && $objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
                     {
-                        $arrEvents[$k]['canEditStory'] = true;
+                        if ($objEventStory->publishState == 1)
+                        {
+                            $arrEvents[$k]['canEditStory'] = true;
+                        }
                     }
                     elseif ($arrEvents[$k]['objStory'] === null && $objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
                     {
@@ -512,12 +518,26 @@ class ModuleSacEventToolMemberDashboard extends Module
                     }
                     else
                     {
+                        $aDates = [];
+                        $arrDates = \Contao\StringUtil::deserialize($objEvent->repeatFixedDates, true);
+                        foreach ($arrDates as $arrDate)
+                        {
+                            $aDates[] = $arrDate['new_repeat'];
+                        }
+
                         $set = array(
-                            'title'       => $objEvent->title,
-                            'authorName'  => $this->objUser->firstname . ' ' . $this->objUser->lastname,
-                            'sacMemberId' => $this->objUser->sacMemberId,
-                            'eventId'         => Input::get('eventId'),
-                            'tstamp'      => time(),
+                            'title'                 => $objEvent->title,
+                            'eventTitle'            => $objEvent->title,
+                            'eventSubstitutionText' => ($objEvent->executionState === 'event_adapted' && $objEvent->eventSubstitutionText != '') ? $objEvent->eventSubstitutionText : '',
+                            'eventStartDate'        => $objEvent->startDate,
+                            'eventEndDate'          => $objEvent->endDate,
+                            'organizers'            => $objEvent->organizers,
+                            'eventDates'            => serialize($aDates),
+                            'authorName'            => $this->objUser->firstname . ' ' . $this->objUser->lastname,
+                            'sacMemberId'           => $this->objUser->sacMemberId,
+                            'eventId'               => Input::get('eventId'),
+                            'tstamp'                => time(),
+                            'addedOn'               => time(),
                         );
                         $objInsertStmt = Database::getInstance()->prepare('INSERT INTO tl_calendar_events_story %s')->set($set)->execute();
 
