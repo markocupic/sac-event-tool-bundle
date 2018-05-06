@@ -386,6 +386,9 @@ class ModuleSacEventToolMemberDashboard extends Module
                     }
                     $eventCounter[$objEvent->eventType]++;
 
+                    /**
+                     * @todo Do only list stories where user is permitted to edit (publishState == 1)
+                     */
                     if ($arrEvents[$k]['objStory'] !== null && $objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
                     {
                         $arrEvents[$k]['canEditStory'] = true;
