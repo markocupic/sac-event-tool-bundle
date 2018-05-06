@@ -212,9 +212,10 @@ class ValidateForms
             {
 
                 $set = array(
-                    'eventId'                   => $this->input->get('eventId'),
+                    'eventId'               => $this->input->get('eventId'),
                     'sacMemberId'           => $this->feUser->sacMemberId,
                     'tstamp'                => time(),
+                    'eventTitle'            => $oEvent->title,
                     'eventSubstitutionText' => ($oEvent->executionState === 'event_adapted' && $oEvent->eventSubstitutionText != '') ? $oEvent->eventSubstitutionText : '',
                 );
 

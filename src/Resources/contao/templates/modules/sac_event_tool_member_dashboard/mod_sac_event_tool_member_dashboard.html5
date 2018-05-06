@@ -192,7 +192,11 @@
                   <tr>
                     <td><?= $event['dateSpan'] ?></td>
                     <td><?= $event['objStory']->eventTitle ?></td>
-                    <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Touren-/Kursbericht verfassen/ansehen" class="btn btn-sm btn-success"><i class="fal fa-fw fa-pencil"></a></td>
+                    <?php if($event['canEditStory']): ?>
+                      <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Touren-/Kursbericht bearbeiten" class="btn btn-sm btn-success"><i class="fal fa-fw fa-pencil"></a></td>
+                    <?php else: ?>
+                      <td class="text-center"><a href="<?= $event['objStoryLink'] ?>" role="button" title="Touren-/Kursbericht ansehen" class="btn btn-sm btn-success"><i class="fal fa-fw fa-eye"></a></td>
+                    <?php endif; ?>
                   </tr>
                   <?php endif; ?>
               <?php endforeach; ?>
