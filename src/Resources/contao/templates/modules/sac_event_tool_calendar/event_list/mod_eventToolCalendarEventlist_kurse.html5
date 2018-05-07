@@ -15,7 +15,7 @@ if (\Environment::get('isAjaxRequest') && \Input::get('xhrAction') === 'switchLa
     exit;
 }
 ?>
-<div class="pl-4 pr-4 <?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
+<div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
     <?php $this->block('headline'); ?>
     <?php if ($this->headline): ?>
   <<?= $this->hl ?> class="ce_headline"><?= $this->headline ?></<?= $this->hl ?>>

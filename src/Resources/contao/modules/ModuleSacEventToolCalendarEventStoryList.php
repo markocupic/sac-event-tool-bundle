@@ -174,7 +174,7 @@ class ModuleSacEventToolCalendarEventStoryList extends Module
         }
 
         $arrStories = [];
-        for ($i = $offset; $i < $offset + $limit; $i++)
+        for ($i = $offset; $i < $limit; $i++)
         {
             if (!isset($arrAllStories[$i]) || !is_array($arrAllStories[$i]))
             {
@@ -182,7 +182,6 @@ class ModuleSacEventToolCalendarEventStoryList extends Module
             }
             $arrStories[] = $arrAllStories[$i];
         }
-
         $this->Template->stories = $arrStories;
 
     }
