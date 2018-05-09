@@ -16,6 +16,7 @@ use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
 use Markocupic\SacEventToolBundle\Services\Newsletter\SendNewsletter;
+use Markocupic\SacEventToolBundle\Services\Newsletter\SendPasswordToMembers;
 
 
 /**
@@ -59,6 +60,14 @@ class CronjobController extends Controller
         if ($input->get('action') === 'sendSurveyNewsletter')
         {
             SendNewsletter::sendSurveyNewsletter(25);
+            exit();
+        }
+
+
+        // Send sacpilatus survey newsletter
+        if ($input->get('action') === 'sendPasswordToMembers')
+        {
+            SendPasswordToMembers::sendPasswordToMembers(25);
             exit();
         }
         exit();

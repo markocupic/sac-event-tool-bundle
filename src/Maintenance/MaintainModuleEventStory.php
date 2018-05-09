@@ -14,8 +14,10 @@ use Contao\CalendarEventsStoryModel;
 use Contao\Config;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Folder;
+use Contao\MemberModel;
 use Contao\System;
 use Psr\Log\LogLevel;
+use Contao\Database;
 
 
 /**
