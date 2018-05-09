@@ -40,6 +40,16 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['newsletterSent'] = array(
     'sql'       => "char(1) NOT NULL default ''",
 );
 
+// passwordSent
+$GLOBALS['TL_DCA']['tl_member']['fields']['passwordSent'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_member']['passwordSent'],
+    'exclude'   => true,
+    'filter'    => true,
+    'inputType' => 'checkbox',
+    'eval'      => array('submitOnChange' => false),
+    'sql'       => "char(1) NOT NULL default ''",
+);
+
 // sacMemberId
 $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['sacMemberId'],

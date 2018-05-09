@@ -37,7 +37,7 @@ class SendPasswordToMembers
         }
 
         $objMember = Database::getInstance()->prepare("SELECT * FROM tl_member WHERE sacMemberId = ?")->limit($limit)->execute('185155');
-       // $objMember = Database::getInstance()->prepare("SELECT * FROM tl_member WHERE isSacMember = ? AND email != ? AND newsletterSent//=?")->limit($limit)->execute('1', '', '');
+       // $objMember = Database::getInstance()->prepare("SELECT * FROM tl_member WHERE isSacMember = ? AND email != ? AND passwordSent=?")->limit($limit)->execute('1', '', '');
         if (!$objMember->numRows)
         {
             return;
@@ -81,7 +81,7 @@ class SendPasswordToMembers
                 // Set flag in tl_member
                 $oMember = MemberModel::findByPk($objMember->id);
                 $oMember->password = $passwordHash;
-                $oMember->newsletterSent = '1';
+                $oMember->passwordSent = '1';
                 $oMember->save();
             }
 
