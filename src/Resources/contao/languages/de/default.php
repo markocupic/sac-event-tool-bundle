@@ -25,6 +25,10 @@ $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_fully_booked'] = 'Event aus
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_canceled'] = 'Event abgesagt!';
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_deferred'] = 'Event verschoben!';
 
+if (TL_MODE === 'FE')
+{
+    $GLOBALS['TL_LANG']['MSC']['username'] = 'SAC Mitgliedernummer';
+}
 
 // References
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][1] = 'Einf&uuml;hrungskurs';
@@ -47,7 +51,6 @@ $GLOBALS['TL_LANG']['MSC']['plusOneReleaseLevel'] = 'Freigabestufe ++';
 $GLOBALS['TL_LANG']['MSC']['minusOneReleaseLevel'] = 'Freigabestufe --';
 $GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'] = 'Verg&uuml;tungsformular';
 $GLOBALS['TL_LANG']['MSC']['writeTourReportButton'] = 'Tourenrapport';
-
 
 
 // Confirm messages

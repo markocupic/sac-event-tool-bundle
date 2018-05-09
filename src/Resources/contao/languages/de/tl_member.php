@@ -9,8 +9,6 @@
  */
 
 
-
-
 // Legends
 $GLOBALS['TL_LANG']['tl_member']['section_legend'] = 'Sektions-Einstellungen';
 $GLOBALS['TL_LANG']['tl_member']['personal_legend'] = 'Personalien';
@@ -20,26 +18,28 @@ $GLOBALS['TL_LANG']['tl_member']['account_legend'] = 'Mitgliederstatus';
 $GLOBALS['TL_LANG']['tl_member']['section_info_legend'] = 'Sektionsinformationen';
 
 
-
 // Fields
-$GLOBALS['TL_LANG']['tl_member']['isSacMember'] = array('Dieser User ist ein SAC-Mitglied','Dieses Mitglied wurde in der Datenbank (CSV-File) beim t&auml;glichen Sync gefunden.');
-$GLOBALS['TL_LANG']['tl_member']['sacMemberId'] = array('Mitgliedernummer','');
-$GLOBALS['TL_LANG']['tl_member']['emergencyPhone'] = array('Notfall-Benachrichtigungs-Telefonnummer','Geben Sie die Telefonnummer einer Ihnen vertrauten Person an, welche in einem Notfall kontaktiert werden kann.');
-$GLOBALS['TL_LANG']['tl_member']['sectionId'] = array('Sektion','');
-$GLOBALS['TL_LANG']['tl_member']['addressExtra'] = array('Adresszusatz','');
-$GLOBALS['TL_LANG']['tl_member']['phoneBusiness'] = array('Telefon Gesch&auml;ft','');
-$GLOBALS['TL_LANG']['tl_member']['profession'] = array('Beruf','');
-$GLOBALS['TL_LANG']['tl_member']['entryYear'] = array('Eintrittsjahr','');
-$GLOBALS['TL_LANG']['tl_member']['membershipType'] = array('Mitglieder Typ','');
-$GLOBALS['TL_LANG']['tl_member']['sectionInfo1'] = array('Sektionsinfo 1','');
-$GLOBALS['TL_LANG']['tl_member']['sectionInfo2'] = array('Sektionsinfo 2','');
-$GLOBALS['TL_LANG']['tl_member']['sectionInfo3'] = array('Sektionsinfo 3','');
-$GLOBALS['TL_LANG']['tl_member']['sectionInfo4'] = array('Bemerkungen Sektion','');
-$GLOBALS['TL_LANG']['tl_member']['debit'] = array('Debit','');
-$GLOBALS['TL_LANG']['tl_member']['memberStatus'] = array('Mitgliederstatus','');
-$GLOBALS['TL_LANG']['tl_member']['disable'] = array('Inaktives SAC-Mitglied (ausgetreten)','');
-$GLOBALS['TL_LANG']['tl_member']['newsletterSent'] = array('Newsletter versandt','');
-
+if (TL_MODE === 'FE')
+{
+    $GLOBALS['TL_LANG']['tl_member']['username'] = array('SAC Mitgliedernummer', 'Gib deine 6-stellige SAC-Mitgliedernummer ein.');
+}
+$GLOBALS['TL_LANG']['tl_member']['isSacMember'] = array('Dieser User ist ein SAC-Mitglied', 'Dieses Mitglied wurde in der Datenbank (CSV-File) beim t&auml;glichen Sync gefunden.');
+$GLOBALS['TL_LANG']['tl_member']['sacMemberId'] = array('Mitgliedernummer', '');
+$GLOBALS['TL_LANG']['tl_member']['emergencyPhone'] = array('Notfall-Benachrichtigungs-Telefonnummer', 'Geben Sie die Telefonnummer einer Ihnen vertrauten Person an, welche in einem Notfall kontaktiert werden kann.');
+$GLOBALS['TL_LANG']['tl_member']['sectionId'] = array('Sektion', '');
+$GLOBALS['TL_LANG']['tl_member']['addressExtra'] = array('Adresszusatz', '');
+$GLOBALS['TL_LANG']['tl_member']['phoneBusiness'] = array('Telefon Gesch&auml;ft', '');
+$GLOBALS['TL_LANG']['tl_member']['profession'] = array('Beruf', '');
+$GLOBALS['TL_LANG']['tl_member']['entryYear'] = array('Eintrittsjahr', '');
+$GLOBALS['TL_LANG']['tl_member']['membershipType'] = array('Mitglieder Typ', '');
+$GLOBALS['TL_LANG']['tl_member']['sectionInfo1'] = array('Sektionsinfo 1', '');
+$GLOBALS['TL_LANG']['tl_member']['sectionInfo2'] = array('Sektionsinfo 2', '');
+$GLOBALS['TL_LANG']['tl_member']['sectionInfo3'] = array('Sektionsinfo 3', '');
+$GLOBALS['TL_LANG']['tl_member']['sectionInfo4'] = array('Bemerkungen Sektion', '');
+$GLOBALS['TL_LANG']['tl_member']['debit'] = array('Debit', '');
+$GLOBALS['TL_LANG']['tl_member']['memberStatus'] = array('Mitgliederstatus', '');
+$GLOBALS['TL_LANG']['tl_member']['disable'] = array('Inaktives SAC-Mitglied (ausgetreten)', '');
+$GLOBALS['TL_LANG']['tl_member']['newsletterSent'] = array('Newsletter versandt', '');
 
 
 // References
