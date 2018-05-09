@@ -37,7 +37,7 @@ class SendPasswordToMembers
         }
 
         $objMember = Database::getInstance()->prepare("SELECT * FROM tl_member WHERE sacMemberId = ?")->limit($limit)->execute('185155');
-       // $objMember = Database::getInstance()->prepare("SELECT * FROM tl_member WHERE isSacMember = ? AND email != ? AND passwordSent=?")->limit($limit)->execute('1', '', '');
+        // $objMember = Database::getInstance()->prepare("SELECT * FROM tl_member WHERE isSacMember = ? AND email != ? AND passwordSent=?")->limit($limit)->execute('1', '', '');
         if (!$objMember->numRows)
         {
             return;
@@ -45,7 +45,7 @@ class SendPasswordToMembers
 
         while ($objMember->next())
         {
-            $passw = StringUtil::substr(md5(uniqid(true)), 8,'');
+            $passw = StringUtil::substr(md5(uniqid(true)), 8, '');
             $passwordHash = password_hash($passw, PASSWORD_DEFAULT);
 
             $objEmail = new Email();
@@ -68,9 +68,7 @@ class SendPasswordToMembers
             $objTemplate->password = $passw;
 
 
-
             $objEmail->text = $objTemplate->parse();
-
 
 
             // Send email
