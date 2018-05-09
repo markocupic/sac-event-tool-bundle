@@ -82,7 +82,6 @@ class ValidateForms
     {
         $this->framework = $framework;
 
-        $this->eventStoriesUploadPath = Config::get('SAC_EVT_EVENT_STORIES_UPLOAD_PATH');
 
         $this->input = $this->framework->getAdapter(\Contao\Input::class);
 
@@ -246,24 +245,6 @@ class ValidateForms
                             $oStoryModel = CalendarEventsStoryModel::findByPk($objStory->id);
                             if ($oStoryModel !== null)
                             {
-
-                                // First delete old and no more used folders
-                                // Get root dir
-                                $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-                                $arrScan = scan($rootDir . '/' . $this->eventStoriesUploadPath);
-                                foreach ($arrScan as $folder)
-                                {
-                                    if (is_dir($rootDir . '/' . $this->eventStoriesUploadPath . '/' . $folder))
-                                    {
-                                        $objFolder = new Folder($this->eventStoriesUploadPath . '/' . $folder);
-                                        if (null === CalendarEventsStoryModel::findByPk($folder))
-                                        {
-                                            $objFolder->delete();
-                                        }
-                                    }
-                                }
-
-
                                 $widgetId = $this->input->post('attachfiles');
                                 $objFile = json_decode($widgetId[0]);
                                 $arrFiles = $objFile->files;

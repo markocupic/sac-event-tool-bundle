@@ -109,6 +109,12 @@ $GLOBALS['TL_CTE']['sac_content_elements'] = array(
     'cabanneSacDetail' => 'Markocupic\SacEventToolBundle\ContentCabanneSacDetail',
 );
 
+// Maintenance
+$GLOBALS['TL_PURGE']['tables']['sac_event_story']['callback'] = array(
+    'Markocupic\SacEventToolBundle\Maintenance\MaintainModuleEventStory',
+    'run'
+);
+
 // Do not index a page if one of the following parameters is set
 $GLOBALS['TL_NOINDEX_KEYS'][] = 'xhrAction';
 
