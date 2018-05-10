@@ -19,10 +19,12 @@ use Contao\Controller;
 use Contao\Database;
 use Contao\Date;
 use Contao\Dbafs;
+use Contao\EventOrganizerModel;
 use Contao\File;
 use Contao\Folder;
 use Contao\MemberModel;
 use Contao\Message;
+use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion;
@@ -242,10 +244,29 @@ class EventRapport
         }
         $strEventDuration = implode(', ', $arrEventDates);
 
+        // Get tour profile
+        $arrTourProfile = CalendarSacEvents::getTourProfileAsArray($objEvent->id);
+        $strTourProfile = implode("\r\n", $arrTourProfile);
+        $strTourProfile = str_replace('Tag: ', 'Tag:' . "\r\n", $strTourProfile);
+
+        // emergencyConcept
+        $arrEmergencyConcept = array();
+        $arrOrganizers = StringUtil::deserialize($objEvent->organizers,true);
+        foreach($arrOrganizers as $organizer)
+        {
+            $objOrganizer = EventOrganizerModel::findByPk($organizer);
+            $arrEmergencyConcept[] = $objOrganizer->title . ":\r\n" . $objOrganizer->emergencyConcept;
+        }
+        $strEmergencyConcept = implode("\r\n\r\n", $arrEmergencyConcept);
+
 
         $arrData[] = array('key' => 'eventDates', 'value' => htmlspecialchars(html_entity_decode($strEventDuration)));
         $arrData[] = array('key' => 'eventMeetingpoint', 'value' => htmlspecialchars(html_entity_decode($objEvent->meetingPoint)));
         $arrData[] = array('key' => 'eventTechDifficulties', 'value' => htmlspecialchars(html_entity_decode(implode(', ', CalendarSacEvents::getTourTechDifficultiesAsArray($objEvent->id, false)))));
+        $arrData[] = array('key' => 'eventEquipment', 'value' => htmlspecialchars(html_entity_decode($objEvent->equipment)), 'options' => array('multiline' => true));
+        $arrData[] = array('key' => 'eventTourProfile', 'value' => htmlspecialchars(html_entity_decode($strTourProfile)), 'options' => array('multiline' => true));
+        $arrData[] = array('key' => 'emergencyConcept', 'value' => htmlspecialchars(html_entity_decode($strEmergencyConcept)), 'options' => array('multiline' => true));
+        $arrData[] = array('key' => 'eventMiscellaneous', 'value' => htmlspecialchars(html_entity_decode($objEvent->miscellaneous)), 'options' => array('multiline' => true));
 
         return $arrData;
 

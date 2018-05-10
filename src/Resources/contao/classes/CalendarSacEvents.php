@@ -698,7 +698,7 @@ class CalendarSacEvents extends System
      * @param $eventId
      * @return array
      */
-    public function getTourProfileAsArray($eventId)
+    public static function getTourProfileAsArray($eventId)
     {
         $arrProfile = array();
         $objEventModel = CalendarEventsModel::findByPk($eventId);
@@ -713,11 +713,11 @@ class CalendarSacEvents extends System
                     $m++;
                     if (count($arrTourProfile) > 1)
                     {
-                        $pattern = $m . '. Tag &nbsp;&nbsp;&nbsp; Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                        $pattern = $m . '. Tag: Aufst: %s m/%sh Abst: %sm/%sh';
                     }
                     else
                     {
-                        $pattern = 'Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                        $pattern = 'Aufst: %sm/%sh Abst: %sm/%sh';
                     }
                     $arrProfile[] = sprintf($pattern, $profile['tourProfileAscentMeters'], $profile['tourProfileAscentTime'], $profile['tourProfileDescentMeters'], $profile['tourProfileDescentTime']);
                 }

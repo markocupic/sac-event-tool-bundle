@@ -11,11 +11,8 @@ declare(strict_types=1);
 
 namespace PhpOffice\PhpWord;
 
-use Contao\Folder;
 use Contao\File;
-use Contao\System;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
-
 
 
 /**
@@ -25,7 +22,7 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
  * $arrData = array();
  *
  * // Simple replacement
- * $arrData[] = array('key' => 'regId', 'value' => $objRegistration->id);
+ * $arrData[] = array('key' => 'regId', 'value' => $objRegistration->id, 'options' => array('multiline' => true));
  *
  * // Clone rows
  * $arrData[] = array(
@@ -142,6 +139,8 @@ class CreateDocxFromTemplate extends TemplateProcessor
             // Process $this->arrData and replace the template vars
             foreach ($this->arrData as $aData)
             {
+
+
                 if (isset($aData['clone']) && !empty($aData['clone']))
                 {
                     // Clone rows
@@ -155,6 +154,13 @@ class CreateDocxFromTemplate extends TemplateProcessor
                             $row = $key + 1;
                             foreach ($arrRow as $arrRowData)
                             {
+                                if (isset($arrRowData['options']['multiline']) && !empty($arrRowData['options']['multiline']))
+                                {
+                                    if ($arrRowData['options']['multiline'] === true)
+                                    {
+                                        $aData['value'] = static::formatMultilineText($aData['value']);
+                                    }
+                                }
                                 $this->setValue($arrRowData['key'] . '#' . $row, $arrRowData['value']);
                             }
                         }
@@ -162,6 +168,13 @@ class CreateDocxFromTemplate extends TemplateProcessor
                 }
                 else
                 {
+                    if (isset($aData['options']['multiline']) && !empty($aData['options']['multiline']))
+                    {
+                        if ($aData['options']['multiline'] === true)
+                        {
+                            $aData['value'] = static::formatMultilineText($aData['value']);
+                        }
+                    }
                     $this->setValue($aData['key'], $aData['value']);
                 }
             }
@@ -184,6 +197,7 @@ class CreateDocxFromTemplate extends TemplateProcessor
      */
     protected static function formatMultilineText($text): string
     {
+
         $text = htmlspecialchars(html_entity_decode($text));
         $text = preg_replace('~\R~u', '</w:t><w:br/><w:t>', $text);
         return $text;
