@@ -988,14 +988,14 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             }
         }
         /**
-        else
-        {
-            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=?')->execute($dc->activeRecord->id);
-            while ($objDb->next())
-            {
-                $this->Database->prepare('UPDATE tl_calendar_events_member SET eventId=? WHERE id=?')->execute(0, $objDb->id);
-            }
-        }
+         * else
+         * {
+         * $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=?')->execute($dc->activeRecord->id);
+         * while ($objDb->next())
+         * {
+         * $this->Database->prepare('UPDATE tl_calendar_events_member SET eventId=? WHERE id=?')->execute(0, $objDb->id);
+         * }
+         * }
          *
          * **/
     }
@@ -1036,14 +1036,20 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function optionsCbEventType(DataContainer $dc)
     {
-
         $arrEventTypes = array();
-        $objCalendar = CalendarModel::findByPk(CURRENT_ID);
+        if (!$dc->id && CURRENT_ID > 0)
+        {
+            $objCalendar = CalendarModel::findByPk(CURRENT_ID);
+        }
+        elseif ($dc->id > 0)
+        {
+            $objCalendar = CalendarEventsModel::findByPk($dc->id)->getRelated('pid');
+        }
+
         if ($objCalendar !== null)
         {
             $arrEventTypes = \Contao\StringUtil::deserialize($objCalendar->allowedEventTypes, true);
         }
-
 
         return $arrEventTypes;
     }

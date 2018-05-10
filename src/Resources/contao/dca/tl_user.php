@@ -51,6 +51,7 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addField(array('firstname', 'lastname', 'sacMemberId', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('hideInFrontendListings', 'userRole'), 'role_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('leiterQualifikation'), 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('avatarSRC', 'hobbies', 'introducing'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('extend', 'tl_user');
 
 // Manipulate palette admin
