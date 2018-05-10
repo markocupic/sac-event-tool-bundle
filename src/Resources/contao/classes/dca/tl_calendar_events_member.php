@@ -612,7 +612,7 @@ class tl_calendar_events_member extends Backend
             $objTemplate = new BackendTemplate('be_calendar_events_registration_dashboard');
             $objTemplate->stateOfSubscription = $objRegistration->stateOfSubscription;
 
-            if (!$objRegistration->hasParticipated)
+            if (!$objRegistration->hasParticipated && $objRegistration->email != '')
             {
                 $objTemplate->showEmailButtons = true;
             }
@@ -857,6 +857,26 @@ class tl_calendar_events_member extends Backend
 
         return '';
 
+    }
+
+    /**
+     * @param $href
+     * @param $label
+     * @param $title
+     * @param $class
+     * @param $attributes
+     * @param $table
+     * @return string
+     */
+    public function buttonCbBackToEventSettings($href, $label, $title, $class, $attributes, $table)
+    {
+        $label = 'Zum Event';
+        $href = ampersand('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s');
+        $eventId = Input::get('id');
+        $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
+        $href = sprintf($href, $eventId, REQUEST_TOKEN, $refererId);
+
+        return ' <a href="' . $href . '" title="' . StringUtil::specialchars('Zur&uuml;ck zum Event') . '"' . $attributes . '>' . Image::getHtml('back.svg', $label) . ' ' . $label . '</a> ';
     }
 
     /**

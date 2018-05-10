@@ -8,4 +8,3 @@ Freundliche Grüsse
 <?= $this->nameGuide ?>
 
 
-Dies ist eine automatisch generierte Nachricht. Wende dich per E-Mail an den Kurs-/Tourenleiter, um genauere Informationen zu bekommen.

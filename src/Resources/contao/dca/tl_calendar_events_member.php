@@ -107,7 +107,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
                 'icon'       => 'bundles/markocupicsaceventtool/icons/enveloppe.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ),
-
+            'backToEventSettings'     => array
+            (
+                'label'           => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
+                'href'            => 'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
+                'class'           => 'back_to_event_settings',
+                'button_callback' => array('tl_calendar_events_member', 'buttonCbBackToEventSettings'),
+                'attributes'      => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+            ),
         ),
         'operations'        => array
         (
@@ -347,7 +354,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['email'],
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
+            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'sacMemberId'         => array
