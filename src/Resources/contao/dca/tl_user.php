@@ -282,7 +282,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['emergencyPhone'] = array(
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'mandatory' => true, 'decodeEntities' => true, 'tl_class' => 'clr'),
+    'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'mandatory' => false, 'decodeEntities' => true, 'tl_class' => 'clr'),
     'sql'       => "varchar(64) NOT NULL default ''",
 );
 
@@ -292,7 +292,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['emergencyPhoneName'] = array(
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => array('maxlength' => 64, 'mandatory' => true, 'decodeEntities' => true, 'tl_class' => 'clr'),
+    'eval'      => array('maxlength' => 64, 'mandatory' => false, 'decodeEntities' => true, 'tl_class' => 'clr'),
     'sql'       => "varchar(64) NOT NULL default ''",
 );
 
