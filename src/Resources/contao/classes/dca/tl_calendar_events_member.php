@@ -614,6 +614,7 @@ class tl_calendar_events_member extends Backend
 
             if (!$objRegistration->hasParticipated && $objRegistration->email != '')
             {
+                if(\Contao\Validator::isEmail($objRegistration->email))
                 $objTemplate->showEmailButtons = true;
             }
 
