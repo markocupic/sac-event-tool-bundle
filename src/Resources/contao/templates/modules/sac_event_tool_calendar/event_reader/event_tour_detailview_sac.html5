@@ -39,7 +39,7 @@
         <div class="col-12 col-xl-4">
           <div class="location event-detail event-info-box icon-box-small">
             <h5>Tourentyp</h5>
-            <p><?= implode('<br>', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypeAsArray($this->tourType)) ?></p>
+            <p><?= implode('<br>', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($this->id,'title')) ?></p>
           </div>
         </div>
       <?php endif; ?>
@@ -53,7 +53,7 @@
         </div>
       <?php endif; ?>
 
-      <?php $organizers = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventOrganizersAsArray($this->organizers); ?>
+      <?php $organizers = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventOrganizersAsArray($this->id); ?>
 
         <div class="col-12 col-xl-4">
           <div class="organizers event-detail event-info-box icon-box-small">

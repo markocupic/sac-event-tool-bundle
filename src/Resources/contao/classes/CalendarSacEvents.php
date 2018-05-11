@@ -572,47 +572,31 @@ class CalendarSacEvents extends System
         return false;
     }
 
-    /**
-     * @param $val
-     * @return array
-     */
-    public static function getTourTypeAsArray($val)
-    {
-        $arrReturn = array();
-        $arrValues = StringUtil::deserialize($val, true);
-        if (!empty($arrValues) && is_array($arrValues))
-        {
-            foreach ($arrValues as $id)
-            {
-                $objModel = TourTypeModel::findByPk($id);
-                if ($objModel !== null)
-                {
-                    $arrReturn[] = $objModel->title;
-                }
-            }
-        }
-        return $arrReturn;
-    }
 
     /**
-     * @param $val
+     * @param $eventId
      * @return array
      */
-    public static function getEventOrganizersAsArray($val)
+    public static function getEventOrganizersAsArray($eventId)
     {
+        $objEvent = CalendarEventsModel::findByPk($eventId);
         $arrReturn = array();
-        $arrValues = StringUtil::deserialize($val, true);
-        if (!empty($arrValues) && is_array($arrValues))
+        if ($objEvent !== null)
         {
-            foreach ($arrValues as $id)
+            $arrValues = StringUtil::deserialize($objEvent->organizers, true);
+            if (!empty($arrValues) && is_array($arrValues))
             {
-                $objModel = EventOrganizerModel::findByPk($id);
-                if ($objModel !== null)
+                foreach ($arrValues as $id)
                 {
-                    $arrReturn[] = $objModel->title;
+                    $objModel = EventOrganizerModel::findByPk($id);
+                    if ($objModel !== null)
+                    {
+                        $arrReturn[] = $objModel->title;
+                    }
                 }
             }
         }
+
         return $arrReturn;
     }
 

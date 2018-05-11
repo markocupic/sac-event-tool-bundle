@@ -8,7 +8,7 @@
  * @link https://sac-kurse.kletterkader.com
  */
 
-
+use League\Csv\CharsetConverter;
 use League\Csv\Writer;
 
 /**
@@ -491,17 +491,77 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     public function triggerGlobalOperations(DataContainer $dc)
     {
 
-        if (Input::get('act') === 'downloadEventList')
+        if (Input::get('act') === 'downloadEventList' && Input::get('id') > 0)
         {
 
-                $arrRows = array();
-                $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE pid=?')->execute(Input::get('id'));
-                while ($objEvent->next())
-                {
-                    $arrRows[] = $objEvent->row();
-                }
-            die(print_r($arrRows,true));
 
+            //Create empty document
+            $csv = Writer::createFromString('');
+
+            // Set encoding from utf-8 to is0-8859-15 (windows)
+            $encoder = (new CharsetConverter())
+                ->outputEncoding('iso-8859-15');
+            $csv->addFormatter($encoder);
+
+            // Set delimiter
+            $csv->setDelimiter(';');
+
+
+            // Header fields
+            $arrFields = array('id', 'title', 'dates', 'organizers', 'mainInstructor', 'instructors', 'eventType', 'tourType', 'eventReleaseLevel');
+            $csv->insertOne($arrFields);
+
+            $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE pid=? ORDER BY startDate ASC')->execute(Input::get('id'));
+            while ($objEvent->next())
+            {
+                $arrRow = array();
+                foreach ($arrFields as $field)
+                {
+                    if ($field === 'mainInstructor')
+                    {
+                        $objUser = \Contao\UserModel::findByPk($objEvent->{$field});
+                        $arrRow[] = $objUser !== null ? html_entity_decode($objUser->name) : '';
+                    }
+                    elseif ($field === 'dates')
+                    {
+                        $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarSacEvents::getEventTimestamps($objEvent->id);
+                        $arrDates = array_map(function ($tstamp) {
+                            return \Contao\Date::parse(\Contao\Config::get('dateFormat'), $tstamp);
+                        }, $arrTimestamps);
+                        $arrRow[] = implode(',', $arrDates);
+                    }
+                    elseif ($field === 'organizers')
+                    {
+                        $arrOrganizers = \Markocupic\SacEventToolBundle\CalendarSacEvents::getEventOrganizersAsArray($objEvent->id);
+                        $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
+                    }
+                    elseif ($field === 'instructors')
+                    {
+                        $arrInstructors = \Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorNamesAsArray($objEvent->id);
+                        $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
+                    }
+                    elseif ($field === 'tourType')
+                    {
+                        $arrTourTypes = \Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($objEvent->id, 'title');
+                        $arrRow[] = html_entity_decode(implode(',', $arrTourTypes));
+                    }
+                    elseif ($field === 'eventReleaseLevel')
+                    {
+                        $objFS = \Contao\EventReleaseLevelPolicyModel::findByPk($objEvent->{$field});
+                        $arrRow[] = $objFS !== null ? $objFS->level : '';
+                    }
+                    else
+                    {
+                        $arrRow[] = $objEvent->{$field};
+                    }
+                }
+                $csv->insertOne($arrRow);
+
+            }
+
+            $objCalendar = \Contao\CalendarModel::findByPk(Input::get('id'));
+            $csv->output($objCalendar->title .'.csv');
+            die();
         }
 
 

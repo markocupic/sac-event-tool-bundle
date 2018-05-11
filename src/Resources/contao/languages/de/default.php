@@ -52,7 +52,7 @@ $GLOBALS['TL_LANG']['MSC']['minusOneReleaseLevel'] = 'Freigabestufe --';
 $GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'] = 'Verg&uuml;tungsformular';
 $GLOBALS['TL_LANG']['MSC']['writeTourReportButton'] = 'Tourenrapport';
 $GLOBALS['TL_LANG']['MSC']['backToEvent'] = 'Zur&uuml;ck zum Event';
-
+$GLOBALS['TL_LANG']['MSC']['downloadEventList'] = 'Events exportieren';
 
 
 // Confirm messages
