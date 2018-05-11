@@ -8,6 +8,9 @@
  * @link https://sac-kurse.kletterkader.com
  */
 
+
+use League\Csv\Writer;
+
 /**
  * Class tl_calendar_events_sac_event_tool
  */
@@ -487,6 +490,21 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function triggerGlobalOperations(DataContainer $dc)
     {
+
+        if (Input::get('act') === 'downloadEventList')
+        {
+
+                $arrRows = array();
+                $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE pid=?')->execute(Input::get('id'));
+                while ($objEvent->next())
+                {
+                    $arrRows[] = $objEvent->row();
+                }
+            die(print_r($arrRows,true));
+
+        }
+
+
         if (Input::get('transformDates'))
         {
             // $mode may be "+52weeks" or "+1year"

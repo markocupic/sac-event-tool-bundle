@@ -172,6 +172,15 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
     'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
 );
 
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['downloadEventList'] = array
+(
+    'label'      => &$GLOBALS['TL_LANG']['MSC']['downloadEventList'],
+    'href'       => 'act=downloadEventList',
+    'class'      => 'global_op_icon_class',
+    'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',
+    'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+);
+
 // Operations
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle'] = array(
     'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events']['toggle'],
