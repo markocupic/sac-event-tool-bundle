@@ -77,7 +77,7 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = array(
     'sac_user_role_tool'       => array(
         'tables' => array('tl_user_role'),
     ),
-    'sac_user_temp'       => array(
+    'sac_user_temp'            => array(
         'tables' => array('tl_user_temp'),
     ),
 );
@@ -96,6 +96,7 @@ $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
     'eventToolCalendarEventlist'          => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventlist',
     'eventTourDifficultyExplanationList'  => 'Markocupic\SacEventToolBundle\ModuleSacEventToolTourDifficultyExplanationList',
     'eventToolCalendarEventPreviewReader' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader',
+    'eventToolEventToolPilatusExport'     => 'Markocupic\SacEventToolBundle\ModuleSacEventToolPilatusExport',
 );
 
 // Content Elements
@@ -112,7 +113,7 @@ $GLOBALS['TL_CTE']['sac_content_elements'] = array(
 // Maintenance
 $GLOBALS['TL_PURGE']['tables']['sac_event_story']['callback'] = array(
     'Markocupic\SacEventToolBundle\Maintenance\MaintainModuleEventStory',
-    'run'
+    'run',
 );
 
 // Do not index a page if one of the following parameters is set
@@ -235,7 +236,6 @@ $GLOBALS['TL_HOOKS']['postLogin'][] = array('Markocupic\SacEventToolBundle\Conta
 
 /** Allow backend users to authenticate with their sacMemberId **/
 $GLOBALS['TL_HOOKS']['importUser'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ImportUser', 'allowBackendUserToAuthenticateWithSacMemberId');
-
 
 
 // Form HOOKS (f.ex. Kursanmeldung)

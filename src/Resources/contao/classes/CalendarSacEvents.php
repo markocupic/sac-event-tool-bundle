@@ -252,26 +252,45 @@ class CalendarSacEvents extends System
 
     /**
      * @param $id
+     * @param string $dateFormat
+     * @param bool $appendEventDuration
      * @return string
+     * @throws \Exception
      */
-    public static function getEventPeriod($id)
+    public static function getEventPeriod($id, $dateFormat='', $appendEventDuration=true)
     {
+        if ($dateFormat == '')
+        {
+            $dateFormat = Config::get('dateFormat');
+        }
+
+        $dateFormatShortened = $dateFormat;
+        if ($dateFormat === 'd.m.Y')
+        {
+            $dateFormatShortened = 'd.m.';
+        }
+
         //return self::getEventDuration($id) . ' ' . Calendar::calculateSpan(self::getStartDate($id), self::getEndDate($id));
         $span = Calendar::calculateSpan(self::getStartDate($id), self::getEndDate($id)) + 1;
         if (self::getEventDuration($id) == 1)
         {
-            return Date::parse('d.m.Y', self::getStartDate($id)) . ' (' . self::getEventDuration($id) . ')';
+            return Date::parse($dateFormat, self::getStartDate($id)) . ($appendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '');
         }
         elseif ($span == self::getEventDuration($id))
         {
-            return Date::parse('d.m.', self::getStartDate($id)) . ' - ' . Date::parse('d.m.Y', self::getEndDate($id)) . ' (' . self::getEventDuration($id) . ')';
+
+            return Date::parse($dateFormatShortened, self::getStartDate($id)) . ' - ' . Date::parse($dateFormat, self::getEndDate($id)) . ($appendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '');
         }
         else
         {
-            $arrDates = array_map(function ($tstamp) {
-                return Date::parse('d.m.Y', $tstamp);
-            }, self::getEventTimestamps($id));
-            return Date::parse('d.m.Y', self::getStartDate($id)) . ' (' . self::getEventDuration($id) . ')<br><a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Kursdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
+            $arrDates = array();
+            $dates = self::getEventTimestamps($id);
+            foreach($dates as $date)
+            {
+                $arrDates[] = Date::parse($dateFormat, $date);
+            }
+
+            return Date::parse($dateFormat, self::getStartDate($id)).($appendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '') . '<br><a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Kursdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
         }
     }
 
