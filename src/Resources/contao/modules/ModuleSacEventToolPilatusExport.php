@@ -116,14 +116,14 @@ class ModuleSacEventToolPilatusExport extends Module
         $range[0] = '---';
 
         $now = Date::parse('n');
-        $start = $now%2>0 ? -11: -10;
+        $start = $now % 2 > 0 ? -11 : -10;
 
-        for ($i = $start; $i < $start + 30; $i+=2)
+        for ($i = $start; $i < $start + 30; $i += 2)
         {
             // echo Date::parse('Y-m-d',strtotime(Date::parse("Y-m-1", strtotime($i . " month"))));
             //echo "<br>";
-            $key = Date::parse("Y-m-1", strtotime($i . " month")) . '|' . Date::parse("Y-m-t", strtotime($i+1 . "  month"));
-            $range[$key] = Date::parse("1.m.Y", strtotime($i . " month")) . '-' . Date::parse("t.m.Y", strtotime($i+1 . "  month"));
+            $key = Date::parse("Y-m-1", strtotime($i . " month")) . '|' . Date::parse("Y-m-t", strtotime($i + 1 . "  month"));
+            $range[$key] = Date::parse("1.m.Y", strtotime($i . " month")) . '-' . Date::parse("t.m.Y", strtotime($i + 1 . "  month"));
         }
 
         $dateFormat = array();
@@ -215,13 +215,14 @@ class ModuleSacEventToolPilatusExport extends Module
             $dateFormatShortened = 'd.m.';
         }
 
-
+        $eventDuration = count(CalendarSacEvents::getEventTimestamps($id));
         $span = Calendar::calculateSpan(CalendarSacEvents::getStartDate($id), CalendarSacEvents::getEndDate($id)) + 1;
-        if (CalendarSacEvents::getEventDuration($id) == 1)
+
+        if ($eventDuration == 1)
         {
             return Date::parse($dateFormat, CalendarSacEvents::getStartDate($id));
         }
-        elseif ($span == CalendarSacEvents::getEventDuration($id))
+        elseif ($span == $eventDuration)
         {
             return Date::parse($dateFormatShortened, CalendarSacEvents::getStartDate($id)) . ' - ' . Date::parse($dateFormat, CalendarSacEvents::getEndDate($id));
         }

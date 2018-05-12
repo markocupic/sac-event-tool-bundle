@@ -257,7 +257,7 @@ class CalendarSacEvents extends System
      * @return string
      * @throws \Exception
      */
-    public static function getEventPeriod($id, $dateFormat='', $appendEventDuration=true)
+    public static function getEventPeriod($id, $dateFormat = '', $appendEventDuration = true)
     {
         if ($dateFormat == '')
         {
@@ -270,28 +270,55 @@ class CalendarSacEvents extends System
             $dateFormatShortened = 'd.m.';
         }
 
-        //return self::getEventDuration($id) . ' ' . Calendar::calculateSpan(self::getStartDate($id), self::getEndDate($id));
+        $eventDuration = count(self::getEventTimestamps($id));
         $span = Calendar::calculateSpan(self::getStartDate($id), self::getEndDate($id)) + 1;
-        if (self::getEventDuration($id) == 1)
+
+        if ($eventDuration == 1)
         {
             return Date::parse($dateFormat, self::getStartDate($id)) . ($appendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '');
         }
-        elseif ($span == self::getEventDuration($id))
+        elseif ($span == $eventDuration)
         {
-
+            // von bis
             return Date::parse($dateFormatShortened, self::getStartDate($id)) . ' - ' . Date::parse($dateFormat, self::getEndDate($id)) . ($appendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '');
         }
         else
         {
             $arrDates = array();
             $dates = self::getEventTimestamps($id);
-            foreach($dates as $date)
+            foreach ($dates as $date)
             {
                 $arrDates[] = Date::parse($dateFormat, $date);
             }
 
-            return Date::parse($dateFormat, self::getStartDate($id)).($appendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '') . '<br><a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Kursdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
+            return Date::parse($dateFormat, self::getStartDate($id)) . ($appendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '') . '<br><a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Eventdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
         }
+    }
+
+    /**
+     * @param $id
+     * @return array|bool
+     */
+    public static function getEventTimestamps($id)
+    {
+        $arrRepeats = array();
+        $objDb = Database::getInstance();
+        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
+        if ($objEvent->numRows)
+        {
+            $arrDates = StringUtil::deserialize($objEvent->repeatFixedDates);
+            if (!is_array($arrDates) || empty($arrDates))
+            {
+                return false;
+            }
+
+            foreach ($arrDates as $v)
+            {
+                $arrRepeats[] = $v['new_repeat'];
+            }
+        }
+        return $arrRepeats;
+
     }
 
     /**
@@ -367,32 +394,6 @@ class CalendarSacEvents extends System
         {
             return '';
         }
-
-    }
-
-    /**
-     * @param $id
-     * @return array|bool
-     */
-    public static function getEventTimestamps($id)
-    {
-        $arrRepeats = array();
-        $objDb = Database::getInstance();
-        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
-        if ($objEvent->numRows)
-        {
-            $arrDates = StringUtil::deserialize($objEvent->repeatFixedDates);
-            if (!is_array($arrDates) || empty($arrDates))
-            {
-                return false;
-            }
-
-            foreach ($arrDates as $v)
-            {
-                $arrRepeats[] = $v['new_repeat'];
-            }
-        }
-        return $arrRepeats;
 
     }
 
