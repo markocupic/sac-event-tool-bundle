@@ -75,7 +75,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'setReg
 PaletteManipulator::create()
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('singleSRCBroschuere'), 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('title', 'alias', 'courseId', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('suitableForBeginners', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
@@ -132,7 +132,7 @@ PaletteManipulator::create()
 PaletteManipulator::create()
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('singleSRCBroschuere'), 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('title', 'alias', 'courseId', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('teaser', 'terms', 'issues', 'location', 'journey', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
@@ -242,6 +242,16 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startDate']['flag'] = 5;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['rte'] = null;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['mandatory'] = true;
 
+
+// minMembers
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseId'],
+    'exclude'   => true,
+    'search'    => true,
+    'inputType' => 'text',
+    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
+    'sql'       => "varchar(255) unsigned NULL",
+);
 
 // eventToken
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventToken'] = array(
@@ -795,7 +805,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = array(
     'relation'         => array('type' => 'hasOne', 'load' => 'lazy'),
     'options_callback' => array('tl_calendar_events_sac_event_tool', 'listReleaseLevels'),
     'save_callback'    => array(array('tl_calendar_events_sac_event_tool', 'saveCallbackEventReleaseLevel')),
-    'eval'             => array('doNotCopy' => true, 'mandatory' => true, 'tl_class' => 'clr m12'),
+    'eval'             => array('mandatory' => true, 'tl_class' => 'clr m12'),
     'sql'              => "int(10) unsigned NOT NULL default '0'",
 );
 if (!Contao\Input::get('act') || Contao\Input::get('act') === 'select')
@@ -901,6 +911,7 @@ foreach ($allowEdititingOnFirstReleaseLevelOnly as $field)
 }
 
 // DoNotCopy - Settings
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['author']['eval']['doNotCopy'] = false;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startDate']['eval']['doNotCopy'] = false;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['endDate']['eval']['doNotCopy'] = false;

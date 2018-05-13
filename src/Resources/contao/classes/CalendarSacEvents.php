@@ -714,6 +714,10 @@ class CalendarSacEvents extends System
                 $arrTourProfile = StringUtil::deserialize($objEventModel->tourProfile, true);
                 foreach ($arrTourProfile as $profile)
                 {
+                    if($profile['tourProfileAscentMeters'] == '' && $profile['tourProfileAscentTime'] == '' && $profile['tourProfileDescentMeters'] == '' && $profile['tourProfileDescentTime'] == '')
+                    {
+                        continue;
+                    }
                     $m++;
                     if (count($arrTourProfile) > 1)
                     {

@@ -1,39 +1,235 @@
 <?= $this->form ?>
 
 
-<?php if ($this->tours): ?>
-<h3 class="ce_headline">Montatsprogramm Touren</h3>
-<table class="event-export-table table table-sm">
+<!-- all events as a table -->
+<h3 class="ce_headline">Montatsprogramm alle Events</h3>
+<?php if (!$this->allEventsTable): ?>
+  <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
+<?php endif; ?>
+<?php if ($this->allEventsTable): ?>
+  <table class="event-export-table table table-sm">
     <thead>
     <tr class="event-export-row-header">
-        <th class="event-export-date">Datum</th>
-        <th class="event-export-weekday">Zeit</th>
-        <th class="event-export-title">Titel</th>
-        <th class="event-export-tour-type">Veranstaltungsart</th>
-        <th class="event-export-instructors">Leiter</th>
-        <th class="event-export-organizers">Gruppe</th>
+      <th class="event-export-date">Datum</th>
+      <th class="event-export-weekday">Zeit</th>
+      <th class="event-export-title">Titel</th>
+      <th class="event-export-tour-type">Veranstaltungsart</th>
+      <th class="event-export-instructors">Leiter</th>
+      <th class="event-export-organizers">Gruppe</th>
     </tr>
     </thead>
     <tbody>
     <?php $week = 0; ?>
-    <?php foreach($this->tours as $arrEvent): ?>
-        <?php if($week != $arrEvent['week']): ?>
+    <?php foreach ($this->allEventsTable as $arrEvent): ?>
+        <?php if ($week != $arrEvent['week']): ?>
         <tr class="event-export-row-body">
             <?php $week = $arrEvent['week']; ?>
-            <td class="event-export-weeknumber" colspan="6" style="text-align:center"><strong>Woche <?=  $arrEvent['week'] ?><strong></td>
+          <td class="event-export-weeknumber" colspan="6" style="text-align:center"><strong>Woche <?= $arrEvent['week'] ?><strong></td>
         </tr>
         <?php endif; ?>
-        <tr class="event-export-row-body">
-            <td class="event-export-date"><?= $arrEvent['eventDates'] ?></td>
-            <td class="event-export-weekday"><?= $arrEvent['weekday'] ?></td>
-            <td class="event-export-title"><?= $arrEvent['title'] ?></td>
-            <td class="event-export-tour-type"><?= $arrEvent['tourType'] ?></td>
-            <td class="event-export-instructors"><?= $arrEvent['instructors'] ?></td>
-            <td class="event-export-organizers"><?= $arrEvent['organizers'] ?></td>
-        </tr>
+      <tr class="event-export-row-body">
+        <td class="event-export-date"><?= $arrEvent['eventDates'] ?></td>
+        <td class="event-export-weekday"><?= $arrEvent['weekday'] ?></td>
+        <td class="event-export-title"><?= $arrEvent['title'] ?></td>
+        <td class="event-export-tour-type"><?= $arrEvent['tourType'] ?></td>
+        <td class="event-export-instructors"><?= $arrEvent['instructors'] ?></td>
+        <td class="event-export-organizers"><?= $arrEvent['organizers'] ?></td>
+      </tr>
 
     <?php endforeach; ?>
     </tbody>
-</table>
+  </table>
+
+<?php endif; ?>
+
+
+<!-- courses -->
+<h3 class="ce_headline">Monatsprogramm Kurse</h3>
+<?php if (!$this->courses): ?>
+  <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
+<?php endif; ?>
+<?php if ($this->courses): ?>
+  <table class="event-export-table event-export-table-courses table table-sm">
+    <tbody>
+    <?php foreach ($this->courses as $arrEvent): ?>
+        <?php if ($arrEvent['headline'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-headline" colspan="2"><strong><?= $arrEvent['headline'] ?><strong></td>
+        </tr>
+        <?php endif; ?>
+        <?php if ($arrEvent['eventState'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-eventState" colspan="2"><strong><?= $arrEvent['eventState'] ?></strong></td>
+        </tr>
+        <?php endif; ?>
+        <?php if ($arrEvent['teaser'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-teaser" colspan="2"><?= $arrEvent['teaser'] ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php if ($arrEvent['issues'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-issues">Kursziele</td>
+          <td class="event-export-issues"><?= $arrEvent['issues'] ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php if ($arrEvent['terms'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-terms">Kursinhalte</td>
+          <td class="event-export-terms"><?= $arrEvent['terms'] ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php if ($arrEvent['requirements'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-requirements">Voraussetzungen</td>
+          <td class="event-export-requirements"><?= $arrEvent['requirements'] ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php if ($arrEvent['location'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-location">Kursort</td>
+          <td class="event-export-location"><?= $arrEvent['location'] ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php if ($arrEvent['instructors'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-instructors">Kursleitung</td>
+          <td class="event-export-instructors"><strong><?= $arrEvent['instructors'] ?></strong></td>
+        </tr>
+        <?php endif; ?>
+        <?php if ($arrEvent['minMaxMembers'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-minMaxMembers">Teilnehmer</td>
+          <td class="event-export-minMaxMembers"><?= $arrEvent['minMaxMembers'] ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php if ($arrEvent['equipment'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-equipment">Mitbringen</td>
+          <td class="event-export-equipment"><?= $arrEvent['equipment'] ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php if ($arrEvent['miscellaneous'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-miscellaneous">Sonstiges</td>
+          <td class="event-export-miscellaneous"><?= $arrEvent['miscellaneous'] ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php if ($arrEvent['leistungen'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-leistungen">Preis/Leistungen</td>
+          <td class="event-export-leistungen"><?= $arrEvent['leistungen'] ?></td>
+        </tr>
+        <?php endif; ?>
+      <tr class="event-export-row-body">
+        <td class="event-export-bookingEvent">Anmeldung</td>
+        <td class="event-export-bookingEvent"><?php if (!$arrEvent['disableOnlineRegistration']): ?>Online Anmeldung{{br}}<?php endif; ?><?= $arrEvent['bookingEvent'] ?></td>
+      </tr>
+    <?php endforeach; ?>
+    </tbody>
+  </table>
+
+<?php endif; ?>
+
+<!-- tours grouped by organizers -->
+<?php if ($this->tours): ?>
+  <h3 class="ce_headline">Monatsprogramm Touren</h3>
+  <table class="event-export-table event-export-table-courses table table-sm">
+
+    <tbody>
+    <?php foreach ($this->tours as $arrOrganizer): ?>
+      <tr class="event-export-row-body">
+        <td class="event-export-tour-organizer" colspan="2"><h4><?= $arrOrganizer['organizer']['title'] ?></h4></td>
+      </tr>
+        <?php if (!$arrOrganizer['events']): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-tour-nor-result-found" colspan="2">Zu dieser Anfrage wurden von diesem Organisator keine Events gefunden!</td>
+        </tr>
+        <?php endif; ?>
+        <?php foreach ($arrOrganizer['events'] as $arrEvent): ?>
+            <?php if ($arrEvent['headline'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-headline" colspan="2"><strong><?= $arrEvent['headline'] ?><strong></td>
+          </tr>
+            <?php endif; ?>
+            <?php if ($arrEvent['eventState'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-eventState" colspan="2"><strong><?= $arrEvent['eventState'] ?></strong></td>
+          </tr>
+            <?php endif; ?>
+            <?php if ($arrEvent['teaser'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-teaser" colspan="2"><?= $arrEvent['teaser'] ?></td>
+          </tr>
+            <?php endif; ?>
+            <?php if ($arrEvent['tourDetailText'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-tourDetailText">Details</td>
+            <td class="event-export-tourDetailText"><?= $arrEvent['tourDetailText'] ?></td>
+          </tr>
+            <?php endif; ?>
+            <?php if ($arrEvent['tourProfile'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-tourProfile">Profil</td>
+            <td class="event-export-tourProfile"><?= $arrEvent['tourProfile'] ?></td>
+          </tr>
+            <?php endif; ?>
+            <?php if ($arrEvent['requirements'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-requirements">Voraussetzungen</td>
+            <td class="event-export-requirements"><?= $arrEvent['requirements'] ?></td>
+          </tr>
+            <?php endif; ?>
+            <?php if ($arrEvent['meetingPoint'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-meetingPoint">Treffpunkt/Zeit</td>
+            <td class="event-export-meetingPoint"><?= $arrEvent['meetingPoint'] ?></td>
+          </tr>
+            <?php endif; ?>
+            <?php if ($arrEvent['journey'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-journey">Anfahrt</td>
+            <td class="event-export-journey"><?= $arrEvent['journey'] ?></td>
+          </tr>
+            <?php endif; ?>
+            <?php if ($arrEvent['instructors'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-instructors">Kursleitung</td>
+            <td class="event-export-instructors"><strong><?= $arrEvent['instructors'] ?></strong></td>
+          </tr>
+            <?php endif; ?>
+            <?php if ($arrEvent['minMaxMembers'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-minMaxMembers">Teilnehmer</td>
+            <td class="event-export-minMaxMembers"><?= $arrEvent['minMaxMembers'] ?></td>
+          </tr>
+            <?php endif; ?>
+            <?php if ($arrEvent['equipment'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-equipment">Mitbringen</td>
+            <td class="event-export-equipment"><?= $arrEvent['equipment'] ?></td>
+          </tr>
+            <?php endif; ?>
+            <?php if ($arrEvent['miscellaneous'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-miscellaneous">Sonstiges</td>
+            <td class="event-export-miscellaneous"><?= $arrEvent['miscellaneous'] ?></td>
+          </tr>
+            <?php endif; ?>
+            <?php if ($arrEvent['leistungen'] != ''): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-leistungen">Preis/Leistungen</td>
+            <td class="event-export-leistungen"><?= $arrEvent['leistungen'] ?></td>
+          </tr>
+            <?php endif; ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-bookingEvent">Anmeldung</td>
+          <td class="event-export-bookingEvent"><?php if (!$arrEvent['disableOnlineRegistration']): ?>Online Anmeldung{{br}}<?php endif; ?><?= $arrEvent['bookingEvent'] ?></td>
+        </tr>
+        <?php endforeach; ?>
+
+    <?php endforeach; ?>
+    </tbody>
+  </table>
 
 <?php endif; ?>

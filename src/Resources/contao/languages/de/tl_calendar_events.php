@@ -27,8 +27,8 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['event_type_legend'] = "Event-Art Eins
 $GLOBALS['TL_LANG']['tl_calendar_events']['journey_legend'] = "Event-Art Einstellungen";
 
 
-
 // Fields
+$GLOBALS['TL_LANG']['tl_calendar_events']['courseId'] = array("Kurs.Nr.", "Geben Sie bitte die Kursnummer ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventType'] = array("Event-Art", "Geben Sie bitte an, um welche Art von Event es sich handelt.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['teaser'] = array("Event-Kurzbeschreibung", "Geben Sie bitte eine Kurzbeschreibung f&uuml;r den Event ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['title'] = array("Event-/Touren-/Kursname", "Geben Sie bitte einen Namen f&uuml;r den Event an.");
@@ -88,8 +88,6 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'] = array("H&
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'] = array("Zeitbedarf im Aufstieg in h", "Machen Sie hier Angaben zum Zeitbedarf im Aufstieg.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'] = array("H&ouml;henunterschied im Abstieg", "Machen Sie hier Angaben zum H&ouml;henunterschied im Abstieg.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = array("Zeitbedarf im Abstieg in h", "Machen Sie hier Angaben zum Zeitbedarf im Abstieg.");
-
-
 
 
 // References
