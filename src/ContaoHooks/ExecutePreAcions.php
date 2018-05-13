@@ -11,9 +11,10 @@
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
-use Contao\MemberModel;
-use Contao\Input;
 use Contao\Date;
+use Contao\Input;
+use Contao\MemberModel;
+use Contao\Config;
 
 
 
@@ -40,23 +41,21 @@ class ExecutePreActions
     }
 
 
-
     /**
      * @param string $strAction
      */
     public function executePreActions($strAction = '')
     {
-
-        // Send language file to the browser
+        // Autocompleter when registrating event members manually in the backend
         if ($strAction === 'autocompleterLoadMemberDataFromSacMemberId')
         {
             // Output
             $json = array('status' => 'error');
             $objMemberModel = MemberModel::findBySacMemberId(Input::post('sacMemberId'));
-            if($objMemberModel !== null)
+            if ($objMemberModel !== null)
             {
                 $json = $objMemberModel->row();
-                $json['dateOfBirth'] = Date::parse('Y-m-d', $json['dateOfBirth']);
+                $json['dateOfBirth'] = Date::parse(Config::get('dateFormat'), $json['dateOfBirth']);
                 $json['status'] = 'success';
 
                 $html = '<div>';
@@ -64,20 +63,14 @@ class ExecutePreActions
                 $html .= sprintf('<div>Sollen die Daten von %s %s &uuml;bernommen werden?</div>', $objMemberModel->firstname, $objMemberModel->lastname);
                 $html .= '<button class="tl_button">Ja</button> <button class="tl_button">nein</button>';
                 $json['html'] = $html;
-
             }
 
 
             // Send it to the browser
             echo html_entity_decode(json_encode($json));
             exit();
-
         }
-
-
     }
-
-
 }
 
 
