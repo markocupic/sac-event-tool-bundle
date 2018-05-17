@@ -90,8 +90,6 @@
           </div>
         <?php endif; ?>
 
-
-
         <?php if ($this->journey != '' && \CalendarEventsJourneyModel::findByPk($this->journey) !== null): ?>
           <div class="journey event-detail event-info-box icon-box-small">
             <h5>Anreise mit:</h5>
@@ -106,7 +104,6 @@
           </div>
         <?php endif; ?>
 
-
         <?php if ($this->miscellaneous != ''): ?>
           <div class="miscellaneous event-detail event-info-box icon-box-small last">
             <h5>Sonstiges</h5>
@@ -120,25 +117,10 @@
             <p><?= nl2br($this->meetingPoint) ?></p>
           </div>
         <?php endif; ?>
-
-
-        <?php if ($this->setRegistrationPeriod): ?>
-          <div class="booking-text event-detail event-info-box icon-box-small">
-            <h5>Anmeldung möglich</h5>
-            <p>Vom <?= \Date::parse('d.m.Y', $this->registrationStartDate) ?> bis zum <?= \Date::parse('d.m.Y', $this->registrationEndDate) ?></p>
-          </div>
-        <?php endif; ?>
-
-        <?php if ($this->bookingEvent != ''): ?>
-          <div class="booking-text event-detail event-info-box icon-box-small">
-            <h5>Anmeldung</h5>
-            <p><?= nl2br($this->bookingEvent) ?></p>
-          </div>
-        <?php endif; ?>
-
-
     </div>
     <!-- End col left -->
+
+
 
     <!-- Col right -->
     <div class="col-lg-6">
@@ -186,6 +168,21 @@
             </div>
           <?php endif; ?>
 
+          <?php if ($this->setRegistrationPeriod): ?>
+            <div class="booking-text event-detail event-info-box icon-box-small">
+              <h5>Anmeldung möglich</h5>
+              <p>Vom <?= \Date::parse('d.m.Y', $this->registrationStartDate) ?> bis zum <?= \Date::parse('d.m.Y', $this->registrationEndDate) ?></p>
+            </div>
+          <?php endif; ?>
+
+          <?php if ($this->bookingEvent != ''): ?>
+            <div class="booking-text event-detail event-info-box icon-box-small">
+              <h5>Anmeldung</h5>
+              <p><?= nl2br($this->bookingEvent) ?></p>
+            </div>
+          <?php endif; ?>
+
+        <!-- buttons -->
         <div class="mt-3">
           <a href="/ical?eventId=<?= $this->id ?>" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary"><i class="fal fa-calendar-plus"></i> iCal download</a>
         </div>
@@ -198,17 +195,7 @@
       </div>
     </div>
     <!-- End col right -->
-
-
   </div>
-
-
-  <!--
-          <div>
-            {{br}}{{br}}
-            <a class="btn btn-outline-primary" href="?printSACWorkshops=true&amp;eventId=<?= $this->id ?>">Detailinfos drucken</a>
-          </div>
-    -->
 
 
   <!-- Weitere Inhaltselemente -->
