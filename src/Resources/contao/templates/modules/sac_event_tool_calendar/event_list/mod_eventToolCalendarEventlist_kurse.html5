@@ -53,7 +53,12 @@ if (\Environment::get('isAjaxRequest') && \Input::get('xhrAction') === 'switchLa
     <li>
       <button class="d-none d-lg-none btn btn-outline-success toggle-filter-btn" onclick=""><i class="fa fa-filter"></i> Filter öffnen</button>
     </li>
-
+    <!-- Button trigger modal -->
+    <li>
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#kursstufenModal">
+        Kursstufen
+      </button>
+    </li>
   </ul>
 </div>
 <!-- end button bar -->

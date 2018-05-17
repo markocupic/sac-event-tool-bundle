@@ -126,7 +126,7 @@ class ExportEvents2Docx
             $cell = $table->addCell(4500);
             $textrun = $cell->addTextRun();
             $textrun->addLink(Environment::get('host') . '/', htmlspecialchars('KURSPROGRAMM ' . $year, ENT_COMPAT, 'UTF-8'), $fStyleMediumRed);
-            $table->addCell(4500)->addImage($rootDir . '/files/sac_pilatus/page_assets/kursbroschuere/logo-sac-pilatus.png', array('height' => 40, 'align' => 'right'));
+            $table->addCell(4500)->addImage($rootDir . '/files/fileadmin/page_assets/kursbroschuere/logo-sac-pilatus.png', array('height' => 40, 'align' => 'right'));
 
             // Add footer
             //$footer = $section->addFooter();

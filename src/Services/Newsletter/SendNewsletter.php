@@ -57,7 +57,7 @@ class SendNewsletter
             // HTML
             $objTemplate = new FrontendTemplate('newsletterRelaunchWebsiteSurveyHtml');
             $objTemplate->firstname = $objMember->firstname;
-            $objTemplate->imageSRC = 'http://sac-kurse.kletterkader.com/files/sac_pilatus/page_assets/newsletter/image-sac-survey.jpg';
+            $objTemplate->imageSRC = 'https://sac-kurse.kletterkader.com/files/fileadmin/page_assets/newsletter/image-sac-survey.jpg';
             $objTemplate->surveyLink = 'https://docs.google.com/forms/d/e/1FAIpQLSftI21CwMu6s4gxKykPugg-sSAkEaxBtxzfVG29-D2-F1-UZg/viewform';
             $objEmail->html = $objTemplate->parse();
 
