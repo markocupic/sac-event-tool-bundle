@@ -50,18 +50,18 @@ class WorkshopTCPDF extends \TCPDF
 	    // Set background-image
 		if ($this->type == 'cover')
 		{
-			$this->backgroundImage = 'files/sac_pilatus/page_assets/kursbroschuere/jahresprogramm-cover.jpg';
+			$this->backgroundImage = 'files/fileadmin/page_assets/kursbroschuere/jahresprogramm-cover.jpg';
 		}
 		elseif ($this->type == 'TOC')
 		{
-			$this->backgroundImage = 'files/sac_pilatus/page_assets/kursbroschuere/toc.jpg';
-			$this->backgroundImageBottom = 'files/sac_pilatus/page_assets/kursbroschuere/background.png';
+			$this->backgroundImage = 'files/fileadmin/page_assets/kursbroschuere/toc.jpg';
+			$this->backgroundImageBottom = 'files/fileadmin/page_assets/kursbroschuere/background.png';
 		}
 		elseif ($this->type == 'eventPage')
 		{
 			// default
-			$this->backgroundImage = 'files/sac_pilatus/page_assets/kursbroschuere/hochtour.jpg';
-			$this->backgroundImageBottom = 'files/sac_pilatus/page_assets/kursbroschuere/background.png';
+			$this->backgroundImage = 'files/fileadmin/page_assets/kursbroschuere/hochtour.jpg';
+			$this->backgroundImageBottom = 'files/fileadmin/page_assets/kursbroschuere/background.png';
 
 			// set background image
 			if ($this->Event->singleSRCBroschuere != '')
