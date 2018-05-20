@@ -152,7 +152,7 @@ class ModuleSacEventToolPilatusExport extends Module
 
         // Now let's add form fields:
         $objForm->addFormField('timeRange', array(
-            'label'     => 'Notfalltelefonnummer/In Notf&auml;llen zu kontaktieren',
+            'label'     => 'Zeitspanne',
             'inputType' => 'select',
             'options'   => $range,
             //'default'   => $this->User->emergencyPhone,
@@ -160,7 +160,7 @@ class ModuleSacEventToolPilatusExport extends Module
         ));
 
         $objForm->addFormField('dateFormat', array(
-            'label'     => 'Notfalltelefonnummer/In Notf&auml;llen zu kontaktieren',
+            'label'     => 'Datumsformat',
             'inputType' => 'select',
             'options'   => $dateFormat,
             //'default'   => $this->User->emergencyPhone,
