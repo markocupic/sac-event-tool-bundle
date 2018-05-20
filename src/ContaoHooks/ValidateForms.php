@@ -76,12 +76,12 @@ class ValidateForms
     /**
      * ValidateForms constructor.
      * @param ContaoFrameworkInterface $framework
-     * @param $eventStoriesUploadPath
      */
     public function __construct(ContaoFrameworkInterface $framework)
     {
         $this->framework = $framework;
 
+        $this->eventStoriesUploadPath = Config::get('SAC_EVT_EVENT_STORIES_UPLOAD_PATH');
 
         $this->input = $this->framework->getAdapter(\Contao\Input::class);
 
@@ -230,7 +230,7 @@ class ValidateForms
                 }
             }
 
-
+            // Foto upload
             if ($arrForm['formID'] === 'form-write-event-story-upload-foto')
             {
                 if (FE_USER_LOGGED_IN)
@@ -263,6 +263,7 @@ class ValidateForms
                                             $oFile = new File($strPath);
                                             $oFile->resizeTo(1000, 1000, 'proportional');
                                             // Create folder if it does not exist
+                                            mail('m.cupic@gmx.ch', $rootDir . '/' . $targetDir, 'bla');
                                             if (!is_dir($rootDir . '/' . $targetDir))
                                             {
                                                 new Folder($targetDir);

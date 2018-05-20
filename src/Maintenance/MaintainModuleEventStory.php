@@ -44,7 +44,7 @@ class MaintainModuleEventStory
         $arrScan = scan($rootDir . '/' . $eventStoriesUploadPath);
         foreach ($arrScan as $folder)
         {
-            if (is_dir($rootDir . '/' . $eventStoriesUploadPath . '/' . $folder))
+            if (is_dir($rootDir . '/' . $eventStoriesUploadPath . '/' . $folder) && $folder !== 'tmp')
             {
                 $objFolder = new Folder($eventStoriesUploadPath . '/' . $folder);
                 if (null === CalendarEventsStoryModel::findByPk($folder))
