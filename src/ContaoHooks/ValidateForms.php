@@ -263,7 +263,6 @@ class ValidateForms
                                             $oFile = new File($strPath);
                                             $oFile->resizeTo(1000, 1000, 'proportional');
                                             // Create folder if it does not exist
-                                            mail('m.cupic@gmx.ch', $rootDir . '/' . $targetDir, 'bla');
                                             if (!is_dir($rootDir . '/' . $targetDir))
                                             {
                                                 new Folder($targetDir);
