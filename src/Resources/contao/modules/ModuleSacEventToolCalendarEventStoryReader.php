@@ -23,6 +23,7 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Validator;
+//use Michelf\MarkdownExtra;
 use Patchwork\Utf8;
 
 
@@ -125,6 +126,9 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
 
         // Set data
         $this->Template->setData($this->story->row());
+
+        //$text = MarkdownExtra::defaultTransform($this->story->text);
+        //$this->Template->text = strip_tags($text, Config::get('allowedTags'));
 
         // Fallback if author is no more findable in tl_member
         $objAuthor = MemberModel::findBySacMemberId($this->story->sacMemberId);
