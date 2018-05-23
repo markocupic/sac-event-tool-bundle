@@ -598,7 +598,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = ar
     'default'   => time(),
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
+    'eval'      => array('rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
     'sql'       => "int(10) unsigned NULL",
 );
 
@@ -608,7 +608,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = arra
     'default'   => time(),
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
+    'eval'      => array('rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
     'sql'       => "int(10) unsigned NULL",
 );
 
