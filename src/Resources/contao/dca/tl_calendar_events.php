@@ -566,6 +566,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration'] 
     'filter'    => true,
     'sorting'   => true,
     'exclude'   => true,
+    'default'   => \Contao\BackendUser::getInstance()->disableOnlineRegistration,
     'inputType' => 'checkbox',
     'eval'      => array('submitOnChange' => false),
     'sql'       => "char(1) NOT NULL default ''",
@@ -929,5 +930,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions']['eva
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventToken']['eval']['doNotCopy'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration']['eval']['doNotCopy'] = false;
 
 

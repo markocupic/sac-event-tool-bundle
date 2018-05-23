@@ -14,6 +14,7 @@ $GLOBALS['TL_LANG']['tl_user']['frontend_legend'] = 'Frontend Einstellungen';
 $GLOBALS['TL_LANG']['tl_user']['emergency_phone_legend'] = 'Notfall Einstellungen';
 $GLOBALS['TL_LANG']['tl_user']['bank_account_legend'] = 'Kontoangaben';
 $GLOBALS['TL_LANG']['tl_user']['role_legend'] = 'Aufgaben/Rollen im Verein';
+$GLOBALS['TL_LANG']['tl_user']['event_tool_legend'] = "Event-Tool Einstellungen";
 
 
 // Fields
@@ -44,7 +45,7 @@ $GLOBALS['TL_LANG']['tl_user']['hideInFrontendListings'] = array('Benutzer in Li
 $GLOBALS['TL_LANG']['tl_user']['calendar_containers'] = array('Erlaubte SAC-Event-Jahrescontainer', '');
 $GLOBALS['TL_LANG']['tl_user']['calendar_containerp'] = array('SAC-Event-Jahrescontainer Rechte', '');
 $GLOBALS['TL_LANG']['tl_user']['sectionId'] = array('Sektions-Mitgliedschaft', 'Geben Sie die Sektionmitgliedschaft an.');
-
+$GLOBALS['TL_LANG']['tl_user']['disableOnlineRegistration'] = array('Online Anmeldungen standardm&auml;ssig ausschalten', 'Geben Sie an, ob bei diesem User die Online Anmeldung bei Events, bei denen dieser Autor ist, standarm&auml;ssig deaktiviert sein soll.');
 
 // References
 $GLOBALS['TL_LANG']['tl_user']['section']['4250'] = 'SAC PILATUS';

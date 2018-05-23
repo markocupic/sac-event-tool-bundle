@@ -25,6 +25,7 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('role_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('instructor_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('emergency_phone_legend', 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('event_tool_legend', 'emergency_phone_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addField(array('iban'), 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('firstname', 'lastname', 'sacMemberId', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('userRole'), 'role_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
@@ -33,6 +34,7 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addField(array('avatarSRC'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('calendar_containers', 'calendar_containerp'), 'calendars_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
     ->addField(array('admin'), 'admin_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_user');
 
 // Manipulate palette extend
@@ -47,11 +49,13 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('bank_account_legend', 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('role_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('instructor_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('event_tool_legend', 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addField(array('iban'), 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('firstname', 'lastname', 'sacMemberId', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('hideInFrontendListings', 'userRole'), 'role_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('leiterQualifikation'), 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('avatarSRC', 'emergencyPhone', 'emergencyPhoneName', 'hobbies', 'introducing'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('extend', 'tl_user');
 
 // Manipulate palette admin
@@ -66,11 +70,13 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('bank_account_legend', 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('role_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('instructor_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('event_tool_legend', 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addField(array('iban'), 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('firstname', 'lastname', 'sacMemberId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('hideInFrontendListings', 'userRole'), 'role_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('leiterQualifikation'), 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('admin'), 'admin_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('admin', 'tl_user');
 
 // Manipulate palette login
@@ -83,10 +89,12 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('frontend_legend', 'backend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('bank_account_legend', 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addLegend('emergency_phone_legend', 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('event_tool_legend', 'emergency_phone_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addField(array('firstname', 'lastname', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'), 'name_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
     ->addField(array('emergencyPhone', 'emergencyPhoneName'), 'emergency_phone_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('iban'), 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('avatarSRC', 'hobbies', 'introducing'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('login', 'tl_user');
 
 //die('<br>' . $GLOBALS['TL_DCA']['tl_user']['palettes']['extend']);
@@ -375,5 +383,17 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['userRole'] = array(
     'options_callback' => array('tl_user_sac_event_tool', 'optionsCallbackUserRoles'),
     'eval'             => array('chosen' => true, 'tl_class' => 'clr m12', 'includeBlankOption' => true, 'multiple' => true, 'mandatory' => false),
     'sql'              => "blob NULL",
+);
+
+// event tool setting: disableOnlineRegistration by default
+$GLOBALS['TL_DCA']['tl_user']['fields']['disableOnlineRegistration'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_user']['disableOnlineRegistration'],
+    'exclude'   => true,
+    'search'    => true,
+    'sorting'   => true,
+    'flag'      => 1,
+    'inputType' => 'checkbox',
+    'eval'      => array('mandatory' => false, 'tl_class' => 'clr'),
+    'sql'       => "varchar(1) NOT NULL default ''",
 );
 
