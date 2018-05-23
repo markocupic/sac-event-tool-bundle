@@ -175,7 +175,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['downloadEventList'] = array
 (
     'label'      => &$GLOBALS['TL_LANG']['MSC']['downloadEventList'],
-    'href'       => 'act=downloadEventList',
+    'href'       => 'action=downloadEventList',
     'class'      => 'global_op_icon_class',
     'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',
     'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',

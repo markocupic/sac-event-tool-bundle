@@ -491,7 +491,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     public function triggerGlobalOperations(DataContainer $dc)
     {
 
-        if (Input::get('act') === 'downloadEventList' && Input::get('id') > 0)
+        if (Input::get('action') === 'downloadEventList' && Input::get('id') > 0)
         {
 
 
