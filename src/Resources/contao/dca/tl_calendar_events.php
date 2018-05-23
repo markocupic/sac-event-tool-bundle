@@ -250,7 +250,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId'] = array(
     'search'    => true,
     'inputType' => 'text',
     'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
-    'sql'       => "varchar(255) unsigned NULL",
+    'sql'       => "varchar(255) NOT NULL default ''",
 );
 
 // eventToken

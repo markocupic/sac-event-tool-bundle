@@ -12,6 +12,7 @@ namespace Markocupic\SacEventToolBundle;
 
 
 use Contao\BackendTemplate;
+use Contao\CalendarEventsJourneyModel;
 use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
@@ -228,7 +229,10 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         {
             // Generate Form
             $this->generateForm();
-            $this->Template->form = $this->objForm->generate();
+            if ($this->objForm !== null)
+            {
+                $this->Template->form = $this->objForm->generate();
+            }
 
             // Check if event is already fully booked
             if ($this->objEvent->maxMembers > 0 && $countAcceptedRegistrations >= $this->objEvent->maxMembers)
@@ -240,10 +244,15 @@ class ModuleSacEventToolEventRegistrationForm extends Module
 
 
     /**
-     * @return Form
+     * @return null
      */
     protected function generateForm()
     {
+        $objEvent = CalendarEventsModel::findByIdOrAlias(Input::get('events'));
+        if ($objEvent === null)
+        {
+            return null;
+        }
 
         $objForm = new Form('form-event-registration', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
@@ -251,7 +260,36 @@ class ModuleSacEventToolEventRegistrationForm extends Module
 
         $objForm->setFormActionFromUri(Environment::get('uri'));
 
+
         // Now let's add form fields:
+        $objJourney = CalendarEventsJourneyModel::findByPk($objEvent->journey);
+        if ($objJourney !== null)
+        {
+            if ($objJourney->alias === 'public-transport')
+            {
+                $objForm->addFormField('ticketInfo', array(
+                    'label'     => 'Ich besitze ein/eine',
+                    'inputType' => 'select',
+                    'options'   => array('GA', 'Halbtax', 'Nichts'),
+                    'eval'      => array('includeBlankOption' => true, 'mandatory' => true, 'rgxp' => 'phone'),
+                ));
+            }
+        }
+
+        $objJourney = CalendarEventsJourneyModel::findByPk($objEvent->journey);
+        if ($objJourney !== null)
+        {
+            if ($objJourney->alias === 'car')
+            {
+                $objForm->addFormField('carInfo', array(
+                    'label'     => 'Ich k&ouml;nnte ein Auto mit ... Pl&auml;tzen (inkl. Fahrer) mitnehmen',
+                    'inputType' => 'select',
+                    'options'   => array('kein Auto', '1', '2', '3', '4', '5', '6', '7', '8', '9'),
+                    'eval'      => array('includeBlankOption' => true, 'mandatory' => true, 'rgxp' => 'phone'),
+                ));
+            }
+        }
+
         $objForm->addFormField('emergencyPhone', array(
             'label'     => 'Notfalltelefonnummer/In Notf&auml;llen zu kontaktieren',
             'inputType' => 'text',

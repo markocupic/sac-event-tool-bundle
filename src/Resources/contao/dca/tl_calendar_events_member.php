@@ -165,7 +165,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
     'palettes'    => array
     (
         '__selector__'    => array('addEmailAttachment'),
-        'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn;{notes_legend}, notes;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,vegetarian;{address_legend:hide},street,postal,city;{contact_legend},phone,email;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;',
+        'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn;{notes_legend},carInfo,ticketInfo,notes;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,vegetarian;{address_legend:hide},street,postal,city;{contact_legend},phone,email;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;',
         'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy;',
         'refuseWithEmail' => 'refuseWithEmail;',
         'acceptWithEmail' => 'acceptWithEmail;',
@@ -223,6 +223,22 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'options'       => array('subscription-not-confirmed', 'subscription-accepted', 'subscription-refused', 'subscription-waitlisted'),
             'eval'          => array('doNotShow' => false, 'readonly' => false, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
             'sql'           => "varchar(255) NOT NULL default ''",
+        ),
+        'carInfo'          => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['carInfo'],
+            'inputType' => 'select',
+            'options'   => array('kein Auto', '1', '2', '3', '4', '5', '6', '7', '8', '9'),
+            'eval'      => array('includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true,),
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ),
+        'ticketInfo'          => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['ticketInfo'],
+            'inputType' => 'select',
+            'options'   => array('GA', 'Halbtax', 'Nichts'),
+            'eval'      => array('includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true,),
+            'sql'       => "varchar(255) NOT NULL default ''",
         ),
         'hasParticipated'     => array
         (

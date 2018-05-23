@@ -302,6 +302,9 @@ class EventRapport
                             $isMember = true;
                         }
                     }
+                    // Keep this var empty
+                    $transportInfo = '';
+
 
                     $i++;
                     $rows[] = array(
@@ -318,6 +321,7 @@ class EventRapport
                         array('key' => 'emergencyPhoneName', 'value' => $objUserModel->emergencyPhoneName, 'options' => array('multiline' => false)),
                         array('key' => 'phone', 'value' => $objUserModel->phone, 'options' => array('multiline' => false)),
                         array('key' => 'email', 'value' => $objUserModel->email, 'options' => array('multiline' => false)),
+                        array('key' => 'transportInfo', 'value' => $transportInfo, 'options' => array('multiline' => false)),
                         array('key' => 'dateOfBirth', 'value' => $objUserModel->dateOfBirth ? Date::parse('d.m.Y', $objUserModel->dateOfBirth) : '', 'options' => array('multiline' => false)),
                     );
                 }
@@ -342,6 +346,17 @@ class EventRapport
                     }
                 }
             }
+
+            $transportInfo = '';
+            if(strlen($objEventMember->carInfo)){
+                $transportInfo .= sprintf(' Auto mit %s Plätzen', $objEventMember->carInfo);
+            }
+
+            // GA, Halbtax, Tageskarte
+            if(strlen($objEventMember->ticketInfo)){
+                $transportInfo .= sprintf(' Ticket: Mit %s', $objEventMember->ticketInfo);
+            }
+
             $rows[] = array(
                 array('key' => 'i', 'value' => $i, 'options' => array('multiline' => false)),
                 array('key' => 'role', 'value' => 'TN', 'options' => array('multiline' => false)),
@@ -356,6 +371,7 @@ class EventRapport
                 array('key' => 'emergencyPhone', 'value' => $objEventMember->emergencyPhone, 'options' => array('multiline' => false)),
                 array('key' => 'emergencyPhoneName', 'value' => $objEventMember->emergencyPhoneName, 'options' => array('multiline' => false)),
                 array('key' => 'email', 'value' => $objEventMember->email, 'options' => array('multiline' => false)),
+                array('key' => 'transportInfo', 'value' => $transportInfo, 'options' => array('multiline' => false)),
                 array('key' => 'dateOfBirth', 'value' => $objEventMember->dateOfBirth ? Date::parse('d.m.Y', $objEventMember->dateOfBirth) : '', 'options' => array('multiline' => false)),
             );
         }

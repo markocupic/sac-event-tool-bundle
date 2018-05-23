@@ -74,7 +74,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_journey'] = array
     ),
     'palettes' => array
     (
-        'default' => 'title'
+        'default' => 'title,alias'
     ),
 
     'fields' => array
@@ -90,6 +90,17 @@ $GLOBALS['TL_DCA']['tl_calendar_events_journey'] = array
         'title'  => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_journey']['title'],
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
+            'filter'    => true,
+            'inputType' => 'text',
+            'eval'      => array('mandatory' => true),
+            'sql'       => "varchar(255) NOT NULL default ''"
+        ),
+        'alias'  => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_journey']['alias'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
