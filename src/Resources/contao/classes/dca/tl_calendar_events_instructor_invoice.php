@@ -103,7 +103,22 @@ class tl_calendar_events_instructor_invoice extends Backend
 
         if (CURRENT_ID != '')
         {
-            $objEvent = CalendarEventsModel::findByPk(CURRENT_ID);
+            if (Input::get('action') === 'generateInvoiceDocx' || Input::get('action') === 'generateInvoicePdf')
+            {
+                $objInvoice = \Contao\CalendarEventsInstructorInvoiceModel::findByPk(Input::get('id'));
+                if ($objInvoice !== null)
+                {
+                    if ($objInvoice->getRelated('pid') !== null)
+                    {
+                        $objEvent = $objInvoice->getRelated('pid');
+                    }
+                }
+            }
+            else
+            {
+                $objEvent = CalendarEventsModel::findByPk(CURRENT_ID);
+            }
+
             if ($objEvent !== null)
             {
                 $blnAllow = EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objEvent->id);
@@ -114,6 +129,7 @@ class tl_calendar_events_instructor_invoice extends Backend
 
                 if (!$blnAllow)
                 {
+                    die($objEvent->title);
                     Message::addError('Sie besitzen nicht die n&ouml;tigen Rechte, um diese Seite zu sehen.', 'BE');
                     $this->redirect($this->getReferer());
                 }
