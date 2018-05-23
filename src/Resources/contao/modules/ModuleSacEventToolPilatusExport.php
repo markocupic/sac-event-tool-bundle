@@ -275,7 +275,7 @@ class ModuleSacEventToolPilatusExport extends Module
         }
         elseif ($span == $eventDuration)
         {
-            return Date::parse($dateFormatShortened, CalendarSacEvents::getStartDate($id)) . ' - ' . Date::parse($dateFormat, CalendarSacEvents::getEndDate($id));
+            return Date::parse($dateFormatShortened, CalendarSacEvents::getStartDate($id)) . '-' . Date::parse($dateFormat, CalendarSacEvents::getEndDate($id));
         }
         else
         {

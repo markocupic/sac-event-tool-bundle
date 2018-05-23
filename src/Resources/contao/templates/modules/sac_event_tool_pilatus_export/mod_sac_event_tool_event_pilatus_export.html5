@@ -52,6 +52,9 @@
   <table class="event-export-table event-export-table-courses table table-sm">
     <tbody>
     <?php foreach ($this->courses as $arrEvent): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-event-separator" colspan="2">&nbsp;</td>
+        </tr>
         <?php if ($arrEvent['headline'] != ''): ?>
         <tr class="event-export-row-body">
           <td class="event-export-headline" colspan="2"><strong><?= $arrEvent['headline'] ?><strong></td>
@@ -125,6 +128,7 @@
         <td class="event-export-bookingEvent">Anmeldung</td>
         <td class="event-export-bookingEvent"><?php if (!$arrEvent['disableOnlineRegistration']): ?>Online Anmeldung{{br}}<?php endif; ?><?= $arrEvent['bookingEvent'] ?></td>
       </tr>
+
     <?php endforeach; ?>
     </tbody>
   </table>
