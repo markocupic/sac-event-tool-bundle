@@ -37,5 +37,6 @@ $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventlist'] = array('SAC Touren- un
 $GLOBALS['TL_LANG']['FMD']['eventTourDifficultyExplanationList'] = array('Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = array('Event Reader Vorschau');
 $GLOBALS['TL_LANG']['FMD']['eventToolEventToolPilatusExport'] = array('SAC Event-Export f&uuml;r Monatszeitschrift');
+$GLOBALS['TL_LANG']['FMD']['eventToolEventToolJahresprogrammExport'] = array('SAC Event-Export f&uuml;r Jahresprogramm');
 
 

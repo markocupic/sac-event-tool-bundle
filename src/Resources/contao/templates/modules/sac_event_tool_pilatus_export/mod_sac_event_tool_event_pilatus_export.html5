@@ -2,7 +2,7 @@
 
 
 <!-- all events as a table -->
-<h3 class="ce_headline">Montatsprogramm alle Events</h3>
+<h3 class="ce_headline">Monatsprogramm alle Events</h3>
 <?php if (!$this->allEventsTable): ?>
   <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
 <?php endif; ?>

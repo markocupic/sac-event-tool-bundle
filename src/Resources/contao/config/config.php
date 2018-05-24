@@ -89,14 +89,15 @@ $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
 
 // Frontend Modules
 $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
-    'eventToolFrontendUserDashboard'      => 'Markocupic\SacEventToolBundle\ModuleSacEventToolMemberDashboard',
-    'eventToolEventRegistrationForm'      => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventRegistrationForm',
-    'eventToolCalendarEventStoryList'     => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryList',
-    'eventToolCalendarEventStoryReader'   => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryReader',
-    'eventToolCalendarEventlist'          => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventlist',
-    'eventTourDifficultyExplanationList'  => 'Markocupic\SacEventToolBundle\ModuleSacEventToolTourDifficultyExplanationList',
-    'eventToolCalendarEventPreviewReader' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader',
-    'eventToolEventToolPilatusExport'     => 'Markocupic\SacEventToolBundle\ModuleSacEventToolPilatusExport',
+    'eventToolFrontendUserDashboard'         => 'Markocupic\SacEventToolBundle\ModuleSacEventToolMemberDashboard',
+    'eventToolEventRegistrationForm'         => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventRegistrationForm',
+    'eventToolCalendarEventStoryList'        => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryList',
+    'eventToolCalendarEventStoryReader'      => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryReader',
+    'eventToolCalendarEventlist'             => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventlist',
+    'eventTourDifficultyExplanationList'     => 'Markocupic\SacEventToolBundle\ModuleSacEventToolTourDifficultyExplanationList',
+    'eventToolCalendarEventPreviewReader'    => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader',
+    'eventToolEventToolPilatusExport'        => 'Markocupic\SacEventToolBundle\ModuleSacEventToolPilatusExport',
+    'eventToolEventToolJahresprogrammExport' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolJahresprogrammExport',
 );
 
 // Content Elements
