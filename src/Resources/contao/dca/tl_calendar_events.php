@@ -343,10 +343,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
                 'reference'  => &$GLOBALS['TL_LANG']['tl_calendar_events'],
                 //'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbTourDifficulties'),
                 'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
-                'foreignKey' => 'tl_user.name',
+                'foreignKey' => "tl_user.CONCAT(name, ', ', city)",
                 'eval'       => array
                 (
-                    'style'              => 'width:200px',
+                    'style'              => 'width:350px',
                     'mandatory'          => true,
                     'includeBlankOption' => true,
                     'chosen'             => true,
