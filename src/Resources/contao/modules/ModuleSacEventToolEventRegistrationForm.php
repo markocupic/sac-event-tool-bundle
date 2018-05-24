@@ -270,7 +270,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                 $objForm->addFormField('ticketInfo', array(
                     'label'     => 'Ich besitze ein/eine',
                     'inputType' => 'select',
-                    'options'   => array('GA', 'Halbtax', 'Nichts'),
+                    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
                     'eval'      => array('includeBlankOption' => true, 'mandatory' => true, 'rgxp' => 'phone'),
                 ));
             }
@@ -284,7 +284,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                 $objForm->addFormField('carInfo', array(
                     'label'     => 'Ich k&ouml;nnte ein Auto mit ... Pl&auml;tzen (inkl. Fahrer) mitnehmen',
                     'inputType' => 'select',
-                    'options'   => array('kein Auto', '1', '2', '3', '4', '5', '6', '7', '8', '9'),
+                    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
                     'eval'      => array('includeBlankOption' => true, 'mandatory' => true, 'rgxp' => 'phone'),
                 ));
             }

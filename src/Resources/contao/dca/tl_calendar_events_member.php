@@ -224,11 +224,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'eval'          => array('doNotShow' => false, 'readonly' => false, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
             'sql'           => "varchar(255) NOT NULL default ''",
         ),
-        'carInfo'          => array
+        'carInfo'             => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['carInfo'],
             'inputType' => 'select',
-            'options'   => array('kein Auto', '1', '2', '3', '4', '5', '6', '7', '8', '9'),
+            'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
             'eval'      => array('includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true,),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
@@ -236,7 +236,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['ticketInfo'],
             'inputType' => 'select',
-            'options'   => array('GA', 'Halbtax', 'Nichts'),
+            'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
             'eval'      => array('includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true,),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),

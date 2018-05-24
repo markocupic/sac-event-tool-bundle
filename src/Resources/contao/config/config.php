@@ -210,6 +210,26 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'] = array(
     '1 Abend und 1 Tag',
 );
 
+// Car seats info used in the event registration form
+$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'] = array(
+    'kein Auto',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+);
+
+// Ticket info used in the event registration form
+$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = array(
+    'GA',
+    'Halbtax-Abo',
+    'Nichts',
+);
+
 
 // Route cronjob calls,ajax calls etc...
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic_sac_event_tool.contao_hooks.initialize_system', 'initializeSystem');
