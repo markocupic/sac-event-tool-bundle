@@ -21,7 +21,8 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
         (
             'keys' => array
             (
-                'id' => 'primary',
+                'id'  => 'primary',
+                'pid' => 'index',
             ),
         ),
     ),
@@ -29,8 +30,10 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
     (
         'sorting'           => array
         (
+            'mode'                  => 5,
             'fields'                => array('title'),
-            'flag'                  => 1,
+            'format'                => '%s',
+            //'flag'                  => 1,
             'panelLayout'           => 'filter;search,limit',
             'paste_button_callback' => array('tl_user_role', 'pasteTag'),
         ),
@@ -87,15 +90,15 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
 
     'fields' => array
     (
-        'id'                  => array
+        'id'                               => array
         (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
         ),
-        'pid'                 => array
+        'pid'                              => array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
-        'sorting'             => array
+        'sorting'                          => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['sorting'],
             'exclude'   => true,
@@ -105,11 +108,11 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'eval'      => array('mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 10),
             'sql'       => "int(10) unsigned NOT NULL default '0'",
         ),
-        'tstamp'              => array
+        'tstamp'                           => array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
-        'title'               => array
+        'title'                            => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['title'],
             'exclude'   => true,
@@ -119,7 +122,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'belongsToExecutiveBoard' => array
+        'belongsToExecutiveBoard'          => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['belongsToExecutiveBoard'],
             'exclude'   => true,
@@ -138,6 +141,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'inputType' => 'checkbox',
             'eval'      => array('mandatory' => false, 'tl_class' => 'clr'),
             'sql'       => "char(1) NOT NULL default ''",
-        )
+        ),
     ),
 );

@@ -66,8 +66,6 @@ class tl_user_role extends Backend
 
         $blnUsed = in_array($row['id'], $arrRoles) ? true : false;
         $style = !$blnUsed ? ' title="Derzeit nicht in Gebrauch" style="color:red"' : '';
-
-        $args[0] = sprintf('<span%s>%s</span>', $style, $args[0]);
-        return $args;
+        return sprintf('<span%s>%s</span>', $style, $label);
     }
 }
