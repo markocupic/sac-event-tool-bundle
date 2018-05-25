@@ -55,8 +55,17 @@
     </table>
     <?php endif; ?>
 
-    <?php if ($this->eventType === 'tour'): ?>
+    <?php if ($this->eventType === 'tour' || $this->eventType === 'lastMinuteTour'): ?>
     <table class="event-export-table table table-sm">
+      <thead>
+      <tr class="event-export-row-head">
+        <td class="event-export-date">Datum</td>
+        <td class="event-export-title">Titel</td>
+        <td class="event-export-tour-type">Tour-Typ</td>
+        <td class="event-export-tour-type">Schwierigkeitsgrad</td>
+        <td class="event-export-instructors">Leiter</td>
+      </tr>
+      </thead>
       <tbody>
       <?php $month = ''; ?>
       <?php foreach ($this->events as $arrEvent): ?>
@@ -71,6 +80,36 @@
           <td class="event-export-title"><?= $arrEvent['title'] ?></td>
           <td class="event-export-tour-type"><?= $arrEvent['tourType'] ?></td>
           <td class="event-export-tour-difficulty"><?= $arrEvent['difficulty'] ?></td>
+          <td class="event-export-instructors"><?= $arrEvent['instructors'] ?></td>
+        </tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
+    <?php endif; ?>
+
+    <?php if ($this->eventType === 'generalEvent'): ?>
+    <table class="event-export-table table table-sm">
+      <thead>
+      <tr class="event-export-row-head">
+        <td class="event-export-date">Datum</td>
+        <td class="event-export-title">Titel</td>
+        <td class="event-export-tour-type">Veranstaltungsart</td>
+        <td class="event-export-instructors">Verantwortlich</td>
+      </tr>
+      </thead>
+      <tbody>
+      <?php $month = ''; ?>
+      <?php foreach ($this->events as $arrEvent): ?>
+          <?php if ($month != $arrEvent['month']): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-course-type-level-0" colspan="4"><strong><?= strtoupper($arrEvent['month']) ?><strong></td>
+          </tr>
+          <?php endif; ?>
+          <?php $month = $arrEvent['month']; ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-date"><?= $arrEvent['date'] ?></td>
+          <td class="event-export-title"><?= $arrEvent['title'] ?></td>
+          <td class="event-export-tour-type">VK</td>
           <td class="event-export-instructors"><?= $arrEvent['instructors'] ?></td>
         </tr>
       <?php endforeach; ?>

@@ -142,7 +142,7 @@ class ModuleSacEventToolJahresprogrammExport extends Module
             'inputType' => 'select',
             'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
             //'default'   => $this->User->emergencyPhone,
-            'eval'      => array('inkludeBlankOption' => true, 'mandatory' => true),
+            'eval'      => array('includeBlankOption' => true, 'mandatory' => true),
         ));
 
 
@@ -156,7 +156,7 @@ class ModuleSacEventToolJahresprogrammExport extends Module
             'label'     => 'Organisierende Gruppe',
             'inputType' => 'select',
             'options'   => $arrOrganizers,
-            'eval'      => array('mandatory' => true),
+            'eval'      => array('includeBlankOption' => true, 'mandatory' => false),
         ));
 
         $objForm->addFormField('startDate', array(
@@ -197,13 +197,13 @@ class ModuleSacEventToolJahresprogrammExport extends Module
         // validate() also checks whether the form has been submitted
         if ($objForm->validate())
         {
-            if (Input::post('startDate') != '' && Input::post('endDate') != '' && Input::post('organizer') > 0 && Input::post('eventType') != '')
+            if (Input::post('startDate') != '' && Input::post('endDate') != '' && Input::post('eventType') != '')
             {
 
                 $this->startDate = strtotime(Input::post('startDate'));
                 $this->endDate = strtotime(Input::post('endDate'));
                 $this->eventType = Input::post('eventType');
-                $this->organizer = Input::post('organizer');
+                $this->organizer = Input::post('organizer') >0 ? Input::post('organizer'): null;
 
                 $this->getEvents();
 
@@ -211,7 +211,7 @@ class ModuleSacEventToolJahresprogrammExport extends Module
                 $this->Template->eventTypeLabel = $GLOBALS['TL_LANG']['MSC'][$this->eventType];
                 $this->Template->startDate = $this->startDate;
                 $this->Template->endDate = $this->endDate;
-                $this->Template->organizer = EventOrganizerModel::findByPk($this->organizer)->title;
+                $this->Template->organizer = $this->organizer > 0 ? EventOrganizerModel::findByPk($this->organizer)->title : 'Alle Gruppen';
                 $this->Template->events = $this->events;
                 $this->Template->instructors = $this->instructors;
                 $this->Template->specialUsers = $this->specialUsers;
@@ -230,12 +230,15 @@ class ModuleSacEventToolJahresprogrammExport extends Module
         $objEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE published=? AND startDate>? AND startDate<?')->execute('1', $this->startDate, $this->endDate);
         while ($objEvents->next())
         {
-
-            $arrOrganizer = StringUtil::deserialize($objEvents->organizers, true);
-            if (!in_array($this->organizer, $arrOrganizer))
+            if($this->organizer)
             {
-                continue;
+                $arrOrganizer = StringUtil::deserialize($objEvents->organizers, true);
+                if (!in_array($this->organizer, $arrOrganizer))
+                {
+                    continue;
+                }
             }
+
             if ($this->eventType !== $objEvents->eventType)
             {
                 continue;
@@ -245,7 +248,7 @@ class ModuleSacEventToolJahresprogrammExport extends Module
 
 
         $arrInstructors = array();
-        if (count($arrEvents > 0))
+        if (count($arrEvents) > 0)
         {
             $arrEvent = array();
 
