@@ -106,7 +106,11 @@ class EventRapport
 
                 // Generate filename
                 $container = \Contao\System::getContainer();
-                $filenamePattern = str_replace('%%s', '%s', $container->getParameter('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
+                $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
+
+                //$filenamePattern = str_replace('%%s', '%s', $container->getParameter('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
+
+
                 $targetFile = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
 
                 // Create temporary folder, if it not exists.
@@ -431,7 +435,7 @@ class EventRapport
 
             // Generate filename
             $container = \Contao\System::getContainer();
-            $filenamePattern = str_replace('%%s', '%s', $container->getParameter('SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'));
+            $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'));
             $targetFile = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
 
             // Create temporary folder, if it not exists.

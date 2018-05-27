@@ -11,7 +11,6 @@
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\Automator;
-use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
@@ -79,7 +78,7 @@ class GeneratePage
             $logger = $container->get('monolog.logger.contao');
             $logger->log(LogLevel::INFO, 'The course booklet has been downloaded.', array('contao' => new ContaoContext(__FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'))));
 
-            $filenamePattern = str_replace('%%s', '%s', $container->getParameter('SAC_EVT_WORKSHOP_FLYER_SRC'));
+            $filenamePattern = str_replace('%%s', '%s',Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'));
             $fileSRC = sprintf($filenamePattern, $year);
             Controller::sendFileToBrowser($fileSRC);
         }

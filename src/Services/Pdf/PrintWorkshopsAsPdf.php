@@ -21,6 +21,7 @@ use Contao\FrontendTemplate;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
+use Contao\Config;
 use Markocupic\SacEventToolBundle\CalendarSacEvents;
 use TCPDF_FONTS;
 
@@ -216,7 +217,7 @@ class PrintWorkshopsAsPdf
         }
 
         $container = System::getContainer();
-        $filenamePattern = str_replace('%%s', '%s', $container->getParameter('SAC_EVT_WORKSHOP_FLYER_SRC'));
+        $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'));
         $fileSRC = sprintf($filenamePattern, $this->year);
 
         if ($this->download === false)
