@@ -9,6 +9,7 @@
  */
 
 use NotificationCenter\Model\Notification;
+use Contao\Config;
 
 
 /**
@@ -89,9 +90,11 @@ class tl_calendar_events_member extends Backend
     }
 
 
+
     /**
-     *
      * OnLoad Callback
+     * @param DC_Table $dc
+     * @throws Exception
      */
     public function onloadCallback(DC_Table $dc)
     {
@@ -253,9 +256,13 @@ class tl_calendar_events_member extends Backend
                 }
 
                 // Send e-mail
+                if (!\Contao\Validator::isEmail(Config::get('tourenUndKursadministrationEmail')))
+                {
+                    throw new \Exception('Please set a valid tourenUndKursadministrationEmail Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
+                }
                 $objEmail = new Email();
-                $objEmail->from = $this->User->email;
-                $objEmail->fromName = html_entity_decode($this->User->name);
+                $objEmail->from = Config::get('tourenUndKursadministrationEmail');
+                $objEmail->fromName = html_entity_decode(Config::get('tourenUndKursadministrationName'));
                 $objEmail->replyTo($this->User->email);
                 $objEmail->subject = Input::post('emailSubject');
                 $objEmail->text = Input::post('emailText');
@@ -640,9 +647,13 @@ class tl_calendar_events_member extends Backend
                 $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
                 if ($objRegistration !== null)
                 {
+                    if (!\Contao\Validator::isEmail(Config::get('tourenUndKursadministrationEmail')))
+                    {
+                        throw new \Exception('Please set a valid tourenUndKursadministrationEmail Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
+                    }
                     $objEmail = new Email();
-                    $objEmail->from = $this->User->email;
-                    $objEmail->fromName = html_entity_decode($this->User->name);
+                    $objEmail->from = Config::get('tourenUndKursadministrationEmail');
+                    $objEmail->fromName = html_entity_decode(Config::get('tourenUndKursadministrationName'));
                     $objEmail->replyTo($this->User->email);
                     $objEmail->subject = Input::post('subject');
                     $objEmail->text = strip_tags(Input::post('text'));
@@ -701,9 +712,11 @@ class tl_calendar_events_member extends Backend
 
     }
 
+
     /**
      * @param DC_Table $dc
      * @return string
+     * @throws Exception
      */
     public function inputFieldCallbackAcceptWithEmail(DC_Table $dc)
     {
@@ -720,9 +733,13 @@ class tl_calendar_events_member extends Backend
                 $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
                 if ($objRegistration !== null)
                 {
+                    if (!\Contao\Validator::isEmail(Config::get('tourenUndKursadministrationEmail')))
+                    {
+                        throw new \Exception('Please set a valid tourenUndKursadministrationEmail Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
+                    }
                     $objEmail = new Email();
-                    $objEmail->from = $this->User->email;
-                    $objEmail->fromName = html_entity_decode($this->User->name);
+                    $objEmail->from = Config::get('tourenUndKursadministrationEmail');
+                    $objEmail->fromName = html_entity_decode(Config::get('tourenUndKursadministrationName'));
                     $objEmail->replyTo($this->User->email);
                     $objEmail->subject = Input::post('subject');
                     $objEmail->text = strip_tags(Input::post('text'));
@@ -785,6 +802,7 @@ class tl_calendar_events_member extends Backend
     /**
      * @param DC_Table $dc
      * @return string
+     * @throws Exception
      */
     public function inputFieldCallbackAddToWaitlist(DC_Table $dc)
     {
@@ -799,9 +817,13 @@ class tl_calendar_events_member extends Backend
                 $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
                 if ($objRegistration !== null)
                 {
+                    if (!\Contao\Validator::isEmail(Config::get('tourenUndKursadministrationEmail')))
+                    {
+                        throw new \Exception('Please set a valid tourenUndKursadministrationEmail Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
+                    }
                     $objEmail = new Email();
-                    $objEmail->from = $this->User->email;
-                    $objEmail->fromName = html_entity_decode($this->User->name);
+                    $objEmail->from = Config::get('tourenUndKursadministrationEmail');
+                    $objEmail->fromName = html_entity_decode(Config::get('tourenUndKursadministrationName'));
                     $objEmail->replyTo($this->User->email);
                     $objEmail->subject = Input::post('subject');
                     $objEmail->text = strip_tags(Input::post('text'));
