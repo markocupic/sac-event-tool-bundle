@@ -53,6 +53,10 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
         $this->rootDir = __DIR__ . '/../../../../../../';
         $this->connection = $this->createMock(Connection::class);
         $this->framework = $this->mockContaoFramework();
+        $this->arrSectionIds = explode(',', $GLOBALS['TL_CONFIG']['SAC_EVT_SAC_SECTION_IDS']);
+        $this->hostname = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'];
+        $this->username = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'];
+        $this->password = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD'];
         $this->_getFtpConnectionParams();
     }
 
@@ -61,8 +65,7 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
      */
     public function testClassInstantiation()
     {
-
-        $objDatabaseSync = new SyncSacMemberDatabase($this->framework, $this->connection, $this->rootDir, $this->hostname, $this->username, $this->password, $this->arrSectionIds);
+        $objDatabaseSync = new SyncSacMemberDatabase($this->framework, $this->connection, $this->rootDir);
         $this->assertInstanceOf(SyncSacMemberDatabase::class, $objDatabaseSync);
     }
 
@@ -72,9 +75,6 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
      */
     public function testFtpConnection()
     {
-
-        // Check for parameter file
-        $this->assertTrue(\is_file($this->rootDir . '/sac_event_tool_parameters.php'));
 
         $this->assertTrue(!empty($this->hostname));
         $this->assertTrue(!empty($this->username));
@@ -96,7 +96,7 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
     public function testFtpDownload()
     {
 
-        $objDatabaseSync = new SyncSacMemberDatabase($this->framework, $this->connection, $this->rootDir, $this->hostname, $this->username, $this->password, $this->arrSectionIds);
+        $objDatabaseSync = new SyncSacMemberDatabase($this->framework, $this->connection, $this->rootDir);
 
         // Make private method accessible
         $connId = $this->_invokeMethod($objDatabaseSync, 'openFtpConnection', array());
@@ -104,7 +104,7 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
         $filesystem = new Filesystem();
         $tempDir = $this->getTempDir() . '/ftp';
         $filesystem->mkdir($tempDir);
-        $arrSectionIds = json_decode($this->arrSectionIds);
+        $arrSectionIds = $this->arrSectionIds;
         foreach ($arrSectionIds as $sectionId)
         {
             $localFile = $tempDir . '/Adressen_0000' . $sectionId . '.csv';
@@ -125,8 +125,6 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
     {
 
         $container = $this->mockContainer();
-        // Load the configuration file
-        require_once $this->rootDir . '/sac_event_tool_parameters.php';
 
         //$container = $this->mockContainer();
         $loader = new YamlFileLoader(
@@ -157,10 +155,10 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
         }
 
         // FTP Credentials SAC Switzerland link: Daniel Fernandez Daniel.Fernandez@sac-cas.ch
-        $this->arrSectionIds = $container->getParameter('SAC_EVT_SAC_SECTION_IDS');
-        $this->hostname = $container->getParameter('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME');
-        $this->username = $container->getParameter('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME');
-        $this->password = $container->getParameter('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD');
+        $this->arrSectionIds = explode(',', $GLOBALS['TL_CONFIG']['SAC_EVT_SAC_SECTION_IDS']);
+        $this->hostname = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'];
+        $this->username = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'];
+        $this->password = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD'];
 
         return $container;
     }

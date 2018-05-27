@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Services\SacMemberDatabase;
 
+
+use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Date;
 use Contao\File;
@@ -86,20 +88,16 @@ class SyncSacMemberDatabase
      * @param ContaoFrameworkInterface $framework
      * @param Connection $connection
      * @param $root_dir
-     * @param $ftp_hostname
-     * @param $ftp_username
-     * @param $ftp_password
-     * @param $section_ids
      */
-    public function __construct(ContaoFrameworkInterface $framework, Connection $connection, $root_dir, $ftp_hostname, $ftp_username, $ftp_password, $section_ids)
+    public function __construct(ContaoFrameworkInterface $framework, Connection $connection, $root_dir)
     {
         $this->framework = $framework;
         $this->connection = $connection;
         $this->root_dir = $root_dir;
-        $this->ftp_hostname = $ftp_hostname;
-        $this->ftp_username = $ftp_username;
-        $this->ftp_password = $ftp_password;
-        $this->section_ids = \json_decode($section_ids);
+        $this->ftp_hostname = Config::get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME');
+        $this->ftp_username = (string) Config::get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME');
+        $this->ftp_password = (string) Config::get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD');
+        $this->section_ids = explode(',', Config::get('SAC_EVT_SAC_SECTION_IDS'));
         $this->test_mode = Input::get('test_mode') ? true : false;
     }
 

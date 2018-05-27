@@ -18,9 +18,6 @@ $GLOBALS['TL_CONFIG']['purgeScriptCache'] = false;
 // Add notification center configs
 require_once($rootDir . '/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/config/notification_center_config.php');
 
-// include some constants like FTP Credentials SAC Switzerland etc.
-require_once $rootDir . '/sac_event_tool_parameters.php';
-
 // include custom functions
 require_once($rootDir . '/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/functions/functions.php');
 

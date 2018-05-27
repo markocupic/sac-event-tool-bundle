@@ -10,9 +10,5 @@ services:
             - "@contao.framework"
             - "@database_connection"
             - "%kernel.project_dir%"
-            - "%SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME%"
-            - "%SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME%"
-            - "%SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD%"
-            - "%SAC_EVT_SAC_SECTION_IDS%"
         public: true
 

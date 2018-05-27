@@ -27,9 +27,6 @@ class MarkocupicSacEventToolExtension extends Extension
      */
     public function load(array $mergedConfig, ContainerBuilder $container)
     {
-        // Load Sensitive outsourced data
-        require_once(__DIR__ . '/../../../../../sac_event_tool_parameters.php');
-
 
         $loader = new YamlFileLoader(
             $container,

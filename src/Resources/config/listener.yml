@@ -4,7 +4,6 @@ services:
         class: Markocupic\SacEventToolBundle\ContaoHooks\ValidateForms
         arguments:
             - "@contao.framework"
-            - "%SAC_EVT_EVENT_STORIES_UPLOAD_PATH%"
 
     # Initialize System Hook
     markocupic_sac_event_tool.contao_hooks.initialize_system:
