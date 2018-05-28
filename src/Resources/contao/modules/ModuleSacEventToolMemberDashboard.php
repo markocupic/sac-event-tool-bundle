@@ -409,6 +409,36 @@ class ModuleSacEventToolMemberDashboard extends Module
                     $arrEvents[$k]['downloadCourseConfirmationLink'] = Frontend::addToUrl('action=download_course_confirmation&amp;id=' . $event['registrationId']);
                 }
 
+
+                // Event Stories
+                $arrEventStories = array();
+                $objEventStory = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? ORDER BY eventStartDate DESC')->execute($this->objUser->sacMemberId);
+                while ($objEventStory->next())
+                {
+                    $arrEventStory = $objEventStory->row();
+
+                    // Check if story is still editable
+                    if ($objEventStory->eventEndDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
+                    {
+                        if ($objEventStory->publishState == 1)
+                        {
+                            $arrEventStory['canEditStory'] = true;
+                        }
+                    }
+
+                    $arrEventStory['date'] = Date::parse(Config::get('dateFormat'), $objEventStory->eventStartDate);
+
+                    // Check if event still exists
+                    if (CalendarEventsModel::findByPk($objEventStory->eventId) !== null)
+                    {
+                        // Overwrite date if event still exists in tl_calendar_events
+                        $arrEventStory['date'] = CalendarSacEvents::getEventPeriod($objEventStory->eventId, Config::get('dateFormat'), false);
+                        $arrEventStory['storyLink'] = Frontend::addToUrl('action=write_event_story&amp;eventId=' . $objEventStory->eventId);
+                    }
+                    $arrEventStories[] = $arrEventStory;
+                }
+
+                $this->Template->arrEventStories = $arrEventStories;
                 $this->Template->timeSpanForCreatingNewEventStory = $this->timeSpanForCreatingNewEventStory;
                 $this->Template->arrPastEvents = $arrEvents;
                 $this->Template->eventCounter = $eventCounter;
