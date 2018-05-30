@@ -93,13 +93,17 @@ class ModuleSacEventToolActivateMemberAccount extends Module
     {
         if (Input::get('activation') != '')
         {
-            $this->Template->step = 'activation-successfull';
+            $this->Template->step = 'check-activation-token';
             $objMember = MemberModel::findByActivation(Input::get('activation'));
-            if ($objMember !== null)
+            if ($objMember !== null && $objMember->activation != '')
             {
                 $objMember->activation = '';
                 $objMember->login = '1';
                 $objMember->save();
+            }
+            else
+            {
+                $this->Template->hasError = true;
             }
         }
         else

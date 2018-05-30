@@ -3,7 +3,7 @@
 <?php $this->block('content'); ?>
 
 
-<?php if ($this->step === 'activation-successfull'): ?>
+<?php if ($this->step === 'check-activation-token'): ?>
     <?php if ($this->hasError): ?>
     <p class="alert alert-danger" role="alert">Kontoaktivierung konnte nicht abgeschlossen werden. Evtl. ist der Aktivierungslink ist nicht (mehr) g&uuml;ltig.</p>
     <?php else: ?>
