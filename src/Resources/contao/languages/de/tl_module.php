@@ -21,5 +21,6 @@ $GLOBALS['TL_LANG']['tl_module']['story_limit'] = array('Gesamtzahl der Beitr&au
 $GLOBALS['TL_LANG']['tl_module']['story_eventOrganizers'] = array("Veranstalter\Ortsgruppen einsch&auml;nken", "W&auml;hlen Sie hier die Event-Veranstalter aus, deren Berichte angezeigt werden sollen.");
 $GLOBALS['TL_LANG']['tl_module']['eventStoryJumpTo'] = array('Event-Bericht Reader', 'Bitte geben Sie hier die Seite mit dem Event-Reader Modul an.');
 $GLOBALS['TL_LANG']['tl_module']['notifyOnEventStoryPublishedNotificationId'] = array('Benachrichtigung bei neu erstelltem Event-Bericht', '');
+$GLOBALS['TL_LANG']['tl_module']['activateMemberAccountNotificationId'] = array('Benachrichtigung bei Mitgliederkonto Aktivierung', '');
 
 

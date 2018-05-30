@@ -38,5 +38,6 @@ $GLOBALS['TL_LANG']['FMD']['eventTourDifficultyExplanationList'] = array('Schwie
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = array('Event Reader Vorschau');
 $GLOBALS['TL_LANG']['FMD']['eventToolEventToolPilatusExport'] = array('SAC Event-Export f&uuml;r Monatszeitschrift');
 $GLOBALS['TL_LANG']['FMD']['eventToolEventToolJahresprogrammExport'] = array('SAC Event-Export f&uuml;r Jahresprogramm');
+$GLOBALS['TL_LANG']['FMD']['eventToolActivateMemberAccount'] = array('SAC Mitgliederkonto Aktivierungsformular');
 
 

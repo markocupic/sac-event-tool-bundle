@@ -1,0 +1,22 @@
+<?php $this->extend('block_unsearchable'); ?>
+
+<?php $this->block('content'); ?>
+
+
+<?php if ($this->step === 'activation-successfull'): ?>
+    <?php if ($this->hasError): ?>
+    <p class="alert alert-danger" role="alert">Kontoaktivierung konnte nicht abgeschlossen werden. Evtl. ist der Aktivierungslink ist nicht (mehr) g&uuml;ltig.</p>
+    <?php else: ?>
+    <p class="alert alert-success" role="alert">Deine Kontoaktivierung konnte erfolgreich abgeschlossen werden. Du kannst dich jetzt mit deiner Mitgliedernummer und deinem zuvor festgelegten Passwort anmelden.</p>
+    <?php endif; ?>
+<?php elseif ($this->step === 'email-sent-to-member'): ?>
+  <p class="alert alert-primary" role="alert">Du hast auf deine E-Mail-Adresse einen Aktivierunglink zugesandt bekommen. Bitte pr&uuml;fe dein Postfach, um die Aktivierung abzuschliessen.</p>
+<?php else: ?>
+    <?php if ($this->hasError): ?>
+    <p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
+    <?php endif; ?>
+    <?= $this->form ?>
+<?php endif; ?>
+
+
+<?php $this->endblock(); ?>

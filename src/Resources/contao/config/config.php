@@ -95,12 +95,13 @@ $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
     'eventToolCalendarEventPreviewReader'    => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader',
     'eventToolEventToolPilatusExport'        => 'Markocupic\SacEventToolBundle\ModuleSacEventToolPilatusExport',
     'eventToolEventToolJahresprogrammExport' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolJahresprogrammExport',
+    'eventToolActivateMemberAccount'         => 'Markocupic\SacEventToolBundle\ModuleSacEventToolActivateMemberAccount',
 );
 
 // Content Elements
-$GLOBALS['TL_CTE']['sac_calendar_newsletter'] = array(
-    'calendar_newsletter' => 'CalendarNewsletter',
-);
+    $GLOBALS['TL_CTE']['sac_calendar_newsletter'] = array(
+        'calendar_newsletter' => 'CalendarNewsletter',
+    );
 $GLOBALS['TL_CTE']['sac_content_elements'] = array(
     'userPortrait'     => 'Markocupic\SacEventToolBundle\ContentUserPortrait',
     'userPortraitList' => 'Markocupic\SacEventToolBundle\ContentUserPortraitList',

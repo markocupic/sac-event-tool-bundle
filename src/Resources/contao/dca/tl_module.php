@@ -22,6 +22,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCalendarEventPreviewReader
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolEventStoryList'] = '{title_legend},name,headline,type;{config_legend},numberOfItems,skipFirst,perPage;{template_legend:hide},eventStoryListTemplate;{image_legend:hide},imgSize;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolEventToolPilatusExport'] = '{title_legend},name,headline,type;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolEventToolJahresprogrammExport'] = '{title_legend},name,headline,type;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolActivateMemberAccount'] = '{title_legend},name,headline,type;{notification_legend},activateMemberAccountNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
 
 // Fields
@@ -49,6 +50,17 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['receiptEventRegistrationNotificationI
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['notifyOnEventStoryPublishedNotificationId'] = array(
     'label'      => &$GLOBALS['TL_LANG']['tl_module']['notifyOnEventStoryPublishedNotificationId'],
+    'exclude'    => true,
+    'search'     => true,
+    'inputType'  => 'select',
+    'foreignKey' => 'tl_nc_notification.title',
+    'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
+    'sql'        => "int(10) unsigned NOT NULL default '0'",
+    'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['activateMemberAccountNotificationId'] = array(
+    'label'      => &$GLOBALS['TL_LANG']['tl_module']['activateMemberAccountNotificationId'],
     'exclude'    => true,
     'search'     => true,
     'inputType'  => 'select',
