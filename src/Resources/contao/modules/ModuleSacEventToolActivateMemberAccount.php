@@ -95,7 +95,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         {
             $this->Template->step = 'check-activation-token';
             $objMember = MemberModel::findByActivation(Input::get('activation'));
-            if ($objMember !== null && $objMember->activation != '')
+            if ($objMember !== null && $objMember->activation != '' && !$objMember->disable)
             {
                 $objMember->activation = '';
                 $objMember->login = '1';
@@ -210,6 +210,15 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                 if ($objMember->login)
                 {
                     $this->Template->errorMsg = sprintf('Das Konto mit der eingegebenen Mitgliedernummer %s wurde bereits aktiviert.', Input::post('username'));
+                    $hasError = true;
+                }
+            }
+
+            if (!$hasError)
+            {
+                if ($objMember->disable)
+                {
+                    $this->Template->errorMsg = sprintf('Das Konto mit der eingegebenen Mitgliedernummer %s ist deaktiviert und nicht mehr g&uuml;ltig.', Input::post('username'));
                     $hasError = true;
                 }
             }
