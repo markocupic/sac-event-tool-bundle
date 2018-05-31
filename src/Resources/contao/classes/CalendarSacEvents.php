@@ -246,7 +246,7 @@ class CalendarSacEvents extends System
             }
         }
 
-        return Config::get('SAC_EVT_EVENT_DEFALUT_PREVIEW_IMAGE_SRC');
+        return Config::get('SAC_EVT_EVENT_DEFAULT_PREVIEW_IMAGE_SRC');
 
     }
 

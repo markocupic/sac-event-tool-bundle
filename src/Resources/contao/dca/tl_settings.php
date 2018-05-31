@@ -27,7 +27,6 @@ PaletteManipulator::create()
     ->addField(array('SAC_EVT_FE_USER_AVATAR_DIRECTORY'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_EVENT_STORIES_UPLOAD_PATH'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_EVENT_DEFAULT_PREVIEW_IMAGE_SRC'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('SAC_EVT_EVENT_DEFAULT_PREVIEW_IMAGE_SRC'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_WORKSHOP_FLYER_SRC'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_ASSETS_DIR'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_CLOUDCONVERT_API_KEY'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
@@ -148,9 +147,9 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_STORIES_UPLOAD_PATH']
     'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
 );
 
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_DEFALUT_PREVIEW_IMAGE_SRC'] = array(
+$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_DEFAULT_PREVIEW_IMAGE_SRC'] = array(
 
-    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_EVENT_DEFALUT_PREVIEW_IMAGE_SRC'],
+    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_EVENT_DEFAULT_PREVIEW_IMAGE_SRC'],
     'inputType' => 'text',
     'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
 );
