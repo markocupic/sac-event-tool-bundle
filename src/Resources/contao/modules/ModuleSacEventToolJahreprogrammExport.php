@@ -203,9 +203,10 @@ class ModuleSacEventToolJahresprogrammExport extends Module
                 $this->startDate = strtotime(Input::post('startDate'));
                 $this->endDate = strtotime(Input::post('endDate'));
                 $this->eventType = Input::post('eventType');
-                $this->organizer = Input::post('organizer') >0 ? Input::post('organizer'): null;
+                $this->organizer = Input::post('organizer') > 0 ? Input::post('organizer') : null;
 
-                $this->getEvents();
+                // Get events and instructors (fill $this->events and $this->instructors)
+                $this->getEventsAndInstructors();
 
                 $this->Template->eventType = $this->eventType;
                 $this->Template->eventTypeLabel = $GLOBALS['TL_LANG']['MSC'][$this->eventType];
@@ -214,6 +215,8 @@ class ModuleSacEventToolJahresprogrammExport extends Module
                 $this->Template->organizer = $this->organizer > 0 ? EventOrganizerModel::findByPk($this->organizer)->title : 'Alle Gruppen';
                 $this->Template->events = $this->events;
                 $this->Template->instructors = $this->instructors;
+
+                $this->specialUsers = $this->getUsersByUserRole(Input::post('userRoles'));
                 $this->Template->specialUsers = $this->specialUsers;
             }
         }
@@ -224,13 +227,13 @@ class ModuleSacEventToolJahresprogrammExport extends Module
     /**
      * @throws \Exception
      */
-    protected function getEvents()
+    protected function getEventsAndInstructors()
     {
         $arrEvents = array();
         $objEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE published=? AND startDate>? AND startDate<?')->execute('1', $this->startDate, $this->endDate);
         while ($objEvents->next())
         {
-            if($this->organizer)
+            if ($this->organizer)
             {
                 $arrOrganizer = StringUtil::deserialize($objEvents->organizers, true);
                 if (!in_array($this->organizer, $arrOrganizer))
@@ -291,61 +294,6 @@ class ModuleSacEventToolJahresprogrammExport extends Module
             }
             $this->events = $arrEvent;
 
-            $specialUsers = array();
-            if (Input::post('userRoles'))
-            {
-                $arrUserRoles = Input::post('userRoles');
-
-                $objUserRoles = Database::getInstance()->execute('SELECT * FROM tl_user_role WHERE id IN(' . implode(',', array_map('\intval', $arrUserRoles)) . ') ORDER BY sorting');
-                while ($objUserRoles->next())
-                {
-                    $userRole = $objUserRoles->id;
-                    $arrUsers = array();
-                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_user ORDER BY name');
-                    while ($objUser->next())
-                    {
-                        $userRoles = StringUtil::deserialize($objUser->userRole, true);
-                        if (in_array($userRole, $userRoles))
-                        {
-
-                            $arrLeft = array();
-                            $arrLeft[] = $objUser->name;
-                            $arrLeft[] = $objUser->street;
-                            $arrLeft[] = $objUser->postal;
-                            $arrLeft[] = $objUser->city;
-                            $arrLeft = array_filter($arrLeft);
-
-
-                            $arrRight = array();
-                            if ($objUser->phone != '')
-                            {
-                                $arrRight[] = 'P ' . $objUser->phone;
-                            }
-                            if ($objUser->mobile != '')
-                            {
-                                $arrRight[] = 'N ' . $objUser->mobile;
-                            }
-                            if ($objUser->email != '')
-                            {
-                                $arrRight[] = $objUser->email;
-                            }
-
-                            $arrUsers[] = array(
-                                'id'       => $objUser->id,
-                                'leftCol'  => implode(', ', $arrLeft),
-                                'rightCol' => implode(', ', $arrRight),
-                            );
-                        }
-                    }
-
-                    $specialUsers[] = array(
-
-                        'title' => UserRoleModel::findByPk($userRole)->title,
-                        'users' => $arrUsers,
-                    );
-                }
-            }
-            $this->specialUsers = $specialUsers;
 
             $arrInstructors = array_unique($arrInstructors);
             $aInstructors = array();
@@ -355,8 +303,7 @@ class ModuleSacEventToolJahresprogrammExport extends Module
                 $arrLeft = array();
                 $arrLeft[] = $objUser->name;
                 $arrLeft[] = $objUser->street;
-                $arrLeft[] = $objUser->postal;
-                $arrLeft[] = $objUser->city;
+                $arrLeft[] = trim($objUser->postal . ' ' . $objUser->city);
                 $arrLeft = array_filter($arrLeft);
 
 
@@ -434,6 +381,67 @@ class ModuleSacEventToolJahresprogrammExport extends Module
 
             return implode('; ', $arrDates);
         }
+    }
+
+
+    /**
+     * @param $arrUserRoles
+     * @return array
+     */
+    protected function getUsersByUserRole($arrUserRoles)
+    {
+        $specialUsers = array();
+        if (is_array($arrUserRoles) && !empty($arrUserRoles))
+        {
+            $objUserRoles = Database::getInstance()->execute('SELECT * FROM tl_user_role WHERE id IN(' . implode(',', array_map('\intval', $arrUserRoles)) . ') ORDER BY sorting');
+            while ($objUserRoles->next())
+            {
+                $userRole = $objUserRoles->id;
+                $arrUsers = array();
+                $objUser = Database::getInstance()->execute('SELECT * FROM tl_user ORDER BY name');
+                while ($objUser->next())
+                {
+                    $userRoles = StringUtil::deserialize($objUser->userRole, true);
+                    if (in_array($userRole, $userRoles))
+                    {
+
+                        $arrLeft = array();
+                        $arrLeft[] = $objUser->name;
+                        $arrLeft[] = $objUser->street;
+                        $arrLeft[] = trim($objUser->postal . ' ' . $objUser->city);
+                        $arrLeft = array_filter($arrLeft);
+
+
+                        $arrRight = array();
+                        if ($objUser->phone != '')
+                        {
+                            $arrRight[] = 'P ' . $objUser->phone;
+                        }
+                        if ($objUser->mobile != '')
+                        {
+                            $arrRight[] = 'N ' . $objUser->mobile;
+                        }
+                        if ($objUser->email != '')
+                        {
+                            $arrRight[] = $objUser->email;
+                        }
+
+                        $arrUsers[] = array(
+                            'id'       => $objUser->id,
+                            'leftCol'  => implode(', ', $arrLeft),
+                            'rightCol' => implode(', ', $arrRight),
+                        );
+                    }
+                }
+
+                $specialUsers[] = array(
+
+                    'title' => UserRoleModel::findByPk($userRole)->title,
+                    'users' => $arrUsers,
+                );
+            }
+        }
+        return $specialUsers;
     }
 
 }
