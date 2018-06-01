@@ -20,6 +20,16 @@ $GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index
 
 
 // Fields
+
+// activationLinkLifetime
+$GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_member']['activationLinkLifetime'],
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => array('rgxp' => 'datim', 'mandatory' => false, 'datepicker' => true, 'tl_class' => 'clr wizard'),
+    'sql'       => "int(10) unsigned NULL",
+);
+
 // isSacMember
 $GLOBALS['TL_DCA']['tl_member']['fields']['isSacMember'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['isSacMember'],
@@ -33,16 +43,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['isSacMember'] = array(
 // newsletterSent
 $GLOBALS['TL_DCA']['tl_member']['fields']['newsletterSent'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['newsletterSent'],
-    'exclude'   => true,
-    'filter'    => true,
-    'inputType' => 'checkbox',
-    'eval'      => array('submitOnChange' => false),
-    'sql'       => "char(1) NOT NULL default ''",
-);
-
-// passwordSent
-$GLOBALS['TL_DCA']['tl_member']['fields']['passwordSent'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_member']['passwordSent'],
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'checkbox',

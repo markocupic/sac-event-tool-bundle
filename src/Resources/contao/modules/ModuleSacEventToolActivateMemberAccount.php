@@ -39,18 +39,25 @@ class ModuleSacEventToolActivateMemberAccount extends Module
      */
     protected $strTemplate = 'mod_sac_event_tool_activate_member_account';
 
-
     /**
      * @var
      */
     protected $objNotification;
 
+    /**
+     * @var
+     */
+    protected $arrGroups;
 
     /**
      * @var
      */
     protected $objForm;
 
+    /**
+     * @var int
+     */
+    protected $activationLinkLifetime = 3600;
 
     /**
      * Display a wildcard in the back end
@@ -78,6 +85,9 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             $this->objUser = FrontendUser::getInstance();
         }
 
+        // Add groups
+        $this->arrGroups = StringUtil::deserialize($this->reg_groups, true);
+
         // Use terminal42/notification_center
         $this->objNotification = Notification::findByPk($this->activateMemberAccountNotificationId);
 
@@ -95,10 +105,19 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         {
             $this->Template->step = 'check-activation-token';
             $objMember = MemberModel::findByActivation(Input::get('activation'));
-            if ($objMember !== null && $objMember->activation != '' && !$objMember->disable)
+            if ($objMember !== null && $objMember->activation != '' && $objMember->activationLinkLifetime > time() && !$objMember->disable)
             {
                 $objMember->activation = '';
                 $objMember->login = '1';
+                $objMember->activationLinkLifetime = 0;
+
+                // Add groups
+                $arrGroups = StringUtil::deserialize($objMember->groups, true);
+                $arrGroups = array_merge($arrGroups, $this->arrGroups);
+                $arrGroups = array_unique($arrGroups);
+                $arrGroups = array_filter($arrGroups);
+                $objMember->groups = serialize($arrGroups);
+
                 $objMember->save();
             }
             else
@@ -236,12 +255,13 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                     $objMemberModel->password = password_hash(Input::post('password'), PASSWORD_DEFAULT);
                     $token = StringUtil::substr($objMemberModel->id . md5(uniqid()) . md5(uniqid()), 32, '');
                     $objMemberModel->activation = $token;
+                    $objMemberModel->activationLinkLifetime = time() + $this->activationLinkLifetime;
                     $objMemberModel->save();
-
 
                     if ($this->notifyMember($objMemberModel))
                     {
                         $this->Template->step = 'email-sent-to-member';
+                        $this->Template->objMember = $objMemberModel;
                     }
                     else
                     {
