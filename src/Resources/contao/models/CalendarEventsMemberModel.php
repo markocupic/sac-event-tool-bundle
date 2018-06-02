@@ -70,6 +70,7 @@ class CalendarEventsMemberModel extends \Model
             $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id);
             if ($objJoinedEvents->numRows)
             {
+                $arr = $objEvents->row();
                 $objEventsModel = \CalendarEventsModel::findByPk($objEvents->id);
                 $arr['id'] = $objEvents->id;
                 $arr['eventModel'] = $objEventsModel;

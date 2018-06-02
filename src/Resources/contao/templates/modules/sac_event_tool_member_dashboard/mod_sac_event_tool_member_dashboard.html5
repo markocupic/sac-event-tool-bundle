@@ -102,7 +102,15 @@
                   <?php $stateOfSubscription = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$event['eventRegistrationModel']->stateOfSubscription]; ?>
                 <tr>
                   <td><?= $event['dateSpan'] ?></td>
-                  <td><a href="<?= $event['eventUrl'] ?>" title="zum Event"><?= $event['eventModel']->title ?></a></td>
+                  <td>
+                      <?php if ($event['eventState'] === 'event_deferred'): ?>
+                        <small><span style="color:red">Event verschoben!</span></small>{{br}}
+                      <?php endif; ?>
+                      <?php if ($event['eventState'] === 'event_canceled'): ?>
+                        <small><span style="color:red">Event abgesagt!</span></small>{{br}}
+                      <?php endif; ?>
+                    <a href="<?= $event['eventUrl'] ?>" title="zum Event"><?= $event['eventModel']->title ?></a>
+                  </td>
                   <td><?= $stateOfSubscription ?></td>
                   <td class="text-center"><a href="<?= $event['unregisterUrl'] ?>" role="button" title="Von Event abmelden" class="sign-out-from-event-button btn btn-sm btn-danger"><i class="fa fa-fw fa-times"></a></td>
                 </tr>
