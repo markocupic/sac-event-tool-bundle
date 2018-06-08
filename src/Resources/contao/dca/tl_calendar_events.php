@@ -77,7 +77,7 @@ PaletteManipulator::create()
     ->addField(array('singleSRCBroschuere'), 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('title', 'alias', 'courseId', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('suitableForBeginners', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('eventDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('terms', 'issues'), 'details_legend', PaletteManipulator::POSITION_APPEND)
@@ -96,7 +96,7 @@ PaletteManipulator::create()
 PaletteManipulator::create()
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'suitableForBeginners', 'tourTechDifficulty', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('eventDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
@@ -116,7 +116,7 @@ PaletteManipulator::create()
 PaletteManipulator::create()
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('title', 'alias', 'eventState', 'author', 'instructor', 'organizers', 'tourType', 'teaser'), 'title_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('eventDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('location', 'journey', 'generalEventDetailText', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
@@ -133,7 +133,7 @@ PaletteManipulator::create()
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('singleSRCBroschuere'), 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('title', 'alias', 'courseId', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'), 'title_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('repeatFixedDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('eventDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('teaser', 'terms', 'issues', 'location', 'journey', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
@@ -516,12 +516,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['miscellaneous'] = array(
     'sql'       => "text NULL",
 );
 
-// repeatFixedDates
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['repeatFixedDates'] = array(
-    'label'         => &$GLOBALS['TL_LANG']['tl_calendar_events']['repeatFixedDates'],
+// eventDates
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDates'] = array(
+    'label'         => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventDates'],
     'exclude'       => true,
     'inputType'     => 'multiColumnWizard',
-    'load_callback' => array(array('tl_calendar_events_sac_event_tool', 'loadCallbackRepeatFixedDates')),
+    'load_callback' => array(array('tl_calendar_events_sac_event_tool', 'loadCallbackeventDates')),
     'eval'          => array(
         'columnsCallback' => array('tl_calendar_events_sac_event_tool', 'listFixedDates'),
         'buttons'         => array('up' => false, 'down' => false),
@@ -901,7 +901,7 @@ $allowEdititingOnFirstReleaseLevelOnly = array(
     'courseLevel',
     'courseTypeLevel0',
     'courseTypeLevel1',
-    'repeatFixedDates',
+    'eventDates',
     'durationInfo',
     'tourType',
     'tourTechDifficulty',

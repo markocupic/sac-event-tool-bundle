@@ -590,7 +590,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         $set['registrationEndDate'] = strtotime($mode, $objEvent->registrationEndDate);
                     }
 
-                    $arrRepeats = StringUtil::deserialize($objEvent->repeatFixedDates, true);
+                    $arrRepeats = StringUtil::deserialize($objEvent->eventDates, true);
                     $newArrRepeats = array();
                     if (count($arrRepeats) > 0)
                     {
@@ -599,7 +599,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                             $repeat['new_repeat'] = strtotime($mode, $repeat['new_repeat']);
                             $newArrRepeats[] = $repeat;
                         }
-                        $set['repeatFixedDates'] = serialize($newArrRepeats);
+                        $set['eventDates'] = serialize($newArrRepeats);
                     }
                     $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
                 }
@@ -691,7 +691,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             {
                 $row[$i] = $value === '' ? '---' : $value;
             }
-            elseif ($i === 'repeatFixedDates')
+            elseif ($i === 'eventDates')
             {
                 if (!empty($value) && is_array($value))
                 {
@@ -940,7 +940,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      * @param \Contao\DC_Table $dc
      * @return array|null|string
      */
-    public function loadCallbackRepeatFixedDates($arrValues, Contao\DC_Table $dc)
+    public function loadCallbackeventDates($arrValues, Contao\DC_Table $dc)
     {
         if ($arrValues !== '')
         {
@@ -1290,7 +1290,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             return;
         }
 
-        $arrDates = StringUtil::deserialize($dc->activeRecord->repeatFixedDates);
+        $arrDates = StringUtil::deserialize($dc->activeRecord->eventDates);
         if (!is_array($arrDates) || empty($arrDates))
         {
             return;
@@ -1310,7 +1310,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $arrDates[] = array('new_repeat' => $v);
         }
         $arrSet = array();
-        $arrSet['repeatFixedDates'] = serialize($arrDates);
+        $arrSet['eventDates'] = serialize($arrDates);
         $startTime = !empty($arrDates[0]['new_repeat']) ? $arrDates[0]['new_repeat'] : 0;
         $endTime = !empty($arrDates[count($arrDates) - 1]['new_repeat']) ? $arrDates[count($arrDates) - 1]['new_repeat'] : 0;
 

@@ -21,6 +21,12 @@
             </div>
           <?php endif; ?>
 
+          <?php if ($this->courseId != ''): ?>
+            <div class="courseId event-detail event-info-box icon-box-small">
+              <h5>Kurs-Nr.: <?= $this->courseId ?></h5>
+            </div>
+          <?php endif; ?>
+
           <?php $days = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($this->id); ?>
         <div class="eventdate event-detail event-info-box icon-box-small">
           <h5>Kursdauer: <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($this->id) ?></h5>

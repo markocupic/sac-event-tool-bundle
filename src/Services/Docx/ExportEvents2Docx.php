@@ -146,7 +146,7 @@ class ExportEvents2Docx
             $table = $section->addTable('Event-Item');
 
             $arrFields = array(
-                "Datum" => 'repeatFixedDates',
+                "Datum" => 'eventDates',
                 "Autor (-en)" => 'author',
                 "Kursart" => 'kursart',
                 "Kursstufe" => 'courseLevel',
@@ -294,7 +294,7 @@ class ExportEvents2Docx
             }
 
             // Kusdatendaten in der Form d.m.Y, d.m.Y, ...
-            if ($field == 'repeatFixedDates')
+            if ($field == 'eventDates')
             {
 
                 $arr = CalendarSacEvents::getEventTimestamps(self::$arrDatarecord['id']);

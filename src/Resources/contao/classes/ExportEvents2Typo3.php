@@ -68,7 +68,7 @@ class ExportEvents2Typo3
                 $output .= "</p>";
             }
 
-            if ($objEvent->repeatFixedDates != '')
+            if ($objEvent->eventDates != '')
             {
                 $output .= "<p>";
                 $output .= "<b>Kursdaten</b><br>";

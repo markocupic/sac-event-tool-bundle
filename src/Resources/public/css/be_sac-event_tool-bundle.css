@@ -1,5 +1,5 @@
 /** new_repeat im multicolumn wizard ausblenden**/
-table#ctrl_repeatFixedDates thead tr:first-child {
+table#ctrl_eventDates thead tr:first-child {
     display: none;
 }
 

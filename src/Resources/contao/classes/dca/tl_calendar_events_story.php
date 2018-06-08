@@ -56,7 +56,7 @@ class tl_calendar_events_story extends Backend
                 $objStoryModel->organizers = $objEvent->organizers;
 
                 $aDates = [];
-                $arrDates = \Contao\StringUtil::deserialize($objEvent->repeatFixedDates, true);
+                $arrDates = \Contao\StringUtil::deserialize($objEvent->eventDates, true);
                 foreach ($arrDates as $arrDate)
                 {
                     $aDates[] = $arrDate['new_repeat'];

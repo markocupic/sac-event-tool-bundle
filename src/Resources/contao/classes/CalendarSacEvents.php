@@ -306,7 +306,7 @@ class CalendarSacEvents extends System
         $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
         if ($objEvent->numRows)
         {
-            $arrDates = StringUtil::deserialize($objEvent->repeatFixedDates);
+            $arrDates = StringUtil::deserialize($objEvent->eventDates);
             if (!is_array($arrDates) || empty($arrDates))
             {
                 return false;
@@ -332,7 +332,7 @@ class CalendarSacEvents extends System
         $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($eventId);
         if ($objEvent->numRows)
         {
-            $arrDates = StringUtil::deserialize($objEvent->repeatFixedDates);
+            $arrDates = StringUtil::deserialize($objEvent->eventDates);
             if (!is_array($arrDates) || empty($arrDates))
             {
                 return $tstamp;
@@ -354,7 +354,7 @@ class CalendarSacEvents extends System
         $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($eventId);
         if ($objEvent->numRows)
         {
-            $arrDates = StringUtil::deserialize($objEvent->repeatFixedDates);
+            $arrDates = StringUtil::deserialize($objEvent->eventDates);
             if (!is_array($arrDates) || empty($arrDates))
             {
                 return $tstamp;
@@ -380,7 +380,7 @@ class CalendarSacEvents extends System
             throw new \Exception(sprintf('Calendar Event with ID %s not found.', $id));
         }
 
-        $arrDates = StringUtil::deserialize($objEvent->repeatFixedDates);
+        $arrDates = StringUtil::deserialize($objEvent->eventDates);
 
         if ($objEvent->durationInfo != '')
         {
@@ -636,7 +636,7 @@ class CalendarSacEvents extends System
         }
 
         $arrEventDates = array();
-        $arrEventRepeats = StringUtil::deserialize($objEvent->repeatFixedDates, true);
+        $arrEventRepeats = StringUtil::deserialize($objEvent->eventDates, true);
         if (!empty($arrEventRepeats) && is_array($arrEventRepeats))
         {
             foreach ($arrEventRepeats as $eventRepeat)
@@ -658,7 +658,7 @@ class CalendarSacEvents extends System
             $objMemberEvent = CalendarEventsModel::findByPk($objMemberEvents->eventId);
             if ($objMemberEvent !== null)
             {
-                $arrRepeats = StringUtil::deserialize($objMemberEvent->repeatFixedDates, true);
+                $arrRepeats = StringUtil::deserialize($objMemberEvent->eventDates, true);
                 if (!empty($arrRepeats) && is_array($arrRepeats))
                 {
                     foreach ($arrRepeats as $repeat)
