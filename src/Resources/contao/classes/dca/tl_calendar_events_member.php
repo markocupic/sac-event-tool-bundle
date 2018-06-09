@@ -8,8 +8,8 @@
  * @link https://sac-kurse.kletterkader.com
  */
 
-use NotificationCenter\Model\Notification;
 use Contao\Config;
+use NotificationCenter\Model\Notification;
 
 
 /**
@@ -690,20 +690,24 @@ class tl_calendar_events_member extends Backend
         $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
         if ($objRegistration !== null)
         {
+            $objEvent = $objRegistration->getRelated('eventId');
+
             // Build email text from template
             $objEmailTemplate = new BackendTemplate('be_email_templ_refuse_registration');
             $objEmailTemplate->firstname = $objRegistration->firstname;
             $objEmailTemplate->lastname = $objRegistration->lastname;
-            $objEmailTemplate->eventname = $objRegistration->getRelated('eventId')->title;
+            $objEmailTemplate->eventname = $objEvent->title;
+            $objEmailTemplate->courseId = $objEvent->courseId;
+            $objEmailTemplate->eventType = $objEvent->eventType;
             $objEmailTemplate->nameGuide = $this->User->name;
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_refuse_with_email');
 
             // Get event type
-            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('eventId')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('eventId')->eventType] . ': ' : 'Event: ';
+            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objEvent->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType] . ': ' : 'Event: ';
 
-            $objTemplate->emailSubject = 'Absage für ' . $eventType . $objRegistration->getRelated('eventId')->title;
+            $objTemplate->emailSubject = 'Absage für ' . $eventType . $objEvent->title;
             $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
             return $objTemplate->parse();
         }
@@ -777,20 +781,24 @@ class tl_calendar_events_member extends Backend
         $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
         if ($objRegistration !== null)
         {
+            $objEvent = $objRegistration->getRelated('eventId');
+
             // Build email text from template
             $objEmailTemplate = new BackendTemplate('be_email_templ_accept_registration');
             $objEmailTemplate->firstname = $objRegistration->firstname;
             $objEmailTemplate->lastname = $objRegistration->lastname;
-            $objEmailTemplate->eventname = $objRegistration->getRelated('eventId')->title;
+            $objEmailTemplate->eventname = $objEvent->title;
+            $objEmailTemplate->courseId = $objEvent->courseId;
+            $objEmailTemplate->eventType = $objEvent->eventType;
             $objEmailTemplate->nameGuide = $this->User->name;
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_accept_with_email');
 
             // Get event type
-            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('eventId')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('eventId')->eventType] . ': ' : 'Event: ';
+            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objEvent->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType] . ': ' : 'Event: ';
 
-            $objTemplate->emailSubject = 'Zusage für ' . $eventType . $objRegistration->getRelated('eventId')->title;
+            $objTemplate->emailSubject = 'Zusage für ' . $eventType . $objEvent->title;
             $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
             return $objTemplate->parse();
         }
@@ -860,20 +868,24 @@ class tl_calendar_events_member extends Backend
         $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
         if ($objRegistration !== null)
         {
+            $objEvent = $objRegistration->getRelated('eventId');
+
             // Build email text from template
             $objEmailTemplate = new BackendTemplate('be_email_templ_added_to_waitlist');
             $objEmailTemplate->firstname = $objRegistration->firstname;
             $objEmailTemplate->lastname = $objRegistration->lastname;
-            $objEmailTemplate->eventname = $objRegistration->getRelated('eventId')->title;
+            $objEmailTemplate->eventname = $objEvent->title;
+            $objEmailTemplate->courseId = $objEvent->courseId;
+            $objEmailTemplate->eventType = $objEvent->eventType;
             $objEmailTemplate->nameGuide = $this->User->name;
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_added_to_waitlist');
 
             // Get event type
-            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('eventId')->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objRegistration->getRelated('eventId')->eventType] . ': ' : 'Event: ';
+            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objEvent->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType] . ': ' : 'Event: ';
 
-            $objTemplate->emailSubject = 'Auf Warteliste für ' . $eventType . $objRegistration->getRelated('eventId')->title;
+            $objTemplate->emailSubject = 'Auf Warteliste für ' . $eventType . $objEvent->title;
             $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
             return $objTemplate->parse();
         }

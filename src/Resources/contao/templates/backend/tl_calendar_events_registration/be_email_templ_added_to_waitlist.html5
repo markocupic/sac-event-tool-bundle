@@ -1,7 +1,11 @@
 Hallo <?= $this->firstname ?> <?= $this->lastname ?>
 
-Leider kann ich dir für den Event: "<?= $this->eventname ?>" im Moment noch keine Zusage erteilen. Du wurdest auf die Warteliste gesetzt und sollte ein Platz frei werden, wirst du wieder kontaktiert.
-Ich danke dir für dein Verständnis.
+
+<?php if($this->eventType === 'course'): ?>
+Leider kann ich dir für den Kurs: <?php if($this->courseId != ''): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventname ?>"  im Moment noch keine Zusage erteilen. Du wirst auf die Warteliste gesetzt und sollte ein Platz frei werden, wieder kontaktiert.
+<?php else: ?>
+Leider kann ich dir für den Event: "<?= $this->eventname ?>" im Moment noch keine Zusage erteilen. Du wirst auf die Warteliste gesetzt und sollte ein Platz frei werden, wieder kontaktiert.
+<?php endif; ?>
 
 Freundliche Grüsse
 

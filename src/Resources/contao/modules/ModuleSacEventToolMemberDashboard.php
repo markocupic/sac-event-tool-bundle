@@ -146,21 +146,32 @@ class ModuleSacEventToolMemberDashboard extends Module
                         {
 
                             $objMember = MemberModel::findBySacMemberId($this->objUser->sacMemberId);
+                            $startDate = '';
+                            $arrDates = array();
+                            $courseId = '';
+                            $eventTitle = $objRegistration->eventName;
+
                             $objEvent = $objRegistration->getRelated('eventId');
-                            if ($objEvent === null)
+                            if ($objEvent !== null)
                             {
-                                throw new \Exception('Event with ID ' . $objRegistration->eventId . ' not found in tl_calendar_events.');
+                                $startDate = Date::parse('Y', $objEvent->startDate);
+
+                                // Build up $arrData;
+                                // Get event dates from event object
+                                $arrDates = array_map(function ($tstmp) {
+                                    return Date::parse('m.d.Y', $tstmp);
+                                }, CalendarSacEvents::getEventTimestamps($objEvent->id));
+
+                                // Course id
+                                $courseId = htmlspecialchars(html_entity_decode($objEvent->courseId));
+
+                                // Event title
+                                $eventTitle = htmlspecialchars(html_entity_decode($objEvent->title));
                             }
 
                             // Log
                             System::log(sprintf('New event confirmation download. SAC-User-ID: %s. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_CONFIRMATION_DOWNLOAD'));
 
-
-                            // Build up $arrData;
-                            // Get event dates from event object
-                            $arrDates = array_map(function ($tstmp) {
-                                return Date::parse('m.d.Y', $tstmp);
-                            }, CalendarSacEvents::getEventTimestamps($objEvent->id));
 
                             // Replace template vars
                             $arrData = array();
@@ -168,14 +179,16 @@ class ModuleSacEventToolMemberDashboard extends Module
                             $arrData[] = array('key' => 'firstname', 'value' => htmlspecialchars(html_entity_decode($objMember->firstname)));
                             $arrData[] = array('key' => 'lastname', 'value' => htmlspecialchars(html_entity_decode($objMember->lastname)));
                             $arrData[] = array('key' => 'memberId', 'value' => $objMember->sacMemberId);
-                            $arrData[] = array('key' => 'eventYear', 'value' => Date::parse('Y', $objEvent->startDate));
+                            $arrData[] = array('key' => 'eventYear', 'value' => $startDate);
                             $arrData[] = array('key' => 'eventId', 'value' => htmlspecialchars(html_entity_decode($objRegistration->eventId)));
-                            $arrData[] = array('key' => 'eventName', 'value' => htmlspecialchars(html_entity_decode($objEvent->title)));
+                            $arrData[] = array('key' => 'eventName', 'value' => $eventTitle);
                             $arrData[] = array('key' => 'regId', 'value' => $objRegistration->id);
+                            $arrData[] = array('key' => 'courseId', 'value' => $courseId);
+
 
                             $container = System::getContainer();
                             $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'));
-                            $filename = sprintf($filenamePattern, $objMember->sacMemberId, $objEvent->id, 'docx');
+                            $filename = sprintf($filenamePattern, $objMember->sacMemberId, $objRegistration->id, 'docx');
                             $targetSrc = Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename;
                             $docxTemplateSrc = Config::get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC');
 
@@ -264,7 +277,9 @@ class ModuleSacEventToolMemberDashboard extends Module
 
 
                     $arrTokens = array(
+                        'event_course_id'   => $objEvent->courseId,
                         'event_name'        => $objEvent->title,
+                        'event_type'        => $objEvent->eventType,
                         'instructor_name'   => $objInstructor->name,
                         'instructor_email'  => $objInstructor->email,
                         'participant_name'  => $objEventsMember->firstname . ' ' . $objEventsMember->lastname,

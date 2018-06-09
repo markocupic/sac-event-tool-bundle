@@ -167,10 +167,11 @@ class EventRapport
         $transport = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : 'keine Angabe';
         $arrData[] = array('key' => 'eventTransport', 'value' => htmlspecialchars(html_entity_decode($transport)));
         $arrData[] = array('key' => 'eventCanceled', 'value' => $objEvent->eventState === 'event_canceled' ? 'Ja' : 'Nein');
-        $arrData[] = array('key' => 'eventHasExecuted', 'value' => $objEvent->executionState === 'event_executed_like_predicted'  ? 'Ja' : 'Nein');
+        $arrData[] = array('key' => 'eventHasExecuted', 'value' => $objEvent->executionState === 'event_executed_like_predicted' ? 'Ja' : 'Nein');
         $substitutionText = $objEvent->eventSubstitutionText !== '' ? $objEvent->eventSubstitutionText : '---';
         $arrData[] = array('key' => 'eventSubstitutionText', 'value' => htmlspecialchars(html_entity_decode($substitutionText)));
         $arrData[] = array('key' => 'eventDuration', 'value' => htmlspecialchars(html_entity_decode($objEventInvoice->eventDuration)));
+
 
         // User
         $arrData[] = array('key' => 'eventInstructorName', 'value' => htmlspecialchars(html_entity_decode($objBiller->name)));
@@ -225,12 +226,15 @@ class EventRapport
      */
     protected function getEventData($arrData, $objEvent)
     {
-
-
         // Event data
         $arrData[] = array('key' => 'eventTitle', 'value' => htmlspecialchars(html_entity_decode($objEvent->title)));
         Controller::loadLanguageFile('tl_calendar_events');
         $arrEventTstamps = CalendarSacEvents::getEventTimestamps($objEvent->id);
+
+        if ($objEvent->eventType === 'course')
+        {
+            $arrData[] = array('key' => 'courseId', 'value' => htmlspecialchars(html_entity_decode('Kurs-Nr: ' . $objEvent->courseId)));
+        }
 
         // Generate event duration string
         $arrEventDates = array();
@@ -255,8 +259,8 @@ class EventRapport
 
         // emergencyConcept
         $arrEmergencyConcept = array();
-        $arrOrganizers = StringUtil::deserialize($objEvent->organizers,true);
-        foreach($arrOrganizers as $organizer)
+        $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
+        foreach ($arrOrganizers as $organizer)
         {
             $objOrganizer = EventOrganizerModel::findByPk($organizer);
             $arrEmergencyConcept[] = $objOrganizer->title . ":\r\n" . $objOrganizer->emergencyConcept;
@@ -286,6 +290,7 @@ class EventRapport
     {
         $i = 0;
         $rows = array();
+
 
         // TL
         $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
@@ -352,12 +357,14 @@ class EventRapport
             }
 
             $transportInfo = '';
-            if(strlen($objEventMember->carInfo)){
+            if (strlen($objEventMember->carInfo))
+            {
                 $transportInfo .= sprintf(' Auto mit %s Plätzen', $objEventMember->carInfo);
             }
 
             // GA, Halbtax, Tageskarte
-            if(strlen($objEventMember->ticketInfo)){
+            if (strlen($objEventMember->ticketInfo))
+            {
                 $transportInfo .= sprintf(' Ticket: Mit %s', $objEventMember->ticketInfo);
             }
 

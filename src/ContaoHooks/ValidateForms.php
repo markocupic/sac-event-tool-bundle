@@ -261,7 +261,8 @@ class ValidateForms
                                             $targetDir = $this->eventStoriesUploadPath . '/' . $objStory->id;
                                             $fileNewPath = $targetDir . '/event-story-' . $objStory->id . '-img-' . $objFile->id . '.' . $objFile->extension;
                                             $oFile = new File($strPath);
-                                            $oFile->resizeTo(1000, 1000, 'proportional');
+                                            $resolution = Config::get('maxImageWidth') > 0 ? Config::get('maxImageWidth') : 2000;
+                                            $oFile->resizeTo($resolution, $resolution, 'proportional');
                                             // Create folder if it does not exist
                                             if (!is_dir($rootDir . '/' . $targetDir))
                                             {

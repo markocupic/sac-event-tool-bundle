@@ -471,6 +471,8 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             // Set token array
             $arrTokens = array(
                 'event_name'                       => html_entity_decode($eventType . $this->objEvent->title),
+                'event_type'                       => html_entity_decode($objEvent->eventType),
+                'event_course_id'                  => $objEvent->courseId,
                 'instructor_name'                  => $bypassRegistration ? html_entity_decode($strRegistrationGoesToName) : html_entity_decode($this->objInstructor->name),
                 'instructor_email'                 => $bypassRegistration ? html_entity_decode($strRegistrationGoesToEmail) : html_entity_decode($this->objInstructor->email),
                 'participant_name'                 => html_entity_decode($objMember->firstname . ' ' . $objMember->lastname),
