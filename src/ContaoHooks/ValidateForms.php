@@ -190,15 +190,7 @@ class ValidateForms
         return $arrSet;
     }
 
-
-    /**
-     * @param $arrSubmitted
-     * @param $arrForm
-     * @param $arrFiles
-     * @param $arrLabels
-     * @param \Form $objForm
-     */
-    public function processFormData($arrSubmitted, $arrForm, $arrFiles, $arrLabels, $objForm)
+    public function processFormDataOld($arrSubmitted, $arrForm, $arrFiles, $arrLabels, $objForm)
     {
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
@@ -229,6 +221,7 @@ class ValidateForms
                     $this->database->prepare('UPDATE tl_calendar_events_story %s WHERE id=?')->set($set)->execute($objStory->id);
                 }
             }
+            die(print_r($arrFiles, true));
 
             // Foto upload
             if ($arrForm['formID'] === 'form-write-event-story-upload-foto')
@@ -329,6 +322,150 @@ class ValidateForms
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * @param $arrSubmitted
+     * @param $arrForm
+     * @param $arrFiles
+     * @param $arrLabels
+     * @param \Form $objForm
+     */
+    public function processFormData($arrSubmitted, $arrForm, $arrFiles, $arrLabels, $objForm)
+    {
+        // Get root dir
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+
+        if ($arrForm['formID'] === 'form-write-event-story-text-and-yt' || $arrForm['formID'] === 'form-write-event-story-upload-foto')
+        {
+
+            $oEvent = $this->calendarEventsModelAdapter->findByPk($this->input->get('eventId'));
+            if ($this->feUser !== null && $oEvent !== null)
+            {
+
+                // !!!! The insert is done in ModuleSacEventToolMemberDashboard LINE 520
+                $set = array();
+                if ($arrSubmitted['youtubeId'])
+                {
+                    $set['youtubeId'] = $this->input->post('youtubeId');
+                }
+
+                if ($arrSubmitted['text'])
+                {
+                    $set['text'] = $this->input->post('text');
+                }
+
+                $objStory = $this->database->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=?')->limit(1)->execute($this->feUser->sacMemberId, $this->input->get('eventId'));
+                if ($objStory->numRows)
+                {
+                    $set['addedOn'] = time();
+                    $this->database->prepare('UPDATE tl_calendar_events_story %s WHERE id=?')->set($set)->execute($objStory->id);
+                }
+            }
+
+            // Foto upload form-write-event-story-upload-foto
+            if ($arrForm['formID'] === 'form-write-event-story-upload-foto')
+            {
+                if (FE_USER_LOGGED_IN)
+                {
+                    // Manage Fileuploads
+                    $eventId = $this->input->get('eventId');
+                    $objStory = $this->database->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=?')->execute($this->feUser->sacMemberId, $eventId);
+                    if ($objStory->numRows)
+                    {
+                        $oStoryModel = CalendarEventsStoryModel::findByPk($objStory->id);
+                        if ($oStoryModel !== null)
+                        {
+                            foreach ($arrFiles as $file)
+                            {
+                                $strTmpSource = str_replace($rootDir . '/', '',$file['tmp_name']);
+                                if (is_file($rootDir . '/' . $strTmpSource))
+                                {
+                                    $objFile = $this->filesModelAdapter->findByPath($strTmpSource);
+                                    if ($objFile !== null)
+                                    {
+                                        $targetDir = $this->eventStoriesUploadPath . '/' . $objStory->id;
+                                        $fileNewPath = $targetDir . '/event-story-' . $objStory->id . '-img-' . $objFile->id . '.' . $objFile->extension;
+                                        $oFile = new File($strTmpSource);
+                                        $resolution = Config::get('maxImageWidth') > 0 ? Config::get('maxImageWidth') : 2000;
+                                        $oFile->resizeTo($resolution, $resolution, 'proportional');
+
+                                        // Create folder if it does not exist
+                                        if (!is_dir($rootDir . '/' . $targetDir))
+                                        {
+                                            new Folder($targetDir);
+                                        }
+
+                                        $oFile->copyTo($fileNewPath);
+                                        //$oFile->delete();
+                                        Dbafs::addResource($fileNewPath);
+                                        $oFileModel = FilesModel::findByPath($fileNewPath);
+
+                                        if ($oFileModel !== null)
+                                        {
+                                            // Add Photographer name to meta field
+                                            $objUser = FrontendUser::getInstance();
+                                            if ($objUser !== null)
+                                            {
+                                                $arrMeta = \StringUtil::deserialize($oFileModel->meta, true);
+                                                if (!isset($arrMeta['de']))
+                                                {
+                                                    $arrMeta['de'] = array(
+                                                        'title'        => '',
+                                                        'alt'          => '',
+                                                        'link'         => '',
+                                                        'caption'      => '',
+                                                        'photographer' => '',
+                                                    );
+                                                }
+                                                $arrMeta['de']['photographer'] = $objUser->firstname . ' ' . $objUser->lastname;
+                                                $oFileModel->meta = serialize($arrMeta);
+                                                $oFileModel->save();
+                                            }
+
+                                            // Save gallery data to tl_calendar_events_story
+                                            $multiSRC = StringUtil::deserialize($oStoryModel->multiSRC, true);
+                                            $multiSRC[] = $oFileModel->uuid;
+                                            $oStoryModel->multiSRC = serialize($multiSRC);
+                                            $orderSRC = StringUtil::deserialize($oStoryModel->multiSRC, true);
+                                            $orderSRC[] = $oFileModel->uuid;
+                                            $oStoryModel->orderSRC = serialize($orderSRC);
+                                            $oStoryModel->save();
+                                        }
+                                    }
+                                }
+                                /**
+
+                                // Delete empty tmp folders
+                                $arrFolders = array(
+                                    $this->eventStoriesUploadPath . '/tmp',
+                                    $this->eventStoriesUploadPath . '/tmp/tmp',
+                                );
+                                foreach ($arrFolders as $folder)
+                                {
+                                    if(is_dir($rootDir . '/' . $folder))
+                                    {
+                                        $folders = scan($rootDir . '/' . $folder);
+                                        foreach ($folders as $dir)
+                                        {
+                                            $objFolder = new Folder($folder . '/' . $dir);
+                                            if ($objFolder->isEmpty())
+                                            {
+                                                //$objFolder->delete();
+                                            }
+                                        }
+                                    }
+                                }
+                                 *
+                                 * **/
+                            }
+                        }
+                    }
+
                 }
             }
         }
