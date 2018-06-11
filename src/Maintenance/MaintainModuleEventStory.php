@@ -14,10 +14,8 @@ use Contao\CalendarEventsStoryModel;
 use Contao\Config;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Folder;
-use Contao\MemberModel;
 use Contao\System;
 use Psr\Log\LogLevel;
-use Contao\Database;
 
 
 /**
@@ -54,6 +52,13 @@ class MaintainModuleEventStory
                     $objFolder->delete();
                 }
             }
+        }
+
+        // Purge the tmp folder
+        if (is_dir($rootDir . '/' . $eventStoriesUploadPath . '/tmp'))
+        {
+            $objFolder = new Folder($eventStoriesUploadPath . '/tmp');
+            $objFolder->purge();
         }
     }
 }
