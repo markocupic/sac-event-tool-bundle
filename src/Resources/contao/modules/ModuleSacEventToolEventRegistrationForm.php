@@ -164,7 +164,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         }
         elseif ($this->objEvent->eventState === 'event_fully_booked')
         {
-            Message::addInfo('Dieser Anlass ist ausgebucht.', TL_MODE);
+            Message::addInfo('Dieser Anlass ist ausgebucht. Bitte erkundige dich beim Leiter, ob eine Nachmeldung m&ouml;glich ist.', TL_MODE);
         }
         elseif ($this->objEvent->eventState === 'event_canceled')
         {
@@ -408,7 +408,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                     System::log(sprintf('New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").', $objMemberModel->firstname, $objMemberModel->lastname, $objMemberModel->id, $this->objEvent->id, $this->objEvent->title), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_SUBSCRIPTION'));
 
 
-                    $notified = $this->notifyMember($arrData, $objMemberModel, $this->objEvent);
+                    $notified = $this->notifyMember($arrData, $objMemberModel, $this->objEvent, $objEventRegistration);
 
                     if ($this->jumpTo)
                     {
@@ -432,7 +432,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
      * @param $objMember
      * @return bool
      */
-    protected function notifyMember($arrData, $objMember, $objEvent)
+    protected function notifyMember($arrData, $objMember, $objEvent, $objEventRegistration)
     {
         $hasError = false;
 
@@ -468,6 +468,17 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             // Get the event type
             $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$this->objEvent->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$this->objEvent->eventType] . ': ' : '';
 
+            // Check if event is already fully booked
+            $objCalEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=? AND contaoMemberId IN (SELECT id FROM tl_member WHERE disable=?)')->execute($objEvent->id, 'subscription-accepted', '');
+            $countAcceptedRegistrations = $objCalEventMember->numRows;
+            $eventFullyBooked = false;
+            if ($objEvent->maxMembers > 0 && $countAcceptedRegistrations >= $objEvent->maxMembers)
+            {
+                $eventFullyBooked = true;
+                $objEventRegistration->stateOfSubscription = 'subscription-waitlisted';
+                $objEventRegistration->save();
+            }
+
             // Set token array
             $arrTokens = array(
                 'event_name'                       => html_entity_decode($eventType . $this->objEvent->title),
@@ -489,6 +500,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                 'participant_vegetarian'           => $arrData['vegetarian'] == 'true' ? 'Ja' : 'Nein',
                 'participant_notes'                => html_entity_decode($arrData['notes']),
                 'event_link_detail'                => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($this->objEvent),
+                'event_state'                      => $eventFullyBooked === true ? 'fully-booked' : '',
             );
 
 
