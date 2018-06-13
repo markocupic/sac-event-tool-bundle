@@ -235,9 +235,9 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             }
 
             // Check if event is already fully booked
-            if ($this->objEvent->maxMembers > 0 && $countAcceptedRegistrations >= $this->objEvent->maxMembers)
+            if (CalendarSacEvents::eventIsFullyBooked($this->objEvent->id) === true)
             {
-                $this->Template->eventFullyBooked = true;
+                $this->Template->bookingLimitReaches = true;
             }
         }
     }
@@ -469,10 +469,8 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$this->objEvent->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$this->objEvent->eventType] . ': ' : '';
 
             // Check if event is already fully booked
-            $objCalEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=? AND contaoMemberId IN (SELECT id FROM tl_member WHERE disable=?)')->execute($objEvent->id, 'subscription-accepted', '');
-            $countAcceptedRegistrations = $objCalEventMember->numRows;
             $eventFullyBooked = false;
-            if ($objEvent->maxMembers > 0 && $countAcceptedRegistrations >= $objEvent->maxMembers)
+            if (CalendarSacEvents::eventIsFullyBooked($objEvent->id) === true)
             {
                 $eventFullyBooked = true;
                 $objEventRegistration->stateOfSubscription = 'subscription-waitlisted';

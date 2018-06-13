@@ -92,6 +92,26 @@ class CalendarSacEvents extends System
     }
 
     /**
+     * @param $eventId
+     * @return bool
+     */
+    public static function eventIsFullyBooked($eventId)
+    {
+        $objEvent = CalendarEventsModel::findByPk($eventId);
+        if ($objEvent !== null)
+        {
+            $objEventsMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
+            $registrationCount = $objEventsMember->numRows;
+            if ($objEvent->eventState === 'event_fully_booked' || ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers))
+            {
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+    /**
      * @param $id
      * @return string
      */
@@ -714,7 +734,7 @@ class CalendarSacEvents extends System
                 $arrTourProfile = StringUtil::deserialize($objEventModel->tourProfile, true);
                 foreach ($arrTourProfile as $profile)
                 {
-                    if($profile['tourProfileAscentMeters'] == '' && $profile['tourProfileAscentTime'] == '' && $profile['tourProfileDescentMeters'] == '' && $profile['tourProfileDescentTime'] == '')
+                    if ($profile['tourProfileAscentMeters'] == '' && $profile['tourProfileAscentTime'] == '' && $profile['tourProfileDescentMeters'] == '' && $profile['tourProfileDescentTime'] == '')
                     {
                         continue;
                     }
