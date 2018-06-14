@@ -235,6 +235,10 @@ class EventRapport
         {
             $arrData[] = array('key' => 'courseId', 'value' => htmlspecialchars(html_entity_decode('Kurs-Nr: ' . $objEvent->courseId)));
         }
+        else
+        {
+            $arrData[] = array('key' => 'courseId', 'value' => '');
+        }
 
         // Generate event duration string
         $arrEventDates = array();

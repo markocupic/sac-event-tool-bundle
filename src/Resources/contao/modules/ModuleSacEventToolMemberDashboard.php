@@ -409,10 +409,8 @@ class ModuleSacEventToolMemberDashboard extends Module
                      */
                     if ($arrEvents[$k]['objStory'] !== null && $objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
                     {
-                        if ($objEventStory->publishState == 1)
-                        {
-                            $arrEvents[$k]['canEditStory'] = true;
-                        }
+
+                        $arrEvents[$k]['canEditStory'] = true;
                     }
                     elseif ($arrEvents[$k]['objStory'] === null && $objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
                     {
