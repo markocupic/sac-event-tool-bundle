@@ -45,6 +45,7 @@
               {{user::postal}} {{user::city}}
               <br><br>
               Telefon: {{user::phone}}{{br}}
+              Mobile: {{user::mobile}}{{br}}
               E-Mail: {{user::email}}
               <br><br>
               Mitglieder-Nr. {{user::sacMemberId}}

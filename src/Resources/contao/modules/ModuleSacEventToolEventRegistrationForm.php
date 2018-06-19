@@ -290,6 +290,18 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             }
         }
 
+        $objForm->addFormField('phone', array(
+            'label'     => 'Telefonnummer',
+            'inputType' => 'text',
+            'default'   => $this->User->phone,
+            'eval'      => array('mandatory' => false, 'rgxp' => 'phone'),
+        ));
+        $objForm->addFormField('mobile', array(
+            'label'     => 'Mobilnummer',
+            'inputType' => 'text',
+            'default'   => $this->User->mobile,
+            'eval'      => array('mandatory' => false, 'rgxp' => 'phone'),
+        ));
         $objForm->addFormField('emergencyPhone', array(
             'label'     => 'Notfalltelefonnummer/In Notf&auml;llen zu kontaktieren',
             'inputType' => 'text',
@@ -306,7 +318,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             'label'     => 'Anmerkungen/Erfahrungen/Referenztouren',
             'inputType' => 'textarea',
             'eval'      => array('mandatory' => true, 'rows' => 4),
-            'class'     => 'bla',
+            'class'     => '',
         ));
         $objForm->addFormField('agb', array(
             'label'     => array('', 'Ich akzeptiere die <a href="#" data-toggle="modal" data-target="#agbModal">allg. Gesch&auml;ftsbedingungen.</a>'),
@@ -325,7 +337,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         $objForm->addContaoHiddenFields();
 
         // Get form presets from tl_member
-        $arrFields = array('emergencyPhone', 'emergencyPhoneName');
+        $arrFields = array('phone', 'mobile', 'emergencyPhone', 'emergencyPhoneName');
         foreach ($arrFields as $field)
         {
             $objWidget = $objForm->getWidget($field);
@@ -387,6 +399,16 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                     $arrData['eventId'] = $this->objEvent->id;
                     $arrData['addedOn'] = time();
                     $arrData['stateOfSubscription'] = 'subscription-not-confirmed';
+
+                    if ($arrData['phone'] == '' && $this->objUser->phone != '')
+                    {
+                        $arrData['phone'] = $this->objUser->phone;
+                    }
+
+                    if ($arrData['mobile'] == '' && $this->objUser->mobile != '')
+                    {
+                        $arrData['mobile'] = $this->objUser->mobile;
+                    }
 
                     // Save emergency phone number to user profile
                     if ($objMemberModel->emergencyPhone == '')
@@ -494,6 +516,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                 'participant_contao_member_id'     => $objMember->id,
                 'participant_sac_member_id'        => $objMember->sacMemberId,
                 'participant_phone'                => $arrData['phone'],
+                'participant_mobile'               => $arrData['mobile'],
                 'participant_date_of_birth'        => $arrData['dateOfBirth'] > 0 ? Date::parse('d.m.Y', $arrData['dateOfBirth']) : '---',
                 'participant_vegetarian'           => $arrData['vegetarian'] == 'true' ? 'Ja' : 'Nein',
                 'participant_notes'                => html_entity_decode($arrData['notes']),

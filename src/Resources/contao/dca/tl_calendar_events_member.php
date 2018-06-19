@@ -165,7 +165,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
     'palettes'    => array
     (
         '__selector__'    => array('addEmailAttachment'),
-        'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn;{notes_legend},carInfo,ticketInfo,notes;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,vegetarian;{address_legend:hide},street,postal,city;{contact_legend},phone,email;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;',
+        'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn;{notes_legend},carInfo,ticketInfo,notes;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,vegetarian;{address_legend:hide},street,postal,city;{contact_legend},phone,mobile,email;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;',
         'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy;',
         'refuseWithEmail' => 'refuseWithEmail;',
         'acceptWithEmail' => 'acceptWithEmail;',
@@ -348,6 +348,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         'phone'               => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['phone'],
+            'inputType' => 'text',
+            'eval'      => array('mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
+            'sql'       => "varchar(64) NOT NULL default ''",
+        ),
+        'mobile'               => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['mobile'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
             'sql'       => "varchar(64) NOT NULL default ''",

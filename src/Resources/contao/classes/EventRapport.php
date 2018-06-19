@@ -318,6 +318,9 @@ class EventRapport
                     // Keep this var empty
                     $transportInfo = '';
 
+                    // Phones
+                    $mobile = $objUserModel->mobile != '' ? $objUserModel->mobile : '----';
+                    $phone = $objUserModel->phone != '' ? $objUserModel->phone : '----';
 
                     $i++;
                     $rows[] = array(
@@ -332,7 +335,8 @@ class EventRapport
                         array('key' => 'city', 'value' => $objUserModel->city, 'options' => array('multiline' => false)),
                         array('key' => 'emergencyPhone', 'value' => $objUserModel->emergencyPhone, 'options' => array('multiline' => false)),
                         array('key' => 'emergencyPhoneName', 'value' => $objUserModel->emergencyPhoneName, 'options' => array('multiline' => false)),
-                        array('key' => 'phone', 'value' => $objUserModel->phone, 'options' => array('multiline' => false)),
+                        array('key' => 'phone', 'value' => $phone, 'options' => array('multiline' => false)),
+                        array('key' => 'mobile', 'value' => $mobile, 'options' => array('multiline' => false)),
                         array('key' => 'email', 'value' => $objUserModel->email, 'options' => array('multiline' => false)),
                         array('key' => 'transportInfo', 'value' => $transportInfo, 'options' => array('multiline' => false)),
                         array('key' => 'dateOfBirth', 'value' => $objUserModel->dateOfBirth ? Date::parse('d.m.Y', $objUserModel->dateOfBirth) : '', 'options' => array('multiline' => false)),
@@ -372,6 +376,10 @@ class EventRapport
                 $transportInfo .= sprintf(' Ticket: Mit %s', $objEventMember->ticketInfo);
             }
 
+            // Phones
+            $mobile = $objEventMember->mobile != '' ? $objEventMember->mobile : '----';
+            $phone = $objEventMember->phone != '' ? $objEventMember->phone : '----';
+
             $rows[] = array(
                 array('key' => 'i', 'value' => $i, 'options' => array('multiline' => false)),
                 array('key' => 'role', 'value' => 'TN', 'options' => array('multiline' => false)),
@@ -382,7 +390,8 @@ class EventRapport
                 array('key' => 'street', 'value' => $objEventMember->street, 'options' => array('multiline' => false)),
                 array('key' => 'postal', 'value' => $objEventMember->postal, 'options' => array('multiline' => false)),
                 array('key' => 'city', 'value' => $objEventMember->city, 'options' => array('multiline' => false)),
-                array('key' => 'phone', 'value' => $objEventMember->phone, 'options' => array('multiline' => false)),
+                array('key' => 'phone', 'value' => $phone, 'options' => array('multiline' => false)),
+                array('key' => 'mobile', 'value' => $mobile, 'options' => array('multiline' => false)),
                 array('key' => 'emergencyPhone', 'value' => $objEventMember->emergencyPhone, 'options' => array('multiline' => false)),
                 array('key' => 'emergencyPhoneName', 'value' => $objEventMember->emergencyPhoneName, 'options' => array('multiline' => false)),
                 array('key' => 'email', 'value' => $objEventMember->email, 'options' => array('multiline' => false)),
