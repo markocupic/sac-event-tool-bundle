@@ -76,7 +76,7 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.min
 
 
           <div id="dateStart" class="col-6">
-            <label for="ctrl_dateStart">Kurse anzeigen ab:</label>
+            <label for="ctrl_dateStart">Touren anzeigen ab:</label>
             <input type="hidden" id="ctrl_dateStartHidden" value="0">
             <div class="input-group date">
               <input type="text" id="ctrl_dateStart" class="form-control" data-date-now="<?= \Date::parse('d-m-Y') ?>" placeholder="dd-mm-yyyy" value="">
