@@ -400,16 +400,6 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                     $arrData['addedOn'] = time();
                     $arrData['stateOfSubscription'] = 'subscription-not-confirmed';
 
-                    if ($arrData['phone'] == '' && $this->objUser->phone != '')
-                    {
-                        $arrData['phone'] = $this->objUser->phone;
-                    }
-
-                    if ($arrData['mobile'] == '' && $this->objUser->mobile != '')
-                    {
-                        $arrData['mobile'] = $this->objUser->mobile;
-                    }
-
                     // Save emergency phone number to user profile
                     if ($objMemberModel->emergencyPhone == '')
                     {
