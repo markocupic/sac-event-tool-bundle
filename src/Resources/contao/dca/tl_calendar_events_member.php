@@ -62,7 +62,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         ),
         'label'             => array
         (
-            'fields'         => array('stateOfSubscription', 'firstname', 'lastname', 'street', 'city'),
+            'fields'         => array('stateOfSubscription', 'firstname', 'lastname', 'street', 'city', 'vegetarian'),
             'showColumns'    => true,
             'label_callback' => array('tl_calendar_events_member', 'addIcon'),
         ),
@@ -209,6 +209,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['addedOn'],
             'inputType' => 'text',
+            'flag'      => 5,
+            'sorting'   => true,
             'eval'      => array('rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'),
             'sql'       => "varchar(10) NOT NULL default ''",
         ),
@@ -312,6 +314,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['gender'],
             'inputType' => 'select',
+            'sorting'   => true,
             'options'   => array('male', 'female'),
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
             'eval'      => array('mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'),
@@ -320,6 +323,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         'dateOfBirth'         => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['dateOfBirth'],
+            'sorting'   => true,
+            'flag'      => 5,
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'),
             'sql'       => "varchar(10) NOT NULL default ''",
@@ -352,7 +357,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'eval'      => array('mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
             'sql'       => "varchar(64) NOT NULL default ''",
         ),
-        'mobile'               => array
+        'mobile'              => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['mobile'],
             'inputType' => 'text',
@@ -391,6 +396,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['vegetarian'],
             'inputType' => 'select',
+            'sorting'   => true,
             'options'   => array('false' => 'Nein', 'true' => 'Ja'),
             'eval'      => array('doNotShow' => false, 'doNotCopy' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
             'sql'       => "varchar(32) NOT NULL default ''",
