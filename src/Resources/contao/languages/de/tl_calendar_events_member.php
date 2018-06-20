@@ -41,7 +41,6 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['contaoMemberId'] = array("Cont
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['street'] = array("Strasse", "Geben Sie hier die Strasse ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['postal'] = array("Postleitzahl", "Geben Sie hier die Postleitzahl ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['city'] = array("Ort", "Geben Sie hier den Ort ein.");
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['phone'] = array("Telefonnummer", "Geben Sie die Telefonnummer ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['mobile'] = array("Mobilnummer", "Geben Sie die Mobilnummer ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['emergencyPhoneName'] = array("Namen einer vertrauten Person f&uuml;r Notf&auml;lle", "Geben Sie den Namen einer vertrauten Person an, welche in Notf&auml;llen kontaktiert wird.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['emergencyPhone'] = array("Notfall Telefonnummer", "Geben Sie eine Notfallnummer ein.");

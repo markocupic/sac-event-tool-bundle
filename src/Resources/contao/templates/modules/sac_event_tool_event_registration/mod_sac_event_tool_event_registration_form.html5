@@ -1,84 +1,122 @@
 <?php $this->extend('block_searchable'); ?>
 <?php $this->block('content'); ?>
 
-<div id="eventBookingForm" class="event-detail event-info-box">
+  <div id="eventBookingForm" class="event-detail event-info-box">
 
-    <?php if ($this->hasErrorMessage): ?>
-      <div class="alert alert-danger" role="alert">
-          <?= $this->errorMessage ?>
-      </div>
-    <?php endif; ?>
-
-    <?php if ($this->hasInfoMessage): ?>
-      <div class="alert alert-info" role="alert">
-          <?= $this->infoMessage ?>
-      </div>
-    <?php endif; ?>
-
-    <?php if (!FE_USER_LOGGED_IN): ?>
-      <a href="{{link_url::member-login}}" class="trigger-login-modal btn btn-link">LOGIN</a>
-    <?php endif; ?>
-
-
-    <?php if ($this->form): ?>
-      <h2 class="ce_headline">Anmeldeformular</h2>
-
-      <div class="row">
-      <div class="col-md-6">
-        <div>
-          <span class="font-weight-bold">{{user::firstname}} {{user::lastname}}{{br}}</span>
-          {{user::street}}{{br}}
-          {{user::postal}} {{user::city}}{{br}}
-          {{user::email}}{{br}}
-          {{user::phone}}{{br}}
-          SAC-Mitglieder-Nr. {{user::sacMemberId}}{{br}}
+      <?php if ($this->hasErrorMessage): ?>
+        <div class="alert alert-danger" role="alert">
+            <?= $this->errorMessage ?>
         </div>
-      </div>
-      <div class="col-md-6">
-          <?php if ($this->bookingLimitReaches): ?>
-            <div class="alert alert-info" role="alert">
-              Die maximale Teilnehmerzahl für diesen Event ist bereits erreicht. Wenn du dich trotzdem anmeldest, gelangst du auf die Warteliste und kannst bei Absagen evtl. nachr&uuml;cken. Du kannst selbstverst&auml;ndlich auch mit dem Leiter Kontakt aufnehmen, um Genaueres zu erfahren.
+      <?php endif; ?>
+
+      <?php if ($this->hasInfoMessage): ?>
+        <div class="alert alert-info" role="alert">
+            <?= $this->infoMessage ?>
+        </div>
+      <?php endif; ?>
+
+      <?php if (!FE_USER_LOGGED_IN): ?>
+        <a href="{{link_url::member-login}}" class="trigger-login-modal btn btn-link">LOGIN</a>
+      <?php endif; ?>
+
+
+      <?php if ($this->form): ?>
+        <h2 class="ce_headline">Anmeldeformular</h2>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div>
+              <span class="font-weight-bold">{{user::firstname}} {{user::lastname}}{{br}}</span>
+              {{user::street}}{{br}}
+              {{user::postal}} {{user::city}}{{br}}
+              {{user::email}}{{br}}
+              {{user::phone}}{{br}}
+              SAC-Mitglieder-Nr. {{user::sacMemberId}}{{br}}
             </div>
-          <?php endif; ?>
+          </div>
+          <div class="col-md-6">
+              <?php if ($this->bookingLimitReaches): ?>
+                <div class="alert alert-info" role="alert">
+                  Die maximale Teilnehmerzahl für diesen Event ist bereits erreicht. Wenn du dich trotzdem anmeldest, gelangst du auf die Warteliste und kannst bei Absagen evtl. nachr&uuml;cken. Du kannst selbstverst&auml;ndlich auch mit dem Leiter Kontakt aufnehmen, um Genaueres zu erfahren.
+                </div>
+              <?php endif; ?>
 
-          <?php if ($this->hasBookingError): ?>
-            <div class="alert alert-info" role="alert">
-                <?= $this->bookingErrorMsg ?>
+              <?php if ($this->hasBookingError): ?>
+                <div class="alert alert-info" role="alert">
+                    <?= $this->bookingErrorMsg ?>
+                </div>
+              <?php endif; ?>
+            <div class="hasteform_form-event-registration block">
+              <form action="<?= $this->objForm->getFormAction() ?>" method="<?= $this->objForm->getMethod() ?>" enctype="<?= $this->objForm->getEnctype() ?>">
+                <div class="formbody">
+                    <?php if ($this->objForm->hasFormField('FORM_SUBMIT')): ?>
+                        <?= $this->objForm->getWidget('FORM_SUBMIT')->parse(); ?>
+                    <?php endif; ?>
+                    <?php if ($this->objForm->hasFormField('REQUEST_TOKEN')): ?>
+                        <?= $this->objForm->getWidget('REQUEST_TOKEN')->parse(); ?>
+                    <?php endif; ?>
+                    <?php if ($this->objForm->hasFormField('carInfo')): ?>
+                        <?= $this->objForm->getWidget('carInfo')->parse(); ?>
+                    <?php endif; ?>
+                    <?php if ($this->objForm->hasFormField('ticketInfo')): ?>
+                        <?= $this->objForm->getWidget('ticketInfo')->parse(); ?>
+                    <?php endif; ?>
+                    <?php if ($this->objForm->hasFormField('mobile')): ?>
+                        <?= $this->objForm->getWidget('mobile')->parse(); ?>
+                      <div class="alert alert-success" role="alert">
+                        Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leergelassen werden. Damit der Leiter dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine <strong>Mobilnummer</strong> zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.
+                      </div>
+                    <?php endif; ?>
+                    <?php if ($this->objForm->hasFormField('emergencyPhone')): ?>
+                        <?= $this->objForm->getWidget('emergencyPhone')->parse(); ?>
+                    <?php endif; ?>
+                    <?php if ($this->objForm->hasFormField('emergencyPhoneName')): ?>
+                        <?= $this->objForm->getWidget('emergencyPhoneName')->parse(); ?>
+                    <?php endif; ?>
+                    <?php if ($this->objForm->hasFormField('notes')): ?>
+                        <?= $this->objForm->getWidget('notes')->parse(); ?>
+                    <?php endif; ?>
+                    <?php if ($this->objForm->hasFormField('agb')): ?>
+                        <?= $this->objForm->getWidget('agb')->parse(); ?>
+                    <?php endif; ?>
+                    <?php if ($this->objForm->hasFormField('submit')): ?>
+                        <?= $this->objForm->getWidget('submit')->parse(); ?>
+                    <?php endif; ?>
+                </div>
+              </form>
             </div>
-          <?php endif; ?>
-          <?= $this->form ?>
-      </div>
-    </div>
-    <?php endif; ?>
+          </div>
+        </div>
+      <?php endif; ?>
 
 
-  <!-- AGB Modal -->
-  <div class="modal fade" id="agbModal" tabindex="-1" role="dialog" aria-labelledby="agbTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered  modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="agbTitle">Allgemeine Gesch&auml;ftsbedingungen</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p>
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-            Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
-            Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
-            Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
-            Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.
-            At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur
-          </p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+    <!-- AGB Modal -->
+    <div class="modal fade" id="agbModal" tabindex="-1" role="dialog" aria-labelledby="agbTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered  modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="agbTitle">Allgemeine Gesch&auml;ftsbedingungen</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+              Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
+              Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
+              Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
+              Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.
+              At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
 
 <?php $this->endblock(); ?>

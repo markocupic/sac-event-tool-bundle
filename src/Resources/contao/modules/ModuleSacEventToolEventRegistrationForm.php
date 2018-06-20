@@ -232,6 +232,8 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             if ($this->objForm !== null)
             {
                 $this->Template->form = $this->objForm->generate();
+                $this->Template->objForm = $this->objForm;
+
             }
 
             // Check if event is already fully booked
@@ -271,7 +273,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                     'label'     => 'Ich besitze ein/eine',
                     'inputType' => 'select',
                     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
-                    'eval'      => array('includeBlankOption' => true, 'mandatory' => true, 'rgxp' => 'phone'),
+                    'eval'      => array('includeBlankOption' => true, 'mandatory' => true),
                 ));
             }
         }
@@ -285,17 +287,12 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                     'label'     => 'Ich k&ouml;nnte ein Auto mit ... Pl&auml;tzen (inkl. Fahrer) mitnehmen',
                     'inputType' => 'select',
                     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
-                    'eval'      => array('includeBlankOption' => true, 'mandatory' => true, 'rgxp' => 'phone'),
+                    'eval'      => array('includeBlankOption' => true, 'mandatory' => true),
                 ));
             }
         }
 
-        $objForm->addFormField('phone', array(
-            'label'     => 'Telefonnummer',
-            'inputType' => 'text',
-            'default'   => $this->User->phone,
-            'eval'      => array('mandatory' => false, 'rgxp' => 'phone'),
-        ));
+
         $objForm->addFormField('mobile', array(
             'label'     => 'Mobilnummer',
             'inputType' => 'text',
@@ -337,7 +334,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         $objForm->addContaoHiddenFields();
 
         // Get form presets from tl_member
-        $arrFields = array('phone', 'mobile', 'emergencyPhone', 'emergencyPhoneName');
+        $arrFields = array('mobile', 'emergencyPhone', 'emergencyPhoneName');
         foreach ($arrFields as $field)
         {
             $objWidget = $objForm->getWidget($field);
@@ -505,7 +502,6 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                 'participant_city'                 => html_entity_decode($objMember->city),
                 'participant_contao_member_id'     => $objMember->id,
                 'participant_sac_member_id'        => $objMember->sacMemberId,
-                'participant_phone'                => $arrData['phone'],
                 'participant_mobile'               => $arrData['mobile'],
                 'participant_date_of_birth'        => $arrData['dateOfBirth'] > 0 ? Date::parse('d.m.Y', $arrData['dateOfBirth']) : '---',
                 'participant_vegetarian'           => $arrData['vegetarian'] == 'true' ? 'Ja' : 'Nein',
