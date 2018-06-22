@@ -76,32 +76,32 @@ div.legend-box li {
     background-color: #f3f3f5;
 }
 
-#acceptAutocompleteBox
-{
+#acceptAutocompleteBox {
     padding: 15px 0;
 }
 
-#acceptAutocompleteBox button{
+#acceptAutocompleteBox button {
     margin-right: 20px;
 }
 
-#acceptAutocompleteBox strong{
+#acceptAutocompleteBox strong {
     font-weight: bold;
     color: #000;
 }
-#acceptAutocompleteBox .autocompleteInfo{
+
+#acceptAutocompleteBox .autocompleteInfo {
     color: green
 }
 
 .tl_formbody_edit div.readonly {
     margin: 0 15px;
-    position:relative;
+    position: relative;
     width: calc(100% - 30px);
 }
 
 .tl_formbody_edit div.readonly .field-content-box {
     border: 1px solid #aaa;
-    padding:8px 5px;
+    padding: 8px 5px;
     background-color: lightgray;
     box-sizing: border-box;
     border: 1px solid #aaa;
@@ -110,43 +110,70 @@ div.legend-box li {
     line-height: 1.4;
     min-height: 37px;
 }
+
 .tl_content_right .invoice img,
 .tl_content_right .generateInvoicePdf img,
-.tl_content_right .generateInvoiceDocx img
-{
+.tl_content_right .generateInvoiceDocx img {
     width: 16px !important;
-    height:auto !important;
+    height: auto !important;
 }
 
 div.tl_header_tour_rapport {
     background-color: #f3f3f5;
-    display:block;
+    display: block;
     border-top: 1px solid grey;
     border-bottom: 1px solid grey;
 }
+
 div.tl_header_tour_rapport table td {
     padding: 10px;
 }
 
 /** tl_calendar_events Show subscription state **/
-.tl_listing_container .subscription-badge{
+.tl_listing_container .subscription-badge {
     background-color: darkgray;
     font-size: x-small;
     border-radius: 5px;
-    padding:3px 8px;
+    padding: 3px 8px;
     margin-left: 20px;
     cursor: pointer;
 }
-.tl_listing_container .subscription-badge.not-confirmed{
+
+.tl_listing_container .subscription-badge.not-confirmed {
     background-color: #cccccc;
 }
-.tl_listing_container .subscription-badge.accepted{
-    background-color:#91dc5a;
+
+.tl_listing_container .subscription-badge.accepted {
+    background-color: #91dc5a;
 }
-.tl_listing_container .subscription-badge.waitlisted{
+
+.tl_listing_container .subscription-badge.waitlisted {
     background-color: #006df0;
 }
-.tl_listing_container .subscription-badge.refused{
+
+.tl_listing_container .subscription-badge.refused {
     background-color: #d80027;
 }
+
+/** alerts **/
+.alert {
+    margin: 15px;
+    padding: 15px;
+}
+
+.alert.alert-danger {
+    background: red;
+    color: white;
+}
+
+.alert.alert-primary {
+    background: #cce5ff;
+    color: #000;
+}
+
+.alert.alert-success {
+    background: #d4edda;
+    color: #000;
+}
+
 

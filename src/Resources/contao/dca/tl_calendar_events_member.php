@@ -223,7 +223,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'default'       => 'subscription-not-confirmed',
             'reference'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
             'options'       => array('subscription-not-confirmed', 'subscription-accepted', 'subscription-refused', 'subscription-waitlisted'),
-            'eval'          => array('doNotShow' => false, 'readonly' => false, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
+            'eval'          => array('doNotShow' => false, 'readonly' => true, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
             'sql'           => "varchar(255) NOT NULL default ''",
         ),
         'carInfo'             => array

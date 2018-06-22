@@ -22,15 +22,28 @@ $onclickC = "Soll dieser Anwärter per E-Mail auf die Warteliste gesetzt werden?
 </div>
 
 <?php if($this->showEmailButtons): ?>
-<div class="tl_submit_container">
- <?php if($this->stateOfSubscription !== 'subscription-refused'): ?>
-    <button type="submit" name="refuseWithEmail" id="refuseWithEmail" onclick="if(!confirm('<?= $onclickA ?>'))return false;Backend.getScrollOffset()" class="tl_submit" >Ablehnen mit E-Mail</button>
+  <div class="tl_submit_container">
+
+   <?php if($this->stateOfSubscription !== 'subscription-refused'): ?>
+      <button type="submit" name="refuseWithEmail" id="refuseWithEmail" onclick="if(!confirm('<?= $onclickA ?>'))return false;Backend.getScrollOffset()" class="tl_submit" >Ablehnen mit E-Mail</button>
+  <?php endif; ?>
+
+  <?php if($this->stateOfSubscription !== 'subscription-accepted' && !Markocupic\SacEventToolBundle\CalendarSacEvents::eventIsFullyBooked($this->objEvent->id)): ?>
+      <button type="submit" name="acceptWithEmail" id="acceptWithEmail" onclick="if(!confirm('<?= $onclickB ?>'))return false;Backend.getScrollOffset()" class="tl_submit">Zusagen mit E-Mail</button>
+  <?php endif; ?>
+
+  <?php if($this->stateOfSubscription !== 'subscription-waitlisted'): ?>
+      <button type="submit" name="addToWaitlist" id="addToWaitlist" onclick="if(!confirm('<?= $onclickC ?>'))return false;Backend.getScrollOffset()" class="tl_submit">Auf Warteliste mit E-Mail</button>
+  <?php endif; ?>
+  </div>
+
+  <?php if(Markocupic\SacEventToolBundle\CalendarSacEvents::eventIsFullyBooked($this->objEvent->id) && $this->objEvent->stateOfSubscription !== 'subscription-accepted'): ?>
+      <div class="alert alert-danger">F&uuml;r diesen Anlass ist die maximale Teilnehmerzahl von <?= $this->objEvent->maxMembers ?> Personen erreicht! Es kann keine weitere Anmeldung angenommen werden.</div>
+  <?php endif; ?>
+
 <?php endif; ?>
-<?php if($this->stateOfSubscription !== 'subscription-accepted'): ?>
-    <button type="submit" name="acceptWithEmail" id="acceptWithEmail" onclick="if(!confirm('<?= $onclickB ?>'))return false;Backend.getScrollOffset()" class="tl_submit">Zusagen mit E-Mail</button>
-<?php endif; ?>
-<?php if($this->stateOfSubscription !== 'subscription-waitlisted'): ?>
-    <button type="submit" name="addToWaitlist" id="addToWaitlist" onclick="if(!confirm('<?= $onclickC ?>'))return false;Backend.getScrollOffset()" class="tl_submit">Auf Warteliste mit E-Mail</button>
-<?php endif; ?>
-</div>
+
+
+<?php if($this->objRegistration->hasParticipated): ?>
+  <div class="alert alert-primary">Dieser Teilnehmer/diese Teilnehmerin hat am Anlass teilgenommen.</div>
 <?php endif; ?>

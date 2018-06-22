@@ -616,19 +616,24 @@ class tl_calendar_events_member extends Backend
         if ($objRegistration !== null)
         {
             $objTemplate = new BackendTemplate('be_calendar_events_registration_dashboard');
+            $objTemplate->objRegistration = $objRegistration;
             $objTemplate->stateOfSubscription = $objRegistration->stateOfSubscription;
-
-            if (!$objRegistration->hasParticipated && $objRegistration->email != '')
+            $objEvent = \Contao\CalendarEventsModel::findByPk($objRegistration->eventId);
+            if ($objEvent !== null)
             {
-                if (\Contao\Validator::isEmail($objRegistration->email))
+                $objTemplate->objEvent = $objEvent;
+                if (!$objRegistration->hasParticipated && $objRegistration->email != '')
                 {
-                    $objTemplate->showEmailButtons = true;
+                    if (\Contao\Validator::isEmail($objRegistration->email))
+                    {
+                        $objTemplate->showEmailButtons = true;
+                    }
                 }
+
+                return $objTemplate->parse();
             }
-
-            return $objTemplate->parse();
         }
-
+        return '';
     }
 
 
