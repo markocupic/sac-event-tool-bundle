@@ -189,7 +189,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         }
         elseif (FE_USER_LOGGED_IN && true === CalendarSacEvents::areBookingDatesOccupied($this->objEvent->id, $this->objUser->id))
         {
-            Message::addInfo('Die Anmeldung zu diesem Event ist nicht m&ouml;glich, da die Event-Daten sich mit den Daten eines anderen Events &uuml;berschneiden, wo Ihre Teilnahme bereits best&auml;tigt ist.', TL_MODE);
+            Message::addInfo('Die Anmeldung zu diesem Event ist nicht m&ouml;glich, da die Event-Daten sich mit den Daten eines anderen Events &uuml;berschneiden, wo deine Teilnahme bereits best&auml;tigt ist.', TL_MODE);
         }
         elseif ($this->objInstructor === null)
         {
@@ -375,7 +375,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             {
                 if (true === CalendarSacEvents::areBookingDatesOccupied($this->objEvent->id, $objMember->id))
                 {
-                    $this->Template->bookingErrorMsg = 'Die Anmeldung zu diesem Event ist nicht m&ouml;glich, da die Event-Daten sich mit den Daten eines anderen Events &uuml;berschneiden, wo Ihre Teilnahme bereits best&auml;tigt ist.';
+                    $this->Template->bookingErrorMsg = 'Die Anmeldung zu diesem Event ist nicht m&ouml;glich, da die Event-Daten sich mit den Daten eines anderen Events &uuml;berschneiden, wo deine Teilnahme bereits best&auml;tigt ist.';
                     $hasError = true;
                 }
             }
