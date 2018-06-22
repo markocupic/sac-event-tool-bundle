@@ -1,6 +1,6 @@
 <?php $this->extend('block_searchable'); ?>
 <?php $this->block('content'); ?>
-
+  <hr>
   <div id="eventBookingForm" class="event-detail event-info-box">
 
       <?php if ($this->hasErrorMessage): ?>
@@ -57,28 +57,38 @@
                     <?php endif; ?>
                     <?php if ($this->objForm->hasFormField('carInfo')): ?>
                         <?= $this->objForm->getWidget('carInfo')->parse(); ?>
+                        {{br}}
                     <?php endif; ?>
                     <?php if ($this->objForm->hasFormField('ticketInfo')): ?>
                         <?= $this->objForm->getWidget('ticketInfo')->parse(); ?>
+                        {{br}}
                     <?php endif; ?>
+
                     <?php if ($this->objForm->hasFormField('mobile')): ?>
                         <?= $this->objForm->getWidget('mobile')->parse(); ?>
                       <div class="alert alert-success" role="alert">
                         Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leergelassen werden. Damit der Leiter dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine <strong>Mobilnummer</strong> zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.
                       </div>
+                      {{br}}
                     <?php endif; ?>
+
                     <?php if ($this->objForm->hasFormField('emergencyPhone')): ?>
                         <?= $this->objForm->getWidget('emergencyPhone')->parse(); ?>
                     <?php endif; ?>
                     <?php if ($this->objForm->hasFormField('emergencyPhoneName')): ?>
                         <?= $this->objForm->getWidget('emergencyPhoneName')->parse(); ?>
+                    {{br}}
                     <?php endif; ?>
+
                     <?php if ($this->objForm->hasFormField('notes')): ?>
                         <?= $this->objForm->getWidget('notes')->parse(); ?>
                     <?php endif; ?>
+                    <div class="alert alert-success" role="alert">
+                      Bitte beschreibe in wenigen Worten dein Leistungsniveau und/oder beantworte, die in den Anmeldebestimmungen verlangten Angaben. (z.B. bereits absolvierte Referenztouren oder Essgewohnheiten bei Events mit &Uuml;bernachtung, etc.)                    </div>
                     <?php if ($this->objForm->hasFormField('agb')): ?>
                         <?= $this->objForm->getWidget('agb')->parse(); ?>
                     <?php endif; ?>
+                    {{br}}
                     <?php if ($this->objForm->hasFormField('submit')): ?>
                         <?= $this->objForm->getWidget('submit')->parse(); ?>
                     <?php endif; ?>

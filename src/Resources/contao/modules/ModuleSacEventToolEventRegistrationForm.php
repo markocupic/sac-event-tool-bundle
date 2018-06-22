@@ -346,8 +346,8 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         }
 
 
-        $objWidget = $objForm->getWidget('notes');
-        $objWidget->addAttribute('placeholder', 'Bitte beschreibe in wenigen S&auml;tzen dein Leistungsniveau und/oder beantworte, die in den Anmeldebestimmungen verlangten Angaben. (z.B. bereits absolvierte Referenztouren oder Essgewohnheiten bei Events mit &Uuml;bernachtung, etc.)');
+        //$objWidget = $objForm->getWidget('notes');
+        //$objWidget->addAttribute('placeholder', 'Bitte beschreibe in wenigen S&auml;tzen dein Leistungsniveau und/oder beantworte, die in den Anmeldebestimmungen verlangten Angaben. (z.B. bereits absolvierte Referenztouren oder Essgewohnheiten bei Events mit &Uuml;bernachtung, etc.)');
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate())
