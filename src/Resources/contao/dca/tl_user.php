@@ -177,6 +177,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['sacMemberId'] = array(
 // sectionId
 $GLOBALS['TL_DCA']['tl_user']['fields']['sectionId'] = array(
     'filter'    => true,
+    'exclude'   => true,
     'sorting'   => true,
     'label'     => &$GLOBALS['TL_LANG']['tl_user']['sectionId'],
     'reference' => &$GLOBALS['TL_LANG']['tl_user']['section'],
