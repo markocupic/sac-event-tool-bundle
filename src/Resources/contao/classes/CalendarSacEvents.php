@@ -273,11 +273,12 @@ class CalendarSacEvents extends System
     /**
      * @param $id
      * @param string $dateFormat
-     * @param bool $appendEventDuration
+     * @param bool $blnAppendEventDuration
+     * @param bool $blnTooltip
      * @return string
      * @throws \Exception
      */
-    public static function getEventPeriod($id, $dateFormat = '', $appendEventDuration = true)
+    public static function getEventPeriod($id, $dateFormat = '', $blnAppendEventDuration = true, $blnTooltip = true)
     {
         if ($dateFormat == '')
         {
@@ -295,12 +296,12 @@ class CalendarSacEvents extends System
 
         if ($eventDuration == 1)
         {
-            return Date::parse($dateFormat, self::getStartDate($id)) . ($appendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '');
+            return Date::parse($dateFormat, self::getStartDate($id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '');
         }
         elseif ($span == $eventDuration)
         {
             // von bis
-            return Date::parse($dateFormatShortened, self::getStartDate($id)) . ' - ' . Date::parse($dateFormat, self::getEndDate($id)) . ($appendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '');
+            return Date::parse($dateFormatShortened, self::getStartDate($id)) . ' - ' . Date::parse($dateFormat, self::getEndDate($id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '');
         }
         else
         {
@@ -310,8 +311,20 @@ class CalendarSacEvents extends System
             {
                 $arrDates[] = Date::parse($dateFormat, $date);
             }
-
-            return Date::parse($dateFormat, self::getStartDate($id)) . ($appendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '') . '<br><a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Eventdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
+            if ($blnTooltip)
+            {
+                return Date::parse($dateFormat, self::getStartDate($id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '') . '<br><a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Eventdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
+            }
+            else
+            {
+                $dateString = '';
+                foreach (self::getEventTimestamps($id) as $tstamp)
+                {
+                    $dateString .= sprintf('<time datetime="%s">%s</time>', Date::parse('Y-m-d', $tstamp), Date::parse('D, d.m.Y', $tstamp));
+                }
+                $dateString .= $blnAppendEventDuration ? sprintf('<time>(%s)</time>', self::getEventDuration($id)) : '';
+                return $dateString;
+            }
         }
     }
 

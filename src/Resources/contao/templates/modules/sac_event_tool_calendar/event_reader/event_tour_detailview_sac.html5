@@ -25,11 +25,7 @@
       <div class="eventdate event-detail event-info-box icon-box-small">
         <h5>Datum/Dauer</h5>
         <p>
-            <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($this->id) ?>
-          <br>
-            <?php foreach (Markocupic\SacEventToolBundle\CalendarSacEvents::getEventTimestamps($this->id) as $tstamp): ?>
-              <time datetime="<?= \Date::parse('Y-m-d', $tstamp) ?>"><?= \Date::parse('D, d.m.Y', $tstamp) ?></time>
-            <?php endforeach; ?>
+          <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventPeriod($this->id, '', true, false) ?>
         </p>
       </div>
 
