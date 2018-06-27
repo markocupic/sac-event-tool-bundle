@@ -19,7 +19,7 @@ use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\EventReleaseLevelPolicyModel;
 use Contao\Input;
 use Contao\System;
-use Markocupic\SacEventToolBundle\CalendarSacEvents;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 class ParseBackendTemplate
 {
@@ -176,7 +176,7 @@ class ParseBackendTemplate
         }
 
         $objTemplate->allowEventPreviewButton = true;
-        $objTemplate->eventPreviewUrl = CalendarSacEvents::generateEventPreviewUrl($objEvent);
+        $objTemplate->eventPreviewUrl = CalendarEventsHelper::generateEventPreviewUrl($objEvent);
         if ($objTemplate->eventPreviewUrl !== '')
         {
             $objTemplate->allowEventPreviewButton = true;

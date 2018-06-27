@@ -197,7 +197,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events')->execute();
         while ($objEvent->next())
         {
-            $arrGuides = \Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+            $arrGuides = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
             if (count($arrGuides) > 0)
             {
                 $objEv = CalendarEventsModel::findByPk($objEvent->id);
@@ -524,7 +524,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     }
                     elseif ($field === 'dates')
                     {
-                        $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarSacEvents::getEventTimestamps($objEvent->id);
+                        $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent->id);
                         $arrDates = array_map(function ($tstamp) {
                             return \Contao\Date::parse(\Contao\Config::get('dateFormat'), $tstamp);
                         }, $arrTimestamps);
@@ -532,17 +532,17 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     }
                     elseif ($field === 'organizers')
                     {
-                        $arrOrganizers = \Markocupic\SacEventToolBundle\CalendarSacEvents::getEventOrganizersAsArray($objEvent->id);
+                        $arrOrganizers = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id);
                         $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
                     }
                     elseif ($field === 'instructors')
                     {
-                        $arrInstructors = \Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorNamesAsArray($objEvent->id);
+                        $arrInstructors = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id);
                         $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
                     }
                     elseif ($field === 'tourType')
                     {
-                        $arrTourTypes = \Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($objEvent->id, 'title');
+                        $arrTourTypes = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($objEvent->id, 'title');
                         $arrRow[] = html_entity_decode(implode(',', $arrTourTypes));
                     }
                     elseif ($field === 'eventReleaseLevel')

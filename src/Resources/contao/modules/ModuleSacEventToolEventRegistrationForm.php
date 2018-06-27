@@ -187,7 +187,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         {
             Message::addInfo('Die Anmeldefrist f&uuml;r diesen Event ist abgelaufen.', TL_MODE);
         }
-        elseif (FE_USER_LOGGED_IN && true === CalendarSacEvents::areBookingDatesOccupied($this->objEvent->id, $this->objUser->id))
+        elseif (FE_USER_LOGGED_IN && true === CalendarEventsHelper::areBookingDatesOccupied($this->objEvent->id, $this->objUser->id))
         {
             Message::addInfo('Die Anmeldung zu diesem Event ist nicht m&ouml;glich, da die Event-Daten sich mit den Daten eines anderen Events &uuml;berschneiden, wo deine Teilnahme bereits best&auml;tigt ist.', TL_MODE);
         }
@@ -237,7 +237,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             }
 
             // Check if event is already fully booked
-            if (CalendarSacEvents::eventIsFullyBooked($this->objEvent->id) === true)
+            if (CalendarEventsHelper::eventIsFullyBooked($this->objEvent->id) === true)
             {
                 $this->Template->bookingLimitReaches = true;
             }
@@ -373,7 +373,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             }
             if (!$hasError)
             {
-                if (true === CalendarSacEvents::areBookingDatesOccupied($this->objEvent->id, $objMember->id))
+                if (true === CalendarEventsHelper::areBookingDatesOccupied($this->objEvent->id, $objMember->id))
                 {
                     $this->Template->bookingErrorMsg = 'Die Anmeldung zu diesem Event ist nicht m&ouml;glich, da die Event-Daten sich mit den Daten eines anderen Events &uuml;berschneiden, wo deine Teilnahme bereits best&auml;tigt ist.';
                     $hasError = true;
@@ -479,7 +479,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
 
             // Check if event is already fully booked
             $eventFullyBooked = false;
-            if (CalendarSacEvents::eventIsFullyBooked($objEvent->id) === true)
+            if (CalendarEventsHelper::eventIsFullyBooked($objEvent->id) === true)
             {
                 $eventFullyBooked = true;
                 $objEventRegistration->stateOfSubscription = 'subscription-waitlisted';

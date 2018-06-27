@@ -30,10 +30,10 @@ use Haste\Util\Url;
 
 
 /**
- * Class CalendarSacEvents
+ * Class CalendarEventsHelper
  * @package Markocupic\SacEventToolBundle
  */
-class CalendarSacEvents extends System
+class CalendarEventsHelper extends System
 {
 
 

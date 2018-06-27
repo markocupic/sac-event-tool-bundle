@@ -160,7 +160,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                                 // Get event dates from event object
                                 $arrDates = array_map(function ($tstmp) {
                                     return Date::parse('m.d.Y', $tstmp);
-                                }, CalendarSacEvents::getEventTimestamps($objEvent->id));
+                                }, CalendarEventsHelper::getEventTimestamps($objEvent->id));
 
                                 // Course id
                                 $courseId = htmlspecialchars(html_entity_decode($objEvent->courseId));
@@ -445,7 +445,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                     if (CalendarEventsModel::findByPk($objEventStory->eventId) !== null)
                     {
                         // Overwrite date if event still exists in tl_calendar_events
-                        $arrEventStory['date'] = CalendarSacEvents::getEventPeriod($objEventStory->eventId, Config::get('dateFormat'), false);
+                        $arrEventStory['date'] = CalendarEventsHelper::getEventPeriod($objEventStory->eventId, Config::get('dateFormat'), false);
                         $arrEventStory['storyLink'] = Frontend::addToUrl('action=write_event_story&amp;eventId=' . $objEventStory->eventId);
                     }
                     $arrEventStories[] = $arrEventStory;
@@ -476,7 +476,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                     }
 
                     $this->Template->eventName = $objEvent->title;
-                    $this->Template->eventPeriod = CalendarSacEvents::getEventPeriod($objEvent->id);
+                    $this->Template->eventPeriod = CalendarEventsHelper::getEventPeriod($objEvent->id);
                     $this->Template->executionState = $objEvent->executionState;
                     $this->Template->eventSubstitutionText = $objEvent->eventSubstitutionText;
 

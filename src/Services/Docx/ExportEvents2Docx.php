@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Services\Docx;
 
 use Contao\Environment;
-use Markocupic\SacEventToolBundle\CalendarSacEvents;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 use Contao\Controller;
@@ -260,7 +260,7 @@ class ExportEvents2Docx
 
             if ($field == 'instructor')
             {
-                $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+                $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
                 $arrValue = array_map(function ($v) {
                     return UserModel::findByPk($v)->name;
                 }, $arrInstructors);
@@ -297,7 +297,7 @@ class ExportEvents2Docx
             if ($field == 'eventDates')
             {
 
-                $arr = CalendarSacEvents::getEventTimestamps(self::$arrDatarecord['id']);
+                $arr = CalendarEventsHelper::getEventTimestamps(self::$arrDatarecord['id']);
                 $arr = array_map(function ($tstamp) {
                     return Date::parse('d.m.Y', $tstamp);
                 }, $arr);

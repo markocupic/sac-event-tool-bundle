@@ -8,7 +8,7 @@ session_start();
     <div class="row">
       <div class="col-sm-3 col-xl-5 d-none d-sm-block">
         <a class="responsive" href="{{event_url::<?php echo $this->id; ?>}}">
-          {{picture::<?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventImagePath($this->id) ?>?size=20&alt=<?= $this->title ?>}}
+          {{picture::<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventImagePath($this->id) ?>?size=20&alt=<?= $this->title ?>}}
         </a>
       </div>
 
@@ -19,17 +19,17 @@ session_start();
           </a>
           <h5><?= \CourseMainTypeModel::findByPk($this->courseTypeLevel0)->name ?>: <?= \CourseSubTypeModel::findByPk($this->courseTypeLevel1)->name ?></h5>
         </div>
-        <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorNamesAsArray($this->id,true); ?>
+        <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id,true); ?>
         <div class="detail-item">
           <i class="fa fa-fw fa-user"></i>Leitung: <?= implode(', ', $arrInstructors) ?>
         </div>
         <div class="detail-item">
-          <i class="fa fa-fw fa-calendar-alt"></i><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventPeriod($this->id) ?>
+          <i class="fa fa-fw fa-calendar-alt"></i><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventPeriod($this->id) ?>
         </div>
         <div class="detail-item">
-            <?php $eventState = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($this->id); ?>
-            <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($this->id)]; ?>
-            <?php $bookingState = Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($this->id); ?>
+            <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id); ?>
+            <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id)]; ?>
+            <?php $bookingState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($this->id); ?>
             <?= $bookingState ?> <?= $eventStateLabel ?>
           <!--<i class="fa-fw event-state-icon <?= $eventState ?>" aria-label="<?= $eventStateLabel ?>" data-toggle="tooltip" data-placement="top" title="<?= $eventStateLabel ?>"></i><?= $eventStateLabel ?>-->
         </div>
@@ -44,17 +44,17 @@ session_start();
         <?= \Date::parse('d.m.Y', $this->startDate) ?>
     </td>
     <td>
-        <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventDuration($this->id) ?>
+        <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventDuration($this->id) ?>
     </td>
     <td>
-      <?php $eventState = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($this->id); ?>
-      <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarSacEvents::getEventState($this->id)]; ?>
+      <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id); ?>
+      <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id)]; ?>
       <i class="event-state-icon fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" data-toggle="tooltip" data-placement="top" title="<?= $eventStateLabel ?>"></i></td>
     <td>
       <a href="{{event_url::<?php echo $this->id; ?>}}">{{event_title::<?= $this->id ?>}}</a>
     </td>
-    <td><?= Markocupic\SacEventToolBundle\CalendarSacEvents::getBookingCounter($this->id) ?></td>
-    <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorNamesAsArray($this->id); ?>
+    <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($this->id) ?></td>
+    <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id); ?>
     <td><?= implode(', ', $arrInstructors) ?></td>
   </tr>
 <?php endif; ?>

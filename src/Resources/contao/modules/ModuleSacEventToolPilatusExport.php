@@ -221,12 +221,12 @@ class ModuleSacEventToolPilatusExport extends Module
                 'eventDates'  => $this->getEventPeriod($objTour->id, $this->dateFormat),
                 'weekday'     => $this->getEventPeriod($objTour->id, 'D'),
                 'title'       => $objTour->title,
-                'instructors' => implode(', ', CalendarSacEvents::getInstructorNamesAsArray($objTour->id)),
-                'organizers'  => implode(', ', CalendarSacEvents::getEventOrganizersAsArray($objTour->id)),
+                'instructors' => implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objTour->id)),
+                'organizers'  => implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objTour->id)),
                 'id'          => $objTour->id,
             );
             // tourType
-            $arrEventType = CalendarSacEvents::getTourTypesAsArray($objTour->id, 'shortcut', false);
+            $arrEventType = CalendarEventsHelper::getTourTypesAsArray($objTour->id, 'shortcut', false);
             if ($objTour->eventType === 'course')
             {
                 // KU = Kurs
@@ -262,25 +262,25 @@ class ModuleSacEventToolPilatusExport extends Module
         }
 
 
-        $eventDuration = count(CalendarSacEvents::getEventTimestamps($id));
-        $span = Calendar::calculateSpan(CalendarSacEvents::getStartDate($id), CalendarSacEvents::getEndDate($id)) + 1;
+        $eventDuration = count(CalendarEventsHelper::getEventTimestamps($id));
+        $span = Calendar::calculateSpan(CalendarEventsHelper::getStartDate($id), CalendarEventsHelper::getEndDate($id)) + 1;
 
         if ($eventDuration == 1)
         {
-            return Date::parse($dateFormat, CalendarSacEvents::getStartDate($id));
+            return Date::parse($dateFormat, CalendarEventsHelper::getStartDate($id));
         }
         if ($eventDuration == 2 && $span != $eventDuration)
         {
-            return Date::parse($dateFormatShortened, CalendarSacEvents::getStartDate($id)) . ' & ' . Date::parse($dateFormat, CalendarSacEvents::getEndDate($id));
+            return Date::parse($dateFormatShortened, CalendarEventsHelper::getStartDate($id)) . ' & ' . Date::parse($dateFormat, CalendarEventsHelper::getEndDate($id));
         }
         elseif ($span == $eventDuration)
         {
-            return Date::parse($dateFormatShortened, CalendarSacEvents::getStartDate($id)) . '-' . Date::parse($dateFormat, CalendarSacEvents::getEndDate($id));
+            return Date::parse($dateFormatShortened, CalendarEventsHelper::getStartDate($id)) . '-' . Date::parse($dateFormat, CalendarEventsHelper::getEndDate($id));
         }
         else
         {
             $arrDates = array();
-            $dates = CalendarSacEvents::getEventTimestamps($id);
+            $dates = CalendarEventsHelper::getEventTimestamps($id);
             foreach ($dates as $date)
             {
                 $arrDates[] = Date::parse($dateFormat, $date);
@@ -320,8 +320,8 @@ class ModuleSacEventToolPilatusExport extends Module
             $arrRow['week'] = Date::parse('W', $objEvent->startDate);
             $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);
             $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
-            $arrRow['instructors'] = implode(', ', CalendarSacEvents::getInstructorNamesAsArray($objEvent->id));
-            $arrRow['organizers'] = implode(', ', CalendarSacEvents::getEventOrganizersAsArray($objEvent->id));
+            $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id));
+            $arrRow['organizers'] = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id));
             $arrRow['meetingPoint'] = nl2br($objEvent->meetingPoint);
 
             $arrRow['id'] = $objEvent->id;
@@ -397,9 +397,9 @@ class ModuleSacEventToolPilatusExport extends Module
             $arrRow['week'] = Date::parse('W', $objEvent->startDate);
             $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);
             $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
-            $arrRow['instructors'] = implode(', ', CalendarSacEvents::getInstructorNamesAsArray($objEvent->id));
-            $arrRow['organizers'] = implode(', ', CalendarSacEvents::getEventOrganizersAsArray($objEvent->id));
-            $arrRow['tourProfile'] = implode('<br>', CalendarSacEvents::getTourProfileAsArray($objEvent->id));
+            $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id));
+            $arrRow['organizers'] = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id));
+            $arrRow['tourProfile'] = implode('<br>', CalendarEventsHelper::getTourProfileAsArray($objEvent->id));
             $arrRow['tourDetailText'] = nl2br($objEvent->tourDetailText);
             $arrRow['meetingPoint'] = nl2br($objEvent->meetingPoint);
             $arrRow['journey'] = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : '';
@@ -424,7 +424,7 @@ class ModuleSacEventToolPilatusExport extends Module
             $arrHeadline[] = $this->getEventPeriod($objEvent->id, 'D');
             $arrHeadline[] = $objEvent->title;
 
-            $strDifficulties = implode(', ', CalendarSacEvents::getTourTechDifficultiesAsArray($objEvent->id));
+            $strDifficulties = implode(', ', CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent->id));
             if ($strDifficulties != '')
             {
                 $arrHeadline[] = $strDifficulties;

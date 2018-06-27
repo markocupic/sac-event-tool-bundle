@@ -266,10 +266,10 @@ class ModuleSacEventToolJahresprogrammExport extends Module
             }
             while ($objEvent->next())
             {
-                $arrInstructors = array_merge($arrInstructors, CalendarSacEvents::getInstructorsAsArray($objEvent->id));
+                $arrInstructors = array_merge($arrInstructors, CalendarEventsHelper::getInstructorsAsArray($objEvent->id));
 
                 // tourType
-                $arrTourType = CalendarSacEvents::getTourTypesAsArray($objEvent->id, 'shortcut', false);
+                $arrTourType = CalendarEventsHelper::getTourTypesAsArray($objEvent->id, 'shortcut', false);
                 if ($objEvent->eventType === 'course')
                 {
                     // KU = Kurs
@@ -279,7 +279,7 @@ class ModuleSacEventToolJahresprogrammExport extends Module
                     'id'               => $objEvent->id,
                     'eventType'        => $objEvent->eventType,
                     'courseId'         => $objEvent->courseId,
-                    'organizers'       => implode(', ', CalendarSacEvents::getEventOrganizersAsArray($objEvent->id)),
+                    'organizers'       => implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id)),
                     'courseLevel'      => isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel]) ? $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel] : '',
                     'courseTypeLevel0' => (CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0) !== null) ? CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name : '',
                     'courseTypeLevel1' => (CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1) !== null) ? CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name : '',
@@ -287,9 +287,9 @@ class ModuleSacEventToolJahresprogrammExport extends Module
                     'date'             => $this->getEventPeriod($objEvent->id, 'd.m.'),
                     'month'            => Date::parse('F', $objEvent->startDate),
                     'durationInfo'     => $objEvent->durationInfo,
-                    'instructors'      => implode(', ', CalendarSacEvents::getInstructorNamesAsArray($objEvent->id)),
+                    'instructors'      => implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id)),
                     'tourType'         => implode(', ', $arrTourType),
-                    'difficulty'       => implode(',', CalendarSacEvents::getTourTechDifficultiesAsArray($objEvent->id)),
+                    'difficulty'       => implode(',', CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent->id)),
                 );
             }
             $this->events = $arrEvent;
@@ -355,25 +355,25 @@ class ModuleSacEventToolJahresprogrammExport extends Module
         }
 
 
-        $eventDuration = count(CalendarSacEvents::getEventTimestamps($id));
-        $span = Calendar::calculateSpan(CalendarSacEvents::getStartDate($id), CalendarSacEvents::getEndDate($id)) + 1;
+        $eventDuration = count(CalendarEventsHelper::getEventTimestamps($id));
+        $span = Calendar::calculateSpan(CalendarEventsHelper::getStartDate($id), CalendarEventsHelper::getEndDate($id)) + 1;
 
         if ($eventDuration == 1)
         {
-            return Date::parse($dateFormat, CalendarSacEvents::getStartDate($id));
+            return Date::parse($dateFormat, CalendarEventsHelper::getStartDate($id));
         }
         if ($eventDuration == 2 && $span != $eventDuration)
         {
-            return Date::parse($dateFormatShortened, CalendarSacEvents::getStartDate($id)) . ' & ' . Date::parse($dateFormat, CalendarSacEvents::getEndDate($id));
+            return Date::parse($dateFormatShortened, CalendarEventsHelper::getStartDate($id)) . ' & ' . Date::parse($dateFormat, CalendarEventsHelper::getEndDate($id));
         }
         elseif ($span == $eventDuration)
         {
-            return Date::parse($dateFormatShortened, CalendarSacEvents::getStartDate($id)) . '-' . Date::parse($dateFormat, CalendarSacEvents::getEndDate($id));
+            return Date::parse($dateFormatShortened, CalendarEventsHelper::getStartDate($id)) . '-' . Date::parse($dateFormat, CalendarEventsHelper::getEndDate($id));
         }
         else
         {
             $arrDates = array();
-            $dates = CalendarSacEvents::getEventTimestamps($id);
+            $dates = CalendarEventsHelper::getEventTimestamps($id);
             foreach ($dates as $date)
             {
                 $arrDates[] = Date::parse($dateFormat, $date);

@@ -181,7 +181,7 @@ class tl_calendar_events_member extends Backend
             $objEvent = \Contao\CalendarEventsModel::findByPk(Input::get('eventId'));
             if ($objEvent !== null)
             {
-                $arrGuideIDS = \Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+                $arrGuideIDS = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
                 foreach ($arrGuideIDS as $userId)
                 {
                     $objInstructor = \Contao\UserModel::findByPk($userId);

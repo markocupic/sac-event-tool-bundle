@@ -159,7 +159,7 @@ class EventRapport
         Controller::loadLanguageFile('tl_calendar_events');
 
         $countParticipants = $objEventMember->numRows;
-        $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
         $countInstructors = count($arrInstructors);
         $countParticipantsTotal = $countParticipants + $countInstructors;
 
@@ -229,7 +229,7 @@ class EventRapport
         // Event data
         $arrData[] = array('key' => 'eventTitle', 'value' => htmlspecialchars(html_entity_decode($objEvent->title)));
         Controller::loadLanguageFile('tl_calendar_events');
-        $arrEventTstamps = CalendarSacEvents::getEventTimestamps($objEvent->id);
+        $arrEventTstamps = CalendarEventsHelper::getEventTimestamps($objEvent->id);
 
         if ($objEvent->eventType === 'course')
         {
@@ -257,7 +257,7 @@ class EventRapport
         $strEventDuration = implode(', ', $arrEventDates);
 
         // Get tour profile
-        $arrTourProfile = CalendarSacEvents::getTourProfileAsArray($objEvent->id);
+        $arrTourProfile = CalendarEventsHelper::getTourProfileAsArray($objEvent->id);
         $strTourProfile = implode("\r\n", $arrTourProfile);
         $strTourProfile = str_replace('Tag: ', 'Tag:' . "\r\n", $strTourProfile);
 
@@ -274,7 +274,7 @@ class EventRapport
 
         $arrData[] = array('key' => 'eventDates', 'value' => htmlspecialchars(html_entity_decode($strEventDuration)));
         $arrData[] = array('key' => 'eventMeetingpoint', 'value' => htmlspecialchars(html_entity_decode($objEvent->meetingPoint)));
-        $arrData[] = array('key' => 'eventTechDifficulties', 'value' => htmlspecialchars(html_entity_decode(implode(', ', CalendarSacEvents::getTourTechDifficultiesAsArray($objEvent->id, false)))));
+        $arrData[] = array('key' => 'eventTechDifficulties', 'value' => htmlspecialchars(html_entity_decode(implode(', ', CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent->id, false)))));
         $arrData[] = array('key' => 'eventEquipment', 'value' => htmlspecialchars(html_entity_decode($objEvent->equipment)), 'options' => array('multiline' => true));
         $arrData[] = array('key' => 'eventTourProfile', 'value' => htmlspecialchars(html_entity_decode($strTourProfile)), 'options' => array('multiline' => true));
         $arrData[] = array('key' => 'emergencyConcept', 'value' => htmlspecialchars(html_entity_decode($strEmergencyConcept)), 'options' => array('multiline' => true));
@@ -297,7 +297,7 @@ class EventRapport
 
 
         // TL
-        $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
         if (!empty($arrInstructors) && is_array($arrInstructors))
         {
             foreach ($arrInstructors as $userId)
@@ -403,7 +403,7 @@ class EventRapport
         );
 
         // Event instructors
-        $aInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+        $aInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
 
         $arrInstructors = array_map(function ($id) {
             $objUser = \UserModel::findByPk($id);

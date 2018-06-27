@@ -22,7 +22,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Contao\Config;
-use Markocupic\SacEventToolBundle\CalendarSacEvents;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use TCPDF_FONTS;
 
 /**
@@ -306,12 +306,12 @@ class PrintWorkshopsAsPdf
         $objPartial->mountainguide = $objCalendar->mountainguide;
 
         // Instructors
-        $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objCalendar->id);
+        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objCalendar->id);
         $arrItems = array_map(function ($userId) {
             $objUser = UserModel::findByPk($userId);
             if ($objUser !== null)
             {
-                $strQuali = CalendarSacEvents::getMainQualifikation($userId) != '' ? ' (' . CalendarSacEvents::getMainQualifikation($userId) . ')' : '';
+                $strQuali = CalendarEventsHelper::getMainQualifikation($userId) != '' ? ' (' . CalendarEventsHelper::getMainQualifikation($userId) . ')' : '';
                 return $objUser->name . $strQuali;
             }
             return '';
@@ -357,7 +357,7 @@ class PrintWorkshopsAsPdf
     public function getDateString($eventId)
     {
 
-        $arr = CalendarSacEvents::getEventTimestamps($eventId);
+        $arr = CalendarEventsHelper::getEventTimestamps($eventId);
         if (count($arr) > 1)
         {
             $arrValue = array();

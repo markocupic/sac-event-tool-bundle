@@ -13,7 +13,7 @@
  */
 
 namespace Contao;
-use Markocupic\SacEventToolBundle\CalendarSacEvents;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
  * Class EventReleaseLevelPolicyModel
@@ -198,7 +198,7 @@ class EventReleaseLevelPolicyModel extends \Model
 
         $arrAllowedGroups = \StringUtil::deserialize($objReleaseLevelModel->groups, true);
 
-        $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
 
         // Check if user has permission
         if ($objBackendUser->admin)
@@ -311,7 +311,7 @@ class EventReleaseLevelPolicyModel extends \Model
 
         $arrAllowedGroups = \StringUtil::deserialize($objReleaseLevelModel->groups, true);
 
-        $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
 
         // Check if user has permission
         if ($objBackendUser->admin)
@@ -402,7 +402,7 @@ class EventReleaseLevelPolicyModel extends \Model
 
         $arrAllowedGroups = \StringUtil::deserialize($objReleaseLevelModel->groups, true);
 
-        $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
 
         // Check if user has permission
         if ($objBackendUser->admin)

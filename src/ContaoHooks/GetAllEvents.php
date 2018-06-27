@@ -15,7 +15,7 @@ use Contao\Date;
 use Contao\Input;
 use Contao\Module;
 use Contao\StringUtil;
-use Markocupic\SacEventToolBundle\CalendarSacEvents;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
  * Class GetAllEvents

@@ -25,14 +25,14 @@
       <div class="eventdate event-detail event-info-box icon-box-small">
         <h5>Datum/Dauer</h5>
         <p>
-          <?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventPeriod($this->id, '', true, false) ?>
+          <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventPeriod($this->id, '', true, false) ?>
         </p>
       </div>
 
         <?php if ($this->tourType != ''): ?>
           <div class="location event-detail event-info-box icon-box-small">
             <h5>Tourentyp</h5>
-            <p><?= implode('<br>', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTypesAsArray($this->id, 'title')) ?></p>
+            <p><?= implode('<br>', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($this->id, 'title')) ?></p>
           </div>
         <?php endif; ?>
 
@@ -43,7 +43,7 @@
           </div>
         <?php endif; ?>
 
-        <?php $organizers = Markocupic\SacEventToolBundle\CalendarSacEvents::getEventOrganizersAsArray($this->id); ?>
+        <?php $organizers = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($this->id); ?>
 
       <div class="organizers event-detail event-info-box icon-box-small">
         <h5>Organisierende Gruppe</h5>
@@ -77,9 +77,9 @@
                 <p class="requirements-text"><?= nl2br($this->requirements) ?></p>
               <?php endif; ?>
 
-            <p class="tech-difficulty"><strong>Schwierigkeit: </strong><?= implode(', ', Markocupic\SacEventToolBundle\CalendarSacEvents::getTourTechDifficultiesAsArray($this->id)) ?></p>
+            <p class="tech-difficulty"><strong>Schwierigkeit: </strong><?= implode(', ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($this->id)) ?></p>
 
-              <?php $arrTourProfile = Markocupic\SacEventToolBundle\CalendarSacEvents::getTourProfileAsArray($this->id); ?>
+              <?php $arrTourProfile = Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourProfileAsArray($this->id); ?>
               <?php if (count($arrTourProfile) > 1): ?>
             <p class="tour-profile"><strong>Profil:</strong><br> <?= implode('<br>', $arrTourProfile) ?><p>
                   <?php endif; ?>
@@ -122,7 +122,7 @@
     <div class="col-lg-6">
       <div class="grey-box-right p-4 mb-4" style="background-color: #eee;">
 
-          <?php $arrInstructors = \Markocupic\SacEventToolBundle\CalendarSacEvents::getInstructorsAsArray($this->id) ?>
+          <?php $arrInstructors = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorsAsArray($this->id) ?>
 
         <div class="instructor event-detail event-info-box icon-box-small">
           <h5 class="mt-0">Leitung</h5>
@@ -141,7 +141,7 @@
                             </a>
                           </div>
                           <div class="instructor-name">
-                              <?php $strQuali = Markocupic\SacEventToolBundle\CalendarSacEvents::getMainQualifikation($userId) != '' ? ' (' . Markocupic\SacEventToolBundle\CalendarSacEvents::getMainQualifikation($userId) . ')' : ''; ?>
+                              <?php $strQuali = Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($userId) != '' ? ' (' . Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($userId) . ')' : ''; ?>
                             <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
                                 <?= \UserModel::findByPk($userId)->name . $strQuali ?>
                             </a>
@@ -223,7 +223,7 @@
         <?php $arrData['fullsize'] = true; ?>
 
         <?php $arrData['galleryTpl'] = 'gallery_bootstrap_col-4'; ?>
-        <?php echo Markocupic\SacEventToolBundle\CalendarSacEvents::getGallery($arrData); ?>
+        <?php echo Markocupic\SacEventToolBundle\CalendarEventsHelper::getGallery($arrData); ?>
     <?php endif; ?>
 
 

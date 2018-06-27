@@ -5,13 +5,13 @@
     <div class="slider-item-inner">
 
         <div class="slider-image-container">
-            {{picture::<?= Markocupic\SacEventToolBundle\CalendarSacEvents::getEventImagePath($this->id) ?>?size=20&alt=<?= $this->title ?>}}
+            {{picture::<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventImagePath($this->id) ?>?size=20&alt=<?= $this->title ?>}}
         </div>
     </div>
     <div class="slider-image-overlay"></div>
 
     <div class="info-text">
-        <h6 class="ce_headline event-date-span"><?=  Markocupic\SacEventToolBundle\CalendarSacEvents::getEventPeriod($this->id) ?></h6>
+        <h6 class="ce_headline event-date-span"><?=  Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventPeriod($this->id) ?></h6>
         <h4 class="ce_headline"><?= $this->title ?></h4>
         {{br}}
         <div class="button-container">

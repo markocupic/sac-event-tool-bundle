@@ -72,7 +72,7 @@ class ExportEvents2Typo3
             {
                 $output .= "<p>";
                 $output .= "<b>Kursdaten</b><br>";
-                foreach (CalendarSacEvents::getEventTimestamps($objEvent->id) as $tstamp)
+                foreach (CalendarEventsHelper::getEventTimestamps($objEvent->id) as $tstamp)
                 {
                     $output .= Date::parse('D, d.m.Y', $tstamp) . "<br>";
                 }
@@ -95,11 +95,11 @@ class ExportEvents2Typo3
                 $output .= "</p>";
             }
 
-            $arrInstructors = CalendarSacEvents::getInstructorsAsArray($objEvent->id);
+            $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
             if (count($arrInstructors) > 0)
             {
                 $arrName = array_map(function ($id) {
-                    $strQuali = CalendarSacEvents::getMainQualifikation($id) != '' ? ' (' . CalendarSacEvents::getMainQualifikation($id) . ')' : '';
+                    $strQuali = CalendarEventsHelper::getMainQualifikation($id) != '' ? ' (' . CalendarEventsHelper::getMainQualifikation($id) . ')' : '';
                     return UserModel::findByPk($id)->name . $strQuali;
                 }, $arrInstructors);
 
