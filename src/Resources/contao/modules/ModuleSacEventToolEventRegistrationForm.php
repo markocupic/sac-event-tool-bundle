@@ -306,7 +306,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             'eval'      => array('mandatory' => true, 'rgxp' => 'phone'),
         ));
         $objForm->addFormField('emergencyPhoneName', array(
-            'label'     => 'Name der angeh&ouml;rigen Person, welche im Notfall zu kontaktieren ist',
+            'label'     => 'Name und Bezug der angeh&ouml;rigen Person, welche im Notfall zu kontaktieren ist',
             'inputType' => 'text',
             'default'   => $this->User->emergencyPhoneName,
             'eval'      => array('mandatory' => true),

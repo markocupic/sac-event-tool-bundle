@@ -694,7 +694,7 @@ class ModuleSacEventToolMemberDashboard extends Module
             'eval'      => array('rgxp' => 'phone', 'mandatory' => true),
         ));
         $objForm->addFormField('emergencyPhoneName', array(
-            'label'     => 'Name des Angeh&ouml;rigen',
+            'label'     => 'Name und Bezug des Angeh&ouml;rigen',
             'inputType' => 'text',
             'eval'      => array('mandatory' => true),
         ));
