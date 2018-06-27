@@ -6,7 +6,7 @@
   <td>
       <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventPeriod($this->id, 'd.m.Y', false) ?>
   </td>
-  <td>
+  <td class="d-none d-md-table-cell">
       <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventDuration($this->id) ?>
   </td>
   <td>
@@ -16,9 +16,9 @@
     <?php if ($this->eventType === 'lastMinuteTour'): ?><span class="last-minute-tour small"><i class="fa fa-clock"></i> LAST MINUTE TOUR</span><br><?php endif; ?>
     <a href="{{event_url::<?php echo $this->id; ?>}}">{{event_title::<?= $this->id ?>}}</a>
   </td>
-  <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($this->id) ?></td>
-  <td class="tourTechDifficulty"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($this->id, true)) ?></td>
-  <td class="tourType"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($this->id, 'shortcut', true)) ?></td>
+  <td class="d-none d-md-table-cell"><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($this->id) ?></td>
+  <td class="tourTechDifficulty d-none d-md-table-cell"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($this->id, true)) ?></td>
+  <td class="tourType d-none d-md-table-cell"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($this->id, 'shortcut', true)) ?></td>
     <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id); ?>
   <td><?= implode(', ', $arrInstructors) ?></td>
 </tr>

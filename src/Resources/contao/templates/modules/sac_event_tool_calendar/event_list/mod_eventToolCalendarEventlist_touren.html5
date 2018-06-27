@@ -25,12 +25,12 @@
 <table class="table layout-table table-responsive">
   <tr>
     <th>Datum</th>
-    <th>Dauer</th>
+    <th class="d-none d-md-table-cell">Dauer</th>
     <th></th>
     <th>Tour</th>
-    <th>Anz.</th>
-    <th>Anf.</th>
-    <th>Art</th>
+    <th class="d-none d-md-table-cell">Anz.</th>
+    <th class="d-none d-md-table-cell">Anf.</th>
+    <th class="d-none d-md-table-cell">Art</th>
     <th>Leitung</th>
   </tr>
     <?= $this->events ?>
