@@ -167,6 +167,6 @@ class tl_calendar_events_instructor_invoice extends Backend
      */
     public function listInvoices($row)
     {
-        return '<div class="tl_content_left"><span class="level">Spesenformular von: ' . UserModel::findByPk($row['userPid'])->name . '</span> <span>[' . CalendarEventsModel::findByPk($row['pid'])->title . ']</span></div>';
+        return '<div class="tl_content_left"><span class="level">Verg&uuml;tungsformular (mit Tour Rapport) von: ' . UserModel::findByPk($row['userPid'])->name . '</span> <span>[' . CalendarEventsModel::findByPk($row['pid'])->title . ']</span></div>';
     }
 }

@@ -202,9 +202,9 @@ class EventRapport
             }
         }
 
-        $arrData[] = array('key' => 'carTaxes', 'value' => htmlspecialchars(html_entity_decode(round($carTaxes))));
+        $arrData[] = array('key' => 'carTaxes', 'value' => htmlspecialchars(html_entity_decode(round($carTaxes,2))));
         $totalCosts = $objEventInvoice->sleepingTaxes + $objEventInvoice->miscTaxes + $objEventInvoice->railwTaxes + $objEventInvoice->cabelCarTaxes + $objEventInvoice->roadTaxes + $objEventInvoice->phoneTaxes + $carTaxes;
-        $arrData[] = array('key' => 'totalCosts', 'value' => htmlspecialchars(html_entity_decode(round($totalCosts))));
+        $arrData[] = array('key' => 'totalCosts', 'value' => htmlspecialchars(html_entity_decode(round($totalCosts, 2))));
 
         // Notice
         $notice = $objEventInvoice->notice == '' ? '---' : $objEventInvoice->notice;
