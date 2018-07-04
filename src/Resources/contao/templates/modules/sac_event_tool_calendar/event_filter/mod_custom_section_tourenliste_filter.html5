@@ -40,7 +40,7 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.min
           <div id="eventYear" class="col-6">
             <label for="ctrl_eventYear">Jahr</label>
             <select class="form-control filter-select" name="year" id="ctrl_eventYear">
-              <option value="0"<?= !\Input::get('year') ? ' selected' : '' ?>>alle zuk&uuml;nftigen Touren und Anl&auml; zeigen</option>
+              <option value="0"<?= !\Input::get('year') ? ' selected' : '' ?>>alle zuk&uuml;nftigen Touren und Anl&auml;sse zeigen</option>
                 <?php for ($i = intval(\Date::parse('Y')) + 1; $i > 2015; $i--): ?>
                     <?php if (\Input::get('year') != '')
                     {
