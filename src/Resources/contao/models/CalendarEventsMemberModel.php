@@ -64,7 +64,7 @@ class CalendarEventsMemberModel extends \Model
             return $arrEvents;
         }
 
-        $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE endDate>? ORDER BY startDate')->execute(time());
+        $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE endDate>? AND published=? ORDER BY startDate')->execute(time(), '1');
         while ($objEvents->next())
         {
             $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id);
@@ -86,6 +86,7 @@ class CalendarEventsMemberModel extends \Model
 
         return $arrEvents;
     }
+
 
 
     /**
