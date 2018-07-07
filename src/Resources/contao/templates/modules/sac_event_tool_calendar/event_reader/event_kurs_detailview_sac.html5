@@ -59,9 +59,12 @@
           <a href="?printSACWorkshops=true&amp;eventId=<?= $this->id ?>" title="Details drucken" class="btn btn-block btn-outline-primary"><i class="fal fa-print"></i> Detailinfos drucken</a>
         </div>
 
+        <?php if(!$this->disableOnlineRegistration): ?>
         <div class="event-detail-buttons mt-3">
-          <a href="{{event_url::<?= $this->id ?>}}#eventBookingForm" title="Kurs buchen" class="btn btn-block btn-lg  btn-primary"><i class="fal fa-shopping-cart"></i> Zur Anmeldung</a>
+          <a href="{{event_url::<?= $this->id ?>}}#eventBookingForm" title="Kurs buchen" class="btn btn-block btn-lg  btn-primary"><i class="fal fa-shopping-cart"></i> Zur Kursanmeldung</a>
         </div>
+        <?php endif; ?>
+
       </div>
 
     </div><!--end col right-->
@@ -106,14 +109,14 @@
     </div>
 
 
-    <div class="col-md-6"><!--start col right-->
-      <div class="">
+    <div class="col-md-6" ><!--start col right-->
+      <div class="grey-box-right p-4 mb-4" style="background-color:#eee">
         <div class="instructor event-detail event-info-box icon-box-small">
           <h5>Kursleitung</h5>
           <div class="row tiny-gutter">
               <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorsAsArray($this->id); ?>
               <?php foreach ($arrInstructors as $userId): ?>
-                <div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-3">
+                <div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4">
                   <div class="">
                       <?php if (\UserModel::findByPk($userId) !== null): ?>
                         <div class="image_container portrait">

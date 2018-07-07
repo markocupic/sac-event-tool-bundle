@@ -39,7 +39,7 @@ window.addEvent('domready', function () {
                             acceptAutocomplete.appendHTML(' <button id="btnAcceptAutocomplete" class="tl_submit autocomleteBtn">&Uuml;bernehmen</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id="btnRefuseAutocomplete" class="tl_submit autocomleteBtn">Nein</button>');
                             // Autofill form inputs
                             $('btnAcceptAutocomplete').addEvent('click', function (event) {
-                                var fields = ['gender', 'firstname', 'lastname', 'street', 'postal', 'city', 'phone', 'email', 'dateOfBirth', 'vegetarian', 'emergencyPhone', 'emergencyPhoneName'];
+                                var fields = ['gender', 'firstname', 'lastname', 'street', 'postal', 'city', 'phone', 'email', 'dateOfBirth', 'foodHabits', 'emergencyPhone', 'emergencyPhoneName'];
                                 fields.each(function (field) {
                                     if ($('ctrl_' + field)) {
                                         if (json[field] !== null) {

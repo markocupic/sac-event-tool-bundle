@@ -225,15 +225,14 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhoneName'] = array(
     'sql'       => "varchar(64) NOT NULL default ''",
 );
 
-// vegetarian
-$GLOBALS['TL_DCA']['tl_member']['fields']['vegetarian'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_member']['vegetarian'],
+// foodHabits
+$GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_member']['foodHabits'],
     'exclude'   => true,
     'search'    => true,
-    'inputType' => 'select',
-    'options'   => array('false' => 'Nein', 'true' => 'Ja'),
-    'eval'      => array('tl_class' => 'w50'),
-    'sql'       => "varchar(32) NOT NULL default ''",
+    'inputType' => 'text',
+    'eval'      => array('tl_class' => 'clr'),
+    'sql'       => "varchar(1024) NOT NULL default ''",
 );
 
 

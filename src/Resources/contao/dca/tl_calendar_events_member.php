@@ -62,7 +62,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         ),
         'label'             => array
         (
-            'fields'         => array('stateOfSubscription', 'firstname', 'lastname', 'street', 'city', 'vegetarian'),
+            'fields'         => array('stateOfSubscription', 'firstname', 'lastname', 'street', 'city'),
             'showColumns'    => true,
             'label_callback' => array('tl_calendar_events_member', 'addIcon'),
         ),
@@ -165,7 +165,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
     'palettes'    => array
     (
         '__selector__'    => array('addEmailAttachment'),
-        'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn;{notes_legend},carInfo,ticketInfo,notes;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,vegetarian;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;',
+        'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn;{notes_legend},carInfo,ticketInfo,notes;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,foodHabits;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;',
         'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy;',
         'refuseWithEmail' => 'refuseWithEmail;',
         'acceptWithEmail' => 'acceptWithEmail;',
@@ -385,14 +385,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'eval'      => array('doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'vegetarian'          => array
+        'foodHabits'          => array
         (
-            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['vegetarian'],
-            'inputType' => 'select',
-            'sorting'   => true,
-            'options'   => array('false' => 'Nein', 'true' => 'Ja'),
-            'eval'      => array('doNotShow' => false, 'doNotCopy' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
-            'sql'       => "varchar(32) NOT NULL default ''",
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['foodHabits'],
+            'exclude'   => true,
+            'search'    => true,
+            'inputType' => 'text',
+            'eval'      => array('tl_class' => 'clr'),
+            'sql'       => "varchar(1024) NOT NULL default ''",
         ),
         // Send E-mail
         'emailRecipients'     => array

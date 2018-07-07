@@ -31,7 +31,7 @@
 
         <?php if ($this->tourType != ''): ?>
           <div class="location event-detail event-info-box icon-box-small">
-            <h5>Tourentyp</h5>
+            <h5>Event-Art</h5>
             <p><?= implode('<br>', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($this->id, 'title')) ?></p>
           </div>
         <?php endif; ?>
@@ -130,7 +130,7 @@
           <?php if (!empty($arrInstructors)): ?>
             <div class="row mt-3 tiny-gutter">
                 <?php foreach ($arrInstructors as $userId): ?>
-                  <div class="col-12 col-sm-6 col-md-6 col-xl-6">
+                  <div class="col-12 col-sm-6 col-md-6 col-xl-4">
                     <div class="">
                         <?php if (\UserModel::findByPk($userId) !== null): ?>
                           <div class="image_container portrait">
@@ -183,10 +183,11 @@
           <a href="/ical?eventId=<?= $this->id ?>" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary"><i class="fal fa-calendar-plus"></i> iCal download</a>
         </div>
 
-
+        <?php if(!$this->disableOnlineRegistration): ?>
         <div class="event-detail-buttons mt-3">
           <a href="{{event_url::<?= $this->id ?>}}#eventBookingForm" title="Tour buchen" class="btn btn-block btn-lg  btn-primary"><i class="fal fa-shopping-cart"></i> Zur Anmeldung</a>
         </div>
+        <?php endif; ?>
 
       </div>
     </div>

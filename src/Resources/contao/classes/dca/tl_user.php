@@ -57,9 +57,9 @@ class tl_user_sac_event_tool extends Backend
                                 $GLOBALS['TL_DCA']['tl_user']['fields']['firstname']['eval']['readonly'] = true;
                                 $GLOBALS['TL_DCA']['tl_user']['fields']['lastname']['eval']['readonly'] = true;
                                 $GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['readonly'] = false;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['phone']['eval']['readonly'] = false;
-                                //$GLOBALS['TL_DCA']['tl_user']['fields']['mobile']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['phone']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['mobile']['eval']['readonly'] = true;
                                 $GLOBALS['TL_DCA']['tl_user']['fields']['street']['eval']['readonly'] = true;
                                 $GLOBALS['TL_DCA']['tl_user']['fields']['postal']['eval']['readonly'] = true;
                                 $GLOBALS['TL_DCA']['tl_user']['fields']['city']['eval']['readonly'] = true;

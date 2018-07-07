@@ -24,17 +24,7 @@
         <h2 class="ce_headline">Anmeldeformular</h2>
 
         <div class="row">
-          <div class="col-md-6">
-            <div>
-              <span class="font-weight-bold">{{user::firstname}} {{user::lastname}}{{br}}</span>
-              {{user::street}}{{br}}
-              {{user::postal}} {{user::city}}{{br}}
-              {{user::email}}{{br}}
-              {{user::phone}}{{br}}
-              SAC-Mitglieder-Nr. {{user::sacMemberId}}{{br}}
-            </div>
-          </div>
-          <div class="col-md-6">
+          <div class="col-md-8">
               <?php if ($this->bookingLimitReaches): ?>
                 <div class="alert alert-info" role="alert">
                   Die maximale Teilnehmerzahl für diesen Event ist bereits erreicht. Wenn du dich trotzdem anmeldest, gelangst du auf die Warteliste und kannst bei Absagen evtl. nachr&uuml;cken. Du kannst selbstverst&auml;ndlich auch mit dem Leiter Kontakt aufnehmen, um Genaueres zu erfahren.
@@ -81,10 +71,16 @@
                     <?php endif; ?>
 
                     <?php if ($this->objForm->hasFormField('notes')): ?>
-                        <?= $this->objForm->getWidget('notes')->parse(); ?>
+                      <?= $this->objForm->getWidget('notes')->parse(); ?>
+                      <div class="alert alert-success" role="alert">Bitte beschreibe in wenigen Worten dein Leistungsniveau und/oder beantworte, die in den Anmeldebestimmungen verlangten Angaben. (z.B. bereits absolvierte Referenztouren oder Essgewohnheiten bei Events mit &Uuml;bernachtung, etc.)</div>
+                      {{br}}
                     <?php endif; ?>
-                    <div class="alert alert-success" role="alert">
-                      Bitte beschreibe in wenigen Worten dein Leistungsniveau und/oder beantworte, die in den Anmeldebestimmungen verlangten Angaben. (z.B. bereits absolvierte Referenztouren oder Essgewohnheiten bei Events mit &Uuml;bernachtung, etc.)                    </div>
+
+                    <?php if ($this->objForm->hasFormField('foodHabits')): ?>
+                        <?= $this->objForm->getWidget('foodHabits')->parse(); ?>
+                      {{br}}
+                    <?php endif; ?>
+
                     <?php if ($this->objForm->hasFormField('agb')): ?>
                         <?= $this->objForm->getWidget('agb')->parse(); ?>
                     <?php endif; ?>
@@ -96,6 +92,18 @@
               </form>
             </div>
           </div>
+          <!--
+          <div class="col-md-6">
+            <div>
+              <span class="font-weight-bold">{{user::firstname}} {{user::lastname}}{{br}}</span>
+              {{user::street}}{{br}}
+              {{user::postal}} {{user::city}}{{br}}
+              {{user::email}}{{br}}
+              {{user::phone}}{{br}}
+              SAC-Mitglieder-Nr. {{user::sacMemberId}}{{br}}
+            </div>
+          </div>
+          -->
         </div>
       <?php endif; ?>
 

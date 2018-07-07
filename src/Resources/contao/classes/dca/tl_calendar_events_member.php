@@ -350,7 +350,7 @@ class tl_calendar_events_member extends Backend
                     'email'          => $objMemberModel->email,
                     'postal'         => $objMemberModel->postal,
                     'city'           => $objMemberModel->city,
-                    'phone'          => $objMemberModel->phone,
+                    'mobile'          => $objMemberModel->mobile,
                 );
                 $objEventMember = $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($objDb->id);
             }

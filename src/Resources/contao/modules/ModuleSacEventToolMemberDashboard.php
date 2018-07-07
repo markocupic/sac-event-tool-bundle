@@ -682,12 +682,6 @@ class ModuleSacEventToolMemberDashboard extends Module
         $objForm->setFormActionFromUri(Environment::get('uri'));
 
         // Now let's add form fields:
-        $objForm->addFormField('vegetarian', array(
-            'label'     => 'Vegetarier',
-            'inputType' => 'select',
-            'options'   => array('false' => 'Nein', 'true' => 'Ja'),
-            'eval'      => array('mandatory' => true),
-        ));
         $objForm->addFormField('emergencyPhone', array(
             'label'     => 'Notfallnummer',
             'inputType' => 'text',
@@ -698,6 +692,11 @@ class ModuleSacEventToolMemberDashboard extends Module
             'inputType' => 'text',
             'eval'      => array('mandatory' => true),
         ));
+        $objForm->addFormField('foodHabits', array(
+            'label'     => 'Essgewohngeiten (Vegetarier, Laktoseintoleranz, etc.)',
+            'inputType' => 'text',
+            'eval'      => array('mandatory' => false),
+        ));
 
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
@@ -706,7 +705,7 @@ class ModuleSacEventToolMemberDashboard extends Module
         ));
 
         // Get form presets from tl_member
-        $arrFields = array('emergencyPhone', 'emergencyPhoneName', 'vegetarian');
+        $arrFields = array('emergencyPhone', 'emergencyPhoneName', 'foodHabits');
         foreach ($arrFields as $field)
         {
             $objWidget = $objForm->getWidget($field);

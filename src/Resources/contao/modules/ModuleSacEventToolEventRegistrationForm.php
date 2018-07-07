@@ -296,19 +296,16 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         $objForm->addFormField('mobile', array(
             'label'     => 'Mobilnummer',
             'inputType' => 'text',
-            'default'   => $this->User->mobile,
             'eval'      => array('mandatory' => false, 'rgxp' => 'phone'),
         ));
         $objForm->addFormField('emergencyPhone', array(
             'label'     => 'Notfalltelefonnummer/In Notf&auml;llen zu kontaktieren',
             'inputType' => 'text',
-            'default'   => $this->User->emergencyPhone,
             'eval'      => array('mandatory' => true, 'rgxp' => 'phone'),
         ));
         $objForm->addFormField('emergencyPhoneName', array(
             'label'     => 'Name und Bezug der angeh&ouml;rigen Person, welche im Notfall zu kontaktieren ist',
             'inputType' => 'text',
-            'default'   => $this->User->emergencyPhoneName,
             'eval'      => array('mandatory' => true),
         ));
         $objForm->addFormField('notes', array(
@@ -317,6 +314,20 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             'eval'      => array('mandatory' => true, 'rows' => 4),
             'class'     => '',
         ));
+
+        // Only show this field if it is a multi day event
+        $durationInDays = count(CalendarEventsHelper::getEventTimestamps($objEvent->id));
+        $startDate = CalendarEventsHelper::getStartDate($objEvent->id);
+        $endDate = CalendarEventsHelper::getEndDate($objEvent->id);
+        if ($durationInDays > 1 && $startDate + ($durationInDays - 1) * 86400 === $endDate)
+        {
+            $objForm->addFormField('foodHabits', array(
+                'label'     => 'Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)',
+                'inputType' => 'text',
+                'eval'      => array('mandatory' => false),
+            ));
+        }
+
         $objForm->addFormField('agb', array(
             'label'     => array('', 'Ich akzeptiere die <a href="#" data-toggle="modal" data-target="#agbModal">allg. Gesch&auml;ftsbedingungen.</a>'),
             'inputType' => 'checkbox',
@@ -334,7 +345,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         $objForm->addContaoHiddenFields();
 
         // Get form presets from tl_member
-        $arrFields = array('mobile', 'emergencyPhone', 'emergencyPhoneName');
+        $arrFields = array('mobile', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits');
         foreach ($arrFields as $field)
         {
             $objWidget = $objForm->getWidget($field);
@@ -504,7 +515,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                 'participant_sac_member_id'        => $objMember->sacMemberId,
                 'participant_mobile'               => $arrData['mobile'],
                 'participant_date_of_birth'        => $arrData['dateOfBirth'] > 0 ? Date::parse('d.m.Y', $arrData['dateOfBirth']) : '---',
-                'participant_vegetarian'           => $arrData['vegetarian'] == 'true' ? 'Ja' : 'Nein',
+                'participant_food_habits'          => $arrData['foodHabits'],
                 'participant_notes'                => html_entity_decode($arrData['notes']),
                 'event_link_detail'                => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($this->objEvent),
                 'event_state'                      => $eventFullyBooked === true ? 'fully-booked' : '',

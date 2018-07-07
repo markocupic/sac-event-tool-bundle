@@ -796,11 +796,6 @@ class CalendarEventsHelper extends System
                 }
             }
 
-            if ($field === 'vegetarian')
-            {
-                $value = $value == 'true' ? 'Ja' : 'Nein';
-            }
-
             if ($field === 'stateOfSubscription')
             {
                 Controller::loadLanguageFile('tl_calendar_events_member');
