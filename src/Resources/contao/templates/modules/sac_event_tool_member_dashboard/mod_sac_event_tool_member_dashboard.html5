@@ -20,12 +20,12 @@
 
   <div class="row">
     <div class="col-12 col-md-4 col-xl-3">
-      <nav class="nav nav-tabs" id="dashboardTab" role="tablist">
-        <a class="list-group-item list-group-item-action active" id="nav-profile-tab" data-toggle="tab" href="#nav-next-events" role="tab" aria-controls="nav-profile" aria-selected="true"><i class="fal fa-fw fa-cart-arrow-down"></i> Buchungen</a>
-        <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-past-workshops" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-thumbs-up"></i> Absolvierte Kurse</a>
-        <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-past-tours" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-star"></i> Absolvierte Touren</a>
+      <nav class="nav nav-tabs session-tabs" data-sessiontabs="dashboardTab" id="dashboardTab" role="tablist">
+        <a class="list-group-item list-group-item-action active" id="nav-my-bookings-tab" data-toggle="tab" href="#nav-my-bookings" role="tab" aria-controls="nav-profile" aria-selected="true"><i class="fal fa-fw fa-cart-arrow-down"></i> Buchungen</a>
+        <a class="list-group-item list-group-item-action" id="nav-past-workshops-tab" data-toggle="tab" href="#nav-past-workshops" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-thumbs-up"></i> Absolvierte Kurse</a>
+        <a class="list-group-item list-group-item-action" id="nav-past-tours-tab" data-toggle="tab" href="#nav-past-tours" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-star"></i> Absolvierte Touren</a>
         <a class="list-group-item list-group-item-action" id="nav-my-blogs-tab" data-toggle="tab" href="#nav-my-blogs" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-pencil"></i> Meine Tourenberichte</a>
-        <a class="list-group-item list-group-item-action" id="nav-home-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-home" aria-selected="false"><i class="fal fa-fw fa-cog"></i> Profil</a>
+        <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-cog"></i> Profil</a>
       </nav>
       {{br}}{{br}}
     </div>
@@ -36,9 +36,8 @@
       <div class="tab-content" id="nav-tabContent">
 
 
-
         <!-- tab-pane-1 -->
-        <div class="tab-pane fade show active" id="nav-next-events" role="tabpanel" aria-labelledby="nav-profile-tab">
+        <div class="tab-pane fade show active" id="nav-my-bookings" role="tabpanel" aria-labelledby="nav-profile-tab">
           <h2 class="mt-0">Deine nächsten Events</h2>
           <table class="table layout-table table-responsive table-striped">
             <tr>
@@ -216,6 +215,29 @@
     </div> <!-- end col -->
 
   </div> <!-- end row -->
+  <script>
+      // Always open last used bootstrap tab, when reloading the page
+      // Add session-tabs class to the nav tag
+      // Add data-sessiontabs="someId" to the nav tag
+      (function ($) {
+          $(document).ready(function () {
+              $('.session-tabs[role="tablist"] > a[role="tab"]').click(function () {
+                  if($(this).parent(".session-tabs").data('sessiontabs') !== 'undefined')
+                  {
+                      sessionStorage.setItem($(this).parent(".session-tabs").data('sessiontabs'), $(this).prop('id'));
+                  }
+              });
+              $('.session-tabs[role="tablist"][data-sessiontabs]').each(function () {
+                  if (sessionStorage.getItem($(this).data('sessiontabs')) !== '') {
+                      var activeTab = sessionStorage.getItem($(this).data('sessiontabs'));
+                      if ($('#' + activeTab).length) {
+                          $('#' + activeTab).trigger('click');
+                      }
+                  }
+              });
+          });
+      })(jQuery);
+  </script>
 
 
 <?php $this->endblock(); ?>
