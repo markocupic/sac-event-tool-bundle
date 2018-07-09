@@ -184,6 +184,15 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = array(
 
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'] = array(
     '',
+    'ca. 1 h',
+    'ca. 2 h',
+    'ca. 3 h',
+    'ca. 4 h',
+    'ca. 5 h',
+    'ca. 6 h',
+    'ca. 7 h',
+    'ca. 8 h',
+    'ca. 9 h',
     '1/2 Tag',
     '1 Tag',
     '1 1/2 Tage',

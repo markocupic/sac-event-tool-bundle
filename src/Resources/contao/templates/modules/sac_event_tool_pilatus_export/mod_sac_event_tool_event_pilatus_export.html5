@@ -1,5 +1,6 @@
 <?= $this->form ?>
 
+<button class="enable-fe-editing">Frontend Editing aktivieren</button>
 
 <!-- all events as a table -->
 <h3 class="ce_headline">Monatsprogramm alle Events</h3>
@@ -52,9 +53,9 @@
   <table class="event-export-table event-export-table-courses table table-sm">
     <tbody>
     <?php foreach ($this->courses as $arrEvent): ?>
-        <tr class="event-export-row-body">
-          <td class="event-export-event-separator" colspan="2">&nbsp;</td>
-        </tr>
+      <tr class="event-export-row-body">
+        <td class="event-export-event-separator" colspan="2">&nbsp;</td>
+      </tr>
         <?php if ($arrEvent['headline'] != ''): ?>
         <tr class="event-export-row-body">
           <td class="event-export-headline" colspan="2"><strong><?= $arrEvent['headline'] ?><strong></td>
@@ -126,12 +127,67 @@
         <?php endif; ?>
       <tr class="event-export-row-body">
         <td class="event-export-bookingEvent">Anmeldung</td>
-        <td class="event-export-bookingEvent"><?php if (!$arrEvent['disableOnlineRegistration']): ?>Online Anmeldung{{br}}<?php endif; ?><?= $arrEvent['bookingEvent'] ?></td>
+        <td class="event-export-bookingEvent"><?php if (!$arrEvent['disableOnlineRegistration']): ?>Online Anmeldung, Kursnummer: <?= $arrEvent['courseId'] ?>
+                <?php if (isset($arrEvent['registrationPeriod'])): ?>
+              {{br}}Anmeldung möglich vom <?= $arrEvent['registrationPeriod'] ?>
+                <?php endif; ?>
+            {{br}}
+            <?php endif; ?><?= $arrEvent['bookingEvent'] ?>
+        </td>
+      </tr>
+      <tr class="event-export-row-body row-fe-edit d-none">
+        <td class="event-export-editEvent"></td>
+        <td class="event-export-editEvent">
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal_event_<?= $arrEvent['id'] ?>">Bearbeiten</button>
+        </td>
       </tr>
 
     <?php endforeach; ?>
     </tbody>
   </table>
+    <?php foreach ($this->courses as $arrEvent): ?>
+    <!-- The Modal -->
+    <div class="modal" id="modal_event_<?= $arrEvent['id'] ?>">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title"><?= $arrEvent['title'] ?></h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+            <form id="editEventForm_<?= $arrEvent['id'] ?>" method="post" action="{{env::request}}">
+                <?php $arrEditable = array('teaser', 'issues', 'terms', 'requirements', 'equipment', 'leistungen', 'bookingEvent'); ?>
+
+              <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
+              <input type="hidden" name="FORM_SUBMIT" value="edit-event">
+              <input type="hidden" name="id" value="<?= $arrEvent['id'] ?>">
+              <input type="hidden" name="submitted_fields" value="<?= implode(';', $arrEditable) ?>">
+
+                <?php foreach ($arrEditable as $field): ?>
+                  <!-- <?= $field ?> -->
+                  <div class="form-group">
+                    <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $field ?></label>
+                    <textarea class="form-control" rows="5" id="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>" name="<?= $field ?>"><?= \Contao\CalendarEventsModel::findByPk($arrEvent['id'])->{$field} ?></textarea>
+                  </div>
+                <?php endforeach; ?>
+              <button type="button" class="btn btn-danger send-form">Änderungen Speichern</button>
+            </form>
+          </div>
+
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- End modal -->
+    <?php endforeach; ?>
+
 
 <?php endif; ?>
 
@@ -228,8 +284,15 @@
             <?php endif; ?>
         <tr class="event-export-row-body">
           <td class="event-export-bookingEvent">Anmeldung</td>
-          <td class="event-export-bookingEvent"><?php if (!$arrEvent['disableOnlineRegistration']): ?>Online Anmeldung{{br}}<?php endif; ?><?= $arrEvent['bookingEvent'] ?></td>
+          <td class="event-export-bookingEvent"><?php if (!$arrEvent['disableOnlineRegistration']): ?>Online Anmeldung, Tour-/Anlassnummer: <?= Date::parse('Y', $arrEvent['startDate']) ?>-<?= $arrEvent['id'] ?>{{br}}<?php endif; ?><?= $arrEvent['bookingEvent'] ?></td>
         </tr>
+        <tr class="event-export-row-body row-fe-edit d-none">
+          <td class="event-export-editEvent"></td>
+          <td class="event-export-editEvent">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal_event_<?= $arrEvent['id'] ?>">Bearbeiten</button>
+          </td>
+        </tr>
+
         <?php endforeach; ?>
 
     <?php endforeach; ?>
@@ -237,3 +300,53 @@
   </table>
 
 <?php endif; ?>
+
+<script>
+    (function ($) {
+        $(document).ready(function () {
+
+            $('.enable-fe-editing').click(function(){
+              $('tr.row-fe-edit').toggleClass('d-none');
+              if($('tr.row-fe-edit').hasClass('d-none'))
+              {
+                  alert('Frontend-Editing wurde deaktiviert.');
+              }
+              else
+              {
+                  alert('Frontend-Editing wurde aktiviert. Die Events können nun bearbeitet werden. !Achtung gemachte Änderungen können nicht rückgängig gemacht werden.');
+              }
+            });
+
+            if (sessionStorage.getItem('scroll-top') > 0) {
+                $(document).scrollTop(sessionStorage.getItem('scroll-top'));
+                sessionStorage.setItem('scroll-top', 0);
+            }
+
+            $("button.send-form").click(function () {
+
+                var modal = $(this).closest('.modal')
+                var form = $(this).closest('form');
+                var form_data = $(form).serialize();
+                var request_method = $(form).attr("method");
+                var url = $(form).attr("action");
+                $.ajax({
+                    url: url,
+                    type: request_method,
+                    data: form_data
+                }).done(function (response) {
+                    var objResponse = jQuery.parseJSON(response);
+                    if (objResponse.status === 'success') {
+                        $(modal).modal('hide');
+                        var scrollTop = $(document).scrollTop();
+                        sessionStorage.setItem('scroll-top', scrollTop);
+                        // Reload page
+                        var formReload = $('input[name="FORM_SUBMIT"][value="form-pilatus-export"]').closest('form');
+                        $(formReload).find('.submit').trigger('click');
+                    } else {
+                        console.log(objResponse.message);
+                    }
+                });
+            });
+        });
+    })(jQuery);
+</script>

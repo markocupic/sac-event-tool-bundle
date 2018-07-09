@@ -16,6 +16,7 @@ use Contao\CalendarEventsJourneyModel;
 use Contao\Controller;
 use Contao\Database;
 use Contao\Date;
+use Contao\Config;
 use Contao\Environment;
 use Contao\Input;
 use Contao\Module;
@@ -93,6 +94,26 @@ class ModuleSacEventToolPilatusExport extends Module
         }
 
 
+        if(Input::post('FORM_SUBMIT') === 'edit-event')
+        {
+            $set = array();
+            foreach(explode(';', Input::post('submitted_fields')) as $field)
+            {
+                $set[$field] = Input::post($field);
+            }
+            $objUpdateStmt = Database::getInstance()->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute(Input::post('id'));
+            if ($objUpdateStmt->affectedRows)
+            {
+                $arrReturn = array('status' => 'success', 'message' => 'Saved changes successfully to the Database.');
+            }else{
+                $arrReturn = array('status' => 'error', 'message' => 'Error during the upload process.');
+            }
+
+            die(\json_encode($arrReturn));
+        }
+
+
+
         return parent::generate();
     }
 
@@ -126,7 +147,6 @@ class ModuleSacEventToolPilatusExport extends Module
         $objForm = new Form('form-pilatus-export', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
-
         $objForm->setFormActionFromUri(Environment::get('uri'));
 
 
@@ -145,9 +165,9 @@ class ModuleSacEventToolPilatusExport extends Module
         }
 
         $dateFormat = array();
-        $dateFormat['d'] = "Nur den Tag";
-        $dateFormat['d.m'] = "Tag und Monat";
-        $dateFormat['d.m.Y'] = "Tag Monat und Jahr";
+        $dateFormat['j.'] = "Nur den Tag";
+        $dateFormat['j.m.'] = "Tag und Monat";
+        $dateFormat['j.m.Y'] = "Tag Monat und Jahr";
 
 
         // Now let's add form fields:
@@ -217,7 +237,7 @@ class ModuleSacEventToolPilatusExport extends Module
         while ($objTour->next())
         {
             $arrRow = array(
-                'week'        => Date::parse('W', $objTour->startDate),
+                'week'        => Date::parse('W', $objTour->startDate) . ', ' . Date::parse('j. F',$this->getFirstDayOfWeekTimestamp($objTour->startDate)) . '-' . Date::parse('j. F',$this->getLastDayOfWeekTimestamp($objTour->startDate)),
                 'eventDates'  => $this->getEventPeriod($objTour->id, $this->dateFormat),
                 'weekday'     => $this->getEventPeriod($objTour->id, 'D'),
                 'title'       => $objTour->title,
@@ -240,6 +260,27 @@ class ModuleSacEventToolPilatusExport extends Module
 
         }
         $this->allEventsTable = count($arrTours) > 0 ? $arrTours : null;
+    }
+
+    /**
+     * @param $timestamp
+     * @return int
+     */
+    private function getFirstDayOfWeekTimestamp($timestamp)
+    {
+        $date = Date::parse('d-m-Y', $timestamp);
+        $day = \DateTime::createFromFormat('d-m-Y', $date);
+        $day->setISODate((int)$day->format('o'), (int)$day->format('W'), 1);
+        return $day->getTimestamp();
+    }
+
+    /**
+     * @param $timestamp
+     * @return int
+     */
+    private function getLastDayOfWeekTimestamp($timestamp)
+    {
+        return $this->getFirstDayOfWeekTimestamp($timestamp) + 6*24*3600;
     }
 
     /**
@@ -308,7 +349,7 @@ class ModuleSacEventToolPilatusExport extends Module
             $arrRow['eventState'] = $objEvent->eventState != '' ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
             $arrRow['teaser'] = nl2br($objEvent->teaser);
             $arrRow['issues'] = nl2br($objEvent->issues);
-            $arrRow['terms'] = nl2br($objEvent->issues);
+            $arrRow['terms'] = nl2br($objEvent->terms);
             $arrRow['requirements'] = nl2br($objEvent->requirements);
             $arrRow['location'] = nl2br($objEvent->location);
             $arrRow['journey'] = nl2br($objEvent->location);
@@ -318,6 +359,10 @@ class ModuleSacEventToolPilatusExport extends Module
             $arrRow['meetingPoint'] = nl2br($objEvent->meetingPoint);
             $arrRow['miscellaneous'] = nl2br($objEvent->miscellaneous);
             $arrRow['week'] = Date::parse('W', $objEvent->startDate);
+            if($objEvent->setRegistrationPeriod)
+            {
+                $arrRow['registrationPeriod'] = Date::parse('j.m.Y', $objEvent->registrationStartDate) . ' bis ' . Date::parse('j.m.Y', $objEvent->registrationEndDate);
+            }
             $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);
             $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
             $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id));
@@ -385,7 +430,7 @@ class ModuleSacEventToolPilatusExport extends Module
             $arrRow['eventState'] = $objEvent->eventState != '' ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
             $arrRow['teaser'] = nl2br($objEvent->teaser);
             $arrRow['issues'] = nl2br($objEvent->issues);
-            $arrRow['terms'] = nl2br($objEvent->issues);
+            $arrRow['terms'] = nl2br($objEvent->terms);
             $arrRow['requirements'] = nl2br($objEvent->requirements);
             $arrRow['location'] = nl2br($objEvent->location);
             $arrRow['journey'] = nl2br($objEvent->location);
@@ -395,6 +440,10 @@ class ModuleSacEventToolPilatusExport extends Module
             $arrRow['meetingPoint'] = nl2br($objEvent->meetingPoint);
             $arrRow['miscellaneous'] = nl2br($objEvent->miscellaneous);
             $arrRow['week'] = Date::parse('W', $objEvent->startDate);
+            if($objEvent->setRegistrationPeriod)
+            {
+                $arrRow['registrationPeriod'] = Date::parse('j.m.Y', $objEvent->registrationStartDate) . ' bis ' . Date::parse('j.m.Y', $objEvent->registrationEndDate);
+            }
             $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);
             $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
             $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id));

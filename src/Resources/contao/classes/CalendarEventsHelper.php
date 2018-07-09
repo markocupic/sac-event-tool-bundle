@@ -127,7 +127,11 @@ class CalendarEventsHelper extends System
             $objUser = UserModel::findByPk($arrInstructors[0]);
             if ($objUser !== null)
             {
-                return $objUser->name;
+                $arrName = array();
+                $arrName[] = $objUser->lastname;
+                $arrName[] = $objUser->firstname;
+                $arrName = array_filter($arrName);
+                return implode(' ', $arrName);
             }
         }
         return '';
@@ -179,13 +183,17 @@ class CalendarEventsHelper extends System
                     $objUser = UserModel::findByPk($arrUser['instructorId']);
                     if ($objUser !== null)
                     {
+                        $arrName = array();
+                        $arrName[] = $objUser->lastname;
+                        $arrName[] = $objUser->firstname;
+                        $arrName = array_filter($arrName);
                         if ($blnAddMainQualification && static::getMainQualifikation($objUser->id) != '')
                         {
-                            $arrInstructors[] = $objUser->name . ' (' . static::getMainQualifikation($objUser->id) . ')';
+                            $arrInstructors[] = implode(' ', $arrName) . ' (' . static::getMainQualifikation($objUser->id) . ')';
                         }
                         else
                         {
-                            $arrInstructors[] = $objUser->name;
+                            $arrInstructors[] = implode(' ', $arrName);
                         }
                     }
                 }

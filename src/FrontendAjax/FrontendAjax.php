@@ -44,12 +44,27 @@ class FrontendAjax
      */
     public function filterTourList()
     {
+
         $visibleItems = array();
         $arrIDS = Input::post('ids') != '' ? json_decode(Input::post('ids')) : array();
         $arrOrganizers = Input::post('organizers') != '' ? json_decode(Input::post('organizers')) : array();
         $strSearchterm = trim(Input::post('searchterm'));
+        $strEventId = trim(Input::post('eventId'));
         $eventTypeId = Input::post('eventType');
         $intStartDate = round(Input::post('startDate'));
+
+        if($strEventId != '')
+        {
+            if (strpos($strEventId, '-') !== false)
+            {
+                $arrPieces = explode('-', $strEventId);
+                if (is_array($arrPieces) && count($arrPieces) == 2)
+                {
+                    $strEventId = $arrPieces[1];
+                }
+            }
+        }
+
 
         if ($intStartDate < 1)
         {
@@ -65,6 +80,19 @@ class FrontendAjax
             if ($objEvent !== null)
             {
                 $filter = false;
+
+                // check for eventId and courseId
+                if ($filter === false)
+                {
+                    if ($strEventId != '' || trim(Input::post('eventId')) != '')
+                    {
+                        if ($objEvent->id != $strEventId && strtolower($objEvent->courseId) != strtolower($strEventId))
+                        {
+                            $filter = true;
+                        }
+                    }
+                }
+
 
                 // startDate
                 if ($filter === false)
@@ -224,8 +252,21 @@ class FrontendAjax
         $arrIDS = Input::post('ids') != '' ? json_decode(Input::post('ids')) : array();
         $arrOrganizers = Input::post('organizers') != '' ? json_decode(Input::post('organizers')) : array();
         $strSearchterm = trim(Input::post('searchterm'));
+        $strEventId = trim(Input::post('eventId'));
         $eventTypeId = Input::post('eventType');
         $intStartDate = round(Input::post('startDate'));
+
+        if($strEventId != '')
+        {
+            if (strpos($strEventId, '-') !== false)
+            {
+                $arrPieces = explode('-', $strEventId);
+                if (is_array($arrPieces) && count($arrPieces) == 2)
+                {
+                    $strEventId = $arrPieces[1];
+                }
+            }
+        }
 
 
         if ($intStartDate < 1)
@@ -242,6 +283,18 @@ class FrontendAjax
             if ($objEvent !== null)
             {
                 $filter = false;
+
+                // check for eventId and courseId
+                if ($filter === false)
+                {
+                    if ($strEventId != '' || trim(Input::post('eventId')) != '')
+                    {
+                        if ($objEvent->id != $strEventId && strtolower($objEvent->courseId) != strtolower(trim(Input::post('eventId'))))
+                        {
+                            $filter = true;
+                        }
+                    }
+                }
 
                 // startDate
                 if ($filter === false)

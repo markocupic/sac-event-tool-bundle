@@ -60,6 +60,11 @@ var EventFilter = {
      */
     $ctrlDateStartHidden: null,
 
+    /**
+     * EventId input
+     */
+    $ctrlEventId: null,
+
 
     /**
      * queueRequest
@@ -176,6 +181,11 @@ var EventFilter = {
         // Save Input to sessionStorage
         self.sessionStorageSet('ctrl_search', strSearchterm);
 
+        // eventId
+        var strEventId = self.$ctrlEventId.val();
+        // Do not save Input to sessionStorage
+        // self.sessionStorageSet('ctrl_eventId', strEventId);
+
         // Get url from options
         var url = self.options.xhr.action.split('?');
 
@@ -190,7 +200,8 @@ var EventFilter = {
                 eventType: eventTypeId,
                 organizers: JSON.stringify(arrOrganizers),
                 searchterm: strSearchterm,
-                startDate: intStartDate
+                startDate: intStartDate,
+                eventId: strEventId
             },
             dataType: 'json'
         });
@@ -317,6 +328,8 @@ var EventFilter = {
         self.$ctrlEventYear = $('#ctrl_eventYear');
         self.$ctrlDateStart = $('#ctrl_dateStart');
         self.$ctrlDateStartHidden = $('#ctrl_dateStartHidden');
+        self.$ctrlEventId = $('#ctrl_eventId');
+
 
         // Reset organizer filter and reset session storage item
         $('.reset-form').click(function (e) {
@@ -420,6 +433,11 @@ var EventFilter = {
 
         // Trigger on change event
         self.$ctrlSearch.on('keyup', function () {
+            self.queueRequest();
+        });
+
+        // Trigger on change event
+        self.$ctrlEventId.on('keyup', function () {
             self.queueRequest();
         });
 

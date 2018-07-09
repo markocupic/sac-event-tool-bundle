@@ -33,75 +33,72 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.min
     </div>
     <div class="row">
 
-      <div class="col-lg-8">
+      <div id="eventYear" class="col-6 col-sm-4">
+        <label for="ctrl_eventYear">Jahr</label>
+        <select class="form-control filter-select" name="year" id="ctrl_eventYear">
+          <option value="0"<?= !\Input::get('year') ? ' selected' : '' ?>>alle zuk&uuml;nftigen Touren und Anl&auml;sse zeigen</option>
+            <?php for ($i = intval(\Date::parse('Y')) + 1; $i > 2015; $i--): ?>
+                <?php if (\Input::get('year') != '')
+                {
+                    $selected = \Input::get('year') == $i ? ' selected' : '';
+                }
+                ?>
+              <option value="<?= $i ?>"<?= $selected ?>>Jahr <?= $i ?></option>
+            <?php endfor; ?>
+        </select>
+      </div>
 
+      <div id="eventType" class="col-6 col-sm-4">
+        <label for="ctrl_event_type">Tour-/Anlasstyp?</label>
+        <select class="form-control filter-select" id="ctrl_eventType">
+          <option value="0">alle Touren und Anl&auml;sse zeigen</option>
+            <?php $tourTypes = TourTypeModel::findAll(); ?>
+            <?php if ($tourTypes !== null): ?>
+                <?php while ($tourTypes->next()): ?>
+                <option value="<?= $tourTypes->id ?>"> <?= $tourTypes->title ?></option>
+                <?php endwhile; ?>
+            <?php endif; ?>
+        </select>
+      </div>
 
-        <div class="row">
-          <div id="eventYear" class="col-6">
-            <label for="ctrl_eventYear">Jahr</label>
-            <select class="form-control filter-select" name="year" id="ctrl_eventYear">
-              <option value="0"<?= !\Input::get('year') ? ' selected' : '' ?>>alle zuk&uuml;nftigen Touren und Anl&auml;sse zeigen</option>
-                <?php for ($i = intval(\Date::parse('Y')) + 1; $i > 2015; $i--): ?>
-                    <?php if (\Input::get('year') != '')
-                    {
-                        $selected = \Input::get('year') == $i ? ' selected' : '';
-                    }
-                    ?>
-                  <option value="<?= $i ?>"<?= $selected ?>>Jahr <?= $i ?></option>
-                <?php endfor; ?>
-            </select>
+      <div id="search" class="col-6 col-sm-4">
+        <div class="form-group">
+          <label for="ctrl_search">Im Text suchen:</label>
+          <input type="text" class="form-control" name="searchterm" id="ctrl_search" placeholder="Suchen">
+        </div>
+      </div>
+
+      <div id="dateStart" class="col-6 col-sm-4">
+        <label for="ctrl_dateStart">Anzeigen ab:</label>
+        <input type="hidden" id="ctrl_dateStartHidden" value="0">
+        <div class="input-group date">
+          <input type="text" id="ctrl_dateStart" class="form-control" data-date-now="<?= \Date::parse('d-m-Y') ?>" placeholder="dd-mm-yyyy" value="">
+          <div class="input-group-append">
+            <button class="btn btn-danger" type="button"><i class="fa fa-th"></i></button>
           </div>
+        </div>
+      </div>
 
-
-          <div id="eventType" class="col-6">
-            <label for="ctrl_event_type">Tour-/Anlasstyp?</label>
-            <select class="form-control filter-select" id="ctrl_eventType">
-              <option value="0">alle Touren und Anl&auml;sse zeigen</option>
-                <?php $tourTypes = TourTypeModel::findAll(); ?>
-                <?php if ($tourTypes !== null): ?>
-                    <?php while ($tourTypes->next()): ?>
-                    <option value="<?= $tourTypes->id ?>"> <?= $tourTypes->title ?></option>
-                    <?php endwhile; ?>
-                <?php endif; ?>
-            </select>
-          </div>
-
-
-          <div id="search" class="col-6">
-            <div class="form-group">
-              <label for="ctrl_search">Im Text suchen:</label>
-              <input type="text" class="form-control" name="searchterm" id="ctrl_search" placeholder="Suchen">
-            </div>
-          </div>
-
-
-          <div id="dateStart" class="col-6">
-            <label for="ctrl_dateStart">Touren und Anl&auml;sse anzeigen ab:</label>
-            <input type="hidden" id="ctrl_dateStartHidden" value="0">
-            <div class="input-group date">
-              <input type="text" id="ctrl_dateStart" class="form-control" data-date-now="<?= \Date::parse('d-m-Y') ?>" placeholder="dd-mm-yyyy" value="">
-              <div class="input-group-append">
-                <button class="btn btn-danger" type="button"><i class="fa fa-th"></i></button>
-              </div>
-            </div>
-          </div>
-        </div><!-- endrow -->
-      </div><!--end col-left -->
-
-
-      <div class="col-lg-4">
+      <div class="col-6 col-sm-4">
         <div id="organizers">
             <?php $objOrganizers = \EventOrganizerModel::findAll(array('order' => 'sorting ASC')); ?>
             <?php if ($objOrganizers !== null): ?>
               <label for="ctrl_organizers">Veranstalter:</label>
-              <select placeholder="Organisierende Gruppe..." chosen style="width:100%" id="ctrl_organizers" multiple tabindex="3">
+              <select placeholder="Organisierende Gruppe" chosen style="width:100%" id="ctrl_organizers" multiple tabindex="3">
                   <?php while ($objOrganizers->next()): ?>
                     <option value="<?= $objOrganizers->id ?>" id="organizator-select-option-<?= $objOrganizers->id ?>"><?= $objOrganizers->title ?></option>
                   <?php endwhile; ?>
               </select>
             <?php endif; ?>
         </div>
-      </div><!--end col-right -->
+      </div>
+
+      <div class="col-6 col-sm-4">
+        <div id="eventId">
+          <label for="ctrl_eventId">Eventnummer:</label>
+          <input type="text" id="ctrl_eventId" class="form-control" name="eventId" placeholder="<?= \Contao\Date::parse("Y") ?>-*****" value="">
+        </div>
+      </div>
 
     </div><!-- endrow -->
     <div class="mt-3">

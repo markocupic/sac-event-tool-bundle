@@ -129,7 +129,7 @@
                         <div class="instructor-name">
                             <?php $strQuali = Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($userId) != '' ? ' (' . Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($userId) . ')' : ''; ?>
                           <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
-                              <?= \UserModel::findByPk($userId)->name . $strQuali ?>
+                              <?= \UserModel::findByPk($userId)->lastname . ' ' . \UserModel::findByPk($userId)->firstname . $strQuali ?>
                           </a>
                         </div>
                       <?php endif; ?>
