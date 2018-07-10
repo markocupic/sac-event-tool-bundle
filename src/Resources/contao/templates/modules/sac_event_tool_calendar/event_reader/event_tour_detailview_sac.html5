@@ -160,15 +160,19 @@
         <?php endif; ?>
 
         <?php if ($this->eventType === 'tour'): ?>
-          <div class="requirements event-detail event-info-box icon-box-small">
-
+          <div class="tour-difficulties event-detail event-info-box icon-box-small">
             <h6>Schwierigkeit</h6>
-            <p class="tech-difficulty"><?= implode(', ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($this->id)) ?></p>
-              <?php $arrTourProfile = Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourProfileAsArray($this->id); ?>
-              <?php if (count($arrTourProfile) > 1): ?>
-              <p class="tour-profile"><strong>Profil:</strong><br> <?= implode('<br>', $arrTourProfile) ?><p>
-              <?php endif; ?>
+            <p><?= implode(', ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($this->id)) ?></p>
           </div>
+
+          <?php $arrTourProfile = Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourProfileAsArray($this->id); ?>
+          <?php if (count($arrTourProfile) >= 1): ?>
+            <div class="tour-profile event-detail event-info-box icon-box-small">
+              <h6>Profil</h6>
+              <p><?= implode('<br>', $arrTourProfile) ?><p>
+            </div>
+          <?php endif; ?>
+
         <?php endif; ?>
 
         <?php if ($this->journey != '' && \CalendarEventsJourneyModel::findByPk($this->journey) !== null): ?>

@@ -639,7 +639,7 @@ class CalendarEventsHelper extends System
      * @param string $field
      * @return array
      */
-    public static function getEventOrganizersAsArray($eventId, $field='title')
+    public static function getEventOrganizersAsArray($eventId, $field = 'title')
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
         $arrReturn = array();
@@ -761,15 +761,49 @@ class CalendarEventsHelper extends System
                         continue;
                     }
                     $m++;
+
+                    $arrAsc = array();
+                    $arrDesc = array();
                     if (count($arrTourProfile) > 1)
                     {
-                        $pattern = $m . '. Tag: Aufst: %s m/%sh Abst: %sm/%sh';
+                        $strProfile = sprintf('%s. Tag: ', $m);
                     }
                     else
                     {
-                        $pattern = 'Aufst: %sm/%sh Abst: %sm/%sh';
+                        $strProfile = '';
                     }
-                    $arrProfile[] = sprintf($pattern, $profile['tourProfileAscentMeters'], $profile['tourProfileAscentTime'], $profile['tourProfileDescentMeters'], $profile['tourProfileDescentTime']);
+
+                    if ($profile['tourProfileAscentMeters'] != '')
+                    {
+                        $arrAsc[] = sprintf('%s Hm', $profile['tourProfileAscentMeters']);
+                    }
+                    
+                    if ($profile['tourProfileAscentTime'] != '')
+                    {
+                        $arrAsc[] = sprintf('%s h', $profile['tourProfileAscentTime']);
+                    }
+
+                    if ($profile['tourProfileDescentMeters'] != '')
+                    {
+                        $arrDesc[] = sprintf('%s Hm', $profile['tourProfileDescentMeters']);
+                    }
+
+                    if ($profile['tourProfileDescentTime'] != '')
+                    {
+                        $arrDesc[] = sprintf('%s h', $profile['tourProfileDescentTime']);
+                    }
+
+                    if (count($arrAsc) > 0)
+                    {
+                        $strProfile .= 'Aufst: ' . implode('/', $arrAsc);
+                    }
+
+                    if (count($arrDesc) > 0)
+                    {
+                        $strProfile .= ($strProfile != '' ? ', ' : '') . 'Abst: ' . implode('/', $arrDesc);
+                    }
+
+                    $arrProfile[] = $strProfile;
                 }
             }
         }
