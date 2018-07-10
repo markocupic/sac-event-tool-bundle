@@ -636,9 +636,10 @@ class CalendarEventsHelper extends System
 
     /**
      * @param $eventId
+     * @param string $field
      * @return array
      */
-    public static function getEventOrganizersAsArray($eventId)
+    public static function getEventOrganizersAsArray($eventId, $field='title')
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
         $arrReturn = array();
@@ -652,7 +653,7 @@ class CalendarEventsHelper extends System
                     $objModel = EventOrganizerModel::findByPk($id);
                     if ($objModel !== null)
                     {
-                        $arrReturn[] = $objModel->title;
+                        $arrReturn[] = $objModel->{$field};
                     }
                 }
             }

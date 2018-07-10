@@ -82,7 +82,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
     ),
     'palettes' => array
     (
-        'default' => '{title_legend},title,sorting,emergencyConcept',
+        'default' => '{title_legend},title,titlePrint,sorting,emergencyConcept',
     ),
 
     'fields' => array
@@ -98,6 +98,16 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
         'title'            => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['title'],
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
+            'inputType' => 'text',
+            'eval'      => array('mandatory' => true, 'maxlength' => 255),
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ),
+        'titlePrint'            => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['titlePrint'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,

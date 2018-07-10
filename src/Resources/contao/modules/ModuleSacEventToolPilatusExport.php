@@ -55,7 +55,7 @@ class ModuleSacEventToolPilatusExport extends Module
     /**
      * @var
      */
-    protected $dateFormat;
+    protected $dateFormat = 'j.';
 
     /**
      * @var null
@@ -112,6 +112,8 @@ class ModuleSacEventToolPilatusExport extends Module
             die(\json_encode($arrReturn));
         }
 
+        Controller::loadLanguageFile('tl_calendar_events');
+
 
 
         return parent::generate();
@@ -164,10 +166,7 @@ class ModuleSacEventToolPilatusExport extends Module
             $range[$key] = Date::parse("1.m.Y", strtotime($i . " month")) . '-' . Date::parse("t.m.Y", strtotime($i + 1 . "  month"));
         }
 
-        $dateFormat = array();
-        $dateFormat['j.'] = "Nur den Tag";
-        $dateFormat['j.m.'] = "Tag und Monat";
-        $dateFormat['j.m.Y'] = "Tag Monat und Jahr";
+
 
 
         // Now let's add form fields:
@@ -179,13 +178,7 @@ class ModuleSacEventToolPilatusExport extends Module
             'eval'      => array('mandatory' => true),
         ));
 
-        $objForm->addFormField('dateFormat', array(
-            'label'     => 'Datumsformat',
-            'inputType' => 'select',
-            'options'   => $dateFormat,
-            //'default'   => $this->User->emergencyPhone,
-            'eval'      => array('mandatory' => true),
-        ));
+
 
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
@@ -196,12 +189,11 @@ class ModuleSacEventToolPilatusExport extends Module
         // validate() also checks whether the form has been submitted
         if ($objForm->validate())
         {
-            if (Input::post('timeRange') != 0 && Input::post('dateFormat') != '')
+            if (Input::post('timeRange') != 0)
             {
                 $arrRange = explode('|', Input::post('timeRange'));
                 $this->startDate = strtotime($arrRange[0]);
                 $this->endDate = strtotime($arrRange[1]);
-                $this->dateFormat = Input::post('dateFormat');
                 $this->generateAllEventsTable();
                 $this->generateCourses();
 
@@ -237,12 +229,12 @@ class ModuleSacEventToolPilatusExport extends Module
         while ($objTour->next())
         {
             $arrRow = array(
-                'week'        => Date::parse('W', $objTour->startDate) . ', ' . Date::parse('j. F',$this->getFirstDayOfWeekTimestamp($objTour->startDate)) . '-' . Date::parse('j. F',$this->getLastDayOfWeekTimestamp($objTour->startDate)),
-                'eventDates'  => $this->getEventPeriod($objTour->id, $this->dateFormat),
+                'week'        => Date::parse('W', $objTour->startDate) . ', ' . Date::parse('j.',$this->getFirstDayOfWeekTimestamp($objTour->startDate)) . '-' . Date::parse('j. F',$this->getLastDayOfWeekTimestamp($objTour->startDate)),
+                'eventDates'  => $this->getEventPeriod($objTour->id, 'd.'),
                 'weekday'     => $this->getEventPeriod($objTour->id, 'D'),
                 'title'       => $objTour->title,
                 'instructors' => implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objTour->id)),
-                'organizers'  => implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objTour->id)),
+                'organizers'  => implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objTour->id, 'titlePrint')),
                 'id'          => $objTour->id,
             );
             // tourType
@@ -296,10 +288,34 @@ class ModuleSacEventToolPilatusExport extends Module
             $dateFormat = Config::get('dateFormat');
         }
 
-        $dateFormatShortened = $dateFormat;
-        if ($dateFormat === 'd.m.Y' || $dateFormat === 'd.m.')
+        $dateFormatShortened = array();
+
+
+        if ($dateFormat === 'd.')
         {
-            $dateFormatShortened = 'd.m.';
+            $dateFormatShortened['from'] = 'd.';
+            $dateFormatShortened['to'] = 'd.';
+        }
+
+        elseif ($dateFormat === 'j.m.')
+        {
+            $dateFormatShortened['from'] = 'j.';
+            $dateFormatShortened['to'] = 'j.m.';
+        }
+
+        elseif ($dateFormat === 'j.-j. F')
+        {
+            $dateFormatShortened['from'] = 'j.';
+            $dateFormatShortened['to'] = 'j. F';
+        }
+        elseif ($dateFormat === 'D')
+        {
+            $dateFormatShortened['from'] = 'D';
+            $dateFormatShortened['to'] = 'D';
+        }
+        else{
+            $dateFormatShortened['from'] = 'j.';
+            $dateFormatShortened['to'] = 'j.m.';
         }
 
 
@@ -308,15 +324,15 @@ class ModuleSacEventToolPilatusExport extends Module
 
         if ($eventDuration == 1)
         {
-            return Date::parse($dateFormat, CalendarEventsHelper::getStartDate($id));
+            return Date::parse($dateFormatShortened['to'], CalendarEventsHelper::getStartDate($id));
         }
         if ($eventDuration == 2 && $span != $eventDuration)
         {
-            return Date::parse($dateFormatShortened, CalendarEventsHelper::getStartDate($id)) . ' & ' . Date::parse($dateFormat, CalendarEventsHelper::getEndDate($id));
+            return Date::parse($dateFormatShortened['from'], CalendarEventsHelper::getStartDate($id)) . ' & ' . Date::parse($dateFormatShortened['to'] , CalendarEventsHelper::getEndDate($id));
         }
         elseif ($span == $eventDuration)
         {
-            return Date::parse($dateFormatShortened, CalendarEventsHelper::getStartDate($id)) . '-' . Date::parse($dateFormat, CalendarEventsHelper::getEndDate($id));
+            return Date::parse($dateFormatShortened['from'], CalendarEventsHelper::getStartDate($id)) . '-' . Date::parse($dateFormatShortened['to'] , CalendarEventsHelper::getEndDate($id));
         }
         else
         {
@@ -324,10 +340,10 @@ class ModuleSacEventToolPilatusExport extends Module
             $dates = CalendarEventsHelper::getEventTimestamps($id);
             foreach ($dates as $date)
             {
-                $arrDates[] = Date::parse($dateFormat, $date);
+                $arrDates[] = Date::parse($dateFormatShortened['to'], $date);
             }
 
-            return implode('; ', $arrDates);
+            return implode(', ', $arrDates);
         }
     }
 
@@ -366,7 +382,7 @@ class ModuleSacEventToolPilatusExport extends Module
             $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);
             $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
             $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id));
-            $arrRow['organizers'] = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id));
+            $arrRow['organizers'] = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'title'));
             $arrRow['meetingPoint'] = nl2br($objEvent->meetingPoint);
 
             $arrRow['id'] = $objEvent->id;
@@ -384,7 +400,7 @@ class ModuleSacEventToolPilatusExport extends Module
             $arrRow['minMaxMembers'] = implode('/', $arrMinMaxMembers);
 
             $arrHeadline = array();
-            $arrHeadline[] = $this->getEventPeriod($objEvent->id, 'd. F');
+            $arrHeadline[] = $this->getEventPeriod($objEvent->id, 'j.-j. F');
             $arrHeadline[] = $this->getEventPeriod($objEvent->id, 'D');
             $arrHeadline[] = $objEvent->title;
             if (isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel]))
@@ -447,7 +463,7 @@ class ModuleSacEventToolPilatusExport extends Module
             $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);
             $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
             $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id));
-            $arrRow['organizers'] = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id));
+            $arrRow['organizers'] = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'title'));
             $arrRow['tourProfile'] = implode('<br>', CalendarEventsHelper::getTourProfileAsArray($objEvent->id));
             $arrRow['tourDetailText'] = nl2br($objEvent->tourDetailText);
             $arrRow['meetingPoint'] = nl2br($objEvent->meetingPoint);
@@ -469,7 +485,7 @@ class ModuleSacEventToolPilatusExport extends Module
             $arrRow['minMaxMembers'] = implode('/', $arrMinMaxMembers);
 
             $arrHeadline = array();
-            $arrHeadline[] = $this->getEventPeriod($objEvent->id, 'd. F');
+            $arrHeadline[] = $this->getEventPeriod($objEvent->id, 'j.-j. F');
             $arrHeadline[] = $this->getEventPeriod($objEvent->id, 'D');
             $arrHeadline[] = $objEvent->title;
 

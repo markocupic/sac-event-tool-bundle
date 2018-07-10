@@ -532,7 +532,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     }
                     elseif ($field === 'organizers')
                     {
-                        $arrOrganizers = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id);
+                        $arrOrganizers = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'title');
                         $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
                     }
                     elseif ($field === 'instructors')

@@ -279,7 +279,7 @@ class ModuleSacEventToolJahresprogrammExport extends Module
                     'id'               => $objEvent->id,
                     'eventType'        => $objEvent->eventType,
                     'courseId'         => $objEvent->courseId,
-                    'organizers'       => implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id)),
+                    'organizers'       => implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'title')),
                     'courseLevel'      => isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel]) ? $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel] : '',
                     'courseTypeLevel0' => (CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0) !== null) ? CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name : '',
                     'courseTypeLevel1' => (CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1) !== null) ? CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name : '',
