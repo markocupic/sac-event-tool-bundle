@@ -744,7 +744,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = array(
                 'inputType' => 'text',
                 'eval'      => array
                 (
-                    'rgxp'      => 'numeric',
+                    'rgxp'      => 'digit',
                     'style'     => 'width:150px',
                     'mandatory' => false,
                 ),
@@ -767,7 +767,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = array(
                 'inputType' => 'text',
                 'eval'      => array
                 (
-                    'rgxp'      => 'numeric',
+                    'rgxp'      => 'digit',
                     'style'     => 'width:150px',
                     'mandatory' => false,
                 ),

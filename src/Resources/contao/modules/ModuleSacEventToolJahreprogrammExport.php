@@ -11,6 +11,7 @@
 namespace Markocupic\SacEventToolBundle;
 
 use Contao\BackendTemplate;
+use Contao\CalendarEventsModel;
 use Contao\Calendar;
 use Contao\Controller;
 use Contao\CourseMainTypeModel;
@@ -230,9 +231,18 @@ class ModuleSacEventToolJahresprogrammExport extends Module
     protected function getEventsAndInstructors()
     {
         $arrEvents = array();
-        $objEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE published=? AND startDate>? AND startDate<?')->execute('1', $this->startDate, $this->endDate);
+        $objEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate>? AND startDate<?')->execute($this->startDate, $this->endDate);
         while ($objEvents->next())
         {
+
+
+            // Check if event is at least on second highest level (Level 3/4)
+            $eventModel = CalendarEventsModel::findByPk($objEvents->id);
+            if(!ModuleSacEventToolPilatusExport::hasValidReleaseLevel($eventModel))
+            {
+                continue;
+            }
+
             if ($this->organizer)
             {
                 $arrOrganizer = StringUtil::deserialize($objEvents->organizers, true);

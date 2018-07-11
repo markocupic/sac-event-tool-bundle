@@ -119,6 +119,12 @@
           <td class="event-export-miscellaneous"><?= $arrEvent['miscellaneous'] ?></td>
         </tr>
         <?php endif; ?>
+        <?php if ($arrEvent['journey'] != ''): ?>
+        <tr class="event-export-row-body">
+          <td class="event-export-journey">Anfahrt</td>
+          <td class="event-export-journey"><?= $arrEvent['journey'] ?></td>
+        </tr>
+        <?php endif; ?>
         <?php if ($arrEvent['leistungen'] != ''): ?>
         <tr class="event-export-row-body">
           <td class="event-export-leistungen">Preis/Leistungen</td>
@@ -158,16 +164,15 @@
           <!-- Modal body -->
           <div class="modal-body">
             <form id="editEventForm_<?= $arrEvent['id'] ?>" method="post" action="{{env::request}}">
-              <?php $arrEditable = array('teaser', 'issues', 'terms', 'requirements', 'equipment', 'leistungen', 'bookingEvent'); ?>
               <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
               <input type="hidden" name="FORM_SUBMIT" value="edit-event">
               <input type="hidden" name="id" value="<?= $arrEvent['id'] ?>">
-              <input type="hidden" name="submitted_fields" value="<?= implode(';', $arrEditable) ?>">
-              <?php foreach ($arrEditable as $field): ?>
+              <input type="hidden" name="submitted_fields" value="<?= implode(';', $arrEvent['feEditables']) ?>">
+              <?php foreach ($arrEvent['feEditables'] as $field): ?>
                 <!-- <?= $field ?> -->
                 <div class="form-group">
                   <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?></label>
-                  <textarea class="form-control" rows="5" id="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>" name="<?= $field ?>"><?= \Contao\CalendarEventsModel::findByPk($arrEvent['id'])->{$field} ?></textarea>
+                  <textarea class="form-control" rows="3" id="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>" name="<?= $field ?>"><?= \Contao\CalendarEventsModel::findByPk($arrEvent['id'])->{$field} ?></textarea>
                 </div>
               <?php endforeach; ?>
               <button type="button" class="btn btn-danger send-form">Änderungen Speichern</button>
@@ -193,14 +198,16 @@
 
     <tbody>
     <?php foreach ($this->tours as $arrOrganizer): ?>
-      <tr class="event-export-row-body">
-        <td class="event-export-tour-organizer" colspan="2"><h4>Touren <?= $arrOrganizer['organizer']['title'] ?></h4></td>
-      </tr>
+        <tr class="event-export-row-body">
+          <td class="event-export-tour-organizer" colspan="2"><h4>Touren <?= $arrOrganizer['title'] ?></h4></td>
+        </tr>
+
         <?php if (!$arrOrganizer['events']): ?>
         <tr class="event-export-row-body">
           <td class="event-export-tour-nor-result-found" colspan="2">Zu dieser Anfrage wurden von diesem Organisator keine Events gefunden!</td>
         </tr>
         <?php endif; ?>
+
         <?php foreach ($arrOrganizer['events'] as $arrEvent): ?>
             <?php if ($arrEvent['headline'] != ''): ?>
           <tr class="event-export-row-body">
@@ -295,45 +302,43 @@
   </table>
 <?php if ($this->tours): ?>
     <?php foreach ($this->tours as $arrOrganizer): ?>
-    <?php foreach ($arrOrganizer['events'] as $arrEvent): ?>
-  <!-- The Modal for frontend editing-->
-  <div class="modal" id="modal_event_<?= $arrEvent['id'] ?>">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title"><?= $arrEvent['title'] ?></h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <?php foreach ($arrOrganizer['events'] as $arrEvent): ?>
+        <!-- The Modal for frontend editing-->
+        <div class="modal" id="modal_event_<?= $arrEvent['id'] ?>">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <!-- Modal Header -->
+              <div class="modal-header">
+                <h4 class="modal-title"><?= $arrEvent['title'] ?></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+              </div>
+              <!-- Modal body -->
+              <div class="modal-body">
+                <form id="editEventForm_<?= $arrEvent['id'] ?>" method="post" action="{{env::request}}">
+                  <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
+                  <input type="hidden" name="FORM_SUBMIT" value="edit-event">
+                  <input type="hidden" name="id" value="<?= $arrEvent['id'] ?>">
+                  <input type="hidden" name="submitted_fields" value="<?= implode(';', $arrOrganizer['feEditables']) ?>">
+                    <?php foreach ($arrOrganizer['feEditables'] as $field): ?>
+                      <!-- <?= $field ?> -->
+                      <div class="form-group">
+                        <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?></label>
+                        <textarea class="form-control" rows="3" id="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>" name="<?= $field ?>"><?= \Contao\CalendarEventsModel::findByPk($arrEvent['id'])->{$field} ?></textarea>
+                      </div>
+                    <?php endforeach; ?>
+                  <button type="button" class="btn btn-danger send-form">Änderungen Speichern</button>
+                </form>
+              </div>
+              <!-- Modal footer -->
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <!-- Modal body -->
-        <div class="modal-body">
-          <form id="editEventForm_<?= $arrEvent['id'] ?>" method="post" action="{{env::request}}">
-              <?php $arrEditable = array('teaser', 'tourDetailText', 'meetingPoint', 'equipment', 'miscellaneous', 'leistungen'); ?>
-            <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
-            <input type="hidden" name="FORM_SUBMIT" value="edit-event">
-            <input type="hidden" name="id" value="<?= $arrEvent['id'] ?>">
-            <input type="hidden" name="submitted_fields" value="<?= implode(';', $arrEditable) ?>">
-              <?php foreach ($arrEditable as $field): ?>
-                <!-- <?= $field ?> -->
-                <div class="form-group">
-                  <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?></label>
-                  <textarea class="form-control" rows="5" id="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>" name="<?= $field ?>"><?= \Contao\CalendarEventsModel::findByPk($arrEvent['id'])->{$field} ?></textarea>
-                </div>
-              <?php endforeach; ?>
-            <button type="button" class="btn btn-danger send-form">Änderungen Speichern</button>
-          </form>
-        </div>
-        <!-- Modal footer -->
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- End modal -->
-  <?php endforeach; ?>
+        <!-- End modal -->
         <?php endforeach; ?>
-
+      <?php endforeach; ?>
     <?php endif; ?>
 <?php endif; ?>
 
