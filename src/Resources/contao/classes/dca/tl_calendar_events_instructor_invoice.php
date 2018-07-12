@@ -129,7 +129,6 @@ class tl_calendar_events_instructor_invoice extends Backend
 
                 if (!$blnAllow)
                 {
-                    die($objEvent->title);
                     Message::addError('Sie besitzen nicht die n&ouml;tigen Rechte, um diese Seite zu sehen.', 'BE');
                     $this->redirect($this->getReferer());
                 }

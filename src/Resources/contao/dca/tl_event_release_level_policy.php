@@ -78,7 +78,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
     ),
     'palettes' => array
     (
-        'default' => 'level,title,description,allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowSwitchingToPrevLevel,allowSwitchingToNextLevel,groups',
+        'default' => 'level,title,description,allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowSwitchingToPrevLevel,allowSwitchingToNextLevel,groupReleaseLevelRights',
     ),
 
     'fields' => array
@@ -122,16 +122,6 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
             'eval'      => array('mandatory' => true, 'tl_class' => 'clr'),
             'sql'       => "text NULL",
         ),
-        'groups'                        => array
-        (
-            'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['groups'],
-            'exclude'    => true,
-            'inputType'  => 'checkbox',
-            'relation'   => array('type' => 'hasMany', 'load' => 'eager'),
-            'foreignKey' => 'tl_user_group.name',
-            'eval'       => array('multiple' => true, 'chosen' => true, 'mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'clr'),
-            'sql'        => "blob NULL",
-        ),
         'allowSwitchingToPrevLevel'     => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowSwitchingToPrevLevel'],
@@ -171,6 +161,57 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
             'filter'    => true,
             'inputType' => 'checkbox',
             'sql'       => "char(1) NOT NULL default ''",
+        ),
+        'groupReleaseLevelRights'       => array(
+            'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['groupReleaseLevelRights'],
+            'exclude'   => true,
+            'inputType' => 'multiColumnWizard',
+            'eval'      => array
+            (
+                'mandatory'    => false,
+                'columnFields' => array
+                (
+                    'group'              => array
+                    (
+                        'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['group'],
+                        'exclude'    => true,
+                        'inputType'  => 'select',
+                        'reference'  => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
+                        'relation'   => array('type' => 'hasMany', 'load' => 'eager'),
+                        'foreignKey' => 'tl_user_group.name',
+                        'eval'       => array
+                        (
+                            'style'              => 'width:250px',
+                            'mandatory'          => true,
+                            'includeBlankOption' => true,
+                        ),
+                    ),
+                    'releaseLevelRights' => array
+                    (
+                        'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['releaseLevelRights'],
+                        'exclude'   => true,
+                        'inputType' => 'select',
+                        'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
+                        'options'   => array('up', 'down', 'upAndDown'),
+                        'eval'      => array
+                        (
+                            'style'              => 'width:250px',
+                            'mandatory'          => true,
+                            'includeBlankOption' => true,
+                        ),
+                    ),
+                    'writeAccess'        => array
+                    (
+                        'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['writeAccess'],
+                        'exclude'   => true,
+                        'inputType' => 'checkbox',
+                        'eval'      => array(
+                            'style' => 'width:100px',
+                        ),
+                    ),
+                ),
+            ),
+            'sql'       => "blob NULL",
         ),
     ),
 );

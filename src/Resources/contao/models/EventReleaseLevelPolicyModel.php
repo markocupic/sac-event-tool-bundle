@@ -13,6 +13,7 @@
  */
 
 namespace Contao;
+
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
@@ -305,22 +306,15 @@ class EventReleaseLevelPolicyModel extends \Model
             Message::addError('ReleaseLevelModel not found for tl_calendar_events with ID ' . $objEvent->id . '. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
             return false;
         }
-        $allow = false;
 
         $arrGroupsUserBelongsTo = \StringUtil::deserialize($objBackendUser->groups, true);
-
-        $arrAllowedGroups = \StringUtil::deserialize($objReleaseLevelModel->groups, true);
-
         $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
+
+        $allow = false;
 
         // Check if user has permission
         if ($objBackendUser->admin)
         {
-            $allow = true;
-        }
-        elseif (count(array_intersect($arrGroupsUserBelongsTo, $arrAllowedGroups)) >= 1)
-        {
-            // User is in a group that is permitted
             $allow = true;
         }
         elseif ($objBackendUser->id == $objEvent->author && $objReleaseLevelModel->allowWriteAccessToAuthor)
@@ -335,19 +329,29 @@ class EventReleaseLevelPolicyModel extends \Model
         }
         else
         {
-            $allow = false;
+            // Check if user is in a group that is permitted
+            $arrGroups = \StringUtil::deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
+            foreach ($arrGroups as $k => $v)
+            {
+                if (in_array($v['group'], $arrGroupsUserBelongsTo))
+                {
+                    if ($v['writeAccess'])
+                    {
+                        $allow = true;
+                        continue;
+                    }
+                }
+            }
         }
         return $allow;
 
     }
 
-
-
     /**
      *
      * Switching to the next/prev level is allowed for:
      * - admins on each level
-     * - for super users (defined in each level in tl_event_release_level_policy.groups)
+     * - for super users (defined in each level in tl_event_release_level_policy.groupReleaseLevelRights)
      * - for authors if he is allowed
      * - for instructors if they are allowed
      *
@@ -396,32 +400,26 @@ class EventReleaseLevelPolicyModel extends \Model
             Message::addError('ReleaseLevelModel not found for tl_calendar_events with ID ' . $objEvent->id . '. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
             return false;
         }
-        $allow = false;
 
         $arrGroupsUserBelongsTo = \StringUtil::deserialize($objBackendUser->groups, true);
-
-        $arrAllowedGroups = \StringUtil::deserialize($objReleaseLevelModel->groups, true);
-
         $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
+
+        $allow = false;
 
         // Check if user has permission
         if ($objBackendUser->admin)
         {
             $allow = true;
         }
-        elseif (count(array_intersect($arrGroupsUserBelongsTo, $arrAllowedGroups)) >= 1)
-        {
-            // User is in a group that is permitted
-            $allow = true;
-        }
+
         elseif ($objBackendUser->id == $objEvent->author && $objReleaseLevelModel->allowWriteAccessToAuthor)
         {
             // User is author and is allowed to switch up/down
-            if($direction === 'up' && $objReleaseLevelModel->allowSwitchingToNextLevel)
+            if ($direction === 'up' && $objReleaseLevelModel->allowSwitchingToNextLevel)
             {
                 $allow = true;
             }
-            if($direction === 'down' && $objReleaseLevelModel->allowSwitchingToPrevLevel)
+            if ($direction === 'down' && $objReleaseLevelModel->allowSwitchingToPrevLevel)
             {
                 $allow = true;
             }
@@ -429,18 +427,43 @@ class EventReleaseLevelPolicyModel extends \Model
         elseif (in_array($objBackendUser->id, $arrInstructors))
         {
             // User is set as a instructor in the current event and is allowed to switch up/down
-            if($direction === 'up' && $objReleaseLevelModel->allowSwitchingToNextLevel)
+            if ($direction === 'up' && $objReleaseLevelModel->allowSwitchingToNextLevel)
             {
                 $allow = true;
             }
-            if($direction === 'down' && $objReleaseLevelModel->allowSwitchingToPrevLevel)
+            if ($direction === 'down' && $objReleaseLevelModel->allowSwitchingToPrevLevel)
             {
                 $allow = true;
             }
         }
         else
         {
-            $allow = false;
+            // Check if user is in a group that is permitted
+            $arrGroups = \StringUtil::deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
+            $arrAllowedGroups = array();
+            foreach ($arrGroups as $k => $v)
+            {
+                $arrAllowedGroups[$v['group']] = $v;
+                if (in_array($v['group'], $arrGroupsUserBelongsTo))
+                {
+                    if ($direction === 'up')
+                    {
+                        if ($v['releaseLevelRights'] === 'up' || $v['releaseLevelRights'] === 'upAndDown')
+                        {
+                            $allow = true;
+                            continue;
+                        }
+                    }
+                    if ($direction === 'down')
+                    {
+                        if ($v['releaseLevelRights'] === 'down' || $v['releaseLevelRights'] === 'upAndDown')
+                        {
+                            $allow = true;
+                            continue;
+                        }
+                    }
+                }
+            }
         }
         return $allow;
 
