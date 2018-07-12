@@ -147,7 +147,7 @@ class EventReleaseLevelPolicyModel extends \Model
     /**
      * Deleting events is allowed for:
      * - admins on each level
-     * - for super users on each level
+     * - for super users (defined in each level in tl_event_release_level_policy.groupReleaseLevelRights)
      * - for authors and (instructors) only on the first level
      * - for all users, if if there is no release package defined in tl_calendar
      * @param $userId
@@ -193,22 +193,15 @@ class EventReleaseLevelPolicyModel extends \Model
             Message::addError('ReleaseLevelModel not found for tl_calendar_events with ID ' . $objEvent->id . '. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
             return false;
         }
-        $allow = false;
 
         $arrGroupsUserBelongsTo = \StringUtil::deserialize($objBackendUser->groups, true);
-
-        $arrAllowedGroups = \StringUtil::deserialize($objReleaseLevelModel->groups, true);
-
         $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
+
+        $allow = false;
 
         // Check if user has permission
         if ($objBackendUser->admin)
         {
-            $allow = true;
-        }
-        elseif (count(array_intersect($arrGroupsUserBelongsTo, $arrAllowedGroups)) >= 1)
-        {
-            // User is in a group that is permitted
             $allow = true;
         }
         elseif (static::findPrevLevel($objEvent->eventReleaseLevel) === null && $objBackendUser->id == $objEvent->author && $objReleaseLevelModel->allowWriteAccessToAuthor)
@@ -223,7 +216,19 @@ class EventReleaseLevelPolicyModel extends \Model
         }
         else
         {
-            $allow = false;
+            // Check if user is in a group that is permitted
+            $arrGroups = \StringUtil::deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
+            foreach ($arrGroups as $k => $v)
+            {
+                if (in_array($v['group'], $arrGroupsUserBelongsTo))
+                {
+                    if ($v['writeAccess'])
+                    {
+                        $allow = true;
+                        continue;
+                    }
+                }
+            }
         }
         return $allow;
     }
@@ -259,7 +264,7 @@ class EventReleaseLevelPolicyModel extends \Model
     /**
      * Writing/editing an event is allowed for:
      * - admins on each level
-     * - for super users (defined in each level in tl_event_release_level_policy.groups)
+     * - for super users (defined in each level in tl_event_release_level_policy.groupReleaseLevelRights)
      * - for authors if he is allowed on the current level
      * - for instructors if they are allowed  on the current level
      *
