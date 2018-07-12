@@ -214,9 +214,10 @@ class EventReleaseLevelPolicyModel extends \Model
             // The event is on the first level and the user is set as a instructor in the current event
             $allow = true;
         }
-        else
+
+        // Check if user is in a group that is permitted
+        if($allow === false)
         {
-            // Check if user is in a group that is permitted
             $arrGroups = \StringUtil::deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
             foreach ($arrGroups as $k => $v)
             {
@@ -230,6 +231,7 @@ class EventReleaseLevelPolicyModel extends \Model
                 }
             }
         }
+
         return $allow;
     }
 
@@ -332,9 +334,10 @@ class EventReleaseLevelPolicyModel extends \Model
             // User is set as a instructor in the current event
             $allow = true;
         }
-        else
+
+        // Check if user is in a group that is permitted
+        if($allow === false)
         {
-            // Check if user is in a group that is permitted
             $arrGroups = \StringUtil::deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
             foreach ($arrGroups as $k => $v)
             {
@@ -348,6 +351,7 @@ class EventReleaseLevelPolicyModel extends \Model
                 }
             }
         }
+
         return $allow;
 
     }
@@ -441,9 +445,10 @@ class EventReleaseLevelPolicyModel extends \Model
                 $allow = true;
             }
         }
-        else
+
+        // Check if user is in a group that is permitted
+        if ($allow === false)
         {
-            // Check if user is in a group that is permitted
             $arrGroups = \StringUtil::deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
             $arrAllowedGroups = array();
             foreach ($arrGroups as $k => $v)
@@ -470,6 +475,7 @@ class EventReleaseLevelPolicyModel extends \Model
                 }
             }
         }
+
         return $allow;
 
     }
