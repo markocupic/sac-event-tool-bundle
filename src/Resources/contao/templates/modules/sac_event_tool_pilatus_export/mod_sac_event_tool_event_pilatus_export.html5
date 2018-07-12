@@ -193,7 +193,7 @@
 
 <!-- tours grouped by organizers -->
 <?php if ($this->tours): ?>
-  <h3 class="ce_headline">Monatsprogramm Touren</h3>
+  <h3 class="ce_headline">Monatsprogramm Touren und Anlässe</h3>
   <table class="event-export-table event-export-table-courses table table-sm">
 
     <tbody>
@@ -209,6 +209,11 @@
         <?php endif; ?>
 
         <?php foreach ($arrOrganizer['events'] as $arrEvent): ?>
+            <?php if ($arrEvent['eventType'] == 'generalEvent'): ?>
+          <tr class="event-export-row-body">
+            <td class="event-export-headline" colspan="2" style="color:red"><strong>ALLGEMEINER ANLASS<strong></td>
+          </tr>
+            <?php endif; ?>
             <?php if ($arrEvent['headline'] != ''): ?>
           <tr class="event-export-row-body">
             <td class="event-export-headline" colspan="2"><strong><?= $arrEvent['headline'] ?><strong></td>

@@ -19,9 +19,7 @@ use Contao\Controller;
 use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
-use Contao\EventReleaseLevelPolicyModel;
 use Contao\Input;
-use Contao\Module;
 use Contao\StringUtil;
 use Haste\Form\Form;
 use Patchwork\Utf8;
@@ -30,7 +28,7 @@ use Patchwork\Utf8;
  * Class ModuleSacEventToolPilatusExport
  * @package Markocupic\SacEventToolBundle
  */
-class ModuleSacEventToolPilatusExport extends Module
+class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
 {
 
     /**
@@ -203,43 +201,6 @@ class ModuleSacEventToolPilatusExport extends Module
         $this->objForm = $objForm;
     }
 
-    /**
-     * @param $objEvent
-     * @return bool
-     */
-    public static function hasValidReleaseLevel($objEvent)
-    {
-        if ($objEvent->published)
-        {
-            return true;
-        }
-
-        if ($objEvent !== null)
-        {
-            $objCalendar = $objEvent->getRelated('pid');
-            if ($objCalendar !== null)
-            {
-                if ($objCalendar->levelAccessPermissionPackage)
-                {
-                    $objEventReleaseLevel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
-                    if ($objEventReleaseLevel !== null)
-                    {
-                        $nextLevelModel = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
-                        $lastLevelModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
-                        if ($nextLevelModel !== null && $lastLevelModel !== null)
-                        {
-                            if ($nextLevelModel->id === $lastLevelModel->id)
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
 
     /**
      *
@@ -261,7 +222,7 @@ class ModuleSacEventToolPilatusExport extends Module
 
             // Check if event is at least on second highest level (Level 3/4)
             $eventModel = CalendarEventsModel::findByPk($objEvent->id);
-            if(!self::hasValidReleaseLevel($eventModel))
+            if(!$this->hasValidReleaseLevel($eventModel))
             {
                 continue;
             }
@@ -409,7 +370,7 @@ class ModuleSacEventToolPilatusExport extends Module
 
             // Check if event is at least on second highest level (Level 3/4)
             $eventModel = CalendarEventsModel::findByPk($objEvent->id);
-            if(!self::hasValidReleaseLevel($eventModel))
+            if(!$this->hasValidReleaseLevel($eventModel))
             {
                 continue;
             }
@@ -466,7 +427,9 @@ class ModuleSacEventToolPilatusExport extends Module
         $arrTextareas = array('teaser', 'terms', 'issues', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous',);
         foreach ($arrTextareas as $field)
         {
+
             $arrRow[$field] = nl2br($objEvent->{$field});
+            $arrRow[$field] = $this->searchAndReplace($arrRow[$field]);
             $arrFeEditables[] = $field;
         }
 
@@ -522,7 +485,7 @@ class ModuleSacEventToolPilatusExport extends Module
 
                 // Check if event is at least on second highest level (Level 3/4)
                 $eventModel = CalendarEventsModel::findByPk($objEvent->id);
-                if(!self::hasValidReleaseLevel($eventModel))
+                if(!$this->hasValidReleaseLevel($eventModel))
                 {
                     continue;
                 }

@@ -21,7 +21,6 @@ use Contao\Date;
 use Contao\Environment;
 use Contao\EventOrganizerModel;
 use Contao\Input;
-use Contao\Module;
 use Contao\StringUtil;
 use Contao\UserRoleModel;
 use Haste\Form\Form;
@@ -32,7 +31,7 @@ use Patchwork\Utf8;
  * Class ModuleSacEventToolJahresprogrammExport
  * @package Markocupic\SacEventToolBundle
  */
-class ModuleSacEventToolJahresprogrammExport extends Module
+class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExport
 {
 
     /**
@@ -238,7 +237,7 @@ class ModuleSacEventToolJahresprogrammExport extends Module
 
             // Check if event is at least on second highest level (Level 3/4)
             $eventModel = CalendarEventsModel::findByPk($objEvents->id);
-            if(!ModuleSacEventToolPilatusExport::hasValidReleaseLevel($eventModel))
+            if(!$this->hasValidReleaseLevel($eventModel))
             {
                 continue;
             }
