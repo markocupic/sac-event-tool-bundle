@@ -2,59 +2,60 @@
 // Start session
 session_start();
 ?>
-
-<?php if (!$_SESSION['layout_table']): ?>
-  <div class="col-xl-6 event-item event-item-course event layout_upcoming<?php echo $this->classUpcoming; ?>" data-id="<?= $this->id ?>" data-event-type="<?= $this->courseTypeLevel1 ?>">
-    <div class="row">
-      <div class="col-sm-3 col-xl-5 d-none d-sm-block">
-        <a class="responsive" href="{{event_url::<?php echo $this->id; ?>}}">
-          {{picture::<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventImagePath($this->id) ?>?size=20&alt=<?= $this->title ?>}}
-        </a>
-      </div>
-
-      <div class="col-sm-9 col-xl-7">
-        <div class="title">
-          <a href="{{event_url::<?php echo $this->id; ?>}}">
-            <h3 class="headline">{{event_title::<?= $this->id ?>}}</h3>
+<?php if($this->eventType === 'course'): ?>
+  <?php if (!$_SESSION['layout_table']): ?>
+    <div class="col-xl-6 event-item event-item-course event layout_upcoming<?php echo $this->classUpcoming; ?>" data-id="<?= $this->id ?>" data-event-type="<?= $this->courseTypeLevel1 ?>">
+      <div class="row">
+        <div class="col-sm-3 col-xl-5 d-none d-sm-block">
+          <a class="responsive" href="{{event_url::<?php echo $this->id; ?>}}">
+            {{picture::<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventImagePath($this->id) ?>?size=20&alt=<?= $this->title ?>}}
           </a>
-          <h5><?= \CourseMainTypeModel::findByPk($this->courseTypeLevel0)->name ?>: <?= \CourseSubTypeModel::findByPk($this->courseTypeLevel1)->name ?></h5>
         </div>
-        <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id,true); ?>
-        <div class="detail-item">
-          <i class="fa fa-fw fa-user"></i>Leitung: <?= implode(', ', $arrInstructors) ?>
-        </div>
-        <div class="detail-item">
-          <i class="fa fa-fw fa-calendar-alt"></i><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventPeriod($this->id) ?>
-        </div>
-        <div class="detail-item">
-            <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id); ?>
-            <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id)]; ?>
-            <?php $bookingState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($this->id); ?>
-            <?= $bookingState ?> <?= $eventStateLabel ?>
-          <!--<i class="fa-fw event-state-icon <?= $eventState ?>" aria-label="<?= $eventStateLabel ?>" data-toggle="tooltip" data-placement="top" title="<?= $eventStateLabel ?>"></i><?= $eventStateLabel ?>-->
+
+        <div class="col-sm-9 col-xl-7">
+          <div class="title">
+            <a href="{{event_url::<?php echo $this->id; ?>}}">
+              <h3 class="headline">{{event_title::<?= $this->id ?>}}</h3>
+            </a>
+            <h5><?= \CourseMainTypeModel::findByPk($this->courseTypeLevel0)->name ?>: <?= \CourseSubTypeModel::findByPk($this->courseTypeLevel1)->name ?></h5>
+          </div>
+          <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id,true); ?>
+          <div class="detail-item">
+            <i class="fa fa-fw fa-user"></i>Leitung: <?= implode(', ', $arrInstructors) ?>
+          </div>
+          <div class="detail-item">
+            <i class="fa fa-fw fa-calendar-alt"></i><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventPeriod($this->id) ?>
+          </div>
+          <div class="detail-item">
+              <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id); ?>
+              <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id)]; ?>
+              <?php $bookingState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($this->id); ?>
+              <?= $bookingState ?> <?= $eventStateLabel ?>
+            <!--<i class="fa-fw event-state-icon <?= $eventState ?>" aria-label="<?= $eventStateLabel ?>" data-toggle="tooltip" data-placement="top" title="<?= $eventStateLabel ?>"></i><?= $eventStateLabel ?>-->
+          </div>
         </div>
       </div>
     </div>
-  </div>
-<?php endif; ?>
+  <?php endif; ?>
 
-<?php if ($_SESSION['layout_table']): ?>
-  <tr class="event-item event-item-course event" data-id="<?= $this->id ?>" data-event-type="<?= $this->courseTypeLevel1 ?>">
-    <td>
-        <?= \Date::parse('d.m.Y', $this->startDate) ?>
-    </td>
-    <td>
-        <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventDuration($this->id) ?>
-    </td>
-    <td>
-      <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id); ?>
-      <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id)]; ?>
-      <i class="event-state-icon fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" data-toggle="tooltip" data-placement="top" title="<?= $eventStateLabel ?>"></i></td>
-    <td>
-      <a href="{{event_url::<?php echo $this->id; ?>}}">{{event_title::<?= $this->id ?>}}</a>
-    </td>
-    <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($this->id) ?></td>
-    <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id); ?>
-    <td><?= implode(', ', $arrInstructors) ?></td>
-  </tr>
+  <?php if ($_SESSION['layout_table']): ?>
+    <tr class="event-item event-item-course event" data-id="<?= $this->id ?>" data-event-type="<?= $this->courseTypeLevel1 ?>">
+      <td>
+          <?= \Date::parse('d.m.Y', $this->startDate) ?>
+      </td>
+      <td>
+          <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventDuration($this->id) ?>
+      </td>
+      <td>
+        <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id); ?>
+        <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id)]; ?>
+        <i class="event-state-icon fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" data-toggle="tooltip" data-placement="top" title="<?= $eventStateLabel ?>"></i></td>
+      <td>
+        <a href="{{event_url::<?php echo $this->id; ?>}}">{{event_title::<?= $this->id ?>}}</a>
+      </td>
+      <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($this->id) ?></td>
+      <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id); ?>
+      <td><?= implode(', ', $arrInstructors) ?></td>
+    </tr>
+  <?php endif; ?>
 <?php endif; ?>

@@ -34,7 +34,16 @@
           </p>
         </div>
 
-          <?php if ($this->location != ''): ?>
+        <div class="organizers event-detail event-info-box icon-box-small">
+          <h5>Organisierende Gruppe</h5>
+          <p>
+              <?php $organizers = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($this->id, 'title'); ?>
+              <?php if (!empty($organizers)): ?><?= implode('<br>', $organizers) ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
+          </p>
+        </div>
+
+
+        <?php if ($this->location != ''): ?>
             <div class="location event-detail event-info-box icon-box-small">
               <h5>Kursort</h5>
               <p><?= $this->location ?></p>

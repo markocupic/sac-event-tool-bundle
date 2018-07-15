@@ -216,12 +216,15 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         if (Input::get('act') === 'editAll' || Input::get('act') === 'overrideAll')
         {
             $allow = true;
-            $objCalendar = \Contao\CalendarModel::findByPk(CURRENT_ID);
-            if ($objCalendar !== null)
+            $objSession = System::getContainer()->get('session');
+            $session = $objSession->get('CURRENT');
+            $arrIDS = $session['IDS'];
+            foreach ($arrIDS as $eventId)
             {
-                if ($objCalendar->levelAccessPermissionPackage)
+                $objEvent = \Contao\CalendarEventsModel::findByPk($eventId);
+                if ($objEvent !== null)
                 {
-                    $objEventReleaseLevelPolicyPackageModel = $objCalendar->getRelated('levelAccessPermissionPackage');
+                    $objEventReleaseLevelPolicyPackageModel = \Contao\EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($eventId);
                     if ($objEventReleaseLevelPolicyPackageModel !== null)
                     {
                         $objReleaseLevelModel = \Contao\EventReleaseLevelPolicyModel::findByPid($objEventReleaseLevelPolicyPackageModel->id);
@@ -229,19 +232,26 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         {
                             while ($objReleaseLevelModel->next())
                             {
-
+                                $allow = false;
                                 $arrGroupsUserBelongsTo = \StringUtil::deserialize($this->User->groups, true);
-                                $arrAllowedGroups = \StringUtil::deserialize($objReleaseLevelModel->groups, true);
-
-                                if (!array_intersect($arrGroupsUserBelongsTo, $arrAllowedGroups))
+                                $arrGroups = \StringUtil::deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
+                                foreach ($arrGroups as $k => $v)
                                 {
-                                    $allow = false;
+                                    if (in_array($v['group'], $arrGroupsUserBelongsTo))
+                                    {
+                                        if ($v['releaseLevelRights'] === 'upAndDown')
+                                        {
+                                            $allow = true;
+                                            continue;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+
             if ($this->User->isAdmin || $allow === true)
             {
                 \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
@@ -309,52 +319,49 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $objEventsModel = CalendarEventsModel::findOneById(Input::get('id'));
             if ($objEventsModel !== null)
             {
-                if (!EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objEventsModel->id) && $this->User->id !== $objEventsModel->registrationGoesTo)
+                if (EventReleaseLevelPolicyModel::findByPk($objEventsModel->eventReleaseLevel) !== null)
                 {
-                    // User has no write access to the datarecord, so present field values without the form input
-                    foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] as $field => $dca)
+                    if (!EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objEventsModel->id) && $this->User->id !== $objEventsModel->registrationGoesTo)
                     {
-                        $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['input_field_callback'] = array('tl_calendar_events_sac_event_tool', 'showFieldValue');
-                    }
-                    if (Input::post('FORM_SUBMIT') === 'tl_calendar_events')
-                    {
-                        Message::addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'], $objEventsModel->id));
-                        $this->redirect($this->getReferer());
-                    }
-                }
-                else
-                {
-                    // Protect fields with $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEdititingOnFirstReleaseLevelOnly'] == true,
-                    // if the event is on the first release level
-                    if (!$this->User->isAdmin)
-                    {
-                        $objCalendarModel = $objEventsModel->getRelated('pid');
-                        if ($objCalendarModel !== null)
+                        // User has no write access to the datarecord, so present field values without the form input
+                        foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] as $field => $dca)
                         {
-                            if ($objCalendarModel->useLevelAccessPermissions)
+                            $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['input_field_callback'] = array('tl_calendar_events_sac_event_tool', 'showFieldValue');
+                        }
+                        if (Input::post('FORM_SUBMIT') === 'tl_calendar_events')
+                        {
+                            Message::addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'], $objEventsModel->id));
+                            $this->redirect($this->getReferer());
+                        }
+                    }
+                    else
+                    {
+                        // Protect fields with $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEdititingOnFirstReleaseLevelOnly'] == true,
+                        // if the event is on the first release level
+                        if (!$this->User->isAdmin)
+                        {
+                            $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($objEventsModel->id);
+                            if ($objEventReleaseLevelPolicyPackageModel !== null)
                             {
-                                $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findByPk($objCalendarModel->levelAccessPermissionPackage);
-                                if ($objEventReleaseLevelPolicyPackageModel !== null)
+                                if ($objEventsModel->eventReleaseLevel > 0)
                                 {
-                                    if ($objEventsModel->eventReleaseLevel > 0)
+                                    $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEventsModel->id);
+                                    if ($objEventReleaseLevelPolicyModel !== null)
                                     {
-                                        $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEventsModel->id);
-                                        if ($objEventReleaseLevelPolicyModel !== null)
+                                        if ($objEventReleaseLevelPolicyModel->id != $objEventsModel->eventReleaseLevel)
                                         {
-                                            if ($objEventReleaseLevelPolicyModel->id != $objEventsModel->eventReleaseLevel)
+                                            foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] as $fieldname => $arrDca)
                                             {
-                                                foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] as $fieldname => $arrDca)
+                                                if ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEdititingOnFirstReleaseLevelOnly'] == true && $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['inputType'] != '')
                                                 {
-                                                    if ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEdititingOnFirstReleaseLevelOnly'] == true && $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['inputType'] != '')
-                                                    {
-                                                        $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['input_field_callback'] = array('tl_calendar_events_sac_event_tool', 'showFieldValue');
-                                                    }
+                                                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['input_field_callback'] = array('tl_calendar_events_sac_event_tool', 'showFieldValue');
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
+
                         }
                     }
                 }
@@ -370,15 +377,11 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $session = $objSessionBag->all();
             $filter = ($GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['mode'] == 4) ? 'tl_calendar_events_' . CURRENT_ID : 'tl_calendar_events';
 
-            $objCalendar = CalendarModel::findByPk(CURRENT_ID);
-            if ($objCalendar !== null)
+            if (!isset($session['filter'][$filter]['eventReleaseLevel']))
             {
-                if (!isset($session['filter'][$filter]['eventReleaseLevel']) && $objCalendar->useLevelAccessPermissions)
-                {
-                    Message::addInfo('"Mehrere bearbeiten" nur möglich, wenn ein Freigabestufen-Filter gesetzt wurde."');
-                    $this->redirect($this->getReferer());
-                    return;
-                }
+                Message::addInfo('"Mehrere bearbeiten" nur möglich, wenn ein Freigabestufen-Filter gesetzt wurde."');
+                $this->redirect($this->getReferer());
+                return;
             }
         }
 
@@ -386,23 +389,17 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         // Nur Datensätze auflisten bei denen der angemeldete Benutzer schreibberechtigt ist
         if (Input::get('act') === 'select' || Input::get('act') === 'editAll')
         {
-            $objCalendar = CalendarModel::findByPk(CURRENT_ID);
-            if ($objCalendar !== null)
+            $arrIDS = array(0);
+            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE pid=?')->execute(CURRENT_ID);
+            while ($objDb->next())
             {
-                if ($objCalendar->useLevelAccessPermissions)
+                if (EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objDb->id))
                 {
-                    $arrIDS = array(0);
-                    $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE pid=?')->execute(CURRENT_ID);
-                    while ($objDb->next())
-                    {
-                        if (EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objDb->id))
-                        {
-                            $arrIDS[] = $objDb->id;
-                        }
-                    }
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['root'] = $arrIDS;
+                    $arrIDS[] = $objDb->id;
                 }
             }
+            $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['root'] = $arrIDS;
+
         }
 
         // Do not allow editing write protected fields in editAll mode
@@ -560,7 +557,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             }
 
             $objCalendar = \Contao\CalendarModel::findByPk(Input::get('id'));
-            $csv->output($objCalendar->title .'.csv');
+            $csv->output($objCalendar->title . '.csv');
             die();
         }
 
@@ -985,25 +982,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $objEventsModel->mainInstructor = $this->User->id;
             $objEventsModel->instructor = serialize(array(array('instructorId' => $this->User->id)));
             $objEventsModel->save();
-
-
-            $objCalendarModel = $objEventsModel->getRelated('pid');
-            if ($objCalendarModel !== null)
-            {
-                if ($objCalendarModel->useLevelAccessPermissions)
-                {
-                    $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findByPk($objCalendarModel->levelAccessPermissionPackage);
-                    if ($objEventReleaseLevelPolicyPackageModel !== null)
-                    {
-                        $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEventsModel->id);
-                        if ($objEventReleaseLevelPolicyModel !== null)
-                        {
-                            $objEventsModel->eventReleaseLevel = $objEventReleaseLevelPolicyModel->id;
-                            $objEventsModel->save();
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -1022,21 +1000,14 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $objEventsModel->author = $this->User->id;
             $objEventsModel->save();
 
-            $objCalendarModel = $objEventsModel->getRelated('pid');
-            if ($objCalendarModel !== null)
+            // Set eventReleaseLevel
+            if ($objEventsModel->eventType != '')
             {
-                if ($objCalendarModel->useLevelAccessPermissions)
+                $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEventsModel->id);
+                if ($objEventReleaseLevelPolicyModel !== null)
                 {
-                    $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findByPk($objCalendarModel->levelAccessPermissionPackage);
-                    if ($objEventReleaseLevelPolicyPackageModel !== null)
-                    {
-                        $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEventsModel->id);
-                        if ($objEventReleaseLevelPolicyModel !== null)
-                        {
-                            $objEventsModel->eventReleaseLevel = $objEventReleaseLevelPolicyModel->id;
-                            $objEventsModel->save();
-                        }
-                    }
+                    $objEventsModel->eventReleaseLevel = $objEventReleaseLevelPolicyModel->id;
+                    $objEventsModel->save();
                 }
             }
         }
@@ -1124,12 +1095,36 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $objCalendar = CalendarEventsModel::findByPk($dc->id)->getRelated('pid');
         }
 
+        $arrAllowedEventTypes = array();
+        $objUser = \Contao\BackendUser::getInstance();
+        if ($objUser !== null)
+        {
+            $arrGroups = \Contao\StringUtil::deserialize($objUser->groups, true);
+            foreach ($arrGroups as $group)
+            {
+                $objGroup = \Contao\UserGroupModel::findByPk($group);
+                if (!empty($objGroup->allowedEventTypes) && is_array($objGroup->allowedEventTypes))
+                {
+                    $arrAllowedEvtTypes = \Contao\StringUtil::deserialize($objGroup->allowedEventTypes, true);
+                    foreach ($arrAllowedEvtTypes as $eventType)
+                    {
+                        if (!in_array($eventType, $arrAllowedEventTypes))
+                        {
+                            $arrAllowedEventTypes[] = $eventType;
+                        }
+                    }
+                }
+            }
+        }
+
         if ($objCalendar !== null)
         {
             $arrEventTypes = \Contao\StringUtil::deserialize($objCalendar->allowedEventTypes, true);
+            //$arrEventTypes = array_intersect($arrEventTypes,$arrAllowedEventTypes);
         }
 
         return $arrEventTypes;
+
     }
 
 
@@ -1168,49 +1163,55 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     {
         $options = array();
 
-        $calendarId = null;
+        $objUser = \Contao\BackendUser::getInstance();
+        $arrAllowedEventTypes = array();
 
-        if (Input::get('act') === 'overrideAll' || Input::get('act') === 'editAll')
+        if ($objUser !== null)
         {
-            $calendarId = Input::get('id');
-        }
-        else
-        {
-            $intId = $dc->activeRecord->id;
-            if (strlen($intId))
+            if (!$objUser->admin)
             {
-                $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
-                if ($objEvent !== null)
+                $arrGroups = \Contao\StringUtil::deserialize($objUser->groups, true);
+                foreach ($arrGroups as $group)
                 {
-                    $objCalendar = $objEvent->getRelated('pid');
-                    if ($objCalendar !== null)
+                    $objGroup = \Contao\UserGroupModel::findByPk($group);
+                    if ($objGroup !== null)
                     {
-                        $calendarId = $objCalendar->id;
+                        $arrEventTypes = \Contao\StringUtil::deserialize($objGroup->allowedEventTypes, true);
+                        foreach ($arrEventTypes as $eventType)
+                        {
+                            if (!in_array($eventType, $arrAllowedEventTypes))
+                            {
+                                $arrAllowedEventTypes[] = $eventType;
+                            }
+                        }
                     }
                 }
-            }
-        }
-
-        if ($calendarId !== null)
-        {
-            $objCalendar = CalendarModel::findByPk($calendarId);
-            if ($objCalendar !== null)
-            {
-                if ($objCalendar->useLevelAccessPermissions)
+                foreach ($arrAllowedEventTypes as $eventType)
                 {
-                    $objEventReleasePackage = EventReleaseLevelPolicyPackageModel::findByPk($objCalendar->levelAccessPermissionPackage);
-                    if ($objEventReleasePackage !== null)
+                    $objEventType = \Contao\EventTypeModel::findByPk($eventType);
+                    if ($objEventType !== null)
                     {
-                        $objEventReleaseLevels = $this->Database->prepare('SELECT * FROM tl_event_release_level_policy WHERE pid=? ORDER BY level ASC')->execute($objEventReleasePackage->id);
-                        while ($objEventReleaseLevels->next())
+                        $objEventReleasePackage = \Contao\EventReleaseLevelPolicyPackageModel::findByPk($objEventType->levelAccessPermissionPackage);
+                        if ($objEventReleasePackage !== null)
                         {
-                            $options[$objEventReleaseLevels->id] = 'Stufe ' . $objEventReleaseLevels->level . ' - ' . $objEventReleaseLevels->title;
+                            $objEventReleaseLevels = $this->Database->prepare('SELECT * FROM tl_event_release_level_policy WHERE pid=? ORDER BY level ASC')->execute($objEventReleasePackage->id);
+                            while ($objEventReleaseLevels->next())
+                            {
+                                $options[\Contao\EventReleaseLevelPolicyModel::findByPk($objEventReleaseLevels->id)->getRelated('pid')->title][$objEventReleaseLevels->id] = $objEventReleaseLevels->title;
+                            }
                         }
                     }
                 }
             }
+            else
+            {
+                $objEventReleaseLevels = $this->Database->prepare('SELECT * FROM tl_event_release_level_policy ORDER BY pid,level ASC')->execute();
+                while ($objEventReleaseLevels->next())
+                {
+                    $options[\Contao\EventReleaseLevelPolicyModel::findByPk($objEventReleaseLevels->id)->getRelated('pid')->title][$objEventReleaseLevels->id] = $objEventReleaseLevels->title;
+                }
+            }
         }
-
 
         return $options;
     }
@@ -1339,7 +1340,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             return;
         }
 
-        // Set tl level 1, if useLevelAccessPermissions is activated in the parent calendar
+        // Set releaseLevel to level 1
         $eventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($dc->activeRecord->id);
         if ($eventReleaseLevelModel !== null)
         {
@@ -1393,6 +1394,42 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function onsubmitCallback(DataContainer $dc)
     {
+        // Set correct eventReleaseLevel
+        $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
+        if ($objEvent !== null)
+        {
+            if ($objEvent->eventType !== '')
+            {
+                if ($objEvent->eventReleaseLevel > 0)
+                {
+                    $objEventReleaseLevel = \Contao\EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+                    if ($objEventReleaseLevel !== null)
+                    {
+                        $objEventReleaseLevelPackage = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($objEvent->id);
+                        // Change eventReleaseLevel when changing eventType...
+                        if ($objEventReleaseLevel->pid !== $objEventReleaseLevelPackage->id)
+                        {
+                            $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
+                            if ($oEventReleaseLevelModel !== null)
+                            {
+                                $set = array('eventReleaseLevel' => $oEventReleaseLevelModel->id);
+                                $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Add eventReleaseLevel when creating a new event...
+                    $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
+                    $set = array('eventReleaseLevel' => $oEventReleaseLevelModel->id);
+                    $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
+                }
+            }
+        }
+        // End set correct eventReleaseLevel
+
+
         // Set filledInEventReportForm, now the invoice form can be printed in tl_calendar_events_instructor_invoice
         if (Input::get('call') === 'writeTourReport')
         {
@@ -1678,6 +1715,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function saveCallbackEventReleaseLevel($newEventReleaseLevelId, DC_Table $dc = null, $eventId = null)
     {
+        $hasError = false;
         // Get event id
         if ($dc->activeRecord->id > 0)
         {
@@ -1693,8 +1731,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             if ($lastEventReleaseModel !== null)
             {
 
-                // Display message in the backend
-                Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'], $objEvent->id, EventReleaseLevelPolicyModel::findByPk($newEventReleaseLevelId)->level));
 
                 // Display message in the backend if event is published or unpublished now
                 if ($lastEventReleaseModel->id == $newEventReleaseLevelId)
@@ -1707,6 +1743,18 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 }
                 else
                 {
+                    $eventReleaseModel = EventReleaseLevelPolicyModel::findByPk($newEventReleaseLevelId);
+                    $firstEventReleaseModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
+                    if ($eventReleaseModel !== null)
+                    {
+                        if ($eventReleaseModel->pid !== $firstEventReleaseModel->pid)
+                        {
+                            $hasError = true;
+                            $newEventReleaseLevelId = $firstEventReleaseModel->id;
+                            Message::addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" musste auf "%s" korrigiert werden, weil eine zum Event-Typ ungültige Freigabestufe gewählt wurde. ', $objEvent->title, $objEvent->id, $firstEventReleaseModel->title));
+                        }
+                    }
+
                     if ($objEvent->published)
                     {
                         Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
@@ -1714,9 +1762,57 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     $objEvent->published = '';
                 }
                 $objEvent->save();
+                if (!$hasError)
+                {
+                    // Display message in the backend
+                    Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'], $objEvent->id, EventReleaseLevelPolicyModel::findByPk($newEventReleaseLevelId)->level));
+                }
             }
         }
         return $newEventReleaseLevelId;
+
+    }
+
+    /**
+     * @param $strEventType
+     * @param DC_Table|null $dc
+     * @param null $eventId
+     * @return mixed
+     */
+    public function saveCallbackEventType($strEventType, DC_Table $dc = null, $eventId = null)
+    {
+        if ($strEventType !== '')
+        {
+
+            // Get event id
+            if ($dc->activeRecord->id > 0)
+            {
+                $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
+            }
+            elseif ($eventId > 0)
+            {
+                $objEvent = CalendarEventsModel::findByPk($eventId);
+            }
+            // !important, because if eventType is not saved, then no eventReleaseLevel can be assigned
+            $objEvent->eventType = $strEventType;
+            $objEvent->save();
+
+            if ($objEvent !== null)
+            {
+                if (EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel) === null)
+                {
+
+                    $objEventReleaseModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
+                    if ($objEventReleaseModel !== null)
+                    {
+                        $objEvent->eventReleaseLevel = $objEventReleaseModel->id;
+                        $objEvent->save();
+                    }
+                }
+            }
+        }
+
+        return $strEventType;
 
     }
 

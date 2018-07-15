@@ -9,15 +9,10 @@
  */
 
 // Legends
-$GLOBALS['TL_LANG']['tl_calendar']['access_permission_legend'] = 'Kalender Zugriffsrechte';
 $GLOBALS['TL_LANG']['tl_calendar']['event_type_legend'] = 'Event Typen Einstellungen';
-$GLOBALS['TL_LANG']['tl_calendar']['preview_page_legend'] = 'Vorschau Seite';
 
 // Fields
-$GLOBALS['TL_LANG']['tl_calendar']['useLevelAccessPermissions'] = array("Zugriffsstufen-Schreibschutz aktivieren", "Aktivieren Sie den Zugriffsstufen-Schreibschutz.");
-$GLOBALS['TL_LANG']['tl_calendar']['levelAccessPermissionPackage'] = array("Zugriffsstufen-Schreibschutz-Package", "W&auml;hlen Sie ein Zugriffsstufen-Schreibschutz-Package aus.");
 $GLOBALS['TL_LANG']['tl_calendar']['allowedEventTypes'] = array("Erlaubte Event Typen", "W&auml;hlen Sie die Event Typen, die im Kalender ausgew&auml;hlt werden d&uuml;rfen, aus.");
-$GLOBALS['TL_LANG']['tl_calendar']['previewPage'] = array("Vorschau Seite", "W&auml;hlen Sie die Seite aus, auf welche Benutzer aus dem Backend gelangen, wenn sie den Vorschau Button klicken.");
 
 
 // References

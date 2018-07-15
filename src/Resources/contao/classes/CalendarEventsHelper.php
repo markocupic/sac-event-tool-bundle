@@ -18,6 +18,7 @@ use Contao\Controller;
 use Contao\Database;
 use Contao\Date;
 use Contao\EventOrganizerModel;
+use Contao\EventTypeModel;
 use Contao\FilesModel;
 use Contao\MemberModel;
 use Contao\PageModel;
@@ -727,14 +728,25 @@ class CalendarEventsHelper extends System
     public static function generateEventPreviewUrl($objEvent)
     {
         $strUrl = '';
-        $objPage = PageModel::findByPk($objEvent->getRelated('pid')->previewPage);
-
-        if ($objPage instanceof PageModel)
+        if($objEvent->eventType != '')
         {
-            $params = (Config::get('useAutoItem') ? '/' : '/events/') . ($objEvent->alias ?: $objEvent->id);
-            $strUrl = ampersand($objPage->getFrontendUrl($params));
-            $strUrl = Url::addQueryString('eventToken=' . $objEvent->eventToken, $strUrl);
+            $objEventType = EventTypeModel::findByAlias($objEvent->eventType);
+            if($objEventType !== null)
+            {
+                if($objEventType->previewPage > 0)
+                {
+                    $objPage = PageModel::findByPk($objEventType->previewPage);
+
+                    if ($objPage instanceof PageModel)
+                    {
+                        $params = (Config::get('useAutoItem') ? '/' : '/events/') . ($objEvent->alias ?: $objEvent->id);
+                        $strUrl = ampersand($objPage->getFrontendUrl($params));
+                        $strUrl = Url::addQueryString('eventToken=' . $objEvent->eventToken, $strUrl);
+                    }
+                }
+            }
         }
+
 
         return $strUrl;
     }

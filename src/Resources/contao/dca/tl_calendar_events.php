@@ -275,6 +275,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = array(
     'filter'           => true,
     'inputType'        => 'select',
     'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbEventType'),
+    'save_callback'    => array(array('tl_calendar_events_sac_event_tool', 'saveCallbackEventType')),
     'eval'             => array('submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => true),
     'sql'              => "varchar(32) NOT NULL default ''",
 );

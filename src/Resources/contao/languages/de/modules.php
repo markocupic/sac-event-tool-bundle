@@ -24,6 +24,7 @@ $GLOBALS['TL_LANG']['MOD']['sac_event_organizer_tool'] = array('Organisierende G
 $GLOBALS['TL_LANG']['MOD']['sac_event_journey_tool'] = array('Event Anreise-Art-Tool');
 $GLOBALS['TL_LANG']['MOD']['sac_cabanne_tool'] = array('H&uuml;tten-Tool');
 $GLOBALS['TL_LANG']['MOD']['sac_user_role_tool'] = array('Vereinsfunktionen-Tool');
+$GLOBALS['TL_LANG']['MOD']['sac_event_type_tool'] = array('SAC Event-Art-Tool');
 
 
 

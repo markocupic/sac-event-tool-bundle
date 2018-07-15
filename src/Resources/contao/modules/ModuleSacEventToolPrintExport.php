@@ -35,22 +35,18 @@ abstract class ModuleSacEventToolPrintExport extends Module
 
         if ($objEvent !== null)
         {
-            $objCalendar = $objEvent->getRelated('pid');
-            if ($objCalendar !== null)
+            if ($objEvent->eventReleaseLevel > 0)
             {
-                if ($objCalendar->levelAccessPermissionPackage)
+                $objEventReleaseLevel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+                if ($objEventReleaseLevel !== null)
                 {
-                    $objEventReleaseLevel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
-                    if ($objEventReleaseLevel !== null)
+                    $nextLevelModel = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
+                    $lastLevelModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
+                    if ($nextLevelModel !== null && $lastLevelModel !== null)
                     {
-                        $nextLevelModel = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
-                        $lastLevelModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
-                        if ($nextLevelModel !== null && $lastLevelModel !== null)
+                        if ($nextLevelModel->id === $lastLevelModel->id)
                         {
-                            if ($nextLevelModel->id === $lastLevelModel->id)
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
                 }

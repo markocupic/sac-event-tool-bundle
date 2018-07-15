@@ -119,7 +119,8 @@
       <div class="organizers event-detail event-info-box icon-box-small">
         <h6 class="mt-lg-0">Organisierende Gruppe</h6>
         <p>
-            <?php if (!empty($organizers)): ?><?= implode('<br>', $organizers) ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
+          <?php $organizers = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($this->id, 'title'); ?>
+          <?php if (!empty($organizers)): ?><?= implode('<br>', $organizers) ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
         </p>
       </div>
 
@@ -137,7 +138,6 @@
           </div>
         <?php endif; ?>
 
-        <?php $organizers = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($this->id, 'title'); ?>
 
 
 
@@ -175,7 +175,7 @@
 
         <?php endif; ?>
 
-        <?php if ($this->journey != '' && \CalendarEventsJourneyModel::findByPk($this->journey) !== null): ?>
+        <?php if ($this->journey != '' && $this->journey != 'not-specified' && \CalendarEventsJourneyModel::findByPk($this->journey) !== null): ?>
           <div class="journey event-detail event-info-box icon-box-small">
             <h6>Anreise mit:</h6>
             <p><?= \CalendarEventsJourneyModel::findByPk($this->journey)->title ?></p>

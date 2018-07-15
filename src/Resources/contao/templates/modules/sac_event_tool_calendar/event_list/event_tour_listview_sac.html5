@@ -1,3 +1,4 @@
+<?php if($this->eventType === 'tour' || $this->eventType === 'generalEvent'): ?>
 <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id); ?>
 <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][$eventState]; ?>
 
@@ -22,3 +23,4 @@
     <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id); ?>
   <td><?= implode(', ', $arrInstructors) ?></td>
 </tr>
+<?php endif; ?>

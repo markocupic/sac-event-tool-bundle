@@ -14,6 +14,7 @@
 
 namespace Contao;
 
+
 /**
  * Class EventReleaseLevelPolicyPackageModel
  * @package Contao
@@ -26,5 +27,29 @@ class EventReleaseLevelPolicyPackageModel extends \Model
      * @var string
      */
     protected static $strTable = 'tl_event_release_level_policy_package';
+
+    /**
+     * @param $eventId
+     * @return null
+     */
+    public function findReleaseLevelPolicyPackageModelByEventId($eventId)
+    {
+        $objEvent = \CalendarEventsModel::findByPk($eventId);
+        if ($objEvent === null)
+        {
+            return null;
+        }
+
+        $objEventType = EventTypeModel::findByAlias($objEvent->eventType);
+        if($objEventType === null)
+        {
+            return null;
+        }
+
+        if($objEventType->levelAccessPermissionPackage > 0)
+        {
+            return self::findByPk($objEventType->levelAccessPermissionPackage);
+        }
+    }
 
 }

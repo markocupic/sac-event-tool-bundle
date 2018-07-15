@@ -62,28 +62,27 @@ class EventReleaseLevelPolicyModel extends \Model
      */
     public static function findFirstLevelByEventId($eventId)
     {
-
-        $objEvent = \CalendarEventsModel::findByPk($eventId);
+        $objEvent = CalendarEventsModel::findByPk($eventId);
         if ($objEvent === null)
         {
             return null;
         }
 
-        $objCalendar = $objEvent->getRelated('pid');
-        if ($objCalendar === null)
+        $objEventType = EventTypeModel::findByAlias($objEvent->eventType);
+        if ($objEventType === null)
         {
             return null;
         }
 
-        if (!$objCalendar->levelAccessPermissionPackage)
+        if ($objEventType->levelAccessPermissionPackage > 0)
         {
-            return null;
+            $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findByPk($objEventType->levelAccessPermissionPackage);
         }
 
-        $objEventReleaseLevelPolicyPackageModel = $objCalendar->getRelated('levelAccessPermissionPackage');
+
         if ($objEventReleaseLevelPolicyPackageModel === null)
         {
-            Message::addError('Datarecord tl_event_release_level_policy_package with ID ' . $objCalendar->levelAccessPermissionPackage . ' not found. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
+            Message::addError('Datarecord tl_event_release_level_policy_package with ID ' . $objEventType->levelAccessPermissionPackage . ' not found. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
             return null;
         }
 
@@ -107,27 +106,27 @@ class EventReleaseLevelPolicyModel extends \Model
     public static function findLastLevelByEventId($eventId)
     {
 
-        $objEvent = \CalendarEventsModel::findByPk($eventId);
+        $objEvent = CalendarEventsModel::findByPk($eventId);
         if ($objEvent === null)
         {
             return null;
         }
 
-        $objCalendar = $objEvent->getRelated('pid');
-        if ($objCalendar === null)
+        $objEventType = EventTypeModel::findByAlias($objEvent->eventType);
+        if ($objEventType === null)
         {
             return null;
         }
 
-        if (!$objCalendar->levelAccessPermissionPackage)
+        if ($objEventType->levelAccessPermissionPackage > 0)
         {
-            return null;
+            $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findByPk($objEventType->levelAccessPermissionPackage);
         }
 
-        $objEventReleaseLevelPolicyPackageModel = $objCalendar->getRelated('levelAccessPermissionPackage');
+
         if ($objEventReleaseLevelPolicyPackageModel === null)
         {
-            Message::addError('Datarecord tl_event_release_level_policy_package with ID ' . $objCalendar->levelAccessPermissionPackage . ' not found. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
+            Message::addError('Datarecord tl_event_release_level_policy_package with ID ' . $objEventType->levelAccessPermissionPackage . ' not found. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
             return null;
         }
 
@@ -168,30 +167,18 @@ class EventReleaseLevelPolicyModel extends \Model
             return false;
         }
 
-        $objCalendar = $objEvent->getRelated('pid');
-        if ($objCalendar === null)
+        if ($objEvent->eventReleaseLevel > 0)
         {
-            return false;
+            $objReleaseLevelModel = self::findByPk($objEvent->eventReleaseLevel);
+            if ($objReleaseLevelModel === null)
+            {
+                Message::addError('ReleaseLevelModel not found for tl_calendar_events with ID ' . $objEvent->id . '. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
+                return false;
+            }
         }
-
-        if (!$objCalendar->levelAccessPermissionPackage)
+        else
         {
-            // Allow if there is no release package defined in tl_calendar
             return true;
-        }
-        $objEventReleaseLevelPolicyPackageModel = $objCalendar->getRelated('levelAccessPermissionPackage');
-        if ($objEventReleaseLevelPolicyPackageModel === null)
-        {
-
-            Message::addError('Datarecord tl_event_release_level_policy_package with ID ' . $objCalendar->levelAccessPermissionPackage . ' not found. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
-            return false;
-        }
-
-        $objReleaseLevelModel = static::findOneById($objEvent->eventReleaseLevel);
-        if ($objReleaseLevelModel === null)
-        {
-            Message::addError('ReleaseLevelModel not found for tl_calendar_events with ID ' . $objEvent->id . '. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
-            return false;
         }
 
         $arrGroupsUserBelongsTo = \StringUtil::deserialize($objBackendUser->groups, true);
@@ -216,7 +203,7 @@ class EventReleaseLevelPolicyModel extends \Model
         }
 
         // Check if user is in a group that is permitted
-        if($allow === false)
+        if ($allow === false)
         {
             $arrGroups = \StringUtil::deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
             foreach ($arrGroups as $k => $v)
@@ -288,30 +275,18 @@ class EventReleaseLevelPolicyModel extends \Model
             return false;
         }
 
-        $objCalendar = $objEvent->getRelated('pid');
-        if ($objCalendar === null)
+        if ($objEvent->eventReleaseLevel > 0)
         {
-            return false;
+            $objReleaseLevelModel = self::findByPk($objEvent->eventReleaseLevel);
+            if ($objReleaseLevelModel === null)
+            {
+                Message::addError('ReleaseLevelModel not found for tl_calendar_events with ID ' . $objEvent->id . '. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
+                return false;
+            }
         }
-
-        if (!$objCalendar->levelAccessPermissionPackage)
+        else
         {
-            // Allow if there is no release package defined in tl_calendar
             return true;
-        }
-        $objEventReleaseLevelPolicyPackageModel = $objCalendar->getRelated('levelAccessPermissionPackage');
-        if ($objEventReleaseLevelPolicyPackageModel === null)
-        {
-
-            Message::addError('Datarecord tl_event_release_level_policy_package with ID ' . $objCalendar->levelAccessPermissionPackage . ' not found. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
-            return false;
-        }
-
-        $objReleaseLevelModel = static::findOneById($objEvent->eventReleaseLevel);
-        if ($objReleaseLevelModel === null)
-        {
-            Message::addError('ReleaseLevelModel not found for tl_calendar_events with ID ' . $objEvent->id . '. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
-            return false;
         }
 
         $arrGroupsUserBelongsTo = \StringUtil::deserialize($objBackendUser->groups, true);
@@ -336,7 +311,7 @@ class EventReleaseLevelPolicyModel extends \Model
         }
 
         // Check if user is in a group that is permitted
-        if($allow === false)
+        if ($allow === false)
         {
             $arrGroups = \StringUtil::deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
             foreach ($arrGroups as $k => $v)
@@ -384,30 +359,18 @@ class EventReleaseLevelPolicyModel extends \Model
             return false;
         }
 
-        $objCalendar = $objEvent->getRelated('pid');
-        if ($objCalendar === null)
+        if ($objEvent->eventReleaseLevel > 0)
         {
-            return false;
+            $objReleaseLevelModel = self::findByPk($objEvent->eventReleaseLevel);
+            if ($objReleaseLevelModel === null)
+            {
+                Message::addError('ReleaseLevelModel not found for tl_calendar_events with ID ' . $objEvent->id . '. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
+                return false;
+            }
         }
-
-        if (!$objCalendar->levelAccessPermissionPackage)
+        else
         {
-            // Allow if there is no release package defined in tl_calendar
             return true;
-        }
-        $objEventReleaseLevelPolicyPackageModel = $objCalendar->getRelated('levelAccessPermissionPackage');
-        if ($objEventReleaseLevelPolicyPackageModel === null)
-        {
-
-            Message::addError('Datarecord tl_event_release_level_policy_package with ID ' . $objCalendar->levelAccessPermissionPackage . ' not found. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
-            return false;
-        }
-
-        $objReleaseLevelModel = static::findOneById($objEvent->eventReleaseLevel);
-        if ($objReleaseLevelModel === null)
-        {
-            Message::addError('ReleaseLevelModel not found for tl_calendar_events with ID ' . $objEvent->id . '. Error in ' . __METHOD__ . ' Line: ' . __LINE__);
-            return false;
         }
 
         $arrGroupsUserBelongsTo = \StringUtil::deserialize($objBackendUser->groups, true);
@@ -489,37 +452,17 @@ class EventReleaseLevelPolicyModel extends \Model
     public static function levelExists($eventId, $level = null)
     {
 
-        $objEvent = \CalendarEventsModel::findByPk($eventId);
-        if ($objEvent === null)
+        $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($eventId);
+        if ($objEventReleaseLevelPolicyPackageModel !== null)
         {
-            return false;
+            // Check if the wanted level exists
+            $objNewReleaseLevelModel = static::findOneByPidAndLevel($objEventReleaseLevelPolicyPackageModel->id, $level);
+
+            if ($objNewReleaseLevelModel !== null)
+            {
+                return true;
+            }
         }
-
-        $objCalendar = $objEvent->getRelated('pid');
-        if ($objCalendar === null)
-        {
-            return false;
-        }
-
-        if (!$objCalendar->levelAccessPermissionPackage)
-        {
-            return false;
-        }
-
-        $objEventReleaseLevelPolicyPackageModel = $objCalendar->getRelated('levelAccessPermissionPackage');
-        if ($objEventReleaseLevelPolicyPackageModel === null)
-        {
-            return false;
-        }
-
-        // Check if the wanted level exists
-        $objNewReleaseLevelModel = static::findOneByPidAndLevel($objEventReleaseLevelPolicyPackageModel->id, $level);
-
-        if ($objNewReleaseLevelModel !== null)
-        {
-            return true;
-        }
-
 
         return false;
     }

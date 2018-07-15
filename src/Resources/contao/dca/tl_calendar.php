@@ -33,18 +33,8 @@ if (BackendUser::getInstance()->isAdmin)
 // Palettes
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('event_type_legend', 'protected_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
-    ->addLegend('access_permission_legend', 'protected_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
-    ->addLegend('preview_page_legend', 'protected_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addField(array('allowedEventTypes'), 'event_type_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('useLevelAccessPermissions'), 'access_permission_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('previewPage'), 'preview_page_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_calendar');
-
-// Selectors
-$GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'useLevelAccessPermissions';
-
-// Subpalettes
-$GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['useLevelAccessPermissions'] = 'levelAccessPermissionPackage';
 
 
 // Fields
@@ -67,36 +57,6 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['allowedEventTypes'] = array(
     'sql'       => "blob NULL",
 );
 
-// Preview page
-$GLOBALS['TL_DCA']['tl_calendar']['fields']['previewPage'] = array(
 
-    'label'      => &$GLOBALS['TL_LANG']['tl_calendar']['previewPage'],
-    'exclude'    => true,
-    'inputType'  => 'pageTree',
-    'foreignKey' => 'tl_page.title',
-    'eval'       => array('mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'),
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
-);
 
-// levelAccessPermissionPackage
-$GLOBALS['TL_DCA']['tl_calendar']['fields']['levelAccessPermissionPackage'] = array(
-    'label'      => &$GLOBALS['TL_LANG']['tl_calendar']['levelAccessPermissionPackage'],
-    'exclude'    => true,
-    'inputType'  => 'select',
-    'relation'   => array('type' => 'belongsTo', 'load' => 'eager'),
-    'foreignKey' => 'tl_event_release_level_policy_package.title',
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'eval'       => array('includeBlankOption' => false, 'mandatory' => true, 'tl_class' => 'clr'),
-);
 
-// useLevelAccessPermissions
-$GLOBALS['TL_DCA']['tl_calendar']['fields']['useLevelAccessPermissions'] = array(
-
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['useLevelAccessPermissions'],
-    'exclude'   => true,
-    'filter'    => true,
-    'inputType' => 'checkbox',
-    'eval'      => array('submitOnChange' => true),
-    'sql'       => "char(1) NOT NULL default ''",
-);

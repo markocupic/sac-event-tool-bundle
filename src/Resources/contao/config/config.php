@@ -46,7 +46,9 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = array(
     'sac_course_sub_types_tool'        => array(
         'tables' => array('tl_course_sub_type'),
     ),
-
+    'sac_event_type_tool'        => array(
+        'tables' => array('tl_event_type'),
+    ),
     'sac_tour_difficulty_tool' => array(
         'tables' => array('tl_tour_difficulty_category', 'tl_tour_difficulty'),
         'table'  => array('TableWizard', 'importTable'),
