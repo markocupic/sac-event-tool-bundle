@@ -1730,8 +1730,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $lastEventReleaseModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
             if ($lastEventReleaseModel !== null)
             {
-
-
                 // Display message in the backend if event is published or unpublished now
                 if ($lastEventReleaseModel->id == $newEventReleaseLevelId)
                 {
@@ -1750,8 +1748,16 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         if ($eventReleaseModel->pid !== $firstEventReleaseModel->pid)
                         {
                             $hasError = true;
-                            $newEventReleaseLevelId = $firstEventReleaseModel->id;
-                            Message::addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" musste auf "%s" korrigiert werden, weil eine zum Event-Typ ungültige Freigabestufe gewählt wurde. ', $objEvent->title, $objEvent->id, $firstEventReleaseModel->title));
+                            if ($objEvent->eventReleaseLevel > 0)
+                            {
+                                $newEventReleaseLevelId = $objEvent->eventReleaseLevel;
+                                Message::addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" konnte nicht auf "%s" geändert werden, weil diese Freigabestufe zum Event-Typ ungültig ist. ', $objEvent->title, $objEvent->id, $eventReleaseModel->title));
+                            }
+                            else
+                            {
+                                $newEventReleaseLevelId = $firstEventReleaseModel->id;
+                                Message::addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" musste auf "%s" korrigiert werden, weil eine zum Event-Typ ungültige Freigabestufe gewählt wurde. ', $objEvent->title, $objEvent->id, $firstEventReleaseModel->title));
+                            }
                         }
                     }
 
