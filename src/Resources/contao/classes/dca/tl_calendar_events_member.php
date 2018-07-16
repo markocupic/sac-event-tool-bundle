@@ -8,8 +8,11 @@
  * @link https://sac-kurse.kletterkader.com
  */
 
-use Contao\Config;
+
+namespace Contao;
+
 use NotificationCenter\Model\Notification;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 
 /**
@@ -137,6 +140,7 @@ class tl_calendar_events_member extends Backend
                 }
                 else
                 {
+                    /** @noinspection PhpUndefinedMethodInspection */
                     $objEvent = CalendarEventsMemberModel::findByPk($id)->getRelated('eventId');
                 }
 
@@ -164,7 +168,7 @@ class tl_calendar_events_member extends Backend
         // Download the registration list as a docx file
         if (Input::get('act') === 'downloadEventMemberList')
         {
-            $objMemberList = new Markocupic\SacEventToolBundle\EventRapport();
+            $objMemberList = new \Markocupic\SacEventToolBundle\EventRapport();
             $objMemberList->generateMemberList(Input::get('id'), 'docx');
             exit;
         }
@@ -178,18 +182,18 @@ class tl_calendar_events_member extends Backend
             $options = array();
 
             // First get instructors
-            $objEvent = \Contao\CalendarEventsModel::findByPk(Input::get('eventId'));
+            $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
             if ($objEvent !== null)
             {
-                $arrGuideIDS = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
+                $arrGuideIDS = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
                 foreach ($arrGuideIDS as $userId)
                 {
-                    $objInstructor = \Contao\UserModel::findByPk($userId);
+                    $objInstructor = UserModel::findByPk($userId);
                     if ($objInstructor !== null)
                     {
                         if ($objInstructor->email !== '')
                         {
-                            if (\Contao\Validator::isEmail($objInstructor->email))
+                            if (Validator::isEmail($objInstructor->email))
                             {
                                 $options['tl_user-' . $objInstructor->id] = $objInstructor->firstname . ' ' . $objInstructor->lastname . ' (Leiter)';
                             }
@@ -202,7 +206,7 @@ class tl_calendar_events_member extends Backend
             $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY stateOfSubscription, firstname')->execute(Input::get('eventId'));
             while ($objDb->next())
             {
-                if (\Contao\Validator::isEmail($objDb->email))
+                if (Validator::isEmail($objDb->email))
                 {
                     if ($objDb->stateOfSubscription === 'subscription-not-confirmed')
                     {
@@ -231,10 +235,10 @@ class tl_calendar_events_member extends Backend
                     if (strpos($key, 'tl_user-') !== false)
                     {
                         $id = str_replace('tl_user-', '', $key);
-                        $objInstructor = \Contao\UserModel::findByPk($id);
+                        $objInstructor = UserModel::findByPk($id);
                         if ($objInstructor !== null)
                         {
-                            if (\Contao\Validator::isEmail($objInstructor->email))
+                            if (Validator::isEmail($objInstructor->email))
                             {
                                 $arrRecipients[] = $objInstructor->email;
                             }
@@ -243,10 +247,10 @@ class tl_calendar_events_member extends Backend
                     elseif (strpos($key, 'tl_calendar_events_member-') !== false)
                     {
                         $id = str_replace('tl_calendar_events_member-', '', $key);
-                        $objEventMember = \Contao\CalendarEventsMemberModel::findByPk($id);
+                        $objEventMember = CalendarEventsMemberModel::findByPk($id);
                         if ($objEventMember !== null)
                         {
-                            if (\Contao\Validator::isEmail($objEventMember->email))
+                            if (Validator::isEmail($objEventMember->email))
                             {
                                 $arrRecipients[] = $objEventMember->email;
                             }
@@ -255,7 +259,7 @@ class tl_calendar_events_member extends Backend
                 }
 
                 // Send e-mail
-                if (!\Contao\Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
+                if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
                 {
                     throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
                 }
@@ -280,7 +284,7 @@ class tl_calendar_events_member extends Backend
                         {
                             foreach ($arrUUID as $uuid)
                             {
-                                $objFile = \Contao\FilesModel::findByUuid($uuid);
+                                $objFile = FilesModel::findByUuid($uuid);
                                 if ($objFile !== null)
                                 {
                                     if (is_file(TL_ROOT . '/' . $objFile->path))
@@ -352,7 +356,7 @@ class tl_calendar_events_member extends Backend
                     'city'           => $objMemberModel->city,
                     'mobile'          => $objMemberModel->mobile,
                 );
-                $objEventMember = $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($objDb->id);
+                $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($objDb->id);
             }
         }
     }
@@ -383,7 +387,6 @@ class tl_calendar_events_member extends Backend
                             'event_link_detail'                 => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($objEvent),
                         );
                         $objNotification->send($arrTokens, 'de');
-                        //Message::addInfo(sprintf('Der Teilnehmer "%s %s" wurde per E-Mail über die &Auml;nderung seines Teilnehmestatus benachrichtigt.', $objEventMemberModel->firstname, $objEventMemberModel->lastname));
                     }
                 }
             }
@@ -432,10 +435,6 @@ class tl_calendar_events_member extends Backend
                     }
                 }
                 $objEventMemberModel->save();
-            }
-            else
-            {
-                //$objEventMemberModel->delete();
             }
         }
     }
@@ -559,7 +558,7 @@ class tl_calendar_events_member extends Backend
         $module = Input::get('do');
 
         $eventId = Input::get('id');
-        $objEvent = \Contao\CalendarEventsModel::findByPk($eventId);
+        $objEvent = CalendarEventsModel::findByPk($eventId);
         if ($objEvent !== null)
         {
             // Check if backend user is allowed
@@ -618,13 +617,13 @@ class tl_calendar_events_member extends Backend
             $objTemplate = new BackendTemplate('be_calendar_events_registration_dashboard');
             $objTemplate->objRegistration = $objRegistration;
             $objTemplate->stateOfSubscription = $objRegistration->stateOfSubscription;
-            $objEvent = \Contao\CalendarEventsModel::findByPk($objRegistration->eventId);
+            $objEvent = CalendarEventsModel::findByPk($objRegistration->eventId);
             if ($objEvent !== null)
             {
                 $objTemplate->objEvent = $objEvent;
                 if (!$objRegistration->hasParticipated && $objRegistration->email != '')
                 {
-                    if (\Contao\Validator::isEmail($objRegistration->email))
+                    if (Validator::isEmail($objRegistration->email))
                     {
                         $objTemplate->showEmailButtons = true;
                     }
@@ -640,6 +639,7 @@ class tl_calendar_events_member extends Backend
     /**
      * @param DC_Table $dc
      * @return string
+     * @throws Exception
      */
     public function inputFieldCallbackRefuseWithEmail(DC_Table $dc)
     {
@@ -653,7 +653,7 @@ class tl_calendar_events_member extends Backend
                 $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
                 if ($objRegistration !== null)
                 {
-                    if (!\Contao\Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
+                    if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
                     {
                         throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
                     }
@@ -743,7 +743,7 @@ class tl_calendar_events_member extends Backend
                 $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
                 if ($objRegistration !== null)
                 {
-                    if (!\Contao\Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
+                    if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
                     {
                         throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
                     }
@@ -831,7 +831,7 @@ class tl_calendar_events_member extends Backend
                 $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
                 if ($objRegistration !== null)
                 {
-                    if (!\Contao\Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
+                    if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
                     {
                         throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
                     }
@@ -981,7 +981,7 @@ class tl_calendar_events_member extends Backend
         else
         {
             $id = Input::get('id');
-            $objEvent = \CalendarEventsModel::findByPk($id);
+            $objEvent = CalendarEventsModel::findByPk($id);
             if ($objEvent !== null)
             {
                 $arrAuthors = StringUtil::deserialize($objEvent->author, true);
@@ -1011,7 +1011,7 @@ class tl_calendar_events_member extends Backend
      * @param boolean $blnVisible
      * @param DataContainer $dc
      *
-     * @throws Contao\CoreBundle\Exception\AccessDeniedException
+     * @throws \Contao\CoreBundle\Exception\AccessDeniedException
      */
     public function toggleVisibility($intId, $blnVisible, DataContainer $dc = null)
     {
@@ -1037,13 +1037,13 @@ class tl_calendar_events_member extends Backend
         else
         {
             $id = Input::get('id');
-            $objEvent = \CalendarEventsModel::findByPk($id);
+            $objEvent = CalendarEventsModel::findByPk($id);
             if ($objEvent !== null)
             {
                 $arrAuthors = StringUtil::deserialize($objEvent->author, true);
                 if (!in_array($this->User->id, $arrAuthors))
                 {
-                    throw new Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to activate/deactivate registration ID ' . $id . '.');
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to activate/deactivate registration ID ' . $id . '.');
                 }
             }
         }

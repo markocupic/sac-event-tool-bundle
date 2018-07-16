@@ -55,7 +55,7 @@ class tl_calendar_container extends Backend
     /**
      * Check permissions to edit table tl_calendar
      *
-     * @throws Contao\CoreBundle\Exception\AccessDeniedException
+     * @throws \Contao\CoreBundle\Exception\AccessDeniedException
      */
     public function checkPermission()
     {
@@ -164,7 +164,7 @@ class tl_calendar_container extends Backend
             case 'show':
                 if (!in_array(Input::get('id'), $root) || (Input::get('act') == 'delete' && !$this->User->hasAccess('delete', 'calendar_containerp')))
                 {
-                    throw new Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to ' . Input::get('act') . ' calendar ID ' . Input::get('id') . '.');
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to ' . Input::get('act') . ' calendar ID ' . Input::get('id') . '.');
                 }
                 break;
 
@@ -186,7 +186,7 @@ class tl_calendar_container extends Backend
             default:
                 if (strlen(Input::get('act')))
                 {
-                    throw new Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to ' . Input::get('act') . ' calendar_containers.');
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to ' . Input::get('act') . ' calendar_containers.');
                 }
                 break;
         }

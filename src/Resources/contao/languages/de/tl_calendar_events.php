@@ -10,7 +10,6 @@
 
 // Operations
 $GLOBALS['TL_LANG']['tl_calendar_events']['registrations'] = array("Event-Anmeldungen", "Bearbeiten Sie die Anmeldungen des Events mit ID %s.");
-$GLOBALS['TL_LANG']['tl_calendar_events']['typo3export'] = array("HTML-Export f&uuml;r Typo 3", "Generieren Sie den HTML-Code des Events mit ID %s f&uuml;r den Import nach Typo 3 (alte Webseite).");
 $GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelNext'] = array("Freigabestufe um +1 erh&ouml;hen", "Freigabestufe von Datensatz mit ID %s um +1 erh&ouml;hen. Der Datensatz ist dann vielleicht nicht mehr bearbeitbar.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelPrev'] = array("Freigabestufe um -1 verringern", "Freigabestufe  von Datensatz mit ID %s um -1 verringern.");
 

@@ -13,8 +13,6 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Input;
 use Contao\System;
-use Contao\CalendarEventsModel;
-use Markocupic\SacEventToolBundle\ExportEvents2Typo3;
 
 
 /**
@@ -49,13 +47,6 @@ class InitializeSystem
         $objPluginEnv = System::getContainer()->get('markocupic.sac_event_tool_bundle.prepare_plugin_environment');
 
         $objPluginEnv->createPluginDirectories();
-
-
-        // Convert events to typo3 html export file
-        if (Input::get('action') === 'exportEvents2Typo3' && Input::get('id'))
-        {
-            ExportEvents2Typo3::sendToBrowser(Input::get('id'));
-        }
 
         // Convert events to ical
         if (Input::get('action') === 'exportEventsToIcal' && Input::get('id'))

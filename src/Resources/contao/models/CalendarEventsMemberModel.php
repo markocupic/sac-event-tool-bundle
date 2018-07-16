@@ -78,7 +78,7 @@ class CalendarEventsMemberModel extends \Model
                 $arr['dateSpan'] = ($objEventsModel->startDate != $objEventsModel->endDate) ? \Date::parse('d.m.', $objEventsModel->startDate) . ' - ' . \Date::parse('d.m.Y', $objEventsModel->endDate) : \Date::parse('d.m.Y', $objEventsModel->startDate);
                 $arr['eventType'] = $objEventsModel->eventType;
                 $arr['registrationId'] = $objJoinedEvents->id;
-                $arr['eventRegistrationModel'] = \CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
+                $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
                 $arr['unregisterUrl'] = \Frontend::addToUrl('do=unregisterUserFromEvent&amp;registrationId=' . $objJoinedEvents->id);
                 $arrEvents[] = $arr;
             }
@@ -88,9 +88,8 @@ class CalendarEventsMemberModel extends \Model
     }
 
 
-
     /**
-     * @param $memberId
+     * @param $sacMemberId
      * @return array
      */
     public static function findPastEventsBySacMemberId($sacMemberId)
@@ -119,6 +118,10 @@ class CalendarEventsMemberModel extends \Model
         }
 
         return $arrEvents;
+    }
+
+    public static function findByPk($get)
+    {
     }
 
 }

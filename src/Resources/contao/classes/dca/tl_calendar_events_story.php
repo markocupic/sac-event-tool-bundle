@@ -167,7 +167,7 @@ class tl_calendar_events_story extends Backend
      * @param boolean $blnVisible
      * @param DataContainer $dc
      *
-     * @throws Contao\CoreBundle\Exception\AccessDeniedException
+     * @throws \Contao\CoreBundle\Exception\AccessDeniedException
      */
     public function toggleVisibility($intId, $blnVisible, DataContainer $dc = null)
     {
@@ -198,7 +198,7 @@ class tl_calendar_events_story extends Backend
                 $arrAuthors = StringUtil::deserialize($objEvent->author, true);
                 if (!in_array($this->User->id, $arrAuthors))
                 {
-                    throw new Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to activate/deactivate registration ID ' . $id . '.');
+                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to activate/deactivate registration ID ' . $id . '.');
                 }
             }
         }

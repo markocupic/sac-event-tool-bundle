@@ -141,11 +141,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         if (!$this->User->isAdmin)
         {
             unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['show']);
-
-            /**
-             * @todo delete this operation in summer 2018
-             */
-            unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['typo3export']);
         }
 
 
@@ -155,41 +150,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year']);
             unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year']);
         }
-
-        /** @var Migration Code
-         * $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events')->execute();
-         * while ($objEvent->next())
-         * {
-         * $arrOrder = \Contao\StringUtil::deserialize($objEvent->orderInstructor, true);
-         * $arrInst = \Contao\StringUtil::deserialize($objEvent->instructor_old, true);
-         * $new = [];
-         * foreach ($arrOrder as $id)
-         * {
-         * if (in_array($id, $arrInst))
-         * {
-         * $new[] = $id;
-         * }
-         * }
-         * foreach ($arrInst as $id)
-         * {
-         * if (!in_array($id, $arrOrder))
-         * {
-         * $new[] = $id;
-         * }
-         * }
-         *
-         * $set = array();
-         * $set['instructor'] = array();
-         * if(!empty($new))
-         * {
-         * foreach ($new as $id)
-         * {
-         * $set['instructor'][] = array('instructorId' => $id);
-         * }
-         * }
-         * $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
-         * }
-         **/
 
 
         // Set tl_calendar_events.mainInstructor from tl_calendar_events.instructor

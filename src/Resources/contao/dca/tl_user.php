@@ -97,7 +97,6 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addField(array('disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('login', 'tl_user');
 
-//die('<br>' . $GLOBALS['TL_DCA']['tl_user']['palettes']['extend']);
 
 // Fields
 $GLOBALS['TL_DCA']['tl_user']['fields']['username']['eval']['tl_class'] = 'clr';

@@ -11,7 +11,7 @@
 
 // Extend default palette
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-    ->addLegend('allowed_event_types_legend','calendars_legend',Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
+    ->addLegend('allowed_event_types_legend', 'calendars_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
     ->addField(array('calendar_containers', 'calendar_containerp'), 'calendars_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
     ->addField(array('allowedEventTypes'), 'allowed_event_types_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
     ->applyToPalette('default', 'tl_user_group');
@@ -50,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['allowedEventTypes'] = array
     'inputType'  => 'checkbox',
     'relation'   => array('type' => 'belongsTo', 'load' => 'eager'),
     'foreignKey' => 'tl_event_type.title',
-    'sql'       => "blob NULL",
+    'sql'        => "blob NULL",
     'eval'       => array('multiple' => true, 'mandatory' => false, 'tl_class' => 'clr'),
 );
 

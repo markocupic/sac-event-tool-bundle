@@ -189,12 +189,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle'] = array
     'button_callback' => array('tl_calendar_events_sac_event_tool', 'toggleIcon'),
 );
 
-$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['typo3export'] = array(
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['typo3export'],
-    'href'  => 'action=exportEvents2Typo3',
-    'icon'  => 'bundles/markocupicsaceventtool/icons/typo3.png',
-);
-
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = array(
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrations'],
     'href'  => 'table=tl_calendar_events_member',
@@ -304,26 +298,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mainInstructor'] = array(
     'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
 );
 
-// instructor
-/**
- * $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
- * 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructor'],
- * 'exclude'    => true,
- * 'filter'     => true,
- * 'inputType'  => 'checkboxWizard',
- * 'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
- * 'foreignKey' => 'tl_user.name',
- * 'eval'       => array('multiple' => true, 'chosen' => true, 'orderField' => 'orderInstructor', 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr'),
- * 'sql'        => "blob NULL",
- * );
- *
- * // orderInstructor
- * $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['orderInstructor'] = array(
- * 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['orderInstructor'],
- * 'sql'   => "blob NULL",
- * );
- **/
-
+// Instructor
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructor'],
     'exclude'   => true,
@@ -342,7 +317,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
                 'default'    => BackendUser::getInstance()->id,
                 'filter'     => true,
                 'reference'  => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                //'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbTourDifficulties'),
                 'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
                 'foreignKey' => "tl_user.CONCAT(name, ', ', city)",
                 'eval'       => array

@@ -1,11 +1,11 @@
 <?php
 
-/*
- * This file is part of Contao.
- *
- * (c) Leo Feyer
- *
- * @license LGPL-3.0-or-later
+/**
+ * SAC Event Tool Web Plugin for Contao
+ * Copyright (c) 2008-2017 Marko Cupic
+ * @package sac-event-tool-bundle
+ * @author Marko Cupic m.cupic@gmx.ch, 2017-2018
+ * @link https://sac-kurse.kletterkader.com
  */
 
 
