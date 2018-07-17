@@ -17,14 +17,24 @@
     <!-- Col left -->
     <div class="col-lg-6">
 
-        <?php if ($this->teaser != ''): ?>
-          <div class="teaser event-detail font-weight-bold">
-              <?= nl2br($this->teaser) ?>
-          </div>
-          {{br}}
-        <?php endif; ?>
+      <?php if ($this->teaser != ''): ?>
+        <div class="teaser event-detail font-weight-bold">
+            <?= nl2br($this->teaser) ?>
+        </div>
+        {{br}}
+      <?php endif; ?>
 
       <div class="grey-box p-4 mb-4" style="background-color: #f2f2f2;">
+        <?php $arrLogo = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersLogoAsHtml($this->id, '{{image::%s?width=60}}', false); ?>
+        <div class="event-detail event-info-box organizer-logo mb-4"><?= implode('', $arrLogo) ?></div>
+
+        <div class="organizers event-detail event-info-box icon-box-small">
+          <h6 class="mt-lg-0">Organisierende Gruppe</h6>
+          <p>
+              <?php $organizers = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($this->id, 'title'); ?>
+              <?php if (!empty($organizers)): ?><?= implode('<br>', $organizers) ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
+          </p>
+        </div>
 
         <div class="eventdate event-detail event-info-box icon-box-small">
           <h6 class="mt-0">Datum/Dauer</h6>
@@ -116,13 +126,7 @@
 
     <!-- Col right -->
     <div class="col-lg-6">
-      <div class="organizers event-detail event-info-box icon-box-small">
-        <h6 class="mt-lg-0">Organisierende Gruppe</h6>
-        <p>
-          <?php $organizers = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($this->id, 'title'); ?>
-          <?php if (!empty($organizers)): ?><?= implode('<br>', $organizers) ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
-        </p>
-      </div>
+
 
         <?php if ($this->tourType != ''): ?>
           <div class="location event-detail event-info-box icon-box-small">

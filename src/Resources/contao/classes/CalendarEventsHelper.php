@@ -728,12 +728,12 @@ class CalendarEventsHelper extends System
     public static function generateEventPreviewUrl($objEvent)
     {
         $strUrl = '';
-        if($objEvent->eventType != '')
+        if ($objEvent->eventType != '')
         {
             $objEventType = EventTypeModel::findByAlias($objEvent->eventType);
-            if($objEventType !== null)
+            if ($objEventType !== null)
             {
-                if($objEventType->previewPage > 0)
+                if ($objEventType->previewPage > 0)
                 {
                     $objPage = PageModel::findByPk($objEventType->previewPage);
 
@@ -789,7 +789,7 @@ class CalendarEventsHelper extends System
                     {
                         $arrAsc[] = sprintf('%s Hm', $profile['tourProfileAscentMeters']);
                     }
-                    
+
                     if ($profile['tourProfileAscentTime'] != '')
                     {
                         $arrAsc[] = sprintf('%s h', $profile['tourProfileAscentTime']);
@@ -864,5 +864,41 @@ class CalendarEventsHelper extends System
         return $value;
     }
 
+    /**
+     * @param $eventId
+     * @param string $strInsertTag
+     * @return array
+     */
+    public function getEventOrganizersLogoAsHtml($eventId, $strInsertTag = '{{image::%s}}', $allowDuplicate = false)
+    {
+        $arrHtml = array();
+        $arrUuids = array();
+        $objEventModel = CalendarEventsModel::findByPk($eventId);
+        if ($objEventModel !== null)
+        {
+            $arrOrganizers = StringUtil::deserialize($objEventModel->organizers, true);
+            foreach ($arrOrganizers as $orgId)
+            {
+                $objOrganizer = EventOrganizerModel::findByPk($orgId);
+                if ($objOrganizer !== null)
+                {
+                    if ($objOrganizer->addLogo && $objOrganizer->singleSRC != '')
+                    {
+                        if (in_array($objOrganizer->singleSRC, $arrUuids) && !$allowDuplicate)
+                        {
+                            continue;
+                        }
+                        $arrUuids[] = $objOrganizer->singleSRC;
+                        $strLogo = Controller::replaceInsertTags(sprintf($strInsertTag, StringUtil::binToUuid($objOrganizer->singleSRC)));
+                        if ($strLogo != '')
+                        {
+                            $arrHtml[] = $strLogo;
+                        }
+                    }
+                }
+            }
+        }
 
+        return $arrHtml;
+    }
 }

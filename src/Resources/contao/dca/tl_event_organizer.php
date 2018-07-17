@@ -9,6 +9,7 @@
  */
 
 
+
 $GLOBALS['TL_DCA']['tl_event_organizer'] = array
 (
 
@@ -27,7 +28,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
         ),
     ),
 
-    'list'     => array
+    'list'        => array
     (
         'sorting'           => array
         (
@@ -80,12 +81,18 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
             ),
         ),
     ),
-    'palettes' => array
+    'palettes'    => array
     (
-        'default' => '{title_legend},title,titlePrint,sorting,emergencyConcept',
+        '__selector__' => array('addLogo'),
+        'default'      => '{title_legend},title,titlePrint,sorting;{emergency_concept_legend},emergencyConcept;{logo_legend},addLogo',
+    ),
+    // Subpalettes
+    'subpalettes' => array
+    (
+        'addLogo'                    => 'singleSRC',
     ),
 
-    'fields' => array
+    'fields'      => array
     (
         'id'               => array
         (
@@ -105,7 +112,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
             'eval'      => array('mandatory' => true, 'maxlength' => 255),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'titlePrint'            => array
+        'titlePrint'       => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['titlePrint'],
             'exclude'   => true,
@@ -132,6 +139,28 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
             'eval'      => array('tl_class' => 'clr m12', 'mandatory' => true),
             'sql'       => "text NULL",
         ),
+        'addLogo'          => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['addLogo'],
+            'exclude'   => true,
+            'inputType' => 'checkbox',
+            'eval'      => array('submitOnChange' => true),
+            'sql'       => "char(1) NOT NULL default ''",
+        ),
+        'singleSRC'        => array
+        (
+            'label'         => &$GLOBALS['TL_LANG']['tl_event_organizer']['singleSRC'],
+            'exclude'       => true,
+            'inputType'     => 'fileTree',
+            'eval'          => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'),
+            'load_callback' => array
+            (
+                array('tl_event_organizer', 'setSingleSrcFlags'),
+            ),
+            'sql'           => "binary(16) NULL",
+        ),
     ),
 );
+
+
 

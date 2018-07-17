@@ -36,6 +36,9 @@
 
         <div class="organizers event-detail event-info-box icon-box-small">
           <h5>Organisierende Gruppe</h5>
+          <?php $arrLogo = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersLogoAsHtml($this->id, '{{image::%s?width=60}}', false); ?>
+          <div class="organizer-logo m2-4 mb-2"><?= implode('', $arrLogo) ?></div>
+
           <p>
               <?php $organizers = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($this->id, 'title'); ?>
               <?php if (!empty($organizers)): ?><?= implode('<br>', $organizers) ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
