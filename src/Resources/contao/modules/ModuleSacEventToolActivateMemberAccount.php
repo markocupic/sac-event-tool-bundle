@@ -167,8 +167,9 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             'inputType' => 'text',
             'eval'      => array('rgxp' => 'date', 'datepicker' => true),
         ));
+
         $objForm->addFormField('password', array(
-            'label'     => 'Erstelle dein Passwort',
+            'label'     => 'Erstelle dein neues Passwort',
             'inputType' => 'password',
             'eval'      => array('mandatory' => true, 'preserveTags' => true, 'minlength' => Config::get('minPasswordLength')),
         ));
