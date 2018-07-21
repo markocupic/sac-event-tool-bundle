@@ -11,8 +11,8 @@
 
 namespace Contao;
 
-use NotificationCenter\Model\Notification;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use NotificationCenter\Model\Notification;
 
 
 /**
@@ -141,7 +141,7 @@ class tl_calendar_events_member extends Backend
                 else
                 {
                     /** @noinspection PhpUndefinedMethodInspection */
-                    $objEvent = CalendarEventsMemberModel::findByPk($id)->getRelated('eventId');
+                    $objEvent = CalendarEventsMemberModel::findById($id)->getRelated('eventId');
                 }
 
 
@@ -247,7 +247,7 @@ class tl_calendar_events_member extends Backend
                     elseif (strpos($key, 'tl_calendar_events_member-') !== false)
                     {
                         $id = str_replace('tl_calendar_events_member-', '', $key);
-                        $objEventMember = CalendarEventsMemberModel::findByPk($id);
+                        $objEventMember = CalendarEventsMemberModel::findById($id);
                         if ($objEventMember !== null)
                         {
                             if (Validator::isEmail($objEventMember->email))
@@ -354,7 +354,7 @@ class tl_calendar_events_member extends Backend
                     'email'          => $objMemberModel->email,
                     'postal'         => $objMemberModel->postal,
                     'city'           => $objMemberModel->city,
-                    'mobile'          => $objMemberModel->mobile,
+                    'mobile'         => $objMemberModel->mobile,
                 );
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($objDb->id);
             }
@@ -367,13 +367,20 @@ class tl_calendar_events_member extends Backend
      */
     public function saveCallbackStateOfSubscription($varValue, DC_Table $dc)
     {
-        $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
+        $objEventMemberModel = CalendarEventsMemberModel::findById($dc->id);
         if ($objEventMemberModel !== null)
         {
             $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
             if ($objEvent !== null && $objEventMemberModel->stateOfSubscription != $varValue)
             {
-                if (Validator::isEmail($objEventMemberModel->email))
+                // Check if member has already booked at the same time
+                $objMember = MemberModel::findBySacMemberId($objEventMemberModel->sacMemberId);
+                if ($varValue === 'subscription-accepted' && $objMember !== null && CalendarEventsHelper::areBookingDatesOccupied($objEventMemberModel->eventId, $objMember->id))
+                {
+                    $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht bestätigt serden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde.';
+                    $varValue = $objEventMemberModel->stateOfSubscription;
+                }
+                elseif (Validator::isEmail($objEventMemberModel->email))
                 {
                     // Use terminal42/notification_center
                     $objNotification = Notification::findOneByType('onchange_state_of_subscription');
@@ -401,7 +408,7 @@ class tl_calendar_events_member extends Backend
     public function onsubmitCallback(DC_Table $dc)
     {
         // Set correct contaoMemberId if there is a sacMemberId
-        $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
+        $objEventMemberModel = CalendarEventsMemberModel::findById($dc->id);
         if ($objEventMemberModel !== null)
         {
 
@@ -469,6 +476,12 @@ class tl_calendar_events_member extends Backend
             return;
         }
 
+        if (isset($_SESSION['addError']))
+        {
+            Message::addError($_SESSION['addError']);
+            unset($_SESSION['addError']);
+        }
+
         if (isset($_SESSION['addInfo']))
         {
             Message::addConfirmation($_SESSION['addInfo']);
@@ -495,7 +508,7 @@ class tl_calendar_events_member extends Backend
 
         if (isset($_POST['refuseWithoutEmail']))
         {
-            $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
+            $objRegistration = CalendarEventsMemberModel::findById(Input::get('id'));
             if ($objRegistration !== null)
             {
                 $set = array('stateOfSubscription' => 'subscription-refused');
@@ -508,7 +521,7 @@ class tl_calendar_events_member extends Backend
 
         if (isset($_POST['acceptWithoutEmail']))
         {
-            $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
+            $objRegistration = CalendarEventsMemberModel::findById(Input::get('id'));
             if ($objRegistration !== null)
             {
                 $set = array('stateOfSubscription' => 'subscription-accepted');
@@ -521,7 +534,7 @@ class tl_calendar_events_member extends Backend
 
         if (isset($_POST['addToWaitlist']))
         {
-            $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
+            $objRegistration = CalendarEventsMemberModel::findById(Input::get('id'));
             if ($objRegistration !== null)
             {
                 $set = array('stateOfSubscription' => 'subscription-waitlisted');
@@ -611,7 +624,7 @@ class tl_calendar_events_member extends Backend
      */
     public function inputFieldCallbackDashboard(DC_Table $dc)
     {
-        $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
+        $objRegistration = CalendarEventsMemberModel::findById($dc->id);
         if ($objRegistration !== null)
         {
             $objTemplate = new BackendTemplate('be_calendar_events_registration_dashboard');
@@ -650,7 +663,7 @@ class tl_calendar_events_member extends Backend
         {
             if (Input::post('subject') != '' && Input::post('text') != '')
             {
-                $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
+                $objRegistration = CalendarEventsMemberModel::findById($dc->id);
                 if ($objRegistration !== null)
                 {
                     if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
@@ -693,7 +706,7 @@ class tl_calendar_events_member extends Backend
             }
         }
 
-        $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
+        $objRegistration = CalendarEventsMemberModel::findById($dc->id);
         if ($objRegistration !== null)
         {
             $objEvent = $objRegistration->getRelated('eventId');
@@ -740,7 +753,7 @@ class tl_calendar_events_member extends Backend
             {
 
 
-                $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
+                $objRegistration = CalendarEventsMemberModel::findById($dc->id);
                 if ($objRegistration !== null)
                 {
                     if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
@@ -754,11 +767,14 @@ class tl_calendar_events_member extends Backend
                     $objEmail->subject = Input::post('subject');
                     $objEmail->text = strip_tags(Input::post('text'));
 
-                    // Send copy to instructor
-                    // $objEmail->sendBcc($this->User->email);
-
+                    // Check if member has already booked at the same time
+                    $objMember = MemberModel::findBySacMemberId($objRegistration->sacMemberId);
+                    if ($objMember !== null && CalendarEventsHelper::areBookingDatesOccupied($objRegistration->eventId, $objMember->id))
+                    {
+                        $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht bestätigt serden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde.';
+                    }
                     // Send email
-                    if (Validator::isEmail($objRegistration->email))
+                    elseif (Validator::isEmail($objRegistration->email))
                     {
                         $objEmail->sendTo($objRegistration->email);
 
@@ -784,7 +800,7 @@ class tl_calendar_events_member extends Backend
             }
         }
 
-        $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
+        $objRegistration = CalendarEventsMemberModel::findById($dc->id);
         if ($objRegistration !== null)
         {
             $objEvent = $objRegistration->getRelated('eventId');
@@ -828,7 +844,7 @@ class tl_calendar_events_member extends Backend
         {
             if (Input::post('subject') != '' && Input::post('text') != '')
             {
-                $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
+                $objRegistration = CalendarEventsMemberModel::findById($dc->id);
                 if ($objRegistration !== null)
                 {
                     if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
@@ -871,7 +887,7 @@ class tl_calendar_events_member extends Backend
             }
         }
 
-        $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
+        $objRegistration = CalendarEventsMemberModel::findById($dc->id);
         if ($objRegistration !== null)
         {
             $objEvent = $objRegistration->getRelated('eventId');

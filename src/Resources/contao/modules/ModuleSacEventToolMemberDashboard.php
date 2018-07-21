@@ -138,7 +138,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                 if (FE_USER_LOGGED_IN)
                 {
 
-                    $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
+                    $objRegistration = CalendarEventsMemberModel::findById(Input::get('id'));
                     if ($objRegistration !== null)
                     {
 
@@ -225,7 +225,7 @@ class ModuleSacEventToolMemberDashboard extends Module
         $blnHasError = true;
         $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event abgemeldet werden. Bitte nimm mit dem verantwortlichen Leiter Kontakt auf.';
 
-        $objEventsMember = CalendarEventsMemberModel::findByPk($registrationId);
+        $objEventsMember = CalendarEventsMemberModel::findById($registrationId);
         if ($objEventsMember === null)
         {
             Message::add($errorMsg, 'TL_ERROR', TL_MODE);
@@ -329,6 +329,83 @@ class ModuleSacEventToolMemberDashboard extends Module
     }
 
     /**
+     * @todo UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION
+     * @param $memberId
+     * @param bool $blnForceDelete
+     */
+    protected function clearMemberProfile($memberId, $blnForceDelete = false)
+    {
+        $arrEventsMember = array();
+        $blnHasError = false;
+
+        $objMember = MemberModel::findByPk($memberId);
+        if ($objMember !== null)
+        {
+            // Upcoming events
+            $arrEvents = CalendarEventsMemberModel::findUpcomingEventsByMemberId($objMember->id);
+            foreach ($arrEvents as $arrEvent)
+            {
+
+                $objEventsMember = CalendarEventsMemberModel::findById($arrEvent['registrationId']);
+                if ($objEventsMember !== null)
+                {
+
+                    if ($arrEvent['eventModel'] !== null)
+                    {
+                        $objEvent = $arrEvent['eventModel'];
+                        if ($blnForceDelete)
+                        {
+                            continue;
+                        }
+                        elseif ($objEventsMember->stateOfSubscription === 'subscription-refused')
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            $arrErrorMsg[] = sprintf('Dein Profil kann nicht gelöscht werden, weil du beim Event "%s [%s]" vom %s auf der Buchungsliste stehst. Bitte melde dich zuerst vom Event ab oder nimm gegebenenfalls mit dem Leiter Kontakt auf.', $objEvent->title, $objEventsMember->stateOfSubscription, Date::parse(Config::get('dateFormat'), $objEvent->startDate));
+                            $blnHasError = true;
+                        }
+                    }
+                }
+            }
+
+            // Past events
+            $arrEvents = CalendarEventsMemberModel::findPastEventsByMemberId($objMember->id);
+            foreach ($arrEvents as $arrEvent)
+            {
+                $objEventsMember = CalendarEventsMemberModel::findById($arrEvent['registrationId']);
+
+                if ($objEventsMember !== null)
+                {
+                    $arrEventsMember[] = $objEventsMember->id;
+                }
+            }
+
+            if ($blnHasError)
+            {
+                foreach ($arrErrorMsg as $errorMsg)
+                {
+                    Message::add($errorMsg, 'TL_ERROR', TL_MODE);
+                }
+            }
+            else
+            {
+                // Delete entires from tl_calendar_events_member
+                foreach ($arrEventsMember as $eventsMemberId)
+                {
+                    $objEventsMember = CalendarEventsMemberModel::findById($eventsMemberId);
+                    if ($objEventsMember !== null)
+                    {
+                        System::log(sprintf('Clean SAC-member profile of member "%s %s (%s)": Delete tl_calendar_events_member.id=%s', $objMember->firstname, $objMember->lastname, $objMember->sacMemberId, $objEventsMember->eventId), __FILE__ . ' Line: ' . __LINE__, 'CLEAR_MEMBER_DATA');
+                        //$objEventsMember->delete();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Generate the module
      */
     protected function compile()
@@ -356,6 +433,7 @@ class ModuleSacEventToolMemberDashboard extends Module
             $this->Template->hasErrorMessage = true;
             $session = System::getContainer()->get('session')->getFlashBag()->get('contao.FE.error');
             $this->Template->errorMessage = $session[0];
+            $this->Template->errorMessages = $session;
         }
 
         Message::reset();
@@ -383,7 +461,7 @@ class ModuleSacEventToolMemberDashboard extends Module
 
 
                 // Past events
-                $arrEvents = CalendarEventsMemberModel::findPastEventsBySacMemberId($this->objUser->sacMemberId);
+                $arrEvents = CalendarEventsMemberModel::findPastEventsByMemberId($this->objUser->id);
                 foreach ($arrEvents as $k => $event)
                 {
 
