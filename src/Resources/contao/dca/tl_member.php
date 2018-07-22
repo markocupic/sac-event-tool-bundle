@@ -58,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = array(
     'sorting'   => true,
     'flag'      => 1,
     'inputType' => 'text',
-    'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'rgxp' => 'natural'),
+    'eval'      => array('doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'rgxp' => 'natural'),
     'sql'       => "int(10) unsigned NOT NULL default '0'",
 );
 

@@ -211,6 +211,15 @@
             </div>
 
           </div>
+          <h3 class="mt-0">Profil löschen/Konto deaktivieren</h3>
+          <div class="alert alert-danger" role="alert">
+            Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten gelöscht.
+            Deine Tourhistory ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.
+            Dieser Vorgang kann allerdings nur durchgeführt werden, wenn du keine hängigen Tourenbuchungen hast.
+            {{br}}
+            {{br}}
+            <a href="{{env::request}}?action=clear_profile" class="clear-profile-link btn btn-danger">Mein Profil löschen</a>
+          </div>
         </div>
 
       </div>
@@ -236,6 +245,22 @@
                           $('#' + activeTab).trigger('click');
                       }
                   }
+              });
+          });
+      })(jQuery);
+  </script>
+  <script>
+      // Always open last used bootstrap tab, when reloading the page
+      // Add session-tabs class to the nav tag
+      // Add data-sessiontabs="someId" to the nav tag
+      (function ($) {
+          $(document).ready(function () {
+              $('.clear-profile-link').click(function(e){
+                  if (confirm( "Möchtest du dein Profil endgültig löschen? Die Daten können danach nicht mehr wiederhergestellt werden." ))
+                  {
+                      return true;
+                  }
+                  return false;
               });
           });
       })(jQuery);

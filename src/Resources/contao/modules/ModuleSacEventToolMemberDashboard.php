@@ -673,6 +673,11 @@ class ModuleSacEventToolMemberDashboard extends Module
                     }
                 }
                 break;
+
+            case 'clear_profile':
+                $this->Template->form = $this->generateClearProfileForm();
+
+                break;
         }
 
     }
@@ -803,6 +808,53 @@ class ModuleSacEventToolMemberDashboard extends Module
         {
             // The model will now contain the changes so you can save it
             $objModel->save();
+        }
+
+
+        return $objForm->generate();
+    }
+
+    /**
+     * Generate the clear profile form
+     * @return Form
+     */
+    protected function generateClearProfileForm()
+    {
+
+        $objForm = new Form('form-clear-profile', 'POST', function ($objHaste) {
+            return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
+        });
+
+
+        $objForm->setFormActionFromUri(Environment::get('uri'));
+
+        // Now let's add form fields:
+        $objForm->addFormField('sacMemberId', array(
+            'label'     => array('SAC-Mitgliedernummer', ''),
+            'inputType' => 'text',
+        ));
+
+        // Let's add  a submit button
+        $objForm->addFormField('submit', array(
+            'label'     => 'Profil unwiederkehrlich löschen',
+            'inputType' => 'submit',
+        ));
+
+
+        if ($objForm->validate())
+        {
+            if (Input::post('FORM_SUBMIT') === 'form-clear-profile')
+            {
+                if (Input::post('sacMemberId') === $this->objUser->sacMemberId)
+                {
+                    die('Noch in der Testphase. ;-)');
+                }
+                else
+                {
+                    $objFormField = $objForm->getWidget('sacMemberId');
+                    $objFormField->addError('Das Profil kann nicht gelöscht werden. Die Mitgliedernummer ist falsch.');
+                }
+            }
         }
 
 

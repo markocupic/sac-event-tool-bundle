@@ -382,6 +382,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['sacMemberId'],
             'inputType' => 'text',
+            'save_callback' => array(array('tl_calendar_events_member', 'saveCallbackSacMemberId')),
             'eval'      => array('doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
@@ -444,6 +445,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         'agb'                 => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['agb'],
+            'inputType' => 'checkbox',
+            'eval'      => array('doNotShow' => true, 'doNotCopy' => true,),
+            'sql'       => "char(1) NOT NULL default ''",
+        ),
+        'anonymized'       => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['anonymized'],
             'inputType' => 'checkbox',
             'eval'      => array('doNotShow' => true, 'doNotCopy' => true,),
             'sql'       => "char(1) NOT NULL default ''",

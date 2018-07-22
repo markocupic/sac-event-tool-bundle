@@ -58,6 +58,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['emailSendCopy'] = array("Kopie
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['addEmailAttachment'] = array("Dateianlage hinzuf&uuml;gen", "");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['emailAttachment'] = array("Dateien ausw&auml;hlen", "W&auml;hlen Sie die Dateien aus dem Dateibaum aus.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['eventName'] = array("Eventname", "Geben Sie bitte den Eventnamen ein.");
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['anonymized'] = array("Eingaben anonymisiert", "");
 
 
 // References

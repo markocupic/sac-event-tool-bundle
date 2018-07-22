@@ -1,0 +1,59 @@
+<?php $this->extend('block_unsearchable'); ?>
+
+<?php $this->block('content'); ?>
+
+
+<?php if ($this->hasInfoMessage): ?>
+  <div class="alert alert-info" role="alert">
+      <?= $this->infoMessage ?>
+  </div>
+<?php endif; ?>
+
+<?php if ($this->hasErrorMessage): ?>
+  <?php foreach($this->errorMessages as $msg): ?>
+  <div class="alert alert-danger" role="alert">
+      <?= $msg ?>
+  </div>
+  <?php endforeach; ?>
+<?php endif; ?>
+
+  <h1 class="ce_headline first">Profil/Konto löschen</h1>
+<div class="row">
+  <div class="col-12 col-sm-6">
+    <div class="alert alert-danger" role="alert">
+      Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten gelöscht.
+      Deine Tourhistory ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.
+      Dieser Vorgang kann allerdings nur durchgeführt werden, wenn du keine hängigen Tourenbuchungen hast.
+    </div>
+  </div>
+  <div class="col-12 col-sm-6">
+      <h6 class="mt-0">Zum Löschen deines Kontos musst du deine Mitgliedernummer eingeben</h6>
+      <?= $this->form; ?>
+  </div>
+
+</div>
+
+
+
+
+
+
+  <script>
+      // Always open last used bootstrap tab, when reloading the page
+      // Add session-tabs class to the nav tag
+      // Add data-sessiontabs="someId" to the nav tag
+      (function ($) {
+          $(document).ready(function () {
+            $('.hasteform_form-clear-profile form ').submit(function(e){
+                if (confirm( "Möchtest du dein Profil endgültig löschen? Die Daten können danach nicht mehr wiederhergestellt werden." ))
+                {
+                    return true;
+                }
+                return false;
+            });
+          });
+      })(jQuery);
+  </script>
+
+
+<?php $this->endblock(); ?>

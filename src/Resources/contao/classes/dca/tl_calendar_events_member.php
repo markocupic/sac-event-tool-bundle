@@ -12,6 +12,7 @@
 namespace Contao;
 
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\ClearPersonalMemberData;
 use NotificationCenter\Model\Notification;
 
 
@@ -28,7 +29,7 @@ class tl_calendar_events_member extends Backend
     public function __construct()
     {
         $this->import('BackendUser', 'User');
-
+        ClearPersonalMemberData::anonymizeOrphanedCalendarEventsMemberDataRecords();
         parent::__construct();
 
         // Set correct referer
@@ -361,6 +362,52 @@ class tl_calendar_events_member extends Backend
         }
     }
 
+
+    /**
+     * @param $varValue
+     * @param DC_Table $dc
+     */
+    public function saveCallbackSacMemberId($varValue, DC_Table $dc)
+    {
+
+        // Set correct contaoMemberId if there is a sacMemberId
+        $objEventMemberModel = CalendarEventsMemberModel::findById($dc->id);
+        if ($objEventMemberModel !== null)
+        {
+            if ($varValue != '')
+            {
+
+                $objMemberModel = MemberModel::findBySacMemberId($varValue);
+                if ($objMemberModel !== null)
+                {
+                    $set = array(
+                        'contaoMemberId' => $objMemberModel->id,
+                    );
+                    $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
+                }
+                else
+                {
+                    $varValue = '';
+                    $set = array(
+                        'sacMemberId'    => '',
+                        'contaoMemberId' => '',
+                    );
+                    $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
+                }
+            }
+            else
+            {
+                $set = array(
+                    'sacMemberId'    => '',
+                    'contaoMemberId' => '',
+                );
+                $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
+            }
+        }
+
+        return $varValue;
+    }
+
     /**
      * @param $varValue
      * @param DC_Table $dc
@@ -415,8 +462,10 @@ class tl_calendar_events_member extends Backend
             // Set correct addedOn timestamp
             if (!$objEventMemberModel->addedOn)
             {
-                $objEventMemberModel->addedOn = time();
-                $objEventMemberModel->save();
+                $set = array(
+                    'addedOn' => time(),
+                );
+                $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
             }
 
             $eventId = $objEventMemberModel->eventId > 0 ? $objEventMemberModel->eventId : CURRENT_ID;
@@ -425,23 +474,11 @@ class tl_calendar_events_member extends Backend
             if ($objEventModel !== null)
             {
                 // Set correct event title and eventId
-                $objEventMemberModel->eventName = $objEventModel->title;
-                $objEventMemberModel->eventId = $eventId;
-
-
-                if ($objEventMemberModel->sacMemberId != '')
-                {
-                    $objMemberModel = MemberModel::findBySacMemberId($objEventMemberModel->sacMemberId);
-                    if ($objMemberModel !== null)
-                    {
-                        $objEventMemberModel->contaoMemberId = $objMemberModel->id;
-                    }
-                    else
-                    {
-                        $objEventMemberModel->sacMemberId = '';
-                    }
-                }
-                $objEventMemberModel->save();
+                $set = array(
+                    'eventName' => $objEventModel->title,
+                    'eventId'   => $eventId,
+                );
+                $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
             }
         }
     }
@@ -622,7 +659,8 @@ class tl_calendar_events_member extends Backend
      * @param DC_Table $dc
      * @return string
      */
-    public function inputFieldCallbackDashboard(DC_Table $dc)
+    public
+    function inputFieldCallbackDashboard(DC_Table $dc)
     {
         $objRegistration = CalendarEventsMemberModel::findById($dc->id);
         if ($objRegistration !== null)
