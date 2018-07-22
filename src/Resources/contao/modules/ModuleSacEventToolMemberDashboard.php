@@ -328,82 +328,6 @@ class ModuleSacEventToolMemberDashboard extends Module
         }
     }
 
-    /**
-     * @todo UNDER CONSTRUCTION UNDER CONSTRUCTION UNDER CONSTRUCTION
-     * @param $memberId
-     * @param bool $blnForceDelete
-     */
-    protected function clearMemberProfile($memberId, $blnForceDelete = false)
-    {
-        $arrEventsMember = array();
-        $blnHasError = false;
-
-        $objMember = MemberModel::findByPk($memberId);
-        if ($objMember !== null)
-        {
-            // Upcoming events
-            $arrEvents = CalendarEventsMemberModel::findUpcomingEventsByMemberId($objMember->id);
-            foreach ($arrEvents as $arrEvent)
-            {
-
-                $objEventsMember = CalendarEventsMemberModel::findById($arrEvent['registrationId']);
-                if ($objEventsMember !== null)
-                {
-
-                    if ($arrEvent['eventModel'] !== null)
-                    {
-                        $objEvent = $arrEvent['eventModel'];
-                        if ($blnForceDelete)
-                        {
-                            continue;
-                        }
-                        elseif ($objEventsMember->stateOfSubscription === 'subscription-refused')
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            $arrErrorMsg[] = sprintf('Dein Profil kann nicht gelöscht werden, weil du beim Event "%s [%s]" vom %s auf der Buchungsliste stehst. Bitte melde dich zuerst vom Event ab oder nimm gegebenenfalls mit dem Leiter Kontakt auf.', $objEvent->title, $objEventsMember->stateOfSubscription, Date::parse(Config::get('dateFormat'), $objEvent->startDate));
-                            $blnHasError = true;
-                        }
-                    }
-                }
-            }
-
-            // Past events
-            $arrEvents = CalendarEventsMemberModel::findPastEventsByMemberId($objMember->id);
-            foreach ($arrEvents as $arrEvent)
-            {
-                $objEventsMember = CalendarEventsMemberModel::findById($arrEvent['registrationId']);
-
-                if ($objEventsMember !== null)
-                {
-                    $arrEventsMember[] = $objEventsMember->id;
-                }
-            }
-
-            if ($blnHasError)
-            {
-                foreach ($arrErrorMsg as $errorMsg)
-                {
-                    Message::add($errorMsg, 'TL_ERROR', TL_MODE);
-                }
-            }
-            else
-            {
-                // Delete entires from tl_calendar_events_member
-                foreach ($arrEventsMember as $eventsMemberId)
-                {
-                    $objEventsMember = CalendarEventsMemberModel::findById($eventsMemberId);
-                    if ($objEventsMember !== null)
-                    {
-                        System::log(sprintf('Clean SAC-member profile of member "%s %s (%s)": Delete tl_calendar_events_member.id=%s', $objMember->firstname, $objMember->lastname, $objMember->sacMemberId, $objEventsMember->eventId), __FILE__ . ' Line: ' . __LINE__, 'CLEAR_MEMBER_DATA');
-                        //$objEventsMember->delete();
-                    }
-                }
-            }
-        }
-    }
 
     /**
      * Generate the module
@@ -829,6 +753,14 @@ class ModuleSacEventToolMemberDashboard extends Module
         $objForm->setFormActionFromUri(Environment::get('uri'));
 
         // Now let's add form fields:
+        // Now let's add form fields:
+        $objForm->addFormField('deleteProfile', array(
+            'label'     => array('Profil löschen', ''),
+            'inputType' => 'select',
+            'options'   => array('false' => 'Nein', 'true' => 'Ja'),
+        ));
+
+
         $objForm->addFormField('sacMemberId', array(
             'label'     => array('SAC-Mitgliedernummer', ''),
             'inputType' => 'text',
@@ -845,14 +777,27 @@ class ModuleSacEventToolMemberDashboard extends Module
         {
             if (Input::post('FORM_SUBMIT') === 'form-clear-profile')
             {
-                if (Input::post('sacMemberId') === $this->objUser->sacMemberId)
+                $blnError = false;
+                if (Input::post('deleteProfile') !== 'true')
                 {
-                    die('Noch in der Testphase. ;-)');
+                    $blnError = true;
+                    $objFormField1 = $objForm->getWidget('deleteProfile');
+                    $objFormField1->addError('Falsche Eingabe. Das Profil konnte nicht gelöscht werden.');
                 }
-                else
+                if (Input::post('sacMemberId') != $this->objUser->sacMemberId)
                 {
-                    $objFormField = $objForm->getWidget('sacMemberId');
-                    $objFormField->addError('Das Profil kann nicht gelöscht werden. Die Mitgliedernummer ist falsch.');
+                    $blnError = true;
+                    $objFormField2 = $objForm->getWidget('sacMemberId');
+                    $objFormField2->addError('Das Profil konnte nicht gelöscht werden. Die Mitgliedernummer ist falsch.');
+                }
+
+                if (!$blnError)
+                {
+                    // Clear account
+                    ClearPersonalMemberData::clearMemberProfile($this->objUser->id);
+                    ClearPersonalMemberData::disableLogin($this->objUser->id);
+                    ClearPersonalMemberData::deleteFrontendAccount($this->objUser->id);
+                    Controller::reload();
                 }
             }
         }
