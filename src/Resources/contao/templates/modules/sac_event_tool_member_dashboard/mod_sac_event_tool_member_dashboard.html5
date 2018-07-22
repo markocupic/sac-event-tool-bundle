@@ -190,8 +190,11 @@
             </div>
 
             <div class="col-12">
-              <h3>Weiteres</h3>
+              <h3>Angaben für die Online Anmeldung zu Events</h3>
+              <div class="alert alert-dark">
                 <?= $this->userProfileForm ?>
+              </div>
+              {{br}}
               <hr>
             </div>
 
@@ -199,7 +202,9 @@
               <h3>Avatar Einstellungen</h3>
               <div class="row">
                 <div class="col-9">
+                  <div class="alert alert-dark">
                     <?= $this->avatarForm ?>
+                  </div>
                 </div>
                 <div class="col-3">
                   <figure class="responsive thumbnail image_container">
@@ -211,6 +216,8 @@
             </div>
 
           </div>
+          <hr>
+          {{br}}
           <h3 class="mt-0">Profil löschen/Konto deaktivieren</h3>
           <div class="alert alert-danger" role="alert">
             Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten gelöscht.
