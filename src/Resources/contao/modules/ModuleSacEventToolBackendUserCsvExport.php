@@ -233,7 +233,14 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
                                 $objGroupModel = $GroupModel::findByPk($groupId);
                                 if ($objGroupModel !== null)
                                 {
-                                    $arrUser[] = $objGroupModel->name;
+                                    if ($objGroupModel->name != '')
+                                    {
+                                        $arrUser[] = $objGroupModel->name;
+                                    }
+                                    else
+                                    {
+                                        $arrUser[] = $objGroupModel->title;
+                                    }
                                 }
                                 else
                                 {
