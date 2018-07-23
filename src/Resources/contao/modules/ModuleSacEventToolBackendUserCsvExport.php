@@ -139,18 +139,18 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
                 if (Input::post('export-type') === 'user-role-export')
                 {
                     $strTable = 'tl_user';
-                    $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'lastLogin', 'password', 'pwChange', 'userRole');
+                    $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'admin', 'lastLogin', 'password', 'pwChange', 'userRole');
                     $strGroupFieldName = 'userRole';
-                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_user');
+                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, 'UserRoleModel', $blnKeepGroupsInOneLine);
                 }
 
                 if (Input::post('export-type') === 'user-group-export')
                 {
                     $strTable = 'tl_user';
-                    $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'lastLogin', 'password', 'pwChange', 'groups');
+                    $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'admin', 'lastLogin', 'password', 'pwChange', 'groups');
                     $strGroupFieldName = 'groups';
-                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_user');
+                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, 'UserGroupModel', $blnKeepGroupsInOneLine);
                 }
 
@@ -159,7 +159,7 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
                     $strTable = 'tl_member';
                     $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'login', 'lastLogin', 'groups');
                     $strGroupFieldName = 'groups';
-                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_member');
+                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_member ORDER BY lastname, firstname');
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, 'MemberGroupModel', $blnKeepGroupsInOneLine);
                 }
 
