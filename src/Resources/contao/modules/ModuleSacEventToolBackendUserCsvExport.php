@@ -13,14 +13,13 @@ namespace Markocupic\SacEventToolBundle;
 
 use Contao\BackendTemplate;
 use Contao\Config;
+use Contao\Controller;
 use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
 use Contao\Input;
 use Contao\Module;
 use Contao\StringUtil;
-use Contao\UserGroupModel;
-use Contao\UserRoleModel;
 use Haste\Form\Form;
 use League\Csv\Reader;
 use League\Csv\Writer;
@@ -114,9 +113,13 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
         $objForm->addFormField('export-type', array(
             'label'     => array('Export auswählen', ''),
             'inputType' => 'select',
-            'options'   => array('user-role-export' => 'SAC Benutzerrollen exportieren', 'user-group-export' => 'User und Benutzergruppenzugehörigkeit exportieren'),
+            'options'   => array('user-role-export' => 'SAC Benutzerrollen exportieren', 'user-group-export' => 'User und Benutzergruppenzugehörigkeit exportieren', 'member-group-export' => 'Mitglieder und Benutzerzugehörigkeit exportieren'),
         ));
 
+        $objForm->addFormField('keep-groups-in-one-line', array(
+            'label'     => array('', 'Gruppen einzeilig darstellen'),
+            'inputType' => 'checkbox',
+        ));
 
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
@@ -129,15 +132,35 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
         {
             if (Input::post('FORM_SUBMIT') === 'form-user-export')
             {
-                self::loadLanguageFile('tl_user');
-                $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'lastLogin', 'password');
+                $blnKeepGroupsInOneLine = Input::post('keep-groups-in-one-line');
+
+                $exportType = Input::post('export-type');
+
                 if (Input::post('export-type') === 'user-role-export')
                 {
-                    $this->userRoleExport($arrFields);
+                    $strTable = 'tl_user';
+                    $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'lastLogin', 'password', 'pwChange', 'userRole');
+                    $strGroupFieldName = 'userRole';
+                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_user');
+                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, 'UserRoleModel', $blnKeepGroupsInOneLine);
                 }
+
                 if (Input::post('export-type') === 'user-group-export')
                 {
-                    $this->userGroupExport($arrFields);
+                    $strTable = 'tl_user';
+                    $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'lastLogin', 'password', 'pwChange', 'groups');
+                    $strGroupFieldName = 'groups';
+                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_user');
+                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, 'UserGroupModel', $blnKeepGroupsInOneLine);
+                }
+
+                if (Input::post('export-type') === 'member-group-export')
+                {
+                    $strTable = 'tl_member';
+                    $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'login', 'lastLogin', 'groups');
+                    $strGroupFieldName = 'groups';
+                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_member');
+                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, 'MemberGroupModel', $blnKeepGroupsInOneLine);
                 }
 
             }
@@ -148,19 +171,23 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
     }
 
     /**
+     * @param $type
+     * @param $strTable
+     * @param $arrFields
+     * @param $strGroupFieldName
+     * @param $objUser
+     * @param $GroupModel
+     * @param bool $blnKeepGroupsInOneLine
      * @throws \League\Csv\Exception
      * @throws \TypeError
      */
-    private function userRoleExport($arrFields)
+    private function exportTable($type, $strTable, $arrFields, $strGroupFieldName, $objUser, $GroupModel, $blnKeepGroupsInOneLine = false)
     {
-        $filename = 'user-role-export_' . \Date::parse('Y-m-d_H-i-s') . '.csv';
+        $filename = $type . '_' . \Date::parse('Y-m-d_H-i-s') . '.csv';
         $arrData = array();
 
-        $objUser = Database::getInstance()->execute('SELECT * FROM tl_user');
-        $arrFields[] = 'userRole';
-
-        $arrData[] = $this->getHeadline($arrFields);
-
+        // Write headline
+        $arrData[] = $this->getHeadline($arrFields, $strTable);
 
         // Write rows
         while ($objUser->next())
@@ -168,40 +195,75 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
             $arrUser = array();
             foreach ($arrFields as $field)
             {
-                if ($field === 'userRole')
+                if ($field === $strGroupFieldName)
                 {
-                    if (!empty($objUser->{$field}) && is_array(StringUtil::deserialize($objUser->{$field})))
+                    $hasGroups = false;
+                    $arrGroups = StringUtil::deserialize($objUser->{$field}, true);
+
+                    if (count($arrGroups) > 0)
                     {
-                        $arrUserRoles = StringUtil::deserialize($objUser->{$field}, true);
-                        foreach ($arrUserRoles as $userRole)
+                        // Write all the groups/roles in one line
+                        if ($blnKeepGroupsInOneLine)
                         {
-                            $objUserRole = UserRoleModel::findByPk($userRole);
-                            if ($objUserRole !== null)
+                            $arrUser[] = implode(', ', array_filter(array_map(function ($id) use ($GroupModel) {
+                                $objGroupModel = $GroupModel::findByPk($id);
+                                if ($objGroupModel !== null)
+                                {
+                                    if ($objGroupModel->name != '')
+                                    {
+                                        return $objGroupModel->name;
+                                    }
+                                    else
+                                    {
+                                        return $objGroupModel->title;
+                                    }
+                                }
+                                else
+                                {
+                                    return '';
+                                }
+                            }, $arrGroups)));
+                        }
+                        // Make a row for each group/role
+                        else
+                        {
+                            $hasGroups = true;
+                            foreach ($arrGroups as $groupId)
                             {
-                                $arrUser[] = $objUserRole->title;
+                                $objGroupModel = $GroupModel::findByPk($groupId);
+                                if ($objGroupModel !== null)
+                                {
+                                    $arrUser[] = $objGroupModel->name;
+                                }
+                                else
+                                {
+                                    $arrUser[] = 'Unbekannte Gruppe/Rolle mit ID:' . $groupId;
+                                }
+                                $arrData[] = $arrUser;
+                                array_pop($arrUser);
                             }
-                            else
-                            {
-                                $arrUser[] = 'Unbekannte Rolle mit ID:' . $userRole;
-                            }
-                            $arrData[] = $arrUser;
-                            array_pop($arrUser);
                         }
                     }
                     else
                     {
                         $arrUser[] = '';
-                        $arrData[] = $arrUser;
                     }
                 }
                 else
                 {
                     $arrUser[] = $this->getField($field, $objUser);
                 }
-
             }
-            $arrData[] = $arrUser;
+            if (!$hasGroups)
+            {
+                $arrData[] = $arrUser;
+            }
+            else
+            {
+                $hasGroups = false;
+            }
         }
+
         // Print to screen
         $this->printCsv($arrData, $filename);
     }
@@ -210,13 +272,14 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
      * @param $arrFields
      * @return array
      */
-    private function getHeadline($arrFields)
+    private function getHeadline($arrFields, $strTable)
     {
+        Controller::loadLanguageFile($strTable);
         // Write headline
         $arrHeadline = array();
         foreach ($arrFields as $field)
         {
-            $arrHeadline[] = isset($GLOBALS['TL_LANG']['tl_user'][$field][0]) ? $GLOBALS['TL_LANG']['tl_user'][$field][0] : $field;
+            $arrHeadline[] = isset($GLOBALS['TL_LANG'][$strTable][$field][0]) ? $GLOBALS['TL_LANG'][$strTable][$field][0] : $field;
         }
         return $arrHeadline;
     }
@@ -239,7 +302,6 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
             {
                 return '#######';
             }
-
         }
         elseif ($field === 'lastLogin')
         {
@@ -290,65 +352,4 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
 
         exit;
     }
-
-    /**
-     * @throws \League\Csv\Exception
-     * @throws \TypeError
-     */
-    private function userGroupExport($arrFields)
-    {
-        $filename = 'user-group-export_' . \Date::parse('Y-m-d_H-i-s') . '.csv';
-        $arrData = array();
-
-        $objUser = Database::getInstance()->execute('SELECT * FROM tl_user');
-        $arrFields[] = 'groups';
-
-        $arrData[] = $this->getHeadline($arrFields);
-
-
-        // Write rows
-        while ($objUser->next())
-        {
-            $arrUser = array();
-            foreach ($arrFields as $field)
-            {
-                if ($field === 'groups')
-                {
-                    if (!empty($objUser->{$field}) && is_array(StringUtil::deserialize($objUser->{$field})))
-                    {
-                        $arrUserGroups = StringUtil::deserialize($objUser->{$field}, true);
-                        foreach ($arrUserGroups as $userGroup)
-                        {
-                            $objUserGroup = UserGroupModel::findByPk($userGroup);
-                            if ($objUserGroup !== null)
-                            {
-                                $arrUser[] = $objUserGroup->name;
-                            }
-                            else
-                            {
-                                $arrUser[] = 'Unbekannte Gruppe mit ID:' . $userGroup;
-                            }
-                            $arrData[] = $arrUser;
-                            array_pop($arrUser);
-                        }
-                    }
-                    else
-                    {
-                        $arrUser[] = '';
-                        $arrData[] = $arrUser;
-                    }
-                }
-                else
-                {
-                    $arrUser[] = $this->getField($field, $objUser);
-                }
-
-            }
-            $arrData[] = $arrUser;
-        }
-        // Print to screen
-        $this->printCsv($arrData, $filename);
-    }
-
-
 }
