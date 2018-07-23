@@ -22,7 +22,7 @@
 <div class="row">
   <div class="col-12 col-sm-6">
     <div class="alert alert-danger" role="alert">
-      Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten gelöscht.
+      Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten unwiderruflich gelöscht.
       Deine Tourhistory ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.
       Dieser Vorgang kann allerdings nur durchgeführt werden, wenn du keine hängigen Tourenbuchungen hast.
     </div>
@@ -44,7 +44,7 @@
       (function ($) {
           $(document).ready(function () {
             $('.hasteform_form-clear-profile form ').submit(function(e){
-                if (confirm( "Möchtest du dein Profil endgültig löschen? Die Daten können danach nicht mehr wiederhergestellt werden." ))
+                if (confirm( "Möchtest du dein Profil endgültig und unwiderruflich löschen? Die Daten können danach nicht mehr wiederhergestellt werden." ))
                 {
                     return true;
                 }

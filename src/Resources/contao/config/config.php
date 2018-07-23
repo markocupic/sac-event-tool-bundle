@@ -46,37 +46,37 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = array(
     'sac_course_sub_types_tool'        => array(
         'tables' => array('tl_course_sub_type'),
     ),
-    'sac_event_type_tool'        => array(
+    'sac_event_type_tool'              => array(
         'tables' => array('tl_event_type'),
     ),
-    'sac_tour_difficulty_tool' => array(
+    'sac_tour_difficulty_tool'         => array(
         'tables' => array('tl_tour_difficulty_category', 'tl_tour_difficulty'),
         'table'  => array('TableWizard', 'importTable'),
         'list'   => array('ListWizard', 'importList'),
     ),
-    'sac_tour_type_tool'       => array(
+    'sac_tour_type_tool'               => array(
         'tables' => array('tl_tour_type'),
     ),
-    'sac_event_release_tool'   => array(
+    'sac_event_release_tool'           => array(
         'tables' => array('tl_event_release_level_policy_package', 'tl_event_release_level_policy'),
         'table'  => array('TableWizard', 'importTable'),
         'list'   => array('ListWizard', 'importList'),
     ),
-    'sac_event_organizer_tool' => array(
+    'sac_event_organizer_tool'         => array(
         'tables' => array('tl_event_organizer'),
         'table'  => array('TableWizard', 'importTable'),
         'list'   => array('ListWizard', 'importList'),
     ),
-    'sac_event_journey_tool'   => array(
+    'sac_event_journey_tool'           => array(
         'tables' => array('tl_calendar_events_journey'),
     ),
-    'sac_cabanne_tool'         => array(
+    'sac_cabanne_tool'                 => array(
         'tables' => array('tl_cabanne_sac'),
     ),
-    'sac_user_role_tool'       => array(
+    'sac_user_role_tool'               => array(
         'tables' => array('tl_user_role'),
     ),
-    'sac_user_temp'            => array(
+    'sac_user_temp'                    => array(
         'tables' => array('tl_user_temp'),
     ),
 );
@@ -98,12 +98,13 @@ $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
     'eventToolEventToolPilatusExport'        => 'Markocupic\SacEventToolBundle\ModuleSacEventToolPilatusExport',
     'eventToolEventToolJahresprogrammExport' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolJahresprogrammExport',
     'eventToolActivateMemberAccount'         => 'Markocupic\SacEventToolBundle\ModuleSacEventToolActivateMemberAccount',
+    'eventToolBackendUserCsvExport'          => 'Markocupic\SacEventToolBundle\ModuleSacEventToolBackendUserCsvExport',
 );
 
 // Content Elements
-    $GLOBALS['TL_CTE']['sac_calendar_newsletter'] = array(
-        'calendar_newsletter' => 'CalendarNewsletter',
-    );
+$GLOBALS['TL_CTE']['sac_calendar_newsletter'] = array(
+    'calendar_newsletter' => 'CalendarNewsletter',
+);
 $GLOBALS['TL_CTE']['sac_content_elements'] = array(
     'userPortrait'     => 'Markocupic\SacEventToolBundle\ContentUserPortrait',
     'userPortraitList' => 'Markocupic\SacEventToolBundle\ContentUserPortraitList',

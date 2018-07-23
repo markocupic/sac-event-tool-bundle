@@ -18,6 +18,7 @@ PaletteManipulator::create()
     ->addField(array('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_SAC_SECTION_IDS'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_SECTION_NAME'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('SAC_EVT_DEFAULT_BACKEND_PASSWORD'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME', 'SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_TEMP_PATH'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_AVATAR_MALE'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
@@ -83,6 +84,12 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_SECTION_NAME'] = array(
     'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
 );
 
+$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_DEFAULT_BACKEND_PASSWORD'] = array(
+
+    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_DEFAULT_BACKEND_PASSWORD'],
+    'inputType' => 'text',
+    'eval'      => array('mandatory' => true, 'decodeEntities' => true, 'tl_class' => 'w50'),
+);
 
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'] = array(
 
