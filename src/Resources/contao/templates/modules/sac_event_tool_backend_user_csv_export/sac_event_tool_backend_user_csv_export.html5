@@ -2,7 +2,9 @@
 
 <?php $this->block('content'); ?>
 
-<?= $this->form ?>
+<div class="alert bg-light">
+    <?= $this->form ?>
+</div>
 
 
 <?php $this->endblock(); ?>

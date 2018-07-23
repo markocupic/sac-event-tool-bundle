@@ -153,7 +153,7 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
      */
     private function userRoleExport($arrFields)
     {
-        $filename = 'system/tmp/user-role-export_' . \Date::parse('Y-m-d_H-i-s') . '.csv';
+        $filename = 'user-role-export_' . \Date::parse('Y-m-d_H-i-s') . '.csv';
         $arrData = array();
 
         $objUser = Database::getInstance()->execute('SELECT * FROM tl_user');
@@ -170,9 +170,9 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
             {
                 if ($field === 'userRole')
                 {
-                    if (!empty($objUser->userRole) && is_array(StringUtil::deserialize($objUser->userRole)))
+                    if (!empty($objUser->{$field}) && is_array(StringUtil::deserialize($objUser->{$field})))
                     {
-                        $arrUserRoles = StringUtil::deserialize($objUser->userRole, true);
+                        $arrUserRoles = StringUtil::deserialize($objUser->{$field}, true);
                         foreach ($arrUserRoles as $userRole)
                         {
                             $objUserRole = UserRoleModel::findByPk($userRole);
@@ -297,7 +297,7 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
      */
     private function userGroupExport($arrFields)
     {
-        $filename = 'system/tmp/user-group-export_' . \Date::parse('Y-m-d_H-i-s') . '.csv';
+        $filename = 'user-group-export_' . \Date::parse('Y-m-d_H-i-s') . '.csv';
         $arrData = array();
 
         $objUser = Database::getInstance()->execute('SELECT * FROM tl_user');
@@ -349,4 +349,6 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
         // Print to screen
         $this->printCsv($arrData, $filename);
     }
+
+
 }
