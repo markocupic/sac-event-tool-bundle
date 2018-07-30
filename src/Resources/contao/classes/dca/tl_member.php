@@ -32,12 +32,18 @@ class tl_member_sac_bundle extends Backend
      */
     public function ondeleteCallback(DC_Table $objMember, $undoId)
     {
-        // Delete items from tl_calendar_events_member of a certain member
-        Database::getInstance()->prepare('DELETE FROM tl_undo WHERE id=?')->execute($undoId);
-        $oMember = MemberModel::findByPk($objMember->id);
-        if ($oMember !== null)
+        // Clear personal data f.ex.
+        // Anonymize entries in tl_calendar_events_member
+        // Delete avatar directory
+        if ($objMember->activeRecord->id > 0)
         {
-            Database::getInstance()->prepare('DELETE FROM tl_calendar_events_member WHERE sacMemberId=?')->execute($oMember->sacMemberId);
+            if (false === \Markocupic\SacEventToolBundle\ClearPersonalMemberData::clearMemberProfile($objMember->activeRecord->id))
+            {
+                $arrErrorMsg = sprintf('Das Mitglied mit ID:%s kann nicht gelöscht werden, weil es bei Events noch auf der Buchungsliste steht.', $objMember->activeRecord->id);
+                \Contao\Message::add($arrErrorMsg, 'TL_ERROR', TL_MODE);
+                \Contao\Controller::redirect('contao?do=member');
+            }
         }
+
     }
 }

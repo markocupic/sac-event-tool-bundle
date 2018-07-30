@@ -17,6 +17,7 @@ use Contao\Date;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\System;
+use Contao\Folder;
 
 
 /**
@@ -131,6 +132,8 @@ class ClearPersonalMemberData
     /**
      * @param $memberId
      * @param bool $blnForceClearing
+     * @return bool
+     * @throws \Exception
      */
     public static function clearMemberProfile($memberId, $blnForceClearing = false)
     {
@@ -186,6 +189,7 @@ class ClearPersonalMemberData
                 {
                     Message::add($errorMsg, 'TL_ERROR', TL_MODE);
                 }
+                return false;
             }
             else
             {
@@ -198,8 +202,12 @@ class ClearPersonalMemberData
                         self::anonymizeCalendarEventsMemberDataRecord($objEventsMember->id);
                     }
                 }
+                // Delete avatar directory
+                self::deleteAvatarDirectory($memberId);
+                return true;
             }
         }
+        return false;
     }
 
     /**
@@ -261,6 +269,26 @@ class ClearPersonalMemberData
             }
         }
         return $arrEvents;
+    }
+
+
+    /**
+     * @param $memberId
+     * @throws \Exception
+     */
+    public static function deleteAvatarDirectory($memberId)
+    {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+        $strAvatarDir = Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY');
+        if(is_dir($rootDir . '/' . $strAvatarDir))
+        {
+            $objDir = new Folder($strAvatarDir . '/' . $memberId);
+            if($objDir !== null)
+            {
+                $objDir->purge();
+                $objDir->delete();
+            }
+        }
     }
 
 }
