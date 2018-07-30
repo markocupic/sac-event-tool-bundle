@@ -9,14 +9,13 @@
 
 namespace Markocupic\SacEventToolBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Contao\Input;
 use Contao\System;
-use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
 use Markocupic\SacEventToolBundle\Services\Newsletter\SendNewsletter;
 use Markocupic\SacEventToolBundle\Services\Newsletter\SendPasswordToMembers;
+use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 
 /**

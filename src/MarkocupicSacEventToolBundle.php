@@ -9,7 +9,6 @@
  */
 
 
-
 namespace Markocupic\SacEventToolBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;

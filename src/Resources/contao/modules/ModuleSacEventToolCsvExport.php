@@ -26,17 +26,17 @@ use League\Csv\Writer;
 use Patchwork\Utf8;
 
 /**
- * Class ModuleSacEventToolBackendUserCsvExport
+ * Class ModuleSacEventToolCsvExport
  * @package Markocupic\SacEventToolBundle
  */
-class ModuleSacEventToolBackendUserCsvExport extends Module
+class ModuleSacEventToolCsvExport extends Module
 {
 
     /**
      * Template
      * @var string
      */
-    protected $strTemplate = 'sac_event_tool_backend_user_csv_export';
+    protected $strTemplate = 'sac_event_tool_csv_export';
 
     /**
      * @var
@@ -71,7 +71,7 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
             /** @var BackendTemplate|object $objTemplate */
             $objTemplate = new BackendTemplate('be_wildcard');
 
-            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['eventToolBackendUserCsvExport'][0]) . ' ###';
+            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['eventToolCsvExport'][0]) . ' ###';
             $objTemplate->title = $this->headline;
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
@@ -157,7 +157,7 @@ class ModuleSacEventToolBackendUserCsvExport extends Module
                 if (Input::post('export-type') === 'member-group-export')
                 {
                     $strTable = 'tl_member';
-                    $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'login', 'lastLogin', 'groups');
+                    $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups');
                     $strGroupFieldName = 'groups';
                     $objUser = Database::getInstance()->execute('SELECT * FROM tl_member ORDER BY lastname, firstname');
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, 'MemberGroupModel', $blnKeepGroupsInOneLine);

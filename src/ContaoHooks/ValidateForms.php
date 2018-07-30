@@ -245,7 +245,7 @@ class ValidateForms
                         {
                             foreach ($arrFiles as $file)
                             {
-                                $strTmpSource = str_replace($rootDir . '/', '',$file['tmp_name']);
+                                $strTmpSource = str_replace($rootDir . '/', '', $file['tmp_name']);
                                 if (is_file($rootDir . '/' . $strTmpSource))
                                 {
                                     $objFile = $this->filesModelAdapter->findByPath($strTmpSource);
@@ -302,27 +302,27 @@ class ValidateForms
                                     }
                                 }
                                 /**
-
-                                // Delete empty tmp folders
-                                $arrFolders = array(
-                                    $this->eventStoriesUploadPath . '/tmp',
-                                    $this->eventStoriesUploadPath . '/tmp/tmp',
-                                );
-                                foreach ($arrFolders as $folder)
-                                {
-                                    if(is_dir($rootDir . '/' . $folder))
-                                    {
-                                        $folders = scan($rootDir . '/' . $folder);
-                                        foreach ($folders as $dir)
-                                        {
-                                            $objFolder = new Folder($folder . '/' . $dir);
-                                            if ($objFolder->isEmpty())
-                                            {
-                                                //$objFolder->delete();
-                                            }
-                                        }
-                                    }
-                                }
+                                 *
+                                 * // Delete empty tmp folders
+                                 * $arrFolders = array(
+                                 * $this->eventStoriesUploadPath . '/tmp',
+                                 * $this->eventStoriesUploadPath . '/tmp/tmp',
+                                 * );
+                                 * foreach ($arrFolders as $folder)
+                                 * {
+                                 * if(is_dir($rootDir . '/' . $folder))
+                                 * {
+                                 * $folders = scan($rootDir . '/' . $folder);
+                                 * foreach ($folders as $dir)
+                                 * {
+                                 * $objFolder = new Folder($folder . '/' . $dir);
+                                 * if ($objFolder->isEmpty())
+                                 * {
+                                 * //$objFolder->delete();
+                                 * }
+                                 * }
+                                 * }
+                                 * }
                                  *
                                  * **/
                             }

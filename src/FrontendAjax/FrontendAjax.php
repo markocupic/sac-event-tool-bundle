@@ -53,7 +53,7 @@ class FrontendAjax
         $eventTypeId = Input::post('eventType');
         $intStartDate = round(Input::post('startDate'));
 
-        if($strEventId != '')
+        if ($strEventId != '')
         {
             if (strpos($strEventId, '-') !== false)
             {
@@ -256,7 +256,7 @@ class FrontendAjax
         $eventTypeId = Input::post('eventType');
         $intStartDate = round(Input::post('startDate'));
 
-        if($strEventId != '')
+        if ($strEventId != '')
         {
             if (strpos($strEventId, '-') !== false)
             {

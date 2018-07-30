@@ -10,10 +10,6 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
-use Contao\CalendarEventsModel;
-use Contao\Config;
-use Contao\Input;
-
 /**
  * Class GetContentElement
  * @package Markocupic\SacEventToolBundle\ContaoHooks

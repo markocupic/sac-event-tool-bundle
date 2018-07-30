@@ -48,10 +48,10 @@ class AddCustomRegexp
         // Check for a valid/existent sacMemberId
         if ($strRegexp === 'sacMemberId')
         {
-            if(trim($varValue) !== '')
+            if (trim($varValue) !== '')
             {
                 $objMemberModel = MemberModel::findBySacMemberId(trim($varValue));
-                if($objMemberModel === null)
+                if ($objMemberModel === null)
                 {
                     $objWidget->addError('Field ' . $objWidget->label . ' should be a valid sac member id.');
                 }

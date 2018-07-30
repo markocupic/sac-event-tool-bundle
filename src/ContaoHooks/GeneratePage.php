@@ -58,8 +58,6 @@ class GeneratePage
         }
 
 
-
-
         // Für Downloads z.B. Downloadlink auf www.sac-pilatus.ch/kurse
         if (Input::get('action') === 'downloadKursbroschuere' && Input::get('year') != '')
         {
@@ -78,7 +76,7 @@ class GeneratePage
             $logger = $container->get('monolog.logger.contao');
             $logger->log(LogLevel::INFO, 'The course booklet has been downloaded.', array('contao' => new ContaoContext(__FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'))));
 
-            $filenamePattern = str_replace('%%s', '%s',Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'));
+            $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'));
             $fileSRC = sprintf($filenamePattern, $year);
             Controller::sendFileToBrowser($fileSRC);
         }

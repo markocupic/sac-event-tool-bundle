@@ -10,12 +10,11 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
+use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Date;
 use Contao\Input;
 use Contao\MemberModel;
-use Contao\Config;
-
 
 
 /**
