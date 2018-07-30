@@ -14,10 +14,10 @@ use Contao\CalendarEventsMemberModel;
 use Contao\Config;
 use Contao\Database;
 use Contao\Date;
+use Contao\Folder;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\System;
-use Contao\Folder;
 
 
 /**
@@ -204,6 +204,7 @@ class ClearPersonalMemberData
                 }
                 // Delete avatar directory
                 self::deleteAvatarDirectory($memberId);
+
                 return true;
             }
         }
@@ -243,6 +244,27 @@ class ClearPersonalMemberData
 
     /**
      * @param $memberId
+     * @throws \Exception
+     */
+    public static function deleteAvatarDirectory($memberId)
+    {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+        $strAvatarDir = Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY');
+        if (is_dir($rootDir . '/' . $strAvatarDir . '/' . $memberId))
+        {
+            $strDir = $strAvatarDir . '/' . $memberId;
+            $objDir = new Folder($strDir);
+            if ($objDir !== null)
+            {
+                System::log(sprintf('Deleted avatar directory "%s" for member with ID:%s.', $strDir, $memberId), __FILE__ . ' Line: ' . __LINE__, 'DELETED_AVATAR_DORECTORY');
+                $objDir->purge();
+                $objDir->delete();
+            }
+        }
+    }
+
+    /**
+     * @param $memberId
      * @return array
      */
     private static function findUpcomingEventsByMemberId($memberId)
@@ -269,26 +291,6 @@ class ClearPersonalMemberData
             }
         }
         return $arrEvents;
-    }
-
-
-    /**
-     * @param $memberId
-     * @throws \Exception
-     */
-    public static function deleteAvatarDirectory($memberId)
-    {
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-        $strAvatarDir = Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY');
-        if(is_dir($rootDir . '/' . $strAvatarDir))
-        {
-            $objDir = new Folder($strAvatarDir . '/' . $memberId);
-            if($objDir !== null)
-            {
-                $objDir->purge();
-                $objDir->delete();
-            }
-        }
     }
 
 }
