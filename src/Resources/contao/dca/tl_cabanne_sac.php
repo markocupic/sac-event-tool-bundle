@@ -233,7 +233,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
             'eval'      => array('mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'),
             'sql'       => "varchar(512) NOT NULL default ''",
         ),
-        'ascent'      => array
+        'ascent'        => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascent'],
             'exclude'   => true,

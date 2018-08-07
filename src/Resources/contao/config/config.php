@@ -11,10 +11,6 @@
 $rootDir = Contao\System::getContainer()->getParameter('kernel.project_dir');
 
 
-/*** purge script cache for development use only **/
-// purgeScriptCache() is called in Markocupic\SacEventToolBundle\ContaoHooks\GeneratePage::generatePage;
-$GLOBALS['TL_CONFIG']['purgeScriptCache'] = false;
-
 // Add notification center configs
 require_once($rootDir . '/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/config/notification_center_config.php');
 
@@ -293,3 +289,7 @@ $GLOBALS['TL_HOOKS']['processFormData'][] = array('markocupic_sac_event_tool.con
 
 // Parse backend template hook
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic_sac_event_tool.contao_hooks.parse_backend_template', 'parseBackendTemplate');
+
+// Cron jobs
+$GLOBALS['TL_CRON']['daily']['syncSacMemberDatabase'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'syncSacMemberDatabase');
+$GLOBALS['TL_CRON']['hourly']['printSACWorkshops'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'printSacWorkshops');

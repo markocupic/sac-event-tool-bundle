@@ -13,6 +13,7 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
 PaletteManipulator::create()
     ->addLegend('sacEventTool_legend', 'global_legend')
+    ->addLegend('sacWorkshopFlyer_legend', 'global_legend')
     ->addField(array('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
@@ -45,6 +46,9 @@ PaletteManipulator::create()
     ->addField(array('SAC_EVT_LOG_EVENT_SUBSCRIPTION'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_LOG_EVENT_SUBSCRIPTION_ERROR'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
+    //
+    ->addField(array('SAC_WORKSHOP_FLYER_YEAR'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('SAC_WORKSHOP_FLYER_CALENDAR_ID'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_settings');
 
 
@@ -280,4 +284,17 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD
     'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
 );
 
+$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_WORKSHOP_FLYER_CALENDAR_ID'] = array(
+
+    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_WORKSHOP_FLYER_CALENDAR_ID'],
+    'inputType' => 'text',
+    'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
+);
+
+$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_WORKSHOP_FLYER_YEAR'] = array(
+
+    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_WORKSHOP_FLYER_YEAR'],
+    'inputType' => 'text',
+    'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
+);
 

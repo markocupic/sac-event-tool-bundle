@@ -78,10 +78,6 @@ class SyncSacMemberDatabase
      */
     private $root_dir;
 
-    /**
-     * @var
-     */
-    private $test_mode;
 
     /**
      * SyncSacMemberDatabase constructor.
@@ -95,10 +91,10 @@ class SyncSacMemberDatabase
         $this->connection = $connection;
         $this->root_dir = $root_dir;
         $this->ftp_hostname = Config::get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME');
-        $this->ftp_username = (string) Config::get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME');
-        $this->ftp_password = (string) Config::get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD');
+        $this->ftp_username = (string)Config::get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME');
+        $this->ftp_password = (string)Config::get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD');
         $this->section_ids = explode(',', Config::get('SAC_EVT_SAC_SECTION_IDS'));
-        $this->test_mode = Input::get('test_mode') ? true : false;
+
     }
 
 
@@ -108,19 +104,7 @@ class SyncSacMemberDatabase
      */
     public function loadDataFromFtp()
     {
-        if (!$this->test_mode)
-        {
 
-            // Run once per day
-            $statement = $this->connection->executeQuery('SELECT * FROM tl_log WHERE action = ? ORDER BY tstamp DESC LIMIT 0,1', array(self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC));
-            while (false !== ($objLog = $statement->fetch(\PDO::FETCH_OBJ)))
-            {
-                if (Date::parse('Y-m-d', $objLog->tstamp) === Date::parse('Y-m-d', \time()))
-                {
-                    return $this;
-                }
-            }
-        }
 
         // Open FTP connection
         $connId = $this->openFtpConnection();
@@ -197,19 +181,6 @@ class SyncSacMemberDatabase
     public function syncContaoDatabase()
     {
         $startTime = \time();
-
-        if (!$this->test_mode)
-        {
-            // Run once per day
-            $statement = $this->connection->executeQuery('SELECT * FROM tl_log WHERE action = ? ORDER BY tstamp DESC LIMIT 0,1', array(self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC));
-            while (false !== ($objLog = $statement->fetch(\PDO::FETCH_OBJ)))
-            {
-                if (Date::parse('Y-m-d', $objLog->tstamp) === Date::parse('Y-m-d', \time()))
-                {
-                    return $this;
-                }
-            }
-        }
 
         $statement = $this->connection->query('SELECT sacMemberId FROM tl_member');
         $arrMemberIDS = $statement->fetchAll(\PDO::FETCH_COLUMN);
@@ -323,8 +294,7 @@ class SyncSacMemberDatabase
             }
             $this->connection->commit();
 
-        }
-        catch (\Exception $e)
+        } catch (\Exception $e)
         {
             $this->log(
                 'Error during the database sync process. Starting transaction rollback, now.',
@@ -365,13 +335,6 @@ class SyncSacMemberDatabase
                 __FILE__ . ' Line: ' . __LINE__,
                 self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC
             );
-        }
-
-
-        if ($this->test_mode)
-        {
-            echo 'Finished syncing SAC member database with tl_member. Synced ' . \count($arrMember) . ' entries. Duration: ' . $duration . ' s';
-            exit;
         }
 
         return $this;

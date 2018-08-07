@@ -50,13 +50,6 @@ class GeneratePage
      */
     public function generatePage()
     {
-        // Purge the script cache if $GLOBALS['TL_CONFIG']['purgeScriptCache'] is set to true in config.php
-        if ($GLOBALS['TL_CONFIG']['purgeScriptCache'] === true)
-        {
-            $objAutomator = $this->framework->createInstance(Automator::class);
-            $objAutomator->purgeScriptCache();
-        }
-
 
         // Für Downloads z.B. Downloadlink auf www.sac-pilatus.ch/kurse
         if (Input::get('action') === 'downloadKursbroschuere' && Input::get('year') != '')
