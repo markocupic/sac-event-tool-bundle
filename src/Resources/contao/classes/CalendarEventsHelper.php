@@ -741,6 +741,7 @@ class CalendarEventsHelper extends System
                     {
                         $params = (Config::get('useAutoItem') ? '/' : '/events/') . ($objEvent->alias ?: $objEvent->id);
                         $strUrl = ampersand($objPage->getFrontendUrl($params));
+                        $strUrl = Url::addQueryString('mode=eventPreview', $strUrl);
                         $strUrl = Url::addQueryString('eventToken=' . $objEvent->eventToken, $strUrl);
                     }
                 }
