@@ -1209,17 +1209,8 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             return;
         }
 
-        // Set event Token for all event without an eventToken
-        $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE eventToken=?')->execute('');
-        while ($objDb->next())
-        {
-            $strToken = md5(rand(100000000, 999999999)) . $objDb->id;
-            $this->Database->prepare('UPDATE tl_calendar_events SET eventToken=? WHERE id=?')->execute($strToken, $objDb->id);
-        }
-
-        $arrSet['eventToken'] = md5(rand(100000000, 999999999)) . $dc->id;
-        $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($dc->activeRecord->id);
-
+        $strToken = md5(rand(100000000, 999999999)) . $objDb->id;
+        $this->Database->prepare('UPDATE tl_calendar_events SET eventToken=? WHERE id=? AND eventToken=?')->execute($strToken, $dc->activeRecord->id, '');
     }
 
     /**
