@@ -34,9 +34,12 @@ class ReplaceInsertTags
             {
                 $href = $elements[1];
                 $label = $href;
-                if (isset($elements[2]))
+                if (isset($elements[2]) && $elements[2] != '')
                 {
-                    $label = $elements[2];
+                    if(trim($elements) != '')
+                    {
+                        $label = $elements[2];
+                    }
                 }
                 return sprintf('<a href="%s" target="_blank">%s</a>', $href, $label);
             }
