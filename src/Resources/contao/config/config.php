@@ -293,3 +293,6 @@ $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic_sac_event_too
 // Cron jobs
 $GLOBALS['TL_CRON']['daily']['syncSacMemberDatabase'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'syncSacMemberDatabase');
 $GLOBALS['TL_CRON']['hourly']['printSACWorkshops'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'printSacWorkshops');
+
+// Replace insert tags
+$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ReplaceInsertTags', 'replaceInsertTags');
