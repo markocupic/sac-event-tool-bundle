@@ -337,7 +337,7 @@ class EventRapport
                         array('key' => 'mobile', 'value' => $mobile, 'options' => array('multiline' => false)),
                         array('key' => 'email', 'value' => $objUserModel->email, 'options' => array('multiline' => false)),
                         array('key' => 'transportInfo', 'value' => $transportInfo, 'options' => array('multiline' => false)),
-                        array('key' => 'dateOfBirth', 'value' => $objUserModel->dateOfBirth ? Date::parse('d.m.Y', $objUserModel->dateOfBirth) : '', 'options' => array('multiline' => false)),
+                        array('key' => 'dateOfBirth', 'value' => $objUserModel->dateOfBirth != '' ? Date::parse('d.m.Y', $objUserModel->dateOfBirth) : '', 'options' => array('multiline' => false)),
                     );
                 }
             }
@@ -392,7 +392,7 @@ class EventRapport
                 array('key' => 'emergencyPhoneName', 'value' => $objEventMember->emergencyPhoneName, 'options' => array('multiline' => false)),
                 array('key' => 'email', 'value' => $objEventMember->email, 'options' => array('multiline' => false)),
                 array('key' => 'transportInfo', 'value' => $transportInfo, 'options' => array('multiline' => false)),
-                array('key' => 'dateOfBirth', 'value' => $objEventMember->dateOfBirth ? Date::parse('d.m.Y', $objEventMember->dateOfBirth) : '', 'options' => array('multiline' => false)),
+                array('key' => 'dateOfBirth', 'value' => $objEventMember->dateOfBirth != '' ? Date::parse('d.m.Y', $objEventMember->dateOfBirth) : '', 'options' => array('multiline' => false)),
             );
         }
 

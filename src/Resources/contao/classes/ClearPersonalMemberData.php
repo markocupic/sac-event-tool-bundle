@@ -85,7 +85,7 @@ class ClearPersonalMemberData
                     $objCalendarEventsMember->city = 'Ort [anonymisiert]';
                     $objCalendarEventsMember->mobile = '';
                     $objCalendarEventsMember->foodHabits = '';
-                    $objCalendarEventsMember->dateOfBirth = 0;
+                    $objCalendarEventsMember->dateOfBirth = '';
                     $objCalendarEventsMember->contaoMemberId = 0;
                     $objCalendarEventsMember->notes = 'Benutzerdaten anonymisiert am ' . Date::parse('d.m.Y', time());
                     $objCalendarEventsMember->emergencyPhone = '999 99 99';

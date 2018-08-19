@@ -211,7 +211,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'inputType' => 'text',
             'flag'      => 5,
             'sorting'   => true,
-            'eval'      => array('rgxp' => 'datim', 'datepicker' => true, 'tl_class' => 'w50 wizard'),
+            'eval'      => array('rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'),
             'sql'       => "varchar(10) NOT NULL default ''",
         ),
         'stateOfSubscription' => array
@@ -326,8 +326,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'sorting'   => true,
             'flag'      => 5,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'),
-            'sql'       => "varchar(10) NOT NULL default ''",
+            'eval'      => array('mandatory' => false, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'),
+            'sql'       => "varchar(11) NOT NULL default ''",
         ),
         'street'              => array
         (
