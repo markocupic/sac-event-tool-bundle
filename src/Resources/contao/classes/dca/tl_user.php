@@ -146,8 +146,6 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
                         $objEmail->sendBcc('m.cupic@gmx.ch');
                         $objEmail->sendTo($objUser->email);
                     }
-
-
                 }
 
                 $set = array(
