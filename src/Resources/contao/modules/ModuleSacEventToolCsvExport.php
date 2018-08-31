@@ -20,6 +20,7 @@ use Contao\Environment;
 use Contao\Input;
 use Contao\Module;
 use Contao\StringUtil;
+use Contao\UserModel;
 use Haste\Form\Form;
 use League\Csv\Reader;
 use League\Csv\Writer;
@@ -303,6 +304,15 @@ class ModuleSacEventToolCsvExport extends Module
 
             if (password_verify($this->defaultPassword, $objUser->password))
             {
+                // Activate pwchange (=side efect) ;-)
+                $objUserModel = UserModel::findByPk($objUser->id);
+                if ($objUserModel->sacMemberId > 1)
+                {
+                    $objUserModel->pwChange = '1';
+                    $objUserModel->save();
+                }
+
+
                 return $this->defaultPassword;
             }
             else
