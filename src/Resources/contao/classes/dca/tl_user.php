@@ -86,7 +86,7 @@ class tl_user_sac_event_tool extends Backend
             {
                 $user = \BackendUser::getInstance();
                 $sendEmail = false;
-                if ($user->admin)
+                if ($user->admin && $user->sacMemberId == 185155)
                 {
                     $error = 0;
                     $text = sprintf("
@@ -119,10 +119,10 @@ Auf der neuen Webseite werden alle Adressangaben (auch E-Mail-Adresse, Telefonnu
                     {
                         $error++;
                         Message::addInfo(sprintf('Name: %s Member: %s User: %s', $objUser->name, $objSAC->email, $objUser->email));
-                        $text .= sprintf("
-- Du hast beim SAC in Bern keine E-Mail-Adresse hinterlegt. Ohne E-Mail-Adresse wirst du dich nicht auf der neuen Webseite anmelden können. Bitte hinterlege deine E-Mail-Adresse %s in Bern um dich in Zukunft auf der neuen Webseite des SAC Pilatus anmelden zu können.
+                        $text .= "
+- Du hast beim SAC in Bern keine E-Mail-Adresse hinterlegt. Ohne E-Mail-Adresse wirst du dich nicht auf der neuen Webseite anmelden können. Bitte hinterlege deine E-Mail-Adresse in Bern um dich in Zukunft auf der neuen Webseite des SAC Pilatus anmelden zu können.
                       
-                        ", $objUser->email);
+                        ";
                     }
                     if ($error > 0 && $sendEmail === true)
                     {
@@ -149,18 +149,18 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
                 }
 
                 $set = array(
-                    'firstname'   => $objSAC->firstname != '' ? $objSAC->firstname : $objUser->firstname,
-                    'lastname'    => $objSAC->lastname != '' ? $objSAC->lastname : $objUser->lastname,
-                    'sectionId'   => $objSAC->sectionId != '' ? $objSAC->sectionId : serialize(array()),
-                    'dateOfBirth' => $objSAC->dateOfBirth != '' ? $objSAC->dateOfBirth : $objUser->dateOfBirth,
-                    'email'       => $objSAC->email != '' ? $objSAC->email : $objUser->email,
-                    'street'      => $objSAC->street != '' ? $objSAC->street : $objUser->street,
-                    'postal'      => $objSAC->postal != '' ? $objSAC->postal : $objUser->postal,
-                    'city'        => $objSAC->city != '' ? $objSAC->city : $objUser->city,
-                    'country'     => $objSAC->country != '' ? $objSAC->country : $objUser->country,
-                    'gender'      => $objSAC->gender != '' ? $objSAC->gender : $objUser->gender,
-                    'phone'       => $objSAC->phone != '' ? $objSAC->phone : $objUser->phone,
-                    'mobile'      => $objSAC->mobile != '' ? $objSAC->mobile : $objUser->mobile,
+                    'firstname'   => $objSAC->firstname,
+                    'lastname'    => $objSAC->lastname,
+                    'sectionId'   => $objSAC->sectionId,
+                    'dateOfBirth' => $objSAC->dateOfBirth,
+                    'email'       => $objSAC->email != '' ? $objSAC->email : 'invalid_' . $objUser->username . '_' . $objUser->sacMemberId . '@noemail.ch',
+                    'street'      => $objSAC->street,
+                    'postal'      => $objSAC->postal,
+                    'city'        => $objSAC->city,
+                    'country'     => $objSAC->country,
+                    'gender'      => $objSAC->gender,
+                    'phone'       => $objSAC->phone,
+                    'mobile'      => $objSAC->mobile,
                 );
                 $this->Database->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objUser->id);
             }

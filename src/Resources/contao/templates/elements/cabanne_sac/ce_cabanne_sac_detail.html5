@@ -26,76 +26,80 @@
             <div class="tab-content" id="huetteDetail">
                 <!-- Contact -->
                 <div class="tab-pane fade show active" id="kontakt" role="tabpanel" aria-labelledby="kontakt-tab">
-                    <table class="table">
-                        <?php if($this->huettenwart): ?>
-                        <tr>
-                            <td><strong>H&uuml;ttenwart:</strong></td>
-                            <td><?= nl2br($this->huettenwart) ?></td>
-                        </tr>
-                        <?php endif; ?>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <?php if($this->huettenwart): ?>
+                            <tr>
+                                <td><strong>H&uuml;ttenwart:</strong></td>
+                                <td><?= nl2br($this->huettenwart) ?></td>
+                            </tr>
+                            <?php endif; ?>
 
-                        <?php if($this->phone): ?>
-                        <tr>
-                            <td><strong>Hüttentelefon:</strong></td>
-                            <td><?= $this->phone ?></td>
-                        </tr>
-                        <?php endif; ?>
+                            <?php if($this->phone): ?>
+                            <tr>
+                                <td><strong>Hüttentelefon:</strong></td>
+                                <td><?= $this->phone ?></td>
+                            </tr>
+                            <?php endif; ?>
 
-                        <?php if($this->email): ?>
-                        <tr>
-                            <td><strong>E-Mail:</strong></td>
-                            <td><?= $this->email ?></td>
-                        </tr>
-                        <?php endif; ?>
+                            <?php if($this->email): ?>
+                            <tr>
+                                <td><strong>E-Mail:</strong></td>
+                                <td><?= $this->email ?></td>
+                            </tr>
+                            <?php endif; ?>
 
-                        <?php if ($this->url): ?>
-                        <tr>
-                            <td><strong>Webseite:</strong></td>
-                            <td><a href="<?= $this->url ?>" target="_blank">Link</a></td>
-                        </tr>
-                        <?php endif; ?>
+                            <?php if ($this->url): ?>
+                            <tr>
+                                <td><strong>Webseite:</strong></td>
+                                <td><a href="<?= $this->url ?>" target="_blank">Link</a></td>
+                            </tr>
+                            <?php endif; ?>
 
-                        <?php if ($this->bookingMethod): ?>
-                        <tr>
-                            <td><strong>Anfrage/Buchung:</strong></td>
-                            <td><?= nl2br($this->bookingMethod) ?></td>
-                        </tr>
-                        <?php endif; ?>
-                    </table>
+                            <?php if ($this->bookingMethod): ?>
+                            <tr>
+                                <td><strong>Anfrage/Buchung:</strong></td>
+                                <td><?= nl2br($this->bookingMethod) ?></td>
+                            </tr>
+                            <?php endif; ?>
+                        </table>
+                    </div>
                 </div>
 
                 <!--- details -->
                 <div class="tab-pane fade show" id="details" role="tabpanel" aria-labelledby="details-tab">
-                    <table class="table">
-                        <tr>
-                            <td><strong>Hüttenchef:</strong></td>
-                            <td><?= nl2br($this->huettenchef) ?></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Kapazität:</strong></td>
-                            <td><?= nl2br($this->capacity) ?></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Höhe:</strong></td>
-                            <td><?= $this->altitude ?> m.ü.M.</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Koordinaten:</strong></td>
-                            <td><?= $this->coordsCH1903 ?> (CH1903/LV03)<br><?= $this->coordsWGS84 ?> (WGS84)</td>
-                        </tr>
-                    </table>
-
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr>
+                                <td><strong>Hüttenchef:</strong></td>
+                                <td><?= nl2br($this->huettenchef) ?></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Kapazität:</strong></td>
+                                <td><?= nl2br($this->capacity) ?></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Höhe:</strong></td>
+                                <td><?= $this->altitude ?> m.ü.M.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Koordinaten:</strong></td>
+                                <td><?= $this->coordsCH1903 ?> (CH1903/LV03)<br><?= $this->coordsWGS84 ?> (WGS84)</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Bewartungszeiten -->
                 <div class="tab-pane fade show" id="bewartung" role="tabpanel" aria-labelledby="bewartung-tab">
-                    <table class="table">
-                        <tr>
-                            <td><strong>Bewartung:</strong></td>
-                            <td><?= nl2br($this->openingTime) ?></td>
-                        </tr>
-                    </table>
-
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr>
+                                <td><strong>Bewartung:</strong></td>
+                                <td><?= nl2br($this->openingTime) ?></td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -108,27 +112,29 @@
         </div>
 
         <div class="col-xl-8 mb-4 mb-0-lg">
-            <table class="table responsive">
-                <tr>
-                    <th>Beschreibung</th>
-                    <th>Zustiegszeit</th>
-                    <th>Schwierigkeit</th>
-                    <th>Sommer</th>
-                    <th>Winter</th>
-                    <th>Kommentar</th>
-                </tr>
-
-                <?php foreach (\StringUtil::deserialize($this->ascent, true) as $ascent): ?>
+            <div class="table-responsive">
+                <table class="table">
                     <tr>
-                        <td><?= nl2br($ascent['ascentDescription']) ?></td>
-                        <td><?= nl2br($ascent['ascentTime']) ?></td>
-                        <td><?= nl2br($ascent['ascentDifficulty']) ?></td>
-                        <td><?= $ascent['ascentSummer'] == 'true' ? 'Ja' : 'Nein' ?></td>
-                        <td><?= $ascent['ascentWinter'] == 'true' ? 'Ja' : 'Nein' ?></td>
-                        <td><?= nl2br($ascent['ascentComment']) ?></td>
+                        <th>Beschreibung</th>
+                        <th>Zustiegszeit</th>
+                        <th>Schwierigkeit</th>
+                        <th>Sommer</th>
+                        <th>Winter</th>
+                        <th>Kommentar</th>
                     </tr>
-                <?php endforeach; ?>
-            </table>
+
+                    <?php foreach (\StringUtil::deserialize($this->ascent, true) as $ascent): ?>
+                        <tr>
+                            <td><?= nl2br($ascent['ascentDescription']) ?></td>
+                            <td><?= nl2br($ascent['ascentTime']) ?></td>
+                            <td><?= nl2br($ascent['ascentDifficulty']) ?></td>
+                            <td><?= $ascent['ascentSummer'] == 'true' ? 'Ja' : 'Nein' ?></td>
+                            <td><?= $ascent['ascentWinter'] == 'true' ? 'Ja' : 'Nein' ?></td>
+                            <td><?= nl2br($ascent['ascentComment']) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            </div>
         </div>
 
 
