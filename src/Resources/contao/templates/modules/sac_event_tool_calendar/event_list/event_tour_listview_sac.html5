@@ -20,7 +20,7 @@
   <td class="d-none d-md-table-cell"><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($this->id) ?></td>
   <td class="tourTechDifficulty d-none d-md-table-cell"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($this->id, true)) ?></td>
   <td class="tourType d-none d-md-table-cell"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($this->id, 'shortcut', true)) ?></td>
-    <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id); ?>
+    <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id, false, true); ?>
   <td><?= implode(', ', $arrInstructors) ?></td>
 </tr>
 <?php endif; ?>

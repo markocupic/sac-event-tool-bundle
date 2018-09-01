@@ -237,7 +237,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
 
             // Check if event is at least on second highest level (Level 3/4)
             $eventModel = CalendarEventsModel::findByPk($objEvents->id);
-            if(!$this->hasValidReleaseLevel($eventModel))
+            if (!$this->hasValidReleaseLevel($eventModel))
             {
                 continue;
             }
@@ -275,7 +275,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
             }
             while ($objEvent->next())
             {
-                $arrInstructors = array_merge($arrInstructors, CalendarEventsHelper::getInstructorsAsArray($objEvent->id));
+                $arrInstructors = array_merge($arrInstructors, CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false));
 
                 // tourType
                 $arrTourType = CalendarEventsHelper::getTourTypesAsArray($objEvent->id, 'shortcut', false);
@@ -296,7 +296,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
                     'date'             => $this->getEventPeriod($objEvent->id, 'd.m.'),
                     'month'            => Date::parse('F', $objEvent->startDate),
                     'durationInfo'     => $objEvent->durationInfo,
-                    'instructors'      => implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id)),
+                    'instructors'      => implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false)),
                     'tourType'         => implode(', ', $arrTourType),
                     'difficulty'       => implode(',', CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent->id)),
                 );

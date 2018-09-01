@@ -80,7 +80,7 @@
           <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($event['id']) ?></td>
           <td class="tourTechDifficulty"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($event['id'], true)) ?></td>
           <td class="tourType"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($event['id'], 'shortcut', true)) ?></td>
-            <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($event['id']); ?>
+            <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($event['id'], false, true); ?>
           <td><?= implode(', ', $arrInstructors) ?></td>
         </tr>
       <?php endforeach; ?>
@@ -102,7 +102,7 @@
             <a href="{{event_url::<?php echo $event['id']; ?>}}">{{event_title::<?= $event['id'] ?>}}</a>
           </td>
           <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($event['id']) ?></td>
-            <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($event['id']); ?>
+            <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($event['id'], false, true); ?>
           <td><?= implode(', ', $arrInstructors) ?></td>
         </tr>
       <?php endforeach; ?>

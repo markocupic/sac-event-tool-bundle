@@ -60,7 +60,7 @@
                 <?php endif; ?>
 
 
-                <?php $arrInstructors = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorsAsArray($this->id) ?>
+                <?php $arrInstructors = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorsAsArray($this->id, true) ?>
 
                 <div class="instructor event-detail event-info-box icon-box-small">
                     <h6 class="mt-0">Leitung/Betreuung</h6>

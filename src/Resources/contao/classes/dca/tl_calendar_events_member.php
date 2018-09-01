@@ -186,7 +186,7 @@ class tl_calendar_events_member extends Backend
             $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
             if ($objEvent !== null)
             {
-                $arrGuideIDS = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
+                $arrGuideIDS = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
                 foreach ($arrGuideIDS as $userId)
                 {
                     $objInstructor = UserModel::findByPk($userId);

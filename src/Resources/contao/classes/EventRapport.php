@@ -159,7 +159,7 @@ class EventRapport
         Controller::loadLanguageFile('tl_calendar_events');
 
         $countParticipants = $objEventMember->numRows;
-        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
+        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
         $countInstructors = count($arrInstructors);
         $countParticipantsTotal = $countParticipants + $countInstructors;
 
@@ -297,7 +297,7 @@ class EventRapport
 
 
         // TL
-        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
+        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
         if (!empty($arrInstructors) && is_array($arrInstructors))
         {
             foreach ($arrInstructors as $userId)
@@ -403,7 +403,7 @@ class EventRapport
         );
 
         // Event instructors
-        $aInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
+        $aInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
 
         $arrInstructors = array_map(function ($id) {
             $objUser = \UserModel::findByPk($id);

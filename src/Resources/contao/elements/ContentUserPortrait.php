@@ -72,6 +72,12 @@ class ContentUserPortrait extends ContentElement
             return '';
         }
 
+        // Do not show disabled users
+        if ($this->objUser->disable)
+        {
+            return '';
+        }
+
 
         return parent::generate();
     }
@@ -94,7 +100,7 @@ class ContentUserPortrait extends ContentElement
             $eventModel = CalendarEventsModel::findByPk($objEvent->id);
             if ($eventModel !== null)
             {
-                $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
+                $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, true);
                 if (in_array($this->objUser->id, $arrInstructors))
                 {
                     $arrEvents[$objEvent->eventType][] = $objEvent->row();

@@ -232,7 +232,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 'eventDates'  => $this->getEventPeriod($objEvent->id, 'd.'),
                 'weekday'     => $this->getEventPeriod($objEvent->id, 'D'),
                 'title'       => $objEvent->title . ($objEvent->eventType === 'lastMinuteTour' ? ' (LAST MINUTE TOUR!)' : ''),
-                'instructors' => implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id)),
+                'instructors' => implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false)),
                 'organizers'  => implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'titlePrint')),
                 'id'          => $objEvent->id,
             );
@@ -417,7 +417,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $arrRow['week'] = Date::parse('W', $objEvent->startDate);
         $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);
         $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
-        $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id));
+        $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false));
         $arrRow['organizers'] = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'title'));
         $arrRow['tourProfile'] = implode('<br>', CalendarEventsHelper::getTourProfileAsArray($objEvent->id));
         $arrRow['journey'] = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : '';

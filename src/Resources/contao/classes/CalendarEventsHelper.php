@@ -124,7 +124,7 @@ class CalendarEventsHelper extends System
         if ($objEvent->numRows)
         {
 
-            $arrInstructors = static::getInstructorsAsArray($objEvent->id);
+            $arrInstructors = static::getInstructorsAsArray($objEvent->id, false);
             $objUser = UserModel::findByPk($arrInstructors[0]);
             if ($objUser !== null)
             {
@@ -138,12 +138,14 @@ class CalendarEventsHelper extends System
         return '';
     }
 
+
     /**
      * Get instructors as array
      * @param $eventId
+     * @param bool $blnShowPublishedOnly
      * @return array
      */
-    public static function getInstructorsAsArray($eventId)
+    public static function getInstructorsAsArray($eventId, $blnShowPublishedOnly = true)
     {
         $arrInstructors = array();
         $objEvent = \CalendarEventsModel::findByPk($eventId);
@@ -157,6 +159,10 @@ class CalendarEventsHelper extends System
                     $objUser = UserModel::findByPk($arrUser['instructorId']);
                     if ($objUser !== null)
                     {
+                        if ($blnShowPublishedOnly === true && $objUser->disable)
+                        {
+                            continue;
+                        }
                         $arrInstructors[] = $arrUser['instructorId'];
                     }
                 }
@@ -165,12 +171,15 @@ class CalendarEventsHelper extends System
         return $arrInstructors;
     }
 
+
     /**
      * Get instructors names as array
      * @param $eventId
+     * @param bool $blnAddMainQualification
+     * @param bool $blnShowPublishedOnly
      * @return array
      */
-    public static function getInstructorNamesAsArray($eventId, $blnAddMainQualification = false)
+    public static function getInstructorNamesAsArray($eventId, $blnAddMainQualification = false, $blnShowPublishedOnly = true)
     {
         $arrInstructors = array();
         $objEvent = \CalendarEventsModel::findByPk($eventId);
@@ -184,6 +193,11 @@ class CalendarEventsHelper extends System
                     $objUser = UserModel::findByPk($arrUser['instructorId']);
                     if ($objUser !== null)
                     {
+                        if ($blnShowPublishedOnly === true && $objUser->disable)
+                        {
+                            continue;
+                        }
+
                         $arrName = array();
                         $arrName[] = $objUser->lastname;
                         $arrName[] = $objUser->firstname;

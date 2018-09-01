@@ -157,7 +157,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events')->execute();
         while ($objEvent->next())
         {
-            $arrGuides = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
+            $arrGuides = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
             if (count($arrGuides) > 0)
             {
                 $objEv = CalendarEventsModel::findByPk($objEvent->id);
@@ -494,7 +494,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     }
                     elseif ($field === 'instructors')
                     {
-                        $arrInstructors = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id);
+                        $arrInstructors = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false);
                         $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
                     }
                     elseif ($field === 'tourType')

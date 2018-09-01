@@ -19,7 +19,7 @@ session_start();
             </a>
             <h5><?= \CourseMainTypeModel::findByPk($this->courseTypeLevel0)->name ?>: <?= \CourseSubTypeModel::findByPk($this->courseTypeLevel1)->name ?></h5>
           </div>
-          <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id,true); ?>
+          <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id, true, true); ?>
           <div class="detail-item">
             <i class="fa fa-fw fa-user"></i>Leitung: <?= implode(', ', $arrInstructors) ?>
           </div>
@@ -54,7 +54,7 @@ session_start();
         <a href="{{event_url::<?php echo $this->id; ?>}}">{{event_title::<?= $this->id ?>}}</a>
       </td>
       <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($this->id) ?></td>
-      <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id); ?>
+      <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id, false, true); ?>
       <td><?= implode(', ', $arrInstructors) ?></td>
     </tr>
   <?php endif; ?>

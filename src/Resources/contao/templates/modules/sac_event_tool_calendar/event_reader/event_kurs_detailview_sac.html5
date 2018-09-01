@@ -125,7 +125,7 @@
                 <div class="instructor event-detail event-info-box icon-box-small">
                     <h5>Kursleitung</h5>
                     <div class="row tiny-gutter">
-                        <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorsAsArray($this->id); ?>
+                        <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorsAsArray($this->id, true); ?>
                         <?php foreach ($arrInstructors as $userId): ?>
                         <div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4">
                             <div class="">
