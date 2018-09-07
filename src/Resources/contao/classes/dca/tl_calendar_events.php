@@ -234,7 +234,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         // Limit filter fields
         foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] as $k => $v)
         {
-            if ($k === 'organizers' || $k === 'tourType' || $k === 'eventReleaseLevel' || $k === 'mainInstructor' || $k === 'courseTypeLevel0' || $k === 'startTime')
+            if ($k === 'author' || $k === 'organizers' || $k === 'tourType' || $k === 'eventReleaseLevel' || $k === 'mainInstructor' || $k === 'courseTypeLevel0' || $k === 'startTime')
             {
                 continue;
             }
@@ -1429,10 +1429,10 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
         // Add main instructor
         $strAuthor = '';
-        $objUser = UserModel::findByPk($arrRow['author']);
+        $objUser = UserModel::findByPk($arrRow['mainInstructor']);
         if ($objUser !== null)
         {
-            $strAuthor = ' <span style="color:#b3b3b3;padding-left:3px">[Autor: ' . $objUser->name . ']</span><br>';
+            $strAuthor = ' <span style="color:#b3b3b3;padding-left:3px">[Hauptleiter: ' . $objUser->name . ']</span><br>';
         }
 
         $strRegistrations = '';
