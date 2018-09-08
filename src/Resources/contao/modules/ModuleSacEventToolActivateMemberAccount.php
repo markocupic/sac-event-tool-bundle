@@ -44,6 +44,11 @@ class ModuleSacEventToolActivateMemberAccount extends Module
     /**
      * @var
      */
+    protected $step;
+
+    /**
+     * @var
+     */
     protected $objNotification;
 
     /**
@@ -93,6 +98,12 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         // Use terminal42/notification_center
         $this->objNotification = Notification::findByPk($this->activateMemberAccountNotificationId);
 
+        // Add step param
+        if (Input::get('step') == '')
+        {
+            $url = Url::addQueryString('step=1');
+            Controller::redirect($url);
+        }
 
         return parent::generate();
     }
@@ -103,136 +114,68 @@ class ModuleSacEventToolActivateMemberAccount extends Module
      */
     protected function compile()
     {
-        if (Input::get('activation') != '')
+        $this->step = Input::get('step');
+        $this->Template->step = $this->step;
+        $this->Template->hasError = false;
+        $this->Template->errorMsg = '';
+
+
+        switch ($this->step)
         {
-            $this->Template->step = 'set-password';
-
-            $this->generatePasswordForm();
-            if ($this->objForm !== null)
-            {
-                $this->Template->form = $this->objForm->generate();
-            }
-        }
-        elseif (Input::get('account-activated') === 'true')
-        {
-            $this->Template->step = 'account-activated';
-        }
-        else
-        {
-            $this->Template->step = 'display-form';
-
-            $this->generateForm();
-            if ($this->objForm !== null)
-            {
-                $this->Template->form = $this->objForm->generate();
-            }
-        }
-
-    }
-
-    /**
-     *
-     */
-    protected function generatePasswordForm()
-    {
-
-        $objForm = new Form('form-activate-member-account-set-password', 'POST', function ($objHaste) {
-            return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
-        });
-
-        $objForm->setFormActionFromUri(Environment::get('uri'));
-
-        // Password
-        $objForm->addFormField('password', array(
-            'label'     => 'Passwort festlegen',
-            'inputType' => 'password',
-            'eval'      => array('mandatory' => true, 'maxlength' => 255),
-        ));
-
-        // Let's add  a submit button
-        $objForm->addFormField('submit', array(
-            'label'     => 'Mitgliederkonto aktivieren',
-            'inputType' => 'submit',
-        ));
-
-        // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields.
-        // DO NOT use this method with generate() as the "form" template provides those fields by default.
-        $objForm->addContaoHiddenFields();
-
-
-        // Check activation token
-        $hasError = false;
-
-        // Validate token
-        $objMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE activation=?')->limit(1)->execute(Input::get('activation'));
-        if (!$objMember->numRows)
-        {
-            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Der Aktivierungslink ist ungültig.';
-            $hasError = true;
-        }
-
-        elseif ($objMember->activationLinkLifetime < time())
-        {
-            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Der Aktivierungslink ist abgelaufen.';
-            $hasError = true;
-        }
-
-        if ($objMember->disable)
-        {
-            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Dein Mitgliederkonto ist deaktiviert.';
-            $hasError = true;
-        }
-
-        $this->Template->hasError = $hasError;
-
-
-
-        // validate() also checks whether the form has been submitted
-        if ($objForm->validate() && $hasError === false)
-        {
-            // Save data to tl_calendar_events_member
-            if (!$hasError)
-            {
-                $objMemberModel = MemberModel::findByActivation(Input::get('activation'));
-                if ($objMemberModel !== null)
+            case 1:
+                $this->generateFirstForm();
+                if ($this->objForm !== null)
                 {
-                    $objMemberModel->password = password_hash(Input::post('password'), PASSWORD_DEFAULT);
-                    $token = StringUtil::substr($objMemberModel->id . md5(uniqid()) . md5(uniqid()), 32, '');
-                    $objMemberModel->activation = '';
-                    $objMemberModel->activationLinkLifetime = 0;
-                    $objMemberModel->login = '1';
-
-                    // Add groups
-                    $arrGroups = StringUtil::deserialize($objMemberModel->groups, true);
-                    $arrGroups = array_merge($arrGroups, $this->arrGroups);
-                    $arrGroups = array_unique($arrGroups);
-                    $arrGroups = array_filter($arrGroups);
-                    $objMemberModel->groups = serialize($arrGroups);
-
-
-                    $objMemberModel->save();
-                    $url = Url::removeQueryString(['activation']);
-                    $url = Url::addQueryString('account-activated=true', $url);
-                    Controller::redirect($url);
+                    $this->Template->form = $this->objForm->generate();
                 }
-            }
-        }
+                break;
 
-        $this->objForm = $objForm;
+            case 2:
+                $objMember = MemberModel::findByPk(Input::get('uid'));
+                if ($objMember !== null)
+                {
+                    $this->Template->objMember = $objMember;
+                }
+                else
+                {
+                    $this->Template->hasError = true;
+                    $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten.';
+                }
+                break;
+
+            case 3:
+                if (Input::get('activation') != '')
+                {
+                    $this->generateSecondForm();
+                    if ($this->objForm !== null)
+                    {
+                        $this->Template->form = $this->objForm->generate();
+                    }
+                }
+                else
+                {
+                    $this->Template->hasError = true;
+                    $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten.';
+                }
+                break;
+
+            case 4:
+                break;
+        }
     }
 
 
     /**
      * @return null
      */
-    protected function generateForm()
+    protected function generateFirstForm()
     {
 
         $objForm = new Form('form-activate-member-account', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
-
-        $objForm->setFormActionFromUri(Environment::get('uri'));
+        $url = Environment::get('uri');
+        $objForm->setFormActionFromUri($url);
 
 
         $objForm->addFormField('username', array(
@@ -279,7 +222,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             $objMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')->limit(1)->execute(Input::post('username'));
             if (!$objMember->numRows)
             {
-                $this->Template->errorMsg = sprintf('Der eingegebenen Mitgliedernummer %s konnte kein Benutzer zugeordnet werden.', Input::post('username'));
+                $this->Template->errorMsg = sprintf('Zur eingegebenen Mitgliedernummer %s konnte kein Benutzer zugeordnet werden.', Input::post('username'));
                 $hasError = true;
             }
 
@@ -336,8 +279,10 @@ class ModuleSacEventToolActivateMemberAccount extends Module
 
                     if ($this->notifyMember($objMemberModel))
                     {
-                        $this->Template->step = 'email-sent-to-member';
-                        $this->Template->objMember = $objMemberModel;
+                        $url = Url::removeQueryString(['step', 'activation', 'uid']);
+                        $url = Url::addQueryString('step=2', $url);
+                        $url = Url::addQueryString('uid=' . $objMember->id, $url);
+                        Controller::redirect($url);
                     }
                     else
                     {
@@ -354,16 +299,108 @@ class ModuleSacEventToolActivateMemberAccount extends Module
 
 
     /**
+     *
+     */
+    protected function generateSecondForm()
+    {
+
+        $objForm = new Form('form-activate-member-account-set-password', 'POST', function ($objHaste) {
+            return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
+        });
+
+        $objForm->setFormActionFromUri(Environment::get('uri'));
+
+        // Password
+        $objForm->addFormField('password', array(
+            'label'     => 'Passwort festlegen',
+            'inputType' => 'password',
+            'eval'      => array('mandatory' => true, 'maxlength' => 255),
+        ));
+
+        // Let's add  a submit button
+        $objForm->addFormField('submit', array(
+            'label'     => 'Mitgliederkonto aktivieren',
+            'inputType' => 'submit',
+        ));
+
+        // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields.
+        // DO NOT use this method with generate() as the "form" template provides those fields by default.
+        $objForm->addContaoHiddenFields();
+
+
+        // Check activation token
+        $hasError = false;
+
+        // Validate token
+        $objMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE activation=?')->limit(1)->execute(Input::get('activation'));
+        if (!$objMember->numRows)
+        {
+            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Der Aktivierungslink ist ungültig.';
+            $hasError = true;
+        }
+
+        elseif ($objMember->activationLinkLifetime < time())
+        {
+            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Der Aktivierungslink ist abgelaufen.';
+            $hasError = true;
+        }
+
+        if ($objMember->disable)
+        {
+            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Dein Mitgliederkonto ist deaktiviert.';
+            $hasError = true;
+        }
+
+        $this->Template->hasError = $hasError;
+
+
+        // validate() also checks whether the form has been submitted
+        if ($objForm->validate() && $hasError === false)
+        {
+            // Save data to tl_calendar_events_member
+            if (!$hasError)
+            {
+                $objMemberModel = MemberModel::findByActivation(Input::get('activation'));
+                if ($objMemberModel !== null)
+                {
+                    $objMemberModel->password = password_hash(Input::post('password'), PASSWORD_DEFAULT);
+                    $token = StringUtil::substr($objMemberModel->id . md5(uniqid()) . md5(uniqid()), 32, '');
+                    $objMemberModel->activation = '';
+                    $objMemberModel->activationLinkLifetime = 0;
+                    $objMemberModel->login = '1';
+
+                    // Add groups
+                    $arrGroups = StringUtil::deserialize($objMemberModel->groups, true);
+                    $arrGroups = array_merge($arrGroups, $this->arrGroups);
+                    $arrGroups = array_unique($arrGroups);
+                    $arrGroups = array_filter($arrGroups);
+                    $objMemberModel->groups = serialize($arrGroups);
+
+
+                    $objMemberModel->save();
+                    $url = Url::removeQueryString(['step', 'activation', 'uid']);
+                    $url = Url::addQueryString('step=4', $url);
+                    Controller::redirect($url);
+                }
+            }
+        }
+
+        $this->objForm = $objForm;
+    }
+
+
+    /**
      * @param $objMember
      * @return bool
      */
     protected function notifyMember($objMember)
     {
-
-
         // Use terminal42/notification_center
         if ($this->objNotification !== null)
         {
+            $url = Url::removeQueryString(['step', 'activation', 'uid'], Environment::get('uri'));
+            $url = Url::addQueryString('step=3', $url);
+            $url = Url::addQueryString('activation=' . $objMember->activation, $url);
 
             // Set token array
             $arrTokens = array(
@@ -374,7 +411,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                 'city'           => html_entity_decode($objMember->city),
                 'phone'          => html_entity_decode($objMember->phone),
                 'activation'     => $objMember->activation,
-                'activation_url' => Url::addQueryString('activation=' . $objMember->activation, Environment::get('uri')),
+                'activation_url' => $url,
                 'username'       => html_entity_decode($objMember->username),
                 'sacMemberId'    => html_entity_decode($objMember->username),
                 'email'          => $objMember->email,

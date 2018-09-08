@@ -2,12 +2,52 @@
 
 <?php $this->block('content'); ?>
 
+<h6 class="mt-0 mb-4 form-step">Schritt <?= $this->step ?> von 4</h6>
+
+
+<!-- Step 1 -->
+<?php if($this->step === '1'): ?>
+<?php if ($this->hasError): ?>
+<p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
+<?php endif; ?>
+<?= $this->form ?>
+<!-- AGB Modal -->
+<div class="modal fade" id="agbModal" tabindex="-1" role="dialog" aria-labelledby="agbTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered  modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="agbTitle">Allgemeine Gesch&auml;ftsbedingungen</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+          Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
+          Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
+          Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
+          Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.
+          At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Modal -->
+
+
 
 
 
 <!-- step 2 -->
-<?php if ($this->step === 'email-sent-to-member'): ?>
-<h6 class="mt-0 mb-4 form-step">Schritt 2 von 4</h6>
+<?php elseif ($this->step === '2'): ?>
+  <?php if ($this->hasError): ?>
+  <p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
+  <?php else: ?>
   <p>
     Zu deinen Eingaben wurde das folgende Mitgliederkonto gefunden:{{br}}{{br}}
     <strong><?= $this->objMember->firstname ?> <?= $this->objMember->lastname ?></strong>{{br}}
@@ -16,16 +56,17 @@
   </p>
 
   <p class="alert alert-primary" role="alert">Du hast auf deine E-Mail-Adresse "<?= $this->objMember->email ?>" einen Aktivierungslink zugesandt bekommen. Der Aktivierungslink ist nur <strong>60 Minuten</strong> lang g&uuml;ltig. Bitte pr&uuml;fe jetzt dein Postfach, um die Aktivierung abzuschliessen.</p>
+  <?php endif; ?>
 
 
 
 
 <!-- step 3 -->
-<?php elseif ($this->step === 'set-password'): ?>
-  <h6 class="mt-0 mb-4 form-step">Schritt 3 von 4</h6>
+<?php elseif ($this->step === '3'): ?>
   <?php if ($this->hasError): ?>
   <p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
   <?php else: ?>
+  <p class="alert alert-primary" role="alert">Der Aktivierungslink ist gültig. Du kannst jetzt dein Passwort festlegen.</p>
   <?= $this->form ?>
   <?php endif; ?>
 
@@ -33,51 +74,15 @@
 
 
 <!-- Step 4 -->
-<?php elseif ($this->step === 'account-activated'): ?>
-<h6 class="mt-0 mb-4 form-step">Schritt 4 von 4</h6>
-  <p class="alert alert-success" role="alert">Deine Kontoaktivierung konnte erfolgreich abgeschlossen werden. Du kannst dich jetzt mit deiner Mitgliedernummer und deinem zuvor festgelegten Passwort anmelden.</p>
+<?php elseif ($this->step === '4'): ?>
+  <p class="alert alert-primary" role="alert">Deine Kontoaktivierung konnte erfolgreich abgeschlossen werden. Du kannst dich jetzt mit deiner Mitgliedernummer und deinem zuvor festgelegten Passwort anmelden.</p>
   {{br}}
   <button class="btn btn-dark trigger-login-modal">anmelden</button>
-
-
-
-
-<!-- Step 1 -->
-<?php else: ?>
-    <h6 class="mt-0 mb-4 form-step">Schritt 1 von 4</h6>
-    <?php if ($this->hasError): ?>
-    <p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
-    <?php endif; ?>
-    <?= $this->form ?>
-    <!-- AGB Modal -->
-    <div class="modal fade" id="agbModal" tabindex="-1" role="dialog" aria-labelledby="agbTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered  modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="agbTitle">Allgemeine Gesch&auml;ftsbedingungen</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>
-              Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-              Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
-              Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
-              Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
-              Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.
-              At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur
-            </p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
-          </div>
-        </div>
-      </div>
-    </div>
-<!-- End Modal -->
-
 <?php endif; ?>
+
+
+
+
 
 
 <?php $this->endblock(); ?>
