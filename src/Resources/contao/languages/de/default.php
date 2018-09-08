@@ -86,3 +86,9 @@ $GLOBALS['TL_LANG']['MSC']['unpublished'] = 'unver&ouml;ffentlicht';
 // Meta wizard
 $GLOBALS['TL_LANG']['MSC']['aw_photographer'] = 'Photograph';
 
+// Errors
+$GLOBALS['TL_LANG']['ERR']['memberAccountNotActivated'] = 'Dein Konto wurde noch nicht aktiviert. Bitte aktiviere einmalig dein Konto und lege dein Passwort fest.';
+$GLOBALS['TL_LANG']['ERR']['memberAccountNotFound'] = 'Zur Mitgliedernummer "%s" wurde kein Mitgliederkonto gefunden. Bitte probiere es nochmals.';
+
+
+

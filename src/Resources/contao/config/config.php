@@ -296,3 +296,6 @@ $GLOBALS['TL_CRON']['hourly']['printSACWorkshops'] = array('Markocupic\SacEventT
 
 // Replace insert tags
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ReplaceInsertTags', 'replaceInsertTags');
+
+// Parse template
+$GLOBALS['TL_HOOKS']['parseTemplate'][] =  array('Markocupic\SacEventToolBundle\ContaoHooks\ParseTemplate', 'checkIfAccountIsActivated');
