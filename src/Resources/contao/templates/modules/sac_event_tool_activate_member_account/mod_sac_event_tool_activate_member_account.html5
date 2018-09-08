@@ -3,13 +3,11 @@
 <?php $this->block('content'); ?>
 
 
-<?php if ($this->step === 'check-activation-token'): ?>
-  <?php if ($this->hasError): ?>
-  <p class="alert alert-danger" role="alert">Kontoaktivierung konnte nicht abgeschlossen werden. Evtl. ist der Aktivierungslink ist nicht (mehr) g&uuml;ltig.</p>
-  <?php else: ?>
-  <p class="alert alert-success" role="alert">Deine Kontoaktivierung konnte erfolgreich abgeschlossen werden. Du kannst dich jetzt mit deiner Mitgliedernummer und deinem zuvor festgelegten Passwort anmelden.</p>
-  <?php endif; ?>
-<?php elseif ($this->step === 'email-sent-to-member'): ?>
+
+
+<!-- step 2 -->
+<?php if ($this->step === 'email-sent-to-member'): ?>
+<h6 class="mt-0 mb-4 form-step">Schritt 2 von 4</h6>
   <p>
     Zu deinen Eingaben wurde das folgende Mitgliederkonto gefunden:{{br}}{{br}}
     <strong><?= $this->objMember->firstname ?> <?= $this->objMember->lastname ?></strong>{{br}}
@@ -17,8 +15,36 @@
       <?= $this->objMember->postal ?> <?= $this->objMember->city ?>{{br}}
   </p>
 
-  <p class="alert alert-primary" role="alert">Du hast auf deine E-Mail-Adresse einen Aktivierungslink zugesandt bekommen. Der Aktivierungslink ist nur <strong>60 Minuten</strong> g&uuml;ltig. Bitte pr&uuml;fe jetzt dein Postfach, um die Aktivierung abzuschliessen.</p>
+  <p class="alert alert-primary" role="alert">Du hast auf deine E-Mail-Adresse "<?= $this->objMember->email ?>" einen Aktivierungslink zugesandt bekommen. Der Aktivierungslink ist nur <strong>60 Minuten</strong> lang g&uuml;ltig. Bitte pr&uuml;fe jetzt dein Postfach, um die Aktivierung abzuschliessen.</p>
+
+
+
+
+<!-- step 3 -->
+<?php elseif ($this->step === 'set-password'): ?>
+  <h6 class="mt-0 mb-4 form-step">Schritt 3 von 4</h6>
+  <?php if ($this->hasError): ?>
+  <p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
+  <?php else: ?>
+  <?= $this->form ?>
+  <?php endif; ?>
+
+
+
+
+<!-- Step 4 -->
+<?php elseif ($this->step === 'account-activated'): ?>
+<h6 class="mt-0 mb-4 form-step">Schritt 4 von 4</h6>
+  <p class="alert alert-success" role="alert">Deine Kontoaktivierung konnte erfolgreich abgeschlossen werden. Du kannst dich jetzt mit deiner Mitgliedernummer und deinem zuvor festgelegten Passwort anmelden.</p>
+  {{br}}
+  <button class="btn btn-dark trigger-login-modal">anmelden</button>
+
+
+
+
+<!-- Step 1 -->
 <?php else: ?>
+    <h6 class="mt-0 mb-4 form-step">Schritt 1 von 4</h6>
     <?php if ($this->hasError): ?>
     <p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
     <?php endif; ?>

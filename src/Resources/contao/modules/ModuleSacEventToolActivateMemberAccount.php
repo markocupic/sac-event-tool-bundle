@@ -13,6 +13,7 @@ namespace Markocupic\SacEventToolBundle;
 
 use Contao\BackendTemplate;
 use Contao\Config;
+use Contao\Controller;
 use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
@@ -22,6 +23,7 @@ use Contao\MemberModel;
 use Contao\Module;
 use Contao\StringUtil;
 use Haste\Form\Form;
+use Haste\Haste;
 use Haste\Util\Url;
 use NotificationCenter\Model\Notification;
 use Patchwork\Utf8;
@@ -103,27 +105,17 @@ class ModuleSacEventToolActivateMemberAccount extends Module
     {
         if (Input::get('activation') != '')
         {
-            $this->Template->step = 'check-activation-token';
-            $objMember = MemberModel::findByActivation(Input::get('activation'));
-            if ($objMember !== null && $objMember->activation != '' && $objMember->activationLinkLifetime > time() && !$objMember->disable)
-            {
-                $objMember->activation = '';
-                $objMember->login = '1';
-                $objMember->activationLinkLifetime = 0;
+            $this->Template->step = 'set-password';
 
-                // Add groups
-                $arrGroups = StringUtil::deserialize($objMember->groups, true);
-                $arrGroups = array_merge($arrGroups, $this->arrGroups);
-                $arrGroups = array_unique($arrGroups);
-                $arrGroups = array_filter($arrGroups);
-                $objMember->groups = serialize($arrGroups);
-
-                $objMember->save();
-            }
-            else
+            $this->generatePasswordForm();
+            if ($this->objForm !== null)
             {
-                $this->Template->hasError = true;
+                $this->Template->form = $this->objForm->generate();
             }
+        }
+        elseif (Input::get('account-activated') === 'true')
+        {
+            $this->Template->step = 'account-activated';
         }
         else
         {
@@ -136,6 +128,97 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             }
         }
 
+    }
+
+    /**
+     *
+     */
+    protected function generatePasswordForm()
+    {
+
+        $objForm = new Form('form-activate-member-account-set-password', 'POST', function ($objHaste) {
+            return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
+        });
+
+        $objForm->setFormActionFromUri(Environment::get('uri'));
+
+        // Password
+        $objForm->addFormField('password', array(
+            'label'     => 'Passwort festlegen',
+            'inputType' => 'password',
+            'eval'      => array('mandatory' => true, 'maxlength' => 255),
+        ));
+
+        // Let's add  a submit button
+        $objForm->addFormField('submit', array(
+            'label'     => 'Mitgliederkonto aktivieren',
+            'inputType' => 'submit',
+        ));
+
+        // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields.
+        // DO NOT use this method with generate() as the "form" template provides those fields by default.
+        $objForm->addContaoHiddenFields();
+
+
+        // Check activation token
+        $hasError = false;
+
+        // Validate token
+        $objMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE activation=?')->limit(1)->execute(Input::get('activation'));
+        if (!$objMember->numRows)
+        {
+            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Der Aktivierungslink ist ungültig.';
+            $hasError = true;
+        }
+
+        elseif ($objMember->activationLinkLifetime < time())
+        {
+            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Der Aktivierungslink ist abgelaufen.';
+            $hasError = true;
+        }
+
+        if ($objMember->disable)
+        {
+            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Dein Mitgliederkonto ist deaktiviert.';
+            $hasError = true;
+        }
+
+        $this->Template->hasError = $hasError;
+
+
+
+        // validate() also checks whether the form has been submitted
+        if ($objForm->validate() && $hasError === false)
+        {
+            // Save data to tl_calendar_events_member
+            if (!$hasError)
+            {
+                $objMemberModel = MemberModel::findByActivation(Input::get('activation'));
+                if ($objMemberModel !== null)
+                {
+                    $objMemberModel->password = password_hash(Input::post('password'), PASSWORD_DEFAULT);
+                    $token = StringUtil::substr($objMemberModel->id . md5(uniqid()) . md5(uniqid()), 32, '');
+                    $objMemberModel->activation = '';
+                    $objMemberModel->activationLinkLifetime = 0;
+                    $objMemberModel->login = '1';
+
+                    // Add groups
+                    $arrGroups = StringUtil::deserialize($objMemberModel->groups, true);
+                    $arrGroups = array_merge($arrGroups, $this->arrGroups);
+                    $arrGroups = array_unique($arrGroups);
+                    $arrGroups = array_filter($arrGroups);
+                    $objMemberModel->groups = serialize($arrGroups);
+
+
+                    $objMemberModel->save();
+                    $url = Url::removeQueryString(['activation']);
+                    $url = Url::addQueryString('account-activated=true', $url);
+                    Controller::redirect($url);
+                }
+            }
+        }
+
+        $this->objForm = $objForm;
     }
 
 
@@ -167,13 +250,6 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             'inputType' => 'text',
             'eval'      => array('rgxp' => 'date', 'datepicker' => true),
         ));
-
-        $objForm->addFormField('password', array(
-            'label'     => 'Erstelle dein neues Passwort',
-            'inputType' => 'password',
-            'eval'      => array('mandatory' => true, 'preserveTags' => true, 'minlength' => Config::get('minPasswordLength')),
-        ));
-
         $objForm->addFormField('agb', array(
             'label'     => array('', 'Ich akzeptiere die <a href="#" data-toggle="modal" data-target="#agbModal">allg. Gesch&auml;ftsbedingungen.</a>'),
             'inputType' => 'checkbox',
@@ -253,7 +329,6 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                 $objMemberModel = MemberModel::findByPk($objMember->id);
                 if ($objMemberModel !== null)
                 {
-                    $objMemberModel->password = password_hash(Input::post('password'), PASSWORD_DEFAULT);
                     $token = StringUtil::substr($objMemberModel->id . md5(uniqid()) . md5(uniqid()), 32, '');
                     $objMemberModel->activation = $token;
                     $objMemberModel->activationLinkLifetime = time() + $this->activationLinkLifetime;
