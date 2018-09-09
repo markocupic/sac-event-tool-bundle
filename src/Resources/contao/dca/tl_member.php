@@ -21,6 +21,19 @@ $GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index
 
 // Fields
 
+// Avatar
+$GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = array(
+    'label'         => &$GLOBALS['TL_LANG']['tl_member']['avatar'],
+    'exclude'       => true,
+    'inputType'     => 'fileTree',
+    'eval'          => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'),
+    'load_callback' => array
+    (
+        array('tl_content', 'setSingleSrcFlags')
+    ),
+    'sql'           => "binary(16) NULL"
+);
+
 // activationLinkLifetime
 $GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['activationLinkLifetime'],

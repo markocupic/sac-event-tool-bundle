@@ -114,7 +114,7 @@ class ModuleSacEventToolMemberDashboard extends Module
             $this->action = 'member_dashboard';
         }
 
-       // Sign out from Event
+        // Sign out from Event
         if (Input::get('do') === 'unregisterUserFromEvent')
         {
             $this->unregisterUserFromEvent(Input::get('registrationId'), $this->unregisterFromEventNotificationId);
@@ -125,7 +125,7 @@ class ModuleSacEventToolMemberDashboard extends Module
         if (Input::get('do') === 'rotate-avatar')
         {
             $this->rotateImage(Input::get('img'));
-            $url = Url::removeQueryString(['img','do']);
+            $url = Url::removeQueryString(['img', 'do']);
             Controller::redirect($url);
         }
 
@@ -237,7 +237,7 @@ class ModuleSacEventToolMemberDashboard extends Module
         $angle = 270;
 
         $objFiles = FilesModel::findById($id);
-        if($objFiles === null)
+        if ($objFiles === null)
         {
             return false;
         }
@@ -272,6 +272,7 @@ class ModuleSacEventToolMemberDashboard extends Module
 
         // Output
         imagejpeg($imgTmp, $rootDir . '/' . $src);
+
         imagedestroy($source);
         return true;
 
@@ -428,11 +429,19 @@ class ModuleSacEventToolMemberDashboard extends Module
         switch ($this->action)
         {
             case 'member_dashboard':
+                $this->checkAvatar();
 
                 // Load languages
                 System::loadLanguageFile('tl_calendar_events_member');
 
                 $this->Template->objUser = $this->objUser;
+
+                $objUploadFolder = new Folder(Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/' . $this->objUser->id);
+                if (!$objUploadFolder->isEmpty())
+                {
+                    $this->Template->objUser->hasAvatar = true;
+                }
+
 
                 $this->Template->avatarForm = $this->generateAvatarForm();
 
@@ -674,6 +683,8 @@ class ModuleSacEventToolMemberDashboard extends Module
      */
     protected function generateAvatarForm()
     {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+
 
         $objForm = new Form('form-avatar-upload', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
@@ -713,6 +724,12 @@ class ModuleSacEventToolMemberDashboard extends Module
         if (Input::post('FORM_SUBMIT') === 'form-avatar-upload' && Input::post('delete-avatar'))
         {
             $objUploadFolder->purge();
+            $oMember = MemberModel::findByPk($this->objUser->id);
+            if ($oMember !== null)
+            {
+                $oMember->avatar = '';
+                $oMember->save();
+            }
         }
 
         // Standardize name
@@ -721,6 +738,17 @@ class ModuleSacEventToolMemberDashboard extends Module
             $objUploadFolder->purge();
             $objFile = new File($_FILES['avatar']['name']);
             $_FILES['avatar']['name'] = 'avatar-' . $this->objUser->id . '.' . strtolower($objFile->extension);
+
+            // Move uploaded file so we can save the avatar uuid in tl_member.avatar
+            move_uploaded_file($_FILES['avatar']['tmp_name'], TL_ROOT . '/' . $objUploadFolder->path . '/' . $_FILES['avatar']['name']);
+            Dbafs::addResource($objUploadFolder->path . '/' . $_FILES['avatar']['name']);
+            $fileModel = FilesModel::findByPath($objUploadFolder->path . '/' . $_FILES['avatar']['name']);
+            $oMember = MemberModel::findByPk($this->objUser->id);
+            if ($oMember !== null)
+            {
+                $oMember->avatar = $fileModel->uuid;
+                $oMember->save();
+            }
         }
 
         if ($objForm->validate())
@@ -868,5 +896,40 @@ class ModuleSacEventToolMemberDashboard extends Module
         return $objForm->generate();
     }
 
+    /**
+     * @throws \Exception
+     */
+    private function checkAvatar()
+    {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
+        // Check for valid avatar
+        $oMember = MemberModel::findByPk($this->objUser->id);
+        if ($oMember !== null)
+        {
+            if ($oMember->avatar != '')
+            {
+                $objFile = FilesModel::findByUuid($oMember->avatar);
+                if ($objFile === null)
+                {
+                    $hasError = true;
+                }
+                if (!is_file($rootDir . '/' . $objFile->path))
+                {
+                    $hasError = true;
+                }
+                if ($hasError)
+                {
+                    $oMember->avatar = '';
+                    $oMember->save();
+                    $objUploadFolder = new Folder(Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/' . $this->objUser->id);
+                    if ($objUploadFolder !== null)
+                    {
+                        $objUploadFolder->purge();
+                        $objUploadFolder->delete();
+                    }
+                }
+            }
+        }
+    }
 }

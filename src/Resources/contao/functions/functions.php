@@ -70,17 +70,12 @@ function getAvatar($userId, $mode = 'BE')
     {
         if ($objUser !== null)
         {
-            $uploadFolder = Config::get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/' . $objUser->id;
-            if (is_dir($rootDir . '/' . $uploadFolder))
+            $objFiles = FilesModel::findByUuid($objUser->avatar);
+            if ($objFiles !== null)
             {
-                $arrRes = scan($rootDir . '/' . $uploadFolder);
-                foreach ($arrRes as $file)
+                if (is_file($rootDir . '/' . $objFiles->path))
                 {
-                    if (is_file($rootDir . '/' . $uploadFolder . '/' . $file))
-                    {
-                        // Return first file
-                        return $uploadFolder . '/' . $file;
-                    }
+                    return $objFiles->path;
                 }
             }
 
