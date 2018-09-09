@@ -207,8 +207,9 @@
                   </div>
                 </div>
                 <div class="col-3">
-                  <figure class="responsive thumbnail image_container">
+                  <figure class="member-dashboard-avatar responsive thumbnail image_container">
                     {{image::<?= getAvatar($this->objUser->id, 'FE') ?>?width=300}}
+                    <a href="{{env::request}}?do=rotate-avatar&img=<?= FilesModel::findByPath(getAvatar($this->objUser->id, 'FE'))->id ?>" class="member-dashboard-rotate-image-button" title="Bild im UZS 90° drehen"><i class="fa fa-history turn-image"></i></a>
                   </figure>
                 </div>
               </div>

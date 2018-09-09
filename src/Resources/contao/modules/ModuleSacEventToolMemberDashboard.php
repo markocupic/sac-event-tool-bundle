@@ -36,6 +36,7 @@ use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
 use Haste\Form\Form;
+use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion;
 use NotificationCenter\Model\Notification;
 use Patchwork\Utf8;
@@ -113,11 +114,19 @@ class ModuleSacEventToolMemberDashboard extends Module
             $this->action = 'member_dashboard';
         }
 
-        // Sign out from Event
+       // Sign out from Event
         if (Input::get('do') === 'unregisterUserFromEvent')
         {
             $this->unregisterUserFromEvent(Input::get('registrationId'), $this->unregisterFromEventNotificationId);
             Controller::redirect(PageModel::findByPk($objPage->id)->getFrontendUrl());
+        }
+
+        // Sign out from Event
+        if (Input::get('do') === 'rotate-avatar')
+        {
+            $this->rotateImage(Input::get('img'));
+            $url = Url::removeQueryString(['img','do']);
+            Controller::redirect($url);
         }
 
 
@@ -214,6 +223,59 @@ class ModuleSacEventToolMemberDashboard extends Module
 
 
         return parent::generate();
+    }
+
+
+    /**
+     * Rotate an image clockwise by 90°
+     * @param $id
+     * @return bool
+     * @throws \Exception
+     */
+    protected function rotateImage($id)
+    {
+        $angle = 270;
+
+        $objFiles = FilesModel::findById($id);
+        if($objFiles === null)
+        {
+            return false;
+        }
+
+        $src = $objFiles->path;
+
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+
+        if (!file_exists($rootDir . '/' . $src))
+        {
+            Message::addError(sprintf('File "%s" not found.', $src));
+            return false;
+        }
+
+        $objFile = new File($src);
+        if (!$objFile->isGdImage)
+        {
+            Message::addError(sprintf('File "%s" could not be rotated because it is not an image.', $src));
+            return false;
+        }
+
+        if (!function_exists('imagerotate'))
+        {
+            Message::addError(sprintf('PHP function "%s" is not installed.', 'imagerotate'));
+            return false;
+        }
+
+        $source = imagecreatefromjpeg($rootDir . '/' . $src);
+
+        //rotate
+        $imgTmp = imagerotate($source, $angle, 0);
+
+        // Output
+        imagejpeg($imgTmp, $rootDir . '/' . $src);
+        imagedestroy($source);
+        return true;
+
+
     }
 
     /**
