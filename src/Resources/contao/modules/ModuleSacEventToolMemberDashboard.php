@@ -227,177 +227,10 @@ class ModuleSacEventToolMemberDashboard extends Module
 
 
     /**
-     * Rotate an image clockwise by 90°
-     * @param $id
-     * @return bool
-     * @throws \Exception
-     */
-    protected function rotateImage($id)
-    {
-        $angle = 270;
-
-        $objFiles = FilesModel::findById($id);
-        if ($objFiles === null)
-        {
-            return false;
-        }
-
-        $src = $objFiles->path;
-
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-
-        if (!file_exists($rootDir . '/' . $src))
-        {
-            Message::addError(sprintf('File "%s" not found.', $src));
-            return false;
-        }
-
-        $objFile = new File($src);
-        if (!$objFile->isGdImage)
-        {
-            Message::addError(sprintf('File "%s" could not be rotated because it is not an image.', $src));
-            return false;
-        }
-
-        if (!function_exists('imagerotate'))
-        {
-            Message::addError(sprintf('PHP function "%s" is not installed.', 'imagerotate'));
-            return false;
-        }
-
-        $source = imagecreatefromjpeg($rootDir . '/' . $src);
-
-        //rotate
-        $imgTmp = imagerotate($source, $angle, 0);
-
-        // Output
-        imagejpeg($imgTmp, $rootDir . '/' . $src);
-
-        imagedestroy($source);
-        return true;
-
-
-    }
-
-    /**
-     * @param $registrationId
-     * @param $notificationId
-     */
-    protected function unregisterUserFromEvent($registrationId, $notificationId)
-    {
-        $blnHasError = true;
-        $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event abgemeldet werden. Bitte nimm mit dem verantwortlichen Leiter Kontakt auf.';
-
-        $objEventsMember = CalendarEventsMemberModel::findById($registrationId);
-        if ($objEventsMember === null)
-        {
-            Message::add($errorMsg, 'TL_ERROR', TL_MODE);
-            return;
-        }
-
-        // Use terminal42/notification_center
-        $objNotification = Notification::findByPk($notificationId);
-
-        if (null !== $objNotification && null !== $objEventsMember)
-        {
-            $objEvent = $objEventsMember->getRelated('eventId');
-            if ($objEvent !== null)
-            {
-                $objInstructor = $objEvent->getRelated('mainInstructor');
-                if ($objEventsMember->stateOfSubscription === 'subscription-refused')
-                {
-                    $objEventsMember->delete();
-                    System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
-                    return;
-                }
-                elseif (!$objEvent->allowDeregistration)
-                {
-                    $errorMsg = $objEvent->allowDeregistration . 'Du kannst dich vom Event "' . $objEvent->title . '" nicht abmelden. Die Anmeldung ist definitiv. Nimm Kontakt mit dem Event-Organisator auf.';
-                    $blnHasError = true;
-                }
-                elseif ($objEvent->startDate < time())
-                {
-                    $errorMsg = 'Du konntest nicht vom Event "' . $objEvent->title . '" abgemeldet werden, da der Event bereits vorbei ist.';
-                    $blnHasError = true;
-                }
-                elseif ($objEvent->allowDeregistration && ($objEvent->startDate < (time() + $objEvent->deregistrationLimit * 25 * 3600)))
-                {
-                    $errorMsg = 'Du konntest nicht vom Event "' . $objEvent->title . '" abgemeldet werden, da die Abmeldefrist von ' . $objEvent->deregistrationLimit . ' Tag(en) abgelaufen ist. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
-                    $blnHasError = true;
-                }
-                elseif ($this->objUser->email == '' || !Validator::isEmail($this->objUser->email))
-                {
-                    $errorMsg = 'Leider wurde f&uuml;r dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschr&auml;nkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
-                    $blnHasError = true;
-                }
-                elseif ($objEventsMember->sacMemberId != $this->objUser->sacMemberId)
-                {
-                    $errorMsg = 'Du hast nicht die nötigen Benutzerrechte um dich vom Event "' . $objEvent->title . '" abzumelden.';
-                    $blnHasError = true;
-                }
-                elseif ($objInstructor !== null)
-                {
-
-
-                    $arrTokens = array(
-                        'event_course_id'   => $objEvent->courseId,
-                        'event_name'        => $objEvent->title,
-                        'event_type'        => $objEvent->eventType,
-                        'instructor_name'   => $objInstructor->name,
-                        'instructor_email'  => $objInstructor->email,
-                        'participant_name'  => $objEventsMember->firstname . ' ' . $objEventsMember->lastname,
-                        'participant_email' => $objEventsMember->email,
-                        'event_link_detail' => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($objEvent),
-                        'sac_member_id'     => $objEventsMember->sacMemberId != '' ? $objEventsMember->sacMemberId : 'keine',
-                    );
-
-                    if ($objEvent->registrationGoesTo > 0)
-                    {
-                        $objUser = UserModel::findByPk($objEvent->registrationGoesTo);
-                        if ($objUser !== null)
-                        {
-                            if ($objUser->email != '')
-                            {
-                                if (Validator::isEmail($objUser->email))
-                                {
-                                    $arrTokens['instructor_name'] = $objUser->name;
-                                    $arrTokens['instructor_email'] = $objUser->email;
-                                }
-                            }
-                        }
-                    }
-
-                    Message::add('Du hast dich vom Event "' . $objEventsMember->eventName . '" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.', 'TL_INFO', TL_MODE);
-
-                    // Log
-                    System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
-
-                    $objNotification->send($arrTokens, 'de');
-
-                    // Delete from tl_calendar_events_member
-                    $objEventsMember->delete();
-                    $blnHasError = false;
-                }
-                else
-                {
-                    $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event "' . $objEvent->title . '" abgemeldet werden. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
-                    $blnHasError = true;
-                }
-            }
-        }
-        if ($blnHasError)
-        {
-            Message::add($errorMsg, 'TL_ERROR', TL_MODE);
-        }
-    }
-
-
-    /**
      * Generate the module
      */
     protected function compile()
     {
-
         if ($this->objUser->email == '' || !Validator::isEmail($this->objUser->email))
         {
             Message::addInfo('Leider wurde f&uuml;r dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschr&auml;nkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
@@ -585,7 +418,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                                                 'uuid'       => $objFiles->uuid,
                                                 'name'       => $objFile->basename,
                                                 'singleSRC'  => $objFiles->path,
-                                                'title'      => \StringUtil::specialchars($objFile->basename),
+                                                'title'      => StringUtil::specialchars($objFile->basename),
                                                 'filesModel' => $objFiles->current(),
                                                 'caption'    => isset($arrMeta['de']['caption']) ? $arrMeta['de']['caption'] : '',
                                                 'alt'        => isset($arrMeta['de']['alt']) ? $arrMeta['de']['alt'] : '',
@@ -675,6 +508,173 @@ class ModuleSacEventToolMemberDashboard extends Module
                 break;
         }
 
+    }
+
+
+
+    /**
+     * Rotate an image clockwise by 90°
+     * @param $id
+     * @return bool
+     * @throws \Exception
+     */
+    protected function rotateImage($id)
+    {
+        $angle = 270;
+
+        $objFiles = FilesModel::findById($id);
+        if ($objFiles === null)
+        {
+            return false;
+        }
+
+        $src = $objFiles->path;
+
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+
+        if (!file_exists($rootDir . '/' . $src))
+        {
+            Message::addError(sprintf('File "%s" not found.', $src));
+            return false;
+        }
+
+        $objFile = new File($src);
+        if (!$objFile->isGdImage)
+        {
+            Message::addError(sprintf('File "%s" could not be rotated because it is not an image.', $src));
+            return false;
+        }
+
+        if (!function_exists('imagerotate'))
+        {
+            Message::addError(sprintf('PHP function "%s" is not installed.', 'imagerotate'));
+            return false;
+        }
+
+        $source = imagecreatefromjpeg($rootDir . '/' . $src);
+
+        //rotate
+        $imgTmp = imagerotate($source, $angle, 0);
+
+        // Output
+        imagejpeg($imgTmp, $rootDir . '/' . $src);
+
+        imagedestroy($source);
+        return true;
+
+
+    }
+
+    /**
+     * @param $registrationId
+     * @param $notificationId
+     */
+    protected function unregisterUserFromEvent($registrationId, $notificationId)
+    {
+        $blnHasError = true;
+        $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event abgemeldet werden. Bitte nimm mit dem verantwortlichen Leiter Kontakt auf.';
+
+        $objEventsMember = CalendarEventsMemberModel::findById($registrationId);
+        if ($objEventsMember === null)
+        {
+            Message::add($errorMsg, 'TL_ERROR', TL_MODE);
+            return;
+        }
+
+        // Use terminal42/notification_center
+        $objNotification = Notification::findByPk($notificationId);
+
+        if (null !== $objNotification && null !== $objEventsMember)
+        {
+            $objEvent = $objEventsMember->getRelated('eventId');
+            if ($objEvent !== null)
+            {
+                $objInstructor = $objEvent->getRelated('mainInstructor');
+                if ($objEventsMember->stateOfSubscription === 'subscription-refused')
+                {
+                    $objEventsMember->delete();
+                    System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
+                    return;
+                }
+                elseif (!$objEvent->allowDeregistration)
+                {
+                    $errorMsg = $objEvent->allowDeregistration . 'Du kannst dich vom Event "' . $objEvent->title . '" nicht abmelden. Die Anmeldung ist definitiv. Nimm Kontakt mit dem Event-Organisator auf.';
+                    $blnHasError = true;
+                }
+                elseif ($objEvent->startDate < time())
+                {
+                    $errorMsg = 'Du konntest nicht vom Event "' . $objEvent->title . '" abgemeldet werden, da der Event bereits vorbei ist.';
+                    $blnHasError = true;
+                }
+                elseif ($objEvent->allowDeregistration && ($objEvent->startDate < (time() + $objEvent->deregistrationLimit * 25 * 3600)))
+                {
+                    $errorMsg = 'Du konntest nicht vom Event "' . $objEvent->title . '" abgemeldet werden, da die Abmeldefrist von ' . $objEvent->deregistrationLimit . ' Tag(en) abgelaufen ist. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
+                    $blnHasError = true;
+                }
+                elseif ($this->objUser->email == '' || !Validator::isEmail($this->objUser->email))
+                {
+                    $errorMsg = 'Leider wurde f&uuml;r dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschr&auml;nkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
+                    $blnHasError = true;
+                }
+                elseif ($objEventsMember->sacMemberId != $this->objUser->sacMemberId)
+                {
+                    $errorMsg = 'Du hast nicht die nötigen Benutzerrechte um dich vom Event "' . $objEvent->title . '" abzumelden.';
+                    $blnHasError = true;
+                }
+                elseif ($objInstructor !== null)
+                {
+
+
+                    $arrTokens = array(
+                        'event_course_id'   => $objEvent->courseId,
+                        'event_name'        => $objEvent->title,
+                        'event_type'        => $objEvent->eventType,
+                        'instructor_name'   => $objInstructor->name,
+                        'instructor_email'  => $objInstructor->email,
+                        'participant_name'  => $objEventsMember->firstname . ' ' . $objEventsMember->lastname,
+                        'participant_email' => $objEventsMember->email,
+                        'event_link_detail' => Environment::get('url') . '/' . Events::generateEventUrl($objEvent),
+                        'sac_member_id'     => $objEventsMember->sacMemberId != '' ? $objEventsMember->sacMemberId : 'keine',
+                    );
+
+                    if ($objEvent->registrationGoesTo > 0)
+                    {
+                        $objUser = UserModel::findByPk($objEvent->registrationGoesTo);
+                        if ($objUser !== null)
+                        {
+                            if ($objUser->email != '')
+                            {
+                                if (Validator::isEmail($objUser->email))
+                                {
+                                    $arrTokens['instructor_name'] = $objUser->name;
+                                    $arrTokens['instructor_email'] = $objUser->email;
+                                }
+                            }
+                        }
+                    }
+
+                    Message::add('Du hast dich vom Event "' . $objEventsMember->eventName . '" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.', 'TL_INFO', TL_MODE);
+
+                    // Log
+                    System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
+
+                    $objNotification->send($arrTokens, 'de');
+
+                    // Delete from tl_calendar_events_member
+                    $objEventsMember->delete();
+                    $blnHasError = false;
+                }
+                else
+                {
+                    $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event "' . $objEvent->title . '" abgemeldet werden. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
+                    $blnHasError = true;
+                }
+            }
+        }
+        if ($blnHasError)
+        {
+            Message::add($errorMsg, 'TL_ERROR', TL_MODE);
+        }
     }
 
     /**

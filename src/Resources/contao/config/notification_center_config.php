@@ -76,7 +76,7 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['sac_event_tool'] = array
     (
         // Field in tl_nc_language
         'recipients' => array('email'),
-        'email_text' => array('firstname', 'lastname', 'street', 'postal', 'city', 'phone', 'activation', 'activation_url', 'username', 'sac_member_id', 'email'),
+        'email_text' => array('firstname', 'lastname', 'street', 'postal', 'city', 'phone', 'activation', 'username', 'sac_member_id', 'email'),
     ),
 
 );

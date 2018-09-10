@@ -45,23 +45,28 @@
 
 <!-- step 2 -->
 <?php elseif ($this->step === '2'): ?>
-  <?php if ($this->hasError): ?>
-  <p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
-  <?php else: ?>
-  <p>
+
     Zu deinen Eingaben wurde das folgende Mitgliederkonto gefunden:{{br}}{{br}}
     <strong><?= $this->objMember->firstname ?> <?= $this->objMember->lastname ?></strong>{{br}}
       <?= $this->objMember->street ?>{{br}}
       <?= $this->objMember->postal ?> <?= $this->objMember->city ?>{{br}}
   </p>
 
-  <p class="alert alert-primary" role="alert">Du hast auf deine E-Mail-Adresse "<?= $this->objMember->email ?>" einen Aktivierungslink zugesandt bekommen. Der Aktivierungslink ist nur <strong>60 Minuten</strong> lang g&uuml;ltig. Bitte pr&uuml;fe jetzt dein Postfach, um die Aktivierung abzuschliessen.</p>
+  <p class="alert alert-primary" role="alert">Du hast auf deine E-Mail-Adresse "<?= $this->objMember->email ?>" einen Aktivierungscode zugesandt bekommen. Der Aktivierungscode ist nur <strong>60 Minuten</strong> lang g&uuml;ltig. Bitte pr&uuml;fe jetzt dein Postfach, um die Aktivierung abzuschliessen.</p>
+  {{br}}
+  <?php if ($this->hasError): ?>
+  <p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
+  <?php endif; ?>
+  <p>
+  <?php if(!$this->Template->doNotShowForm): ?>
+    <?= $this->form ?>
   <?php endif; ?>
 
 
 
 
-<!-- step 3 -->
+
+    <!-- step 3 -->
 <?php elseif ($this->step === '3'): ?>
   <?php if ($this->hasError): ?>
   <p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
@@ -77,7 +82,7 @@
 <?php elseif ($this->step === '4'): ?>
   <p class="alert alert-primary" role="alert">Deine Kontoaktivierung konnte erfolgreich abgeschlossen werden. Du kannst dich jetzt mit deiner Mitgliedernummer und deinem zuvor festgelegten Passwort anmelden.</p>
   {{br}}
-  <button class="btn btn-dark trigger-login-modal">anmelden</button>
+  <button class="btn btn-dark trigger-login-modal">Jetzt anmelden</button>
 <?php endif; ?>
 
 

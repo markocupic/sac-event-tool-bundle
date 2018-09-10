@@ -28,6 +28,9 @@ use Haste\Util\Url;
 use NotificationCenter\Model\Notification;
 use Patchwork\Utf8;
 
+
+session_start();
+
 /**
  * Class ModuleSacEventToolActivateMemberAccount
  * @package Markocupic\SacEventToolBundle
@@ -123,6 +126,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         switch ($this->step)
         {
             case 1:
+                unset($_SESSION['SAC_EVT_TOOL']);
                 $this->generateFirstForm();
                 if ($this->objForm !== null)
                 {
@@ -131,22 +135,25 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                 break;
 
             case 2:
-                $objMember = MemberModel::findByPk(Input::get('uid'));
+                $objMember = MemberModel::findByPk($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId']);
                 if ($objMember !== null)
                 {
+                    $this->generateSecondForm();
                     $this->Template->objMember = $objMember;
+                    $this->Template->form = $this->objForm->generate();
                 }
                 else
                 {
-                    $this->Template->hasError = true;
-                    $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten.';
+                    unset($_SESSION['SAC_EVT_TOOL']);
+                    $url = Url::removeQueryString(['step']);
+                    Controller::redirect($url);
                 }
                 break;
 
             case 3:
-                if (Input::get('activation') != '')
+                if ($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['passedTokenCheck'] === true)
                 {
-                    $this->generateSecondForm();
+                    $this->generateThirdForm();
                     if ($this->objForm !== null)
                     {
                         $this->Template->form = $this->objForm->generate();
@@ -154,12 +161,20 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                 }
                 else
                 {
-                    $this->Template->hasError = true;
-                    $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten.';
+                    unset($_SESSION['SAC_EVT_TOOL']);
+                    $url = Url::removeQueryString(['step']);
+                    Controller::redirect($url);
                 }
                 break;
 
             case 4:
+                if(!isset($_SESSION['SAC_EVT_TOOL']))
+                {
+                    $url = Url::removeQueryString(['step']);
+                    Controller::redirect($url);
+                }
+                unset($_SESSION['SAC_EVT_TOOL']);
+
                 break;
         }
     }
@@ -212,6 +227,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
 
         $objWidget = $objForm->getWidget('dateOfBirth');
         $objWidget->addAttribute('placeholder', 'dd.mm.YYYY');
+
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate())
@@ -272,16 +288,17 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                 $objMemberModel = MemberModel::findByPk($objMember->id);
                 if ($objMemberModel !== null)
                 {
-                    $token = StringUtil::substr($objMemberModel->id . md5(uniqid()) . md5(uniqid()), 32, '');
+                    $token = rand(111111, 999999);
                     $objMemberModel->activation = $token;
                     $objMemberModel->activationLinkLifetime = time() + $this->activationLinkLifetime;
+                    $objMemberModel->activationFalseTokenCounter = 0;
                     $objMemberModel->save();
 
                     if ($this->notifyMember($objMemberModel))
                     {
-                        $url = Url::removeQueryString(['step', 'activation', 'uid']);
+                        $url = Url::removeQueryString(['step']);
                         $url = Url::addQueryString('step=2', $url);
-                        $url = Url::addQueryString('uid=' . $objMember->id, $url);
+                        $_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId'] = $objMemberModel->id;
                         Controller::redirect($url);
                     }
                     else
@@ -297,12 +314,138 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         $this->objForm = $objForm;
     }
 
-
     /**
      *
      */
     protected function generateSecondForm()
     {
+        $objMember = MemberModel::findByPk($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId']);
+        if ($objMember === null)
+        {
+            $url = Url::removeQueryString(['step']);
+            Controller::redirect($url);
+        }
+        $objForm = new Form('form-activate-member-account-activation-token', 'POST', function ($objHaste) {
+            return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
+        });
+
+        $objForm->setFormActionFromUri(Environment::get('uri'));
+
+        // Password
+        $objForm->addFormField('activationToken', array(
+            'label'     => 'Aktivierungscode eingeben',
+            'inputType' => 'text',
+            'eval'      => array('mandatory' => true, 'minlength' => 6, 'maxlength' => 6),
+        ));
+
+        // Let's add  a submit button
+        $objForm->addFormField('submit', array(
+            'label'     => 'Aktivierungscode absenden',
+            'inputType' => 'submit',
+        ));
+
+        // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields.
+        // DO NOT use this method with generate() as the "form" template provides those fields by default.
+        $objForm->addContaoHiddenFields();
+
+
+        // Check activation token
+        $hasError = false;
+
+
+        // Set passedTokenCheck to false
+        $_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['passedTokenCheck'] = false;
+
+
+        // validate() also checks whether the form has been submitted
+        if ($objForm->validate() && Input::post('activationToken') !== '')
+        {
+
+            $token = trim(Input::post('activationToken'));
+
+            $objMember = MemberModel::findByPk($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId']);
+            if ($objMember === null)
+            {
+                $hasError = true;
+                $url = Url::removeQueryString(['step']);
+                $this->Template->doNotShowForm =true;
+                $this->Template->errorMsg = sprintf('Leider ist die Session abgelaufen. Starte den Aktivierungsprozess von vorne.<br><a href="%s">Aktivierungsprozess neu starten</a>', $url);
+            }
+
+            if ($objMember->disable)
+            {
+                $hasError = true;
+                $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Dein Mitgliederkonto ist deaktiviert. Bitte informiere die Geschäftsstelle.';
+            }
+
+            $objDb = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE id=? AND activation=?')->limit(1)->execute($objMember->id, $token);
+
+            if (!$hasError && !$objDb->numRows)
+            {
+                $hasError = true;
+                $objMember->activationFalseTokenCounter++;
+                $objMember->save();
+                // Too many tries
+                if ($objMember->activationFalseTokenCounter > 5)
+                {
+                    $objMember->activationFalseTokenCounter = 0;
+                    $objMember->activation = '';
+                    $objMember->activationLinkLifetime = 0;
+                    $objMember->save();
+                    unset($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId']);
+                    $url = Url::removeQueryString(['step']);
+                    $this->Template->doNotShowForm =true;
+                    $this->Template->errorMsg = sprintf('Ungültiger Aktivierungscode und zu viele Anzahl ungültiger Versuche. Bitte starte den Aktivierungsprozess von vorne. <br><a href="%s">Aktivierungsprozess neu starten</a>', $url);
+                }
+                else
+                {
+                    // False token
+                    $this->Template->errorMsg = 'Ungültiger Aktivierungscode. Bitte probiere nochmals.';
+                }
+            }
+            else
+            {
+                // Token has expired
+                if ($objDb->activationLinkLifetime < time())
+                {
+                    $hasError = true;
+                    $this->Template->doNotShowForm =true;
+                    $this->Template->errorMsg = 'Der Aktivierungscode ist abgelaufen. Bitte starte den Aktivierungsprozess von vorne.';
+                }
+                else
+                {
+                    // All ok!
+                    $objMember->activationFalseTokenCounter = 0;
+                    $objMember->activation = '';
+                    $objMember->activationLinkLifetime = 0;
+
+                    // Set passedTokenCheck to true
+                    $_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['passedTokenCheck'] = true;
+
+                    $url = Url::removeQueryString(['step']);
+                    $url = Url::addQueryString('step=3', $url);
+                    Controller::redirect($url);
+                }
+            }
+        }
+
+        $this->Template->hasError = $hasError;
+        $this->objForm = $objForm;
+    }
+
+
+    /**
+     *
+     */
+    protected function generateThirdForm()
+    {
+
+        // Check passedTokenCheck
+        if ($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['passedTokenCheck'] !== true)
+        {
+            $this->Template->errorMsg = 'Es ist zu einem Fehler gekommen. Bitte starte den Aktivierungsprozess von vorne.';
+            return false;
+        }
 
         $objForm = new Form('form-activate-member-account-set-password', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
@@ -331,23 +474,11 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         // Check activation token
         $hasError = false;
 
-        // Validate token
-        $objMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE activation=?')->limit(1)->execute(Input::get('activation'));
-        if (!$objMember->numRows)
+        // Validate session
+        $objMemberModel = MemberModel::findByPk($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId']);
+        if ($objMemberModel === null)
         {
-            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Der Aktivierungslink ist ungültig.';
-            $hasError = true;
-        }
-
-        elseif ($objMember->activationLinkLifetime < time())
-        {
-            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Der Aktivierungslink ist abgelaufen.';
-            $hasError = true;
-        }
-
-        if ($objMember->disable)
-        {
-            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Dein Mitgliederkonto ist deaktiviert.';
+            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Die Session ist abgelaufen.';
             $hasError = true;
         }
 
@@ -357,30 +488,32 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         // validate() also checks whether the form has been submitted
         if ($objForm->validate() && $hasError === false)
         {
-            // Save data to tl_calendar_events_member
+
+            // Save data to tl_member
             if (!$hasError)
             {
-                $objMemberModel = MemberModel::findByActivation(Input::get('activation'));
-                if ($objMemberModel !== null)
+                if (true === $_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['passedTokenCheck'])
                 {
-                    $objMemberModel->password = password_hash(Input::post('password'), PASSWORD_DEFAULT);
-                    $token = StringUtil::substr($objMemberModel->id . md5(uniqid()) . md5(uniqid()), 32, '');
-                    $objMemberModel->activation = '';
-                    $objMemberModel->activationLinkLifetime = 0;
-                    $objMemberModel->login = '1';
+                    if ($objMemberModel !== null)
+                    {
+                        $objMemberModel->password = password_hash(Input::post('password'), PASSWORD_DEFAULT);
+                        $objMemberModel->activation = '';
+                        $objMemberModel->activationLinkLifetime = 0;
+                        $objMember->activationFalseTokenCounter = 0;
+                        $objMemberModel->login = '1';
 
-                    // Add groups
-                    $arrGroups = StringUtil::deserialize($objMemberModel->groups, true);
-                    $arrGroups = array_merge($arrGroups, $this->arrGroups);
-                    $arrGroups = array_unique($arrGroups);
-                    $arrGroups = array_filter($arrGroups);
-                    $objMemberModel->groups = serialize($arrGroups);
+                        // Add groups
+                        $arrGroups = StringUtil::deserialize($objMemberModel->groups, true);
+                        $arrGroups = array_merge($arrGroups, $this->arrGroups);
+                        $arrGroups = array_unique($arrGroups);
+                        $arrGroups = array_filter($arrGroups);
+                        $objMemberModel->groups = serialize($arrGroups);
 
-
-                    $objMemberModel->save();
-                    $url = Url::removeQueryString(['step', 'activation', 'uid']);
-                    $url = Url::addQueryString('step=4', $url);
-                    Controller::redirect($url);
+                        $objMemberModel->save();
+                        $url = Url::removeQueryString(['step']);
+                        $url = Url::addQueryString('step=4', $url);
+                        Controller::redirect($url);
+                    }
                 }
             }
         }
@@ -393,28 +526,23 @@ class ModuleSacEventToolActivateMemberAccount extends Module
      * @param $objMember
      * @return bool
      */
-    protected function notifyMember($objMember)
+    private function notifyMember($objMember)
     {
         // Use terminal42/notification_center
         if ($this->objNotification !== null)
         {
-            $url = Url::removeQueryString(['step', 'activation', 'uid'], Environment::get('uri'));
-            $url = Url::addQueryString('step=3', $url);
-            $url = Url::addQueryString('activation=' . $objMember->activation, $url);
-
             // Set token array
             $arrTokens = array(
-                'firstname'      => html_entity_decode($objMember->firstname),
-                'lastname'       => html_entity_decode($objMember->lastname),
-                'street'         => html_entity_decode($objMember->street),
-                'postal'         => html_entity_decode($objMember->postal),
-                'city'           => html_entity_decode($objMember->city),
-                'phone'          => html_entity_decode($objMember->phone),
-                'activation'     => $objMember->activation,
-                'activation_url' => $url,
-                'username'       => html_entity_decode($objMember->username),
-                'sacMemberId'    => html_entity_decode($objMember->username),
-                'email'          => $objMember->email,
+                'firstname'   => html_entity_decode($objMember->firstname),
+                'lastname'    => html_entity_decode($objMember->lastname),
+                'street'      => html_entity_decode($objMember->street),
+                'postal'      => html_entity_decode($objMember->postal),
+                'city'        => html_entity_decode($objMember->city),
+                'phone'       => html_entity_decode($objMember->phone),
+                'activation'  => $objMember->activation,
+                'username'    => html_entity_decode($objMember->username),
+                'sacMemberId' => html_entity_decode($objMember->username),
+                'email'       => $objMember->email,
             );
 
             $this->objNotification->send($arrTokens, 'de');
