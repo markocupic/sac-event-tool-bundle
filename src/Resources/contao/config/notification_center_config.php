@@ -60,7 +60,7 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['sac_event_tool'] = array
         'email_recipient_cc'   => array('participant_email'),
         'email_replyTo'        => array('participant_email'),
         'email_subject'        => array('event_name', 'event_type', 'event_course_id', 'participant_name', 'sac_member_id', 'instructor_name', 'event_link_detail'),
-        'email_text'           => array('event_name', 'event_type', 'event_course_id', 'participant_name', 'participant_email', 'sac_member_id', 'instructor_name', 'instructor_email', 'event_link_detail'),
+        'email_text'           => array('event_name', 'event_type', 'event_course_id', 'state_of_subscription', 'participant_name', 'participant_email', 'sac_member_id', 'instructor_name', 'instructor_email', 'event_link_detail'),
     ),
     // Type
     'notify_on_new_event_story'      => array

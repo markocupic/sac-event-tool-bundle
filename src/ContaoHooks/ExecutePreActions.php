@@ -15,6 +15,7 @@ use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Date;
 use Contao\Input;
 use Contao\MemberModel;
+use Contao\StringUtil;
 
 
 /**
@@ -56,6 +57,9 @@ class ExecutePreActions
                 $json = $objMemberModel->row();
                 $json['dateOfBirth'] = Date::parse(Config::get('dateFormat'), $json['dateOfBirth']);
                 $json['status'] = 'success';
+                // Bin to hex otherwise there will be a json error
+                $json['avatar'] = $json['avatar'] != '' ? StringUtil::binToUuid($json['avatar']) : '';
+                $json['password'] = '';
 
                 $html = '<div>';
                 $html .= '<h1>Mitglied gefunden</h1>';
@@ -63,7 +67,6 @@ class ExecutePreActions
                 $html .= '<button class="tl_button">Ja</button> <button class="tl_button">nein</button>';
                 $json['html'] = $html;
             }
-
 
             // Send it to the browser
             echo html_entity_decode(json_encode($json));

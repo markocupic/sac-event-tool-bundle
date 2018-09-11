@@ -9,6 +9,10 @@
 window.addEvent('domready', function () {
 
     var globalTimeout = null;
+    if (!$$('input[name="sacMemberId"]')[0]) {
+        return;
+    }
+
     $$('input[name="sacMemberId"]')[0].addEvent('keyup', function (event) {
         if (globalTimeout != null) {
             clearTimeout(globalTimeout);
@@ -21,7 +25,7 @@ window.addEvent('domready', function () {
                 new Request.JSON({
                     url: window.location.href,
                     onSuccess: function (json, txt) {
-                        if (json['status'] === 'success' && json['sacMemberId'] === sacMemberId) {
+                        if (json['status'] === 'success' && json['sacMemberId'] == sacMemberId) {
 
                             if ($('acceptAutocompleteBox') !== null) {
                                 $('acceptAutocompleteBox').destroy();
@@ -37,6 +41,7 @@ window.addEvent('domready', function () {
                             acceptAutocomplete.appendHTML(' <p class="autocompleteInfo">In der Datenbank wurde zur Mitgliednummer <strong>' + sacMemberId + '</strong> folgendes Mitglied gefunden:</p>');
                             acceptAutocomplete.appendHTML(' <p class="autocompleteInfo"><strong>' + json['firstname'] + ' ' + json['lastname'] + ', ' + json['street'] + ', ' + json['postal'] + ' ' + json['city'] + '</strong></p>');
                             acceptAutocomplete.appendHTML(' <button id="btnAcceptAutocomplete" class="tl_submit autocomleteBtn">&Uuml;bernehmen</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id="btnRefuseAutocomplete" class="tl_submit autocomleteBtn">Nein</button>');
+
                             // Autofill form inputs
                             $('btnAcceptAutocomplete').addEvent('click', function (event) {
                                 var fields = ['gender', 'firstname', 'lastname', 'street', 'postal', 'city', 'phone', 'email', 'dateOfBirth', 'foodHabits', 'emergencyPhone', 'emergencyPhoneName'];

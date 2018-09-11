@@ -511,7 +511,6 @@ class ModuleSacEventToolMemberDashboard extends Module
     }
 
 
-
     /**
      * Rotate an image clockwise by 90°
      * @param $id
@@ -596,6 +595,12 @@ class ModuleSacEventToolMemberDashboard extends Module
                     System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
                     return;
                 }
+                elseif ($objEventsMember->stateOfSubscription === 'subscription-not-confirmed' || $objEventsMember->stateOfSubscription === 'subscription-waitlisted')
+                {
+                    // allow unregistering if member is not confirmed on the event
+                    // allow unregistering if member is waitlisted on the event
+                    $blnHasError = false;
+                }
                 elseif (!$objEvent->allowDeregistration)
                 {
                     $errorMsg = $objEvent->allowDeregistration . 'Du kannst dich vom Event "' . $objEvent->title . '" nicht abmelden. Die Anmeldung ist definitiv. Nimm Kontakt mit dem Event-Organisator auf.';
@@ -623,18 +628,33 @@ class ModuleSacEventToolMemberDashboard extends Module
                 }
                 elseif ($objInstructor !== null)
                 {
+                    // unregister from event
+                    $blnHasError = false;
+                }
+                else
+                {
+                    $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event "' . $objEvent->title . '" abgemeldet werden. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
+                    $blnHasError = true;
+                }
 
+
+                // Unregister from event
+                if (!$blnHasError)
+                {
+                    // Load language file
+                    Controller::loadLanguageFile('tl_calendar_events_member');
 
                     $arrTokens = array(
-                        'event_course_id'   => $objEvent->courseId,
-                        'event_name'        => $objEvent->title,
-                        'event_type'        => $objEvent->eventType,
-                        'instructor_name'   => $objInstructor->name,
-                        'instructor_email'  => $objInstructor->email,
-                        'participant_name'  => $objEventsMember->firstname . ' ' . $objEventsMember->lastname,
-                        'participant_email' => $objEventsMember->email,
-                        'event_link_detail' => Environment::get('url') . '/' . Events::generateEventUrl($objEvent),
-                        'sac_member_id'     => $objEventsMember->sacMemberId != '' ? $objEventsMember->sacMemberId : 'keine',
+                        'state_of_subscription' => $GLOBALS['TL_LANG']['tl_calendar_events_member'][$objEventsMember->stateOfSubscription],
+                        'event_course_id'       => $objEvent->courseId,
+                        'event_name'            => $objEvent->title,
+                        'event_type'            => $objEvent->eventType,
+                        'instructor_name'       => $objInstructor->name,
+                        'instructor_email'      => $objInstructor->email,
+                        'participant_name'      => $objEventsMember->firstname . ' ' . $objEventsMember->lastname,
+                        'participant_email'     => $objEventsMember->email,
+                        'event_link_detail'     => Environment::get('url') . '/' . Events::generateEventUrl($objEvent),
+                        'sac_member_id'         => $objEventsMember->sacMemberId != '' ? $objEventsMember->sacMemberId : 'keine',
                     );
 
                     if ($objEvent->registrationGoesTo > 0)
@@ -662,12 +682,6 @@ class ModuleSacEventToolMemberDashboard extends Module
 
                     // Delete from tl_calendar_events_member
                     $objEventsMember->delete();
-                    $blnHasError = false;
-                }
-                else
-                {
-                    $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event "' . $objEvent->title . '" abgemeldet werden. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
-                    $blnHasError = true;
                 }
             }
         }
