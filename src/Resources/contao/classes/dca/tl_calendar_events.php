@@ -465,7 +465,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
 
             // Header fields
-            $arrFields = array('id', 'title', 'dates', 'organizers', 'mainInstructor', 'instructors', 'eventType', 'tourType', 'eventReleaseLevel');
+            $arrFields = array('id', 'title', 'dates', 'organizers', 'mainInstructor', 'instructors', 'eventType', 'tourType', 'tourTechDifficulties', 'eventReleaseLevel');
             $csv->insertOne($arrFields);
 
             $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE pid=? ORDER BY startDate ASC')->execute(Input::get('id'));
@@ -478,6 +478,11 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     {
                         $objUser = \Contao\UserModel::findByPk($objEvent->{$field});
                         $arrRow[] = $objUser !== null ? html_entity_decode($objUser->name) : '';
+                    }
+                    elseif ($field === 'tourTechDifficulties')
+                    {
+                        $arrDiff = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent->id, false);
+                        $arrRow[] = implode(' und ', $arrDiff);
                     }
                     elseif ($field === 'dates')
                     {
