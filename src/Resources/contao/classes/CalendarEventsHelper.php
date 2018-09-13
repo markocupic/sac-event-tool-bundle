@@ -198,17 +198,14 @@ class CalendarEventsHelper extends System
                             continue;
                         }
 
-                        $arrName = array();
-                        $arrName[] = $objUser->lastname;
-                        $arrName[] = $objUser->firstname;
-                        $arrName = array_filter($arrName);
+                        $strName = $objUser->name;
                         if ($blnAddMainQualification && static::getMainQualifikation($objUser->id) != '')
                         {
-                            $arrInstructors[] = implode(' ', $arrName) . ' (' . static::getMainQualifikation($objUser->id) . ')';
+                            $arrInstructors[] = $strName . ' (' . static::getMainQualifikation($objUser->id) . ')';
                         }
                         else
                         {
-                            $arrInstructors[] = implode(' ', $arrName);
+                            $arrInstructors[] = $strName;
                         }
                     }
                 }

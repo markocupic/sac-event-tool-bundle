@@ -9,7 +9,6 @@
  */
 
 
-
 $GLOBALS['TL_DCA']['tl_event_organizer'] = array
 (
 
@@ -84,25 +83,25 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
     'palettes'    => array
     (
         '__selector__' => array('addLogo'),
-        'default'      => '{title_legend},title,titlePrint,sorting;{emergency_concept_legend},emergencyConcept;{logo_legend},addLogo',
+        'default'      => '{title_legend},title,titlePrint,sorting;{event_story_legend},notifyWebmasterOnNewEventStory;{emergency_concept_legend},emergencyConcept;{logo_legend},addLogo',
     ),
     // Subpalettes
     'subpalettes' => array
     (
-        'addLogo'                    => 'singleSRC',
+        'addLogo' => 'singleSRC',
     ),
 
-    'fields'      => array
+    'fields' => array
     (
-        'id'               => array
+        'id'                             => array
         (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
         ),
-        'tstamp'           => array
+        'tstamp'                         => array
         (
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ),
-        'title'            => array
+        'title'                          => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['title'],
             'exclude'   => true,
@@ -112,7 +111,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
             'eval'      => array('mandatory' => true, 'maxlength' => 255),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'titlePrint'       => array
+        'titlePrint'                     => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['titlePrint'],
             'exclude'   => true,
@@ -122,7 +121,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
             'eval'      => array('mandatory' => true, 'maxlength' => 255),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'sorting'          => array
+        'sorting'                        => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['sorting'],
             'exclude'   => true,
@@ -132,14 +131,24 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
             'eval'      => array('rgxp' => 'digit', 'mandatory' => true, 'maxlength' => 255),
             'sql'       => "int(10) unsigned NOT NULL default '0'",
         ),
-        'emergencyConcept' => array(
+        'notifyWebmasterOnNewEventStory' => array(
+            'label'      => &$GLOBALS['TL_LANG']['tl_event_organizer']['notifyWebmasterOnNewEventStory'],
+            'exclude'    => true,
+            'filter'     => true,
+            'inputType'  => 'select',
+            'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
+            'foreignKey' => 'tl_user.name',
+            'eval'       => array('multiple' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'),
+            'sql'        => "blob NULL",
+        ),
+        'emergencyConcept'               => array(
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['emergencyConcept'],
             'exclude'   => true,
             'inputType' => 'textarea',
             'eval'      => array('tl_class' => 'clr m12', 'mandatory' => true),
             'sql'       => "text NULL",
         ),
-        'addLogo'          => array
+        'addLogo'                        => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['addLogo'],
             'exclude'   => true,
@@ -147,7 +156,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
             'eval'      => array('submitOnChange' => true),
             'sql'       => "char(1) NOT NULL default ''",
         ),
-        'singleSRC'        => array
+        'singleSRC'                      => array
         (
             'label'         => &$GLOBALS['TL_LANG']['tl_event_organizer']['singleSRC'],
             'exclude'       => true,

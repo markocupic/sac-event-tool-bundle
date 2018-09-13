@@ -17,6 +17,7 @@ use Contao\CalendarEventsStoryModel;
 use Contao\Config;
 use Contao\Database;
 use Contao\Environment;
+use Contao\EventOrganizerModel;
 use Contao\File;
 use Contao\FilesModel;
 use Contao\FrontendUser;
@@ -520,6 +521,35 @@ class FrontendAjax
                     }
                 }
 
+                // Notify webmaster
+                $arrNotifyEmail = array();
+                $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
+                foreach ($arrOrganizers as $orgId)
+                {
+                    $objEventOrganizer = EventOrganizerModel::findByPk($orgId);
+                    if ($objEventOrganizer !== null)
+                    {
+                        $arrUsers = StringUtil::deserialize($objEventOrganizer->notifyWebmasterOnNewEventStory, true);
+                        foreach ($arrUsers as $userId)
+                        {
+                            $objUser = UserModel::findByPk($userId);
+                            if ($objUser !== null)
+                            {
+
+                                if ($objUser->email != '')
+                                {
+                                    if (Validator::isEmail($objUser->email))
+                                    {
+                                        $arrNotifyEmail[] = $objUser->email;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                $webmasterEmail = implode(',', $arrNotifyEmail);
+
+
                 if ($objEvent !== null)
                 {
                     $arrTokens = array(
@@ -527,6 +557,7 @@ class FrontendAjax
                         'event_id'             => $objEvent->id,
                         'instructor_name'      => $instructorName != '' ? $instructorName : 'keine Angabe',
                         'instructor_email'     => $instructorEmail != '' ? $instructorEmail : 'keine Angabe',
+                        'webmaster_email'      => $webmasterEmail != '' ? $webmasterEmail : '',
                         'author_name'          => $objUser->firstname . ' ' . $objUser->lastname,
                         'author_email'         => $objUser->email,
                         'author_sac_member_id' => $objUser->sacMemberId,
