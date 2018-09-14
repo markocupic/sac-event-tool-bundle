@@ -21,6 +21,7 @@ $GLOBALS['TL_LANG']['tl_event_organizer']['title_legend'] = 'Titel Einstellungen
 $GLOBALS['TL_LANG']['tl_event_organizer']['event_story_legend'] = 'Tourenbericht-Einstellungen';
 $GLOBALS['TL_LANG']['tl_event_organizer']['emergency_concept_legend'] = 'Notfallkonzept Einstellungen';
 $GLOBALS['TL_LANG']['tl_event_organizer']['logo_legend'] = 'Logo Einstellungen';
+$GLOBALS['TL_LANG']['tl_event_organizer']['event_regulation_legend'] = 'Kurs- und Tourenreglement Einstellungen für Event-Anmeldungen';
 
 
 // Fields
@@ -31,5 +32,8 @@ $GLOBALS['TL_LANG']['tl_event_organizer']['emergencyConcept'] = array("Notfallko
 $GLOBALS['TL_LANG']['tl_event_organizer']['addLogo'] = array("Logo hinzufügen", "Weisen Sie dem Veranstalter ein Logo zu.");
 $GLOBALS['TL_LANG']['tl_event_organizer']['singleSRC'] = array("Quelldatei", "Bitte wählen Sie eine Datei aus der Dateiübersicht.");
 $GLOBALS['TL_LANG']['tl_event_organizer']['notifyWebmasterOnNewEventStory'] = array("Kontrollperson bei neuen Tourenberichten", "Bitte wählen Sie eine oder mehrere Personen aus der Liste aus.");
-
+$GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationExtract'] = array("Ausschnitt aus dem Tourenreglement", "Bitte schreiben Sie hier die wichtigsten Ausschnitte aus dem Tourenreglement.");
+$GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationExtract'] = array("Ausschnitt aus dem Kursreglement", "Bitte schreiben Sie hier die wichtigsten Ausschnitte aus dem Kursreglement.");
+$GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationSRC'] = array("Tourenreglement Datei", "Bitte wählen Sie die Datei aus.");
+$GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationSRC'] = array("Kursreglement Datei", "Bitte wählen Sie die Datei aus.");
 

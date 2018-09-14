@@ -20,7 +20,9 @@ use Contao\Controller;
 use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
+use Contao\EventOrganizerModel;
 use Contao\Events;
+use Contao\FilesModel;
 use Contao\FrontendUser;
 use Contao\Input;
 use Contao\MemberModel;
@@ -29,6 +31,7 @@ use Contao\Module;
 use Contao\PageModel;
 use Contao\System;
 use Contao\UserModel;
+use Contao\StringUtil;
 use Contao\Validator;
 use Haste\Form\Form;
 use NotificationCenter\Model\Notification;
@@ -140,6 +143,9 @@ class ModuleSacEventToolEventRegistrationForm extends Module
 
         $this->Template->objUser = $this->objUser;
         $this->Template->objEvent = $this->objEvent;
+
+        // Set other template vars
+        $this->setTemplateVars();
 
         // Show errors after form submit @see $this->generateForm()
         $this->Template->hasBookingError = false;
@@ -329,7 +335,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         }
 
         $objForm->addFormField('agb', array(
-            'label'     => array('', 'Ich akzeptiere die <a href="#" data-toggle="modal" data-target="#agbModal">allg. Gesch&auml;ftsbedingungen.</a>'),
+            'label'     => array('', 'Ich akzeptiere <a href="#" data-toggle="modal" data-target="#agbModal">das Kurs- und Tourenreglement.</a>'),
             'inputType' => 'checkbox',
             'eval'      => array('mandatory' => true),
         ));
@@ -532,6 +538,58 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             return true;
 
         }
+    }
+
+    /**
+     *
+     */
+    private function setTemplateVars()
+    {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+
+        if ($this->objEvent->eventType === 'tour' || $this->objEvent->eventType === 'last-minute-tour' || $this->objEvent->eventType === 'course')
+        {
+
+            $objEvent = $this->objEvent;
+            $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
+            if (isset($arrOrganizers[0]))
+            {
+                $objOrganizer = EventOrganizerModel::findByPk($arrOrganizers[0]);
+                if ($objOrganizer !== null)
+                {
+                    $prefix = '';
+                    if ($this->objEvent->eventType === 'tour' || $this->objEvent->eventType === 'last-minute-tour')
+                    {
+                        $prefix = 'tour';
+                    }
+                    if ($this->objEvent->eventType === 'course')
+                    {
+                        $prefix = 'course';
+                    }
+
+                    if ($prefix !== '')
+                    {
+
+                        if ($objOrganizer->{$prefix . 'RegulationSRC'} !== '')
+                        {
+                            if (Validator::isBinaryUuid($objOrganizer->{$prefix . 'RegulationSRC'}))
+                            {
+                                $objFile = FilesModel::findByUuid($objOrganizer->{$prefix . 'RegulationSRC'});
+                                if ($objFile !== null && is_file($rootDir . '/' . $objFile->path))
+                                {
+                                    $this->Template->objEventRegulationFile = $objFile;
+                                }
+                            }
+                        }
+                        if ($objOrganizer->{$prefix . 'RegulationExtract'} !== '')
+                        {
+                            $this->Template->eventRegulationExtract = $objOrganizer->{$prefix . 'RegulationExtract'};
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
 
