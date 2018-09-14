@@ -3,110 +3,118 @@
 <?php $this->block('content'); ?>
 
 
-  <!-- indexer::stop -->
-  <p class="back"><a href="{{env::referer}}" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
-  <!-- indexer::continue -->
+<!-- indexer::stop -->
+<p class="back"><a href="{{env::referer}}" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
+<!-- indexer::continue -->
 
-  <div class="row">
+<div class="row">
     <div class="image_container portrait col-sm-4 col-lg-3">
-      {{image::<?= getAvatar($this->user['id'], 'BE') ?>?mode=crop&width=160&height=200}}
+        {{image::<?= getAvatar($this->user['id'], 'BE') ?>?mode=crop&width=160&height=200}}
     </div>
 
     <div class="col-sm-8 col-lg-9">
-      <h5 class="ce_headline"><?= $this->user['name'] ?></h5>
-      <div class="ce_user_portrait_qualification">
-          <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($this->user['id']) ?>
-      </div>
-    <?php if (FE_USER_LOGGED_IN): ?>
-      <div class="ce_user_portrait_street">
-          <?= $this->user['street'] ?>
-      </div>
+        <h5 class="ce_headline"><?= $this->user['name'] ?></h5>
+        <div class="ce_user_portrait_qualification">
+            <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($this->user['id']) ?>
+        </div>
+        <?php if (FE_USER_LOGGED_IN): ?>
+        <div class="ce_user_portrait_street">
+            <?= $this->user['street'] ?>
+        </div>
 
-      <div class="ce_user_portrait_city">
-          <?= $this->user['postal'] ?> <?= $this->user['city'] ?>
-      </div>
-      <!-- Show personal data to logged users only -->
-      <div class="ce_user_portrait_phone">
-          <?= $this->user['phone'] ?>
-      </div>
+        <div class="ce_user_portrait_city">
+            <?= $this->user['postal'] ?> <?= $this->user['city'] ?>
+        </div>
+        <!-- Show personal data to logged users only -->
+        <?php if($this->user['phone'] !== ''): ?>
+        <div class="ce_user_portrait_phone">
+            <?= $this->user['phone'] ?>
+        </div>
+        <?php endif; ?>
 
-      <div class="ce_user_portrait_email">
-        {{email::<?= $this->user['email'] ?>}}
-      </div>
+        <?php if($this->user['mobile'] !== ''): ?>
+        <div class="ce_user_portrait_mobile">
+            <?= $this->user['mobile'] ?>
+        </div>
+        <?php endif; ?>
 
-      <?php if ($this->user['hobbies'] != ''): ?>
-      <div class="ce_user_portrait_hobbies">
-        <h5 class="ce_headline">Hobbys</h5>
-          <?= nl2br($this->user['hobbies']) ?>
-      </div>
-      <?php endif; ?>
+        <div class="ce_user_portrait_email">
+            {{email::<?= $this->user['email'] ?>}}
+        </div>
 
-      <?php if ($this->user['introducing'] != ''): ?>
-      <h5 class="ce_headline">Selbstportrait</h5>
-      <div class="ce_user_portrait_introducing">
-          <?= nl2br($this->user['introducing']) ?>
-      </div>
-      <?php endif; ?>
-    <?php endif; ?>
+        <?php if ($this->user['hobbies'] != ''): ?>
+        <div class="ce_user_portrait_hobbies">
+            <h5 class="ce_headline">Hobbys</h5>
+            <?= nl2br($this->user['hobbies']) ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($this->user['introducing'] != ''): ?>
+        <h5 class="ce_headline">Selbstportrait</h5>
+        <div class="ce_user_portrait_introducing">
+            <?= nl2br($this->user['introducing']) ?>
+        </div>
+        <?php endif; ?>
+        <?php endif; ?>
 
     </div>
-  </div>
-  <br>
-  <br>
+</div>
+<br>
+<br>
 <?php $arrEvents = $this->events; ?>
 <?php if (!empty($arrEvents['tour']) && is_array($arrEvents['tour'])): ?>
-  <h2 class="ce_headline">Die n&auml;chsten Touren mit <?= $this->user['name'] ?></h2>
-  <table class="table">
+<h2 class="ce_headline">Die n&auml;chsten Touren mit <?= $this->user['name'] ?></h2>
+<table class="table">
     <tr>
-      <th>Datum</th>
-      <th>Dauer</th>
-      <th>Tour</th>
-      <th></th>
-      <th>Anf.</th>
-      <th>Art</th>
-      <th>Leitung</th>
+        <th>Datum</th>
+        <th>Dauer</th>
+        <th>Tour</th>
+        <th></th>
+        <th>Anf.</th>
+        <th>Art</th>
+        <th>Leitung</th>
     </tr>
-      <?php foreach ($arrEvents['tour'] as $event): ?>
-          <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($event['id']); ?>
-          <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][$eventState]; ?>
-          <?php $arrTourTypes = \StringUtil::deserialize($event['tourType'], true); ?>
-        <tr class="event-item-tour event" data-id="<?= $event['id'] ?>" data-tourType="<?= implode(',', $arrTourTypes) ?>">
-          <td><?= \Date::parse('d.m.Y', $event['startDate']) ?></td>
-          <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventDuration($event['id']) ?></td>
-          <td>
+    <?php foreach ($arrEvents['tour'] as $event): ?>
+    <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($event['id']); ?>
+    <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][$eventState]; ?>
+    <?php $arrTourTypes = \StringUtil::deserialize($event['tourType'], true); ?>
+    <tr class="event-item-tour event" data-id="<?= $event['id'] ?>" data-tourType="<?= implode(',', $arrTourTypes) ?>">
+        <td><?= \Date::parse('d.m.Y', $event['startDate']) ?></td>
+        <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventDuration($event['id']) ?></td>
+        <td>
             <i class="fa-fw event-state-icon <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
             <a href="{{event_url::<?php echo $event['id']; ?>}}">{{event_title::<?= $event['id'] ?>}}</a>
-          </td>
-          <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($event['id']) ?></td>
-          <td class="tourTechDifficulty"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($event['id'], true)) ?></td>
-          <td class="tourType"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($event['id'], 'shortcut', true)) ?></td>
-            <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($event['id'], false, true); ?>
-          <td><?= implode(', ', $arrInstructors) ?></td>
-        </tr>
-      <?php endforeach; ?>
-  </table>
+        </td>
+        <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($event['id']) ?></td>
+        <td class="tourTechDifficulty"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($event['id'], true)) ?></td>
+        <td class="tourType"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($event['id'], 'shortcut', true)) ?></td>
+        <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($event['id'], false, true); ?>
+        <td><?= implode(', ', $arrInstructors) ?></td>
+    </tr>
+    <?php endforeach; ?>
+</table>
 <?php endif; ?>
 
 <?php if (!empty($arrEvents['course']) && is_array($arrEvents['course'])): ?>
-  <h2 class="ce_headline">Die n&auml;chsten Kurse mit <?= $this->user['name'] ?></h2>
-  <table class="table">
-      <?php foreach ($arrEvents['course'] as $event): ?>
-        <tr class="event-item event-item-course event" data-id="<?= $event['id'] ?>" data-event-type="<?= $event['courseTypeLevel1'] ?>">
-          <td><?= \Date::parse('d.m.Y', $event['startDate']) ?></td>
-          <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventDuration($event['id']) ?></td>
-          <td>
-              <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($event['id']); ?>
-              <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($event['id'])]; ?>
+<h2 class="ce_headline">Die n&auml;chsten Kurse mit <?= $this->user['name'] ?></h2>
+<table class="table">
+    <?php foreach ($arrEvents['course'] as $event): ?>
+    <tr class="event-item event-item-course event" data-id="<?= $event['id'] ?>" data-event-type="<?= $event['courseTypeLevel1'] ?>">
+        <td><?= \Date::parse('d.m.Y', $event['startDate']) ?></td>
+        <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventDuration($event['id']) ?></td>
+        <td>
+            <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($event['id']); ?>
+            <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($event['id'])]; ?>
             <i class="event-state-icon fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" data-toggle="tooltip" data-placement="top" title="<?= $eventStateLabel ?>"></i></td>
-          <td>
+        <td>
             <a href="{{event_url::<?php echo $event['id']; ?>}}">{{event_title::<?= $event['id'] ?>}}</a>
-          </td>
-          <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($event['id']) ?></td>
-            <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($event['id'], false, true); ?>
-          <td><?= implode(', ', $arrInstructors) ?></td>
-        </tr>
-      <?php endforeach; ?>
-  </table>
+        </td>
+        <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($event['id']) ?></td>
+        <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($event['id'], false, true); ?>
+        <td><?= implode(', ', $arrInstructors) ?></td>
+    </tr>
+    <?php endforeach; ?>
+</table>
 <?php endif; ?>
 
 <?php $this->endblock(); ?>

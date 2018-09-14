@@ -83,6 +83,16 @@
                                 <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
                                     <?= \UserModel::findByPk($userId)->lastname . ' ' . \UserModel::findByPk($userId)->firstname . $strQuali ?>
                                 </a>
+                                <?php if(FE_USER_LOGGED_IN && $this->disableOnlineRegistration): ?>
+                                    <?php $arrContact = ['phone', 'mobile', 'email']; ?>
+                                    <?php foreach($arrContact as $field): ?>
+                                        <?php if(\UserModel::findByPk($userId)->{$field} !== ''): ?>
+                                            <div class="ce_user_portrait_<?= $field ?>">
+                                                <small title="<?= \UserModel::findByPk($userId)->{$field} ?>"><?= \UserModel::findByPk($userId)->{$field} ?></small>
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </div>
                             <?php endif; ?>
                         </div>
