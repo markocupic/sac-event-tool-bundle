@@ -55,6 +55,11 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     /**
      * @var
      */
+    protected $eventReleaseLevel;
+
+    /**
+     * @var
+     */
     protected $dateFormat = 'j.';
 
     /**
@@ -177,6 +182,13 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             'eval'      => array('mandatory' => true),
         ));
 
+        $objForm->addFormField('eventReleaseLevel', array(
+            'label'     => 'Zeige an ab Freigabestufe (Wenn leer gelassen, wird ab 2. höchster FS gelistet!)',
+            'inputType' => 'select',
+            'options'   => array(1 => 'FS1', 2 => 'FS2', 3 => 'FS3', 4 => 'FS4'),
+            'eval'      => array('mandatory' => false, 'includeBlankOption' => true),
+        ));
+
 
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
@@ -192,6 +204,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 $arrRange = explode('|', Input::post('timeRange'));
                 $this->startDate = strtotime($arrRange[0]);
                 $this->endDate = strtotime($arrRange[1]);
+                $this->eventReleaseLevel = Input::post('eventReleaseLevel') > 0 ? Input::post('eventReleaseLevel') : null;
                 $this->generateAllEventsTable();
                 $this->generateCourses();
                 $this->generateTours();
@@ -214,15 +227,15 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         while ($objEvent->next())
         {
             // Check if event has allowed type
-            $arrAllowedEventTypes = StringUtil::deserialize($this->print_export_allowedEventTypes,true);
-            if(!in_array($objEvent->eventType, $arrAllowedEventTypes))
+            $arrAllowedEventTypes = StringUtil::deserialize($this->print_export_allowedEventTypes, true);
+            if (!in_array($objEvent->eventType, $arrAllowedEventTypes))
             {
                 continue;
             }
 
             // Check if event is at least on second highest level (Level 3/4)
             $eventModel = CalendarEventsModel::findByPk($objEvent->id);
-            if(!$this->hasValidReleaseLevel($eventModel))
+            if (!$this->hasValidReleaseLevel($eventModel, $this->eventReleaseLevel))
             {
                 continue;
             }
@@ -362,15 +375,15 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         while ($objEvent->next())
         {
             // Check if event has allowed type
-            $arrAllowedEventTypes = StringUtil::deserialize($this->print_export_allowedEventTypes,true);
-            if(!in_array($objEvent->eventType, $arrAllowedEventTypes))
+            $arrAllowedEventTypes = StringUtil::deserialize($this->print_export_allowedEventTypes, true);
+            if (!in_array($objEvent->eventType, $arrAllowedEventTypes))
             {
                 continue;
             }
 
             // Check if event is at least on second highest level (Level 3/4)
             $eventModel = CalendarEventsModel::findByPk($objEvent->id);
-            if(!$this->hasValidReleaseLevel($eventModel))
+            if (!$this->hasValidReleaseLevel($eventModel, $this->eventReleaseLevel))
             {
                 continue;
             }
@@ -461,7 +474,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     function generateTours()
     {
         $objDatabase = Database::getInstance();
-        $arrOrganizerContainer= array();
+        $arrOrganizerContainer = array();
 
         $objOrganizer = Database::getInstance()->prepare('SELECT * FROM tl_event_organizer ORDER BY sorting')->execute();
         while ($objOrganizer->next())
@@ -477,15 +490,15 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 }
 
                 // Check if event has allowed type
-                $arrAllowedEventTypes = StringUtil::deserialize($this->print_export_allowedEventTypes,true);
-                if(!in_array($objEvent->eventType, $arrAllowedEventTypes))
+                $arrAllowedEventTypes = StringUtil::deserialize($this->print_export_allowedEventTypes, true);
+                if (!in_array($objEvent->eventType, $arrAllowedEventTypes))
                 {
                     continue;
                 }
 
                 // Check if event is at least on second highest level (Level 3/4)
                 $eventModel = CalendarEventsModel::findByPk($objEvent->id);
-                if(!$this->hasValidReleaseLevel($eventModel))
+                if (!$this->hasValidReleaseLevel($eventModel, $this->eventReleaseLevel))
                 {
                     continue;
                 }
@@ -514,11 +527,11 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             }
 
             $arrOrganizerContainer[] = array(
-                'id' => $objOrganizer->id,
-                'title' => $objOrganizer->title,
-                'events' => $arrOrganizerEvents,
+                'id'          => $objOrganizer->id,
+                'title'       => $objOrganizer->title,
+                'events'      => $arrOrganizerEvents,
                 'feEditables' => $arrFeEditables
-                );
+            );
 
         }
 

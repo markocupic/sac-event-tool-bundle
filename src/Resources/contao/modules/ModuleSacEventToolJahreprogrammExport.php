@@ -66,6 +66,11 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
     protected $eventType;
 
     /**
+     * @var
+     */
+    protected $eventReleaseLevel;
+
+    /**
      * @var null
      */
     protected $events = null;
@@ -173,6 +178,13 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
             'eval'      => array('rgxp' => 'date', 'mandatory' => true),
         ));
 
+        $objForm->addFormField('eventReleaseLevel', array(
+            'label'     => 'Zeige an ab Freigabestufe (Wenn leer gelassen, wird ab 2. höchster FS gelistet!)',
+            'inputType' => 'select',
+            'options'   => array(1 => 'FS1', 2 => 'FS2', 3 => 'FS3', 4 => 'FS4'),
+            'eval'      => array('mandatory' => false, 'includeBlankOption' => true),
+        ));
+
 
         $arrUserRoles = array();
         $objUserRoles = Database::getInstance()->prepare('SELECT * FROM tl_user_role ORDER BY title')->execute();
@@ -204,6 +216,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
                 $this->endDate = strtotime(Input::post('endDate'));
                 $this->eventType = Input::post('eventType');
                 $this->organizer = Input::post('organizer') > 0 ? Input::post('organizer') : null;
+                $this->eventReleaseLevel = Input::post('eventReleaseLevel') > 0 ? Input::post('eventReleaseLevel') : null;
 
                 // Get events and instructors (fill $this->events and $this->instructors)
                 $this->getEventsAndInstructors();
@@ -237,7 +250,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
 
             // Check if event is at least on second highest level (Level 3/4)
             $eventModel = CalendarEventsModel::findByPk($objEvents->id);
-            if (!$this->hasValidReleaseLevel($eventModel))
+            if (!$this->hasValidReleaseLevel($eventModel, $this->eventReleaseLevel))
             {
                 continue;
             }

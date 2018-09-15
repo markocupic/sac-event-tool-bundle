@@ -26,7 +26,7 @@ abstract class ModuleSacEventToolPrintExport extends Module
      * @param $objEvent
      * @return bool
      */
-    public function hasValidReleaseLevel($objEvent)
+    public function hasValidReleaseLevel($objEvent, $minLevel = null)
     {
         if ($objEvent->published)
         {
@@ -35,19 +35,31 @@ abstract class ModuleSacEventToolPrintExport extends Module
 
         if ($objEvent !== null)
         {
+
             if ($objEvent->eventReleaseLevel > 0)
             {
                 $objEventReleaseLevel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
                 if ($objEventReleaseLevel !== null)
                 {
-                    $nextLevelModel = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
-                    $lastLevelModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
-                    if ($nextLevelModel !== null && $lastLevelModel !== null)
+                    if ($minLevel === null)
                     {
-                        if ($nextLevelModel->id === $lastLevelModel->id)
+
+                        $nextLevelModel = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
+                        $lastLevelModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
+                        if ($nextLevelModel !== null && $lastLevelModel !== null)
                         {
-                            return true;
+                            if ($nextLevelModel->id === $lastLevelModel->id)
+                            {
+                                return true;
+                            }
                         }
+                    }
+                    else
+                    {
+                       if($objEventReleaseLevel->level >= $minLevel)
+                       {
+                           return true;
+                       }
                     }
                 }
             }
