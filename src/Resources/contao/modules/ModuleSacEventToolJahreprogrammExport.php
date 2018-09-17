@@ -319,11 +319,11 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
 
             $arrInstructors = array_unique($arrInstructors);
             $aInstructors = array();
-            $objUser = Database::getInstance()->execute('SELECT * FROM tl_user WHERE id IN (' . implode(',', array_map('\intval', $arrInstructors)) . ') ORDER BY name');
+            $objUser = Database::getInstance()->execute('SELECT * FROM tl_user WHERE id IN (' . implode(',', array_map('\intval', $arrInstructors)) . ') ORDER BY lastname, firstname');
             while ($objUser->next())
             {
                 $arrLeft = array();
-                $arrLeft[] = $objUser->name;
+                $arrLeft[] = trim($objUser->lastname . ' ' . $objUser->firstname);
                 $arrLeft[] = $objUser->street;
                 $arrLeft[] = trim($objUser->postal . ' ' . $objUser->city);
                 $arrLeft = array_filter($arrLeft);
@@ -420,7 +420,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
             {
                 $userRole = $objUserRoles->id;
                 $arrUsers = array();
-                $objUser = Database::getInstance()->execute('SELECT * FROM tl_user ORDER BY name');
+                $objUser = Database::getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
                 while ($objUser->next())
                 {
                     $userRoles = StringUtil::deserialize($objUser->userRole, true);
@@ -428,7 +428,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
                     {
 
                         $arrLeft = array();
-                        $arrLeft[] = $objUser->name;
+                        $arrLeft[] = trim($objUser->lastname . ' ' . $objUser->firstname);
                         $arrLeft[] = $objUser->street;
                         $arrLeft[] = trim($objUser->postal . ' ' . $objUser->city);
                         $arrLeft = array_filter($arrLeft);

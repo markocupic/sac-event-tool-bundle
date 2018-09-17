@@ -198,7 +198,7 @@ class CalendarEventsHelper extends System
                             continue;
                         }
 
-                        $strName = $objUser->name;
+                        $strName = trim($objUser->lastname . ' ' . $objUser->firstname);
                         if ($blnAddMainQualification && static::getMainQualifikation($objUser->id) != '')
                         {
                             $arrInstructors[] = $strName . ' (' . static::getMainQualifikation($objUser->id) . ')';

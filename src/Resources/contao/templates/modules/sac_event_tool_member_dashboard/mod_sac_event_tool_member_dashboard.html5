@@ -218,6 +218,14 @@
               {{br}}{{br}}
             </div>
 
+            <div class="col-12">
+              <h3>Abonnierte Newsletter</h3>
+              <div class="alert bg-light">
+                <?= \Contao\Controller::replaceInsertTags('{{insert_module::367}}') ?>
+              </div>
+                {{br}}{{br}}
+            </div>
+
           </div>
           <hr>
           {{br}}
