@@ -78,6 +78,11 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     protected $tours = null;
 
     /**
+     * @var null
+     */
+    protected $generalEvents = null;
+
+    /**
      * Display a wildcard in the back end
      *
      * @return string
@@ -141,8 +146,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $this->Template->allEventsTable = $this->allEventsTable;
         $this->Template->courses = $this->courses;
         $this->Template->tours = $this->tours;
-
-
+        $this->Template->generalEvents = $this->generalEvents;
     }
 
 
@@ -207,7 +211,8 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 $this->eventReleaseLevel = Input::post('eventReleaseLevel') > 0 ? Input::post('eventReleaseLevel') : null;
                 $this->generateAllEventsTable();
                 $this->generateCourses();
-                $this->generateTours();
+                $this->generateEvents('tour');
+                $this->generateEvents('generalEvent');
             }
         }
 
@@ -364,7 +369,8 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     }
 
     /**
-     *
+     * Generate courses
+     * @throws \Exception
      */
     protected function generateCourses()
     {
@@ -418,60 +424,11 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     }
 
     /**
-     * Helper method
-     * @param $objEvent
-     * @return mixed
+     * Generate tours and generalEvents
+     * @param $type
      * @throws \Exception
      */
-    private function getEventDetails($objEvent)
-    {
-        $arrRow = $objEvent->row();
-        $arrRow['eventState'] = $objEvent->eventState != '' ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
-        $arrRow['week'] = Date::parse('W', $objEvent->startDate);
-        $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);
-        $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
-        $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false));
-        $arrRow['organizers'] = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'title'));
-        $arrRow['tourProfile'] = implode('<br>', CalendarEventsHelper::getTourProfileAsArray($objEvent->id));
-        $arrRow['journey'] = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : '';
-
-
-        // Textareas
-        $arrTextareas = array('teaser', 'terms', 'issues', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous',);
-        foreach ($arrTextareas as $field)
-        {
-
-            $arrRow[$field] = nl2br($objEvent->{$field});
-            $arrRow[$field] = $this->searchAndReplace($arrRow[$field]);
-            $arrFeEditables[] = $field;
-        }
-
-
-        if ($objEvent->setRegistrationPeriod)
-        {
-            $arrRow['registrationPeriod'] = Date::parse('j.m.Y', $objEvent->registrationStartDate) . ' bis ' . Date::parse('j.m.Y', $objEvent->registrationEndDate);
-        }
-
-        // MinMaxMembers
-        $arrMinMaxMembers = array();
-        if ($objEvent->addMinAndMaxMembers && $objEvent->minMembers > 0)
-        {
-            $arrMinMaxMembers[] = 'min. ' . $objEvent->minMembers;
-        }
-        if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0)
-        {
-            $arrMinMaxMembers[] = 'max. ' . $objEvent->maxMembers;
-        }
-        $arrRow['minMaxMembers'] = implode('/', $arrMinMaxMembers);
-
-
-        return $arrRow;
-    }
-
-    /**
-     * @throws \Exception
-     */
-    function generateTours()
+    function generateEvents($type)
     {
         $objDatabase = Database::getInstance();
         $arrOrganizerContainer = array();
@@ -480,7 +437,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         while ($objOrganizer->next())
         {
             $arrOrganizerEvents = array();
-            $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE (eventType=? OR eventType=?) AND startDate>=? AND endDate<=? ORDER BY startDate ASC')->execute('tour', 'generalEvent', $this->startDate, $this->endDate);
+            $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE (eventType=?) AND startDate>=? AND endDate<=? ORDER BY startDate ASC')->execute($type, $this->startDate, $this->endDate);
             while ($objEvent->next())
             {
                 $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
@@ -535,8 +492,58 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
 
         }
 
-        $this->tours = $arrOrganizerContainer;
+        $this->{$type . 's'} = $arrOrganizerContainer;
     }
 
+    /**
+     * Helper method
+     * @param $objEvent
+     * @return mixed
+     * @throws \Exception
+     */
+    private function getEventDetails($objEvent)
+    {
+        $arrRow = $objEvent->row();
+        $arrRow['eventState'] = $objEvent->eventState != '' ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
+        $arrRow['week'] = Date::parse('W', $objEvent->startDate);
+        $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);
+        $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
+        $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false));
+        $arrRow['organizers'] = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'title'));
+        $arrRow['tourProfile'] = implode('<br>', CalendarEventsHelper::getTourProfileAsArray($objEvent->id));
+        $arrRow['journey'] = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : '';
+
+
+        // Textareas
+        $arrTextareas = array('teaser', 'terms', 'issues', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous',);
+        foreach ($arrTextareas as $field)
+        {
+
+            $arrRow[$field] = nl2br($objEvent->{$field});
+            $arrRow[$field] = $this->searchAndReplace($arrRow[$field]);
+            $arrFeEditables[] = $field;
+        }
+
+
+        if ($objEvent->setRegistrationPeriod)
+        {
+            $arrRow['registrationPeriod'] = Date::parse('j.m.Y', $objEvent->registrationStartDate) . ' bis ' . Date::parse('j.m.Y', $objEvent->registrationEndDate);
+        }
+
+        // MinMaxMembers
+        $arrMinMaxMembers = array();
+        if ($objEvent->addMinAndMaxMembers && $objEvent->minMembers > 0)
+        {
+            $arrMinMaxMembers[] = 'min. ' . $objEvent->minMembers;
+        }
+        if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0)
+        {
+            $arrMinMaxMembers[] = 'max. ' . $objEvent->maxMembers;
+        }
+        $arrRow['minMaxMembers'] = implode('/', $arrMinMaxMembers);
+
+
+        return $arrRow;
+    }
 
 }
