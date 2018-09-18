@@ -9,7 +9,8 @@
     </div>
     <div class="col-7 col-sm-7 col-md-7 col-xl-6 ">
       <small>
-        <strong><?php if ($this->name != ''): ?><?= $this->name ?>{{br}}<?php endif; ?></strong>
+        <strong><?= trim($this->lastname . ' ' . $this->firstname) ?></strong>
+        {{br}}
           <?php if (FE_USER_LOGGED_IN): ?>
             <!-- Show personal data to logged users only -->
             <?php if ($this->street != ''): ?><?= $this->street ?>{{br}}<?php endif; ?>
