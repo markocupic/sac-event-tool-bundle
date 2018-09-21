@@ -15,8 +15,13 @@
         </div>
       <?php endif; ?>
 
-      <?php if (!FE_USER_LOGGED_IN): ?>
-        <a href="{{link_url::member-login}}" class="trigger-login-modal btn btn-link">LOGIN</a>
+      <?php if (!FE_USER_LOGGED_IN && $this->showLoginForm): ?>
+        <!-- Login form -->
+        <?php if ($this->objEvent->eventType === 'course'): ?>
+            {{insert_module::369}}
+        <?php else: ?>
+            {{insert_module::368}}
+        <?php endif; ?>
       <?php endif; ?>
 
 

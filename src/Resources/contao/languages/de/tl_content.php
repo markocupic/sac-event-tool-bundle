@@ -21,6 +21,7 @@ $GLOBALS['TL_LANG']['tl_content']['userList_selectMode'] = array('Auswahltyp', '
 $GLOBALS['TL_LANG']['tl_content']['userList_users'] = array('Anzuzeigende Benutzer', 'W&auml;hlen Sie einen oder mehrere Benutzer aus, die angezeigt werden, aus.');
 $GLOBALS['TL_LANG']['tl_content']['userList_userRoles'] = array('Benutzer abh&auml;ngig nach ihrer Rolle ausw&auml;hlen', 'W&auml;hlen Sie eine oder mehrere Rollen aus.');
 $GLOBALS['TL_LANG']['tl_content']['userList_queryType'] = array('Abfragetyp (UND/ODER)', 'W&auml;hlen Sie einen Abfragetyp aus.');
+$GLOBALS['TL_LANG']['tl_content']['userList_showFieldsToGuests'] = array('Zeige Felder unangemeldeten Gästen', 'Zeige diese Felder unangemeldeten Gästen');
 $GLOBALS['TL_LANG']['tl_content']['imgSize'] = array('Bildgr&ouml;sse', 'W&auml;hlen Sie eine Bildgr&ouml;sse aus.');
 $GLOBALS['TL_LANG']['tl_content']['jumpTo'] = array('Weiterleitungsseite', 'W&auml;hlen Sie eine Weiterleitungsseite aus.');
 

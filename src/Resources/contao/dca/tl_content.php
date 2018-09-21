@@ -22,7 +22,7 @@ $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array('tl_cont
 
 
 // Palettes
-$GLOBALS['TL_DCA']['tl_content']['palettes']['userPortraitList'] = 'name,type,headline;{config_legend},userList_selectMode,userList_users,userList_userRoles,userList_queryType;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{template_legend},userList_template,userList_partial_template;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes']['userPortraitList'] = 'name,type,headline,userList_showFieldsToGuests;{config_legend},userList_selectMode,userList_users,userList_userRoles,userList_queryType;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{template_legend},userList_template,userList_partial_template;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['userPortrait'] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['cabanneSacList'] = '{type_legend},type,headline,cabanneSac;{image_legend},singleSRC,size,imagemargin,fullsize,overwriteMeta;{link_legend},jumpTo;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['cabanneSacDetail'] = '{type_legend},type,headline,cabanneSac;{image_legend},singleSRC,size,imagemargin,fullsize,overwriteMeta;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
@@ -85,6 +85,17 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_userRoles'] = array
     'filter'           => true,
     'inputType'        => 'select',
     'options_callback' => array('tl_content_sac_event_tool', 'optionsCallbackUserRoles'),
+    'eval'             => array('multiple' => true, 'chosen' => true, 'tl_class' => 'clr'),
+    'sql'              => "blob NULL",
+);
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['userList_showFieldsToGuests'] = array
+(
+    'label'            => &$GLOBALS['TL_LANG']['tl_content']['userList_showFieldsToGuests'],
+    'exclude'          => true,
+    'filter'           => true,
+    'inputType'        => 'select',
+    'options' => array('email','phone','mobile','street', 'postal', 'city'),
     'eval'             => array('multiple' => true, 'chosen' => true, 'tl_class' => 'clr'),
     'sql'              => "blob NULL",
 );

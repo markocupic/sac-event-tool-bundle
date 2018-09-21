@@ -50,13 +50,13 @@ class ContentUserPortraitList extends ContentElement
 
 
         // Get template
-        if($this->userList_template != '')
+        if ($this->userList_template != '')
         {
             $this->strTemplate = $this->userList_template;
         }
 
         // Get partial template
-        if($this->userList_partial_template != '')
+        if ($this->userList_partial_template != '')
         {
             $this->strTemplatePartial = $this->userList_partial_template;
         }
@@ -71,8 +71,6 @@ class ContentUserPortraitList extends ContentElement
         }
 
 
-
-
         return parent::generate();
     }
 
@@ -82,7 +80,6 @@ class ContentUserPortraitList extends ContentElement
      */
     protected function compile()
     {
-
         $arrIDS = array();
         if ($this->userList_selectMode === 'selectUserRoles')
         {
@@ -147,6 +144,8 @@ class ContentUserPortraitList extends ContentElement
                 $objTemplate = new FrontendTemplate($this->strTemplatePartial);
                 $objTemplate->setData($objUser->row());
                 $objTemplate->jumpTo = $this->jumpTo;
+                $objTemplate->showFieldsToGuests = StringUtil::deserialize($this->userList_showFieldsToGuests, true);
+
 
                 // Get users avatar
                 $strAvatarSRC = getAvatar($objUser->id);
