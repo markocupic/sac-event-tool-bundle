@@ -25,6 +25,12 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolEventToolJahresprogrammExp
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolActivateMemberAccount'] = '{title_legend},name,headline,type;{account_legend},reg_groups;cc{notification_legend},activateMemberAccountNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCsvExport'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
+
+// Manipulate palettes
+Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+    ->addField(array('jumpToWhenNotActivated'), 'redirect_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
+    ->applyToPalette('login', 'tl_module');
+
 // Fields
 $GLOBALS['TL_DCA']['tl_module']['fields']['unregisterFromEventNotificationId'] = array(
     'label'      => &$GLOBALS['TL_LANG']['tl_module']['unregisterFromEventNotificationId'],
@@ -116,7 +122,17 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = ar
     'inputType' => 'select',
     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
     'eval'      => array('mandatory' => false, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'),
-    'sql'       => "blob NULL",
+    'sql'       => "blob NULL"
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['jumpToWhenNotActivated'] = array(
+    'label'      => &$GLOBALS['TL_LANG']['tl_module']['jumpToWhenNotActivated'],
+    'exclude'    => true,
+    'inputType'  => 'pageTree',
+    'foreignKey' => 'tl_page.title',
+    'eval'       => array('fieldType' => 'radio'),
+    'sql'        => "int(10) unsigned NOT NULL default '0'",
+    'relation'   => array('type' => 'hasOne', 'load' => 'eager')
 );
 
 

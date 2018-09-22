@@ -10,6 +10,7 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
+use Contao\Config;
 
 /**
  * Class ReplaceInsertTags
@@ -36,7 +37,7 @@ class ReplaceInsertTags
                 $label = $href;
                 if (isset($elements[2]) && $elements[2] != '')
                 {
-                    if(trim($elements) != '')
+                    if (trim($elements) != '')
                     {
                         $label = $elements[2];
                     }
@@ -44,6 +45,13 @@ class ReplaceInsertTags
                 return sprintf('<a href="%s" target="_blank">%s</a>', $href, $label);
             }
         }
+
+        // privacy policy
+        if (strpos($strTag, 'SAC_PRIVACY_POLICY') !== false)
+        {
+            return Config::get('SAC_PRIVACY_POLICY');
+        }
+
 
         return false;
     }

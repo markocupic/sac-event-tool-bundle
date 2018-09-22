@@ -210,7 +210,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             'eval'      => array('rgxp' => 'date', 'datepicker' => true),
         ));
         $objForm->addFormField('agb', array(
-            'label'     => array('', 'Ich akzeptiere die <a href="#" data-toggle="modal" data-target="#agbModal">allg. Gesch&auml;ftsbedingungen.</a>'),
+            'label'     => array('', 'Ich akzeptiere die <a href="#" data-toggle="modal" data-target="#agbModal">allg. Datenschutzrichtlinien.</a>'),
             'inputType' => 'checkbox',
             'eval'      => array('mandatory' => true),
         ));
@@ -283,7 +283,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             $this->Template->hasError = $hasError;
 
 
-            // Save data to tl_calendar_events_member
+            // Save data to tl_member
             if (!$hasError)
             {
                 $objMemberModel = MemberModel::findByPk($objMember->id);

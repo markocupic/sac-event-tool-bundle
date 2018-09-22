@@ -22,5 +22,6 @@ $GLOBALS['TL_LANG']['tl_module']['story_eventOrganizers'] = array("Veranstalter\
 $GLOBALS['TL_LANG']['tl_module']['eventStoryJumpTo'] = array('Event-Bericht Reader', 'Bitte geben Sie hier die Seite mit dem Event-Reader Modul an.');
 $GLOBALS['TL_LANG']['tl_module']['notifyOnEventStoryPublishedNotificationId'] = array('Benachrichtigung bei neu erstelltem Event-Bericht', '');
 $GLOBALS['TL_LANG']['tl_module']['activateMemberAccountNotificationId'] = array('Benachrichtigung bei Mitgliederkonto Aktivierung', '');
+$GLOBALS['TL_LANG']['tl_module']['jumpToWhenNotActivated'] = array('Weiterleitung zur Seite mit Kontoaktivierungsmodul', 'Legen Sie fest zu welcher Seite ein Mitglied weitergeleitet wird, wenn das Mitgliederkonto deaktiviert ist (login = false)');
 
 

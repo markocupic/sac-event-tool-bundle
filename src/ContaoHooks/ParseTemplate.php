@@ -11,6 +11,9 @@
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\MemberModel;
+use Contao\ModuleModel;
+use Contao\PageModel;
+use Contao\Controller;
 
 
 /**
@@ -37,6 +40,20 @@ class ParseTemplate
                     {
                         if (!$objMember->login)
                         {
+                            // Redirect to account activation page if it is set
+                            $objLoginModule = ModuleModel::findByPk($objTemplate->id);
+                            if ($objLoginModule !== null)
+                            {
+                                if ($objLoginModule->jumpToWhenNotActivated > 0)
+                                {
+                                    $objPage = PageModel::findByPk($objLoginModule->jumpToWhenNotActivated);
+                                    if ($objPage !== null)
+                                    {
+                                        $url = $objPage->getFrontendUrl();
+                                        Controller::redirect($url);
+                                    }
+                                }
+                            }
                             $objTemplate->message = $GLOBALS['TL_LANG']['ERR']['memberAccountNotActivated'];
                         }
                     }
