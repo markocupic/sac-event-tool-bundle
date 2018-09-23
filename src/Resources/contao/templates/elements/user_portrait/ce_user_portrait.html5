@@ -17,6 +17,15 @@
         <div class="ce_user_portrait_qualification">
             <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($this->user['id']) ?>
         </div>
+
+        <?php if (!FE_USER_LOGGED_IN): ?>
+        {{br}}
+        <div class="alert alert-info" role="alert">
+            Bitte melden dich mit deinem Mitgliederkonto an, um die Kontaktdaten von <strong><?=$this->user['name'] ?></strong> zu sehen.
+        </div>
+        {{br}}
+        <?php endif ?>
+
         <?php if (FE_USER_LOGGED_IN): ?>
         <div class="ce_user_portrait_street">
             <?= $this->user['street'] ?>
@@ -60,6 +69,7 @@
     </div>
 </div>
 <br>
+
 <br>
 <?php $arrEvents = $this->events; ?>
 <?php if (!empty($arrEvents['tour']) && is_array($arrEvents['tour'])): ?>

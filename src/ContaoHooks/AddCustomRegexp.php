@@ -57,7 +57,6 @@ class AddCustomRegexp
                 }
             }
 
-
             return true;
         }
 

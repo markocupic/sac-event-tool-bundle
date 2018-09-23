@@ -46,11 +46,7 @@ class ReplaceInsertTags
             }
         }
 
-        // privacy policy
-        if (strpos($strTag, 'SAC_PRIVACY_POLICY') !== false)
-        {
-            return Config::get('SAC_PRIVACY_POLICY');
-        }
+
 
 
         return false;

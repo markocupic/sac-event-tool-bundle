@@ -280,22 +280,25 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
             // Let's use different queries for each event type
             if ($this->eventType === 'course')
             {
-                $objEvent = Database::getInstance()->execute('SELECT * FROM tl_calendar_events WHERE id IN (' . implode(',', array_map('\intval', $arrEvents)) . ') ORDER BY courseTypeLevel0, courseTypeLevel1, courseId, startDate');
+                $objEvent = Database::getInstance()->execute('SELECT * FROM tl_calendar_events WHERE id IN (' . implode(',', array_map('\intval', $arrEvents)) . ') ORDER BY courseTypeLevel0, courseTypeLevel1, courseId, startDate, endDate');
             }
             else
             {
-                $objEvent = Database::getInstance()->execute('SELECT * FROM tl_calendar_events WHERE id IN (' . implode(',', array_map('\intval', $arrEvents)) . ') ORDER BY startDate');
+                $objEvent = Database::getInstance()->execute('SELECT * FROM tl_calendar_events WHERE id IN (' . implode(',', array_map('\intval', $arrEvents)) . ') ORDER BY startDate, endDate');
             }
             while ($objEvent->next())
             {
                 $arrInstructors = array_merge($arrInstructors, CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false));
 
-                // tourType
+                // tourType && date format
                 $arrTourType = CalendarEventsHelper::getTourTypesAsArray($objEvent->id, 'shortcut', false);
+                $dateFormat = 'd.';
+
                 if ($objEvent->eventType === 'course')
                 {
                     // KU = Kurs
                     $arrTourType[] = 'KU';
+                    $dateFormat = 'd.m.';
                 }
                 $arrEvent[] = array(
                     'id'               => $objEvent->id,
@@ -306,7 +309,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
                     'courseTypeLevel0' => (CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0) !== null) ? CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name : '',
                     'courseTypeLevel1' => (CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1) !== null) ? CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name : '',
                     'title'            => $objEvent->title,
-                    'date'             => $this->getEventPeriod($objEvent->id, 'd.m.'),
+                    'date'             => $this->getEventPeriod($objEvent->id, $dateFormat),
                     'month'            => Date::parse('F', $objEvent->startDate),
                     'durationInfo'     => $objEvent->durationInfo,
                     'instructors'      => implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false)),
@@ -375,6 +378,10 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
         {
             $dateFormatShortened = 'd.m.';
         }
+        elseif ($dateFormat === 'd.')
+        {
+            $dateFormatShortened = 'd.';
+        }
 
 
         $eventDuration = count(CalendarEventsHelper::getEventTimestamps($id));
@@ -386,7 +393,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
         }
         if ($eventDuration == 2 && $span != $eventDuration)
         {
-            return Date::parse($dateFormatShortened, CalendarEventsHelper::getStartDate($id)) . ' & ' . Date::parse($dateFormat, CalendarEventsHelper::getEndDate($id));
+            return Date::parse($dateFormatShortened, CalendarEventsHelper::getStartDate($id)) . '+' . Date::parse($dateFormat, CalendarEventsHelper::getEndDate($id));
         }
         elseif ($span == $eventDuration)
         {
@@ -401,7 +408,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
                 $arrDates[] = Date::parse($dateFormat, $date);
             }
 
-            return implode('; ', $arrDates);
+            return implode('+', $arrDates);
         }
     }
 

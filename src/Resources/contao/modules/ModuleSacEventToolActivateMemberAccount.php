@@ -22,6 +22,7 @@ use Contao\Input;
 use Contao\MemberModel;
 use Contao\Module;
 use Contao\StringUtil;
+use Contao\System;
 use Haste\Form\Form;
 use Haste\Haste;
 use Haste\Util\Url;
@@ -126,6 +127,17 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         switch ($this->step)
         {
             case 1:
+                $session = System::getContainer()->get('session');
+                $flashBag = $session->getFlashBag();
+
+                // Get error message from the login form if there was a redirect because the account is not activated
+                if ($session->isStarted() && $flashBag->has('mod_login'))
+                {
+                    $arrMessages = $flashBag->get('mod_login');
+                    $this->Template->hasError = true;
+                    $this->Template->errorMsg = implode('<br>', $arrMessages);
+                }
+
                 unset($_SESSION['SAC_EVT_TOOL']);
                 $_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['step'] = 1;
                 $this->generateFirstForm();

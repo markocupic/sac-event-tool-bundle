@@ -14,6 +14,7 @@ use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Controller;
+use Contao\System;
 
 
 /**
@@ -49,6 +50,11 @@ class ParseTemplate
                                     $objPage = PageModel::findByPk($objLoginModule->jumpToWhenNotActivated);
                                     if ($objPage !== null)
                                     {
+                                        // Before redirecting store error message in the session flash bag
+                                        $session = System::getContainer()->get('session');
+                                        $flashBag = $session->getFlashBag();
+                                        $flashBag->set('mod_login', $GLOBALS['TL_LANG']['ERR']['memberAccountNotActivated']);
+
                                         $url = $objPage->getFrontendUrl();
                                         Controller::redirect($url);
                                     }
