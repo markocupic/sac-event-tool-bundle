@@ -477,7 +477,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     if ($field === 'mainInstructor')
                     {
                         $objUser = \Contao\UserModel::findByPk($objEvent->{$field});
-                        $arrRow[] = $objUser !== null ? html_entity_decode($objUser->name) : '';
+                        $arrRow[] = $objUser !== null ? html_entity_decode($objUser->lastname . ' ' . $objUser->firstname) : '';
                     }
                     elseif ($field === 'tourTechDifficulties')
                     {
