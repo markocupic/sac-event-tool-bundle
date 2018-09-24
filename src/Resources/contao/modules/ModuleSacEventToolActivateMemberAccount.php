@@ -207,29 +207,28 @@ class ModuleSacEventToolActivateMemberAccount extends Module
 
 
         $objForm->addFormField('username', array(
-            'label'     => 'SAC Mitgliedernummer',
+            'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_sacMemberId'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true),
         ));
         $objForm->addFormField('email', array(
-            'label'     => 'Deine beim SAC registrierte E-Mail-Adresse',
+            'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_email'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'rgxp' => 'email'),
         ));
         $objForm->addFormField('dateOfBirth', array(
-            'label'     => 'Dein Geburtsdatum (dd.mm.YYYY)',
+            'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_dateOfBirth'],
             'inputType' => 'text',
-            'eval'      => array('rgxp' => 'date', 'datepicker' => true),
+            'eval'      => array('mandatory' => true, 'rgxp' => 'date', 'datepicker' => true),
         ));
         $objForm->addFormField('agb', array(
-            'label'     => array('', 'Ich akzeptiere die <a href="#" data-toggle="modal" data-target="#agbModal">allg. Datenschutzrichtlinien.</a>'),
+            'label'     => array('', sprintf($GLOBALS['TL_LANG']['MSC']['activateMemberAccount_agb'], '<a href="#" data-toggle="modal" data-target="#agbModal">', '</a>')),
             'inputType' => 'checkbox',
             'eval'      => array('mandatory' => true),
         ));
-
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
-            'label'     => 'Mitgliederkonto aktivieren',
+            'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_startActivationProcess'],
             'inputType' => 'submit',
         ));
 
@@ -251,7 +250,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             $objMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')->limit(1)->execute(Input::post('username'));
             if (!$objMember->numRows)
             {
-                $this->Template->errorMsg = sprintf('Zur eingegebenen Mitgliedernummer %s konnte kein Benutzer zugeordnet werden.', Input::post('username'));
+                $this->Template->errorMsg = sprintf($GLOBALS['TL_LANG']['ERR']['activateMemberAccount_couldNotAssignUserToSacMemberId'], Input::post('username'));
                 $hasError = true;
             }
 
@@ -259,7 +258,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             {
                 if (Date::parse(Config::get('dateFormat'), $objMember->dateOfBirth) !== Input::post('dateOfBirth'))
                 {
-                    $this->Template->errorMsg = 'Mitgliedernummer und Geburtsdatum stimmen nicht &uuml;berein.';
+                    $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberIdAndDateOfBirthDoNotMatch'];
                     $hasError = true;
                 }
             }
@@ -268,7 +267,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             {
                 if (strtolower(Input::post('email')) !== strtolower($objMember->email))
                 {
-                    $this->Template->errorMsg = 'Mitgliedernummer und E-Mail-Adresse stimmen nicht &uuml;berein.';
+                    $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberIdAndEmailDoNotMatch'];
                     $hasError = true;
                 }
             }
@@ -277,7 +276,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             {
                 if ($objMember->login)
                 {
-                    $this->Template->errorMsg = sprintf('Das Konto mit der eingegebenen Mitgliedernummer %s wurde bereits aktiviert.', Input::post('username'));
+                    $this->Template->errorMsg = sprintf($GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountWithThisSacMemberIdIsAllreadyRegistered'], Input::post('username'));
                     $hasError = true;
                 }
             }
@@ -286,7 +285,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             {
                 if ($objMember->disable)
                 {
-                    $this->Template->errorMsg = sprintf('Das Konto mit der eingegebenen Mitgliedernummer %s ist deaktiviert und nicht mehr g&uuml;ltig.', Input::post('username'));
+                    $this->Template->errorMsg = sprintf($GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountWithThisSacMemberIdHasBeendDeactivatedAndIsNoMoreValid'], Input::post('username'));
                     $hasError = true;
                 }
             }
@@ -322,7 +321,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                     {
                         $hasError = true;
                         $this->Template->hasError = $hasError;
-                        $this->Template->errorMsg = 'Der Aktivierung konnte nicht abgeschlossen werden. Bitte probiere es nochmals oder nimm mit der Gesch&auml;ftsstelle Kontakt auf.';
+                        $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_couldNotTerminateActivationProcess'];
                     }
                 }
             }
@@ -350,14 +349,14 @@ class ModuleSacEventToolActivateMemberAccount extends Module
 
         // Password
         $objForm->addFormField('activationToken', array(
-            'label'     => 'Aktivierungscode eingeben',
+            'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_pleaseEnterTheActivationCode'],
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'minlength' => 6, 'maxlength' => 6),
         ));
 
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
-            'label'     => 'Aktivierungscode absenden',
+            'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_proceedActivationProcess'],
             'inputType' => 'submit',
         ));
 
@@ -387,7 +386,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             if ($objMember->disable)
             {
                 $hasError = true;
-                $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Dein Mitgliederkonto ist deaktiviert. Bitte informiere die Geschäftsstelle.';
+                $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountActivationStoppedAccountIsDeactivated'];
             }
 
             $objDb = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE id=? AND activation=?')->limit(1)->execute($objMember->id, $token);
@@ -407,12 +406,12 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                     unset($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId']);
                     $url = Url::removeQueryString(['step']);
                     $this->Template->doNotShowForm = true;
-                    $this->Template->errorMsg = sprintf('Ungültiger Aktivierungscode und zu viele Anzahl ungültiger Versuche. Bitte starte den Aktivierungsprozess von vorne. <br><a href="%s">Aktivierungsprozess neu starten</a>', $url);
+                    $this->Template->errorMsg = sprintf($GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountActivationStoppedInvalidActivationCodeAndTooMuchTries'], '<br><a href="' . $url . '">', '</a>');
                 }
                 else
                 {
                     // False token
-                    $this->Template->errorMsg = 'Ungültiger Aktivierungscode. Bitte erneut versuchen.';
+                    $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_invalidActivationCode'];
                 }
             }
             else
@@ -422,7 +421,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                 {
                     $hasError = true;
                     $this->Template->doNotShowForm = true;
-                    $this->Template->errorMsg = 'Der Aktivierungscode ist abgelaufen. Bitte starte den Aktivierungsprozess von vorne.';
+                    $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_activationCodeExpired'];
                 }
                 else
                 {
@@ -461,14 +460,14 @@ class ModuleSacEventToolActivateMemberAccount extends Module
 
         // Password
         $objForm->addFormField('password', array(
-            'label'     => 'Passwort festlegen',
+            'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_pleaseEnterPassword'],
             'inputType' => 'password',
             'eval'      => array('mandatory' => true, 'maxlength' => 255),
         ));
 
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
-            'label'     => 'Mitgliederkonto aktivieren',
+            'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_activateMemberAccount'],
             'inputType' => 'submit',
         ));
 
@@ -484,7 +483,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         $objMemberModel = MemberModel::findByPk($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId']);
         if ($objMemberModel === null)
         {
-            $this->Template->errorMsg = 'Es ist ein Fehler aufgetreten. Die Session ist abgelaufen.';
+            $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sessionExpired'];
             $hasError = true;
         }
 

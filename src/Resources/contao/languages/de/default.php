@@ -86,9 +86,34 @@ $GLOBALS['TL_LANG']['MSC']['unpublished'] = 'unver&ouml;ffentlicht';
 // Meta wizard
 $GLOBALS['TL_LANG']['MSC']['aw_photographer'] = 'Photograph';
 
-// Errors
+// mod_login
 $GLOBALS['TL_LANG']['ERR']['memberAccountNotActivated'] = 'Anmeldeversuch gescheitert! Das Benutzerkonto wurde noch nicht aktiviert. Bitte aktiviere einmalig dein Konto und lege dein Passwort fest.';
 $GLOBALS['TL_LANG']['ERR']['memberAccountNotFound'] = 'Anmeldeversuch gescheitert! Zur Mitgliedernummer "%s" wurde kein Mitgliederkonto gefunden. Bitte probiere es nochmals.';
+
+// eventToolActivateMemberAccount
+$GLOBALS['TL_LANG']['MSC']['activateMemberAccount_sacMemberId'] = 'SAC Mitgliedernummer';
+$GLOBALS['TL_LANG']['MSC']['activateMemberAccount_email'] = 'Deine beim SAC registrierte E-Mail-Adresse';
+$GLOBALS['TL_LANG']['MSC']['activateMemberAccount_dateOfBirth'] = 'Dein Geburtsdatum (dd.mm.YYYY)';
+$GLOBALS['TL_LANG']['MSC']['activateMemberAccount_startActivationProcess'] = 'Aktivierung starten';
+$GLOBALS['TL_LANG']['MSC']['activateMemberAccount_agb'] = 'Ich akzeptiere die %sallg. Datenschutzrichtlinien.%s';
+$GLOBALS['TL_LANG']['MSC']['activateMemberAccount_pleaseEnterTheActivationCode'] = 'Aktivierungscode eingeben';
+$GLOBALS['TL_LANG']['MSC']['activateMemberAccount_proceedActivationProcess'] = 'Mit dem Aktivierungsprozess fortfahren';
+$GLOBALS['TL_LANG']['MSC']['activateMemberAccount_pleaseEnterPassword'] = 'Passwort für dein Mitgliederkonto festlegen';
+$GLOBALS['TL_LANG']['MSC']['activateMemberAccount_activateMemberAccount'] = 'Mitgliederkonto aktivieren';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_couldNotAssignUserToSacMemberId'] = 'Für die eingegebene Mitgliedernummer %s konnte kein Benutzer gefunden werden.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberIdAndDateOfBirthDoNotMatch'] = 'Mitgliedernummer und Geburtsdatum stimmen nicht überein.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberIdAndEmailDoNotMatch'] = 'Mitgliedernummer und E-Mail-Adresse stimmen nicht &uuml;berein.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountWithThisSacMemberIdIsAllreadyRegistered'] = 'Das Konto mit der eingegebenen Mitgliedernummer %s wurde bereits aktiviert.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountWithThisSacMemberIdHasBeendDeactivatedAndIsNoMoreValid'] = 'Das Konto mit der eingegebenen Mitgliedernummer %s ist deaktiviert und nicht mehr g&uuml;ltig.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_couldNotTerminateActivationProcess'] = 'Der Aktivierung konnte nicht abgeschlossen werden. Bitte probiere es nochmals oder nimm mit der Geschäftsstelle Kontakt auf.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountActivationStoppedAccountIsDeactivated'] = 'Es ist ein Fehler aufgetreten. Dein Mitgliederkonto ist deaktiviert. Bitte nimm gegebenenfalls mit der Geschäftsstelle Kontakt auf.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountActivationStoppedInvalidActivationCodeAndTooMuchTries'] = 'Ungültiger Aktivierungscode und zu viele Anzahl ungültiger Versuche. Bitte starte den Aktivierungsprozess von vorne. %sAktivierungsprozess neu starten%s';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_invalidActivationCode'] = 'Ungültiger Aktivierungscode. Bitte erneut versuchen.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_activationCodeExpired'] = 'Der Aktivierungscode ist abgelaufen. Bitte starte den Aktivierungsprozess neu.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sessionExpired'] = 'Es ist ein Fehler aufgetreten. Die Session ist abgelaufen.';
+
+
+
 
 
 
