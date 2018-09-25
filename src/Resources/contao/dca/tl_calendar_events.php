@@ -32,6 +32,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = arra
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'adjustRegistrationPeriod');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'adjustImageSize');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'adjustEventReleaseLevel');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'adjustDurationInfo');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'setEventToken');
 
 
@@ -433,14 +434,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['equipment'] = array(
 
 // durationInfo
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'],
-    'search'    => true,
-    'filter'    => true,
-    'exclude'   => true,
-    'inputType' => 'select',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'],
-    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => true),
-    'sql'       => "varchar(32) NOT NULL default ''",
+    'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'],
+    'search'          => true,
+    'filter'          => true,
+    'exclude'         => true,
+    'inputType'       => 'select',
+    'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCallbackGetEventDuration'),
+    'eval'            => array('includeBlankOption' => true, 'tl_class' => 'clr m12', 'mandatory' => true),
+    'sql'             => "varchar(32) NOT NULL default ''",
 );
 
 // Add minimum an maximum members

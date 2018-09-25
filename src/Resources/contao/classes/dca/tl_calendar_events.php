@@ -1015,6 +1015,27 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
+     * @return array
+     */
+    public function optionsCallbackGetEventDuration()
+    {
+        if (is_array($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo']) && !empty($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo']))
+        {
+            $opt = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'];
+        }
+        else
+        {
+            $opt = array();
+        }
+        $arrOpt = array();
+        foreach ($opt as $k => $v)
+        {
+            $arrOpt[] = $k;
+        }
+        return $arrOpt;
+    }
+
+    /**
      * options_callback optionsCbTourDifficulties()
      * @return array
      */
@@ -1302,6 +1323,43 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         {
             $set = array('eventReleaseLevel' => $eventReleaseLevelModel->id);
             $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
+        }
+    }
+
+    /**
+     * @param DataContainer $dc
+     */
+    public function adjustDurationInfo(DataContainer $dc)
+    {
+        // Return if there is no active record (override all)
+        if (!$dc->activeRecord)
+        {
+            return;
+        }
+
+        $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($dc->activeRecord->id);
+        if ($objEvent->numRows > 0)
+        {
+            $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent->id);
+            if ($objEvent->durationInfo != '' && !empty($arrTimestamps) && is_array($arrTimestamps))
+            {
+                $countTimestamps = count($arrTimestamps);
+                if (isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$objEvent->durationInfo]))
+                {
+                    $arrDuration = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$objEvent->durationInfo];
+                    if (!empty($arrDuration) && is_array($arrDuration))
+                    {
+                        $duration = $arrDuration['dateRows'];
+                        if ($duration != $countTimestamps)
+                        {
+                            $arrSet = array();
+                            $arrSet['durationInfo'] = '';
+                            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($objEvent->id);
+                            \Contao\Message::addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein. Setzen SIe für jeden Event-Tag eine Datumszeile!', $objEvent->title, $objEvent->id), TL_MODE);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -1661,6 +1719,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
     }
 
+
     /**
      * save_callback saveCallbackEventReleaseLevel()
      * Publish or unpublish events if eventReleaseLevel has reached the highest/last level
@@ -1734,6 +1793,44 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         return $newEventReleaseLevelId;
 
     }
+
+
+    /**
+     * @param $strDuration
+     * @param DC_Table|null $dc
+     * @param null $eventId
+     * @return string
+     */
+    public function onSubmitCallbackDurationInfo($strDuration, DC_Table $dc = null, $eventId = null)
+    {
+        // Get event id
+        if ($dc->activeRecord->id > 0)
+        {
+            $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
+        }
+        elseif ($eventId > 0)
+        {
+            $objEvent = CalendarEventsModel::findByPk($eventId);
+        }
+
+        if (\Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent->id) !== false)
+        {
+            $countTimestamps = count(\Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent->id));
+
+            $arrDuration = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$strDuration];
+            if (!empty($arrDuration) && is_array($arrDuration))
+            {
+                $duration = $arrDuration['dateRows'];
+                if ($duration != $countTimestamps)
+                {
+                    \Contao\Message::addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein.', $objEvent->title, $objEvent->id));
+                    return '';
+                }
+            }
+        }
+        return $strDuration;
+    }
+
 
     /**
      * @param $strEventType

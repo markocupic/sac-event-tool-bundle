@@ -243,7 +243,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
     protected function getEventsAndInstructors()
     {
         $arrEvents = array();
-        $objEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate>? AND startDate<?')->execute($this->startDate, $this->endDate);
+        $objEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=?')->execute($this->startDate, $this->endDate);
         while ($objEvents->next())
         {
 
@@ -373,14 +373,17 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
             $dateFormat = Config::get('dateFormat');
         }
 
-        $dateFormatShortened = $dateFormat;
-        if ($dateFormat === 'd.m.Y' || $dateFormat === 'd.m.')
+        if ($dateFormat === 'd.m.')
         {
             $dateFormatShortened = 'd.m.';
         }
         elseif ($dateFormat === 'd.')
         {
             $dateFormatShortened = 'd.';
+        }
+        else
+        {
+            $dateFormatShortened = $dateFormat;
         }
 
 
@@ -397,7 +400,15 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
         }
         elseif ($span == $eventDuration)
         {
-            return Date::parse($dateFormatShortened, CalendarEventsHelper::getStartDate($id)) . '-' . Date::parse($dateFormat, CalendarEventsHelper::getEndDate($id));
+            // Check if event dates are not in the same month
+            if (Date::parse('m.Y', CalendarEventsHelper::getStartDate($id)) === Date::parse('m.Y', CalendarEventsHelper::getEndDate($id)))
+            {
+                return Date::parse($dateFormatShortened, CalendarEventsHelper::getStartDate($id)) . '-' . Date::parse($dateFormat, CalendarEventsHelper::getEndDate($id));
+            }
+            else
+            {
+                return Date::parse('d.m.', CalendarEventsHelper::getStartDate($id)) . '-' . Date::parse('d.m.', CalendarEventsHelper::getEndDate($id));
+            }
         }
         else
         {
