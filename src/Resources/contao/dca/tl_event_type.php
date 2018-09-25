@@ -110,8 +110,8 @@ $GLOBALS['TL_DCA']['tl_event_type'] = array
             'search'        => true,
             'flag'          => 1,
             'load_callback' => array(array('tl_event_type', 'loadCallbackAlias')),
-            'eval'          => array('mandatory' => true, 'rgxp' => 'alnum', 'maxlength' => 64, 'tl_class' => 'w50'),
-            'sql'           => "varchar(64) NULL",
+            'eval'          => array('mandatory' => true, 'rgxp' => 'alnum', 'maxlength' => 128, 'tl_class' => 'w50'),
+            'sql'           => "varchar(128) NULL",
         ),
         'title'                        => array
         (
@@ -120,8 +120,8 @@ $GLOBALS['TL_DCA']['tl_event_type'] = array
             'exclude'   => true,
             'search'    => true,
             'flag'      => 1,
-            'eval'      => array('mandatory' => true, 'maxlength' => 64, 'tl_class' => 'w50'),
-            'sql'       => "varchar(64) NULL",
+            'eval'      => array('mandatory' => true, 'maxlength' => 128, 'tl_class' => 'w50'),
+            'sql'       => "varchar(128) NULL",
         ),
         'levelAccessPermissionPackage' => array(
             'label'      => &$GLOBALS['TL_LANG']['tl_event_type']['levelAccessPermissionPackage'],

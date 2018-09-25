@@ -244,16 +244,14 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             {
                 continue;
             }
+            $arrRow = $objEvent->fetchAssoc();
+            $arrRow['week']        = Date::parse('W', $objEvent->startDate) . ', ' . Date::parse('j.', $this->getFirstDayOfWeekTimestamp($objEvent->startDate)) . '-' . Date::parse('j. F', $this->getLastDayOfWeekTimestamp($objEvent->startDate));
+            $arrRow['eventDates']  = $this->getEventPeriod($objEvent->id, 'd.');
+            $arrRow['weekday']     = $this->getEventPeriod($objEvent->id, 'D');
+            $arrRow['title']       = $objEvent->title . ($objEvent->eventType === 'lastMinuteTour' ? ' (LAST MINUTE TOUR!)' : '');
+            $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false));
+            $arrRow['organizers']  = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'titlePrint'));
 
-            $arrRow = array(
-                'week'        => Date::parse('W', $objEvent->startDate) . ', ' . Date::parse('j.', $this->getFirstDayOfWeekTimestamp($objEvent->startDate)) . '-' . Date::parse('j. F', $this->getLastDayOfWeekTimestamp($objEvent->startDate)),
-                'eventDates'  => $this->getEventPeriod($objEvent->id, 'd.'),
-                'weekday'     => $this->getEventPeriod($objEvent->id, 'D'),
-                'title'       => $objEvent->title . ($objEvent->eventType === 'lastMinuteTour' ? ' (LAST MINUTE TOUR!)' : ''),
-                'instructors' => implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false)),
-                'organizers'  => implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'titlePrint')),
-                'id'          => $objEvent->id,
-            );
             // tourType
             $arrEventType = CalendarEventsHelper::getTourTypesAsArray($objEvent->id, 'shortcut', false);
             if ($objEvent->eventType === 'course')
@@ -503,7 +501,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
      */
     private function getEventDetails($objEvent)
     {
-        $arrRow = $objEvent->row();
+        $arrRow = $objEvent->fetchAssoc();
         $arrRow['eventState'] = $objEvent->eventState != '' ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
         $arrRow['week'] = Date::parse('W', $objEvent->startDate);
         $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);

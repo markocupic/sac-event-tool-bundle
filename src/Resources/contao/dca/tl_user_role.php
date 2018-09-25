@@ -85,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
     ),
     'palettes' => array
     (
-        'default' => 'title,belongsToExecutiveBoard,belongsToBeauftragteStammsektion',
+        'default' => 'title,belongsToExecutiveBoard,belongsToBeauftragteStammsektion,email',
     ),
 
     'fields' => array
@@ -141,6 +141,16 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'inputType' => 'checkbox',
             'eval'      => array('mandatory' => false, 'tl_class' => 'clr'),
             'sql'       => "char(1) NOT NULL default ''",
+        ),
+        'email'                            => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['email'],
+            'exclude'   => true,
+            'search'    => true,
+            'filter'    => true,
+            'inputType' => 'text',
+            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'tl_class' => 'w50'),
+            'sql'       => "varchar(255) NOT NULL default ''"
         ),
     ),
 );

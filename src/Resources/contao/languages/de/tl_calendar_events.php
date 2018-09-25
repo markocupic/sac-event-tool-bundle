@@ -54,6 +54,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['maxMembers'] = array("Maximale Teilne
 $GLOBALS['TL_LANG']['tl_calendar_events']['equipment'] = array("Ben&ouml;tigtes Material/Ausr&uuml;stung", "Geben Sie bitte eine Liste mit der ben&ouml;tigten Ausr&uuml;stung an.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['bookingEvent'] = array("Anmeldung", "Geben Sie bitte Details zur Anmeldung an.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['miscellaneous'] = array("Sonstiges", "Geben Sie bitte weitere/sonstige Informationen ein.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['isRecurringEvent'] = array("Sich wiederholender Event", "Bitte geben Sie an, ob es sich bei diesem Event um einen sich wiederholdenden Event handelt.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventDates'] = array("Eventdaten", "Geben Sie bitte die Eventdaten ein. F&uuml;r jeden Tag eine Zeile.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'] = array("Event-Dauer", "Geben SIe die Event-Dauer an.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventState'] = array("Event Status", "Geben Sie optional einen Event-Status an. !!!Teilnehmer m&uuml;ssen informiert werden.");

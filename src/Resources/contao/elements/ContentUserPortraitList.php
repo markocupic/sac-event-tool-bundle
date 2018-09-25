@@ -17,6 +17,7 @@ use Contao\FilesModel;
 use Contao\FrontendTemplate;
 use Contao\StringUtil;
 use Contao\UserModel;
+use Contao\UserRoleModel;
 use Patchwork\Utf8;
 
 
@@ -141,10 +142,33 @@ class ContentUserPortraitList extends ContentElement
             while ($objUser->next())
             {
 
+
+
                 $objTemplate = new FrontendTemplate($this->strTemplatePartial);
                 $objTemplate->setData($objUser->row());
                 $objTemplate->jumpTo = $this->jumpTo;
                 $objTemplate->showFieldsToGuests = StringUtil::deserialize($this->userList_showFieldsToGuests, true);
+                // Roles
+                $arrIDS = StringUtil::deserialize($objUser->userRole,true);
+                $objRoles = UserRoleModel::findMultipleByIds($arrIDS);
+                $arrRoleEmails =  array();
+                $arrRoles = array();
+                if($objRoles !== null)
+                {
+                    while($objRoles->next())
+                    {
+                        $objTemplate->hasRole = true;
+                        $arrRoles[] = $objRoles->title;
+
+                        if($objRoles->email !== '')
+                        {
+                            $arrRoleEmails[$objRoles->title] = $objRoles->email;
+                            $objTemplate->hasRoleEmail = true;
+                        }
+                    }
+                }
+                $objTemplate->roleEmails = $arrRoleEmails;
+                $objTemplate->roles = $arrRoles;
 
 
                 // Get users avatar

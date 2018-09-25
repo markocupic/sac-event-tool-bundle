@@ -10,6 +10,9 @@
     <div class="col-7 col-sm-7 col-md-7 col-xl-6 ">
       <small>
         <strong><?= trim($this->lastname . ' ' . $this->firstname) ?></strong>
+        <?php if($this->hasRoleEmail): ?>
+        <?= implode('<br>', $this->roleEmails); ?>
+        <?php endif; ?>
         {{br}}
 
         <!-- Show personal data to logged users only or if it is allowed in the ce settings -->
@@ -34,7 +37,7 @@
         <?php endif; ?>
 
         <?php if (FE_USER_LOGGED_IN || in_array('email',$this->showFieldsToGuests)): ?>
-        <?php if ($this->email != ''): ?>{{email_open::<?= $this->email ?>}}E-Mail senden</a>{{br}}<?php endif; ?>
+        <?php if ($this->email != ''): ?>{{email_open::<?= $this->email ?>}}<?= $this->email ?></a>{{br}}<?php endif; ?>
         <?php endif; ?>
 
       </small>

@@ -40,7 +40,7 @@
 
         <!-- tab-pane-1 -->
         <div class="tab-pane fade show active" id="nav-my-bookings" role="tabpanel" aria-labelledby="nav-profile-tab">
-          <h2 class="mt-0">Deine nächsten Events</h2>
+          <h2 class="mt-0">Meine nächsten Events</h2>
           <table class="table layout-table table-responsive table-striped">
             <tr>
               <th>Datum</th>
