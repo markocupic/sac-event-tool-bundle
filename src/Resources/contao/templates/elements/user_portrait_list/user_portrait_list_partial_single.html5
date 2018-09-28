@@ -11,6 +11,7 @@
       <small>
         <strong><?= trim($this->lastname . ' ' . $this->firstname) ?></strong>
         <?php if($this->hasRoleEmail): ?>
+        {{br}}
         <?= implode('<br>', $this->roleEmails); ?>
         <?php endif; ?>
         {{br}}

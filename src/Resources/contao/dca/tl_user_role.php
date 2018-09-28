@@ -31,15 +31,15 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
         'sorting'           => array
         (
             'mode'                  => 5,
-            'fields'                => array('title'),
-            'format'                => '%s',
+            'fields'                => array('title', 'email'),
+            'format'                => '%s %s',
             //'flag'                  => 1,
             'panelLayout'           => 'filter;search,limit',
             'paste_button_callback' => array('tl_user_role', 'pasteTag'),
         ),
         'label'             => array
         (
-            'fields'         => array('title'),
+            'fields'         => array('title', 'email'),
             'showColumns'    => true,
             'label_callback' => array('tl_user_role', 'checkForUsage'),
         ),

@@ -50,6 +50,7 @@ class tl_user_role extends Backend
      */
     public function checkForUsage($row, $label, DataContainer $dc, $args)
     {
+
         $arrRoles = array();
         $objDb = $this->Database->execute('SELECT * FROM tl_user');
         if ($objDb->numRows)
@@ -66,6 +67,6 @@ class tl_user_role extends Backend
 
         $blnUsed = in_array($row['id'], $arrRoles) ? true : false;
         $style = !$blnUsed ? ' title="Derzeit nicht in Gebrauch" style="color:red"' : '';
-        return sprintf('<span%s>%s</span>', $style, $label);
+        return sprintf('<span%s>%s</span> <span style="color:gray">%s</span>', $style, $row['title'], $row['email']);
     }
 }
