@@ -8,9 +8,9 @@
       </a>
     </div>
     <div class="col-7 col-sm-7 col-md-7 col-xl-6 ">
+      <strong><?= trim($this->lastname . ' ' . $this->firstname) ?></strong>
       <small>
-        <strong><?= trim($this->lastname . ' ' . $this->firstname) ?></strong>
-        <?php if($this->hasRoleEmail): ?>
+      <?php if($this->hasRoleEmail): ?>
         {{br}}
         <?= implode('<br>', $this->roleEmails); ?>
         <?php endif; ?>
