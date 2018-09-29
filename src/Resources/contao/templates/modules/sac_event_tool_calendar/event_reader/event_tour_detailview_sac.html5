@@ -133,7 +133,7 @@
 
                 <?php if (!$this->disableOnlineRegistration): ?>
                 <div class="event-detail-buttons mt-3">
-                    <a href="{{event_url::<?= $this->id ?>}}#eventBookingForm" title="Tour buchen" class="btn btn-block btn-lg  btn-primary"><i class="fal fa-shopping-cart"></i> Zur Anmeldung</a>
+                    <a href="{{event_url::<?= $this->id ?>}}#eventBookingForm" title="Für Tour anmelden" class="btn btn-block btn-lg  btn-primary"><i class="fal fa-shopping-cart"></i> Für Tour anmelden</a>
                 </div>
                 <?php endif; ?>
 

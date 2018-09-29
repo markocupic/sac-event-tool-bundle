@@ -167,7 +167,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         }
         elseif (!FE_USER_LOGGED_IN)
         {
-            Message::addInfo('Bitte melde dich mit deinem Benutzerkonto an, um dich f&uuml;r den Event anzumelden.', TL_MODE);
+            Message::addInfo('Bitte logge dich mit deinem Mitglieder-Konto ein, um dich f&uuml;r den Event anzumelden.', TL_MODE);
             $this->Template->showLoginForm = true;
         }
         elseif (FE_USER_LOGGED_IN && true === CalendarEventsMemberModel::isRegistered($this->objUser->id, $this->objEvent->id))
