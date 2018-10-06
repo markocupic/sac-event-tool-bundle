@@ -27,6 +27,7 @@
         <a class="list-group-item list-group-item-action" id="nav-past-workshops-tab" data-toggle="tab" href="#nav-past-workshops" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-thumbs-up"></i> Absolvierte Kurse</a>
         <a class="list-group-item list-group-item-action" id="nav-past-tours-tab" data-toggle="tab" href="#nav-past-tours" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-star"></i> Absolvierte Touren</a>
         <a class="list-group-item list-group-item-action" id="nav-my-blogs-tab" data-toggle="tab" href="#nav-my-blogs" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-pencil"></i> Meine Tourenberichte</a>
+        <a class="list-group-item list-group-item-action" id="nav-member-picture-feed-tab" data-toggle="tab" href="#nav-member-picture-feed" role="tab" aria-controls="nav-member-picture-feed" aria-selected="false"><i class="fal fa-fw fa-image"></i> Bilder Feed</a>
         <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-cog"></i> Profil</a>
       </nav>
       {{br}}{{br}}
@@ -162,6 +163,13 @@
         </div>
 
         <!-- tab-pane-5 -->
+        <div class="tab-pane fade" id="nav-member-picture-feed" role="tabpanel" aria-labelledby="nav-member-picture-feed-tab">
+          <h2 class="mt-0">Mein Bilder Feed</h2>
+          <p>Hier kannst du deine aktuellsten Bilder von deinen Touren hochladen. Die neusten Bilder werden auf der Webseite in einem Bilder-Feed präsentiert. Bitte schreibe zu jedem Bild den Namen des Fotografen und zum Bild eine kleine Beschreibung hinzu.</p>
+          {{insert_module::373}}
+        </div>
+
+        <!-- tab-pane-6 -->
         <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-home-tab">
           <h2 class="mt-0">Persönliche Einstellungen</h2>
 
