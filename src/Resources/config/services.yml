@@ -1,10 +1,12 @@
 services:
     markocupic.sac_event_tool_bundle.prepare_plugin_environment:
+        public: true
         class: Markocupic\SacEventToolBundle\PreparePluginEnvironment
         arguments:
             - "@contao.framework"
 
     markocupic.sac_event_tool_bundle.sync_sac_member_database:
+        public: true
         class: Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase
         arguments:
             - "@contao.framework"
