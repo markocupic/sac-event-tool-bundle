@@ -16,7 +16,7 @@
     "phpoffice/phpword": "v0.13.*",
     "markocupic/export_table": ">=3.0",
     "menatwork/contao-multicolumnwizard": "^3.3",
-    "codefog/contao-haste": "^4",
+    "codefog/contao-haste": "4.20.3",
     "eluceo/ical": "~0.6",
     "league/csv": "^9.1"
   },
