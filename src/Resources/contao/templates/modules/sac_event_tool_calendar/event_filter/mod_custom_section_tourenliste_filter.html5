@@ -1,5 +1,5 @@
 <?php
-$GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.min.js|static";
+$GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.js|static";
 ?>
 <script>
     $().ready(function () {
@@ -84,7 +84,7 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.min
             <?php $objOrganizers = \EventOrganizerModel::findAll(array('order' => 'sorting ASC')); ?>
             <?php if ($objOrganizers !== null): ?>
               <label for="ctrl_organizers">Veranstalter:</label>
-              <select placeholder="Organisierende Gruppe" chosen style="width:100%" id="ctrl_organizers" multiple tabindex="3">
+              <select placeholder="Organisierende Gruppe" style="width:100%" id="ctrl_organizers" multiple tabindex="3">
                   <?php while ($objOrganizers->next()): ?>
                     <option value="<?= $objOrganizers->id ?>" id="organizator-select-option-<?= $objOrganizers->id ?>"><?= $objOrganizers->title ?></option>
                   <?php endwhile; ?>

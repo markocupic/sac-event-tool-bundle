@@ -380,6 +380,7 @@ var EventFilter = {
         // Close dropdown on deselect
         self.$ctrlOrganizers.on('select2:unselect', function () {
             window.setTimeout(function () {
+                // Hacks Hacks Hacks !!!!
                 self.$ctrlOrganizers.select2('close');
             }, 100);
         });
@@ -388,8 +389,12 @@ var EventFilter = {
         // Disable search field (important if using the plugin with mobile devices)
         // https://select2.org/searching
         self.$ctrlOrganizers.on('select2:opening select2:closing', function (event) {
-            var $searchfield = $(this).parent().find('.select2-search__field');
-            $searchfield.prop('disabled', true);
+            // Hacks!!!!!!!
+            //var $searchfield = $(this).parent().find('.select2-search__field');
+            //$searchfield.prop('disabled', true);
+            //if($('#organizers li.select2-selection__choice').length < 1){
+                //$('#organizers > span > span.selection > span > ul > li > input').removeAttr('disabled');
+           //}
         });
 
 

@@ -1,5 +1,5 @@
 <?php
-$GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.min.js|static";
+$GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.js|static";
 ?>
 <script>
     $().ready(function () {
