@@ -280,7 +280,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
             // Let's use different queries for each event type
             if ($this->eventType === 'course')
             {
-                $objEvent = Database::getInstance()->execute('SELECT * FROM tl_calendar_events WHERE id IN (' . implode(',', array_map('\intval', $arrEvents)) . ') ORDER BY courseTypeLevel0, courseTypeLevel1, courseId, startDate, endDate');
+                $objEvent = Database::getInstance()->execute('SELECT * FROM tl_calendar_events WHERE id IN (' . implode(',', array_map('\intval', $arrEvents)) . ') ORDER BY courseTypeLevel0, courseTypeLevel1, startDate, endDate, courseId');
             }
             else
             {
