@@ -292,13 +292,13 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
 
                 // tourType && date format
                 $arrTourType = CalendarEventsHelper::getTourTypesAsArray($objEvent->id, 'shortcut', false);
-                $dateFormat = 'd.';
+                $dateFormat = 'j.';
 
                 if ($objEvent->eventType === 'course')
                 {
                     // KU = Kurs
                     $arrTourType[] = 'KU';
-                    $dateFormat = 'd.m.';
+                    $dateFormat = 'j.n.';
                 }
                 $arrEvent[] = array(
                     'id'               => $objEvent->id,
@@ -373,13 +373,13 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
             $dateFormat = Config::get('dateFormat');
         }
 
-        if ($dateFormat === 'd.m.')
+        if ($dateFormat === 'j.n.')
         {
-            $dateFormatShortened = 'd.m.';
+            $dateFormatShortened = 'j.n.';
         }
-        elseif ($dateFormat === 'd.')
+        elseif ($dateFormat === 'j.')
         {
-            $dateFormatShortened = 'd.';
+            $dateFormatShortened = 'j.';
         }
         else
         {
@@ -401,13 +401,13 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
         elseif ($span == $eventDuration)
         {
             // Check if event dates are not in the same month
-            if (Date::parse('m.Y', CalendarEventsHelper::getStartDate($id)) === Date::parse('m.Y', CalendarEventsHelper::getEndDate($id)))
+            if (Date::parse('n.Y', CalendarEventsHelper::getStartDate($id)) === Date::parse('n.Y', CalendarEventsHelper::getEndDate($id)))
             {
                 return Date::parse($dateFormatShortened, CalendarEventsHelper::getStartDate($id)) . '-' . Date::parse($dateFormat, CalendarEventsHelper::getEndDate($id));
             }
             else
             {
-                return Date::parse('d.m.', CalendarEventsHelper::getStartDate($id)) . '-' . Date::parse('d.m.', CalendarEventsHelper::getEndDate($id));
+                return Date::parse('j.n.', CalendarEventsHelper::getStartDate($id)) . '-' . Date::parse('j.n.', CalendarEventsHelper::getEndDate($id));
             }
         }
         else
