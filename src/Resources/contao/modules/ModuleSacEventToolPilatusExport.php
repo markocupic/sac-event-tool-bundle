@@ -21,6 +21,7 @@ use Contao\Date;
 use Contao\Environment;
 use Contao\Input;
 use Contao\StringUtil;
+use Contao\Validator;
 use Haste\Form\Form;
 use Patchwork\Utf8;
 
@@ -172,18 +173,34 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         {
             // echo Date::parse('Y-m-d',strtotime(Date::parse("Y-m-1", strtotime($i . " month"))));
             //echo "<br>";
-            $key = Date::parse("Y-m-1", strtotime($i . " month")) . '|' . Date::parse("Y-m-t", strtotime($i + 1 . "  month"));
-            $range[$key] = Date::parse("1.m.Y", strtotime($i . " month")) . '-' . Date::parse("t.m.Y", strtotime($i + 1 . "  month"));
+            $key = Date::parse("Y-m-01", strtotime($i . " month")) . '|' . Date::parse("Y-m-t", strtotime($i + 1 . "  month"));
+            $range[$key] = Date::parse("01.m.Y", strtotime($i . " month")) . '-' . Date::parse("t.m.Y", strtotime($i + 1 . "  month"));
         }
 
 
         // Now let's add form fields:
         $objForm->addFormField('timeRange', array(
-            'label'     => 'Zeitspanne',
+            'label'     => 'Zeitspanne (fixe Zeitspanne)',
             'inputType' => 'select',
             'options'   => $range,
             //'default'   => $this->User->emergencyPhone,
-            'eval'      => array('mandatory' => true),
+            'eval'      => array('mandatory' => false),
+        ));
+
+        // Now let's add form fields:
+        $objForm->addFormField('timeRangeStart', array(
+            'label'     => 'Zeitspanne (Startdatum)',
+            'inputType' => 'text',
+            'eval'      => array('mandatory' => false, 'maxlength' => '10', 'minlength' => 8, 'placeholder' => 'dd-mm-YYYY'),
+            'value'     => Input::post('timeRangeStart')
+        ));
+
+        // Now let's add form fields:
+        $objForm->addFormField('timeRangeEnd', array(
+            'label'     => 'Zeitspanne (Enddatum)',
+            'inputType' => 'text',
+            'eval'      => array('mandatory' => false, 'maxlength' => '10', 'minlength' => 8, 'placeholder' => 'dd-mm-YYYY'),
+            'value'     => Input::post('timeRangeEnd')
         ));
 
         $objForm->addFormField('eventReleaseLevel', array(
@@ -208,6 +225,39 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 $arrRange = explode('|', Input::post('timeRange'));
                 $this->startDate = strtotime($arrRange[0]);
                 $this->endDate = strtotime($arrRange[1]);
+                $objForm->getWidget('timeRangeStart')->value = '';
+                $objForm->getWidget('timeRangeEnd')->value = '';
+            }
+
+            // Alternatively you can add the date manualy
+            elseif (Input::post('timeRangeStart') != '' && Input::post('timeRangeEnd') != '')
+            {
+                if (strtotime(Input::post('timeRangeStart')) > 0 && strtotime(Input::post('timeRangeStart')) > 0)
+                {
+                    $objWidgetStart = $objForm->getWidget('timeRangeStart');
+                    $objWidgetEnd = $objForm->getWidget('timeRangeEnd');
+
+                    $intStart = strtotime(Input::post('timeRangeStart'));
+                    $intEnd = strtotime(Input::post('timeRangeEnd'));
+
+                    if ($intStart > $intEnd || !Validator::isDate($objWidgetStart->value) || !Validator::isDate($objWidgetEnd->value))
+                    {
+                        $strError = 'Ungültige Datumseingabe. Gib das Datum im Format \'dd-mm-YYYY\' ein. Das Startdatum muss kleiner sein als das Enddatum.';
+                        $objForm->getWidget('timeRangeStart')->addError($strError);
+                        $objForm->getWidget('timeRangeEnd')->addError($strError);
+                    }
+                    else
+                    {
+                        $this->startDate = $intStart;
+                        $this->endDate = $intEnd;
+                        Input::setPost('timeRange', '');
+                        $objForm->getWidget('timeRange')->value = '';
+                    }
+                }
+            }
+
+            if ($this->startDate && $this->endDate)
+            {
                 $this->eventReleaseLevel = Input::post('eventReleaseLevel') > 0 ? Input::post('eventReleaseLevel') : null;
                 $this->generateAllEventsTable();
                 $this->generateCourses();
@@ -245,12 +295,12 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 continue;
             }
             $arrRow = $objEvent->fetchAssoc();
-            $arrRow['week']        = Date::parse('W', $objEvent->startDate) . ', ' . Date::parse('j.', $this->getFirstDayOfWeekTimestamp($objEvent->startDate)) . '-' . Date::parse('j. F', $this->getLastDayOfWeekTimestamp($objEvent->startDate));
-            $arrRow['eventDates']  = $this->getEventPeriod($objEvent->id, 'd.');
-            $arrRow['weekday']     = $this->getEventPeriod($objEvent->id, 'D');
-            $arrRow['title']       = $objEvent->title . ($objEvent->eventType === 'lastMinuteTour' ? ' (LAST MINUTE TOUR!)' : '');
+            $arrRow['week'] = Date::parse('W', $objEvent->startDate) . ', ' . Date::parse('j.', $this->getFirstDayOfWeekTimestamp($objEvent->startDate)) . '-' . Date::parse('j. F', $this->getLastDayOfWeekTimestamp($objEvent->startDate));
+            $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, 'd.');
+            $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
+            $arrRow['title'] = $objEvent->title . ($objEvent->eventType === 'lastMinuteTour' ? ' (LAST MINUTE TOUR!)' : '');
             $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false));
-            $arrRow['organizers']  = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'titlePrint'));
+            $arrRow['organizers'] = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'titlePrint'));
 
             // tourType
             $arrEventType = CalendarEventsHelper::getTourTypesAsArray($objEvent->id, 'shortcut', false);
