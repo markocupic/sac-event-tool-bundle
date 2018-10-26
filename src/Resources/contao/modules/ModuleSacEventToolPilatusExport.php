@@ -189,7 +189,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
 
         // Now let's add form fields:
         $objForm->addFormField('timeRangeStart', array(
-            'label'     => 'Zeitspanne (Startdatum)',
+            'label'     => array('Zeitspanne manuelle Eingabe (Startdatum)','sdff'),
             'inputType' => 'text',
             'eval'      => array('mandatory' => false, 'maxlength' => '10', 'minlength' => 8, 'placeholder' => 'dd-mm-YYYY'),
             'value'     => Input::post('timeRangeStart')
@@ -197,7 +197,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
 
         // Now let's add form fields:
         $objForm->addFormField('timeRangeEnd', array(
-            'label'     => 'Zeitspanne (Enddatum)',
+            'label'     => 'Zeitspanne manuelle Eingabe (Enddatum)',
             'inputType' => 'text',
             'eval'      => array('mandatory' => false, 'maxlength' => '10', 'minlength' => 8, 'placeholder' => 'dd-mm-YYYY'),
             'value'     => Input::post('timeRangeEnd')
