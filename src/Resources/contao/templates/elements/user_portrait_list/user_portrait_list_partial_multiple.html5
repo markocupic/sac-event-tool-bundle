@@ -10,20 +10,22 @@
     <div class="col-7 col-sm-7 col-md-7 col-xl-6 ">
       <strong><?= trim($this->lastname . ' ' . $this->firstname) ?></strong>
       <small>
-      <?php if($this->hasRoleEmail): ?>
-        {{br}}
-        <?= implode('<br>', $this->roleEmails); ?>
+        <?php if($this->hasRoleEmail): ?>
+          <?php $arrEmail = array_unique($this->roleEmails); ?>
+          <?php foreach($arrEmail as $email): ?>
+          {{br}}{{email_open::<?= $email ?>}}<?= $email ?></a>
+          <?php endforeach; ?>
         <?php endif; ?>
         {{br}}
-          <?php if (FE_USER_LOGGED_IN): ?>
-            <!-- Show personal data to logged users only -->
-            <?php if ($this->street != ''): ?><?= $this->street ?>{{br}}<?php endif; ?>
-            <?php if ($this->postal != ''): ?><?= $this->postal ?>&nbsp;<?php endif; ?>
-            <?php if ($this->city != ''): ?><?= $this->city ?>{{br}}<?php endif; ?>
-            <?php if ($this->phone != ''): ?>P: <?= $this->phone ?>{{br}}<?php endif; ?>
-            <?php if ($this->mobile != ''): ?>M: <?= $this->mobile ?>{{br}}<?php endif; ?>
-            <?php if ($this->email != ''): ?>{{email_open::<?= $this->email ?>}}<?= $this->email ?></a>{{br}}<?php endif; ?>
-          <?php endif; ?>
+        <?php if (FE_USER_LOGGED_IN): ?>
+          <!-- Show personal data to logged users only -->
+          <?php if ($this->street != ''): ?><?= $this->street ?>{{br}}<?php endif; ?>
+          <?php if ($this->postal != ''): ?><?= $this->postal ?>&nbsp;<?php endif; ?>
+          <?php if ($this->city != ''): ?><?= $this->city ?>{{br}}<?php endif; ?>
+          <?php if ($this->phone != ''): ?>P: <?= $this->phone ?>{{br}}<?php endif; ?>
+          <?php if ($this->mobile != ''): ?>M: <?= $this->mobile ?>{{br}}<?php endif; ?>
+          <?php if ($this->email != ''): ?>{{email_open::<?= $this->email ?>}}<?= $this->email ?></a>{{br}}<?php endif; ?>
+        <?php endif; ?>
       </small>
     </div>
   </div>

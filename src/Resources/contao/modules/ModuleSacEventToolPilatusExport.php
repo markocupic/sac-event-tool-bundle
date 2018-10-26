@@ -393,7 +393,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             }
 
             // Call helper method
-            $arrRow = $this->getEventDetails($objEvent);
+            $arrRow = $this->getEventDetails($eventModel);
 
 
             // Headline
@@ -438,6 +438,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE (eventType=?) AND startDate>=? AND endDate<=? ORDER BY startDate ASC')->execute($type, $this->startDate, $this->endDate);
             while ($objEvent->next())
             {
+
                 $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
                 if (!in_array($objOrganizer->id, $arrOrganizers))
                 {
@@ -451,6 +452,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                     continue;
                 }
 
+
                 // Check if event is at least on second highest level (Level 3/4)
                 $eventModel = CalendarEventsModel::findByPk($objEvent->id);
                 if (!$this->hasValidReleaseLevel($eventModel, $this->eventReleaseLevel))
@@ -458,8 +460,9 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                     continue;
                 }
 
+
                 // Call helper method
-                $arrRow = $this->getEventDetails($objEvent);
+                $arrRow = $this->getEventDetails($eventModel);
 
                 // Headline
                 $arrHeadline = array();
@@ -491,6 +494,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         }
 
         $this->{$type . 's'} = $arrOrganizerContainer;
+
     }
 
     /**
@@ -501,7 +505,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
      */
     private function getEventDetails($objEvent)
     {
-        $arrRow = $objEvent->fetchAssoc();
+        $arrRow = $objEvent->row();
         $arrRow['eventState'] = $objEvent->eventState != '' ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
         $arrRow['week'] = Date::parse('W', $objEvent->startDate);
         $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);

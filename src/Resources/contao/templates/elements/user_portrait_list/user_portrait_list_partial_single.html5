@@ -10,9 +10,11 @@
     <div class="col-7 col-sm-7 col-md-7 col-xl-6 ">
       <strong><?= trim($this->lastname . ' ' . $this->firstname) ?></strong>
       <small>
-      <?php if($this->hasRoleEmail): ?>
-        {{br}}
-        <?= implode('<br>', $this->roleEmails); ?>
+        <?php if($this->hasRoleEmail): ?>
+        <?php $arrEmail = array_unique($this->roleEmails); ?>
+        <?php foreach($arrEmail as $email): ?>
+        {{br}}{{email_open::<?= $email ?>}}<?= $email ?></a>
+        <?php endforeach; ?>
         <?php endif; ?>
         {{br}}
 
