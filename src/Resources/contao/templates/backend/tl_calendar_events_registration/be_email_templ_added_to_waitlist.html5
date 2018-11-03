@@ -7,6 +7,8 @@ Leider kann ich dir für den Kurs: <?php if($this->courseId != ''): ?><?= $this-
 Leider kann ich dir für den Event: "<?= $this->eventname ?>" im Moment noch keine Zusage erteilen. Du wirst auf die Warteliste gesetzt und sollte ein Platz frei werden, wieder kontaktiert.
 <?php endif; ?>
 
+Fragen bitte an <?= $this->emailGuide ?> richten.
+
 Freundliche Grüsse
 
 <?= $this->nameGuide ?>

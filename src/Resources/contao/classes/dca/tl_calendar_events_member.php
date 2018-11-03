@@ -264,43 +264,65 @@ class tl_calendar_events_member extends Backend
                 {
                     throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
                 }
-                $objEmail = new Email();
-                $objEmail->from = Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL');
-                $objEmail->fromName = html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'));
-                $objEmail->replyTo($this->User->email);
-                $objEmail->subject = Input::post('emailSubject');
-                $objEmail->text = Input::post('emailText');
-                if (Input::post('emailSendCopy'))
-                {
-                    $objEmail->sendBcc($this->User->email);
-                }
 
-                // Add attachment
-                if (Input::post('addEmailAttachment'))
+
+                $objEmail = Notification::findOneByType('default_email');
+
+                // Use terminal42/notification_center
+                if ($objEmail !== null)
                 {
-                    if (Input::post('emailAttachment') !== '')
+                    // Set token array
+                    $arrTokens = array(
+                        'email_sender_name'  => html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME')),
+                        'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
+                        'reply_to'           => $this->User->email,
+                        'email_subject'      => html_entity_decode(Input::post('emailSubject')),
+                        'email_text'         => html_entity_decode(strip_tags(Input::post('emailText'))),
+                    );
+
+                    if (Input::post('emailSendCopy'))
                     {
-                        $arrUUID = explode(',', Input::post('emailAttachment'));
-                        if (is_array($arrUUID) && !empty($arrUUID))
+                        $arrTokens['recipient_bcc'] = $this->User->email;
+                    }
+
+
+                    $arrFiles = array();
+
+                    // Add attachment
+                    if (Input::post('addEmailAttachment'))
+                    {
+                        if (Input::post('emailAttachment') !== '')
                         {
-                            foreach ($arrUUID as $uuid)
+                            $arrUUID = explode(',', Input::post('emailAttachment'));
+                            if (is_array($arrUUID) && !empty($arrUUID))
                             {
-                                $objFile = FilesModel::findByUuid($uuid);
-                                if ($objFile !== null)
+                                foreach ($arrUUID as $uuid)
                                 {
-                                    if (is_file(TL_ROOT . '/' . $objFile->path))
+                                    $objFile = FilesModel::findByUuid($uuid);
+                                    if ($objFile !== null)
                                     {
-                                        $objEmail->attachFile(TL_ROOT . '/' . $objFile->path);
+                                        if (is_file(TL_ROOT . '/' . $objFile->path))
+                                        {
+                                            $arrFiles[] = $objFile->path;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                $arrRecipients = array_unique($arrRecipients);
-                if (count($arrRecipients) > 0)
-                {
-                    $objEmail->sendTo($arrRecipients);
+
+                    $strAttachments = implode(',', $arrFiles);
+                    if ($strAttachments !== '')
+                    {
+                        $arrTokens['attachment_token'] = $strAttachments;
+                    }
+
+                    $arrRecipients = array_unique($arrRecipients);
+                    if (count($arrRecipients) > 0)
+                    {
+                        $arrTokens['send_to'] = implode(',', $arrRecipients);
+                        $objEmail->send($arrTokens, 'de');
+                    }
                 }
             }
         }
@@ -708,27 +730,37 @@ class tl_calendar_events_member extends Backend
                     {
                         throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
                     }
-                    $objEmail = new Email();
-                    $objEmail->from = Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL');
-                    $objEmail->fromName = html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'));
-                    $objEmail->replyTo($this->User->email);
-                    $objEmail->subject = Input::post('subject');
-                    $objEmail->text = strip_tags(Input::post('text'));
 
-                    // Send copy to instructor
-                    // $objEmail->sendBcc($this->User->email);
+                    $objEmail = Notification::findOneByType('default_email');
 
-                    // Send email
-                    if (Validator::isEmail($objRegistration->email))
+                    // Use terminal42/notification_center
+                    if ($objEmail !== null)
                     {
-                        $objEmail->sendTo($objRegistration->email);
-                        $set = array('stateOfSubscription' => 'subscription-refused');
-                        $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
-                        $_SESSION['addInfo'] = 'Dem Benutzer wurde mit einer E-Mail eine Absage versandt.';
-                    }
-                    else
-                    {
-                        $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.';
+                        // Set token array
+                        $arrTokens = array(
+                            'email_sender_name'  => html_entity_decode(html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'))),
+                            'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
+                            'send_to'            => $objRegistration->email,
+                            'reply_to'           => $this->User->email,
+                            // 'recipient_cc'       => '',
+                            // 'recipient_bcc'      => '',
+                            'email_subject'      => html_entity_decode(Input::post('subject')),
+                            'email_text'         => html_entity_decode(strip_tags(Input::post('text'))),
+                            'email_html'         => html_entity_decode(''),
+                        );
+
+                        // Send email
+                        if (Validator::isEmail($objRegistration->email))
+                        {
+                            $objEmail->send($arrTokens, 'de');
+                            $set = array('stateOfSubscription' => 'subscription-refused');
+                            $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
+                            $_SESSION['addInfo'] = 'Dem Benutzer wurde mit einer E-Mail eine Absage versandt.';
+                        }
+                        else
+                        {
+                            $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.';
+                        }
                     }
                 }
                 $this->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=' . Input::get('id') . '&act=edit&rt=' . Input::get('rt'));
@@ -757,6 +789,7 @@ class tl_calendar_events_member extends Backend
             $objEmailTemplate->courseId = $objEvent->courseId;
             $objEmailTemplate->eventType = $objEvent->eventType;
             $objEmailTemplate->nameGuide = $this->User->name;
+            $objEmailTemplate->emailGuide = $this->User->email;
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_refuse_with_email');
@@ -798,31 +831,45 @@ class tl_calendar_events_member extends Backend
                     {
                         throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
                     }
-                    $objEmail = new Email();
-                    $objEmail->from = Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL');
-                    $objEmail->fromName = html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'));
-                    $objEmail->replyTo($this->User->email);
-                    $objEmail->subject = Input::post('subject');
-                    $objEmail->text = strip_tags(Input::post('text'));
 
-                    // Check if member has already booked at the same time
-                    $objMember = MemberModel::findBySacMemberId($objRegistration->sacMemberId);
-                    if ($objMember !== null && CalendarEventsHelper::areBookingDatesOccupied($objRegistration->eventId, $objMember->id))
-                    {
-                        $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht bestätigt serden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde.';
-                    }
-                    // Send email
-                    elseif (Validator::isEmail($objRegistration->email))
-                    {
-                        $objEmail->sendTo($objRegistration->email);
+                    $objEmail = Notification::findOneByType('default_email');
 
-                        $set = array('stateOfSubscription' => 'subscription-accepted');
-                        $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
-                        $_SESSION['addInfo'] = 'Dem Benutzer wurde mit einer E-Mail eine Zusage für diesen Event versandt.';
-                    }
-                    else
+                    // Use terminal42/notification_center
+                    if ($objEmail !== null)
                     {
-                        $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.';
+                        // Set token array
+                        $arrTokens = array(
+                            'email_sender_name'  => html_entity_decode(html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'))),
+                            'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
+                            'send_to'            => $objRegistration->email,
+                            'reply_to'           => $this->User->email,
+                            // 'recipient_cc'       => html_entity_decode(''),
+                            // 'recipient_bcc'      => html_entity_decode(''),
+                            'email_subject'      => html_entity_decode(Input::post('subject')),
+                            'email_text'         => html_entity_decode(strip_tags(Input::post('text'))),
+                            //'email_html' => html_entity_decode(''),
+                        );
+
+                        // Check if member has already booked at the same time
+                        $objMember = MemberModel::findBySacMemberId($objRegistration->sacMemberId);
+                        if ($objMember !== null && CalendarEventsHelper::areBookingDatesOccupied($objRegistration->eventId, $objMember->id))
+                        {
+                            $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht bestätigt serden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde.';
+                        }
+                        // Send email
+                        elseif (Validator::isEmail($objRegistration->email))
+                        {
+                            // Send message
+                            $objEmail->send($arrTokens, 'de');
+
+                            $set = array('stateOfSubscription' => 'subscription-accepted');
+                            $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
+                            $_SESSION['addInfo'] = 'Dem Benutzer wurde mit einer E-Mail eine Zusage für diesen Event versandt.';
+                        }
+                        else
+                        {
+                            $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.';
+                        }
                     }
                 }
                 $this->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=' . Input::get('id') . '&act=edit&rt=' . Input::get('rt'));
@@ -851,6 +898,8 @@ class tl_calendar_events_member extends Backend
             $objEmailTemplate->courseId = $objEvent->courseId;
             $objEmailTemplate->eventType = $objEvent->eventType;
             $objEmailTemplate->nameGuide = $this->User->name;
+            $objEmailTemplate->emailGuide = $this->User->email;
+
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_accept_with_email');
@@ -889,27 +938,36 @@ class tl_calendar_events_member extends Backend
                     {
                         throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
                     }
-                    $objEmail = new Email();
-                    $objEmail->from = Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL');
-                    $objEmail->fromName = html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'));
-                    $objEmail->replyTo($this->User->email);
-                    $objEmail->subject = Input::post('subject');
-                    $objEmail->text = strip_tags(Input::post('text'));
+                    $objEmail = Notification::findOneByType('default_email');
 
-                    // Send copy to instructor
-                    // $objEmail->sendBcc($this->User->email);
+                    // Use terminal42/notification_center
+                    if ($objEmail !== null)
+                    {
+                        // Set token array
+                        $arrTokens = array(
+                            'email_sender_name'  => html_entity_decode(html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'))),
+                            'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
+                            'send_to'            => $objRegistration->email,
+                            'reply_to'           => $this->User->email,
+                            // 'recipient_cc'       => '',
+                            // 'recipient_bcc'      => '',
+                            'email_subject'      => html_entity_decode(Input::post('subject')),
+                            'email_text'         => html_entity_decode(strip_tags(Input::post('text'))),
+                            'email_html'         => html_entity_decode(''),
+                        );
 
-                    // Send email
-                    if (Validator::isEmail($objRegistration->email))
-                    {
-                        $objEmail->sendTo($objRegistration->email);
-                        $set = array('stateOfSubscription' => 'subscription-waitlisted');
-                        $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
-                        $_SESSION['addInfo'] = 'Dem Benutzer wurde auf die Warteliste gesetzt und mit einer E-Mail dar&uuml;ber informiert.';
-                    }
-                    else
-                    {
-                        $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.';
+                        // Send email
+                        if (Validator::isEmail($objRegistration->email))
+                        {
+                            $objEmail->send($arrTokens, 'de');
+                            $set = array('stateOfSubscription' => 'subscription-waitlisted');
+                            $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
+                            $_SESSION['addInfo'] = 'Dem Benutzer wurde auf die Warteliste gesetzt und mit einer E-Mail dar&uuml;ber informiert.';
+                        }
+                        else
+                        {
+                            $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.';
+                        }
                     }
                 }
                 $this->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=' . Input::get('id') . '&act=edit&rt=' . Input::get('rt'));
@@ -938,6 +996,8 @@ class tl_calendar_events_member extends Backend
             $objEmailTemplate->courseId = $objEvent->courseId;
             $objEmailTemplate->eventType = $objEvent->eventType;
             $objEmailTemplate->nameGuide = $this->User->name;
+            $objEmailTemplate->emailGuide = $this->User->email;
+
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_added_to_waitlist');

@@ -168,4 +168,26 @@ class tl_calendar_events_instructor_invoice extends Backend
     {
         return '<div class="tl_content_left"><span class="level">Verg&uuml;tungsformular (mit Tour Rapport) von: ' . UserModel::findByPk($row['userPid'])->name . '</span> <span>[' . CalendarEventsModel::findByPk($row['pid'])->title . ']</span></div>';
     }
+
+
+    /**
+     * buttons_callback buttonsCallback
+     * @param $arrButtons
+     * @param $dc
+     * @return mixed
+     */
+    public function buttonsCallback($arrButtons, $dc)
+    {
+
+        if (\Contao\Input::get('act') === 'edit')
+        {
+            unset($arrButtons['saveNcreate']);
+            unset($arrButtons['saveNduplicate']);
+            unset($arrButtons['saveNedit']);
+            unset($arrButtons['saveNback']);
+
+        }
+
+        return $arrButtons;
+    }
 }

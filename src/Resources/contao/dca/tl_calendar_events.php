@@ -35,6 +35,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = arra
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'adjustDurationInfo');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'setEventToken');
 
+// Buttons callback
+$GLOBALS['TL_DCA']['tl_calendar_events']['edit']['buttons_callback'][] = array('tl_calendar_events_sac_event_tool', 'buttonsCallback');
 
 // List
 // Sortierung nach Datum neuste Events zu letzt

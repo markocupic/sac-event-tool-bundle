@@ -7,8 +7,12 @@ Du bist für den Kurs: <?php if($this->courseId != ''): ?><?= $this->courseId ?>
 Du bist für den Event: "<?= $this->eventname ?>" definitiv angemeldet und deine Teilnahme ist bestätigt.
 <?php endif; ?>
 
+Fragen bitte an <?= $this->emailGuide ?> richten.
+
 Freundliche Grüsse
 
 <?= $this->nameGuide ?>
+
+
 
 

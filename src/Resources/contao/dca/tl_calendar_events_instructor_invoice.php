@@ -34,6 +34,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = array
         )
     ),
 
+    // Buttons callback
+    'edit'   => array(
+        'buttons_callback' => array(array('tl_calendar_events_instructor_invoice', 'buttonsCallback'))
+    ),
+
+
     'list'     => array
     (
         'sorting'           => array
@@ -62,26 +68,26 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = array
         ),
         'operations'        => array
         (
-            'edit'            => array
+            'edit'                => array
             (
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.gif'
             ),
-            'copy'            => array
+            'copy'                => array
             (
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.gif'
             ),
-            'delete'          => array
+            'delete'              => array
             (
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"'
             ),
-            'generateInvoicePdf' => array
+            'generateInvoicePdf'  => array
             (
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoicePdf'],
                 'href'       => 'action=generateInvoicePdf',

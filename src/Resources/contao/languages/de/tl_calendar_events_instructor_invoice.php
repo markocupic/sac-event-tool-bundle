@@ -8,7 +8,7 @@
  * @link https://sac-kurse.kletterkader.com
  */
 
-$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['new'] = array("Neues Verg&uuml;tungsformular", "Neues Verg&uuml;tungsformular hinzuf&uuml;gen.");
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['new'] = array("Neues Verg&uuml;tungsformular mit Tourrapport", "Neues Verg&uuml;tungsformular mit Tourrapport hinzuf&uuml;gen.");
 
 // Operations
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['edit'] = array("Verg&uuml;tungsformular bearbeiten", "Verg&uuml;tungsformular mit ID %s bearbeiten.");

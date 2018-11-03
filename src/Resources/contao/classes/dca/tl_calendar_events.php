@@ -928,6 +928,14 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function buttonsCallback($arrButtons, $dc)
     {
+
+        if (\Contao\Input::get('call') === 'writeTourReport')
+        {
+            unset($arrButtons['saveNcreate']);
+            unset($arrButtons['saveNduplicate']);
+            unset($arrButtons['saveNedit']);
+        }
+
         return $arrButtons;
     }
 
