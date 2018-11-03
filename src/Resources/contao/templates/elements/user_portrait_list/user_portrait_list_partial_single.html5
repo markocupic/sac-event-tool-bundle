@@ -12,6 +12,11 @@
       <small>
         <?php if($this->hasRoleEmail): ?>
         <?php $arrEmail = array_unique($this->roleEmails); ?>
+        <?php if(FE_USER_LOGGED_ID && $this->email != ''): ?>
+          <?php if(($key = array_search($this->email, $arrEmail)) !== FALSE): ?>
+            <?php $this->email = ''; ?>
+          <?php endif; ?>
+        <?php endif; ?>
         <?php foreach($arrEmail as $email): ?>
         {{br}}{{email_open::<?= $email ?>}}<?= $email ?></a>
         <?php endforeach; ?>
