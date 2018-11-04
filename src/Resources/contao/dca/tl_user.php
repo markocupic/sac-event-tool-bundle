@@ -208,6 +208,18 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['hideInFrontendListings'] = array(
     'sql'       => "varchar(1) NOT NULL default ''",
 );
 
+// avatarUpload  !!!!Not in use not in use delete after golive
+$GLOBALS['TL_DCA']['tl_user']['fields']['avatarUpload'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_user']['avatarUpload'],
+    'exclude'   => true,
+    'search'    => true,
+    'sorting'   => true,
+    'flag'      => 1,
+    'inputType' => 'checkbox',
+    'eval'      => array('mandatory' => false, 'tl_class' => 'clr'),
+    'sql'       => "char(1) NOT NULL default ''",
+);
+
 // gender
 $GLOBALS['TL_DCA']['tl_user']['fields']['gender'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_user']['gender'],

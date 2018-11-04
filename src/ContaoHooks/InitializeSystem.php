@@ -13,6 +13,10 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 use Contao\Automator;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Database;
+use Contao\Dbafs;
+use Contao\File;
+use Contao\Files;
+use Contao\FilesModel;
 use Contao\Input;
 use Contao\System;
 use NotificationCenter\Model\Language;
@@ -41,6 +45,86 @@ class InitializeSystem
     public function __construct(ContaoFrameworkInterface $framework)
     {
         $this->framework = $framework;
+    }
+
+
+    /**
+     * !!! Not in use, not in use.....
+     * @throws \Exception
+     */
+    protected function avatarUpload()
+    {
+        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_user')->execute('');
+        while ($objDb->next())
+        {
+            if ($objDb->avatarSRC == '')
+            {
+                /**
+                $targetSRC = sprintf('files/sac_pilatus/be_user_home_directories/%s/avatar/%s.jpg', $objDb->id, $objDb->username);
+                if(is_file(TL_ROOT . '/' . $targetSRC))
+                {
+                    $objFile = FilesModel::findByPath($targetSRC);
+                    if($objFile !== null)
+                    {
+                        $set = array(
+                            'avatarSRC'    => $objFile->uuid,
+                            'avatarUpload' => '1',
+                            'tstamp'       => time()
+                        );
+                        $objStmt = Database::getInstance()->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objDb->id);
+                    }
+                }
+              **/
+                //avatarUpload
+                $src = sprintf('files/avatare/%s.jpg', $objDb->username);
+                //echo $src . '<br>';
+                if (is_file(TL_ROOT . '/' . $src))
+                {
+                    $objFile = new File($src);
+                    if ($objFile->isGdImage)
+                    {
+                        $targetSRC = sprintf('files/sac_pilatus/be_user_home_directories/%s/avatar/%s.jpg', $objDb->id, $objDb->username);
+                        if (!is_file(TL_ROOT . '/' . $targetSRC))
+                        {
+
+                            if (Files::getInstance()->rename($src, $targetSRC))
+                            {
+                                Dbafs::addResource($targetSRC);
+                                $objNew = FilesModel::findByPath($targetSRC);
+                                if ($objNew !== null)
+                                {
+                                    $set = array(
+                                        'avatarSRC'    => $objNew->uuid,
+                                        'avatarUpload' => '1',
+                                        'tstamp'       => time()
+                                    );
+                                    $objStmt = Database::getInstance()->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objDb->id);
+                                    if ($objStmt->insertId > 0)
+                                    {
+                                        echo sprintf('Avatar von %s hochgeladen.', $objDb->username) . '<br>';
+                                    }
+                                    else
+                                    {
+                                        //Files::getInstance()->delete($targetSRC);
+                                        //echo sprintf("Error 1 bei %s", $objDb->username) . "<br>";
+                                    }
+                                }
+                                else
+                                {
+                                    //Files::getInstance()->delete($targetSRC);
+                                    echo sprintf("Error 2 bei %s", $objDb->username) . "<br>";
+                                }
+                            }
+                            else
+                            {
+                                echo sprintf("Error 3 bei %s", $objDb->username) . "<br>";
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
 
