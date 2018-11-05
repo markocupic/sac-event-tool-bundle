@@ -104,9 +104,10 @@ var EventFilter = {
         "use strict";
         var self = this;
 
-        // Add loading icon
-        $('.loading-icon-lg').remove();
-        self.$eventList.first().append(self.options.loadingIcon.html);
+        // Show loading icon
+        if(typeof self.options['loadingIcon'] !== 'undefined') {
+            $('.loader-icon-container').removeClass('invisible');
+        }
     },
 
     /**
@@ -114,9 +115,13 @@ var EventFilter = {
      */
     hideLoadingIcon: function () {
         "use strict";
+        var self = this;
 
         // Add loading icon
-        $('.loading-icon-lg').remove();
+        if(typeof self.options['loadingIcon'] !== 'undefined')
+        {
+            $('.loader-icon-container').addClass('invisible');
+        }
     },
 
     /**
@@ -219,6 +224,11 @@ var EventFilter = {
                 if (itemsFound === 0 && $('.alert-no-results-found').length === 0) {
 
                     self.$eventList.first().append(self.options.noResult.html);
+                }
+                
+                if(typeof self.options['eventContainer'] !== 'undefined')
+                {
+                    $(self.options['eventContainer']).removeClass('d-none');
                 }
 
                 $('html, body').animate({

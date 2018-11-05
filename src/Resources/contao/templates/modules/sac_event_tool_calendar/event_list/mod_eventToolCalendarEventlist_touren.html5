@@ -22,7 +22,7 @@
 <!-- indexer::continue -->
 
 
-<table class="table layout-table table-responsive">
+<table class="event-container d-none table layout-table table-responsive">
   <tr>
     <th>Datum</th>
     <th class="d-none d-md-table-cell">Dauer</th>
@@ -37,8 +37,11 @@
 </table>
 
 
-<?php $this->block('content'); ?>
-<?php $this->endblock(); ?>
+
+<!-- loader icon -->
+<div class="loader-icon-container visible loading-icon-lg"><div class="preloader-icon"></div></div>
+
+
 
 
 </div>

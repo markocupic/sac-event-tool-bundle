@@ -14,17 +14,19 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.js|
                 action: 'ajax?filterCourseList'
             },
             delay: 1500,
-            loadingIcon: {
-                html: '<div class="loading-icon-lg"><div class="preloader-icon"></div></div>'
-            },
+            loadingIcon: '.loading-icon-container',
+            eventContainer: '.event-container',
             noResult:{
                 html: '<div class="alert alert-primary alert-no-results-found text-lg" role="alert"><h5><i class="fal fa-meh" aria-hidden="true"></i> Leider wurden zu deiner Suchanfrage keine Events gefunden. &Uuml;berp&uuml;fe bitte die Filtereinstellungen.</h5></div>'
             }
         });
+
+        $('#eventFilterBoard').css('opacity',1);
+
     });
 </script>
 
-<div class="filter-board" id="eventFilterBoard">
+<div class="filter-board" style="opacity: 0" id="eventFilterBoard">
   <div class="inside">
     <div class="d-lg-none text-right">
       <button class="btn btn-link close-event-filter-button"><i class="fal fa-times"></i> Filter schliessen</button>
