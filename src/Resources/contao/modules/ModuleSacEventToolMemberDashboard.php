@@ -122,7 +122,7 @@ class ModuleSacEventToolMemberDashboard extends Module
         }
 
         // Sign out from Event
-        if (Input::get('do') === 'rotate-avatar')
+        if (Input::get('do') === 'rotate-avatar' || Input::get('do') === 'rotate-image')
         {
             $this->rotateImage(Input::get('img'));
             $url = Url::removeQueryString(['img', 'do']);
@@ -329,6 +329,9 @@ class ModuleSacEventToolMemberDashboard extends Module
                 }
 
 
+                $objNewEventStoryForm = $this->generateCreateNewEventStoryForm();
+                $this->Template->newEventStoryForm = $objNewEventStoryForm;
+
                 // Event Stories
                 $arrEventStories = array();
                 $objEventStory = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? ORDER BY eventStartDate DESC')->execute($this->objUser->sacMemberId);
@@ -369,7 +372,6 @@ class ModuleSacEventToolMemberDashboard extends Module
                 $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
                 if ($objEvent !== null)
                 {
-
                     // Do not allow blogging for old events
                     if ($objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 < time())
                     {
@@ -689,6 +691,66 @@ class ModuleSacEventToolMemberDashboard extends Module
         {
             Message::add($errorMsg, 'TL_ERROR', TL_MODE);
         }
+    }
+
+
+
+
+    protected function generateCreateNewEventStoryForm()
+    {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+
+
+        $objForm = new Form('form-create-new-event-story', 'POST', function ($objHaste) {
+            return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
+        });
+
+
+        $objForm->setFormActionFromUri(Environment::get('uri'));
+
+        $arrOptions = array();
+        $arrEvents = CalendarEventsMemberModel::findPastEventsByMemberId2($this->objUser->id, $this->timeSpanForCreatingNewEventStory);
+        if(is_array($arrEvents) && !empty($arrEvents))
+        {
+            foreach($arrEvents as $event)
+            {
+                if($event['objEvent'] !== null)
+                {
+                    $objEvent = $event['objEvent'];
+                    $arrOptions[$event['id']] = $objEvent->title;
+                }
+            }
+        }
+
+        // Now let's add form fields:
+        $objForm->addFormField('event', array(
+            'label'     => 'Tourenbericht zu diesem Anlass schreiben',
+            'inputType' => 'select',
+            'options' => $arrOptions,
+            'eval'      => array('mandatory' => true),
+        ));
+
+
+        // Let's add  a submit button
+        $objForm->addFormField('submit', array(
+            'label'     => 'Weiter',
+            'inputType' => 'submit',
+        ));
+
+        if ($objForm->validate())
+        {
+            // Reload page after uploads
+            if (Input::post('FORM_SUBMIT') === 'form-create-new-event-story')
+            {
+                $objWidget = $objForm->getWidget('event');
+                Controller::redirect(Frontend::addToUrl('action=write_event_story&amp;eventId=' . $objWidget->value));
+            }
+        }
+
+
+        return $objForm->generate();
+
+
     }
 
     /**

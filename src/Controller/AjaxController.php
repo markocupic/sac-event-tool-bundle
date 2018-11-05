@@ -71,6 +71,15 @@ class AjaxController extends Controller
         }
 
         // Event story
+        if (Input::post('action') === 'rotate-image')
+        {
+            $controller = new FrontendAjax();
+            $fileId = Input::post('fileId');
+            $controller->rotateImage($fileId);
+        }
+
+
+        // Event story
         if (Input::post('action') === 'getCaption')
         {
             $controller = new FrontendAjax();

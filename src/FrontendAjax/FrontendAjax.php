@@ -29,6 +29,7 @@ use Contao\UserModel;
 use Contao\Validator;
 use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\RotateImage;
 use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -651,6 +652,25 @@ class FrontendAjax
             $oFile = new File($objFile->path);
             $oFile->delete();
             $objFile->delete();
+        }
+        $response = new JsonResponse(array('status' => 'success'));
+        return $response->send();
+    }
+
+
+    /**
+     * Ajax call
+     * Rotate image 
+     */
+    public function rotateImage($fileId)
+    {
+        if (RotateImage::rotate($fileId, 270))
+        {
+            $response = new JsonResponse(array('status' => 'success'));
+        }
+        else
+        {
+            $response = new JsonResponse(array('status' => 'error'));
         }
         $response = new JsonResponse(array('status' => 'success'));
         return $response->send();

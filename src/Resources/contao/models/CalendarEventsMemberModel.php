@@ -14,6 +14,8 @@
 
 namespace Contao;
 
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+
 /**
  * Class CalendarEventsMemberModel
  * @package Contao
@@ -114,6 +116,88 @@ class CalendarEventsMemberModel extends \Model
                 $arr['registrationId'] = $objJoinedEvents->id;
                 $arr['objEvent'] = \CalendarEventsModel::findByPk($objEvents->id);
                 $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findById($objJoinedEvents->id);
+                $arrEvents[] = $arr;
+            }
+        }
+
+        return $arrEvents;
+    }
+
+    /**
+     * List all events where user has participated as member or instructor
+     * @param $memberId
+     * @return array
+     */
+    public static function findPastEventsByMemberId2($memberId, $timeSpanDays = 0)
+    {
+        $arrEvents = array();
+        $objMember = \MemberModel::findByPk($memberId);
+
+
+        $memberHasUserAccount = false;
+        if ($objMember !== null)
+        {
+            if ($objMember->sacMemberId != '')
+            {
+                $objUser = UserModel::findBySacMemberId($objMember->sacMemberId);
+                if ($objUser !== null)
+                {
+
+                    $memberHasUserAccount = true;
+                }
+            }
+        }
+
+        $queryTimeSpan = '';
+        if ($timeSpanDays > 0)
+        {
+            $limit = time() - $timeSpanDays*24*3600;
+            $queryTimeSpan = ' AND startDate>' . $limit . ' ';
+        }
+
+        $arrEventsAsInstructor = array();
+        if ($memberHasUserAccount)
+        {
+            $objEvents1 = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate<? ' . $queryTimeSpan . ' ORDER BY startDate DESC')->execute(time());
+            while ($objEvents1->next())
+            {
+                if ($objEvents1->instructor != '')
+                {
+
+                    $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvents1->id);
+                    if (in_array($objUser->id, $arrInstructors))
+                    {
+                        $arrEventsAsInstructor[] = $objEvents1->id;
+                    }
+                }
+            }
+        }
+
+        $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate<? ' . $queryTimeSpan . ' ORDER BY startDate DESC')->execute(time());
+        while ($objEvents->next())
+        {
+            $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=? AND hasParticipated=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id, '1');
+            if ($objJoinedEvents->numRows)
+            {
+                $arr = $objEvents->row();
+                $arr['id'] = $objEvents->id;
+                $arr['role'] = 'member';
+                $arr['dateSpan'] = ($objEvents->startDate != $objEvents->endDate) ? \Date::parse('d.m.', $objEvents->startDate) . ' - ' . \Date::parse('d.m.Y', $objEvents->endDate) : \Date::parse('d.m.Y', $objEvents->startDate);
+                $arr['registrationId'] = $objJoinedEvents->id;
+                $arr['objEvent'] = \CalendarEventsModel::findByPk($objEvents->id);
+                $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findById($objJoinedEvents->id);
+                $arrEvents[] = $arr;
+            }
+            // Instructor
+            elseif (in_array($objEvents->id, $arrEventsAsInstructor))
+            {
+                $arr = $objEvents->row();
+                $arr['id'] = $objEvents->id;
+                $arr['role'] = 'instructor';
+                $arr['dateSpan'] = ($objEvents->startDate != $objEvents->endDate) ? \Date::parse('d.m.', $objEvents->startDate) . ' - ' . \Date::parse('d.m.Y', $objEvents->endDate) : \Date::parse('d.m.Y', $objEvents->startDate);
+                $arr['registrationId'] = null;
+                $arr['objEvent'] = \CalendarEventsModel::findByPk($objEvents->id);
+                $arr['eventRegistrationModel'] = null;
                 $arrEvents[] = $arr;
             }
         }

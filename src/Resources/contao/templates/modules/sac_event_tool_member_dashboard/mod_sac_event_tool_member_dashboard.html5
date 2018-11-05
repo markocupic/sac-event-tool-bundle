@@ -91,6 +91,7 @@
                   <tr>
                     <td><?= $event['dateSpan'] ?></td>
                     <td><?= $event['objEvent']->title ?></td>
+                      <!--
                     <td class="text-center">
                         <?php if ($event['canEditStory'] || $event['canOpenStory']): ?>
                           <a href="<?= $event['objStoryLink'] ?>" role="button" title="Kursbericht <?php if ($event['canEditStory']): ?>bearbeiten<?php else: ?>erstellen<?php endif; ?>" class="btn btn-sm btn-danger">
@@ -100,7 +101,7 @@
                             </span>
                           </a>
                         <?php endif; ?>
-                    </td>
+                    </td>-->
                     <td class="text-center"><a href="<?= $event['downloadCourseConfirmationLink'] ?>" title="Kursbestätigung downloaden" class="btn btn-sm btn-info"><i class="fal fa-fw fa-download"></a></td>
                   </tr>
                   <?php endif; ?>
@@ -126,6 +127,7 @@
                           <small><span style="color:red">Ausweichtour: <?= $event['eventSubstitutionText'] ?></span></small>
                         <?php endif; ?>
                     </td>
+                      <!--
                     <td class="text-center">
                         <?php if ($event['canEditStory'] || $event['canOpenStory']): ?>
                           <a href="<?= $event['objStoryLink'] ?>" role="button" title="Tourbericht <?php if ($event['canEditStory']): ?>bearbeiten<?php else: ?>erstellen<?php endif; ?>" class="btn btn-sm btn-danger">
@@ -135,7 +137,7 @@
                             </span>
                           </a>
                         <?php endif; ?>
-                    </td>
+                    </td>-->
                   </tr>
                   <?php endif; ?>
               <?php endforeach; ?>
@@ -144,8 +146,12 @@
 
         <!-- tab-pane-4 -->
         <div class="tab-pane fade" id="nav-my-blogs" role="tabpanel" aria-labelledby="nav-profile-tab">
-          <h2 class="mt-0">Meine Tourenberichte</h2>
-          <table class="table layout-table table-responsive table-striped">
+            <h2 class="mt-0">Tourenberichte</h2>
+            <div class="alert bg-light">
+            <?= $this->newEventStoryForm ?>
+          </div>
+            <h3>Meine Tourenberichte</h3>
+            <table class="table layout-table table-responsive table-striped">
               <?php foreach ($this->arrEventStories as $story): ?>
                 <tr>
                   <td><?= $story['date'] ?></td>
