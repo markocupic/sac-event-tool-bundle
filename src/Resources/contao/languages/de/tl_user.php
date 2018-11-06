@@ -46,6 +46,7 @@ $GLOBALS['TL_LANG']['tl_user']['calendar_containers'] = array('Erlaubte SAC-Even
 $GLOBALS['TL_LANG']['tl_user']['calendar_containerp'] = array('SAC-Event-Jahrescontainer Rechte', '');
 $GLOBALS['TL_LANG']['tl_user']['sectionId'] = array('Sektions-Mitgliedschaft', 'Geben Sie die Sektionmitgliedschaft an.');
 $GLOBALS['TL_LANG']['tl_user']['disableOnlineRegistration'] = array('Online Anmeldungen standardm&auml;ssig ausschalten', 'Geben Sie an, ob bei diesem User die Online Anmeldung bei Events, bei denen dieser Autor ist, standarm&auml;ssig deaktiviert sein soll.');
+$GLOBALS['TL_LANG']['tl_user']['generateMainInstructorContactDataFromDb'] = array('Kontaktdaten standardmässig aus der Datenbank generieren', 'Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.');
 
 // References
 $GLOBALS['TL_LANG']['tl_user']['section']['4250'] = 'SAC PILATUS';

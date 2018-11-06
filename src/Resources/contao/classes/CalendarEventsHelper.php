@@ -138,6 +138,34 @@ class CalendarEventsHelper extends System
         return '';
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
+    public static function generateMainInstructorContactDataFromDb($id)
+    {
+
+        $objDb = Database::getInstance();
+        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
+        if ($objEvent->numRows)
+        {
+
+            $arrInstructors = static::getInstructorsAsArray($objEvent->id, false);
+            $objUser = UserModel::findByPk($arrInstructors[0]);
+            if ($objUser !== null)
+            {
+                $arrContact = array();
+                $arrContact[] = sprintf('<strong>%s %s</strong>', $objUser->lastname, $objUser->firstname);
+                $arrContact[] = sprintf('Tel.: %s', $objUser->phone);
+                $arrContact[] = sprintf('Mobile: %s', $objUser->mobile);
+                $arrContact[] = sprintf('E-Mail: %s', $objUser->email);
+                $arrContact = array_filter($arrContact);
+                return implode(', ', $arrContact);
+            }
+        }
+        return '';
+    }
+
 
     /**
      * Get instructors as array

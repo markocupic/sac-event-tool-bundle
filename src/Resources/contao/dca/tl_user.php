@@ -34,7 +34,7 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addField(array('avatarSRC'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('calendar_containers', 'calendar_containerp'), 'calendars_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
     ->addField(array('admin'), 'admin_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_user');
 
 // Manipulate palette extend
@@ -55,7 +55,7 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addField(array('hideInFrontendListings', 'userRole'), 'role_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('leiterQualifikation'), 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('avatarSRC', 'emergencyPhone', 'emergencyPhoneName', 'hobbies', 'introducing'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('extend', 'tl_user');
 
 // Manipulate palette admin
@@ -76,7 +76,7 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addField(array('hideInFrontendListings', 'userRole'), 'role_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('leiterQualifikation'), 'instructor_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('admin'), 'admin_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('admin', 'tl_user');
 
 // Manipulate palette login
@@ -94,7 +94,7 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addField(array('emergencyPhone', 'emergencyPhoneName'), 'emergency_phone_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('iban'), 'bank_account_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('avatarSRC', 'hobbies', 'introducing'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('login', 'tl_user');
 
 
@@ -403,9 +403,19 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['disableOnlineRegistration'] = array(
     'exclude'   => true,
     'search'    => true,
     'sorting'   => true,
-    'flag'      => 1,
     'inputType' => 'checkbox',
-    'eval'      => array('mandatory' => false, 'tl_class' => 'clr'),
+    'eval'      => array('tl_class' => 'clr'),
     'sql'       => "varchar(1) NOT NULL default ''",
+);
+
+// event tool setting: generateMainInstructorContactDataFromDb by default
+$GLOBALS['TL_DCA']['tl_user']['fields']['generateMainInstructorContactDataFromDb'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_user']['generateMainInstructorContactDataFromDb'],
+    'filter'    => true,
+    'sorting'   => true,
+    'exclude'   => true,
+    'inputType' => 'checkbox',
+    'eval'      => array('tl_class' => 'clr'),
+    'sql'       => "char(1) NOT NULL default ''",
 );
 

@@ -87,7 +87,7 @@ PaletteManipulator::create()
     ->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('terms', 'issues'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
@@ -106,7 +106,7 @@ PaletteManipulator::create()
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
@@ -127,7 +127,7 @@ PaletteManipulator::create()
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('location', 'journey', 'generalEventDetailText', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
@@ -145,7 +145,7 @@ PaletteManipulator::create()
     ->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('teaser', 'terms', 'issues', 'location', 'journey', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
@@ -550,6 +550,18 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['singleSRCBroschuere'] = arra
     'inputType' => 'fileTree',
     'eval'      => array('filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'mandatory' => false),
     'sql'       => "binary(16) NULL",
+);
+
+// Disable online registration
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generateMainInstructorContactDataFromDb'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'],
+    'filter'    => true,
+    'sorting'   => true,
+    'exclude'   => true,
+    'default'   => \Contao\BackendUser::getInstance()->generateMainInstructorContactDataFromDb,
+    'inputType' => 'checkbox',
+    'eval'      => array('submitOnChange' => false),
+    'sql'       => "char(1) NOT NULL default ''",
 );
 
 // Disable online registration

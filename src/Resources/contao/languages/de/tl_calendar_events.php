@@ -19,7 +19,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['title_legend'] = "Basis-Einstellungen
 $GLOBALS['TL_LANG']['tl_calendar_events']['broschuere_legend'] = "Einstellungen f&uuml;r die PDF-Brosch&uuml;re";
 $GLOBALS['TL_LANG']['tl_calendar_events']['deregistration_legend'] = "Einstellungen f&uuml;r Event-Abmeldungen";
 $GLOBALS['TL_LANG']['tl_calendar_events']['gallery_legend'] = "Einstellungen f&uuml;r die Bildergalerie";
-$GLOBALS['TL_LANG']['tl_calendar_events']['registration_legend'] = "Einstellungen f&uuml;r die Online-Anmeldung";
+$GLOBALS['TL_LANG']['tl_calendar_events']['registration_legend'] = "Anmelde-Einstellungen";
 $GLOBALS['TL_LANG']['tl_calendar_events']['tour_report_legend'] = "Tourenrapport";
 $GLOBALS['TL_LANG']['tl_calendar_events']['min_max_member_legend'] = "Teilnehmerzahl Einstellungen";
 $GLOBALS['TL_LANG']['tl_calendar_events']['event_type_legend'] = "Event-Art Einstellungen";
@@ -88,6 +88,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'] = array("H&
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'] = array("Zeitbedarf im Aufstieg in h", "Machen Sie hier Angaben zum Zeitbedarf im Aufstieg.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'] = array("H&ouml;henunterschied im Abstieg", "Machen Sie hier Angaben zum H&ouml;henunterschied im Abstieg.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = array("Zeitbedarf im Abstieg in h", "Machen Sie hier Angaben zum Zeitbedarf im Abstieg.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'] = array('<span style="color:red">Kontaktdaten standardmässig aus der Datenbank generieren (Wichtig, falls Online-Anmeldung deaktiviert ist!!!)</span>', 'Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.');
 
 
 // References

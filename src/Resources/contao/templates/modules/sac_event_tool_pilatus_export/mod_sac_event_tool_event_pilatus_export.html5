@@ -134,12 +134,19 @@
         <?php endif; ?>
         <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
           <td class="event-export-bookingEvent">Anmeldung</td>
-          <td class="event-export-bookingEvent"><?php if (!$arrEvent['disableOnlineRegistration']): ?>Online Anmeldung: Kursnummer: <?= $arrEvent['courseId'] ?>
-                <?php if (isset($arrEvent['registrationPeriod'])): ?>
+          <td class="event-export-bookingEvent">
+            <?php if (!$arrEvent['disableOnlineRegistration']): ?>
+              Online Anmeldung: Kursnummer: <?= $arrEvent['courseId'] ?>
+            <?php endif; ?>
+            <?php if (isset($arrEvent['registrationPeriod'])): ?>
               {{br}}Anmeldung möglich vom <?= $arrEvent['registrationPeriod'] ?>
-                <?php endif; ?>
-            {{br}}
-            <?php endif; ?><?= $arrEvent['bookingEvent'] ?>
+            <?php endif; ?>
+            <?php if($arrEvent['bookingEvent'] != ''): ?>
+              {{br}}<?= $arrEvent['bookingEvent'] ?>
+            <?php endif; ?>
+            <?php if($arrEvent['generateMainInstructorContactDataFromDb']): ?>
+              {{br}}<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateMainInstructorContactDataFromDb($arrEvent['id']); ?>
+            <?php endif; ?>
           </td>
         </tr>
         <tr class="event-export-row-body row-fe-edit d-none" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
@@ -302,16 +309,21 @@
           <?php endif; ?>
           <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
             <td class="event-export-bookingEvent">Anmeldung</td>
-            <?php $strText = ''; ?>
+            <?php $arrText = array(); ?>
             <?php if (!$arrEvent['disableOnlineRegistration']): ?>
-            <?php $strText .= sprintf("Online Anmeldung: Tour-/Anlassnummer: %s-%s<br>", Date::parse('Y', $arrEvent['startDate']), $arrEvent['id'], $arrEvent['bookingEvent']); ?>
+              <?php $arrText[] = sprintf("Online Anmeldung: Tour-/Anlassnummer: %s-%s", Date::parse('Y', $arrEvent['startDate']), $arrEvent['id'], $arrEvent['bookingEvent']); ?>
             <?php else: ?>
-            <?php $strText .= $arrEvent['bookingEvent']; ?>
+              <?php if($arrEvent['bookingEvent'] != ''): ?>
+                <?php $arrText[] = $arrEvent['bookingEvent']; ?>
+              <?php endif; ?>
             <?php endif; ?>
-            <?php if(trim($strText) == ''): ?>
-            <?php $strText .= 'Kontaktdaten siehe JP'; ?>
+            <?php if($arrEvent['generateMainInstructorContactDataFromDb']): ?>
+              <?php $arrText[] = Markocupic\SacEventToolBundle\CalendarEventsHelper::generateMainInstructorContactDataFromDb($arrEvent['id']); ?>
             <?php endif; ?>
-            <td class="event-export-bookingEvent"><?= $strText ?></td>
+            <?php if(empty($arrText)): ?>
+              <?php $arrText[] = 'Kontaktdaten siehe JP'; ?>
+            <?php endif; ?>
+            <td class="event-export-bookingEvent"><?= implode('{{br}}', array_filter($arrText)) ?></td>
           </tr>
           <tr class="event-export-row-body row-fe-edit d-none" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
             <td class="event-export-editEvent"></td>

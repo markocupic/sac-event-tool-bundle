@@ -172,6 +172,9 @@
                 <div class="booking-text event-detail event-info-box icon-box-small">
                     <h5>Anmeldung</h5>
                     <p><?= nl2br($this->bookingEvent) ?></p>
+                    <?php if($this->generateMainInstructorContactDataFromDb): ?>
+                        <p class="m-0"><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateMainInstructorContactDataFromDb($this->id); ?></p>
+                    <?php endif; ?>
                 </div>
                 <?php endif; ?>
 
