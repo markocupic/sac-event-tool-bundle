@@ -81,6 +81,8 @@ class ContentUserPortraitList extends ContentElement
      */
     protected function compile()
     {
+        $this->Template->userList_hideRoleEmail = $this->userList_hideRoleEmail == '1' ? true : null;
+
         $arrIDS = array();
         if ($this->userList_selectMode === 'selectUserRoles')
         {
@@ -143,24 +145,23 @@ class ContentUserPortraitList extends ContentElement
             {
 
 
-
                 $objTemplate = new FrontendTemplate($this->strTemplatePartial);
                 $objTemplate->setData($objUser->row());
                 $objTemplate->jumpTo = $this->jumpTo;
                 $objTemplate->showFieldsToGuests = StringUtil::deserialize($this->userList_showFieldsToGuests, true);
                 // Roles
-                $arrIDS = StringUtil::deserialize($objUser->userRole,true);
+                $arrIDS = StringUtil::deserialize($objUser->userRole, true);
                 $objRoles = UserRoleModel::findMultipleByIds($arrIDS);
-                $arrRoleEmails =  array();
+                $arrRoleEmails = array();
                 $arrRoles = array();
-                if($objRoles !== null)
+                if ($objRoles !== null)
                 {
-                    while($objRoles->next())
+                    while ($objRoles->next())
                     {
                         $objTemplate->hasRole = true;
                         $arrRoles[] = $objRoles->title;
 
-                        if($objRoles->email !== '')
+                        if ($objRoles->email !== '')
                         {
                             $arrRoleEmails[$objRoles->title] = $objRoles->email;
                             $objTemplate->hasRoleEmail = true;
