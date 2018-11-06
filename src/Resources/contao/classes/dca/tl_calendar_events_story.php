@@ -21,8 +21,23 @@ class tl_calendar_events_story extends Backend
     {
         parent::__construct();
         $this->import('BackendUser', 'User');
+    }
 
-
+    /**
+     * Onload Callback
+     * setPalette
+     */
+    public function setPalettes()
+    {
+        // Overwrite readonly attribute for admins
+        if($this->User->admin)
+        {
+            $fields = array('sacMemberId', 'eventId', 'authorName');
+            foreach($fields as $field)
+            {
+                $GLOBALS['TL_DCA']['tl_calendar_events_story']['fields'][$field]['eval']['readonly'] = false;
+            }
+        }
     }
 
     /**
