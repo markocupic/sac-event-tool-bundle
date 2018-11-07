@@ -45,14 +45,14 @@
                             <?php if($this->email): ?>
                             <tr>
                                 <td><strong>E-Mail:</strong></td>
-                                <td><?= $this->email ?></td>
+                                <td>{{email::<?= $this->email ?>}}</td>
                             </tr>
                             <?php endif; ?>
 
-                            <?php if ($this->url): ?>
+                            <?php if ($this->url !== ''): ?>
                             <tr>
                                 <td><strong>Webseite:</strong></td>
-                                <td><a href="<?= $this->url ?>" target="_blank">Link</a></td>
+                                <td><a href="<?= $this->url ?>" target="_blank"><?= Contao\StringUtil::substr($this->url, 26, ' ...') ?></a></td>
                             </tr>
                             <?php endif; ?>
 
