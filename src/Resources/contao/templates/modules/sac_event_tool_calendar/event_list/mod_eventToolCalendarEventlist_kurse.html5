@@ -92,8 +92,14 @@ if (\Environment::get('isAjaxRequest') && \Input::get('xhrAction') === 'switchLa
 <?php endif; ?>
 
 <!-- loader icon -->
-<div class="loader-icon-container visible loading-icon-lg"><div class="preloader-icon"></div></div>
-
+<div class="loader-icon-container visible loading-icon-lg">
+  <div class="preloader-icon fa-5x">
+    <i style="color:#0082c7;" class="fal fa-circle-notch fa-spin"></i>
+  </div>
+  <div class="preloader-text">
+    {{br}}{{br}}Bitte etwas Geduld.{{br}}Die Event-Liste wird geladen.
+  </div>
+</div>
 
 
 </div>
