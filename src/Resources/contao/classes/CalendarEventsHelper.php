@@ -34,7 +34,7 @@ use Haste\Util\Url;
  * Class CalendarEventsHelper
  * @package Markocupic\SacEventToolBundle
  */
-class CalendarEventsHelper extends System
+class CalendarEventsHelper
 {
 
 

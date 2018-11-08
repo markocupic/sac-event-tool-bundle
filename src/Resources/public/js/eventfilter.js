@@ -65,6 +65,11 @@ var EventFilter = {
      */
     $ctrlEventId: null,
 
+    /**
+     * requestCounter
+     */
+    $requestCounter: 0,
+
 
     /**
      * queueRequest
@@ -105,7 +110,7 @@ var EventFilter = {
         var self = this;
 
         // Show loading icon
-        if(typeof self.options['loadingIcon'] !== 'undefined') {
+        if (typeof self.options['loadingIcon'] !== 'undefined') {
             $('.loader-icon-container').removeClass('invisible');
         }
     },
@@ -118,8 +123,7 @@ var EventFilter = {
         var self = this;
 
         // Add loading icon
-        if(typeof self.options['loadingIcon'] !== 'undefined')
-        {
+        if (typeof self.options['loadingIcon'] !== 'undefined') {
             $('.loader-icon-container').addClass('invisible');
         }
     },
@@ -194,53 +198,69 @@ var EventFilter = {
         // Get url from options
         var url = self.options.xhr.action.split('?');
 
-        var request = $.ajax({
-            method: 'post',
-            url: url[0],
-            data: {
-                action: url[1],
-                year: self.getUrlParam('year'),
-                REQUEST_TOKEN: self.options.requestToken,
-                ids: JSON.stringify(arrIds),
-                eventType: eventTypeId,
-                organizers: JSON.stringify(arrOrganizers),
-                searchterm: strSearchterm,
-                startDate: intStartDate,
-                eventId: strEventId
-            },
-            dataType: 'json'
-        });
-        request.done(function (json) {
-            if (json) {
-                self.hideLoadingIcon();
-                $.each(json.filter, function (key, id) {
-                    $('.event-item[data-id="' + id + '"]').each(function () {
-                        //intFound++;
-                        $(this).show();
-                        $(this).addClass('visible');
-                        itemsFound++;
-                    });
-                });
-                if (itemsFound === 0 && $('.alert-no-results-found').length === 0) {
+        var inputs = {
+            action: url[1],
+            year: self.getUrlParam('year'),
+            REQUEST_TOKEN: self.options.requestToken,
+            ids: JSON.stringify(arrIds),
+            eventType: eventTypeId,
+            organizers: JSON.stringify(arrOrganizers),
+            searchterm: strSearchterm,
+            startDate: intStartDate,
+            eventId: strEventId
+        }
 
-                    self.$eventList.first().append(self.options.noResult.html);
-                }
-                
-                if(typeof self.options['eventContainer'] !== 'undefined')
-                {
-                    $(self.options['eventContainer']).removeClass('d-none');
-                }
-
-                $('html, body').animate({
-                    scrollTop: (self.$filterBoard.offset().top)
-                }, 500);
-            }
-        });
-        request.fail(function (jqXHR) {
+        // No ajax request after page is loades and if all inputs are empty
+        if (self.$requestCounter == 0 && inputs['year'] == 0 && inputs['eventType'] == 0 && inputs['eventId'] == "" && inputs['searchterm'] == "" && inputs['startDate'] == 0 && arrOrganizers.length < 1) {
             self.hideLoadingIcon();
-            window.console.log(jqXHR);
-            //window.alert('Fehler: Die Anfrage konnte nicht bearbeitet werden! Überprüfen Sie die Internetverbindung.');
-        });
+            $('.event-item').each(function () {
+                $(this).show();
+                $(this).addClass('visible');
+            });
+            if (typeof self.options['eventContainer'] !== 'undefined') {
+                $(self.options['eventContainer']).removeClass('d-none');
+            }
+        } else {
+            self.$requestCounter++;
+            var request = $.ajax({
+                method: 'post',
+                url: url[0],
+                data: inputs,
+                dataType: 'json'
+            });
+
+            request.done(function (json) {
+                if (json) {
+                    self.hideLoadingIcon();
+                    //window.console.log(json);
+                    $.each(json.filter, function (key, id) {
+                        $('.event-item[data-id="' + id + '"]').each(function () {
+                            $(this).show();
+                            $(this).addClass('visible');
+                            itemsFound++;
+                        });
+                    });
+                    if (itemsFound === 0 && $('.alert-no-results-found').length === 0) {
+
+                        self.$eventList.first().append(self.options.noResult.html);
+                    }
+
+                    if (typeof self.options['eventContainer'] !== 'undefined') {
+                        $(self.options['eventContainer']).removeClass('d-none');
+                    }
+
+                    $('html, body').animate({
+                        scrollTop: (self.$filterBoard.offset().top)
+                    }, 500);
+                }
+            });
+            request.fail(function (jqXHR) {
+                self.hideLoadingIcon();
+                window.console.log(jqXHR);
+                //window.alert('Fehler: Die Anfrage konnte nicht bearbeitet werden! Überprüfen Sie die Internetverbindung.');
+            });
+        }
+
     },
     /**
      * get url param
@@ -403,8 +423,8 @@ var EventFilter = {
             //var $searchfield = $(this).parent().find('.select2-search__field');
             //$searchfield.prop('disabled', true);
             //if($('#organizers li.select2-selection__choice').length < 1){
-                //$('#organizers > span > span.selection > span > ul > li > input').removeAttr('disabled');
-           //}
+            //$('#organizers > span > span.selection > span > ul > li > input').removeAttr('disabled');
+            //}
         });
 
 

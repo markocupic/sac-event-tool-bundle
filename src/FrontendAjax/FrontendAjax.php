@@ -46,6 +46,18 @@ class FrontendAjax
      */
     public function filterTourList()
     {
+        // Load from cache
+        if (!isset($_SESSION['eventFilterCache']))
+        {
+            $_SESSION['eventFilterCache'] = array();
+        }
+
+        if (isset($_SESSION['eventFilterCache'][md5(serialize($_POST))]))
+        {
+            $visibleItems = $_SESSION['eventFilterCache'][md5(serialize($_POST))];
+            $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'true', 'status' => 'success', 'filter' => $visibleItems));
+            return $response->send();
+        }
 
         $visibleItems = array();
         $arrIDS = Input::post('ids') != '' ? json_decode(Input::post('ids')) : array();
@@ -205,7 +217,9 @@ class FrontendAjax
             }
         }
 
-        $response = new JsonResponse(array('status' => 'success', 'filter' => $visibleItems));
+        $_SESSION['eventFilterCache'][md5(serialize($_POST))] = $visibleItems;
+
+        $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'false', 'status' => 'success', 'filter' => $visibleItems));
         return $response->send();
 
     }
@@ -250,6 +264,19 @@ class FrontendAjax
      */
     public function filterCourseList()
     {
+        // Load from cache
+        if (!isset($_SESSION['eventFilterCache']))
+        {
+            $_SESSION['eventFilterCache'] = array();
+        }
+
+        if (isset($_SESSION['eventFilterCache'][md5(serialize($_POST))]))
+        {
+            $visibleItems = $_SESSION['eventFilterCache'][md5(serialize($_POST))];
+            $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'true', 'status' => 'success', 'filter' => $visibleItems));
+            return $response->send();
+        }
+
         $visibleItems = array();
         $arrIDS = Input::post('ids') != '' ? json_decode(Input::post('ids')) : array();
         $arrOrganizers = Input::post('organizers') != '' ? json_decode(Input::post('organizers')) : array();
@@ -398,7 +425,9 @@ class FrontendAjax
             }
         }
 
-        $response = new JsonResponse(array('status' => 'success', 'filter' => $visibleItems));
+        $_SESSION['eventFilterCache'][md5(serialize($_POST))] = $visibleItems;
+
+        $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'false', 'status' => 'success', 'filter' => $visibleItems));
         return $response->send();
 
     }
@@ -660,7 +689,7 @@ class FrontendAjax
 
     /**
      * Ajax call
-     * Rotate image 
+     * Rotate image
      */
     public function rotateImage($fileId)
     {
