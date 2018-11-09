@@ -28,7 +28,7 @@
         <a class="list-group-item list-group-item-action" id="nav-past-tours-tab" data-toggle="tab" href="#nav-past-tours" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-star"></i> Absolvierte Touren</a>
         <a class="list-group-item list-group-item-action" id="nav-my-blogs-tab" data-toggle="tab" href="#nav-my-blogs" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-pencil"></i> Meine Tourenberichte</a>
         <a class="list-group-item list-group-item-action" id="nav-member-picture-feed-tab" data-toggle="tab" href="#nav-member-picture-feed" role="tab" aria-controls="nav-member-picture-feed" aria-selected="false"><i class="fal fa-fw fa-image"></i> Bilder Feed</a>
-        <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-cog"></i> Profil</a>
+        <a class="list-group-item list-group-item-action" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false"><i class="fal fa-fw fa-cog"></i> Meine Daten</a>
       </nav>
       {{br}}{{br}}
     </div>
@@ -149,6 +149,7 @@
             <h2 class="mt-0">Tourenberichte</h2>
             <div class="alert bg-light">
             <?= $this->newEventStoryForm ?>
+              <p class="small">*Tourenberichte können bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Tourende verfasst werden.</p>
           </div>
             <h3>Meine Tourenberichte</h3>
             <table class="table layout-table table-responsive table-striped">
@@ -205,7 +206,7 @@
 
             <div class="col-12">
               <h3>Angaben für die Online Anmeldung zu Events</h3>
-              <div class="alert bg-light">
+              <div class="">
                 <?= $this->userProfileForm ?>
               </div>
               {{br}}
@@ -216,7 +217,7 @@
               <h3>Avatar Einstellungen</h3>
               <div class="row">
                 <div class="col-9">
-                  <div class="alert bg-light">
+                  <div class="">
                     <?= $this->avatarForm ?>
                   </div>
                 </div>
@@ -224,17 +225,18 @@
                   <figure class="member-dashboard-avatar responsive thumbnail image_container">
                     {{image::<?= getAvatar($this->objUser->id, 'FE') ?>?width=300}}
                     <?php if($this->objUser->avatar != ''): ?>
-                    <a href="{{env::request}}?do=rotate-avatar&img=<?= FilesModel::findByPath(getAvatar($this->objUser->id, 'FE'))->id ?>" class="member-dashboard-rotate-image-button" title="Bild im UZS 90° drehen"><i class="fa fa-history turn-image"></i></a>
+                    <a href="{{env::request}}?do=rotate-avatar&img=<?= FilesModel::findByPath(getAvatar($this->objUser->id, 'FE'))->id ?>" class="member-dashboard-rotate-image-button" title="Bild im GUZS 90° drehen"><i class="fa fa-history turn-image"></i></a>
                     <?php endif; ?>
                   </figure>
                 </div>
               </div>
               {{br}}{{br}}
+              <hr>
             </div>
 
             <div class="col-12">
               <h3>Abonnierte Newsletter</h3>
-              <div class="alert bg-light">
+              <div class="">
                 <?= \Contao\Controller::replaceInsertTags('{{insert_module::367}}') ?>
               </div>
                 {{br}}{{br}}

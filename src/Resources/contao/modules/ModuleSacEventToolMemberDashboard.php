@@ -514,14 +514,14 @@ class ModuleSacEventToolMemberDashboard extends Module
 
 
     /**
-     * Rotate an image clockwise by 90°
+     * Rotate an image anti clockwise by 90°
      * @param $id
      * @return bool
      * @throws \Exception
      */
     protected function rotateImage($id)
     {
-        $angle = 270;
+        $angle = 90;
 
         $objFiles = FilesModel::findById($id);
         if ($objFiles === null)
@@ -724,7 +724,7 @@ class ModuleSacEventToolMemberDashboard extends Module
 
         // Now let's add form fields:
         $objForm->addFormField('event', array(
-            'label'     => 'Tourenbericht zu diesem Anlass schreiben',
+            'label'     => 'Tourenbericht zu einem Event erstellen',
             'inputType' => 'select',
             'options' => $arrOptions,
             'eval'      => array('mandatory' => true),
@@ -771,9 +771,9 @@ class ModuleSacEventToolMemberDashboard extends Module
 
         // Now let's add form fields:
         $objForm->addFormField('avatar', array(
-            'label'     => 'Profilbild',
+            'label'     => 'Profilbild hochladen',
             'inputType' => 'upload',
-            'eval'      => array('mandatory' => false),
+            'eval'      => array('class' => 'custom-input-file', 'mandatory' => false),
         ));
         $objForm->addFormField('delete-avatar', array(
             'label'     => array('', 'Profilbild l&ouml;schen'),
