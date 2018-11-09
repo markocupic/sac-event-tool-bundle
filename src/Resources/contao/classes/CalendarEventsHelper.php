@@ -285,7 +285,7 @@ class CalendarEventsHelper
         {
             foreach ($GLOBALS['TL_HOOKS']['getContentElement'] as $callback)
             {
-                $strBuffer = static::importStatic($callback[0])->{$callback[1]}($objModel, $strBuffer, $objGallery);
+                $strBuffer = System::importStatic($callback[0])->{$callback[1]}($objModel, $strBuffer, $objGallery);
             }
         }
         return $strBuffer;

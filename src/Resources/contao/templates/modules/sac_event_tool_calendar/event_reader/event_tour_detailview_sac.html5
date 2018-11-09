@@ -1,11 +1,13 @@
+<!-- indexer::stop -->
 <p class="back"><a href="javascript:history.go(-1)" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
 
 <div class="event event-detailview layout_full block<?= $this->class ?>">
     <?php if ($this->eventState): ?>
     <h4 class="event-state-headline"><?= $GLOBALS['TL_LANG']['CTE']['calendar_events'][$this->eventState] ?></h4>
     <?php endif; ?>
+    <!-- indexer::continue -->
     <h1 class="ce_headline"><?= $this->title ?></h1>
-
+    <!-- indexer::stop -->
     <?php if ($this->eventType === 'lastMinuteTour'): ?>
     <h4 class="ce_headline last-minute-tour">Last minute tour (Spontantour)</h4>
     <?php endif; ?>
@@ -49,7 +51,11 @@
                 </div>
                 <div class="requirements event-detail event-info-box icon-box-small">
                     <h6>Eventnummer</h6>
-                    <p class="event-id"><?= \Contao\Date::parse('Y', $this->startDate) ?>-<?= nl2br($this->id) ?></p>
+                    <p class="event-id">
+                        <!-- indexer::continue -->
+                        <?= \Contao\Date::parse('Y', $this->startDate) ?>-<?= nl2br($this->id) ?>
+                        <!-- indexer::stop -->
+                    </p>
                 </div>
 
                 <?php if ($this->location != ''): ?>
@@ -277,3 +283,5 @@
 
 </div>
 {{br}}
+<!-- indexer::continue -->
+

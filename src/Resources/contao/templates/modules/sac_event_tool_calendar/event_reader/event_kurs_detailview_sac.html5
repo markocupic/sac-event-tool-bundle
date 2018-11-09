@@ -1,3 +1,4 @@
+<!-- indexer::stop -->
 <p class="back m-0"><a href="javascript:history.go(-1)" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
 <div class="event event-detailview layout_full block<?= $this->class ?>">
 
@@ -5,7 +6,10 @@
     <h4 class="event-state-headline"><?= $GLOBALS['TL_LANG']['CTE']['calendar_events'][$this->eventState] ?></h4>
     <?php endif; ?>
 
+    <!-- indexer::continue -->
     <h1 class="ce_headline"><?= $this->title ?></h1>
+    <!-- indexer::stop -->
+
 
     <div class="row">
         <div class="col-lg-6">
@@ -23,7 +27,11 @@
 
                 <?php if ($this->courseId != ''): ?>
                 <div class="courseId event-detail event-info-box icon-box-small">
-                    <h5>Kurs-Nr.: <?= $this->courseId ?></h5>
+                    <h5>Kurs-Nr.:
+                        <!-- indexer::continue -->
+                        <?= $this->courseId ?></h5>
+                        <!-- indexer::stop -->
+
                 </div>
                 <?php endif; ?>
 
@@ -238,4 +246,4 @@
 </div>
 
 <hr>
-
+<!-- indexer::continue -->

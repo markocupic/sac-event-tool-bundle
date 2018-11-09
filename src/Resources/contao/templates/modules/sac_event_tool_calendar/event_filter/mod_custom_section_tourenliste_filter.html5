@@ -1,6 +1,7 @@
 <?php
 $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.js|static";
 ?>
+<!-- indexer::stop -->
 <script>
     $().ready(function () {
         "use strict";
@@ -109,7 +110,7 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.js|
     </div>
   </div>
 </div>
-
+<!-- indexer::continue -->
 
 
 
