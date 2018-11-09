@@ -11,6 +11,7 @@
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\Automator;
+use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Database;
 use Contao\Dbafs;
@@ -145,6 +146,19 @@ class InitializeSystem
                 touch($rootDir . '/files/theme-sac-pilatus/scss/main.scss');
             }
         }
+        
+        /** Delete orphaned entries
+        $oDb = Database::getInstance()->execute('SELECT * FROM tl_calendar_events_member');
+        while($oDb->next())
+        {
+            $oEv = CalendarEventsModel::findByPk($oDb->eventId);
+            if($oEv === null)
+            {
+                echo $oDb->lastname . ' ' . $oDb->firstname . '<br>';
+                //Database::getInstance()->prepare('DELETE FROM tl_calendar_events_member WHERE id=?')->execute($oDb->id);
+            }
+        }
+        **/
 
         // Prepare Plugin environment, create folders, etc.
         $objPluginEnv = System::getContainer()->get('markocupic.sac_event_tool_bundle.prepare_plugin_environment');
