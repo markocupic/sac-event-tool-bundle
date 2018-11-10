@@ -16,8 +16,9 @@ use Contao\Database;
 use Contao\UserModel;
 use NotificationCenter\Model\Notification;
 
-class SendNewPasswToInstructors
+class ReplaceDefaultPassword
 {
+
     /**
      * @var
      */
@@ -51,16 +52,22 @@ class SendNewPasswToInstructors
                 // Generate text
                 $bodyText = $this->generateEmailText($objUserModel, $pw);
 
-                $objEmail = Notification::findOneByType('default_email');
                 // Use terminal42/notification_center
+                $objEmail = Notification::findOneByType('default_email');
                 if ($objEmail !== null)
                 {
                     // Set token array
                     $arrTokens = array(
-                        'email_text' => $bodyText,
-                        'send_to'    => $objUserModel->email
+                        'email_sender_name'  => 'Administrator SAC Pilatus',
+                        'email_sender_email' => Config::get('adminEmail'),
+                        'replyTo'            => Config::get('adminEmail'),
+                        'email_subject'      => html_entity_decode('Passwortänderung auf der Webseite der SAC Sektion Pilatus'),
+                        'email_text'         => $bodyText,
+                        'send_to'            => $objUserModel->email
                     );
                     $objEmail->send($arrTokens, 'de');
+
+                    // Limitize emails
                     $counter++;
                     if ($counter > $this->emailSendLimit)
                     {
@@ -81,11 +88,11 @@ class SendNewPasswToInstructors
 
         if (password_verify($this->defaultPassword, $objUser->password))
         {
-            // Activate pwchange (=side efect) ;-)
+            // Generate pw
             $objUserModel = UserModel::findByPk($objUser->id);
             if ($objUserModel->sacMemberId > 1)
             {
-                $pw = rand(49879049, 99999999);
+                $pw = rand(44444444, 99999999);
                 return $pw;
             }
         }
@@ -93,7 +100,7 @@ class SendNewPasswToInstructors
 
     }
 
-    
+
     /**
      * @param $objMember
      * @param $pw
@@ -103,13 +110,13 @@ class SendNewPasswToInstructors
     {
         $text = 'Hallo %s
         
-Wir haben heute den Relaunch der Website der SAC Sektion Pilatus durchgeführt. Dein bisheriges Default Passwort "%s" für den Backend-Zugang ist aus Gründen der Sicherheit ab sofort nicht mehr gültig. Mit dieser Nachricht erhältst du ein neues Passwort. Bitte logge dich mit deiner 6-stelligen Mitgliedernummer und dem Passwort auf https://www.sac-pilatus.ch/contao ein und ändere dein Passwort durch ein eigenes sicheres Passwort.
+Dein bisheriges Default Passwort "%s" für den Backend-Zugang ist aus Gründen der Sicherheit ab sofort nicht mehr gültig. Mit dieser Nachricht erhältst du ein neues Passwort. Bitte logge dich mit deiner 6-stelligen Mitgliedernummer und dem Passwort auf https://www.sac-pilatus.ch/contao ein und ändere dein Passwort durch ein eigenes sicheres Passwort.
 
 Benutzername: Deine 6-stellige Mitgliedernummer
 Passwort: %s
 
 
-Wir wünschen dir viel Spass beim Surfen auf unseren neuen Webseite.
+Wir wünschen dir viel Spass beim Surfen auf unseren Webseite.
 https://www.sac-pilatus.ch
 
 Projektteam "Neue Website SAC Pilatus"
