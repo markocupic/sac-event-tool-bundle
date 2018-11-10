@@ -516,6 +516,9 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                     // Set sesion data
                     $_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['step'] = 4;
 
+                    // Log
+                    System::log(sprintf('User %s %s [%s] has successfully activated his member account.', $objMemberModel->firstname, $objMemberModel->lastname, $objMemberModel->sacMemberId), __METHOD__, 'MEMBER_ACCOUNT_ACTIVATION');
+
                     // Redirect
                     $url = Url::removeQueryString(['step']);
                     $url = Url::addQueryString('step=4', $url);

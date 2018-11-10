@@ -290,6 +290,7 @@ $GLOBALS['TL_HOOKS']['processFormData'][] = array('markocupic_sac_event_tool.con
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic_sac_event_tool.contao_hooks.parse_backend_template', 'parseBackendTemplate');
 
 // Cron jobs
+$GLOBALS['TL_CRON']['minutely']['sendNewPassword'] = array('Markocupic\SacEventToolBundle\SendNewPasswToInstructors', 'sendNewPassword');
 $GLOBALS['TL_CRON']['daily']['syncSacMemberDatabase'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'syncSacMemberDatabase');
 $GLOBALS['TL_CRON']['hourly']['printSACWorkshops'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'printSacWorkshops');
 
