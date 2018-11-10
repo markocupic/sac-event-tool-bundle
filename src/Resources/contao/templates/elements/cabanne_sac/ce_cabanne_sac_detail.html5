@@ -2,7 +2,7 @@
 
 <?php $this->block('content'); ?>
 
-
+    <!-- indexer::stop -->
     <div class="row">
         <div class="col-lg-6 col-xl-8 mb-4 mb-0-lg">
             <figure class="image_container"<?php if ($this->margin): ?> style="<?= $this->margin ?>"<?php endif; ?> itemscope itemtype="http://schema.org/ImageObject">
@@ -31,7 +31,9 @@
                             <?php if($this->huettenwart): ?>
                             <tr>
                                 <td><strong>H&uuml;ttenwart:</strong></td>
+                                <!-- indexer::continue -->
                                 <td><?= nl2br($this->huettenwart) ?></td>
+                                <!-- indexer::stop -->
                             </tr>
                             <?php endif; ?>
 
@@ -72,7 +74,9 @@
                         <table class="table">
                             <tr>
                                 <td><strong>Hüttenchef:</strong></td>
+                                <!-- indexer::continue -->
                                 <td><?= nl2br($this->huettenchef) ?></td>
+                                <!-- indexer::stop -->
                             </tr>
                             <tr>
                                 <td><strong>Kapazität:</strong></td>
@@ -146,5 +150,5 @@
         </div>
     </div><!-- end row -->
 
-
+<!-- indexer::continue -->
 <?php $this->endblock(); ?>

@@ -6,19 +6,15 @@
     <h4 class="event-state-headline"><?= $GLOBALS['TL_LANG']['CTE']['calendar_events'][$this->eventState] ?></h4>
     <?php endif; ?>
 
-    <!-- indexer::continue -->
     <h1 class="ce_headline"><?= $this->title ?></h1>
-    <!-- indexer::stop -->
-
 
     <div class="row">
         <div class="col-lg-6">
             {{picture::<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventImagePath($this->id) ?>?class=img-fluid&size=20&alt=<?= $this->title ?>}}
         </div>
 
-        <div class="col-lg-6 mt-3 mt-lg-0"><!--start col left-->
+        <div class="col-lg-6 mt-3 mt-lg-0"><!--begin col left -->
             <div class="">
-
                 <?php if ($this->teaser != ''): ?>
                 <div class="teaser event-detail font-weight-bold">
                     <p><?= nl2br($this->teaser) ?></p>
@@ -27,11 +23,7 @@
 
                 <?php if ($this->courseId != ''): ?>
                 <div class="courseId event-detail event-info-box icon-box-small">
-                    <h5>Kurs-Nr.:
-                        <!-- indexer::continue -->
-                        <?= $this->courseId ?></h5>
-                        <!-- indexer::stop -->
-
+                    <h5>Kurs-Nr.:<!-- indexer::continue --><?= $this->courseId ?><!-- indexer::stop --></h5>
                 </div>
                 <?php endif; ?>
 
@@ -94,7 +86,7 @@
             <hr>
         </div>
 
-        <div class="col-md-6"><!--start col left-->
+        <div class="col-md-6"><!--begin col left-->
             <div class="m-0">
                 <?php if ($this->issues != ''): ?>
                 <div class="topics event-detail event-info-box icon-box-small">
@@ -128,7 +120,7 @@
         </div>
 
 
-        <div class="col-md-6"><!--start col right-->
+        <div class="col-md-6"><!--begin col right-->
             <div class="grey-box-right p-4 mb-4" style="background-color:#eee">
                 <div class="instructor event-detail event-info-box icon-box-small">
                     <h5>Kursleitung</h5>
