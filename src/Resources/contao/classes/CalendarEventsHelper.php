@@ -73,7 +73,7 @@ class CalendarEventsHelper
             return 'event_status_3'; // fa-circle red
         }
 
-        // Event is over or booking in no more possible
+        // Event is over or booking is no more possible
         elseif ($objEvent->startDate <= time() || ($objEvent->setRegistrationPeriod && $objEvent->registrationEndDate < time()))
         {
             return 'event_status_2';
@@ -83,6 +83,10 @@ class CalendarEventsHelper
         elseif ($objEvent->setRegistrationPeriod && $objEvent->registrationStartDate > time())
         {
             return 'event_status_5'; // fa-circle orange
+        }
+        elseif($objEvent->disableOnlineRegistration)
+        {
+            return 'event_status_7';
         }
 
         else
