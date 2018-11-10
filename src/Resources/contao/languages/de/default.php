@@ -42,7 +42,7 @@ $GLOBALS['TL_LANG']['MSC']['courseLevel'][5] = 'Tourenleiter Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC']['course'] = 'Kurs';
 $GLOBALS['TL_LANG']['MSC']['tour'] = 'Tour';
 $GLOBALS['TL_LANG']['MSC']['lastMinuteTour'] = 'Last Minute Tour';
-$GLOBALS['TL_LANG']['MSC']['generalEvent'] = 'Veranstaltung (Kultur, Vorträge + sektionsübergreifende Events)';
+$GLOBALS['TL_LANG']['MSC']['generalEvent'] = 'Veranstaltung (Fitnesstrainings, Skiturnen, Kultur, Vorträge + sektionsübergreifende Events)';
 
 
 // Buttons

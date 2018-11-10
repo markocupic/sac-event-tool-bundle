@@ -129,30 +129,31 @@
                         <?php foreach ($arrInstructors as $userId): ?>
                         <div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4">
                             <div class="">
-                                <?php if (\UserModel::findByPk($userId) !== null): ?>
-                                <div class="image_container portrait">
-                                    <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
-                                        <figure class="avatar-large">
-                                            <?php $this->insert('picture_default', generateAvatar($userId, 18)); ?>
-                                        </figure>
-                                    </a>
-                                </div>
-                                <div class="instructor-name">
-                                    <?php $strQuali = Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($userId) != '' ? ' (' . Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($userId) . ')' : ''; ?>
-                                    <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
-                                        <?= \UserModel::findByPk($userId)->lastname . ' ' . \UserModel::findByPk($userId)->firstname . $strQuali ?>
-                                    </a>
-                                    <?php if(FE_USER_LOGGED_IN && $this->disableOnlineRegistration): ?>
-                                        <?php $arrContact = ['phone', 'mobile', 'email']; ?>
-                                        <?php foreach($arrContact as $field): ?>
-                                            <?php if(\UserModel::findByPk($userId)->{$field} !== ''): ?>
-                                            <div class="ce_user_portrait_<?= $field ?>">
-                                                <small title="<?= \UserModel::findByPk($userId)->{$field} ?>"><?= \UserModel::findByPk($userId)->{$field} ?></small>
-                                            </div>
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </div>
+                                <?php $objUser = \UserModel::findByPk($userId); ?>
+                                <?php if($objUser !== null): ?>
+                                    <div class="image_container portrait">
+                                        <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
+                                            <figure class="avatar-large">
+                                                <?php $this->insert('picture_default', generateAvatar($userId, 18)); ?>
+                                            </figure>
+                                        </a>
+                                    </div>
+                                    <div class="instructor-name">
+                                        <?php $strQuali = Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($userId) != '' ? ' (' . Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($userId) . ')' : ''; ?>
+                                        <?php if(!$objUser->hideInFrontendListings): ?><a href="{{link_url::leiter-portrait}}?username=<?= $objUser->username ?>" title="Leiter Portrait ansehen"><?php endif; ?>
+                                            <?= $objUser->lastname . ' ' . $objUser->firstname . $strQuali ?>
+                                        <?php if(!$objUser->hideInFrontendListings): ?></a><?php endif; ?>
+                                        <?php if(FE_USER_LOGGED_IN && !$objUser->hideInFrontendListings): ?>
+                                            <?php $arrContact = ['phone', 'mobile', 'email']; ?>
+                                            <?php foreach($arrContact as $field): ?>
+                                                <?php if($objUser->{$field} !== ''): ?>
+                                                <div class="ce_user_portrait_<?= $field ?>">
+                                                    <small title="<?= $objUser->{$field} ?>"><?= $objUser->{$field} ?></small>
+                                                </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </div>

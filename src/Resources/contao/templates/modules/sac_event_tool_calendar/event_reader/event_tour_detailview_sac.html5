@@ -71,25 +71,26 @@
                     <?php foreach ($arrInstructors as $userId): ?>
                     <div class="col-6 col-sm-4 col-md-4 col-xl-4">
                         <div class="">
-                            <?php if (\UserModel::findByPk($userId) !== null): ?>
+                            <?php $objUser = \UserModel::findByPk($userId); ?>
+                            <?php if ($objUser !== null): ?>
                             <div class="image_container portrait">
                                 <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
-                                    <figure class="avatar-large">
+                                    <figure class="avatar-large img-fluid w-100">
                                         <?php $this->insert('picture_default', generateAvatar($userId, 18)); ?>
                                     </figure>
                                 </a>
                             </div>
                             <div class="instructor-name">
                                 <?php $strQuali = Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($userId) != '' ? ' (' . Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($userId) . ')' : ''; ?>
-                                <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
-                                    <?= \UserModel::findByPk($userId)->lastname . ' ' . \UserModel::findByPk($userId)->firstname . $strQuali ?>
-                                </a>
-                                <?php if(FE_USER_LOGGED_IN && $this->disableOnlineRegistration): ?>
+                                <?php if(!$objUser->hideInFrontendListings): ?><a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen"><?php endif; ?>
+                                    <?= $objUser->lastname . ' ' . $objUser->firstname . $strQuali ?>
+                                <?php if(!$objUser->hideInFrontendListings): ?></a><?php endif; ?>
+                                <?php if(FE_USER_LOGGED_IN && !$objUser->hideInFrontendListings): ?>
                                     <?php $arrContact = ['phone', 'mobile', 'email']; ?>
                                     <?php foreach($arrContact as $field): ?>
-                                        <?php if(\UserModel::findByPk($userId)->{$field} !== ''): ?>
+                                        <?php if($objUser->{$field} !== ''): ?>
                                             <div class="ce_user_portrait_<?= $field ?>">
-                                                <small title="<?= \UserModel::findByPk($userId)->{$field} ?>"><?= \UserModel::findByPk($userId)->{$field} ?></small>
+                                                <small title="<?= $objUser->{$field} ?>"><?= $objUser->{$field} ?></small>
                                             </div>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
@@ -156,11 +157,13 @@
             </div>
             <?php endif; ?>
 
+            <?php if ($this->eventType === 'tour' || $this->eventType === 'lastMinuteTour'): ?>
             <?php if ($this->suitableForBeginners): ?>
             <div class="suitableForBeginners event-detail event-info-box icon-box-small">
                 <h6>F&uuml;r Anf&auml;nger geeignet</h6>
                 <p>Ideale Tour f&uuml;r Einsteiger</p>
             </div>
+            <?php endif; ?>
             <?php endif; ?>
             <?php if ($this->requirements != ''): ?>
             <div class="requirements event-detail event-info-box icon-box-small">
