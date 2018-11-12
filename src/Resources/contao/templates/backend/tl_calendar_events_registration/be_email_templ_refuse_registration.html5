@@ -6,10 +6,10 @@ Leider kann ich dir für den Kurs: <?php if($this->courseId != ''): ?><?= $this-
 <?php else: ?>
 Leider kann ich dir für den Event: "<?= $this->eventname ?>" keine Zusage erteilen.
 <?php endif; ?>
-Ich danke dir für dein Verständnis. Fragen bitte an <?= $this->emailGuide ?> richten.
+Ich danke dir für dein Verständnis. Fragen bitte an <?= $this->emailInstructor ?> richten.
 
 Freundliche Grüsse
 
-<?= $this->nameGuide ?>
+<?= $this->nameInstructor ?>
 
 

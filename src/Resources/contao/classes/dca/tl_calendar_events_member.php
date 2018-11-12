@@ -788,8 +788,8 @@ class tl_calendar_events_member extends Backend
             $objEmailTemplate->eventname = $objEvent->title;
             $objEmailTemplate->courseId = $objEvent->courseId;
             $objEmailTemplate->eventType = $objEvent->eventType;
-            $objEmailTemplate->nameGuide = $this->User->name;
-            $objEmailTemplate->emailGuide = $this->User->email;
+            $objEmailTemplate->nameInstructor = $this->User->name;
+            $objEmailTemplate->emailInstructor = $this->User->email;
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_refuse_with_email');
@@ -897,8 +897,8 @@ class tl_calendar_events_member extends Backend
             $objEmailTemplate->eventname = $objEvent->title;
             $objEmailTemplate->courseId = $objEvent->courseId;
             $objEmailTemplate->eventType = $objEvent->eventType;
-            $objEmailTemplate->nameGuide = $this->User->name;
-            $objEmailTemplate->emailGuide = $this->User->email;
+            $objEmailTemplate->nameInstructor = $this->User->name;
+            $objEmailTemplate->emailInstructor = $this->User->email;
 
 
             // Prefill form
@@ -995,8 +995,8 @@ class tl_calendar_events_member extends Backend
             $objEmailTemplate->eventname = $objEvent->title;
             $objEmailTemplate->courseId = $objEvent->courseId;
             $objEmailTemplate->eventType = $objEvent->eventType;
-            $objEmailTemplate->nameGuide = $this->User->name;
-            $objEmailTemplate->emailGuide = $this->User->email;
+            $objEmailTemplate->nameInstructor = $this->User->name;
+            $objEmailTemplate->emailInstructor = $this->User->email;
 
 
             // Prefill form

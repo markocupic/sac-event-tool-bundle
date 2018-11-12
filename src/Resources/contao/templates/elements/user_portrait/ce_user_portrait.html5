@@ -21,7 +21,7 @@
         <?php if (!FE_USER_LOGGED_IN): ?>
         {{br}}
         <div class="alert alert-info" role="alert">
-            Bitte melden dich mit deinem Mitgliederkonto an, um die Kontaktdaten von <strong><?=$this->user['name'] ?></strong> zu sehen.
+            Bitte melde dich mit deinem Mitgliederkonto an, um die Kontaktdaten und mehr von <strong><?=$this->user['name'] ?></strong> zu sehen.
         </div>
         {{br}}
         <?php endif ?>
