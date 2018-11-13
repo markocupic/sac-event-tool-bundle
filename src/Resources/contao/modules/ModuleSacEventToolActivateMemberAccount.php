@@ -265,6 +265,15 @@ class ModuleSacEventToolActivateMemberAccount extends Module
 
             if (!$hasError)
             {
+                if (strtolower(Input::post('email')) !== "" && trim($objMember->email) == '')
+                {
+                    $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberEmailNotRegistered'];
+                    $hasError = true;
+                }
+            }
+
+            if (!$hasError)
+            {
                 if (strtolower(Input::post('email')) !== strtolower($objMember->email))
                 {
                     $this->Template->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberIdAndEmailDoNotMatch'];

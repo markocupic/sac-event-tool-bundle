@@ -1,4 +1,28 @@
+<?php
+$GLOBALS['TL_JAVASCRIPT'][] = "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js";
+$GLOBALS['TL_JAVASCRIPT'][] = "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/locale/de-ch.js";
+$GLOBALS['TL_JAVASCRIPT'][] = "https://cdn.jsdelivr.net/npm/pikaday/pikaday.js";
+$GLOBALS['TL_HEAD'][] = '<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">';
+?>
+
+
+<?php $this->extend('block_unsearchable'); ?>
+
+<?php $this->block('content'); ?>
+
 <?= $this->form ?>
+<script>
+    var picker1 = new Pikaday({
+        field: document.getElementById('ctrl_timeRangeStart'),
+        // Requires moment.js!
+        format: 'DD.MM.YYYY',
+    });
+    var picker2 = new Pikaday({
+        field: document.getElementById('ctrl_timeRangeEnd'),
+        // Requires moment.js!
+        format: 'DD.MM.YYYY',
+    });
+</script>
 
 <button class="btn btn-info enable-fe-editing" data-label-enable="Frontend Editing aktivieren" data-label-disable="Frontend Editing deaktivieren">Frontend Editing aktivieren</button>
 <button class="btn btn-danger toggle-recurring-events" data-label-hide="Wiederkehrende Events ausblenden" data-label-show="Wiederkehrende Events einblenden">Wiederkehrende Events ausblenden</button>
@@ -462,3 +486,6 @@
         });
     })(jQuery);
 </script>
+
+
+<?php $this->endblock(); ?>
