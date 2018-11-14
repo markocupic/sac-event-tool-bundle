@@ -38,7 +38,7 @@ class ReplaceDefaultPassword
     {
         $this->defaultPassword = Config::get('SAC_EVT_DEFAULT_BACKEND_PASSWORD');
 
-        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_user')->execute();
+        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE pwChange=?')->execute('1');
         $counter = 0;
         while ($objDb->next())
         {
