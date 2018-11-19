@@ -112,23 +112,20 @@ class SyncSacMemberDatabase
         foreach ($this->section_ids as $sectionId)
         {
             $localFile = $this->root_dir . '/system/tmp/Adressen_0000' . $sectionId . '.csv';
-            $remoteFile = 'Adressen_0000' . $sectionId . '.csv';
+            if (is_file($localFile))
+            {
+                unlink($localFile);
+                echo 'Deleting old/unused file: ' . $localFile . '<br>';
+            }
 
+            $remoteFile = 'Adressen_0000' . $sectionId . '.csv';
             if ($this->downloadFileFromFtp($connId, $localFile, $remoteFile))
             {
                 // Write csv file to the tmp folder
-            }
-            else
-            {
-                $this->log('Error during SAC member database sync. Could not open FTP connection.',
-                    __FILE__ . ' Line: ' . __LINE__,
-                    TL_ERROR
-                );
-                throw new \Exception("Tried to open FTP connection.");
+                echo 'Downloaded ' . $remoteFile . ' to the tmp folder.' . '<br>';
             }
         }
         \ftp_close($connId);
-
         return $this;
     }
 
@@ -141,8 +138,15 @@ class SyncSacMemberDatabase
         $connId = \ftp_connect($this->ftp_hostname);
         if (!\ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId)
         {
-            throw new \Exception('Could not establish ftp connection.');
+            $msg = 'Could not establish ftp connection to ' . $this->ftp_hostname;
+            echo $msg . '<br>';
+            $this->log($msg,
+                __FILE__ . ' Line: ' . __LINE__,
+                TL_ERROR
+            );
+            throw new \Exception($msg);
         }
+        echo 'Open FTP Connection with: ' . $this->ftp_hostname . '<br><br>';
         return $connId;
     }
 
@@ -159,7 +163,13 @@ class SyncSacMemberDatabase
         $connId = \ftp_get($connId, $localFile, $remoteFile, FTP_BINARY);
         if (!$connId)
         {
-            throw new \Exception('Could not download files from ftp server.');
+            $msg = 'Could not find/download ' . $remoteFile . ' from ' . $this->ftp_hostname;
+            echo $msg . '<br>';
+            $this->log($msg,
+                __FILE__ . ' Line: ' . __LINE__,
+                TL_ERROR
+            );
+            throw new \Exception($msg);
         }
         return $connId;
     }
@@ -181,7 +191,7 @@ class SyncSacMemberDatabase
     public function syncContaoDatabase()
     {
         $startTime = \time();
-
+        sleep(2);
         $statement = $this->connection->query('SELECT sacMemberId FROM tl_member');
         $arrMemberIDS = $statement->fetchAll(\PDO::FETCH_COLUMN);
 

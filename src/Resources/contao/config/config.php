@@ -291,7 +291,7 @@ $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic_sac_event_too
 
 // Cron jobs
 $GLOBALS['TL_CRON']['daily']['replaceDefaultPassword'] = array('Markocupic\SacEventToolBundle\ReplaceDefaultPassword', 'sendNewPassword');
-$GLOBALS['TL_CRON']['daily']['syncSacMemberDatabase'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'syncSacMemberDatabase');
+$GLOBALS['TL_CRON']['hourly']['syncSacMemberDatabase'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'syncSacMemberDatabase');
 $GLOBALS['TL_CRON']['hourly']['printSACWorkshops'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'printSacWorkshops');
 
 // Replace insert tags
