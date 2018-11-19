@@ -85,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
     ),
     'palettes' => array
     (
-        'default' => 'title,belongsToExecutiveBoard,belongsToBeauftragteStammsektion,email',
+        'default' => 'title,belongsToExecutiveBoard,belongsToBeauftragteStammsektion;{address_legend},street,postal,city,phone,mobile,email',
     ),
 
     'fields' => array
@@ -151,6 +151,53 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'inputType' => 'text',
             'eval'      => array('mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'tl_class' => 'w50'),
             'sql'       => "varchar(255) NOT NULL default ''"
+        ),
+        'street'                           => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['street'],
+            'exclude'   => true,
+            'search'    => true,
+            'inputType' => 'text',
+            'eval'      => array('maxlength' => 255, 'tl_class' => 'w50'),
+            'sql'       => "varchar(255) NOT NULL default ''"
+        ),
+        'postal'                           => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['postal'],
+            'exclude'   => true,
+            'search'    => true,
+            'inputType' => 'text',
+            'eval'      => array('maxlength' => 32, 'tl_class' => 'w50'),
+            'sql'       => "varchar(32) NOT NULL default ''"
+        ),
+        'city'                             => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['city'],
+            'exclude'   => true,
+            'filter'    => true,
+            'search'    => true,
+            'sorting'   => true,
+            'inputType' => 'text',
+            'eval'      => array('maxlength' => 255, 'tl_class' => 'w50'),
+            'sql'       => "varchar(255) NOT NULL default ''"
+        ),
+        'phone'                            => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['phone'],
+            'exclude'   => true,
+            'search'    => true,
+            'inputType' => 'text',
+            'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'),
+            'sql'       => "varchar(64) NOT NULL default ''"
+        ),
+        'mobile'                           => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['mobile'],
+            'exclude'   => true,
+            'search'    => true,
+            'inputType' => 'text',
+            'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'),
+            'sql'       => "varchar(64) NOT NULL default ''"
         ),
     ),
 );

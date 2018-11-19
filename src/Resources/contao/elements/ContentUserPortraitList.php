@@ -143,12 +143,11 @@ class ContentUserPortraitList extends ContentElement
             $strItems = '';
             while ($objUser->next())
             {
-
-
                 $objTemplate = new FrontendTemplate($this->strTemplatePartial);
                 $objTemplate->setData($objUser->row());
                 $objTemplate->jumpTo = $this->jumpTo;
                 $objTemplate->showFieldsToGuests = StringUtil::deserialize($this->userList_showFieldsToGuests, true);
+
                 // Roles
                 $arrIDS = StringUtil::deserialize($objUser->userRole, true);
                 $objRoles = UserRoleModel::findMultipleByIds($arrIDS);
@@ -166,6 +165,18 @@ class ContentUserPortraitList extends ContentElement
                             $arrRoleEmails[$objRoles->title] = $objRoles->email;
                             $objTemplate->hasRoleEmail = true;
                         }
+
+                        // overwrite private address with role address
+                        // Be carefull to only aply this setting once per user
+                        $arrAddress = StringUtil::deserialize($this->userList_replacePrivateAdressWithRoleAdress, true);
+                        foreach ($arrAddress as $field)
+                        {
+                            if ($objRoles->{$field} != '')
+                            {
+                                $objTemplate->{$field} = $objRoles->{$field};
+                            }
+                        }
+
                     }
                 }
                 $objTemplate->roleEmails = $arrRoleEmails;
