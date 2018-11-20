@@ -10,16 +10,16 @@
     <div class="col-7 col-sm-7 col-md-7 col-xl-6 ">
       <strong><?= trim($this->lastname . ' ' . $this->firstname) ?></strong>
       <small>
-        <?php if($this->hasRoleEmail && $this->userList_hideRoleEmail === false): ?>
+        <?php if($this->hasRoleEmail && !$this->userList_hideRoleEmail): ?>
         <?php $arrEmail = array_unique($this->roleEmails); ?>
-        <?php if(FE_USER_LOGGED_ID && $this->email != ''): ?>
-          <?php if(($key = array_search($this->email, $arrEmail)) !== FALSE): ?>
-            <?php $this->email = ''; ?>
+          <?php if(FE_USER_LOGGED_ID && $this->email != ''): ?>
+            <?php if(($key = array_search($this->email, $arrEmail)) !== FALSE): ?>
+              <?php $this->email = ''; ?>
+            <?php endif; ?>
           <?php endif; ?>
-        <?php endif; ?>
-        <?php foreach($arrEmail as $email): ?>
-        {{br}}{{email_open::<?= $email ?>}}<?= $email ?></a>
-        <?php endforeach; ?>
+          <?php foreach($arrEmail as $email): ?>
+          {{br}}{{email_open::<?= $email ?>}}<?= $email ?></a>
+          <?php endforeach; ?>
         <?php endif; ?>
         {{br}}
 

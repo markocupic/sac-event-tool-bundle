@@ -81,8 +81,6 @@ class ContentUserPortraitList extends ContentElement
      */
     protected function compile()
     {
-        $this->Template->userList_hideRoleEmail = $this->userList_hideRoleEmail == '1' ? true : null;
-
         $arrIDS = array();
         if ($this->userList_selectMode === 'selectUserRoles')
         {
@@ -147,6 +145,8 @@ class ContentUserPortraitList extends ContentElement
                 $objTemplate->setData($objUser->row());
                 $objTemplate->jumpTo = $this->jumpTo;
                 $objTemplate->showFieldsToGuests = StringUtil::deserialize($this->userList_showFieldsToGuests, true);
+                $objTemplate->userList_hideRoleEmail = $this->userList_hideRoleEmail;
+
 
                 // Roles
                 $arrIDS = StringUtil::deserialize($objUser->userRole, true);

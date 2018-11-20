@@ -72,7 +72,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_hideRoleEmail'] = array
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'checkbox',
-    'eval'      => array('submitOnChange' => false, 'tl_class' => 'clr'),
+    'eval'      => array('multiple' => false, 'submitOnChange' => false, 'tl_class' => 'clr'),
     'sql'       => "char(1) NOT NULL default ''",
 );
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_replacePrivateAdressWithRoleAdress'] = array
