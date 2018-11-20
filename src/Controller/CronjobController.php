@@ -67,13 +67,7 @@ class CronjobController extends Controller
         $framework->initialize();
 
         // Sync SAC member database with tl_member
-        $container->get('markocupic.sac_event_tool_bundle.sync_sac_member_database')
-            // Load files fromftp
-            ->loadDataFromFtp()
-            // Then sync with tl_member
-            ->syncContaoDatabase();
-        echo "Successfully synced SAC member database.";
-        //exit();
+        $container->get('markocupic.sac_event_tool_bundle.sync_sac_member_database')->loadDataFromFtp()->syncContaoDatabase();
     }
 
     /**

@@ -123,7 +123,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
         $this->generateForm();
 
         $this->Template->form = $this->objForm;
- 
+
     }
 
 

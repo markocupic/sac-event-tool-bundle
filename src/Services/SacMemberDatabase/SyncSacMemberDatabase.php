@@ -42,6 +42,10 @@ class SyncSacMemberDatabase
      * Log type if a member has been disabled
      */
     const SAC_EVT_LOG_DISABLE_MEMBER = 'DISABLE_MEMBER';
+    /**
+     * @var bool
+     */
+    private $testMode = false;
 
     /**
      * @var
@@ -87,6 +91,7 @@ class SyncSacMemberDatabase
      */
     public function __construct(ContaoFrameworkInterface $framework, Connection $connection, $root_dir)
     {
+        $this->testMode = false;
         $this->framework = $framework;
         $this->connection = $connection;
         $this->root_dir = $root_dir;
@@ -115,14 +120,14 @@ class SyncSacMemberDatabase
             if (is_file($localFile))
             {
                 unlink($localFile);
-                echo 'Deleting old/unused file: ' . $localFile . '<br>';
+                if ($this->testMode) echo 'Deleting old/unused file: ' . $localFile . '<br>';
             }
 
             $remoteFile = 'Adressen_0000' . $sectionId . '.csv';
             if ($this->downloadFileFromFtp($connId, $localFile, $remoteFile))
             {
                 // Write csv file to the tmp folder
-                echo 'Downloaded ' . $remoteFile . ' to the tmp folder.' . '<br>';
+                if ($this->testMode) echo 'Downloaded ' . $remoteFile . ' to the tmp folder.' . '<br>';
             }
         }
         \ftp_close($connId);
@@ -139,14 +144,14 @@ class SyncSacMemberDatabase
         if (!\ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId)
         {
             $msg = 'Could not establish ftp connection to ' . $this->ftp_hostname;
-            echo $msg . '<br>';
+            if ($this->testMode) echo $msg . '<br>';
             $this->log($msg,
                 __FILE__ . ' Line: ' . __LINE__,
                 TL_ERROR
             );
             throw new \Exception($msg);
         }
-        echo 'Open FTP Connection with: ' . $this->ftp_hostname . '<br><br>';
+        if ($this->testMode) echo 'Open FTP Connection with: ' . $this->ftp_hostname . '<br><br>';
         return $connId;
     }
 
@@ -164,7 +169,7 @@ class SyncSacMemberDatabase
         if (!$connId)
         {
             $msg = 'Could not find/download ' . $remoteFile . ' from ' . $this->ftp_hostname;
-            echo $msg . '<br>';
+            if ($this->testMode) echo $msg . '<br>';
             $this->log($msg,
                 __FILE__ . ' Line: ' . __LINE__,
                 TL_ERROR
@@ -210,7 +215,6 @@ class SyncSacMemberDatabase
                     {
                         continue;
                     }
-
                     $arrLine = \explode('$', $line);
                     $set = array();
                     $set['sacMemberId'] = \intval($arrLine[0]);
