@@ -20,7 +20,6 @@ $GLOBALS['TL_LANG']['tl_content']['config_legend'] = 'Element-Einstellungen';
 $GLOBALS['TL_LANG']['tl_content']['userList_selectMode'] = array('Auswahltyp', 'W&auml;hlen Sie einen Auswahltyp aus.');
 $GLOBALS['TL_LANG']['tl_content']['userList_users'] = array('Anzuzeigende Benutzer', 'W&auml;hlen Sie einen oder mehrere Benutzer aus, die angezeigt werden, aus.');
 $GLOBALS['TL_LANG']['tl_content']['userList_userRoles'] = array('Benutzer abh&auml;ngig nach ihrer Rolle ausw&auml;hlen', 'W&auml;hlen Sie eine oder mehrere Rollen aus.');
-$GLOBALS['TL_LANG']['tl_content']['userList_hideRoleEmail'] = array('Funktions-E-Mail-Adressen nicht anzeigen', 'Geben Sie an, ob Sie die Funktions-E-Mail-Adressen im FE anzeigen möchten oder nicht.');
 $GLOBALS['TL_LANG']['tl_content']['userList_replacePrivateAdressWithRoleAdress'] = array('Private Adressen-Angaben mit Rollen-Adressen-Angaben überschreiben', 'Geben Sie an, welche private Adressen-Angaben durch Rollen-Adressen-Angaben überschrieben werden sollen.');
 $GLOBALS['TL_LANG']['tl_content']['userList_queryType'] = array('Abfragetyp (UND/ODER)', 'W&auml;hlen Sie einen Abfragetyp aus.');
 $GLOBALS['TL_LANG']['tl_content']['userList_showFieldsToGuests'] = array('Zeige Felder unangemeldeten Gästen', 'Zeige diese Felder unangemeldeten Gästen');

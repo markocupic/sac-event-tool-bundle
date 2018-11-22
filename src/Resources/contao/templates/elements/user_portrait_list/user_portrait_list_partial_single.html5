@@ -10,44 +10,23 @@
     <div class="col-7 col-sm-7 col-md-7 col-xl-6 ">
       <strong><?= trim($this->lastname . ' ' . $this->firstname) ?></strong>
       <small>
-        <?php if($this->hasRoleEmail && !$this->userList_hideRoleEmail): ?>
-        <?php $arrEmail = array_unique($this->roleEmails); ?>
-          <?php if(FE_USER_LOGGED_ID && $this->email != ''): ?>
-            <?php if(($key = array_search($this->email, $arrEmail)) !== FALSE): ?>
-              <?php $this->email = ''; ?>
-            <?php endif; ?>
-          <?php endif; ?>
-          <?php foreach($arrEmail as $email): ?>
-          {{br}}{{email_open::<?= $email ?>}}<?= $email ?></a>
-          <?php endforeach; ?>
-        <?php endif; ?>
         {{br}}
-
-        <!-- Show personal data to logged users only or if it is allowed in the ce settings -->
-        <?php if (FE_USER_LOGGED_IN || in_array('street',$this->showFieldsToGuests)): ?>
-        <?php if ($this->street != ''): ?><?= $this->street ?>{{br}}<?php endif; ?>
+        <?php if (FE_USER_LOGGED_IN): ?>
+          <!-- Show personal data to logged users only -->
+          <?php if ($this->street != ''): ?><?= $this->street ?>{{br}}<?php endif; ?>
+          <?php if ($this->postal != ''): ?><?= $this->postal ?>&nbsp;<?php endif; ?>
+          <?php if ($this->city != ''): ?><?= $this->city ?>{{br}}<?php endif; ?>
+          <?php if ($this->phone != ''): ?>P: <?= $this->phone ?>{{br}}<?php endif; ?>
+          <?php if ($this->mobile != ''): ?>M: <?= $this->mobile ?>{{br}}<?php endif; ?>
+          <?php if ($this->email != ''): ?>{{email_open::<?= $this->email ?>}}<?= $this->email ?></a>{{br}}<?php endif; ?>
+        <?php else: ?>
+          <?php if ($this->street != '' && in_array('street', $this->showFieldsToGuests)): ?><?= $this->street ?>{{br}}<?php endif; ?>
+          <?php if ($this->postal != '' && in_array('postal', $this->showFieldsToGuests)): ?><?= $this->postal ?>{{br}}<?php endif; ?>
+          <?php if ($this->city != '' && in_array('city', $this->showFieldsToGuests)): ?><?= $this->city ?>{{br}}<?php endif; ?>
+          <?php if ($this->phone != '' && in_array('phone', $this->showFieldsToGuests)): ?><?= $this->phone ?>{{br}}<?php endif; ?>
+          <?php if ($this->mobile != '' && in_array('mobile', $this->showFieldsToGuests)): ?><?= $this->mobile ?>{{br}}<?php endif; ?>
+          <?php if ($this->email != '' && in_array('email', $this->showFieldsToGuests)): ?>{{email_open::<?= $this->email ?>}}<?= $this->email ?></a>{{br}}<?php endif; ?>
         <?php endif; ?>
-
-        <?php if (FE_USER_LOGGED_IN || in_array('postal',$this->showFieldsToGuests)): ?>
-        <?php if ($this->postal != ''): ?><?= $this->postal ?>&nbsp;<?php endif; ?>
-        <?php endif; ?>
-
-        <?php if (FE_USER_LOGGED_IN || in_array('city',$this->showFieldsToGuests)): ?>
-        <?php if ($this->city != ''): ?><?= $this->city ?>{{br}}<?php endif; ?>
-        <?php endif; ?>
-
-        <?php if (FE_USER_LOGGED_IN || in_array('phone',$this->showFieldsToGuests)): ?>
-        <?php if ($this->phone != ''): ?>P: <?= $this->phone ?>{{br}}<?php endif; ?>
-        <?php endif; ?>
-
-        <?php if (FE_USER_LOGGED_IN || in_array('mobile',$this->showFieldsToGuests)): ?>
-        <?php if ($this->mobile != ''): ?>M: <?= $this->mobile ?>{{br}}<?php endif; ?>
-        <?php endif; ?>
-
-        <?php if (FE_USER_LOGGED_IN || in_array('email',$this->showFieldsToGuests)): ?>
-        <?php if ($this->email != ''): ?>{{email_open::<?= $this->email ?>}}<?= $this->email ?></a>{{br}}<?php endif; ?>
-        <?php endif; ?>
-
       </small>
     </div>
   </div>

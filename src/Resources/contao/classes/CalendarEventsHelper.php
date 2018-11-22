@@ -624,7 +624,7 @@ class CalendarEventsHelper
                 else
                 {
                     // There is no booking limit. Show registered members
-                    return sprintf($strBadge, 'success', $memberCount . ' Anmeldungen', $memberCount);
+                    return sprintf($strBadge, 'success', $memberCount . ' Anmeldungen', $memberCount . '/?');
                 }
             }
         }

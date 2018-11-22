@@ -84,9 +84,9 @@ class ContentUserPortraitList extends ContentElement
         $arrIDS = array();
         if ($this->userList_selectMode === 'selectUserRoles')
         {
-            $arrUserRoles = StringUtil::deserialize($this->userList_userRoles, true);
+            $arrSelectedRoles = StringUtil::deserialize($this->userList_userRoles, true);
             $queryType = $this->userList_queryType;
-            if (count($arrUserRoles) > 0)
+            if (count($arrSelectedRoles) > 0)
             {
                 $objDb = Database::getInstance()->prepare('SELECT * FROM tl_user  WHERE disable=? AND hideInFrontendListings =? ORDER BY lastname ASC, firstname ASC')->execute('', '');
 
@@ -96,7 +96,7 @@ class ContentUserPortraitList extends ContentElement
                     {
                         $arrUserRole = StringUtil::deserialize($objDb->userRole, true);
 
-                        if (count(array_intersect($arrUserRole, $arrUserRoles)) > 0)
+                        if (count(array_intersect($arrUserRole, $arrSelectedRoles)) > 0)
                         {
                             $arrIDS[] = $objDb->id;
                         }
@@ -108,7 +108,7 @@ class ContentUserPortraitList extends ContentElement
                     {
                         $arrUserRole = StringUtil::deserialize($objDb->userRole, true);
 
-                        if (count(array_intersect($arrUserRole, $arrUserRoles)) === count($arrUserRoles))
+                        if (count(array_intersect($arrUserRole, $arrSelectedRoles)) === count($arrSelectedRoles))
                         {
                             $arrIDS[] = $objDb->id;
                         }
@@ -145,7 +145,6 @@ class ContentUserPortraitList extends ContentElement
                 $objTemplate->setData($objUser->row());
                 $objTemplate->jumpTo = $this->jumpTo;
                 $objTemplate->showFieldsToGuests = StringUtil::deserialize($this->userList_showFieldsToGuests, true);
-                $objTemplate->userList_hideRoleEmail = $this->userList_hideRoleEmail;
 
 
                 // Roles
@@ -157,6 +156,12 @@ class ContentUserPortraitList extends ContentElement
                 {
                     while ($objRoles->next())
                     {
+
+                        if(!in_array($objRoles->id,$arrSelectedRoles))
+                        {
+                            continue;
+                        }
+
                         $objTemplate->hasRole = true;
                         $arrRoles[] = $objRoles->title;
 
@@ -176,7 +181,6 @@ class ContentUserPortraitList extends ContentElement
                                 $objTemplate->{$field} = $objRoles->{$field};
                             }
                         }
-
                     }
                 }
                 $objTemplate->roleEmails = $arrRoleEmails;

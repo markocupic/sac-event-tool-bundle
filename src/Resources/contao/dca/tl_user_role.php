@@ -149,7 +149,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'search'    => true,
             'filter'    => true,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'tl_class' => 'w50'),
+            'eval'      => array('assignTo' => 'tl_user.email', 'mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'tl_class' => 'w50'),
             'sql'       => "varchar(255) NOT NULL default ''"
         ),
         'street'                           => array
@@ -158,7 +158,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => array('maxlength' => 255, 'tl_class' => 'w50'),
+            'eval'      => array('assignTo' => 'tl_user.street', 'maxlength' => 255, 'tl_class' => 'w50'),
             'sql'       => "varchar(255) NOT NULL default ''"
         ),
         'postal'                           => array
@@ -167,7 +167,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => array('maxlength' => 32, 'tl_class' => 'w50'),
+            'eval'      => array('assignTo' => 'tl_user.postal', 'maxlength' => 32, 'tl_class' => 'w50'),
             'sql'       => "varchar(32) NOT NULL default ''"
         ),
         'city'                             => array
@@ -178,7 +178,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => array('maxlength' => 255, 'tl_class' => 'w50'),
+            'eval'      => array('assignTo' => 'tl_user.city', 'maxlength' => 255, 'tl_class' => 'w50'),
             'sql'       => "varchar(255) NOT NULL default ''"
         ),
         'phone'                            => array
@@ -187,7 +187,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'),
+            'eval'      => array('assignTo' => 'tl_user.phone', 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'),
             'sql'       => "varchar(64) NOT NULL default ''"
         ),
         'mobile'                           => array
@@ -196,7 +196,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'),
+            'eval'      => array('assignTo' => 'tl_user.mobile', 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'),
             'sql'       => "varchar(64) NOT NULL default ''"
         ),
     ),
