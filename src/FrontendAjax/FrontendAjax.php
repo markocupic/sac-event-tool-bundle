@@ -562,21 +562,21 @@ class FrontendAjax
                         $arrUsers = StringUtil::deserialize($objEventOrganizer->notifyWebmasterOnNewEventStory, true);
                         foreach ($arrUsers as $userId)
                         {
-                            $objUser = UserModel::findByPk($userId);
-                            if ($objUser !== null)
+                            $objWebmaster = UserModel::findByPk($userId);
+                            if ($objWebmaster !== null)
                             {
-
-                                if ($objUser->email != '')
+                                if ($objWebmaster->email != '')
                                 {
-                                    if (Validator::isEmail($objUser->email))
+                                    if (Validator::isEmail($objWebmaster->email))
                                     {
-                                        $arrNotifyEmail[] = $objUser->email;
+                                        $arrNotifyEmail[] = $objWebmaster->email;
                                     }
                                 }
                             }
                         }
                     }
                 }
+
                 $webmasterEmail = implode(',', $arrNotifyEmail);
 
 
