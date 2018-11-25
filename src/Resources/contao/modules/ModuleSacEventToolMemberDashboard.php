@@ -22,6 +22,7 @@ use Contao\Dbafs;
 use Contao\Environment;
 use Contao\Events;
 use Contao\File;
+use Contao\Files;
 use Contao\FilesModel;
 use Contao\Folder;
 use Contao\Frontend;
@@ -41,6 +42,8 @@ use Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion;
 use NotificationCenter\Model\Notification;
 use Patchwork\Utf8;
 use PhpOffice\PhpWord\CreateDocxFromTemplate;
+use Contao\CoreBundle\Monolog\ContaoContext;
+use Psr\Log\LogLevel;
 
 /**
  * Front end module "registration".
@@ -392,6 +395,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                     $objStory = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=?')->execute($this->objUser->sacMemberId, Input::get('eventId'));
                     if ($objStory->numRows)
                     {
+                        $objStoryModel = CalendarEventsStoryModel::findByPk($objStory->id);
                         $this->Template->youtubeId = $objStory->youtubeId;
                         $this->Template->text = $objStory->text;
                         $this->Template->title = $objStory->title;
@@ -500,7 +504,12 @@ class ModuleSacEventToolMemberDashboard extends Module
                             $set['securityToken'] = md5(rand(100000000, 999999999)) . $insertId;
                             Database::getInstance()->prepare('UPDATE tl_calendar_events_story %s WHERE id=?')->set($set)->execute($insertId);
                         }
+                        $objStoryModel = CalendarEventsStoryModel::findByPk($insertId);
+
                     }
+
+                    $this->Template->objEventStoryImageUploadForm = $this->generatePictureUploadForm($objStoryModel);
+
                 }
                 break;
 
@@ -694,8 +703,6 @@ class ModuleSacEventToolMemberDashboard extends Module
     }
 
 
-
-
     protected function generateCreateNewEventStoryForm()
     {
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
@@ -710,11 +717,11 @@ class ModuleSacEventToolMemberDashboard extends Module
 
         $arrOptions = array();
         $arrEvents = CalendarEventsMemberModel::findPastEventsByMemberId2($this->objUser->id, $this->timeSpanForCreatingNewEventStory);
-        if(is_array($arrEvents) && !empty($arrEvents))
+        if (is_array($arrEvents) && !empty($arrEvents))
         {
-            foreach($arrEvents as $event)
+            foreach ($arrEvents as $event)
             {
-                if($event['objEvent'] !== null)
+                if ($event['objEvent'] !== null)
                 {
                     $objEvent = $event['objEvent'];
                     $arrOptions[$event['id']] = $objEvent->title;
@@ -726,7 +733,7 @@ class ModuleSacEventToolMemberDashboard extends Module
         $objForm->addFormField('event', array(
             'label'     => 'Tourenbericht zu einem Event erstellen',
             'inputType' => 'select',
-            'options' => $arrOptions,
+            'options'   => $arrOptions,
             'eval'      => array('mandatory' => true),
         ));
 
@@ -1007,5 +1014,247 @@ class ModuleSacEventToolMemberDashboard extends Module
                 }
             }
         }
+    }
+
+    /**
+     * @return null
+     */
+    protected function generatePictureUploadForm($objEventStoryModel)
+    {
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+
+
+        if ($this->eventStoryUploadFolder != '')
+        {
+
+            if (Validator::isBinaryUuid($this->eventStoryUploadFolder))
+            {
+                $objFilesModel = FilesModel::findByUuid($this->eventStoryUploadFolder);
+                if ($objFilesModel !== null)
+                {
+                    $objUploadFolder = new Folder($objFilesModel->path . '/' . $objEventStoryModel->id);
+                    Dbafs::addResource($objFilesModel->path . '/' . $objEventStoryModel->id);
+                }
+            }
+        }
+
+        if ($objUploadFolder === null)
+        {
+            return;
+        }
+
+
+        $objForm = new Form('form-eventstory-picture-upload', 'POST', function ($objHaste) {
+            return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
+        });
+
+        $url = Environment::get('uri');
+        $objForm->setFormActionFromUri($url);
+
+        // Add some fields
+        $objForm->addFormField('fileupload', array(
+            'label'     => 'Bildupload',
+            'inputType' => 'fineUploader',
+            'eval'      => array('extensions'   => 'jpg,jpeg',
+                                 'storeFile'    => true,
+                                 'addToDbafs'   => true,
+                                 'isGallery'    => false,
+                                 'directUpload' => false,
+                                 'multiple'     => true,
+                                 'useHomeDir'   => false,
+                                 'uploadFolder' => $objUploadFolder->path,
+                                 'mandatory'    => true
+            ),
+        ));
+
+
+        // Let's add  a submit button
+        $objForm->addFormField('submit', array(
+            'label'     => 'upload starten',
+            'inputType' => 'submit',
+        ));
+
+
+        // Add attributes
+        $objWidgetFileupload = $objForm->getWidget('fileupload');
+        $objWidgetFileupload->addAttribute('accept', '.jpg, .jpeg');
+        $objWidgetFileupload->storeFile = true;
+
+        // Overwrite uploader template
+        if ($this->eventStoryCustomUploaderTpl !== '')
+        {
+            //$objWidgetFileupload->template = $this->eventStoryCustomUploaderTpl;
+        }
+
+
+        // validate() also checks whether the form has been submitted
+        if ($objForm->validate() && Input::post('FORM_SUBMIT') === $objForm->getFormId())
+        {
+            if (is_array($_SESSION['FILES']) && !empty($_SESSION['FILES']))
+            {
+                foreach ($_SESSION['FILES'] as $k => $file)
+                {
+                    $uuid = $file['uuid'];
+                    if (Validator::isStringUuid($uuid))
+                    {
+                        $binUuid = StringUtil::uuidToBin($uuid);
+                        $objModel = FilesModel::findByUuid($binUuid);
+
+                        if ($objModel !== null)
+                        {
+                            $objFile = new File($objModel->path);
+                            if ($objFile->isImage)
+                            {
+                                // Rename file
+                                $newFilename = sprintf('event-story-%s-img-%s.%s', $objEventStoryModel->id, $objModel->id, strtolower($objFile->extension));
+                                $newPath = $objUploadFolder->path . '/' . $newFilename;
+                                Files::getInstance()->rename($objFile->path, $newPath);
+                                $objModel->path = $newPath;
+                                $objModel->name = basename($newPath);
+                                $objModel->save();
+                                Dbafs::updateFolderHashes($objUploadFolder->path);
+
+                                $objModel = FilesModel::findByPath($newPath);
+                                $objModel->tstamp = time();
+                                $objModel->save();
+
+                                if (is_file($rootDir . '/' . $newPath))
+                                {
+                                    $oFile = new File($newPath);
+
+                                    // Resize image
+                                    $this->resizeUploadedImage($oFile->path);
+
+                                    $oFileModel = FilesModel::findByPath($newPath);
+
+                                    if ($oFileModel !== null)
+                                    {
+                                        // Add Photographer name to meta field
+                                        $objUser = FrontendUser::getInstance();
+                                        if ($objUser !== null)
+                                        {
+                                            $arrMeta = \StringUtil::deserialize($oFileModel->meta, true);
+                                            if (!isset($arrMeta['de']))
+                                            {
+                                                $arrMeta['de'] = array(
+                                                    'title'        => '',
+                                                    'alt'          => '',
+                                                    'link'         => '',
+                                                    'caption'      => '',
+                                                    'photographer' => '',
+                                                );
+                                            }
+                                            $arrMeta['de']['photographer'] = $objUser->firstname . ' ' . $objUser->lastname;
+                                            $oFileModel->meta = serialize($arrMeta);
+                                            $oFileModel->save();
+                                        }
+
+                                        // Save gallery data to tl_calendar_events_story
+                                        $multiSRC = StringUtil::deserialize($objEventStoryModel->multiSRC, true);
+                                        $multiSRC[] = $oFileModel->uuid;
+                                        $objEventStoryModel->multiSRC = serialize($multiSRC);
+                                        $orderSRC = StringUtil::deserialize($objEventStoryModel->multiSRC, true);
+                                        $orderSRC[] = $oFileModel->uuid;
+                                        $objEventStoryModel->orderSRC = serialize($orderSRC);
+                                        $objEventStoryModel->save();
+                                    }
+
+
+                                    // Log
+                                    $strText = sprintf('User with username %s has uploadad a new picture ("%s").', $this->objUser->username, $objModel->path);
+                                    $logger = System::getContainer()->get('monolog.logger.contao');
+                                    $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, 'EVENT STORY PICTURE UPLOAD')));
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!$objWidgetFileupload->hasErrors())
+            {
+                // Reload page
+                $this->reload();
+            }
+        }
+
+        unset($_SESSION['FILES']);
+
+        return $objForm->generate();
+    }
+
+    /**
+     * Resize an uploaded image if necessary
+     *
+     * @param string $strImage
+     *
+     * @return boolean
+     */
+    public function resizeUploadedImage($strImage)
+    {
+        // The feature is disabled
+        if (Config::get('maxImageWidth') < 1)
+        {
+            return false;
+        }
+
+        $objFile = new File($strImage);
+
+        // Not an image
+        if (!$objFile->isSvgImage && !$objFile->isGdImage)
+        {
+            return false;
+        }
+        $arrImageSize = $objFile->imageSize;
+
+        // The image is too big to be handled by the GD library
+        if ($objFile->isGdImage && ($arrImageSize[0] > Config::get('gdMaxImgWidth') || $arrImageSize[1] > Config::get('gdMaxImgHeight')))
+        {
+            // Log
+            $strText = 'File "' . $strImage . '" is too big to be resized automatically';
+            $logger = System::getContainer()->get('monolog.logger.contao');
+            $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, TL_FILES)));
+
+            // Set flash bag message
+            $this->setFlashMessage($this->flashMessageKey, sprintf($GLOBALS['TL_LANG']['MSC']['fileExceeds'], $objFile->basename));
+            return false;
+        }
+
+        $blnResize = false;
+
+        // The image exceeds the maximum image width
+        if ($arrImageSize[0] > Config::get('maxImageWidth'))
+        {
+            $blnResize = true;
+            $intWidth = Config::get('maxImageWidth');
+            $intHeight = round(Config::get('maxImageWidth') * $arrImageSize[1] / $arrImageSize[0]);
+            $arrImageSize = array($intWidth, $intHeight);
+        }
+
+        // The image exceeds the maximum image height
+        if ($arrImageSize[1] > Config::get('maxImageWidth'))
+        {
+            $blnResize = true;
+            $intWidth = round(Config::get('maxImageWidth') * $arrImageSize[0] / $arrImageSize[1]);
+            $intHeight = Config::get('maxImageWidth');
+            $arrImageSize = array($intWidth, $intHeight);
+        }
+
+        // Resized successfully
+        if ($blnResize)
+        {
+            System::getContainer()
+                ->get('contao.image.image_factory')
+                ->create(TL_ROOT . '/' . $strImage, array($arrImageSize[0], $arrImageSize[1]), TL_ROOT . '/' . $strImage);
+
+            $this->blnHasResized = true;
+
+            // Set flash bag message
+            $this->setFlashMessage($this->flashMessageKey, sprintf($GLOBALS['TL_LANG']['MSC']['fileResized'], $objFile->basename));
+            return true;
+        }
+
+        return false;
     }
 }

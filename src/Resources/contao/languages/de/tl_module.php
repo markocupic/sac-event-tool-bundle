@@ -20,6 +20,7 @@ $GLOBALS['TL_LANG']['tl_module']['timeSpanForCreatingNewEventStory'] = array('Fr
 $GLOBALS['TL_LANG']['tl_module']['story_limit'] = array('Gesamtzahl der Beitr&auml;ge', 'Hier k&ouml;nnen Sie die Gesamtzahl der Beitr&auml;ge begrenzen. Geben Sie 0 ein, um alle anzuzeigen.');
 $GLOBALS['TL_LANG']['tl_module']['story_eventOrganizers'] = array("Veranstalter\Ortsgruppen einsch&auml;nken", "W&auml;hlen Sie hier die Event-Veranstalter aus, deren Berichte angezeigt werden sollen.");
 $GLOBALS['TL_LANG']['tl_module']['eventStoryJumpTo'] = array('Event-Bericht Reader', 'Bitte geben Sie hier die Seite mit dem Event-Reader Modul an.');
+$GLOBALS['TL_LANG']['tl_module']['eventStoryUploadFolder'] = array('Event-Bericht Uploadverzeichnis', 'Bitte geben Sie das Upload-Verzeichnis für die Bilder an.');
 $GLOBALS['TL_LANG']['tl_module']['notifyOnEventStoryPublishedNotificationId'] = array('Benachrichtigung bei neu erstelltem Event-Bericht', '');
 $GLOBALS['TL_LANG']['tl_module']['activateMemberAccountNotificationId'] = array('Benachrichtigung bei Mitgliederkonto Aktivierung', '');
 $GLOBALS['TL_LANG']['tl_module']['jumpToWhenNotActivated'] = array('Weiterleitung zur Seite mit Kontoaktivierungsmodul', 'Legen Sie fest zu welcher Seite ein Mitglied weitergeleitet wird, wenn das Mitgliederkonto deaktiviert ist (login = false)');

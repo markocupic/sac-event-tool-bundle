@@ -84,7 +84,7 @@
           </button>
         </div>
         <div class="modal-body">
-          {{insert_form::19}}
+          <?= $this->objEventStoryImageUploadForm ?>
         </div>
       </div>
     </div>
