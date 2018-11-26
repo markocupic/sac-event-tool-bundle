@@ -130,26 +130,7 @@ class ValidateForms
     public function loadFormField(Widget $objWidget, $strForm, $arrForm, $objForm)
     {
 
-        if ($arrForm['formID'] == 'form-write-event-story-text-and-yt' && FE_USER_LOGGED_IN && $this->input->get('eventId'))
-        {
-            $oEvent = $this->calendarEventsModelAdapter->findByPk($this->input->get('eventId'));
-            if ($this->feUser !== null && $oEvent !== null)
-            {
-                $objStory = $this->database->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=?')->execute($this->feUser->sacMemberId, $this->input->get('eventId'));
-                if ($objStory->numRows)
-                {
-                    if ($objWidget->name == 'text')
-                    {
-                        $objWidget->value = $objStory->text;
-                    }
 
-                    if ($objWidget->name == 'youtubeId')
-                    {
-                        $objWidget->value = $objStory->youtubeId;
-                    }
-                }
-            }
-        }
         return $objWidget;
     }
 
@@ -203,32 +184,6 @@ class ValidateForms
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
-        if ($arrForm['formID'] === 'form-write-event-story-text-and-yt' || $arrForm['formID'] === 'form-write-event-story-upload-foto')
-        {
 
-            $oEvent = $this->calendarEventsModelAdapter->findByPk($this->input->get('eventId'));
-            if ($this->feUser !== null && $oEvent !== null)
-            {
-
-                // !!!! The insert is done in ModuleSacEventToolMemberDashboard LINE 520
-                $set = array();
-                if ($arrSubmitted['youtubeId'])
-                {
-                    $set['youtubeId'] = $this->input->post('youtubeId');
-                }
-
-                if ($arrSubmitted['text'])
-                {
-                    $set['text'] = $this->input->post('text');
-                }
-
-                $objStory = $this->database->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=?')->limit(1)->execute($this->feUser->sacMemberId, $this->input->get('eventId'));
-                if ($objStory->numRows)
-                {
-                    $set['addedOn'] = time();
-                    $this->database->prepare('UPDATE tl_calendar_events_story %s WHERE id=?')->set($set)->execute($objStory->id);
-                }
-            }
-        }
     }
 }

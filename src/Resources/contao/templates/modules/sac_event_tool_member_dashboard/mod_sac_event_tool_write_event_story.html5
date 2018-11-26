@@ -68,7 +68,7 @@
           </button>
         </div>
         <div class="modal-body">
-          {{insert_form::18}}
+          <?= $this->objEventStoryTextAndYoutubeForm ?>
         </div>
       </div>
     </div>
@@ -158,7 +158,7 @@
   <h3>Vorschau</h3>
 <?php if (strlen($this->text) > 0): ?>
   <div class="ce_text block">
-      <?= nl2br($this->text) ?>
+      <?= nl2br(html_entity_decode(htmlspecialchars_decode($this->text))) ?>
   </div>
 <?php endif; ?>
 

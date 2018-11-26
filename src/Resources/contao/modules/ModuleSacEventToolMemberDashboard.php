@@ -508,6 +508,8 @@ class ModuleSacEventToolMemberDashboard extends Module
 
                     }
 
+                    // Generate forms
+                    $this->Template->objEventStoryTextAndYoutubeForm = $this->generateTextAndYoutubeForm($objStoryModel);
                     $this->Template->objEventStoryImageUploadForm = $this->generatePictureUploadForm($objStoryModel);
 
                 }
@@ -1017,12 +1019,83 @@ class ModuleSacEventToolMemberDashboard extends Module
     }
 
     /**
-     * @return null
+     * @param $objEventStoryModel
      */
-    protected function generatePictureUploadForm($objEventStoryModel)
+    protected function generateTextAndYoutubeForm($objEventStoryModel)
     {
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
+        $objForm = new Form('form-eventstory-text-and-youtube', 'POST', function ($objHaste) {
+            return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
+        });
+
+        $url = Environment::get('uri');
+        $objForm->setFormActionFromUri($url);
+
+        // Add some fields
+        $objForm->addFormField('text', array(
+            'label'     => 'Touren-/Lager-/Kursbericht',
+            'inputType' => 'textarea',
+            'eval'      => array('decodeEntities' => true),
+            'value'     => html_entity_decode($objEventStoryModel->text)
+
+        ));
+
+        // Add some fields
+        $objForm->addFormField('youtubeId', array(
+            'label'     => 'Touren-/Lager-/Kursbericht',
+            'inputType' => 'text',
+            'eval'      => array(),
+            'value'     => $objEventStoryModel->youtubeId
+        ));
+
+        // Let's add  a submit button
+        $objForm->addFormField('submit', array(
+            'label'     => 'absenden',
+            'inputType' => 'submit',
+        ));
+
+        // Add attributes
+        $objWidgetYt = $objForm->getWidget('youtubeId');
+        $objWidgetText = $objForm->getWidget('text');
+
+        $objWidgetYt->addAttribute('placeholder', 'z.B. G02hYgT3nGw');
+
+        // Bind model
+        $objForm->bindModel($objEventStoryModel);
+
+        $hasError = true;
+
+        // validate() also checks whether the form has been submitted
+        if ($objForm->validate() && Input::post('FORM_SUBMIT') === $objForm->getFormId())
+        {
+            $hasError = false;
+        }
+
+
+        if (!$hasError)
+        {
+            $objEventStoryModel->addedOn = time();
+            $objEventStoryModel->text = htmlspecialchars($objWidgetText->value);
+            $objEventStoryModel->youtubeId = $objWidgetYt->value;
+            $objEventStoryModel->save();
+            // Reload page
+            $this->reload();
+        }
+
+        return $objForm->generate();
+    }
+
+    /**
+     * @param $objEventStoryModel
+     * @return string|void
+     * @throws \Exception
+     */
+    protected function generatePictureUploadForm($objEventStoryModel)
+    {
+        global $objPage;
+
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
         if ($this->eventStoryUploadFolder != '')
         {
@@ -1042,7 +1115,6 @@ class ModuleSacEventToolMemberDashboard extends Module
         {
             return;
         }
-
 
         $objForm = new Form('form-eventstory-picture-upload', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
@@ -1067,13 +1139,11 @@ class ModuleSacEventToolMemberDashboard extends Module
             ),
         ));
 
-
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
             'label'     => 'upload starten',
             'inputType' => 'submit',
         ));
-
 
         // Add attributes
         $objWidgetFileupload = $objForm->getWidget('fileupload');
@@ -1085,7 +1155,6 @@ class ModuleSacEventToolMemberDashboard extends Module
         {
             //$objWidgetFileupload->template = $this->eventStoryCustomUploaderTpl;
         }
-
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate() && Input::post('FORM_SUBMIT') === $objForm->getFormId())
@@ -1105,38 +1174,32 @@ class ModuleSacEventToolMemberDashboard extends Module
                             $objFile = new File($objModel->path);
                             if ($objFile->isImage)
                             {
+                                // Resize image
+                                $this->resizeUploadedImage($objModel->path);
+
                                 // Rename file
                                 $newFilename = sprintf('event-story-%s-img-%s.%s', $objEventStoryModel->id, $objModel->id, strtolower($objFile->extension));
                                 $newPath = $objUploadFolder->path . '/' . $newFilename;
                                 Files::getInstance()->rename($objFile->path, $newPath);
                                 $objModel->path = $newPath;
                                 $objModel->name = basename($newPath);
-                                $objModel->save();
-                                Dbafs::updateFolderHashes($objUploadFolder->path);
-
-                                $objModel = FilesModel::findByPath($newPath);
                                 $objModel->tstamp = time();
                                 $objModel->save();
+                                Dbafs::updateFolderHashes($objUploadFolder->path);
 
                                 if (is_file($rootDir . '/' . $newPath))
                                 {
                                     $oFile = new File($newPath);
-
-                                    // Resize image
-                                    $this->resizeUploadedImage($oFile->path);
-
                                     $oFileModel = FilesModel::findByPath($newPath);
-
                                     if ($oFileModel !== null)
                                     {
                                         // Add Photographer name to meta field
-                                        $objUser = FrontendUser::getInstance();
-                                        if ($objUser !== null)
+                                        if ($this->objUser !== null)
                                         {
                                             $arrMeta = \StringUtil::deserialize($oFileModel->meta, true);
-                                            if (!isset($arrMeta['de']))
+                                            if (!isset($arrMeta[$objPage->language]))
                                             {
-                                                $arrMeta['de'] = array(
+                                                $arrMeta[$objPage->language] = array(
                                                     'title'        => '',
                                                     'alt'          => '',
                                                     'link'         => '',
@@ -1144,7 +1207,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                                                     'photographer' => '',
                                                 );
                                             }
-                                            $arrMeta['de']['photographer'] = $objUser->firstname . ' ' . $objUser->lastname;
+                                            $arrMeta[$objPage->language]['photographer'] = $this->objUser->firstname . ' ' . $this->objUser->lastname;
                                             $oFileModel->meta = serialize($arrMeta);
                                             $oFileModel->save();
                                         }
@@ -1158,7 +1221,6 @@ class ModuleSacEventToolMemberDashboard extends Module
                                         $objEventStoryModel->orderSRC = serialize($orderSRC);
                                         $objEventStoryModel->save();
                                     }
-
 
                                     // Log
                                     $strText = sprintf('User with username %s has uploadad a new picture ("%s").', $this->objUser->username, $objModel->path);
@@ -1216,8 +1278,6 @@ class ModuleSacEventToolMemberDashboard extends Module
             $logger = System::getContainer()->get('monolog.logger.contao');
             $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, TL_FILES)));
 
-            // Set flash bag message
-            $this->setFlashMessage($this->flashMessageKey, sprintf($GLOBALS['TL_LANG']['MSC']['fileExceeds'], $objFile->basename));
             return false;
         }
 
@@ -1250,8 +1310,6 @@ class ModuleSacEventToolMemberDashboard extends Module
 
             $this->blnHasResized = true;
 
-            // Set flash bag message
-            $this->setFlashMessage($this->flashMessageKey, sprintf($GLOBALS['TL_LANG']['MSC']['fileResized'], $objFile->basename));
             return true;
         }
 
