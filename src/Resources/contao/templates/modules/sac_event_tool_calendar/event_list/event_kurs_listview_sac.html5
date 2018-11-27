@@ -41,7 +41,7 @@ session_start();
   <?php if ($_SESSION['layout_table']): ?>
     <tr class="event-item event-item-course event" data-id="<?= $this->id ?>" data-event-type="<?= $this->courseTypeLevel1 ?>">
       <td>
-          <?= \Date::parse('d.m.Y', $this->startDate) ?>
+          <?= \Date::parse('D, d.m.Y', $this->startDate) ?>
       </td>
       <td>
           <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventDuration($this->id) ?>

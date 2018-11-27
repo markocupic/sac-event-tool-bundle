@@ -5,7 +5,8 @@
 <?php $arrTourTypes = \StringUtil::deserialize($this->tourType, true); ?>
 <tr class="event-item event-item-tour event" data-id="<?= $this->id ?>" data-event-type="<?= implode(',', $arrTourTypes) ?>">
   <td>
-      <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventPeriod($this->id, 'd.m.Y', false) ?>
+    <span class="d-lg-none"><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventPeriod($this->id, 'd.m.Y', false) ?></span>
+    <span class="d-none d-lg-block"><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventPeriod($this->id, 'D, d.m.Y', false) ?></span>
   </td>
   <td class="d-none d-md-table-cell">
       <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventDuration($this->id) ?>

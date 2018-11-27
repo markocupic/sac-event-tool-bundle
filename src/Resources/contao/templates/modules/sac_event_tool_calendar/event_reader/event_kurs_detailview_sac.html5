@@ -30,7 +30,7 @@
                 <div class="eventdate event-detail event-info-box icon-box-small">
                     <h5>Kursdaten:</h5>
                     <p>
-                        <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventPeriod($this->id, '', true, false) ?>
+                        <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventPeriod($this->id, 'D, d.m.Y', true, false) ?>
                     </p>
                 </div>
 
