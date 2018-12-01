@@ -529,6 +529,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                 'participant_date_of_birth'        => $arrData['dateOfBirth'] > 0 ? Date::parse('d.m.Y', $arrData['dateOfBirth']) : '---',
                 'participant_food_habits'          => $arrData['foodHabits'],
                 'participant_notes'                => html_entity_decode($arrData['notes']),
+                'event_id'                         => $objEvent->id,
                 'event_link_detail'                => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($this->objEvent),
                 'event_state'                      => $eventFullyBooked === true ? 'fully-booked' : '',
             );
