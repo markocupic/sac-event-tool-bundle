@@ -117,7 +117,7 @@
                 <?php if ($this->setRegistrationPeriod): ?>
                 <div class="booking-text event-detail event-info-box icon-box-small">
                     <h6>Anmeldung möglich</h6>
-                    <p>Vom <?= \Date::parse('d.m.Y', $this->registrationStartDate) ?> bis zum <?= \Date::parse('d.m.Y', $this->registrationEndDate) ?></p>
+                    <p>Vom <?= \Date::parse(\Config::get('datimFormat'), $this->registrationStartDate) ?> bis zum <?= \Date::parse(\Config::get('datimFormat'), $this->registrationEndDate) ?></p>
                 </div>
                 <?php endif; ?>
 

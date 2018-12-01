@@ -593,7 +593,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
 
         if ($objEvent->setRegistrationPeriod)
         {
-            $arrRow['registrationPeriod'] = Date::parse('j.m.Y', $objEvent->registrationStartDate) . ' bis ' . Date::parse('j.m.Y', $objEvent->registrationEndDate);
+            $arrRow['registrationPeriod'] = Date::parse('j.m.Y H:i', $objEvent->registrationStartDate) . ' bis ' . Date::parse('j.m.Y H:i', $objEvent->registrationEndDate);
         }
 
         // MinMaxMembers
