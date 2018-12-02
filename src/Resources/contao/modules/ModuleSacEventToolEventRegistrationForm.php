@@ -188,7 +188,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         }
         elseif ($this->objEvent->setRegistrationPeriod && $this->objEvent->registrationStartDate > time())
         {
-            Message::addInfo(sprintf('Anmeldungen f&uuml;r <strong>"%s"</strong> sind erst ab dem %s m&ouml;glich.', $this->objEvent->title, Date::parse('d.m.Y', $this->objEvent->registrationStartDate)), TL_MODE);
+            Message::addInfo(sprintf('Anmeldungen f&uuml;r <strong>"%s"</strong> sind erst ab dem %s m&ouml;glich.', $this->objEvent->title, Date::parse('d.m.Y H:i', $this->objEvent->registrationStartDate)), TL_MODE);
         }
         elseif ($this->objEvent->setRegistrationPeriod && $this->objEvent->registrationEndDate < time())
         {
