@@ -44,7 +44,7 @@ window.addEvent('domready', function () {
 
                             // Autofill form inputs
                             $('btnAcceptAutocomplete').addEvent('click', function (event) {
-                                var fields = ['gender', 'firstname', 'lastname', 'street', 'postal', 'city', 'phone', 'email', 'dateOfBirth', 'foodHabits', 'emergencyPhone', 'emergencyPhoneName'];
+                                var fields = ['gender', 'name', 'username', 'firstname', 'lastname', 'street', 'postal', 'city', 'mobile', 'phone', 'email', 'dateOfBirth', 'foodHabits', 'emergencyPhone', 'emergencyPhoneName'];
                                 fields.each(function (field) {
                                     if ($('ctrl_' + field)) {
                                         if (json[field] !== null) {

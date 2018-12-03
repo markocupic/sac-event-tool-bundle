@@ -11,7 +11,9 @@
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\Database;
 use Contao\MemberModel;
+use Contao\UserModel;
 use Contao\Widget;
 
 
@@ -59,6 +61,33 @@ class AddCustomRegexp
 
             return true;
         }
+
+
+        // Check for a valid/existent sacMemberId
+        if ($strRegexp === 'sacMemberIdIsUniqueAndValid')
+        {
+            if(!is_numeric($varValue))
+            {
+                $objWidget->addError('Sac member id must be number >= 0');
+            }
+            elseif (trim($varValue) !== '' && $varValue > 0)
+            {
+                $objMemberModel = MemberModel::findBySacMemberId(trim($varValue));
+                if ($objMemberModel === null)
+                {
+                    $objWidget->addError('Field ' . $objWidget->label . ' should be a valid sac member id.');
+                }
+
+                $objUser = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE sacMemberId=?')->execute($varValue);
+                if ($objUser->numRows > 1)
+                {
+                    $objWidget->addError('Sac member id ' . $varValue . ' is already in use.');
+                }
+            }
+
+            return true;
+        }
+
 
         return false;
     }

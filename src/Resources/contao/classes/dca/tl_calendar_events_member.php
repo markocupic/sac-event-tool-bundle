@@ -35,7 +35,7 @@ class tl_calendar_events_member extends Backend
         // Set correct referer
         if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('ref') != '')
         {
-            $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/tl_calendar_events_member.js';
+            $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/backend_member_autocomplete.js';
         }
 
         // Set correct referer

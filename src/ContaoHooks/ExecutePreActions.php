@@ -55,6 +55,8 @@ class ExecutePreActions
             if ($objMemberModel !== null)
             {
                 $json = $objMemberModel->row();
+                $json['name'] = $json['firstname'] . ' ' . $json['lastname'];
+                $json['username'] = str_replace(' ', '', strtolower($json['name']));
                 $json['dateOfBirth'] = Date::parse(Config::get('dateFormat'), $json['dateOfBirth']);
                 $json['status'] = 'success';
                 // Bin to hex otherwise there will be a json error

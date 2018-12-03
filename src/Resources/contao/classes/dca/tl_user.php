@@ -21,49 +21,59 @@ class tl_user_sac_event_tool extends Backend
     {
         parent::__construct();
         $this->import('BackendUser', 'User');
+
+        // Import js
+        if (Input::get('do') === 'user' && Input::get('act') === 'edit' && Input::get('ref') != '')
+        {
+            $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/backend_member_autocomplete.js';
+        }
     }
 
+
     /**
-     * Seet readonly fields
+     * See readonly fields
      * @param DataContainer $dc
      */
     public function addReadonlyAttributeToSyncedFields(DataContainer $dc)
     {
         // User profile
-        if (Input::get('do') === 'login')
+        if(Input::get('do') === 'login')
         {
-            $id = $this->User->id;
-        }
-        else
-        {
-            $id = $dc->id;
-        }
-
-        if ($id > 0)
-        {
-            if (!$this->User->admin)
+            if (Input::get('do') === 'login')
             {
-                $objUser = UserModel::findByPk($id);
-                if ($objUser !== null)
+                $id = $this->User->id;
+            }
+            else
+            {
+                $id = $dc->id;
+            }
+
+            if ($id > 0)
+            {
+                if (!$this->User->admin)
                 {
-                    if ($objUser->sacMemberId > 0)
+                    $objUser = UserModel::findByPk($id);
+                    if ($objUser !== null)
                     {
-                        $objMember = MemberModel::findBySacMemberId($objUser->sacMemberId);
-                        if ($objMember !== null)
+                        if ($objUser->sacMemberId > 0)
                         {
-                            if (!$objMember->disable)
+                            $objMember = MemberModel::findBySacMemberId($objUser->sacMemberId);
+                            if ($objMember !== null)
                             {
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['gender']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['firstname']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['lastname']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['phone']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['mobile']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['street']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['postal']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['city']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['dateOfBirth']['eval']['readonly'] = true;
+                                if (!$objMember->disable)
+                                {
+                                    $GLOBALS['TL_DCA']['tl_user']['fields']['gender']['eval']['readonly'] = true;
+                                    $GLOBALS['TL_DCA']['tl_user']['fields']['firstname']['eval']['readonly'] = true;
+                                    $GLOBALS['TL_DCA']['tl_user']['fields']['lastname']['eval']['readonly'] = true;
+                                    $GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['readonly'] = true;
+                                    $GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['readonly'] = true;
+                                    $GLOBALS['TL_DCA']['tl_user']['fields']['phone']['eval']['readonly'] = true;
+                                    $GLOBALS['TL_DCA']['tl_user']['fields']['mobile']['eval']['readonly'] = true;
+                                    $GLOBALS['TL_DCA']['tl_user']['fields']['street']['eval']['readonly'] = true;
+                                    $GLOBALS['TL_DCA']['tl_user']['fields']['postal']['eval']['readonly'] = true;
+                                    $GLOBALS['TL_DCA']['tl_user']['fields']['city']['eval']['readonly'] = true;
+                                    $GLOBALS['TL_DCA']['tl_user']['fields']['dateOfBirth']['eval']['readonly'] = true;
+                                }
                             }
                         }
                     }
@@ -77,8 +87,17 @@ class tl_user_sac_event_tool extends Backend
      */
     public function onloadCallback(DataContainer $dc)
     {
+
+        if ($dc->id == '' || !is_numeric($dc->id))
+        {
+            return;
+        }
+
         // Sync tl_user with tl_member
-        $objUser = $this->Database->prepare('SELECT * FROM tl_user WHERE sacMemberId>?')->execute(0);
+        // We used this during the pilot state, to find out whichuser does not have a valis email-address
+        // $objUser = $this->Database->prepare('SELECT * FROM tl_user WHERE sacMemberId>?')->execute(0);
+        $objUser = $this->Database->prepare('SELECT * FROM tl_user WHERE sacMemberId>? AND id=?')->execute(0, $dc->id);
+
         while ($objUser->next())
         {
             $objSAC = $this->Database->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')->limit(1)->execute($objUser->sacMemberId);
@@ -191,6 +210,28 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
 
         Message::addInfo('Einige Felder werden mit der Datenbank des Zentralverbandes synchronisiert. Wenn Sie &Auml;nderungen machen möchten, müssen Sie diese zuerst dort vornehmen.');
 
+    }
+
+
+    /**
+     * @param DataContainer $dc
+     */
+    public function oncreateCallback($strTable, $id, $arrSet)
+    {
+        $objUser = \Contao\UserModel::findByPk($id);
+        if($objUser !== null)
+        {
+            if($arrSet['inherit'] !== 'extend')
+            {
+                $objUser->inherit = 'extend';
+                $objUser->pwChange = '1';
+                $defaultPassword = Config::get('SAC_EVT_DEFAULT_BACKEND_PASSWORD');
+                $objUser->password = password_hash($defaultPassword, PASSWORD_DEFAULT);
+                $objUser->tstamp = 0;
+                $objUser->save();
+                $this->reload;
+            }
+        }
     }
 
 
