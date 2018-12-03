@@ -36,7 +36,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['stateOfSubscription'] = array(
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['addedOn'] = array("Anmeldedatum", "Geben Sie hier das Anmeldedatum ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['firstname'] = array("Vorname", "Geben Sie hier den Vornamen ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['lastname'] = array("Nachname", "Geben Sie hier den Nachnamen ein.");
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['sacMemberId'] = array("SAC Mitgliedernummer", "Geben Sie hier die Mitgliedernummer ein.");
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['sacMemberId'] = array("SAC Mitgliedernummer", '<span style="font-weight:bold;color:red">Lasse das Feld leer</span>, falls die Person kein Sektionsmitglied ist.');
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['contaoMemberId'] = array("Contao Mitglieder Id (tl_member)", "Geben Sie hier die Contao Mitglieder-ID ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['street'] = array("Strasse", "Geben Sie hier die Strasse ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['postal'] = array("Postleitzahl", "Geben Sie hier die Postleitzahl ein.");

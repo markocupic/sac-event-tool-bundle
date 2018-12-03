@@ -204,7 +204,7 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
             if (!$this->User->isAdmin)
             {
                 // Readonly acces to non admins
-                $GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['readonly'] = true;
+                //$GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['readonly'] = true;
             }
         }
 
