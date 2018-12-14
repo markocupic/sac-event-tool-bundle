@@ -1043,7 +1043,7 @@ class ModuleSacEventToolMemberDashboard extends Module
 
         // Add some fields
         $objForm->addFormField('youtubeId', array(
-            'label'     => 'Touren-/Lager-/Kursbericht',
+            'label'     => 'Youtube Film-Id',
             'inputType' => 'text',
             'eval'      => array(),
             'value'     => $objEventStoryModel->youtubeId
