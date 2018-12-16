@@ -202,7 +202,7 @@ class EventRapport
             }
         }
 
-        $arrData[] = array('key' => 'carTaxes', 'value' => htmlspecialchars(html_entity_decode(round($carTaxes,2))));
+        $arrData[] = array('key' => 'carTaxes', 'value' => htmlspecialchars(html_entity_decode(round($carTaxes, 2))));
         $totalCosts = $objEventInvoice->sleepingTaxes + $objEventInvoice->miscTaxes + $objEventInvoice->railwTaxes + $objEventInvoice->cabelCarTaxes + $objEventInvoice->roadTaxes + $objEventInvoice->phoneTaxes + $carTaxes;
         $arrData[] = array('key' => 'totalCosts', 'value' => htmlspecialchars(html_entity_decode(round($totalCosts, 2))));
 
@@ -325,18 +325,18 @@ class EventRapport
                     $rows[] = array(
                         array('key' => 'i', 'value' => $i, 'options' => array('multiline' => false)),
                         array('key' => 'role', 'value' => 'TL', 'options' => array('multiline' => false)),
-                        array('key' => 'firstname', 'value' => $objUserModel->name, 'options' => array('multiline' => false)),
+                        array('key' => 'firstname', 'value' => htmlspecialchars(html_entity_decode($objUserModel->name)), 'options' => array('multiline' => false)),
                         array('key' => 'lastname', 'value' => '', 'options' => array('multiline' => false)),
                         array('key' => 'sacMemberId', 'value' => 'Mitgl. No. ' . $objUserModel->sacMemberId, 'options' => array('multiline' => false)),
                         array('key' => 'isNotSacMember', 'value' => $isMember ? ' ' : '!inaktiv/kein Mitglied', 'options' => array('multiline' => false)),
-                        array('key' => 'street', 'value' => $objUserModel->street, 'options' => array('multiline' => false)),
-                        array('key' => 'postal', 'value' => $objUserModel->postal, 'options' => array('multiline' => false)),
-                        array('key' => 'city', 'value' => $objUserModel->city, 'options' => array('multiline' => false)),
-                        array('key' => 'emergencyPhone', 'value' => $objUserModel->emergencyPhone, 'options' => array('multiline' => false)),
-                        array('key' => 'emergencyPhoneName', 'value' => $objUserModel->emergencyPhoneName, 'options' => array('multiline' => false)),
-                        array('key' => 'mobile', 'value' => $mobile, 'options' => array('multiline' => false)),
-                        array('key' => 'email', 'value' => $objUserModel->email, 'options' => array('multiline' => false)),
-                        array('key' => 'transportInfo', 'value' => $transportInfo, 'options' => array('multiline' => false)),
+                        array('key' => 'street', 'value' => htmlspecialchars(html_entity_decode($objUserModel->street)), 'options' => array('multiline' => false)),
+                        array('key' => 'postal', 'value' => htmlspecialchars(html_entity_decode($objUserModel->postal)), 'options' => array('multiline' => false)),
+                        array('key' => 'city', 'value' => htmlspecialchars(html_entity_decode($objUserModel->city)), 'options' => array('multiline' => false)),
+                        array('key' => 'emergencyPhone', 'value' => htmlspecialchars(html_entity_decode($objUserModel->emergencyPhone)), 'options' => array('multiline' => false)),
+                        array('key' => 'emergencyPhoneName', 'value' => htmlspecialchars(html_entity_decode($objUserModel->emergencyPhoneName)), 'options' => array('multiline' => false)),
+                        array('key' => 'mobile', 'value' => htmlspecialchars(html_entity_decode($mobile)), 'options' => array('multiline' => false)),
+                        array('key' => 'email', 'value' => htmlspecialchars(html_entity_decode($objUserModel->email)), 'options' => array('multiline' => false)),
+                        array('key' => 'transportInfo', 'value' => htmlspecialchars(html_entity_decode($transportInfo)), 'options' => array('multiline' => false)),
                         array('key' => 'dateOfBirth', 'value' => $objUserModel->dateOfBirth != '' ? Date::parse('d.m.Y', $objUserModel->dateOfBirth) : '', 'options' => array('multiline' => false)),
                     );
                 }
@@ -376,22 +376,21 @@ class EventRapport
 
             // Phone
             $mobile = $objEventMember->mobile != '' ? $objEventMember->mobile : '----';
-
             $rows[] = array(
                 array('key' => 'i', 'value' => $i, 'options' => array('multiline' => false)),
                 array('key' => 'role', 'value' => 'TN', 'options' => array('multiline' => false)),
-                array('key' => 'firstname', 'value' => $objEventMember->firstname, 'options' => array('multiline' => false)),
-                array('key' => 'lastname', 'value' => $objEventMember->lastname, 'options' => array('multiline' => false)),
+                array('key' => 'firstname', 'value' => htmlspecialchars(html_entity_decode($objEventMember->firstname)), 'options' => array('multiline' => false)),
+                array('key' => 'lastname', 'value' => htmlspecialchars(html_entity_decode($objEventMember->lastname)), 'options' => array('multiline' => false)),
                 array('key' => 'sacMemberId', 'value' => 'Mitgl. No. ' . $objEventMember->sacMemberId, 'options' => array('multiline' => false)),
                 array('key' => 'isNotSacMember', 'value' => $strIsActiveMember, 'options' => array('multiline' => false)),
-                array('key' => 'street', 'value' => $objEventMember->street, 'options' => array('multiline' => false)),
-                array('key' => 'postal', 'value' => $objEventMember->postal, 'options' => array('multiline' => false)),
-                array('key' => 'city', 'value' => $objEventMember->city, 'options' => array('multiline' => false)),
-                array('key' => 'mobile', 'value' => $mobile, 'options' => array('multiline' => false)),
-                array('key' => 'emergencyPhone', 'value' => $objEventMember->emergencyPhone, 'options' => array('multiline' => false)),
-                array('key' => 'emergencyPhoneName', 'value' => $objEventMember->emergencyPhoneName, 'options' => array('multiline' => false)),
-                array('key' => 'email', 'value' => $objEventMember->email, 'options' => array('multiline' => false)),
-                array('key' => 'transportInfo', 'value' => $transportInfo, 'options' => array('multiline' => false)),
+                array('key' => 'street', 'value' => htmlspecialchars(html_entity_decode($objEventMember->street)), 'options' => array('multiline' => false)),
+                array('key' => 'postal', 'value' => htmlspecialchars(html_entity_decode($objEventMember->postal)), 'options' => array('multiline' => false)),
+                array('key' => 'city', 'value' => htmlspecialchars(html_entity_decode($objEventMember->city)), 'options' => array('multiline' => false)),
+                array('key' => 'mobile', 'value' => htmlspecialchars(html_entity_decode($mobile)), 'options' => array('multiline' => false)),
+                array('key' => 'emergencyPhone', 'value' => htmlspecialchars(html_entity_decode($objEventMember->emergencyPhone)), 'options' => array('multiline' => false)),
+                array('key' => 'emergencyPhoneName', 'value' => htmlspecialchars(html_entity_decode($objEventMember->emergencyPhoneName)), 'options' => array('multiline' => false)),
+                array('key' => 'email', 'value' => htmlspecialchars(html_entity_decode($objEventMember->email)), 'options' => array('multiline' => false)),
+                array('key' => 'transportInfo', 'value' => htmlspecialchars(html_entity_decode($transportInfo)), 'options' => array('multiline' => false)),
                 array('key' => 'dateOfBirth', 'value' => $objEventMember->dateOfBirth != '' ? Date::parse('d.m.Y', $objEventMember->dateOfBirth) : '', 'options' => array('multiline' => false)),
             );
         }
@@ -476,6 +475,7 @@ class EventRapport
             if ($outputType === 'docx')
             {
                 // Generate Docx file from template;
+                //die(print_r($arrData,true));
                 CreateDocxFromTemplate::create($arrData, Config::get('SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'), $targetFile)
                     ->generateUncached(true)
                     ->sendToBrowser(true)
