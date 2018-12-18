@@ -48,8 +48,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
         'sorting'           => array
         (
             'mode'        => 2,
-            'fields'      => array('eventEndDate'),
-            'flag'        => 1,
+            'fields'      => array('eventStartDate DESC'),
+            //'flag'        => 12,
             'panelLayout' => 'filter;sort,search',
         ),
         'label'             => array
@@ -170,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
         (
             'label'   => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['eventStartDate'],
             'sorting' => true,
-            'flag'    => 8,
+            'flag'    => 6,
             'sql'     => "int(10) unsigned NOT NULL default '0'",
         ),
         'eventEndDate'          => array
