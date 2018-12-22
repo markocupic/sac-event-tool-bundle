@@ -946,14 +946,21 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     public function oncreateCallback($strTable, $insertId, $set, DataContainer $dc)
     {
 
-        // Add author & first release level, when a new event was created
+        // Set source and add author, first release level, when a new event was created & set customEventRegistrationConfirmationEmailText
         $objEventsModel = CalendarEventsModel::findByPk($insertId);
         if ($objEventsModel !== null)
         {
+            // Set source always to "default"
+            $objEventsModel->source = 'default';
+
             // Set logged in User as author
             $objEventsModel->author = $this->User->id;
             $objEventsModel->mainInstructor = $this->User->id;
             $objEventsModel->instructor = serialize(array(array('instructorId' => $this->User->id)));
+
+            // Set customEventRegistrationConfirmationEmailText
+            $objEventsModel->customEventRegistrationConfirmationEmailText = str_replace('{{br}}',"\n", Config::get('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'));
+
             $objEventsModel->save();
         }
     }

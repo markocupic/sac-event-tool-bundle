@@ -79,7 +79,7 @@ class CronjobController extends Controller
         $container->get('contao.framework');
         $framework = $container->get('contao.framework');
         $framework->initialize();
-        $year = Config::get('SAC_WORKSHOP_FLYER_YEAR');
+        $year = Config::get('SAC_EVT_WORKSHOP_FLYER_YEAR');
         $calendarId = Config::get('SAC_WORKSHOP_FLYER_CALENDAR_ID');
         $objPrint = new PrintWorkshopsAsPdf($year, $calendarId, null, false);
         $objPrint->printWorkshopsAsPdf();

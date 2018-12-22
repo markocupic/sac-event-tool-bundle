@@ -50,12 +50,15 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['allowDeregistration'] =
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addGallery'] = 'multiSRC';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['setRegistrationPeriod'] = 'registrationStartDate,registrationEndDate';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addMinAndMaxMembers'] = 'minMembers,maxMembers';
+$GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['customizeEventRegistrationConfirmationEmailText'] = 'customEventRegistrationConfirmationEmailText';
+
+
 
 // Reset palettes
 $strLegends = '
 {tour_report_legend:hide};{event_type_legend};
 {broschuere_legend:hide};{title_legend:hide};{date_legend:hide};{recurring_legend:hide};{details_legend:hide};
-{min_max_member_legend:hide};{registration_legend:hide};{deregistration_legend:hide};{image_legend:hide};{gallery_legend:hide};
+{min_max_member_legend:hide};{registration_legend:hide};{deregistration_legend:hide};{event_registration_confirmation_legend:hide};{image_legend:hide};{gallery_legend:hide};
 {enclosure_legend:hide};{source_legend:hide};{expert_legend:hide}
 ';
 
@@ -71,6 +74,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'allowD
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addMinAndMaxMembers';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addGallery';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'setRegistrationPeriod';
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'customizeEventRegistrationConfirmationEmailText';
 
 
 // Default palettes (define it for any case, f.ex edit all mode)
@@ -89,6 +93,7 @@ PaletteManipulator::create()
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('customizeEventRegistrationConfirmationEmailText'), 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
@@ -108,6 +113,7 @@ PaletteManipulator::create()
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('customizeEventRegistrationConfirmationEmailText'), 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('source'), 'source_legend', PaletteManipulator::POSITION_APPEND)
@@ -129,6 +135,7 @@ PaletteManipulator::create()
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('customizeEventRegistrationConfirmationEmailText'), 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('source'), 'source_legend', PaletteManipulator::POSITION_APPEND)
@@ -147,6 +154,7 @@ PaletteManipulator::create()
     ->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('customizeEventRegistrationConfirmationEmailText'), 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
@@ -450,14 +458,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['equipment'] = array(
 
 // durationInfo
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = array(
-    'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'],
-    'search'          => true,
-    'filter'          => true,
-    'exclude'         => true,
-    'inputType'       => 'select',
+    'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'],
+    'search'           => true,
+    'filter'           => true,
+    'exclude'          => true,
+    'inputType'        => 'select',
     'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCallbackGetEventDuration'),
-    'eval'            => array('includeBlankOption' => true, 'tl_class' => 'clr m12', 'mandatory' => true),
-    'sql'             => "varchar(32) NOT NULL default ''",
+    'eval'             => array('includeBlankOption' => true, 'tl_class' => 'clr m12', 'mandatory' => true),
+    'sql'              => "varchar(32) NOT NULL default ''",
 );
 
 // Add minimum an maximum members
@@ -818,6 +826,29 @@ if (!Contao\Input::get('act') || Contao\Input::get('act') === 'select')
     // Display the field correctly in the filter menu
     $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel']['options_callback'] = null;
 }
+
+// customizeEventRegistrationConfirmationEmailText
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customizeEventRegistrationConfirmationEmailText'] = array(
+
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'],
+    'exclude'   => true,
+    'filter'    => false,
+    'inputType' => 'checkbox',
+    'eval'      => array('submitOnChange' => true),
+    'sql'       => "char(1) NOT NULL default ''",
+);
+
+// customEventRegistrationConfirmationEmailText
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfirmationEmailText'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'],
+    'exclude'   => true,
+    'default'   => str_replace('{{br}}',"\n", Config::get('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT')),
+    'inputType' => 'textarea',
+    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false, 'preserveTags' => true, 'allowHtml' => true, 'decodeEntities' => false),
+    'sql'       => "text NULL",
+);
+
+
 
 
 // Tour report fields:
