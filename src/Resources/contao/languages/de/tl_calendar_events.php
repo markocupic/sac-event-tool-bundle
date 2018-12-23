@@ -24,7 +24,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tour_report_legend'] = "Tourenrapport
 $GLOBALS['TL_LANG']['tl_calendar_events']['min_max_member_legend'] = "Teilnehmerzahl Einstellungen";
 $GLOBALS['TL_LANG']['tl_calendar_events']['event_type_legend'] = "Event-Art Einstellungen";
 $GLOBALS['TL_LANG']['tl_calendar_events']['journey_legend'] = "Event-Art Einstellungen";
-$GLOBALS['TL_LANG']['tl_calendar_events']['event_registration_confirmation_legend'] = "Anmeldebestätigung individualisieren";
+$GLOBALS['TL_LANG']['tl_calendar_events']['event_registration_confirmation_legend'] = "E-Mail-Anmeldebestätigung individualisieren";
 
 
 
@@ -91,8 +91,8 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'] = array("Zeit
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'] = array("H&ouml;henunterschied im Abstieg", "Machen Sie hier Angaben zum H&ouml;henunterschied im Abstieg.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = array("Zeitbedarf im Abstieg in h", "Machen Sie hier Angaben zum Zeitbedarf im Abstieg.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'] = array('<span style="color:red">Kontaktdaten standardmässig aus der Datenbank generieren (Wichtig, falls Online-Anmeldung deaktiviert ist!!!)</span>', 'Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.');
-$GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'] = array("Anmeldebestätigungs-E-Mail individualisieren", "");
-$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'] = array("Anmeldebestätigungs-E-Mail-Text", "Hier lässt sich ein individualisierter E-Mail-Bestätigungs-Text für den Event erstellen.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'] = array("E-Mail-Text für Anmeldebestätigung individualisieren.", "");
+$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'] = array("E-Mail-Text für Anmeldebestätigung", "Hier lässt sich ein individualisierter E-Mail-Bestätigungs-Text für den Event erstellen. Mit den Tags lassen sich eventspezifische Daten ausgeben.");
 
 
 

@@ -892,7 +892,7 @@ class tl_calendar_events_member extends Backend
             if ($objEvent->customizeEventRegistrationConfirmationEmailText && $objEvent->customEventRegistrationConfirmationEmailText != '')
             {
                 $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent->id);
-                $strDates = implode(',', array_map(function ($tstamp) {
+                $strDates = implode(', ', array_map(function ($tstamp) {
                     return Date::parse(Config::get('dateFormat'), $tstamp);
                 }, $eventDates));
 
