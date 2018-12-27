@@ -16,7 +16,7 @@ Freundliche Grüsse
 
 
 --------------------------
-<?= $this->eventTitle ?> <?= $this->eventUrl ?>
+<?= $this->eventname ?> <?= $this->eventUrl ?>
 
 
 

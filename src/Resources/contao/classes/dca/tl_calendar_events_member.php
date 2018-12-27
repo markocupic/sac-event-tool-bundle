@@ -889,24 +889,24 @@ class tl_calendar_events_member extends Backend
         if ($objRegistration !== null)
         {
             $objEvent = $objRegistration->getRelated('eventId');
+
+            $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent->id);
+            $strDates = implode(', ', array_map(function ($tstamp) {
+                return Date::parse(Config::get('dateFormat'), $tstamp);
+            }, $eventDates));
+
             if ($objEvent->customizeEventRegistrationConfirmationEmailText && $objEvent->customEventRegistrationConfirmationEmailText != '')
             {
-                $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent->id);
-                $strDates = implode(', ', array_map(function ($tstamp) {
-                    return Date::parse(Config::get('dateFormat'), $tstamp);
-                }, $eventDates));
-
                 $emailBodyText = $objEvent->customEventRegistrationConfirmationEmailText;
                 $emailBodyText = str_replace('##firstname##', $objRegistration->firstname, $emailBodyText);
                 $emailBodyText = str_replace('##lastname##', $objRegistration->lastname, $emailBodyText);
                 $emailBodyText = str_replace('##eventname##', $objEvent->title, $emailBodyText);
                 $emailBodyText = str_replace('##courseId##', $objEvent->courseId, $emailBodyText);
                 $emailBodyText = str_replace('##eventType##', $objEvent->eventType, $emailBodyText);
-                $emailBodyText = str_replace('##eventDates##', $strDates, $emailBodyText);
                 $emailBodyText = str_replace('##nameInstructor##', $this->User->name, $emailBodyText);
                 $emailBodyText = str_replace('##emailInstructor##', $this->User->email, $emailBodyText);
-                $emailBodyText = str_replace('##eventTitle##', $objEvent->title, $emailBodyText);
                 $emailBodyText = str_replace('##eventUrl##', Events::generateEventUrl($objEvent,true), $emailBodyText);
+                $emailBodyText = str_replace('##eventDates##', $strDates, $emailBodyText);
                 $emailBodyText = strip_tags($emailBodyText);
             }
             else
@@ -921,7 +921,7 @@ class tl_calendar_events_member extends Backend
                 $objEmailTemplate->nameInstructor = $this->User->name;
                 $objEmailTemplate->emailInstructor = $this->User->email;
                 $objEmailTemplate->eventUrl = Events::generateEventUrl($objEvent,true);
-                $objEmailTemplate->eventTitle = $objEvent->title;
+                $objEmailTemplate->eventDates = $strDates;
                 $emailBodyText = strip_tags($objEmailTemplate->parse());
             }
 
