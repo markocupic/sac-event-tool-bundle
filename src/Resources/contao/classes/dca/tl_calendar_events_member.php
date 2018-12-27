@@ -905,6 +905,8 @@ class tl_calendar_events_member extends Backend
                 $emailBodyText = str_replace('##eventDates##', $strDates, $emailBodyText);
                 $emailBodyText = str_replace('##nameInstructor##', $this->User->name, $emailBodyText);
                 $emailBodyText = str_replace('##emailInstructor##', $this->User->email, $emailBodyText);
+                $emailBodyText = str_replace('##eventTitle##', $objEvent->title, $emailBodyText);
+                $emailBodyText = str_replace('##eventUrl##', Events::generateEventUrl($objEvent,true), $emailBodyText);
                 $emailBodyText = strip_tags($emailBodyText);
             }
             else
@@ -918,6 +920,8 @@ class tl_calendar_events_member extends Backend
                 $objEmailTemplate->eventType = $objEvent->eventType;
                 $objEmailTemplate->nameInstructor = $this->User->name;
                 $objEmailTemplate->emailInstructor = $this->User->email;
+                $objEmailTemplate->eventUrl = Events::generateEventUrl($objEvent,true);
+                $objEmailTemplate->eventTitle = $objEvent->title;
                 $emailBodyText = strip_tags($objEmailTemplate->parse());
             }
 
