@@ -897,16 +897,22 @@ class tl_calendar_events_member extends Backend
 
             if ($objEvent->customizeEventRegistrationConfirmationEmailText && $objEvent->customEventRegistrationConfirmationEmailText != '')
             {
+                // Replace tags (tags can be used case insensitive!)
                 $emailBodyText = $objEvent->customEventRegistrationConfirmationEmailText;
-                $emailBodyText = str_replace('##firstname##', $objRegistration->firstname, $emailBodyText);
-                $emailBodyText = str_replace('##lastname##', $objRegistration->lastname, $emailBodyText);
-                $emailBodyText = str_replace('##eventname##', $objEvent->title, $emailBodyText);
-                $emailBodyText = str_replace('##courseId##', $objEvent->courseId, $emailBodyText);
-                $emailBodyText = str_replace('##eventType##', $objEvent->eventType, $emailBodyText);
-                $emailBodyText = str_replace('##nameInstructor##', $this->User->name, $emailBodyText);
-                $emailBodyText = str_replace('##emailInstructor##', $this->User->email, $emailBodyText);
-                $emailBodyText = str_replace('##eventUrl##', Events::generateEventUrl($objEvent,true), $emailBodyText);
-                $emailBodyText = str_replace('##eventDates##', $strDates, $emailBodyText);
+                $emailBodyText = preg_replace('/##firstname##/i', $objRegistration->firstname, $emailBodyText);
+                $emailBodyText = preg_replace('/##lastname##/i', $objRegistration->lastname, $emailBodyText);
+                $emailBodyText = preg_replace('/##eventname##/i', $objEvent->title, $emailBodyText);
+                $emailBodyText = preg_replace('/##courseId##/i', $objEvent->courseId, $emailBodyText);
+                $emailBodyText = preg_replace('/##eventType##/i', $objEvent->eventType, $emailBodyText);
+                $emailBodyText = preg_replace('/##eventUrl##/i', Events::generateEventUrl($objEvent, true), $emailBodyText);
+                $emailBodyText = preg_replace('/##eventDates##/i', $strDates, $emailBodyText);
+                $emailBodyText = preg_replace('/##nameInstructor##/i', $this->User->name, $emailBodyText);
+                $emailBodyText = preg_replace('/##phoneInstructor##/i', $this->User->phone, $emailBodyText);
+                $emailBodyText = preg_replace('/##mobileInstructor##/i', $this->User->mobile, $emailBodyText);
+                $emailBodyText = preg_replace('/##streetInstructor##/i', $this->User->street, $emailBodyText);
+                $emailBodyText = preg_replace('/##postalInstructor##/i', $this->User->postal, $emailBodyText);
+                $emailBodyText = preg_replace('/##cityInstructor##/i', $this->User->city, $emailBodyText);
+                $emailBodyText = preg_replace('/##emailInstructor##/i', $this->User->email, $emailBodyText);
                 $emailBodyText = strip_tags($emailBodyText);
             }
             else
@@ -920,7 +926,7 @@ class tl_calendar_events_member extends Backend
                 $objEmailTemplate->eventType = $objEvent->eventType;
                 $objEmailTemplate->nameInstructor = $this->User->name;
                 $objEmailTemplate->emailInstructor = $this->User->email;
-                $objEmailTemplate->eventUrl = Events::generateEventUrl($objEvent,true);
+                $objEmailTemplate->eventUrl = Events::generateEventUrl($objEvent, true);
                 $objEmailTemplate->eventDates = $strDates;
                 $emailBodyText = strip_tags($objEmailTemplate->parse());
             }
