@@ -91,7 +91,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'] = array("H
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = array("Zeitbedarf im Abstieg in h", "Machen Sie hier Angaben zum Zeitbedarf im Abstieg.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'] = array('<span style="color:red">Kontaktdaten standardmässig aus der Datenbank generieren (Wichtig, falls Online-Anmeldung deaktiviert ist!!!)</span>', 'Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.');
 $GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'] = array("E-Mail-Text für Anmeldebestätigung individualisieren.", "");
-$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'] = array("E-Mail-Text für Anmeldebestätigung", sprintf("Nutzen Sie die Tags, um eine individualisierte E-Mail-Bestätigungs für den Event zu erstellen. Fahren Sie mit der Maus über diesen Text, um mehr zu erfahren. %s", "<br><br>" . str_replace('{{br}}', '<br>', Config::get('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'))));
+$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'] = array("E-Mail-Text für Anmeldebestätigung", sprintf("Nutzen Sie dieses Feld, um eine individualisierte E-Mail-Bestätigungs für den Event zu erstellen. Fahren Sie mit der Maus über diesen Text, um mehr zu erfahren. %s. Die Tags dienen als Platzhalter für eventspezifische Informationen.", "<br><br>" . str_replace('{{br}}', '<br>', Config::get('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'))));
 
 
 // References
