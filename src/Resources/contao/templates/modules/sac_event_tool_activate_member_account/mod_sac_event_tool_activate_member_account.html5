@@ -61,7 +61,7 @@ $GLOBALS['TL_HEAD'][] = '<link rel="stylesheet" type="text/css" href="https://cd
       <?= $this->objMember->postal ?> <?= $this->objMember->city ?>{{br}}
   </p>
 
-  <p class="alert alert-primary" role="alert">Du hast auf deine E-Mail-Adresse "<?= $this->objMember->email ?>" einen Aktivierungscode zugesandt bekommen. Der Aktivierungscode ist nur <strong>60 Minuten</strong> lang g&uuml;ltig. Bitte pr&uuml;fe jetzt dein Postfach, um die Aktivierung mit der Eingabe des Aktivierungscodes abzuschliessen.</p>
+  <p class="alert alert-primary" role="alert">Du hast auf deine E-Mail-Adresse "<?= $this->objMember->email ?>" einen Aktivierungscode zugesandt bekommen. Der Aktivierungscode ist nur <strong>60 Minuten</strong> lang g&uuml;ltig. Bitte pr&uuml;fe jetzt dein E-Mail-Postfach (und evtl. auch dein Spam-Verzeichnis), um die Aktivierung mit der Eingabe des Aktivierungscodes abzuschliessen.</p>
   {{br}}
   <?php if ($this->hasError): ?>
   <p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
