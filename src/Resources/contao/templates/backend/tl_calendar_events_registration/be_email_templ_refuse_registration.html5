@@ -1,15 +1,21 @@
-Hallo <?= $this->firstname ?> <?= $this->lastname ?>
+Hallo <?= $this->participantFirstname ?> <?= $this->participantLastname ?>
 
 
 <?php if($this->eventType === 'course'): ?>
-Leider kann ich dir für den Kurs: <?php if($this->courseId != ''): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventname ?>" keine Zusage erteilen.
+Leider kann ich dir für den Kurs: <?php if($this->courseId != ''): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>" keine Zusage erteilen.
 <?php else: ?>
-Leider kann ich dir für den Event: "<?= $this->eventname ?>" keine Zusage erteilen.
+Leider kann ich dir für den Event: "<?= $this->eventName ?>" keine Zusage erteilen.
 <?php endif; ?>
-Ich danke dir für dein Verständnis. Fragen bitte an <?= $this->emailInstructor ?> richten.
+Ich danke dir für dein Verständnis. Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte: <?= $this->instructorEmail ?>.
 
 Freundliche Grüsse
 
-<?= $this->nameInstructor ?>
+<?= $this->instructorName ?>
 
+
+
+--------------------------
+<?= $this->eventName ?>
+
+<?= $this->eventUrl ?>
 

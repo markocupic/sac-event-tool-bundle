@@ -781,15 +781,24 @@ class tl_calendar_events_member extends Backend
         {
             $objEvent = $objRegistration->getRelated('eventId');
 
+            $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent->id);
+            $strDates = implode(', ', array_map(function ($tstamp) {
+                return Date::parse(Config::get('dateFormat'), $tstamp);
+            }, $eventDates));
+
             // Build email text from template
             $objEmailTemplate = new BackendTemplate('be_email_templ_refuse_registration');
-            $objEmailTemplate->firstname = $objRegistration->firstname;
-            $objEmailTemplate->lastname = $objRegistration->lastname;
-            $objEmailTemplate->eventname = $objEvent->title;
-            $objEmailTemplate->courseId = $objEvent->courseId;
+            $objEmailTemplate->participantFirstname = $objRegistration->firstname;
+            $objEmailTemplate->participantLastname = $objRegistration->lastname;
+            $objEmailTemplate->eventName = $objEvent->title;
+            $objEmailTemplate->eventUrl = Events::generateEventUrl($objEvent, true);
+            $objEmailTemplate->eventDates = $strDates;
             $objEmailTemplate->eventType = $objEvent->eventType;
-            $objEmailTemplate->nameInstructor = $this->User->name;
-            $objEmailTemplate->emailInstructor = $this->User->email;
+            $objEmailTemplate->courseId = $objEvent->courseId;
+            $objEmailTemplate->instructorName = $this->User->name;
+            $objEmailTemplate->instructorEmail = $this->User->email;
+            $emailBodyText = strip_tags($objEmailTemplate->parse());
+
 
             // Prefill form
             $objTemplate = new BackendTemplate('be_calendar_events_registration_refuse_with_email');
@@ -798,7 +807,7 @@ class tl_calendar_events_member extends Backend
             $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objEvent->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType] . ': ' : 'Event: ';
 
             $objTemplate->emailSubject = 'Absage für ' . $eventType . $objEvent->title;
-            $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
+            $objTemplate->emailText = $emailBodyText;
             return $objTemplate->parse();
         }
 
@@ -899,35 +908,37 @@ class tl_calendar_events_member extends Backend
             {
                 // Replace tags (tags can be used case insensitive!)
                 $emailBodyText = $objEvent->customEventRegistrationConfirmationEmailText;
-                $emailBodyText = preg_replace('/##firstname##/i', $objRegistration->firstname, $emailBodyText);
-                $emailBodyText = preg_replace('/##lastname##/i', $objRegistration->lastname, $emailBodyText);
-                $emailBodyText = preg_replace('/##eventname##/i', $objEvent->title, $emailBodyText);
+                $emailBodyText = preg_replace('/##participantFirstname##/i', $objRegistration->firstname, $emailBodyText);
+                $emailBodyText = preg_replace('/##participantLastname##/i', $objRegistration->lastname, $emailBodyText);
+                $emailBodyText = preg_replace('/##eventName##/i', $objEvent->title, $emailBodyText);
                 $emailBodyText = preg_replace('/##courseId##/i', $objEvent->courseId, $emailBodyText);
                 $emailBodyText = preg_replace('/##eventType##/i', $objEvent->eventType, $emailBodyText);
                 $emailBodyText = preg_replace('/##eventUrl##/i', Events::generateEventUrl($objEvent, true), $emailBodyText);
                 $emailBodyText = preg_replace('/##eventDates##/i', $strDates, $emailBodyText);
-                $emailBodyText = preg_replace('/##nameInstructor##/i', $this->User->name, $emailBodyText);
-                $emailBodyText = preg_replace('/##phoneInstructor##/i', $this->User->phone, $emailBodyText);
-                $emailBodyText = preg_replace('/##mobileInstructor##/i', $this->User->mobile, $emailBodyText);
-                $emailBodyText = preg_replace('/##streetInstructor##/i', $this->User->street, $emailBodyText);
-                $emailBodyText = preg_replace('/##postalInstructor##/i', $this->User->postal, $emailBodyText);
-                $emailBodyText = preg_replace('/##cityInstructor##/i', $this->User->city, $emailBodyText);
-                $emailBodyText = preg_replace('/##emailInstructor##/i', $this->User->email, $emailBodyText);
+                $emailBodyText = preg_replace('/##instructorName##/i', $this->User->name, $emailBodyText);
+                $emailBodyText = preg_replace('/##instructorFirstname##/i', $this->User->firstname, $emailBodyText);
+                $emailBodyText = preg_replace('/##instructorLastname##/i', $this->User->lastname, $emailBodyText);
+                $emailBodyText = preg_replace('/##instructorPhone##/i', $this->User->phone, $emailBodyText);
+                $emailBodyText = preg_replace('/##instructorMobile##/i', $this->User->mobile, $emailBodyText);
+                $emailBodyText = preg_replace('/##instructorStreet##/i', $this->User->street, $emailBodyText);
+                $emailBodyText = preg_replace('/##instructorPostal##/i', $this->User->postal, $emailBodyText);
+                $emailBodyText = preg_replace('/##instructorCity##/i', $this->User->city, $emailBodyText);
+                $emailBodyText = preg_replace('/##instructorEmail##/i', $this->User->email, $emailBodyText);
                 $emailBodyText = strip_tags($emailBodyText);
             }
             else
             {
                 // Build email text from template
                 $objEmailTemplate = new BackendTemplate('be_email_templ_accept_registration');
-                $objEmailTemplate->firstname = $objRegistration->firstname;
-                $objEmailTemplate->lastname = $objRegistration->lastname;
-                $objEmailTemplate->eventname = $objEvent->title;
-                $objEmailTemplate->courseId = $objEvent->courseId;
-                $objEmailTemplate->eventType = $objEvent->eventType;
-                $objEmailTemplate->nameInstructor = $this->User->name;
-                $objEmailTemplate->emailInstructor = $this->User->email;
+                $objEmailTemplate->participantFirstname = $objRegistration->firstname;
+                $objEmailTemplate->participantLastname = $objRegistration->lastname;
+                $objEmailTemplate->eventName = $objEvent->title;
                 $objEmailTemplate->eventUrl = Events::generateEventUrl($objEvent, true);
                 $objEmailTemplate->eventDates = $strDates;
+                $objEmailTemplate->eventType = $objEvent->eventType;
+                $objEmailTemplate->courseId = $objEvent->courseId;
+                $objEmailTemplate->instructorName = $this->User->name;
+                $objEmailTemplate->instructorEmail = $this->User->email;
                 $emailBodyText = strip_tags($objEmailTemplate->parse());
             }
 
@@ -1014,20 +1025,29 @@ class tl_calendar_events_member extends Backend
             }
         }
 
+
         $objRegistration = CalendarEventsMemberModel::findById($dc->id);
         if ($objRegistration !== null)
         {
             $objEvent = $objRegistration->getRelated('eventId');
 
+            $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent->id);
+            $strDates = implode(', ', array_map(function ($tstamp) {
+                return Date::parse(Config::get('dateFormat'), $tstamp);
+            }, $eventDates));
+
             // Build email text from template
             $objEmailTemplate = new BackendTemplate('be_email_templ_added_to_waitlist');
-            $objEmailTemplate->firstname = $objRegistration->firstname;
-            $objEmailTemplate->lastname = $objRegistration->lastname;
-            $objEmailTemplate->eventname = $objEvent->title;
-            $objEmailTemplate->courseId = $objEvent->courseId;
+            $objEmailTemplate->participantFirstname = $objRegistration->firstname;
+            $objEmailTemplate->participantLastname = $objRegistration->lastname;
+            $objEmailTemplate->eventName = $objEvent->title;
+            $objEmailTemplate->eventUrl = Events::generateEventUrl($objEvent, true);
+            $objEmailTemplate->eventDates = $strDates;
             $objEmailTemplate->eventType = $objEvent->eventType;
-            $objEmailTemplate->nameInstructor = $this->User->name;
-            $objEmailTemplate->emailInstructor = $this->User->email;
+            $objEmailTemplate->courseId = $objEvent->courseId;
+            $objEmailTemplate->instructorName = $this->User->name;
+            $objEmailTemplate->instructorEmail = $this->User->email;
+            $emailBodyText = strip_tags($objEmailTemplate->parse());
 
 
             // Prefill form
@@ -1037,7 +1057,7 @@ class tl_calendar_events_member extends Backend
             $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objEvent->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType] . ': ' : 'Event: ';
 
             $objTemplate->emailSubject = 'Auf Warteliste für ' . $eventType . $objEvent->title;
-            $objTemplate->emailText = strip_tags($objEmailTemplate->parse());
+            $objTemplate->emailText = $emailBodyText;
             return $objTemplate->parse();
         }
 

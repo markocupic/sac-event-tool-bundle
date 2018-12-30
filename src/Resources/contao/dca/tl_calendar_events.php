@@ -53,7 +53,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addMinAndMaxMembers'] =
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['customizeEventRegistrationConfirmationEmailText'] = 'customEventRegistrationConfirmationEmailText';
 
 
-
 // Reset palettes
 $strLegends = '
 {tour_report_legend:hide};{event_type_legend};
@@ -842,13 +841,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customizeEventRegistrationCo
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfirmationEmailText'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'],
     'exclude'   => true,
-    'default'   => str_replace('{{br}}',"\n", Config::get('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT')),
+    'default'   => str_replace('{{br}}', "\n", Config::get('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT')),
     'inputType' => 'textarea',
     'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false, 'preserveTags' => true, 'allowHtml' => true, 'decodeEntities' => false),
     'sql'       => "text NULL",
 );
-
-
 
 
 // Tour report fields:
