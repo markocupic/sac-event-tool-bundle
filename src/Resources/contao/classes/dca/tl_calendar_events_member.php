@@ -714,11 +714,47 @@ class tl_calendar_events_member extends Backend
      * @return string
      * @throws Exception
      */
-    public function inputFieldCallbackRefuseWithEmail(DC_Table $dc)
+    public function inputFieldCallbackNotifyMemberAboutSubscriptionState(DC_Table $dc)
     {
         // Start session
         session_start();
 
+        // Build action array first
+        $arrActions = array(
+            'acceptWithEmail' => array(
+                'stateOfSubscription' => 'subscription-accepted',
+                'sessionInfoText'     => 'Dem Benutzer wurde mit einer E-Mail eine Zusage für diesen Event versandt.',
+                'template'            => 'be_calendar_events_registration_accept_with_email',
+                'emailTemplate'       => 'be_email_templ_accept_registration',
+                'emailSubject'        => 'Zusage für %s'
+            ),
+            'addToWaitlist'   => array(
+                'stateOfSubscription' => 'subscription-waitlisted',
+                'sessionInfoText'     => 'Dem Benutzer wurde auf die Warteliste gesetzt und mit einer E-Mail darüber informiert.',
+                'template'            => 'be_calendar_events_registration_added_to_waitlist',
+                'emailTemplate'       => 'be_email_templ_added_to_waitlist',
+                'emailSubject'        => 'Auf Warteliste für %s'
+            ),
+            'refuseWithEmail' => array(
+                'stateOfSubscription' => 'subscription-refused',
+                'sessionInfoText'     => 'Dem Benutzer wurde mit einer E-Mail eine Absage versandt.',
+                'template'            => 'be_calendar_events_registration_refuse_with_email',
+                'emailTemplate'       => 'be_email_templ_refuse_registration',
+                'emailSubject'        => 'Absage für %s'
+            ),
+        );
+
+        if (Input::get('call') == '' || !is_array($arrActions[Input::get('call')]) || empty($arrActions[Input::get('call')]))
+        {
+            $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten.';
+            $this->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=' . Input::get('id') . '&act=edit&rt=' . Input::get('rt'));
+        }
+
+        // Set action array
+        $arrAction = $arrActions[Input::get('call')];
+
+
+        // Send notification
         if (Input::post('FORM_SUBMIT') === 'tl_calendar_events_member')
         {
             if (Input::post('subject') != '' && Input::post('text') != '')
@@ -730,7 +766,6 @@ class tl_calendar_events_member extends Backend
                     {
                         throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
                     }
-
                     $objEmail = Notification::findOneByType('default_email');
 
                     // Use terminal42/notification_center
@@ -749,159 +784,19 @@ class tl_calendar_events_member extends Backend
                             'email_html'         => html_entity_decode(''),
                         );
 
-                        // Send email
-                        if (Validator::isEmail($objRegistration->email))
-                        {
-                            $objEmail->send($arrTokens, 'de');
-                            $set = array('stateOfSubscription' => 'subscription-refused');
-                            $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
-                            $_SESSION['addInfo'] = 'Dem Benutzer wurde mit einer E-Mail eine Absage versandt.';
-                        }
-                        else
-                        {
-                            $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.';
-                        }
-                    }
-                }
-                $this->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=' . Input::get('id') . '&act=edit&rt=' . Input::get('rt'));
-
-            }
-            else
-            {
-                // Prefill form
-                $objTemplate = new BackendTemplate('be_calendar_events_registration_refuse_with_email');
-                $objTemplate->emailSubject = Input::post('subject');
-                $objTemplate->emailText = strip_tags(Input::post('text'));
-                return $objTemplate->parse();
-            }
-        }
-
-        $objRegistration = CalendarEventsMemberModel::findById($dc->id);
-        if ($objRegistration !== null)
-        {
-            $objEvent = $objRegistration->getRelated('eventId');
-
-            $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent->id);
-            $strDates = implode(', ', array_map(function ($tstamp) {
-                return Date::parse(Config::get('dateFormat'), $tstamp);
-            }, $eventDates));
-
-            $arrTokens = array(
-                'participantFirstname' => $objRegistration->firstname,
-                'participantLastname'  => $objRegistration->lastname,
-                'eventName'            => $objEvent->title,
-                'courseId'             => $objEvent->courseId,
-                'eventType'            => $objEvent->eventType,
-                'eventUrl'             => Events::generateEventUrl($objEvent, true),
-                'eventDates'           => $strDates,
-                'instructorName'       => $this->User->name,
-                'instructorFirstname'  => $this->User->firstname,
-                'instructorLastname'   => $this->User->lastname,
-                'instructorPhone'      => $this->User->phone,
-                'instructorMobile'     => $this->User->mobile,
-                'instructorStreet'     => $this->User->street,
-                'instructorPostal'     => $this->User->postal,
-                'instructorCity'       => $this->User->city,
-                'instructorEmail'      => $this->User->email,
-            );
-
-            if (Input::get('call') === 'acceptWithEmail' && $objEvent->customizeEventRegistrationConfirmationEmailText && $objEvent->customEventRegistrationConfirmationEmailText != '')
-            {
-                // Replace tags (tags can be used case insensitive!)
-                $emailBodyText = $objEvent->customEventRegistrationConfirmationEmailText;
-                foreach ($arrTokens as $k => $v)
-                {
-                    $strPattern = '/##' . $k . '##/i';
-                    $emailBodyText = preg_replace($strPattern, $v, $emailBodyText);
-                }
-                $emailBodyText = strip_tags($emailBodyText);
-            }
-            else
-            {
-                // Build email text from template
-                $objEmailTemplate = new BackendTemplate('be_email_templ_refuse_registration');
-                foreach ($arrTokens as $k => $v)
-                {
-                    $objEmailTemplate->{$k} = $v;
-                }
-                $emailBodyText = strip_tags($objEmailTemplate->parse());
-            }
-
-
-            // Prefill form
-            $objTemplate = new BackendTemplate('be_calendar_events_registration_refuse_with_email');
-
-            // Get event type
-            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objEvent->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType] . ': ' : 'Event: ';
-
-            $objTemplate->emailSubject = 'Absage für ' . $eventType . $objEvent->title;
-            $objTemplate->emailText = $emailBodyText;
-            return $objTemplate->parse();
-        }
-
-        return '';
-
-    }
-
-
-    /**
-     * @param DC_Table $dc
-     * @return string
-     * @throws Exception
-     */
-    public function inputFieldCallbackAcceptWithEmail(DC_Table $dc)
-    {
-
-        // Start session
-        session_start();
-
-        if (Input::post('FORM_SUBMIT') === 'tl_calendar_events_member')
-        {
-            if (Input::post('subject') != '' && Input::post('text') != '')
-            {
-
-
-                $objRegistration = CalendarEventsMemberModel::findById($dc->id);
-                if ($objRegistration !== null)
-                {
-                    if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
-                    {
-                        throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
-                    }
-
-                    $objEmail = Notification::findOneByType('default_email');
-
-                    // Use terminal42/notification_center
-                    if ($objEmail !== null)
-                    {
-                        // Set token array
-                        $arrTokens = array(
-                            'email_sender_name'  => html_entity_decode(html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'))),
-                            'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
-                            'send_to'            => $objRegistration->email,
-                            'reply_to'           => $this->User->email,
-                            // 'recipient_cc'       => html_entity_decode(''),
-                            // 'recipient_bcc'      => html_entity_decode(''),
-                            'email_subject'      => html_entity_decode(Input::post('subject')),
-                            'email_text'         => html_entity_decode(strip_tags(Input::post('text'))),
-                            //'email_html' => html_entity_decode(''),
-                        );
-
                         // Check if member has already booked at the same time
                         $objMember = MemberModel::findBySacMemberId($objRegistration->sacMemberId);
-                        if ($objMember !== null && CalendarEventsHelper::areBookingDatesOccupied($objRegistration->eventId, $objMember->id))
+                        if (Input::get('call') === 'acceptWithEmail' && $objMember !== null && CalendarEventsHelper::areBookingDatesOccupied($objRegistration->eventId, $objMember->id))
                         {
                             $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht bestätigt serden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde.';
                         }
                         // Send email
                         elseif (Validator::isEmail($objRegistration->email))
                         {
-                            // Send message
                             $objEmail->send($arrTokens, 'de');
-
-                            $set = array('stateOfSubscription' => 'subscription-accepted');
+                            $set = array('stateOfSubscription' => $arrAction['stateOfSubscription']);
                             $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
-                            $_SESSION['addInfo'] = 'Dem Benutzer wurde mit einer E-Mail eine Zusage für diesen Event versandt.';
+                            $_SESSION['addInfo'] = $arrAction['sessionInfoText'];
                         }
                         else
                         {
@@ -915,211 +810,84 @@ class tl_calendar_events_member extends Backend
             else
             {
                 // Prefill form
-                $objTemplate = new BackendTemplate('be_calendar_events_registration_accept_with_email');
+                $objTemplate = new BackendTemplate($arrAction['template']);
                 $objTemplate->emailSubject = Input::post('subject');
                 $objTemplate->emailText = strip_tags(Input::post('text'));
                 return $objTemplate->parse();
             }
         }
-
-        $objRegistration = CalendarEventsMemberModel::findById($dc->id);
-        if ($objRegistration !== null)
+        else // Prefill form
         {
-            $objEvent = $objRegistration->getRelated('eventId');
 
-            $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent->id);
-            $strDates = implode(', ', array_map(function ($tstamp) {
-                return Date::parse(Config::get('dateFormat'), $tstamp);
-            }, $eventDates));
-
-            $arrTokens = array(
-                'participantFirstname' => $objRegistration->firstname,
-                'participantLastname'  => $objRegistration->lastname,
-                'eventName'            => $objEvent->title,
-                'courseId'             => $objEvent->courseId,
-                'eventType'            => $objEvent->eventType,
-                'eventUrl'             => Events::generateEventUrl($objEvent, true),
-                'eventDates'           => $strDates,
-                'instructorName'       => $this->User->name,
-                'instructorFirstname'  => $this->User->firstname,
-                'instructorLastname'   => $this->User->lastname,
-                'instructorPhone'      => $this->User->phone,
-                'instructorMobile'     => $this->User->mobile,
-                'instructorStreet'     => $this->User->street,
-                'instructorPostal'     => $this->User->postal,
-                'instructorCity'       => $this->User->city,
-                'instructorEmail'      => $this->User->email,
-            );
-
-            if (Input::get('call') === 'acceptWithEmail' && $objEvent->customizeEventRegistrationConfirmationEmailText && $objEvent->customEventRegistrationConfirmationEmailText != '')
+            // Get the registration object
+            $objRegistration = CalendarEventsMemberModel::findById($dc->id);
+            if ($objRegistration !== null)
             {
-                // Replace tags (tags can be used case insensitive!)
-                $emailBodyText = $objEvent->customEventRegistrationConfirmationEmailText;
-                foreach ($arrTokens as $k => $v)
+                // Get the event object
+                $objEvent = $objRegistration->getRelated('eventId');
+
+                // Get event dates as a comma separated string
+                $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent->id);
+                $strDates = implode(', ', array_map(function ($tstamp) {
+                    return Date::parse(Config::get('dateFormat'), $tstamp);
+                }, $eventDates));
+
+                // Build token array
+                $arrTokens = array(
+                    'participantFirstname' => $objRegistration->firstname,
+                    'participantLastname'  => $objRegistration->lastname,
+                    'eventName'            => $objEvent->title,
+                    'courseId'             => $objEvent->courseId,
+                    'eventType'            => $objEvent->eventType,
+                    'eventUrl'             => Events::generateEventUrl($objEvent, true),
+                    'eventDates'           => $strDates,
+                    'instructorName'       => $this->User->name,
+                    'instructorFirstname'  => $this->User->firstname,
+                    'instructorLastname'   => $this->User->lastname,
+                    'instructorPhone'      => $this->User->phone,
+                    'instructorMobile'     => $this->User->mobile,
+                    'instructorStreet'     => $this->User->street,
+                    'instructorPostal'     => $this->User->postal,
+                    'instructorCity'       => $this->User->city,
+                    'instructorEmail'      => $this->User->email,
+                );
+
+                if (Input::get('call') === 'acceptWithEmail' && $objEvent->customizeEventRegistrationConfirmationEmailText && $objEvent->customEventRegistrationConfirmationEmailText != '')
                 {
-                    $strPattern = '/##' . $k . '##/i';
-                    $emailBodyText = preg_replace($strPattern, $v, $emailBodyText);
-                }
-                $emailBodyText = strip_tags($emailBodyText);
-            }
-            else
-            {
-                // Build email text from template
-                $objEmailTemplate = new BackendTemplate('be_email_templ_accept_registration');
-                foreach ($arrTokens as $k => $v)
-                {
-                    $objEmailTemplate->{$k} = $v;
-                }
-                $emailBodyText = strip_tags($objEmailTemplate->parse());
-            }
-
-
-            // Prefill form
-            $objTemplate = new BackendTemplate('be_calendar_events_registration_accept_with_email');
-
-            // Get event type
-            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objEvent->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType] . ': ' : 'Event: ';
-
-            $objTemplate->emailSubject = 'Zusage für ' . $eventType . $objEvent->title;
-            $objTemplate->emailText = $emailBodyText;
-            return $objTemplate->parse();
-        }
-
-        return '';
-
-    }
-
-    /**
-     * @param DC_Table $dc
-     * @return string
-     * @throws Exception
-     */
-    public function inputFieldCallbackAddToWaitlist(DC_Table $dc)
-    {
-
-        // Start session
-        session_start();
-
-        if (Input::post('FORM_SUBMIT') === 'tl_calendar_events_member')
-        {
-            if (Input::post('subject') != '' && Input::post('text') != '')
-            {
-                $objRegistration = CalendarEventsMemberModel::findById($dc->id);
-                if ($objRegistration !== null)
-                {
-                    if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
+                    // Only for acceptWithEmail!!!
+                    // Replace tags for custom notification set in the events settings (tags can be used case insensitive!)
+                    $emailBodyText = $objEvent->customEventRegistrationConfirmationEmailText;
+                    foreach ($arrTokens as $k => $v)
                     {
-                        throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in ' . __METHOD__ . ' LINE: ' . __LINE__);
+                        $strPattern = '/##' . $k . '##/i';
+                        $emailBodyText = preg_replace($strPattern, $v, $emailBodyText);
                     }
-                    $objEmail = Notification::findOneByType('default_email');
-
-                    // Use terminal42/notification_center
-                    if ($objEmail !== null)
-                    {
-                        // Set token array
-                        $arrTokens = array(
-                            'email_sender_name'  => html_entity_decode(html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'))),
-                            'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
-                            'send_to'            => $objRegistration->email,
-                            'reply_to'           => $this->User->email,
-                            // 'recipient_cc'       => '',
-                            // 'recipient_bcc'      => '',
-                            'email_subject'      => html_entity_decode(Input::post('subject')),
-                            'email_text'         => html_entity_decode(strip_tags(Input::post('text'))),
-                            'email_html'         => html_entity_decode(''),
-                        );
-
-                        // Send email
-                        if (Validator::isEmail($objRegistration->email))
-                        {
-                            $objEmail->send($arrTokens, 'de');
-                            $set = array('stateOfSubscription' => 'subscription-waitlisted');
-                            $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
-                            $_SESSION['addInfo'] = 'Dem Benutzer wurde auf die Warteliste gesetzt und mit einer E-Mail dar&uuml;ber informiert.';
-                        }
-                        else
-                        {
-                            $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.';
-                        }
-                    }
+                    $emailBodyText = strip_tags($emailBodyText);
                 }
-                $this->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=' . Input::get('id') . '&act=edit&rt=' . Input::get('rt'));
+                else
+                {
+                    // Build email text from template
+                    $objEmailTemplate = new BackendTemplate($arrAction['emailTemplate']);
+                    foreach ($arrTokens as $k => $v)
+                    {
+                        $objEmailTemplate->{$k} = $v;
+                    }
+                    $emailBodyText = strip_tags($objEmailTemplate->parse());
+                }
 
-            }
-            else
-            {
                 // Prefill form
-                $objTemplate = new BackendTemplate('be_calendar_events_registration_added_to_waitlist');
-                $objTemplate->emailSubject = Input::post('subject');
-                $objTemplate->emailText = strip_tags(Input::post('text'));
+                $objTemplate = new BackendTemplate($arrAction['template']);
+
+                // Get event type
+                $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objEvent->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType] . ': ' : 'Event: ';
+
+                $objTemplate->emailSubject = sprintf($arrAction['emailSubject'], $eventType . $objEvent->title);
+                $objTemplate->emailText = $emailBodyText;
                 return $objTemplate->parse();
             }
+
+            return '';
         }
-
-
-        $objRegistration = CalendarEventsMemberModel::findById($dc->id);
-        if ($objRegistration !== null)
-        {
-            $objEvent = $objRegistration->getRelated('eventId');
-
-            $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent->id);
-            $strDates = implode(', ', array_map(function ($tstamp) {
-                return Date::parse(Config::get('dateFormat'), $tstamp);
-            }, $eventDates));
-
-            $arrTokens = array(
-                'participantFirstname' => $objRegistration->firstname,
-                'participantLastname'  => $objRegistration->lastname,
-                'eventName'            => $objEvent->title,
-                'courseId'             => $objEvent->courseId,
-                'eventType'            => $objEvent->eventType,
-                'eventUrl'             => Events::generateEventUrl($objEvent, true),
-                'eventDates'           => $strDates,
-                'instructorName'       => $this->User->name,
-                'instructorFirstname'  => $this->User->firstname,
-                'instructorLastname'   => $this->User->lastname,
-                'instructorPhone'      => $this->User->phone,
-                'instructorMobile'     => $this->User->mobile,
-                'instructorStreet'     => $this->User->street,
-                'instructorPostal'     => $this->User->postal,
-                'instructorCity'       => $this->User->city,
-                'instructorEmail'      => $this->User->email,
-            );
-
-            if (Input::get('call') === 'acceptWithEmail' && $objEvent->customizeEventRegistrationConfirmationEmailText && $objEvent->customEventRegistrationConfirmationEmailText != '')
-            {
-                // Replace tags (tags can be used case insensitive!)
-                $emailBodyText = $objEvent->customEventRegistrationConfirmationEmailText;
-                foreach ($arrTokens as $k => $v)
-                {
-                    $strPattern = '/##' . $k . '##/i';
-                    $emailBodyText = preg_replace($strPattern, $v, $emailBodyText);
-                }
-                $emailBodyText = strip_tags($emailBodyText);
-            }
-            else
-            {
-                // Build email text from template
-                $objEmailTemplate = new BackendTemplate('be_email_templ_added_to_waitlist');
-                foreach ($arrTokens as $k => $v)
-                {
-                    $objEmailTemplate->{$k} = $v;
-                }
-                $emailBodyText = strip_tags($objEmailTemplate->parse());
-            }
-
-            // Prefill form
-            $objTemplate = new BackendTemplate('be_calendar_events_registration_added_to_waitlist');
-
-            // Get event type
-            $eventType = (strlen($GLOBALS['TL_LANG']['MSC'][$objEvent->eventType])) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType] . ': ' : 'Event: ';
-
-            $objTemplate->emailSubject = 'Auf Warteliste für ' . $eventType . $objEvent->title;
-            $objTemplate->emailText = $emailBodyText;
-            return $objTemplate->parse();
-        }
-
-        return '';
 
     }
 

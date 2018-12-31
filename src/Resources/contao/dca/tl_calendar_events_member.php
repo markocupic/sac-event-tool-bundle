@@ -261,7 +261,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         (
             'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['refuseWithEmail'],
             'inputType'            => 'text',
-            'input_field_callback' => array('tl_calendar_events_member', 'inputFieldCallbackRefuseWithEmail'),
+            'input_field_callback' => array('tl_calendar_events_member', 'inputFieldCallbackNotifyMemberAboutSubscriptionState'),
             'eval'                 => array('doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
             'sql'                  => "varchar(255) NOT NULL default ''",
         ),
@@ -269,7 +269,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         (
             'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['acceptWithEmail'],
             'inputType'            => 'text',
-            'input_field_callback' => array('tl_calendar_events_member', 'inputFieldCallbackAcceptWithEmail'),
+            'input_field_callback' => array('tl_calendar_events_member', 'inputFieldCallbackNotifyMemberAboutSubscriptionState'),
             'eval'                 => array('doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
             'sql'                  => "varchar(255) NOT NULL default ''",
         ),
@@ -277,7 +277,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         (
             'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['acceptWithEmail'],
             'inputType'            => 'text',
-            'input_field_callback' => array('tl_calendar_events_member', 'inputFieldCallbackAddToWaitlist'),
+            'input_field_callback' => array('tl_calendar_events_member', 'inputFieldCallbackNotifyMemberAboutSubscriptionState'),
             'eval'                 => array('doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'),
             'sql'                  => "varchar(255) NOT NULL default ''",
         ),

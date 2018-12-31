@@ -107,7 +107,7 @@ class ParseBackendTemplate
             }
 
             // Do not show submit container in the e-mail mode of tl_calendar_events_member
-            if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('table') === 'tl_calendar_events_member' && (Input::get('call') === 'refuseWithEmail' || Input::get('call') === 'acceptWithEmail'))
+            if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('table') === 'tl_calendar_events_member' && (Input::get('call') === 'refuseWithEmail' || Input::get('call') === 'accept_with_email'))
             {
                 if (preg_match('/<div class=\"tl_formbody_submit(.*)<\/form>/sU', $strBuffer))
                 {
