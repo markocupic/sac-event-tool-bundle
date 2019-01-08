@@ -66,6 +66,10 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['subscription-not-confirmed'] =
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['subscription-accepted'] = 'Anmeldung best&auml;tigt';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['subscription-refused'] = 'Anmeldung abgelehnt';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['subscription-waitlisted'] = 'Auf Warteliste';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['user-has-unsubscribed'] = 'Vom Event abgemeldet';
+
+
+
 
 
 

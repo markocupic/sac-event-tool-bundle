@@ -155,6 +155,12 @@ div.tl_header_tour_rapport table td {
     background-color: #d80027;
 }
 
+.tl_listing_container .subscription-badge.unsubscribed-user {
+    background-color: #d86811;
+}
+
+
+
 /** alerts **/
 .alert {
     margin: 15px;

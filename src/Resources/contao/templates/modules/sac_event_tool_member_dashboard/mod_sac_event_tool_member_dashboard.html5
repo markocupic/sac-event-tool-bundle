@@ -70,7 +70,7 @@
 
           <script>
               $('.sign-out-from-event-button').click(function (e) {
-                  if (!confirm('Willst du dich wirklich vom Event abmelden und dich von der Teilnehmerliste streichen lassen?')) {
+                  if (!confirm('Willst du dich wirklich vom Event abmelden?')) {
                       e.preventDefault();
                   }
               });

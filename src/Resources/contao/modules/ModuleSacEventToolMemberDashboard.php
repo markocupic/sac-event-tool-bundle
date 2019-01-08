@@ -608,6 +608,11 @@ class ModuleSacEventToolMemberDashboard extends Module
                     System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
                     return;
                 }
+                elseif($objEventsMember->stateOfSubscription === 'user-has-unsubscribed')
+                {
+                    $errorMsg = 'Abmeldung fehlgeschlagen! Du hast dich vom Event "' . $objEvent->title . '" bereits abgemeldet.';
+                    $blnHasError = true;
+                }
                 elseif ($objEventsMember->stateOfSubscription === 'subscription-not-confirmed' || $objEventsMember->stateOfSubscription === 'subscription-waitlisted')
                 {
                     // allow unregistering if member is not confirmed on the event
@@ -654,6 +659,12 @@ class ModuleSacEventToolMemberDashboard extends Module
                 // Unregister from event
                 if (!$blnHasError)
                 {
+                    $objEventsMember->stateOfSubscription = 'user-has-unsubscribed';
+
+                    // Save data record in tl_calendar_events_member
+                    $objEventsMember->save();
+
+
                     // Load language file
                     Controller::loadLanguageFile('tl_calendar_events_member');
 
@@ -693,8 +704,6 @@ class ModuleSacEventToolMemberDashboard extends Module
 
                     $objNotification->send($arrTokens, 'de');
 
-                    // Delete from tl_calendar_events_member
-                    $objEventsMember->delete();
                 }
             }
         }

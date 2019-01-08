@@ -1250,7 +1250,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             return;
         }
 
-        $strToken = md5(rand(100000000, 999999999)) . $objDb->id;
+        $strToken = md5(rand(100000000, 999999999)) . $dc->id;
         $this->Database->prepare('UPDATE tl_calendar_events SET eventToken=? WHERE id=? AND eventToken=?')->execute($strToken, $dc->activeRecord->id, '');
     }
 
@@ -1518,6 +1518,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         $intAccepted = 0;
         $intRefused = 0;
         $intWaitlisted = 0;
+        $intUnsubscribedUser = 0;
 
         $eventsMemberModel = CalendarEventsMemberModel::findByEventId($arrRow['id']);
         if ($eventsMemberModel !== null)
@@ -1541,6 +1542,10 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 {
                     $intWaitlisted++;
                 }
+                if ($eventsMemberModel->stateOfSubscription === 'user-has-unsubscribed')
+                {
+                    $intUnsubscribedUser++;
+                }
             }
 
             $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
@@ -1562,6 +1567,10 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             if ($intWaitlisted > 0)
             {
                 $strRegistrations .= sprintf('<span class="subscription-badge waitlisted" title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=%s">%s</span>', $intWaitlisted, $href, $intWaitlisted);
+            }
+            if ($intUnsubscribedUser > 0)
+            {
+                $strRegistrations .= sprintf('<span class="subscription-badge unsubscribed-user" title="%s Abgemeldete Teilnehmer" role="button" onclick="window.location.href=%s">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
             }
         }
         if ($strRegistrations != '')
