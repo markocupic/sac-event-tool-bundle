@@ -201,7 +201,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         }
         elseif (FE_USER_LOGGED_IN && true === CalendarEventsHelper::areBookingDatesOccupied($this->objEvent->id, $this->objUser->id))
         {
-            Message::addInfo('Die Anmeldung zu diesem Event ist nicht m&ouml;glich, da die Event-Daten sich mit den Daten eines anderen Events &uuml;berschneiden, wo deine Teilnahme bereits best&auml;tigt ist.', TL_MODE);
+            Message::addInfo('Die Anmeldung zu diesem Event ist nicht m&ouml;glich, da die Event-Daten sich mit den Daten eines anderen Events &uuml;berschneiden, wo deine Teilnahme bereits best&auml;tigt ist. Bitte nimm pers&ouml;nlich Kontakt mit dem Touren-/Kursleiter auf, falls du der Ansicht bist, dass keine zeitliche &Uuml;berschneidung vorliegt und deine Teilnahme an beiden Events m&ouml;glich ist.', TL_MODE);
         }
         elseif ($this->objInstructor === null)
         {
@@ -398,7 +398,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             {
                 if (true === CalendarEventsHelper::areBookingDatesOccupied($this->objEvent->id, $objMember->id))
                 {
-                    $this->Template->bookingErrorMsg = 'Die Anmeldung zu diesem Event ist nicht m&ouml;glich, da die Event-Daten sich mit den Daten eines anderen Events &uuml;berschneiden, wo deine Teilnahme bereits best&auml;tigt ist.';
+                    $this->Template->bookingErrorMsg = 'Die Anmeldung zu diesem Event ist nicht m&ouml;glich, da die Event-Daten sich mit den Daten eines anderen Events &uuml;berschneiden, wo deine Teilnahme bereits best&auml;tigt ist. Bitte nimm pers&ouml;nlich Kontakt mit dem Touren-/Kursleiter auf, falls du der Ansicht bist, dass keine zeitliche &Uuml;berschneidung vorliegt und deine Teilnahme an beiden Events m&ouml;glich ist.';
                     $hasError = true;
                 }
             }
