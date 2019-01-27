@@ -1,4 +1,4 @@
-<?php if($this->eventType === 'tour' || $this->eventType === 'generalEvent'): ?>
+<?php if($this->eventType === 'tour' || $this->eventType === 'generalEvent' || $this->eventType === 'lastMinuteTour'): ?>
 <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($this->id); ?>
 <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][$eventState]; ?>
 
