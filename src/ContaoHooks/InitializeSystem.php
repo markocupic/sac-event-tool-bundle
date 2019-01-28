@@ -136,9 +136,10 @@ class InitializeSystem
     public function initializeSystem()
     {
 
-        // Hack Marko Cupic:
+        // Hack Marko Cupic: 2019-01-28
         // https://github.com/contao/contao/issues/302
         // Set chmod in assets/images to 0644
+        /**
         if(Input::get('do') !== 'maintenance')
         {
             $arrFolder = scan(TL_ROOT . '/assets/images');
@@ -159,6 +160,7 @@ class InitializeSystem
             }
         }
         // End hack
+         * */
 
 
         // Purge script cache in dev mode
