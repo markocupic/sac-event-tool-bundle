@@ -15,6 +15,7 @@ use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Database;
 use Contao\Dbafs;
+use Contao\Config;
 use Contao\File;
 use Contao\Files;
 use Contao\FilesModel;
@@ -61,21 +62,21 @@ class InitializeSystem
             if ($objDb->avatarSRC == '')
             {
                 /**
-                $targetSRC = sprintf('files/sac_pilatus/be_user_home_directories/%s/avatar/%s.jpg', $objDb->id, $objDb->username);
-                if(is_file(TL_ROOT . '/' . $targetSRC))
-                {
-                    $objFile = FilesModel::findByPath($targetSRC);
-                    if($objFile !== null)
-                    {
-                        $set = array(
-                            'avatarSRC'    => $objFile->uuid,
-                            'avatarUpload' => '1',
-                            'tstamp'       => time()
-                        );
-                        $objStmt = Database::getInstance()->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objDb->id);
-                    }
-                }
-              **/
+                 * $targetSRC = sprintf('files/sac_pilatus/be_user_home_directories/%s/avatar/%s.jpg', $objDb->id, $objDb->username);
+                 * if(is_file(TL_ROOT . '/' . $targetSRC))
+                 * {
+                 * $objFile = FilesModel::findByPath($targetSRC);
+                 * if($objFile !== null)
+                 * {
+                 * $set = array(
+                 * 'avatarSRC'    => $objFile->uuid,
+                 * 'avatarUpload' => '1',
+                 * 'tstamp'       => time()
+                 * );
+                 * $objStmt = Database::getInstance()->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objDb->id);
+                 * }
+                 * }
+                 **/
                 //avatarUpload
                 $src = sprintf('files/avatare/%s.jpg', $objDb->username);
                 //echo $src . '<br>';
@@ -134,6 +135,32 @@ class InitializeSystem
      */
     public function initializeSystem()
     {
+
+        // Hack Marko Cupic:
+        // https://github.com/contao/contao/issues/302
+        // Set chmod in assets/images to 0644
+        if(Input::get('do') !== 'maintenance')
+        {
+            $arrFolder = scan(TL_ROOT . '/assets/images');
+            foreach ($arrFolder as $strFolder)
+            {
+                if (is_dir(TL_ROOT . '/assets/images/' . $strFolder))
+                {
+                    $arrFiles = scan(TL_ROOT . '/assets/images/' . $strFolder);
+                    foreach ($arrFiles as $strFile)
+                    {
+                        if (is_file(TL_ROOT . '/assets/images/' . $strFolder . '/' . $strFile))
+                        {
+                            $objFile = new File('assets/images/' . $strFolder . '/' . $strFile);
+                            $objFile->chmod(Config::get('defaultFileChmod'));
+                        }
+                    }
+                }
+            }
+        }
+        // End hack
+
+
         // Purge script cache in dev mode
         $kernel = System::getContainer()->get('kernel');
         if ($kernel->isDebug())
@@ -146,19 +173,19 @@ class InitializeSystem
                 touch($rootDir . '/files/theme-sac-pilatus/scss/main.scss');
             }
         }
-        
+
         /** Delete orphaned entries
-        $oDb = Database::getInstance()->execute('SELECT * FROM tl_calendar_events_member');
-        while($oDb->next())
-        {
-            $oEv = CalendarEventsModel::findByPk($oDb->eventId);
-            if($oEv === null)
-            {
-                echo $oDb->lastname . ' ' . $oDb->firstname . '<br>';
-                //Database::getInstance()->prepare('DELETE FROM tl_calendar_events_member WHERE id=?')->execute($oDb->id);
-            }
-        }
-        **/
+         * $oDb = Database::getInstance()->execute('SELECT * FROM tl_calendar_events_member');
+         * while($oDb->next())
+         * {
+         * $oEv = CalendarEventsModel::findByPk($oDb->eventId);
+         * if($oEv === null)
+         * {
+         * echo $oDb->lastname . ' ' . $oDb->firstname . '<br>';
+         * //Database::getInstance()->prepare('DELETE FROM tl_calendar_events_member WHERE id=?')->execute($oDb->id);
+         * }
+         * }
+         **/
 
         // Prepare Plugin environment, create folders, etc.
         $objPluginEnv = System::getContainer()->get('markocupic.sac_event_tool_bundle.prepare_plugin_environment');
