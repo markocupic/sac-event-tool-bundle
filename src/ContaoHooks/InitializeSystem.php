@@ -135,34 +135,6 @@ class InitializeSystem
      */
     public function initializeSystem()
     {
-
-        // Hack Marko Cupic: 2019-01-28
-        // https://github.com/contao/contao/issues/302
-        // Set chmod in assets/images to 0644
-        /**
-        if(Input::get('do') !== 'maintenance')
-        {
-            $arrFolder = scan(TL_ROOT . '/assets/images');
-            foreach ($arrFolder as $strFolder)
-            {
-                if (is_dir(TL_ROOT . '/assets/images/' . $strFolder))
-                {
-                    $arrFiles = scan(TL_ROOT . '/assets/images/' . $strFolder);
-                    foreach ($arrFiles as $strFile)
-                    {
-                        if (is_file(TL_ROOT . '/assets/images/' . $strFolder . '/' . $strFile))
-                        {
-                            $objFile = new File('assets/images/' . $strFolder . '/' . $strFile);
-                            $objFile->chmod(Config::get('defaultFileChmod'));
-                        }
-                    }
-                }
-            }
-        }
-        // End hack
-         * */
-
-
         // Purge script cache in dev mode
         $kernel = System::getContainer()->get('kernel');
         if ($kernel->isDebug())
