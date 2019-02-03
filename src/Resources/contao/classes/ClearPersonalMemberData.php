@@ -67,7 +67,7 @@ class ClearPersonalMemberData
      */
     public static function anonymizeCalendarEventsMemberDataRecord($calendarEventsMemberId)
     {
-        $objCalendarEventsMember = CalendarEventsMemberModel::findById($calendarEventsMemberId);
+        $objCalendarEventsMember = CalendarEventsMemberModel::findByPk($calendarEventsMemberId);
         if ($objCalendarEventsMember !== null)
         {
             if ($objCalendarEventsMember !== null)
@@ -147,7 +147,7 @@ class ClearPersonalMemberData
             foreach ($arrEvents as $arrEvent)
             {
 
-                $objEventsMember = CalendarEventsMemberModel::findById($arrEvent['registrationId']);
+                $objEventsMember = CalendarEventsMemberModel::findByPk($arrEvent['registrationId']);
                 if ($objEventsMember !== null)
                 {
 
@@ -175,7 +175,7 @@ class ClearPersonalMemberData
             $arrEvents = self::findPastEventsByMemberId($objMember->id);
             foreach ($arrEvents as $arrEvent)
             {
-                $objEventsMember = CalendarEventsMemberModel::findById($arrEvent['registrationId']);
+                $objEventsMember = CalendarEventsMemberModel::findByPk($arrEvent['registrationId']);
 
                 if ($objEventsMember !== null)
                 {
@@ -196,7 +196,7 @@ class ClearPersonalMemberData
                 // Anonymize entries from tl_calendar_events_member
                 foreach ($arrEventsMember as $eventsMemberId)
                 {
-                    $objEventsMember = CalendarEventsMemberModel::findById($eventsMemberId);
+                    $objEventsMember = CalendarEventsMemberModel::findByPk($eventsMemberId);
                     if ($objEventsMember !== null)
                     {
                         self::anonymizeCalendarEventsMemberDataRecord($objEventsMember->id);
@@ -233,7 +233,7 @@ class ClearPersonalMemberData
                     $arr['id'] = $objEvents->id;
                     $arr['registrationId'] = $objJoinedEvents->id;
                     $arr['objEvent'] = \CalendarEventsModel::findByPk($objEvents->id);
-                    $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findById($objJoinedEvents->id);
+                    $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
                     $arrEvents[] = $arr;
                 }
             }
@@ -285,7 +285,7 @@ class ClearPersonalMemberData
                     $arr['id'] = $objEvents->id;
                     $arr['eventModel'] = $objEventsModel;
                     $arr['registrationId'] = $objJoinedEvents->id;
-                    $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findById($objJoinedEvents->id);
+                    $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
                     $arrEvents[] = $arr;
                 }
             }

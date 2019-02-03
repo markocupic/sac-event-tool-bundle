@@ -80,7 +80,7 @@ class CalendarEventsMemberModel extends \Model
                 $arr['dateSpan'] = ($objEventsModel->startDate != $objEventsModel->endDate) ? \Date::parse('d.m.', $objEventsModel->startDate) . ' - ' . \Date::parse('d.m.Y', $objEventsModel->endDate) : \Date::parse('d.m.Y', $objEventsModel->startDate);
                 $arr['eventType'] = $objEventsModel->eventType;
                 $arr['registrationId'] = $objJoinedEvents->id;
-                $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findById($objJoinedEvents->id);
+                $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
                 $arr['unregisterUrl'] = \Frontend::addToUrl('do=unregisterUserFromEvent&amp;registrationId=' . $objJoinedEvents->id);
                 $arrEvents[] = $arr;
             }
@@ -115,7 +115,7 @@ class CalendarEventsMemberModel extends \Model
                 $arr['dateSpan'] = ($objEvents->startDate != $objEvents->endDate) ? \Date::parse('d.m.', $objEvents->startDate) . ' - ' . \Date::parse('d.m.Y', $objEvents->endDate) : \Date::parse('d.m.Y', $objEvents->startDate);
                 $arr['registrationId'] = $objJoinedEvents->id;
                 $arr['objEvent'] = \CalendarEventsModel::findByPk($objEvents->id);
-                $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findById($objJoinedEvents->id);
+                $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
                 $arrEvents[] = $arr;
             }
         }
@@ -185,7 +185,7 @@ class CalendarEventsMemberModel extends \Model
                 $arr['dateSpan'] = ($objEvents->startDate != $objEvents->endDate) ? \Date::parse('d.m.', $objEvents->startDate) . ' - ' . \Date::parse('d.m.Y', $objEvents->endDate) : \Date::parse('d.m.Y', $objEvents->startDate);
                 $arr['registrationId'] = $objJoinedEvents->id;
                 $arr['objEvent'] = \CalendarEventsModel::findByPk($objEvents->id);
-                $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findById($objJoinedEvents->id);
+                $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
                 $arrEvents[] = $arr;
             }
             // Instructor
@@ -204,9 +204,4 @@ class CalendarEventsMemberModel extends \Model
 
         return $arrEvents;
     }
-
-    public static function findByPk($get)
-    {
-    }
-
 }

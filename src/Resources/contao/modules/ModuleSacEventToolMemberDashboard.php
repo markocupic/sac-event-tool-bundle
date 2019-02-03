@@ -150,7 +150,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                 if (FE_USER_LOGGED_IN)
                 {
 
-                    $objRegistration = CalendarEventsMemberModel::findById(Input::get('id'));
+                    $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
                     if ($objRegistration !== null)
                     {
 
@@ -586,7 +586,7 @@ class ModuleSacEventToolMemberDashboard extends Module
         $blnHasError = true;
         $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event abgemeldet werden. Bitte nimm mit dem verantwortlichen Leiter Kontakt auf.';
 
-        $objEventsMember = CalendarEventsMemberModel::findById($registrationId);
+        $objEventsMember = CalendarEventsMemberModel::findByPk($registrationId);
         if ($objEventsMember === null)
         {
             Message::add($errorMsg, 'TL_ERROR', TL_MODE);

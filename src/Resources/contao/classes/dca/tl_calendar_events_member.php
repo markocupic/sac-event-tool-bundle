@@ -142,7 +142,7 @@ class tl_calendar_events_member extends Backend
                 else
                 {
                     /** @noinspection PhpUndefinedMethodInspection */
-                    $objEvent = CalendarEventsMemberModel::findById($id)->getRelated('eventId');
+                    $objEvent = CalendarEventsMemberModel::findByPk($id)->getRelated('eventId');
                 }
 
 
@@ -248,7 +248,7 @@ class tl_calendar_events_member extends Backend
                     elseif (strpos($key, 'tl_calendar_events_member-') !== false)
                     {
                         $id = str_replace('tl_calendar_events_member-', '', $key);
-                        $objEventMember = CalendarEventsMemberModel::findById($id);
+                        $objEventMember = CalendarEventsMemberModel::findByPk($id);
                         if ($objEventMember !== null)
                         {
                             if (Validator::isEmail($objEventMember->email))
@@ -393,7 +393,7 @@ class tl_calendar_events_member extends Backend
     {
 
         // Set correct contaoMemberId if there is a sacMemberId
-        $objEventMemberModel = CalendarEventsMemberModel::findById($dc->id);
+        $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
         if ($objEventMemberModel !== null)
         {
             if ($varValue != '')
@@ -436,7 +436,7 @@ class tl_calendar_events_member extends Backend
      */
     public function saveCallbackStateOfSubscription($varValue, DC_Table $dc)
     {
-        $objEventMemberModel = CalendarEventsMemberModel::findById($dc->id);
+        $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
         if ($objEventMemberModel !== null)
         {
             $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
@@ -477,7 +477,7 @@ class tl_calendar_events_member extends Backend
     public function onsubmitCallback(DC_Table $dc)
     {
         // Set correct contaoMemberId if there is a sacMemberId
-        $objEventMemberModel = CalendarEventsMemberModel::findById($dc->id);
+        $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
         if ($objEventMemberModel !== null)
         {
 
@@ -567,7 +567,7 @@ class tl_calendar_events_member extends Backend
 
         if (isset($_POST['refuseWithoutEmail']))
         {
-            $objRegistration = CalendarEventsMemberModel::findById(Input::get('id'));
+            $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
             if ($objRegistration !== null)
             {
                 $set = array('stateOfSubscription' => 'subscription-refused');
@@ -580,7 +580,7 @@ class tl_calendar_events_member extends Backend
 
         if (isset($_POST['acceptWithoutEmail']))
         {
-            $objRegistration = CalendarEventsMemberModel::findById(Input::get('id'));
+            $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
             if ($objRegistration !== null)
             {
                 $set = array('stateOfSubscription' => 'subscription-accepted');
@@ -593,7 +593,7 @@ class tl_calendar_events_member extends Backend
 
         if (isset($_POST['addToWaitlist']))
         {
-            $objRegistration = CalendarEventsMemberModel::findById(Input::get('id'));
+            $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
             if ($objRegistration !== null)
             {
                 $set = array('stateOfSubscription' => 'subscription-waitlisted');
@@ -684,7 +684,7 @@ class tl_calendar_events_member extends Backend
     public
     function inputFieldCallbackDashboard(DC_Table $dc)
     {
-        $objRegistration = CalendarEventsMemberModel::findById($dc->id);
+        $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
         if ($objRegistration !== null)
         {
             $objTemplate = new BackendTemplate('be_calendar_events_registration_dashboard');
@@ -759,7 +759,7 @@ class tl_calendar_events_member extends Backend
         {
             if (Input::post('subject') != '' && Input::post('text') != '')
             {
-                $objRegistration = CalendarEventsMemberModel::findById($dc->id);
+                $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
                 if ($objRegistration !== null)
                 {
                     if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL')))
@@ -820,7 +820,7 @@ class tl_calendar_events_member extends Backend
         {
 
             // Get the registration object
-            $objRegistration = CalendarEventsMemberModel::findById($dc->id);
+            $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
             if ($objRegistration !== null)
             {
                 // Get the event object
