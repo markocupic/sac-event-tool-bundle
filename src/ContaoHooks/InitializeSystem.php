@@ -148,7 +148,7 @@ class InitializeSystem
             }
         }
 
-        /** Delete orphaned entries
+        /** @todo Delete orphaned entries
          * $oDb = Database::getInstance()->execute('SELECT * FROM tl_calendar_events_member');
          * while($oDb->next())
          * {

@@ -41,9 +41,10 @@ class PreparePluginEnvironment
      */
     public function preparePluginEnvironment()
     {
-        // No more used, because all params are set in system/localconfig.php
         /**
-         * // Store all params in $GLOBALS['TL_CONFIG']
+         * @todo No more used, because all params are set in system/localconfig.php
+
+         Store all params in $GLOBALS['TL_CONFIG']
          * $container = new ContainerBuilder();
          * $loader = new YamlFileLoader(
          * $container,
