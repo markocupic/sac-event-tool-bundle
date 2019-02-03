@@ -164,7 +164,7 @@ class InitializeSystem
         // Prepare Plugin environment, create folders, etc.
         $objPluginEnv = System::getContainer()->get('markocupic.sac_event_tool_bundle.prepare_plugin_environment');
 
-        $objPluginEnv->createPluginDirectories();
+        $objPluginEnv->preparePluginEnvironment();
 
         // Convert events to ical
         if (Input::get('action') === 'exportEventsToIcal' && Input::get('id'))
