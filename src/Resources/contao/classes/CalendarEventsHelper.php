@@ -84,7 +84,7 @@ class CalendarEventsHelper
         {
             return 'event_status_5'; // fa-circle orange
         }
-        elseif($objEvent->disableOnlineRegistration)
+        elseif ($objEvent->disableOnlineRegistration)
         {
             return 'event_status_7';
         }
@@ -605,28 +605,26 @@ class CalendarEventsHelper
                 // Event canceled
                 return '';
             }
-            // At the moment "diableOnlineREgistration" is deactivated anyway
-            if (!$objEvent->disableOnlineRegistration)
+
+            if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0)
             {
-                if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0)
+                if ($memberCount >= $objEvent->maxMembers)
                 {
-                    if ($memberCount >= $objEvent->maxMembers)
-                    {
-                        // Event fully booked
-                        return sprintf($strBadge, 'danger', 'ausgebucht', $memberCount . '/' . $objEvent->maxMembers);
-                    }
-                    if ($memberCount < $objEvent->maxMembers)
-                    {
-                        // Free places
-                        return sprintf($strBadge, 'success', sprintf('noch %s freie Pl&auml;tze', $objEvent->maxMembers - $memberCount), $memberCount . '/' . $objEvent->maxMembers);
-                    }
+                    // Event fully booked
+                    return sprintf($strBadge, 'danger', 'ausgebucht', $memberCount . '/' . $objEvent->maxMembers);
                 }
-                else
+                if ($memberCount < $objEvent->maxMembers)
                 {
-                    // There is no booking limit. Show registered members
-                    return sprintf($strBadge, 'success', $memberCount . ' Anmeldungen', $memberCount . '/?');
+                    // Free places
+                    return sprintf($strBadge, 'success', sprintf('noch %s freie Pl&auml;tze', $objEvent->maxMembers - $memberCount), $memberCount . '/' . $objEvent->maxMembers);
                 }
             }
+            else
+            {
+                // There is no booking limit. Show registered members
+                return sprintf($strBadge, 'success', $memberCount . ' Anmeldungen', $memberCount . '/?');
+            }
+
         }
         return '';
     }
