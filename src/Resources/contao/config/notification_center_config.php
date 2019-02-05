@@ -24,7 +24,7 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['sac_event_tool'] = array
         'email_subject' => array('email_subject'),
         'email_text'    => array('email_text'),
         'email_html'    => array('email_html'),
-        'attachment_tokens' => array('attachment_token')
+        'attachment_tokens' => array('attachment_tokens')
     ),
 
     // Type

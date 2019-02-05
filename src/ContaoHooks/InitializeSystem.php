@@ -200,7 +200,7 @@ class InitializeSystem
                 'language'             => 'de',
                 'fallback'             => '1',
                 'recipients'           => '##send_to##',
-                'attachment_tokens'    => '#attachment_token##',
+                'attachment_tokens'    => '#attachment_tokens##',
                 'email_sender_name'    => '##email_sender_name##',
                 'email_sender_address' => '##email_sender_email##',
                 'email_recipient_cc'   => '##recipient_cc##',

@@ -278,6 +278,7 @@ class tl_calendar_events_member extends Backend
                         'reply_to'           => $this->User->email,
                         'email_subject'      => html_entity_decode(Input::post('emailSubject')),
                         'email_text'         => html_entity_decode(strip_tags(Input::post('emailText'))),
+                        'attachment_tokens'  => '',
                     );
 
                     if (Input::post('emailSendCopy'))
@@ -314,7 +315,7 @@ class tl_calendar_events_member extends Backend
                     $strAttachments = implode(',', $arrFiles);
                     if ($strAttachments !== '')
                     {
-                        $arrTokens['attachment_token'] = $strAttachments;
+                        $arrTokens['attachment_tokens'] = $strAttachments;
                     }
 
                     $arrRecipients = array_unique($arrRecipients);

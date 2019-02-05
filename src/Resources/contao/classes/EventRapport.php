@@ -191,6 +191,8 @@ class EventRapport
         {
             $arrData[] = array('key' => $field, 'value' => htmlspecialchars(html_entity_decode($objEventInvoice->{$field})));
         }
+
+
         // Calculate car costs
         $carTaxes = 0;
         if ($objEventInvoice->countCars > 0 && $objEventInvoice->carTaxesKm > 0)
@@ -198,12 +200,13 @@ class EventRapport
             $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND hasParticipated=?')->execute($objEvent->id, '1');
             if ($objEventMember->numRows)
             {
-                $carTaxes = $objEventInvoice->countCars * 0.6 / $countParticipantsTotal * $objEventInvoice->carTaxesKm;
+                // ((CHF 0.60 x AnzKm + Park-/Strassen-/Tunnelgebühren) x AnzAutos) : AnzPersonen
+                $carTaxes = ((0.6 * $objEventInvoice->carTaxesKm + $objEventInvoice->roadTaxes) * $objEventInvoice->countCars) / $countParticipantsTotal;
             }
         }
 
         $arrData[] = array('key' => 'carTaxes', 'value' => htmlspecialchars(html_entity_decode(round($carTaxes, 2))));
-        $totalCosts = $objEventInvoice->sleepingTaxes + $objEventInvoice->miscTaxes + $objEventInvoice->railwTaxes + $objEventInvoice->cabelCarTaxes + $objEventInvoice->roadTaxes + $objEventInvoice->phoneTaxes + $carTaxes;
+        $totalCosts = $objEventInvoice->sleepingTaxes + $objEventInvoice->miscTaxes + $objEventInvoice->railwTaxes + $objEventInvoice->cabelCarTaxes + $objEventInvoice->phoneTaxes + $carTaxes;
         $arrData[] = array('key' => 'totalCosts', 'value' => htmlspecialchars(html_entity_decode(round($totalCosts, 2))));
 
         // Notice
@@ -215,6 +218,7 @@ class EventRapport
         $arrData[] = array('key' => 'accountHolder', 'value' => htmlspecialchars(html_entity_decode($objBiller->name)));
 
         return $arrData;
+
 
     }
 

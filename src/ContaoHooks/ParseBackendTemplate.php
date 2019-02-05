@@ -18,6 +18,7 @@ use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\EventReleaseLevelPolicyModel;
 use Contao\Input;
+use Contao\StringUtil;
 use Contao\System;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
@@ -74,34 +75,48 @@ class ParseBackendTemplate
             if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('table') === 'tl_calendar_events_member')
             {
 
-                if (preg_match('/<table class=\"tl_listing(.*)<\/table>/sU', $strBuffer))
+                $objEvent = CalendarEventsModel::findByPk(Input::get('id'));
+                if($objEvent !== null)
                 {
-                    Controller::loadDataContainer('tl_calendar_events_member');
-                    Controller::loadLanguageFile('tl_calendar_events_member');
-                    $strLegend = '<div class="legend-box">';
-                    $strLegend .= '<div class="subscription-state-legend">';
-                    $strLegend .= '<h3>Status der Event-Anmeldung</h3>';
-                    $strLegend .= '<ul>';
-                    $arrStates = $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields']['stateOfSubscription']['options'];
-                    foreach ($arrStates as $state)
+                    if (preg_match('/<table class=\"tl_listing(.*)<\/table>/sU', $strBuffer))
                     {
-                        $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Config::get('SAC_EVT_ASSETS_DIR'), $state, $GLOBALS['TL_LANG']['tl_calendar_events_member'][$state]);
+                        Controller::loadDataContainer('tl_calendar_events_member');
+                        Controller::loadLanguageFile('tl_calendar_events_member');
+                        $strLegend = '';
+
+                        $strLegend .= '<div class="legend-box">';
+
+                        // Event details
+                        $strLegend .= '<div class="event-detail-legend">';
+                        $strLegend .= '<h3>' . StringUtil::substr($objEvent->title, 30, '...') . '</h3>';
+                        $strLegend .= '<p>' . CalendarEventsHelper::getEventPeriod($objEvent->id) . '</p>';
+                        $strLegend .= '<p><strong>Leiter:</strong><br>' . implode("<br>", CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id)) . '</p>';
+                        $strLegend .= '</div>';
+
+                        $strLegend .= '<div class="subscription-state-legend">';
+                        $strLegend .= '<h3>Status der Event-Anmeldung</h3>';
+                        $strLegend .= '<ul>';
+                        $arrStates = $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields']['stateOfSubscription']['options'];
+                        foreach ($arrStates as $state)
+                        {
+                            $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Config::get('SAC_EVT_ASSETS_DIR'), $state, $GLOBALS['TL_LANG']['tl_calendar_events_member'][$state]);
+                        }
+                        $strLegend .= '</ul>';
+                        $strLegend .= '</div>';
+
+                        $strLegend .= '<div class="participation-state-legend">';
+                        $strLegend .= '<h3>Teilnahmestatus <span style="color:red">(Erst nach der Event-Durchf&uuml;hrung auszuf&uuml;llen!)</span></h3>';
+                        $strLegend .= '<ul>';
+                        $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Config::get('SAC_EVT_ASSETS_DIR'), 'has-not-participated', 'Hat am Event nicht/noch nicht teilgenommen');
+                        $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Config::get('SAC_EVT_ASSETS_DIR'), 'has-participated', 'Hat am Event teilgenommen');
+                        $strLegend .= '</ul>';
+                        $strLegend .= '</div>';
+
+                        $strLegend .= '</div>';
+
+                        // Add legend to the listing table
+                        $strBuffer = preg_replace('/<table class=\"tl_listing(.*)<\/table>/sU', '${0}' . $strLegend, $strBuffer);
                     }
-                    $strLegend .= '</ul>';
-                    $strLegend .= '</div>';
-
-                    $strLegend .= '<div class="participation-state-legend">';
-                    $strLegend .= '<h3>Teilnahmestatus <span style="color:red">(Erst nach der Event-Durchf&uuml;hrung auszuf&uuml;llen!)</span></h3>';
-                    $strLegend .= '<ul>';
-                    $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Config::get('SAC_EVT_ASSETS_DIR'), 'has-not-participated', 'Hat am Event nicht/noch nicht teilgenommen');
-                    $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Config::get('SAC_EVT_ASSETS_DIR'), 'has-participated', 'Hat am Event teilgenommen');
-                    $strLegend .= '</ul>';
-                    $strLegend .= '</div>';
-
-                    $strLegend .= '</div>';
-
-                    // Add legend to the listing table
-                    $strBuffer = preg_replace('/<table class=\"tl_listing(.*)<\/table>/sU', '${0}' . $strLegend, $strBuffer);
                 }
 
             }
