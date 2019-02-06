@@ -172,7 +172,12 @@
         <!-- tab-pane-5 -->
         <div class="tab-pane fade" id="nav-member-picture-feed" role="tabpanel" aria-labelledby="nav-member-picture-feed-tab">
           <h2 class="mt-0">Mein Bilder Feed</h2>
-          <p>Hier kannst du deine aktuellsten Bilder von deinen Touren hochladen. Die neusten Bilder werden auf der Webseite in einem Bilder-Feed präsentiert. Bitte schreibe zu jedem Bild den Namen des Fotografen und zum Bild eine kleine Beschreibung hinzu.</p>
+          <p>Hier kannst du deine Bilder von deinen Touren hochladen. Die aktuellsten Bilder werden auf der Webseite in einem Bilder-Feed präsentiert. Bitte <strong>halte dich an folgende Konventionen/Regeln:</strong></p>
+            <ul>
+          <li><i class="fas fa-arrow-circle-right"></i> Bitte schreibe zu jedem Bild <strong>den Namen des Fotografen.</strong></li>
+          <li><i class="fas fa-arrow-circle-right"></i> Bitte schreibe zu jedem Bild eine <strong>kleine Beschreibung</strong> hinzu.</li>
+          <li><i class="fas fa-arrow-circle-right"></i> Schaue auch, dass die Bilder <strong>richtig gedreht</strong> sind und korrigiere dies bitte, falls nötig.</li>
+          </ul>
           {{insert_module::373}}
         </div>
 
