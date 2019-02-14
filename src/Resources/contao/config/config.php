@@ -182,51 +182,51 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = array(
 
 
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'] = array(
-    'ca. 1 h' => array('dateRows' => 1),
-    'ca. 2 h'=> array('dateRows' => 1),
-    'ca. 3 h'=> array('dateRows' => 1),
-    'ca. 4 h'=> array('dateRows' => 1),
-    'ca. 5 h'=> array('dateRows' => 1),
-    'ca. 6 h'=> array('dateRows' => 1),
-    'ca. 7 h'=> array('dateRows' => 1),
-    'ca. 8 h'=> array('dateRows' => 1),
-    'ca. 9 h'=> array('dateRows' => 1),
-    '1/2 Tag'=> array('dateRows' => 1),
-    '1 Tag'=> array('dateRows' => 1),
-    '1 1/2 Tage'=> array('dateRows' => 2),
-    '2 Tage'=> array('dateRows' => 2),
-    '2 1/2 Tage'=> array('dateRows' => 3),
-    '3 Tage'=> array('dateRows' => 3),
-    '3 1/2 Tage'=> array('dateRows' => 4),
-    '4 Tage'=> array('dateRows' => 4),
-    '4 1/2 Tage'=> array('dateRows' => 5),
-    '5 Tage'=> array('dateRows' => 5),
-    '5 1/2 Tage'=> array('dateRows' => 6),
-    '6 Tage'=> array('dateRows' => 6),
-    '6 1/2 Tage'=> array('dateRows' => 7),
-    '7 Tage'=> array('dateRows' => 7),
-    '7 1/2 Tage'=> array('dateRows' => 8),
-    '8 Tage'=> array('dateRows' => 8),
-    '8 1/2 Tage'=> array('dateRows' => 9),
-    '9 Tage'=> array('dateRows' => 9),
-    '9 1/2 Tage'=> array('dateRows' => 10),
-    '10 Tage'=> array('dateRows' => 10),
-    '10 1/2 Tage'=> array('dateRows' => 11),
-    '11 Tage'=> array('dateRows' => 11),
-    '11 1/2 Tage'=> array('dateRows' => 12),
-    '12 Tage'=> array('dateRows' => 12),
-    '12 1/2 Tage'=> array('dateRows' => 13),
-    '13 Tage'=> array('dateRows' => 13),
-    '13 1/2 Tage'=> array('dateRows' => 14),
-    '14 Tage'=> array('dateRows' => 14),
-    '1 Abend'=> array('dateRows' => 1),
-    '2 Abende'=> array('dateRows' => 2),
-    '3 Abende'=> array('dateRows' => 3),
-    '4 Abende'=> array('dateRows' => 4),
-    '5 Abende'=> array('dateRows' => 5),
-    '6 Abende'=> array('dateRows' => 6),
-    '7 Abende'=> array('dateRows' => 7),
-    '1 Abend und 1 Tag'=> array('dateRows' => 2)
+    'ca. 1 h'           => array('dateRows' => 1),
+    'ca. 2 h'           => array('dateRows' => 1),
+    'ca. 3 h'           => array('dateRows' => 1),
+    'ca. 4 h'           => array('dateRows' => 1),
+    'ca. 5 h'           => array('dateRows' => 1),
+    'ca. 6 h'           => array('dateRows' => 1),
+    'ca. 7 h'           => array('dateRows' => 1),
+    'ca. 8 h'           => array('dateRows' => 1),
+    'ca. 9 h'           => array('dateRows' => 1),
+    '1/2 Tag'           => array('dateRows' => 1),
+    '1 Tag'             => array('dateRows' => 1),
+    '1 1/2 Tage'        => array('dateRows' => 2),
+    '2 Tage'            => array('dateRows' => 2),
+    '2 1/2 Tage'        => array('dateRows' => 3),
+    '3 Tage'            => array('dateRows' => 3),
+    '3 1/2 Tage'        => array('dateRows' => 4),
+    '4 Tage'            => array('dateRows' => 4),
+    '4 1/2 Tage'        => array('dateRows' => 5),
+    '5 Tage'            => array('dateRows' => 5),
+    '5 1/2 Tage'        => array('dateRows' => 6),
+    '6 Tage'            => array('dateRows' => 6),
+    '6 1/2 Tage'        => array('dateRows' => 7),
+    '7 Tage'            => array('dateRows' => 7),
+    '7 1/2 Tage'        => array('dateRows' => 8),
+    '8 Tage'            => array('dateRows' => 8),
+    '8 1/2 Tage'        => array('dateRows' => 9),
+    '9 Tage'            => array('dateRows' => 9),
+    '9 1/2 Tage'        => array('dateRows' => 10),
+    '10 Tage'           => array('dateRows' => 10),
+    '10 1/2 Tage'       => array('dateRows' => 11),
+    '11 Tage'           => array('dateRows' => 11),
+    '11 1/2 Tage'       => array('dateRows' => 12),
+    '12 Tage'           => array('dateRows' => 12),
+    '12 1/2 Tage'       => array('dateRows' => 13),
+    '13 Tage'           => array('dateRows' => 13),
+    '13 1/2 Tage'       => array('dateRows' => 14),
+    '14 Tage'           => array('dateRows' => 14),
+    '1 Abend'           => array('dateRows' => 1),
+    '2 Abende'          => array('dateRows' => 2),
+    '3 Abende'          => array('dateRows' => 3),
+    '4 Abende'          => array('dateRows' => 4),
+    '5 Abende'          => array('dateRows' => 5),
+    '6 Abende'          => array('dateRows' => 6),
+    '7 Abende'          => array('dateRows' => 7),
+    '1 Abend und 1 Tag' => array('dateRows' => 2)
 );
 
 // Car seats info used in the event registration form
@@ -249,6 +249,11 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = array(
     'Nichts',
 );
 
+// Custom Hook publish Event
+$GLOBALS['TL_HOOKS']['publishEvent'] = array(array('Markocupic\SacEventToolBundle\ContaoHooks\PublishEvent', 'publishEvent'));
+
+// Custom Hook change event release level
+$GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] = array(array('Markocupic\SacEventToolBundle\ContaoHooks\ChangeEventReleaseLevel', 'changeEventReleaseLevel'));
 
 // Route cronjob calls,ajax calls etc...
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic_sac_event_tool.contao_hooks.initialize_system', 'initializeSystem');
@@ -298,5 +303,5 @@ $GLOBALS['TL_CRON']['daily']['printSACWorkshops'] = array('Markocupic\SacEventTo
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ReplaceInsertTags', 'replaceInsertTags');
 
 // Parse template
-$GLOBALS['TL_HOOKS']['parseTemplate'][] =  array('Markocupic\SacEventToolBundle\ContaoHooks\ParseTemplate', 'checkIfAccountIsActivated');
+$GLOBALS['TL_HOOKS']['parseTemplate'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ParseTemplate', 'checkIfAccountIsActivated');
 

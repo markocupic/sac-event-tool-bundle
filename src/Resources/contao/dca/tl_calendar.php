@@ -33,7 +33,7 @@ if (BackendUser::getInstance()->isAdmin)
 // Palettes
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('event_type_legend', 'protected_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
-    ->addField(array('allowedEventTypes'), 'event_type_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('allowedEventTypes,adviceOnEventReleaseLevelChange,adviceOnEventPublish'), 'event_type_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_calendar');
 
 
@@ -55,6 +55,26 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['allowedEventTypes'] = array(
     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
     'eval'      => array('multiple' => true, 'includeBlankOption' => false, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => true),
     'sql'       => "blob NULL",
+);
+
+// adviceOnEventReleaseLevelChange
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventReleaseLevelChange'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventReleaseLevelChange'],
+    'exclude'   => true,
+    'filter'    => false,
+    'inputType' => 'text',
+    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
+    'sql'       => "varchar(255) NOT NULL default ''"
+);
+
+// adviceOnEventPublish
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventPublish'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventPublish'],
+    'exclude'   => true,
+    'filter'    => false,
+    'inputType' => 'text',
+    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
+    'sql'       => "varchar(255) NOT NULL default ''"
 );
 
 

@@ -11,6 +11,7 @@
 use League\Csv\CharsetConverter;
 use League\Csv\Writer;
 
+
 /**
  * Class tl_calendar_events_sac_event_tool
  */
@@ -1700,6 +1701,8 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function releaseLevelNext($row, $href, $label, $title, $icon, $attributes)
     {
+        $strDirection = 'up';
+
         $canSendToNextReleaseLevel = false;
         $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
         $nextReleaseLevel = null;
@@ -1723,13 +1726,22 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         $objEvent->save();
                         $this->saveCallbackEventReleaseLevel($objEvent->eventReleaseLevel, null, $objEvent->id);
 
+                        // HOOK: changeEventReleaseLevel, f.ex inform tourenchef via email
+                        if (isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) && \is_array($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']))
+                        {
+                            foreach ($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] as $callback)
+                            {
+                                System::importStatic($callback[0])->{$callback[1]}($objEvent, $strDirection);
+                            }
+                        }
+
                     }
                 }
             }
             $this->redirect($this->getReferer());
         }
 
-        if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id'], 'up') === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel) === true)
+        if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id'], $strDirection) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel) === true)
         {
             $canSendToNextReleaseLevel = true;
         }
@@ -1777,6 +1789,15 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
                     }
                     $objEvent->published = '1';
+
+                    // HOOK: publishEvent, f.ex inform tourenchef via email
+                    if (isset($GLOBALS['TL_HOOKS']['publishEvent']) && \is_array($GLOBALS['TL_HOOKS']['publishEvent']))
+                    {
+                        foreach ($GLOBALS['TL_HOOKS']['publishEvent'] as $callback)
+                        {
+                             System::importStatic($callback[0])->{$callback[1]}($objEvent);
+                        }
+                    }
                 }
                 else
                 {
@@ -1911,6 +1932,8 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function releaseLevelPrev($row, $href, $label, $title, $icon, $attributes)
     {
+        $strDirection = 'down';
+
         $canSendToNextReleaseLevel = false;
         $prevReleaseLevel = null;
         $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
@@ -1934,13 +1957,22 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         $objEvent->eventReleaseLevel = $objReleaseLevelModel->id;
                         $objEvent->save();
                         $this->saveCallbackEventReleaseLevel($objEvent->eventReleaseLevel, null, $objEvent->id);
+
+                        // HOOK: changeEventReleaseLevel, f.ex inform tourenchef via email
+                        if (isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) && \is_array($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']))
+                        {
+                            foreach ($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] as $callback)
+                            {
+                                System::importStatic($callback[0])->{$callback[1]}($objEvent, $strDirection);
+                            }
+                        }
                     }
                 }
             }
             $this->redirect($this->getReferer());
         }
 
-        if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id'], 'down') === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel) === true)
+        if (EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id'], $strDirection) === true && EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel) === true)
         {
             $canSendToNextReleaseLevel = true;
         }

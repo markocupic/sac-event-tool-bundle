@@ -13,6 +13,9 @@ $GLOBALS['TL_LANG']['tl_calendar']['event_type_legend'] = 'Event Typen Einstellu
 
 // Fields
 $GLOBALS['TL_LANG']['tl_calendar']['allowedEventTypes'] = array("Erlaubte Event Typen", "W&auml;hlen Sie die Event Typen, die im Kalender ausgew&auml;hlt werden d&uuml;rfen, aus.");
+$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventReleaseLevelChange'] = array("Benachrichtigen bei Freigabestufen-Änderung", "Geben Sie eine Kommaseparierte Liste mit E-Mail-Adressen an.");
+$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventPublish'] = array("Benachrichtigen bei Event-Veröffentlichung", "Geben Sie eine Kommaseparierte Liste mit E-Mail-Adressen an.");
+
 
 
 // References
