@@ -130,7 +130,7 @@ div.tl_header_tour_rapport table td {
 }
 
 /** tl_calendar_events Show subscription state **/
-.tl_listing_container .subscription-badge {
+.tl_messages .subscription-badge, .tl_listing_container .subscription-badge {
     background-color: darkgray;
     font-size: x-small;
     border-radius: 5px;
@@ -139,23 +139,23 @@ div.tl_header_tour_rapport table td {
     cursor: pointer;
 }
 
-.tl_listing_container .subscription-badge.not-confirmed {
+.tl_messages .subscription-badge.not-confirmed ,.tl_listing_container .subscription-badge.not-confirmed {
     background-color: #cccccc;
 }
 
-.tl_listing_container .subscription-badge.accepted {
+.tl_messages .subscription-badge.not-confirmed, .tl_listing_container .subscription-badge.accepted {
     background-color: #91dc5a;
 }
 
-.tl_listing_container .subscription-badge.waitlisted {
+.tl_messages .subscription-badge.not-confirmed, .tl_listing_container .subscription-badge.waitlisted {
     background-color: #006df0;
 }
 
-.tl_listing_container .subscription-badge.refused {
+.tl_messages .subscription-badge.not-confirmed, .tl_listing_container .subscription-badge.refused {
     background-color: #d80027;
 }
 
-.tl_listing_container .subscription-badge.unsubscribed-user {
+.tl_messages .subscription-badge.not-confirmed, .tl_listing_container .subscription-badge.unsubscribed-user {
     background-color: #d86811;
 }
 
