@@ -164,7 +164,7 @@ PaletteManipulator::create()
 
 // Tour report palette
 PaletteManipulator::create()
-    ->addField(array('executionState', 'eventSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents'), 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('executionState', 'eventSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents', 'eventReportAdditionalNotices'), 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('tour_report', 'tl_calendar_events');
 
 
@@ -886,9 +886,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = array(
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventSubstitutionText'],
     'exclude'   => true,
-    'inputType' => 'text',
-    'eval'      => array('tl_class' => 'clr m12', 'maxlength' => '64', 'mandatory' => false),
-    'sql'       => "varchar(255) NOT NULL default ''",
+    'inputType' => 'textarea',
+    'eval'      => array('mandatory' => false, 'tl_class' => 'clr m12'),
+    'sql'       => "text NULL",
 );
 
 // tourWeatherConditions
@@ -914,6 +914,15 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = 
 // tourSpecialIncidents
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourSpecialIncidents'],
+    'exclude'   => true,
+    'inputType' => 'textarea',
+    'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
+    'sql'       => "text NULL",
+);
+
+// eventReportAdditionalNotices
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReportAdditionalNotices'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventReportAdditionalNotices'],
     'exclude'   => true,
     'inputType' => 'textarea',
     'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),

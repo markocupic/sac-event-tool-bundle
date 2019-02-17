@@ -185,7 +185,6 @@ class EventRapport
         $arrData[] = array('key' => 'avalancheConditions', 'value' => htmlspecialchars(html_entity_decode($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->tourAvalancheConditions][0])));
         $arrData[] = array('key' => 'specialIncidents', 'value' => htmlspecialchars(html_entity_decode($objEvent->tourSpecialIncidents)));
 
-
         $arrFields = array('sleepingTaxes', 'sleepingTaxesText', 'miscTaxes', 'miscTaxesText', 'railwTaxes', 'railwTaxesText', 'cabelCarTaxes', 'cabelCarTaxesText', 'roadTaxes', 'carTaxesKm', 'countCars', 'phoneTaxes');
         foreach ($arrFields as $field)
         {
@@ -211,7 +210,11 @@ class EventRapport
 
         // Notice
         $notice = $objEventInvoice->notice == '' ? '---' : $objEventInvoice->notice;
-        $arrData[] = array('key' => 'notice', 'value' => htmlspecialchars(html_entity_decode($notice)));
+        $arrData[] = array('key' => 'notice', 'value' => htmlspecialchars(html_entity_decode($notice)), 'options' => array('multiline' => true));
+
+        // eventReportAdditionalNotices
+        $eventReportAdditionalNotices = $objEvent->eventReportAdditionalNotices == '' ? '---' : $objEvent->eventReportAdditionalNotices;
+        $arrData[] = array('key' => 'eventReportAdditionalNotices', 'value' => htmlspecialchars(html_entity_decode($eventReportAdditionalNotices)), 'options' => array('multiline' => true));
 
         // Iban & account holder
         $arrData[] = array('key' => 'iban', 'value' => htmlspecialchars(html_entity_decode($objEventInvoice->iban)));
