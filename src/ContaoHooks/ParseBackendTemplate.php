@@ -170,10 +170,10 @@ class ParseBackendTemplate
         $objTemplate = new BackendTemplate('be_calendar_events_event_dashboard');
         $objTemplate->objEvent = $objEvent;
         // Set button href
-        $objTemplate->eventListHref = sprintf('contao?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, REQUEST_TOKEN, $refererId);
+        $objTemplate->eventListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, REQUEST_TOKEN, $refererId);
         $objTemplate->writeTourReportHref = Controller::addToUrl('call=writeTourReport&rt=' . REQUEST_TOKEN, true);
-        $objTemplate->participantListHref = sprintf('contao?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
-        $objTemplate->invoiceListHref = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
+        $objTemplate->participantListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
+        $objTemplate->invoiceListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
 
         // Check if user is allowed
         if (EventReleaseLevelPolicyModel::hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id)

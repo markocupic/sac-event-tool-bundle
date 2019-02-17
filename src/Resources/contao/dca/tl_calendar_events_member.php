@@ -110,7 +110,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'backToEventSettings'     => array
             (
                 'label'           => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
-                'href'            => 'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
+                'href'            => 'contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
                 'class'           => 'back_to_event_settings',
                 'button_callback' => array('tl_calendar_events_member', 'buttonCbBackToEventSettings'),
                 'attributes'      => 'onclick="Backend.getScrollOffset()" accesskey="e"',

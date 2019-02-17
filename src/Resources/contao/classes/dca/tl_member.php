@@ -41,7 +41,7 @@ class tl_member_sac_bundle extends Backend
             {
                 $arrErrorMsg = sprintf('Das Mitglied mit ID:%s kann nicht gelöscht werden, weil es bei Events noch auf der Buchungsliste steht.', $objMember->activeRecord->id);
                 \Contao\Message::add($arrErrorMsg, 'TL_ERROR', TL_MODE);
-                \Contao\Controller::redirect('contao?do=member');
+                \Contao\Controller::redirect('contao/main.php?do=member');
             }
         }
 

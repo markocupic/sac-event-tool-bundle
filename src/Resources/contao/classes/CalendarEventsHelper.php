@@ -718,7 +718,7 @@ class CalendarEventsHelper
             }
             $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
 
-            $href = sprintf("'contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s'", $objEvent->id, REQUEST_TOKEN, $refererId);
+            $href = sprintf("'contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s'", $objEvent->id, REQUEST_TOKEN, $refererId);
 
             if ($intNotConfirmed > 0)
             {

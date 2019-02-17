@@ -54,8 +54,8 @@ class GetSystemMessages
                     while ($objEvent->next())
                     {
                         $strCSSRowClass = ($objEvent->endDate > time()) ? 'upcoming-event' : 'past-event';
-                        $link = sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s', $objEvent->id, $rt);
-                        $linkMemberList = sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $objEvent->id, $rt);
+                        $link = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s', $objEvent->id, $rt);
+                        $linkMemberList = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $objEvent->id, $rt);
                         $strBuffer .= sprintf('<tr class="%s"><td>%s</td><td><a href="%s" title="Event \'%s\' bearbeiten">%s [%s]</a></td><td><a href="%s" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>',
                             $strCSSRowClass,
                             CalendarEventsHelper::getEventStateOfSubscriptionBadgesString($objEvent),

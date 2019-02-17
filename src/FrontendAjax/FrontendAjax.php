@@ -592,7 +592,7 @@ class FrontendAjax
                         'author_email'         => $objUser->email,
                         'author_sac_member_id' => $objUser->sacMemberId,
                         'hostname'             => Environment::get('host'),
-                        'story_link_backend'   => Environment::get('url') . '/contao?do=sac_calendar_events_stories_tool&act=edit&id=' . $objStory->id,
+                        'story_link_backend'   => Environment::get('url') . '/contao/main.php?do=sac_calendar_events_stories_tool&act=edit&id=' . $objStory->id,
                         'story_link_frontend'  => $previewLink,
                         'story_title'          => $objStory->title,
                         'story_text'           => $objStory->text,

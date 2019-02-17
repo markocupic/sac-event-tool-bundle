@@ -445,7 +445,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     /**
      * onload_callback triggerGlobalOperations
      * transform dates of all events of a certain calendar
-     * https://somehost/contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=21&transformDate=+52weeks&rt=hUFF18TV1YCLddb-Cyb48dRH8y_9iI-BgM-Nc1rB8o8&ref=2sjHl6mB
+     * https://somehost/contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events&id=21&transformDate=+52weeks&rt=hUFF18TV1YCLddb-Cyb48dRH8y_9iI-BgM-Nc1rB8o8&ref=2sjHl6mB
      */
     public function triggerGlobalOperations(DataContainer $dc)
     {
