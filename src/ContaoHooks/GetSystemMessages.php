@@ -13,9 +13,12 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\BackendUser;
 use Contao\CalendarEventsMemberModel;
+use Contao\Config;
 use Contao\Database;
+use Contao\Date;
 use Contao\RequestToken;
 use Contao\System;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
  * Class GetSystemMessages
@@ -26,6 +29,7 @@ class GetSystemMessages
 
 
     /**
+     * Show all upcoming events (where user is main instructor) for the logged in user
      * @return string
      */
     public function listUntreatedEventSubscriptions()
@@ -36,16 +40,24 @@ class GetSystemMessages
             $objUser = BackendUser::getInstance();
             if ($objUser->id > 0)
             {
-                $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE mainInstructor=? AND startDate>? ORDER BY startDate')->execute($objUser->id, 0);
+                $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE mainInstructor=? AND startDate>? ORDER BY startDate')->execute($objUser->id, time() + 14 * 24 * 3600);
                 if ($objEvent->numRows)
                 {
-                    $strBuffer .= '<h3>Deine Events</h3>';
-                    $strBuffer .= '<table>';
+                    $strBuffer .= '<h3>' . $GLOBALS['TL_LANG']['MSC']['yourUpcomingEvents'] . '</h3>';
+                    $strBuffer .= '<table id="tl_upcoming_events" class="tl_listing">';
+                    $strBuffer .= '<thead><tr><th>Teiln.</th><th>Eventname</th><th></th></tr></thead>';
+                    $strBuffer .= '<tbody>';
+
+                    $container = System::getContainer();
+                    $rt = $container->get('contao.csrf.token_manager')->getToken($container->getParameter('contao.csrf_token_name'))->getValue();
+
                     while ($objEvent->next())
                     {
-                        $link = sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s', $objEvent->id, RequestToken::get());
-                        $strBuffer .= sprintf('<tr><td>%s</td><td><a href="%s">%s</a></td></tr>', $this->_getRegistrationData($objEvent), $link, $objEvent->title);
+                        $link = sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s', $objEvent->id, $rt);
+                        $linkMemberList = sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $objEvent->id, $rt);
+                        $strBuffer .= sprintf('<tr><td>%s</td><td><a href="%s" title="Event \'%s\' bearbeiten">%s [%s]</a></td><td><a href="%s" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>', CalendarEventsHelper::getEventStateOfSubscriptionBadgesString($objEvent), $link, $objEvent->title, $objEvent->title, Date::parse(Config::get('dateFormat'), $objEvent->startDate), $linkMemberList, $objEvent->title);
                     }
+                    $strBuffer .= '</tbody>';
                     $strBuffer .= '</table>';
                 }
             }
@@ -54,75 +66,6 @@ class GetSystemMessages
 
     }
 
-    /**
-     * @param $objEvent
-     * @return string
-     */
-    protected function _getRegistrationData($objEvent)
-    {
-        $strRegistrations = '';
-        $intNotConfirmed = 0;
-        $intAccepted = 0;
-        $intRefused = 0;
-        $intWaitlisted = 0;
-        $intUnsubscribedUser = 0;
-
-        $eventsMemberModel = CalendarEventsMemberModel::findByEventId($objEvent->id);
-        if ($eventsMemberModel !== null)
-        {
-            while ($eventsMemberModel->next())
-            {
-
-                if ($eventsMemberModel->stateOfSubscription === 'subscription-not-confirmed')
-                {
-                    $intNotConfirmed++;
-                }
-                if ($eventsMemberModel->stateOfSubscription === 'subscription-accepted')
-                {
-                    $intAccepted++;
-                }
-                if ($eventsMemberModel->stateOfSubscription === 'subscription-refused')
-                {
-                    $intRefused++;
-                }
-                if ($eventsMemberModel->stateOfSubscription === 'subscription-waitlisted')
-                {
-                    $intWaitlisted++;
-                }
-                if ($eventsMemberModel->stateOfSubscription === 'user-has-unsubscribed')
-                {
-                    $intUnsubscribedUser++;
-                }
-            }
-            $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
-
-            $href = sprintf("'contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s'", $objEvent->id, REQUEST_TOKEN, $refererId);
-
-            if ($intNotConfirmed > 0)
-            {
-                $strRegistrations .= sprintf('<span class="subscription-badge not-confirmed" title="%s unbestätigte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
-            }
-            if ($intAccepted > 0)
-            {
-                $strRegistrations .= sprintf('<span class="subscription-badge accepted" title="%s bestätigte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intAccepted, $href, $intAccepted);
-            }
-            if ($intRefused > 0)
-            {
-                $strRegistrations .= sprintf('<span class="subscription-badge refused" title="%s abgelehnte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intRefused, $href, $intRefused);
-            }
-            if ($intWaitlisted > 0)
-            {
-                $strRegistrations .= sprintf('<span class="subscription-badge waitlisted" title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=%s">%s</span>', $intWaitlisted, $href, $intWaitlisted);
-            }
-            if ($intUnsubscribedUser > 0)
-            {
-                $strRegistrations .= sprintf('<span class="subscription-badge unsubscribed-user" title="%s Abgemeldete Teilnehmer" role="button" onclick="window.location.href=%s">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
-            }
-        }
-
-
-        return $strRegistrations;
-    }
 }
 
 

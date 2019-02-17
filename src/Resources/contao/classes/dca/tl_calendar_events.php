@@ -10,6 +10,7 @@
 
 use League\Csv\CharsetConverter;
 use League\Csv\Writer;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 
 /**
@@ -1480,6 +1481,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     public function listEvents($arrRow)
     {
         $span = Calendar::calculateSpan($arrRow['startTime'], $arrRow['endTime']);
+        $objEvent = CalendarEventsModel::findByPk($arrRow['id']);
 
         if ($span > 0)
         {
@@ -1514,66 +1516,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $strAuthor = ' <span style="color:#b3b3b3;padding-left:3px">[Hauptleiter: ' . $objUser->name . ']</span><br>';
         }
 
-        $strRegistrations = '';
-        $intNotConfirmed = 0;
-        $intAccepted = 0;
-        $intRefused = 0;
-        $intWaitlisted = 0;
-        $intUnsubscribedUser = 0;
-
-        $eventsMemberModel = CalendarEventsMemberModel::findByEventId($arrRow['id']);
-        if ($eventsMemberModel !== null)
-        {
-            while ($eventsMemberModel->next())
-            {
-
-                if ($eventsMemberModel->stateOfSubscription === 'subscription-not-confirmed')
-                {
-                    $intNotConfirmed++;
-                }
-                if ($eventsMemberModel->stateOfSubscription === 'subscription-accepted')
-                {
-                    $intAccepted++;
-                }
-                if ($eventsMemberModel->stateOfSubscription === 'subscription-refused')
-                {
-                    $intRefused++;
-                }
-                if ($eventsMemberModel->stateOfSubscription === 'subscription-waitlisted')
-                {
-                    $intWaitlisted++;
-                }
-                if ($eventsMemberModel->stateOfSubscription === 'user-has-unsubscribed')
-                {
-                    $intUnsubscribedUser++;
-                }
-            }
-
-            $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
-
-            $href = sprintf("'contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s'", $arrRow['id'], REQUEST_TOKEN, $refererId);
-
-            if ($intNotConfirmed > 0)
-            {
-                $strRegistrations .= sprintf('<span class="subscription-badge not-confirmed" title="%s unbestätigte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
-            }
-            if ($intAccepted > 0)
-            {
-                $strRegistrations .= sprintf('<span class="subscription-badge accepted" title="%s bestätigte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intAccepted, $href, $intAccepted);
-            }
-            if ($intRefused > 0)
-            {
-                $strRegistrations .= sprintf('<span class="subscription-badge refused" title="%s abgelehnte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intRefused, $href, $intRefused);
-            }
-            if ($intWaitlisted > 0)
-            {
-                $strRegistrations .= sprintf('<span class="subscription-badge waitlisted" title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=%s">%s</span>', $intWaitlisted, $href, $intWaitlisted);
-            }
-            if ($intUnsubscribedUser > 0)
-            {
-                $strRegistrations .= sprintf('<span class="subscription-badge unsubscribed-user" title="%s Abgemeldete Teilnehmer" role="button" onclick="window.location.href=%s">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
-            }
-        }
+        $strRegistrations = CalendarEventsHelper::getEventStateOfSubscriptionBadgesString($objEvent);
         if ($strRegistrations != '')
         {
             $strRegistrations = '<br>' . $strRegistrations;

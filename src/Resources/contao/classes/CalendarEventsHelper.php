@@ -12,6 +12,7 @@ namespace Markocupic\SacEventToolBundle;
 
 use Contao\Calendar;
 use Contao\CalendarEventsModel;
+use Contao\CalendarEventsMemberModel;
 use Contao\Config;
 use Contao\ContentModel;
 use Contao\Controller;
@@ -673,6 +674,76 @@ class CalendarEventsHelper
             }
         }
         return false;
+    }
+
+    /**
+     * @param $objEvent
+     * @return string
+     */
+    public function getEventStateOfSubscriptionBadgesString($objEvent)
+    {
+        $strRegistrationsBadges = '';
+        $intNotConfirmed = 0;
+        $intAccepted = 0;
+        $intRefused = 0;
+        $intWaitlisted = 0;
+        $intUnsubscribedUser = 0;
+
+        $eventsMemberModel = CalendarEventsMemberModel::findByEventId($objEvent->id);
+        if ($eventsMemberModel !== null)
+        {
+            while ($eventsMemberModel->next())
+            {
+
+                if ($eventsMemberModel->stateOfSubscription === 'subscription-not-confirmed')
+                {
+                    $intNotConfirmed++;
+                }
+                if ($eventsMemberModel->stateOfSubscription === 'subscription-accepted')
+                {
+                    $intAccepted++;
+                }
+                if ($eventsMemberModel->stateOfSubscription === 'subscription-refused')
+                {
+                    $intRefused++;
+                }
+                if ($eventsMemberModel->stateOfSubscription === 'subscription-waitlisted')
+                {
+                    $intWaitlisted++;
+                }
+                if ($eventsMemberModel->stateOfSubscription === 'user-has-unsubscribed')
+                {
+                    $intUnsubscribedUser++;
+                }
+            }
+            $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
+
+            $href = sprintf("'contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s'", $objEvent->id, REQUEST_TOKEN, $refererId);
+
+            if ($intNotConfirmed > 0)
+            {
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge not-confirmed blink" title="%s unbestätigte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
+            }
+            if ($intAccepted > 0)
+            {
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge accepted" title="%s bestätigte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intAccepted, $href, $intAccepted);
+            }
+            if ($intRefused > 0)
+            {
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge refused" title="%s abgelehnte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intRefused, $href, $intRefused);
+            }
+            if ($intWaitlisted > 0)
+            {
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge waitlisted" title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=%s">%s</span>', $intWaitlisted, $href, $intWaitlisted);
+            }
+            if ($intUnsubscribedUser > 0)
+            {
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge unsubscribed-user" title="%s Abgemeldete Teilnehmer" role="button" onclick="window.location.href=%s">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
+            }
+        }
+
+
+        return $strRegistrationsBadges;
     }
 
 

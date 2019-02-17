@@ -11,6 +11,7 @@
 // Overwrite defaults
 
 $GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
+$GLOBALS['TL_LANG']['MSC']['yourUpcomingEvents'] = 'Deine nächsten Events';
 
 $GLOBALS['TL_LANG']['CTE']['userPortrait'] = array('SAC-User-Portrait');
 $GLOBALS['TL_LANG']['CTE']['userPortraitList'] = array('SAC-User-Portrait-Liste');

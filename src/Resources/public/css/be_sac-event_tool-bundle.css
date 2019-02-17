@@ -130,7 +130,7 @@ div.tl_header_tour_rapport table td {
 }
 
 /** tl_calendar_events Show subscription state **/
-.tl_messages .subscription-badge, .tl_listing_container .subscription-badge {
+.subscription-badge {
     background-color: darkgray;
     font-size: x-small;
     border-radius: 5px;
@@ -139,27 +139,47 @@ div.tl_header_tour_rapport table td {
     cursor: pointer;
 }
 
-.tl_messages .subscription-badge.not-confirmed ,.tl_listing_container .subscription-badge.not-confirmed {
+.subscription-badge.not-confirmed {
     background-color: #cccccc;
+    animation: blinker 2s step-start infinite;
+}
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
 }
 
-.tl_messages .subscription-badge.not-confirmed, .tl_listing_container .subscription-badge.accepted {
+.subscription-badge.accepted {
     background-color: #91dc5a;
 }
 
-.tl_messages .subscription-badge.not-confirmed, .tl_listing_container .subscription-badge.waitlisted {
+.subscription-badge.waitlisted {
     background-color: #006df0;
 }
 
-.tl_messages .subscription-badge.not-confirmed, .tl_listing_container .subscription-badge.refused {
+.subscription-badge.refused {
     background-color: #d80027;
 }
 
-.tl_messages .subscription-badge.not-confirmed, .tl_listing_container .subscription-badge.unsubscribed-user {
+.subscription-badge.unsubscribed-user {
     background-color: #d86811;
 }
 
+#tl_messages h3 {
+    font-size: .875rem;
+    margin: 15px 0 5px;
+}
 
+#tl_upcoming_events th {
+    background: #f6f6f8;
+    padding: 6px;
+    border-top: 1px solid #e9e9e9;
+}
+
+#tl_upcoming_events td {
+    border-bottom: 1px solid #e9e9e9;
+    padding: 6px 6px;
+}
 
 /** alerts **/
 .alert {
