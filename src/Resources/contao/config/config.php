@@ -21,7 +21,7 @@ require_once($rootDir . '/vendor/markocupic/sac-event-tool-bundle/src/Resources/
 if (TL_MODE == 'BE')
 {
     // Add Backend CSS
-    $GLOBALS['TL_CSS'][] = 'bundles/markocupicsaceventtool/css/be_sac-event_tool-bundle.css';
+    $GLOBALS['TL_CSS'][] = 'bundles/markocupicsaceventtool/css/stylesheet.css';
 }
 
 
