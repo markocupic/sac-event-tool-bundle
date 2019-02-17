@@ -40,7 +40,7 @@ class GetSystemMessages
             $objUser = BackendUser::getInstance();
             if ($objUser->id > 0)
             {
-                $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE mainInstructor=? AND startDate>? ORDER BY startDate')->execute($objUser->id, time() + 14 * 24 * 3600);
+                $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE mainInstructor=? AND startDate>? ORDER BY startDate')->execute($objUser->id, time() - 3 * 30 * 24 * 3600);
                 if ($objEvent->numRows)
                 {
                     $strBuffer .= '<h3>' . $GLOBALS['TL_LANG']['MSC']['yourUpcomingEvents'] . '</h3>';
@@ -53,9 +53,18 @@ class GetSystemMessages
 
                     while ($objEvent->next())
                     {
+                        $strCSSRowClass = ($objEvent->endDate > time()) ? 'upcoming-event' : 'past-event';
                         $link = sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s', $objEvent->id, $rt);
                         $linkMemberList = sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $objEvent->id, $rt);
-                        $strBuffer .= sprintf('<tr><td>%s</td><td><a href="%s" title="Event \'%s\' bearbeiten">%s [%s]</a></td><td><a href="%s" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>', CalendarEventsHelper::getEventStateOfSubscriptionBadgesString($objEvent), $link, $objEvent->title, $objEvent->title, Date::parse(Config::get('dateFormat'), $objEvent->startDate), $linkMemberList, $objEvent->title);
+                        $strBuffer .= sprintf('<tr class="%s"><td>%s</td><td><a href="%s" title="Event \'%s\' bearbeiten">%s [%s]</a></td><td><a href="%s" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>',
+                            $strCSSRowClass,
+                            CalendarEventsHelper::getEventStateOfSubscriptionBadgesString($objEvent),
+                            $link, $objEvent->title,
+                            $objEvent->title,
+                            Date::parse(Config::get('dateFormat'), $objEvent->startDate),
+                            $linkMemberList,
+                            $objEvent->title
+                        );
                     }
                     $strBuffer .= '</tbody>';
                     $strBuffer .= '</table>';
