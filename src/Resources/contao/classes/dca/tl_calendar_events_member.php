@@ -640,11 +640,11 @@ class tl_calendar_events_member extends Backend
                 if ($objEvent->eventType === 'tour' || $objEvent->eventType === 'lastMinuteTour')
                 {
 
-                    $url = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&call=writeTourReport&rt=%s&ref=%s', $eventId, REQUEST_TOKEN, $refererId);
+                    $url = sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&call=writeTourReport&rt=%s&ref=%s', $eventId, REQUEST_TOKEN, $refererId);
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'] = $url;
                     $blnAllowTourReportButton = true;
 
-                    $url = sprintf('contao/main.php?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
+                    $url = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'] = $url;
                     $blnAllowInstructorInvoiceButton = true;
                 }
@@ -748,7 +748,7 @@ class tl_calendar_events_member extends Backend
         if (Input::get('call') == '' || !is_array($arrActions[Input::get('call')]) || empty($arrActions[Input::get('call')]))
         {
             $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten.';
-            $this->redirect('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=' . Input::get('id') . '&act=edit&rt=' . Input::get('rt'));
+            $this->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=' . Input::get('id') . '&act=edit&rt=' . Input::get('rt'));
         }
 
         // Set action array
@@ -805,7 +805,7 @@ class tl_calendar_events_member extends Backend
                         }
                     }
                 }
-                $this->redirect('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=' . Input::get('id') . '&act=edit&rt=' . Input::get('rt'));
+                $this->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=' . Input::get('id') . '&act=edit&rt=' . Input::get('rt'));
 
             }
             else
@@ -904,7 +904,7 @@ class tl_calendar_events_member extends Backend
     public function buttonCbBackToEventSettings($href, $label, $title, $class, $attributes, $table)
     {
         $label = 'Zum Event';
-        $href = ampersand('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s');
+        $href = ampersand('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s');
         $eventId = Input::get('id');
         $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
         $href = sprintf($href, $eventId, REQUEST_TOKEN, $refererId);

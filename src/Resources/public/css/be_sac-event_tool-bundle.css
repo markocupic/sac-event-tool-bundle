@@ -143,6 +143,9 @@ div.tl_header_tour_rapport table td {
     background-color: #cccccc;
     animation: blinker 2s step-start infinite;
 }
+.col_stateOfSubscription img[alt="subscription-not-confirmed"]{
+    animation: blinker 2s step-start infinite;
+}
 
 @keyframes blinker {
     50% {
