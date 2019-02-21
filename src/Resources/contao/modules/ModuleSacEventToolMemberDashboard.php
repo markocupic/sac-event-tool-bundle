@@ -884,7 +884,7 @@ class ModuleSacEventToolMemberDashboard extends Module
             'eval'      => array('mandatory' => true),
         ));
         $objForm->addFormField('foodHabits', array(
-            'label'     => 'Essgewohngeiten (Vegetarier, Laktoseintoleranz, etc.)',
+            'label'     => 'Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)',
             'inputType' => 'text',
             'eval'      => array('mandatory' => false),
         ));

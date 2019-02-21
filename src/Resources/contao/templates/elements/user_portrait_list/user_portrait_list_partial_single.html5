@@ -21,7 +21,7 @@
           <?php if ($this->email != ''): ?>{{email_open::<?= $this->email ?>}}<?= $this->email ?></a>{{br}}<?php endif; ?>
         <?php else: ?>
           <?php if ($this->street != '' && in_array('street', $this->showFieldsToGuests)): ?><?= $this->street ?>{{br}}<?php endif; ?>
-          <?php if ($this->postal != '' && in_array('postal', $this->showFieldsToGuests)): ?><?= $this->postal ?>{{br}}<?php endif; ?>
+          <?php if ($this->postal != '' && in_array('postal', $this->showFieldsToGuests)): ?><?= $this->postal ?>&nbsp;<?php endif; ?>
           <?php if ($this->city != '' && in_array('city', $this->showFieldsToGuests)): ?><?= $this->city ?>{{br}}<?php endif; ?>
           <?php if ($this->phone != '' && in_array('phone', $this->showFieldsToGuests)): ?><?= $this->phone ?>{{br}}<?php endif; ?>
           <?php if ($this->mobile != '' && in_array('mobile', $this->showFieldsToGuests)): ?><?= $this->mobile ?>{{br}}<?php endif; ?>
