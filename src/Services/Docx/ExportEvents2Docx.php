@@ -186,22 +186,8 @@ class ExportEvents2Docx
         $objWriter->save($rootDir . '/' . Config::get('SAC_EVT_TEMP_PATH') . '/sac-jahresprogramm.docx');
         sleep(1);
 
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
         $fileSRC = Config::get('SAC_EVT_TEMP_PATH') . '/sac-jahresprogramm.docx';
-
-        header("Pragma: public"); // required
-        header("Expires: 0");
-        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-        header("Cache-Control: private", false); // required for certain browsers
-        header("Content-Type: application/msword");
-        header("Content-Disposition: attachment; filename=\"" . basename($fileSRC) . "\";");
-        header("Content-Transfer-Encoding: binary");
-        header("Content-Length: " . filesize($rootDir . '/' . $fileSRC));
-        ob_clean();
-        flush();
-        readfile($rootDir . '/' . $fileSRC);
-        exit();
-
+        Controller::sendFileToBrowser($fileSRC, false);
     }
 
     /**

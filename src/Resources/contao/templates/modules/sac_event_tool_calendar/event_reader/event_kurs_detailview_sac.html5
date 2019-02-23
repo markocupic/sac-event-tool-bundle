@@ -68,7 +68,7 @@
                 </div>
 
                 <div class="mt-3">
-                    <a href="?printSACWorkshops=true&amp;eventId=<?= $this->id ?>" title="Details drucken" class="btn btn-block btn-outline-primary"><i class="fal fa-print"></i> Detailinfos drucken</a>
+                    <a href="/download?printSACWorkshops=true&amp;eventId=<?= $this->id ?>" title="Details drucken" class="btn btn-block btn-outline-primary"><i class="fal fa-print"></i> Detailinfos drucken</a>
                 </div>
 
                 <?php if(!$this->disableOnlineRegistration): ?>

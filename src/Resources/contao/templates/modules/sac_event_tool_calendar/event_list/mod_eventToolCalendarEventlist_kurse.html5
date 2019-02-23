@@ -39,14 +39,14 @@ if (\Environment::get('isAjaxRequest') && \Input::get('xhrAction') === 'switchLa
     </li>
 
     <li>
-      <a href="{{env::url}}/?action=downloadKursbroschuere&year=current&cat=0">
+      <a href="/download?action=downloadWorkshopBooklet&year=current&cat=0">
         <button class="text-right btn btn-success" title="Kursprogramm als pdf Brosch&uuml;re herunterladen">
           <i class="fa fa-fw fa-file-pdf"></i>
         </button>
       </a>
     </li>
     <li>
-      <a href="{{env::url}}/?action=exportEvents2Docx&calendarId=6&year={{date::Y}}">
+      <a href="/download?action=exportEvents2Docx&calendarId=6&year={{date::Y}}">
         <button class="text-right btn btn-primary" title="Kursprogramm herunterladen im docx Format herunterladen">
           <i class="fa fa-fw fa-file-word"></i>
         </button>
