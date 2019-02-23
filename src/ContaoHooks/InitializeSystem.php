@@ -158,66 +158,6 @@ class InitializeSystem
         }
 
 
-
-
-
-
-        // Für Downloads z.B. Downloadlink auf www.sac-pilatus.ch/kurse
-        if (Input::get('action') == 'downloadKursbroschuere' && Input::get('year') != '')
-        {
-            /**
-             * @todo Remove this hack if we go on production (the link on sac-pilatus.ch/kurse ist static and set to year=2017)
-             */
-            $year = Input::get('year') == '2017' ? '2018' : Input::get('year');
-
-            if (Input::get('year') === 'current')
-            {
-                $year = Date::parse('Y', time());
-            }
-
-
-            // Log download
-            $container = System::getContainer();
-            $logger = $container->get('monolog.logger.contao');
-            $logger->log(LogLevel::INFO, 'The course booklet has been downloaded.', array('contao' => new ContaoContext(__FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'))));
-
-            $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'));
-            $fileSRC = sprintf($filenamePattern, $year);
-            //die($fileSRC);
-            //Controller::sendFileToBrowser($fileSRC, true);
-            //Controller::sendFileToBrowser($fileSRC);
-            $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-
-            $filepath = $rootDir;
-            $filename = $fileSRC;
-            header('Content-disposition: attachment; filename='.$filename);
-            header('Content-type: application/octet-stream' );
-            header('Content-Length: '. filesize($filepath.'/' . $filename));
-            readfile($filepath.'/' . $filename);
-            exit;
-        }
-
-        // Generate a selected course description
-        if (Input::get('printSACWorkshops') === 'true' && Input::get('eventId'))
-        {
-            $objPrint = new PrintWorkshopsAsPdf(0, 0, Input::get('eventId'), true);
-            $objPrint->printWorkshopsAsPdf();
-            exit();
-        }
-
-
-        // Download Events as docx file
-        // ?action=exportEvents2Docx&calendarId=6&year=2017
-        // ?action=exportEvents2Docx&calendarId=6&year=2017&eventId=89
-        if (Input::get('action') === 'exportEvents2Docx' && Input::get('year') && Input::get('calendarId'))
-        {
-            ExportEvents2Docx::sendToBrowser(Input::get('calendarId'), Input::get('year'), Input::get('eventId'));
-        }
-
-
-        
-        
-
         /** @todo Delete orphaned entries
          * $oDb = Database::getInstance()->execute('SELECT * FROM tl_calendar_events_member');
          * while($oDb->next())
@@ -281,8 +221,6 @@ class InitializeSystem
                 'email_text'           => '##email_text##'
             );
             $oInsertStmt3 = Database::getInstance()->prepare('INSERT into tl_nc_language %s')->set($set)->execute();
-
-
         }
     }
 
