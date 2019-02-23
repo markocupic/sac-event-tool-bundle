@@ -18,7 +18,8 @@
     "menatwork/contao-multicolumnwizard": "^3.3",
     "codefog/contao-haste": "^4.21",
     "eluceo/ical": "^0.15",
-    "league/csv": "^9.1"
+    "league/csv": "^9.1",
+    "tecnickcom/tcpdf": "^6.2.26"
   },
   "require-dev": {
     "contao/test-case": ">=1.1"

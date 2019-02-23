@@ -12,7 +12,7 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\BackendUser;
 use Contao\Config;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\Email;
 use Contao\Input;

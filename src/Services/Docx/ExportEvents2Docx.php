@@ -93,8 +93,8 @@ class ExportEvents2Docx
 
         $tableStyle = array(
             'borderColor' => '000000',
-            'borderSize' => 6,
-            'cellMargin' => 50,
+            'borderSize'  => 6,
+            'cellMargin'  => 50,
         );
         $twip = 56.6928; // 1mm = 56.6928 twip
         $widthCol_1 = round(45 * $twip);
@@ -146,21 +146,21 @@ class ExportEvents2Docx
             $table = $section->addTable('Event-Item');
 
             $arrFields = array(
-                "Datum" => 'eventDates',
-                "Autor (-en)" => 'author',
-                "Kursart" => 'kursart',
-                "Kursstufe" => 'courseLevel',
+                "Datum"                 => 'eventDates',
+                "Autor (-en)"           => 'author',
+                "Kursart"               => 'kursart',
+                "Kursstufe"             => 'courseLevel',
                 "Organisierende Gruppe" => 'organizers',
-                "Einführungstext" => 'teaser',
-                "Kursziele" => 'terms',
-                "Kursinhalte" => 'issues',
-                "Voraussetzungen" => 'requirements',
-                "Bergf./Tourenl." => 'mountainguide',
-                "Leiter" => 'instructor',
-                "Preis/Leistungen" => 'leistungen',
-                "Anmeldung" => 'bookingEvent',
-                "Material" => 'equipment',
-                "Weiteres" => 'miscellaneous',
+                "Einführungstext"       => 'teaser',
+                "Kursziele"             => 'terms',
+                "Kursinhalte"           => 'issues',
+                "Voraussetzungen"       => 'requirements',
+                "Bergf./Tourenl."       => 'mountainguide',
+                "Leiter"                => 'instructor',
+                "Preis/Leistungen"      => 'leistungen',
+                "Anmeldung"             => 'bookingEvent',
+                "Material"              => 'equipment',
+                "Weiteres"              => 'miscellaneous',
             );
 
             foreach ($arrFields as $label => $fieldname)
@@ -185,8 +185,21 @@ class ExportEvents2Docx
         new Folder(Config::get('SAC_EVT_TEMP_PATH'));
         $objWriter->save($rootDir . '/' . Config::get('SAC_EVT_TEMP_PATH') . '/sac-jahresprogramm.docx');
         sleep(1);
-        Controller::sendFileToBrowser(Config::get('SAC_EVT_TEMP_PATH') . '/sac-jahresprogramm.docx');
 
+        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+        $fileSRC = Config::get('SAC_EVT_TEMP_PATH') . '/sac-jahresprogramm.docx';
+
+        header("Pragma: public"); // required
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: private", false); // required for certain browsers
+        header("Content-Type: application/msword");
+        header("Content-Disposition: attachment; filename=\"" . basename($fileSRC) . "\";");
+        header("Content-Transfer-Encoding: binary");
+        header("Content-Length: " . filesize($rootDir . '/' . $fileSRC));
+        ob_clean();
+        flush();
+        readfile($rootDir . '/' . $fileSRC);
         exit();
 
     }

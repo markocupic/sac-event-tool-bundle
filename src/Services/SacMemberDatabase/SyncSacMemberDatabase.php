@@ -15,7 +15,7 @@ namespace Markocupic\SacEventToolBundle\Services\SacMemberDatabase;
 
 
 use Contao\Config;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\File;
 use Contao\Input;
@@ -85,11 +85,11 @@ class SyncSacMemberDatabase
 
     /**
      * SyncSacMemberDatabase constructor.
-     * @param ContaoFrameworkInterface $framework
+     * @param ContaoFramework $framework
      * @param Connection $connection
      * @param $root_dir
      */
-    public function __construct(ContaoFrameworkInterface $framework, Connection $connection, $root_dir)
+    public function __construct(ContaoFramework $framework, Connection $connection, $root_dir)
     {
         $this->testMode = false;
         $this->framework = $framework;

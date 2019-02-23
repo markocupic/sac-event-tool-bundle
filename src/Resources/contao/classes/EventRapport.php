@@ -344,7 +344,7 @@ class EventRapport
                         array('key' => 'mobile', 'value' => htmlspecialchars(html_entity_decode($mobile)), 'options' => array('multiline' => false)),
                         array('key' => 'email', 'value' => htmlspecialchars(html_entity_decode($objUserModel->email)), 'options' => array('multiline' => false)),
                         array('key' => 'transportInfo', 'value' => htmlspecialchars(html_entity_decode($transportInfo)), 'options' => array('multiline' => false)),
-                        array('key' => 'dateOfBirth', 'value' => $objUserModel->dateOfBirth != '' ? Date::parse('d.m.Y', $objUserModel->dateOfBirth) : '', 'options' => array('multiline' => false)),
+                        array('key' => 'dateOfBirth', 'value' => $objUserModel->dateOfBirth != '' ? Date::parse('Y', $objUserModel->dateOfBirth) : '', 'options' => array('multiline' => false)),
                     );
                 }
             }
@@ -372,7 +372,10 @@ class EventRapport
             $transportInfo = '';
             if (strlen($objEventMember->carInfo))
             {
-                $transportInfo .= sprintf(' Auto mit %s Plätzen', $objEventMember->carInfo);
+                if ((integer)$objEventMember->carInfo > 0)
+                {
+                    $transportInfo .= sprintf(' Auto mit %s Plätzen', $objEventMember->carInfo);
+                }
             }
 
             // GA, Halbtax, Tageskarte
@@ -398,7 +401,7 @@ class EventRapport
                 array('key' => 'emergencyPhoneName', 'value' => htmlspecialchars(html_entity_decode($objEventMember->emergencyPhoneName)), 'options' => array('multiline' => false)),
                 array('key' => 'email', 'value' => htmlspecialchars(html_entity_decode($objEventMember->email)), 'options' => array('multiline' => false)),
                 array('key' => 'transportInfo', 'value' => htmlspecialchars(html_entity_decode($transportInfo)), 'options' => array('multiline' => false)),
-                array('key' => 'dateOfBirth', 'value' => $objEventMember->dateOfBirth != '' ? Date::parse('d.m.Y', $objEventMember->dateOfBirth) : '', 'options' => array('multiline' => false)),
+                array('key' => 'dateOfBirth', 'value' => $objEventMember->dateOfBirth != '' ? Date::parse('Y', $objEventMember->dateOfBirth) : '', 'options' => array('multiline' => false)),
             );
         }
 

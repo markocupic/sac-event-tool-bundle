@@ -12,7 +12,7 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\CalendarEventsStoryModel;
 use Contao\Config;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
 use Contao\File;
 use Contao\FilesModel;
@@ -29,7 +29,7 @@ use Contao\Widget;
 class ValidateForms
 {
     /**
-     * @var ContaoFrameworkInterface
+     * @var ContaoFramework
      */
     private $framework;
 
@@ -75,9 +75,9 @@ class ValidateForms
 
     /**
      * ValidateForms constructor.
-     * @param ContaoFrameworkInterface $framework
+     * @param ContaoFramework $framework
      */
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
 

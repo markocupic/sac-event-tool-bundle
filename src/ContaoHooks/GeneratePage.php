@@ -13,7 +13,7 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 use Contao\Automator;
 use Contao\Config;
 use Contao\Controller;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Contao\Date;
@@ -31,7 +31,7 @@ use Psr\Log\LogLevel;
 class GeneratePage
 {
     /**
-     * @var ContaoFrameworkInterface
+     * @var ContaoFramework
      */
     private $framework;
 
@@ -39,9 +39,9 @@ class GeneratePage
     /**
      * Constructor.
      *
-     * @param ContaoFrameworkInterface $framework
+     * @param ContaoFramework $framework
      */
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
     }
@@ -52,6 +52,7 @@ class GeneratePage
      */
     public function generatePage()
     {
+
         $disabled = true;
         if (!$disabled && Input::get('action') === 'importNewsletterRecipients')
         {
@@ -72,25 +73,25 @@ class GeneratePage
                     $objMember->newsletter = serialize([$newsletterChannelId]);
                     $objMember->save();
                     $sets[strtolower($objMember->email)] = array(
-                        'pid' => $newsletterChannelId,
-                        'tstamp' => $time,
-                        'email' => $objMember->email,
-                        'active' => '1',
+                        'pid'     => $newsletterChannelId,
+                        'tstamp'  => $time,
+                        'email'   => $objMember->email,
+                        'active'  => '1',
                         'addedOn' => $addedOn,
-                        'token' => $token
-                        );
+                        'token'   => $token
+                    );
                 }
                 else
                 {
-                    if($objDb->email != '')
+                    if ($objDb->email != '')
                     {
                         $sets[strtolower($objDb->email)] = array(
-                            'pid' => $newsletterChannelId,
-                            'tstamp' => $time,
-                            'email' => $objDb->email,
-                            'active' => '1',
+                            'pid'     => $newsletterChannelId,
+                            'tstamp'  => $time,
+                            'email'   => $objDb->email,
+                            'active'  => '1',
                             'addedOn' => $addedOn,
-                            'token' => $token
+                            'token'   => $token
                         );
 
                     }
@@ -101,7 +102,7 @@ class GeneratePage
             Database::getInstance()->beginTransaction();
             try
             {
-                foreach($sets as $set)
+                foreach ($sets as $set)
                 {
                     Database::getInstance()->prepare('INSERT INTO tl_newsletter_recipients %s')->set($set)->execute();
                 }
@@ -114,47 +115,6 @@ class GeneratePage
                 throw $e;
             }
         }
-
-        // Für Downloads z.B. Downloadlink auf www.sac-pilatus.ch/kurse
-        if (Input::get('action') === 'downloadKursbroschuere' && Input::get('year') != '')
-        {
-            /**
-             * @todo Remove this hack if we go on production (the link on sac-pilatus.ch/kurse ist static and set to year=2017)
-             */
-            $year = Input::get('year') == '2017' ? '2018' : Input::get('year');
-
-            if (Input::get('year') === 'current')
-            {
-                $year = Date::parse('Y', time());
-            }
-
-            // Log download
-            $container = System::getContainer();
-            $logger = $container->get('monolog.logger.contao');
-            $logger->log(LogLevel::INFO, 'The course booklet has been downloaded.', array('contao' => new ContaoContext(__FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'))));
-
-            $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'));
-            $fileSRC = sprintf($filenamePattern, $year);
-            Controller::sendFileToBrowser($fileSRC);
-        }
-
-        // Generate a selected course description
-        if (Input::get('printSACWorkshops') === 'true' && Input::get('eventId'))
-        {
-            $objPrint = new PrintWorkshopsAsPdf(0, 0, Input::get('eventId'), true);
-            $objPrint->printWorkshopsAsPdf();
-            exit();
-        }
-
-
-        // Download Events as docx file
-        // ?action=exportEvents2Docx&calendarId=6&year=2017
-        // ?action=exportEvents2Docx&calendarId=6&year=2017&eventId=89
-        if (Input::get('action') === 'exportEvents2Docx' && Input::get('year') && Input::get('calendarId'))
-        {
-            ExportEvents2Docx::sendToBrowser(Input::get('calendarId'), Input::get('year'), Input::get('eventId'));
-        }
-
     }
 
 }

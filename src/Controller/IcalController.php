@@ -13,11 +13,11 @@ namespace Markocupic\SacEventToolBundle\Controller;
 use Contao\CalendarEventsModel;
 use Contao\Input;
 use Markocupic\SacEventToolBundle\Services\Ical\SendEventIcal;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
 
 
-class IcalController extends Controller
+class IcalController extends AbstractController
 {
     /**
      * Handles ical requests.

@@ -9,7 +9,7 @@
 
 namespace Markocupic\SacEventToolBundle;
 
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Config;
 use Contao\Folder;
 use Contao\Dbafs;
@@ -25,9 +25,9 @@ class PreparePluginEnvironment
 
     /**
      * PreparePluginEnvironment constructor.
-     * @param ContaoFrameworkInterface $framework
+     * @param ContaoFramework $framework
      */
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
         $this->framework->initialize();

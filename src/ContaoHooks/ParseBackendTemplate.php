@@ -15,7 +15,7 @@ use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\EventReleaseLevelPolicyModel;
 use Contao\Input;
 use Contao\StringUtil;
@@ -28,9 +28,9 @@ class ParseBackendTemplate
     /**
      * Constructor.
      *
-     * @param ContaoFrameworkInterface $framework
+     * @param ContaoFramework $framework
      */
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
     }

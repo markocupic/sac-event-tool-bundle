@@ -16,7 +16,6 @@ use Contao\CalendarEventsMemberModel;
 use Contao\Config;
 use Contao\Database;
 use Contao\Date;
-use Contao\RequestToken;
 use Contao\System;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 

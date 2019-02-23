@@ -10,7 +10,7 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\Input;
 use Contao\Module;
@@ -22,7 +22,7 @@ use Contao\Module;
 class GetAllEvents
 {
     /**
-     * @var ContaoFrameworkInterface
+     * @var ContaoFramework
      */
     private $framework;
 
@@ -30,9 +30,9 @@ class GetAllEvents
     /**
      * Constructor.
      *
-     * @param ContaoFrameworkInterface $framework
+     * @param ContaoFramework $framework
      */
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
     }

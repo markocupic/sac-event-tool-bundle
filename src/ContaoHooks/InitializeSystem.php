@@ -12,8 +12,11 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\Automator;
 use Contao\CalendarEventsModel;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\Controller;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
+use Contao\Date;
 use Contao\Dbafs;
 use Contao\Config;
 use Contao\File;
@@ -21,10 +24,16 @@ use Contao\Files;
 use Contao\FilesModel;
 use Contao\Input;
 use Contao\System;
+use Markocupic\SacEventToolBundle\Services\Docx\ExportEvents2Docx;
+use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
 use NotificationCenter\Model\Language;
 use NotificationCenter\Model\Message;
 use NotificationCenter\Model\Notification;
+use Psr\Log\LogLevel;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 
 /**
@@ -34,7 +43,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class InitializeSystem
 {
     /**
-     * @var ContaoFrameworkInterface
+     * @var ContaoFramework
      */
     private $framework;
 
@@ -42,9 +51,9 @@ class InitializeSystem
     /**
      * Constructor
      *
-     * @param ContaoFrameworkInterface $framework
+     * @param ContaoFramework $framework
      */
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
     }
@@ -147,6 +156,67 @@ class InitializeSystem
                 touch($rootDir . '/files/theme-sac-pilatus/scss/main.scss');
             }
         }
+
+
+
+
+
+
+        // Für Downloads z.B. Downloadlink auf www.sac-pilatus.ch/kurse
+        if (Input::get('action') == 'downloadKursbroschuere' && Input::get('year') != '')
+        {
+            /**
+             * @todo Remove this hack if we go on production (the link on sac-pilatus.ch/kurse ist static and set to year=2017)
+             */
+            $year = Input::get('year') == '2017' ? '2018' : Input::get('year');
+
+            if (Input::get('year') === 'current')
+            {
+                $year = Date::parse('Y', time());
+            }
+
+
+            // Log download
+            $container = System::getContainer();
+            $logger = $container->get('monolog.logger.contao');
+            $logger->log(LogLevel::INFO, 'The course booklet has been downloaded.', array('contao' => new ContaoContext(__FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'))));
+
+            $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'));
+            $fileSRC = sprintf($filenamePattern, $year);
+            //die($fileSRC);
+            //Controller::sendFileToBrowser($fileSRC, true);
+            //Controller::sendFileToBrowser($fileSRC);
+            $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+
+            $filepath = $rootDir;
+            $filename = $fileSRC;
+            header('Content-disposition: attachment; filename='.$filename);
+            header('Content-type: application/octet-stream' );
+            header('Content-Length: '. filesize($filepath.'/' . $filename));
+            readfile($filepath.'/' . $filename);
+            exit;
+        }
+
+        // Generate a selected course description
+        if (Input::get('printSACWorkshops') === 'true' && Input::get('eventId'))
+        {
+            $objPrint = new PrintWorkshopsAsPdf(0, 0, Input::get('eventId'), true);
+            $objPrint->printWorkshopsAsPdf();
+            exit();
+        }
+
+
+        // Download Events as docx file
+        // ?action=exportEvents2Docx&calendarId=6&year=2017
+        // ?action=exportEvents2Docx&calendarId=6&year=2017&eventId=89
+        if (Input::get('action') === 'exportEvents2Docx' && Input::get('year') && Input::get('calendarId'))
+        {
+            ExportEvents2Docx::sendToBrowser(Input::get('calendarId'), Input::get('year'), Input::get('eventId'));
+        }
+
+
+        
+        
 
         /** @todo Delete orphaned entries
          * $oDb = Database::getInstance()->execute('SELECT * FROM tl_calendar_events_member');

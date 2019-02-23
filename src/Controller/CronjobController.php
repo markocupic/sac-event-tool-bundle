@@ -15,15 +15,15 @@ use Contao\Config;
 use Markocupic\SacEventToolBundle\Services\Newsletter\SendNewsletter;
 use Markocupic\SacEventToolBundle\Services\Newsletter\SendPasswordToMembers;
 use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
 
 
 /**
  * Class CronjobController
  * @package Markocupic\SacEventToolBundle\Controller
  */
-class CronjobController extends Controller
+class CronjobController extends AbstractController
 {
     /**
      * Handles cronjob requests.

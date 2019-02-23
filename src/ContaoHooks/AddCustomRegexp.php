@@ -10,7 +10,7 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\MemberModel;
 use Contao\UserModel;
@@ -24,7 +24,7 @@ use Contao\Widget;
 class AddCustomRegexp
 {
     /**
-     * @var ContaoFrameworkInterface
+     * @var ContaoFramework
      */
     private $framework;
 
@@ -32,9 +32,9 @@ class AddCustomRegexp
     /**
      * Constructor.
      *
-     * @param ContaoFrameworkInterface $framework
+     * @param ContaoFramework $framework
      */
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
     }
