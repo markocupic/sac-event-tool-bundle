@@ -2,10 +2,10 @@
 
 /**
  * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2017 Marko Cupic
+ * Copyright (c) 2008-2019 Marko Cupic
  * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2018
- * @link https://sac-kurse.kletterkader.com
+ * @author Marko Cupic m.cupic@gmx.ch, 2017-2019
+ * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
 namespace Markocupic\SacEventToolBundle\Controller;
@@ -29,16 +29,17 @@ class DownloadController extends AbstractController
 
 
     /**
-     * Handles ajax requests.
-     * @return JsonResponse
-     * @Route("/download", name="sac_event_tool_download_frontend", defaults={"_scope" = "frontend", "_token_check" = false})
+     * Download workshops as pdf booklet
+     * /_download/print_workshop_booklet_as_pdf?year=2019&cat=0
+     * /_download/print_workshop_booklet_as_pdf?year=current&cat=0
+     * @Route("/_download/print_workshop_booklet_as_pdf", name="sac_event_tool_download_print_workshop_booklet_as_pdf", defaults={"_scope" = "frontend", "_token_check" = false})
      */
-    public function downloadAction()
+    public function printWorkshopBookletAsPdfAction()
     {
         $this->container->get('contao.framework')->initialize();
 
         // Für Downloads workshops as pdf booklet
-        if (Input::get('action') == 'downloadWorkshopBooklet' && Input::get('year') != '')
+        if (Input::get('year') != '')
         {
 
             $year = Input::get('year');
@@ -58,26 +59,49 @@ class DownloadController extends AbstractController
 
             Controller::sendFileToBrowser($fileSRC, false);
         }
+        exit();
+    }
 
+    /**
+     * Download events as docx file
+     * /_download/print_workshop_details_as_docx?calendarId=6&year=2017
+     * /_download/print_workshop_details_as_docx?calendarId=6&year=2017&eventId=89
+     * @Route("/_download/print_workshop_details_as_docx", name="sac_event_tool_download_print_workshop_details_as_docx", defaults={"_scope" = "frontend", "_token_check" = false})
+     */
+    public function printWorkshopDetailsAsDocxAction()
+    {
+        $this->container->get('contao.framework')->initialize();
 
-        // Download Events as docx file
-        // ?action=exportEvents2Docx&calendarId=6&year=2017
-        // ?action=exportEvents2Docx&calendarId=6&year=2017&eventId=89
-        if (Input::get('action') === 'exportEvents2Docx' && Input::get('year') && Input::get('calendarId'))
+        if (Input::get('year') && Input::get('calendarId'))
         {
             ExportEvents2Docx::sendToBrowser(Input::get('calendarId'), Input::get('year'), Input::get('eventId'));
         }
+        exit();
+    }
 
+    /**
+     * Download workshop details as pdf
+     * /_download/print_workshop_details_as_pdf?eventId=643
+     * @Route("/_download/print_workshop_details_as_pdf", name="sac_event_tool_download_print_workshop_details_as_pdf", defaults={"_scope" = "frontend", "_token_check" = false})
+     */
+    public function printWorkshopDetailsAsPdfAction()
+    {
+        $this->container->get('contao.framework')->initialize();
 
-        // Generate a selected course description
-        if (Input::get('printSACWorkshops') === 'true' && Input::get('eventId'))
-        {
-            $objPrint = new PrintWorkshopsAsPdf(0, 0, Input::get('eventId'), true);
-            $objPrint->printWorkshopsAsPdf();
-            exit();
-        }
+        $objPrint = new PrintWorkshopsAsPdf(0, 0, Input::get('eventId'), true);
+        $objPrint->printWorkshopsAsPdf();
+        exit();
+    }
 
-
+    /**
+     * The defaultAction has to be at the bottom of the class
+     * Handles download requests.
+     * @Route("/_download/{slug}", name="sac_event_tool_download", defaults={"_scope" = "frontend", "_token_check" = false})
+     */
+    public function defaultAction($slug = '')
+    {
+        $this->container->get('contao.framework')->initialize();
+        echo sprintf('Welcome to %s::%s. You have called the Service with this route: _download/%s', __CLASS__, __FUNCTION__, $slug);
         exit();
     }
 }

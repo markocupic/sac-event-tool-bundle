@@ -1,21 +1,3 @@
-sac_event_tool_ajax_frontend:
-  resource: "@MarkocupicSacEventToolBundle/Controller"
-  type: annotation
-  defaults:
-    _scope: frontend
-    _token_check: true
-
-sac_event_tool_download_frontend:
-  resource: "@MarkocupicSacEventToolBundle/Controller"
-  type: annotation
-  defaults:
-    _scope: frontend
-
-sac_event_tool_ical_frontend:
-  resource: "@MarkocupicSacEventToolBundle/Controller"
-  type: annotation
-
-
-sac_event_tool_cronjob:
+sac_event_tool:
   resource: "@MarkocupicSacEventToolBundle/Controller"
   type: annotation

@@ -2,10 +2,10 @@
 
 /**
  * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2017 Marko Cupic
+ * Copyright (c) 2008-2019 Marko Cupic
  * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2018
- * @link https://sac-kurse.kletterkader.com
+ * @author Marko Cupic m.cupic@gmx.ch, 2017-2019
+ * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
 use League\Csv\CharsetConverter;

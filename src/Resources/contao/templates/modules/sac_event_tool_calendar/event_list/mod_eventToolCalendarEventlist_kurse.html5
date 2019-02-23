@@ -37,16 +37,15 @@ if (\Environment::get('isAjaxRequest') && \Input::get('xhrAction') === 'switchLa
           <?php endif; ?>
       </button>
     </li>
-
     <li>
-      <a href="/download?action=downloadWorkshopBooklet&year=current&cat=0">
+      <a href="/_download/print_workshop_booklet_as_pdf?year=current&cat=0">
         <button class="text-right btn btn-success" title="Kursprogramm als pdf Brosch&uuml;re herunterladen">
           <i class="fa fa-fw fa-file-pdf"></i>
         </button>
       </a>
     </li>
     <li>
-      <a href="/download?action=exportEvents2Docx&calendarId=6&year={{date::Y}}">
+      <a href="/_download/print_workshop_details_as_docx?calendarId=6&year={{date::Y}}">
         <button class="text-right btn btn-primary" title="Kursprogramm herunterladen im docx Format herunterladen">
           <i class="fa fa-fw fa-file-word"></i>
         </button>
