@@ -11,29 +11,9 @@
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\Automator;
-use Contao\CalendarEventsModel;
-use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\Database;
-use Contao\Date;
-use Contao\Dbafs;
-use Contao\Config;
-use Contao\File;
-use Contao\Files;
-use Contao\FilesModel;
-use Contao\Input;
 use Contao\System;
-use Markocupic\SacEventToolBundle\Services\Docx\ExportEvents2Docx;
-use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
-use NotificationCenter\Model\Language;
-use NotificationCenter\Model\Message;
-use NotificationCenter\Model\Notification;
-use Psr\Log\LogLevel;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+
 
 
 /**

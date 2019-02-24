@@ -27,7 +27,6 @@ use Contao\System;
 class ClearPersonalMemberData
 {
 
-
     /**
      *
      */

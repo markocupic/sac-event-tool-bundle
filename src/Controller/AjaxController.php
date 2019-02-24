@@ -14,9 +14,12 @@ use Contao\Environment;
 use Contao\Input;
 use Markocupic\SacEventToolBundle\FrontendAjax\FrontendAjax;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class AjaxController
+ * @package Markocupic\SacEventToolBundle\Controller
+ */
 class AjaxController extends AbstractController
 {
 

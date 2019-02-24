@@ -22,6 +22,10 @@ use Contao\StringUtil;
 use Contao\System;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
+/**
+ * Class ParseBackendTemplate
+ * @package Markocupic\SacEventToolBundle\ContaoHooks
+ */
 class ParseBackendTemplate
 {
 

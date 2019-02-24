@@ -27,7 +27,6 @@ use Contao\StringUtil;
 class PublishEvent
 {
 
-
     /**
      * Beta state
      * @param $objEvent

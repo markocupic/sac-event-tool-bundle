@@ -18,6 +18,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
+/**
+ * Class PreparePluginEnvironment
+ * @package Markocupic\SacEventToolBundle
+ */
 class PreparePluginEnvironment
 {
     private $framework;

@@ -16,11 +16,10 @@ namespace Markocupic\SacEventToolBundle\Services\SacMemberDatabase;
 
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Date;
 use Contao\File;
-use Contao\Input;
 use Contao\System;
 use Doctrine\DBAL\Connection;
+
 
 /**
  * Class SyncSacMemberDatabase

@@ -9,13 +9,11 @@
 
 namespace Markocupic\SacEventToolBundle\Controller;
 
-use Contao\Input;
 use Contao\System;
 use Contao\Config;
 use Markocupic\SacEventToolBundle\Services\Newsletter\SendNewsletter;
 use Markocupic\SacEventToolBundle\Services\Newsletter\SendPasswordToMembers;
 use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
-use Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

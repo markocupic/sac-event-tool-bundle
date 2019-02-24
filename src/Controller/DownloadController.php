@@ -15,7 +15,6 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Date;
-use Contao\Environment;
 use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Services\Docx\ExportEvents2Docx;
@@ -23,10 +22,12 @@ use Markocupic\SacEventToolBundle\Services\Ical\SendEventIcal;
 use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class DownloadController
+ * @package Markocupic\SacEventToolBundle\Controller
+ */
 class DownloadController extends AbstractController
 {
 

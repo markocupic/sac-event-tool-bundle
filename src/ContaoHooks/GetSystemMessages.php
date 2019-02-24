@@ -12,12 +12,12 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 
 use Contao\BackendUser;
-use Contao\CalendarEventsMemberModel;
 use Contao\Config;
 use Contao\Database;
 use Contao\Date;
 use Contao\System;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+
 
 /**
  * Class GetSystemMessages

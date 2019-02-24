@@ -19,6 +19,10 @@ use Contao\UserModel;
 use NotificationCenter\Model\Notification;
 use Psr\Log\LogLevel;
 
+/**
+ * Class ReplaceDefaultPassword
+ * @package Markocupic\SacEventToolBundle
+ */
 class ReplaceDefaultPassword
 {
 

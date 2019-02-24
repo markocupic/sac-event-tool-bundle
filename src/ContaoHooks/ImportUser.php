@@ -14,6 +14,7 @@ use Contao\Input;
 use Contao\System;
 use Contao\UserModel;
 
+
 /**
  * Class ImportUser
  * @package Markocupic\SacEventToolBundle\ContaoHooks
