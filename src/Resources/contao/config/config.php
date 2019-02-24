@@ -264,7 +264,7 @@ $GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic_sac_event_tool.co
 /** Empty at the moment **/
 $GLOBALS['TL_HOOKS']['generatePage'][] = array('markocupic_sac_event_tool.contao_hooks.generate_page', 'generatePage');
 
-/*** Handle Ajax calls from the backend **/
+/** Handle Ajax calls from the backend **/
 $GLOBALS['TL_HOOKS']['executePreActions'][] = array('markocupic_sac_event_tool.contao_hooks.execute_pre_actions', 'executePreActions');
 
 /** Handle custom rgxp in the backend **/
