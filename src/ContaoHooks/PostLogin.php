@@ -28,26 +28,7 @@ use Contao\UserModel;
  */
 class PostLogin
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
-
-
-    /**
-     * Constructor.
-     *
-     * @param ContaoFramework $framework
-     */
-    /**
-     * public function __construct(ContaoFramework $framework)
-     * {
-     * $this->framework = $framework;
-     * $this->input = $this->framework->getAdapter(Input::class);
-     * }
-     **/
-
-
+   
     /**
      * @param User $user
      */

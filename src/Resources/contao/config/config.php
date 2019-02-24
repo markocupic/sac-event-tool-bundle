@@ -261,20 +261,12 @@ $GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] = array(array('Markocupic\SacEve
 /** Route prepare plugin environment **/
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic_sac_event_tool.contao_hooks.initialize_system', 'initializeSystem');
 
-/** Empty at the moment **/
-$GLOBALS['TL_HOOKS']['generatePage'][] = array('markocupic_sac_event_tool.contao_hooks.generate_page', 'generatePage');
-
 /** Handle Ajax calls from the backend **/
 $GLOBALS['TL_HOOKS']['executePreActions'][] = array('markocupic_sac_event_tool.contao_hooks.execute_pre_actions', 'executePreActions');
 
 /** Handle custom rgxp in the backend **/
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic_sac_event_tool.contao_hooks.add_custom_regexp', 'addCustomRegexp');
 
-/** Handle event listing **/
-$GLOBALS['TL_HOOKS']['getAllEvents'][] = array('markocupic_sac_event_tool.contao_hooks.get_all_events', 'getAllEvents');
-
-/** Allow event preview from the backend if the event token is passed to the url */
-$GLOBALS['TL_HOOKS']['getContentElement'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\GetContentElement', 'getContentElement');
 
 /** Prepare User accounts (create user directories, etc.
  * @deprecated PostLogin Hook will be be removed in Contao 5.0.
@@ -284,15 +276,8 @@ $GLOBALS['TL_HOOKS']['postLogin'][] = array('Markocupic\SacEventToolBundle\Conta
 /** Allow backend users to authenticate with their sacMemberId **/
 $GLOBALS['TL_HOOKS']['importUser'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ImportUser', 'allowBackendUserToAuthenticateWithSacMemberId');
 
-
 /** Form HOOKS (f.ex. Kursanmeldung) **/
 $GLOBALS['TL_HOOKS']['postUpload'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'postUpload');
-$GLOBALS['TL_HOOKS']['compileFormFields'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'compileFormFields');
-$GLOBALS['TL_HOOKS']['loadFormField'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'loadFormField');
-$GLOBALS['TL_HOOKS']['validateFormField'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'validateFormField');
-$GLOBALS['TL_HOOKS']['storeFormData'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'storeFormData');
-$GLOBALS['TL_HOOKS']['prepareFormData'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'prepareFormData');
-$GLOBALS['TL_HOOKS']['processFormData'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'processFormData');
 
 /** Parse backend template hook **/
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic_sac_event_tool.contao_hooks.parse_backend_template', 'parseBackendTemplate');

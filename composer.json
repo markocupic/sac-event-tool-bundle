@@ -15,6 +15,7 @@
     "cloudconvert/cloudconvert-php": ">=2.2.0.0,<2.3-dev",
     "phpoffice/phpword": "^0.16",
     "markocupic/export_table": "^3.0",
+    "markocupic/notification-center-default-email-bundle": "^1.0",
     "menatwork/contao-multicolumnwizard": "^3.3",
     "codefog/contao-haste": "^4.21",
     "eluceo/ical": "^0.15",

@@ -1,51 +1,33 @@
 services:
-    # Validate Forms
-    markocupic_sac_event_tool.contao_hooks.validate_forms:
-        public: true
-        class: Markocupic\SacEventToolBundle\ContaoHooks\ValidateForms
-        arguments:
-            - "@contao.framework"
 
-    # Initialize System Hook
-    markocupic_sac_event_tool.contao_hooks.initialize_system:
-        public: true
-        class: Markocupic\SacEventToolBundle\ContaoHooks\InitializeSystem
-        arguments:
-            - "@contao.framework"
-
-    # Generate Page Hook
-    markocupic_sac_event_tool.contao_hooks.generate_page:
-        public: true
-        class: Markocupic\SacEventToolBundle\ContaoHooks\GeneratePage
-        arguments:
-            - "@contao.framework"
-
-    # Parse Backend Template
-    markocupic_sac_event_tool.contao_hooks.parse_backend_template:
-        public: true
-        class: Markocupic\SacEventToolBundle\ContaoHooks\ParseBackendTemplate
-        arguments:
-            - "@contao.framework"
+  # Initialize System Hook
+  markocupic_sac_event_tool.contao_hooks.initialize_system:
+    public: true
+    class: Markocupic\SacEventToolBundle\ContaoHooks\InitializeSystem
+    arguments:
+    - "@contao.framework"
 
 
-    # Execute Pre Actions
-    markocupic_sac_event_tool.contao_hooks.execute_pre_actions:
-        public: true
-        class: Markocupic\SacEventToolBundle\ContaoHooks\ExecutePreActions
-        arguments:
-            - "@contao.framework"
+  # Parse Backend Template
+  markocupic_sac_event_tool.contao_hooks.parse_backend_template:
+    public: true
+    class: Markocupic\SacEventToolBundle\ContaoHooks\ParseBackendTemplate
+    arguments:
+    - "@contao.framework"
 
 
-    # Execute Pre Actions
-    markocupic_sac_event_tool.contao_hooks.add_custom_regexp:
-        public: true
-        class: Markocupic\SacEventToolBundle\ContaoHooks\AddCustomRegexp
-        arguments:
-            - "@contao.framework"
+  # Execute Pre Actions
+  markocupic_sac_event_tool.contao_hooks.execute_pre_actions:
+    public: true
+    class: Markocupic\SacEventToolBundle\ContaoHooks\ExecutePreActions
+    arguments:
+    - "@contao.framework"
 
-    # Get All Events
-    markocupic_sac_event_tool.contao_hooks.get_all_events:
-        public: true
-        class: Markocupic\SacEventToolBundle\ContaoHooks\GetAllEvents
-        arguments:
-            - "@contao.framework"
+
+  # Add custom regexp
+  markocupic_sac_event_tool.contao_hooks.add_custom_regexp:
+    public: true
+    class: Markocupic\SacEventToolBundle\ContaoHooks\AddCustomRegexp
+    arguments:
+    - "@contao.framework"
+
