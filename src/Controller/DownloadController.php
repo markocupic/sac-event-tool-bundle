@@ -10,6 +10,7 @@
 
 namespace Markocupic\SacEventToolBundle\Controller;
 
+use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -18,10 +19,12 @@ use Contao\Environment;
 use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Services\Docx\ExportEvents2Docx;
+use Markocupic\SacEventToolBundle\Services\Ical\SendEventIcal;
 use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DownloadController extends AbstractController
@@ -92,6 +95,31 @@ class DownloadController extends AbstractController
         $objPrint->printWorkshopsAsPdf();
         exit();
     }
+
+
+    /**
+     * Send ical to the browser
+     * @Route("/_download/download_event_ical", name="sac_event_tool_download_download_event_ical", defaults={"_scope" = "frontend", "_token_check" = false})
+     */
+    public function downloadEventIcalAction()
+    {
+        $this->container->get('contao.framework')->initialize();
+
+        // Course Filter
+        if (Input::get('eventId') > 0)
+        {
+            $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
+            {
+                if ($objEvent !== null)
+                {
+                    $controller = new SendEventIcal();
+                    $controller->sendIcsFile($objEvent);
+                }
+            }
+        }
+        exit();
+    }
+
 
     /**
      * The defaultAction has to be at the bottom of the class

@@ -58,92 +58,12 @@ class InitializeSystem
         $this->framework = $framework;
     }
 
-
     /**
-     * !!! Not in use, not in use.....
-     * @throws \Exception
-     */
-    protected function avatarUpload()
-    {
-        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_user')->execute('');
-        while ($objDb->next())
-        {
-            if ($objDb->avatarSRC == '')
-            {
-                /**
-                 * $targetSRC = sprintf('files/sac_pilatus/be_user_home_directories/%s/avatar/%s.jpg', $objDb->id, $objDb->username);
-                 * if(is_file(TL_ROOT . '/' . $targetSRC))
-                 * {
-                 * $objFile = FilesModel::findByPath($targetSRC);
-                 * if($objFile !== null)
-                 * {
-                 * $set = array(
-                 * 'avatarSRC'    => $objFile->uuid,
-                 * 'avatarUpload' => '1',
-                 * 'tstamp'       => time()
-                 * );
-                 * $objStmt = Database::getInstance()->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objDb->id);
-                 * }
-                 * }
-                 **/
-                //avatarUpload
-                $src = sprintf('files/avatare/%s.jpg', $objDb->username);
-                //echo $src . '<br>';
-                if (is_file(TL_ROOT . '/' . $src))
-                {
-                    $objFile = new File($src);
-                    if ($objFile->isGdImage)
-                    {
-                        $targetSRC = sprintf('files/sac_pilatus/be_user_home_directories/%s/avatar/%s.jpg', $objDb->id, $objDb->username);
-                        if (!is_file(TL_ROOT . '/' . $targetSRC))
-                        {
-
-                            if (Files::getInstance()->rename($src, $targetSRC))
-                            {
-                                Dbafs::addResource($targetSRC);
-                                $objNew = FilesModel::findByPath($targetSRC);
-                                if ($objNew !== null)
-                                {
-                                    $set = array(
-                                        'avatarSRC'    => $objNew->uuid,
-                                        'avatarUpload' => '1',
-                                        'tstamp'       => time()
-                                    );
-                                    $objStmt = Database::getInstance()->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objDb->id);
-                                    if ($objStmt->insertId > 0)
-                                    {
-                                        echo sprintf('Avatar von %s hochgeladen.', $objDb->username) . '<br>';
-                                    }
-                                    else
-                                    {
-                                        //Files::getInstance()->delete($targetSRC);
-                                        //echo sprintf("Error 1 bei %s", $objDb->username) . "<br>";
-                                    }
-                                }
-                                else
-                                {
-                                    //Files::getInstance()->delete($targetSRC);
-                                    echo sprintf("Error 2 bei %s", $objDb->username) . "<br>";
-                                }
-                            }
-                            else
-                            {
-                                echo sprintf("Error 3 bei %s", $objDb->username) . "<br>";
-                            }
-                        }
-                    }
-                }
-
-            }
-        }
-    }
-
-
-    /**
-     *
+     * Prepare the plugin environment
      */
     public function initializeSystem()
     {
+
         // Purge script cache in dev mode
         $kernel = System::getContainer()->get('kernel');
         if ($kernel->isDebug())
@@ -158,30 +78,14 @@ class InitializeSystem
         }
 
 
-        /** @todo Delete orphaned entries
-         * $oDb = Database::getInstance()->execute('SELECT * FROM tl_calendar_events_member');
-         * while($oDb->next())
-         * {
-         * $oEv = CalendarEventsModel::findByPk($oDb->eventId);
-         * if($oEv === null)
-         * {
-         * echo $oDb->lastname . ' ' . $oDb->firstname . '<br>';
-         * //Database::getInstance()->prepare('DELETE FROM tl_calendar_events_member WHERE id=?')->execute($oDb->id);
-         * }
-         * }
-         **/
 
         // Prepare Plugin environment, create folders, etc.
         $objPluginEnv = System::getContainer()->get('markocupic.sac_event_tool_bundle.prepare_plugin_environment');
-
         $objPluginEnv->preparePluginEnvironment();
 
-        // Convert events to ical
-        if (Input::get('action') === 'exportEventsToIcal' && Input::get('id'))
-        {
-            ExportEvents2Ical::sendToBrowser(Input::get('id'));
-        }
 
+
+        // Create default notification
         $objNotification = \NotificationCenter\Model\Notification::findOneByType('default_email');
         if ($objNotification === null)
         {

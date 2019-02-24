@@ -12,9 +12,12 @@ namespace Markocupic\SacEventToolBundle;
 
 
 use Contao\Config;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
+use Contao\System;
 use Contao\UserModel;
 use NotificationCenter\Model\Notification;
+use Psr\Log\LogLevel;
 
 class ReplaceDefaultPassword
 {
@@ -40,6 +43,7 @@ class ReplaceDefaultPassword
 
         $objDb = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE pwChange=?')->execute('1');
         $counter = 0;
+
         while ($objDb->next())
         {
             if (($pw = $this->replaceDefaultPassword($objDb->id)) !== false)
@@ -60,12 +64,18 @@ class ReplaceDefaultPassword
                     $arrTokens = array(
                         'email_sender_name'  => 'Administrator SAC Pilatus',
                         'email_sender_email' => Config::get('adminEmail'),
-                        'replyTo'            => Config::get('adminEmail'),
-                        'email_subject'      => html_entity_decode('Passwortänderung auf der Webseite der SAC Sektion Pilatus'),
+                        'reply_to'           => Config::get('adminEmail'),
+                        'email_subject'      => html_entity_decode('Passwortänderung für Backend-Zugang auf der Webseite der SAC Sektion Pilatus'),
                         'email_text'         => $bodyText,
                         'send_to'            => $objUserModel->email
                     );
+
                     $objEmail->send($arrTokens, 'de');
+
+                    // System log
+                    $strText = sprintf('The default password for backend user %s has been replaced and sent by e-mail.', $objUserModel->name);
+                    $logger = System::getContainer()->get('monolog.logger.contao');
+                    $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, 'REPLACE DEFAULT PASSWORD')));
 
                     // Limitize emails
                     $counter++;
@@ -119,7 +129,7 @@ Passwort: %s
 Wir wünschen dir viel Spass beim Surfen auf unseren Webseite.
 https://www.sac-pilatus.ch
 
-Projektteam "Neue Website SAC Pilatus"
+Administrator SAC Sektion Pilatus"
 
 ----------------------------
 Dies ist eine automatisch generierte Nachricht. Bitte antworte nicht darauf.';

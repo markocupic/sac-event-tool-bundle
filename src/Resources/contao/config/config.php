@@ -249,34 +249,34 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = array(
     'Nichts',
 );
 
-// Get system messages
+/** Get system messages **/
 $GLOBALS['TL_HOOKS']['getSystemMessages'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\GetSystemMessages', 'listUntreatedEventSubscriptions');
 
-// Custom Hook publish Event
+/** Custom Hook publish Event **/
 $GLOBALS['TL_HOOKS']['publishEvent'] = array(array('Markocupic\SacEventToolBundle\ContaoHooks\PublishEvent', 'publishEvent'));
 
-// Custom Hook change event release level
+/** Custom Hook change event release level **/
 $GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] = array(array('Markocupic\SacEventToolBundle\ContaoHooks\ChangeEventReleaseLevel', 'changeEventReleaseLevel'));
 
-// Route cronjob calls,ajax calls etc...
+/** Route prepare plugin environment **/
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic_sac_event_tool.contao_hooks.initialize_system', 'initializeSystem');
 
-// Route cronjob calls,ajax calls etc...
+/** Empty at the moment **/
 $GLOBALS['TL_HOOKS']['generatePage'][] = array('markocupic_sac_event_tool.contao_hooks.generate_page', 'generatePage');
 
 /*** Handle Ajax calls from the backend **/
 $GLOBALS['TL_HOOKS']['executePreActions'][] = array('markocupic_sac_event_tool.contao_hooks.execute_pre_actions', 'executePreActions');
 
-/*** Handle custom rgxp in the backend **/
+/** Handle custom rgxp in the backend **/
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic_sac_event_tool.contao_hooks.add_custom_regexp', 'addCustomRegexp');
 
-/*** Handle event listing **/
+/** Handle event listing **/
 $GLOBALS['TL_HOOKS']['getAllEvents'][] = array('markocupic_sac_event_tool.contao_hooks.get_all_events', 'getAllEvents');
 
 /** Allow event preview from the backend if the event token is passed to the url */
 $GLOBALS['TL_HOOKS']['getContentElement'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\GetContentElement', 'getContentElement');
 
-/*** Prepare User accounts (create user directories, etc.
+/** Prepare User accounts (create user directories, etc.
  * @deprecated PostLogin Hook will be be removed in Contao 5.0.
  **/
 $GLOBALS['TL_HOOKS']['postLogin'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\PostLogin', 'prepareBeUserAccount');
@@ -285,7 +285,7 @@ $GLOBALS['TL_HOOKS']['postLogin'][] = array('Markocupic\SacEventToolBundle\Conta
 $GLOBALS['TL_HOOKS']['importUser'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ImportUser', 'allowBackendUserToAuthenticateWithSacMemberId');
 
 
-// Form HOOKS (f.ex. Kursanmeldung)
+/** Form HOOKS (f.ex. Kursanmeldung) **/
 $GLOBALS['TL_HOOKS']['postUpload'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'postUpload');
 $GLOBALS['TL_HOOKS']['compileFormFields'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'compileFormFields');
 $GLOBALS['TL_HOOKS']['loadFormField'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'loadFormField');
@@ -294,17 +294,17 @@ $GLOBALS['TL_HOOKS']['storeFormData'][] = array('markocupic_sac_event_tool.conta
 $GLOBALS['TL_HOOKS']['prepareFormData'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'prepareFormData');
 $GLOBALS['TL_HOOKS']['processFormData'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'processFormData');
 
-// Parse backend template hook
+/** Parse backend template hook **/
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic_sac_event_tool.contao_hooks.parse_backend_template', 'parseBackendTemplate');
 
-// Cron jobs
+/** Cron jobs **/
 $GLOBALS['TL_CRON']['daily']['replaceDefaultPassword'] = array('Markocupic\SacEventToolBundle\ReplaceDefaultPassword', 'sendNewPassword');
 $GLOBALS['TL_CRON']['hourly']['syncSacMemberDatabase'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'syncSacMemberDatabase');
-$GLOBALS['TL_CRON']['daily']['printSACWorkshops'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'printSacWorkshops');
+$GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'generateWorkshopPdfBooklet');
 
-// Replace insert tags
+/** Replace insert tags **/
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ReplaceInsertTags', 'replaceInsertTags');
 
-// Parse template
+/** Parse template **/
 $GLOBALS['TL_HOOKS']['parseTemplate'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ParseTemplate', 'checkIfAccountIsActivated');
 

@@ -20,28 +20,28 @@ use Symfony\Component\Routing\Annotation\Route;
 class AjaxController extends AbstractController
 {
 
-
     /**
      * Handles ajax requests.
-     * @return JsonResponse
      * @Route("/ajax", name="sac_event_tool_ajax_frontend", defaults={"_scope" = "frontend", "_token_check" = true})
      */
     public function ajaxAction()
     {
         $this->container->get('contao.framework')->initialize();
+
+        // Do allow only xhr requests
         if (Environment::get('isAjaxRequest') === false)
         {
             throw $this->createNotFoundException('The route "/ajax" is allowed to xhr requests only.');
         }
 
-        // Course Filter
+        // Tour filter
         if (Input::post('action') === 'filterTourList')
         {
             $controller = new FrontendAjax();
             $controller->filterTourList();
         }
 
-        // Course Filter
+        // Course filter
         if (Input::post('action') === 'filterCourseList')
         {
             $controller = new FrontendAjax();
@@ -76,7 +76,6 @@ class AjaxController extends AbstractController
             $fileId = Input::post('fileId');
             $controller->rotateImage($fileId);
         }
-
 
         // Event story
         if (Input::post('action') === 'getCaption')

@@ -64,7 +64,7 @@
 
 
                 <div class="mt-3">
-                    <a href="/ical?eventId=<?= $this->id ?>" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary"><i class="fal fa-calendar-plus"></i> iCal download</a>
+                    <a href="/_download/download_event_ical?eventId=<?= $this->id ?>" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary"><i class="fal fa-calendar-plus"></i> iCal download</a>
                 </div>
 
                 <div class="mt-3">
