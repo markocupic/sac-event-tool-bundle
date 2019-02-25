@@ -1,0 +1,30 @@
+<!-- row start event: <?= $this->title ?> -->
+<div class="col-xl-6 event-item event-item-course event layout_upcoming<?php echo $this->classUpcoming; ?>" data-id="<?= $this->id ?>" data-event-type="<?= $this->courseTypeLevel1 ?>">
+    <div class="row">
+        <div class="col-sm-3 col-xl-5 d-none d-sm-block">
+            <a class="responsive" href="{{event_url::<?php echo $this->id; ?>}}">
+                {{picture::<?= $this->eventImagePath ?>?size=20&alt=<?= $this->title ?>}}
+            </a>
+        </div>
+
+        <div class="col-sm-9 col-xl-7">
+            <div class="title">
+                <a href="{{event_url::<?php echo $this->id; ?>}}">
+                    <h3 class="headline">{{event_title::<?= $this->id ?>}}</h3>
+                </a>
+                <h5><?= $this->courseTypeLevel0Name ?>: <?= $this->courseTypeLevel1Name ?></h5>
+            </div>
+            <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($this->id, true, true); ?>
+            <div class="detail-item">
+                <i class="fa fa-fw fa-user"></i>Leitung: <?= $this->instructorsWithQualification ?>
+            </div>
+            <div class="detail-item">
+                <i class="fa fa-fw fa-calendar-alt"></i><?= $this->eventPeriodLg ?>
+            </div>
+            <div class="detail-item">
+                <?= $this->bookingCounter ?> <?= $this->eventStateLabel ?>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- row end event: <?= $this->title ?> -->

@@ -77,15 +77,16 @@
 <table class="table">
     <tr>
         <th>Datum</th>
-        <th>Dauer</th>
-        <th>Tour</th>
+        <th class="d-none d-md-table-cell">Dauer</th>
         <th></th>
-        <th>Anf.</th>
-        <th>Art</th>
+        <th>Tour</th>
+        <th class="d-none d-md-table-cell">Anz.</th>
+        <th class="d-none d-md-table-cell">Anf.</th>
+        <th class="d-none d-md-table-cell">Art</th>
         <th>Leitung</th>
     </tr>
     <?php foreach ($arrEvents['tour'] as $event): ?>
-    <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateTourRow($event['id']) ?>
+    <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateTourRow($event['id'], array('tour', 'lastMinuteTour'), 'partial_event_tour_row_layout_table') ?>
     <?php endforeach; ?>
 </table>
 <?php endif; ?>

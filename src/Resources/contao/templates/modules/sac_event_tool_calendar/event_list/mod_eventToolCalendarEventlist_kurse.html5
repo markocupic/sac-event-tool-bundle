@@ -12,94 +12,87 @@ if (\Environment::get('isAjaxRequest') && \Input::get('xhrAction') === 'switchLa
         $_SESSION['layout_table'] = true;
     }
     echo json_encode(array('status' => 'success'));
-    exit;
+exit;
 }
 ?>
 <!-- indexer::stop -->
 
 <div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
-    <?php $this->block('headline'); ?>
-    <?php if ($this->headline): ?>
-  <<?= $this->hl ?> class="ce_headline"><?= $this->headline ?></<?= $this->hl ?>>
-<?php endif; ?>
+<?php $this->block('headline'); ?>
+<?php if ($this->headline): ?><<?= $this->hl ?> class="ce_headline"><?= $this->headline ?></<?= $this->hl ?>><?php endif; ?>
 <?php $this->endblock(); ?>
 
 
-<!-- button bar -->
-<div class="button-bar">
-  <ul>
-    <li>
-      <button class="btn btn-danger switch-layout" title="Switch Layout">
-          <?php if ($_SESSION['layout_table']): ?>
-            <i class="fa fa-fw fa-list"></i>
-          <?php else: ?>
-            <i class="fa fa-fw fa-th"></i>
-          <?php endif; ?>
-      </button>
-    </li>
-    <li>
-      <a href="/_download/print_workshop_booklet_as_pdf?year=current&cat=0">
-        <button class="text-right btn btn-success" title="Kursprogramm als pdf Brosch&uuml;re herunterladen">
-          <i class="fa fa-fw fa-file-pdf"></i>
-        </button>
-      </a>
-    </li>
-    <li>
-      <a href="/_download/print_workshop_details_as_docx?calendarId=6&year={{date::Y}}">
-        <button class="text-right btn btn-primary" title="Kursprogramm herunterladen im docx Format herunterladen">
-          <i class="fa fa-fw fa-file-word"></i>
-        </button>
-      </a>
-    </li>
-    <li>
-      <button class="d-none d-lg-none btn btn-outline-success toggle-filter-btn" onclick=""><i class="fa fa-filter"></i> Filter öffnen</button>
-    </li>
-    <!-- Button trigger modal -->
-    <li>
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#kursstufenModal">
-        Kursstufen
-      </button>
-    </li>
-  </ul>
-</div>
-<!-- end button bar -->
+    <!-- button bar -->
+    <div class="button-bar">
+        <ul>
+            <li>
+                <button class="btn btn-danger switch-layout" title="Switch Layout">
+                    <?php if ($_SESSION['layout_table']): ?>
+                    <i class="fa fa-fw fa-list"></i>
+                    <?php else: ?>
+                    <i class="fa fa-fw fa-th"></i>
+                    <?php endif; ?>
+                </button>
+            </li>
+            <li>
+                <a href="/_download/print_workshop_booklet_as_pdf?year=current&cat=0">
+                    <button class="text-right btn btn-success" title="Kursprogramm als pdf Brosch&uuml;re herunterladen">
+                        <i class="fa fa-fw fa-file-pdf"></i>
+                    </button>
+                </a>
+            </li>
+            <li>
+                <a href="/_download/print_workshop_details_as_docx?calendarId=6&year={{date::Y}}">
+                    <button class="text-right btn btn-primary" title="Kursprogramm herunterladen im docx Format herunterladen">
+                        <i class="fa fa-fw fa-file-word"></i>
+                    </button>
+                </a>
+            </li>
+            <li>
+                <button class="d-none d-lg-none btn btn-outline-success toggle-filter-btn" onclick=""><i class="fa fa-filter"></i> Filter öffnen</button>
+            </li>
+            <!-- Button trigger modal -->
+            <li>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#kursstufenModal">
+                    Kursstufen
+                </button>
+            </li>
+        </ul>
+    </div>
+    <!-- end button bar -->
 
 
 <?php if ($_SESSION['layout_table']): ?>
-<table class="event-container d-none table layout-table table-responsive">
-  <tr>
-    <th>Datum</th>
-    <th>Dauer</th>
-    <th>Status</th>
-    <th>Kurs</th>
-    <th>Anz.</th>
-    <th>Leitung</th>
-  </tr>
+    <table class="event-container d-none table layout-table table-responsive">
+        <tr>
+            <th>Datum</th>
+            <th class="d-none d-md-table-cell">Dauer</th>
+            <th>Status</th>
+            <th>Kurs</th>
+            <th>Anz.</th>
+            <th class="d-none d-md-table-cell">Leitung</th>
+        </tr>
 <?php endif; ?>
 
-<?php if(!$_SESSION['layout_table']): ?>
-  <div class="event-container d-none row">
-<?php endif; ?>
+    <?php if(!$_SESSION['layout_table']): ?><div class="event-container d-none row"><?php endif; ?>
 
     <?= $this->events ?>
 
-<?php if ($_SESSION['layout_table']): ?>
-  </table>
-<?php endif; ?>
+    <?php if ($_SESSION['layout_table']): ?></table><?php endif; ?>
 
-<?php if(!$_SESSION['layout_table']): ?>
-  </div>
-<?php endif; ?>
+    <?php if(!$_SESSION['layout_table']): ?></div><?php endif; ?>
 
-<!-- loader icon -->
-<div class="loader-icon-container visible loading-icon-lg">
-  <div class="preloader-icon fa-5x">
-    <i style="color:#0082c7;" class="fal fa-circle-notch fa-spin"></i>
-  </div>
-  <div class="preloader-text">
-    {{br}}{{br}}Bitte etwas Geduld.{{br}}Die Event-Liste wird geladen.
-  </div>
-</div>
+
+    <!-- loader icon -->
+    <div class="loader-icon-container visible loading-icon-lg">
+        <div class="preloader-icon fa-5x">
+            <i style="color:#0082c7;" class="fal fa-circle-notch fa-spin"></i>
+        </div>
+        <div class="preloader-text">
+            {{br}}{{br}}Bitte etwas Geduld.{{br}}Die Event-Liste wird geladen.
+        </div>
+    </div>
 
 
 </div>

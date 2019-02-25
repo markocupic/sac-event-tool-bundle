@@ -1,4 +1,5 @@
-<tr class="event-item event-item-tour event" data-id="<?= $this->id ?>" data-event-type="<?= $this->tourTypesIds ?>">
+<!-- row start event: <?= $this->title ?> -->
+<tr class="event-item event-item-course event" data-id="<?= $this->id ?>" data-event-type="<?= $this->courseTypeLevel1 ?>">
     <td>
         <span class="d-lg-none"><?= $this->eventPeriodSm ?></span>
         <span class="d-none d-lg-block"><?= $this->eventPeriodLg ?></span>
@@ -10,13 +11,9 @@
         <i class="event-state-icon fa-fw <?= $eventState ?>" data-toggle="tooltip" data-placement="top" aria-label="<?= htmlspecialchars($this->eventStateLabel) ?>" title="<?= $this->eventStateLabel ?>"></i>
     </td>
     <td>
-        <?php if ($this->isLastMinuteTour): ?>
-        <span class="last-minute-tour small"><i class="fa fa-clock"></i> LAST MINUTE TOUR</span><br>
-        <?php endif; ?>
         <a href="{{event_url::<?= $this->id ?>}}">{{event_title::<?= $this->id ?>}}</a>
     </td>
     <td class="d-none d-md-table-cell"><?= $this->bookingCounter ?></td>
-    <td class="tourTechDifficulty d-none d-md-table-cell"><?= $this->tourTechDifficulties ?></td>
-    <td class="tourType d-none d-md-table-cell"><?= $this->tourTypesShortcuts ?></td>
     <td><?= $this->instructors ?></td>
 </tr>
+<!-- row end event: <?= $this->title ?> -->
