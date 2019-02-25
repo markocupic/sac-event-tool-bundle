@@ -85,22 +85,7 @@
         <th>Leitung</th>
     </tr>
     <?php foreach ($arrEvents['tour'] as $event): ?>
-    <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($event['id']); ?>
-    <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][$eventState]; ?>
-    <?php $arrTourTypes = \StringUtil::deserialize($event['tourType'], true); ?>
-    <tr class="event-item-tour event" data-id="<?= $event['id'] ?>" data-tourType="<?= implode(',', $arrTourTypes) ?>">
-        <td><?= \Date::parse('d.m.Y', $event['startDate']) ?></td>
-        <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventDuration($event['id']) ?></td>
-        <td>
-            <i class="fa-fw event-state-icon <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" title="<?= $eventStateLabel ?>"></i>
-            <a href="{{event_url::<?php echo $event['id']; ?>}}">{{event_title::<?= $event['id'] ?>}}</a>
-        </td>
-        <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($event['id']) ?></td>
-        <td class="tourTechDifficulty"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($event['id'], true)) ?></td>
-        <td class="tourType"><?= implode(' ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($event['id'], 'shortcut', true)) ?></td>
-        <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($event['id'], false, true); ?>
-        <td><?= implode(', ', $arrInstructors) ?></td>
-    </tr>
+    <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateTourRow($event['id']) ?>
     <?php endforeach; ?>
 </table>
 <?php endif; ?>

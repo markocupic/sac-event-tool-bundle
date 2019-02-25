@@ -21,6 +21,7 @@ use Contao\Date;
 use Contao\EventOrganizerModel;
 use Contao\EventTypeModel;
 use Contao\FilesModel;
+use Contao\FrontendTemplate;
 use Contao\MemberModel;
 use Contao\PageModel;
 use Contao\StringUtil;
@@ -38,6 +39,45 @@ use Haste\Util\Url;
 class CalendarEventsHelper
 {
 
+    /**
+     * @param $eventId
+     * @param string $strTemplate
+     * @return string
+     * @throws \Exception
+     */
+    public function generateTourRow($eventId, $strTemplate = 'partial_event_tour_row')
+    {
+        $objEvent = CalendarEventsModel::findByPk($eventId);
+        if ($objEvent === null)
+        {
+            return '';
+        }
+        if ($objEvent->eventType !== 'tour' && $objEvent->eventType !== 'generalEvent' && $objEvent->eventType !== 'lastMinuteTour')
+        {
+            return '';
+        }
+
+        $objTemplate = new FrontendTemplate($strTemplate);
+        $objTemplate->id = $objEvent->id;
+        $objTemplate->eventType = $objEvent->eventType;
+        $objTemplate->tourTypesIds = implode(\StringUtil::deserialize($objEvent->tourType, true));
+        $objTemplate->tourTypesShortcuts = implode(' ', static::getTourTypesAsArray($objEvent->id, 'shortcut', true));
+        $objTemplate->eventPeriodSm = static::getEventPeriod($objEvent->id, 'd.m.Y', false);
+        $objTemplate->eventPeriodLg = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false);
+        $objTemplate->eventDuration = static::getEventDuration($objEvent->id);
+        $objTemplate->eventState = static::getEventState($objEvent->id);
+        $objTemplate->eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][static::getEventState($objEvent->id)];
+        $objTemplate->isLastMinuteTour = $objEvent->eventType === 'lastMinuteTour' ? true : false;
+        $objTemplate->isTour = $objEvent->eventType === 'tour' ? true : false;
+        $objTemplate->isGeneralEvent = $objEvent->eventType === 'generalEvent' ? true : false;
+        $objTemplate->isCourse = $objEvent->eventType === 'course' ? true : false;
+        $objTemplate->bookingCounter = static::getBookingCounter($objEvent->id);
+        $objTemplate->tourTechDifficulties = implode(' ', static::getTourTechDifficultiesAsArray($objEvent->id, true));
+        $objTemplate->instructors = implode(', ', static::getInstructorNamesAsArray($objEvent->id, false, true));
+
+        return $objTemplate->parse();
+
+    }
 
     /**
      * @param $id
