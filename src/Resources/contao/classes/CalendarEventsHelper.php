@@ -16,6 +16,8 @@ use Contao\CalendarEventsMemberModel;
 use Contao\Config;
 use Contao\ContentModel;
 use Contao\Controller;
+use Contao\CourseMainTypeModel;
+use Contao\CourseSubTypeModel;
 use Contao\Database;
 use Contao\Date;
 use Contao\EventOrganizerModel;
@@ -41,24 +43,33 @@ class CalendarEventsHelper
 
     /**
      * @param $eventId
+     * @param array $arrAllowedEventTypes
      * @param string $strTemplate
      * @return string
      * @throws \Exception
      */
-    public function generateTourRow($eventId, $strTemplate = 'partial_event_tour_row')
+    public function generateTourRow($eventId, $arrAllowedEventTypes = array(), $strTemplate = 'partial_event_tour_row_layout_table')
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
         if ($objEvent === null)
         {
             return '';
         }
-        if ($objEvent->eventType !== 'tour' && $objEvent->eventType !== 'generalEvent' && $objEvent->eventType !== 'lastMinuteTour')
+
+        if(empty($arrAllowedEventTypes) || !is_array($arrAllowedEventTypes))
+        {
+            return '';
+        }
+
+        if (!in_array($objEvent->eventType, $arrAllowedEventTypes))
         {
             return '';
         }
 
         $objTemplate = new FrontendTemplate($strTemplate);
+
         $objTemplate->id = $objEvent->id;
+        $objTemplate->title = $objEvent->title;
         $objTemplate->eventType = $objEvent->eventType;
         $objTemplate->tourTypesIds = implode(\StringUtil::deserialize($objEvent->tourType, true));
         $objTemplate->tourTypesShortcuts = implode(' ', static::getTourTypesAsArray($objEvent->id, 'shortcut', true));
@@ -74,6 +85,11 @@ class CalendarEventsHelper
         $objTemplate->bookingCounter = static::getBookingCounter($objEvent->id);
         $objTemplate->tourTechDifficulties = implode(' ', static::getTourTechDifficultiesAsArray($objEvent->id, true));
         $objTemplate->instructors = implode(', ', static::getInstructorNamesAsArray($objEvent->id, false, true));
+        $objTemplate->instructorsWithQualification = implode(', ', static::getInstructorNamesAsArray($objEvent->id, true, true));
+        $objTemplate->courseTypeLevel1 = $objEvent->courseTypeLevel1;
+        $objTemplate->eventImagePath = static::getEventImagePath($objEvent->id);
+        $objTemplate->courseTypeLevel0Name = CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name;
+        $objTemplate->courseTypeLevel1Name = CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
 
         return $objTemplate->parse();
 
