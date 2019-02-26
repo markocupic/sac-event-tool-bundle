@@ -86,7 +86,7 @@
         <th>Leitung</th>
     </tr>
     <?php foreach ($arrEvents['tour'] as $event): ?>
-    <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateTourRow($event['id'], array('tour', 'lastMinuteTour'), 'partial_event_tour_row_layout_table') ?>
+    <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateEventRow($event['id'], array('tour', 'lastMinuteTour'), 'partial_event_tour_row_layout_table') ?>
     <?php endforeach; ?>
 </table>
 <?php endif; ?>

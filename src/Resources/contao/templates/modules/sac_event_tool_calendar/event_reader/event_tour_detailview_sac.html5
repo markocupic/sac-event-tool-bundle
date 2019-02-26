@@ -1,9 +1,11 @@
+<?php Markocupic\SacEventToolBundle\CalendarEventsHelper::addEventDataToTemplate($this); ?>
+
 <!-- indexer::stop -->
 <p class="back"><a href="javascript:history.go(-1)" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
 
 <div class="event event-detailview layout_full block<?= $this->class ?>">
     <?php if ($this->eventState): ?>
-    <h4 class="event-state-headline"><?= $GLOBALS['TL_LANG']['CTE']['calendar_events'][$this->eventState] ?></h4>
+    <h4 class="event-state-headline"><?= $this->eventStateLabel ?></h4>
     <?php endif; ?>
 
     <h1 class="ce_headline"><?= $this->title ?></h1>
@@ -24,14 +26,12 @@
             <?php endif; ?>
 
             <div class="grey-box p-4 mb-4" style="background-color: #f2f2f2;">
-                <?php $arrLogo = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersLogoAsHtml($this->id, '{{image::%s?width=60}}', false); ?>
-                <div class="event-detail event-info-box organizer-logo mb-4"><?= implode('', $arrLogo) ?></div>
+                <div class="event-detail event-info-box organizer-logo mb-4"><?= $this->eventOrganizerLogos ?></div>
 
                 <div class="organizers event-detail event-info-box icon-box-small">
                     <h6>Organisierende Gruppe</h6>
                     <p>
-                        <?php $organizers = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($this->id, 'title'); ?>
-                        <?php if (!empty($organizers)): ?><?= implode('<br>', $organizers) ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
+                        <?php if($this->eventOrganizers !== ''): ?><?= $this->eventOrganizers ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
                     </p>
                 </div>
                 <?php if($this->mountainguide): ?>
@@ -43,13 +43,14 @@
                 <div class="eventdate event-detail event-info-box icon-box-small">
                     <h6>Datum/Dauer</h6>
                     <p>
-                        <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventPeriod($this->id, 'D, d.m.Y', true, false) ?>
+                        <?= $this->eventPeriodLg ?>
                     </p>
                 </div>
                 <div class="requirements event-detail event-info-box icon-box-small">
                     <h6>Eventnummer</h6>
                     <p class="event-id">
-                        <!-- indexer::continue --><?= \Contao\Date::parse('Y', $this->startDate) ?>-<?= nl2br($this->id) ?><!-- indexer::stop -->
+                        <!-- event id f.ex. 2019-3233331 -->
+                        <!-- indexer::continue --><?= $this->eventId ?><!-- indexer::stop -->
                     </p>
                 </div>
 
@@ -60,46 +61,12 @@
                 </div>
                 <?php endif; ?>
 
-
-                <?php $arrInstructors = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorsAsArray($this->id, true) ?>
-
                 <div class="instructor event-detail event-info-box icon-box-small">
                     <h6 class="mt-0">Leitung/Betreuung</h6>
                 </div>
-                <?php if (!empty($arrInstructors)): ?>
+                <?php if($this->instructorContactBoxes !== ''): ?>
                 <div class="row mt-3 tiny-gutter">
-                    <?php foreach ($arrInstructors as $userId): ?>
-                    <div class="col-6 col-sm-4 col-md-4 col-xl-4">
-                        <div class="">
-                            <?php $objUser = \UserModel::findByPk($userId); ?>
-                            <?php if ($objUser !== null): ?>
-                            <div class="image_container portrait">
-                                <a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen">
-                                    <figure class="avatar-large img-fluid w-100">
-                                        <?php $this->insert('picture_default', generateAvatar($userId, 18)); ?>
-                                    </figure>
-                                </a>
-                            </div>
-                            <div class="instructor-name">
-                                <?php $strQuali = Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($userId) != '' ? ' (' . Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($userId) . ')' : ''; ?>
-                                <?php if(!$objUser->hideInFrontendListings): ?><a href="{{link_url::leiter-portrait}}?username=<?= \UserModel::findByPk($userId)->username ?>" title="Leiter Portrait ansehen"><?php endif; ?>
-                                    <?= $objUser->lastname . ' ' . $objUser->firstname . $strQuali ?>
-                                <?php if(!$objUser->hideInFrontendListings): ?></a><?php endif; ?>
-                                <?php if(FE_USER_LOGGED_IN && !$objUser->hideInFrontendListings): ?>
-                                    <?php $arrContact = ['phone', 'mobile', 'email']; ?>
-                                    <?php foreach($arrContact as $field): ?>
-                                        <?php if($objUser->{$field} !== ''): ?>
-                                            <div class="ce_user_portrait_<?= $field ?>">
-                                                <small title="<?= $objUser->{$field} ?>"><?= $objUser->{$field} ?></small>
-                                            </div>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
+                    <?= $this->instructorContactBoxes ?>
                 </div>
                 <?php else: ?>
                 Leiter wurde gel&ouml;scht.
@@ -108,9 +75,7 @@
                 <?php if ($this->leistungen != ''): ?>
                 <div class="price event-detail event-info-box icon-box-small">
                     <h6>Leistungen/Preis</h6>
-                    <p>
-                        <?= nl2br($this->leistungen) ?>
-                    </p>
+                    <p><?= nl2br($this->leistungen) ?></p>
                 </div>
                 <?php endif; ?>
 
@@ -123,11 +88,9 @@
 
                 <?php if ($this->bookingEvent != '' || $this->generateMainInstructorContactDataFromDb): ?>
                 <div class="booking-text event-detail event-info-box icon-box-small">
-                    <h6>Anmeldung</h6>
+                    <h5>Anmeldung</h5>
                     <?php if($this->bookingEvent != ''): ?><p><?= nl2br($this->bookingEvent) ?></p><?php endif; ?>
-                    <?php if($this->generateMainInstructorContactDataFromDb): ?>
-                    <p class="m-0"><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateMainInstructorContactDataFromDb($this->id); ?></p>
-                    <?php endif; ?>
+                    <?php if($this->generateMainInstructorContactDataFromDb): ?><p class="m-0"><?= $this->mainInstructorContactDataFromDb ?></p><?php endif; ?>
                 </div>
                 <?php endif; ?>
 
@@ -141,6 +104,7 @@
                     <a href="{{event_url::<?= $this->id ?>}}#eventBookingForm" title="Für Tour anmelden" class="btn btn-block btn-lg  btn-primary"><i class="fal fa-shopping-cart"></i> Für Tour anmelden</a>
                 </div>
                 <?php endif; ?>
+                <!-- end buttons -->
 
             </div>
         </div>
@@ -149,11 +113,10 @@
         <!-- Col right -->
         <div class="col-lg-6">
 
-
             <?php if ($this->tourType != ''): ?>
             <div class="tour-type event-detail event-info-box icon-box-small">
                 <h6>Touren-Typ</h6>
-                <p><?= implode('<br>', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($this->id, 'title')) ?></p>
+                <p><?= $this->tourTypesTitles ?></p>
             </div>
             <?php endif; ?>
 
@@ -164,6 +127,7 @@
                 <p>Ideale Tour f&uuml;r Einsteiger</p>
             </div>
             <?php endif; ?>
+
             <?php endif; ?>
             <?php if ($this->requirements != ''): ?>
             <div class="requirements event-detail event-info-box icon-box-small">
@@ -171,7 +135,6 @@
                 <p class="requirements-text"><?= nl2br($this->requirements) ?></p>
             </div>
             <?php endif; ?>
-
 
             <?php if ($this->eventType === 'tour' && $this->tourDetailText != ''): ?>
             <div class="tour-detail-text event-detail event-info-box icon-box-small">
@@ -196,16 +159,15 @@
                 <h6>Schwierigkeit</h6>
                 <p><?= implode(', ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($this->id)) ?></p>
             </div>
-
-            <?php $arrTourProfile = Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourProfileAsArray($this->id); ?>
-            <?php if (count($arrTourProfile) >= 1): ?>
-            <div class="tour-profile event-detail event-info-box icon-box-small">
-                <h6>Profil</h6>
-                <p><?= implode('<br>', $arrTourProfile) ?>
-                <p>
-            </div>
             <?php endif; ?>
 
+            <?php if ($this->eventType === 'tour'): ?>
+            <?php if (!empty($this->arrTourProfile)): ?>
+            <div class="tour-profile event-detail event-info-box icon-box-small">
+                <h6>Profil</h6>
+                <p><?= implode('<br>', $this->arrTourProfile) ?><p>
+            </div>
+            <?php endif; ?>
             <?php endif; ?>
 
             <?php if ($this->journey != '' && $this->journey != 'not-specified' && \CalendarEventsJourneyModel::findByPk($this->journey) !== null): ?>
@@ -264,18 +226,10 @@
 
 
     <?php if ($this->addGallery): ?>
+    <!-- gallery start -->
     <hr>
-    <h6>Bildimpressionen</h6>
-    <?php $arrData = array(); ?>
-    <?php $arrData['multiSRC'] = $this->multiSRC; ?>
-    <?php $arrData['orderSRC'] = $this->orderSRC; ?>
-    <?php $arrData['sortBy'] = 'custom'; ?>
-    <?php $arrData['perRow'] = 4; ?>
-    <?php $arrData['size'] = serialize(array(400, 400, 'center_center', 'proportional')); ?>
-    <?php $arrData['fullsize'] = true; ?>
-
-    <?php $arrData['galleryTpl'] = 'gallery_bootstrap_col-4'; ?>
-    <?php echo Markocupic\SacEventToolBundle\CalendarEventsHelper::getGallery($arrData); ?>
+    <?= $this->gallery ?>
+    <!-- gallery end -->
     <?php endif; ?>
 
 

@@ -3,9 +3,9 @@
 session_start();
 ?>
 <?php if (!$_SESSION['layout_table']): ?>
-<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateTourRow($this->id, array('course'), 'partial_event_course_row_layout_default') ?>
+<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateEventRow($this->id, array('course'), 'partial_event_course_row_layout_default') ?>
 <?php endif; ?>
 
 <?php if ($_SESSION['layout_table']): ?>
-<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateTourRow($this->id, array('course'), 'partial_event_course_row_layout_table') ?>
+<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateEventRow($this->id, array('course'), 'partial_event_course_row_layout_table') ?>
 <?php endif; ?>

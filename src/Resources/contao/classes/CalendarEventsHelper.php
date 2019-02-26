@@ -42,13 +42,14 @@ class CalendarEventsHelper
 {
 
     /**
+     * Generate/parse event row (usage in tour/course listing modules)
      * @param $eventId
      * @param array $arrAllowedEventTypes
      * @param string $strTemplate
      * @return string
      * @throws \Exception
      */
-    public function generateTourRow($eventId, $arrAllowedEventTypes = array(), $strTemplate = 'partial_event_tour_row_layout_table')
+    public static function generateEventRow($eventId, $arrAllowedEventTypes = array(), $strTemplate = 'partial_event_tour_row_layout_table')
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
         if ($objEvent === null)
@@ -56,7 +57,7 @@ class CalendarEventsHelper
             return '';
         }
 
-        if(empty($arrAllowedEventTypes) || !is_array($arrAllowedEventTypes))
+        if (empty($arrAllowedEventTypes) || !is_array($arrAllowedEventTypes))
         {
             return '';
         }
@@ -67,33 +68,140 @@ class CalendarEventsHelper
         }
 
         $objTemplate = new FrontendTemplate($strTemplate);
-
         $objTemplate->id = $objEvent->id;
-        $objTemplate->title = $objEvent->title;
-        $objTemplate->eventType = $objEvent->eventType;
-        $objTemplate->tourTypesIds = implode(\StringUtil::deserialize($objEvent->tourType, true));
-        $objTemplate->tourTypesShortcuts = implode(' ', static::getTourTypesAsArray($objEvent->id, 'shortcut', true));
-        $objTemplate->eventPeriodSm = static::getEventPeriod($objEvent->id, 'd.m.Y', false);
-        $objTemplate->eventPeriodLg = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false);
-        $objTemplate->eventDuration = static::getEventDuration($objEvent->id);
-        $objTemplate->eventState = static::getEventState($objEvent->id);
-        $objTemplate->eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][static::getEventState($objEvent->id)];
-        $objTemplate->isLastMinuteTour = $objEvent->eventType === 'lastMinuteTour' ? true : false;
-        $objTemplate->isTour = $objEvent->eventType === 'tour' ? true : false;
-        $objTemplate->isGeneralEvent = $objEvent->eventType === 'generalEvent' ? true : false;
-        $objTemplate->isCourse = $objEvent->eventType === 'course' ? true : false;
-        $objTemplate->bookingCounter = static::getBookingCounter($objEvent->id);
-        $objTemplate->tourTechDifficulties = implode(' ', static::getTourTechDifficultiesAsArray($objEvent->id, true));
-        $objTemplate->instructors = implode(', ', static::getInstructorNamesAsArray($objEvent->id, false, true));
-        $objTemplate->instructorsWithQualification = implode(', ', static::getInstructorNamesAsArray($objEvent->id, true, true));
-        $objTemplate->courseTypeLevel1 = $objEvent->courseTypeLevel1;
-        $objTemplate->eventImagePath = static::getEventImagePath($objEvent->id);
-        $objTemplate->courseTypeLevel0Name = CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name;
-        $objTemplate->courseTypeLevel1Name = CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
+
+        // Add event data to template
+        self::addEventDataToTemplate($objTemplate);
 
         return $objTemplate->parse();
 
     }
+
+
+    /**
+     * Usage in event detail reader&listing template
+     * @param FrontendTemplate $objTemplate
+     * @throws \Exception
+     */
+    public static function addEventDataToTemplate(FrontendTemplate $objTemplate)
+    {
+        $objEvent = CalendarEventsModel::findByPk($objTemplate->id);
+        if ($objEvent !== null)
+        {
+            // Set event data to template
+            $objTemplate->setData($objEvent->row());
+
+            // Add more data
+            $objTemplate->eventId = sprintf('%s-%s', Date::parse('Y', $objEvent->startDate), $objEvent->id);
+            $objTemplate->tourTypesIds = implode(\StringUtil::deserialize($objEvent->tourType, true));
+            $objTemplate->tourTypesShortcuts = implode(' ', static::getTourTypesAsArray($objEvent->id, 'shortcut', true));
+            $objTemplate->tourTypesTitles = implode('<br>', static::getTourTypesAsArray($objEvent->id, 'title', false));
+            $objTemplate->eventPeriodSm = static::getEventPeriod($objEvent->id, 'd.m.Y', false);
+            $objTemplate->eventPeriodSmTooltip = static::getEventPeriod($objEvent->id, 'd.m.Y', false, true);
+            $objTemplate->eventPeriodLg = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false);
+            $objTemplate->eventPeriodLgTooltip = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false, true);
+            $objTemplate->eventDuration = static::getEventDuration($objEvent->id);
+            $objTemplate->eventState = static::getEventState($objEvent->id);
+            $objTemplate->eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][static::getEventState($objEvent->id)];
+            $objTemplate->isLastMinuteTour = $objEvent->eventType === 'lastMinuteTour' ? true : false;
+            $objTemplate->isTour = $objEvent->eventType === 'tour' ? true : false;
+            $objTemplate->isGeneralEvent = $objEvent->eventType === 'generalEvent' ? true : false;
+            $objTemplate->isCourse = $objEvent->eventType === 'course' ? true : false;
+            $objTemplate->bookingCounter = static::getBookingCounter($objEvent->id);
+            $objTemplate->tourTechDifficulties = implode(' ', static::getTourTechDifficultiesAsArray($objEvent->id, true));
+            $objTemplate->instructors = implode(', ', static::getInstructorNamesAsArray($objEvent->id, false, true));
+            $objTemplate->instructorsWithQualification = implode(', ', static::getInstructorNamesAsArray($objEvent->id, true, true));
+            $objTemplate->courseTypeLevel1 = $objEvent->courseTypeLevel1;
+            $objTemplate->eventImagePath = static::getEventImagePath($objEvent->id);
+            $objTemplate->courseTypeLevel0Name = CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name;
+            $objTemplate->courseTypeLevel1Name = CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
+            $objTemplate->eventOrganizerLogos = implode('', static::getEventOrganizersLogoAsHtml($objEvent->id, '{{image::%s?width=60}}', false));
+            $objTemplate->eventOrganizers = implode('<br>', static::getEventOrganizersAsArray($objEvent->id, 'title'));
+            $objTemplate->mainInstructorContactDataFromDb = static::generateMainInstructorContactDataFromDb($objEvent->id);
+            $objTemplate->instructorContactBoxes = static::generateInstructorContactBoxes($objEvent);
+            $objTemplate->arrTourProfile = static::getTourProfileAsArray($objEvent->id);
+            $objTemplate->gallery = static::getGallery(array(
+                'multiSRC'   => $objEvent->multiSRC,
+                'orderSRC'   => $objEvent->orderSRC,
+                'sortBy'     => 'custom',
+                'perRow'     => 4,
+                'size'       => serialize(array(400, 400, 'center_center', 'proportional')),
+                'fullsize'   => true,
+                'galleryTpl' => 'gallery_bootstrap_col-4'
+            ));
+        }
+    }
+
+    /**
+     * Usage in static::addEventDataToTemplate()/event detail reader template
+     * @param CalendarEventsModel $objEvent
+     * @return string
+     */
+    public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent)
+    {
+        $strHtml = '';
+        if ($objEvent !== null)
+        {
+            $arrInstructors = static::getInstructorsAsArray($objEvent->id, true);
+            foreach ($arrInstructors as $userId)
+            {
+                $strHtml .= '<div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4"><div class="">';
+
+                $objUser = UserModel::findByPk($userId);
+                if ($objUser !== null)
+                {
+                    $objPictureTpl = new FrontendTemplate('picture_default');
+                    $objPictureTpl->setData(generateAvatar($userId, 18));
+                    $strHtml .= '<div class="image_container portrait">';
+                    $strHtml .= sprintf('<a href="%s?username=%s" title="Leiter Portrait ansehen">', Controller::replaceInsertTags('{{link_url::leiter-portrait}}'), UserModel::findByPk($userId)->username);
+                    $strHtml .= sprintf('<figure class="avatar-large">%s</figure>', $objPictureTpl->parse());
+                    $strHtml .= '</a></div>';
+                    // End image
+
+                    // Start instructor name
+                    $strHtml .= '<div class="instructor-name">';
+                    $strQuali = '';
+                    if (static::getMainQualifikation($userId) != '')
+                    {
+                        $strQuali .= ' (' . static::getMainQualifikation($userId) . ')';
+                    }
+
+                    if (!$objUser->hideInFrontendListings)
+                    {
+                        $strHtml .= sprintf('<a href="%s?username=%s" title="Leiter Portrait ansehen">', Controller::replaceInsertTags('{{link_url::leiter-portrait}}'), $objUser->username);
+                    }
+
+                    $strHtml .= sprintf('%s %s%s', $objUser->lastname, $objUser->firstname, $strQuali);
+
+                    if (!$objUser->hideInFrontendListings)
+                    {
+                        $strHtml .= '</a>';
+                    }
+
+                    if (FE_USER_LOGGED_IN && !$objUser->hideInFrontendListings)
+                    {
+                        $arrContact = ['phone', 'mobile', 'email'];
+                        foreach ($arrContact as $field)
+                        {
+                            if ($objUser->{$field} !== '')
+                            {
+                                $strHtml .= sprintf('<div class="ce_user_portrait_%s">', $field);
+                                $strHtml .= sprintf('<small title="%s">%s</small>', $objUser->{$field}, $objUser->{$field});
+                                $strHtml .= '</div>';
+                            }
+                        }
+                    }
+                    $strHtml .= '</div>';
+                    // End instructor name
+
+                }
+                $strHtml .= '</div></div>';
+            }
+        }
+
+        return $strHtml;
+    }
+
 
     /**
      * @param $id
