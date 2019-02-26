@@ -43,6 +43,15 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = array(
     'sql'       => "int(10) unsigned NULL",
 );
 
+// activation
+$GLOBALS['TL_DCA']['tl_member']['fields']['activation'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_member']['activation'],
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => array('mandatory' => false, 'tl_class' => 'w50'),
+    'sql'       => "varchar(64) NOT NULL default ''",
+);
+
 // activationFalseTokenCounter
 $GLOBALS['TL_DCA']['tl_member']['fields']['activationFalseTokenCounter'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['activationFalseTokenCounter'],
