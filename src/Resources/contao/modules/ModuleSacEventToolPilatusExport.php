@@ -167,9 +167,9 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $range[0] = '---';
 
         $now = Date::parse('n');
-        $start = $now % 2 > 0 ? -11 : -10;
+        $start = $now % 2 > 0 ? -7 : -6;
 
-        for ($i = $start; $i < $start + 30; $i += 2)
+        for ($i = $start; $i < $start + 16; $i += 2)
         {
             // echo Date::parse('Y-m-d',strtotime(Date::parse("Y-m-1", strtotime($i . " month"))));
             //echo "<br>";
@@ -278,7 +278,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $objDatabase = Database::getInstance();
         $arrTours = array();
 
-        $oEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE startDate>=? AND endDate<=? ORDER BY startDate ASC')->execute($this->startDate, $this->endDate);
+        $oEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate ASC')->execute($this->startDate, $this->endDate);
         while ($oEvent->next())
         {
 
@@ -432,7 +432,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $objDatabase = Database::getInstance();
         $arrEvents = array();
 
-        $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE eventType=? AND startDate>=? AND endDate<=? ORDER BY startDate ASC')->execute('course', $this->startDate, $this->endDate);
+        $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE eventType=? AND startDate>=? AND startDate<=? ORDER BY startDate ASC')->execute('course', $this->startDate, $this->endDate);
         while ($objEvent->next())
         {
             $eventModel = CalendarEventsModel::findByPk($objEvent->id);
@@ -497,7 +497,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         {
             $arrOrganizerEvents = array();
 
-            $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE (eventType=?) AND startDate>=? AND endDate<=? ORDER BY startDate ASC')->execute($type, $this->startDate, $this->endDate);
+            $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE (eventType=?) AND startDate>=? AND startDate<=? ORDER BY startDate ASC')->execute($type, $this->startDate, $this->endDate);
             while ($objEvent->next())
             {
 
