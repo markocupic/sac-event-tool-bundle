@@ -249,6 +249,10 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = array(
     'Nichts',
 );
 
+
+/** Get page layout: purge script cache in dev mode **/
+$GLOBALS['TL_HOOKS']['getPageLayout'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\GetPageLayout', 'purgeScriptCache');
+
 /** Get system messages **/
 $GLOBALS['TL_HOOKS']['getSystemMessages'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\GetSystemMessages', 'listUntreatedEventSubscriptions');
 

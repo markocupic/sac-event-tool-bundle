@@ -10,10 +10,8 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
-use Contao\Automator;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
-
 
 
 /**
@@ -43,20 +41,6 @@ class InitializeSystem
      */
     public function initializeSystem()
     {
-
-        // Purge script cache in dev mode
-        $kernel = System::getContainer()->get('kernel');
-        if ($kernel->isDebug())
-        {
-            $objAutomator = new Automator();
-            $objAutomator->purgeScriptCache();
-            $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-            if (is_file($rootDir . '/files/theme-sac-pilatus/scss/main.scss'))
-            {
-                touch($rootDir . '/files/theme-sac-pilatus/scss/main.scss');
-            }
-        }
-
 
         // Prepare Plugin environment, create folders, etc.
         $objPluginEnv = System::getContainer()->get('markocupic.sac_event_tool_bundle.prepare_plugin_environment');
