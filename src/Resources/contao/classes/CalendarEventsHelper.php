@@ -88,8 +88,6 @@ class CalendarEventsHelper
         $objEvent = CalendarEventsModel::findByPk($objTemplate->id);
         if ($objEvent !== null)
         {
-            // Set event data to template
-            $objTemplate->setData($objEvent->row());
 
             // Add more data
             $objTemplate->eventId = sprintf('%s-%s', Date::parse('Y', $objEvent->startDate), $objEvent->id);
