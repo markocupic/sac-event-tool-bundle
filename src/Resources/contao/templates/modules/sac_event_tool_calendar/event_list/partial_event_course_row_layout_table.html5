@@ -1,19 +1,19 @@
-<!-- row start event: <?= $this->title ?> -->
-<tr class="event-item event-item-course event" data-id="<?= $this->id ?>" data-event-type="<?= $this->courseTypeLevel1 ?>">
+<!-- row start event: <?= $this->getEventData('title') ?> -->
+<tr class="event-item event-item-course event" data-id="<?= $this->getEventData('id') ?>" data-event-type="<?= $this->getEventData('courseTypeLevel1') ?>">
     <td>
-        <span class="d-lg-none"><?= $this->eventPeriodSm ?></span>
-        <span class="d-none d-lg-block"><?= $this->eventPeriodLg ?></span>
+        <span class="d-lg-none"><?= $this->getEventData('eventPeriodSm') ?></span>
+        <span class="d-none d-lg-block"><?= $this->getEventData('eventPeriodLg') ?></span>
     </td>
     <td class="d-none d-md-table-cell">
-        <?= $this->eventDuration ?>
+        <?= $this->getEventData('eventDuration') ?>
     </td>
     <td>
-        <i class="event-state-icon fa-fw <?= $eventState ?>" data-toggle="tooltip" data-placement="top" aria-label="<?= htmlspecialchars($this->eventStateLabel) ?>" title="<?= $this->eventStateLabel ?>"></i>
+        <i class="event-state-icon fa-fw <?= $this->getEventData('eventState') ?>" data-toggle="tooltip" data-placement="top" aria-label="<?= htmlspecialchars($this->getEventData('eventStateLabel')) ?>" title="<?= $this->getEventData('eventStateLabel') ?>"></i>
     </td>
     <td>
-        <a href="{{event_url::<?= $this->id ?>}}">{{event_title::<?= $this->id ?>}}</a>
+        <a href="{{event_url::<?= $this->getEventData('id') ?>}}">{{event_title::<?= $this->getEventData('id') ?>}}</a>
     </td>
-    <td class="d-none d-md-table-cell"><?= $this->bookingCounter ?></td>
-    <td><?= $this->instructors ?></td>
+    <td class="d-none d-md-table-cell"><?= $this->getEventData('bookingCounter') ?></td>
+    <td><?= $this->getEventData('instructors') ?></td>
 </tr>
-<!-- row end event: <?= $this->title ?> -->
+<!-- row end event: <?= $this->getEventData('title') ?> -->

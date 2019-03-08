@@ -2,73 +2,73 @@
 
 <!-- indexer::stop -->
 <p class="back m-0"><a href="javascript:history.go(-1)" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
-<div class="event event-detailview layout_full block<?= $this->class ?>">
+<div class="event event-detailview layout_full block<?= $this->getEventData('class') ?>">
 
-    <?php if ($this->eventState): ?>
-    <h4 class="event-state-headline"><?= $this->eventStateLabel ?></h4>
+    <?php if ($this->getEventData('eventState')): ?>
+    <h4 class="event-state-headline"><?= $this->getEventData('eventStateLabel') ?></h4>
     <?php endif; ?>
 
-    <h1 class="ce_headline"><?= $this->title ?></h1>
+    <h1 class="ce_headline"><?= $this->getEventData('title') ?></h1>
 
     <div class="row">
         <div class="col-lg-6">
-            {{picture::<?= $this->eventImagePath ?>?class=img-fluid&size=20&alt=<?= $this->title ?>}}
+            {{picture::<?= $this->getEventData('eventImagePath') ?>?class=img-fluid&size=20&alt=<?= $this->getEventData('title') ?>}}
         </div>
 
         <div class="col-lg-6 mt-3 mt-lg-0"><!--begin col left -->
             <div class="">
-                <?php if ($this->teaser != ''): ?>
+                <?php if ($this->getEventData('teaser') != ''): ?>
                 <div class="teaser event-detail font-weight-bold">
-                    <p><?= nl2br($this->teaser) ?></p>
+                    <p><?= nl2br($this->getEventData('teaser')) ?></p>
                 </div>
                 <?php endif; ?>
 
-                <?php if ($this->courseId != ''): ?>
+                <?php if ($this->getEventData('courseId') != ''): ?>
                 <div class="courseId event-detail event-info-box icon-box-small">
-                    <h5>Kurs-Nr.:&nbsp;<!-- indexer::continue --><?= $this->courseId ?><!-- indexer::stop --></h5>
+                    <h5>Kurs-Nr.:&nbsp;<!-- indexer::continue --><?= $this->getEventData('courseId') ?><!-- indexer::stop --></h5>
                 </div>
                 <?php endif; ?>
 
                 <div class="eventdate event-detail event-info-box icon-box-small">
                     <h5>Kursdaten:</h5>
-                    <p><?= $this->eventPeriodLg ?></p>
+                    <p><?= $this->getEventData('eventPeriodLg') ?></p>
                 </div>
 
                 <div class="organizers event-detail event-info-box icon-box-small">
                     <h5>Organisierende Gruppe</h5>
-                    <div class="organizer-logo m2-4 mb-2"><?= $this->eventOrganizerLogos ?></div>
+                    <div class="organizer-logo m2-4 mb-2"><?= $this->getEventData('eventOrganizerLogos') ?></div>
                     <p>
-                        <?php if($this->eventOrganizers !== ''): ?><?= $this->eventOrganizers ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
+                        <?php if($this->getEventData('eventOrganizers') !== ''): ?><?= $this->getEventData('eventOrganizers') ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
                     </p>
                 </div>
 
-                <?php if ($this->location != ''): ?>
+                <?php if ($this->getEventData('location') != ''): ?>
                 <div class="location event-detail event-info-box icon-box-small">
                     <h5>Kursort</h5>
-                    <p><?= $this->location ?></p>
+                    <p><?= $this->getEventData('location') ?></p>
                 </div>
                 <?php endif; ?>
 
-                <?php if ($this->leistungen != ''): ?>
+                <?php if ($this->getEventData('leistungen') != ''): ?>
                 <div class="price event-detail event-info-box icon-box-small">
                     <h5>Leistungen/Preis</h5>
                     <p>
-                        <?= nl2br($this->leistungen) ?>
+                        <?= nl2br($this->getEventData('leistungen')) ?>
                     </p>
                 </div>
                 <?php endif; ?>
 
                 <div class="mt-3">
-                    <a href="/_download/download_event_ical?eventId=<?= $this->id ?>" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary"><i class="fal fa-calendar-plus"></i> iCal download</a>
+                    <a href="/_download/download_event_ical?eventId=<?= $this->getEventData('id') ?>" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary"><i class="fal fa-calendar-plus"></i> iCal download</a>
                 </div>
 
                 <div class="mt-3">
-                    <a href="/_download/print_workshop_details_as_pdf?eventId=<?= $this->id ?>" title="Details drucken" class="btn btn-block btn-outline-primary"><i class="fal fa-print"></i> Detailinfos drucken</a>
+                    <a href="/_download/print_workshop_details_as_pdf?eventId=<?= $this->getEventData('id') ?>" title="Details drucken" class="btn btn-block btn-outline-primary"><i class="fal fa-print"></i> Detailinfos drucken</a>
                 </div>
 
-                <?php if(!$this->disableOnlineRegistration): ?>
+                <?php if(!$this->getEventData('disableOnlineRegistration')): ?>
                 <div class="event-detail-buttons mt-3">
-                    <a href="{{event_url::<?= $this->id ?>}}#eventBookingForm" title="Kurs buchen" class="btn btn-block btn-lg  btn-primary"><i class="fal fa-shopping-cart"></i> Zur Kursanmeldung</a>
+                    <a href="{{event_url::<?= $this->getEventData('id') ?>}}#eventBookingForm" title="Kurs buchen" class="btn btn-block btn-lg  btn-primary"><i class="fal fa-shopping-cart"></i> Zur Kursanmeldung</a>
                 </div>
                 <?php endif; ?>
 
@@ -83,31 +83,31 @@
 
         <div class="col-md-6"><!--begin col left-->
             <div class="m-0">
-                <?php if ($this->issues != ''): ?>
+                <?php if ($this->getEventData('issues') != ''): ?>
                 <div class="topics event-detail event-info-box icon-box-small">
                     <h5>Kursinhalte</h5>
-                    <p><?= nl2br($this->issues) ?></p>
+                    <p><?= nl2br($this->getEventData('issues')) ?></p>
                 </div>
                 <?php endif; ?>
 
-                <?php if ($this->terms != ''): ?>
+                <?php if ($this->getEventData('terms') != ''): ?>
                 <div class="terms event-detail event-info-box icon-box-small">
                     <h5>Kursziele</h5>
-                    <p><?= nl2br($this->terms) ?></p>
+                    <p><?= nl2br($this->getEventData('terms')) ?></p>
                 </div>
                 <?php endif; ?>
 
-                <?php if ($this->requirements != ''): ?>
+                <?php if ($this->getEventData('requirements') != ''): ?>
                 <div class="qualifications event-detail event-info-box icon-box-small">
                     <h5>Voraussetzungen</h5>
-                    <p><?= nl2br($this->requirements) ?></p>
+                    <p><?= nl2br($this->getEventData('requirements')) ?></p>
                 </div>
                 <?php endif; ?>
 
-                <?php if ($this->equipment != ''): ?>
+                <?php if ($this->getEventData('equipment') != ''): ?>
                 <div class="equipment event-detail event-info-box icon-box-small">
                     <h5>Ben&ouml;tigtes Material</h5>
-                    <p><?= nl2br($this->equipment) ?></p>
+                    <p><?= nl2br($this->getEventData('equipment')) ?></p>
                 </div>
                 <?php endif; ?>
             </div>
@@ -119,36 +119,36 @@
                 <div class="instructor event-detail event-info-box icon-box-small">
                     <h5>Kursleitung</h5>
                     <div class="row tiny-gutter">
-                        <?= $this->instructorContactBoxes ?>
+                        <?= $this->getEventData('instructorContactBoxes') ?>
                     </div>
                 </div>
 
-                <?php if ($this->setRegistrationPeriod): ?>
+                <?php if ($this->getEventData('setRegistrationPeriod')): ?>
                 <div class="booking-text event-detail event-info-box icon-box-small">
                     <h5>Anmeldung möglich</h5>
-                    <p>Vom <?= \Date::parse(\Config::get('datimFormat'), $this->registrationStartDate) ?> bis zum <?= \Date::parse(\Config::get('datimFormat'), $this->registrationEndDate) ?></p>
+                    <p>Vom <?= \Date::parse(\Config::get('datimFormat'), $this->getEventData('registrationStartDate')) ?> bis zum <?= \Date::parse(\Config::get('datimFormat'), $this->getEventData('registrationEndDate')) ?></p>
                 </div>
                 <?php endif; ?>
 
-                <?php if ($this->bookingEvent != '' || $this->generateMainInstructorContactDataFromDb): ?>
+                <?php if ($this->getEventData('bookingEvent') != '' || $this->getEventData('generateMainInstructorContactDataFromDb')): ?>
                 <div class="booking-text event-detail event-info-box icon-box-small">
                     <h5>Anmeldung</h5>
-                    <?php if($this->bookingEvent != ''): ?><p><?= nl2br($this->bookingEvent) ?></p><?php endif; ?>
-                    <?php if($this->generateMainInstructorContactDataFromDb): ?><p class="m-0"><?= $this->mainInstructorContactDataFromDb ?></p><?php endif; ?>
+                    <?php if($this->getEventData('bookingEvent') != ''): ?><p><?= nl2br($this->getEventData('bookingEvent')) ?></p><?php endif; ?>
+                    <?php if($this->getEventData('generateMainInstructorContactDataFromDb')): ?><p class="m-0"><?= $this->getEventData('mainInstructorContactDataFromDb') ?></p><?php endif; ?>
                 </div>
                 <?php endif; ?>
 
-                <?php if ($this->meetingPoint != ''): ?>
+                <?php if ($this->getEventData('meetingPoint') != ''): ?>
                 <div class="meeting-point event-detail event-info-box icon-box-small">
                     <h5>Zeit und Treffpunkt</h5>
-                    <p><?= nl2br($this->meetingPoint) ?></p>
+                    <p><?= nl2br($this->getEventData('meetingPoint')) ?></p>
                 </div>
                 <?php endif; ?>
 
-                <?php if ($this->miscellaneous != ''): ?>
+                <?php if ($this->getEventData('miscellaneous') != ''): ?>
                 <div class="miscellaneous event-detail event-info-box icon-box-small last">
                     <h5>Sonstiges</h5>
-                    <p><?= nl2br($this->miscellaneous) ?></p>
+                    <p><?= nl2br($this->getEventData('miscellaneous')) ?></p>
                 </div>
                 <?php endif; ?>
             </div>
@@ -159,20 +159,20 @@
 
 
     <!-- Weitere Inhaltselemente -->
-    <?php if ($this->hasDetails): ?>
-    <?php //echo $this->details; ?>
+    <?php if ($this->getEventData('hasDetails')): ?>
+    <?php //echo $this->getEventData('details'); ?>
     <?php endif; ?>
 
 
     <!-- enclosures/downloads -->
     <?php // !Vorsicht bei Urheberrechtsverletzung wie z.B. urheberrechtlich geschützen Anhängen wie Topos, Karten, etc. ?>
-    <?php if(FE_USER_LOGGED_IN || Contao\Input::get(mode) === 'eventPreview'): ?>
-    <?php if ($this->enclosure): ?>
+    <?php if(FE_USER_LOGGED_IN || Contao\Input::get('mode') === 'eventPreview'): ?>
+    <?php if ($this->getEventData('enclosure')): ?>
     <hr>
     <div class="event-eclosures event-detail event-info-box icon-box-small">
         <h5>Downloads/weitere Informationen</h5>
         <div class="enclosure">
-            <?php foreach ($this->enclosure as $enclosure): ?>
+            <?php foreach ($this->getEventData('enclosure') as $enclosure): ?>
             <p><img src="<?= $enclosure['icon'] ?>" width="18" height="18" alt="<?= $enclosure['mime'] ?>" class="mime_icon"> <a href="<?= $enclosure['href'] ?>" title="<?= $enclosure['title'] ?>"><?= $enclosure['link'] ?> <span class="size">(<?= $enclosure['filesize'] ?>)</span></a></p>
             <?php endforeach; ?>
         </div>
@@ -181,10 +181,10 @@
     <?php endif; ?>
 
 
-    <?php if ($this->addGallery): ?>
+    <?php if ($this->getEventData('addGallery')): ?>
         <!-- gallery start -->
         <hr>
-        <?= $this->gallery ?>
+        <?= $this->getEventData('gallery') ?>
         <!-- gallery end -->
     <?php endif; ?>
 

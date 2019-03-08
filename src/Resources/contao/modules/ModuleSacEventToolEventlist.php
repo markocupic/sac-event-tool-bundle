@@ -12,6 +12,7 @@ namespace Markocupic\SacEventToolBundle;
 
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Patchwork\Utf8;
+use Contao\ModuleEventlist;
 
 
 /**
@@ -29,20 +30,14 @@ use Patchwork\Utf8;
  *
  * @author Leo Feyer <https://github.com/leofeyer>
  */
-class ModuleSacEventToolEventlist extends \ModuleEventlist
+class ModuleSacEventToolEventlist extends ModuleEventlist
 {
-
-    /**
-     * Current date object
-     * @var Date
-     */
-    //protected $Date;
 
     /**
      * Template
      * @var string
      */
-    protected $strTemplate = 'mod_eventToolCalendarEventlist';
+    protected $strTemplate = 'mod_eventlist';
 
 
     /**

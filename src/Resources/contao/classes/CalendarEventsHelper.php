@@ -41,6 +41,7 @@ use Haste\Util\Url;
 class CalendarEventsHelper
 {
 
+
     /**
      * Generate/parse event row (usage in tour/course listing modules)
      * @param $eventId
@@ -77,7 +78,7 @@ class CalendarEventsHelper
 
     }
 
-
+    
     /**
      * Usage in event detail reader&listing template
      * @param FrontendTemplate $objTemplate
@@ -88,47 +89,126 @@ class CalendarEventsHelper
         $objEvent = CalendarEventsModel::findByPk($objTemplate->id);
         if ($objEvent !== null)
         {
-
-            // Add more data
-            $objTemplate->eventId = sprintf('%s-%s', Date::parse('Y', $objEvent->startDate), $objEvent->id);
-            $objTemplate->tourTypesIds = implode(\StringUtil::deserialize($objEvent->tourType, true));
-            $objTemplate->tourTypesShortcuts = implode(' ', static::getTourTypesAsArray($objEvent->id, 'shortcut', true));
-            $objTemplate->tourTypesTitles = implode('<br>', static::getTourTypesAsArray($objEvent->id, 'title', false));
-            $objTemplate->eventPeriodSm = static::getEventPeriod($objEvent->id, 'd.m.Y', false);
-            $objTemplate->eventPeriodSmTooltip = static::getEventPeriod($objEvent->id, 'd.m.Y', false, true);
-            $objTemplate->eventPeriodLg = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false);
-            $objTemplate->eventPeriodLgTooltip = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false, true);
-            $objTemplate->eventDuration = static::getEventDuration($objEvent->id);
-            $objTemplate->eventState = static::getEventState($objEvent->id);
-            $objTemplate->eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][static::getEventState($objEvent->id)];
-            $objTemplate->isLastMinuteTour = $objEvent->eventType === 'lastMinuteTour' ? true : false;
-            $objTemplate->isTour = $objEvent->eventType === 'tour' ? true : false;
-            $objTemplate->isGeneralEvent = $objEvent->eventType === 'generalEvent' ? true : false;
-            $objTemplate->isCourse = $objEvent->eventType === 'course' ? true : false;
-            $objTemplate->bookingCounter = static::getBookingCounter($objEvent->id);
-            $objTemplate->tourTechDifficulties = implode(' ', static::getTourTechDifficultiesAsArray($objEvent->id, true));
-            $objTemplate->instructors = implode(', ', static::getInstructorNamesAsArray($objEvent->id, false, true));
-            $objTemplate->instructorsWithQualification = implode(', ', static::getInstructorNamesAsArray($objEvent->id, true, true));
-            $objTemplate->courseTypeLevel1 = $objEvent->courseTypeLevel1;
-            $objTemplate->eventImagePath = static::getEventImagePath($objEvent->id);
-            $objTemplate->courseTypeLevel0Name = CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name;
-            $objTemplate->courseTypeLevel1Name = CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
-            $objTemplate->eventOrganizerLogos = implode('', static::getEventOrganizersLogoAsHtml($objEvent->id, '{{image::%s?width=60}}', false));
-            $objTemplate->eventOrganizers = implode('<br>', static::getEventOrganizersAsArray($objEvent->id, 'title'));
-            $objTemplate->mainInstructorContactDataFromDb = static::generateMainInstructorContactDataFromDb($objEvent->id);
-            $objTemplate->instructorContactBoxes = static::generateInstructorContactBoxes($objEvent);
-            $objTemplate->arrTourProfile = static::getTourProfileAsArray($objEvent->id);
-            $objTemplate->gallery = static::getGallery(array(
-                'multiSRC'   => $objEvent->multiSRC,
-                'orderSRC'   => $objEvent->orderSRC,
-                'sortBy'     => 'custom',
-                'perRow'     => 4,
-                'size'       => serialize(array(400, 400, 'center_center', 'proportional')),
-                'fullsize'   => true,
-                'galleryTpl' => 'gallery_bootstrap_col-4'
-            ));
+            $objTemplate->getEventData = (function ($prop) use (&$objEvent, &$objTemplate) {
+                switch ($prop)
+                {
+                    case 'id':
+                        return $objEvent->id;
+                        break;
+                    case 'eventId':
+                        return sprintf('%s-%s', Date::parse('Y', $objEvent->startDate), $objEvent->id);
+                        break;
+                    case 'tourTypesIds':
+                        return implode(StringUtil::deserialize($objEvent->tourType, true));
+                        break;
+                    case 'tourTypesShortcuts':
+                        return implode(' ', static::getTourTypesAsArray($objEvent->id, 'shortcut', true));
+                        break;
+                    case 'tourTypesTitles':
+                        return implode('<br>', static::getTourTypesAsArray($objEvent->id, 'title', false));
+                        break;
+                    case 'eventPeriodSm':
+                        return static::getEventPeriod($objEvent->id, 'd.m.Y', false);
+                        break;
+                    case 'eventPeriodSmTooltip':
+                        return static::getEventPeriod($objEvent->id, 'd.m.Y', false, true);
+                        break;
+                    case 'eventPeriodLg':
+                        return static::getEventPeriod($objEvent->id, 'D, d.m.Y', false);
+                        break;
+                    case 'eventPeriodLgTooltip':
+                        return static::getEventPeriod($objEvent->id, 'D, d.m.Y', false, true);
+                        break;
+                    case 'eventDuration':
+                        return static::getEventDuration($objEvent->id);
+                        break;
+                    case 'eventState':
+                        return static::getEventState($objEvent->id);
+                        break;
+                    case 'eventStateLabel':
+                        return $GLOBALS['TL_LANG']['CTE']['calendar_events'][static::getEventState($objEvent->id)];
+                        break;
+                    case 'isLastMinuteTour':
+                        return $objEvent->eventType === 'lastMinuteTour' ? true : false;
+                        break;
+                    case 'isTour':
+                        return $objEvent->eventType === 'tour' ? true : false;
+                        break;
+                    case 'isGeneralEvent':
+                        return $objEvent->eventType === 'generalEvent' ? true : false;
+                        break;
+                    case 'isCourse':
+                        return $objEvent->eventType === 'course' ? true : false;
+                        break;
+                    case 'bookingCounter':
+                        return static::getBookingCounter($objEvent->id);
+                        break;
+                    case 'tourTechDifficulties':
+                        return implode(' ', static::getTourTechDifficultiesAsArray($objEvent->id, true));
+                        break;
+                    case 'instructors':
+                        return implode(', ', static::getInstructorNamesAsArray($objEvent->id, false, true));
+                        break;
+                    case 'instructorsWithQualification':
+                        return implode(', ', static::getInstructorNamesAsArray($objEvent->id, true, true));
+                        break;
+                    case 'courseTypeLevel1':
+                        return $objEvent->courseTypeLevel1;
+                        break;
+                    case 'eventImagePath':
+                        return static::getEventImagePath($objEvent->id);
+                        break;
+                    case 'courseTypeLevel0Name':
+                        return CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name;
+                        break;
+                    case 'courseTypeLevel1Name':
+                        return CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
+                        break;
+                    case 'eventOrganizerLogos':
+                        return implode('', static::getEventOrganizersLogoAsHtml($objEvent->id, '{{image::%s?width=60}}', false));
+                        break;
+                    case 'eventOrganizers':
+                        return implode('<br>', static::getEventOrganizersAsArray($objEvent->id, 'title'));
+                        break;
+                    case 'mainInstructorContactDataFromDb':
+                        return static::generateMainInstructorContactDataFromDb($objEvent->id);
+                        break;
+                    case 'instructorContactBoxes':
+                        return static::generateInstructorContactBoxes($objEvent);
+                        break;
+                    case 'arrTourProfile':
+                        return static::getTourProfileAsArray($objEvent->id);
+                        break;
+                    case 'gallery':
+                        return static::getGallery(array(
+                            'multiSRC'   => $objEvent->multiSRC,
+                            'orderSRC'   => $objEvent->orderSRC,
+                            'sortBy'     => 'custom',
+                            'perRow'     => 4,
+                            'size'       => serialize(array(400, 400, 'center_center', 'proportional')),
+                            'fullsize'   => true,
+                            'galleryTpl' => 'gallery_bootstrap_col-4'
+                        ));
+                        break;
+                    default:
+                        $arrEvent = $objEvent->row();
+                        if (isset($objTemplate->{$prop}))
+                        {
+                            return $objTemplate->{$prop};
+                        }
+                        elseif (isset($arrEvent[$prop]))
+                        {
+                            return $arrEvent[$prop];
+                        }
+                        else
+                        {
+                            return "";
+                        }
+                }
+            });
         }
     }
+
 
     /**
      * Usage in static::addEventDataToTemplate()/event detail reader template
