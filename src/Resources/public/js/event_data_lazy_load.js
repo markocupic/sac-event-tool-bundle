@@ -8,29 +8,35 @@
 (function ($) {
     $(document).ready(function () {
         var arrDataXhr = [];
-        var rt = $('[data-request-token]').first().data('request-token');
-        $('[data-event-lazyload]').each(function () {
-            var arrData = $(this).data('event-lazyload').split(',');
+        var rt = jQuery('[data-request-token]').first().data('request-token');
+        var i=0;
+        jQuery('[data-event-lazyload]').each(function () {
+            i++;
+            var arrData = jQuery(this).data('event-lazyload').split(',');
             var eventId = arrData[0];
             var eventField = arrData[1];
             arrDataXhr.push(arrData);
-        });
-
-        if (arrDataXhr.length) {
-            var jqxhr = $.post('ajax', {
-                'REQUEST_TOKEN': rt,
-                'action': 'getEventData',
-                'data': JSON.stringify(arrDataXhr),
-            }).done(function (json) {
-                if (json.status === 'success') {
-                    jQuery.each(json.data, function (key, value) {
-                        var element = $('[data-event-lazyload="' + value[0] + ',' + value[1] + '"').first();
-                        $(element).append(value[2]);
+            if(i%100 == 0){
+                var arrXHR = arrDataXhr;
+                arrDataXhr = [];
+                if (arrXHR.length) {
+                    var jqxhr = jQuery.post('ajax', {
+                        'REQUEST_TOKEN': rt,
+                        'action': 'getEventData',
+                        'data': JSON.stringify(arrXHR),
+                    }).done(function (json) {
+                        if (json.status === 'success') {
+                            jQuery.each(json.data, function (key, value) {
+                                var element = jQuery('[data-event-lazyload="' + value[0] + ',' + value[1] + '"').first();
+                                jQuery(element).append(value[2]);
+                            });
+                        }
+                        console.log('lazyload' + i);
+                    }).always(function () {
+                        //window.location.reload();
                     });
                 }
-            }).always(function () {
-                //window.location.reload();
-            });
-        }
+            }
+        });
     });
 })(jQuery);
