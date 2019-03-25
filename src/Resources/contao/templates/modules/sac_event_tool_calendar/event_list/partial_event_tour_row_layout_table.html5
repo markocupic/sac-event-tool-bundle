@@ -1,7 +1,7 @@
 <!-- row start event: <?= $this->getEventData('title') ?> -->
 <tr class="event-item event-item-tour event" data-id="<?= $this->getEventData('id') ?>" data-event-type="<?= $this->getEventData('tourTypesIds') ?>">
     <td>
-        <span class="d-lg-none"><?= $this->getEventData('eventPeriodSm') ?></span>
+        <span class="d-lg-none" data-event-lazyload="<?= $this->getEventData('id') ?>,eventPeriodSm">></span>
         <span class="d-none d-lg-block"><?= $this->getEventData('eventPeriodLg') ?></span>
     </td>
     <td class="d-none d-md-table-cell">
@@ -16,7 +16,7 @@
         <?php endif; ?>
         <a href="{{event_url::<?= $this->getEventData('id') ?>}}">{{event_title::<?= $this->getEventData('id') ?>}}</a>
     </td>
-    <td class="d-none d-md-table-cell"><?= $this->getEventData('bookingCounter') ?></td>
+    <td class="d-none d-md-table-cell" data-event-lazyload="<?= $this->getEventData('id') ?>,bookingCounter"></td>
     <td class="tourTechDifficulty d-none d-md-table-cell"><?= $this->getEventData('tourTechDifficulties') ?></td>
     <td class="tourType d-none d-md-table-cell"><?= $this->getEventData('tourTypesShortcuts') ?></td>
     <td><?= $this->getEventData('instructors') ?></td>

@@ -33,13 +33,41 @@ use Markocupic\SacEventToolBundle\RotateImage;
 use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-
 /**
  * Class FrontendAjax
  * @package Markocupic\SacEventToolBundle\FrontendAjax
  */
 class FrontendAjax
 {
+
+    /**
+     * Ajax lazyload for the calendar event list module
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function getEventData()
+    {
+        $arrJSON = [];
+
+        $arrData = json_decode(Input::post('data'));
+        foreach ($arrData as $i => $v)
+        {
+            // $v[0] is the event id
+            $objEvent = CalendarEventsModel::findByPk($v[0]);
+            if ($objEvent !== null)
+            {
+                // $v[1] fieldname/property
+                $strHtml = CalendarEventsHelper::getEventData($objEvent, $v[1]);
+                $arrData[$i][] = $strHtml;
+            }
+        }
+
+        $arrJSON['status'] = 'success';
+        $arrJSON['data'] = $arrData;
+
+        $response = new JsonResponse($arrJSON);
+        return $response->send();
+    }
 
     /**
      * Course list filter
@@ -79,7 +107,6 @@ class FrontendAjax
             }
         }
 
-
         if ($intStartDate < 1)
         {
             if (!Input::post('year') || Input::post('year') < 1)
@@ -107,7 +134,6 @@ class FrontendAjax
                     }
                 }
 
-
                 // startDate
                 if ($filter === false)
                 {
@@ -117,7 +143,6 @@ class FrontendAjax
                     }
                 }
 
-
                 // tourtype (climbing, ski, via ferrata, etc) multiple=true
                 if ($filter === false)
                 {
@@ -126,7 +151,6 @@ class FrontendAjax
                         $filter = true;
                     }
                 }
-
 
                 // organizers
                 if ($filter === false)
@@ -140,16 +164,12 @@ class FrontendAjax
                     }
                 }
 
-
                 // Textsuche
                 if ($filter === false)
                 {
-
                     if ($strSearchterm != '')
                     {
-
                         $treffer = 0;
-
 
                         foreach (explode(' ', $strSearchterm) as $strNeedle)
                         {
@@ -200,14 +220,12 @@ class FrontendAjax
                             }
                         }
 
-
                         if ($treffer < 1)
                         {
                             $filter = true;
                         }
                     }
                 }
-
 
                 // All ok, this item will not be filtered
                 if ($filter === false)
@@ -221,7 +239,6 @@ class FrontendAjax
 
         $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'false', 'status' => 'success', 'filter' => $visibleItems));
         return $response->send();
-
     }
 
     /**
@@ -257,7 +274,6 @@ class FrontendAjax
         }
         return false;
     }
-
 
     /**
      * Course list filter
@@ -297,7 +313,6 @@ class FrontendAjax
             }
         }
 
-
         if ($intStartDate < 1)
         {
             if (!Input::post('year') || Input::post('year') < 1)
@@ -334,7 +349,6 @@ class FrontendAjax
                     }
                 }
 
-
                 // courseType
                 if ($filter === false)
                 {
@@ -343,7 +357,6 @@ class FrontendAjax
                         $filter = true;
                     }
                 }
-
 
                 // organizers
                 if ($filter === false)
@@ -357,11 +370,9 @@ class FrontendAjax
                     }
                 }
 
-
                 // Textsuche
                 if ($filter === false)
                 {
-
                     if ($strSearchterm != '')
                     {
                         $treffer = 0;
@@ -372,7 +383,6 @@ class FrontendAjax
                             {
                                 continue;
                             }
-
 
                             // Suche nach Namen des Kursleiters
                             $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
@@ -407,15 +417,12 @@ class FrontendAjax
                             }
                         }
 
-
                         if ($treffer < 1)
                         {
                             $filter = true;
                         }
-
                     }
                 }
-
 
                 // All ok, this item will not be filtered
                 if ($filter === false)
@@ -429,7 +436,6 @@ class FrontendAjax
 
         $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'false', 'status' => 'success', 'filter' => $visibleItems));
         return $response->send();
-
     }
 
     /**
@@ -438,7 +444,6 @@ class FrontendAjax
      */
     public function sortGallery()
     {
-
         if (Input::post('action') !== 'sortGallery' || !Input::post('uuids') || !Input::post('eventId') || !FE_USER_LOGGED_IN)
         {
             $response = new JsonResponse(array('status' => 'error'));
@@ -477,9 +482,7 @@ class FrontendAjax
 
         $response = new JsonResponse(array('status' => 'success'));
         return $response->send();
-
     }
-
 
     /**
      * Ajax call
@@ -487,7 +490,6 @@ class FrontendAjax
      */
     public function setPublishState()
     {
-
         if (Input::post('action') !== 'setPublishState' || !Input::post('eventId') || !FE_USER_LOGGED_IN)
         {
             $response = new JsonResponse(array('status' => 'error'));
@@ -527,7 +529,6 @@ class FrontendAjax
 
             if (null !== $objNotification && null !== $objUser && Input::post('eventId') > 0)
             {
-
                 $objEvent = CalendarEventsModel::findByPk(Input::post('eventId'));
                 $objInstructor = UserModel::findByPk($objEvent->mainInstructor);
                 $instructorName = '';
@@ -579,7 +580,6 @@ class FrontendAjax
 
                 $webmasterEmail = implode(',', $arrNotifyEmail);
 
-
                 if ($objEvent !== null)
                 {
                     $arrTokens = array(
@@ -603,7 +603,6 @@ class FrontendAjax
                 $objNotification->send($arrTokens, 'de');
             }
         }
-
 
         // Save publish state
         $objStory->publishState = Input::post('publishState');
@@ -686,7 +685,6 @@ class FrontendAjax
         return $response->send();
     }
 
-
     /**
      * Ajax call
      * Rotate image
@@ -756,7 +754,6 @@ class FrontendAjax
         }
         $response = new JsonResponse(array('status' => 'error'));
         return $response->send();
-
     }
 
     /**
@@ -801,6 +798,5 @@ class FrontendAjax
         }
         $response = new JsonResponse(array('status' => 'error'));
         return $response->send();
-
     }
 }

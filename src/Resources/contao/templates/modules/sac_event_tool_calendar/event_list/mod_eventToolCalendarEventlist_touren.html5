@@ -1,3 +1,7 @@
+<?php
+$GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/event_data_lazy_load.js|static";
+?>
+<div data-request-token="{{request_token}}" style="display:none"></div>
 <!-- indexer::stop -->
 <div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
     <?php $this->block('headline'); ?>

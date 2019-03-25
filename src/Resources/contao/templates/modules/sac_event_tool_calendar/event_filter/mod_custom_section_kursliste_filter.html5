@@ -1,6 +1,7 @@
 <?php
 $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.js|static";
 ?>
+
 <!-- indexer::stop -->
 <script>
     $().ready(function () {

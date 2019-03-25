@@ -37,6 +37,13 @@ class AjaxController extends AbstractController
             throw $this->createNotFoundException('The route "/ajax" is allowed to xhr requests only.');
         }
 
+        // Ajax lazyload for the calendar event list module
+        if (Input::post('action') === 'getEventData')
+        {
+            $controller = new FrontendAjax();
+            $controller->getEventData();
+        }
+
         // Tour filter
         if (Input::post('action') === 'filterTourList')
         {
