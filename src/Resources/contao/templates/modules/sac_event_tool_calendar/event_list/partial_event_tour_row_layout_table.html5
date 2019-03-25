@@ -1,7 +1,7 @@
 <!-- row start event: <?= $this->getEventData('title') ?> -->
 <tr class="event-item event-item-tour event" data-id="<?= $this->getEventData('id') ?>" data-event-type="<?= $this->getEventData('tourTypesIds') ?>">
     <td>
-        <span class="d-lg-none" data-event-lazyload="<?= $this->getEventData('id') ?>,eventPeriodSm">></span>
+        <span class="d-lg-none" data-event-lazyload="<?= $this->getEventData('id') ?>,eventPeriodSm"></span>
         <span class="d-none d-lg-block" data-event-lazyload="<?= $this->getEventData('id') ?>,eventPeriodLg"></span>
     </td>
     <td class="d-none d-md-table-cell" data-event-lazyload="<?= $this->getEventData('id') ?>,eventDuration">
