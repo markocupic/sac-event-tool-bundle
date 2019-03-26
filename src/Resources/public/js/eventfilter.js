@@ -97,8 +97,7 @@ var EventFilter = {
 
         $('.alert-no-results-found').remove();
         $('.event-item').each(function () {
-            $(this).hide();
-            $(this).removeClass('visible');
+            $(this).hide().removeClass('visible');
         });
     },
 
@@ -143,14 +142,12 @@ var EventFilter = {
             var date = new Date(match[3], match[2] - 1, match[1]);
             var tstamp = Math.round(date.getTime() / 1000);
             if (!isNaN(tstamp)) {
-                self.$ctrlDateStartHidden.val(tstamp);
-                self.$ctrlDateStartHidden.attr('value', tstamp);
+                self.$ctrlDateStartHidden.val(tstamp).attr('value', tstamp);
                 self.queueRequest();
                 return;
             }
         }
-        self.$ctrlDateStartHidden.attr('value', '0');
-        self.$ctrlDateStartHidden.val('0');
+        self.$ctrlDateStartHidden.attr('value', '0').val('0');
         self.queueRequest();
     },
 
@@ -210,13 +207,11 @@ var EventFilter = {
             eventId: strEventId
         }
 
-        // No ajax request after page is loades and if all inputs are empty
+        // No ajax request on domready and if all filter inputs are empty
         if (self.$requestCounter == 0 && inputs['year'] == 0 && inputs['eventType'] == 0 && inputs['eventId'] == "" && inputs['searchterm'] == "" && inputs['startDate'] == 0 && arrOrganizers.length < 1) {
             self.hideLoadingIcon();
-            $('.event-item').each(function () {
-                $(this).show();
-                $(this).addClass('visible');
-            });
+            $('.event-item').show().addClass('visible');
+
             if (typeof self.options['eventContainer'] !== 'undefined') {
                 $(self.options['eventContainer']).removeClass('d-none');
             }
@@ -232,11 +227,9 @@ var EventFilter = {
             request.done(function (json) {
                 if (json) {
                     self.hideLoadingIcon();
-                    //window.console.log(json);
                     $.each(json.filter, function (key, id) {
                         $('.event-item[data-id="' + id + '"]').each(function () {
-                            $(this).show();
-                            $(this).addClass('visible');
+                            $(this).show().addClass('visible');
                             itemsFound++;
                         });
                     });

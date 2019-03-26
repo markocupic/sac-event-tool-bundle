@@ -1721,6 +1721,10 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         }
         if ($objEvent !== null)
         {
+
+            // Delete request cache
+            tl_calendar_events_request_cache::deleteRequestCache();
+
             $lastEventReleaseModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
             if ($lastEventReleaseModel !== null)
             {

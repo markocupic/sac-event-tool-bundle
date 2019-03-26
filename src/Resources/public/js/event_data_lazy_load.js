@@ -16,13 +16,15 @@
             console.log('Request token is missing.');
         }
         let i = 0;
+        let loadNumberOfItemsAtOnce = 100;
         let lazyLoadItems = jQuery('[data-event-lazyload]');
         if (lazyLoadItems.length) {
             jQuery(lazyLoadItems).each(function () {
                 i++;
                 let arrData = jQuery(this).data('event-lazyload').split(',');
                 arrDataXhr.push(arrData);
-                if (i % 100 === 0 || i === lazyLoadItems.length) {
+                if (i % loadNumberOfItemsAtOnce === 0 || i === lazyLoadItems.length) {
+                    loadNumberOfItemsAtOnce = lazyLoadItems.length - loadNumberOfItemsAtOnce + 1;
                     let arrXHR = arrDataXhr;
                     arrDataXhr = [];
                     if (arrXHR.length) {

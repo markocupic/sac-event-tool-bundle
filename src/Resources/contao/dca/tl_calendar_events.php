@@ -10,12 +10,10 @@
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
-
 // Keys
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['mountainguide'] = 'index';
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventState'] = 'index';
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventReleaseLevel'] = 'index';
-
 
 // Callbacks
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'onloadCallback');
@@ -34,6 +32,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = arra
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'adjustEventReleaseLevel');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'adjustDurationInfo');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'setEventToken');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_request_cache', 'deleteRequestCache');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['oncreate_callback'][] = array('tl_calendar_events_request_cache', 'deleteRequestCache');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['ondelete_callback'][] = array('tl_calendar_events_request_cache', 'deleteRequestCache');
+
+// Fields callback
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['published']['save_callback'][] = array('tl_calendar_events_request_cache', 'deleteRequestCache');
 
 // Buttons callback
 $GLOBALS['TL_DCA']['tl_calendar_events']['edit']['buttons_callback'][] = array('tl_calendar_events_sac_event_tool', 'buttonsCallback');
@@ -44,14 +48,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['disableGrouping'] =
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['fields'] = array('startDate ASC');
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['child_record_callback'] = array('tl_calendar_events_sac_event_tool', 'listEvents');
 
-
 // Subpalettes
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['allowDeregistration'] = 'deregistrationLimit';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addGallery'] = 'multiSRC';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['setRegistrationPeriod'] = 'registrationStartDate,registrationEndDate';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addMinAndMaxMembers'] = 'minMembers,maxMembers';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['customizeEventRegistrationConfirmationEmailText'] = 'customEventRegistrationConfirmationEmailText';
-
 
 // Reset palettes
 $strLegends = '
@@ -74,7 +76,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addMin
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addGallery';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'setRegistrationPeriod';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'customizeEventRegistrationConfirmationEmailText';
-
 
 // Default palettes (define it for any case, f.ex edit all mode)
 // Put here all defined fields in the dca
@@ -100,7 +101,6 @@ PaletteManipulator::create()
     ->addField(array('cssClass', 'noComments'), 'expert_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_calendar_events');
 
-
 // Tour and lastMinuteTour palette
 PaletteManipulator::create()
     ->addField(array('eventType'), 'event_type_legend', PaletteManipulator::POSITION_APPEND)
@@ -119,7 +119,6 @@ PaletteManipulator::create()
     ->addField(array('cssClass', 'noComments'), 'expert_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('tour', 'tl_calendar_events')
     ->applyToPalette('lastMinuteTour', 'tl_calendar_events');
-
 
 // generalEvent
 // same like tour but remove Fields: 'suitableForBeginners', 'tourTechDifficulty', 'tourProfile', 'mountainguide','tourDetailText', 'requirements'
@@ -161,12 +160,10 @@ PaletteManipulator::create()
     ->addField(array('cssClass', 'noComments'), 'expert_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('course', 'tl_calendar_events');
 
-
 // Tour report palette
 PaletteManipulator::create()
     ->addField(array('executionState', 'eventSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents', 'eventReportAdditionalNotices'), 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('tour_report', 'tl_calendar_events');
-
 
 // Global operations
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year'] = array
@@ -224,11 +221,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelNext
     'button_callback' => array('tl_calendar_events_sac_event_tool', 'releaseLevelNext'),
 );
 
-
 // Operations Button Callbacks
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['delete']['button_callback'] = array('tl_calendar_events_sac_event_tool', 'deleteIcon');
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['copy']['button_callback'] = array('tl_calendar_events_sac_event_tool', 'copyIcon');
-
 
 // alias
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['alias']['input_field_callback'] = array('tl_calendar_events_sac_event_tool', 'showFieldValue');
@@ -250,7 +245,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startDate']['flag'] = 5;
 // teaser
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['rte'] = null;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['mandatory'] = true;
-
 
 // minMembers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId'] = array(
@@ -667,7 +661,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['orderSRC'] = array(
     'sql'   => "blob NULL",
 );
 
-
 // tour type
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType'] = array(
     'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourType'],
@@ -679,7 +672,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType'] = array(
     'eval'       => array('multiple' => true, 'chosen' => true, 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr m12'),
     'sql'        => "blob NULL",
 );
-
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'],
@@ -726,7 +718,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = array
     ),
     'sql'       => "blob NULL",
 );
-
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfile'],
@@ -847,7 +838,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfi
     'sql'       => "text NULL",
 );
 
-
 // Tour report fields:
 // This field is autofilled, if a user has filled in the event report
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = array(
@@ -880,7 +870,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = array(
     'eval'       => array('multiple' => false, 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr m12'),
     'sql'        => "varchar(255) NOT NULL default ''",
 );
-
 
 // eventSubstitutionText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = array(
@@ -928,7 +917,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReportAdditionalNotices
     'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
     'sql'       => "text NULL",
 );
-
 
 // For these fields allow editing on first release level only
 $allowEdititingOnFirstReleaseLevelOnly = array(

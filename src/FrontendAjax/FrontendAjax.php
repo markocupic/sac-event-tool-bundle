@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\FrontendAjax;
 
 use Contao\CalendarEventsModel;
+use Contao\CalendarEventsRequestCacheModel;
 use Contao\CalendarEventsStoryModel;
 use Contao\Config;
 use Contao\Database;
@@ -74,16 +75,15 @@ class FrontendAjax
      */
     public function filterTourList()
     {
-        // Load from cache
-        if (!isset($_SESSION['eventFilterCache']))
-        {
-            $_SESSION['eventFilterCache'] = array();
-        }
+        // Delete old requests from cache
+        Database::getInstance()->prepare('DELETE FROM tl_calendar_events_request_cache WHERE tstamp<?')->execute(time() - (7 * 24 * 60 * 60));
 
-        if (isset($_SESSION['eventFilterCache'][md5(serialize($_POST))]))
+        // Load from cache
+        $objRequestCache = CalendarEventsRequestCacheModel::findByInput(md5(serialize($_POST)));
+        if ($objRequestCache !== null)
         {
-            $visibleItems = $_SESSION['eventFilterCache'][md5(serialize($_POST))];
-            $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'true', 'status' => 'success', 'filter' => $visibleItems));
+            $visibleItems = $objRequestCache->value;
+            $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'true', 'status' => 'success', 'filter' => StringUtil::deserialize($visibleItems, true)));
             return $response->send();
         }
 
@@ -235,9 +235,14 @@ class FrontendAjax
             }
         }
 
-        $_SESSION['eventFilterCache'][md5(serialize($_POST))] = $visibleItems;
+        // Save request
+        $objRequestCache = new CalendarEventsRequestCacheModel();
+        $objRequestCache->tstamp = time();
+        $objRequestCache->input = md5(serialize($_POST));
+        $objRequestCache->value = serialize($visibleItems);
+        $objRequestCache->save();
 
-        $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'false', 'status' => 'success', 'filter' => $visibleItems));
+        $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'false', 'status' => 'success', 'filter' => StringUtil::deserialize($visibleItems, true)));
         return $response->send();
     }
 
@@ -280,16 +285,15 @@ class FrontendAjax
      */
     public function filterCourseList()
     {
-        // Load from cache
-        if (!isset($_SESSION['eventFilterCache']))
-        {
-            $_SESSION['eventFilterCache'] = array();
-        }
+        // Delete old requests from cache
+        Database::getInstance()->prepare('DELETE FROM tl_calendar_events_request_cache WHERE tstamp<?')->execute(time() - (7 * 24 * 60 * 60));
 
-        if (isset($_SESSION['eventFilterCache'][md5(serialize($_POST))]))
+        // Load from cache
+        $objRequestCache = CalendarEventsRequestCacheModel::findByInput(md5(serialize($_POST)));
+        if ($objRequestCache !== null)
         {
-            $visibleItems = $_SESSION['eventFilterCache'][md5(serialize($_POST))];
-            $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'true', 'status' => 'success', 'filter' => $visibleItems));
+            $visibleItems = $objRequestCache->value;
+            $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'true', 'status' => 'success', 'filter' => StringUtil::deserialize($visibleItems, true)));
             return $response->send();
         }
 
@@ -432,9 +436,14 @@ class FrontendAjax
             }
         }
 
-        $_SESSION['eventFilterCache'][md5(serialize($_POST))] = $visibleItems;
+        // Save request
+        $objRequestCache = new CalendarEventsRequestCacheModel();
+        $objRequestCache->tstamp = time();
+        $objRequestCache->input = md5(serialize($_POST));
+        $objRequestCache->value = serialize($visibleItems);
+        $objRequestCache->save();
 
-        $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'false', 'status' => 'success', 'filter' => $visibleItems));
+        $response = new JsonResponse(array('rt' => $_POST['REQUEST_TOKEN'], 'postSerialize' => md5(serialize($_POST)), 'fromCache' => 'false', 'status' => 'success', 'filter' => StringUtil::deserialize($visibleItems, true)));
         return $response->send();
     }
 
