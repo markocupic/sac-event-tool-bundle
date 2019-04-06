@@ -13,7 +13,7 @@
         <?php if ($this->getEventData('isLastMinuteTour')): ?>
         <span class="last-minute-tour small"><i class="fa fa-clock"></i> LAST MINUTE TOUR</span><br>
         <?php endif; ?>
-        <a href="{{event_url::<?= $this->getEventData('id') ?>}}">{{event_title::<?= $this->getEventData('id') ?>}}</a>
+        <a href="{{event_url::<?= $this->getEventData('id') ?>}}" class="event-title-link">{{event_title::<?= $this->getEventData('id') ?>}}</a>
     </td>
     <td class="d-none d-md-table-cell" data-event-lazyload="<?= $this->getEventData('id') ?>,bookingCounter"></td>
     <td class="tourTechDifficulty d-none d-md-table-cell" data-event-lazyload="<?= $this->getEventData('id') ?>,tourTechDifficulties"></td>

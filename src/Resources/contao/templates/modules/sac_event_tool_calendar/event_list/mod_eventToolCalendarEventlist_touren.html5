@@ -41,7 +41,7 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/event_data_lazy
 
 <!-- Modal -->
 <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModal" aria-hidden="true">
-  <div style="width:1300px; max-width:1300px" class="modal-dialog modal-xl" role="document">
+  <div style="width:1450px; max-width:1450px" class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Schliessen">
@@ -57,7 +57,8 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/event_data_lazy
 <script>
   jQuery('a.event-title-link').click(function(e){
 
-      if(window.innerHeight<1400){
+      // Do not show modal on small screens
+      if(window.innerWidth < 1500){
           return;
       }
       e.stopPropagation();
@@ -66,10 +67,12 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/event_data_lazy
       var jqxhr = $.get(url, {
 
       }).done(function (json) {
-         var site = json;
-         var elDetail = $(site).find('#main .inside');
-          $('#eventModal').find('.modal-body').html($(elDetail).html());
-          $('#eventModal').modal('show');
+        var site = json;
+        var elDetail = $(site).find('#main .inside');
+        $(elDetail).find('.article-inside.container').removeClass('container');
+        $(elDetail).find('.back').remove();
+        $('#eventModal').find('.modal-body').html($(elDetail).html());
+        $('#eventModal').modal('show');
       }).always(function (json) {
           //
       });
