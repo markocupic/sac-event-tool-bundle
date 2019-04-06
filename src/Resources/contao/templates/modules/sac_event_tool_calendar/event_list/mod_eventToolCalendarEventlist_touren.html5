@@ -55,29 +55,30 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/event_data_lazy
 </div>
 <!-- end Modal -->
 <script>
-  jQuery('a.event-title-link').click(function(e){
+    jQuery('a.event-title-link').click(function(e){
+        return;
+        // Do not show modal on small screens
+        if(window.innerWidth < 1500){
+            return;
+        }
+        e.stopPropagation();
+        e.preventDefault();
+        var url = $(this).attr('href');
+        var jqxhr = $.get(url, {
 
-      // Do not show modal on small screens
-      if(window.innerWidth < 1500){
-          return;
-      }
-      e.stopPropagation();
-      e.preventDefault();
-      var url = $(this).attr('href');
-      var jqxhr = $.get(url, {
-
-      }).done(function (json) {
-        var site = json;
-        var elDetail = $(site).find('#main .inside');
-        $(elDetail).find('.article-inside.container').removeClass('container');
-        $(elDetail).find('.back').remove();
-        $('#eventModal').find('.modal-body').html($(elDetail).html());
-        $('#eventModal').modal('show');
-      }).always(function (json) {
-          //
-      });
-  });
+        }).done(function (json) {
+            var site = json;
+            var elDetail = $(site).find('#main .inside');
+            $(elDetail).find('.article-inside.container').removeClass('container');
+            $(elDetail).find('.back').remove();
+            $('#eventModal').find('.modal-body').html($(elDetail).html());
+            $('#eventModal').modal('show');
+        }).always(function (json) {
+            //
+        });
+    });
 </script>
+
 
 
 
