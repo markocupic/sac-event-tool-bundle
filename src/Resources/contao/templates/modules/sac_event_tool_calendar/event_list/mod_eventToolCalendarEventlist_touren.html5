@@ -69,10 +69,15 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/event_data_lazy
         }).done(function (json) {
             var site = json;
             var elDetail = $(site).find('#main .inside');
-            $(elDetail).find('.article-inside.container').removeClass('container');
-            $(elDetail).find('.back').remove();
-            $('#eventModal').find('.modal-body').html($(elDetail).html());
-            $('#eventModal').modal('show');
+            $('#main .inside > *').addClass('temporary-hidden').hide();
+            $('#main .inside').first().prepend($(elDetail).html());
+
+            $('.back').first().click(function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                $('#main .inside > *').first().remove();
+                $('.temporary-hidden').removeClass('temporary-hidden').show();
+            });
         }).always(function (json) {
             //
         });
