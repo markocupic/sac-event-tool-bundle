@@ -10,20 +10,17 @@
 
 $rootDir = Contao\System::getContainer()->getParameter('kernel.project_dir');
 
-
 // Add notification center configs
 require_once($rootDir . '/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/config/notification_center_config.php');
 
 // include custom functions
 require_once($rootDir . '/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/functions/functions.php');
 
-
 if (TL_MODE == 'BE')
 {
     // Add Backend CSS
     $GLOBALS['TL_CSS'][] = 'bundles/markocupicsaceventtool/css/be_stylesheet.css';
 }
-
 
 $GLOBALS['BE_MOD']['content']['calendar']['tables'] = array('tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member');
 $GLOBALS['BE_MOD']['sac_be_modules'] = array(
@@ -81,7 +78,6 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = array(
 $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containers';
 $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
 
-
 // Frontend Modules
 $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
     'eventToolFrontendUserDashboard'         => 'Markocupic\SacEventToolBundle\ModuleSacEventToolMemberDashboard',
@@ -117,7 +113,6 @@ $GLOBALS['TL_PURGE']['tables']['sac_event_story']['callback'] = array(
 // Do not index a page if one of the following parameters is set
 $GLOBALS['TL_NOINDEX_KEYS'][] = 'xhrAction';
 
-
 // TL_CONFIG
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'] = array(
     'course',
@@ -151,7 +146,6 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL']
     'avalanche_level_5',
 );
 
-
 // Guide qualifications
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = array(
     1 => "Tourenleiter SAC",
@@ -179,7 +173,6 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = array(
     14 => "3 - 5",
     15 => "4 - 5",
 );
-
 
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'] = array(
     'ca. 1 h'           => array('dateRows' => 1),
@@ -249,7 +242,6 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = array(
     'Nichts',
 );
 
-
 /** Get page layout: purge script cache in dev mode **/
 $GLOBALS['TL_HOOKS']['getPageLayout'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\GetPageLayout', 'purgeScriptCache');
 
@@ -270,7 +262,6 @@ $GLOBALS['TL_HOOKS']['executePreActions'][] = array('markocupic_sac_event_tool.c
 
 /** Handle custom rgxp in the backend **/
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic_sac_event_tool.contao_hooks.add_custom_regexp', 'addCustomRegexp');
-
 
 /** Prepare User accounts (create user directories, etc.
  * @deprecated PostLogin Hook will be be removed in Contao 5.0.

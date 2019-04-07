@@ -24,5 +24,6 @@ $GLOBALS['TL_LANG']['tl_module']['eventStoryUploadFolder'] = array('Event-Berich
 $GLOBALS['TL_LANG']['tl_module']['notifyOnEventStoryPublishedNotificationId'] = array('Benachrichtigung bei neu erstelltem Event-Bericht', '');
 $GLOBALS['TL_LANG']['tl_module']['activateMemberAccountNotificationId'] = array('Benachrichtigung bei Mitgliederkonto Aktivierung', '');
 $GLOBALS['TL_LANG']['tl_module']['jumpToWhenNotActivated'] = array('Weiterleitung zur Seite mit Kontoaktivierungsmodul', 'Legen Sie fest zu welcher Seite ein Mitglied weitergeleitet wird, wenn das Mitgliederkonto deaktiviert ist (login = false)');
+$GLOBALS['TL_LANG']['tl_module']['eventType'] = array('Event Art', 'Legen Sie fest welche Event-Arten angezeigt werden sollen.');
 
 

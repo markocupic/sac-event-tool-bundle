@@ -18,9 +18,9 @@ exit;
 <!-- indexer::stop -->
 
 <div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
-<?php $this->block('headline'); ?>
-<?php if ($this->headline): ?><<?= $this->hl ?> class="ce_headline"><?= $this->headline ?></<?= $this->hl ?>><?php endif; ?>
-<?php $this->endblock(); ?>
+
+<<?= $this->hl ?> class="ce_headline"><?= $this->headline ?> <?= $this->year ?></<?= $this->hl ?>>
+
 
 
     <!-- button bar -->
@@ -49,9 +49,6 @@ exit;
                     </button>
                 </a>
             </li>
-            <li>
-                <button class="d-none d-lg-none btn btn-outline-success toggle-filter-btn" onclick=""><i class="fa fa-filter"></i> Filter öffnen</button>
-            </li>
             <!-- Button trigger modal -->
             <li>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#kursstufenModal">
@@ -62,9 +59,14 @@ exit;
     </div>
     <!-- end button bar -->
 
+<?php if(!$this->hasItems): ?>
+<div class="alert alert-dark" role="alert">
+    <p>Leider wurden zu deiner Suchanfrage keine Events gefunden. Bitte überprüfe die Filtereinstellungen.</p>
+</div>
+<?php endif; ?>
 
 <?php if ($_SESSION['layout_table']): ?>
-    <table class="event-container d-none table layout-table table-responsive">
+    <table class="event-container table layout-table table-responsive">
         <tr>
             <th>Datum</th>
             <th class="d-none d-md-table-cell">Dauer</th>
@@ -75,24 +77,13 @@ exit;
         </tr>
 <?php endif; ?>
 
-    <?php if(!$_SESSION['layout_table']): ?><div class="event-container d-none row"><?php endif; ?>
+    <?php if(!$_SESSION['layout_table']): ?><div class="event-container row"><?php endif; ?>
 
     <?= $this->events ?>
 
     <?php if ($_SESSION['layout_table']): ?></table><?php endif; ?>
 
     <?php if(!$_SESSION['layout_table']): ?></div><?php endif; ?>
-
-
-    <!-- loader icon -->
-    <div class="loader-icon-container visible loading-icon-lg">
-        <div class="preloader-icon fa-5x">
-            <i style="color:#0082c7;" class="fal fa-circle-notch fa-spin"></i>
-        </div>
-        <div class="preloader-text">
-            {{br}}{{br}}Bitte etwas Geduld.{{br}}Die Event-Liste wird geladen.
-        </div>
-    </div>
 
     <!-- Modal -->
     <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModal" aria-hidden="true">

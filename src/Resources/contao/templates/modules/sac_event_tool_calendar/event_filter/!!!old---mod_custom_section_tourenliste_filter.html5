@@ -1,0 +1,117 @@
+<?php
+$GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.js|static";
+?>
+<!-- indexer::stop -->
+<script>
+    $().ready(function () {
+        "use strict";
+
+        /**
+         * Initialize filter board
+         */
+        EventFilter.initialize($('.mod_eventToolCalendarEventlist'), {
+            filterBoardId: <?= $this->id ?>,
+            requestToken: '<?= REQUEST_TOKEN ?>',
+            xhr: {
+                action: 'ajax?filterTourList'
+            },
+            delay: 1500,
+            loadingIcon: '.loading-icon-container',
+            eventContainer: '.event-container',
+            noResult:{
+                html: '<div class="alert alert-primary alert-no-results-found text-lg" role="alert"><h5><i class="fal fa-meh" aria-hidden="true"></i> Leider wurden zu deiner Suchanfrage keine Events gefunden. &Uuml;berp&uuml;fe bitte die Filtereinstellungen.</h5></div>'
+            }
+        });
+
+        $('#eventFilterBoard').css('opacity',1);
+
+    });
+</script>
+
+<div class="filter-board" class="invisible" style="opacity:0" id="eventFilterBoard">
+  <div class="inside">
+
+    <div class="d-lg-none text-right">
+      <button class="btn btn-link close-event-filter-button"><i class="fal fa-times"></i> Filter schliessen</button>
+      {{br}}{{br}}
+    </div>
+    <div class="row">
+
+      <div id="eventYear" class="col-6 col-sm-4">
+        <label for="ctrl_eventYear">Jahr</label>
+        <select class="form-control filter-select" name="year" id="ctrl_eventYear">
+          <option value="0"<?= !\Input::get('year') ? ' selected' : '' ?>>alle zuk&uuml;nftigen Touren und Anl&auml;sse zeigen</option>
+            <?php for ($i = intval(\Date::parse('Y')) + 1; $i > 2015; $i--): ?>
+                <?php if (\Input::get('year') != '')
+                {
+                    $selected = \Input::get('year') == $i ? ' selected' : '';
+                }
+                ?>
+              <option value="<?= $i ?>"<?= $selected ?>>Jahr <?= $i ?></option>
+            <?php endfor; ?>
+        </select>
+      </div>
+
+      <div id="eventType" class="col-6 col-sm-4">
+        <label for="ctrl_event_type">Tour-/Anlasstyp?</label>
+        <select class="form-control filter-select" id="ctrl_eventType">
+          <option value="0">alle Touren und Anl&auml;sse zeigen</option>
+            <?php $tourTypes = TourTypeModel::findAll(); ?>
+            <?php if ($tourTypes !== null): ?>
+                <?php while ($tourTypes->next()): ?>
+                <option value="<?= $tourTypes->id ?>"> <?= $tourTypes->title ?></option>
+                <?php endwhile; ?>
+            <?php endif; ?>
+        </select>
+      </div>
+
+      <div id="search" class="col-6 col-sm-4">
+        <div class="form-group">
+          <label for="ctrl_search">Im Text suchen:</label>
+          <input type="text" class="form-control" name="searchterm" id="ctrl_search" placeholder="Suchen">
+        </div>
+      </div>
+
+      <div id="dateStart" class="col-6 col-sm-4">
+        <label for="ctrl_dateStart">Anzeigen ab:</label>
+        <input type="hidden" id="ctrl_dateStartHidden" value="0">
+        <div class="input-group date">
+          <input type="text" id="ctrl_dateStart" class="form-control" data-date-now="<?= \Date::parse('d-m-Y') ?>" placeholder="dd-mm-yyyy" value="">
+          <div class="input-group-append">
+            <button class="btn btn-danger" type="button"><i class="fa fa-th"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-4">
+        <div id="organizers">
+            <?php $objOrganizers = \EventOrganizerModel::findAll(array('order' => 'sorting ASC')); ?>
+            <?php if ($objOrganizers !== null): ?>
+              <label for="ctrl_organizers">Veranstalter:</label>
+              <select placeholder="Organisierende Gruppe" style="width:100%" id="ctrl_organizers" multiple tabindex="3">
+                  <?php while ($objOrganizers->next()): ?>
+                    <option value="<?= $objOrganizers->id ?>" id="organizator-select-option-<?= $objOrganizers->id ?>"><?= $objOrganizers->title ?></option>
+                  <?php endwhile; ?>
+              </select>
+            <?php endif; ?>
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-4">
+        <div id="eventId">
+          <label for="ctrl_eventId">Eventnummer:</label>
+          <input type="text" id="ctrl_eventId" class="form-control" name="eventId" placeholder="<?= \Contao\Date::parse("Y") ?>-*****" value="">
+        </div>
+      </div>
+
+    </div><!-- endrow -->
+    <div class="mt-3">
+      <a href="#" class="reset-form">Filter zur&uuml;cksetzen</a>
+    </div>
+  </div>
+</div>
+<!-- indexer::continue -->
+
+
+
+

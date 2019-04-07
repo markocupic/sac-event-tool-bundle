@@ -1,0 +1,104 @@
+<?php
+$GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/event_data_lazy_load.js|static";
+?>
+<div data-request-token="{{request_token}}" style="display:none"></div>
+<!-- indexer::stop -->
+<div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
+    <?php $this->block('headline'); ?>
+    <?php if ($this->headline): ?>
+  <<?= $this->hl ?> class="ce_headline"><?= $this->headline ?></<?= $this->hl ?>>
+<?php endif; ?>
+<?php $this->endblock(); ?>
+
+
+
+<!-- button bar -->
+<div class="button-bar">
+  <ul>
+    <li>
+      <button class="btn btn-outline-primary" data-toggle="modal" data-target="#tourDifficultiesModal"><i class="fal fa-question"></i> Schwierigkeitsgrade</button>
+    </li>
+    <li>
+      <button class="d-none d-lg-none btn btn-success toggle-filter-btn" onclick=""><i class="fal fa-filter"></i> Filter öffnen</button>
+    </li>
+  </ul>
+</div>
+<!-- end button bar -->
+
+<table class="event-container d-none table layout-table table-responsive">
+  <tr>
+    <th>Datum</th>
+    <th class="d-none d-md-table-cell">Dauer</th>
+    <th></th>
+    <th>Tour</th>
+    <th class="d-none d-md-table-cell">Anz.</th>
+    <th class="d-none d-md-table-cell">Anf.</th>
+    <th class="d-none d-md-table-cell">Art</th>
+    <th>Leitung</th>
+  </tr>
+    <?= $this->events ?>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModal" aria-hidden="true">
+  <div style="width:1450px; max-width:1450px" class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Schliessen">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end Modal -->
+<script>
+    jQuery('a.event-title-link').click(function(e){
+        return;
+        // Do not show modal on small screens
+        if(window.innerWidth < 1500){
+            return;
+        }
+        e.stopPropagation();
+        e.preventDefault();
+        var url = $(this).attr('href');
+        var jqxhr = $.get(url, {
+
+        }).done(function (json) {
+            var site = json;
+            var elDetail = $(site).find('#main .inside');
+            $('#main .inside > *').addClass('temporary-hidden').hide();
+            $('#main .inside').first().prepend($(elDetail).html());
+
+            $('.back').first().click(function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                $('#main .inside > *').first().remove();
+                $('.temporary-hidden').removeClass('temporary-hidden').show();
+            });
+        }).always(function (json) {
+            //
+        });
+    });
+</script>
+
+
+
+
+<!-- loader icon -->
+<div class="loader-icon-container visible loading-icon-lg">
+  <div class="preloader-icon fa-5x">
+    <i style="color:#0082c7;" class="fal fa-circle-notch fa-spin"></i>
+  </div>
+  <div class="preloader-text">
+    {{br}}{{br}}Bitte etwas Geduld.{{br}}Die Event-Liste wird geladen.
+  </div>
+</div>
+
+
+
+
+</div>
+<!-- indexer::continue -->
