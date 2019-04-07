@@ -84,53 +84,6 @@ exit;
     <?php if ($_SESSION['layout_table']): ?></table><?php endif; ?>
 
     <?php if(!$_SESSION['layout_table']): ?></div><?php endif; ?>
-
-    <!-- Modal -->
-    <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModal" aria-hidden="true">
-        <div style="width:1450px; max-width:1450px" class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Schliessen">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- end Modal -->
-    <script>
-        jQuery('a.event-title-link').click(function(e){
-            return;
-            // Do not show modal on small screens
-            if(window.innerWidth < 1500){
-                return;
-            }
-            e.stopPropagation();
-            e.preventDefault();
-            var url = $(this).attr('href');
-            var jqxhr = $.get(url, {
-
-            }).done(function (json) {
-                var site = json;
-                var elDetail = $(site).find('#main .inside');
-                $('#main .inside > *').addClass('temporary-hidden').hide();
-                $('#main .inside').first().prepend($(elDetail).html());
-
-                $('.back').first().click(function(e){
-                    e.stopPropagation();
-                    e.preventDefault();
-                    $('#main .inside > *').first().remove();
-                    $('.temporary-hidden').removeClass('temporary-hidden').show();
-                });
-            }).always(function (json) {
-                //
-            });
-        });
-    </script>
-
-
 </div>
 
 

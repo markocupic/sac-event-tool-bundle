@@ -14,6 +14,7 @@ use Contao\BackendTemplate;
 use Contao\Config;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\Database;
+use Contao\Environment;
 use Contao\Date;
 use Contao\Events;
 use Contao\FilesModel;
@@ -26,28 +27,11 @@ use Contao\UserModel;
 use Patchwork\Utf8;
 
 /**
- * Front end module "event list".
- *
- * @property bool $cal_noSpan
- * @property string $cal_template
- * @property int $cal_limit
- * @property string $cal_order
- * @property array $cal_calendar
- * @property string $cal_format
- * @property bool $cal_ignoreDynamic
- * @property int $cal_readerModule
- * @property bool $cal_hideRunning
- *
- * @author Leo Feyer <https://github.com/leofeyer>
+ * Class ModuleSacEventToolEventlist
+ * @package Markocupic\SacEventToolBundle
  */
 class ModuleSacEventToolEventlist extends Events
 {
-
-    /**
-     * Current date object
-     * @var Date
-     */
-    protected $Date;
 
     /**
      * Template
@@ -65,7 +49,7 @@ class ModuleSacEventToolEventlist extends Events
         if (TL_MODE == 'BE')
         {
             $objTemplate = new BackendTemplate('be_wildcard');
-            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['eventlist'][0]) . ' ###';
+            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventlist'][0]) . ' ###';
             $objTemplate->title = $this->headline;
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
@@ -211,8 +195,12 @@ class ModuleSacEventToolEventlist extends Events
         }
     }
 
+    /**
+     * @return array
+     */
     protected function getEvents()
     {
+        // Build query string
         $query = 'SELECT * FROM tl_calendar_events WHERE published=\'1\' AND pid IN(' . implode(',', $this->cal_calendar) . ')';
 
         // Filter eventType
