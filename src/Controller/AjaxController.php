@@ -44,20 +44,6 @@ class AjaxController extends AbstractController
             $controller->getEventData();
         }
 
-        // Tour filter
-        if (Input::post('action') === 'filterTourList')
-        {
-            $controller = new FrontendAjax();
-            $controller->filterTourList();
-        }
-
-        // Course filter
-        if (Input::post('action') === 'filterCourseList')
-        {
-            $controller = new FrontendAjax();
-            $controller->filterCourseList();
-        }
-
         // Event story
         if (Input::post('action') === 'setPublishState')
         {

@@ -32,12 +32,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = arra
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'adjustEventReleaseLevel');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'adjustDurationInfo');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_sac_event_tool', 'setEventToken');
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = array('tl_calendar_events_request_cache', 'deleteRequestCache');
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['oncreate_callback'][] = array('tl_calendar_events_request_cache', 'deleteRequestCache');
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['ondelete_callback'][] = array('tl_calendar_events_request_cache', 'deleteRequestCache');
-
-// Fields callback
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['published']['save_callback'][] = array('tl_calendar_events_request_cache', 'deleteRequestCache');
 
 // Buttons callback
 $GLOBALS['TL_DCA']['tl_calendar_events']['edit']['buttons_callback'][] = array('tl_calendar_events_sac_event_tool', 'buttonsCallback');
