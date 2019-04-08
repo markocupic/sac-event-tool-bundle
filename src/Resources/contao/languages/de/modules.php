@@ -8,8 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
-
 // Backend Modules
 $GLOBALS['TL_LANG']['MOD']['sac_be_modules'] = array('SAC Module');
 $GLOBALS['TL_LANG']['MOD']['sac_course_main_types_tool'] = array('Kurs-Hauptkategorien');
@@ -26,8 +24,6 @@ $GLOBALS['TL_LANG']['MOD']['sac_cabanne_tool'] = array('H&uuml;tten-Tool');
 $GLOBALS['TL_LANG']['MOD']['sac_user_role_tool'] = array('Vereinsfunktionen-Tool');
 $GLOBALS['TL_LANG']['MOD']['sac_event_type_tool'] = array('SAC Event-Art-Tool');
 
-
-
 // Frontend modules
 $GLOBALS['TL_LANG']['FMD']['sac_event_tool_fe_modules'] = array('SAC Frontend Module');
 $GLOBALS['TL_LANG']['FMD']['eventToolFrontendUserDashboard'] = array('SAC Mitglieder Dashboard');
@@ -41,4 +37,5 @@ $GLOBALS['TL_LANG']['FMD']['eventToolEventToolPilatusExport'] = array('SAC Event
 $GLOBALS['TL_LANG']['FMD']['eventToolEventToolJahresprogrammExport'] = array('SAC Event-Export f&uuml;r Jahresprogramm');
 $GLOBALS['TL_LANG']['FMD']['eventToolActivateMemberAccount'] = array('SAC Mitgliederkonto Aktivierungsformular');
 $GLOBALS['TL_LANG']['FMD']['eventToolCsvExport'] = array('SAC-Member- und Backend-User CSV-Export-Funktion');
+$GLOBALS['TL_LANG']['FMD']['eventToolEventFilterForm'] = array('SAC-Event-Liste-Filter');
 

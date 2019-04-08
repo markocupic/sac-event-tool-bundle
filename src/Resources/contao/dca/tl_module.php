@@ -23,6 +23,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolEventToolPilatusExport'] =
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolEventToolJahresprogrammExport'] = '{title_legend},name,headline,type,print_export_allowedEventTypes;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolActivateMemberAccount'] = '{title_legend},name,headline,type;{account_legend},reg_groups;cc{notification_legend},activateMemberAccountNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolCsvExport'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['eventToolEventFilterForm'] = '{title_legend},name,headline,type;{config_legend},eventFilterBoardFields;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
 // Manipulate palettes
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()
@@ -150,5 +151,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['jumpToWhenNotActivated'] = array(
     'sql'        => "int(10) unsigned NOT NULL default '0'",
     'relation'   => array('type' => 'hasOne', 'load' => 'eager')
 );
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = array(
+    'label'            => &$GLOBALS['TL_LANG']['tl_module']['eventFilterBoardFields'],
+    'inputType'        => 'checkboxWizard',
+    'options_callback' => array('tl_module_sac_event_tool', 'getEventFilterBoardFields'),
+    'eval'             => array('mandatory' => false, 'multiple' => true, 'ooorderField'=>'orderSRC', 'tl_class' => 'clr'),
+    'sql'              => "blob NULL"
+);
+
 
 

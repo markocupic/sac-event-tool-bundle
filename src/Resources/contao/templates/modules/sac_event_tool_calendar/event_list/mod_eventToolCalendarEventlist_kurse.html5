@@ -1,63 +1,33 @@
-<?php
-// Start session
-session_start();
-if (\Environment::get('isAjaxRequest') && \Input::get('xhrAction') === 'switchLayout')
-{
-    if (isset($_SESSION['layout_table']))
-    {
-        unset($_SESSION['layout_table']);
-    }
-    else
-    {
-        $_SESSION['layout_table'] = true;
-    }
-    echo json_encode(array('status' => 'success'));
-exit;
-}
-?>
-<!-- indexer::stop -->
+<?php $this->extend('block_unsearchable'); ?>
 
-<div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
+<?php $this->block('content'); ?>
 
-<<?= $this->hl ?> class="ce_headline"><?= $this->headline ?> <?= $this->year ?></<?= $this->hl ?>>
-
-
-
-    <!-- button bar -->
-    <div class="button-bar">
-        <ul>
-            <li>
-                <button class="btn btn-danger switch-layout" title="Switch Layout">
-                    <?php if ($_SESSION['layout_table']): ?>
-                    <i class="fa fa-fw fa-list"></i>
-                    <?php else: ?>
-                    <i class="fa fa-fw fa-th"></i>
-                    <?php endif; ?>
+<!-- button bar -->
+<div class="button-bar">
+    <ul>
+        <li>
+            <a href="/_download/print_workshop_booklet_as_pdf?year=current&cat=0">
+                <button class="text-right btn btn-success" title="Kursprogramm als pdf Brosch&uuml;re herunterladen">
+                    <i class="fa fa-fw fa-file-pdf"></i>
                 </button>
-            </li>
-            <li>
-                <a href="/_download/print_workshop_booklet_as_pdf?year=current&cat=0">
-                    <button class="text-right btn btn-success" title="Kursprogramm als pdf Brosch&uuml;re herunterladen">
-                        <i class="fa fa-fw fa-file-pdf"></i>
-                    </button>
-                </a>
-            </li>
-            <li>
-                <a href="/_download/print_workshop_details_as_docx?calendarId=6&year={{date::Y}}">
-                    <button class="text-right btn btn-primary" title="Kursprogramm herunterladen im docx Format herunterladen">
-                        <i class="fa fa-fw fa-file-word"></i>
-                    </button>
-                </a>
-            </li>
-            <!-- Button trigger modal -->
-            <li>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#kursstufenModal">
-                    Kursstufen
+            </a>
+        </li>
+        <li>
+            <a href="/_download/print_workshop_details_as_docx?calendarId=6&year={{date::Y}}">
+                <button class="text-right btn btn-primary" title="Kursprogramm herunterladen im docx Format herunterladen">
+                    <i class="fa fa-fw fa-file-word"></i>
                 </button>
-            </li>
-        </ul>
-    </div>
-    <!-- end button bar -->
+            </a>
+        </li>
+        <!-- Button trigger modal -->
+        <li>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#kursstufenModal">
+                Kursstufen
+            </button>
+        </li>
+    </ul>
+</div>
+<!-- end button bar -->
 
 <?php if(!$this->hasItems): ?>
 <div class="alert alert-dark" role="alert">
@@ -65,44 +35,10 @@ exit;
 </div>
 <?php endif; ?>
 
-<?php if ($_SESSION['layout_table']): ?>
-    <table class="event-container table layout-table table-responsive">
-        <tr>
-            <th>Datum</th>
-            <th class="d-none d-md-table-cell">Dauer</th>
-            <th>Status</th>
-            <th>Kurs</th>
-            <th>Anz.</th>
-            <th class="d-none d-md-table-cell">Leitung</th>
-        </tr>
+<?php if($this->hasItems): ?>
+<div class="event-container row">
+    <?= $this->events ?>
+</div>
 <?php endif; ?>
 
-    <?php if(!$_SESSION['layout_table']): ?><div class="event-container row"><?php endif; ?>
-
-    <?= $this->events ?>
-
-    <?php if ($_SESSION['layout_table']): ?></table><?php endif; ?>
-
-    <?php if(!$_SESSION['layout_table']): ?></div><?php endif; ?>
-</div>
-
-
-<script>
-    (function ($) {
-        $(document).ready(function () {
-            $(".switch-layout").click(function () {
-                console.log(window.location.href);
-                var data = {
-                    'xhrAction': 'switchLayout'
-                };
-                $.getJSON(window.location.href, data, function (response) {
-                    console.log(response);
-                    if (response['status'] == 'success') {
-                        window.location.href = window.location.href;
-                    }
-                });
-            });
-        });
-    })(jQuery);
-</script>
-<!-- indexer::continue -->
+<?php $this->endblock(); ?>

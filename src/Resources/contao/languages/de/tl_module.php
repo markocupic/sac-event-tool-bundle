@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 // Legends
 $GLOBALS['TL_LANG']['tl_module']['member_dashboard_upcoming_events_legend'] = 'Member Dashboard: Zuk&uuml;nftige Events';
 $GLOBALS['TL_LANG']['tl_module']['jumpTo_legend'] = 'Weiterleitungs-Einstellungen';
@@ -25,5 +24,6 @@ $GLOBALS['TL_LANG']['tl_module']['notifyOnEventStoryPublishedNotificationId'] = 
 $GLOBALS['TL_LANG']['tl_module']['activateMemberAccountNotificationId'] = array('Benachrichtigung bei Mitgliederkonto Aktivierung', '');
 $GLOBALS['TL_LANG']['tl_module']['jumpToWhenNotActivated'] = array('Weiterleitung zur Seite mit Kontoaktivierungsmodul', 'Legen Sie fest zu welcher Seite ein Mitglied weitergeleitet wird, wenn das Mitgliederkonto deaktiviert ist (login = false)');
 $GLOBALS['TL_LANG']['tl_module']['eventType'] = array('Event Art', 'Legen Sie fest welche Event-Arten angezeigt werden sollen.');
+$GLOBALS['TL_LANG']['tl_module']['eventFilterBoardFields'] = array('Event-Filter-Felder', 'Legen Sie hier die Felder fest, die im Filter angezeigt werden sollen.');
 
 

@@ -20,15 +20,11 @@ var EventFilter = {
         // Initialize Select2 for organizer input
         $('#ctrl_organizers').select2();
         window.setTimeout(function () {
-            $('#organizers').removeClass('d-none');
-        }, 90);
-        window.setTimeout(function () {
-            $('.filter-board > .inside').css('visibility', 'visible');
-        }, 100);
-
+            $('.filter-board-widget').css('visibility', 'visible');
+        }, 20);
 
         // Reset form
-        $('.reset-form').click(function (e) {
+        $('.filter-board .reset-form').click(function (e) {
             e.stopPropagation();
             e.preventDefault();
             window.location.href = location.href.replace(location.search, '');

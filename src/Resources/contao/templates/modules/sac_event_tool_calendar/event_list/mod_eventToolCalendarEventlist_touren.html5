@@ -1,18 +1,14 @@
-<?php
-$GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/event_data_lazy_load.js|static";
-?>
+<?php $this->extend('block_unsearchable'); ?>
+
+<?php $this->block('content'); ?>
+<?php //$GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/event_data_lazy_load.js|static"; ?>
 <div data-request-token="{{request_token}}" style="display:none"></div>
-
-<!-- indexer::stop -->
-<div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
-
-<<?= $this->hl ?> class="ce_headline"><?= $this->headline ?> <?= $this->year ?></<?= $this->hl ?>>
 
 <!-- button bar -->
 <div class="button-bar">
   <ul>
     <li>
-      <button class="btn btn-outline-primary" data-toggle="modal" data-target="#tourDifficultiesModal"><i class="fal fa-question"></i> Schwierigkeitsgrade</button>
+      <button class="btn btn-primary" data-toggle="modal" data-target="#tourDifficultiesModal">Schwierigkeitsgrade</button>
     </li>
   </ul>
 </div>
@@ -24,7 +20,7 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/event_data_lazy
 </div>
 <?php endif; ?>
 
-
+<?php if($this->hasItems): ?>
 <table class="event-container table layout-table table-responsive">
   <tr>
     <th>Datum</th>
@@ -36,11 +32,12 @@ $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/event_data_lazy
     <th class="d-none d-md-table-cell">Art</th>
     <th>Leitung</th>
   </tr>
-    <?= $this->events ?>
+  <?= $this->events ?>
 </table>
+<?php endif; ?>
 
 <?php if($this->pagination): ?>
 <?= $this->pagination ?>
 <?php endif; ?>
-</div>
-<!-- indexer::continue -->
+
+<?php $this->endblock(); ?>

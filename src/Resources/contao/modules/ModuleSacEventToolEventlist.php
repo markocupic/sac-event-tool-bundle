@@ -14,8 +14,8 @@ use Contao\BackendTemplate;
 use Contao\Config;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\Database;
-use Contao\Environment;
 use Contao\Date;
+use Contao\Environment;
 use Contao\Events;
 use Contao\FilesModel;
 use Contao\FrontendTemplate;
@@ -191,7 +191,7 @@ class ModuleSacEventToolEventlist extends Events
         // Headline
         if (Input::get('year') > 2000)
         {
-            $this->Template->year = Input::get('year');
+            $this->Template->headline = $this->headline != '' ? $this->headline . ' ' . Input::get('year') : Input::get('year');
         }
     }
 
