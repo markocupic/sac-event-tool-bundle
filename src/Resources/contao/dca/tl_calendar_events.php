@@ -316,6 +316,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'multiColumnWizard',
+    'save_callback' => array(array('tl_calendar_events_sac_event_tool', 'saveCallbackSetMaininstructor')),
     'eval'      => array
     (
         'mandatory'    => true,
