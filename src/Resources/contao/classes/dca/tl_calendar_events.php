@@ -926,6 +926,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         {
             // Set logged in User as author
             $objEventsModel->author = $this->User->id;
+            $objEventsModel->eventToken = $this->generateEventToken($insertId);
             $objEventsModel->save();
 
             // Set eventReleaseLevel
@@ -1193,8 +1194,27 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             return;
         }
 
-        $strToken = md5(rand(100000000, 999999999)) . $dc->id;
+        $objEvent = \Contao\CalendarEventsModel::findByPk($dc->activeRecord->id);
+        if ($objEvent !== null)
+        {
+            if (strpos($objEvent->eventToken, '-' . $dc->activeRecord->id) === false)
+            {
+                $objEvent->eventToken = $this->generateEventToken($dc->activeRecord->id);
+                $objEvent->save();
+            }
+        }
+
+        $strToken = $this->generateEventToken($dc->activeRecord->id);
         $this->Database->prepare('UPDATE tl_calendar_events SET eventToken=? WHERE id=? AND eventToken=?')->execute($strToken, $dc->activeRecord->id, '');
+    }
+
+    /**
+     * @param $eventId
+     * @return string
+     */
+    public function generateEventToken($eventId)
+    {
+        return md5(rand(100000000, 999999999)) . '-' . $eventId;
     }
 
     /**
