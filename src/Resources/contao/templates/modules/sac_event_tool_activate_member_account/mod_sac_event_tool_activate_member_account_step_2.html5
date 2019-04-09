@@ -1,0 +1,25 @@
+<?php $this->extend('block_unsearchable'); ?>
+
+<?php $this->block('content'); ?>
+
+<!-- step 2 -->
+<h6 class="mt-0 mb-4 form-step">Schritt <?= $this->step ?> von 4</h6>
+
+<p>Zu deinen Eingaben wurde das folgende Mitgliederkonto gefunden:{{br}}{{br}}
+    <strong><?= $this->objMember->firstname ?> <?= $this->objMember->lastname ?></strong>{{br}}
+    <?= $this->objMember->street ?>{{br}}
+    <?= $this->objMember->postal ?> <?= $this->objMember->city ?>{{br}}
+    Mitgl.-Nr. <?= $this->objMember->sacMemberId ?>{{br}}
+</p>
+
+<p class="alert alert-primary" role="alert">Du hast auf deine E-Mail-Adresse "<?= $this->objMember->email ?>" einen Aktivierungscode zugesandt bekommen. Der Aktivierungscode ist nur <strong>60 Minuten</strong> lang g&uuml;ltig. Bitte pr&uuml;fe jetzt dein E-Mail-Postfach (und evtl. auch dein Spam-Verzeichnis), um die Aktivierung mit der Eingabe des Aktivierungscodes abzuschliessen.</p>
+{{br}}
+<?php if ($this->hasError): ?>
+<p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
+<?php endif; ?>
+
+<?php if(!$this->Template->doNotShowForm): ?>
+<?= $this->form ?>
+<?php endif; ?>
+
+<?php $this->endblock(); ?>

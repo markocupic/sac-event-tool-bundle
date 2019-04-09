@@ -1,7 +1,7 @@
-<div class="block <?= $this->class ?>">
+<?php $this->extend('block_searchable'); ?>
 
-  <p class="small mb-0">Verfasst von: <strong><?= $this->authorName ?></strong>, <?= \Date::parse('d.m.Y', $this->addedOn) ?></p>
-  <h1 class="ce_headline"><?= $this->title ?></h1>
+<?php $this->block('content'); ?>
+
   <?php if($this->eventSubstitutionText != ''): ?>
     <h4 class="mt-0 mb-3" style="color: red">Ausweichtour: <?= $this->eventSubstitutionText ?></h4>
   <?php endif; ?>
@@ -44,3 +44,5 @@
     <?php endif; ?>
 
 </div>
+
+<?php $this->endblock(); ?>

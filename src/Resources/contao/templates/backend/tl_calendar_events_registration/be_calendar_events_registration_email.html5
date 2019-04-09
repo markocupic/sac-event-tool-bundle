@@ -1,0 +1,63 @@
+<div class="registration-email">
+    <h1 class="headline"><?= $this->headline ?></h1>
+
+    <?php if($this->form->hasFormField('subject')): ?>
+    <?= $this->form->getWidget('subject')->parse() ?>
+    <?php endif; ?>
+
+    <?php if($this->form->hasFormField('text')): ?>
+    <?= $this->form->getWidget('text')->parse() ?>
+    <?php endif; ?>
+
+    <?php if($this->form->hasFormField('submit')): ?>
+    <?= $this->form->getWidget('submit')->parse() ?>
+    <?php endif; ?>
+</div>
+
+<style type='text/css'>
+    .registration-email .headline{
+        margin: 15px 15px 40px 15px;
+        font-size: 1.25rem;
+        color: green;
+    }
+    .registration-email .widget{
+        margin-bottom: 40px;
+        width: 100%;
+        max-width: 800px;
+    }
+    .registration-email input.text, .registration-email textarea{
+        width: 100%;
+        padding: 4px;
+    }
+    .registration-email label {
+        display:block;
+        margin: 12px 0 5px 0;
+        font-weight: bold;
+    }
+    .registration-email .submit{
+        padding: 7px 12px;
+        border: 1px solid #aaa;
+        border-radius: 2px;
+        box-sizing: border-box;
+        cursor: pointer;
+        background: #eee;
+        transition: background .2s ease;
+    }
+
+</style>
+
+<script>
+    /**
+     * Prevent multiple clicks
+     * Disable Submit Button Upon Form Submission
+     */
+    window.addEvent('domready', function() {
+        $('tl_calendar_events_member').addEvent('submit', function(){
+            if($$('input[name="subject"]').get('value') != '' && $$('textarea[name="text"]').get('value') != '')
+            {
+                document.getElementById('ctrl_submit').disabled = 1;
+            }
+        });
+    });
+
+</script>

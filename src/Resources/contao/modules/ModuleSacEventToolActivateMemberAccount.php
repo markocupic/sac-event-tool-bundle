@@ -10,7 +10,6 @@
 
 namespace Markocupic\SacEventToolBundle;
 
-
 use Contao\BackendTemplate;
 use Contao\Config;
 use Contao\Controller;
@@ -24,11 +23,9 @@ use Contao\Module;
 use Contao\StringUtil;
 use Contao\System;
 use Haste\Form\Form;
-use Haste\Haste;
 use Haste\Util\Url;
 use NotificationCenter\Model\Notification;
 use Patchwork\Utf8;
-
 
 session_start();
 
@@ -109,20 +106,20 @@ class ModuleSacEventToolActivateMemberAccount extends Module
             Controller::redirect($url);
         }
 
+        $this->step = Input::get('step');
+        $this->strTemplate = 'mod_sac_event_tool_activate_member_account_step_' . $this->step;
+
         return parent::generate();
     }
-
 
     /**
      * Generate the module
      */
     protected function compile()
     {
-        $this->step = Input::get('step');
         $this->Template->step = $this->step;
         $this->Template->hasError = false;
         $this->Template->errorMsg = '';
-
 
         switch ($this->step)
         {
@@ -192,19 +189,16 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         }
     }
 
-
     /**
      * @return null
      */
     protected function generateFirstForm()
     {
-
         $objForm = new Form('form-activate-member-account', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
         $url = Environment::get('uri');
         $objForm->setFormActionFromUri($url);
-
 
         $objForm->addFormField('username', array(
             'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_sacMemberId'],
@@ -236,10 +230,8 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         // DO NOT use this method with generate() as the "form" template provides those fields by default.
         $objForm->addContaoHiddenFields();
 
-
         $objWidget = $objForm->getWidget('dateOfBirth');
         $objWidget->addAttribute('placeholder', 'dd.mm.YYYY');
-
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate())
@@ -299,9 +291,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                 }
             }
 
-
             $this->Template->hasError = $hasError;
-
 
             // Save data to tl_member
             if (!$hasError)
@@ -373,14 +363,12 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         // DO NOT use this method with generate() as the "form" template provides those fields by default.
         $objForm->addContaoHiddenFields();
 
-
         // Check activation token
         $hasError = false;
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate() && Input::post('activationToken') !== '')
         {
-
             $token = trim(Input::post('activationToken'));
 
             $objMember = MemberModel::findByPk($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId']);
@@ -454,13 +442,11 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         $this->objForm = $objForm;
     }
 
-
     /**
      *
      */
     protected function generateThirdForm()
     {
-
         $objForm = new Form('form-activate-member-account-set-password', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
@@ -484,7 +470,6 @@ class ModuleSacEventToolActivateMemberAccount extends Module
         // DO NOT use this method with generate() as the "form" template provides those fields by default.
         $objForm->addContaoHiddenFields();
 
-
         // Check activation token
         $hasError = false;
 
@@ -498,11 +483,9 @@ class ModuleSacEventToolActivateMemberAccount extends Module
 
         $this->Template->hasError = $hasError;
 
-
         // validate() also checks whether the form has been submitted
         if ($objForm->validate() && $hasError === false)
         {
-
             // Save data to tl_member
             if (!$hasError)
             {
@@ -511,7 +494,7 @@ class ModuleSacEventToolActivateMemberAccount extends Module
                     $objMemberModel->password = password_hash(Input::post('password'), PASSWORD_DEFAULT);
                     $objMemberModel->activation = '';
                     $objMemberModel->activationLinkLifetime = 0;
-                    $objMember->activationFalseTokenCounter = 0;
+                    $objMemberModel->activationFalseTokenCounter = 0;
                     $objMemberModel->login = '1';
 
                     // Add groups
@@ -538,7 +521,6 @@ class ModuleSacEventToolActivateMemberAccount extends Module
 
         $this->objForm = $objForm;
     }
-
 
     /**
      * @param $objMember

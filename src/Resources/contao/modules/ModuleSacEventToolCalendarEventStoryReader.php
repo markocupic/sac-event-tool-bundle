@@ -86,13 +86,6 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
             return '';
         }
 
-        $objStory = CalendarEventsStoryModel::findAll();
-        while ($objStory->next())
-        {
-            //$objStory->securityToken = md5(rand(100000000, 999999999)) . $objStory->id;
-            //$objStory->save();
-        }
-
 
         if (strlen(Input::get('securityToken')))
         {
@@ -127,8 +120,8 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
         // Set data
         $this->Template->setData($this->story->row());
 
-        //$text = MarkdownExtra::defaultTransform($this->story->text);
-        //$this->Template->text = strip_tags($text, Config::get('allowedTags'));
+        // Set title as headline
+        $this->Template->headline = $this->story->title;
 
         // Fallback if author is no more findable in tl_member
         $objAuthor = MemberModel::findBySacMemberId($this->story->sacMemberId);

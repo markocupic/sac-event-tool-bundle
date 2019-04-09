@@ -1,5 +1,6 @@
 <div class="event-dashboard">
   <div class="tl_submit_container">
+
     <a href="<?= $this->eventListHref ?>" role="button" class="tl_submit">Zur Eventliste</a>
 
       <?php if ($this->allowEventPreviewButton): ?>
@@ -17,5 +18,6 @@
       <?php if ($this->allowInvoiceListButton): ?>
         <a href="<?= $this->invoiceListHref ?>" role="button" class="tl_submit">Tourrapport und Verg&uuml;tungsformulare drucken</a>
       <?php endif; ?>
+
   </div>
 </div>
