@@ -19,13 +19,10 @@
                 <p class="card-date m-0">
                     <small><?= \Date::parse('d.m.Y', $story['addedOn']) ?></small>
                 </p>
-
                 <a href="<?= $story['href'] ?>" title="weiterlesen">
                     <h6 class="card-title mt-0"><?= $story['title'] ?></h6>
                 </a>
-
                 <p class="card-news-teaser"><?= \StringUtil::substr($story['text'], 80) ?></p>
-
             </div>
         </div>
     </div>
