@@ -47,13 +47,16 @@
                     <?php if ($this->objForm->hasFormField('FORM_SUBMIT')): ?>
                         <?= $this->objForm->getWidget('FORM_SUBMIT')->parse(); ?>
                     <?php endif; ?>
+
                     <?php if ($this->objForm->hasFormField('REQUEST_TOKEN')): ?>
                         <?= $this->objForm->getWidget('REQUEST_TOKEN')->parse(); ?>
                     <?php endif; ?>
+
                     <?php if ($this->objForm->hasFormField('carInfo')): ?>
                         <?= $this->objForm->getWidget('carInfo')->parse(); ?>
                         {{br}}
                     <?php endif; ?>
+
                     <?php if ($this->objForm->hasFormField('ticketInfo')): ?>
                         <?= $this->objForm->getWidget('ticketInfo')->parse(); ?>
                         {{br}}
@@ -70,6 +73,7 @@
                     <?php if ($this->objForm->hasFormField('emergencyPhone')): ?>
                         <?= $this->objForm->getWidget('emergencyPhone')->parse(); ?>
                     <?php endif; ?>
+
                     <?php if ($this->objForm->hasFormField('emergencyPhoneName')): ?>
                         <?= $this->objForm->getWidget('emergencyPhoneName')->parse(); ?>
                     {{br}}
@@ -102,7 +106,6 @@
 
 
     <!-- AGB Modal -->
-
     <div class="modal fade" id="agbModal" tabindex="-1" role="dialog" aria-labelledby="agbTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered  modal-lg" role="document">
         <div class="modal-content">

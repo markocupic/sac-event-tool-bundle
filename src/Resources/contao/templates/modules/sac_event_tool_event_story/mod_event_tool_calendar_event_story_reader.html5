@@ -11,23 +11,14 @@
   </div>
 
     <?php if ($this->images): ?>
-      <div class="ce_gallery">
+      <div class="ce_galleryy">
         <div class="row tiny-gutter">
             <?php foreach ($this->images as $image): ?>
               <figure class="col-12 col-sm-6 col-md-3 image_container thumbnail responsive">
-                  <?php $arrFigureCaption = array(); ?>
-                  <?php if ($image['caption'] != '') {
-                      $arrFigureCaption[] = $image['caption'];
-                  } ?>
-                  <?php $photographer = $image['photographer'] != '' ? ' (Foto: ' . $image['photographer'] . ')' : ''; ?>
-                  <?php $photographer = Contao\StringUtil::specialchars($photographer); ?>
-                  <?php if ($photographer != '') {
-                      $arrFigureCaption[] = $photographer;
-                  } ?>
-                <a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement" title="<?= $image['caption'] . $photographer ?>">
+                <a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement" title="<?=  $image['linkTitle']  ?>">
                   {{image::<?= Contao\StringUtil::binToUuid($image['uuid']) ?>?width=400&height=400&mode=crop&alt=<?= $image['alt'] ?>}}
                 </a>
-                <figcaption class="figure-caption"><?= implode('<br>', $arrFigureCaption) ?></figcaption>
+                <figcaption class="figure-caption"><?= $image['strFigureCaption'] ?></figcaption>
               </figure>
             <?php endforeach; ?>
         </div>
@@ -42,7 +33,6 @@
         </div>
       </div>
     <?php endif; ?>
-
 </div>
 
 <?php $this->endblock(); ?>

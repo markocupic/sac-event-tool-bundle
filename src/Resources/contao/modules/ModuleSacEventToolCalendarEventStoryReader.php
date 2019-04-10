@@ -23,9 +23,9 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Validator;
-//use Michelf\MarkdownExtra;
 use Patchwork\Utf8;
 
+//use Michelf\MarkdownExtra;
 
 /**
  * Class ModuleSacEventToolCalendarEventStoryReader
@@ -44,7 +44,6 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
      * @var string
      */
     protected $strTemplate = 'mod_event_tool_calendar_event_story_reader';
-
 
     /**
      * Display a wildcard in the back end
@@ -67,7 +66,6 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
             return $objTemplate->parse();
         }
 
-
         // Set the item from the auto_item parameter
         if (!isset($_GET['items']) && Config::get('useAutoItem') && isset($_GET['auto_item']))
         {
@@ -85,7 +83,6 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
 
             return '';
         }
-
 
         if (strlen(Input::get('securityToken')))
         {
@@ -107,7 +104,6 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
 
         return parent::generate();
     }
-
 
     /**
      * Generate the module
@@ -160,19 +156,36 @@ class ModuleSacEventToolCalendarEventStoryReader extends Module
                                 $photographer = $arrMeta['de']['photographer'];
                             }
 
+                            $arrFigureCaption = array();
+                            if ($caption != '')
+                            {
+                                $arrFigureCaption[] = $caption;
+                            }
+                            if ($photographer != '')
+                            {
+                                $arrFigureCaption[] = '(Foto: ' . $photographer . ')';
+                            }
+                            $strFigureCaption = implode(', ', $arrFigureCaption);
+
+                            $linkTitle = '';
+                            $linkTitle .= $caption != '' ? $caption : '';
+                            $linkTitle .= $photographer != '' ? ' (Foto: ' . $photographer . ')' : '';
+
                             $images[$objFiles->path] = array
                             (
-                                'id'           => $objFiles->id,
-                                'path'         => $objFiles->path,
-                                'uuid'         => $objFiles->uuid,
-                                'name'         => $objFile->basename,
-                                'singleSRC'    => $objFiles->path,
-                                'title'        => StringUtil::specialchars($objFile->basename),
-                                'filesModel'   => $objFiles->current(),
-                                'caption'      => StringUtil::specialchars($caption),
-                                'alt'          => StringUtil::specialchars($alt),
-                                'title'        => StringUtil::specialchars($title),
-                                'photographer' => StringUtil::specialchars($photographer),
+                                'id'               => $objFiles->id,
+                                'path'             => $objFiles->path,
+                                'uuid'             => $objFiles->uuid,
+                                'name'             => $objFile->basename,
+                                'singleSRC'        => $objFiles->path,
+                                'title'            => StringUtil::specialchars($objFile->basename),
+                                'filesModel'       => $objFiles->current(),
+                                'caption'          => StringUtil::specialchars($caption),
+                                'alt'              => StringUtil::specialchars($alt),
+                                'title'            => StringUtil::specialchars($title),
+                                'photographer'     => StringUtil::specialchars($photographer),
+                                'strFigureCaption' => StringUtil::specialchars($strFigureCaption),
+                                'linkTitle'        => StringUtil::specialchars($linkTitle),
                             );
                         }
                     }

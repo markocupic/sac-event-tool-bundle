@@ -18,7 +18,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventReleaseL
 // Callbacks
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'onloadCallback');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'setPaletteWhenCreatingNew');
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'triggerGlobalOperations');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'exportCalendar');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'shiftEventDates');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'setPalettes');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'deleteInvalidEvents');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'setFilterSearchAndSortingBoard');
@@ -178,10 +179,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
     'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
 );
 
-$GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['downloadEventList'] = array
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['exportCalendar'] = array
 (
-    'label'      => &$GLOBALS['TL_LANG']['MSC']['downloadEventList'],
-    'href'       => 'action=downloadEventList',
+    'label'      => &$GLOBALS['TL_LANG']['MSC']['exportCalendar'],
+    'href'       => 'action=exportCalendar',
     'class'      => 'global_op_icon_class',
     'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',
     'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',

@@ -1,8 +1,3 @@
-<?php $GLOBALS['TL_JAVASCRIPT'][] = "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"; ?>
-<?php $GLOBALS['TL_JAVASCRIPT'][] = "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/locale/de-ch.js"; ?>
-<?php $GLOBALS['TL_JAVASCRIPT'][] = "https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"; ?>
-<?php $GLOBALS['TL_HEAD'][] = '<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">'; ?>
-
 <?php $this->extend('block_unsearchable'); ?>
 
 <?php $this->block('content'); ?>
@@ -17,12 +12,15 @@
 <?= $this->form ?>
 
 <script>
-    var picker = new Pikaday({
-        field: document.getElementById('ctrl_dateOfBirth'),
-        // Requires moment.js!
-        format: 'DD.MM.YYYY',
-    });
-    picker.gotoYear('1976');
+    //Set Datepicker
+    var opt = {
+        format: "dd.mm.yyyy",
+        autoclose: true,
+        language: "de",
+        startView: 2,
+        maxViewMode: 2,
+    };
+    $('#ctrl_dateOfBirth').datepicker(opt);
 </script>
 
 

@@ -78,7 +78,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * Do not show the same filters for different event types
+     * Display differentfilters for each event types
      * @param DataContainer $dc
      */
     public function setFilterSearchAndSortingBoard(DataContainer $dc)
@@ -141,7 +141,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['show']);
         }
 
-        // Do not allow this to default users
+        // Do not allow some specific global operations to default users
         if (!$this->User->isAdmin)
         {
             unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year']);
@@ -149,7 +149,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         }
 
         // Special treatment for tl_calendar_events.eventReleaseLevel
-        // Do not allow multi edit on tl_calendar_events.eventReleaseLevel, if user has not write permissions on every level
+        // Do not allow multi edit on tl_calendar_events.eventReleaseLevel, if user does not habe write permissions on all levels
         if (Input::get('act') === 'editAll' || Input::get('act') === 'overrideAll')
         {
             $allow = true;
@@ -197,15 +197,16 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             }
         }
 
+        // Skip here if user is admin
         if ($this->User->isAdmin)
         {
             return;
         }
 
-        // Do not allow cutting an editing
+        // Do not allow cutting an editing to default users
         $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['edit'] = null;
 
-        // Limit filter fields
+        // Limitize filter fields
         foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] as $k => $v)
         {
             if ($k === 'author' || $k === 'organizers' || $k === 'tourType' || $k === 'eventReleaseLevel' || $k === 'mainInstructor' || $k === 'courseTypeLevel0' || $k === 'startTime')
@@ -216,7 +217,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$k]['filter'] = null;
         }
 
-        // Schutz vor unbefugtem veroeffentlichen
+        // Prevent unauthorized publishing
         if (Input::get('tid'))
         {
             $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute(Input::get('tid'));
@@ -230,7 +231,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             }
         }
 
-        // Schutz vor unbefugtem Loeschen
+        // Prevent unauthorized deletion
         if (Input::get('act') === 'delete')
         {
             $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($dc->id);
@@ -244,7 +245,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             }
         }
 
-        // Schutz vor unbefugtem Bearbeiten
+        // Prevent unauthorized editing
         if (Input::get('act') === 'edit')
         {
             $objEventsModel = CalendarEventsModel::findOneById(Input::get('id'));
@@ -254,7 +255,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 {
                     if (!EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objEventsModel->id) && $this->User->id !== $objEventsModel->registrationGoesTo)
                     {
-                        // User has no write access to the datarecord, so present field values without the form input
+                        // User has no write access to the datarecord, that's why we display field values without a form input
                         foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] as $field => $dca)
                         {
                             $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['input_field_callback'] = array('tl_calendar_events_sac_event_tool', 'showFieldValue');
@@ -298,7 +299,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             }
         }
 
-        // Allow select mode only, if there is set an eventReleaseLevel filter.
+        // Allow select mode only, if an eventReleaseLevel filter is set
         if (Input::get('act') === 'select')
         {
             /** @var AttributeBagInterface $objSessionBag */
@@ -314,7 +315,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             }
         }
 
-        // Nur Datensätze auflisten bei denen der angemeldete Benutzer schreibberechtigt ist
+        // Only list record where the logged in user has write permissions
         if (Input::get('act') === 'select' || Input::get('act') === 'editAll')
         {
             $arrIDS = array(0);
@@ -330,7 +331,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         }
 
         // Do not allow editing write protected fields in editAll mode
-        // Use input_field_callback to only show the field values without any form input field
+        // Use input_field_callback to only display the field values without the form input field
         if (Input::get('act') === 'editAll' || Input::get('act') === 'overrideAll')
         {
             $objSession = System::getContainer()->get('session');
@@ -390,7 +391,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 return;
             }
 
-            // Set palette fort tour and course
+            // Set palette for tour and course
             $objCalendarEventsModel = CalendarEventsModel::findByPk($dc->id);
             if ($objCalendarEventsModel !== null)
             {
@@ -403,15 +404,14 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * onload_callback triggerGlobalOperations
-     * transform dates of all events of a certain calendar
-     * https://somehost/contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=21&transformDate=+52weeks&rt=hUFF18TV1YCLddb-Cyb48dRH8y_9iI-BgM-Nc1rB8o8&ref=2sjHl6mB
+     * onload_callback exportCalendar
+     * CSV-export of all events of a calendar
      */
-    public function triggerGlobalOperations(DataContainer $dc)
+    public function exportCalendar(DataContainer $dc)
     {
-        if (Input::get('action') === 'downloadEventList' && Input::get('id') > 0)
+        if (Input::get('action') === 'exportCalendar' && Input::get('id') > 0)
         {
-            //Create empty document
+            // Create empty document
             $csv = Writer::createFromString('');
 
             // Set encoding from utf-8 to is0-8859-15 (windows)
@@ -422,9 +422,15 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             // Set delimiter
             $csv->setDelimiter(';');
 
-            // Header fields
-            $arrFields = array('id', 'title', 'dates', 'organizers', 'mainInstructor', 'instructors', 'eventType', 'tourType', 'tourTechDifficulties', 'eventReleaseLevel');
-            $csv->insertOne($arrFields);
+            // Selected fields
+            $arrFields = array('id', 'title', 'eventDates', 'organizers', 'mainInstructor', 'instructor', 'eventType', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel');
+
+            // Insert headline first
+            \Contao\Controller::loadLanguageFile('tl_calendar_events');
+            $arrHeadline = array_map(function ($field) {
+                return isset($GLOBALS['TL_LANG']['tl_calendar_events'][$field][0]) ? $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] : $field;
+            }, $arrFields);
+            $csv->insertOne($arrHeadline);
 
             $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE pid=? ORDER BY startDate ASC')->execute(Input::get('id'));
             while ($objEvent->next())
@@ -437,12 +443,12 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         $objUser = \Contao\UserModel::findByPk($objEvent->{$field});
                         $arrRow[] = $objUser !== null ? html_entity_decode($objUser->lastname . ' ' . $objUser->firstname) : '';
                     }
-                    elseif ($field === 'tourTechDifficulties')
+                    elseif ($field === 'tourTechDifficulty')
                     {
                         $arrDiff = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent->id, false);
                         $arrRow[] = implode(' und ', $arrDiff);
                     }
-                    elseif ($field === 'dates')
+                    elseif ($field === 'eventDates')
                     {
                         $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent->id);
                         $arrDates = array_map(function ($tstamp) {
@@ -455,7 +461,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         $arrOrganizers = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'title');
                         $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
                     }
-                    elseif ($field === 'instructors')
+                    elseif ($field === 'instructor')
                     {
                         $arrInstructors = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false);
                         $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
@@ -480,9 +486,17 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
             $objCalendar = \Contao\CalendarModel::findByPk(Input::get('id'));
             $csv->output($objCalendar->title . '.csv');
-            die();
+            exit;
         }
+    }
 
+    /**
+     * onload_callback shiftEventDates
+     * Shift all event dates of a certain calendar by +/- 1 year
+     * https://somehost/contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=21&transformDate=+52weeks&rt=hUFF18TV1YCLddb-Cyb48dRH8y_9iI-BgM-Nc1rB8o8&ref=2sjHl6mB
+     */
+    public function shiftEventDates(DataContainer $dc)
+    {
         if (Input::get('transformDates'))
         {
             // $mode may be "+52weeks" or "+1year"
@@ -812,7 +826,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 $row[$i] = $value;
             }
 
-            // Label & help
+            // Label and help
             if (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label']))
             {
                 $label = is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label']) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'][0] : $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'];
@@ -861,7 +875,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             {
                 if ($arrValues[0]['new_repeat'] <= 0)
                 {
-                    // Replace invalid date to empty string
+                    // Replace invalid date with empty string
                     $arrValues = '';
                 }
             }
@@ -894,7 +908,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function oncreateCallback($strTable, $insertId, $set, DataContainer $dc)
     {
-        // Set source and add author, first release level, when a new event was created & set customEventRegistrationConfirmationEmailText
+        // Set source, add author, set first release level and & set customEventRegistrationConfirmationEmailText on creating new events
         $objEventsModel = CalendarEventsModel::findByPk($insertId);
         if ($objEventsModel !== null)
         {
@@ -920,7 +934,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function oncopyCallback($insertId, DC_Table $dc)
     {
-        // Add author & first release level, when a new event was created
+        // Add author and set first release level on creating new events
         $objEventsModel = CalendarEventsModel::findByPk($insertId);
         if ($objEventsModel !== null)
         {
@@ -944,7 +958,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
     /**
      * ondelete_callback ondeleteCallback
-     * Do not allow non-admins deleting records if there are child records (registrations) in tl_calendar_events_member
+     * Do not allow to non-admins deleting records if there are child records (event registrations) in tl_calendar_events_member
      * @param DataContainer $dc
      */
     public function ondeleteCallback(DataContainer $dc)
@@ -964,17 +978,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 $this->redirect($this->getReferer());
             }
         }
-        /**
-         * else
-         * {
-         * $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=?')->execute($dc->activeRecord->id);
-         * while ($objDb->next())
-         * {
-         * $this->Database->prepare('UPDATE tl_calendar_events_member SET eventId=? WHERE id=?')->execute(0, $objDb->id);
-         * }
-         * }
-         *
-         * **/
     }
 
     /**
@@ -1067,7 +1070,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         if ($objCalendar !== null)
         {
             $arrEventTypes = \Contao\StringUtil::deserialize($objCalendar->allowedEventTypes, true);
-            //$arrEventTypes = array_intersect($arrEventTypes,$arrAllowedEventTypes);
         }
 
         return $arrEventTypes;
@@ -1587,7 +1589,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * Push event to the next release level
+     * Push event to next release level
      * @param $row
      * @param $href
      * @param $label
@@ -1713,7 +1715,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     }
                     $objEvent->published = '1';
 
-                    // HOOK: publishEvent, f.ex inform tourenchef via email
+                    // HOOK: publishEvent, f.ex advice tourenchef by email
                     if (isset($GLOBALS['TL_HOOKS']['publishEvent']) && \is_array($GLOBALS['TL_HOOKS']['publishEvent']))
                     {
                         foreach ($GLOBALS['TL_HOOKS']['publishEvent'] as $callback)
@@ -1838,7 +1840,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * Pull event to the previous release level
+     * Downgrade event to the previous release level
      * @param $row
      * @param $href
      * @param $label
