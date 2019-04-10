@@ -1,5 +1,4 @@
 <?php
-
 $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE pid=? AND startDate>? AND published=? ORDER BY startDate')->execute(6,time(),'1');
 ?>
 <div class="sac-events-slider">
