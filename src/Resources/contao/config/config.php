@@ -272,9 +272,6 @@ $GLOBALS['TL_HOOKS']['postLogin'][] = array('Markocupic\SacEventToolBundle\Conta
 /** Allow backend users to authenticate with their sacMemberId **/
 $GLOBALS['TL_HOOKS']['importUser'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ImportUser', 'allowBackendUserToAuthenticateWithSacMemberId');
 
-/** Form HOOKS (f.ex. Kursanmeldung) **/
-$GLOBALS['TL_HOOKS']['postUpload'][] = array('markocupic_sac_event_tool.contao_hooks.validate_forms', 'postUpload');
-
 /** Parse backend template hook **/
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic_sac_event_tool.contao_hooks.parse_backend_template', 'parseBackendTemplate');
 
