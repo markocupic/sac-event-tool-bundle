@@ -18,10 +18,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventReleaseL
 // Callbacks
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'onloadCallback');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'setPaletteWhenCreatingNew');
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'exportCalendar');
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'shiftEventDates');
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'setPalettes');
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'deleteInvalidEvents');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'onloadCallbackExportCalendar');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'onloadCallbackShiftEventDates');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'onloadCallbackSetPalettes');
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'onloadCallbackDeleteInvalidEvents');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = array('tl_calendar_events_sac_event_tool', 'setFilterSearchAndSortingBoard');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['oncreate_callback'][] = array('tl_calendar_events_sac_event_tool', 'oncreateCallback');
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['oncopy_callback'][] = array('tl_calendar_events_sac_event_tool', 'oncopyCallback');
@@ -179,10 +179,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
     'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
 );
 
-$GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['exportCalendar'] = array
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = array
 (
-    'label'      => &$GLOBALS['TL_LANG']['MSC']['exportCalendar'],
-    'href'       => 'action=exportCalendar',
+    'label'      => &$GLOBALS['TL_LANG']['MSC']['onloadCallbackExportCalendar'],
+    'href'       => 'action=onloadCallbackExportCalendar',
     'class'      => 'global_op_icon_class',
     'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',
     'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
@@ -281,7 +281,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = array(
     'exclude'          => true,
     'filter'           => true,
     'inputType'        => 'select',
-    'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbEventType'),
+    'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCallbackEventType'),
     'save_callback'    => array(array('tl_calendar_events_sac_event_tool', 'saveCallbackEventType')),
     'eval'             => array('submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => true),
     'sql'              => "varchar(32) NOT NULL default ''",
@@ -417,7 +417,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1'] = array(
     'inputType'        => 'select',
     'foreignKey'       => 'tl_course_sub_type.name',
     'relation'         => array('type' => 'hasOne', 'load' => 'lazy'),
-    'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbCourseSubType'),
+    'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCallbackCourseSubType'),
     'eval'             => array('tl_class' => 'clr m12', 'multiple' => false, 'mandatory' => true),
     'sql'              => "int(10) unsigned NOT NULL default '0'",
 );
@@ -634,6 +634,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['deregistrationLimit'] = arra
     'sql'       => "int(10) unsigned NOT NULL default '0'",
 );
 
+// addGallery
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addGallery'] = array(
 
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['addGallery'],
@@ -644,6 +645,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addGallery'] = array(
     'sql'       => "char(1) NOT NULL default ''",
 );
 
+// multiSRC
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['multiSRC'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['multiSRC'],
     'exclude'   => true,
@@ -652,6 +654,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['multiSRC'] = array(
     'sql'       => "blob NULL",
 );
 
+// orderSRC
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['orderSRC'] = array(
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['orderSRC'],
     'sql'   => "blob NULL",
@@ -669,6 +672,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType'] = array(
     'sql'        => "blob NULL",
 );
 
+// tourTechDifficulty
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'],
     'exclude'   => true,
@@ -684,7 +688,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = array
                 'exclude'          => true,
                 'inputType'        => 'select',
                 'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbTourDifficulties'),
+                'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCallbackTourDifficulties'),
                 'relation'         => array('type' => 'hasMany', 'load' => 'eager'),
                 'foreignKey'       => 'tl_tour_difficulty.shortcut',
                 'eval'             => array
@@ -700,7 +704,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = array
                 'exclude'          => true,
                 'inputType'        => 'select',
                 'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCbTourDifficulties'),
+                'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCallbackTourDifficulties'),
                 'relation'         => array('type' => 'hasMany', 'load' => 'eager'),
                 'foreignKey'       => 'tl_tour_difficulty.shortcut',
                 'eval'             => array
@@ -715,6 +719,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = array
     'sql'       => "blob NULL",
 );
 
+// tourProfile
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfile'],
     'exclude'   => true,
@@ -802,7 +807,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = array(
     'inputType'        => 'select',
     'foreignKey'       => 'tl_event_release_level_policy.title',
     'relation'         => array('type' => 'hasOne', 'load' => 'lazy'),
-    'options_callback' => array('tl_calendar_events_sac_event_tool', 'listReleaseLevels'),
+    'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCallbackListReleaseLevels'),
     'save_callback'    => array(array('tl_calendar_events_sac_event_tool', 'saveCallbackEventReleaseLevel')),
     'eval'             => array('mandatory' => true, 'tl_class' => 'clr m12'),
     'sql'              => "int(10) unsigned NOT NULL default '0'",
@@ -914,7 +919,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReportAdditionalNotices
     'sql'       => "text NULL",
 );
 
-// For these fields allow editing on first release level only
+// Allow for these fields editing on first release level only
 $allowEdititingOnFirstReleaseLevelOnly = array(
     'suitableForBeginners',
     'eventType',

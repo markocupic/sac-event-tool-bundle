@@ -115,10 +115,10 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * onload_callback deleteInvalidEvents
+     * onload_callback onloadCallbackDeleteInvalidEvents
      * @param DataContainer $dc
      */
-    public function deleteInvalidEvents(DataContainer $dc)
+    public function onloadCallbackDeleteInvalidEvents(DataContainer $dc)
     {
         $this->Database->prepare('DELETE FROM tl_calendar_events WHERE tstamp<? AND tstamp>? AND title=?')->execute(time() - 24 * 60 * 60, 0, '');
     }
@@ -372,11 +372,11 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * onload_callback setPalettes
+     * onload_callback onloadCallbackSetPalettes
      * Set palette for course, tour, tour_report, etc
      * @param DataContainer $dc
      */
-    public function setPalettes(DataContainer $dc)
+    public function onloadCallbackSetPalettes(DataContainer $dc)
     {
         if (\Input::get('act') === 'editAll' || \Input::get('act') === 'overrideAll')
         {
@@ -404,12 +404,12 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * onload_callback exportCalendar
+     * onload_callback onloadCallbackExportCalendar
      * CSV-export of all events of a calendar
      */
-    public function exportCalendar(DataContainer $dc)
+    public function onloadCallbackExportCalendar(DataContainer $dc)
     {
-        if (Input::get('action') === 'exportCalendar' && Input::get('id') > 0)
+        if (Input::get('action') === 'onloadCallbackExportCalendar' && Input::get('id') > 0)
         {
             // Create empty document
             $csv = Writer::createFromString('');
@@ -491,11 +491,11 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * onload_callback shiftEventDates
+     * onload_callback onloadCallbackShiftEventDates
      * Shift all event dates of a certain calendar by +/- 1 year
      * https://somehost/contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=21&transformDate=+52weeks&rt=hUFF18TV1YCLddb-Cyb48dRH8y_9iI-BgM-Nc1rB8o8&ref=2sjHl6mB
      */
-    public function shiftEventDates(DataContainer $dc)
+    public function onloadCallbackShiftEventDates(DataContainer $dc)
     {
         if (Input::get('transformDates'))
         {
@@ -539,6 +539,324 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             // Redirect
             $this->redirect($this->getReferer());
         }
+    }
+
+    /**
+     * oncreate_callback oncreateCallback
+     * @param DataContainer $dc
+     */
+    public function oncreateCallback($strTable, $insertId, $set, DataContainer $dc)
+    {
+        // Set source, add author, set first release level and & set customEventRegistrationConfirmationEmailText on creating new events
+        $objEventsModel = CalendarEventsModel::findByPk($insertId);
+        if ($objEventsModel !== null)
+        {
+            // Set source always to "default"
+            $objEventsModel->source = 'default';
+
+            // Set logged in User as author
+            $objEventsModel->author = $this->User->id;
+            $objEventsModel->mainInstructor = $this->User->id;
+            $objEventsModel->instructor = serialize(array(array('instructorId' => $this->User->id)));
+
+            // Set customEventRegistrationConfirmationEmailText
+            $objEventsModel->customEventRegistrationConfirmationEmailText = str_replace('{{br}}', "\n", Config::get('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'));
+
+            $objEventsModel->save();
+        }
+    }
+
+    /**
+     * oncopy_callback oncopyCallback
+     * @param $insertId
+     * @param DC_Table $dc
+     */
+    public function oncopyCallback($insertId, DC_Table $dc)
+    {
+        // Add author and set first release level on creating new events
+        $objEventsModel = CalendarEventsModel::findByPk($insertId);
+        if ($objEventsModel !== null)
+        {
+            // Set logged in User as author
+            $objEventsModel->author = $this->User->id;
+            $objEventsModel->eventToken = $this->generateEventToken($insertId);
+            $objEventsModel->save();
+
+            // Set eventReleaseLevel
+            if ($objEventsModel->eventType != '')
+            {
+                $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEventsModel->id);
+                if ($objEventReleaseLevelPolicyModel !== null)
+                {
+                    $objEventsModel->eventReleaseLevel = $objEventReleaseLevelPolicyModel->id;
+                    $objEventsModel->save();
+                }
+            }
+        }
+    }
+
+    /**
+     * ondelete_callback ondeleteCallback
+     * Do not allow to non-admins deleting records if there are child records (event registrations) in tl_calendar_events_member
+     * @param DataContainer $dc
+     */
+    public function ondeleteCallback(DataContainer $dc)
+    {
+        // Return if there is no ID
+        if (!$dc->activeRecord)
+        {
+            return;
+        }
+
+        if (!$this->User->admin)
+        {
+            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=?')->execute($dc->activeRecord->id);
+            if ($objDb->numRows)
+            {
+                Message::addError(sprintf($GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'], $dc->activeRecord->id));
+                $this->redirect($this->getReferer());
+            }
+        }
+    }
+
+    /**
+     * onsubmit_callback adjustImageSize()
+     * @param DataContainer $dc
+     */
+    public function adjustImageSize(DataContainer $dc)
+    {
+        // Return if there is no active record (override all)
+        if (!$dc->activeRecord)
+        {
+            return;
+        }
+
+        $arrSet['size'] = serialize(array("", "", 11));
+        $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($dc->activeRecord->id);
+    }
+
+    /**
+     * onsubmit_callback adjustEndDate()
+     * @param DataContainer $dc
+     */
+    public function adjustEndDate(DataContainer $dc)
+    {
+        // Return if there is no active record (override all)
+        if (!$dc->activeRecord)
+        {
+            return;
+        }
+
+        $arrDates = StringUtil::deserialize($dc->activeRecord->eventDates);
+        if (!is_array($arrDates) || empty($arrDates))
+        {
+            return;
+        }
+
+        $aNew = array();
+        foreach ($arrDates as $k => $v)
+        {
+            $objDate = new Date($v['new_repeat']);
+            $aNew[$objDate->timestamp] = $objDate->timestamp;
+        }
+        ksort($aNew);
+        $arrDates = array();
+        foreach ($aNew as $v)
+        {
+            // Save as timestamp
+            $arrDates[] = array('new_repeat' => $v);
+        }
+        $arrSet = array();
+        $arrSet['eventDates'] = serialize($arrDates);
+        $startTime = !empty($arrDates[0]['new_repeat']) ? $arrDates[0]['new_repeat'] : 0;
+        $endTime = !empty($arrDates[count($arrDates) - 1]['new_repeat']) ? $arrDates[count($arrDates) - 1]['new_repeat'] : 0;
+
+        $arrSet['endTime'] = $endTime;
+        $arrSet['endDate'] = $endTime;
+        $arrSet['startDate'] = $startTime;
+        $arrSet['startTime'] = $startTime;
+        $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($dc->activeRecord->id);
+    }
+
+    /**
+     * onsubmit_callback adjustEventReleaseLevel()
+     * @param DataContainer $dc
+     */
+    public function adjustEventReleaseLevel(DataContainer $dc)
+    {
+        // Return if there is no active record (override all)
+        if (!$dc->activeRecord)
+        {
+            return;
+        }
+
+        if ($dc->activeRecord->eventReleaseLevel)
+        {
+            return;
+        }
+
+        // Set releaseLevel to level 1
+        $eventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($dc->activeRecord->id);
+        if ($eventReleaseLevelModel !== null)
+        {
+            $set = array('eventReleaseLevel' => $eventReleaseLevelModel->id);
+            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
+        }
+    }
+
+    /**
+     * onsubmit_callback setEventToken()
+     * @param DataContainer $dc
+     */
+    public function setEventToken(DataContainer $dc)
+    {
+        // Return if there is no active record (override all)
+        if (!$dc->activeRecord)
+        {
+            return;
+        }
+
+        $objEvent = \Contao\CalendarEventsModel::findByPk($dc->activeRecord->id);
+        if ($objEvent !== null)
+        {
+            if (strpos($objEvent->eventToken, '-' . $dc->activeRecord->id) === false)
+            {
+                $objEvent->eventToken = $this->generateEventToken($dc->activeRecord->id);
+                $objEvent->save();
+            }
+        }
+
+        $strToken = $this->generateEventToken($dc->activeRecord->id);
+        $this->Database->prepare('UPDATE tl_calendar_events SET eventToken=? WHERE id=? AND eventToken=?')->execute($strToken, $dc->activeRecord->id, '');
+    }
+
+    /**
+     * onsubmit_callback adjustDurationInfo()
+     * @param DataContainer $dc
+     */
+    public function adjustDurationInfo(DataContainer $dc)
+    {
+        // Return if there is no active record (override all)
+        if (!$dc->activeRecord)
+        {
+            return;
+        }
+
+        $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($dc->activeRecord->id);
+        if ($objEvent->numRows > 0)
+        {
+            $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent->id);
+            if ($objEvent->durationInfo != '' && !empty($arrTimestamps) && is_array($arrTimestamps))
+            {
+                $countTimestamps = count($arrTimestamps);
+                if (isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$objEvent->durationInfo]))
+                {
+                    $arrDuration = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$objEvent->durationInfo];
+                    if (!empty($arrDuration) && is_array($arrDuration))
+                    {
+                        $duration = $arrDuration['dateRows'];
+                        if ($duration != $countTimestamps)
+                        {
+                            $arrSet = array();
+                            $arrSet['durationInfo'] = '';
+                            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($objEvent->id);
+                            \Contao\Message::addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein. Setzen SIe für jeden Event-Tag eine Datumszeile!', $objEvent->title, $objEvent->id), TL_MODE);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * onsubmit_callback adjustRegistrationPeriod()
+     * @param DataContainer $dc
+     */
+    public function adjustRegistrationPeriod(DataContainer $dc)
+    {
+        // Return if there is no active record (override all)
+        if (!$dc->activeRecord)
+        {
+            return;
+        }
+
+        $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($dc->activeRecord->id);
+        if ($objDb->numRows > 0)
+        {
+            if ($objDb->setRegistrationPeriod)
+            {
+                $regEndDate = $objDb->registrationEndDate;
+                $regStartDate = $objDb->registrationStartDate;
+
+                if ($regEndDate > $objDb->startDate)
+                {
+                    $regEndDate = $objDb->startDate;
+                    Message::addInfo($GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck'], TL_MODE);
+                }
+
+                if ($regStartDate > $regEndDate)
+                {
+                    $regStartDate = $regEndDate - 86400;
+                    Message::addInfo($GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck'], TL_MODE);
+                }
+                $arrSet['registrationStartDate'] = $regStartDate;
+                $arrSet['registrationEndDate'] = $regEndDate;
+                $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($objDb->id);
+            }
+        }
+    }
+
+    /**
+     * onsubmit_callback onsubmitCallback
+     * Set alias
+     * @param DataContainer $dc
+     */
+    public function onsubmitCallback(DataContainer $dc)
+    {
+        // Set correct eventReleaseLevel
+        $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
+        if ($objEvent !== null)
+        {
+            if ($objEvent->eventType !== '')
+            {
+                if ($objEvent->eventReleaseLevel > 0)
+                {
+                    $objEventReleaseLevel = \Contao\EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+                    if ($objEventReleaseLevel !== null)
+                    {
+                        $objEventReleaseLevelPackage = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($objEvent->id);
+                        // Change eventReleaseLevel when changing eventType...
+                        if ($objEventReleaseLevel->pid !== $objEventReleaseLevelPackage->id)
+                        {
+                            $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
+                            if ($oEventReleaseLevelModel !== null)
+                            {
+                                $set = array('eventReleaseLevel' => $oEventReleaseLevelModel->id);
+                                $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Add eventReleaseLevel when creating a new event...
+                    $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
+                    $set = array('eventReleaseLevel' => $oEventReleaseLevelModel->id);
+                    $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
+                }
+            }
+        }
+        // End set correct eventReleaseLevel
+
+        // Set filledInEventReportForm, now the invoice form can be printed in tl_calendar_events_instructor_invoice
+        if (Input::get('call') === 'writeTourReport')
+        {
+            $set = array('filledInEventReportForm' => '1');
+            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
+        }
+
+        $set = array('alias' => 'event-' . $dc->id);
+        $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
     }
 
     /**
@@ -903,84 +1221,6 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * oncreate_callback oncreateCallback
-     * @param DataContainer $dc
-     */
-    public function oncreateCallback($strTable, $insertId, $set, DataContainer $dc)
-    {
-        // Set source, add author, set first release level and & set customEventRegistrationConfirmationEmailText on creating new events
-        $objEventsModel = CalendarEventsModel::findByPk($insertId);
-        if ($objEventsModel !== null)
-        {
-            // Set source always to "default"
-            $objEventsModel->source = 'default';
-
-            // Set logged in User as author
-            $objEventsModel->author = $this->User->id;
-            $objEventsModel->mainInstructor = $this->User->id;
-            $objEventsModel->instructor = serialize(array(array('instructorId' => $this->User->id)));
-
-            // Set customEventRegistrationConfirmationEmailText
-            $objEventsModel->customEventRegistrationConfirmationEmailText = str_replace('{{br}}', "\n", Config::get('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'));
-
-            $objEventsModel->save();
-        }
-    }
-
-    /**
-     * oncopy_callback oncopyCallback
-     * @param $insertId
-     * @param DC_Table $dc
-     */
-    public function oncopyCallback($insertId, DC_Table $dc)
-    {
-        // Add author and set first release level on creating new events
-        $objEventsModel = CalendarEventsModel::findByPk($insertId);
-        if ($objEventsModel !== null)
-        {
-            // Set logged in User as author
-            $objEventsModel->author = $this->User->id;
-            $objEventsModel->eventToken = $this->generateEventToken($insertId);
-            $objEventsModel->save();
-
-            // Set eventReleaseLevel
-            if ($objEventsModel->eventType != '')
-            {
-                $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEventsModel->id);
-                if ($objEventReleaseLevelPolicyModel !== null)
-                {
-                    $objEventsModel->eventReleaseLevel = $objEventReleaseLevelPolicyModel->id;
-                    $objEventsModel->save();
-                }
-            }
-        }
-    }
-
-    /**
-     * ondelete_callback ondeleteCallback
-     * Do not allow to non-admins deleting records if there are child records (event registrations) in tl_calendar_events_member
-     * @param DataContainer $dc
-     */
-    public function ondeleteCallback(DataContainer $dc)
-    {
-        // Return if there is no ID
-        if (!$dc->activeRecord)
-        {
-            return;
-        }
-
-        if (!$this->User->admin)
-        {
-            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=?')->execute($dc->activeRecord->id);
-            if ($objDb->numRows)
-            {
-                Message::addError(sprintf($GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'], $dc->activeRecord->id));
-                $this->redirect($this->getReferer());
-            }
-        }
-    }
-
-    /**
      * @return array
      */
     public function optionsCallbackGetEventDuration()
@@ -1002,10 +1242,10 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * options_callback optionsCbTourDifficulties()
+     * options_callback optionsCallbackTourDifficulties()
      * @return array
      */
-    public function optionsCbTourDifficulties(MultiColumnWizard $dc)
+    public function optionsCallbackTourDifficulties(MultiColumnWizard $dc)
     {
         $options = array();
         $objDb = $this->Database->execute('SELECT * FROM tl_tour_difficulty ORDER BY pid ASC, code ASC');
@@ -1033,7 +1273,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      * @param DataContainer $dc
      * @return array
      */
-    public function optionsCbEventType(DataContainer $dc)
+    public function optionsCallbackEventType(DataContainer $dc)
     {
         $arrEventTypes = array();
         if (!$dc->id && CURRENT_ID > 0)
@@ -1076,10 +1316,10 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * options_callback optionsCbCourseSubType()
+     * options_callback optionsCallbackCourseSubType()
      * @return array
      */
-    public function optionsCbCourseSubType()
+    public function optionsCallbackCourseSubType()
     {
         $options = array();
         if (Input::get('act') === 'edit')
@@ -1102,11 +1342,11 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * options_callback listReleaseLevels
+     * options_callback optionsCallbackListReleaseLevels
      * @param \Contao\DC_Table $dc
      * @return array
      */
-    public function listReleaseLevels(DataContainer $dc)
+    public function optionsCallbackListReleaseLevels(DataContainer $dc)
     {
         $options = array();
 
@@ -1185,251 +1425,12 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     }
 
     /**
-     * onsubmit_callback setEventToken()
-     * @param DataContainer $dc
-     */
-    public function setEventToken(DataContainer $dc)
-    {
-        // Return if there is no active record (override all)
-        if (!$dc->activeRecord)
-        {
-            return;
-        }
-
-        $objEvent = \Contao\CalendarEventsModel::findByPk($dc->activeRecord->id);
-        if ($objEvent !== null)
-        {
-            if (strpos($objEvent->eventToken, '-' . $dc->activeRecord->id) === false)
-            {
-                $objEvent->eventToken = $this->generateEventToken($dc->activeRecord->id);
-                $objEvent->save();
-            }
-        }
-
-        $strToken = $this->generateEventToken($dc->activeRecord->id);
-        $this->Database->prepare('UPDATE tl_calendar_events SET eventToken=? WHERE id=? AND eventToken=?')->execute($strToken, $dc->activeRecord->id, '');
-    }
-
-    /**
      * @param $eventId
      * @return string
      */
     public function generateEventToken($eventId)
     {
         return md5(rand(100000000, 999999999)) . '-' . $eventId;
-    }
-
-    /**
-     * onsubmit_callback adjustImageSize()
-     * @param DataContainer $dc
-     */
-    public function adjustImageSize(DataContainer $dc)
-    {
-        // Return if there is no active record (override all)
-        if (!$dc->activeRecord)
-        {
-            return;
-        }
-
-        $arrSet['size'] = serialize(array("", "", 11));
-        $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($dc->activeRecord->id);
-    }
-
-    /**
-     * onsubmit_callback adjustEndDate()
-     * @param DataContainer $dc
-     */
-    public function adjustEndDate(DataContainer $dc)
-    {
-        // Return if there is no active record (override all)
-        if (!$dc->activeRecord)
-        {
-            return;
-        }
-
-        $arrDates = StringUtil::deserialize($dc->activeRecord->eventDates);
-        if (!is_array($arrDates) || empty($arrDates))
-        {
-            return;
-        }
-
-        $aNew = array();
-        foreach ($arrDates as $k => $v)
-        {
-            $objDate = new Date($v['new_repeat']);
-            $aNew[$objDate->timestamp] = $objDate->timestamp;
-        }
-        ksort($aNew);
-        $arrDates = array();
-        foreach ($aNew as $v)
-        {
-            // Save as timestamp
-            $arrDates[] = array('new_repeat' => $v);
-        }
-        $arrSet = array();
-        $arrSet['eventDates'] = serialize($arrDates);
-        $startTime = !empty($arrDates[0]['new_repeat']) ? $arrDates[0]['new_repeat'] : 0;
-        $endTime = !empty($arrDates[count($arrDates) - 1]['new_repeat']) ? $arrDates[count($arrDates) - 1]['new_repeat'] : 0;
-
-        $arrSet['endTime'] = $endTime;
-        $arrSet['endDate'] = $endTime;
-        $arrSet['startDate'] = $startTime;
-        $arrSet['startTime'] = $startTime;
-        $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($dc->activeRecord->id);
-    }
-
-    /**
-     * onsubmit_callback adjustEventReleaseLevel()
-     * @param DataContainer $dc
-     */
-    public function adjustEventReleaseLevel(DataContainer $dc)
-    {
-        // Return if there is no active record (override all)
-        if (!$dc->activeRecord)
-        {
-            return;
-        }
-
-        if ($dc->activeRecord->eventReleaseLevel)
-        {
-            return;
-        }
-
-        // Set releaseLevel to level 1
-        $eventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($dc->activeRecord->id);
-        if ($eventReleaseLevelModel !== null)
-        {
-            $set = array('eventReleaseLevel' => $eventReleaseLevelModel->id);
-            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
-        }
-    }
-
-    /**
-     * @param DataContainer $dc
-     */
-    public function adjustDurationInfo(DataContainer $dc)
-    {
-        // Return if there is no active record (override all)
-        if (!$dc->activeRecord)
-        {
-            return;
-        }
-
-        $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($dc->activeRecord->id);
-        if ($objEvent->numRows > 0)
-        {
-            $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent->id);
-            if ($objEvent->durationInfo != '' && !empty($arrTimestamps) && is_array($arrTimestamps))
-            {
-                $countTimestamps = count($arrTimestamps);
-                if (isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$objEvent->durationInfo]))
-                {
-                    $arrDuration = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$objEvent->durationInfo];
-                    if (!empty($arrDuration) && is_array($arrDuration))
-                    {
-                        $duration = $arrDuration['dateRows'];
-                        if ($duration != $countTimestamps)
-                        {
-                            $arrSet = array();
-                            $arrSet['durationInfo'] = '';
-                            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($objEvent->id);
-                            \Contao\Message::addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein. Setzen SIe für jeden Event-Tag eine Datumszeile!', $objEvent->title, $objEvent->id), TL_MODE);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * onsubmit_callback adjustRegistrationPeriod()
-     * @param DataContainer $dc
-     */
-    public function adjustRegistrationPeriod(DataContainer $dc)
-    {
-        // Return if there is no active record (override all)
-        if (!$dc->activeRecord)
-        {
-            return;
-        }
-
-        $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($dc->activeRecord->id);
-        if ($objDb->numRows > 0)
-        {
-            if ($objDb->setRegistrationPeriod)
-            {
-                $regEndDate = $objDb->registrationEndDate;
-                $regStartDate = $objDb->registrationStartDate;
-
-                if ($regEndDate > $objDb->startDate)
-                {
-                    $regEndDate = $objDb->startDate;
-                    Message::addInfo($GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck'], TL_MODE);
-                }
-
-                if ($regStartDate > $regEndDate)
-                {
-                    $regStartDate = $regEndDate - 86400;
-                    Message::addInfo($GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck'], TL_MODE);
-                }
-                $arrSet['registrationStartDate'] = $regStartDate;
-                $arrSet['registrationEndDate'] = $regEndDate;
-                $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($objDb->id);
-            }
-        }
-    }
-
-    /**
-     * onsubmit_callback onsubmitCallback
-     * Set alias
-     * @param DataContainer $dc
-     */
-    public function onsubmitCallback(DataContainer $dc)
-    {
-        // Set correct eventReleaseLevel
-        $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
-        if ($objEvent !== null)
-        {
-            if ($objEvent->eventType !== '')
-            {
-                if ($objEvent->eventReleaseLevel > 0)
-                {
-                    $objEventReleaseLevel = \Contao\EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
-                    if ($objEventReleaseLevel !== null)
-                    {
-                        $objEventReleaseLevelPackage = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($objEvent->id);
-                        // Change eventReleaseLevel when changing eventType...
-                        if ($objEventReleaseLevel->pid !== $objEventReleaseLevelPackage->id)
-                        {
-                            $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
-                            if ($oEventReleaseLevelModel !== null)
-                            {
-                                $set = array('eventReleaseLevel' => $oEventReleaseLevelModel->id);
-                                $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // Add eventReleaseLevel when creating a new event...
-                    $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
-                    $set = array('eventReleaseLevel' => $oEventReleaseLevelModel->id);
-                    $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
-                }
-            }
-        }
-        // End set correct eventReleaseLevel
-
-        // Set filledInEventReportForm, now the invoice form can be printed in tl_calendar_events_instructor_invoice
-        if (Input::get('call') === 'writeTourReport')
-        {
-            $set = array('filledInEventReportForm' => '1');
-            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
-        }
-
-        $set = array('alias' => 'event-' . $dc->id);
-        $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
     }
 
     /**
