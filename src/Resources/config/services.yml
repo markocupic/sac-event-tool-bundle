@@ -13,3 +13,7 @@ services:
             - "@database_connection"
             - "%kernel.project_dir%"
 
+    tool.cors:
+        class:  Markocupic\SacEventToolBundle\Services\Cors\CorsListener
+        tags:
+        - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }

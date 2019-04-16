@@ -186,7 +186,7 @@ class ModuleSacEventToolEventlist extends Events
 
         $this->Template->hasItems = $total > 0 ? true : false;
         $this->Template->events = $strEvents;
-        $this->Template->eventCount = $total;
+        $this->Template->countItems = $total;
 
         // Headline
         if (Input::get('year') > 2000)

@@ -11,8 +11,8 @@
 namespace Markocupic\SacEventToolBundle;
 
 use Contao\Calendar;
-use Contao\CalendarEventsModel;
 use Contao\CalendarEventsMemberModel;
+use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\ContentModel;
 use Contao\Controller;
@@ -84,157 +84,105 @@ class CalendarEventsHelper
      */
     public static function getEventData($objEvent, $strProperty, $objTemplate = null)
     {
-        //unset($_SESSION['getEventData']);
-        //$strTemplate = isset($objTemplate) ? '-' . $objTemplate->id : '';
-        //$key = $objEvent->id . '-' . $strProperty . $strTemplate;
-        //if(isset($_SESSION['getEventData'][$key])){
-        //return $_SESSION['getEventData'][$key];
-        //}
+        // Load language files
+        Controller::loadLanguageFile('tl_calendar_events');
+        Controller::loadLanguageFile('default');
+
+        $value = '';
 
         switch ($strProperty)
         {
             case 'id':
-                return $objEvent->id;
+                $value = $objEvent->id;
                 break;
             case 'eventId':
                 $value = sprintf('%s-%s', Date::parse('Y', $objEvent->startDate), $objEvent->id);
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
+            case 'eventTitle':
+                $value = Controller::replaceInsertTags(sprintf('{{event_title::%s}}', $objEvent->id));
+                break;
+            case 'eventUrl':
+                $value = Controller::replaceInsertTags(sprintf('{{event_url::%s}}', $objEvent->id));
                 break;
             case 'tourTypesIds':
                 $value = implode(StringUtil::deserialize($objEvent->tourType, true));
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'tourTypesShortcuts':
                 $value = implode(' ', static::getTourTypesAsArray($objEvent->id, 'shortcut', true));
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'tourTypesTitles':
                 $value = implode('<br>', static::getTourTypesAsArray($objEvent->id, 'title', false));
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'eventPeriodSm':
                 $value = static::getEventPeriod($objEvent->id, 'd.m.Y', false);
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'eventPeriodSmTooltip':
                 $value = static::getEventPeriod($objEvent->id, 'd.m.Y', false, true);
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'eventPeriodLg':
                 $value = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false);
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'eventPeriodLgTooltip':
                 $value = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false, true);
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'eventDuration':
                 $value = static::getEventDuration($objEvent->id);
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'eventState':
                 $value = static::getEventState($objEvent->id);
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'eventStateLabel':
-                $value = $GLOBALS['TL_LANG']['CTE']['calendar_events'][static::getEventState($objEvent->id)];
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
+                $value = $GLOBALS['TL_LANG']['CTE']['calendar_events'][static::getEventState($objEvent->id)] != '' ? $GLOBALS['TL_LANG']['CTE']['calendar_events'][static::getEventState($objEvent->id)] : static::getEventState($objEvent->id);
                 break;
             case 'isLastMinuteTour':
                 $value = $objEvent->eventType === 'lastMinuteTour' ? true : false;
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'isTour':
                 $value = $objEvent->eventType === 'tour' ? true : false;
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'isGeneralEvent':
                 $value = $objEvent->eventType === 'generalEvent' ? true : false;
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'isCourse':
                 $value = $objEvent->eventType === 'course' ? true : false;
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'bookingCounter':
                 $value = static::getBookingCounter($objEvent->id);
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'tourTechDifficulties':
                 $value = implode(' ', static::getTourTechDifficultiesAsArray($objEvent->id, true));
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'instructors':
                 $value = implode(', ', static::getInstructorNamesAsArray($objEvent->id, false, true));
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'instructorsWithQualification':
                 $value = implode(', ', static::getInstructorNamesAsArray($objEvent->id, true, true));
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'courseTypeLevel1':
                 $value = $objEvent->courseTypeLevel1;
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'eventImagePath':
                 $value = static::getEventImagePath($objEvent->id);
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'courseTypeLevel0Name':
                 $value = CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name;
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'courseTypeLevel1Name':
                 $value = CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'eventOrganizerLogos':
                 $value = implode('', static::getEventOrganizersLogoAsHtml($objEvent->id, '{{image::%s?width=60}}', false));
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'eventOrganizers':
                 $value = implode('<br>', static::getEventOrganizersAsArray($objEvent->id, 'title'));
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'mainInstructorContactDataFromDb':
                 $value = static::generateMainInstructorContactDataFromDb($objEvent->id);
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'instructorContactBoxes':
                 $value = static::generateInstructorContactBoxes($objEvent);
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'arrTourProfile':
                 $value = static::getTourProfileAsArray($objEvent->id);
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             case 'gallery':
                 $value = static::getGallery(array(
@@ -246,28 +194,24 @@ class CalendarEventsHelper
                     'fullsize'   => true,
                     'galleryTpl' => 'gallery_bootstrap_col-4'
                 ));
-                //$_SESSION['getEventData'][$key] = $value;
-                return $value;
                 break;
             default:
                 $arrEvent = $objEvent->row();
                 if ($objTemplate !== null && isset($objTemplate->{$strProperty}))
                 {
                     $value = $objTemplate->{$strProperty};
-                    //$_SESSION['getEventData'][$key] = $value;
-                    return $value;
                 }
                 elseif (isset($arrEvent[$strProperty]))
                 {
                     $value = $arrEvent[$strProperty];
-                    //$_SESSION['getEventData'][$key] = $value;
-                    return $value;
                 }
                 else
                 {
-                    return "";
+                    $value = "";
                 }
         }
+
+        return $value;
     }
 
     /**
