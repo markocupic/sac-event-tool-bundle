@@ -166,7 +166,7 @@ class EventRapport
 
         $transport = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : 'keine Angabe';
         $arrData[] = array('key' => 'eventTransport', 'value' => htmlspecialchars(html_entity_decode($transport)));
-        $arrData[] = array('key' => 'eventCanceled', 'value' => $objEvent->eventState === 'event_canceled' ? 'Ja' : 'Nein');
+        $arrData[] = array('key' => 'eventCanceled', 'value' => ($objEvent->eventState === 'event_canceled' || $objEvent->executionState === 'event_canceled') ? 'Ja' : 'Nein');
         $arrData[] = array('key' => 'eventHasExecuted', 'value' => $objEvent->executionState === 'event_executed_like_predicted' ? 'Ja' : 'Nein');
         $substitutionText = $objEvent->eventSubstitutionText !== '' ? $objEvent->eventSubstitutionText : '---';
         $arrData[] = array('key' => 'eventSubstitutionText', 'value' => htmlspecialchars(html_entity_decode($substitutionText)));
