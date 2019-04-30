@@ -7,13 +7,13 @@
  */
 new Vue({
     el: '#event-list',
-    created() {
+    created: function () {
         let self = this;
 
-        self.fetchData();
+        self.prepareRequest();
         self.interval = setInterval(
             function () {
-                self.fetchData();
+                self.prepareRequest();
             }, 200);
     },
     data: function () {
@@ -30,11 +30,11 @@ new Vue({
     },
     methods: {
         // Prepare ajax request
-        fetchData() {
+        prepareRequest: function () {
             let self = this;
             if (this.isBusy === false && self.eventlist.ids.length > this.loadedItems) {
                 this.isBusy = true;
-                this.xhr();
+                this.getDataByXhr();
             }
             if (self.allEventsLoaded === false && self.eventlist.ids.length === this.loadedItems) {
                 self.allEventsLoaded = true;
@@ -43,7 +43,7 @@ new Vue({
             }
         },
         // Get data from ajax
-        xhr() {
+        getDataByXhr: function () {
             let self = this;
             let ids = [];
             let counter = 0;
