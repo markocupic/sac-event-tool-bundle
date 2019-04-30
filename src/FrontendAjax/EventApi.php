@@ -14,6 +14,7 @@ namespace Markocupic\SacEventToolBundle\FrontendAjax;
 
 use Contao\CalendarEventsModel;
 use Contao\Input;
+use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 

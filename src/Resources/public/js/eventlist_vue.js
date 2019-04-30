@@ -6,9 +6,9 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 new Vue({
-    el: '#eventList',
+    el: '#event-list',
     created() {
-        var self = this;
+        let self = this;
 
         self.fetchData();
         self.interval = setInterval(
@@ -16,35 +16,38 @@ new Vue({
                 self.fetchData();
             }, 200);
     },
-    data: {
-        eventlist: Eventlist,
-        rows: [],
-        isBusy: false,
-        loadedItems: 0,
-        interval: null,
-        allEventsLoaded: false,
-        loadAtOnce: 50,
-        loadAllOnSecondRequest: true
+    data: function () {
+        return {
+            eventlist: Eventlist,
+            rows: [],
+            isBusy: false,
+            loadedItems: 0,
+            interval: null,
+            allEventsLoaded: false,
+            loadAtOnce: 80,
+            loadAllOnSecondRequest: true
+        }
     },
     methods: {
+        // Prepare ajax request
         fetchData() {
-            var self = this;
+            let self = this;
             if (this.isBusy === false && self.eventlist.ids.length > this.loadedItems) {
                 this.isBusy = true;
                 this.xhr();
             }
-            if (self.allEventsLoaded === false && self.eventlist.ids.length == this.loadedItems) {
+            if (self.allEventsLoaded === false && self.eventlist.ids.length === this.loadedItems) {
                 self.allEventsLoaded = true;
                 clearInterval(self.interval);
                 console.log('Finished download process. ' + this.loadedItems + ' items loaded.');
             }
         },
-
+        // Get data from ajax
         xhr() {
-            var self = this;
-            var ids = [];
-            var counter = 0;
-            var itemsPerRequest = 50;
+            let self = this;
+            let ids = [];
+            let counter = 0;
+            let itemsPerRequest = 50;
 
             if (self.loadedItems === 0) {
                 itemsPerRequest = self.loadAtOnce;
@@ -58,27 +61,26 @@ new Vue({
 
                 ids.push(self.eventlist.ids[i]);
                 counter++;
-                if (counter == itemsPerRequest) {
+                if (counter === itemsPerRequest) {
                     break;
                 }
             }
 
-            var data = {
+            let data = {
                 'REQUEST_TOKEN': self.eventlist.requestToken,
                 'ids': ids,
                 'fields': self.eventlist.fields
             };
 
-            var self = this;
-            var url = self.eventlist.url;
-            var xhr = $.ajax({
+            let url = self.eventlist.url;
+            let xhr = $.ajax({
                 type: 'POST',
                 url: url,
                 data: data,
                 dataType: 'json'
             });
 
-            xhr.done(function (data, textStatus, jqXHR) {
+            xhr.done(function (data) {
                 self.isBusy = false;
                 data.forEach(function (row) {
                     self.rows.push(row);

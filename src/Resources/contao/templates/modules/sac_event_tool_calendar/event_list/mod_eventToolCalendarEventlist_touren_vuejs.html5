@@ -22,8 +22,10 @@
 <?php endif; ?>
 
 <?php if($this->hasItems): ?>
-<div  id="eventList" class="table-responsive">
-    <div class="align-right"><small>Es wurden <?= $this->countItems ?> Events gefunden.</small></div>
+<div  id="event-list" class="table-responsive">
+    <span><small>Es wurden <?= $this->countItems ?> Events gefunden. </small></span>
+    <span v-if="isBusy === true" class="text-success"><small>Lade events...</small></span>
+
     <table class="event-container table layout-table">
         <thead>
         <tr>

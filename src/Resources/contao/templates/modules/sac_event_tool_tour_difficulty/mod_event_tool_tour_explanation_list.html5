@@ -16,13 +16,13 @@
             <?php foreach ($this->difficulties as $difficulty): ?>
                 <?php if ($difficulty['catStart']): ?>
                 <tr>
-                  <th colspan="3"><?= htmlspecialchars_decode($difficulty['catTitle']) ?></th>
+                  <th colspan="3"><?= $difficulty['catTitle'] ?></th>
                 </tr>
                 <?php endif; ?>
               <tr>
                 <td><?= $difficulty['shortcut'] ?></td>
                 <td><?= $difficulty['title'] ?></td>
-                <td><?= htmlspecialchars_decode($difficulty['description']) ?></td>
+                <td><?= $difficulty['description'] ?></td>
               </tr>
             <?php endforeach; ?>
         </table>
