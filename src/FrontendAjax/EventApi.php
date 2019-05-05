@@ -14,7 +14,6 @@ namespace Markocupic\SacEventToolBundle\FrontendAjax;
 
 use Contao\CalendarEventsModel;
 use Contao\Input;
-use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -26,15 +25,12 @@ class EventApi
 {
 
     /**
+     * This method is used for the tour listing in the frontend
      * @return JsonResponse
      * @throws \Exception
      */
     public function sendEventDataByIds()
     {
-        //$response = new Response();
-        //$response->headers->set('Access-Control-Allow-Origin', '*');
-        //$response->send();
-
         $arrIds = Input::post('ids') == '' ? array() : Input::post('ids');
         $arrFields = Input::post('fields') == '' ? array() : Input::post('fields');
         if (is_array($arrIds))
