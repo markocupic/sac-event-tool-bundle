@@ -296,7 +296,7 @@
           <?php endif; ?>
           <?php if ($arrEvent['instructors'] != ''): ?>
           <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-instructors">Kursleitung</td>
+            <td class="event-export-instructors">Leitung</td>
             <td class="event-export-instructors"><strong><?= $arrEvent['instructors'] ?></strong></td>
           </tr>
           <?php endif; ?>
