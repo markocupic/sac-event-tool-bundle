@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * SAC Event Tool Web Plugin for Contao
  * Copyright (c) 2008-2019 Marko Cupic
@@ -7,15 +9,14 @@
  */
 new Vue({
     el: '#event-list',
-    created: function () {
-        let self = this;
+    created: function created() {
+        var self = this;
         self.prepareRequest();
-        self.interval = setInterval(
-            function () {
-                self.prepareRequest();
-            }, 200);
+        self.interval = setInterval(function () {
+            self.prepareRequest();
+        }, 200);
     },
-    data: function () {
+    data: function data() {
         return {
             eventlist: Eventlist,
             rows: [],
@@ -25,16 +26,18 @@ new Vue({
             allEventsLoaded: false,
             loadAtOnce: 80,
             loadAllOnSecondRequest: true
-        }
+        };
     },
     methods: {
         // Prepare ajax request
-        prepareRequest: function () {
-            let self = this;
+        prepareRequest: function prepareRequest() {
+            var self = this;
+
             if (self.isBusy === false && self.eventlist.ids.length > self.loadedItems) {
                 self.isBusy = true;
                 self.getDataByXhr();
             }
+
             if (self.allEventsLoaded === false && self.eventlist.ids.length === self.loadedItems) {
                 self.allEventsLoaded = true;
                 clearInterval(self.interval);
@@ -42,11 +45,11 @@ new Vue({
             }
         },
         // Get data by xhr
-        getDataByXhr: function () {
-            let self = this;
-            let ids = [];
-            let counter = 0;
-            let itemsPerRequest = 50;
+        getDataByXhr: function getDataByXhr() {
+            var self = this;
+            var ids = [];
+            var counter = 0;
+            var itemsPerRequest = 50;
 
             if (self.loadedItems === 0) {
                 itemsPerRequest = self.loadAtOnce;
@@ -56,28 +59,27 @@ new Vue({
                 itemsPerRequest = self.eventlist.ids.length;
             }
 
-            for (let i = self.loadedItems; i < self.eventlist.ids.length; i++) {
+            for (var i = self.loadedItems; i < self.eventlist.ids.length; i++) {
                 ids.push(self.eventlist.ids[i]);
                 counter++;
+
                 if (counter === itemsPerRequest) {
                     break;
                 }
             }
 
-            let data = {
+            var data = {
                 'REQUEST_TOKEN': self.eventlist.requestToken,
                 'ids': ids,
                 'fields': self.eventlist.fields
             };
-
-            let url = self.eventlist.url;
-            let xhr = $.ajax({
+            var url = self.eventlist.url;
+            var xhr = $.ajax({
                 type: 'POST',
                 url: url,
                 data: data,
                 dataType: 'json'
             });
-
             xhr.done(function (data) {
                 self.isBusy = false;
                 data.forEach(function (row) {
