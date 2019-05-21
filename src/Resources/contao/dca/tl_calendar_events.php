@@ -313,12 +313,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mainInstructor'] = array(
 
 // Instructor
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructor'],
-    'exclude'   => true,
-    'search'    => true,
-    'inputType' => 'multiColumnWizard',
+    'label'         => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructor'],
+    'exclude'       => true,
+    'search'        => true,
+    'inputType'     => 'multiColumnWizard',
     'save_callback' => array(array('tl_calendar_events_sac_event_tool', 'saveCallbackSetMaininstructor')),
-    'eval'      => array
+    'eval'          => array
     (
         'mandatory'    => true,
         'columnFields' => array
@@ -344,7 +344,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
             ),
         ),
     ),
-    'sql'       => "blob NULL",
+    'sql'           => "blob NULL",
 );
 
 // Terms/Ziele
@@ -527,8 +527,17 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = array(
     'inputType' => 'select',
     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-STATE'],
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval'      => array('includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false),
+    'eval'      => array('submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false),
     'sql'       => "varchar(32) NOT NULL default ''",
+);
+
+// eventDeferDate
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDeferDate'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventDeferDate'],
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => true, 'datepicker' => true, 'tl_class' => 'clr wizard'),
+    'sql'       => "int(10) unsigned NULL"
 );
 
 // meetingPoint
@@ -961,5 +970,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText']['eva
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventToken']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration']['eval']['doNotCopy'] = false;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDeferDate']['eval']['doNotCopy'] = false;
 
 

@@ -59,6 +59,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['isRecurringEvent'] = array("Sich wied
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventDates'] = array("Eventdaten", "Geben Sie bitte die Eventdaten ein. F&uuml;r jeden Tag eine Zeile.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'] = array("Event-Dauer", "Geben SIe die Event-Dauer an.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventState'] = array("Event Status", "Geben Sie optional einen Event-Status an. !!!Teilnehmer m&uuml;ssen informiert werden.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['eventDeferDate'] = array("Verschiebedatum", "Geben Sie das Verschiebedatum an, falls der Anlass verschoben wurde.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['singleSRCBroschuere'] = array("Hintergrundbild fuer Broschuere", "W&auml;hlen Sie bitte ein Bild aus.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['allowDeregistration'] = array("Angemeldeter Teilnehmer darf sich online vom Event abmelden", "Geben Sie dem angemeldeten Teilnehmer die M&ouml;glichkeit unter Einhaltung einer definierten Abmeldefrist sich online vom Event abzumelden.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['deregistrationLimit'] = array("Abmeldefrist in Tagen", "Definieren Sie den Zeitraum in Tagen, bis zu dem sich ein bereits angemeldeter Teilnehmer wieder online vom Event abmelden kann.");
