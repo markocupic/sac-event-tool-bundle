@@ -74,19 +74,18 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = 'eventType';
                 }
             }
-
+            /** @todo Den Teilnehmern weiterhin ermöglichen, sich anzumelden, auch wenn das Enddatum abgelaufen ist */
             // If event has been deferred
-            /** @todo */
-            /**
             if ($objCalendarEventsModel->eventState === 'event_deferred')
             {
                 \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
                     ->addField(array('eventDeferDate'), 'eventState', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
                     ->applyToPalette('default', 'tl_calendar_events')
                     ->applyToPalette('tour', 'tl_calendar_events')
-                    ->applyToPalette('lastMinuteTour', 'tl_calendar_events');
+                    ->applyToPalette('lastMinuteTour', 'tl_calendar_events')
+                    ->applyToPalette('generalEvent', 'tl_calendar_events')
+                    ->applyToPalette('course', 'tl_calendar_events');
             }
-             **/
         }
     }
 

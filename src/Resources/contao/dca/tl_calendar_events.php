@@ -527,11 +527,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = array(
     'inputType' => 'select',
     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-STATE'],
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval'      => array('submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false),
+    'eval'      => array('submitOnChange' => false, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false),
+    //'eval'      => array('submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false),
     'sql'       => "varchar(32) NOT NULL default ''",
 );
 
+/** @todo Falls verschoben, kann hier das Verschiebedatum angegeben werden. */
 // eventDeferDate
+/**
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDeferDate'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventDeferDate'],
     'exclude'   => true,
@@ -539,6 +542,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDeferDate'] = array(
     'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => true, 'datepicker' => true, 'tl_class' => 'clr wizard'),
     'sql'       => "int(10) unsigned NULL"
 );
+**/
 
 // meetingPoint
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['meetingPoint'] = array(

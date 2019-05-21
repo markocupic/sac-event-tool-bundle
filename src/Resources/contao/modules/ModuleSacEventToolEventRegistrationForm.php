@@ -194,7 +194,6 @@ class ModuleSacEventToolEventRegistrationForm extends Module
         {
             Message::addInfo('Die Anmeldefrist f&uuml;r diesen Event ist abgelaufen.', TL_MODE);
         }
-
         elseif ($this->objEvent->startDate - 60 * 60 * 24 < time())
         {
             Message::addInfo('Die Anmeldefrist f&uuml;r diesen Event ist abgelaufen.', TL_MODE);
