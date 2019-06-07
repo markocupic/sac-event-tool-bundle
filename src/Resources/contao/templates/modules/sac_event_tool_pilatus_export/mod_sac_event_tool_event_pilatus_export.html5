@@ -7,13 +7,11 @@
 <script>
     //Set Datepicker
     var opt = {
-        format: "dd.mm.yyyy",
-        autoclose: true,
-        maxViewMode: 0,
-        language: "de"
+        dateFormat: "d.m.Y",
+        locale: "de",
     };
-    $('#ctrl_timeRangeStart').datepicker(opt);
-    $('#ctrl_timeRangeEnd').datepicker(opt);
+    flatpickr('#ctrl_timeRangeStart', opt);
+    flatpickr('#ctrl_timeRangeEnd', opt);
 </script>
 
 <button class="btn btn-info enable-fe-editing" data-label-enable="Frontend Editing aktivieren" data-label-disable="Frontend Editing deaktivieren">Frontend Editing aktivieren</button>

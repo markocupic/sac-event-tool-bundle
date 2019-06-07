@@ -24,7 +24,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_filter_form']['dateStart'],
             'inputType' => 'text',
-            'eval'      => array('placeholder' => 'z.B. ' . Contao\Date::parse('Y-m-d'), 'maxlength' => 12),
+            'eval'      => array('placeholder' => 'yyyy-mm-dd', 'maxlength' => 12),
         ),
         'tourType'   => array
         (
@@ -34,7 +34,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = array
             'eval'             => array('includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']),
 
         ),
-        'courseType'   => array
+        'courseType' => array
         (
             'label'            => &$GLOBALS['TL_LANG']['tl_event_filter_form']['courseType'],
             'inputType'        => 'select',
@@ -61,7 +61,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = array
             'inputType' => 'text',
             'eval'      => array('placeholder' => Contao\Date::parse('Y') . '-****'),
         ),
-        'courseId'    => array
+        'courseId'   => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'],
             'inputType' => 'text',

@@ -14,6 +14,8 @@ use Contao\BackendTemplate;
 use Contao\Controller;
 use Contao\Input;
 use Contao\Module;
+use Contao\Date;
+use Contao\Environment;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Haste\Form\Form;
@@ -68,6 +70,28 @@ class ModuleSacEventToolEventEventFilterForm extends Module
      */
     protected function compile()
     {
+        if (Environment::get('isAjaxRequest'))
+        {
+            // Clean url dateStart url param & redirect
+            if (Input::get('year') > 0 && Input::get('dateStart') != '')
+            {
+                if (Input::get('year') != Date::parse('Y', strtotime(Input::get('dateStart'))))
+                {
+                    $url = \Haste\Util\Url::removeQueryString(['dateStart']);
+                    Controller::redirect($url);
+                }
+            }
+            // Clean url dateStart url param & redirect
+            if (Input::get('year') == '' && Input::get('dateStart') != '')
+            {
+                if (Date::parse('Y') != Date::parse('Y', strtotime(Input::get('dateStart'))))
+                {
+                    $url = \Haste\Util\Url::removeQueryString(['dateStart']);
+                    Controller::redirect($url);
+                }
+            }
+        }
+
         $this->Template->fields = static::$arrAllowedFields;
         $this->generateForm();
     }

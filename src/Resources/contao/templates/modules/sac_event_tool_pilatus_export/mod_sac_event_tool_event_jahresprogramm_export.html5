@@ -7,13 +7,11 @@
 <script>
     //Set Datepicker
     var opt = {
-        format: "dd.mm.yyyy",
-        autoclose: true,
-        maxViewMode: 0,
-        language: "de"
+        dateFormat: "d.m.Y",
+        locale: "de",
     };
-    $('#ctrl_startDate').datepicker(opt);
-    $('#ctrl_endDate').datepicker(opt);
+    flatpickr('#ctrl_startDate', opt);
+    flatpickr('#ctrl_endDate', opt);
 </script>
 
 <h3 class="ce_headline">Jahresprogramm</h3>

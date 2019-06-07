@@ -14,13 +14,12 @@
 <script>
     //Set Datepicker
     var opt = {
-        format: "dd.mm.yyyy",
-        autoclose: true,
-        language: "de",
-        startView: 2,
-        maxViewMode: 2,
+        dateFormat: 'd.m.Y',
+        allowInput: true,
+        enableTime: false,
+        locale: 'de'
     };
-    $('#ctrl_dateOfBirth').datepicker(opt);
+    flatpickr('#ctrl_dateOfBirth', opt);
 </script>
 
 

@@ -33,29 +33,34 @@ var EventFilter = {
 
         //Set Datepicker
         var opt = {
-            format: "dd-mm-yyyy",
-            autoclose: true,
-            maxViewMode: 0,
-            language: "de"
-        };
+            dateFormat: 'Y-m-d',
+            "locale": 'de',
+        }
+
+        var today = new Date();
+        var mm = today.getMonth() + 1;
+        var dd = today.getDate();
+        var YYYY = today.getFullYear();
+
         // Set datepickers start and end date
         if (self.getUrlParam('year') > 0) {
-            opt.startDate = "01-01-" + self.getUrlParam('year');
-            opt.endDate = "31-12-" + self.getUrlParam('year');
+            opt.minDate = self.getUrlParam('year') + '-01-01';
+            opt.maxDate = self.getUrlParam('year') + '-12-31';
+            opt.defaultDate = '';
+            if (self.getUrlParam('dateStart') != '') {
+                opt.defaultDate = self.getUrlParam('dateStart');
+            }
         } else {
             var today = new Date();
             var mm = today.getMonth() + 1;
             var dd = today.getDate();
             var YYYY = today.getFullYear();
-            opt.startDate = dd + '-' + mm + '-' + YYYY;
+            opt.minDate = YYYY + '-' + mm + '-' + dd;
             YYYY = YYYY + 2;
-            opt.endDate = dd + '-' + mm + '-' + YYYY;
+            opt.maxDate = YYYY + '-' + mm + '-' + dd;
         }
-        $('#ctrl_dateStart').datepicker(opt);
 
-        $('#dateStart button').click(function (e) {
-            $('#ctrl_dateStart').datepicker('show');
-        });
+        flatpickr("#ctrl_dateStart", opt);
 
     },
     /**
