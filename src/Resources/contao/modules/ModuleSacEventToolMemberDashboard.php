@@ -38,10 +38,10 @@ use Contao\UserModel;
 use Contao\Validator;
 use Haste\Form\Form;
 use Haste\Util\Url;
+use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion;
 use NotificationCenter\Model\Notification;
 use Patchwork\Utf8;
-use PhpOffice\PhpWord\CreateDocxFromTemplate;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Psr\Log\LogLevel;
 
@@ -68,7 +68,6 @@ class ModuleSacEventToolMemberDashboard extends Module
      * @var
      */
     protected $objUser;
-
 
     /**
      * Display a wildcard in the back end
@@ -106,7 +105,6 @@ class ModuleSacEventToolMemberDashboard extends Module
         // Logged in FE user object
         $this->objUser = FrontendUser::getInstance();
 
-
         if (strlen(Input::get('action')))
         {
             $this->action = Input::get('action');
@@ -132,7 +130,6 @@ class ModuleSacEventToolMemberDashboard extends Module
             Controller::redirect($url);
         }
 
-
         // Set the action
         if ($this->action === 'write_event_story')
         {
@@ -149,14 +146,11 @@ class ModuleSacEventToolMemberDashboard extends Module
             {
                 if (FE_USER_LOGGED_IN)
                 {
-
                     $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
                     if ($objRegistration !== null)
                     {
-
                         if ($this->objUser->sacMemberId == $objRegistration->sacMemberId)
                         {
-
                             $objMember = MemberModel::findBySacMemberId($this->objUser->sacMemberId);
                             $startDate = '';
                             $arrDates = array();
@@ -184,34 +178,30 @@ class ModuleSacEventToolMemberDashboard extends Module
                             // Log
                             System::log(sprintf('New event confirmation download. SAC-User-ID: %s. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_CONFIRMATION_DOWNLOAD'));
 
-
-                            // Replace template vars
-                            $arrData = array();
-                            $arrData[] = array('key' => 'eventDates', 'value' => implode(', ', $arrDates));
-                            $arrData[] = array('key' => 'firstname', 'value' => htmlspecialchars(html_entity_decode($objMember->firstname)));
-                            $arrData[] = array('key' => 'lastname', 'value' => htmlspecialchars(html_entity_decode($objMember->lastname)));
-                            $arrData[] = array('key' => 'memberId', 'value' => $objMember->sacMemberId);
-                            $arrData[] = array('key' => 'eventYear', 'value' => $startDate);
-                            $arrData[] = array('key' => 'eventId', 'value' => htmlspecialchars(html_entity_decode($objRegistration->eventId)));
-                            $arrData[] = array('key' => 'eventName', 'value' => $eventTitle);
-                            $arrData[] = array('key' => 'regId', 'value' => $objRegistration->id);
-                            $arrData[] = array('key' => 'courseId', 'value' => $courseId);
-
-
-                            $container = System::getContainer();
+                            // Create phpWord instance
                             $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'));
                             $filename = sprintf($filenamePattern, $objMember->sacMemberId, $objRegistration->id, 'docx');
-                            $targetSrc = Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename;
-                            $docxTemplateSrc = Config::get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC');
+                            $destFilename = Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename;
+                            $objPhpWord = MsWordTemplateProcessor::create(Config::get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'), $destFilename);
 
-                            // Generate docxPhpOffice\PhpWord;
-                            CreateDocxFromTemplate::create($arrData, $docxTemplateSrc, $targetSrc)
-                                ->generateUncached(false)
+                            // Replace template vars
+                            $objPhpWord->replace('eventDates', implode(', ', $arrDates));
+                            $objPhpWord->replace('firstname', htmlspecialchars(html_entity_decode($objMember->firstname)));
+                            $objPhpWord->replace('lastname', htmlspecialchars(html_entity_decode($objMember->lastname)));
+                            $objPhpWord->replace('memberId', $objMember->sacMemberId);
+                            $objPhpWord->replace('eventYear', $startDate);
+                            $objPhpWord->replace('eventId', htmlspecialchars(html_entity_decode($objRegistration->eventId)));
+                            $objPhpWord->replace('eventName', $eventTitle);
+                            $objPhpWord->replace('regId', $objRegistration->id);
+                            $objPhpWord->replace('courseId', $courseId);
+
+                            // Generate ms word file and send it to the browser
+                            $objPhpWord->generateUncached(false)
                                 ->sendToBrowser(false)
                                 ->generate();
 
                             // Generate pdf
-                            DocxToPdfConversion::create($targetSrc, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
+                            DocxToPdfConversion::create($destFilename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
                                 ->sendToBrowser(true)
                                 ->createUncached(false)
                                 ->convert();
@@ -224,10 +214,8 @@ class ModuleSacEventToolMemberDashboard extends Module
             throw new \Exception('There was an error while trying to generate the course confirmation.');
         }
 
-
         return parent::generate();
     }
-
 
     /**
      * Generate the module
@@ -261,7 +249,6 @@ class ModuleSacEventToolMemberDashboard extends Module
 
         Message::reset();
 
-
         switch ($this->action)
         {
             case 'member_dashboard':
@@ -278,11 +265,9 @@ class ModuleSacEventToolMemberDashboard extends Module
                     $this->Template->objUser->hasAvatar = true;
                 }
 
-
                 $this->Template->avatarForm = $this->generateAvatarForm();
 
                 $this->Template->userProfileForm = $this->generateUserProfileForm();
-
 
                 // Upcoming events
                 $this->Template->arrUpcomingEvents = CalendarEventsMemberModel::findUpcomingEventsByMemberId($this->objUser->id);
@@ -290,12 +275,10 @@ class ModuleSacEventToolMemberDashboard extends Module
                 // Count events
                 $eventCounter = array();
 
-
                 // Past events
                 $arrEvents = CalendarEventsMemberModel::findPastEventsByMemberId($this->objUser->id);
                 foreach ($arrEvents as $k => $event)
                 {
-
                     $objEvent = \CalendarEventsModel::findByPk($event['id']);
                     $arrEvents[$k]['objEvent'] = $objEvent;
 
@@ -318,7 +301,6 @@ class ModuleSacEventToolMemberDashboard extends Module
                      */
                     if ($arrEvents[$k]['objStory'] !== null && $objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
                     {
-
                         $arrEvents[$k]['canEditStory'] = true;
                     }
                     elseif ($arrEvents[$k]['objStory'] === null && $objEvent->endDate + $this->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
@@ -330,7 +312,6 @@ class ModuleSacEventToolMemberDashboard extends Module
                     $arrEvents[$k]['objStoryLink'] = ($arrEvents[$k]['objStory'] !== null || $arrEvents[$k]['canEditStory'] || $arrEvents[$k]['canOpenStory']) ? Frontend::addToUrl('action=write_event_story&amp;eventId=' . $event['id']) : '#';
                     $arrEvents[$k]['downloadCourseConfirmationLink'] = Frontend::addToUrl('action=download_course_confirmation&amp;id=' . $event['registrationId']);
                 }
-
 
                 $objNewEventStoryForm = $this->generateCreateNewEventStoryForm();
                 $this->Template->newEventStoryForm = $objNewEventStoryForm;
@@ -383,14 +364,12 @@ class ModuleSacEventToolMemberDashboard extends Module
                             Message::addError('F&uuml;r diesen Event kann kein Bericht mehr erstellt werden. Das Eventdatum liegt schon zu lange zur&uuml;ck');
                             Controller::redirect(Controller::getReferer());
                         }
-
                     }
 
                     $this->Template->eventName = $objEvent->title;
                     $this->Template->eventPeriod = CalendarEventsHelper::getEventPeriod($objEvent->id);
                     $this->Template->executionState = $objEvent->executionState;
                     $this->Template->eventSubstitutionText = $objEvent->eventSubstitutionText;
-
 
                     $objStory = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=?')->execute($this->objUser->sacMemberId, Input::get('eventId'));
                     if ($objStory->numRows)
@@ -505,13 +484,11 @@ class ModuleSacEventToolMemberDashboard extends Module
                             Database::getInstance()->prepare('UPDATE tl_calendar_events_story %s WHERE id=?')->set($set)->execute($insertId);
                         }
                         $objStoryModel = CalendarEventsStoryModel::findByPk($insertId);
-
                     }
 
                     // Generate forms
                     $this->Template->objEventStoryTextAndYoutubeForm = $this->generateTextAndYoutubeForm($objStoryModel);
                     $this->Template->objEventStoryImageUploadForm = $this->generatePictureUploadForm($objStoryModel);
-
                 }
                 break;
 
@@ -520,9 +497,7 @@ class ModuleSacEventToolMemberDashboard extends Module
 
                 break;
         }
-
     }
-
 
     /**
      * Rotate an image anti clockwise by 90°
@@ -573,8 +548,6 @@ class ModuleSacEventToolMemberDashboard extends Module
 
         imagedestroy($source);
         return true;
-
-
     }
 
     /**
@@ -608,7 +581,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                     System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
                     return;
                 }
-                elseif($objEventsMember->stateOfSubscription === 'user-has-unsubscribed')
+                elseif ($objEventsMember->stateOfSubscription === 'user-has-unsubscribed')
                 {
                     $errorMsg = 'Abmeldung fehlgeschlagen! Du hast dich vom Event "' . $objEvent->title . '" bereits abgemeldet.';
                     $blnHasError = true;
@@ -655,7 +628,6 @@ class ModuleSacEventToolMemberDashboard extends Module
                     $blnHasError = true;
                 }
 
-
                 // Unregister from event
                 if (!$blnHasError)
                 {
@@ -663,7 +635,6 @@ class ModuleSacEventToolMemberDashboard extends Module
 
                     // Save data record in tl_calendar_events_member
                     $objEventsMember->save();
-
 
                     // Load language file
                     Controller::loadLanguageFile('tl_calendar_events_member');
@@ -703,7 +674,6 @@ class ModuleSacEventToolMemberDashboard extends Module
                     System::log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
 
                     $objNotification->send($arrTokens, 'de');
-
                 }
             }
         }
@@ -713,16 +683,13 @@ class ModuleSacEventToolMemberDashboard extends Module
         }
     }
 
-
     protected function generateCreateNewEventStoryForm()
     {
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
-
         $objForm = new Form('form-create-new-event-story', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
-
 
         $objForm->setFormActionFromUri(Environment::get('uri'));
 
@@ -748,7 +715,6 @@ class ModuleSacEventToolMemberDashboard extends Module
             'eval'      => array('mandatory' => true),
         ));
 
-
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
             'label'     => 'Weiter',
@@ -765,10 +731,7 @@ class ModuleSacEventToolMemberDashboard extends Module
             }
         }
 
-
         return $objForm->generate();
-
-
     }
 
     /**
@@ -779,11 +742,9 @@ class ModuleSacEventToolMemberDashboard extends Module
     {
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
-
         $objForm = new Form('form-avatar-upload', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
-
 
         $objForm->setFormActionFromUri(Environment::get('uri'));
 
@@ -854,7 +815,6 @@ class ModuleSacEventToolMemberDashboard extends Module
             }
         }
 
-
         return $objForm->generate();
     }
 
@@ -864,11 +824,9 @@ class ModuleSacEventToolMemberDashboard extends Module
      */
     protected function generateUserProfileForm()
     {
-
         $objForm = new Form('form-user-profile', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
-
 
         $objForm->setFormActionFromUri(Environment::get('uri'));
 
@@ -911,13 +869,11 @@ class ModuleSacEventToolMemberDashboard extends Module
         $objModel = MemberModel::findByPk($this->objUser->id);
         $objForm->bindModel($objModel);
 
-
         if ($objForm->validate())
         {
             // The model will now contain the changes so you can save it
             $objModel->save();
         }
-
 
         return $objForm->generate();
     }
@@ -928,11 +884,9 @@ class ModuleSacEventToolMemberDashboard extends Module
      */
     protected function generateClearProfileForm()
     {
-
         $objForm = new Form('form-clear-profile', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
-
 
         $objForm->setFormActionFromUri(Environment::get('uri'));
 
@@ -944,7 +898,6 @@ class ModuleSacEventToolMemberDashboard extends Module
             'options'   => array('false' => 'Nein', 'true' => 'Ja'),
         ));
 
-
         $objForm->addFormField('sacMemberId', array(
             'label'     => array('SAC-Mitgliedernummer', ''),
             'inputType' => 'text',
@@ -955,7 +908,6 @@ class ModuleSacEventToolMemberDashboard extends Module
             'label'     => 'Profil unwiederkehrlich löschen',
             'inputType' => 'submit',
         ));
-
 
         if ($objForm->validate())
         {
@@ -985,7 +937,6 @@ class ModuleSacEventToolMemberDashboard extends Module
                 }
             }
         }
-
 
         return $objForm->generate();
     }
@@ -1081,7 +1032,6 @@ class ModuleSacEventToolMemberDashboard extends Module
             $hasError = false;
         }
 
-
         if (!$hasError)
         {
             $objEventStoryModel->addedOn = time();
@@ -1108,7 +1058,6 @@ class ModuleSacEventToolMemberDashboard extends Module
 
         if ($this->eventStoryUploadFolder != '')
         {
-
             if (Validator::isBinaryUuid($this->eventStoryUploadFolder))
             {
                 $objFilesModel = FilesModel::findByUuid($this->eventStoryUploadFolder);
@@ -1235,7 +1184,6 @@ class ModuleSacEventToolMemberDashboard extends Module
                                     $strText = sprintf('User with username %s has uploadad a new picture ("%s").', $this->objUser->username, $objModel->path);
                                     $logger = System::getContainer()->get('monolog.logger.contao');
                                     $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, 'EVENT STORY PICTURE UPLOAD')));
-
                                 }
                             }
                         }

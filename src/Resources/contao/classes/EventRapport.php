@@ -10,7 +10,6 @@
 
 namespace Markocupic\SacEventToolBundle;
 
-
 use Contao\CalendarEventsInstructorInvoiceModel;
 use Contao\CalendarEventsJourneyModel;
 use Contao\CalendarEventsModel;
@@ -27,9 +26,8 @@ use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
+use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion;
-use PhpOffice\PhpWord\CreateDocxFromTemplate;
-
 
 /**
  * Class EventRapport
@@ -45,7 +43,6 @@ class EventRapport
      */
     public function generateInvoice($invoiceId, $outputType = 'docx')
     {
-
         $objEventInvoice = CalendarEventsInstructorInvoiceModel::findByPk($invoiceId);
         if ($objEventInvoice !== null)
         {
@@ -60,7 +57,7 @@ class EventRapport
                     $objFile = new File(Config::get('SAC_EVT_TEMP_PATH') . '/' . $file);
                     if ($objFile !== null)
                     {
-                        if ($objFile->mtime + 60 * 60 * 24 * 7 < time())
+                        if ((int)$objFile->mtime + 60 * 60 * 24 * 7 < time())
                         {
                             $objFile->delete();
                         }
@@ -88,30 +85,21 @@ class EventRapport
                     Controller::redirect(System::getReferer());
                 }
 
-
-                $arrData = array();
+                $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
+                $destFilename = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
+                $objPhpWord = MsWordTemplateProcessor::create(Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), $destFilename);
 
                 // Page #1
                 // Tour rapport
-                $arrData = $this->getTourRapportData($arrData, $objEvent, $objEventMember, $objEventInvoice, $objBiller);
+                $this->getTourRapportData($objPhpWord, $objEvent, $objEventMember, $objEventInvoice, $objBiller);
 
                 // Page #1 + #2
                 // Get event data
-                $arrData = $this->getEventData($arrData, $objEvent);
+                $this->getEventData($objPhpWord, $objEvent);
 
                 // Page #2
                 // Member list
-                $arrData = $this->getEventMemberData($arrData, $objEvent, $objEventMember);
-
-
-                // Generate filename
-                $container = \Contao\System::getContainer();
-                $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
-
-                //$filenamePattern = str_replace('%%s', '%s', $container->getParameter('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
-
-
-                $targetFile = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
+                $this->getEventMemberData($objPhpWord, $objEvent, $objEventMember);
 
                 // Create temporary folder, if it not exists.
                 new Folder(Config::get('SAC_EVT_TEMP_PATH'));
@@ -120,13 +108,12 @@ class EventRapport
                 if ($outputType === 'pdf')
                 {
                     // Generate Docx file from template;
-                    CreateDocxFromTemplate::create($arrData, Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), $targetFile)
-                        ->generateUncached(true)
+                    $objPhpWord->generateUncached(true)
                         ->sendToBrowser(false)
                         ->generate();
 
                     // Generate pdf
-                    DocxToPdfConversion::create($targetFile, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
+                    DocxToPdfConversion::create($destFilename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
                         ->sendToBrowser(true)
                         ->createUncached(true)
                         ->convert();
@@ -135,26 +122,24 @@ class EventRapport
                 if ($outputType === 'docx')
                 {
                     // Generate Docx file from template;
-                    CreateDocxFromTemplate::create($arrData, Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), $targetFile)
-                        ->generateUncached(true)
+                    $objPhpWord->generateUncached(true)
                         ->sendToBrowser(true)
                         ->generate();
                 }
-
 
                 exit();
             }
         }
     }
 
-
     /**
-     * @param $arrData
+     * @param MsWordTemplateProcessor $objPhpWord
      * @param $objEvent
      * @param $objEventMember
-     * @return array
+     * @param $objEventInvoice
+     * @param $objBiller
      */
-    protected function getTourRapportData($arrData, $objEvent, $objEventMember, $objEventInvoice, $objBiller)
+    protected function getTourRapportData(MsWordTemplateProcessor $objPhpWord, $objEvent, $objEventMember, $objEventInvoice, $objBiller)
     {
         Controller::loadLanguageFile('tl_calendar_events');
 
@@ -163,34 +148,30 @@ class EventRapport
         $countInstructors = count($arrInstructors);
         $countParticipantsTotal = $countParticipants + $countInstructors;
 
-
         $transport = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : 'keine Angabe';
-        $arrData[] = array('key' => 'eventTransport', 'value' => htmlspecialchars(html_entity_decode($transport)));
-        $arrData[] = array('key' => 'eventCanceled', 'value' => ($objEvent->eventState === 'event_canceled' || $objEvent->executionState === 'event_canceled') ? 'Ja' : 'Nein');
-        $arrData[] = array('key' => 'eventHasExecuted', 'value' => $objEvent->executionState === 'event_executed_like_predicted' ? 'Ja' : 'Nein');
+        $objPhpWord->replace('eventTransport', htmlspecialchars(html_entity_decode($transport)));
+        $objPhpWord->replace('eventCanceled', ($objEvent->eventState === 'event_canceled' || $objEvent->executionState === 'event_canceled') ? 'Ja' : 'Nein');
+        $objPhpWord->replace('eventHasExecuted', $objEvent->executionState === 'event_executed_like_predicted' ? 'Ja' : 'Nein');
         $substitutionText = $objEvent->eventSubstitutionText !== '' ? $objEvent->eventSubstitutionText : '---';
-        $arrData[] = array('key' => 'eventSubstitutionText', 'value' => htmlspecialchars(html_entity_decode($substitutionText)));
-        $arrData[] = array('key' => 'eventDuration', 'value' => htmlspecialchars(html_entity_decode($objEventInvoice->eventDuration)));
-
+        $objPhpWord->replace('eventSubstitutionText', htmlspecialchars(html_entity_decode($substitutionText)));
+        $objPhpWord->replace('eventDuration', htmlspecialchars(html_entity_decode($objEventInvoice->eventDuration)));
 
         // User
-        $arrData[] = array('key' => 'eventInstructorName', 'value' => htmlspecialchars(html_entity_decode($objBiller->name)));
-        $arrData[] = array('key' => 'eventInstructorStreet', 'value' => htmlspecialchars(html_entity_decode($objBiller->street)));
-        $arrData[] = array('key' => 'eventInstructorPostalCity', 'value' => htmlspecialchars(html_entity_decode($objBiller->postal . ' ' . $objBiller->city)));
-        $arrData[] = array('key' => 'eventInstructorPhone', 'value' => htmlspecialchars(html_entity_decode($objBiller->phone)));
-        $arrData[] = array('key' => 'countParticipants', 'value' => htmlspecialchars(html_entity_decode($countParticipantsTotal)));
+        $objPhpWord->replace('eventInstructorName', htmlspecialchars(html_entity_decode($objBiller->name)));
+        $objPhpWord->replace('eventInstructorStreet', htmlspecialchars(html_entity_decode($objBiller->street)));
+        $objPhpWord->replace('eventInstructorPostalCity', htmlspecialchars(html_entity_decode($objBiller->postal . ' ' . $objBiller->city)));
+        $objPhpWord->replace('eventInstructorPhone', htmlspecialchars(html_entity_decode($objBiller->phone)));
+        $objPhpWord->replace('countParticipants', htmlspecialchars(html_entity_decode($countParticipantsTotal)));
 
-
-        $arrData[] = array('key' => 'weatherConditions', 'value' => htmlspecialchars(html_entity_decode($objEvent->tourWeatherConditions)));
-        $arrData[] = array('key' => 'avalancheConditions', 'value' => htmlspecialchars(html_entity_decode($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->tourAvalancheConditions][0])));
-        $arrData[] = array('key' => 'specialIncidents', 'value' => htmlspecialchars(html_entity_decode($objEvent->tourSpecialIncidents)));
+        $objPhpWord->replace('weatherConditions', htmlspecialchars(html_entity_decode($objEvent->tourWeatherConditions)));
+        $objPhpWord->replace('avalancheConditions', htmlspecialchars(html_entity_decode($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->tourAvalancheConditions][0])));
+        $objPhpWord->replace('specialIncidents', htmlspecialchars(html_entity_decode($objEvent->tourSpecialIncidents)));
 
         $arrFields = array('sleepingTaxes', 'sleepingTaxesText', 'miscTaxes', 'miscTaxesText', 'railwTaxes', 'railwTaxesText', 'cabelCarTaxes', 'cabelCarTaxesText', 'roadTaxes', 'carTaxesKm', 'countCars', 'phoneTaxes');
         foreach ($arrFields as $field)
         {
-            $arrData[] = array('key' => $field, 'value' => htmlspecialchars(html_entity_decode($objEventInvoice->{$field})));
+            $objPhpWord->replace($field, htmlspecialchars(html_entity_decode($objEventInvoice->{$field})));
         }
-
 
         // Calculate car costs
         $carTaxes = 0;
@@ -204,47 +185,41 @@ class EventRapport
             }
         }
 
-        $arrData[] = array('key' => 'carTaxes', 'value' => htmlspecialchars(html_entity_decode(round($carTaxes, 2))));
+        $objPhpWord->replace('carTaxes', htmlspecialchars(html_entity_decode(round($carTaxes, 2))));
         $totalCosts = $objEventInvoice->sleepingTaxes + $objEventInvoice->miscTaxes + $objEventInvoice->railwTaxes + $objEventInvoice->cabelCarTaxes + $objEventInvoice->phoneTaxes + $carTaxes;
-        $arrData[] = array('key' => 'totalCosts', 'value' => htmlspecialchars(html_entity_decode(round($totalCosts, 2))));
+        $objPhpWord->replace('totalCosts', htmlspecialchars(html_entity_decode(round($totalCosts, 2))));
 
         // Notice
         $notice = $objEventInvoice->notice == '' ? '---' : $objEventInvoice->notice;
-        $arrData[] = array('key' => 'notice', 'value' => htmlspecialchars(html_entity_decode($notice)), 'options' => array('multiline' => true));
+        $objPhpWord->replace('notice', htmlspecialchars(html_entity_decode($notice)), array('multiline' => true));
 
         // eventReportAdditionalNotices
         $eventReportAdditionalNotices = $objEvent->eventReportAdditionalNotices == '' ? '---' : $objEvent->eventReportAdditionalNotices;
-        $arrData[] = array('key' => 'eventReportAdditionalNotices', 'value' => htmlspecialchars(html_entity_decode($eventReportAdditionalNotices)), 'options' => array('multiline' => true));
+        $objPhpWord->replace('eventReportAdditionalNotices', htmlspecialchars(html_entity_decode($eventReportAdditionalNotices)), array('multiline' => true));
 
         // Iban & account holder
-        $arrData[] = array('key' => 'iban', 'value' => htmlspecialchars(html_entity_decode($objEventInvoice->iban)));
-        $arrData[] = array('key' => 'accountHolder', 'value' => htmlspecialchars(html_entity_decode($objBiller->name)));
-
-        return $arrData;
-
-
+        $objPhpWord->replace('iban', htmlspecialchars(html_entity_decode($objEventInvoice->iban)));
+        $objPhpWord->replace('accountHolder', htmlspecialchars(html_entity_decode($objBiller->name)));
     }
 
     /**
-     * @param $arrData
+     * @param MsWordTemplateProcessor $objPhpWord
      * @param $objEvent
-     * @param $objEventMember
-     * @return array
      */
-    protected function getEventData($arrData, $objEvent)
+    protected function getEventData(MsWordTemplateProcessor $objPhpWord, $objEvent)
     {
         // Event data
-        $arrData[] = array('key' => 'eventTitle', 'value' => htmlspecialchars(html_entity_decode($objEvent->title)));
+        $objPhpWord->replace('eventTitle', htmlspecialchars(html_entity_decode($objEvent->title)));
         Controller::loadLanguageFile('tl_calendar_events');
         $arrEventTstamps = CalendarEventsHelper::getEventTimestamps($objEvent->id);
 
         if ($objEvent->eventType === 'course')
         {
-            $arrData[] = array('key' => 'courseId', 'value' => htmlspecialchars(html_entity_decode('Kurs-Nr: ' . $objEvent->courseId)));
+            $objPhpWord->replace('courseId', htmlspecialchars(html_entity_decode('Kurs-Nr: ' . $objEvent->courseId)));
         }
         else
         {
-            $arrData[] = array('key' => 'courseId', 'value' => '');
+            $objPhpWord->replace('courseId', '');
         }
 
         // Generate event duration string
@@ -278,30 +253,23 @@ class EventRapport
         }
         $strEmergencyConcept = implode("\r\n\r\n", $arrEmergencyConcept);
 
-
-        $arrData[] = array('key' => 'eventDates', 'value' => htmlspecialchars(html_entity_decode($strEventDuration)));
-        $arrData[] = array('key' => 'eventMeetingpoint', 'value' => htmlspecialchars(html_entity_decode($objEvent->meetingPoint)));
-        $arrData[] = array('key' => 'eventTechDifficulties', 'value' => htmlspecialchars(html_entity_decode(implode(', ', CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent->id, false)))));
-        $arrData[] = array('key' => 'eventEquipment', 'value' => htmlspecialchars(html_entity_decode($objEvent->equipment)), 'options' => array('multiline' => true));
-        $arrData[] = array('key' => 'eventTourProfile', 'value' => htmlspecialchars(html_entity_decode($strTourProfile)), 'options' => array('multiline' => true));
-        $arrData[] = array('key' => 'emergencyConcept', 'value' => htmlspecialchars(html_entity_decode($strEmergencyConcept)), 'options' => array('multiline' => true));
-        $arrData[] = array('key' => 'eventMiscellaneous', 'value' => htmlspecialchars(html_entity_decode($objEvent->miscellaneous)), 'options' => array('multiline' => true));
-
-        return $arrData;
-
+        $objPhpWord->replace('eventDates', htmlspecialchars(html_entity_decode($strEventDuration)));
+        $objPhpWord->replace('eventMeetingpoint', htmlspecialchars(html_entity_decode($objEvent->meetingPoint)));
+        $objPhpWord->replace('eventTechDifficulties', htmlspecialchars(html_entity_decode(implode(', ', CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent->id, false)))));
+        $objPhpWord->replace('eventEquipment', htmlspecialchars(html_entity_decode($objEvent->equipment)), array('multiline' => true));
+        $objPhpWord->replace('eventTourProfile', htmlspecialchars(html_entity_decode($strTourProfile)), array('multiline' => true));
+        $objPhpWord->replace('emergencyConcept', htmlspecialchars(html_entity_decode($strEmergencyConcept)), array('multiline' => true));
+        $objPhpWord->replace('eventMiscellaneous', htmlspecialchars(html_entity_decode($objEvent->miscellaneous)), array('multiline' => true));
     }
 
     /**
-     * @param $arrData
+     * @param MsWordTemplateProcessor $objPhpWord
      * @param $objEvent
      * @param $objEventMember
-     * @return array
      */
-    protected function getEventMemberData($arrData, $objEvent, $objEventMember)
+    protected function getEventMemberData(MsWordTemplateProcessor $objPhpWord, $objEvent, $objEventMember)
     {
         $i = 0;
-        $rows = array();
-
 
         // TL
         $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
@@ -329,7 +297,7 @@ class EventRapport
                     $mobile = $objUserModel->mobile != '' ? $objUserModel->mobile : '----';
 
                     $i++;
-                    $rows[] = array(
+                    $row = array(
                         array('key' => 'i', 'value' => $i, 'options' => array('multiline' => false)),
                         array('key' => 'role', 'value' => 'TL', 'options' => array('multiline' => false)),
                         array('key' => 'firstname', 'value' => htmlspecialchars(html_entity_decode($objUserModel->name)), 'options' => array('multiline' => false)),
@@ -346,6 +314,7 @@ class EventRapport
                         array('key' => 'transportInfo', 'value' => htmlspecialchars(html_entity_decode($transportInfo)), 'options' => array('multiline' => false)),
                         array('key' => 'dateOfBirth', 'value' => $objUserModel->dateOfBirth != '' ? Date::parse('Y', $objUserModel->dateOfBirth) : '', 'options' => array('multiline' => false)),
                     );
+                    $objPhpWord->replaceAndClone('i', $row);
                 }
             }
         }
@@ -386,7 +355,7 @@ class EventRapport
 
             // Phone
             $mobile = $objEventMember->mobile != '' ? $objEventMember->mobile : '----';
-            $rows[] = array(
+            $row = array(
                 array('key' => 'i', 'value' => $i, 'options' => array('multiline' => false)),
                 array('key' => 'role', 'value' => 'TN', 'options' => array('multiline' => false)),
                 array('key' => 'firstname', 'value' => htmlspecialchars(html_entity_decode($objEventMember->firstname)), 'options' => array('multiline' => false)),
@@ -403,13 +372,8 @@ class EventRapport
                 array('key' => 'transportInfo', 'value' => htmlspecialchars(html_entity_decode($transportInfo)), 'options' => array('multiline' => false)),
                 array('key' => 'dateOfBirth', 'value' => $objEventMember->dateOfBirth != '' ? Date::parse('Y', $objEventMember->dateOfBirth) : '', 'options' => array('multiline' => false)),
             );
+            $objPhpWord->replaceAndClone('i', $row);
         }
-
-        // Clone rows
-        $arrData[] = array(
-            'clone' => 'i',
-            'rows'  => $rows,
-        );
 
         // Event instructors
         $aInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
@@ -421,12 +385,10 @@ class EventRapport
                 return $objUser->name;
             }
         }, $aInstructors);
-        $arrData[] = array('key' => 'eventInstructors', 'value' => htmlspecialchars(html_entity_decode(implode(', ', $arrInstructors))));
+        $objPhpWord->replace('eventInstructors', htmlspecialchars(html_entity_decode(implode(', ', $arrInstructors))));
 
         // Event Id
-        $arrData[] = array('key' => 'eventId', 'value' => $objEvent->id);
-
-        return $arrData;
+        $objPhpWord->replace('eventId', $objEvent->id);
     }
 
     /**
@@ -437,7 +399,6 @@ class EventRapport
      */
     public function generateMemberList($eventId, $outputType = 'docx')
     {
-
         $objEvent = CalendarEventsModel::findByPk($eventId);
 
         if ($objEvent !== null)
@@ -450,18 +411,16 @@ class EventRapport
                 Controller::redirect(System::getReferer());
             }
 
-            $arrData = array();
+            // Create phpWord instance
+            $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'));
+            $destFile = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
+            $objPhpWord = MsWordTemplateProcessor::create(Config::get('SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'), $destFile);
 
             // Get event data
-            $arrData = $this->getEventData($arrData, $objEvent);
+            $this->getEventData($objPhpWord, $objEvent);
 
             // Member list
-            $arrData = $this->getEventMemberData($arrData, $objEvent, $objEventMember);
-
-            // Generate filename
-            $container = \Contao\System::getContainer();
-            $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'));
-            $targetFile = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
+            $this->getEventMemberData($objPhpWord, $objEvent, $objEventMember);
 
             // Create temporary folder, if it not exists.
             new Folder(Config::get('SAC_EVT_TEMP_PATH'));
@@ -470,13 +429,12 @@ class EventRapport
             if ($outputType === 'pdf')
             {
                 // Generate Docx file from template;
-                CreateDocxFromTemplate::create($arrData, Config::get('SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'), $targetFile)
-                    ->generateUncached(true)
+                $objPhpWord->generateUncached(true)
                     ->sendToBrowser(false)
                     ->generate();
 
                 // Generate pdf
-                DocxToPdfConversion::create($targetFile, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
+                DocxToPdfConversion::create($destFile, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
                     ->sendToBrowser(true)
                     ->createUncached(true)
                     ->convert();
@@ -485,17 +443,13 @@ class EventRapport
             if ($outputType === 'docx')
             {
                 // Generate Docx file from template;
-                //die(print_r($arrData,true));
-                CreateDocxFromTemplate::create($arrData, Config::get('SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'), $targetFile)
-                    ->generateUncached(true)
+                $objPhpWord->generateUncached(true)
                     ->sendToBrowser(true)
                     ->generate();
             }
 
-
             exit();
         }
     }
-
 
 }
