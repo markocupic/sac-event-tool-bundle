@@ -71,8 +71,9 @@
     </div>
 </div>
 
-<!-- Preparing the Eventlsit object -->
+<!-- Preparing the Eventlist object -->
 <script>
+    // Lazyload data by ajax
     Eventlist = {
         ids: [],
         url: '_event_api/get_event_data_by_ids',
