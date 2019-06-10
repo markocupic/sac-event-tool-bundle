@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 // Add tl_user.sacMemberId to index
 $GLOBALS['TL_DCA']['tl_user']['config']['sql']['keys']['sacMemberId'] = 'index';
 
@@ -18,7 +17,6 @@ $GLOBALS['TL_DCA']['tl_user']['config']['onload_callback'][] = array('tl_user_sa
 
 // Oncreate callbacks
 $GLOBALS['TL_DCA']['tl_user']['config']['oncreate_callback'][] = array('tl_user_sac_event_tool', 'oncreateCallback');
-
 
 // Manipulate palette default
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()
@@ -99,7 +97,6 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addField(array('avatarSRC', 'hobbies', 'introducing'), 'frontend_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration'), 'event_tool_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('login', 'tl_user');
-
 
 // Fields
 $GLOBALS['TL_DCA']['tl_user']['fields']['username']['eval']['tl_class'] = 'clr';
@@ -232,7 +229,6 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['street'] = array(
     'sql'       => "varchar(255) NOT NULL default ''",
 );
 
-
 // postal
 $GLOBALS['TL_DCA']['tl_user']['fields']['postal'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_user']['postal'],
@@ -356,7 +352,6 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['leiterQualifikation'] = array(
     'eval'      => array('tl_class' => 'clr', 'multiple' => true, 'orderField' => 'orderLeiterQualifikation'),
     'sql'       => "blob NULL",
 );
-
 
 // orderLeiterQualifikation
 $GLOBALS['TL_DCA']['tl_user']['fields']['orderLeiterQualifikation'] = array(

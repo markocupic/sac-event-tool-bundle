@@ -29,7 +29,6 @@ use Contao\Folder;
 use Contao\System;
 use Contao\Config;
 
-
 /**
  * Class ExportEvents2Docx
  * @package Markocupic\SacEventToolBundle
@@ -51,7 +50,6 @@ class ExportEvents2Docx
      */
     public static $arrDatarecord;
 
-
     /**
      * @param $calendarId
      * @param $year
@@ -59,7 +57,6 @@ class ExportEvents2Docx
      */
     public static function sendToBrowser($calendarId, $year, $eventId = null): void
     {
-
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
@@ -67,11 +64,9 @@ class ExportEvents2Docx
         Controller::loadDataContainer('tl_calendar_events');
         self::$dca = $GLOBALS['TL_DCA'][self::$strTable];
 
-
         // Creating the new document...
         // Tutorial http://phpword.readthedocs.io/en/latest/elements.html#titles
         $phpWord = new PhpWord();
-
 
         // Styles
         $fStyleTitle = array('color' => '000000', 'size' => 16, 'bold' => true, 'name' => 'Century Gothic');
@@ -103,7 +98,6 @@ class ExportEvents2Docx
         $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE pid=? AND published=? ORDER BY courseTypeLevel0, title, startDate')->execute($calendarId, 1);
         while ($objEvent->next())
         {
-
             if ($eventId > 0)
             {
                 if ($eventId != $objEvent->id)
@@ -116,7 +110,6 @@ class ExportEvents2Docx
 
             // Adding an empty Section to the document...
             $section = $phpWord->addSection();
-
 
             // Add page header
             $header = $section->addHeader();
@@ -132,7 +125,6 @@ class ExportEvents2Docx
             //$footer = $section->addFooter();
             //$footer->addPreserveText(htmlspecialchars('Page {PAGE} of {NUMPAGES}.', ENT_COMPAT, 'UTF-8'), null, null);
             //$footer->addLink('https://github.com/PHPOffice/PHPWord', htmlspecialchars('PHPWord on GitHub', ENT_COMPAT, 'UTF-8'));
-
 
             // Add the title
             $title = htmlspecialchars(self::formatValue('title', $objEvent->title, $objEvent));
@@ -178,7 +170,6 @@ class ExportEvents2Docx
             $section->addText('version-date: ' . Date::parse('Y-m-d'), 'fStyleSmall', 'pStyle');
 
             $section->addPageBreak();
-
         }
         // Saving the document as OOXML file...
         $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
@@ -196,7 +187,6 @@ class ExportEvents2Docx
      */
     public static function addMultilineText($objCell, $textlines): void
     {
-
         foreach (explode("\n", $textlines) as $line)
         {
             $objCell->addText(htmlspecialchars($line), 'fStyle', 'pStyle');
@@ -242,7 +232,6 @@ class ExportEvents2Docx
                     $strSub = $objSub->code . ' - ' . $objSub->name;
                 }
                 $value = $strMain . ': ' . $strSub;
-
             }
 
             if ($field == 'author')
@@ -283,7 +272,6 @@ class ExportEvents2Docx
                 }
             }
 
-
             if ($field == 'startDate' || $field == 'endDate' || $field == 'tstamp')
             {
                 if ($value > 0)
@@ -295,14 +283,12 @@ class ExportEvents2Docx
             // Kusdatendaten in der Form d.m.Y, d.m.Y, ...
             if ($field == 'eventDates')
             {
-
                 $arr = CalendarEventsHelper::getEventTimestamps(self::$arrDatarecord['id']);
                 $arr = array_map(function ($tstamp) {
                     return Date::parse('d.m.Y', $tstamp);
                 }, $arr);
                 $value = implode(', ', $arr);
             }
-
 
             if ($field == 'mountainguide')
             {
@@ -322,11 +308,9 @@ class ExportEvents2Docx
             */
 
             $value = $value != '' ? html_entity_decode($value, ENT_QUOTES) : '';
-
         }
 
         return $value;
-
     }
 
 }

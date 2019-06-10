@@ -13,7 +13,6 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
 
-
 /**
  * Class InitializeSystem
  * @package Markocupic\SacEventToolBundle\ContaoHooks
@@ -24,7 +23,6 @@ class InitializeSystem
      * @var ContaoFramework
      */
     private $framework;
-
 
     /**
      * Constructor
@@ -41,11 +39,9 @@ class InitializeSystem
      */
     public function initializeSystem()
     {
-
         // Prepare Plugin environment, create folders, etc.
         $objPluginEnv = System::getContainer()->get('markocupic.sac_event_tool_bundle.prepare_plugin_environment');
         $objPluginEnv->preparePluginEnvironment();
-
     }
 
 }

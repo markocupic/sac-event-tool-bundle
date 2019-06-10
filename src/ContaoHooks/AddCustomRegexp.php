@@ -16,7 +16,6 @@ use Contao\MemberModel;
 use Contao\UserModel;
 use Contao\Widget;
 
-
 /**
  * Class AddCustomRegexp
  * @package Markocupic\SacEventToolBundle\ContaoHooks
@@ -27,7 +26,6 @@ class AddCustomRegexp
      * @var ContaoFramework
      */
     private $framework;
-
 
     /**
      * Constructor.
@@ -62,11 +60,10 @@ class AddCustomRegexp
             return true;
         }
 
-
         // Check for a valid/existent sacMemberId
         if ($strRegexp === 'sacMemberIdIsUniqueAndValid')
         {
-            if(!is_numeric($varValue))
+            if (!is_numeric($varValue))
             {
                 $objWidget->addError('Sac member id must be number >= 0');
             }
@@ -88,10 +85,8 @@ class AddCustomRegexp
             return true;
         }
 
-
         return false;
     }
-
 
 }
 

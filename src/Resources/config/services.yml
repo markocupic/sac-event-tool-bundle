@@ -1,19 +1,19 @@
 services:
-    markocupic.sac_event_tool_bundle.prepare_plugin_environment:
-        public: true
-        class: Markocupic\SacEventToolBundle\PreparePluginEnvironment
-        arguments:
-            - "@contao.framework"
+  markocupic.sac_event_tool_bundle.prepare_plugin_environment:
+    public: true
+    class: Markocupic\SacEventToolBundle\PreparePluginEnvironment
+    arguments:
+    - "@contao.framework"
 
-    markocupic.sac_event_tool_bundle.sync_sac_member_database:
-        public: true
-        class: Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase
-        arguments:
-            - "@contao.framework"
-            - "@database_connection"
-            - "%kernel.project_dir%"
+  markocupic.sac_event_tool_bundle.sync_sac_member_database:
+    public: true
+    class: Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase
+    arguments:
+    - "@contao.framework"
+    - "@database_connection"
+    - "%kernel.project_dir%"
 
-    markocupic.sac_event_tool_bundle.services.cors.cors_listener:
-        class:  Markocupic\SacEventToolBundle\Services\Cors\CorsListener
-        tags:
-        - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+  markocupic.sac_event_tool_bundle.services.cors.cors_listener:
+    class:  Markocupic\SacEventToolBundle\Services\Cors\CorsListener
+    tags:
+    - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }

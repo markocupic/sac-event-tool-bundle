@@ -21,7 +21,6 @@ use Contao\File;
 use Contao\System;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
-
 /**
  * Converts docx to pdf using the Cloudconvert Api
  *
@@ -36,24 +35,20 @@ class DocxToPdfConversion
      */
     private $apiKey;
 
-
     /**
      * @var
      */
     private $docxSrc;
-
 
     /**
      * @var bool
      */
     private $sendToBrowser = false;
 
-
     /**
      * @var bool
      */
     private $createUncached = false;
-
 
     /**
      * Creates a new object instance.
@@ -76,7 +71,6 @@ class DocxToPdfConversion
         return $objConv;
     }
 
-
     /**
      * @param bool $blnSendToBrowser
      * @return static
@@ -86,7 +80,6 @@ class DocxToPdfConversion
         $this->sendToBrowser = $blnSendToBrowser;
         return $this;
     }
-
 
     /**
      * @param bool $blnUncached
@@ -101,12 +94,11 @@ class DocxToPdfConversion
     /**
      * @return string
      */
-    public  function bla()
+    public function bla()
     {
         new \Contao\Folder('files/bla');
         return 'foo';
     }
-
 
     /**
      *
@@ -132,27 +124,23 @@ class DocxToPdfConversion
             {
                 // https://cloudconvert.com/api/console
                 $api->convert([
-                    'inputformat' => 'docx',
+                    'inputformat'  => 'docx',
                     'outputformat' => 'pdf',
-                    'input' => 'upload',
-                    'file' => fopen($rootDir . '/' . $this->docxSrc, 'r'),
+                    'input'        => 'upload',
+                    'file'         => fopen($rootDir . '/' . $this->docxSrc, 'r'),
                 ])->wait()->download($rootDir . '/' . $pdfSRC);
-            }
-                // Exception handling
+            } // Exception handling
             catch (ApiBadRequestException $e)
             {
                 echo "Something with your request is wrong: " . $e->getMessage();
-            }
-            catch (ApiConversionFailedException $e)
+            } catch (ApiConversionFailedException $e)
             {
                 echo "Conversion failed, maybe because of a broken input file: " . $e->getMessage();
-            }
-            catch (ApiTemporaryUnavailableException $e)
+            } catch (ApiTemporaryUnavailableException $e)
             {
                 echo "API temporary unavailable: " . $e->getMessage() . "\n";
                 echo "We should retry the conversion in " . $e->retryAfter . " seconds";
-            }
-            catch (\Exception $e)
+            } catch (\Exception $e)
             {
                 // Network problems, etc..
                 echo "Something else went wrong: " . $e->getMessage() . "\n";

@@ -8,10 +8,8 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 // Table config
 $GLOBALS['TL_DCA']['tl_calendar']['config']['ptable'] = 'tl_calendar_container';
-
 
 // List
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['mode'] = 4;
@@ -29,13 +27,11 @@ if (BackendUser::getInstance()->isAdmin)
     );
 }
 
-
 // Palettes
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('event_type_legend', 'protected_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
     ->addField(array('allowedEventTypes,adviceOnEventReleaseLevelChange,adviceOnEventPublish'), 'event_type_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_calendar');
-
 
 // Fields
 // pid

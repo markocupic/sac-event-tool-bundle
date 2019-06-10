@@ -16,7 +16,6 @@ use Contao\PageModel;
 use Contao\Controller;
 use Contao\System;
 
-
 /**
  * Class ParseTemplate
  * @package Markocupic\SacEventToolBundle\ContaoHooks
@@ -28,7 +27,6 @@ class ParseTemplate
      */
     public function checkIfAccountIsActivated($objTemplate)
     {
-
         // Check if login is allowed, if not replace the default error message
         if (TL_MODE === 'FE')
         {

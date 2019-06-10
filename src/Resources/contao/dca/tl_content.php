@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 if (Input::get('do') == 'sac_calendar_events_tool')
 {
     $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_calendar_events';
@@ -20,13 +19,11 @@ if (Input::get('do') == 'sac_calendar_events_tool')
 // Callbacks
 $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array('tl_content_sac_event_tool', 'setPalette');
 
-
 // Palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes']['userPortraitList'] = 'name,type,headline;{config_legend},userList_selectMode,userList_queryType,userList_users,userList_userRoles,userList_replacePrivateAdressWithRoleAdress,userList_showFieldsToGuests;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{template_legend},userList_template,userList_partial_template;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['userPortrait'] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['cabanneSacList'] = '{type_legend},type,headline,cabanneSac;{image_legend},singleSRC,size,imagemargin,fullsize,overwriteMeta;{link_legend},jumpTo;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['cabanneSacDetail'] = '{type_legend},type,headline,cabanneSac;{image_legend},singleSRC,size,imagemargin,fullsize,overwriteMeta;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
-
 
 // Fields
 $GLOBALS['TL_DCA']['tl_content']['fields']['cabanneSac'] = array
@@ -72,9 +69,9 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_replacePrivateAdressWithRol
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'checkbox',
-    'options' => array('email','phone','mobile','street','postal','city'),
+    'options'   => array('email', 'phone', 'mobile', 'street', 'postal', 'city'),
     'eval'      => array('submitOnChange' => false, 'multiple' => true, 'tl_class' => 'clr'),
-    'sql'        => "blob NULL",
+    'sql'       => "blob NULL",
 );
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_users'] = array(
@@ -102,13 +99,13 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_userRoles'] = array
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_showFieldsToGuests'] = array
 (
-    'label'            => &$GLOBALS['TL_LANG']['tl_content']['userList_showFieldsToGuests'],
-    'exclude'          => true,
-    'filter'           => true,
-    'inputType'        => 'checkbox',
-    'options' => array('email','phone','mobile','street', 'postal', 'city'),
-    'eval'             => array('multiple' => true, 'tl_class' => 'clr'),
-    'sql'              => "blob NULL",
+    'label'     => &$GLOBALS['TL_LANG']['tl_content']['userList_showFieldsToGuests'],
+    'exclude'   => true,
+    'filter'    => true,
+    'inputType' => 'checkbox',
+    'options'   => array('email', 'phone', 'mobile', 'street', 'postal', 'city'),
+    'eval'      => array('multiple' => true, 'tl_class' => 'clr'),
+    'sql'       => "blob NULL",
 );
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_queryType'] = array
@@ -124,22 +121,22 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_queryType'] = array
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_template'] = array
 (
-    'label'                   => &$GLOBALS['TL_LANG']['tl_content']['userList_template'],
-    'exclude'                 => true,
-    'inputType'               => 'select',
-    'options_callback'        => array('tl_content_sac_event_tool', 'getUserListTemplates'),
-    'eval'                    => array('tl_class'=>'w50'),
-    'sql'                     => "varchar(64) NOT NULL default ''"
+    'label'            => &$GLOBALS['TL_LANG']['tl_content']['userList_template'],
+    'exclude'          => true,
+    'inputType'        => 'select',
+    'options_callback' => array('tl_content_sac_event_tool', 'getUserListTemplates'),
+    'eval'             => array('tl_class' => 'w50'),
+    'sql'              => "varchar(64) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_partial_template'] = array
 (
-    'label'                   => &$GLOBALS['TL_LANG']['tl_content']['userList_partial_template'],
-    'exclude'                 => true,
-    'inputType'               => 'select',
-    'options_callback'        => array('tl_content_sac_event_tool', 'getUserListPartialTemplates'),
-    'eval'                    => array('tl_class'=>'w50'),
-    'sql'                     => "varchar(64) NOT NULL default ''"
+    'label'            => &$GLOBALS['TL_LANG']['tl_content']['userList_partial_template'],
+    'exclude'          => true,
+    'inputType'        => 'select',
+    'options_callback' => array('tl_content_sac_event_tool', 'getUserListPartialTemplates'),
+    'eval'             => array('tl_class' => 'w50'),
+    'sql'              => "varchar(64) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['imgSize'] = array

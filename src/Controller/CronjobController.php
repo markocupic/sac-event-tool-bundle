@@ -18,14 +18,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-
 /**
  * Class CronjobController
  * @package Markocupic\SacEventToolBundle\Controller
  */
 class CronjobController extends AbstractController
 {
-
 
     /**
      * !!! No more used
@@ -43,7 +41,6 @@ class CronjobController extends AbstractController
         return new Response();
     }
 
-
     /**
      * !!! No more used
      * Send survey newsletter
@@ -59,7 +56,6 @@ class CronjobController extends AbstractController
 
         return new Response();
     }
-
 
     /**
      * Sync SAC member database
@@ -77,7 +73,6 @@ class CronjobController extends AbstractController
 
         return new Response();
     }
-
 
     /**
      * Generate workshop pdf booklet

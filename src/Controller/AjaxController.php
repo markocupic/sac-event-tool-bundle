@@ -87,7 +87,6 @@ class AjaxController extends AbstractController
             $controller->setCaption();
         }
 
-
         exit();
     }
 }

@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 namespace Markocupic\SacEventToolBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;

@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 namespace Markocupic\SacEventToolBundle\Services\Pdf;
 
 use Contao\CalendarEventsModel;
@@ -84,7 +83,6 @@ class PrintWorkshopsAsPdf
         }
         elseif ($eventId > 0)
         {
-
             $this->calendarId = null;
             $this->eventId = $eventId;
         }
@@ -93,23 +91,19 @@ class PrintWorkshopsAsPdf
             new \Exception('Please add more parameters.');
         }
 
-
         if ($this->year === null)
         {
             $this->year = Date::parse('Y');
         }
     }
 
-
     /**
      * Launch method cia CronJob (Geplante Aufgaben on Plesk)
      */
     public function printWorkshopsAsPdf()
     {
-
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-
 
         $this->addToc = true;
         $this->addCover = true;
@@ -142,7 +136,6 @@ class PrintWorkshopsAsPdf
         $this->pdf->SetMargins(20, 20, 20);
         $this->pdf->SetHeaderMargin(0);
 
-
         // set auto page breaks false
         $this->pdf->SetAutoPageBreak(false, 0);
 
@@ -161,7 +154,6 @@ class PrintWorkshopsAsPdf
             $this->pdf->SetFont('opensans', 'B', 45);
             $this->pdf->SetTextColor(255, 255, 255);
             $this->pdf->MultiCell(0, 0, 'Kursprogramm ' . $this->year, 0, 'R', 0, 1, '', '', true, 0);
-
 
             $this->pdf->Ln();
             $this->pdf->SetY(270);
@@ -182,7 +174,6 @@ class PrintWorkshopsAsPdf
         {
             $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE pid=? AND published=? ORDER BY courseTypeLevel0, title, startDate')->execute($this->calendarId, 1);
         }
-
 
         while ($objEvent->next())
         {
@@ -255,7 +246,6 @@ class PrintWorkshopsAsPdf
         $objCalendar = CalendarEventsModel::findByPk($this->pdf->Event->id);
         $this->pdf->Bookmark(html_entity_decode($objCalendar->title), 0, 0, '', 'I', array(0, 0, 0));
 
-
         // Create template object
         $objPartial = new FrontendTemplate('tcpdf_template_sac_kurse');
 
@@ -285,7 +275,6 @@ class PrintWorkshopsAsPdf
             return $item;
         }, StringUtil::deserialize($objCalendar->organizers, true));
         $objPartial->organizers = implode(', ', $arrItems);
-
 
         // Teasertext
         $objPartial->teaser = nl2br($objCalendar->teaser);
@@ -317,7 +306,6 @@ class PrintWorkshopsAsPdf
             return '';
         }, $arrInstructors);
         $objPartial->instructor = implode(', ', $arrItems);
-
 
         // Services/Leistungen
         $objPartial->leistungen = nl2br($objCalendar->leistungen);
@@ -356,7 +344,6 @@ class PrintWorkshopsAsPdf
      */
     public function getDateString($eventId)
     {
-
         $arr = CalendarEventsHelper::getEventTimestamps($eventId);
         if (count($arr) > 1)
         {

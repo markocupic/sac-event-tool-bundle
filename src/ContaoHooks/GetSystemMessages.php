@@ -10,7 +10,6 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
-
 use Contao\BackendUser;
 use Contao\Config;
 use Contao\Database;
@@ -18,14 +17,12 @@ use Contao\Date;
 use Contao\System;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
-
 /**
  * Class GetSystemMessages
  * @package Markocupic\SacEventToolBundle\ContaoHooks
  */
 class GetSystemMessages
 {
-
 
     /**
      * Show all upcoming events (where user is main instructor) for the logged in user
@@ -72,7 +69,6 @@ class GetSystemMessages
             }
         }
         return $strBuffer;
-
     }
 
 }

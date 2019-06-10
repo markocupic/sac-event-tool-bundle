@@ -31,7 +31,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class DownloadController extends AbstractController
 {
 
-
     /**
      * Download workshops as pdf booklet
      * /_download/print_workshop_booklet_as_pdf?year=2019&cat=0
@@ -45,7 +44,6 @@ class DownloadController extends AbstractController
         // Für Downloads workshops as pdf booklet
         if (Input::get('year') != '')
         {
-
             $year = Input::get('year');
 
             if (Input::get('year') === 'current')
@@ -97,7 +95,6 @@ class DownloadController extends AbstractController
         exit();
     }
 
-
     /**
      * Send ical to the browser
      * @Route("/_download/download_event_ical", name="sac_event_tool_download_download_event_ical", defaults={"_scope" = "frontend", "_token_check" = false})
@@ -120,7 +117,6 @@ class DownloadController extends AbstractController
         }
         exit();
     }
-
 
     /**
      * The defaultAction has to be at the bottom of the class

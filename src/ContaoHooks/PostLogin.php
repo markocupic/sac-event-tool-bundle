@@ -21,14 +21,13 @@ use Contao\System;
 use Contao\User;
 use Contao\UserModel;
 
-
 /**
  * Class PostLogin
  * @package Markocupic\SacEventToolBundle\ContaoHooks
  */
 class PostLogin
 {
-   
+
     /**
      * @param User $user
      */
@@ -39,7 +38,6 @@ class PostLogin
 
         if ($user instanceof BackendUser)
         {
-
             // Check all users
             $objUser = Database::getInstance()->execute('SELECT * FROM tl_user');
 

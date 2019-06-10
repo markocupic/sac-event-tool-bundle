@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-
 /**
  * Class MarkocupicSacEventToolExtension
  * @package Markocupic\SacEventToolBundle\DependencyInjection
@@ -27,7 +26,6 @@ class MarkocupicSacEventToolExtension extends Extension
      */
     public function load(array $mergedConfig, ContainerBuilder $container)
     {
-
         $loader = new YamlFileLoader(
             $container,
             new FileLocator(__DIR__ . '/../Resources/config')

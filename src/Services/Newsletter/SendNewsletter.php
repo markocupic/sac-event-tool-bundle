@@ -10,12 +10,10 @@
 
 namespace Markocupic\SacEventToolBundle\Services\Newsletter;
 
-
 use Contao\Email;
 use Contao\Database;
 use Contao\FrontendTemplate;
 use Contao\Validator;
-
 
 /**
  * Class SendNewsletter
@@ -78,6 +76,5 @@ class SendNewsletter
             Database::getInstance()->prepare('UPDATE tl_member %s WHERE id=?')->set($set)->execute($objMember->id);
             exit();
         }
-
     }
 }

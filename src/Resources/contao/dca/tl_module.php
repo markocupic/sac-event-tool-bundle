@@ -156,7 +156,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = array(
     'label'            => &$GLOBALS['TL_LANG']['tl_module']['eventFilterBoardFields'],
     'inputType'        => 'checkboxWizard',
     'options_callback' => array('tl_module_sac_event_tool', 'getEventFilterBoardFields'),
-    'eval'             => array('mandatory' => false, 'multiple' => true, 'ooorderField'=>'orderSRC', 'tl_class' => 'clr'),
+    'eval'             => array('mandatory' => false, 'multiple' => true, 'ooorderField' => 'orderSRC', 'tl_class' => 'clr'),
     'sql'              => "blob NULL"
 );
 

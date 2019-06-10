@@ -14,14 +14,12 @@ use Contao\Input;
 use Contao\System;
 use Contao\UserModel;
 
-
 /**
  * Class ImportUser
  * @package Markocupic\SacEventToolBundle\ContaoHooks
  */
 class ImportUser
 {
-
 
     /**
      * Allow backend users to authenticate with their sacMemberId
@@ -39,7 +37,6 @@ class ImportUser
                 $objUser = UserModel::findBySacMemberId($strUsername);
                 if ($objUser !== null)
                 {
-
                     if ($objUser->sacMemberId > 0 && $objUser->sacMemberId === $strUsername)
                     {
                         // Used for password recovery

@@ -39,7 +39,6 @@ class ParseBackendTemplate
         $this->framework = $framework;
     }
 
-
     /**
      * @param $strBuffer
      * @param $strTemplate
@@ -49,38 +48,29 @@ class ParseBackendTemplate
     {
         if ($strTemplate === 'be_main')
         {
-
             // Add icon explanation legend to tl_calendar_events_member
             if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('table') === 'tl_calendar_events' && Input::get('act') === 'edit')
             {
-
                 if (preg_match('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $strBuffer, $matches))
                 {
-
                     if (Input::get('call') !== 'writeTourReport')
                     {
                         $strDashboard = $this->generateEventDashboard();
                         $strBuffer = preg_replace('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $matches[0] . $strDashboard, $strBuffer);
-
                     }
                     else
                     {
-
                         $strDashboard = $this->generateEventDashboard();
                         $strBuffer = preg_replace('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $matches[0] . $strDashboard, $strBuffer);
-
                     }
                 }
-
             }
-
 
             // Add icon explanation legend to tl_calendar_events_member
             if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('table') === 'tl_calendar_events_member')
             {
-
                 $objEvent = CalendarEventsModel::findByPk(Input::get('id'));
-                if($objEvent !== null)
+                if ($objEvent !== null)
                 {
                     if (preg_match('/<table class=\"tl_listing(.*)<\/table>/sU', $strBuffer))
                     {
@@ -122,7 +112,6 @@ class ParseBackendTemplate
                         $strBuffer = preg_replace('/<table class=\"tl_listing(.*)<\/table>/sU', '${0}' . $strLegend, $strBuffer);
                     }
                 }
-
             }
 
             // Do not show submit container in the e-mail mode of tl_calendar_events_member
@@ -145,7 +134,6 @@ class ParseBackendTemplate
      */
     private function generateEventDashboard()
     {
-
         $objUser = BackendUser::getInstance();
 
         $objEvent = CalendarEventsModel::findByPk(Input::get('id'));
@@ -182,7 +170,6 @@ class ParseBackendTemplate
         // Check if user is allowed
         if (EventReleaseLevelPolicyModel::hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id)
         {
-
             if ($objEvent->eventType === 'tour' || $objEvent->eventType === 'lastMinuteTour')
             {
                 $objTemplate->allowTourReportButton = true;
@@ -190,8 +177,6 @@ class ParseBackendTemplate
             }
 
             $objTemplate->allowParticipantListButton = true;
-
-
         }
 
         $objTemplate->allowEventPreviewButton = true;
@@ -202,6 +187,5 @@ class ParseBackendTemplate
         }
         return $objTemplate->parse();
     }
-
 
 }

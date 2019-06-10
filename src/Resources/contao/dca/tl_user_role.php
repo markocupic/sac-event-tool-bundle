@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 $GLOBALS['TL_DCA']['tl_user_role'] = array
 (
     'config'   => array

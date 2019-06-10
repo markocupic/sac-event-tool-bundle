@@ -297,24 +297,26 @@ class EventRapport
                     $mobile = $objUserModel->mobile != '' ? $objUserModel->mobile : '----';
 
                     $i++;
-                    $row = array(
-                        array('i', $i, array('multiline' => false)),
-                        array('role', 'TL', array('multiline' => false)),
-                        array('firstname', htmlspecialchars(html_entity_decode($objUserModel->name)), array('multiline' => false)),
-                        array('lastname', '', array('multiline' => false)),
-                        array('sacMemberId', 'Mitgl. No. ' . $objUserModel->sacMemberId, array('multiline' => false)),
-                        array('isNotSacMember', $isMember ? ' ' : '!inaktiv/kein Mitglied', array('multiline' => false)),
-                        array('street', htmlspecialchars(html_entity_decode($objUserModel->street)), array('multiline' => false)),
-                        array('postal', htmlspecialchars(html_entity_decode($objUserModel->postal)), array('multiline' => false)),
-                        array('city', htmlspecialchars(html_entity_decode($objUserModel->city)), array('multiline' => false)),
-                        array('emergencyPhone', htmlspecialchars(html_entity_decode($objUserModel->emergencyPhone)), array('multiline' => false)),
-                        array('emergencyPhoneName', htmlspecialchars(html_entity_decode($objUserModel->emergencyPhoneName)), array('multiline' => false)),
-                        array('mobile', htmlspecialchars(html_entity_decode($mobile)), array('multiline' => false)),
-                        array('email', htmlspecialchars(html_entity_decode($objUserModel->email)), array('multiline' => false)),
-                        array('transportInfo', htmlspecialchars(html_entity_decode($transportInfo)), array('multiline' => false)),
-                        array('dateOfBirth', $objUserModel->dateOfBirth != '' ? Date::parse('Y', $objUserModel->dateOfBirth) : '', array('multiline' => false)),
-                    );
-                    $objPhpWord->replaceAndClone('i', $row);
+
+                    // Clone row
+                    $objPhpWord->createClone('i');
+
+                    // Push data to clone
+                    $objPhpWord->addToClone('i', 'i', $i, array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'role', 'TL', array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'firstname', htmlspecialchars(html_entity_decode($objUserModel->name)), array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'lastname', '', array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. ' . $objUserModel->sacMemberId, array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'isNotSacMember', $isMember ? ' ' : '!inaktiv/kein Mitglied', array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'street', htmlspecialchars(html_entity_decode($objUserModel->street)), array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'postal', htmlspecialchars(html_entity_decode($objUserModel->postal)), array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'city', htmlspecialchars(html_entity_decode($objUserModel->city)), array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'emergencyPhone', htmlspecialchars(html_entity_decode($objUserModel->emergencyPhone)), array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'emergencyPhoneName', htmlspecialchars(html_entity_decode($objUserModel->emergencyPhoneName)), array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'mobile', htmlspecialchars(html_entity_decode($mobile)), array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'email', htmlspecialchars(html_entity_decode($objUserModel->email)), array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'transportInfo', htmlspecialchars(html_entity_decode($transportInfo)), array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'dateOfBirth', $objUserModel->dateOfBirth != '' ? Date::parse('Y', $objUserModel->dateOfBirth) : '', array('multiline' => false));
                 }
             }
         }
@@ -355,24 +357,25 @@ class EventRapport
 
             // Phone
             $mobile = $objEventMember->mobile != '' ? $objEventMember->mobile : '----';
-            $row = array(
-                array('i', $i, array('multiline' => false)),
-                array('role', 'TN', array('multiline' => false)),
-                array('firstname', htmlspecialchars(html_entity_decode($objEventMember->firstname)), array('multiline' => false)),
-                array('lastname', htmlspecialchars(html_entity_decode($objEventMember->lastname)), array('multiline' => false)),
-                array('sacMemberId', 'Mitgl. No. ' . $objEventMember->sacMemberId, array('multiline' => false)),
-                array('isNotSacMember', $strIsActiveMember, array('multiline' => false)),
-                array('street', htmlspecialchars(html_entity_decode($objEventMember->street)), array('multiline' => false)),
-                array('postal', htmlspecialchars(html_entity_decode($objEventMember->postal)), array('multiline' => false)),
-                array('city', htmlspecialchars(html_entity_decode($objEventMember->city)), array('multiline' => false)),
-                array('mobile', htmlspecialchars(html_entity_decode($mobile)), array('multiline' => false)),
-                array('emergencyPhone', htmlspecialchars(html_entity_decode($objEventMember->emergencyPhone)), array('multiline' => false)),
-                array('emergencyPhoneName', htmlspecialchars(html_entity_decode($objEventMember->emergencyPhoneName)), array('multiline' => false)),
-                array('email', htmlspecialchars(html_entity_decode($objEventMember->email)), array('multiline' => false)),
-                array('transportInfo', htmlspecialchars(html_entity_decode($transportInfo)), array('multiline' => false)),
-                array('dateOfBirth', $objEventMember->dateOfBirth != '' ? Date::parse('Y', $objEventMember->dateOfBirth) : '', array('multiline' => false)),
-            );
-            $objPhpWord->replaceAndClone('i', $row);
+            // Clone row
+            $objPhpWord->createClone('i');
+
+            // Push data to clone
+            $objPhpWord->addToClone('i', 'i', $i, array('multiline' => false));
+            $objPhpWord->addToClone('i', 'role', 'TN', array('multiline' => false));
+            $objPhpWord->addToClone('i', 'firstname', htmlspecialchars(html_entity_decode($objEventMember->firstname)), array('multiline' => false));
+            $objPhpWord->addToClone('i', 'lastname', htmlspecialchars(html_entity_decode($objEventMember->lastname)), array('multiline' => false));
+            $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. ' . $objEventMember->sacMemberId, array('multiline' => false));
+            $objPhpWord->addToClone('i', 'isNotSacMember', $strIsActiveMember, array('multiline' => false));
+            $objPhpWord->addToClone('i', 'street', htmlspecialchars(html_entity_decode($objEventMember->street)), array('multiline' => false));
+            $objPhpWord->addToClone('i', 'postal', htmlspecialchars(html_entity_decode($objEventMember->postal)), array('multiline' => false));
+            $objPhpWord->addToClone('i', 'city', htmlspecialchars(html_entity_decode($objEventMember->city)), array('multiline' => false));
+            $objPhpWord->addToClone('i', 'mobile', htmlspecialchars(html_entity_decode($mobile)), array('multiline' => false));
+            $objPhpWord->addToClone('i', 'emergencyPhone', htmlspecialchars(html_entity_decode($objEventMember->emergencyPhone)), array('multiline' => false));
+            $objPhpWord->addToClone('i', 'emergencyPhoneName', htmlspecialchars(html_entity_decode($objEventMember->emergencyPhoneName)), array('multiline' => false));
+            $objPhpWord->addToClone('i', 'email', htmlspecialchars(html_entity_decode($objEventMember->email)), array('multiline' => false));
+            $objPhpWord->addToClone('i', 'transportInfo', htmlspecialchars(html_entity_decode($transportInfo)), array('multiline' => false));
+            $objPhpWord->addToClone('i', 'dateOfBirth', $objEventMember->dateOfBirth != '' ? Date::parse('Y', $objEventMember->dateOfBirth) : '', array('multiline' => false));
         }
 
         // Event instructors

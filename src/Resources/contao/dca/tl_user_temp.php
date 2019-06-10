@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 /**
  * Table tl_user_temp
  */
@@ -21,8 +20,7 @@ $GLOBALS['TL_DCA']['tl_user_temp'] = array
         'dataContainer'     => 'Table',
         'enableVersioning'  => true,
         'onload_callback'   => array
-        (
-            //array('tl_user_temp', 'getSacMemberId'),
+        (//array('tl_user_temp', 'getSacMemberId'),
         ),
         'onsubmit_callback' => array
         (//array('tl_user_temp', 'storeDateAdded')
@@ -197,7 +195,7 @@ $GLOBALS['TL_DCA']['tl_user_temp'] = array
             'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'street'  => array
+        'street'       => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['street'],
             'exclude'   => true,
@@ -208,7 +206,7 @@ $GLOBALS['TL_DCA']['tl_user_temp'] = array
             'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'postal'  => array
+        'postal'       => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['postal'],
             'exclude'   => true,
@@ -219,7 +217,7 @@ $GLOBALS['TL_DCA']['tl_user_temp'] = array
             'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'),
             'sql'       => "varchar(255) NOT NULL default ''",
         ),
-        'city'  => array
+        'city'         => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['city'],
             'exclude'   => true,
@@ -278,7 +276,6 @@ $GLOBALS['TL_DCA']['tl_user_temp'] = array
     ),
 );
 
-
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
  *
@@ -298,53 +295,47 @@ class tl_user_temp extends Backend
 
     public function ggetSacMemberId()
     {
-
-
         $objDb = $this->Database->prepare('SELECT * FROM tl_user_temp WHERE sacMemberId = ?')->execute('');
         while ($objDb->next())
         {
-            $objMember = $this->Database->prepare('SELECT * FROM tl_member WHERE firstname = ? AND lastname = ? AND city=?')->execute($objDb->firstname,$objDb->lastname,$objDb->city);
+            $objMember = $this->Database->prepare('SELECT * FROM tl_member WHERE firstname = ? AND lastname = ? AND city=?')->execute($objDb->firstname, $objDb->lastname, $objDb->city);
             if ($objMember->numRows == 1)
             {
                 echo $objDb->sacMemberId . ' ' . $objDb->firstname . ' ' . $objDb->lastname . '<br>';
                 $this->Database->prepare('UPDATE tl_user_temp SET sacMemberId = ? WHERE id=?')->execute($objMember->sacMemberId, $objDb->id);
-
             }
         }
-
-
     }
 
     public function gggetSacMemberId()
     {
-        $objDb = $this->Database->prepare('SELECT * FROM tl_user_temp WHERE sacMemberId != ? AND disable=?')->execute('','');
+        $objDb = $this->Database->prepare('SELECT * FROM tl_user_temp WHERE sacMemberId != ? AND disable=?')->execute('', '');
         while ($objDb->next())
         {
             $objUserModel = $this->Database->prepare('SELECT * FROM tl_user WHERE sacMemberId = ?')->execute($objDb->sacMemberId);
 
             // Bereits bestehende User mit Gruppenzugehörigkeit füttern
-            if($objUserModel->numRows)
+            if ($objUserModel->numRows)
             {
-                if($objDb->userRoleTemp !== '')
+                if ($objDb->userRoleTemp !== '')
                 {
                     $userRole = serialize(array_merge(explode(',', $objDb->userRoleTemp), StringUtil::deserialize($objUserModel->userRole, true)));
                     //$this->Database->prepare('UPDATE tl_user SET userRole=? WHERE id=?')->execute($userRole, $objUserModel->id);
                     //echo $objUserModel->firstname . ' ' . $objUserModel->lastname . print_r($userRole,true) . '<br>';
                 }
-
             }
             else // Noch nicht existierende User aufnehmen
-                {
+            {
                 $set = array();
                 $username = strtolower($objDb->firstname . $objDb->lastname);
-                $username = str_replace('ä','ae', $username);
-                $username = str_replace('ö','oe', $username);
-                $username = str_replace('ü','ue', $username);
-                $username = str_replace('é','e', $username);
-                $username = str_replace('è','e', $username);
+                $username = str_replace('ä', 'ae', $username);
+                $username = str_replace('ö', 'oe', $username);
+                $username = str_replace('ü', 'ue', $username);
+                $username = str_replace('é', 'e', $username);
+                $username = str_replace('è', 'e', $username);
                 $username = str_replace(' ', '', $username);
                 $userModel = \Contao\UserModel::findByUsername($username);
-                if($userModel === null)
+                if ($userModel === null)
                 {
                     $set['username'] = $username;
                     $set['firstname'] = $objDb->firstname;
@@ -356,15 +347,9 @@ class tl_user_temp extends Backend
                     //echo print_r($set,true);
                     //$this->Database->prepare('INSERT INTO tl_user %s')->set($set)->execute();
                 }
-
-
-
-
-
             }
         }
     }
-
 
     /**
      * Check permissions to edit table tl_user_temp
@@ -422,7 +407,6 @@ class tl_user_temp extends Backend
         }
     }
 
-
     /**
      * Add an image to each record
      *
@@ -450,7 +434,6 @@ class tl_user_temp extends Backend
         return $args;
     }
 
-
     /**
      * Return the edit user button
      *
@@ -467,7 +450,6 @@ class tl_user_temp extends Backend
     {
         return ($this->User->isAdmin || !$row['admin']) ? '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ' : Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)) . ' ';
     }
-
 
     /**
      * Return the copy page button
@@ -492,7 +474,6 @@ class tl_user_temp extends Backend
         return ($this->User->isAdmin || !$row['admin']) ? '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ' : Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)) . ' ';
     }
 
-
     /**
      * Return the delete page button
      *
@@ -509,7 +490,6 @@ class tl_user_temp extends Backend
     {
         return ($this->User->isAdmin || !$row['admin']) ? '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ' : Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)) . ' ';
     }
-
 
     /**
      * Generate a "switch account" button and return it as string
@@ -543,7 +523,6 @@ class tl_user_temp extends Backend
 
         return '<a href="' . $url . '" title="' . StringUtil::specialchars($title) . '">' . Image::getHtml($icon, $label) . '</a> ';
     }
-
 
     /**
      * Return a checkbox to delete session data
@@ -596,7 +575,6 @@ class tl_user_temp extends Backend
 </div>';
     }
 
-
     /**
      * Return all modules except profile modules
      *
@@ -618,7 +596,6 @@ class tl_user_temp extends Backend
         return $arrModules;
     }
 
-
     /**
      * Prevent administrators from downgrading their own account
      *
@@ -637,7 +614,6 @@ class tl_user_temp extends Backend
         return $varValue;
     }
 
-
     /**
      * Prevent administrators from disabling their own account
      *
@@ -655,7 +631,6 @@ class tl_user_temp extends Backend
 
         return $varValue;
     }
-
 
     /**
      * Store the date when the account has been added
@@ -683,7 +658,6 @@ class tl_user_temp extends Backend
         $this->Database->prepare("UPDATE tl_user_temp SET dateAdded=? WHERE id=?")
             ->execute($time, $dc->id);
     }
-
 
     /**
      * Return the "toggle visibility" button
@@ -726,7 +700,6 @@ class tl_user_temp extends Backend
 
         return '<a href="' . $this->addToUrl($href) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, 'data-state="' . ($row['disable'] ? 0 : 1) . '"') . '</a> ';
     }
-
 
     /**
      * Disable/enable a user group

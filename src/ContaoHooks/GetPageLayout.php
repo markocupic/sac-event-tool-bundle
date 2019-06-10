@@ -10,7 +10,6 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
-
 use Contao\Automator;
 use Contao\FilesModel;
 use Contao\StringUtil;
@@ -30,7 +29,6 @@ class GetPageLayout
      */
     public function purgeScriptCache($objPage, $objLayout, $objPty)
     {
-
         // Purge script cache in dev mode
         $kernel = System::getContainer()->get('kernel');
         if ($kernel->isDebug())

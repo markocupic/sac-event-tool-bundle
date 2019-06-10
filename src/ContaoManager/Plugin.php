@@ -9,7 +9,6 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoManager;
 
-
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
@@ -35,7 +34,6 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
                 ->setLoadAfter(['Contao\CalendarBundle\ContaoCalendarBundle'])
         ];
     }
-
 
     /**
      * {@inheritdoc}

@@ -29,7 +29,6 @@ class ReplaceInsertTags
         // {{external_link::http://google.ch::more}}
         if (strpos($strTag, 'external_link') !== false)
         {
-
             $elements = explode('::', $strTag);
             if (is_array($elements) && count($elements) > 1)
             {
@@ -45,9 +44,6 @@ class ReplaceInsertTags
                 return sprintf('<a href="%s" target="_blank">%s</a>', $href, $label);
             }
         }
-
-
-
 
         return false;
     }

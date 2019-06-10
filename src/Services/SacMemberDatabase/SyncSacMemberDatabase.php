@@ -13,13 +13,11 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Services\SacMemberDatabase;
 
-
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\File;
 use Contao\System;
 use Doctrine\DBAL\Connection;
-
 
 /**
  * Class SyncSacMemberDatabase
@@ -81,7 +79,6 @@ class SyncSacMemberDatabase
      */
     private $root_dir;
 
-
     /**
      * SyncSacMemberDatabase constructor.
      * @param ContaoFramework $framework
@@ -98,9 +95,7 @@ class SyncSacMemberDatabase
         $this->ftp_username = (string)Config::get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME');
         $this->ftp_password = (string)Config::get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD');
         $this->section_ids = explode(',', Config::get('SAC_EVT_SAC_SECTION_IDS'));
-
     }
-
 
     /**
      * @return $this
@@ -108,8 +103,6 @@ class SyncSacMemberDatabase
      */
     public function loadDataFromFtp()
     {
-
-
         // Open FTP connection
         $connId = $this->openFtpConnection();
 
@@ -202,7 +195,6 @@ class SyncSacMemberDatabase
         $arrMember = array();
         foreach ($this->section_ids as $sectionId)
         {
-
             $objFile = new File('system/tmp/Adressen_0000' . $sectionId . '.csv');
             if ($objFile !== null)
             {
@@ -249,7 +241,6 @@ class SyncSacMemberDatabase
                     $set['disable'] = '';
                     $set['isSacMember'] = '1';
 
-
                     $set = \array_map(function ($value) {
                         if (!\is_array($value))
                         {
@@ -258,7 +249,6 @@ class SyncSacMemberDatabase
                             return $value;
                         }
                         return $value;
-
                     }, $set);
 
                     // Check if the member is already in the array
@@ -306,7 +296,6 @@ class SyncSacMemberDatabase
                 $i++;
             }
             $this->connection->commit();
-
         } catch (\Exception $e)
         {
             $this->log(
@@ -318,7 +307,6 @@ class SyncSacMemberDatabase
             $this->connection->rollBack();
             throw $e;
         }
-
 
         // Set tl_member.disable to true if member was not found in the csv-file
         $statement = $this->connection->executeQuery('SELECT * FROM tl_member WHERE disable=? AND isSacMember=?', array('', ''));

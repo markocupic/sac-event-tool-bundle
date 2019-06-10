@@ -17,7 +17,6 @@ use Contao\Folder;
 use Contao\System;
 use Psr\Log\LogLevel;
 
-
 /**
  * Class MaintainModuleEventStory
  * @package Markocupic\SacEventToolBundle\Maintenance

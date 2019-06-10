@@ -19,7 +19,6 @@ use Contao\Input;
 use Contao\MemberModel;
 use Contao\StringUtil;
 
-
 /**
  * Class PublishEvent
  * @package Markocupic\SacEventToolBundle\ContaoHooks
@@ -45,7 +44,7 @@ class PublishEvent
                     $objEmail->from = Config::get('adminEmail');
                     $objEmail->fromName = 'Administrator SAC Pilatus';
                     $objEmail->subject = sprintf('Event %s wurde veröffentlicht', $objEvent->title);
-                    $objEmail->text = sprintf("Hallo \nEvent %s wurde soeben durch %s veröffentlicht. \n\nDies ist eine automatische Nachricht mit Ursprung in: %s\n Liebe Grüsse\n\nAdministrator SAC Pilatus",  $objEvent->title, $objUser->name, __METHOD__ . ' LINE: ' . __LINE__);
+                    $objEmail->text = sprintf("Hallo \nEvent %s wurde soeben durch %s veröffentlicht. \n\nDies ist eine automatische Nachricht mit Ursprung in: %s\n Liebe Grüsse\n\nAdministrator SAC Pilatus", $objEvent->title, $objUser->name, __METHOD__ . ' LINE: ' . __LINE__);
                     $objEmail->sendTo($objCalendar->adviceOnEventReleaseLevelChange);
                 }
             }

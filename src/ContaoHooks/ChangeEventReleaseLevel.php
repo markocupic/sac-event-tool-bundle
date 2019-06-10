@@ -19,14 +19,12 @@ use Contao\Input;
 use Contao\MemberModel;
 use Contao\StringUtil;
 
-
 /**
  * Class ChangeEventReleaseLevel
  * @package Markocupic\SacEventToolBundle\ContaoHooks
  */
 class ChangeEventReleaseLevel
 {
-
 
     /**
      * Beta state

@@ -10,7 +10,6 @@
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
-
 PaletteManipulator::create()
     ->addLegend('sacEventTool_legend', 'global_legend')
     ->addLegend('sacWorkshopFlyer_legend', 'global_legend')
@@ -51,7 +50,6 @@ PaletteManipulator::create()
     ->addField(array('SAC_EVT_WORKSHOP_FLYER_YEAR'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_WORKSHOP_FLYER_CALENDAR_ID'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_settings');
-
 
 // Member Database Bern
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'] = array(

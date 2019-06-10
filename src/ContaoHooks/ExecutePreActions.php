@@ -17,7 +17,6 @@ use Contao\Input;
 use Contao\MemberModel;
 use Contao\StringUtil;
 
-
 /**
  * Class ExecutePreActions
  * @package Markocupic\SacEventToolBundle\ContaoHooks
@@ -29,7 +28,6 @@ class ExecutePreActions
      */
     private $framework;
 
-
     /**
      * Constructor.
      *
@@ -39,7 +37,6 @@ class ExecutePreActions
     {
         $this->framework = $framework;
     }
-
 
     /**
      * @param string $strAction

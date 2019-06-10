@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 /**
  * Table tl_member
  */
@@ -17,7 +16,6 @@ $GLOBALS['TL_DCA']['tl_member']['config']['ondelete_callback'][] = array('tl_mem
 
 // Add tl_member.sacMemberId to index
 $GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index';
-
 
 // Fields
 

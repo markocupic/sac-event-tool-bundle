@@ -10,12 +10,10 @@
 
 namespace Markocupic\SacEventToolBundle\Controller;
 
-
 use Markocupic\SacEventToolBundle\FrontendAjax\EventApi;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
 
 /**
  * Class EventApiController
@@ -30,7 +28,6 @@ class EventApiController extends AbstractController
      */
     public function getEventDataByIds()
     {
-
         //$response = new Response();
         //$response->headers->set('Access-Control-Allow-Origin', '*');
         //$response->send();
@@ -39,7 +36,5 @@ class EventApiController extends AbstractController
         $objApi->sendEventDataByIds();
 
         return new Response();
-
-
     }
 }
