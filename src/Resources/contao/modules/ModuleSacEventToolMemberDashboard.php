@@ -182,7 +182,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                             $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'));
                             $filename = sprintf($filenamePattern, $objMember->sacMemberId, $objRegistration->id, 'docx');
                             $destFilename = Config::get('SAC_EVT_TEMP_PATH') . '/' . $filename;
-                            $objPhpWord = MsWordTemplateProcessor::create(Config::get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'), $destFilename);
+                            $objPhpWord = new MsWordTemplateProcessor(Config::get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'), $destFilename);
 
                             // Replace template vars
                             $objPhpWord->replace('eventDates', implode(', ', $arrDates));

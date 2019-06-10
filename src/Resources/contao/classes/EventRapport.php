@@ -87,7 +87,7 @@ class EventRapport
 
                 $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
                 $destFilename = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
-                $objPhpWord = MsWordTemplateProcessor::create(Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), $destFilename);
+                $objPhpWord = new MsWordTemplateProcessor(Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), $destFilename);
 
                 // Page #1
                 // Tour rapport
@@ -417,7 +417,7 @@ class EventRapport
             // Create phpWord instance
             $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'));
             $destFile = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
-            $objPhpWord = MsWordTemplateProcessor::create(Config::get('SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'), $destFile);
+            $objPhpWord = new MsWordTemplateProcessor(Config::get('SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'), $destFile);
 
             // Get event data
             $this->getEventData($objPhpWord, $objEvent);
