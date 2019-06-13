@@ -12,7 +12,6 @@
   "require": {
     "contao/core-bundle": "^4.6",
     "terminal42/notification_center": "^1.5",
-    "cloudconvert/cloudconvert-php": ">=2.2.0.0,<2.3-dev",
     "markocupic/export_table": "^3.0",
     "markocupic/notification-center-default-email-bundle": "^1.0",
     "menatwork/contao-multicolumnwizard": "^3.3",
@@ -20,7 +19,8 @@
     "eluceo/ical": "^0.15",
     "league/csv": "^9.1",
     "tecnickcom/tcpdf": "^6.2.26",
-    "markocupic/phpoffice-bundle": "^1.0"
+    "markocupic/phpoffice-bundle": "^1.0",
+    "markocupic/cloudconvert-bundle": "^1.0"
   },
   "require-dev": {
     "contao/test-case": ">=1.1"

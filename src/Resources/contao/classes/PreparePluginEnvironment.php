@@ -105,6 +105,7 @@ class PreparePluginEnvironment
 
         // Check for other system vars in system/localconfig.php
         $arrConfig = array(
+            'cloudconvertApiKey',
             'SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME',
             'SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME',
             'SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD',
@@ -116,7 +117,6 @@ class PreparePluginEnvironment
             'SAC_EVT_AVATAR_MALE',
             'SAC_EVT_AVATAR_FEMALE',
             'SAC_EVT_WORKSHOP_FLYER_SRC',
-            'SAC_EVT_CLOUDCONVERT_API_KEY',
             'SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC',
             'SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN',
             'SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN',

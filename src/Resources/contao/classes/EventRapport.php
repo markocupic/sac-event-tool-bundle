@@ -27,7 +27,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
-use Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion;
+use Markocupic\CloudconvertBundle\Services\DocxToPdfConversion;
 
 /**
  * Class EventRapport
@@ -113,10 +113,7 @@ class EventRapport
                         ->generate();
 
                     // Generate pdf
-                    DocxToPdfConversion::create($destFilename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
-                        ->sendToBrowser(true)
-                        ->createUncached(true)
-                        ->convert();
+                    new DocxToPdfConversion($destFilename, Config::get('cloudconvertApiKey'))->sendToBrowser(true)->createUncached(true)->convert();
                 }
 
                 if ($outputType === 'docx')
@@ -437,10 +434,7 @@ class EventRapport
                     ->generate();
 
                 // Generate pdf
-                DocxToPdfConversion::create($destFile, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
-                    ->sendToBrowser(true)
-                    ->createUncached(true)
-                    ->convert();
+                new DocxToPdfConversion($destFile, Config::get('cloudconvertApiKey'))->sendToBrowser(true)->createUncached(true)->convert();
             }
 
             if ($outputType === 'docx')

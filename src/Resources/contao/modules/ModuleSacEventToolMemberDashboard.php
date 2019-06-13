@@ -39,7 +39,7 @@ use Contao\Validator;
 use Haste\Form\Form;
 use Haste\Util\Url;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
-use Markocupic\SacEventToolBundle\Services\Pdf\DocxToPdfConversion;
+use Markocupic\CloudconvertBundle\Services\DocxToPdfConversion;
 use NotificationCenter\Model\Notification;
 use Patchwork\Utf8;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -201,10 +201,7 @@ class ModuleSacEventToolMemberDashboard extends Module
                                 ->generate();
 
                             // Generate pdf
-                            DocxToPdfConversion::create($destFilename, Config::get('SAC_EVT_CLOUDCONVERT_API_KEY'))
-                                ->sendToBrowser(true)
-                                ->createUncached(false)
-                                ->convert();
+                            new DocxToPdfConversion($destFilename, Config::get('cloudconvertApiKey'))->sendToBrowser(true)->createUncached(false)->convert();
 
                             exit();
                         }

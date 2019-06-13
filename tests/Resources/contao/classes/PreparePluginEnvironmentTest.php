@@ -47,7 +47,6 @@ class PreparePluginEnvironmentTest extends ContaoTestCase
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_EVENT_STORIES_UPLOAD_PATH']));
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_EVENT_DEFALUT_PREVIEW_IMAGE_SRC']));
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_WORKSHOP_FLYER_SRC']));
-        $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_CLOUDCONVERT_API_KEY']));
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC']));
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN']));
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC']));
@@ -60,5 +59,6 @@ class PreparePluginEnvironmentTest extends ContaoTestCase
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_LOG_EVENT_SUBSCRIPTION']));
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_LOG_EVENT_SUBSCRIPTION_ERROR']));
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD']));
+        $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['cloudconvertApiKey']));
     }
 }
