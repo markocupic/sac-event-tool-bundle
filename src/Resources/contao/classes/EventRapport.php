@@ -113,7 +113,8 @@ class EventRapport
                         ->generate();
 
                     // Generate pdf
-                    new DocxToPdfConversion($destFilename, Config::get('cloudconvertApiKey'))->sendToBrowser(true)->createUncached(true)->convert();
+                    $objConversion = new DocxToPdfConversion($destFilename, Config::get('cloudconvertApiKey'));
+                    $objConversion->sendToBrowser(true)->createUncached(true)->convert();
                 }
 
                 if ($outputType === 'docx')
@@ -434,7 +435,8 @@ class EventRapport
                     ->generate();
 
                 // Generate pdf
-                new DocxToPdfConversion($destFile, Config::get('cloudconvertApiKey'))->sendToBrowser(true)->createUncached(true)->convert();
+                $objConversion = new DocxToPdfConversion($destFile, Config::get('cloudconvertApiKey'));
+                $objConversion->sendToBrowser(true)->createUncached(true)->convert();
             }
 
             if ($outputType === 'docx')

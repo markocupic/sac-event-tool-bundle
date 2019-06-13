@@ -201,7 +201,8 @@ class ModuleSacEventToolMemberDashboard extends Module
                                 ->generate();
 
                             // Generate pdf
-                            new DocxToPdfConversion($destFilename, Config::get('cloudconvertApiKey'))->sendToBrowser(true)->createUncached(false)->convert();
+                            $objConversion = new DocxToPdfConversion($destFilename, Config::get('cloudconvertApiKey'));
+                            $objConversion->sendToBrowser(true)->createUncached(false)->convert();
 
                             exit();
                         }
