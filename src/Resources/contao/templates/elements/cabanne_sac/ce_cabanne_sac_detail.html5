@@ -132,8 +132,8 @@
                             <td><?= nl2br($ascent['ascentDescription']) ?></td>
                             <td><?= nl2br($ascent['ascentTime']) ?></td>
                             <td><?= nl2br($ascent['ascentDifficulty']) ?></td>
-                            <td><?= $ascent['ascentSummer'] == 'true' ? 'Ja' : 'Nein' ?></td>
-                            <td><?= $ascent['ascentWinter'] == 'true' ? 'Ja' : 'Nein' ?></td>
+                            <td><?php if($ascent['ascentSummer']): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
+                            <td><?php if($ascent['ascentWinter']): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
                             <td><?= nl2br($ascent['ascentComment']) ?></td>
                         </tr>
                     <?php endforeach; ?>
