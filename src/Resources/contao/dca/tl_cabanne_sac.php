@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
 (
 
@@ -82,7 +81,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
     ),
     'palettes' => array
     (
-        'default' => '{contact_legend},name,canton,altitude,huettenwart,phone,email,url,bookingMethod;{image_legend},singleSRC;{details_legend},huettenchef,capacity,coordsCH1903,coordsWGS84,geoadminlink,openingTime;{ascent_legend},ascent',
+        'default' => '{contact_legend},name,canton,altitude,huettenwart,phone,email,url,bookingMethod;{image_legend},singleSRC;{details_legend},huettenchef,capacity,coordsCH1903,coordsWGS84,openingTime;{ascent_legend},ascent'
     ),
 
     'fields' => array
@@ -137,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
         ),
         'phone'         => array
         (
-            'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['contact'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['phone'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
@@ -185,7 +184,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
         ),
         'huettenchef'   => array
         (
-            'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['huettenwart'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['huettenchef'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
@@ -277,7 +276,8 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
                         'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentSummer'],
                         'exclude'   => true,
                         'inputType' => 'select',
-                        'options'   => array(true, false),
+                        'options'   => array('possible', 'not-possible'),
+                        'reference' => &$GLOBALS['TL_LANG']['tl_cabanne_sac'],
                         'eval'      => array
                         (
                             'style' => 'width:50px',
@@ -288,7 +288,8 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = array
                         'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentWinter'],
                         'exclude'   => true,
                         'inputType' => 'select',
-                        'options'   => array(true, false),
+                        'options'   => array('possible', 'not-possible'),
+                        'reference' => &$GLOBALS['TL_LANG']['tl_cabanne_sac'],
                         'eval'      => array
                         (
                             'style' => 'width:50px',
