@@ -11,6 +11,11 @@
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\Config;
+use Contao\Controller;
+
+use Contao\FrontendUser;
+use Contao\MemberModel;
+use Contao\PageModel;
 
 /**
  * Class ReplaceInsertTags
@@ -42,6 +47,50 @@ class ReplaceInsertTags
                     }
                 }
                 return sprintf('<a href="%s" target="_blank">%s</a>', $href, $label);
+            }
+        }
+
+        // {{member_avatar::###pictureSizeID###}}
+        // Return picture of logged in member
+        if (strpos($strTag, 'member_avatar') !== false)
+        {
+            $elements = explode('::', $strTag);
+            if (is_array($elements) && count($elements) > 1)
+            {
+                $size = $elements[1];
+                if (FE_USER_LOGGED_IN)
+                {
+                    $objUser = MemberModel::findByPk(FrontendUser::getInstance()->id);
+                    if ($objUser !== null)
+                    {
+                        $strUrl = getAvatar($objUser->id, 'FE');
+                        $strInsertTag = sprintf('{{picture::%s?size=%s&alt=&s}}', $strUrl, $size, $objUser->firstname . ' ' . $objUser->lastname);
+                        return Controller::replaceInsertTags($strInsertTag);
+                    }
+                }
+            }
+        }
+
+        // Redirect to an internal page
+        // {{redirect::###pageIdOrAlias###::###params###}}
+        // {{redirect::konto-aktivieren}}
+        // {{redirect::some-page-alias::?foo=bar&var=bla}}
+        if (strpos($strTag, 'redirect') !== false)
+        {
+            $elements = explode('::', $strTag);
+            if (is_array($elements) && count($elements) > 1)
+            {
+                $params = '';
+                if (isset($elements[2]))
+                {
+                    $params = $elements[2];
+                }
+                $objPage = PageModel::findByIdOrAlias($elements[1]);
+                if ($objPage !== null)
+                {
+                    $strLocation = sprintf('%s%s', $objPage->getFrontendUrl(), $params);
+                    Controller::redirect($strLocation);
+                }
             }
         }
 
