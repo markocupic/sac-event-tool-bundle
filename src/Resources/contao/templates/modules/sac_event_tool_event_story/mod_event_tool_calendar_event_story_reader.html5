@@ -3,7 +3,7 @@
 <?php $this->block('content'); ?>
 
   <?php if($this->eventSubstitutionText != ''): ?>
-    <h4 class="mt-0 mb-3" style="color: red">Ausweichtour: <?= $this->eventSubstitutionText ?></h4>
+    <h4 class="mt-0 mb-3" style="color: red"><!-- indexer::stop -->Ausweichtour:<!-- indexer::continue --> <?= $this->eventSubstitutionText ?></h4>
   <?php endif; ?>
 
   <div>
@@ -13,6 +13,7 @@
     <?php if ($this->images): ?>
       <div class="ce_galleryy">
         <div class="row tiny-gutter">
+          <!-- indexer::stop -->
             <?php foreach ($this->images as $image): ?>
               <figure class="col-12 col-sm-6 col-md-3 image_container thumbnail responsive">
                 <a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement" title="<?=  $image['linkTitle']  ?>">
@@ -21,6 +22,7 @@
                 <figcaption class="figure-caption"><?= $image['strFigureCaption'] ?></figcaption>
               </figure>
             <?php endforeach; ?>
+          <!-- indexer::continue -->
         </div>
       </div>
     <?php endif; ?>
