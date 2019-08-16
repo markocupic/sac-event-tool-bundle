@@ -71,7 +71,7 @@ class ModuleSacEventToolTourDifficultyExplanationList extends Module
         // $rootDir = System::getContainer()->getParameter('kernel.project_dir');
         $arrDiff = array();
         $pid = 0;
-        $options = array('order' => 'sorting DESC');
+        $options = array('order' => 'code ASC');
         $objDifficulty = TourDifficultyModel::findAll($options);
 
         if ($objDifficulty !== null)
