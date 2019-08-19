@@ -106,9 +106,9 @@ $GLOBALS['TL_CTE']['sac_content_elements'] = array(
 );
 
 // Maintenance
-$GLOBALS['TL_PURGE']['tables']['sac_event_story']['callback'] = array(
-    'Markocupic\SacEventToolBundle\Maintenance\MaintainModuleEventStory',
-    'run',
+// Delete unused event-story folders
+$GLOBALS['TL_PURGE']['custom']['sac_event_story'] = array(
+    'callback' => array('Markocupic\SacEventToolBundle\Maintenance\MaintainModuleEventStory', 'run')
 );
 
 // Do not index a page if one of the following parameters is set
