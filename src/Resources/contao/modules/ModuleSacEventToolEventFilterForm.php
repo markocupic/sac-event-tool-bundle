@@ -146,7 +146,31 @@ class ModuleSacEventToolEventEventFilterForm extends Module
                     if ($objForm->hasFormField($k))
                     {
                         $objWidget = $objForm->getWidget($k);
-                        $objWidget->value = Input::get($k);
+                        if ($objWidget->name === 'organizers')
+                        {
+                            $arrOrganizers = [];
+                            // The organizers GET param can be transmitted like this: organizers=5
+                            if (is_numeric(Input::get('organizers')))
+                            {
+                                $arrOrganizers = [Input::get('organizers')];
+                            }
+                            // Or the organizers GET param can be transmitted like this: organizers=5,7,3
+                            elseif (strpos(Input::get('organizers'), ',', 1))
+                            {
+                                $arrOrganizers = explode(',', Input::get('organizers'));
+                            }
+                            else
+                            {
+                                // Or the organizers GET param can be transmitted like this: organizers[]=5&organizers[]=7&organizers[]=3
+                                $arrOrganizers = StringUtil::deserialize(Input::get('organizers'), true);
+                            }
+
+                            $objWidget->value = !empty($arrOrganizers) ? $arrOrganizers : '';
+                        }
+                        else
+                        {
+                            $objWidget->value = Input::get($k);
+                        }
                     }
                 }
             }
