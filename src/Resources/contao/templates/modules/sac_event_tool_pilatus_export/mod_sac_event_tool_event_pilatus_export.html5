@@ -322,7 +322,7 @@
             <td class="event-export-leistungen"><?= $arrEvent['leistungen'] ?></td>
           </tr>
           <?php endif; ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+          <time class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
             <td class="event-export-bookingEvent">Anmeldung</td>
             <?php $arrText = array(); ?>
             <?php if (!$arrEvent['disableOnlineRegistration']): ?>
@@ -332,6 +332,11 @@
                 <?php $arrText[] = $arrEvent['bookingEvent']; ?>
               <?php endif; ?>
             <?php endif; ?>
+
+            <?php if(($strBookingPeriod = Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingPeriod($arrEvent['id'], 'd.m.', 'd.m.Y')) != ''): ?>
+            <?php $arrText[] = 'Anmeldezeitraum: <time>' . $strBookingPeriod . '</time>'; ?>
+            <?php endif; ?>
+
             <?php if($arrEvent['generateMainInstructorContactDataFromDb']): ?>
               <?php $arrText[] = Markocupic\SacEventToolBundle\CalendarEventsHelper::generateMainInstructorContactDataFromDb($arrEvent['id']); ?>
             <?php endif; ?>

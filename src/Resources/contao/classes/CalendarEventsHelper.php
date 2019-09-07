@@ -635,6 +635,38 @@ class CalendarEventsHelper
 
     /**
      * @param $id
+     * @param string $dateFormatStart
+     * @param string $dateFormatEnd
+     * @return string
+     */
+    public static function getBookingPeriod($id, $dateFormatStart = '', $dateFormatEnd = '')
+    {
+        $objEvent = CalendarEventsModel::findByPk($id);
+        if ($objEvent === null)
+        {
+            return '';
+        }
+
+        if (!$objEvent->setRegistrationPeriod)
+        {
+            return '';
+        }
+
+        if ($dateFormatStart === '')
+        {
+            $dateFormatStart = Config::get('dateFormat');
+        }
+
+        if ($dateFormatEnd === '')
+        {
+            $dateFormatEnd = Config::get('dateFormat');
+        }
+
+        return Date::parse($dateFormatStart, $objEvent->registrationStartDate) . ' - ' . Date::parse($dateFormatEnd, $objEvent->registrationEndDate);
+    }
+
+    /**
+     * @param $id
      * @return array|bool
      */
     public static function getEventTimestamps($id)
