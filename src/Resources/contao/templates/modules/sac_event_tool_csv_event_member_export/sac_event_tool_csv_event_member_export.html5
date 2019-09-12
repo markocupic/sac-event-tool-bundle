@@ -1,0 +1,10 @@
+<?php $this->extend('block_unsearchable'); ?>
+
+<?php $this->block('content'); ?>
+
+<div class="alert bg-light">
+    <?= $this->form ?>
+</div>
+
+
+<?php $this->endblock(); ?>

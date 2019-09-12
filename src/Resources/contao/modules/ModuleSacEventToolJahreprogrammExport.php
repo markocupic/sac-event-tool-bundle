@@ -167,14 +167,12 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
         $objForm->addFormField('startDate', array(
             'label'     => 'Startdatum',
             'inputType' => 'text',
-            'options'   => $arrOrganizers,
             'eval'      => array('rgxp' => 'date', 'mandatory' => true),
         ));
 
         $objForm->addFormField('endDate', array(
             'label'     => 'Enddatum',
             'inputType' => 'text',
-            'options'   => $arrOrganizers,
             'eval'      => array('rgxp' => 'date', 'mandatory' => true),
         ));
 
