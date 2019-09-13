@@ -19,6 +19,7 @@ use Contao\Date;
 use Contao\Environment;
 use Contao\Input;
 use Contao\Module;
+use Contao\MemberModel;
 use Haste\Form\Form;
 use League\Csv\Reader;
 use League\Csv\Writer;
@@ -83,8 +84,6 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
             return $objTemplate->parse();
         }
 
-        $this->defaultPassword = Config::get('SAC_EVT_DEFAULT_BACKEND_PASSWORD');
-
         return parent::generate();
     }
 
@@ -135,17 +134,10 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
         ));
 
         $objForm->addFormField('mountainguide', array(
-            'label'     => array('', 'Event mit Bergführer'),
+            'label'     => array('', 'Nur Events mit Bergführer exportieren'),
             'inputType' => 'checkbox',
             'eval'      => array(),
         ));
-
-        /**
-         * $objForm->addFormField('keep-groups-in-one-line', array(
-         * 'label'     => array('', 'Gruppen einzeilig darstellen'),
-         * 'inputType' => 'checkbox',
-         * ));
-         **/
 
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
@@ -158,7 +150,7 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
             if (Input::post('FORM_SUBMIT') === 'form-event-member-export')
             {
                 $eventType = Input::post('event-type');
-                $arrFields = array('id', 'eventId', 'eventName', 'startDate', 'endDate', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'hasParticipated', 'stateOfSubscription', 'addedOn');
+                $arrFields = array('id', 'eventId', 'eventName', 'startDate', 'endDate', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'hasParticipated', 'stateOfSubscription', 'addedOn');
                 $startDate = strtotime(Input::post('startDate'));
                 $endDate = strtotime(Input::post('endDate'));
 
@@ -207,7 +199,6 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
 
     /**
      * @param $arrFields
-     * @return array
      */
     private function getHeadline($arrFields)
     {
@@ -215,10 +206,15 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
         $arrHeadline = array();
         foreach ($arrFields as $field)
         {
-            if ($field === 'startDate' || $field === 'endDate' || $field === 'eventState' || $field === 'executionState')
+            if ($field === 'mainInstructor' || $field === 'mountainguide' || $field === 'startDate' || $field === 'endDate' || $field === 'eventState' || $field === 'executionState')
             {
                 Controller::loadLanguageFile('tl_calendar_events');
                 $arrHeadline[] = isset($GLOBALS['TL_LANG']['tl_calendar_events'][$field][0]) ? $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] : $field;
+            }
+            elseif ($field === 'phone')
+            {
+                Controller::loadLanguageFile('tl_member');
+                $arrHeadline[] = isset($GLOBALS['TL_LANG']['tl_member'][$field][0]) ? $GLOBALS['TL_LANG']['tl_member'][$field][0] : $field;
             }
             else
             {
@@ -299,6 +295,42 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
             if ($objEvent !== null)
             {
                 return isset($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0]) ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] : $objEvent->$field;
+            }
+            else
+            {
+                return '';
+            }
+        }
+        elseif ($field === 'mainInstructor')
+        {
+            $objEvent = CalendarEventsModel::findByPk($objEventMember->eventId);
+            if ($objEvent !== null)
+            {
+                return CalendarEventsHelper::getMainInstructorName($objEventMember->eventId);
+            }
+            else
+            {
+                return '';
+            }
+        }
+        elseif ($field === 'mountainguide')
+        {
+            $objEvent = CalendarEventsModel::findByPk($objEventMember->eventId);
+            if ($objEvent !== null)
+            {
+                return $objEvent->$field;
+            }
+            else
+            {
+                return '';
+            }
+        }
+        elseif ($field === 'phone')
+        {
+            $objMember = MemberModel::findBySacMemberId($objEventMember->sacMemberId);
+            if ($objMember !== null)
+            {
+                return $objMember->$field;
             }
             else
             {
