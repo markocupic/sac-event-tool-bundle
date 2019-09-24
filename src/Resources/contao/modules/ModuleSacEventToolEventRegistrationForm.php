@@ -386,7 +386,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
             if (!$hasError)
             {
                 // Prevent duplicate entries
-                $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND contaoMemberId=?')->execute(Input::get('events'), $this->objUser->id);
+                $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND contaoMemberId=?')->execute($this->objEvent->id, $this->objUser->id);
                 if ($objDb->numRows)
                 {
                     $this->Template->bookingErrorMsg = 'F&uuml;r diesen Event liegt von dir bereits eine Anmeldung vor.';
