@@ -107,6 +107,12 @@ class ModuleSacEventToolCsvExport extends Module
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
+        $arrUserRoles = array();
+        $objUserRole = Database::getInstance()->execute('SELECT * FROM tl_user_role ORDER BY sorting');
+        while ($objUserRole->next())
+        {
+            $arrUserRoles[$objUserRole->id] = $objUserRole->title;
+        }
 
         $objForm->setFormActionFromUri(Environment::get('uri'));
 
@@ -117,8 +123,15 @@ class ModuleSacEventToolCsvExport extends Module
             'options'   => array('user-role-export' => 'SAC Benutzerrollen exportieren', 'user-group-export' => 'User und Benutzergruppenzugehörigkeit exportieren', 'member-group-export' => 'Mitglieder und Benutzerzugehörigkeit exportieren'),
         ));
 
+        $objForm->addFormField('user-roles', array(
+            'label'     => array('Benutzerrollen-Filter (ODER-Verknüpfung)', ''),
+            'inputType' => 'select',
+            'options'   => $arrUserRoles,
+            'eval'      => array('multiple' => true)
+        ));
+
         $objForm->addFormField('keep-groups-in-one-line', array(
-            'label'     => array('', 'Gruppen einzeilig darstellen'),
+            'label'     => array('', 'Rollen einzeilig darstellen'),
             'inputType' => 'checkbox',
         ));
 
@@ -190,9 +203,27 @@ class ModuleSacEventToolCsvExport extends Module
         // Write headline
         $arrData[] = $this->getHeadline($arrFields, $strTable);
 
+        // Filter by user role
+        $blnHasUserRoleFilter = false;
+        if (!empty(Input::post('user-roles') && is_array(Input::post('user-roles'))))
+        {
+            $arrFilterRoles = Input::post('user-roles');
+            $blnHasUserRoleFilter = true;
+        }
+
         // Write rows
         while ($objUser->next())
         {
+            // Filter by user role
+            if ($blnHasUserRoleFilter)
+            {
+                $arrUserRoles = StringUtil::deserialize($objUser->userRole, true);
+                if (count(array_intersect($arrFilterRoles, $arrUserRoles)) < 1)
+                {
+                    continue;
+                }
+            }
+
             $arrUser = array();
             foreach ($arrFields as $field)
             {
@@ -231,6 +262,13 @@ class ModuleSacEventToolCsvExport extends Module
                             $hasGroups = true;
                             foreach ($arrGroups as $groupId)
                             {
+                                if ($blnHasUserRoleFilter && count($arrFilterRoles) > 0)
+                                {
+                                    if (!in_array($groupId, $arrFilterRoles))
+                                    {
+                                        continue;
+                                    }
+                                }
                                 $objGroupModel = $GroupModel::findByPk($groupId);
                                 if ($objGroupModel !== null)
                                 {
