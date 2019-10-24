@@ -221,9 +221,9 @@ class SyncSacMemberDatabase
                     $set['city'] = $arrLine[8];
                     $set['country'] = \strtolower($arrLine[9]) == '' ? 'ch' : \strtolower($arrLine[9]);
                     $set['dateOfBirth'] = \strtotime($arrLine[10]);
-                    $set['phoneBusiness'] = $arrLine[11];
-                    $set['phone'] = $arrLine[12];
-                    $set['mobile'] = $arrLine[14];
+                    $set['phoneBusiness'] = beautifyPhoneNumber($arrLine[11]);
+                    $set['phone'] = beautifyPhoneNumber($arrLine[12]);
+                    $set['mobile'] = beautifyPhoneNumber($arrLine[14]);
                     $set['fax'] = $arrLine[15];
                     $set['email'] = $arrLine[16];
                     $set['gender'] = \strtolower($arrLine[17]) == 'weiblich' ? 'female' : 'male';

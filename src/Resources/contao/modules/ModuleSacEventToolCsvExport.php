@@ -10,7 +10,6 @@
 
 namespace Markocupic\SacEventToolBundle;
 
-
 use Contao\BackendTemplate;
 use Contao\Config;
 use Contao\Controller;
@@ -59,7 +58,6 @@ class ModuleSacEventToolCsvExport extends Module
      */
     protected $defaultPassword;
 
-
     /**
      * Display a wildcard in the back end
      *
@@ -83,10 +81,8 @@ class ModuleSacEventToolCsvExport extends Module
 
         $this->defaultPassword = Config::get('SAC_EVT_DEFAULT_BACKEND_PASSWORD');
 
-
         return parent::generate();
     }
-
 
     /**
      * Generate the module
@@ -141,7 +137,6 @@ class ModuleSacEventToolCsvExport extends Module
             'inputType' => 'submit',
         ));
 
-
         if ($objForm->validate())
         {
             if (Input::post('FORM_SUBMIT') === 'form-user-export')
@@ -176,10 +171,8 @@ class ModuleSacEventToolCsvExport extends Module
                     $objUser = Database::getInstance()->execute('SELECT * FROM tl_member ORDER BY lastname, firstname');
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, 'MemberGroupModel', $blnKeepGroupsInOneLine);
                 }
-
             }
         }
-
 
         $this->objForm = $objForm->generate();
     }
@@ -339,7 +332,6 @@ class ModuleSacEventToolCsvExport extends Module
     {
         if ($field === 'password')
         {
-
             if (password_verify($this->defaultPassword, $objUser->password))
             {
                 // Activate pwchange (=side efect) ;-)
@@ -349,7 +341,6 @@ class ModuleSacEventToolCsvExport extends Module
                     $objUserModel->pwChange = '1';
                     $objUserModel->save();
                 }
-
 
                 return $this->defaultPassword;
             }
@@ -361,6 +352,10 @@ class ModuleSacEventToolCsvExport extends Module
         elseif ($field === 'lastLogin')
         {
             return Date::parse('Y-m-d', $objUser->lastLogin);
+        }
+        elseif ($field === 'phone' || $field === 'mobile')
+        {
+            return beautifyPhoneNumber($objUser->{$field});
         }
         else
         {
@@ -385,7 +380,6 @@ class ModuleSacEventToolCsvExport extends Module
             }, $arrRow);
             $arrFinal[] = $arrLine;
         }
-
 
         // Send file to browser
         header('Content-Encoding: UTF-8');

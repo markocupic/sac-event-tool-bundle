@@ -48,7 +48,6 @@ function isInGroup($userId, $groupId, $mode = 'BE')
  */
 function getAvatar($userId, $mode = 'BE')
 {
-
     // Get root dir
     $rootDir = \System::getContainer()->getParameter('kernel.project_dir');
 
@@ -94,7 +93,6 @@ function getAvatar($userId, $mode = 'BE')
         }
     }
 
-
     if ($mode === 'BE')
     {
         if ($objUser !== null)
@@ -125,7 +123,6 @@ function getAvatar($userId, $mode = 'BE')
             {
                 return \Config::get('SAC_EVT_AVATAR_FEMALE');
             }
-
         }
         else
         {
@@ -169,6 +166,32 @@ function userHasRole($userId, $strRole)
         }
     }
     return false;
+}
+
+/**
+ * @param string $strNumber
+ * @return mixed|string
+ */
+function beautifyPhoneNumber($strNumber = '')
+{
+    if ($strNumber != '')
+    {
+        $strNumber = str_replace(' ', '', $strNumber);
+        $strNumber = str_replace('+41', '', $strNumber);
+        if (substr($strNumber, 0, 1) != '0')
+        {
+            $strNumber = '0' . $strNumber;
+        }
+        if (strlen($strNumber) === 10)
+        {
+            $strNumber = substr($strNumber, 0, 3) . ' ' .
+                substr($strNumber, 3, 3) . ' ' .
+                substr($strNumber, 6, 2) . ' ' .
+                substr($strNumber, 8, 2);
+        }
+    }
+
+    return $strNumber;
 }
 
 
