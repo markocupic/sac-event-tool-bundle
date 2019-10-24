@@ -337,7 +337,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
                 }
                 if ($objUser->mobile != '')
                 {
-                    $arrRight[] = 'N ' . $objUser->mobile;
+                    $arrRight[] = 'M ' . $objUser->mobile;
                 }
                 if ($objUser->email != '')
                 {
@@ -457,7 +457,7 @@ class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExpo
                         }
                         if ($objUser->mobile != '')
                         {
-                            $arrRight[] = 'N ' . $objUser->mobile;
+                            $arrRight[] = 'M ' . $objUser->mobile;
                         }
                         if ($objUser->email != '')
                         {
