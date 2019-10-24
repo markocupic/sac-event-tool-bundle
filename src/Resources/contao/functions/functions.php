@@ -176,18 +176,23 @@ function beautifyPhoneNumber($strNumber = '')
 {
     if ($strNumber != '')
     {
-        $strNumber = str_replace(' ', '', $strNumber);
+        $strNumber = preg_replace('/\s+/', '', $strNumber);
         $strNumber = str_replace('+41', '', $strNumber);
-        if (substr($strNumber, 0, 1) != '0')
+        $strNumber = str_replace('0041', '', $strNumber);
+
+        // Add a leading zero, if there is no f.ex 41
+        if (substr($strNumber, 0, 1) != '0' && strlen($strNumber) === 9)
         {
             $strNumber = '0' . $strNumber;
         }
-        if (strlen($strNumber) === 10)
+
+        // Search for 0799871234 and replace it with 079 987 12 34
+        $pattern = '/^([0]{1})([0-9]{2})([0-9]{3})([0-9]{2})([0-9]{2})$/';
+        if (preg_match($pattern, $strNumber))
         {
-            $strNumber = substr($strNumber, 0, 3) . ' ' .
-                substr($strNumber, 3, 3) . ' ' .
-                substr($strNumber, 6, 2) . ' ' .
-                substr($strNumber, 8, 2);
+            $pattern = '/^([0]{1})([0-9]{2})([0-9]{3})([0-9]{2})([0-9]{2})$/';
+            $replace = '$1$2 $3 $4 $5';
+            $strNumber = preg_replace($pattern, $replace, $strNumber);
         }
     }
 
