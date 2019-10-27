@@ -157,6 +157,12 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = array(
     5 => "Dr. med.",
 );
 
+$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'] = array(
+    'deceased', // verstorben
+    'recission', // Rücktritt
+    'leaving' // Austritt
+);
+
 // TL_CONFIG
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = array(
     1  => "1",
