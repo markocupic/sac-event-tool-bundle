@@ -18,10 +18,10 @@ require_once($rootDir . '/vendor/markocupic/sac-event-tool-bundle/src/Resources/
 if (TL_MODE == 'BE')
 {
     // Add Backend CSS
-    $GLOBALS['TL_CSS'][] = 'bundles/markocupicsaceventtool/css/be_stylesheet.css';
+    $GLOBALS['TL_CSS'][] = 'bundles/markocupicsaceventtool/css/be_stylesheet.css|static';
 
     // Add Backend javascript
-    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/edit_all_navbar_helper.js|static';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/backend_edit_all_navbar_helper.js';
 }
 
 $GLOBALS['BE_MOD']['content']['calendar']['tables'] = array('tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member');

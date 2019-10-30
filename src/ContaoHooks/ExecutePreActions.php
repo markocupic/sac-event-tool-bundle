@@ -86,7 +86,7 @@ class ExecutePreActions
                 $arrJSON['subaction'] = Input::post('subaction');
                 if (($objUser = BackendUser::getInstance()) !== null)
                 {
-                    $objTemplate = new BackendTemplate('edit_all_navbar');
+                    $objTemplate = new BackendTemplate('edit_all_navbar_helper');
                     $arrJSON['navbar'] = $objTemplate->parse();
                     $arrJSON['status'] = 'success';
                 }

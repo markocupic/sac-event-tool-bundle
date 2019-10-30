@@ -2,10 +2,10 @@
     <div class="edit-all-navbar-helper-inner">
         <ul>
             <li>
-                <button id="editAllNavbarHelperGetSettings">Get</button>
+                <button id="editAllNavbarHelperGetSettings" title="Checkbox-Konfiguration aus den Benutzereinstellungen laden">Get</button>
             </li>
             <li>
-                <button id="editAllNavbarHelperSaveSettings">Save</button>
+                <button id="editAllNavbarHelperSaveSettings" title="Checkbox-Konfiguration in den Benutzereinstellungen abspeichern">Save</button>
             </li>
         </ul>
     </div>

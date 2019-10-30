@@ -1,22 +1,22 @@
 <div class="event-dashboard">
   <div class="tl_submit_container">
 
-    <a href="<?= $this->eventListHref ?>" title="Zurück zur Eventliste: Alt + Shift + e" target="_blank" accesskey="e" role="button" class="tl_submit">Zur Eventliste</a>
+    <a href="<?= $this->eventListHref ?>" role="button" class="tl_submit">Zur Eventliste</a>
 
     <?php if ($this->allowEventPreviewButton): ?>
-      <a href="<?= $this->eventPreviewUrl ?>" title="Vorschau: Alt + Shift + v" target="_blank" accesskey="v" role="button" class="tl_submit">Vorschau</a>
+      <a href="<?= $this->eventPreviewUrl ?>" target="_blank" accesskey="p" role="button" class="tl_submit">Vorschau</a>
     <?php endif; ?>
 
     <?php if ($this->allowParticipantListButton): ?>
-      <a href="<?= $this->participantListHref ?>" title="Teilnehmerliste: Alt + Shift + t" accesskey="t" role="button" class="tl_submit">Zur Teilnehmerliste</a>
+      <a href="<?= $this->participantListHref ?>" accesskey="m" role="button" class="tl_submit">Zur Teilnehmerliste</a>
     <?php endif; ?>
 
     <?php if ($this->allowTourReportButton): ?>
-      <a href="<?= $this->writeTourReportHref ?>" title="Tourraport: Alt + Shift + r" accesskey="r" role="button" class="tl_submit">Angaben für Tourrapport erfassen</a>
+      <a href="<?= $this->writeTourReportHref ?>" accesskey="r" role="button" class="tl_submit">Angaben für Tourrapport erfassen</a>
     <?php endif; ?>
 
     <?php if ($this->allowInvoiceListButton): ?>
-      <a href="<?= $this->invoiceListHref ?>" title="Tourrapport und Verguetungsformular drucken: Alt + Shift + i" accesskey="i" role="button" class="tl_submit">Tourrapport und Verg&uuml;tungsformulare drucken</a>
+      <a href="<?= $this->invoiceListHref ?>" accesskey="i" role="button" class="tl_submit">Tourrapport und Verg&uuml;tungsformulare drucken</a>
     <?php endif; ?>
 
   </div>

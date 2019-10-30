@@ -6,6 +6,9 @@
     background-color: #f47c00;
     z-index: 2000;
 }
+#editAllNavbarHelper ul{
+    display:flex;
+}
 #editAllNavbarHelper ul,#editAllNavbarHelper li{
     padding:0;
     margin:0;
@@ -17,6 +20,9 @@
     background-color: #000;
     color: #fff;
     border: 0;
+}
+#editAllNavbarHelper button:hover{
+    background-color: #aa0000;
 }
 
 /** new_repeat im multicolumn wizard ausblenden**/
