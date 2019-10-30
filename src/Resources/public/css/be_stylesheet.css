@@ -1,3 +1,24 @@
+/** editAll & overrideAll navbar */
+#editAllNavbarHelper {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    background-color: #f47c00;
+    z-index: 2000;
+}
+#editAllNavbarHelper ul,#editAllNavbarHelper li{
+    padding:0;
+    margin:0;
+    list-style-type: none;
+}
+#editAllNavbarHelper button {
+    margin: 15px 8px;
+    padding: 6px;
+    background-color: #000;
+    color: #fff;
+    border: 0;
+}
+
 /** new_repeat im multicolumn wizard ausblenden**/
 table#ctrl_eventDates thead tr:first-child {
     display: none;
@@ -143,7 +164,8 @@ div.tl_header_tour_rapport table td {
     background-color: #cccccc;
     animation: blinker 2s step-start infinite;
 }
-.col_stateOfSubscription img[alt="subscription-not-confirmed"]{
+
+.col_stateOfSubscription img[alt="subscription-not-confirmed"] {
     animation: blinker 2s step-start infinite;
 }
 

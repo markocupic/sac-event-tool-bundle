@@ -75,29 +75,78 @@ class ExecutePreActions
             exit();
         }
 
-
         // Autocompleter when registrating event members manually in the backend
-        if ($strAction === 'loadEditAllFromSession')
+        if ($strAction === 'editAllNavbarHandler')
         {
-            $arrJSON = array();
-            $arrJSON['session'] = '';
-            $arrJSON['navbar'] = '';
-            $arrJSON['success'] = 'error';
-
-
-            if (($objUser = BackendUser::getInstance()) !== null)
+            if (Input::post('subaction') == 'loadNavbar')
             {
-                $objTemplate = new BackendTemplate('edit_all_helper_navbar');
-                $arrJSON['navbar'] = $objTemplate->parse();
-
-                $objDb = Database::getInstance()->prepare('SELECT session FROM tl_user WHERE id=?')->limit(1)->execute($objUser->id);
-                if ($objDb->numRows)
+                $arrJSON = array();
+                $arrJSON['navbar'] = '';
+                $arrJSON['status'] = 'error';
+                $arrJSON['subaction'] = Input::post('subaction');
+                if (($objUser = BackendUser::getInstance()) !== null)
                 {
-                    $arrJSON['session'] = StringUtil::deserialize($objDb->session, true);
+                    $objTemplate = new BackendTemplate('edit_all_navbar');
+                    $arrJSON['navbar'] = $objTemplate->parse();
                     $arrJSON['status'] = 'success';
                 }
+                echo html_entity_decode(json_encode($arrJSON));
+                exit();
             }
-            echo html_entity_decode(json_encode($arrJSON));
+
+            if (Input::post('subaction') == 'getSessionData')
+            {
+                $arrJSON = array();
+                $arrJSON['session'] = '';
+                $arrJSON['status'] = 'error';
+                $arrJSON['sessionData'] = array();
+                $strTable = Input::get('table');
+
+                if (($objUser = BackendUser::getInstance()) !== null)
+                {
+                    $objDb = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE id=?')->limit(1)->execute($objUser->id);
+                    if ($objDb->numRows)
+                    {
+                        $arrSession = StringUtil::deserialize($objDb->session, true);
+                        if (!isset($arrSession['editAllHelper'][$strTable]))
+                        {
+                            $arrChecked = array();
+                        }
+                        else
+                        {
+                            $arrChecked = StringUtil::deserialize($arrSession['editAllHelper'][$strTable], true);
+                        }
+
+                        $arrJSON['sessionData'] = $arrChecked;
+                        $arrJSON['status'] = 'success';
+                    }
+                }
+                echo html_entity_decode(json_encode($arrJSON));
+                exit();
+            }
+
+            if (Input::post('subaction') == 'saveSessionData')
+            {
+                $arrJSON = array();
+                $arrJSON['session'] = '';
+                $arrJSON['status'] = 'error';
+                $strTable = Input::get('table');
+
+                if (($objUser = BackendUser::getInstance()) !== null)
+                {
+                    $objDb = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE id=?')->limit(1)->execute($objUser->id);
+                    if ($objDb->numRows)
+                    {
+                        $arrSession = StringUtil::deserialize($objDb->session, true);
+                        $arrSession['editAllHelper'][$strTable] = Input::post('checkedItems');
+                        $set = array('session' => serialize($arrSession));
+                        Database::getInstance()->prepare('UPDATE tl_user SET session=? WHERE id=?')->set($set)->execute(serialize($arrSession), $objUser->id);
+                        $arrJSON['status'] = 'success';
+                    }
+                }
+                echo html_entity_decode(json_encode($arrJSON));
+                exit();
+            }
         }
     }
 }

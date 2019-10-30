@@ -1,0 +1,12 @@
+<div id="editAllNavbarHelper">
+    <div class="edit-all-navbar-helper-inner">
+        <ul>
+            <li>
+                <button id="editAllNavbarHelperGetSettings">Get</button>
+            </li>
+            <li>
+                <button id="editAllNavbarHelperSaveSettings">Save</button>
+            </li>
+        </ul>
+    </div>
+</div>

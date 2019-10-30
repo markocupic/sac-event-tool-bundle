@@ -1,9 +1,4 @@
 <?php
-if (TL_MODE == 'BE')
-{
-    // Add Backend CSS
-    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/backend_multiselect_reminder.js';
-}
 /**
  * SAC Event Tool Web Plugin for Contao
  * Copyright (c) 2008-2019 Marko Cupic
@@ -24,6 +19,9 @@ if (TL_MODE == 'BE')
 {
     // Add Backend CSS
     $GLOBALS['TL_CSS'][] = 'bundles/markocupicsaceventtool/css/be_stylesheet.css';
+
+    // Add Backend javascript
+    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/edit_all_navbar_helper.js|static';
 }
 
 $GLOBALS['BE_MOD']['content']['calendar']['tables'] = array('tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member');
