@@ -3,21 +3,21 @@
 
     <a href="<?= $this->eventListHref ?>" role="button" class="tl_submit">Zur Eventliste</a>
 
-      <?php if ($this->allowEventPreviewButton): ?>
-        <a href="<?= $this->eventPreviewUrl ?>" target="_blank" role="button" class="tl_submit">Vorschau</a>
-      <?php endif; ?>
+    <?php if ($this->allowEventPreviewButton): ?>
+      <a href="<?= $this->eventPreviewUrl ?>" target="_blank" accesskey="p" role="button" class="tl_submit">Vorschau</a>
+    <?php endif; ?>
 
-      <?php if ($this->allowParticipantListButton): ?>
-        <a href="<?= $this->participantListHref ?>" role="button" class="tl_submit">Zur Teilnehmerliste</a>
-      <?php endif; ?>
+    <?php if ($this->allowParticipantListButton): ?>
+      <a href="<?= $this->participantListHref ?>" accesskey="m" role="button" class="tl_submit">Zur Teilnehmerliste</a>
+    <?php endif; ?>
 
-      <?php if ($this->allowTourReportButton): ?>
-        <a href="<?= $this->writeTourReportHref ?>" role="button" class="tl_submit">Angaben für Tourrapport erfassen</a>
-      <?php endif; ?>
+    <?php if ($this->allowTourReportButton): ?>
+      <a href="<?= $this->writeTourReportHref ?>" accesskey="r" role="button" class="tl_submit">Angaben für Tourrapport erfassen</a>
+    <?php endif; ?>
 
-      <?php if ($this->allowInvoiceListButton): ?>
-        <a href="<?= $this->invoiceListHref ?>" role="button" class="tl_submit">Tourrapport und Verg&uuml;tungsformulare drucken</a>
-      <?php endif; ?>
+    <?php if ($this->allowInvoiceListButton): ?>
+      <a href="<?= $this->invoiceListHref ?>" accesskey="i" role="button" class="tl_submit">Tourrapport und Verg&uuml;tungsformulare drucken</a>
+    <?php endif; ?>
 
   </div>
 </div>
