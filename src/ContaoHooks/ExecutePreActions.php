@@ -75,7 +75,7 @@ class ExecutePreActions
             exit();
         }
 
-        // Autocompleter when registrating event members manually in the backend
+        // editAllNavbarHandler in the Contao backend when using the overrideAll or editAll mode
         if ($strAction === 'editAllNavbarHandler')
         {
             if (Input::post('subaction') == 'loadNavbar')

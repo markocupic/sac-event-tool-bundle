@@ -18,19 +18,13 @@ var EditAllNavbarHelper = {
         new Request.JSON({
             url: window.location.href,
             onSuccess: function (json, txt) {
-                //console.log(json);
                 if (json['status'] === 'success') {
-
                     $$('body').appendHTML(json['navbar']);
-                    //console.log(json);
-
                     $('editAllNavbarHelperGetSettings').addEvent('click', function () {
                         self.getSessionData();
                     });
-
                     $('editAllNavbarHelperSaveSettings').addEvent('click', function () {
                         self.saveSessionData();
-
                     });
                 }
             }
