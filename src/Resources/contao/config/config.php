@@ -1,5 +1,9 @@
 <?php
-
+if (TL_MODE == 'BE')
+{
+    // Add Backend CSS
+    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/backend_multiselect_reminder.js';
+}
 /**
  * SAC Event Tool Web Plugin for Contao
  * Copyright (c) 2008-2019 Marko Cupic

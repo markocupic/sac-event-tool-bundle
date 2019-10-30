@@ -10,8 +10,11 @@
 
 namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
+use Contao\BackendTemplate;
+use Contao\BackendUser;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Database;
 use Contao\Date;
 use Contao\Input;
 use Contao\MemberModel;
@@ -70,6 +73,31 @@ class ExecutePreActions
             // Send it to the browser
             echo html_entity_decode(json_encode($json));
             exit();
+        }
+
+
+        // Autocompleter when registrating event members manually in the backend
+        if ($strAction === 'loadEditAllFromSession')
+        {
+            $arrJSON = array();
+            $arrJSON['session'] = '';
+            $arrJSON['navbar'] = '';
+            $arrJSON['success'] = 'error';
+
+
+            if (($objUser = BackendUser::getInstance()) !== null)
+            {
+                $objTemplate = new BackendTemplate('edit_all_helper_navbar');
+                $arrJSON['navbar'] = $objTemplate->parse();
+
+                $objDb = Database::getInstance()->prepare('SELECT session FROM tl_user WHERE id=?')->limit(1)->execute($objUser->id);
+                if ($objDb->numRows)
+                {
+                    $arrJSON['session'] = StringUtil::deserialize($objDb->session, true);
+                    $arrJSON['status'] = 'success';
+                }
+            }
+            echo html_entity_decode(json_encode($arrJSON));
         }
     }
 }
