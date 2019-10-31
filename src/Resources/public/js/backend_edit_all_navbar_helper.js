@@ -103,7 +103,7 @@ var EditAllNavbarHelper = {
 window.addEvent('domready', function () {
 
     var urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('act') && urlParams.get('table')) {
+    if (urlParams.has('do') && urlParams.has('act')) {
         if (urlParams.get('act') === 'overrideAll' || urlParams.get('act') === 'editAll') {
             EditAllNavbarHelper.initialize();
         }

@@ -101,6 +101,9 @@ class ExecutePreActions
                 $arrJSON['status'] = 'error';
                 $arrJSON['sessionData'] = array();
                 $strTable = Input::get('table');
+                $strAction = Input::get('act');
+                $strKey = $strAction . $strTable != '' ? '-' .  $strTable: '';
+
 
                 if (($objUser = BackendUser::getInstance()) !== null)
                 {
@@ -108,13 +111,13 @@ class ExecutePreActions
                     if ($objDb->numRows)
                     {
                         $arrSession = StringUtil::deserialize($objDb->session, true);
-                        if (!isset($arrSession['editAllHelper'][$strTable]))
+                        if (!isset($arrSession['editAllHelper'][$strKey]))
                         {
                             $arrChecked = array();
                         }
                         else
                         {
-                            $arrChecked = StringUtil::deserialize($arrSession['editAllHelper'][$strTable], true);
+                            $arrChecked = StringUtil::deserialize($arrSession['editAllHelper'][$strKey], true);
                         }
 
                         $arrJSON['sessionData'] = $arrChecked;
@@ -131,14 +134,15 @@ class ExecutePreActions
                 $arrJSON['session'] = '';
                 $arrJSON['status'] = 'error';
                 $strTable = Input::get('table');
-
+                $strAction = Input::get('act');
+                $strKey = $strAction . $strTable != '' ? '-' .  $strTable: '';
                 if (($objUser = BackendUser::getInstance()) !== null)
                 {
                     $objDb = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE id=?')->limit(1)->execute($objUser->id);
                     if ($objDb->numRows)
                     {
                         $arrSession = StringUtil::deserialize($objDb->session, true);
-                        $arrSession['editAllHelper'][$strTable] = Input::post('checkedItems');
+                        $arrSession['editAllHelper'][$strKey] = Input::post('checkedItems');
                         $set = array('session' => serialize($arrSession));
                         Database::getInstance()->prepare('UPDATE tl_user SET session=? WHERE id=?')->set($set)->execute(serialize($arrSession), $objUser->id);
                         $arrJSON['status'] = 'success';
