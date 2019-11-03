@@ -332,7 +332,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
                 'filter'     => true,
                 'reference'  => &$GLOBALS['TL_LANG']['tl_calendar_events'],
                 'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
-                'foreignKey' => "tl_user.CONCAT(name, ', ', city)",
+                'foreignKey' => "tl_user.CONCAT(lastname, ' ', firstname, ', ', city)",
                 'eval'       => array
                 (
                     'style'              => 'width:350px',
@@ -535,14 +535,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = array(
 /** @todo Falls verschoben, kann hier das Verschiebedatum angegeben werden. */
 // eventDeferDate
 /**
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDeferDate'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventDeferDate'],
-    'exclude'   => true,
-    'inputType' => 'text',
-    'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => true, 'datepicker' => true, 'tl_class' => 'clr wizard'),
-    'sql'       => "int(10) unsigned NULL"
-);
-**/
+ * $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDeferDate'] = array(
+ * 'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventDeferDate'],
+ * 'exclude'   => true,
+ * 'inputType' => 'text',
+ * 'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => true, 'datepicker' => true, 'tl_class' => 'clr wizard'),
+ * 'sql'       => "int(10) unsigned NULL"
+ * );
+ **/
 
 // meetingPoint
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['meetingPoint'] = array(

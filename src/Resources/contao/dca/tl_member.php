@@ -30,19 +30,14 @@ $GLOBALS['TL_DCA']['tl_member']['config']['ondelete_callback'][] = array('tl_mem
 // Add tl_member.sacMemberId to index
 $GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index';
 
-// Fields
-
+// More fields...
 // Avatar
 $GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = array(
-    'label'         => &$GLOBALS['TL_LANG']['tl_member']['avatar'],
-    'exclude'       => true,
-    'inputType'     => 'fileTree',
-    'eval'          => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'),
-    'load_callback' => array
-    (
-        array('tl_content', 'setSingleSrcFlags')
-    ),
-    'sql'           => "binary(16) NULL"
+    'label'     => &$GLOBALS['TL_LANG']['tl_member']['avatar'],
+    'exclude'   => true,
+    'inputType' => 'fileTree',
+    'eval'      => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'),
+    'sql'       => "binary(16) NULL"
 );
 
 // activationLinkLifetime
@@ -107,11 +102,12 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = array(
 // sectionId
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionId'],
+    //'exclude'   => true,
     'reference' => &$GLOBALS['TL_LANG']['tl_member']['section'],
     'inputType' => 'checkbox',
     'filter'    => true,
-    'eval'      => array('multiple' => true),
-    'options'   => Config::get('SAC_EVT_SAC_SECTION_IDS'),
+    'eval'      => array('multiple' => true, 'tl_class' => 'clr'),
+    'options'   => explode(',', Config::get('SAC_EVT_SAC_SECTION_IDS')),
     'sql'       => "blob NULL",
 );
 
@@ -266,5 +262,35 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = array(
     'eval'      => array('tl_class' => 'clr'),
     'sql'       => "varchar(1024) NOT NULL default ''",
 );
+
+// Fields (readonly fields)
+$GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['gender']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['firstname']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['lastname']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['street']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['streetExtra']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['postal']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['city']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['memberStatus']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['debit']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo1']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo2']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo3']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo4']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['entryYear']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['membershipType']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['phone']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['mobile']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['email']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['dateOfBirth']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['username']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['sectionId']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['phoneBusiness']['eval']['readonly'] = 'readonly';
+$GLOBALS['TL_DCA']['tl_member']['fields']['profession']['eval']['readonly'] = 'readonly';
+
+
+
 
 
