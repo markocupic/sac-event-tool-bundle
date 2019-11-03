@@ -8,15 +8,12 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 // Legends
 $GLOBALS['TL_LANG']['tl_member']['section_legend'] = 'Sektions-Einstellungen';
-$GLOBALS['TL_LANG']['tl_member']['personal_legend'] = 'Personalien';
-$GLOBALS['TL_LANG']['tl_member']['address_legend'] = 'Adressangaben';
-$GLOBALS['TL_LANG']['tl_member']['contact_legend'] = 'Kontaktangaben';
-$GLOBALS['TL_LANG']['tl_member']['account_legend'] = 'Mitgliederstatus';
 $GLOBALS['TL_LANG']['tl_member']['section_info_legend'] = 'Sektionsinformationen';
-
+$GLOBALS['TL_LANG']['tl_member']['avatar_legend'] = 'Avatar-Einstellungen';
+$GLOBALS['TL_LANG']['tl_member']['emergency_legend'] = 'Avatar-Einstellungen';
+$GLOBALS['TL_LANG']['tl_member']['food_legend'] = 'Essgewohnheiten-Einstellungen';
 
 // Fields
 if (TL_MODE === 'FE')
@@ -29,6 +26,7 @@ $GLOBALS['TL_LANG']['tl_member']['activationLinkLifetime'] = array('G&uuml;ltigk
 $GLOBALS['TL_LANG']['tl_member']['isSacMember'] = array('Dieser User ist ein SAC-Mitglied', 'Dieses Mitglied wurde in der Datenbank (CSV-File) beim t&auml;glichen Sync gefunden.');
 $GLOBALS['TL_LANG']['tl_member']['sacMemberId'] = array('Mitgliedernummer', '');
 $GLOBALS['TL_LANG']['tl_member']['emergencyPhone'] = array('Notfall-Benachrichtigungs-Telefonnummer', 'Geben Sie die Telefonnummer einer Ihnen vertrauten Person an, welche in einem Notfall kontaktiert werden kann.');
+$GLOBALS['TL_LANG']['tl_member']['emergencyPhoneName'] = array('Kontaktperson für Notfallbenachrichtigung', 'Geben Sie den Namen der Kontaktperson ein, welche im FAlle eines Notfalls benachrichtigt werden soll.');
 $GLOBALS['TL_LANG']['tl_member']['sectionId'] = array('Sektion', '');
 $GLOBALS['TL_LANG']['tl_member']['addressExtra'] = array('Adresszusatz', '');
 $GLOBALS['TL_LANG']['tl_member']['phoneBusiness'] = array('Telefon Gesch&auml;ft', '');
@@ -44,7 +42,6 @@ $GLOBALS['TL_LANG']['tl_member']['memberStatus'] = array('Mitgliederstatus', '')
 $GLOBALS['TL_LANG']['tl_member']['disable'] = array('Inaktives SAC-Mitglied (ausgetreten)', '');
 $GLOBALS['TL_LANG']['tl_member']['newsletterSent'] = array('Newsletter versandt', '');
 $GLOBALS['TL_LANG']['tl_member']['foodHabits'] = array('Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)', '');
-
 
 // References
 $GLOBALS['TL_LANG']['tl_member']['section']['4250'] = 'SAC PILATUS';

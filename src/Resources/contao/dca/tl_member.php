@@ -8,6 +8,19 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+// Manipulate palette default
+Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+    ->addLegend('food_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
+    ->addLegend('section_info_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
+    ->addLegend('section_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
+    ->addLegend('emergency_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
+    ->addLegend('avatar_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
+    ->addField(array('avatar'), 'avatar_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('foodHabits'), 'food_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
+    ->addField(array('isSacMember', 'sacMemberId', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'phoneBusiness', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'), 'section_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('emergencyPhone', 'emergencyPhoneName'), 'emergency_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('default', 'tl_member');
+
 /**
  * Table tl_member
  */
@@ -117,16 +130,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['profession'] = array(
 // addressExtra
 $GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['addressExtra'],
-    'exclude'   => true,
-    'search'    => true,
-    'inputType' => 'text',
-    'eval'      => array('maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'),
-    'sql'       => "varchar(255) NOT NULL default ''",
-);
-
-// street
-$GLOBALS['TL_DCA']['tl_member']['fields']['street'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_member']['street'],
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
