@@ -112,7 +112,7 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
         $objForm->addFormField('event-type', array(
             'label'     => array('Event-Typ auswählen', ''),
             'inputType' => 'select',
-            'options'   => array('tour' => 'Tour', 'course' => 'Kurs'),
+            'options'   => array('all' => 'Alle Events', 'tour' => 'Tour', 'course' => 'Kurs'),
         ));
 
         $objForm->addFormField('startDate', array(
@@ -150,29 +150,34 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
             if (Input::post('FORM_SUBMIT') === 'form-event-member-export')
             {
                 $eventType = Input::post('event-type');
-                $arrFields = array('id', 'eventId', 'eventName', 'startDate', 'endDate', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'hasParticipated', 'stateOfSubscription', 'addedOn');
+                $arrFields = array('id', 'eventId', 'eventName', 'startDate', 'endDate', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'addedOn');
                 $startDate = strtotime(Input::post('startDate'));
                 $endDate = strtotime(Input::post('endDate'));
 
-                $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE eventType=? AND startDate>=? AND startDate<=? ORDER BY startDate')->execute($eventType, $startDate, $endDate);
+                $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate')->execute($startDate, $endDate);
                 $this->getHeadline($arrFields);
                 while ($objEvent->next())
                 {
-                    $skipRecord = false;
+                    if ($eventType != 'all')
+                    {
+                        if ($objEvent->eventType != $eventType)
+                        {
+                            continue;
+                        }
+                    }
+
                     if (Input::post('mountainguide'))
                     {
                         if (!$objEvent->mountainguide)
                         {
-                            $skipRecord = true;
+                            continue;
                         }
                     }
-                    if (!$skipRecord)
+
+                    $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname')->execute($objEvent->id);
+                    while ($objEventMember->next())
                     {
-                        $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname')->execute($objEvent->id);
-                        while ($objEventMember->next())
-                        {
-                            $this->addLine($arrFields, $objEventMember);
-                        }
+                        $this->addLine($arrFields, $objEventMember);
                     }
                 }
                 $this->printCsv(sprintf('Event-Member-Export_%s.csv', Date::parse('Y-m-d')));

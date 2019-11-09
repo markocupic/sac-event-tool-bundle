@@ -418,6 +418,7 @@ class ModuleSacEventToolEventRegistrationForm extends Module
                     $arrData['eventId'] = $this->objEvent->id;
                     $arrData['addedOn'] = time();
                     $arrData['stateOfSubscription'] = 'subscription-not-confirmed';
+                    $arrData['bookingType'] = 'onlineForm';
 
                     // Save emergency phone number to user profile
                     if ($objMemberModel->emergencyPhone == '')

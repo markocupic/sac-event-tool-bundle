@@ -59,7 +59,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['addEmailAttachment'] = array("
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['emailAttachment'] = array("Dateien ausw&auml;hlen", "W&auml;hlen Sie die Dateien aus dem Dateibaum aus.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['eventName'] = array("Eventname", "Geben Sie bitte den Eventnamen ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['anonymized'] = array("Eingaben anonymisiert", "");
-
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['bookingType'] = array("Buchungsart", "Geben Sie an über welchen Zugang der Teilnehmer gebucht hat.");
 
 // References
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['subscription-not-confirmed'] = 'Anmeldung nicht best&auml;tigt';

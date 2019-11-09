@@ -19,6 +19,7 @@ use Contao\Controller;
 use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
+use Contao\FrontendTemplate;
 use Contao\Input;
 use Contao\StringUtil;
 use Contao\Validator;
@@ -144,8 +145,17 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $this->generateForm();
 
         $this->Template->form = $this->objForm;
-        $this->Template->allEventsTable = $this->allEventsTable;
+
+        // Course table
+        $objPartial = new FrontendTemplate('mod_sac_event_tool_event_pilatus_export_all_event_table_partial');
+        $objPartial->eventTable = $this->courseTable;
+        $this->Template->courseTable = $objPartial->parse();
         $this->Template->courses = $this->courses;
+
+        // Tour table
+        $objPartial = new FrontendTemplate('mod_sac_event_tool_event_pilatus_export_all_event_table_partial');
+        $objPartial->eventTable = $this->tourTable;
+        $this->Template->tourTable = $objPartial->parse();
         $this->Template->tours = $this->tours;
         $this->Template->generalEvents = $this->generalEvents;
     }
@@ -259,7 +269,9 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             if ($this->startDate && $this->endDate)
             {
                 $this->eventReleaseLevel = Input::post('eventReleaseLevel') > 0 ? Input::post('eventReleaseLevel') : null;
-                $this->generateAllEventsTable();
+                $this->courseTable = $this->generateEventTable(['course']);
+                $this->tourTable = $this->generateEventTable(['tour', 'generalEvent']);
+
                 $this->generateCourses();
                 $this->generateEvents('tour');
                 $this->generateEvents('generalEvent');
@@ -269,11 +281,12 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $this->objForm = $objForm;
     }
 
-
     /**
-     *
+     * @param $arrAllowedEventType
+     * @return array|null
+     * @throws \Exception
      */
-    protected function generateAllEventsTable()
+    protected function generateEventTable($arrAllowedEventType)
     {
         $objDatabase = Database::getInstance();
         $arrTours = array();
@@ -281,6 +294,11 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $oEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate ASC')->execute($this->startDate, $this->endDate);
         while ($oEvent->next())
         {
+
+            if(!in_array($oEvent->eventType, $arrAllowedEventType))
+            {
+                continue;
+            }
 
             $objEvent = CalendarEventsModel::findByPk($oEvent->id);
             if (null === $objEvent)
@@ -323,7 +341,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             $arrTours[] = $arrRow;
         }
 
-        $this->allEventsTable = count($arrTours) > 0 ? $arrTours : null;
+        return count($arrTours) > 0 ? $arrTours : null;
     }
 
     /**
@@ -432,7 +450,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $objDatabase = Database::getInstance();
         $arrEvents = array();
 
-        $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE eventType=? AND startDate>=? AND startDate<=? ORDER BY startDate ASC')->execute('course', $this->startDate, $this->endDate);
+        $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE eventType=? AND startDate>=? AND startDate<=? ORDER BY courseTypeLevel0, courseId, courseTypeLevel1, startDate ASC')->execute('course', $this->startDate, $this->endDate);
         while ($objEvent->next())
         {
             $eventModel = CalendarEventsModel::findByPk($objEvent->id);

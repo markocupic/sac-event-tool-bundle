@@ -17,14 +17,45 @@
 <button class="btn btn-info enable-fe-editing" data-label-enable="Frontend Editing aktivieren" data-label-disable="Frontend Editing deaktivieren">Frontend Editing aktivieren</button>
 <button class="btn btn-danger toggle-recurring-events" data-label-hide="Wiederkehrende Events ausblenden" data-label-show="Wiederkehrende Events einblenden">Wiederkehrende Events ausblenden</button>
 
-<!-- course table -->
-<h3 class="ce_headline">Monatsprogramm Kurse</h3>
-<?php if (!$this->courseTable): ?>
+<!-- all events as a table -->
+<h3 class="ce_headline">Monatsprogramm alle Events</h3>
+<?php if (!$this->allEventsTable): ?>
   <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
 <?php endif; ?>
-<?php if ($this->courseTable): ?>
-  <!-- insert partial -->
-  <?= $this->courseTable ?>
+<?php if ($this->allEventsTable): ?>
+  <table class="event-export-table table table-sm">
+    <thead>
+    <tr class="event-export-row-header">
+      <th class="event-export-date">Datum</th>
+      <th class="event-export-weekday">Zeit</th>
+      <th class="event-export-title">Titel</th>
+      <th class="event-export-tour-type">Veranstaltungsart</th>
+      <th class="event-export-instructors">Leiter</th>
+      <th class="event-export-organizers">Gruppe</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php $week = 0; ?>
+    <?php foreach ($this->allEventsTable as $arrEvent): ?>
+        <?php if ($week != $arrEvent['week']): ?>
+        <tr class="event-export-row-body">
+            <?php $week = $arrEvent['week']; ?>
+          <td class="event-export-weeknumber" colspan="6" style="text-align:center"><strong>Woche <?= $arrEvent['week'] ?></strong></td>
+        </tr>
+        <?php endif; ?>
+      <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-date"><?= $arrEvent['eventDates'] ?></td>
+        <td class="event-export-weekday"><?= $arrEvent['weekday'] ?></td>
+        <td class="event-export-title"><?= $arrEvent['title'] ?></td>
+        <td class="event-export-tour-type"><?= $arrEvent['tourType'] ?></td>
+        <td class="event-export-instructors"><?= $arrEvent['instructors'] ?></td>
+        <td class="event-export-organizers"><?= $arrEvent['organizers'] ?></td>
+      </tr>
+
+    <?php endforeach; ?>
+    </tbody>
+  </table>
+
 <?php endif; ?>
 
 
@@ -182,19 +213,6 @@
 
 <?php endif; ?>
 
-
-
-
-
-<h3 class="ce_headline">Monatsprogramm Touren</h3>
-<?php if (!$this->tourTable): ?>
-<p>Zu dieser Anfrage wurden keine Events gefunden!</p>
-<?php endif; ?>
-<?php if ($this->tourTable): ?>
-  <!-- insert partial -->
-  <?= $this->tourTable ?>
-<?php endif; ?>
-
 <!-- tours grouped by organizers -->
 <?php $arrTypes = array('tours', 'generalEvents'); ?>
 <?php foreach($arrTypes as $type): ?>
@@ -309,12 +327,11 @@
             <?php $arrText = array(); ?>
             <?php if (!$arrEvent['disableOnlineRegistration']): ?>
               <?php $arrText[] = sprintf("Online Anmeldung: Tour-/Anlassnummer: %s-%s", Date::parse('Y', $arrEvent['startDate']), $arrEvent['id'], $arrEvent['bookingEvent']); ?>
+            <?php else: ?>
+              <?php if($arrEvent['bookingEvent'] != ''): ?>
+                <?php $arrText[] = $arrEvent['bookingEvent']; ?>
+              <?php endif; ?>
             <?php endif; ?>
-            <?php if($arrEvent['bookingEvent'] != ''): ?>
-            <!-- experimental: Redaktion muss diese Einträge prüfen und evtl. doppelt vorhandene Inhalte manuell löschen -->
-            <?php $arrText[] = '<span style="background-color: #FFFF00">' . trim($arrEvent['bookingEvent']) . '</span>'; ?>
-            <?php endif; ?>
-            <!-- end experimental --->
 
             <?php if(($strBookingPeriod = Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingPeriod($arrEvent['id'], 'd.m.', 'd.m.Y')) != ''): ?>
             <?php $arrText[] = 'Anmeldezeitraum: <time>' . $strBookingPeriod . '</time>'; ?>

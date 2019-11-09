@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 /**
  * Table tl_calendar_events_member
  */
@@ -165,7 +164,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
     'palettes'    => array
     (
         '__selector__'    => array('addEmailAttachment'),
-        'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn;{notes_legend},carInfo,ticketInfo,notes;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,foodHabits;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;',
+        'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn;{notes_legend},carInfo,ticketInfo,notes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,foodHabits;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;',
         'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy;',
         'refuseWithEmail' => 'refuseWithEmail;',
         'acceptWithEmail' => 'acceptWithEmail;',
@@ -380,11 +379,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
         ),
         'sacMemberId'         => array
         (
-            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['sacMemberId'],
-            'inputType' => 'text',
+            'label'         => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['sacMemberId'],
+            'inputType'     => 'text',
             'save_callback' => array(array('tl_calendar_events_member', 'saveCallbackSacMemberId')),
-            'eval'      => array('doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'),
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval'          => array('doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'),
+            'sql'           => "varchar(255) NOT NULL default ''",
         ),
         'foodHabits'          => array
         (
@@ -449,12 +448,21 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'eval'      => array('doNotShow' => true, 'doNotCopy' => true,),
             'sql'       => "char(1) NOT NULL default ''",
         ),
-        'anonymized'       => array
+        'anonymized'          => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['anonymized'],
             'inputType' => 'checkbox',
             'eval'      => array('doNotShow' => true, 'doNotCopy' => true,),
             'sql'       => "char(1) NOT NULL default ''",
+        ),
+        'bookingType'         => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['bookingType'],
+            'exclude'   => true,
+            'inputType' => 'select',
+            'options'   => array('onlineForm', 'manually'),
+            'eval'      => array('doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true,),
+            'sql'       => "varchar(255) NOT NULL default 'manually'",
         ),
     ),
 );
