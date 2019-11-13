@@ -105,7 +105,6 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             return $objTemplate->parse();
         }
 
-
         if (Input::post('FORM_SUBMIT') === 'edit-event')
         {
             $set = array();
@@ -128,17 +127,14 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
 
         Controller::loadLanguageFile('tl_calendar_events');
 
-
         return parent::generate();
     }
-
 
     /**
      * Generate the module
      */
     protected function compile()
     {
-
         // Load language file
         Controller::loadLanguageFile('tl_calendar_events');
 
@@ -160,18 +156,15 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $this->Template->generalEvents = $this->generalEvents;
     }
 
-
     /**
      * @return Form
      */
     protected function generateForm()
     {
-
         $objForm = new Form('form-pilatus-export', 'POST', function ($objHaste) {
             return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
         $objForm->setFormActionFromUri(Environment::get('uri'));
-
 
         $range = array();
         $range[0] = '---';
@@ -186,7 +179,6 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             $key = Date::parse("Y-m-01", strtotime($i . " month")) . '|' . Date::parse("Y-m-t", strtotime($i + 1 . "  month"));
             $range[$key] = Date::parse("01.m.Y", strtotime($i . " month")) . '-' . Date::parse("t.m.Y", strtotime($i + 1 . "  month"));
         }
-
 
         // Now let's add form fields:
         $objForm->addFormField('timeRange', array(
@@ -219,7 +211,6 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             'options'   => array(1 => 'FS1', 2 => 'FS2', 3 => 'FS3', 4 => 'FS4'),
             'eval'      => array('mandatory' => false, 'includeBlankOption' => true),
         ));
-
 
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
@@ -294,8 +285,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $oEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate ASC')->execute($this->startDate, $this->endDate);
         while ($oEvent->next())
         {
-
-            if(!in_array($oEvent->eventType, $arrAllowedEventType))
+            if (!in_array($oEvent->eventType, $arrAllowedEventType))
             {
                 continue;
             }
@@ -335,7 +325,6 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 $arrEventType[] = 'KU';
             }
             $arrRow['tourType'] = implode(', ', $arrEventType);
-
 
             // Add row to $arrTour
             $arrTours[] = $arrRow;
@@ -383,7 +372,6 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
 
         $dateFormatShortened = array();
 
-
         if ($dateFormat === 'd.')
         {
             $dateFormatShortened['from'] = 'd.';
@@ -411,7 +399,6 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             $dateFormatShortened['from'] = 'j.';
             $dateFormatShortened['to'] = 'j.m.';
         }
-
 
         $eventDuration = count(CalendarEventsHelper::getEventTimestamps($id));
         $span = Calendar::calculateSpan(CalendarEventsHelper::getStartDate($id), CalendarEventsHelper::getEndDate($id)) + 1;
@@ -450,52 +437,60 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $objDatabase = Database::getInstance();
         $arrEvents = array();
 
-        $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE eventType=? AND startDate>=? AND startDate<=? ORDER BY courseTypeLevel0, courseId, courseTypeLevel1, startDate ASC')->execute('course', $this->startDate, $this->endDate);
-        while ($objEvent->next())
+        // Order By tl_course_main_type, tl_course_sub_type
+        $objCourseMainType = $objDatabase->execute('SELECT * FROM tl_course_main_type ORDER BY code');
+        while ($objCourseMainType->next())
         {
-            $eventModel = CalendarEventsModel::findByPk($objEvent->id);
-            if (null === $eventModel)
+            $objCourseSubType = $objDatabase->prepare('SELECT * FROM tl_course_sub_type WHERE pid=? ORDER BY code')->execute($objCourseMainType->id);
+            while ($objCourseSubType->next())
             {
-                continue;
+                $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE eventType=? AND startDate>=? AND startDate<=? AND courseTypeLevel1=? ORDER BY courseId, startDate ASC')->execute('course', $this->startDate, $this->endDate, $objCourseSubType->id);
+                while ($objEvent->next())
+                {
+                    $eventModel = CalendarEventsModel::findByPk($objEvent->id);
+                    if (null === $eventModel)
+                    {
+                        continue;
+                    }
+
+                    // Check if event has allowed type
+                    $arrAllowedEventTypes = StringUtil::deserialize($this->print_export_allowedEventTypes, true);
+                    if (!in_array($eventModel->eventType, $arrAllowedEventTypes))
+                    {
+                        continue;
+                    }
+
+                    // Check if event is on an enough high level
+                    if (!$this->hasValidReleaseLevel($eventModel, $this->eventReleaseLevel))
+                    {
+                        continue;
+                    }
+
+                    // Call helper method
+                    $arrRow = $this->getEventDetails($eventModel);
+
+                    // Headline
+                    $arrHeadline = array();
+                    $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'j.-j. F');
+                    $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'D');
+                    $arrHeadline[] = $eventModel->title;
+                    if (isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$eventModel->courseLevel]))
+                    {
+                        $arrHeadline[] = 'Kursstufe ' . $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$eventModel->courseLevel];
+                    }
+                    if ($eventModel->courseId != '')
+                    {
+                        $arrHeadline[] = 'Kurs-Nr. ' . $eventModel->courseId;
+                    }
+                    $arrRow['headline'] = implode(' > ', $arrHeadline);
+
+                    // Fe-editable textareas
+                    $arrRow['feEditables'] = array('teaser', 'issues', 'terms', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous',);
+
+                    // Add row to $arrTour
+                    $arrEvents[] = $arrRow;
+                }
             }
-
-            // Check if event has allowed type
-            $arrAllowedEventTypes = StringUtil::deserialize($this->print_export_allowedEventTypes, true);
-            if (!in_array($eventModel->eventType, $arrAllowedEventTypes))
-            {
-                continue;
-            }
-
-            // Check if event is on an enough high level
-            if (!$this->hasValidReleaseLevel($eventModel, $this->eventReleaseLevel))
-            {
-                continue;
-            }
-
-            // Call helper method
-            $arrRow = $this->getEventDetails($eventModel);
-
-            // Headline
-            $arrHeadline = array();
-            $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'j.-j. F');
-            $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'D');
-            $arrHeadline[] = $eventModel->title;
-            if (isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$eventModel->courseLevel]))
-            {
-                $arrHeadline[] = 'Kursstufe ' . $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$eventModel->courseLevel];
-            }
-            if ($eventModel->courseId != '')
-            {
-                $arrHeadline[] = 'Kurs-Nr. ' . $eventModel->courseId;
-            }
-            $arrRow['headline'] = implode(' > ', $arrHeadline);
-
-            // Fe-editable textareas
-            $arrRow['feEditables'] = array('teaser', 'issues', 'terms', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous',);
-
-            // Add row to $arrTour
-            $arrEvents[] = $arrRow;
-
         }
         $this->courses = count($arrEvents) > 0 ? $arrEvents : null;
     }
@@ -518,7 +513,6 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE (eventType=?) AND startDate>=? AND startDate<=? ORDER BY startDate ASC')->execute($type, $this->startDate, $this->endDate);
             while ($objEvent->next())
             {
-
                 $eventModel = CalendarEventsModel::findByPk($objEvent->id);
                 if (null === $eventModel)
                 {
@@ -564,7 +558,6 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
 
                 // Add row to $arrOrganizerEvents
                 $arrOrganizerEvents[] = $arrRow;
-
             }
 
             $arrOrganizerContainer[] = array(
@@ -573,11 +566,9 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 'events'      => $arrOrganizerEvents,
                 'feEditables' => $arrFeEditables
             );
-
         }
 
         $this->{$type . 's'} = $arrOrganizerContainer;
-
     }
 
     /**
@@ -598,7 +589,6 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         $arrRow['tourProfile'] = implode('<br>', CalendarEventsHelper::getTourProfileAsArray($objEvent->id));
         $arrRow['journey'] = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : '';
 
-
         // Textareas
         $arrTextareas = array('teaser', 'terms', 'issues', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous',);
         foreach ($arrTextareas as $field)
@@ -607,7 +597,6 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             $arrRow[$field] = $this->searchAndReplace($arrRow[$field]);
             $arrFeEditables[] = $field;
         }
-
 
         if ($objEvent->setRegistrationPeriod)
         {
@@ -625,7 +614,6 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             $arrMinMaxMembers[] = 'max. ' . $objEvent->maxMembers;
         }
         $arrRow['minMaxMembers'] = implode('/', $arrMinMaxMembers);
-
 
         return $arrRow;
     }

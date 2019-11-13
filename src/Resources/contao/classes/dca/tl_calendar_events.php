@@ -10,6 +10,7 @@
 
 use League\Csv\CharsetConverter;
 use League\Csv\Writer;
+use Contao\Database;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
@@ -1249,6 +1250,20 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         foreach ($opt as $k => $v)
         {
             $arrOpt[] = $k;
+        }
+        return $arrOpt;
+    }
+
+    /**
+     * @return array
+     */
+    public function optionsCallbackCourseTypeLevel0()
+    {
+        $arrOpt = array();
+        $objDatabase = Database::getInstance()->execute('SELECT * FROM tl_course_main_type ORDER BY code');
+        while ($objDatabase->next())
+        {
+            $arrOpt[$objDatabase->id] = $objDatabase->name;
         }
         return $arrOpt;
     }

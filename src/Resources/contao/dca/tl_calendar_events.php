@@ -397,15 +397,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel'] = array(
 
 // Course Type Level_0
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0'] = array(
-    'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseTypeLevel0'],
-    'exclude'    => true,
-    'search'     => true,
-    'filter'     => true,
-    'inputType'  => 'select',
-    'foreignKey' => 'tl_course_main_type.name',
-    'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
-    'eval'       => array('tl_class' => 'clr m12', 'submitOnChange' => true, 'includeBlankOption' => true, 'multiple' => false, 'mandatory' => true),
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
+    'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseTypeLevel0'],
+    'exclude'          => true,
+    'search'           => true,
+    'filter'           => true,
+    'inputType'        => 'select',
+    'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCallbackCourseTypeLevel0'),
+    'eval'             => array('tl_class' => 'clr m12', 'submitOnChange' => true, 'includeBlankOption' => true, 'multiple' => false, 'mandatory' => true),
+    'sql'              => "int(10) unsigned NOT NULL default '0'",
 );
 
 // Course Type Level_1
