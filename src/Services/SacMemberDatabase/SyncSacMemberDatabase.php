@@ -112,14 +112,20 @@ class SyncSacMemberDatabase
             if (is_file($localFile))
             {
                 unlink($localFile);
-                if ($this->testMode) echo 'Deleting old/unused file: ' . $localFile . '<br>';
+                if ($this->testMode)
+                {
+                    echo 'Deleting old/unused file: ' . $localFile . '<br>';
+                }
             }
 
             $remoteFile = 'Adressen_0000' . $sectionId . '.csv';
             if ($this->downloadFileFromFtp($connId, $localFile, $remoteFile))
             {
                 // Write csv file to the tmp folder
-                if ($this->testMode) echo 'Downloaded ' . $remoteFile . ' to the tmp folder.' . '<br>';
+                if ($this->testMode)
+                {
+                    echo 'Downloaded ' . $remoteFile . ' to the tmp folder.' . '<br>';
+                }
             }
         }
         \ftp_close($connId);
@@ -136,14 +142,20 @@ class SyncSacMemberDatabase
         if (!\ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId)
         {
             $msg = 'Could not establish ftp connection to ' . $this->ftp_hostname;
-            if ($this->testMode) echo $msg . '<br>';
+            if ($this->testMode)
+            {
+                echo $msg . '<br>';
+            }
             $this->log($msg,
                 __FILE__ . ' Line: ' . __LINE__,
                 TL_ERROR
             );
             throw new \Exception($msg);
         }
-        if ($this->testMode) echo 'Open FTP Connection with: ' . $this->ftp_hostname . '<br><br>';
+        if ($this->testMode)
+        {
+            echo 'Open FTP Connection with: ' . $this->ftp_hostname . '<br><br>';
+        }
         return $connId;
     }
 
@@ -161,7 +173,10 @@ class SyncSacMemberDatabase
         if (!$connId)
         {
             $msg = 'Could not find/download ' . $remoteFile . ' from ' . $this->ftp_hostname;
-            if ($this->testMode) echo $msg . '<br>';
+            if ($this->testMode)
+            {
+                echo $msg . '<br>';
+            }
             $this->log($msg,
                 __FILE__ . ' Line: ' . __LINE__,
                 TL_ERROR
@@ -281,7 +296,7 @@ class SyncSacMemberDatabase
                     // Add new user
                     $this->connection->insert('tl_member', $arrValues);
                     $this->log(
-                        \sprintf('Insert new SAC-member with SAC-User-ID: %s to tl_member.', $arrValues['sacMemberId']),
+                        \sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']),
                         __FILE__ . ' Line: ' . __LINE__,
                         self::SAC_EVT_LOG_ADD_NEW_MEMBER
                     );
