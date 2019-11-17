@@ -69,6 +69,11 @@
             <div mb-3>... lade Events ...</div>
         </div>
     </div>
+    <div v-if="isBusy === false && enableAutoloading === false && allEventsLoaded === false" v-on:click="prepareRequest()">
+        <div class="d-flex justify-content-center">
+        <button class="btn btn-lg btn-danger btn-block">Lade weitere Events</button>
+        </div>
+    </div>
 </div>
 
 <!-- Preparing the Eventlist object -->
@@ -84,7 +89,7 @@
     <?php echo $this->events; ?>
 </script>
 
-<script src="bundles/markocupicsaceventtool/js/eventlist_vue.js"></script>
+<script src="bundles/markocupicsaceventtool/js/eventlist-vue.js"></script>
 
 <?php endif; ?>
 
