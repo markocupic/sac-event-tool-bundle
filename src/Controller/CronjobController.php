@@ -82,6 +82,7 @@ class CronjobController extends AbstractController
      */
     public function generateWorkshopPdfBooklet()
     {
+
         // Initialize contao framework
         System::getContainer()->get('contao.framework')->initialize();
 
