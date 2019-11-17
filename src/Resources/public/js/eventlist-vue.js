@@ -24,7 +24,9 @@ new Vue({
             // If set to false use the button on the bottom of the list to load more items
             enableAutoloading: false,
             // Load x items per request
-            itemsPerRequest: 100,
+            itemsPerRequest: 200,
+            // Set number of items that are loaded onthe first request
+            itemsOnFirstRequest: 100,
             // If set to true all items will be loaded at once on the second request
             loadAllOnSecondRequest: false,
 
@@ -63,14 +65,14 @@ new Vue({
             var self = this;
             var ids = [];
             var counter = 0;
-            var itemsPerRequest = 100;
+            var itemsPerRequest = self.itemsPerRequest;
 
             if (self.allEventsLoaded === true) {
                 return;
             }
 
             if (self.loadedItems === 0) {
-                itemsPerRequest = self.itemsPerRequest;
+                itemsPerRequest = self.itemsOnFirstRequest;
             }
 
             if (self.loadedItems > 0 && self.loadAllOnSecondRequest === true) {
