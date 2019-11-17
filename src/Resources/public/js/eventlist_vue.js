@@ -24,7 +24,7 @@ new Vue({
             loadedItems: 0,
             interval: null,
             allEventsLoaded: false,
-            loadAtOnce: 150,
+            loadAtOnce: 80,
             loadAllOnSecondRequest: true
         };
     },
@@ -87,7 +87,7 @@ new Vue({
                     self.loadedItems++;
                 });
                 window.setTimeout(function () {
-                    $(self.$el).find('[data-toggle="tooltip"]').tooltip();
+                    $('#eventList').find('[data-toggle="tooltip"]').tooltip();
                 }, 100);
             });
         }

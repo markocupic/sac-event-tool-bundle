@@ -97,6 +97,7 @@ class CalendarEventsHelper
                 break;
             case 'eventId':
                 $value = sprintf('%s-%s', Date::parse('Y', $objEvent->startDate), $objEvent->id);
+                break;
             case 'eventTitle':
                 $value = Controller::replaceInsertTags(sprintf('{{event_title::%s}}', $objEvent->id));
                 break;
