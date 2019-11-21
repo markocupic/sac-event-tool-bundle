@@ -609,7 +609,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod'] = ar
 // Set registration start date
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationStartDate'],
-    'default'   => time(),
+    'default'   => strtotime(\Contao\Date::parse('Y-m-d')),
     'exclude'   => true,
     'inputType' => 'text',
     'eval'      => array('rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
@@ -619,7 +619,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = ar
 // Set registration end date
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationEndDate'],
-    'default'   => time(),
+    'default'   => strtotime(\Contao\Date::parse('Y-m-d')) + 24 * 3600,
     'exclude'   => true,
     'inputType' => 'text',
     'eval'      => array('rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
