@@ -52,7 +52,7 @@ class tl_event_filter_form extends Backend
     public function getOrganizers()
     {
         $arrOptions = array();
-        $objOrganizer = Contao\EventOrganizerModel::findAll();
+        $objOrganizer = Contao\Database::getInstance()->prepare('SELECT * FROM tl_event_organizer WHERE hideInEventFilter=? ORDER BY sorting')->execute('');
         while ($objOrganizer->next())
         {
             $arrOptions[$objOrganizer->id] = $objOrganizer->title;

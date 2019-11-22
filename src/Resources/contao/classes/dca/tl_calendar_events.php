@@ -1257,6 +1257,20 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     /**
      * @return array
      */
+    public function optionsCallbackGetOrganizers()
+    {
+        $arrOptions = array();
+        $objOrganizer = Database::getInstance()->prepare('SELECT * FROM tl_event_organizer ORDER BY sorting')->execute();
+        while ($objOrganizer->next())
+        {
+            $arrOptions[$objOrganizer->id] = $objOrganizer->title;
+        }
+        return $arrOptions;
+    }
+
+    /**
+     * @return array
+     */
     public function optionsCallbackCourseTypeLevel0()
     {
         $arrOpt = array();

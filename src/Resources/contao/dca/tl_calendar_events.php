@@ -423,16 +423,15 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1'] = array(
 
 // organizers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['organizers'] = array(
-    'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['organizers'],
-    'exclude'    => true,
-    'search'     => true,
-    'filter'     => true,
-    'sorting'    => true,
-    'inputType'  => 'select',
-    'foreignKey' => 'tl_event_organizer.title',
-    'relation'   => array('type' => 'hasMany', 'load' => 'lazy'),
-    'eval'       => array('multiple' => true, 'chosen' => true, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr m12'),
-    'sql'        => "blob NULL",
+    'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['organizers'],
+    'exclude'          => true,
+    'search'           => true,
+    'filter'           => true,
+    'sorting'          => true,
+    'inputType'        => 'select',
+    'options_callback' => array('tl_calendar_events_sac_event_tool', 'optionsCallbackGetOrganizers'),
+    'eval'             => array('multiple' => true, 'chosen' => true, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr m12'),
+    'sql'              => "blob NULL",
 );
 
 // equipment

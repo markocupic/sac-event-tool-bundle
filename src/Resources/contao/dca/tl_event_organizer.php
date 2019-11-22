@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 $GLOBALS['TL_DCA']['tl_event_organizer'] = array
 (
 
@@ -83,7 +82,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
     'palettes'    => array
     (
         '__selector__' => array('addLogo'),
-        'default'      => '{title_legend},title,titlePrint,sorting;{eventList_legend},ignoreFilterInEventList;{event_regulation_legend},tourRegulationExtract,tourRegulationSRC,courseRegulationExtract,courseRegulationSRC;{event_story_legend},notifyWebmasterOnNewEventStory;{emergency_concept_legend},emergencyConcept;{logo_legend},addLogo',
+        'default'      => '{title_legend},title,titlePrint,sorting;{eventList_legend},ignoreFilterInEventList,hideInEventFilter;{event_regulation_legend},tourRegulationExtract,tourRegulationSRC,courseRegulationExtract,courseRegulationSRC;{event_story_legend},notifyWebmasterOnNewEventStory;{emergency_concept_legend},emergencyConcept;{logo_legend},addLogo',
     ),
     // Subpalettes
     'subpalettes' => array
@@ -131,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
             'eval'      => array('rgxp' => 'digit', 'mandatory' => true, 'maxlength' => 255),
             'sql'       => "int(10) unsigned NOT NULL default '0'",
         ),
-        'ignoreFilterInEventList'                        => array
+        'ignoreFilterInEventList'        => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['ignoreFilterInEventList'],
             'exclude'   => true,
@@ -139,35 +138,43 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
             'eval'      => array('tl_class' => 'clr m12'),
             'sql'       => "char(1) NOT NULL default ''",
         ),
-        'tourRegulationExtract'               => array(
+        'hideInEventFilter'              => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['hideInEventFilter'],
+            'exclude'   => true,
+            'inputType' => 'checkbox',
+            'eval'      => array('tl_class' => 'clr m12'),
+            'sql'       => "char(1) NOT NULL default ''",
+        ),
+        'tourRegulationExtract'          => array(
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationExtract'],
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => array('tl_class' => 'clr m12', 'rte'=>'tinyMCE', 'helpwizard'=>true,'mandatory' => true),
+            'eval'      => array('tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true),
             'sql'       => "text NULL",
         ),
-        'courseRegulationExtract'               => array(
+        'courseRegulationExtract'        => array(
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationExtract'],
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => array('tl_class' => 'clr m12', 'rte'=>'tinyMCE', 'helpwizard'=>true,'mandatory' => true),
+            'eval'      => array('tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true),
             'sql'       => "text NULL",
         ),
-        'tourRegulationSRC'                      => array
+        'tourRegulationSRC'              => array
         (
-            'label'         => &$GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationSRC'],
-            'exclude'       => true,
-            'inputType'     => 'fileTree',
-            'eval'          => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'),
-            'sql'           => "binary(16) NULL",
+            'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationSRC'],
+            'exclude'   => true,
+            'inputType' => 'fileTree',
+            'eval'      => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'),
+            'sql'       => "binary(16) NULL",
         ),
-        'courseRegulationSRC'                      => array
+        'courseRegulationSRC'            => array
         (
-            'label'         => &$GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationSRC'],
-            'exclude'       => true,
-            'inputType'     => 'fileTree',
-            'eval'          => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'),
-            'sql'           => "binary(16) NULL",
+            'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationSRC'],
+            'exclude'   => true,
+            'inputType' => 'fileTree',
+            'eval'      => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'),
+            'sql'       => "binary(16) NULL",
         ),
         'singleSRC'                      => array
         (
