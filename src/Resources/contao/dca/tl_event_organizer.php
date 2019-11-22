@@ -83,7 +83,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
     'palettes'    => array
     (
         '__selector__' => array('addLogo'),
-        'default'      => '{title_legend},title,titlePrint,sorting;{event_regulation_legend},tourRegulationExtract,tourRegulationSRC,courseRegulationExtract,courseRegulationSRC;{event_story_legend},notifyWebmasterOnNewEventStory;{emergency_concept_legend},emergencyConcept;{logo_legend},addLogo',
+        'default'      => '{title_legend},title,titlePrint,sorting;{eventList_legend},ignoreFilterInEventList;{event_regulation_legend},tourRegulationExtract,tourRegulationSRC,courseRegulationExtract,courseRegulationSRC;{event_story_legend},notifyWebmasterOnNewEventStory;{emergency_concept_legend},emergencyConcept;{logo_legend},addLogo',
     ),
     // Subpalettes
     'subpalettes' => array
@@ -130,6 +130,14 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
             'inputType' => 'text',
             'eval'      => array('rgxp' => 'digit', 'mandatory' => true, 'maxlength' => 255),
             'sql'       => "int(10) unsigned NOT NULL default '0'",
+        ),
+        'ignoreFilterInEventList'                        => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['ignoreFilterInEventList'],
+            'exclude'   => true,
+            'inputType' => 'checkbox',
+            'eval'      => array('tl_class' => 'clr m12'),
+            'sql'       => "char(1) NOT NULL default ''",
         ),
         'tourRegulationExtract'               => array(
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationExtract'],

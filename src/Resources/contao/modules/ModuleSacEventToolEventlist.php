@@ -16,6 +16,7 @@ use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
+use Contao\EventOrganizerModel;
 use Contao\Events;
 use Contao\FilesModel;
 use Contao\FrontendTemplate;
@@ -196,6 +197,7 @@ class ModuleSacEventToolEventlist extends Events
     }
 
     /**
+     * Filter events
      * @return array
      */
     protected function getEvents()
@@ -278,7 +280,11 @@ class ModuleSacEventToolEventlist extends Events
             if (Input::get('organizers') != '')
             {
                 // The organizers GET param can be transmitted like this: organizers=5
-                if (is_numeric(Input::get('organizers')))
+                if (is_array(Input::get('organizers')))
+                {
+                    $arrOrganizers = Input::get('organizers');
+                }
+                elseif (is_numeric(Input::get('organizers')))
                 {
                     $arrOrganizers = [Input::get('organizers')];
                 }
@@ -292,8 +298,24 @@ class ModuleSacEventToolEventlist extends Events
                     // Or the organizers GET param can be transmitted like this: organizers[]=5&organizers[]=7&organizers[]=3
                     $arrOrganizers = StringUtil::deserialize(Input::get('organizers'), true);
                 }
-                $eventOrganizers = StringUtil::deserialize($event['organizers'], true);
-                if (count(array_intersect($arrOrganizers, $eventOrganizers)) < 1)
+
+                $arrEventOrganizers = StringUtil::deserialize($event['organizers'], true);
+                $objEventOrganizerModel = EventOrganizerModel::findByIds($arrEventOrganizers);
+                $blnIgnoreOrganizerFilter = false;
+                if ($objEventOrganizerModel !== null)
+                {
+                    while ($objEventOrganizerModel->next())
+                    {
+                        // Ignore organizers filter if event belongs to organizer where the ignoreFilterInEventList flas is set to true
+                        // tl_event_organizer.ignoreFilterInEventList
+                        // Thanks to Peter Erni, 22.11.2019
+                        if ($objEventOrganizerModel->ignoreFilterInEventList)
+                        {
+                            $blnIgnoreOrganizerFilter = true;
+                        }
+                    }
+                }
+                if ($blnIgnoreOrganizerFilter === false && count(array_intersect($arrOrganizers, $arrEventOrganizers)) < 1)
                 {
                     continue;
                 }

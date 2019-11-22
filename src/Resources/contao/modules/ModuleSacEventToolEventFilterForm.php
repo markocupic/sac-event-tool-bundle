@@ -150,7 +150,11 @@ class ModuleSacEventToolEventEventFilterForm extends Module
                         {
                             $arrOrganizers = [];
                             // The organizers GET param can be transmitted like this: organizers=5
-                            if (is_numeric(Input::get('organizers')))
+                            if (is_array(Input::get('organizers')))
+                            {
+                                $arrOrganizers = Input::get('organizers');
+                            }
+                            elseif (is_numeric(Input::get('organizers')))
                             {
                                 $arrOrganizers = [Input::get('organizers')];
                             }
