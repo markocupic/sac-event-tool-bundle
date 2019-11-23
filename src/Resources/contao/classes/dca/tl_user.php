@@ -29,7 +29,6 @@ class tl_user_sac_event_tool extends Backend
         }
     }
 
-
     /**
      * See readonly fields
      * @param DataContainer $dc
@@ -37,7 +36,7 @@ class tl_user_sac_event_tool extends Backend
     public function addReadonlyAttributeToSyncedFields(DataContainer $dc)
     {
         // User profile
-        if(Input::get('do') === 'login')
+        if (Input::get('do') === 'login')
         {
             if (Input::get('do') === 'login')
             {
@@ -87,7 +86,6 @@ class tl_user_sac_event_tool extends Backend
      */
     public function onloadCallback(DataContainer $dc)
     {
-
         if ($dc->id == '' || !is_numeric($dc->id))
         {
             return;
@@ -191,7 +189,6 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
 
         if (!$this->Input->post)
         {
-
             // sync name with firstname and lastname
             $objUser = $this->Database->prepare('SELECT * FROM tl_user')->execute();
             while ($objUser->next())
@@ -209,9 +206,7 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
         }
 
         Message::addInfo('Einige Felder werden mit der Datenbank des Zentralverbandes synchronisiert. Wenn Sie &Auml;nderungen machen möchten, müssen Sie diese zuerst dort vornehmen.');
-
     }
-
 
     /**
      * @param DataContainer $dc
@@ -219,9 +214,12 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
     public function oncreateCallback($strTable, $id, $arrSet)
     {
         $objUser = \Contao\UserModel::findByPk($id);
-        if($objUser !== null)
+        if ($objUser !== null)
         {
-            if($arrSet['inherit'] !== 'extend')
+            // Create Backend Users homedirectory
+            \Markocupic\SacEventToolBundle\MaintainBackendUsersHomeDirectory::createBackendUsersHomeDirectory($objUser);
+
+            if ($arrSet['inherit'] !== 'extend')
             {
                 $objUser->inherit = 'extend';
                 $objUser->pwChange = '1';
@@ -233,7 +231,6 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
             }
         }
     }
-
 
     /**
      * Dynamically add flags to the "singleSRC" field
@@ -263,7 +260,6 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
      */
     public function optionsCallbackUserRoles()
     {
-
         $options = array();
         $objDb = \Database::getInstance()->prepare('SELECT * FROM tl_user_role ORDER BY sorting ASC')->execute();
         while ($objDb->next())
@@ -272,7 +268,6 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
         }
 
         return $options;
-
     }
 
 }

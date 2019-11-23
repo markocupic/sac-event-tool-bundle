@@ -15,6 +15,8 @@ $GLOBALS['TL_DCA']['tl_user']['config']['sql']['keys']['sacMemberId'] = 'index';
 $GLOBALS['TL_DCA']['tl_user']['config']['onload_callback'][] = array('tl_user_sac_event_tool', 'onloadCallback');
 $GLOBALS['TL_DCA']['tl_user']['config']['onload_callback'][] = array('tl_user_sac_event_tool', 'addReadonlyAttributeToSyncedFields');
 
+
+
 // Oncreate callbacks
 $GLOBALS['TL_DCA']['tl_user']['config']['oncreate_callback'][] = array('tl_user_sac_event_tool', 'oncreateCallback');
 
