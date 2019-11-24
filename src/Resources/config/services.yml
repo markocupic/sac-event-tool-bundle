@@ -17,3 +17,11 @@ services:
     class:  Markocupic\SacEventToolBundle\Services\Cors\CorsListener
     tags:
     - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+  markocupic.sac_event_tool_bundle.controller.frontend_module.tour_difficulty_list_controller:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListController
+    arguments:
+    - '@contao.framework'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true

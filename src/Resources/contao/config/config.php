@@ -80,14 +80,14 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = array(
 $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containers';
 $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
 
-// Frontend Modules
+// Frontend Modules Contao 4 style
+// Contao 5 ready fe modules are registered in service.yml
 $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
     'eventToolFrontendUserDashboard'         => 'Markocupic\SacEventToolBundle\ModuleSacEventToolMemberDashboard',
     'eventToolEventRegistrationForm'         => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventRegistrationForm',
     'eventToolCalendarEventStoryList'        => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryList',
     'eventToolCalendarEventStoryReader'      => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryReader',
     'eventToolCalendarEventlist'             => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventlist',
-    'eventTourDifficultyExplanationList'     => 'Markocupic\SacEventToolBundle\ModuleSacEventToolTourDifficultyExplanationList',
     'eventToolCalendarEventPreviewReader'    => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader',
     'eventToolEventToolPilatusExport'        => 'Markocupic\SacEventToolBundle\ModuleSacEventToolPilatusExport',
     'eventToolEventToolJahresprogrammExport' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolJahresprogrammExport',
