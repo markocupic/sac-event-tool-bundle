@@ -147,7 +147,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         ));
 
         $objForm->addFormField('mountainguide', array(
-            'label'     => array('', 'Nur Events mit Bergführer exportieren'),
+            'label'     => array('Bergführer', 'Nur Events mit Bergführer exportieren'),
             'inputType' => 'checkbox',
             'eval'      => array(),
         ));
