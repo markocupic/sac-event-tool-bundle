@@ -8,35 +8,49 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle;
+namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
-use Contao\BackendTemplate;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
-use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
-use Contao\Input;
-use Contao\Module;
 use Contao\MemberModel;
 use Haste\Form\Form;
 use League\Csv\Reader;
 use League\Csv\Writer;
-use Patchwork\Utf8;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\ModuleModel;
+use Contao\Template;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Doctrine\DBAL\Connection;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
- * Class ModuleSacEventToolCsvEventMemberExport
- * @package Markocupic\SacEventToolBundle
+ * Class CsvEventMemberExportController
+ * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
+ * @FrontendModule(category="sac_event_tool_fe_modules", type="csv_event_member_export")
  */
-class ModuleSacEventToolCsvEventMemberExport extends Module
+class CsvEventMemberExportController extends AbstractFrontendModuleController
 {
+    /**
+     * @var ContaoFramework
+     */
+    protected $framework;
 
     /**
-     * Template
-     * @var string
+     * @var Connection
      */
-    protected $strTemplate = 'sac_event_tool_csv_event_member_export';
+    protected $connection;
+
+    /**
+     * @var RequestStack
+     */
+    protected $requestStack;
 
     /**
      * @var
@@ -64,49 +78,48 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
     protected $arrLines = array();
 
     /**
-     * Display a wildcard in the back end
-     *
-     * @return string
+     * CsvEventMemberExportController constructor.
+     * @param ContaoFramework $framework
+     * @param Connection $connection
+     * @param RequestStack $request
      */
-    public function generate()
+    public function __construct(ContaoFramework $framework, Connection $connection, RequestStack $request)
     {
-        if (TL_MODE == 'BE')
-        {
-            /** @var BackendTemplate|object $objTemplate */
-            $objTemplate = new BackendTemplate('be_wildcard');
-
-            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['eventToolCsvEventMemberExport'][0]) . ' ###';
-            $objTemplate->title = $this->headline;
-            $objTemplate->id = $this->id;
-            $objTemplate->link = $this->name;
-            $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
-
-            return $objTemplate->parse();
-        }
-
-        return parent::generate();
+        $this->framework = $framework;
+        $this->connection = $connection;
+        $this->requestStack = $request;
+        $this->translator = $translator;
     }
 
     /**
-     * Generate the module
+     * @param Template $template
+     * @param ModuleModel $model
+     * @param Request $request
+     * @return null|Response
+     * @throws \League\Csv\Exception
      */
-    protected function compile()
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
         $this->generateForm();
-        $this->Template->form = $this->objForm;
+        $template->form = $this->objForm;
+        $template->dateFormat = $this->framework->getAdapter(Config::class)->get('dateFormat');
+
+        return $template->getResponse();
     }
 
     /**
+     * @throws \Doctrine\DBAL\DBALException
      * @throws \League\Csv\Exception
-     * @throws \TypeError
      */
     private function generateForm()
     {
         $objForm = new Form('form-event-member-export', 'POST', function ($objHaste) {
-            return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
+            $request = $this->requestStack->getCurrentRequest();
+            return $request->get('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
-        $objForm->setFormActionFromUri(Environment::get('uri'));
+        $environment = $this->framework->getAdapter(Environment::class);
+        $objForm->setFormActionFromUri($environment->get('uri'));
 
         // Now let's add form fields:
         $objForm->addFormField('event-type', array(
@@ -147,16 +160,17 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
 
         if ($objForm->validate())
         {
-            if (Input::post('FORM_SUBMIT') === 'form-event-member-export')
+            $request = $this->requestStack->getCurrentRequest();
+            if ($request->get('FORM_SUBMIT') === 'form-event-member-export')
             {
-                $eventType = Input::post('event-type');
+                $eventType = $request->get('event-type');
                 $arrFields = array('id', 'eventId', 'eventName', 'startDate', 'endDate', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'addedOn');
-                $startDate = strtotime(Input::post('startDate'));
-                $endDate = strtotime(Input::post('endDate'));
-
-                $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate')->execute($startDate, $endDate);
+                $startDate = strtotime($request->get('startDate'));
+                $endDate = strtotime($request->get('endDate'));
                 $this->getHeadline($arrFields);
-                while ($objEvent->next())
+
+                $statement1 = $this->connection->executeQuery('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate', array($startDate, $endDate));
+                while (false !== ($objEvent = $statement1->fetch(\PDO::FETCH_OBJ)))
                 {
                     if ($eventType != 'all')
                     {
@@ -166,7 +180,7 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
                         }
                     }
 
-                    if (Input::post('mountainguide'))
+                    if ($request->get('mountainguide'))
                     {
                         if (!$objEvent->mountainguide)
                         {
@@ -174,13 +188,16 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
                         }
                     }
 
-                    $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname')->execute($objEvent->id);
-                    while ($objEventMember->next())
+                    // Set tl_member.disable to true if member was not found in the csv-file
+                    $statement2 = $this->connection->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname', array($objEvent->id));
+                    while (false !== ($objEventMember = $statement2->fetch(\PDO::FETCH_OBJ)))
                     {
                         $this->addLine($arrFields, $objEventMember);
                     }
                 }
-                $this->printCsv(sprintf('Event-Member-Export_%s.csv', Date::parse('Y-m-d')));
+                $date = $this->framework->getAdapter(Date::class);
+
+                $this->printCsv(sprintf('Event-Member-Export_%s.csv', $date->parse('Y-m-d')));
             }
         }
 
@@ -208,22 +225,23 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
     private function getHeadline($arrFields)
     {
         // Write headline
+        $controller = $this->framework->getAdapter(Controller::class);
         $arrHeadline = array();
         foreach ($arrFields as $field)
         {
             if ($field === 'mainInstructor' || $field === 'mountainguide' || $field === 'startDate' || $field === 'endDate' || $field === 'eventState' || $field === 'executionState')
             {
-                Controller::loadLanguageFile('tl_calendar_events');
+                $controller->loadLanguageFile('tl_calendar_events');
                 $arrHeadline[] = isset($GLOBALS['TL_LANG']['tl_calendar_events'][$field][0]) ? $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] : $field;
             }
             elseif ($field === 'phone')
             {
-                Controller::loadLanguageFile('tl_member');
+                $controller->loadLanguageFile('tl_member');
                 $arrHeadline[] = isset($GLOBALS['TL_LANG']['tl_member'][$field][0]) ? $GLOBALS['TL_LANG']['tl_member'][$field][0] : $field;
             }
             else
             {
-                Controller::loadLanguageFile('tl_calendar_events_member');
+                $controller->loadLanguageFile('tl_calendar_events_member');
                 $arrHeadline[] = isset($GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0]) ? $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] : $field;
             }
         }
@@ -237,19 +255,26 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
      */
     private function getField($field, $objEventMember)
     {
+        $date = $this->framework->getAdapter(Date::class);
+        $config = $this->framework->getAdapter(Config::class);
+        $controller = $this->framework->getAdapter(Controller::class);
+        $calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
+        $memberModel = $this->framework->getAdapter(MemberModel::class);
+
         if ($field === 'password')
         {
             return '#######';
         }
         elseif ($field === 'addedOn')
         {
-            return Date::parse('Y-m-d', $objEventMember->addedOn);
+            return $date->parse('Y-m-d', $objEventMember->addedOn);
         }
         elseif ($field === 'dateOfBirth')
         {
             if (is_numeric($objEventMember->$field))
             {
-                return Date::parse(Config::get('dateFormat'), $objEventMember->$field);
+                return $date->parse($config->get('dateFormat'), $objEventMember->$field);
             }
         }
         elseif ($field === 'stateOfSubscription')
@@ -258,10 +283,10 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
         }
         elseif ($field === 'startDate')
         {
-            $objEvent = CalendarEventsModel::findByPk($objEventMember->eventId);
+            $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
             if ($objEvent !== null)
             {
-                return Date::parse('Y-m-d', $objEvent->startDate);
+                return $date->parse('Y-m-d', $objEvent->startDate);
             }
             else
             {
@@ -270,10 +295,10 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
         }
         elseif ($field === 'endDate')
         {
-            $objEvent = CalendarEventsModel::findByPk($objEventMember->eventId);
+            $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
             if ($objEvent !== null)
             {
-                return Date::parse('Y-m-d', $objEvent->endDate);
+                return $date->parse('Y-m-d', $objEvent->endDate);
             }
             else
             {
@@ -282,8 +307,8 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
         }
         elseif ($field === 'executionState')
         {
-            Controller::loadLanguageFile('tl_calendar_events');
-            $objEvent = CalendarEventsModel::findByPk($objEventMember->eventId);
+            $controller->loadLanguageFile('tl_calendar_events');
+            $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
             if ($objEvent !== null)
             {
                 return isset($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0]) ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] : $objEvent->$field;
@@ -295,8 +320,8 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
         }
         elseif ($field === 'eventState')
         {
-            Controller::loadLanguageFile('tl_calendar_events');
-            $objEvent = CalendarEventsModel::findByPk($objEventMember->eventId);
+            $controller->loadLanguageFile('tl_calendar_events');
+            $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
             if ($objEvent !== null)
             {
                 return isset($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0]) ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] : $objEvent->$field;
@@ -308,10 +333,10 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
         }
         elseif ($field === 'mainInstructor')
         {
-            $objEvent = CalendarEventsModel::findByPk($objEventMember->eventId);
+            $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
             if ($objEvent !== null)
             {
-                return CalendarEventsHelper::getMainInstructorName($objEventMember->eventId);
+                return $calendarEventsHelper->getMainInstructorName($objEventMember->eventId);
             }
             else
             {
@@ -320,7 +345,7 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
         }
         elseif ($field === 'mountainguide')
         {
-            $objEvent = CalendarEventsModel::findByPk($objEventMember->eventId);
+            $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
             if ($objEvent !== null)
             {
                 return $objEvent->$field;
@@ -332,7 +357,7 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
         }
         elseif ($field === 'phone')
         {
-            $objMember = MemberModel::findBySacMemberId($objEventMember->sacMemberId);
+            $objMember = $memberModel->findBySacMemberId($objEventMember->sacMemberId);
             if ($objMember !== null)
             {
                 return $objMember->$field;
@@ -366,11 +391,6 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
             $arrFinal[] = $arrLine;
         }
 
-        // Send file to browser
-        header('Content-Encoding: UTF-8');
-        header('Content-type: text/csv; charset=UTF-8');
-        header('Content-Disposition: attachment; filename="' . $filename);
-
         // Load the CSV document from a string
         $csv = Writer::createFromString('');
         $csv->setOutputBOM(Reader::BOM_UTF8);
@@ -381,9 +401,8 @@ class ModuleSacEventToolCsvEventMemberExport extends Module
         // Insert all the records
         $csv->insertAll($arrFinal);
 
-        // Returns the CSV document as a string
-        echo $csv;
-
+        // Send file to browser
+        $csv->output($filename);
         exit;
     }
 }

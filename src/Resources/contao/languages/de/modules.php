@@ -36,8 +36,8 @@ $GLOBALS['TL_LANG']['FMD']['eventToolEventToolPilatusExport'] = array('SAC Event
 $GLOBALS['TL_LANG']['FMD']['eventToolEventToolJahresprogrammExport'] = array('SAC Event-Export f&uuml;r Jahresprogramm');
 $GLOBALS['TL_LANG']['FMD']['eventToolActivateMemberAccount'] = array('SAC Mitgliederkonto Aktivierungsformular');
 $GLOBALS['TL_LANG']['FMD']['eventToolCsvExport'] = array('SAC-Member- und Backend-User CSV-Export-Funktion');
-$GLOBALS['TL_LANG']['FMD']['eventToolCsvEventMemberExport'] = array('SAC-Event-Teilnehmer Export');
 $GLOBALS['TL_LANG']['FMD']['eventToolEventFilterForm'] = array('SAC-Event-Liste-Filter');
 
-// Contao 5 ready
+// Contao 5 ready fronten modules
 $GLOBALS['TL_LANG']['FMD']['tour_difficulty_list'] = array('Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster');
+$GLOBALS['TL_LANG']['FMD']['csv_event_member_export'] = array('SAC-Event-Teilnehmer Export');

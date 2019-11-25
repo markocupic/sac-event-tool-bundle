@@ -1,0 +1,22 @@
+<?php $this->extend('block_unsearchable'); ?>
+
+<?php $this->block('content'); ?>
+
+
+
+
+<div class="alert bg-light">
+    <?= $this->form ?>
+</div>
+<script>
+    //Set Datepicker
+    var opt = {
+        dateFormat: "<?= $this->dateFormat ?>",
+        locale: "de",
+    };
+    flatpickr('#ctrl_startDate', opt);
+    flatpickr('#ctrl_endDate', opt);
+</script>
+
+
+<?php $this->endblock(); ?>
