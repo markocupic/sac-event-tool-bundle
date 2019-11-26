@@ -88,7 +88,6 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $this->framework = $framework;
         $this->connection = $connection;
         $this->requestStack = $request;
-        $this->translator = $translator;
     }
 
     /**
