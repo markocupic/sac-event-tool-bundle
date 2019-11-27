@@ -12,6 +12,8 @@ namespace Markocupic\SacEventToolBundle\ContaoHooks;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
+use Symfony\Component\HttpFoundation\Session\Attribute\NamespacedAttributeBag;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class InitializeSystem
@@ -39,6 +41,7 @@ class InitializeSystem
      */
     public function initializeSystem()
     {
+
         // Prepare Plugin environment, create folders, etc.
         $objPluginEnv = System::getContainer()->get('markocupic.sac_event_tool_bundle.prepare_plugin_environment');
         $objPluginEnv->preparePluginEnvironment();

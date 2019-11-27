@@ -91,7 +91,7 @@ $GLOBALS['TL_LANG']['ERR']['memberAccountNotFound'] = 'Anmeldeversuch gescheiter
 // eventToolActivateMemberAccount
 $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_sacMemberId'] = 'SAC Mitgliedernummer';
 $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_email'] = 'Deine beim <span class="text-danger">SAC in Bern</span> registrierte E-Mail-Adresse';
-$GLOBALS['TL_LANG']['MSC']['activateMemberAccount_dateOfBirth'] = 'Dein Geburtsdatum (dd.mm.YYYY)';
+$GLOBALS['TL_LANG']['MSC']['activateMemberAccount_dateOfBirth'] = 'Dein Geburtsdatum (%s)';
 $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_startActivationProcess'] = 'Aktivierung starten';
 $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_agb'] = 'Ich akzeptiere die %sallg. Datenschutzrichtlinien.%s';
 $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_pleaseEnterTheActivationCode'] = 'Aktivierungscode eingeben';

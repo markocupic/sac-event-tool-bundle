@@ -10,7 +10,7 @@
 <script>
     //Set Datepicker
     var opt = {
-        dateFormat: 'd.m.Y',
+        dateFormat: '<?= $this->dateFormat ?>',
         allowInput: true,
         enableTime: false,
         locale: 'de'

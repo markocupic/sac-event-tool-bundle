@@ -33,9 +33,9 @@ use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Attribute\NamespacedAttributeBag;
 use Symfony\Component\Security\Core\Security;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
-
 
 /**
  * Class ActivateMemberAccountController
@@ -140,23 +140,24 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
                 $this->objUser = $objUser;
             }
 
-            // Add groups
+            // Get groups from model
             $this->arrGroups = $stringUtilAdapter->deserialize($model->reg_groups, true);
 
             // Use terminal42/notification_center
             $this->objNotification = $notificationAdapter->findByPk($model->activateMemberAccountNotificationId);
 
-            // Add step param
+            // Redirect to first step, if there is no step param set in the url
             if ($request->query->get('step') == '')
             {
                 $url = $urlAdapter->addQueryString('step=1');
                 $controllerAdapter->redirect($url);
             }
 
+            // Get the step number from url
             $this->step = $request->query->get('step');
         }
 
-        // Call the parent method
+        // Call parent __invoke
         return parent::__invoke($request, $model, $section, $classes);
     }
 
@@ -173,8 +174,8 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
 
+        // Instantiate partial template
         $this->partial = new FrontendTemplate('partial_activate_member_account_step_' . $this->step);
-
         $this->partial->step = $this->step;
         $this->partial->hasError = false;
         $this->partial->errorMsg = '';
@@ -182,6 +183,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         switch ($this->step)
         {
             case 1:
+                // Get session
                 $session = System::getContainer()->get('session');
                 $flashBag = $session->getFlashBag();
 
@@ -195,7 +197,9 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
 
                 unset($_SESSION['SAC_EVT_TOOL']);
                 $_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['step'] = 1;
+
                 $this->generateFirstForm();
+
                 if ($this->objForm !== null)
                 {
                     $this->partial->form = $this->objForm->generate();
@@ -242,7 +246,6 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
                     $controllerAdapter->redirect($url);
                 }
                 unset($_SESSION['SAC_EVT_TOOL']);
-
                 break;
         }
 
@@ -285,7 +288,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
             'eval'      => array('mandatory' => true, 'maxlength' => 255, 'rgxp' => 'email'),
         ));
         $objForm->addFormField('dateOfBirth', array(
-            'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_dateOfBirth'],
+            'label'     => sprintf($GLOBALS['TL_LANG']['MSC']['activateMemberAccount_dateOfBirth'], $configAdapter->get('dateFormat')),
             'inputType' => 'text',
             'eval'      => array('mandatory' => true, 'rgxp' => 'date', 'datepicker' => true),
         ));
@@ -305,7 +308,10 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         $objForm->addContaoHiddenFields();
 
         $objWidget = $objForm->getWidget('dateOfBirth');
-        $objWidget->addAttribute('placeholder', 'dd.mm.YYYY');
+        $objWidget->addAttribute('placeholder', $configAdapter->get('dateFormat'));
+
+        // Add dateFormat to the template
+        $this->partial->dateFormat = $configAdapter->get('dateFormat');
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate())
@@ -485,7 +491,8 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
                 $hasError = true;
                 $objMember->activationFalseTokenCounter++;
                 $objMember->save();
-                // Too many tries
+
+                // Limit tries to 5x
                 if ($objMember->activationFalseTokenCounter > 5)
                 {
                     $objMember->activationFalseTokenCounter = 0;
@@ -493,7 +500,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
                     $objMember->activationLinkLifetime = 0;
                     $objMember->save();
                     unset($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId']);
-                    $url = Url::removeQueryString(['step']);
+                    $url = $urlAdapter->removeQueryString(['step']);
                     $this->partial->doNotShowForm = true;
                     $this->partial->errorMsg = sprintf($GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountActivationStoppedInvalidActivationCodeAndTooMuchTries'], '<br><a href="' . $url . '">', '</a>');
                 }
