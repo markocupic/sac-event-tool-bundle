@@ -12,29 +12,30 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
 use Contao\FrontendTemplate;
 use Contao\FrontendUser;
 use Contao\MemberModel;
+use Contao\ModuleModel;
+use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
-use Haste\Util\Url;
-use Haste\Form\Form;
-use NotificationCenter\Model\Notification;
-use Contao\PageModel;
-use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
-use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\ModuleModel;
 use Contao\Template;
+use Doctrine\DBAL\Connection;
+use Haste\Form\Form;
+use Haste\Util\Url;
+use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Doctrine\DBAL\Connection;
 use Symfony\Component\Security\Core\Security;
-use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
+
 
 /**
  * Class ActivateMemberAccountController

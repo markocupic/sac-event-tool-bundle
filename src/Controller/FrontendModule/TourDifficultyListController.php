@@ -10,15 +10,16 @@
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
-use Contao\TourDifficultyCategoryModel;
-use Contao\TourDifficultyModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\ModuleModel;
 use Contao\Template;
+use Contao\TourDifficultyCategoryModel;
+use Contao\TourDifficultyModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
+
 
 /**
  * Class TourDifficultyListController

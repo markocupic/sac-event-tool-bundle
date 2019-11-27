@@ -13,22 +13,23 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\Environment;
 use Contao\MemberModel;
+use Contao\ModuleModel;
+use Contao\Template;
+use Doctrine\DBAL\Connection;
 use Haste\Form\Form;
 use League\Csv\Reader;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
-use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\ModuleModel;
-use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Doctrine\DBAL\Connection;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
+
 
 /**
  * Class CsvEventMemberExportController
