@@ -104,13 +104,13 @@ $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberEmailNotRegistered'] 
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberIdAndEmailDoNotMatch'] = 'Mitgliedernummer und E-Mail-Adresse stimmen nicht &uuml;berein.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountWithThisSacMemberIdIsAllreadyRegistered'] = 'Das Konto mit der eingegebenen Mitgliedernummer %s wurde bereits aktiviert.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountWithThisSacMemberIdHasBeendDeactivatedAndIsNoMoreValid'] = 'Das Konto mit der eingegebenen Mitgliedernummer %s ist deaktiviert und nicht mehr g&uuml;ltig.';
-$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_couldNotTerminateActivationProcess'] = 'Der Aktivierung konnte nicht abgeschlossen werden. Bitte probiere es nochmals oder nimm mit der Geschäftsstelle Kontakt auf.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_couldNotTerminateActivationProcess'] = 'Der Aktivierungsprozess konnte nicht abgeschlossen werden. Bitte probiere es nochmals oder nimm mit der Geschäftsstelle Kontakt auf.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountActivationStoppedAccountIsDeactivated'] = 'Es ist ein Fehler aufgetreten. Dein Mitgliederkonto ist deaktiviert. Bitte nimm gegebenenfalls mit der Geschäftsstelle Kontakt auf.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountActivationStoppedInvalidActivationCodeAndTooMuchTries'] = 'Ungültiger Aktivierungscode und zu viele Anzahl ungültiger Versuche. Bitte starte den Aktivierungsprozess von vorne. %sAktivierungsprozess neu starten%s';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_invalidActivationCode'] = 'Ungültiger Aktivierungscode. Bitte erneut versuchen.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_activationCodeExpired'] = 'Der Aktivierungscode ist abgelaufen. Bitte starte den Aktivierungsprozess neu.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sessionExpired'] = 'Es ist ein Fehler aufgetreten. Die Session ist abgelaufen.';
-
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_noValidNotificationSelected'] = 'Vom Administrator wurde keine gültige Benachrichtigung ausgewählt. Kontaktiere bitte die Geschäftsstelle.';
 
 
 

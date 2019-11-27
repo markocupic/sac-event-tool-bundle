@@ -1,8 +1,4 @@
-<?php $this->extend('block_unsearchable'); ?>
-
-<?php $this->block('content'); ?>
-
-<!-- step 2 -->
+<!-- step 1 -->
 <h6 class="mt-0 mb-4 form-step">Schritt <?= $this->step ?> von 4</h6>
 
 <?php if ($this->hasError): ?>
@@ -45,4 +41,3 @@
 </div>
 <!-- End Modal -->
 
-<?php $this->endblock(); ?>

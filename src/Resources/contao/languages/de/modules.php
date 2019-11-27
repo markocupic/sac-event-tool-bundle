@@ -33,7 +33,6 @@ $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventlist'] = array('SAC Touren- un
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = array('Event Reader Vorschau');
 $GLOBALS['TL_LANG']['FMD']['eventToolEventToolPilatusExport'] = array('SAC Event-Export f&uuml;r Monatszeitschrift');
 $GLOBALS['TL_LANG']['FMD']['eventToolEventToolJahresprogrammExport'] = array('SAC Event-Export f&uuml;r Jahresprogramm');
-$GLOBALS['TL_LANG']['FMD']['eventToolActivateMemberAccount'] = array('SAC Mitgliederkonto Aktivierungsformular');
 $GLOBALS['TL_LANG']['FMD']['eventToolCsvExport'] = array('SAC-Member- und Backend-User CSV-Export-Funktion');
 $GLOBALS['TL_LANG']['FMD']['eventToolEventFilterForm'] = array('SAC-Event-Liste-Filter');
 
@@ -41,3 +40,5 @@ $GLOBALS['TL_LANG']['FMD']['eventToolEventFilterForm'] = array('SAC-Event-Liste-
 $GLOBALS['TL_LANG']['FMD']['tour_difficulty_list'] = array('Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster');
 $GLOBALS['TL_LANG']['FMD']['csv_event_member_export'] = array('SAC-Event-Teilnehmer Export');
 $GLOBALS['TL_LANG']['FMD']['event_registration_form'] = array('SAC Event Registrierungsformular');
+$GLOBALS['TL_LANG']['FMD']['activate_member_account'] = array('SAC Mitgliederkonto Aktivierungsformular');
+

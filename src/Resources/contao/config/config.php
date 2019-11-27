@@ -90,7 +90,6 @@ $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
     'eventToolCalendarEventPreviewReader'    => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader',
     'eventToolEventToolPilatusExport'        => 'Markocupic\SacEventToolBundle\ModuleSacEventToolPilatusExport',
     'eventToolEventToolJahresprogrammExport' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolJahresprogrammExport',
-    'eventToolActivateMemberAccount'         => 'Markocupic\SacEventToolBundle\ModuleSacEventToolActivateMemberAccount',
     'eventToolCsvExport'                     => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCsvExport',
     'eventToolEventFilterForm'               => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventEventFilterForm',
 );
