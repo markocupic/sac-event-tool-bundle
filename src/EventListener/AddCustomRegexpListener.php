@@ -12,9 +12,9 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\EventListener;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Database;
 use Contao\MemberModel;
 use Contao\Widget;
-use Doctrine\DBAL\Connection;
 
 /**
  * Class AddCustomRegexpListener
@@ -28,19 +28,13 @@ class AddCustomRegexpListener
     private $framework;
 
     /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * AddCustomRegexpListener constructor.
+     * Constructor.
+     *
      * @param ContaoFramework $framework
-     * @param Connection $connection
      */
-    public function __construct(ContaoFramework $framework, Connection $connection)
+    public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
-        $this->connection = $connection;
     }
 
     /**
@@ -53,6 +47,7 @@ class AddCustomRegexpListener
     {
         // Set adapters
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
+        $databaseAdapter = $this->framework->getAdapter(Database::class);
 
         // Check for a valid/existent sacMemberId
         if ($strRegexp === 'sacMemberId')
@@ -84,13 +79,10 @@ class AddCustomRegexpListener
                     $objWidget->addError('Field ' . $objWidget->label . ' should be a valid sac member id.');
                 }
 
-                $stmt = $this->connection->executeQuery('SELECT * FROM tl_user WHERE sacMemberId=?', array($varValue));
-                if ($objUser = $stmt->fetch(\PDO::FETCH_OBJ))
+                $objUser = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_user WHERE sacMemberId=?')->execute($varValue);
+                if ($objUser->numRows > 1)
                 {
-                    if ($stmt->fetchColumn() > 1)
-                    {
-                        $objWidget->addError('SAC member id ' . $varValue . ' is already in use.');
-                    }
+                    $objWidget->addError('SAC member id ' . $varValue . ' is already in use.');
                 }
             }
 

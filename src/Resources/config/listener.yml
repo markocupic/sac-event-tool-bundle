@@ -29,7 +29,6 @@ services:
     class: Markocupic\SacEventToolBundle\EventListener\AddCustomRegexpListener
     arguments:
     - "@contao.framework"
-    - '@database_connection'
     tags:
     - { name: kernel.event_listener, event: contao.add_custom_regexp, method: onAddCustomRegexp }
 
