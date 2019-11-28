@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * SAC Event Tool Web Plugin for Contao
@@ -8,21 +9,49 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\ContaoHooks;
+namespace Markocupic\SacEventToolBundle\EventListener;
 
 use Contao\BackendUser;
 use Contao\Config;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Database;
 use Contao\Date;
 use Contao\System;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class GetSystemMessages
- * @package Markocupic\SacEventToolBundle\ContaoHooks
+ * Class GetSystemMessagesListener
+ * @package Markocupic\SacEventToolBundle\EventListener
  */
-class GetSystemMessages
+class GetSystemMessagesListener
 {
+    /**
+     * @var ContaoFramework
+     */
+    private $framework;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var ScopeMatcher
+     */
+    private $scopeMatcher;
+
+    /**
+     * GetSystemMessagesListener constructor.
+     * @param ContaoFramework $framework
+     */
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
+    {
+        $this->framework = $framework;
+        $this->requestStack = $requestStack;
+        $this->scopeMatcher = $scopeMatcher;
+    }
 
     /**
      * Show all upcoming events (where user is main instructor) for the logged in user
@@ -31,12 +60,18 @@ class GetSystemMessages
     public function listUntreatedEventSubscriptions()
     {
         $strBuffer = '';
-        if (TL_MODE === 'BE')
+        if ($this->isBackend())
         {
-            $objUser = BackendUser::getInstance();
+            $backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
+            $databaseAdapter = $this->framework->getAdapter(Database::class);
+            $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+            $dateAdapter = $this->framework->getAdapter(Date::class);
+            $configAdapter = $this->framework->getAdapter(Config::class);
+
+            $objUser = $backendUserAdapter->getInstance();
             if ($objUser->id > 0)
             {
-                $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE (mainInstructor=? OR registrationGoesTo=?) AND startDate>? ORDER BY startDate')->execute($objUser->id, $objUser->id, time() - 3 * 30 * 24 * 3600);
+                $objEvent = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE (mainInstructor=? OR registrationGoesTo=?) AND startDate>? ORDER BY startDate')->execute($objUser->id, $objUser->id, time() - 3 * 30 * 24 * 3600);
                 if ($objEvent->numRows)
                 {
                     $strBuffer .= '<h3>' . $GLOBALS['TL_LANG']['MSC']['yourUpcomingEvents'] . '</h3>';
@@ -54,8 +89,8 @@ class GetSystemMessages
                         $linkMemberList = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $objEvent->id, $rt);
                         $strBuffer .= sprintf('<tr class="hover-row %s"><td>%s</td><td>[%s] <a href="%s" style="text-decoration:underline" target="_blank" title="Event \'%s\' bearbeiten">%s</a></td><td><a href="%s" style="text-decoration:underline" target="_blank" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>',
                             $strCSSRowClass,
-                            CalendarEventsHelper::getEventStateOfSubscriptionBadgesString($objEvent),
-                            Date::parse(Config::get('dateFormat'), $objEvent->startDate),
+                            $calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($objEvent),
+                            $dateAdapter->parse($configAdapter->get('dateFormat'), $objEvent->startDate),
                             $link,
                             $objEvent->title,
                             $objEvent->title,
@@ -71,6 +106,12 @@ class GetSystemMessages
         return $strBuffer;
     }
 
+    /**
+     * Identify the Contao scope (TL_MODE) of the current request
+     * @return bool
+     */
+    private function isBackend(): bool
+    {
+        return $this->scopeMatcher->isBackendRequest($this->requestStack->getCurrentRequest());
+    }
 }
-
-

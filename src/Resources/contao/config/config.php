@@ -250,16 +250,24 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = array(
 );
 
 /** Get page layout: purge script cache in dev mode **/
-$GLOBALS['TL_HOOKS']['getPageLayout'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\GetPageLayout', 'purgeScriptCache');
+$GLOBALS['TL_HOOKS']['getPageLayout'][] = array('markocupic.sac_event_tool_bundle.event_listener.get_page_layout', 'purgeScriptCacheInDebugMode');
 
-/** Get system messages **/
-$GLOBALS['TL_HOOKS']['getSystemMessages'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\GetSystemMessages', 'listUntreatedEventSubscriptions');
+/** Get system messages: list untreated event subscriptions in the backend (start page) **/
+$GLOBALS['TL_HOOKS']['getSystemMessages'][] = array('markocupic.sac_event_tool_bundle.event_listener.get_system_messages_listener', 'listUntreatedEventSubscriptions');
 
 /** Custom Hook publish Event **/
-$GLOBALS['TL_HOOKS']['publishEvent'] = array(array('Markocupic\SacEventToolBundle\ContaoHooks\PublishEvent', 'publishEvent'));
+if (!isset($GLOBALS['TL_HOOKS']['publishEvent']) || !is_array($GLOBALS['TL_HOOKS']['publishEvent']))
+{
+    $GLOBALS['TL_HOOKS']['publishEvent'] = array();
+}
+$GLOBALS['TL_HOOKS']['publishEvent'][] = array('markocupic.sac_event_tool_bundle.event_listener.publish_event', 'onPublishEvent');
 
 /** Custom Hook change event release level **/
-$GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] = array(array('Markocupic\SacEventToolBundle\ContaoHooks\ChangeEventReleaseLevel', 'changeEventReleaseLevel'));
+if (!isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) || !is_array($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']))
+{
+    $GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] = array();
+}
+$GLOBALS['TL_HOOKS']['changeEventReleaseLevel'][] = array('markocupic.sac_event_tool_bundle.event_listener.change_event_release_level', 'onChangeEventReleaseLevel');
 
 /** Route prepare plugin environment **/
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic_sac_event_tool.contao_hooks.initialize_system', 'initializeSystem');
