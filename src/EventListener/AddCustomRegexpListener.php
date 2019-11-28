@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\EventListener;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Database;
 use Contao\MemberModel;
 use Contao\Widget;
 use Doctrine\DBAL\Connection;
