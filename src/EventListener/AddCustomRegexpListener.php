@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * SAC Event Tool Web Plugin for Contao
@@ -8,19 +9,19 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\ContaoHooks;
+namespace Markocupic\SacEventToolBundle\EventListener;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\MemberModel;
-use Contao\UserModel;
 use Contao\Widget;
+use Doctrine\DBAL\Connection;
 
 /**
- * Class AddCustomRegexp
- * @package Markocupic\SacEventToolBundle\ContaoHooks
+ * Class AddCustomRegexpListener
+ * @package Markocupic\SacEventToolBundle\EventListener
  */
-class AddCustomRegexp
+class AddCustomRegexpListener
 {
     /**
      * @var ContaoFramework
@@ -28,13 +29,19 @@ class AddCustomRegexp
     private $framework;
 
     /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
      * Constructor.
      *
      * @param ContaoFramework $framework
      */
-    public function __construct(ContaoFramework $framework)
+    public function __construct(ContaoFramework $framework, Connection $connection)
     {
         $this->framework = $framework;
+        $this->connection = $connection;
     }
 
     /**
@@ -43,14 +50,17 @@ class AddCustomRegexp
      * @param Widget $objWidget
      * @return bool
      */
-    public function addCustomRegexp($strRegexp, $varValue, Widget $objWidget)
+    public function onAddCustomRegexp($strRegexp, $varValue, Widget $objWidget): bool
     {
+        // Set adapters
+        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
+
         // Check for a valid/existent sacMemberId
         if ($strRegexp === 'sacMemberId')
         {
             if (trim($varValue) !== '')
             {
-                $objMemberModel = MemberModel::findBySacMemberId(trim($varValue));
+                $objMemberModel = $memberModelAdapter->findBySacMemberId(trim($varValue));
                 if ($objMemberModel === null)
                 {
                     $objWidget->addError('Field ' . $objWidget->label . ' should be a valid sac member id.');
@@ -69,16 +79,19 @@ class AddCustomRegexp
             }
             elseif (trim($varValue) !== '' && $varValue > 0)
             {
-                $objMemberModel = MemberModel::findBySacMemberId(trim($varValue));
+                $objMemberModel = $memberModelAdapter->findBySacMemberId(trim($varValue));
                 if ($objMemberModel === null)
                 {
                     $objWidget->addError('Field ' . $objWidget->label . ' should be a valid sac member id.');
                 }
 
-                $objUser = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE sacMemberId=?')->execute($varValue);
-                if ($objUser->numRows > 1)
+                $stmt = $this->connection->executeQuery('SELECT * FROM tl_user WHERE sacMemberId=?', array($varValue));
+                if ($objUser = $stmt->fetch(\PDO::FETCH_OBJ))
                 {
-                    $objWidget->addError('Sac member id ' . $varValue . ' is already in use.');
+                    if ($stmt->fetchColumn() > 1)
+                    {
+                        $objWidget->addError('SAC member id ' . $varValue . ' is already in use.');
+                    }
                 }
             }
 

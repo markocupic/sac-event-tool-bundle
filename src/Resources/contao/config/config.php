@@ -268,7 +268,7 @@ $GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic_sac_event_tool.co
 $GLOBALS['TL_HOOKS']['executePreActions'][] = array('markocupic_sac_event_tool.contao_hooks.execute_pre_actions', 'executePreActions');
 
 /** Handle custom rgxp in the backend **/
-$GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic_sac_event_tool.contao_hooks.add_custom_regexp', 'addCustomRegexp');
+$GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic.sac_event_tool_bundle.event_listener.add_custom_regexp', 'onAddCustomRegexp');
 
 /** Prepare User accounts (create user directories, etc.
  * @deprecated PostLogin Hook will be be removed in Contao 5.0.

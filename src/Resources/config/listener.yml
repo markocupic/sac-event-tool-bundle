@@ -23,11 +23,15 @@ services:
     arguments:
     - "@contao.framework"
 
-
-  # Add custom regexp
-  markocupic_sac_event_tool.contao_hooks.add_custom_regexp:
+  # Contao add custom regexp hook
+  markocupic.sac_event_tool_bundle.event_listener.add_custom_regexp:
     public: true
-    class: Markocupic\SacEventToolBundle\ContaoHooks\AddCustomRegexp
+    class: Markocupic\SacEventToolBundle\EventListener\AddCustomRegexpListener
     arguments:
     - "@contao.framework"
+    - '@database_connection'
+    tags:
+    - { name: kernel.event_listener, event: contao.add_custom_regexp, method: onAddCustomRegexp }
+
+
 
