@@ -34,9 +34,9 @@ class AddCustomRegexpListener
     private $connection;
 
     /**
-     * Constructor.
-     *
+     * AddCustomRegexpListener constructor.
      * @param ContaoFramework $framework
+     * @param Connection $connection
      */
     public function __construct(ContaoFramework $framework, Connection $connection)
     {
