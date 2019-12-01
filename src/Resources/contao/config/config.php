@@ -273,7 +273,7 @@ $GLOBALS['TL_HOOKS']['changeEventReleaseLevel'][] = array('markocupic.sac_event_
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic_sac_event_tool.contao_hooks.initialize_system', 'initializeSystem');
 
 /** Handle Ajax calls from the backend **/
-$GLOBALS['TL_HOOKS']['executePreActions'][] = array('markocupic_sac_event_tool.contao_hooks.execute_pre_actions', 'executePreActions');
+$GLOBALS['TL_HOOKS']['executePreActions'][] = array('markocupic.sac_event_tool_bundle.event_listener.execute_pre_actions_listener', 'onExecutePreActions');
 
 /** Handle custom rgxp in the backend **/
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic.sac_event_tool_bundle.event_listener.add_custom_regexp', 'onAddCustomRegexp');
