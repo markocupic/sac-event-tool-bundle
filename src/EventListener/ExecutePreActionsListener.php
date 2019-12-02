@@ -139,11 +139,10 @@ class ExecutePreActionsListener
                     $qb->select('session')
                         ->from('tl_user', 't')
                         ->where('t.id = :id')
-                        ->setParameter('id', $objUser->id);
-                    $qb->setMaxResults(1);
+                        ->setParameter('id', $objUser->id)
+                        ->setMaxResults(1);
                     $result = $qb->execute();
 
-                    //$objDb = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE id=?')->limit(1)->execute($objUser->id);
                     if (false !== ($user = $result->fetch()))
                     {
                         $arrSession = $stringUtilAdapter->deserialize($user['session'], true);
@@ -179,8 +178,8 @@ class ExecutePreActionsListener
                     $qb->select('session')
                         ->from('tl_user', 't')
                         ->where('t.id = :id')
-                        ->setParameter('id', $objUser->id);
-                    $qb->setMaxResults(1);
+                        ->setParameter('id', $objUser->id)
+                        ->setMaxResults(1);
                     $result = $qb->execute();
 
                     if (false !== ($user = $result->fetch()))
@@ -189,13 +188,19 @@ class ExecutePreActionsListener
                         $arrSession['editAllHelper'][$strKey] = $request->request->get('checkedItems');
 
                         // Update session
-                        $this->connection->executeUpdate('UPDATE tl_user SET session = ? WHERE id = ?', array(serialize($arrSession), $objUser->id));
-
+                        //$this->connection->executeUpdate('UPDATE tl_user SET session = ? WHERE id = ?', array(serialize($arrSession), $objUser->id));
+                        /** @var  Doctrine\DBAL\Query\QueryBuilder $qb */
+                        $qb = $this->connection->createQueryBuilder();
+                        $qb->update('tl_user', 't')
+                            ->set('t.session', ':session')
+                            ->where('t.id = :id')
+                            ->setParameter('id', $objUser->id)
+                            ->setParameter('session', serialize($arrSession));
                         $json['status'] = 'success';
                     }
                 }
                 // Send json data to the browser
-                // !!! Do not use new JsonResponse($json) because session data will be owerwritten
+                // !!! Do not use new JsonResponse($json) because session data will be overwritten
                 echo json_encode($json);
                 exit;
             }
