@@ -1,4 +1,5 @@
 services:
+
   markocupic.sac_event_tool_bundle.prepare_plugin_environment:
     public: true
     class: Markocupic\SacEventToolBundle\PreparePluginEnvironment

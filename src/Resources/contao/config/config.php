@@ -270,7 +270,7 @@ if (!isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) || !is_array($GLOBAL
 $GLOBALS['TL_HOOKS']['changeEventReleaseLevel'][] = array('markocupic.sac_event_tool_bundle.event_listener.change_event_release_level', 'onChangeEventReleaseLevel');
 
 /** Route prepare plugin environment **/
-$GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic_sac_event_tool.contao_hooks.initialize_system', 'initializeSystem');
+$GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic.sac_event_tool_bundle.event_listener.initialize_system_listener', 'onInitializeSystem');
 
 /** Handle Ajax calls from the backend **/
 $GLOBALS['TL_HOOKS']['executePreActions'][] = array('markocupic.sac_event_tool_bundle.event_listener.execute_pre_actions_listener', 'onExecutePreActions');
@@ -281,10 +281,10 @@ $GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic.sac_event_tool_bun
 /** Prepare User accounts (create user directories, etc.
  * @deprecated PostLogin Hook will be be removed in Contao 5.0.
  **/
-$GLOBALS['TL_HOOKS']['postLogin'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\PostLogin', 'prepareBeUserAccount');
+$GLOBALS['TL_HOOKS']['postLogin'][] = array('markocupic.sac_event_tool_bundle.event_listener.post_login_listener', 'onPostLogin');
 
 /** Allow backend users to authenticate with their sacMemberId **/
-$GLOBALS['TL_HOOKS']['importUser'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ImportUser', 'allowBackendUserToAuthenticateWithSacMemberId');
+$GLOBALS['TL_HOOKS']['importUser'][] = array('markocupic.sac_event_tool_bundle.event_listener.import_user_listener', 'onImportUser');
 
 /** Parse backend template hook **/
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic_sac_event_tool.contao_hooks.parse_backend_template', 'parseBackendTemplate');
@@ -297,6 +297,6 @@ $GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = array('Markocupic\S
 /** Replace insert tags **/
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ReplaceInsertTags', 'replaceInsertTags');
 
-/** Parse template **/
-$GLOBALS['TL_HOOKS']['parseTemplate'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ParseTemplate', 'checkIfAccountIsActivated');
+/** Parse template (Check if frontend login is allowed, if not replace the default error message and redirect to account activation page) */
+$GLOBALS['TL_HOOKS']['parseTemplate'][] = array('markocupic.sac_event_tool_bundle.event_listener.parse_template_listener', 'onParseTemplate');
 

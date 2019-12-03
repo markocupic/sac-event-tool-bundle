@@ -21,7 +21,6 @@ use Contao\Input;
 use Contao\MemberModel;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -60,7 +59,6 @@ class ExecutePreActionsListener
 
     /**
      * @param string $strAction
-     * @return null|JsonResponse
      */
     public function onExecutePreActions($strAction = '')
     {
@@ -99,8 +97,7 @@ class ExecutePreActionsListener
             }
 
             // Send json data to the browser
-            $response = new JsonResponse($json);
-            return $response->send();
+            $this->_jsonSend($json);
         }
 
         // editAllNavbarHandler in the Contao backend when using the overrideAll or editAll mode
@@ -120,11 +117,10 @@ class ExecutePreActionsListener
                     $json['status'] = 'success';
                 }
                 // Send json data to the browser
-                $response = new JsonResponse($json);
-                return $response->send();
+                $this->_jsonSend($json);
             }
 
-            if ($request->request->get('subaction') == 'getSessionData')
+            if ($request->request->get('subaction') === 'getSessionData')
             {
                 $json = array();
                 $json['session'] = '';
@@ -160,15 +156,14 @@ class ExecutePreActionsListener
                     }
                 }
                 // Send json data to the browser
-                $response = new JsonResponse($json);
-                return $response->send();
+                $this->_jsonSend($json);
             }
 
             if ($request->request->get('subaction') === 'saveSessionData')
             {
                 $json = array();
-                $json['session'] = '';
                 $json['status'] = 'error';
+                $json['sessionData'] = '';
                 $strTable = $request->query->get('table');
                 $strKey = $strTable != '' ? $strTable : '';
                 if (($objUser = $backendUserAdapter->getInstance()) !== null)
@@ -186,9 +181,9 @@ class ExecutePreActionsListener
                     {
                         $arrSession = $stringUtilAdapter->deserialize($user['session'], true);
                         $arrSession['editAllHelper'][$strKey] = $request->request->get('checkedItems');
+                        $json['sessionData'] = $arrSession['editAllHelper'];
 
                         // Update session
-                        //$this->connection->executeUpdate('UPDATE tl_user SET session = ? WHERE id = ?', array(serialize($arrSession), $objUser->id));
                         /** @var  Doctrine\DBAL\Query\QueryBuilder $qb */
                         $qb = $this->connection->createQueryBuilder();
                         $qb->update('tl_user', 't')
@@ -196,15 +191,31 @@ class ExecutePreActionsListener
                             ->where('t.id = :id')
                             ->setParameter('id', $objUser->id)
                             ->setParameter('session', serialize($arrSession));
+                        $result = $qb->execute();
+                        $json['affectedRows'] = $result;
                         $json['status'] = 'success';
                     }
                 }
+
                 // Send json data to the browser
-                // !!! Do not use new JsonResponse($json) because session data will be overwritten
-                echo json_encode($json);
-                exit;
+                $this->_jsonSend($json);
             }
         }
+    }
+
+    /**
+     * @param $json
+     * @param int $status
+     */
+    private function _jsonSend($json, $status = 200)
+    {
+        // !!! Do not use new JsonResponse($json) because session data will be overwritten
+        // Send json data to the browser
+        header('Content-Type: application/json');
+        header('Status: ' . $status);
+        // return the encoded json
+        echo json_encode($json);
+        exit();
     }
 }
 

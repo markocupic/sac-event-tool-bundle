@@ -78,3 +78,45 @@ services:
     - '@request_stack'
     tags:
     - { name: kernel.event_listener, event: execute_pre_actions_listener, method: onExecutePreActions }
+
+  # Contao import user hook (Allow users to login into the backend with their sacMemberId)
+  markocupic.sac_event_tool_bundle.event_listener.import_user_listener:
+    public: true
+    class: Markocupic\SacEventToolBundle\EventListener\ImportUserListener
+    arguments:
+    - "@contao.framework"
+    - '@request_stack'
+    tags:
+    - { name: kernel.event_listener, event: import_user_listener, method: onImportUser }
+
+  # Contao initialize system hook (Prepare the SAC Event Tool plugin environment)
+  markocupic.sac_event_tool_bundle.event_listener.initialize_system_listener:
+    public: true
+    class: Markocupic\SacEventToolBundle\EventListener\InitializeSystemListener
+    arguments:
+    - "@contao.framework"
+    tags:
+    - { name: kernel.event_listener, event: initialize_system_listener, method: onInitializeSystem }
+
+  # Contao parse template hook (Check if frontend login is allowed, if not replace the default error message and redirect to account activation page)
+  markocupic.sac_event_tool_bundle.event_listener.parse_template_listener:
+    public: true
+    class: Markocupic\SacEventToolBundle\EventListener\ParseTemplateListener
+    arguments:
+    - "@contao.framework"
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    tags:
+    - { name: kernel.event_listener, event: parse_template_listener, method: onParseTemplate }
+
+  # Contao post login hook (Create backend user home directories if they does not exist & remove no more used directories)
+  markocupic.sac_event_tool_bundle.event_listener.post_login_listener:
+    public: true
+    class: Markocupic\SacEventToolBundle\EventListener\PostLoginListener
+    arguments:
+    - "@contao.framework"
+    - "@database_connection"
+    - '%kernel.project_dir%'
+    tags:
+    - { name: kernel.event_listener, event: post_login_listener, method: onPostLogin }
+

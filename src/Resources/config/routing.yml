@@ -1,3 +1,4 @@
 sac_event_tool:
   resource: "@MarkocupicSacEventToolBundle/Controller"
   type: annotation
+
