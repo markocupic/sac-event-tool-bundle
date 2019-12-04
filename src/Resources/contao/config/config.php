@@ -287,7 +287,7 @@ $GLOBALS['TL_HOOKS']['postLogin'][] = array('markocupic.sac_event_tool_bundle.ev
 $GLOBALS['TL_HOOKS']['importUser'][] = array('markocupic.sac_event_tool_bundle.event_listener.import_user_listener', 'onImportUser');
 
 /** Parse backend template hook **/
-$GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic_sac_event_tool.contao_hooks.parse_backend_template', 'parseBackendTemplate');
+$GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic.sac_event_tool_bundle.event_listener.parse_backend_template_listener', 'onParseBackendTemplate');
 
 /** Cron jobs **/
 $GLOBALS['TL_CRON']['daily']['replaceDefaultPassword'] = array('Markocupic\SacEventToolBundle\ReplaceDefaultPassword', 'sendNewPassword');
@@ -295,7 +295,7 @@ $GLOBALS['TL_CRON']['hourly']['syncSacMemberDatabase'] = array('Markocupic\SacEv
 $GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = array('Markocupic\SacEventToolBundle\Controller\CronjobController', 'generateWorkshopPdfBooklet');
 
 /** Replace insert tags **/
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('Markocupic\SacEventToolBundle\ContaoHooks\ReplaceInsertTags', 'replaceInsertTags');
+$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('markocupic.sac_event_tool_bundle.event_listener.replace_insert_tags_listener', 'onReplaceInsertTags');
 
 /** Parse template (Check if frontend login is allowed, if not replace the default error message and redirect to account activation page) */
 $GLOBALS['TL_HOOKS']['parseTemplate'][] = array('markocupic.sac_event_tool_bundle.event_listener.parse_template_listener', 'onParseTemplate');

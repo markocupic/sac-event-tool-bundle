@@ -8,28 +8,47 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\ContaoHooks;
+namespace Markocupic\SacEventToolBundle\EventListener;
 
-use Contao\Config;
 use Contao\Controller;
-
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
 use Contao\MemberModel;
 use Contao\PageModel;
 
 /**
- * Class ReplaceInsertTags
- * @package Markocupic\SacEventToolBundle\ContaoHooks
+ * Class ReplaceInsertTagsListener
+ * @package Markocupic\SacEventToolBundle\EventListener
  */
-class ReplaceInsertTags
+class ReplaceInsertTagsListener
 {
+
+    /**
+     * @var ContaoFramework
+     */
+    private $framework;
+
+    /**
+     * ReplaceInsertTagsListener constructor.
+     * @param ContaoFramework $framework
+     */
+    public function __construct(ContaoFramework $framework)
+    {
+        $this->framework = $framework;
+    }
 
     /**
      * @param $strTag
      * @return bool|string
      */
-    public function replaceInsertTags($strTag)
+    public function onReplaceInsertTags($strTag)
     {
+        // Set adapters
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
+        $frontendUserAdapter = $this->framework->getAdapter(FrontendUser::class);
+        $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
+
         // Replace external link
         // {{external_link::http://google.ch::more}}
         if (strpos($strTag, 'external_link') !== false)
@@ -60,12 +79,12 @@ class ReplaceInsertTags
                 $size = $elements[1];
                 if (FE_USER_LOGGED_IN)
                 {
-                    $objUser = MemberModel::findByPk(FrontendUser::getInstance()->id);
+                    $objUser = $memberModelAdapter->findByPk($frontendUserAdapter->getInstance()->id);
                     if ($objUser !== null)
                     {
                         $strUrl = getAvatar($objUser->id, 'FE');
                         $strInsertTag = sprintf('{{picture::%s?size=%s&alt=&s}}', $strUrl, $size, $objUser->firstname . ' ' . $objUser->lastname);
-                        return Controller::replaceInsertTags($strInsertTag);
+                        return $controllerAdapter->replaceInsertTags($strInsertTag);
                     }
                 }
             }
@@ -85,11 +104,11 @@ class ReplaceInsertTags
                 {
                     $params = $elements[2];
                 }
-                $objPage = PageModel::findByIdOrAlias($elements[1]);
+                $objPage = $pageModelAdapter->findByIdOrAlias($elements[1]);
                 if ($objPage !== null)
                 {
                     $strLocation = sprintf('%s%s', $objPage->getFrontendUrl(), $params);
-                    Controller::redirect($strLocation);
+                    $controllerAdapter->redirect($strLocation);
                 }
             }
         }

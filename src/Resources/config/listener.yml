@@ -120,3 +120,20 @@ services:
     tags:
     - { name: kernel.event_listener, event: post_login_listener, method: onPostLogin }
 
+  # Contao parse backend template hook (manipulate backend templates)
+  markocupic.sac_event_tool_bundle.event_listener.parse_backend_template_listener:
+    public: true
+    class: Markocupic\SacEventToolBundle\EventListener\ParseBackendTemplateListener
+    arguments:
+    - "@contao.framework"
+    tags:
+    - { name: kernel.event_listener, event: parse_backend_template_listener, method: onParseBackendTemplate }
+
+  # Contao replace insert tags hook (Use custom inserttags)
+  markocupic.sac_event_tool_bundle.event_listener.replace_insert_tags_listener:
+    public: true
+    class: Markocupic\SacEventToolBundle\EventListener\ReplaceInsertTagsListener
+    arguments:
+    - "@contao.framework"
+    tags:
+    - { name: kernel.event_listener, event: replace_insert_tags_listener, method: onReplaceInsertTags }

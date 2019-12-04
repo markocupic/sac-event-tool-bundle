@@ -31,9 +31,7 @@
     },
     "classmap": [
       "src/Resources/contao",
-      "src/ContaoHooks",
-      "src/Services",
-      "src/Controller"
+      "src/Services"
     ],
     "exclude-from-classmap": [
       "src/Resources/contao/assets",
@@ -49,3 +47,4 @@
     "contao-manager-plugin": "Markocupic\\SacEventToolBundle\\ContaoManager\\Plugin"
   }
 }
+
