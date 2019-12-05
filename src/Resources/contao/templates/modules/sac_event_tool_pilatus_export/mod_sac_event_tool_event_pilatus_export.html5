@@ -138,6 +138,27 @@
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal_event_<?= $arrEvent['id'] ?>">Bearbeiten</button>
           </td>
         </tr>
+        <tr class="event-export-row-body">
+          <td class=""></td>
+          <td class="">
+            <?php new Contao\Folder('web/system/eventQRcodes'); ?>
+            <?php $filepath =  'system/qrcodes/eventQRcode_' . $arrEvent['id'] . '.png'; ?>
+            <?php
+            $options = new chillerlan\QRCode\QROptions([
+	                'version'    => 5,
+                    'scale' => 5,
+                    'outputType' => chillerlan\QRCode\QRCode::OUTPUT_IMAGE_PNG,
+                    'eccLevel'   => chillerlan\QRCode\QRCode::ECC_L,
+                    //'cachefile' => $filepath
+              ]);
+            (new chillerlan\QRCode\QRCode($options))->render($arrEvent['url'], $filepath);
+            ?>
+            <img style="border: 1px solid black; width:120px; height:auto;" src="<?php echo $filepath; ?>"/>
+            {{br}}
+            <small><?= $arrEvent['url'] ?></small>
+          </td>
+        </tr>
+
     <?php endforeach; ?>
     </tbody>
   </table>

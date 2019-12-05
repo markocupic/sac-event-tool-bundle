@@ -19,6 +19,7 @@ use Contao\Controller;
 use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
+use Contao\Events;
 use Contao\FrontendTemplate;
 use Contao\Input;
 use Contao\StringUtil;
@@ -580,6 +581,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     private function getEventDetails($objEvent)
     {
         $arrRow = $objEvent->row();
+        $arrRow['url'] = Environment::get('url') . '/' . Events::generateEventUrl($objEvent);
         $arrRow['eventState'] = $objEvent->eventState != '' ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
         $arrRow['week'] = Date::parse('W', $objEvent->startDate);
         $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);
