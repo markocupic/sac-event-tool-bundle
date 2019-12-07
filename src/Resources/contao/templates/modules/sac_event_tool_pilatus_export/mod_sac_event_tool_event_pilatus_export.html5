@@ -180,12 +180,12 @@
                   <textarea class="form-control" rows="3" id="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>" name="<?= $field ?>"><?= \Contao\CalendarEventsModel::findByPk($arrEvent['id'])->{$field} ?></textarea>
                 </div>
               <?php endforeach; ?>
-              <button type="button" class="btn btn-danger send-form">Änderungen Speichern</button>
+              <button type="button" class="btn btn-primary send-form">Änderungen Speichern</button>
             </form>
           </div>
           <!-- Modal footer -->
           <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Schliessen</button>
           </div>
         </div>
       </div>
