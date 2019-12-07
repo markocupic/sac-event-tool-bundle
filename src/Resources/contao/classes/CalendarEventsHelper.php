@@ -10,19 +10,24 @@
 
 namespace Markocupic\SacEventToolBundle;
 
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Contao\Calendar;
 use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\ContentModel;
 use Contao\Controller;
+use Contao\CoreBundle\Util\SymlinkUtil;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
 use Contao\Database;
 use Contao\Date;
 use Contao\EventOrganizerModel;
+use Contao\Events;
 use Contao\EventTypeModel;
 use Contao\FilesModel;
+use Contao\Folder;
 use Contao\FrontendTemplate;
 use Contao\MemberModel;
 use Contao\PageModel;
@@ -1282,5 +1287,56 @@ class CalendarEventsHelper
         }
 
         return $arrHtml;
+    }
+
+    /**
+     * Use chillerlan\QRCode library to generate qur codes
+     * @param CalendarEventsModel $objEvent
+     * @param array $arrOptions
+     * @param bool $blnAbsoluteUrl
+     * @param bool $blnCache
+     * @return null|string
+     * @throws \Exception
+     */
+    public static function getEventQrCode(CalendarEventsModel $objEvent, array $arrOptions = array(), bool $blnAbsoluteUrl = true, bool $blnCache = true)
+    {
+        if ($objEvent !== null)
+        {
+            // Generate QR code folder
+            $objFolder = new Folder('system/qrcodes');
+
+            // Symlink
+            $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+            SymlinkUtil::symlink($objFolder->path, 'web/' . $objFolder->path, $rootDir);
+
+            // Generate path
+            $filepath = sprintf($objFolder->path . '/' . 'eventQRcode_%s.png', $objEvent->id);
+
+            // Defaults
+            $opt = [
+                'version'    => 5,
+                'scale'      => 2,
+                'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+                'eccLevel'   => QRCode::ECC_L,
+                'cachefile'  => $filepath
+            ];
+
+            if (!$blnCache && isset($opt['cachefile']))
+            {
+                unset($opt['cachefile']);
+            }
+
+            $options = new QROptions(array_merge($opt, $arrOptions));
+
+            // Get event reader url
+            $url = Events::generateEventUrl($objEvent, $blnAbsoluteUrl);
+
+            // Generate QR and return the image path
+            if ((new QRCode($options))->render($url, $filepath))
+            {
+                return $filepath;
+            }
+        }
+        return null;
     }
 }

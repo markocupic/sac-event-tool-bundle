@@ -49,6 +49,9 @@ class ReplaceInsertTagsListener
         $frontendUserAdapter = $this->framework->getAdapter(FrontendUser::class);
         $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
 
+        // Trim whitespaces
+        $strTag = $strTag != '' ? trim($strTag) : $strTag;
+
         // Replace external link
         // {{external_link::http://google.ch::more}}
         if (strpos($strTag, 'external_link') !== false)
@@ -60,10 +63,7 @@ class ReplaceInsertTagsListener
                 $label = $href;
                 if (isset($elements[2]) && $elements[2] != '')
                 {
-                    if (trim($elements) != '')
-                    {
-                        $label = $elements[2];
-                    }
+                    $label = $elements[2];
                 }
                 return sprintf('<a href="%s" target="_blank">%s</a>', $href, $label);
             }

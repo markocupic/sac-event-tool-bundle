@@ -61,9 +61,14 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     protected $eventReleaseLevel;
 
     /**
-     * @var
+     * @var string $dateFormat
      */
     protected $dateFormat = 'j.';
+
+    /**
+     * @var boolean $showQrCode
+     */
+    protected $showQrCode = false;
 
     /**
      * @var null
@@ -213,6 +218,12 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             'eval'      => array('mandatory' => false, 'includeBlankOption' => true),
         ));
 
+        $objForm->addFormField('showQrCode', array(
+            'label'     => array('QR Code', 'QR Code anzeigen?'),
+            'inputType' => 'checkbox',
+            'eval'      => array('mandatory' => false),
+        ));
+
         // Let's add  a submit button
         $objForm->addFormField('submit', array(
             'label'     => 'Export starten',
@@ -229,6 +240,12 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 $this->endDate = strtotime($arrRange[1]);
                 $objForm->getWidget('timeRangeStart')->value = '';
                 $objForm->getWidget('timeRangeEnd')->value = '';
+            }
+
+            // Generate QR code
+            if (Input::post('showQrCode'))
+            {
+                $this->showQrCode = true;
             }
 
             // Alternatively you can add the date manualy
@@ -582,6 +599,10 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     {
         $arrRow = $objEvent->row();
         $arrRow['url'] = Environment::get('url') . '/' . Events::generateEventUrl($objEvent);
+        if($this->showQrCode)
+        {
+            $arrRow['qrCode'] = CalendarEventsHelper::getEventQrCode($objEvent);
+        }
         $arrRow['eventState'] = $objEvent->eventState != '' ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
         $arrRow['week'] = Date::parse('W', $objEvent->startDate);
         $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);

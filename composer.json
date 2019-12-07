@@ -19,6 +19,7 @@
     "eluceo/ical": "^0.15",
     "league/csv": "^9.1",
     "tecnickcom/tcpdf": "^6.2.26",
+    "chillerlan/php-qrcode": "^3.2",
     "markocupic/phpoffice-bundle": "^1.0",
     "markocupic/cloudconvert-bundle": "^1.0"
   },
