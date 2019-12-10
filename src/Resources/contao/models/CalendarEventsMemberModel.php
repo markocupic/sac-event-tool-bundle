@@ -66,29 +66,39 @@ class CalendarEventsMemberModel extends \Model
             return $arrEvents;
         }
 
-        $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE endDate>? AND published=? ORDER BY startDate')->execute(time(), '1');
-        while ($objEvents->next())
+        // Get ids of events member has joined
+        $arrIDS = array();
+        $objEventsMemberHasRegistered = \Database::getInstance()->prepare('SELECT eventId FROM tl_calendar_events_member WHERE sacMemberId=?')->execute($objMember->sacMemberId);
+        while ($objEventsMemberHasRegistered->next())
         {
-            $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id);
-            if ($objJoinedEvents->numRows)
+            $arrIDS[] = $objEventsMemberHasRegistered->eventId;
+        }
+
+        if (count($arrIDS) > 0)
+        {
+            $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE id IN(' . implode(',', $arrIDS) . ') AND endDate>? AND published=? ORDER BY startDate')->execute(time(), '1');
+            while ($objEvents->next())
             {
-                $arr = $objEvents->row();
-                $objEventsModel = \CalendarEventsModel::findByPk($objEvents->id);
-                $arr['id'] = $objEvents->id;
-                $arr['eventModel'] = $objEventsModel;
-                $arr['eventUrl'] = \Events::generateEventUrl($objEventsModel);
-                $arr['dateSpan'] = ($objEventsModel->startDate != $objEventsModel->endDate) ? \Date::parse('d.m.', $objEventsModel->startDate) . ' - ' . \Date::parse('d.m.Y', $objEventsModel->endDate) : \Date::parse('d.m.Y', $objEventsModel->startDate);
-                $arr['eventType'] = $objEventsModel->eventType;
-                $arr['registrationId'] = $objJoinedEvents->id;
-                $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
-                $arr['unregisterUrl'] = \Frontend::addToUrl('do=unregisterUserFromEvent&amp;registrationId=' . $objJoinedEvents->id);
-                $arrEvents[] = $arr;
+                $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id);
+                if ($objJoinedEvents->numRows)
+                {
+                    $arr = $objEvents->row();
+                    $objEventsModel = \CalendarEventsModel::findByPk($objEvents->id);
+                    $arr['id'] = $objEvents->id;
+                    $arr['eventModel'] = $objEventsModel;
+                    $arr['eventUrl'] = \Events::generateEventUrl($objEventsModel);
+                    $arr['dateSpan'] = ($objEventsModel->startDate != $objEventsModel->endDate) ? \Date::parse('d.m.', $objEventsModel->startDate) . ' - ' . \Date::parse('d.m.Y', $objEventsModel->endDate) : \Date::parse('d.m.Y', $objEventsModel->startDate);
+                    $arr['eventType'] = $objEventsModel->eventType;
+                    $arr['registrationId'] = $objJoinedEvents->id;
+                    $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
+                    $arr['unregisterUrl'] = \Frontend::addToUrl('do=unregisterUserFromEvent&amp;registrationId=' . $objJoinedEvents->id);
+                    $arrEvents[] = $arr;
+                }
             }
         }
 
         return $arrEvents;
     }
-
 
     /**
      * @param $memberId
@@ -133,7 +143,6 @@ class CalendarEventsMemberModel extends \Model
         $arrEvents = array();
         $objMember = \MemberModel::findByPk($memberId);
 
-
         $memberHasUserAccount = false;
         if ($objMember !== null)
         {
@@ -142,7 +151,6 @@ class CalendarEventsMemberModel extends \Model
                 $objUser = UserModel::findBySacMemberId($objMember->sacMemberId);
                 if ($objUser !== null)
                 {
-
                     $memberHasUserAccount = true;
                 }
             }
@@ -151,7 +159,7 @@ class CalendarEventsMemberModel extends \Model
         $queryTimeSpan = '';
         if ($timeSpanDays > 0)
         {
-            $limit = time() - $timeSpanDays*24*3600;
+            $limit = time() - $timeSpanDays * 24 * 3600;
             $queryTimeSpan = ' AND startDate>' . $limit . ' ';
         }
 
@@ -163,7 +171,6 @@ class CalendarEventsMemberModel extends \Model
             {
                 if ($objEvents1->instructor != '')
                 {
-
                     $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvents1->id);
                     if (in_array($objUser->id, $arrInstructors))
                     {

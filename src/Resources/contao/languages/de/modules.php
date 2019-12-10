@@ -41,4 +41,4 @@ $GLOBALS['TL_LANG']['FMD']['tour_difficulty_list'] = array('Schwierigkeitsgrade 
 $GLOBALS['TL_LANG']['FMD']['csv_event_member_export'] = array('SAC-Event-Teilnehmer Export');
 $GLOBALS['TL_LANG']['FMD']['event_registration_form'] = array('SAC Event Registrierungsformular');
 $GLOBALS['TL_LANG']['FMD']['activate_member_account'] = array('SAC Mitgliederkonto Aktivierungsformular');
-
+$GLOBALS['TL_LANG']['FMD']['member_dashboard_upcoming_events'] = array('SAC Mitgliederkonto Dashboard - Meine nächsten Events');

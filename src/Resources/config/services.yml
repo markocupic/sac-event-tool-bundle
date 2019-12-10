@@ -62,3 +62,15 @@ services:
     - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
     public: true
 
+  markocupic.sac_event_tool_bundle.controller.frontend_module.member_dashboard_upcoming_events:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardUpcomingEventsController
+    arguments:
+    - '@contao.framework'
+    - '@database_connection'
+    - '@security.helper'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+
