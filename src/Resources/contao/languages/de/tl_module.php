@@ -9,9 +9,11 @@
  */
 
 // Legends
-$GLOBALS['TL_LANG']['tl_module']['member_dashboard_upcoming_events_legend'] = 'Member Dashboard: Zuk&uuml;nftige Events';
+$GLOBALS['TL_LANG']['tl_module']['member_dashboard_upcoming_events_legend'] = 'Member Dashboard: Zukünftige Events';
+$GLOBALS['TL_LANG']['tl_module']['member_dashboard_event_type_filter_legend'] = 'Member Dashboard: Event-Filter-Einstellungen';
 $GLOBALS['TL_LANG']['tl_module']['jumpTo_legend'] = 'Weiterleitungs-Einstellungen';
 $GLOBALS['TL_LANG']['tl_module']['events_story_legend'] = 'Touren- und Kursberichte-Einstellungen';
+
 
 // Fields
 $GLOBALS['TL_LANG']['tl_module']['unregisterFromEventNotificationId'] = array('Notification Center: Benachrichtigungs-ID bei Eventabsage eines Mitglieds', 'Geben Sie eine Benachrichtigung aus dem Notification Center ein.');

@@ -17,7 +17,6 @@
   <?php endforeach; ?>
 <?php endif; ?>
 
-<h2 class="mt-0">Meine nächsten Events</h2>
 <table class="table layout-table table-responsive table-striped">
   <tr>
     <th>Datum</th>
@@ -38,7 +37,7 @@
       <?php endif; ?>
       <a href="<?= $event['eventUrl'] ?>" title="zum Event"><?= $event['eventModel']->title ?></a>
     </td>
-    <td><?= $stateOfSubscription ?></td>
+    <td><span class="badge badge-primary"><?= $stateOfSubscription ?></span></td>
     <td class="text-center">
       <?php if($event['eventRegistrationModel']->stateOfSubscription !== 'user-has-unsubscribed'): ?>
       <a href="<?= $event['unregisterUrl'] ?>" role="button" title="Von Event abmelden" class="sign-out-from-event-button btn btn-sm btn-danger">

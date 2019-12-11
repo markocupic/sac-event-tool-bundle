@@ -27,7 +27,6 @@ use Contao\System;
 use Contao\Template;
 use Contao\UserModel;
 use Contao\Validator;
-use Doctrine\DBAL\Connection;
 use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -47,11 +46,6 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
      * @var ContaoFramework
      */
     protected $framework;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
 
     /**
      * @var Security
@@ -74,17 +68,20 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
     protected $objUser;
 
     /**
-     * ModuleSacEventToolMemberDashboardBookingsController constructor.
+     * @var Template
+     */
+    protected $template;
+
+    /**
+     * MemberDashboardUpcomingEventsController constructor.
      * @param ContaoFramework $framework
-     * @param Connection $connection
      * @param Security $security
      * @param RequestStack $requestStack
      * @param ScopeMatcher $scopeMatcher
      */
-    public function __construct(ContaoFramework $framework, Connection $connection, Security $security, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
+    public function __construct(ContaoFramework $framework, Security $security, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
     {
         $this->framework = $framework;
-        $this->connection = $connection;
         $this->security = $security;
         $this->requestStack = $requestStack;
         $this->scopeMatcher = $scopeMatcher;
@@ -100,33 +97,33 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        // Set adapters
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-
         // Return empty string, if user is not logged in as a frontend user
         if ($this->isFrontend())
         {
+            // Set adapters
+            $controllerAdapter = $this->framework->getAdapter(Controller::class);
+            $inputAdapter = $this->framework->getAdapter(Input::class);
+
             if (($objUser = $this->security->getUser()) instanceof FrontendUser)
             {
                 $this->objUser = $objUser;
             }
-        }
 
-        // Neither cache nor search page
-        $page->noSearch = 1;
-        $page->cache = 0;
+            // Neither cache nor search page
+            $page->noSearch = 1;
+            $page->cache = 0;
 
-        if ($this->objUser === null)
-        {
-            $controllerAdapter->redirect('');
-        }
+            if ($this->objUser === null)
+            {
+                $controllerAdapter->redirect('');
+            }
 
-        // Sign out from Event
-        if ($inputAdapter->get('do') === 'unregisterUserFromEvent')
-        {
-            $this->unregisterUserFromEvent($inputAdapter->get('registrationId'), $model->unregisterFromEventNotificationId);
-            $controllerAdapter->redirect($page->getFrontendUrl());
+            // Sign out from Event
+            if ($inputAdapter->get('do') === 'unregisterUserFromEvent')
+            {
+                $this->unregisterUserFromEvent($inputAdapter->get('registrationId'), $model->unregisterFromEventNotificationId);
+                $controllerAdapter->redirect($page->getFrontendUrl());
+            }
         }
 
         // Call the parent method
@@ -141,40 +138,30 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
+        $this->template = $template;
+
         // Set adapters
         $messageAdapter = $this->framework->getAdapter(Message::class);
         $validatorAdapter = $this->framework->getAdapter(Validator::class);
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
+        // Handle messages
         if ($this->objUser->email == '' || !$validatorAdapter->isEmail($this->objUser->email))
         {
             $messageAdapter->addInfo('Leider wurde f&uuml;r dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschr&auml;nkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
         }
 
-        if (Message::hasInfo())
-        {
-            $template->hasInfoMessage = true;
-            $session = System::getContainer()->get('session')->getFlashBag()->get('contao.FE.info');
-            $template->infoMessage = $session[0];
-        }
+        // Add messages to template
+        $this->addMessagesToTemplate();
 
-        if (Message::hasError())
-        {
-            $template->hasErrorMessage = true;
-            $session = System::getContainer()->get('session')->getFlashBag()->get('contao.FE.error');
-            $template->errorMessage = $session[0];
-            $template->errorMessages = $session;
-        }
-
-        Message::reset();
-
+        // Load language
         $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
         // Upcoming events
-        $template->arrUpcomingEvents = $calendarEventsMemberModelAdapter->findUpcomingEventsByMemberId($this->objUser->id);
+        $this->template->arrUpcomingEvents = $calendarEventsMemberModelAdapter->findUpcomingEventsByMemberId($this->objUser->id);
 
-        return $template->getResponse();
+        return $this->template->getResponse();
     }
 
     /**
@@ -329,6 +316,32 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         {
             $messageAdapter->add($errorMsg, 'TL_ERROR', TL_MODE);
         }
+    }
+
+    /**
+     * Add messages from session to template
+     */
+    protected function addMessagesToTemplate(): void
+    {
+        $messageAdapter = $this->framework->getAdapter(Message::class);
+        $systemAdapter = $this->framework->getAdapter(System::class);
+
+        if ($messageAdapter->hasInfo())
+        {
+            $this->template->hasInfoMessage = true;
+            $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.info');
+            $this->template->infoMessage = $session[0];
+        }
+
+        if ($messageAdapter->hasError())
+        {
+            $this->template->hasErrorMessage = true;
+            $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.error');
+            $this->template->errorMessage = $session[0];
+            $this->template->errorMessages = $session;
+        }
+
+        $messageAdapter->reset();
     }
 
 }
