@@ -43,3 +43,4 @@ $GLOBALS['TL_LANG']['FMD']['event_registration_form'] = array('SAC Event Registr
 $GLOBALS['TL_LANG']['FMD']['activate_member_account'] = array('SAC Mitgliederkonto Aktivierungsformular');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_upcoming_events'] = array('SAC Mitgliederkonto Dashboard - Meine nächsten Events');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_past_events'] = array('SAC Mitgliederkonto Dashboard - Meine absolvierten Events');
+$GLOBALS['TL_LANG']['FMD']['member_dashboard_event_report'] = array('SAC Mitgliederkonto Dashboard - Meine Tourenberichte');

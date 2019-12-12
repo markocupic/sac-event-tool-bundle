@@ -29,7 +29,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['event_registration_form'] = '{title
 $GLOBALS['TL_DCA']['tl_module']['palettes']['activate_member_account'] = '{title_legend},name,headline,type;{account_legend},reg_groups;cc{notification_legend},activateMemberAccountNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_upcoming_events'] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},unregisterFromEventNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_past_events'] = '{title_legend},name,headline,type;{member_dashboard_event_type_filter_legend},eventType;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-
+$GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_event_report'] = '{title_legend},name,headline,type;{events_story_legend},timeSpanForCreatingNewEventStory,eventStoryFormJumpTo;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
 // Manipulate palettes
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()
@@ -89,6 +89,17 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['activateMemberAccountNotificationId']
     'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
     'sql'        => "int(10) unsigned NOT NULL default '0'",
     'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryFormJumpTo'] = array(
+
+    'label'      => &$GLOBALS['TL_LANG']['tl_module']['eventStoryFormJumpTo'],
+    'exclude'    => true,
+    'inputType'  => 'pageTree',
+    'foreignKey' => 'tl_page.title',
+    'eval'       => array('mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'),
+    'sql'        => "int(10) unsigned NOT NULL default '0'",
+    'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryJumpTo'] = array(

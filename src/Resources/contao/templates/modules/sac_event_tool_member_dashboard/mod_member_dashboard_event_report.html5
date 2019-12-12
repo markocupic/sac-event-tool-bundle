@@ -1,0 +1,43 @@
+<?php $this->extend('block_unsearchable'); ?>
+
+<?php $this->block('content'); ?>
+
+
+<?php if ($this->hasInfoMessage): ?>
+  <div class="alert alert-info" role="alert">
+      <?= $this->infoMessage ?>
+  </div>
+<?php endif; ?>
+
+<?php if ($this->hasErrorMessage): ?>
+  <?php foreach($this->errorMessages as $msg): ?>
+  <div class="alert alert-danger" role="alert">
+      <?= $msg ?>
+  </div>
+  <?php endforeach; ?>
+<?php endif; ?>
+
+
+<div class="alert bg-light">
+  <?= $this->newEventStoryForm ?>
+  <p class="small">*Tourenberichte können bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Tourende verfasst werden.</p>
+</div>
+
+<table class="table layout-table table-responsive table-striped">
+  <?php foreach ($this->arrEventStories as $story): ?>
+  <tr>
+    <td><?= $story['date'] ?></td>
+    <td><?= $story['eventTitle'] ?></td>
+    <?php if ($story['canEditStory'] && $story['storyLink']): ?>
+    <td class="text-center"><a href="<?= $story['storyLink'] ?>" role="button" title="Touren-/Kursbericht bearbeiten" class="btn btn-sm btn-success"><i class="fal fa-fw fa-pencil"></a></td>
+    <?php elseif ($story['storyLink']): ?>
+    <td class="text-center"><a href="<?= $story['storyLink'] ?>" role="button" title="Touren-/Kursbericht ansehen" class="btn btn-sm btn-success"><i class="fal fa-fw fa-eye"></a></td>
+    <?php else: ?>
+    <td>&nbsp;</td>
+    <?php endif; ?>
+  </tr>
+  <?php endforeach; ?>
+</table>
+
+
+<?php $this->endblock(); ?>

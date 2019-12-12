@@ -85,3 +85,16 @@ services:
     tags:
     - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
     public: true
+
+  # Member dashboard module: list event reports and the form to generate new event reports
+  markocupic.sac_event_tool_bundle.controller.frontend_module.member_dashboard_event_report:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEventReportController
+    arguments:
+    - '@contao.framework'
+    - '@security.helper'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    - '%kernel.project_dir%'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
