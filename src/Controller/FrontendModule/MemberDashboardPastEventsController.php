@@ -154,7 +154,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         // Handle messages
         if ($this->objUser->email == '' || !$validatorAdapter->isEmail($this->objUser->email))
         {
-            $messageAdapter->addInfo('Leider wurde f&uuml;r dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschr&auml;nkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
+            $messageAdapter->addInfo('Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
         }
 
         // Add messages to template

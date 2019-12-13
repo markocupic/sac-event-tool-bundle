@@ -692,7 +692,7 @@ class ModuleSacEventToolMemberDashboard extends Module
         $objForm->setFormActionFromUri(Environment::get('uri'));
 
         $arrOptions = array();
-        $arrEvents = CalendarEventsMemberModel::findPastEventsByMemberId2($this->objUser->id, $this->timeSpanForCreatingNewEventStory);
+        $arrEvents = CalendarEventsMemberModel::findPastEventsByMemberIdAndTimeSpan($this->objUser->id, $this->timeSpanForCreatingNewEventStory);
         if (is_array($arrEvents) && !empty($arrEvents))
         {
             foreach ($arrEvents as $event)

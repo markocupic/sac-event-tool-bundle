@@ -38,11 +38,11 @@ use Symfony\Component\Security\Core\Security;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
- * Class MemberDashboardEventReportController
+ * Class MemberDashboardEventReportListController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
- * @FrontendModule(category="sac_event_tool_fe_modules", type="member_dashboard_event_report")
+ * @FrontendModule(category="sac_event_tool_fe_modules", type="member_dashboard_event_report_list")
  */
-class MemberDashboardEventReportController extends AbstractFrontendModuleController
+class MemberDashboardEventReportListController extends AbstractFrontendModuleController
 {
 
     /**
@@ -151,7 +151,7 @@ class MemberDashboardEventReportController extends AbstractFrontendModuleControl
         // Handle messages
         if ($this->objUser->email == '' || !$validatorAdapter->isEmail($this->objUser->email))
         {
-            $messageAdapter->addInfo('Leider wurde f&uuml;r dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschr&auml;nkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
+            $messageAdapter->addInfo('Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
         }
 
         // Get time span for creating new event story
@@ -254,7 +254,7 @@ class MemberDashboardEventReportController extends AbstractFrontendModuleControl
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         $arrOptions = array();
-        $arrEvents = $calendarEventsMemberModelAdapter->findPastEventsByMemberId2($this->objUser->id, $model->timeSpanForCreatingNewEventStory);
+        $arrEvents = $calendarEventsMemberModelAdapter->findPastEventsByMemberIdAndTimeSpan($this->objUser->id, $model->timeSpanForCreatingNewEventStory);
         if (is_array($arrEvents) && !empty($arrEvents))
         {
             foreach ($arrEvents as $event)
