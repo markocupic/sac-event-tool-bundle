@@ -261,13 +261,15 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                 }
 
                 $this->template->eventName = $objEvent->title;
-                $this->template->eventPeriod = $calendarEventsHelperAdapter->getEventPeriod($objEvent->id);
                 $this->template->executionState = $objEvent->executionState;
                 $this->template->eventSubstitutionText = $objEvent->eventSubstitutionText;
+
                 $this->template->youtubeId = $objReportModel->youtubeId;
                 $this->template->text = $objReportModel->text;
                 $this->template->title = $objReportModel->title;
                 $this->template->publishState = $objReportModel->publishState;
+
+                $this->template->eventPeriod = $calendarEventsHelperAdapter->getEventPeriod($objEvent->id);
 
                 // Get the gallery
                 $this->template->images = $this->getGalleryImages($objReportModel);
@@ -320,9 +322,10 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
     }
 
     /**
-     * @param $objEventStoryModel
+     * @param CalendarEventsStoryModel $objEventStoryModel
+     * @return string
      */
-    protected function generateTextAndYoutubeForm($objEventStoryModel)
+    protected function generateTextAndYoutubeForm(CalendarEventsStoryModel $objEventStoryModel)
     {
         // Set adapters
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
@@ -385,11 +388,12 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
     }
 
     /**
-     * @param $objEventStoryModel
-     * @return string|void
+     * @param CalendarEventsStoryModel $objEventStoryModel
+     * @param ModuleModel $moduleModel
+     * @return string
      * @throws \Exception
      */
-    protected function generatePictureUploadForm($objEventStoryModel, ModuleModel $moduleModel)
+    protected function generatePictureUploadForm(CalendarEventsStoryModel $objEventStoryModel, ModuleModel $moduleModel)
     {
         // Set adapters
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
@@ -400,7 +404,9 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
         $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
+        $messageAdapter = $this->framework->getAdapter(Message::class);
 
+        $objUploadFolder = null;
         if ($moduleModel->eventStoryUploadFolder != '')
         {
             if ($validatorAdapter->isBinaryUuid($moduleModel->eventStoryUploadFolder))
@@ -416,6 +422,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
 
         if ($objUploadFolder === null)
         {
+            $messageAdapter->addError('Uploadverzeichnis nicht gefunden.');
             return;
         }
 
