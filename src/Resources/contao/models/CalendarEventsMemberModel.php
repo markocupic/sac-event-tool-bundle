@@ -123,7 +123,7 @@ class CalendarEventsMemberModel extends \Model
                         {
                             $arr['objEvent'] = $objEventModel;
                             $arr['eventModel'] = $objEventModel;
-                            $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objEventModel);
+                            $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
                             $arr['eventUrl'] = \Events::generateEventUrl($objEventModel);
                         }
                         $arr['unregisterUrl'] = \Frontend::addToUrl('do=unregisterUserFromEvent&amp;registrationId=' . $objJoinedEvents->id);

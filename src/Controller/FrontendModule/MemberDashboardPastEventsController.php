@@ -169,15 +169,29 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
         // Past events
         $arrPastEvents = $calendarEventsMemberModelAdapter->findPastEventsByMemberId($this->objUser->id, $arrEventTypeFilter);
+        $arrEvents = array();
         foreach ($arrPastEvents as $k => $event)
         {
+            // Do only list if member has participated
+            if($event['role'] === 'member')
+            {
+                if($event['eventRegistrationModel'] !== null)
+                {
+                    if(!$event['eventRegistrationModel']->hasParticipated)
+                    {
+                        continue;
+                    }
+                }
+            }
             if ($event['eventType'] === 'course')
             {
-                $arrPastEvents[$k]['downloadCourseConfirmationLink'] = $frontendAdapter->addToUrl('do=download_course_certificate&amp;id=' . $event['registrationId']);
+                $event['downloadCourseConfirmationLink'] = $frontendAdapter->addToUrl('do=download_course_certificate&amp;id=' . $event['registrationId']);
             }
+            $arrEvents[] = $event;
+
         }
 
-        $this->template->arrPastEvents = $arrPastEvents;
+        $this->template->arrPastEvents = $arrEvents;
 
         return $this->template->getResponse();
     }
