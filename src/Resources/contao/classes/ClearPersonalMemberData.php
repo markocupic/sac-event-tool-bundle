@@ -12,13 +12,11 @@ namespace Markocupic\SacEventToolBundle;
 
 use Contao\CalendarEventsMemberModel;
 use Contao\Config;
-use Contao\Database;
 use Contao\Date;
 use Contao\Folder;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\System;
-
 
 /**
  * Class ClearPersonalMemberData
@@ -91,7 +89,6 @@ class ClearPersonalMemberData
                     $objCalendarEventsMember->emergencyPhoneName = ' [anonymisiert]';
                     $objCalendarEventsMember->anonymized = '1';
                     $objCalendarEventsMember->save();
-
                 }
                 return true;
             }
@@ -145,11 +142,9 @@ class ClearPersonalMemberData
             $arrEvents = CalendarEventsMemberModel::findUpcomingEventsByMemberId($objMember->id);
             foreach ($arrEvents as $arrEvent)
             {
-
                 $objEventsMember = CalendarEventsMemberModel::findByPk($arrEvent['registrationId']);
                 if ($objEventsMember !== null)
                 {
-
                     if ($arrEvent['eventModel'] !== null)
                     {
                         $objEvent = $arrEvent['eventModel'];
@@ -171,7 +166,7 @@ class ClearPersonalMemberData
             }
 
             // Past events
-            $arrEvents = self::findPastEventsByMemberId($objMember->id);
+            $arrEvents = CalendarEventsMemberModel::findPastEventsByMemberId($objMember->id);
             foreach ($arrEvents as $arrEvent)
             {
                 $objEventsMember = CalendarEventsMemberModel::findByPk($arrEvent['registrationId']);
@@ -208,37 +203,6 @@ class ClearPersonalMemberData
             }
         }
         return false;
-    }
-
-    /**
-     * @param $memberId
-     * @return array
-     */
-    private static function findPastEventsByMemberId($memberId)
-    {
-        $arrEvents = array();
-        $objMember = MemberModel::findByPk($memberId);
-
-        if ($objMember !== null)
-        {
-
-            $objEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate<? ORDER BY startDate DESC')->execute(time());
-            while ($objEvents->next())
-            {
-                $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id);
-                if ($objJoinedEvents->numRows)
-                {
-                    $arr = $objEvents->row();
-                    $arr['id'] = $objEvents->id;
-                    $arr['registrationId'] = $objJoinedEvents->id;
-                    $arr['objEvent'] = \CalendarEventsModel::findByPk($objEvents->id);
-                    $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
-                    $arrEvents[] = $arr;
-                }
-            }
-        }
-
-        return $arrEvents;
     }
 
     /**

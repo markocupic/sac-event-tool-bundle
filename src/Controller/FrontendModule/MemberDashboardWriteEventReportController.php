@@ -41,6 +41,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
@@ -122,9 +123,6 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         // Return empty string, if user is not logged in as a frontend user
         if ($this->isFrontend())
         {
-            // Set adapters
-            $controllerAdapter = $this->framework->getAdapter(Controller::class);
-
             // Get logged in member object
             if (($objUser = $this->security->getUser()) instanceof FrontendUser)
             {
@@ -138,9 +136,10 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             // Set the page object
             $this->objPage = $page;
 
+            // Do not allow for not authorized users
             if ($this->objUser === null)
             {
-                $controllerAdapter->redirect('');
+                throw new UnauthorizedHttpException();
             }
         }
 

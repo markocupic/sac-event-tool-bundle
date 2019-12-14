@@ -83,7 +83,6 @@ $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
 // Frontend Modules Contao 4 style
 // Contao 5 ready fe modules are registered in service.yml
 $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
-    'eventToolFrontendUserDashboard'         => 'Markocupic\SacEventToolBundle\ModuleSacEventToolMemberDashboard',
     'eventToolCalendarEventStoryList'        => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryList',
     'eventToolCalendarEventStoryReader'      => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryReader',
     'eventToolCalendarEventlist'             => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventlist',

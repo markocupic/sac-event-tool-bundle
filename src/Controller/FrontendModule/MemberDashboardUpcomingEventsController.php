@@ -31,6 +31,7 @@ use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
@@ -113,9 +114,10 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
             $page->noSearch = 1;
             $page->cache = 0;
 
+            // Do not allow for not authorized users
             if ($this->objUser === null)
             {
-                $controllerAdapter->redirect('');
+                throw new UnauthorizedHttpException();
             }
 
             // Sign out from Event

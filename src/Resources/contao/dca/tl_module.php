@@ -31,6 +31,9 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_upcoming_events'] 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_past_events'] = '{title_legend},name,headline,type;{member_dashboard_event_type_filter_legend},eventType;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_event_report_list'] = '{title_legend},name,headline,type;{events_story_legend},timeSpanForCreatingNewEventStory,eventStoryFormJumpTo;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_write_event_report'] = '{title_legend},name,headline,type;{events_story_legend},timeSpanForCreatingNewEventStory,notifyOnEventStoryPublishedNotificationId,eventStoryUploadFolder;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_edit_profile'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_delete_profile'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+
 
 // Manipulate palettes
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()

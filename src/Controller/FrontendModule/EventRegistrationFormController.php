@@ -41,9 +41,9 @@ use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
-
 
 /**
  * Class EventRegistrationFormController
@@ -147,54 +147,60 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        // Set the module object (Contao\ModuleModel)
-        $this->model = $model;
-
-        // Set adapters
-        $configAdapter = $this->framework->getAdapter(Config::class);
-        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-        $notificationAdapter = $this->framework->getAdapter(Notification::class);
-        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-
-        // Return empty string, if user is not logged in as a frontend user
         if ($this->isFrontend())
         {
+            // Set the module object (Contao\ModuleModel)
+            $this->model = $model;
+
+            // Set adapters
+            $configAdapter = $this->framework->getAdapter(Config::class);
+            $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+            $notificationAdapter = $this->framework->getAdapter(Notification::class);
+            $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+
+            // Return empty string, if user is not logged in as a frontend user
+
             if (($objUser = $this->security->getUser()) instanceof FrontendUser)
             {
                 $this->objUser = $objUser;
             }
-        }
 
-        // Set the item from the auto_item parameter
-        if (!$request->query->get('events') && $configAdapter->get('useAutoItem') && isset($_GET['auto_item']))
-        {
-            $request->query->set('events', $_GET['auto_item']);
-            $request->query->set('auto_item', $_GET['auto_item']);
-        }
-
-        // Get $this->objEvent
-        $blnShowModule = false;
-        if ($request->query->get('events') != '')
-        {
-            $objEvent = $calendarEventsModelAdapter->findByIdOrAlias($request->query->get('events'));
-            if ($objEvent !== null)
+            // Do not allow for not authorized users
+            if ($this->objUser === null)
             {
-                $this->objEvent = $objEvent;
-                $blnShowModule = true;
+                throw new UnauthorizedHttpException();
             }
+
+            // Set the item from the auto_item parameter
+            if (!$request->query->get('events') && $configAdapter->get('useAutoItem') && isset($_GET['auto_item']))
+            {
+                $request->query->set('events', $_GET['auto_item']);
+                $request->query->set('auto_item', $_GET['auto_item']);
+            }
+
+            // Get $this->objEvent
+            $blnShowModule = false;
+            if ($request->query->get('events') != '')
+            {
+                $objEvent = $calendarEventsModelAdapter->findByIdOrAlias($request->query->get('events'));
+                if ($objEvent !== null)
+                {
+                    $this->objEvent = $objEvent;
+                    $blnShowModule = true;
+                }
+            }
+            if (!$blnShowModule)
+            {
+                // Return empty string
+                return new Response('', Response::HTTP_NO_CONTENT);
+            }
+
+            // Use terminal42/notification_center
+            $this->objNotification = $notificationAdapter->findByPk($this->model->receiptEventRegistrationNotificationId);
+
+            // Get instructor object from UserModel
+            $this->objInstructor = $userModelAdapter->findByPk($this->objEvent->mainInstructor);
         }
-        if (!$blnShowModule)
-        {
-            // Return empty string
-            return new Response('', Response::HTTP_NO_CONTENT);
-        }
-
-        // Use terminal42/notification_center
-        $this->objNotification = $notificationAdapter->findByPk($this->model->receiptEventRegistrationNotificationId);
-
-        // Get instructor object from UserModel
-        $this->objInstructor = $userModelAdapter->findByPk($this->objEvent->mainInstructor);
-
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }

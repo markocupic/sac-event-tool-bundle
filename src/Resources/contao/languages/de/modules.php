@@ -26,7 +26,6 @@ $GLOBALS['TL_LANG']['MOD']['sac_event_type_tool'] = array('SAC Event-Art-Tool');
 
 // Frontend modules
 $GLOBALS['TL_LANG']['FMD']['sac_event_tool_fe_modules'] = array('SAC Frontend Module');
-$GLOBALS['TL_LANG']['FMD']['eventToolFrontendUserDashboard'] = array('SAC Mitglieder Dashboard');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryList'] = array('SAC Tourenberichte Listen Modul');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryReader'] = array('SAC Tourenberichte Reader Modul');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventlist'] = array('SAC Touren- und Kurse-Auflistungs Modul');
@@ -44,5 +43,7 @@ $GLOBALS['TL_LANG']['FMD']['activate_member_account'] = array('SAC Mitgliederkon
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_upcoming_events'] = array('SAC Mitgliederkonto Dashboard - Meine nächsten Events');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_past_events'] = array('SAC Mitgliederkonto Dashboard - Meine absolvierten Events');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_event_report_list'] = array('SAC Mitgliederkonto Dashboard - Meine Tourenberichte');
-$GLOBALS['TL_LANG']['FMD']['member_dashboard_write_event_report'] = array('SAC Mitgliederkonto Dashboard - Tourenbericht schreiben.');
+$GLOBALS['TL_LANG']['FMD']['member_dashboard_write_event_report'] = array('SAC Mitgliederkonto Dashboard - Tourenbericht schreiben');
+$GLOBALS['TL_LANG']['FMD']['member_dashboard_edit_profile'] = array('SAC Mitgliederkonto Dashboard - Profil bearbeiten');
+$GLOBALS['TL_LANG']['FMD']['member_dashboard_delete_profile'] = array('SAC Mitgliederkonto Dashboard - Profil löschen');
 

@@ -34,6 +34,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
@@ -104,7 +105,6 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         if ($this->isFrontend())
         {
             // Set adapters
-            $controllerAdapter = $this->framework->getAdapter(Controller::class);
             $inputAdapter = $this->framework->getAdapter(Input::class);
 
             // Get logged in member object
@@ -117,9 +117,10 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
             $page->noSearch = 1;
             $page->cache = 0;
 
+            // Do not allow for not authorized users
             if ($this->objUser === null)
             {
-                $controllerAdapter->redirect('');
+                throw new UnauthorizedHttpException();
             }
 
             // Print course certificate
