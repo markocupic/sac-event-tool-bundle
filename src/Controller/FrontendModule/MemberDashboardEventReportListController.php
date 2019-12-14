@@ -252,7 +252,9 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         $arrOptions = array();
-        $arrEvents = $calendarEventsMemberModelAdapter->findPastEventsByMemberIdAndTimeSpan($this->objUser->id, $model->timeSpanForCreatingNewEventStory);
+        $intStartDateMin = $model->timeSpanForCreatingNewEventStory > 0 ? time() - $model->timeSpanForCreatingNewEventStory * 24 * 3600 : time();
+        $arrEvents = $calendarEventsMemberModelAdapter->findEventsByMemberId($this->objUser->id, array(), $intStartDateMin, time(), true);
+
         if (is_array($arrEvents) && !empty($arrEvents))
         {
             foreach ($arrEvents as $event)

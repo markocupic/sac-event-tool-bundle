@@ -54,75 +54,49 @@ class CalendarEventsMemberModel extends \Model
 
     /**
      * @param $memberId
-     * @return array
-     */
-    public static function findUpcomingEventsByMemberId($memberId)
-    {
-        $arrEvents = array();
-        $objMember = \MemberModel::findByPk($memberId);
-
-        if ($objMember === null)
-        {
-            return $arrEvents;
-        }
-
-        // Get ids of events member has joined
-        $arrIDS = array();
-        $objEventsMemberHasRegistered = \Database::getInstance()->prepare('SELECT eventId FROM tl_calendar_events_member WHERE sacMemberId=?')->execute($objMember->sacMemberId);
-        while ($objEventsMemberHasRegistered->next())
-        {
-            $arrIDS[] = $objEventsMemberHasRegistered->eventId;
-        }
-
-        if (count($arrIDS) > 0)
-        {
-            $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE id IN(' . implode(',', $arrIDS) . ') AND endDate>? AND published=? ORDER BY startDate')->execute(time(), '1');
-            while ($objEvents->next())
-            {
-                $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id);
-                if ($objJoinedEvents->numRows)
-                {
-                    $arr = $objEvents->row();
-                    $objEventsModel = \CalendarEventsModel::findByPk($objEvents->id);
-                    $arr['id'] = $objEvents->id;
-                    $arr['eventModel'] = $objEventsModel;
-                    $arr['eventUrl'] = \Events::generateEventUrl($objEventsModel);
-                    $arr['dateSpan'] = ($objEventsModel->startDate != $objEventsModel->endDate) ? \Date::parse('d.m.', $objEventsModel->startDate) . ' - ' . \Date::parse('d.m.Y', $objEventsModel->endDate) : \Date::parse('d.m.Y', $objEventsModel->startDate);
-                    $arr['eventType'] = $objEventsModel->eventType;
-                    $arr['registrationId'] = $objJoinedEvents->id;
-                    $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
-                    $arr['unregisterUrl'] = \Frontend::addToUrl('do=unregisterUserFromEvent&amp;registrationId=' . $objJoinedEvents->id);
-                    $arrEvents[] = $arr;
-                }
-            }
-        }
-
-        return $arrEvents;
-    }
-
-    /**
-     * @param $memberId
      * @param array $arrEventTypeFilter
+     * @param null $intStartDateMin
+     * @param null $intStartDateMax
+     * @param bool $blnInstructorRole
      * @return array
      */
-    public static function findPastEventsByMemberId($memberId, $arrEventTypeFilter = array())
+    public static function findEventsByMemberId($memberId, $arrEventTypeFilter = array(), $intStartDateMin = null, $intStartDateMax = null, $blnInstructorRole = false)
     {
         $arrEvents = array();
         $arrEventIDS = array();
         $objMember = MemberModel::findByPk($memberId);
+        $blnHasEventsAsInstructor = false;
+
+        $queryMin = ($intStartDateMin !== null) ? sprintf("startDate >= %s AND ", $intStartDateMin) : '';
+        $queryMax = ($intStartDateMax !== null) ? sprintf("startDate <= %s AND ", $intStartDateMax) : '';
 
         if ($objMember !== null)
         {
-            $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=?')->execute($objMember->sacMemberId);
+            $objJoinedEvents = \Database::getInstance()->prepare("SELECT * FROM tl_calendar_events_member WHERE sacMemberId=?")->execute($objMember->sacMemberId);
             if ($objJoinedEvents->numRows)
             {
                 $arrEventIDS = $objJoinedEvents->fetchEach('eventId');
                 $arrEventIDS = array_values(array_unique($arrEventIDS));
             }
 
+            if ($blnInstructorRole)
+            {
+                $objUser = UserModel::findBySacMemberId($objMember->sacMemberId);
+                if ($objUser !== null)
+                {
+                    $objJoinedEventsAsInstructor = \Database::getInstance()->prepare("SELECT * FROM tl_calendar_events_instructor WHERE userId=?")->execute($objUser->id);
+                    if ($objJoinedEventsAsInstructor->numRows)
+                    {
+                        $blnHasEventsAsInstructor = true;
+                        $arrEventIDS = array_merge($objJoinedEventsAsInstructor->fetchEach('pid'), $arrEventIDS);
+                        $arrEventIDS = array_values(array_unique($arrEventIDS));
+                    }
+                }
+            }
+
             if (count($arrEventIDS))
             {
-                $objEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE id IN(' . implode(',', $arrEventIDS) . ') AND startDate<? ORDER BY startDate DESC')->execute(time());
+                $objEvents = Database::getInstance()->execute("SELECT * FROM tl_calendar_events WHERE " . $queryMin . $queryMax . "id IN(" . implode(',', $arrEventIDS) . ") ORDER BY startDate DESC");
                 while ($objEvents->next())
                 {
                     // Filter by event type
@@ -137,13 +111,44 @@ class CalendarEventsMemberModel extends \Model
                     $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id);
                     if ($objJoinedEvents->numRows)
                     {
+                        // If member had the role of a participant
+                        $objEventModel = \CalendarEventsModel::findByPk($objEvents->id);
+                        $arr['id'] = $objEvents->id;
                         $arr['title'] = $objEvents->title;
+                        $arr['eventType'] = $objEvents->eventType;
                         $arr['dateSpan'] = ($objEvents->startDate != $objEvents->endDate) ? \Date::parse('d.m.', $objEvents->startDate) . ' - ' . \Date::parse('d.m.Y', $objEvents->endDate) : \Date::parse('d.m.Y', $objEvents->startDate);
                         $arr['registrationId'] = $objJoinedEvents->id;
-                        $arr['objEvent'] = \CalendarEventsModel::findByPk($objEvents->id);
-                        $arr['eventType'] = $objEvents->eventType;
-                        $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
+                        $arr['role'] = 'member';
+                        if ($objEventModel !== null)
+                        {
+                            $arr['objEvent'] = $objEventModel;
+                            $arr['eventModel'] = $objEventModel;
+                            $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objEventModel);
+                            $arr['eventUrl'] = \Events::generateEventUrl($objEventModel);
+                        }
+                        $arr['unregisterUrl'] = \Frontend::addToUrl('do=unregisterUserFromEvent&amp;registrationId=' . $objJoinedEvents->id);
                         $arrEvents[] = $arr;
+                    }
+                    else
+                    {
+                        // If member had the role of an instructor
+                        if ($blnInstructorRole && $blnHasEventsAsInstructor)
+                        {
+                            $objEventModel = \CalendarEventsModel::findByPk($objEvents->id);
+                            $arr['id'] = $objEvents->id;
+                            $arr['title'] = $objEvents->title;
+                            $arr['eventType'] = $objEvents->eventType;
+                            $arr['dateSpan'] = ($objEvents->startDate != $objEvents->endDate) ? \Date::parse('d.m.', $objEvents->startDate) . ' - ' . \Date::parse('d.m.Y', $objEvents->endDate) : \Date::parse('d.m.Y', $objEvents->startDate);
+                            $arr['registrationId'] = null;
+                            $arr['role'] = 'instructor';
+                            if ($objEventModel !== null)
+                            {
+                                $arr['objEvent'] = $objEventModel;
+                                $arr['eventModel'] = $objEventModel;
+                                $arr['eventUrl'] = \Events::generateEventUrl($objEventModel);
+                            }
+                            $arrEvents[] = $arr;
+                        }
                     }
                 }
             }
@@ -153,81 +158,23 @@ class CalendarEventsMemberModel extends \Model
     }
 
     /**
-     * List all events where user has participated as member or instructor
      * @param $memberId
+     * @param array $arrEventTypeFilter
      * @return array
      */
-    public static function findPastEventsByMemberIdAndTimeSpan($memberId, $timeSpanDays = 0)
+    public static function findUpcomingEventsByMemberId($memberId, $arrEventTypeFilter = array(), $blnInstructorRole = false)
     {
-        $arrEvents = array();
-        $objMember = \MemberModel::findByPk($memberId);
-
-        $memberHasUserAccount = false;
-        if ($objMember !== null)
-        {
-            if ($objMember->sacMemberId != '')
-            {
-                $objUser = UserModel::findBySacMemberId($objMember->sacMemberId);
-                if ($objUser !== null)
-                {
-                    $memberHasUserAccount = true;
-                }
-            }
-        }
-
-        $queryTimeSpan = '';
-        if ($timeSpanDays > 0)
-        {
-            $limit = time() - $timeSpanDays * 24 * 3600;
-            $queryTimeSpan = ' AND startDate>' . $limit . ' ';
-        }
-
-        $arrEventsAsInstructor = array();
-        if ($memberHasUserAccount)
-        {
-            $objEvents1 = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate<? ' . $queryTimeSpan . ' ORDER BY startDate DESC')->execute(time());
-            while ($objEvents1->next())
-            {
-                if ($objEvents1->instructor != '')
-                {
-                    $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvents1->id);
-                    if (in_array($objUser->id, $arrInstructors))
-                    {
-                        $arrEventsAsInstructor[] = $objEvents1->id;
-                    }
-                }
-            }
-        }
-
-        $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate<? ' . $queryTimeSpan . ' ORDER BY startDate DESC')->execute(time());
-        while ($objEvents->next())
-        {
-            $objJoinedEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=? AND hasParticipated=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id, '1');
-            if ($objJoinedEvents->numRows)
-            {
-                $arr = $objEvents->row();
-                $arr['id'] = $objEvents->id;
-                $arr['role'] = 'member';
-                $arr['dateSpan'] = ($objEvents->startDate != $objEvents->endDate) ? \Date::parse('d.m.', $objEvents->startDate) . ' - ' . \Date::parse('d.m.Y', $objEvents->endDate) : \Date::parse('d.m.Y', $objEvents->startDate);
-                $arr['registrationId'] = $objJoinedEvents->id;
-                $arr['objEvent'] = \CalendarEventsModel::findByPk($objEvents->id);
-                $arr['eventRegistrationModel'] = CalendarEventsMemberModel::findByPk($objJoinedEvents->id);
-                $arrEvents[] = $arr;
-            }
-            // Instructor
-            elseif (in_array($objEvents->id, $arrEventsAsInstructor))
-            {
-                $arr = $objEvents->row();
-                $arr['id'] = $objEvents->id;
-                $arr['role'] = 'instructor';
-                $arr['dateSpan'] = ($objEvents->startDate != $objEvents->endDate) ? \Date::parse('d.m.', $objEvents->startDate) . ' - ' . \Date::parse('d.m.Y', $objEvents->endDate) : \Date::parse('d.m.Y', $objEvents->startDate);
-                $arr['registrationId'] = null;
-                $arr['objEvent'] = \CalendarEventsModel::findByPk($objEvents->id);
-                $arr['eventRegistrationModel'] = null;
-                $arrEvents[] = $arr;
-            }
-        }
-
-        return $arrEvents;
+        return static::findEventsByMemberId($memberId, $arrEventTypeFilter, time(), null, $blnInstructorRole);
     }
+
+    /**
+     * @param $memberId
+     * @param array $arrEventTypeFilter
+     * @return array
+     */
+    public static function findPastEventsByMemberId($memberId, $arrEventTypeFilter = array(), $blnInstructorRole = false)
+    {
+        return static::findEventsByMemberId($memberId, $arrEventTypeFilter, null, time(), $blnInstructorRole);
+    }
+
 }

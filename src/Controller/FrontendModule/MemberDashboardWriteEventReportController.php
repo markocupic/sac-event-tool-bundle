@@ -201,7 +201,8 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                 if (!$messageAdapter->hasError())
                 {
                     $blnAllow = false;
-                    $arrAllowedEvents = $calendarEventsMemberModelAdapter->findPastEventsByMemberIdAndTimeSpan($this->objUser->id, $model->timeSpanForCreatingNewEventStory);
+                    $intStartDateMin = $model->timeSpanForCreatingNewEventStory > 0 ? time() - $model->timeSpanForCreatingNewEventStory * 24 * 3600 : time();
+                    $arrAllowedEvents = $calendarEventsMemberModelAdapter->findEventsByMemberId($this->objUser->id, array(), $intStartDateMin, time(), true);
                     foreach ($arrAllowedEvents as $allowedEvent)
                     {
                         if ($allowedEvent['id'] == $inputAdapter->get('eventId'))
