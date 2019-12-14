@@ -317,6 +317,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = array(
     'exclude'       => true,
     'search'        => true,
     'inputType'     => 'multiColumnWizard',
+    // Save instructors in a child table tl_calendar_events_instructors
     'save_callback' => array(array('tl_calendar_events_sac_event_tool', 'saveCallbackSetMaininstructor')),
     'eval'          => array
     (

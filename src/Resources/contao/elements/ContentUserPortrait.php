@@ -17,14 +17,12 @@ use Contao\Database;
 use Contao\UserModel;
 use Patchwork\Utf8;
 
-
 /**
  * Class ContentUserPortrait
  * @package Markocupic\SacEventToolBundle
  */
 class ContentUserPortrait extends ContentElement
 {
-
 
     protected $objUser;
 
@@ -34,7 +32,6 @@ class ContentUserPortrait extends ContentElement
      */
     protected $strTemplate = 'ce_user_portrait';
 
-
     /**
      * Return if there are no files
      *
@@ -42,7 +39,6 @@ class ContentUserPortrait extends ContentElement
      */
     public function generate()
     {
-
         if (TL_MODE == 'BE')
         {
             /** @var BackendTemplate|object $objTemplate */
@@ -56,7 +52,6 @@ class ContentUserPortrait extends ContentElement
 
             return $objTemplate->parse();
         }
-
 
         if (\Input::get('username') != '')
         {
@@ -78,10 +73,8 @@ class ContentUserPortrait extends ContentElement
             return '';
         }
 
-
         return parent::generate();
     }
-
 
     /**
      * Generate the content element
@@ -90,7 +83,6 @@ class ContentUserPortrait extends ContentElement
     {
         $arrUser = $this->objUser->row();
         $this->Template->user = $arrUser;
-
 
         // List all courses
         $arrEvents = array();

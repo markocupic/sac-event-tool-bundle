@@ -1705,6 +1705,26 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         if (isset($dc) && $dc->id > 0)
         {
             $arrInstructors = \Contao\StringUtil::deserialize($varValue, true);
+
+            // Use a child table to store instructors
+            // Delete instructor
+            $this->Database->prepare('DELETE FROM tl_calendar_events_instructor WHERE pid=?')->execute($dc->id);
+
+            $i = 0;
+            foreach ($arrInstructors as $arrInstructor)
+            {
+                // Rebuild instructor table
+                $set = array(
+                    'pid'              => $dc->id,
+                    'userId'           => $arrInstructor['instructorId'],
+                    'tstamp'           => time(),
+                    'isMainInstructor' => $i < 1 ? '1' : ''
+                );
+                $this->Database->prepare('INSERT INTO tl_calendar_events_instructor %s')->set($set)->execute();
+                $i++;
+            }
+            // End child insert
+
             if (count($arrInstructors) > 0)
             {
                 $intInstructor = $arrInstructors[0]['instructorId'];

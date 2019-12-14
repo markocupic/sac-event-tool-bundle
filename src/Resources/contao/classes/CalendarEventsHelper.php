@@ -388,22 +388,26 @@ class CalendarEventsHelper
      */
     public static function getMainInstructorName($id)
     {
+        $strName = '';
         $objDb = Database::getInstance();
         $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
         if ($objEvent->numRows)
         {
-            $arrInstructors = static::getInstructorsAsArray($objEvent->id, false);
-            $objUser = UserModel::findByPk($arrInstructors[0]);
-            if ($objUser !== null)
+            $objInstructor = $objDb->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid=? AND isMainInstructor=?')->limit(1)->execute($objEvent->id, '1');
+            if ($objInstructor->numRows)
             {
-                $arrName = array();
-                $arrName[] = $objUser->lastname;
-                $arrName[] = $objUser->firstname;
-                $arrName = array_filter($arrName);
-                return implode(' ', $arrName);
+                $objUser = UserModel::findByPk($objInstructor->id);
+                if ($objUser !== null)
+                {
+                    $arrName = array();
+                    $arrName[] = $objUser->lastname;
+                    $arrName[] = $objUser->firstname;
+                    $arrName = array_filter($arrName);
+                    $strName = implode(' ', $arrName);
+                }
             }
         }
-        return '';
+        return $strName;
     }
 
     /**
@@ -441,26 +445,26 @@ class CalendarEventsHelper
     public static function getInstructorsAsArray($eventId, $blnShowPublishedOnly = true)
     {
         $arrInstructors = array();
-        $objEvent = \CalendarEventsModel::findByPk($eventId);
+        $objDb = Database::getInstance();
+        $objEvent = CalendarEventsModel::findByPk($eventId);
         if ($objEvent !== null)
         {
-            $arrInstr = StringUtil::deserialize($objEvent->instructor, true);
-            foreach ($arrInstr as $arrUser)
+            // Get all instructors from an event, list mainInstructor first
+            $objInstructor = $objDb->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid=? ORDER BY isMainInstructor DESC')->execute($eventId);
+            while ($objInstructor->next())
             {
-                if (isset($arrUser['instructorId']))
+                $objUser = UserModel::findByPk($objInstructor->userId);
+                if ($objUser !== null)
                 {
-                    $objUser = UserModel::findByPk($arrUser['instructorId']);
-                    if ($objUser !== null)
+                    if ($blnShowPublishedOnly === true && $objUser->disable)
                     {
-                        if ($blnShowPublishedOnly === true && $objUser->disable)
-                        {
-                            continue;
-                        }
-                        $arrInstructors[] = $arrUser['instructorId'];
+                        continue;
                     }
+                    $arrInstructors[] = $objUser->id;
                 }
             }
         }
+
         return $arrInstructors;
     }
 
@@ -474,35 +478,30 @@ class CalendarEventsHelper
     public static function getInstructorNamesAsArray($eventId, $blnAddMainQualification = false, $blnShowPublishedOnly = true)
     {
         $arrInstructors = array();
-        $objEvent = \CalendarEventsModel::findByPk($eventId);
-        if ($objEvent !== null)
-        {
-            $arrInstr = StringUtil::deserialize($objEvent->instructor, true);
-            foreach ($arrInstr as $arrUser)
-            {
-                if (isset($arrUser['instructorId']))
-                {
-                    $objUser = UserModel::findByPk($arrUser['instructorId']);
-                    if ($objUser !== null)
-                    {
-                        if ($blnShowPublishedOnly === true && $objUser->disable)
-                        {
-                            continue;
-                        }
 
-                        $strName = trim($objUser->lastname . ' ' . $objUser->firstname);
-                        if ($blnAddMainQualification && static::getMainQualifikation($objUser->id) != '')
-                        {
-                            $arrInstructors[] = $strName . ' (' . static::getMainQualifikation($objUser->id) . ')';
-                        }
-                        else
-                        {
-                            $arrInstructors[] = $strName;
-                        }
-                    }
+        $arrUsers = static::getInstructorsAsArray($eventId, $blnShowPublishedOnly);
+        foreach ($arrUsers as $userId)
+        {
+            $objUser = UserModel::findByPk($userId);
+            if ($objUser !== null)
+            {
+                if ($blnShowPublishedOnly === true && $objUser->disable)
+                {
+                    continue;
+                }
+
+                $strName = trim($objUser->lastname . ' ' . $objUser->firstname);
+                if ($blnAddMainQualification && static::getMainQualifikation($objUser->id) != '')
+                {
+                    $arrInstructors[] = $strName . ' (' . static::getMainQualifikation($objUser->id) . ')';
+                }
+                else
+                {
+                    $arrInstructors[] = $strName;
                 }
             }
         }
+
         return $arrInstructors;
     }
 

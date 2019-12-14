@@ -189,9 +189,9 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         if (!$messageAdapter->hasError())
         {
             // Check if report already exists
-            $objReport = CalendarEventsStoryModel::findOneBySacMemberIdAndEventId($this->objUser->sacMemberId, $objEvent->id);
+            $objReportModel = CalendarEventsStoryModel::findOneBySacMemberIdAndEventId($this->objUser->sacMemberId, $objEvent->id);
 
-            if ($objReport === null)
+            if ($objReportModel === null)
             {
                 if ($objEvent->endDate + $model->timeSpanForCreatingNewEventStory * 24 * 60 * 60 < time())
                 {
@@ -211,6 +211,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                             continue;
                         }
                     }
+
                     // User has not participated on the event neither as guide nor as participant and is not allowed to write a report
                     if (!$blnAllow)
                     {
@@ -221,12 +222,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
 
             if (!$messageAdapter->hasError())
             {
-                $objStory = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=?')->execute($this->objUser->sacMemberId, $inputAdapter->get('eventId'));
-                if ($objStory->numRows)
-                {
-                    $objStoryModel = $calendarEventsStoryModelAdapter->findByPk($objStory->id);
-                }
-                else
+                if ($objReportModel === null)
                 {
                     // Create new
                     $aDates = [];
@@ -261,24 +257,24 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                         $set['securityToken'] = md5(rand(100000000, 999999999)) . $insertId;
                         $databaseAdapter->getInstance()->prepare('UPDATE tl_calendar_events_story %s WHERE id=?')->set($set)->execute($insertId);
                     }
-                    $objStoryModel = $calendarEventsStoryModelAdapter->findByPk($insertId);
+                    $objReportModel = $calendarEventsStoryModelAdapter->findByPk($insertId);
                 }
 
                 $this->template->eventName = $objEvent->title;
                 $this->template->eventPeriod = $calendarEventsHelperAdapter->getEventPeriod($objEvent->id);
                 $this->template->executionState = $objEvent->executionState;
                 $this->template->eventSubstitutionText = $objEvent->eventSubstitutionText;
-                $this->template->youtubeId = $objStory->youtubeId;
-                $this->template->text = $objStory->text;
-                $this->template->title = $objStory->title;
-                $this->template->publishState = $objStory->publishState;
+                $this->template->youtubeId = $objReportModel->youtubeId;
+                $this->template->text = $objReportModel->text;
+                $this->template->title = $objReportModel->title;
+                $this->template->publishState = $objReportModel->publishState;
 
                 // Get the gallery
-                $this->template->images = $this->getGalleryImages($objStoryModel);
+                $this->template->images = $this->getGalleryImages($objReportModel);
 
                 // Generate forms
-                $this->template->objEventStoryTextAndYoutubeForm = $this->generateTextAndYoutubeForm($objStoryModel);
-                $this->template->objEventStoryImageUploadForm = $this->generatePictureUploadForm($objStoryModel, $model);
+                $this->template->objEventStoryTextAndYoutubeForm = $this->generateTextAndYoutubeForm($objReportModel);
+                $this->template->objEventStoryImageUploadForm = $this->generatePictureUploadForm($objReportModel, $model);
             }
         }
 
