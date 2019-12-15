@@ -10,14 +10,7 @@
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
-use Contao\Config;
-use Contao\Controller;
-use Contao\Database;
-use Contao\Dbafs;
 use Contao\Environment;
-use Contao\File;
-use Contao\FilesModel;
-use Contao\Folder;
 use Contao\FrontendUser;
 use Contao\Input;
 use Contao\Template;
@@ -149,25 +142,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
     {
         $this->template = $template;
 
-        // Set adapters
-        $systemAdapter = $this->framework->getAdapter(System::class);
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
-        $this->checkAvatar();
-
-        // Load languages
-        $systemAdapter->loadLanguageFile('tl_calendar_events_member');
-
         $this->template->objUser = $this->objUser;
-
-        $objUploadFolder = new Folder($configAdapter->get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/' . $this->objUser->id);
-        if (!$objUploadFolder->isEmpty())
-        {
-            $this->template->objUser->hasAvatar = true;
-        }
-
-        // Generate avatar uploader
-        $this->template->avatarForm = $this->generateAvatarForm();
 
         // Generate the my profile form
         $this->template->userProfileForm = $this->generateUserProfileForm();
@@ -211,98 +186,6 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         }
 
         $messageAdapter->reset();
-    }
-
-    /**
-     * Generate the avatar upload form
-     * @return Form
-     */
-    protected function generateAvatarForm()
-    {
-        // Set adapters
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-        $configAdapter = $this->framework->getAdapter(Config::class);
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-        $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
-
-        $objForm = new Form('form-avatar-upload', 'POST', function ($objHaste) {
-            $inputAdapter = $this->framework->getAdapter(Input::class);
-            return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
-        });
-
-        $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
-
-        // Now let's add form fields:
-        $objForm->addFormField('avatar', array(
-            'label'     => 'Profilbild hochladen',
-            'inputType' => 'upload',
-            'eval'      => array('class' => 'custom-input-file', 'mandatory' => false),
-        ));
-        $objForm->addFormField('delete-avatar', array(
-            'label'     => array('', 'Profilbild l&ouml;schen'),
-            'inputType' => 'checkbox',
-        ));
-
-        // Let's add  a submit button
-        $objForm->addFormField('submit', array(
-            'label'     => 'Speichern',
-            'inputType' => 'submit',
-        ));
-
-        // Create the folder if it not exists
-        $objUploadFolder = new Folder($configAdapter->get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/' . $this->objUser->id);
-        $dbafsAdapter->addResource($objUploadFolder->path);
-
-        $objWidget = $objForm->getWidget('avatar');
-        $objWidget->extensions = 'jpg,jpeg,png,gif,svg';
-        $objWidget->storeFile = true;
-        $objWidget->uploadFolder = $filesModelAdapter->findByPath($objUploadFolder->path)->uuid;
-        $objWidget->addAttribute('accept', '.jpg,.jpeg,.png,.gif,.svg');
-
-        // Delete avatar
-        if ($inputAdapter->post('FORM_SUBMIT') === 'form-avatar-upload' && $inputAdapter->post('delete-avatar'))
-        {
-            $objUploadFolder->purge();
-            $oMember = $memberModelAdapter->findByPk($this->objUser->id);
-            if ($oMember !== null)
-            {
-                $oMember->avatar = '';
-                $oMember->save();
-            }
-        }
-
-        // Standardize name
-        if ($inputAdapter->post('FORM_SUBMIT') === 'form-avatar-upload' && !empty($_FILES['avatar']['tmp_name']))
-        {
-            $objUploadFolder->purge();
-            $objFile = new File($_FILES['avatar']['name']);
-            $_FILES['avatar']['name'] = 'avatar-' . $this->objUser->id . '.' . strtolower($objFile->extension);
-
-            // Move uploaded file so we can save the avatar uuid in tl_member.avatar
-            move_uploaded_file($_FILES['avatar']['tmp_name'], TL_ROOT . '/' . $objUploadFolder->path . '/' . $_FILES['avatar']['name']);
-            $dbafsAdapter->addResource($objUploadFolder->path . '/' . $_FILES['avatar']['name']);
-            $fileModel = $filesModelAdapter->findByPath($objUploadFolder->path . '/' . $_FILES['avatar']['name']);
-            $oMember = $memberModelAdapter->findByPk($this->objUser->id);
-            if ($oMember !== null)
-            {
-                $oMember->avatar = $fileModel->uuid;
-                $oMember->save();
-            }
-        }
-
-        if ($objForm->validate())
-        {
-            // Reload page after uploads
-            if ($inputAdapter->post('FORM_SUBMIT') === 'form-avatar-upload')
-            {
-                $controllerAdapter->reload();
-            }
-        }
-
-        return $objForm->generate();
     }
 
     /**
@@ -368,46 +251,6 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         }
 
         return $objForm->generate();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    protected function checkAvatar(): void
-    {
-        // Set adapters
-        $configAdapter = $this->framework->getAdapter(Config::class);
-        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-
-        // Check for valid avatar
-        $oMember = $memberModelAdapter->findByPk($this->objUser->id);
-        if ($oMember !== null)
-        {
-            if ($oMember->avatar != '')
-            {
-                $objFile = $filesModelAdapter->findByUuid($oMember->avatar);
-                if ($objFile === null)
-                {
-                    $hasError = true;
-                }
-                if (!is_file($this->projectDir . '/' . $objFile->path))
-                {
-                    $hasError = true;
-                }
-                if ($hasError)
-                {
-                    $oMember->avatar = '';
-                    $oMember->save();
-                    $objUploadFolder = new Folder($configAdapter->get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/' . $this->objUser->id);
-                    if ($objUploadFolder !== null)
-                    {
-                        $objUploadFolder->purge();
-                        $objUploadFolder->delete();
-                    }
-                }
-            }
-        }
     }
 
 }

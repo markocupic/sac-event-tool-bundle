@@ -10,9 +10,9 @@
 
 namespace Markocupic\SacEventToolBundle;
 
-
 use Contao\File;
 use Contao\FilesModel;
+use Contao\Folder;
 use Contao\Message;
 use Contao\System;
 
@@ -26,16 +26,17 @@ class RotateImage
     /**
      * @param $fileId
      * @param int $angle
+     * @param string $target
      * @return bool
-     * @throws \Exception
+     * @throws \ImagickException
      */
-    public static function rotate($fileId, $angle = 270)
+    public static function rotate($fileId, int $angle = 270, string $target = ''): bool
     {
-        if(!is_numeric($fileId) && $fileId < 1)
+        if (!is_numeric($fileId) && $fileId < 1)
         {
             return false;
         }
-        $angle = 270;
+
         $objFiles = FilesModel::findById($fileId);
         if ($objFiles === null)
         {
@@ -59,21 +60,49 @@ class RotateImage
             return false;
         }
 
-        if (!function_exists('imagerotate'))
+        $source = $rootDir . '/' . $src;
+        if ($target === '')
         {
-            Message::addError(sprintf('PHP function "%s" is not installed.', 'imagerotate'));
-            return false;
+            $target = $source;
+        }
+        else
+        {
+            new Folder(dirname($target));
+            $target = $rootDir . '/' . $target;
         }
 
-        $source = imagecreatefromjpeg($rootDir . '/' . $src);
+        if (class_exists('Imagick') && class_exists('ImagickPixel'))
+        {
+            $imagick = new \Imagick();
 
-        //rotate
-        $imgTmp = imagerotate($source, $angle, 0);
+            $imagick->readImage($source);
+            $imagick->rotateImage(new \ImagickPixel('none'), $angle);
+            $imagick->writeImage($target);
+            $imagick->clear();
+            $imagick->destroy();
+            return true;
+        }
+        elseif (function_exists('imagerotate'))
+        {
+            $source = imagecreatefromjpeg($rootDir . '/' . $src);
 
-        // Output
-        imagejpeg($imgTmp, $rootDir . '/' . $src);
+            //rotate
+            $imgTmp = imagerotate($source, $angle, 0);
 
-        imagedestroy($source);
-        return true;
+            // Output
+            imagejpeg($imgTmp, $target);
+
+            imagedestroy($source);
+            if (is_file($target))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            Message::addError(sprintf('Please install class "%s" or php function "%s" for rotating images.', 'Imagick', 'imagerotate'));
+            return false;
+        }
+        return false;
     }
 }

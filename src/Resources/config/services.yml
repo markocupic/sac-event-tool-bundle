@@ -137,3 +137,18 @@ services:
     tags:
     - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
     public: true
+
+
+  # Member dashboard module: display the avatar and the avatar upload form
+  markocupic.sac_event_tool_bundle.controller.frontend_module.member_dashboard_avatar_upload:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardAvatarUploadController
+    arguments:
+    - '@contao.framework'
+    - '@security.helper'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    - '%kernel.project_dir%'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+

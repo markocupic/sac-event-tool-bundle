@@ -17,68 +17,7 @@
   <?php endforeach; ?>
 <?php endif; ?>
 
-
-<div class="row">
-  <div class="col-12">
-    {{user::firstname}} {{user::lastname}}{{br}}
-    {{user::street}}{{br}}
-    {{user::postal}} {{user::city}}
-    <br><br>
-    Telefon: {{user::phone}}{{br}}
-    Mobile: {{user::mobile}}{{br}}
-    E-Mail: {{user::email}}
-    <br><br>
-    Mitglieder-Nr. {{user::sacMemberId}}
-    {{br}}{{br}}
-
-    <a href="{{link_url::290}}" class="btn btn-outline-primary">Passwort ändern</a>
-    {{br}}{{br}}
-
-    <p class="alert alert-danger p-2">
-      &Auml;nderungen an Adresse, Telefonnummer, etc. m&uuml;ssen auf der Webseite des Zentralverbandes gemacht werden.{{br}}{{br}}
-      <a href="http://www.sac-cas.ch/metanav/mein-konto.html" class="btn btn-danger btn-sm" title="Diese Angaben &auml;ndern">Angaben &auml;ndern</a>
-    </p>
-    {{br}}
-    <hr>
-  </div>
-
-  <div class="col-12">
-    <h3>Angaben für die Online Anmeldung zu Events</h3>
-    <div class="">
-      <?= $this->userProfileForm ?>
-    </div>
-    {{br}}
-    <hr>
-  </div>
-
-  <div class="col-12">
-    <h3>Avatar Einstellungen</h3>
-    <div class="row">
-      <div class="col-9">
-        <div class="">
-          <?= $this->avatarForm ?>
-        </div>
-      </div>
-      <div class="col-3">
-        <figure class="member-dashboard-avatar responsive thumbnail image_container">
-          {{image::<?= getAvatar($this->objUser->id, 'FE') ?>?width=300}}
-          <?php if($this->objUser->avatar != ''): ?>
-          <a href="{{env::request}}?do=rotate-avatar&img=<?= FilesModel::findByPath(getAvatar($this->objUser->id, 'FE'))->id ?>" class="member-dashboard-rotate-image-button" title="Bild im GUZS 90° drehen"><i class="fa fa-history turn-image"></i></a>
-          <?php endif; ?>
-        </figure>
-      </div>
-    </div>
-    {{br}}{{br}}
-    <hr>
-  </div>
-
-  <div class="col-12">
-    <h3>Abonnierte Newsletter</h3>
-    <div class="">
-      <?= \Contao\Controller::replaceInsertTags('{{insert_module::367}}') ?>
-    </div>
-    {{br}}{{br}}
-  </div>
-</div>
+<?= $this->userProfileForm ?>
 
 <?php $this->endblock(); ?>
+

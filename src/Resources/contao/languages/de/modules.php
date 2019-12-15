@@ -46,4 +46,5 @@ $GLOBALS['TL_LANG']['FMD']['member_dashboard_event_report_list'] = array('SAC Mi
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_write_event_report'] = array('SAC Mitgliederkonto Dashboard - Tourenbericht schreiben');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_edit_profile'] = array('SAC Mitgliederkonto Dashboard - Profil bearbeiten');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_delete_profile'] = array('SAC Mitgliederkonto Dashboard - Profil löschen');
+$GLOBALS['TL_LANG']['FMD']['member_dashboard_avatar_upload'] = array('SAC Mitgliederkonto Dashboard - Avatar-Upload-Formular');
 
