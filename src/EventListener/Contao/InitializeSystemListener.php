@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Contao\EventListener;
+namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Config;
@@ -19,7 +19,7 @@ use Contao\Dbafs;
 
 /**
  * Class InitializeSystemListener
- * @package Markocupic\SacEventToolBundle\Contao\EventListener
+ * @package Markocupic\SacEventToolBundle\EventListener\Contao
  */
 class InitializeSystemListener
 {

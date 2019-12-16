@@ -13,9 +13,9 @@ namespace Markocupic\SacEventToolBundle\Services\EventRapport;
 use Contao\CalendarEventsInstructorInvoiceModel;
 use Contao\CalendarEventsJourneyModel;
 use Contao\CalendarEventsModel;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\Date;
 use Contao\Dbafs;
@@ -27,8 +27,9 @@ use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
-use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\CloudconvertBundle\Services\DocxToPdfConversion;
+use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
  * Class EventRapport
@@ -42,11 +43,20 @@ class EventRapport
     private $framework;
 
     /**
-     * EventRapport constructor.
+     * @var string
      */
-    public function __construct()
+    private $projectDir;
+
+    /**
+     * EventRapport constructor.
+     * @param ContaoFramework $framework
+     * @param string $projectDir
+     */
+    public function __construct(ContaoFramework $framework, string $projectDir)
     {
-        $this->framework = System::getContainer()->get('contao.framework');
+        $this->framework = $framework;
+        $this->projectDir = $projectDir;
+
         $this->framework->initialize();
     }
 
@@ -79,12 +89,10 @@ class EventRapport
         if ($objEventInvoice !== null)
         {
             // Delete tmp files older the 1 week
-            // Get root dir
-            $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-            $arrScan = scan($rootDir . '/' . $configAdapter->get('SAC_EVT_TEMP_PATH'));
+            $arrScan = scan($this->projectDir . '/' . $configAdapter->get('SAC_EVT_TEMP_PATH'));
             foreach ($arrScan as $file)
             {
-                if (is_file($rootDir . '/' . $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $file))
+                if (is_file($this->projectDir . '/' . $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $file))
                 {
                     $objFile = new File($configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $file);
                     if ($objFile !== null)
@@ -172,9 +180,13 @@ class EventRapport
     protected function getTourRapportData(MsWordTemplateProcessor $objPhpWord, $objEvent, $objEventMember, $objEventInvoice, $objBiller)
     {
         // Set adapters
+        /** @var  Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        /** @var  Database $databaseAdapter */
         $databaseAdapter = $this->framework->getAdapter(Database::class);
+        /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        /** @var  CalendarEventsJourneyModel $calendarEventsJourneyModel */
         $calendarEventsJourneyModel = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
 
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
@@ -245,10 +257,15 @@ class EventRapport
     protected function getEventData(MsWordTemplateProcessor $objPhpWord, $objEvent)
     {
         // Set adapters
+        /** @var  Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        /** @var  StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+        /** @var  Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
+        /** @var  EventOrganizerModel $eventOrganizerModelAdapter */
         $eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
+        /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
 
         // Event data
@@ -313,9 +330,13 @@ class EventRapport
     protected function getEventMemberData(MsWordTemplateProcessor $objPhpWord, $objEvent, $objEventMember)
     {
         // Set adapters
+        /** @var  UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+        /** @var  MemberModel $memberModelAdapter */
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
+        /** @var  $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
+        /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
 
         $i = 0;
@@ -454,11 +475,17 @@ class EventRapport
     public function generateMemberList($eventId, $outputType = 'docx')
     {
         // Set adapters
+        /** @var  Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
+        /** @var  CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+        /** @var  Message $messageAdapter */
         $messageAdapter = $this->framework->getAdapter(Message::class);
+        /** @var  Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        /** @var  Dbafs $dbafsAdapter */
         $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
+        /** @var  Database $databaseAdapter */
         $databaseAdapter = $this->framework->getAdapter(Database::class);
 
         $objEvent = $calendarEventsModelAdapter->findByPk($eventId);

@@ -8,7 +8,7 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Contao\EventListener;
+namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class ParseTemplateListener
- * @package Markocupic\SacEventToolBundle\Contao\EventListener
+ * @package Markocupic\SacEventToolBundle\EventListener\Contao
  */
 class ParseTemplateListener
 {

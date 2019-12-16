@@ -8,7 +8,7 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Contao\EventListener;
+namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\BackendUser;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -19,7 +19,7 @@ use Markocupic\SacEventToolBundle\MaintainBackendUsersHomeDirectory;
 
 /**
  * Class PostLoginListener
- * @package Markocupic\SacEventToolBundle\Contao\EventListener
+ * @package Markocupic\SacEventToolBundle\EventListener\Contao
  */
 class PostLoginListener
 {

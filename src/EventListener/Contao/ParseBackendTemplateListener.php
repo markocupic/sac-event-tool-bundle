@@ -8,7 +8,7 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Contao\EventListener;
+namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\BackendTemplate;
 use Contao\BackendUser;
@@ -25,7 +25,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
  * Class ParseBackendTemplateListener
- * @package Markocupic\SacEventToolBundle\Contao\EventListener
+ * @package Markocupic\SacEventToolBundle\EventListener\Contao
  */
 class ParseBackendTemplateListener
 {

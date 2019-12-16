@@ -85,13 +85,13 @@ class tl_calendar_events_instructor_invoice extends Backend
     {
         if (Input::get('action') === 'generateInvoiceDocx')
         {
-            $objRapport = new EventRapport();
+            $objRapport = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.event_rapport.event_rapport');
             $objRapport->generateInvoice(Input::get('id'), 'docx');
         }
 
         if (Input::get('action') === 'generateInvoicePdf')
         {
-            $objRapport = new EventRapport();
+            $objRapport = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.event_rapport.event_rapport');
             $objRapport->generateInvoice(Input::get('id'), 'pdf');
         }
     }

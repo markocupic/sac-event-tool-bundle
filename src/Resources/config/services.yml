@@ -1,5 +1,14 @@
 services:
 
+  # Generate event rapports docx and pdf files
+  markocupic.sac_event_tool_bundle.services.event_rapport.event_rapport:
+    public: true
+    class: Markocupic\SacEventToolBundle\Services\EventRapport\EventRapport
+    arguments:
+    - '@contao.framework'
+    - '%kernel.project_dir%'
+
+  # Sync member database form bern with contao tl_member
   markocupic.sac_event_tool_bundle.sync_sac_member_database:
     public: true
     class: Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase
@@ -7,11 +16,6 @@ services:
     - '@contao.framework'
     - '@database_connection'
     - '%kernel.project_dir%'
-
-  markocupic.sac_event_tool_bundle.event_listener.cors.cors_listener:
-    class:  Markocupic\SacEventToolBundle\EventListener\Cors\CorsListener
-    tags:
-    - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
   markocupic.sac_event_tool_bundle.controller.frontend_module.tour_difficulty_list_controller:
     class: Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListController
