@@ -269,7 +269,7 @@ if (!isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) || !is_array($GLOBAL
 $GLOBALS['TL_HOOKS']['changeEventReleaseLevel'][] = array('markocupic.sac_event_tool_bundle.event_listener.change_event_release_level', 'onChangeEventReleaseLevel');
 
 /** Route prepare plugin environment **/
-$GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic.sac_event_tool_bundle.event_listener.initialize_system_listener', 'onInitializeSystem');
+$GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic.sac_event_tool_bundle.event_listener.initialize_system_listener', 'preparePluginEnvironment');
 
 /** Handle Ajax calls from the backend **/
 $GLOBALS['TL_HOOKS']['executePreActions'][] = array('markocupic.sac_event_tool_bundle.event_listener.execute_pre_actions_listener', 'onExecutePreActions');

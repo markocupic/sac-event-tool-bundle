@@ -8,12 +8,15 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+namespace Contao;
+
+use Markocupic\SacEventToolBundle\Services\EventRapport\EventRapport;
+
 /**
  * Class tl_calendar_events_instructor_invoice
  */
 class tl_calendar_events_instructor_invoice extends Backend
 {
-
 
     /**
      * Import the back end user object
@@ -82,17 +85,16 @@ class tl_calendar_events_instructor_invoice extends Backend
     {
         if (Input::get('action') === 'generateInvoiceDocx')
         {
-            $objRapport = new Markocupic\SacEventToolBundle\EventRapport();
+            $objRapport = new EventRapport();
             $objRapport->generateInvoice(Input::get('id'), 'docx');
         }
 
         if (Input::get('action') === 'generateInvoicePdf')
         {
-            $objRapport = new Markocupic\SacEventToolBundle\EventRapport();
+            $objRapport = new EventRapport();
             $objRapport->generateInvoice(Input::get('id'), 'pdf');
         }
     }
-
 
     /**
      * Onload_callback
@@ -100,7 +102,6 @@ class tl_calendar_events_instructor_invoice extends Backend
      */
     public function checkAccesRights()
     {
-
         if (CURRENT_ID != '')
         {
             if (Input::get('action') === 'generateInvoiceDocx' || Input::get('action') === 'generateInvoicePdf')
@@ -142,7 +143,6 @@ class tl_calendar_events_instructor_invoice extends Backend
      */
     public function warnIfReportFormHasNotFilledIn()
     {
-
         if (CURRENT_ID != '')
         {
             $objEvent = CalendarEventsModel::findByPk(CURRENT_ID);
@@ -169,7 +169,6 @@ class tl_calendar_events_instructor_invoice extends Backend
         return '<div class="tl_content_left"><span class="level">Verg&uuml;tungsformular (mit Tour Rapport) von: ' . UserModel::findByPk($row['userPid'])->name . '</span> <span>[' . CalendarEventsModel::findByPk($row['pid'])->title . ']</span></div>';
     }
 
-
     /**
      * buttons_callback buttonsCallback
      * @param $arrButtons
@@ -178,14 +177,12 @@ class tl_calendar_events_instructor_invoice extends Backend
      */
     public function buttonsCallback($arrButtons, $dc)
     {
-
         if (\Contao\Input::get('act') === 'edit')
         {
             unset($arrButtons['saveNcreate']);
             unset($arrButtons['saveNduplicate']);
             unset($arrButtons['saveNedit']);
             unset($arrButtons['saveNback']);
-
         }
 
         return $arrButtons;

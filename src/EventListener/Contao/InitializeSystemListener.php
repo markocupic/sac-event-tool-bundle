@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * SAC Event Tool Web Plugin for Contao
  * Copyright (c) 2008-2020 Marko Cupic
@@ -7,78 +10,41 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle;
+namespace Markocupic\SacEventToolBundle\Contao\EventListener;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Config;
 use Contao\Folder;
 use Contao\Dbafs;
-use Contao\System;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 /**
- * Class PreparePluginEnvironment
- * @package Markocupic\SacEventToolBundle
+ * Class InitializeSystemListener
+ * @package Markocupic\SacEventToolBundle\Contao\EventListener
  */
-class PreparePluginEnvironment
+class InitializeSystemListener
 {
+    /**
+     * @var ContaoFramework
+     */
     private $framework;
 
-
     /**
-     * PreparePluginEnvironment constructor.
+     * InitializeSystemListener constructor.
      * @param ContaoFramework $framework
      */
     public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
-        $this->framework->initialize();
     }
 
-
     /**
-     * Prepare the plugin environment
-     * Create directories
-     * Check vars in system/localconfig.php
+     * Prepare the SAC Event Tool plugin environment
      */
-    public function preparePluginEnvironment()
+    public function preparePluginEnvironment(): void
     {
-        /**
-         * @todo No more used, because all params are set in system/localconfig.php
-
-         Store all params in $GLOBALS['TL_CONFIG']
-         * $container = new ContainerBuilder();
-         * $loader = new YamlFileLoader(
-         * $container,
-         * new FileLocator(__DIR__ . '/../../config')
-         * );
-         *
-         * $loader->load('listener.yml');
-         * $loader->load('parameters.yml');
-         * $loader->load('services.yml');
-         *
-         * $parameters = $container->getParameterBag()->all();
-         * foreach ($parameters as $key => $value)
-         * {
-         * echo $key . '<br>';
-         * if (strpos($key, 'SAC_EVT_') !== false)
-         * {
-         * if (is_array(json_decode($value)))
-         * {
-         * $value = json_decode($value);
-         * }
-         * $GLOBALS['TL_CONFIG'][$key] = $value;
-         * }
-         * }
-         */
-
-        $dbafs = $this->framework->getAdapter(Dbafs::class);
-
-        // Get root dir
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-
+        // Set adapters
+        $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
+        $configAdapter = $this->framework->getAdapter(Config::class);
 
         // Check for the this directories
         $arrDirectories = array(
@@ -92,16 +58,15 @@ class PreparePluginEnvironment
         foreach ($arrDirectories as $strDir)
         {
             // Check if directory path was set in system/localconfig.php
-            if (Config::get($strDir) == '')
+            if ($configAdapter->get($strDir) == '')
             {
                 throw new \Exception(sprintf('%s is not set in system/localconfig.php. Please log into the Contao Backend and set the missing values in the backend-settings. Error in %s on Line: %s', $strDir, __METHOD__, __LINE__));
             }
 
             // Create directory
-            $this->framework->createInstance(Folder::class, array(Config::get($strDir)));
-            $dbafs->addResource(Config::get($strDir));
+            $this->framework->createInstance(Folder::class, array($configAdapter->get($strDir)));
+            $dbafsAdapter->addResource($configAdapter->get($strDir));
         }
-
 
         // Check for other system vars in system/localconfig.php
         $arrConfig = array(
@@ -142,7 +107,7 @@ class PreparePluginEnvironment
         foreach ($arrConfig as $strConfig)
         {
             // Check if directory path was set in system/localconfig.php
-            if (Config::get($strConfig) == '')
+            if ($configAdapter->get($strConfig) == '')
             {
                 throw new \Exception(sprintf('%s is not set in system/localconfig.php. Please log into the Contao Backend and set the missing values in the backend-settings. Error in %s on Line: %s', $strConfig, __METHOD__, __LINE__));
             }

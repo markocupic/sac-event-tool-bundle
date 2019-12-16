@@ -1,11 +1,18 @@
 <?php
 
-namespace Markocupic\SacEventToolBundle\Services\Cors;
+namespace Markocupic\SacEventToolBundle\EventListener\Cors;
 
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
+/**
+ * Class CorsListener
+ * @package Markocupic\SacEventToolBundle\EventListener\Cors
+ */
 class CorsListener
 {
+    /**
+     * @param FilterResponseEvent $event
+     */
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $responseHeaders = $event->getResponse()->headers;

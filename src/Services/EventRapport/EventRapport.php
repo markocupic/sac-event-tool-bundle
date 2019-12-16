@@ -8,11 +8,12 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle;
+namespace Markocupic\SacEventToolBundle\Services\EventRapport;
 
 use Contao\CalendarEventsInstructorInvoiceModel;
 use Contao\CalendarEventsJourneyModel;
 use Contao\CalendarEventsModel;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Contao\Config;
 use Contao\Controller;
 use Contao\Database;
@@ -31,10 +32,23 @@ use Markocupic\CloudconvertBundle\Services\DocxToPdfConversion;
 
 /**
  * Class EventRapport
- * @package Markocupic\SacEventToolBundle
+ * @package Markocupic\SacEventToolBundle\Services\EventRapport
  */
 class EventRapport
 {
+    /**
+     * @var ContaoFramework
+     */
+    private $framework;
+
+    /**
+     * EventRapport constructor.
+     */
+    public function __construct()
+    {
+        $this->framework = System::getContainer()->get('contao.framework');
+        $this->framework->initialize();
+    }
 
     /**
      * @param $invoiceId
@@ -43,18 +57,36 @@ class EventRapport
      */
     public function generateInvoice($invoiceId, $outputType = 'docx')
     {
-        $objEventInvoice = CalendarEventsInstructorInvoiceModel::findByPk($invoiceId);
+        // Set adapters
+        /** @var  Config $configAdapter */
+        $configAdapter = $this->framework->getAdapter(Config::class);
+        /** @var  CalendarEventsModel CalendarEventsModel $calendarEventsModelAdapter */
+        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+        /** @var  UserModel $userModelAdapter */
+        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+        /** @var  Message $messageAdapter */
+        $messageAdapter = $this->framework->getAdapter(Message::class);
+        /** @var  Controller $controllerAdapter */
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        /** @var  Dbafs $dbafsAdapter */
+        $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
+        /** @var  Database $databaseAdapter */
+        $databaseAdapter = $this->framework->getAdapter(Database::class);
+        /** @var  CalendarEventsInstructorInvoiceModel $calendarEventsInstructorInvoiceModelAdapter */
+        $calendarEventsInstructorInvoiceModelAdapter = $this->framework->getAdapter(CalendarEventsInstructorInvoiceModel::class);
+
+        $objEventInvoice = $calendarEventsInstructorInvoiceModelAdapter->findByPk($invoiceId);
         if ($objEventInvoice !== null)
         {
             // Delete tmp files older the 1 week
             // Get root dir
             $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-            $arrScan = scan($rootDir . '/' . Config::get('SAC_EVT_TEMP_PATH'));
+            $arrScan = scan($rootDir . '/' . $configAdapter->get('SAC_EVT_TEMP_PATH'));
             foreach ($arrScan as $file)
             {
-                if (is_file($rootDir . '/' . Config::get('SAC_EVT_TEMP_PATH') . '/' . $file))
+                if (is_file($rootDir . '/' . $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $file))
                 {
-                    $objFile = new File(Config::get('SAC_EVT_TEMP_PATH') . '/' . $file);
+                    $objFile = new File($configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $file);
                     if ($objFile !== null)
                     {
                         if ((int)$objFile->mtime + 60 * 60 * 24 * 7 < time())
@@ -65,29 +97,29 @@ class EventRapport
                 }
             }
 
-            $objEvent = CalendarEventsModel::findByPk($objEventInvoice->pid);
+            $objEvent = $calendarEventsModelAdapter->findByPk($objEventInvoice->pid);
             // $objBiller "Der Rechnungssteller"
-            $objBiller = UserModel::findByPk($objEventInvoice->userPid);
+            $objBiller = $userModelAdapter->findByPk($objEventInvoice->userPid);
             if ($objEvent !== null && $objBiller !== null)
             {
                 // Check if tour report has filled in
                 if (!$objEvent->filledInEventReportForm || $objEvent->tourAvalancheConditions === '')
                 {
-                    Message::addError('Bitte f&uuml;llen Sie den Touren-Rapport vollst&auml;ndig aus, bevor Sie das Verg&uuml;tungsformular herunterladen.');
-                    Controller::redirect(System::getReferer());
+                    $messageAdapter->addError('Bitte f&uuml;llen Sie den Touren-Rapport vollst&auml;ndig aus, bevor Sie das Verg&uuml;tungsformular herunterladen.');
+                    $controllerAdapter->redirect(System::getReferer());
                 }
 
-                $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND hasParticipated=?')->execute($objEvent->id, '1');
+                $objEventMember = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND hasParticipated=?')->execute($objEvent->id, '1');
                 if (!$objEventMember->numRows)
                 {
                     // Send error message if there are no members assigned to the event
-                    Message::addError('Bitte &uuml;berpr&uuml;fe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, die am Event teilgenommen haben.');
-                    Controller::redirect(System::getReferer());
+                    $messageAdapter->addError('Bitte &uuml;berpr&uuml;fe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, die am Event teilgenommen haben.');
+                    $controllerAdapter->redirect(System::getReferer());
                 }
 
-                $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
-                $destFilename = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
-                $objPhpWord = new MsWordTemplateProcessor(Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), $destFilename);
+                $filenamePattern = str_replace('%%s', '%s', $configAdapter->get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
+                $destFilename = $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
+                $objPhpWord = new MsWordTemplateProcessor($configAdapter->get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), $destFilename);
 
                 // Page #1
                 // Tour rapport
@@ -102,8 +134,8 @@ class EventRapport
                 $this->getEventMemberData($objPhpWord, $objEvent, $objEventMember);
 
                 // Create temporary folder, if it not exists.
-                new Folder(Config::get('SAC_EVT_TEMP_PATH'));
-                Dbafs::addResource(Config::get('SAC_EVT_TEMP_PATH'));
+                new Folder($configAdapter->get('SAC_EVT_TEMP_PATH'));
+                $dbafsAdapter->addResource($configAdapter->get('SAC_EVT_TEMP_PATH'));
 
                 if ($outputType === 'pdf')
                 {
@@ -113,7 +145,7 @@ class EventRapport
                         ->generate();
 
                     // Generate pdf
-                    $objConversion = new DocxToPdfConversion($destFilename, Config::get('cloudconvertApiKey'));
+                    $objConversion = new DocxToPdfConversion($destFilename, $configAdapter->get('cloudconvertApiKey'));
                     $objConversion->sendToBrowser(true)->createUncached(true)->convert();
                 }
 
@@ -139,14 +171,20 @@ class EventRapport
      */
     protected function getTourRapportData(MsWordTemplateProcessor $objPhpWord, $objEvent, $objEventMember, $objEventInvoice, $objBiller)
     {
-        Controller::loadLanguageFile('tl_calendar_events');
+        // Set adapters
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        $databaseAdapter = $this->framework->getAdapter(Database::class);
+        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsJourneyModel = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
+
+        $controllerAdapter->loadLanguageFile('tl_calendar_events');
 
         $countParticipants = $objEventMember->numRows;
-        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
+        $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent->id, false);
         $countInstructors = count($arrInstructors);
         $countParticipantsTotal = $countParticipants + $countInstructors;
 
-        $transport = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : 'keine Angabe';
+        $transport = $calendarEventsJourneyModel->findByPk($objEvent->journey) !== null ? $calendarEventsJourneyModel->findByPk($objEvent->journey)->title : 'keine Angabe';
         $objPhpWord->replace('eventTransport', htmlspecialchars(html_entity_decode($transport)));
         $objPhpWord->replace('eventCanceled', ($objEvent->eventState === 'event_canceled' || $objEvent->executionState === 'event_canceled') ? 'Ja' : 'Nein');
         $objPhpWord->replace('eventHasExecuted', $objEvent->executionState === 'event_executed_like_predicted' ? 'Ja' : 'Nein');
@@ -175,7 +213,7 @@ class EventRapport
         $carTaxes = 0;
         if ($objEventInvoice->countCars > 0 && $objEventInvoice->carTaxesKm > 0)
         {
-            $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND hasParticipated=?')->execute($objEvent->id, '1');
+            $objEventMember = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND hasParticipated=?')->execute($objEvent->id, '1');
             if ($objEventMember->numRows)
             {
                 // ((CHF 0.60 x AnzKm + Park-/Strassen-/Tunnelgebühren) x AnzAutos) : AnzPersonen
@@ -206,10 +244,17 @@ class EventRapport
      */
     protected function getEventData(MsWordTemplateProcessor $objPhpWord, $objEvent)
     {
+        // Set adapters
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+        $dateAdapter = $this->framework->getAdapter(Date::class);
+        $eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
+        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+
         // Event data
         $objPhpWord->replace('eventTitle', htmlspecialchars(html_entity_decode($objEvent->title)));
-        Controller::loadLanguageFile('tl_calendar_events');
-        $arrEventTstamps = CalendarEventsHelper::getEventTimestamps($objEvent->id);
+        $controllerAdapter->loadLanguageFile('tl_calendar_events');
+        $arrEventTstamps = $calendarEventsHelperAdapter->getEventTimestamps($objEvent->id);
 
         if ($objEvent->eventType === 'course')
         {
@@ -232,28 +277,28 @@ class EventRapport
             {
                 $strFormat = 'd.m.';
             }
-            $arrEventDates[] = Date::parse($strFormat, $v);
+            $arrEventDates[] = $dateAdapter->parse($strFormat, $v);
         }
         $strEventDuration = implode(', ', $arrEventDates);
 
         // Get tour profile
-        $arrTourProfile = CalendarEventsHelper::getTourProfileAsArray($objEvent->id);
+        $arrTourProfile = $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent->id);
         $strTourProfile = implode("\r\n", $arrTourProfile);
         $strTourProfile = str_replace('Tag: ', 'Tag:' . "\r\n", $strTourProfile);
 
         // emergencyConcept
         $arrEmergencyConcept = array();
-        $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
+        $arrOrganizers = $stringUtilAdapter->deserialize($objEvent->organizers, true);
         foreach ($arrOrganizers as $organizer)
         {
-            $objOrganizer = EventOrganizerModel::findByPk($organizer);
+            $objOrganizer = $eventOrganizerModelAdapter->findByPk($organizer);
             $arrEmergencyConcept[] = $objOrganizer->title . ":\r\n" . $objOrganizer->emergencyConcept;
         }
         $strEmergencyConcept = implode("\r\n\r\n", $arrEmergencyConcept);
 
         $objPhpWord->replace('eventDates', htmlspecialchars(html_entity_decode($strEventDuration)));
         $objPhpWord->replace('eventMeetingpoint', htmlspecialchars(html_entity_decode($objEvent->meetingPoint)));
-        $objPhpWord->replace('eventTechDifficulties', htmlspecialchars(html_entity_decode(implode(', ', CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent->id, false)))));
+        $objPhpWord->replace('eventTechDifficulties', htmlspecialchars(html_entity_decode(implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent->id, false)))));
         $objPhpWord->replace('eventEquipment', htmlspecialchars(html_entity_decode($objEvent->equipment)), array('multiline' => true));
         $objPhpWord->replace('eventTourProfile', htmlspecialchars(html_entity_decode($strTourProfile)), array('multiline' => true));
         $objPhpWord->replace('emergencyConcept', htmlspecialchars(html_entity_decode($strEmergencyConcept)), array('multiline' => true));
@@ -267,20 +312,26 @@ class EventRapport
      */
     protected function getEventMemberData(MsWordTemplateProcessor $objPhpWord, $objEvent, $objEventMember)
     {
+        // Set adapters
+        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
+        $dateAdapter = $this->framework->getAdapter(Date::class);
+        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+
         $i = 0;
 
         // TL
-        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
+        $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent->id, false);
         if (!empty($arrInstructors) && is_array($arrInstructors))
         {
             foreach ($arrInstructors as $userId)
             {
-                $objUserModel = UserModel::findByPk($userId);
+                $objUserModel = $userModelAdapter->findByPk($userId);
                 if ($objUserModel !== null)
                 {
                     // Check club membership
                     $isMember = false;
-                    $objMember = MemberModel::findBySacMemberId($objUserModel->sacMemberId);
+                    $objMember = $memberModelAdapter->findBySacMemberId($objUserModel->sacMemberId);
                     if ($objMember !== null)
                     {
                         if ($objMember->isSacMember && !$objMember->disable)
@@ -314,7 +365,7 @@ class EventRapport
                     $objPhpWord->addToClone('i', 'mobile', htmlspecialchars(html_entity_decode($mobile)), array('multiline' => false));
                     $objPhpWord->addToClone('i', 'email', htmlspecialchars(html_entity_decode($objUserModel->email)), array('multiline' => false));
                     $objPhpWord->addToClone('i', 'transportInfo', htmlspecialchars(html_entity_decode($transportInfo)), array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'dateOfBirth', $objUserModel->dateOfBirth != '' ? Date::parse('Y', $objUserModel->dateOfBirth) : '', array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'dateOfBirth', $objUserModel->dateOfBirth != '' ? $dateAdapter->parse('Y', $objUserModel->dateOfBirth) : '', array('multiline' => false));
                 }
             }
         }
@@ -328,7 +379,7 @@ class EventRapport
             $strIsActiveMember = '!inaktiv/keinMitglied';
             if ($objEventMember->sacMemberId != '')
             {
-                $objMemberModel = MemberModel::findBySacMemberId($objEventMember->sacMemberId);
+                $objMemberModel = $memberModelAdapter->findBySacMemberId($objEventMember->sacMemberId);
                 if ($objMemberModel !== null)
                 {
                     if ($objMemberModel->isSacMember && !$objMemberModel->disable)
@@ -373,14 +424,16 @@ class EventRapport
             $objPhpWord->addToClone('i', 'emergencyPhoneName', htmlspecialchars(html_entity_decode($objEventMember->emergencyPhoneName)), array('multiline' => false));
             $objPhpWord->addToClone('i', 'email', htmlspecialchars(html_entity_decode($objEventMember->email)), array('multiline' => false));
             $objPhpWord->addToClone('i', 'transportInfo', htmlspecialchars(html_entity_decode($transportInfo)), array('multiline' => false));
-            $objPhpWord->addToClone('i', 'dateOfBirth', $objEventMember->dateOfBirth != '' ? Date::parse('Y', $objEventMember->dateOfBirth) : '', array('multiline' => false));
+            $objPhpWord->addToClone('i', 'dateOfBirth', $objEventMember->dateOfBirth != '' ? $dateAdapter->parse('Y', $objEventMember->dateOfBirth) : '', array('multiline' => false));
         }
 
         // Event instructors
-        $aInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
+        $aInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent->id, false);
 
         $arrInstructors = array_map(function ($id) {
-            $objUser = \UserModel::findByPk($id);
+            $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+
+            $objUser = $userModelAdapter->findByPk($id);
             if ($objUser !== null)
             {
                 return $objUser->name;
@@ -400,22 +453,30 @@ class EventRapport
      */
     public function generateMemberList($eventId, $outputType = 'docx')
     {
-        $objEvent = CalendarEventsModel::findByPk($eventId);
+        // Set adapters
+        $configAdapter = $this->framework->getAdapter(Config::class);
+        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+        $messageAdapter = $this->framework->getAdapter(Message::class);
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
+        $databaseAdapter = $this->framework->getAdapter(Database::class);
+
+        $objEvent = $calendarEventsModelAdapter->findByPk($eventId);
 
         if ($objEvent !== null)
         {
-            $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
+            $objEventMember = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
             if (!$objEventMember->numRows)
             {
                 // Send error message if there are no members assigned to the event
-                Message::addError('Bitte &uuml;berpr&uuml;fe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, deren Teilname best&auml;tigt ist.');
-                Controller::redirect(System::getReferer());
+                $messageAdapter->addError('Bitte &uuml;berpr&uuml;fe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, deren Teilname best&auml;tigt ist.');
+                $controllerAdapter->redirect(System::getReferer());
             }
 
             // Create phpWord instance
-            $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'));
-            $destFile = Config::get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
-            $objPhpWord = new MsWordTemplateProcessor(Config::get('SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'), $destFile);
+            $filenamePattern = str_replace('%%s', '%s', $configAdapter->get('SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'));
+            $destFile = $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
+            $objPhpWord = new MsWordTemplateProcessor($configAdapter->get('SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'), $destFile);
 
             // Get event data
             $this->getEventData($objPhpWord, $objEvent);
@@ -424,8 +485,8 @@ class EventRapport
             $this->getEventMemberData($objPhpWord, $objEvent, $objEventMember);
 
             // Create temporary folder, if it not exists.
-            new Folder(Config::get('SAC_EVT_TEMP_PATH'));
-            Dbafs::addResource(Config::get('SAC_EVT_TEMP_PATH'));
+            new Folder($configAdapter->get('SAC_EVT_TEMP_PATH'));
+            $dbafsAdapter->addResource($configAdapter->get('SAC_EVT_TEMP_PATH'));
 
             if ($outputType === 'pdf')
             {
@@ -435,7 +496,7 @@ class EventRapport
                     ->generate();
 
                 // Generate pdf
-                $objConversion = new DocxToPdfConversion($destFile, Config::get('cloudconvertApiKey'));
+                $objConversion = new DocxToPdfConversion($destFile, $configAdapter->get('cloudconvertApiKey'));
                 $objConversion->sendToBrowser(true)->createUncached(true)->convert();
             }
 

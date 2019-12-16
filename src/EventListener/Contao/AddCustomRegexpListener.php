@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\EventListener;
+namespace Markocupic\SacEventToolBundle\Contao\EventListener;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
@@ -19,7 +19,7 @@ use Contao\Widget;
 
 /**
  * Class AddCustomRegexpListener
- * @package Markocupic\SacEventToolBundle\EventListener
+ * @package Markocupic\SacEventToolBundle\Contao\EventListener
  */
 class AddCustomRegexpListener
 {

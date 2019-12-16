@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\EventListener;
+namespace Markocupic\SacEventToolBundle\Contao\EventListener;
 
 use Contao\Automator;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Class GetPageLayoutListener
- * @package Markocupic\SacEventToolBundle\EventListener
+ * @package Markocupic\SacEventToolBundle\Contao\EventListener
  */
 class GetPageLayoutListener
 {

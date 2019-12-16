@@ -13,6 +13,7 @@ namespace Contao;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\ClearPersonalMemberData;
 use NotificationCenter\Model\Notification;
+use Markocupic\SacEventToolBundle\Services\EventRapport\EventRapport;
 
 /**
  * Class tl_calendar_events_member
@@ -161,7 +162,7 @@ class tl_calendar_events_member extends Backend
         // Download the registration list as a docx file
         if (Input::get('act') === 'downloadEventMemberList')
         {
-            $objMemberList = new \Markocupic\SacEventToolBundle\EventRapport();
+            $objMemberList = new EventRapport();
             $objMemberList->generateMemberList(Input::get('id'), 'docx');
             exit;
         }
@@ -725,8 +726,6 @@ class tl_calendar_events_member extends Backend
                 'emailSubject'        => 'Absage für %s'
             ),
         );
-
-
 
         if (Input::get('call') == '' || !is_array($arrActions[Input::get('call')]) || empty($arrActions[Input::get('call')]))
         {

@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\EventListener;
+namespace Markocupic\SacEventToolBundle\Contao\EventListener;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Input;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class ImportUserListener
- * @package Markocupic\SacEventToolBundle\EventListener
+ * @package Markocupic\SacEventToolBundle\Contao\EventListener
  */
 class ImportUserListener
 {
