@@ -158,8 +158,6 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
             $notificationAdapter = $this->framework->getAdapter(Notification::class);
             $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
-            // Return empty string, if user is not logged in as a frontend user
-
             if (($objUser = $this->security->getUser()) instanceof FrontendUser)
             {
                 $this->objUser = $objUser;
