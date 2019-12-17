@@ -19,6 +19,7 @@ use Contao\FilesModel;
 use Contao\Folder;
 use Contao\FrontendUser;
 use Contao\Input;
+use Contao\StringUtil;
 use Contao\Template;
 use Contao\MemberModel;
 use Contao\Message;
@@ -29,7 +30,6 @@ use Contao\ModuleModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
-use Markocupic\SacEventToolBundle\RotateImage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -117,7 +117,6 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         {
             $inputAdapter = $this->framework->getAdapter(Input::class);
             $controllerAdapter = $this->framework->getAdapter(Controller::class);
-            $rotateImageAdapter = $this->framework->getAdapter(RotateImage::class);
 
             // Get logged in member object
             if (($objUser = $this->security->getUser()) instanceof FrontendUser)
@@ -141,7 +140,10 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             // Rotate image by 90°
             if ($inputAdapter->get('do') === 'rotate-image' && $inputAdapter->get('fileId') != '')
             {
-                $rotateImageAdapter->rotate($inputAdapter->get('fileId'));
+                // Get the image rotate service
+                $objRotateImage = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.image.rotate_image');
+                $objFiles = FilesModel::findOneById($inputAdapter->get('fileId'));
+                $objRotateImage->rotate($objFiles);
                 $controllerAdapter->redirect($page->getFrontendUrl());
             }
         }

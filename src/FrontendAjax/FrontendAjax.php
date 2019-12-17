@@ -29,7 +29,6 @@ use Contao\UserModel;
 use Contao\Validator;
 use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Markocupic\SacEventToolBundle\RotateImage;
 use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -322,15 +321,18 @@ class FrontendAjax
      */
     public function rotateImage($fileId)
     {
-        if (RotateImage::rotate($fileId, 270))
+        // Get the image rotate service
+        $objFiles = FilesModel::findOneById($fileId);
+        $objRotateImage = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.image.rotate_image');
+        if ($objRotateImage->rotate($objFiles))
         {
-            $response = new JsonResponse(array('status' => 'success'));
+            $json = array('status' => 'success');
         }
         else
         {
-            $response = new JsonResponse(array('status' => 'error'));
+            $json = array('status' => 'error');
         }
-        $response = new JsonResponse(array('status' => 'success'));
+        $response = new JsonResponse($json);
         return $response->send();
     }
 

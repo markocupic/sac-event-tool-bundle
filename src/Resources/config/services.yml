@@ -8,6 +8,14 @@ services:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
+  # Rotate image
+  markocupic.sac_event_tool_bundle.services.image.rotate_image:
+    public: true
+    class: Markocupic\SacEventToolBundle\Services\Image\RotateImage
+    arguments:
+    - '@contao.framework'
+    - '%kernel.project_dir%'
+
   # Sync member database form bern with contao tl_member
   markocupic.sac_event_tool_bundle.sync_sac_member_database:
     public: true
