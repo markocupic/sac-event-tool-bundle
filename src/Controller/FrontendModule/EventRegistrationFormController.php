@@ -165,12 +165,6 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                 $this->objUser = $objUser;
             }
 
-            // Do not allow for not authorized users
-            if ($this->objUser === null)
-            {
-                throw new UnauthorizedHttpException();
-            }
-
             // Set the item from the auto_item parameter
             if (!$request->query->get('events') && $configAdapter->get('useAutoItem') && isset($_GET['auto_item']))
             {
@@ -178,17 +172,19 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                 $request->query->set('auto_item', $_GET['auto_item']);
             }
 
-            // Get $this->objEvent
             $blnShowModule = false;
+
+            // Get $this->objEvent
             if ($request->query->get('events') != '')
             {
                 $objEvent = $calendarEventsModelAdapter->findByIdOrAlias($request->query->get('events'));
-                if ($objEvent !== null)
+                if ($objEvent !== null && $this->objUser !== null)
                 {
                     $this->objEvent = $objEvent;
                     $blnShowModule = true;
                 }
             }
+
             if (!$blnShowModule)
             {
                 // Return empty string
