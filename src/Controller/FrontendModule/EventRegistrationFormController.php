@@ -690,7 +690,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
      */
     protected function isFrontend()
     {
-        return $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest());
+        return $this->requestStack->getCurrentRequest() !== null ? $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()) : false;
     }
 
 }

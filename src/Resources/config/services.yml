@@ -8,6 +8,14 @@ services:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
+  # Generate backend users home directory / remove old backend user home directories
+  markocupic.sac_event_tool_bundle.services.backend_user.maintain_backend_users_home_directory:
+    public: true
+    class: Markocupic\SacEventToolBundle\Services\BackendUser\MaintainBackendUsersHomeDirectory
+    arguments:
+    - '@contao.framework'
+    - '%kernel.project_dir%'
+
   # Rotate image
   markocupic.sac_event_tool_bundle.services.image.rotate_image:
     public: true

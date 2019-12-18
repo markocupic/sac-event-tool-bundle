@@ -57,6 +57,7 @@ class EventRapport
         $this->framework = $framework;
         $this->projectDir = $projectDir;
 
+        // Initialize contao framework
         $this->framework->initialize();
     }
 

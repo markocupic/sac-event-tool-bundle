@@ -12,6 +12,7 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\BackendUser;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\System;
 use Contao\User;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
@@ -58,7 +59,6 @@ class PostLoginListener
      */
     public function onPostLogin(User $user)
     {
-        $maintainBackendUsersHomeDirectoryAdapter = $this->framework->getAdapter(MaintainBackendUsersHomeDirectory::class);
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
         if ($user instanceof BackendUser)
@@ -69,18 +69,20 @@ class PostLoginListener
             $qb->select('id')->from('tl_user');
             $result = $qb->execute();
 
+            $objBackendUserDir = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.backend_user.maintain_backend_users_home_directory');
+
             // Create user directories if they does not exist
             while (false !== ($row = $result->fetch()))
             {
                 $userModel = $userModelAdapter->findByPk($row['id']);
                 if ($userModel !== null)
                 {
-                    $maintainBackendUsersHomeDirectoryAdapter->createBackendUsersHomeDirectory($userModel);
+                    $objBackendUserDir->createBackendUsersHomeDirectory($userModel);
                 }
             }
 
             // Scan for unused old directories and remove them
-            $maintainBackendUsersHomeDirectoryAdapter->removeUnusedBackendUsersHomeDirectories();
+            $objBackendUserDir->removeUnusedBackendUsersHomeDirectories();
         }
     }
 

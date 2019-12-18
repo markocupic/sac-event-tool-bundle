@@ -292,7 +292,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
      */
     protected function isFrontend(): bool
     {
-        return $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest());
+        return $this->requestStack->getCurrentRequest() !== null ? $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()) : false;
     }
 
     /**

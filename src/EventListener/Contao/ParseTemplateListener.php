@@ -54,6 +54,9 @@ class ParseTemplateListener
         $this->scopeMatcher = $scopeMatcher;
     }
 
+    /**
+     * @param $objTemplate
+     */
     public function onParseTemplate($objTemplate)
     {
         if ($this->_isFrontend())
@@ -119,6 +122,7 @@ class ParseTemplateListener
      */
     protected function _isFrontend(): bool
     {
-        return $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest());
+        return $this->requestStack->getCurrentRequest() !== null ? $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()) : false;
     }
+
 }
