@@ -325,20 +325,23 @@ class tl_calendar_events_member extends Backend
     {
         $reload = false;
 
-        // Delete orphaned records 
-        // !!!Prevent deadlock: See https://stackoverflow.com/questions/2332768/how-to-avoid-mysql-deadlock-found-when-trying-to-get-lock-try-restarting-trans
-        $objStmt = $this->Database->prepare('DELETE FROM tl_calendar_events_member WHERE tl_calendar_events_member.sacMemberId > ? AND tstamp > ? AND NOT EXISTS (SELECT * FROM tl_member WHERE tl_calendar_events_member.sacMemberId = tl_member.sacMemberId)')->execute(0, 0);
+        // Delete orphaned records
+        $objStmt = $this->Database->prepare('DELETE FROM tl_calendar_events_member WHERE tl_calendar_events_member.id IN (SELECT id tl_calendar_events_member WHERE tl_calendar_events_member.sacMemberId > ? AND tstamp > ? AND NOT EXISTS (SELECT * FROM tl_member WHERE tl_calendar_events_member.sacMemberId = tl_member.sacMemberId))')->execute(0, 0);
         if ($objStmt->affectedRows > 0)
         {
             $reload = true;
         }
 
         // Delete event members without sacMemberId that are not related to an event
-        // !!!Prevent deadlock: See https://stackoverflow.com/questions/2332768/how-to-avoid-mysql-deadlock-found-when-trying-to-get-lock-try-restarting-trans
-        $objStmt = $this->Database->prepare('DELETE FROM tl_calendar_events_member WHERE (tl_calendar_events_member.sacMemberId < ? OR tl_calendar_events_member.sacMemberId = ?) AND tstamp > ? AND NOT EXISTS (SELECT * FROM tl_calendar_events WHERE tl_calendar_events_member.eventId = tl_calendar_events.id)')->execute(1, '', 0);
-        if ($objStmt->affectedRows > 0)
+        $objStmt = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE (tl_calendar_events_member.sacMemberId < ? OR tl_calendar_events_member.sacMemberId = ?) AND tstamp > ? AND NOT EXISTS (SELECT * FROM tl_calendar_events WHERE tl_calendar_events_member.eventId = tl_calendar_events.id)')->execute(1, '', 0);
+        if ($objStmt->numRows)
         {
-            $reload = true;
+            $arrIDS = $objStmt->fetchEach('id');
+            $objStmt2 = $this->Database->execute('DELETE FROM tl_calendar_events_member WHERE id IN(' . implode(',', $arrIDS) . ')');
+            if ($objStmt2->affectedRows > 0)
+            {
+                $reload = true;
+            }
         }
 
         if ($reload)
