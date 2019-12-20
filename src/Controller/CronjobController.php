@@ -69,7 +69,7 @@ class CronjobController extends AbstractController
         System::getContainer()->get('contao.framework')->initialize();
 
         // Sync SAC member database with tl_member
-        System::getContainer()->get('markocupic.sac_event_tool_bundle.sync_sac_member_database')->loadDataFromFtp()->syncContaoDatabase();
+        System::getContainer()->get('markocupic.sac_event_tool_bundle.services.sac_member_database.sync_sac_member_database')->run();
 
         return new Response();
     }

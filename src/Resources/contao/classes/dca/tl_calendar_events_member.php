@@ -13,7 +13,6 @@ namespace Contao;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\ClearPersonalMemberData;
 use NotificationCenter\Model\Notification;
-use Markocupic\SacEventToolBundle\Services\EventRapport\EventRapport;
 
 /**
  * Class tl_calendar_events_member
@@ -27,7 +26,6 @@ class tl_calendar_events_member extends Backend
     public function __construct()
     {
         $this->import('BackendUser', 'User');
-        ClearPersonalMemberData::anonymizeOrphanedCalendarEventsMemberDataRecords();
         parent::__construct();
 
         // Set correct referer
@@ -39,7 +37,7 @@ class tl_calendar_events_member extends Backend
         // Set correct referer
         if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('ref') != '')
         {
-            $objSession = static::getContainer()->get('session');
+            $objSession = System::getContainer()->get('session');
             $ref = Input::get('ref');
             $session = $objSession->get('referer');
             if (isset($session[$ref]['tl_calendar_container']))

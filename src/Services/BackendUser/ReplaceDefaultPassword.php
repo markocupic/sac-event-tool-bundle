@@ -8,8 +8,7 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle;
-
+namespace Markocupic\SacEventToolBundle\Services\BackendUser;
 
 use Contao\Config;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -18,41 +17,69 @@ use Contao\System;
 use Contao\UserModel;
 use NotificationCenter\Model\Notification;
 use Psr\Log\LogLevel;
+use Contao\CoreBundle\Framework\ContaoFramework;
 
 /**
  * Class ReplaceDefaultPassword
- * @package Markocupic\SacEventToolBundle
+ * @package Markocupic\SacEventToolBundle\Services\BackendUser
  */
 class ReplaceDefaultPassword
 {
+
+    /**
+     * @var ContaoFramework
+     */
+    private $framework;
 
     /**
      * @var
      */
     protected $defaultPassword;
 
-
     /**
      * @var int
      */
     protected $emailSendLimit = 20;
 
+    /**
+     * ReplaceDefaultPassword constructor.
+     * @param ContaoFramework $framework
+     */
+    public function __construct(ContaoFramework $framework)
+    {
+        $this->framework = $framework;
+
+        // Initialize contao framework
+        $this->framework->initialize();
+    }
 
     /**
-     * Replace the default password
+     * Replace default password and send new
      */
-    public function sendNewPassword()
+    public function replaceDefaultPasswordAndSendNew()
     {
-        $this->defaultPassword = Config::get('SAC_EVT_DEFAULT_BACKEND_PASSWORD');
+        /** @var  Config $configAdapter */
+        $configAdapter = $this->framework->getAdapter(Config::class);
 
-        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE pwChange=?')->execute('1');
+        /** @var Database $databaseAdapter */
+        $databaseAdapter = $this->framework->getAdapter(Database::class);
+
+        /** @var UserModel $userModelAdapter */
+        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+
+        /** @var Notification $notificationAdapter */
+        $notificationAdapter = $this->framework->getAdapter(Notification::class);
+
+        $this->defaultPassword = $configAdapter->get('SAC_EVT_DEFAULT_BACKEND_PASSWORD');
+
+        $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_user WHERE pwChange=?')->execute('1');
         $counter = 0;
 
         while ($objDb->next())
         {
             if (($pw = $this->replaceDefaultPassword($objDb->id)) !== false)
             {
-                $objUserModel = UserModel::findByPk($objDb->id);
+                $objUserModel = $userModelAdapter->findByPk($objDb->id);
                 $objUserModel->pwChange = '1';
                 $objUserModel->password = password_hash($pw, PASSWORD_DEFAULT);
                 $objUserModel->save();
@@ -61,14 +88,14 @@ class ReplaceDefaultPassword
                 $bodyText = $this->generateEmailText($objUserModel, $pw);
 
                 // Use terminal42/notification_center
-                $objEmail = Notification::findOneByType('default_email');
+                $objEmail = $notificationAdapter->findOneByType('default_email');
                 if ($objEmail !== null)
                 {
                     // Set token array
                     $arrTokens = array(
                         'email_sender_name'  => 'Administrator SAC Pilatus',
-                        'email_sender_email' => Config::get('adminEmail'),
-                        'reply_to'           => Config::get('adminEmail'),
+                        'email_sender_email' => $configAdapter->get('adminEmail'),
+                        'reply_to'           => $configAdapter->get('adminEmail'),
                         'email_subject'      => html_entity_decode('Passwortänderung für Backend-Zugang auf der Webseite der SAC Sektion Pilatus'),
                         'email_text'         => $bodyText,
                         'send_to'            => $objUserModel->email
@@ -98,12 +125,15 @@ class ReplaceDefaultPassword
      */
     private function replaceDefaultPassword($id)
     {
-        $objUser = UserModel::findByPk($id);
+        /** @var UserModel $userModelAdapter */
+        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+
+        $objUser = $userModelAdapter->findByPk($id);
 
         if (password_verify($this->defaultPassword, $objUser->password))
         {
             // Generate pw
-            $objUserModel = UserModel::findByPk($objUser->id);
+            $objUserModel = $userModelAdapter->findByPk($objUser->id);
             if ($objUserModel->sacMemberId > 1)
             {
                 $pw = rand(44444444, 99999999);
@@ -111,9 +141,7 @@ class ReplaceDefaultPassword
             }
         }
         return false;
-
     }
-
 
     /**
      * @param $objMember

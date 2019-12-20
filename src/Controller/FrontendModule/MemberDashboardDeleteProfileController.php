@@ -10,7 +10,6 @@
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
-use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
@@ -23,7 +22,6 @@ use Contao\PageModel;
 use Contao\System;
 use Contao\Template;
 use Haste\Form\Form;
-use Markocupic\SacEventToolBundle\ClearPersonalMemberData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -201,10 +199,11 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
     protected function generateDeleteProfileForm()
     {
         // Set adapters
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        /** @var  Input $inputAdapter */
         $inputAdapter = $this->framework->getAdapter(Input::class);
+
+        /** @var  Environment $environmentAdapter */
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $clearPersonalMemberDataAdapter = $this->framework->getAdapter(ClearPersonalMemberData::class);
 
         $objForm = new Form('form-clear-profile', 'POST', function ($objHaste) {
             $inputAdapter = $this->framework->getAdapter(Input::class);
@@ -253,10 +252,11 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
                 if (!$blnError)
                 {
                     // Clear account
-                    $clearPersonalMemberDataAdapter->clearMemberProfile($this->objUser->id);
-                    $clearPersonalMemberDataAdapter->disableLogin($this->objUser->id);
-                    $clearPersonalMemberDataAdapter->deleteFrontendAccount($this->objUser->id);
-                    $controllerAdapter->redirect('');
+                    $objClearFrontendUserData = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.frontend_user.clear_frontend_user_data');
+                    $objClearFrontendUserData->clearMemberProfile((int)$this->objUser->id);
+                    $objClearFrontendUserData->disableLogin((int)$this->objUser->id);
+                    $objClearFrontendUserData->deleteFrontendAccount((int)$this->objUser->id);
+                    $objClearFrontendUserData->redirect('');
                 }
             }
         }

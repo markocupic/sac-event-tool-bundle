@@ -22,9 +22,7 @@ class tl_member_sac_bundle extends Backend
         parent::__construct();
         $this->import('BackendUser', 'User');
         $this->import('Database');
-
     }
-
 
     /**
      * @param DC_Table $objMember
@@ -37,13 +35,18 @@ class tl_member_sac_bundle extends Backend
         // Delete avatar directory
         if ($objMember->activeRecord->id > 0)
         {
-            if (false === \Markocupic\SacEventToolBundle\ClearPersonalMemberData::clearMemberProfile($objMember->activeRecord->id))
+            $objClearFrontendUserData = \Contao\System::getContainer()->get('markocupic.sac_event_tool_bundle.services.frontend_user.clear_frontend_user_data');
+
+            $memberModel = \Contao\MemberModel::findByPk($objMember->activeRecord->id);
+            if ($memberModel !== null)
             {
-                $arrErrorMsg = sprintf('Das Mitglied mit ID:%s kann nicht gelöscht werden, weil es bei Events noch auf der Buchungsliste steht.', $objMember->activeRecord->id);
-                \Contao\Message::add($arrErrorMsg, 'TL_ERROR', TL_MODE);
-                \Contao\Controller::redirect('contao?do=member');
+                if (false === $objClearFrontendUserData->clearMemberProfile((int)$memberModel->id))
+                {
+                    $arrErrorMsg = sprintf('Das Mitglied mit ID:%s kann nicht gelöscht werden, weil es bei Events noch auf der Buchungsliste steht.', $objMember->activeRecord->id);
+                    \Contao\Message::add($arrErrorMsg, 'TL_ERROR', TL_MODE);
+                    \Contao\Controller::redirect('contao?do=member');
+                }
             }
         }
-
     }
 }

@@ -1,0 +1,6 @@
+services:
+
+  # Generate event rapports docx and pdf files
+  markocupic.sac_event_tool_bundle.controller.cronjob_controller:
+    public: true
+    class: Markocupic\SacEventToolBundle\Controller\CronjobController

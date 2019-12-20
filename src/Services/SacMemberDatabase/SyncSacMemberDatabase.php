@@ -98,6 +98,15 @@ class SyncSacMemberDatabase
     }
 
     /**
+     * @throws \Exception
+     */
+    public function run()
+    {
+        $this->loadDataFromFtp();
+        $this->syncContaoDatabase();
+    }
+
+    /**
      * @return $this
      * @throws \Exception
      */
