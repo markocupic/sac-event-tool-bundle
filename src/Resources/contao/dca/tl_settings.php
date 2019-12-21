@@ -48,6 +48,8 @@ PaletteManipulator::create()
     //
     ->addField(array('SAC_EVT_WORKSHOP_FLYER_YEAR'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(array('SAC_WORKSHOP_FLYER_CALENDAR_ID'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('SAC_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
+
     ->applyToPalette('default', 'tl_settings');
 
 // Member Database Bern
@@ -288,6 +290,15 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_WORKSHOP_FLYER_YEAR'] = arr
     'inputType' => 'text',
     'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
 );
+
+$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'] = array(
+
+    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'],
+    'inputType' => 'text',
+    'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
+);
+
+
 
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'],

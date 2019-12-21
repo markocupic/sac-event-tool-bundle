@@ -1,0 +1,135 @@
+services:
+
+  markocupic.sac_event_tool_bundle.controller.frontend_module.tour_difficulty_list_controller:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListController
+    arguments:
+    - '@contao.framework'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+
+  markocupic.sac_event_tool_bundle.controller.frontend_module.csv_event_member_export:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvEventMemberExportController
+    arguments:
+    - '@contao.framework'
+    - '@database_connection'
+    - '@request_stack'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+
+  markocupic.sac_event_tool_bundle.controller.frontend_module.event_registration_form:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationFormController
+    arguments:
+    - '@contao.framework'
+    - '@database_connection'
+    - '%kernel.project_dir%'
+    - '@security.helper'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+
+  markocupic.sac_event_tool_bundle.controller.frontend_module.activate_member_account:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\ActivateMemberAccountController
+    arguments:
+    - '@contao.framework'
+    - '@database_connection'
+    - '@security.helper'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+
+  # Member dashboard module: show upcoming events
+  markocupic.sac_event_tool_bundle.controller.frontend_module.member_dashboard_upcoming_events:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardUpcomingEventsController
+    arguments:
+    - '@contao.framework'
+    - '@security.helper'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+
+  # Member dashboard module: show past events
+  markocupic.sac_event_tool_bundle.controller.frontend_module.member_dashboard_past_events:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardPastEventsController
+    arguments:
+    - '@contao.framework'
+    - '@security.helper'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+
+  # Member dashboard module: list event reports and the form to generate new event reports
+  markocupic.sac_event_tool_bundle.controller.frontend_module.member_dashboard_event_report_list:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEventReportListController
+    arguments:
+    - '@contao.framework'
+    - '@security.helper'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    - '%kernel.project_dir%'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+
+  # Member dashboard module: display the forms for writing new event reports
+  markocupic.sac_event_tool_bundle.controller.frontend_module.member_dashboard_write_event_report:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardWriteEventReportController
+    arguments:
+    - '@contao.framework'
+    - '@security.helper'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    - '%kernel.project_dir%'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+
+  # Member dashboard module: display the forms for editing the member profile
+  markocupic.sac_event_tool_bundle.controller.frontend_module.member_dashboard_edit_profile:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEditProfileController
+    arguments:
+    - '@contao.framework'
+    - '@security.helper'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    - '%kernel.project_dir%'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+
+  # Member dashboard module: display the forms for deleting the member profile
+  markocupic.sac_event_tool_bundle.controller.frontend_module.member_dashboard_delete_profile:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardDeleteProfileController
+    arguments:
+    - '@contao.framework'
+    - '@security.helper'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    - '%kernel.project_dir%'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+
+
+  # Member dashboard module: display the avatar and the avatar upload form
+  markocupic.sac_event_tool_bundle.controller.frontend_module.member_dashboard_avatar_upload:
+    class: Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardAvatarUploadController
+    arguments:
+    - '@contao.framework'
+    - '@security.helper'
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    - '%kernel.project_dir%'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    public: true
+

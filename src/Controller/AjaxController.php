@@ -12,7 +12,6 @@ namespace Markocupic\SacEventToolBundle\Controller;
 
 use Contao\Environment;
 use Contao\Input;
-use Markocupic\SacEventToolBundle\FrontendAjax\FrontendAjax;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -29,7 +28,10 @@ class AjaxController extends AbstractController
      */
     public function ajaxAction()
     {
-        $this->container->get('contao.framework')->initialize();
+        $framework = $this->container->get('contao.framework');
+        $framework->initialize();
+        $controller = $this->container->get('markocupic.sac_event_tool_bundle.services.frontend_ajax.frontend_ajax');
+
 
         // Do allow only xhr requests
         if (Environment::get('isAjaxRequest') === false)
@@ -40,35 +42,30 @@ class AjaxController extends AbstractController
         // Ajax lazyload for the calendar event list module
         if (Input::post('action') === 'getEventData')
         {
-            $controller = new FrontendAjax();
             $controller->getEventData();
         }
 
         // Event story
         if (Input::post('action') === 'setPublishState')
         {
-            $controller = new FrontendAjax();
             $controller->setPublishState();
         }
 
         // Event story
         if (Input::post('action') === 'sortGallery')
         {
-            $controller = new FrontendAjax();
             $controller->sortGallery();
         }
 
         // Event story
         if (Input::post('action') === 'removeImage')
         {
-            $controller = new FrontendAjax();
             $controller->removeImage();
         }
 
         // Event story
         if (Input::post('action') === 'rotate-image')
         {
-            $controller = new FrontendAjax();
             $fileId = Input::post('fileId');
             $controller->rotateImage($fileId);
         }
@@ -76,14 +73,12 @@ class AjaxController extends AbstractController
         // Event story
         if (Input::post('action') === 'getCaption')
         {
-            $controller = new FrontendAjax();
             $controller->getCaption();
         }
 
         // Event story
         if (Input::post('action') === 'setCaption')
         {
-            $controller = new FrontendAjax();
             $controller->setCaption();
         }
 

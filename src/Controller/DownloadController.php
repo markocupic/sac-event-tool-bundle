@@ -41,26 +41,30 @@ class DownloadController extends AbstractController
     {
         $this->container->get('contao.framework')->initialize();
 
-        // Für Downloads workshops as pdf booklet
-        if (Input::get('year') != '')
+        /** @var $pdf PrintWorkshopsAsPdf */
+        $pdf = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.pdf.print_workshops_as_pdf');
+
+        $year = Input::get('year') != '' ? Input::get('year') : null;
+        $calendarId = Input::get('calendarId') != '' ? Input::get('calendarId') : null;
+
+        if ($year !== null)
         {
-            $year = Input::get('year');
-
-            if (Input::get('year') === 'current')
-            {
-                $year = Date::parse('Y', time());
-            }
-
-            // Log download
-            $container = System::getContainer();
-            $logger = $container->get('monolog.logger.contao');
-            $logger->log(LogLevel::INFO, 'The course booklet has been downloaded.', array('contao' => new ContaoContext(__FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'))));
-
-            $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'));
-            $fileSRC = sprintf($filenamePattern, $year);
-
-            Controller::sendFileToBrowser($fileSRC, false);
+            $pdf = $pdf->setYear($year);
         }
+        if ($calendarId !== null)
+        {
+            $pdf = $pdf->setCalendarId($calendarId);
+        }
+
+        $pdf->setDownload(true);
+
+        // Log download
+        $container = System::getContainer();
+        $logger = $container->get('monolog.logger.contao');
+        $logger->log(LogLevel::INFO, 'The course booklet has been downloaded.', array('contao' => new ContaoContext(__FILE__ . ' Line: ' . __LINE__, Config::get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'))));
+
+        $pdf->printWorkshopsAsPdf();
+
         exit();
     }
 
@@ -90,8 +94,18 @@ class DownloadController extends AbstractController
     {
         $this->container->get('contao.framework')->initialize();
 
-        $objPrint = new PrintWorkshopsAsPdf(0, 0, Input::get('eventId'), true);
-        $objPrint->printWorkshopsAsPdf();
+        /** @var $pdf PrintWorkshopsAsPdf */
+        $pdf = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.pdf.print_workshops_as_pdf');
+
+        $eventId = Input::get('eventId') ? Input::get('eventId') : null;
+
+        if ($eventId !== null)
+        {
+            $pdf->setEventId($eventId);
+        }
+
+        $pdf->setDownload(true);
+        $pdf->printWorkshopsAsPdf();
         exit();
     }
 

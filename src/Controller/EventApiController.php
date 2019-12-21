@@ -12,7 +12,9 @@ namespace Markocupic\SacEventToolBundle\Controller;
 
 use Markocupic\SacEventToolBundle\FrontendAjax\EventApi;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Contao\Input;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -28,12 +30,18 @@ class EventApiController extends AbstractController
      */
     public function getEventDataByIds()
     {
-        //$response = new Response();
-        //$response->headers->set('Access-Control-Allow-Origin', '*');
-        //$response->send();
-        $this->container->get('contao.framework')->initialize();
-        $objApi = new EventApi();
-        $objApi->sendEventDataByIds();
+        $framework = $this->container->get('contao.framework');
+        $framework->initialize();
+
+        $objApi = $this->container->get('markocupic.sac_event_tool_bundle.services.frontend_ajax.event_api');
+
+        /** @var Input $inputAdapter */
+        $inputAdapter = $framework->getAdapter(Input::class);
+
+        $arrIds = $inputAdapter->post('ids') == '' ? array() : $inputAdapter->post('ids');
+        $arrFields = $inputAdapter->post('fields') == '' ? array() : $inputAdapter->post('fields');
+
+        $objApi->getEventDataByIds($arrIds, $arrFields);
 
         return new Response();
     }

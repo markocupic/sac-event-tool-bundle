@@ -34,6 +34,7 @@ class MarkocupicSacEventToolExtension extends Extension
         $loader->load('listener.yml');
         $loader->load('parameters.yml');
         $loader->load('services.yml');
+        $loader->load('controller-frontend-module.yml');
         $loader->load('controller.yml');
 
 

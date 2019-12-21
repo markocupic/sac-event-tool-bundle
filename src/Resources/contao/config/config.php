@@ -107,7 +107,7 @@ $GLOBALS['TL_CTE']['sac_content_elements'] = array(
 // Maintenance
 // Delete unused event-story folders
 $GLOBALS['TL_PURGE']['custom']['sac_event_story'] = array(
-    'callback' => array('Markocupic\SacEventToolBundle\Maintenance\MaintainModuleEventStory', 'run')
+    'callback' => array('markocupic.sac_event_tool_bundle.services.contao_backend_maintenance.maintain_module_event_story', 'run')
 );
 
 // Do not index a page if one of the following parameters is set
@@ -291,7 +291,7 @@ $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic.sac_event_too
 /** Cron jobs **/
 $GLOBALS['TL_CRON']['monthly']['replaceDefaultPassword'] = array('markocupic.sac_event_tool_bundle.services.backend_user.replace_default_password', 'replaceDefaultPasswordAndSendNew');
 $GLOBALS['TL_CRON']['hourly']['syncSacMemberDatabase'] = array('markocupic.sac_event_tool_bundle.services.sac_member_database.sync_sac_member_database', 'run');
-$GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = array('markocupic.sac_event_tool_bundle.controller.cronjob_controller', 'generateWorkshopPdfBooklet');
+$GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = array('markocupic.sac_event_tool_bundle.services.pdf.print_workshops_as_pdf', 'generateWorkshopPdfBooklet');
 $GLOBALS['TL_CRON']['daily']['anonymizeOrphanedCalendarEventsMemberDataRecords'] = array('markocupic.sac_event_tool_bundle.services.frontend_user.clear_frontend_user_data', 'anonymizeOrphanedCalendarEventsMemberDataRecords');
 
 /** Replace insert tags **/

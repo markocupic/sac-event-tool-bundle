@@ -10,8 +10,7 @@
 namespace Markocupic\SacEventToolBundle\Controller;
 
 use Contao\System;
-use Contao\Config;
-use Markocupic\SacEventToolBundle\Services\Newsletter\SendNewsletter;
+use Contao\Input;
 use Markocupic\SacEventToolBundle\Services\Newsletter\SendPasswordToMembers;
 use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,9 +33,8 @@ class CronjobController extends AbstractController
     public function sendPasswordToBackendUsers()
     {
         // Initialize contao framework
-        System::getContainer()->get('contao.framework')->initialize();
-
-        //SendPasswordToMembers::sendPasswordToMembers(25);
+        $this->container->get('contao.framework')->initialize();
+        SendPasswordToMembers::replaceDefaultPasswordAndSendNew();
 
         return new Response();
     }
@@ -50,7 +48,7 @@ class CronjobController extends AbstractController
     public function sendSurveyNewsletter()
     {
         // Initialize contao framework
-        System::getContainer()->get('contao.framework')->initialize();
+        $this->container->get('contao.framework')->initialize();
 
         //SendNewsletter::sendSurveyNewsletter(25);
 
@@ -66,7 +64,7 @@ class CronjobController extends AbstractController
     public function syncSacMemberDatabase()
     {
         // Initialize contao framework
-        System::getContainer()->get('contao.framework')->initialize();
+        $this->container->get('contao.framework')->initialize();
 
         // Sync SAC member database with tl_member
         System::getContainer()->get('markocupic.sac_event_tool_bundle.services.sac_member_database.sync_sac_member_database')->run();
@@ -82,14 +80,35 @@ class CronjobController extends AbstractController
      */
     public function generateWorkshopPdfBooklet()
     {
-
         // Initialize contao framework
-        System::getContainer()->get('contao.framework')->initialize();
+        $this->container->get('contao.framework')->initialize();
 
-        $year = Config::get('SAC_EVT_WORKSHOP_FLYER_YEAR');
-        $calendarId = Config::get('SAC_WORKSHOP_FLYER_CALENDAR_ID');
-        $objPrint = new PrintWorkshopsAsPdf($year, $calendarId, null, false);
-        $objPrint->printWorkshopsAsPdf();
+        /** @var $pdf PrintWorkshopsAsPdf */
+        $pdf = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.pdf.print_workshops_as_pdf');
+
+        $year = Input::get('year') != '' ? Input::get('year') : null;
+        $calendarId = Input::get('calendarId') != '' ? Input::get('calendarId') : null;
+        $eventId = Input::get('eventId') ? Input::get('eventId') : null;
+        $download = Input::get('download') ? true : false;
+
+        if($year !== null)
+        {
+            $pdf->setYear($year);
+        }
+        if($calendarId !== null)
+        {
+            $pdf->setCalendarId($calendarId);
+        }
+        if($eventId !== null)
+        {
+            $pdf->setEventId($eventId);
+        }
+        if($download === false)
+        {
+            $pdf->setDownload(false);
+        }
+
+        $pdf->printWorkshopsAsPdf();
 
         return new Response();
     }
