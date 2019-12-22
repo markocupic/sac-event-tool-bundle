@@ -111,6 +111,7 @@ $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_invalidActivationCode'] = 'Ung
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_activationCodeExpired'] = 'Der Aktivierungscode ist abgelaufen. Bitte starte den Aktivierungsprozess neu.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sessionExpired'] = 'Es ist ein Fehler aufgetreten. Die Session ist abgelaufen.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_noValidNotificationSelected'] = 'Vom Administrator wurde keine gültige Benachrichtigung ausgewählt. Kontaktiere bitte die Geschäftsstelle.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sessionExpiredPleaseTestartProcess'] = 'Leider ist die Session abgelaufen. Starte den Aktivierungsprozess von vorne.<br><a href="%s">Aktivierungsprozess neu starten</a>';
 
 
 

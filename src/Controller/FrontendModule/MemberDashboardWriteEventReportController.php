@@ -54,26 +54,6 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
 {
 
     /**
-     * @var ContaoFramework
-     */
-    protected $framework;
-
-    /**
-     * @var Security
-     */
-    protected $security;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var ScopeMatcher
-     */
-    protected $scopeMatcher;
-
-    /**
      * @var string
      */
     protected $projectDir;
@@ -94,23 +74,6 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
     protected $objPage;
 
     /**
-     * MemberDashboardWriteEventReportController constructor.
-     * @param ContaoFramework $framework
-     * @param Security $security
-     * @param RequestStack $requestStack
-     * @param ScopeMatcher $scopeMatcher
-     * @param string $projectDir
-     */
-    public function __construct(ContaoFramework $framework, Security $security, RequestStack $requestStack, ScopeMatcher $scopeMatcher, string $projectDir)
-    {
-        $this->framework = $framework;
-        $this->security = $security;
-        $this->requestStack = $requestStack;
-        $this->scopeMatcher = $scopeMatcher;
-        $this->projectDir = $projectDir;
-    }
-
-    /**
      * @param Request $request
      * @param ModuleModel $model
      * @param string $section
@@ -124,7 +87,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         if ($this->isFrontend())
         {
             // Get logged in member object
-            if (($objUser = $this->security->getUser()) instanceof FrontendUser)
+            if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
             {
                 $this->objUser = $objUser;
             }
@@ -143,8 +106,25 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             }
         }
 
+        $this->projectDir = System::getContainer()->getParameter('kernel.project_dir');
+
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSubscribedServices(): array
+    {
+        $services = parent::getSubscribedServices();
+
+        $services['contao.framework'] = ContaoFramework::class;
+        $services['security.helper'] = Security::class;
+        $services['request_stack'] = RequestStack::class;
+        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
+
+        return $services;
     }
 
     /**
@@ -158,16 +138,16 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         $this->template = $template;
 
         // Set adapters
-        $messageAdapter = $this->framework->getAdapter(Message::class);
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-        $calendarEventsStoryModelAdapter = $this->framework->getAdapter(CalendarEventsStoryModel::class);
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
+        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
+        $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+        $calendarEventsMemberModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsMemberModel::class);
+        $calendarEventsStoryModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsStoryModel::class);
+        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
+        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
 
         // Load language file
         $controllerAdapter->loadLanguageFile('tl_calendar_events_story');
@@ -292,7 +272,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
      */
     protected function isFrontend(): bool
     {
-        return $this->requestStack->getCurrentRequest() !== null ? $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()) : false;
+        return $this->get('request_stack')->getCurrentRequest() !== null ? $this->get('contao.routing.scope_matcher')->isFrontendRequest($this->get('request_stack')->getCurrentRequest()) : false;
     }
 
     /**
@@ -300,8 +280,8 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
      */
     protected function addMessagesToTemplate(): void
     {
-        $systemAdapter = $this->framework->getAdapter(System::class);
-        $messageAdapter = $this->framework->getAdapter(Message::class);
+        $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
+        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
 
         if ($messageAdapter->hasInfo())
         {
@@ -328,12 +308,12 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
     protected function generateTextAndYoutubeForm(CalendarEventsStoryModel $objEventStoryModel)
     {
         // Set adapters
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $inputAdapter = $this->framework->getAdapter(Input::class);
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
 
         $objForm = new Form('form-eventstory-text-and-youtube', 'POST', function ($objHaste) {
-            $inputAdapter = $this->framework->getAdapter(Input::class);
+            $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
             return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
@@ -396,15 +376,15 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
     protected function generatePictureUploadForm(CalendarEventsStoryModel $objEventStoryModel, ModuleModel $moduleModel)
     {
         // Set adapters
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-        $filesAdapter = $this->framework->getAdapter(Files::class);
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
-        $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
-        $messageAdapter = $this->framework->getAdapter(Message::class);
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
+        $filesAdapter = $this->get('contao.framework')->getAdapter(Files::class);
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
+        $dbafsAdapter = $this->get('contao.framework')->getAdapter(Dbafs::class);
+        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
 
         $objUploadFolder = null;
         if ($moduleModel->eventStoryUploadFolder != '')
@@ -427,7 +407,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         }
 
         $objForm = new Form('form-eventstory-picture-upload', 'POST', function ($objHaste) {
-            $inputAdapter = $this->framework->getAdapter(Input::class);
+            $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
             return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
@@ -557,9 +537,9 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
     protected function getGalleryImages(CalendarEventsStoryModel $objStory): array
     {
         // Set adapters
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
 
         $images = array();
         $arrMultiSRC = $stringUtilAdapter->deserialize($objStory->multiSRC, true);
@@ -640,7 +620,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
     protected function resizeUploadedImage(string $strImage): bool
     {
         // Set adapters
-        $configAdapter = $this->framework->getAdapter(Config::class);
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
 
         // If there is no limitation
         if ($configAdapter->get('maxImageWidth') < 1)

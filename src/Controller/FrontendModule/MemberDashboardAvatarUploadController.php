@@ -46,26 +46,6 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 {
 
     /**
-     * @var ContaoFramework
-     */
-    protected $framework;
-
-    /**
-     * @var Security
-     */
-    protected $security;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var ScopeMatcher
-     */
-    protected $scopeMatcher;
-
-    /**
      * @var string
      */
     protected $projectDir;
@@ -86,23 +66,6 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     protected $objPage;
 
     /**
-     * MemberDashboardAvatarUploadController constructor.
-     * @param ContaoFramework $framework
-     * @param Security $security
-     * @param RequestStack $requestStack
-     * @param ScopeMatcher $scopeMatcher
-     * @param string $projectDir
-     */
-    public function __construct(ContaoFramework $framework, Security $security, RequestStack $requestStack, ScopeMatcher $scopeMatcher, string $projectDir)
-    {
-        $this->framework = $framework;
-        $this->security = $security;
-        $this->requestStack = $requestStack;
-        $this->scopeMatcher = $scopeMatcher;
-        $this->projectDir = $projectDir;
-    }
-
-    /**
      * @param Request $request
      * @param ModuleModel $model
      * @param string $section
@@ -115,11 +78,11 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         // Return empty string, if user is not logged in as a frontend user
         if ($this->isFrontend())
         {
-            $inputAdapter = $this->framework->getAdapter(Input::class);
-            $controllerAdapter = $this->framework->getAdapter(Controller::class);
+            $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+            $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
 
             // Get logged in member object
-            if (($objUser = $this->security->getUser()) instanceof FrontendUser)
+            if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
             {
                 $this->objUser = $objUser;
             }
@@ -148,8 +111,25 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             }
         }
 
+        $this->projectDir = System::getContainer()->getParameter('kernel.project_dir');
+
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSubscribedServices(): array
+    {
+        $services = parent::getSubscribedServices();
+
+        $services['contao.framework'] = ContaoFramework::class;
+        $services['security.helper'] = Security::class;
+        $services['request_stack'] = RequestStack::class;
+        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
+
+        return $services;
     }
 
     /**
@@ -163,7 +143,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         $this->template = $template;
 
         // Set adapters
-        $configAdapter = $this->framework->getAdapter(Config::class);
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
 
         $this->template->objUser = $this->objUser;
 
@@ -192,7 +172,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
      */
     protected function isFrontend(): bool
     {
-        return $this->requestStack->getCurrentRequest() !== null ? $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()) : false;
+        return $this->get('request_stack')->getCurrentRequest() !== null ? $this->get('contao.routing.scope_matcher')->isFrontendRequest($this->get('request_stack')->getCurrentRequest()) : false;
     }
 
     /**
@@ -200,8 +180,8 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
      */
     protected function addMessagesToTemplate(): void
     {
-        $systemAdapter = $this->framework->getAdapter(System::class);
-        $messageAdapter = $this->framework->getAdapter(Message::class);
+        $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
+        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
 
         if ($messageAdapter->hasInfo())
         {
@@ -228,16 +208,16 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     protected function generateAvatarForm()
     {
         // Set adapters
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-        $configAdapter = $this->framework->getAdapter(Config::class);
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-        $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
+        $memberModelAdapter = $this->get('contao.framework')->getAdapter(MemberModel::class);
+        $dbafsAdapter = $this->get('contao.framework')->getAdapter(Dbafs::class);
 
         $objForm = new Form('form-avatar-upload', 'POST', function ($objHaste) {
-            $inputAdapter = $this->framework->getAdapter(Input::class);
+            $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
             return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
@@ -319,8 +299,8 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     protected function checkAvatar(): void
     {
         // Set adapters
-        $configAdapter = $this->framework->getAdapter(Config::class);
-        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
 
         // Check for valid avatar
         if ($this->objUser !== null)

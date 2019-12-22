@@ -37,6 +37,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ActivateMemberAccountController
@@ -45,30 +46,6 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
  */
 class ActivateMemberAccountController extends AbstractFrontendModuleController
 {
-    /**
-     * @var ContaoFramework
-     */
-    protected $framework;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
-     * @var Security
-     */
-    protected $security;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var ScopeMatcher
-     */
-    protected $scopeMatcher;
 
     /**
      * @var integer
@@ -101,23 +78,6 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
     protected $activationLinkLifetime = 3600;
 
     /**
-     * ModuleSacEventToolActivateMemberAccount constructor.
-     * @param ContaoFramework $framework
-     * @param Connection $connection
-     * @param Security $security
-     * @param RequestStack $requestStack
-     * @param ScopeMatcher $scopeMatcher
-     */
-    public function __construct(ContaoFramework $framework, Connection $connection, Security $security, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
-    {
-        $this->framework = $framework;
-        $this->connection = $connection;
-        $this->security = $security;
-        $this->requestStack = $requestStack;
-        $this->scopeMatcher = $scopeMatcher;
-    }
-
-    /**
      * @param Request $request
      * @param ModuleModel $model
      * @param string $section
@@ -131,12 +91,12 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         if ($this->isFrontend())
         {
             // Set adapters
-            $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-            $notificationAdapter = $this->framework->getAdapter(Notification::class);
-            $urlAdapter = $this->framework->getAdapter(Url::class);
-            $controllerAdapter = $this->framework->getAdapter(Controller::class);
+            $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+            $notificationAdapter = $this->get('contao.framework')->getAdapter(Notification::class);
+            $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
+            $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
 
-            if (($objUser = $this->security->getUser()) instanceof FrontendUser)
+            if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
             {
                 $this->objUser = $objUser;
             }
@@ -162,6 +122,20 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         return parent::__invoke($request, $model, $section, $classes);
     }
 
+    public static function getSubscribedServices(): array
+    {
+        $services = parent::getSubscribedServices();
+
+        $services['contao.framework'] = ContaoFramework::class;
+        $services['database_connection'] = Connection::class;
+        $services['security.helper'] = Security::class;
+        $services['request_stack'] = RequestStack::class;
+        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
+        $services['translator'] = TranslatorInterface::class;
+
+        return $services;
+    }
+
     /**
      * @param Template $template
      * @param ModuleModel $model
@@ -171,9 +145,9 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
         // Set Adapters
-        $urlAdapter = $this->framework->getAdapter(Url::class);
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
+        $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $memberModelAdapter = $this->get('contao.framework')->getAdapter(MemberModel::class);
 
         // Instantiate partial template
         $this->partial = new FrontendTemplate('partial_activate_member_account_step_' . $this->step);
@@ -260,19 +234,22 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
     protected function generateFirstForm(): void
     {
         // Set adapters
-        $urlAdapter = $this->framework->getAdapter(Url::class);
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
-        $configAdapter = $this->framework->getAdapter(Config::class);
-        $dateAdapter = $this->framework->getAdapter(Date::class);
+        $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $memberModelAdapter = $this->get('contao.framework')->getAdapter(MemberModel::class);
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
+
+        // Get translator
+        $translator = $this->get('translator');
 
         // Get request
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->get('request_stack')->getCurrentRequest();
 
         $objForm = new Form('form-activate-member-account', 'POST', function ($objHaste) {
-            $request = $this->requestStack->getCurrentRequest();
+            $request = $this->get('request_stack')->getCurrentRequest();
             return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
         });
         $url = $environmentAdapter->get('uri');
@@ -322,7 +299,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
             // Check for valid notification
             if (!$this->objNotification)
             {
-                $this->partial->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_noValidNotificationSelected'];
+                $this->partial->errorMsg = $translator->trans('ERR.activateMemberAccount_noValidNotificationSelected', [], 'contao_default');
                 $hasError = true;
             }
 
@@ -330,7 +307,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
             $objMember = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')->limit(1)->execute($request->request->get('username'));
             if (!$objMember->numRows)
             {
-                $this->partial->errorMsg = sprintf($GLOBALS['TL_LANG']['ERR']['activateMemberAccount_couldNotAssignUserToSacMemberId'], $request->request->get('username'));
+                $this->partial->errorMsg = sprintf($translator->trans('ERR.activateMemberAccount_couldNotAssignUserToSacMemberId', [], 'contao_default'), $request->request->get('username'));
                 $hasError = true;
             }
 
@@ -338,7 +315,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
             {
                 if ($dateAdapter->parse($configAdapter->get('dateFormat'), $objMember->dateOfBirth) !== $request->request->get('dateOfBirth'))
                 {
-                    $this->partial->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberIdAndDateOfBirthDoNotMatch'];
+                    $this->partial->errorMsg = $translator->trans('ERR.activateMemberAccount_sacMemberIdAndDateOfBirthDoNotMatch', [], 'contao_default');
                     $hasError = true;
                 }
             }
@@ -347,7 +324,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
             {
                 if (strtolower($request->request->get('email')) !== "" && trim($objMember->email) == '')
                 {
-                    $this->partial->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberEmailNotRegistered'];
+                    $this->partial->errorMsg = $translator->trans('ERR.activateMemberAccount_sacMemberEmailNotRegistered', [], 'contao_default');
                     $hasError = true;
                 }
             }
@@ -356,7 +333,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
             {
                 if (strtolower($request->request->get('email')) !== strtolower($objMember->email))
                 {
-                    $this->partial->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberIdAndEmailDoNotMatch'];
+                    $this->partial->errorMsg = $translator->trans('ERR.activateMemberAccount_sacMemberIdAndEmailDoNotMatch', [], 'contao_default');
                     $hasError = true;
                 }
             }
@@ -365,7 +342,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
             {
                 if ($objMember->login)
                 {
-                    $this->partial->errorMsg = sprintf($GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountWithThisSacMemberIdIsAllreadyRegistered'], $request->request->get('username'));
+                    $this->partial->errorMsg = sprintf($translator->trans('ERR.activateMemberAccount_accountWithThisSacMemberIdIsAllreadyRegistered', [], 'contao_default'), $request->request->get('username'));
                     $hasError = true;
                 }
             }
@@ -374,7 +351,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
             {
                 if ($objMember->disable)
                 {
-                    $this->partial->errorMsg = sprintf($GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountWithThisSacMemberIdHasBeendDeactivatedAndIsNoMoreValid'], $request->request->get('username'));
+                    $this->partial->errorMsg = sprintf($translator->trans('ERR.activateMemberAccount_accountWithThisSacMemberIdHasBeendDeactivatedAndIsNoMoreValid', [], 'contao_default'), $request->request->get('username'));
                     $hasError = true;
                 }
             }
@@ -408,7 +385,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
                     {
                         $hasError = true;
                         $this->partial->hasError = $hasError;
-                        $this->partial->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_couldNotTerminateActivationProcess'];
+                        $this->partial->errorMsg = $translator->trans('ERR.activateMemberAccount_couldNotTerminateActivationProcess', [], 'contao_default');
                     }
                 }
             }
@@ -423,14 +400,17 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
     protected function generateSecondForm(): void
     {
         // Set adapters
-        $urlAdapter = $this->framework->getAdapter(Url::class);
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
+        $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $memberModelAdapter = $this->get('contao.framework')->getAdapter(MemberModel::class);
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+
+        // Get translator
+        $translator = $this->get('translator');
 
         // Get request
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->get('request_stack')->getCurrentRequest();
 
         $objMember = $memberModelAdapter->findByPk($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId']);
         if ($objMember === null)
@@ -439,7 +419,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
             $controllerAdapter->redirect($url);
         }
         $objForm = new Form('form-activate-member-account-activation-token', 'POST', function ($objHaste) {
-            $request = $this->requestStack->getCurrentRequest();
+            $request = $this->get('request_stack')->getCurrentRequest();
             return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
@@ -476,13 +456,13 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
                 $hasError = true;
                 $url = $urlAdapter->removeQueryString(['step']);
                 $this->partial->doNotShowForm = true;
-                $this->partial->errorMsg = sprintf('Leider ist die Session abgelaufen. Starte den Aktivierungsprozess von vorne.<br><a href="%s">Aktivierungsprozess neu starten</a>', $url);
+                $this->partial->errorMsg = sprintf($translator->trans('ERR.activateMemberAccount_sessionExpiredPleaseTestartProcess', [], 'contao_default'), $url);
             }
 
             if ($objMember->disable)
             {
                 $hasError = true;
-                $this->partial->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountActivationStoppedAccountIsDeactivated'];
+                $this->partial->errorMsg = $translator->trans('ERR.activateMemberAccount_accountActivationStoppedAccountIsDeactivated', [], 'contao_default');
             }
 
             $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_member WHERE id=? AND activation=?')->limit(1)->execute($objMember->id, $token);
@@ -503,12 +483,12 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
                     unset($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId']);
                     $url = $urlAdapter->removeQueryString(['step']);
                     $this->partial->doNotShowForm = true;
-                    $this->partial->errorMsg = sprintf($GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountActivationStoppedInvalidActivationCodeAndTooMuchTries'], '<br><a href="' . $url . '">', '</a>');
+                    $this->partial->errorMsg = sprintf($translator->trans('ERR.activateMemberAccount_accountActivationStoppedInvalidActivationCodeAndTooMuchTries', [], 'contao_default'), '<br><a href="' . $url . '">', '</a>');
                 }
                 else
                 {
                     // False token
-                    $this->partial->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_invalidActivationCode'];
+                    $this->partial->errorMsg = $translator->trans('ERR.activateMemberAccount_invalidActivationCode', [], 'contao_default');
                 }
             }
             else
@@ -518,7 +498,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
                 {
                     $hasError = true;
                     $this->partial->doNotShowForm = true;
-                    $this->partial->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_activationCodeExpired'];
+                    $this->partial->errorMsg = $translator->trans('ERR.activateMemberAccount_activationCodeExpired', [], 'contao_default');
                 }
                 else
                 {
@@ -548,17 +528,21 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
     protected function generateThirdForm(): void
     {
         // Set adapters
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-        $urlAdapter = $this->framework->getAdapter(Url::class);
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+        $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $memberModelAdapter = $this->get('contao.framework')->getAdapter(MemberModel::class);
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+
+        // Get translator
+        /** @var TranslatorInterface $translator */
+        $translator = $this->get('translator');
 
         // Get request
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->get('request_stack')->getCurrentRequest();
 
         $objForm = new Form('form-activate-member-account-set-password', 'POST', function ($objHaste) {
-            $request = $this->requestStack->getCurrentRequest();
+            $request = $this->get('request_stack')->getCurrentRequest();
             return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
@@ -588,7 +572,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         $objMemberModel = $memberModelAdapter->findByPk($_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['memberId']);
         if ($objMemberModel === null)
         {
-            $this->partial->errorMsg = $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sessionExpired'];
+            $this->partial->errorMsg = $translator->trans('ERR.activateMemberAccount_sessionExpired', [], 'contao_default');
             $hasError = true;
         }
 
@@ -671,7 +655,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
      */
     protected function isFrontend(): bool
     {
-        return $this->requestStack->getCurrentRequest() !== null ? $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()) : false;
+        return $this->get('request_stack')->getCurrentRequest() !== null ? $this->get('contao.routing.scope_matcher')->isFrontendRequest($this->get('request_stack')->getCurrentRequest()) : false;
     }
 
 }

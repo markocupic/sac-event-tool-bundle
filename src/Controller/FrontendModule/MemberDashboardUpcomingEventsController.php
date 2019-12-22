@@ -44,26 +44,6 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 {
 
     /**
-     * @var ContaoFramework
-     */
-    protected $framework;
-
-    /**
-     * @var Security
-     */
-    protected $security;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var ScopeMatcher
-     */
-    protected $scopeMatcher;
-
-    /**
      * @var FrontendUser
      */
     protected $objUser;
@@ -72,21 +52,6 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
      * @var Template
      */
     protected $template;
-
-    /**
-     * MemberDashboardUpcomingEventsController constructor.
-     * @param ContaoFramework $framework
-     * @param Security $security
-     * @param RequestStack $requestStack
-     * @param ScopeMatcher $scopeMatcher
-     */
-    public function __construct(ContaoFramework $framework, Security $security, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
-    {
-        $this->framework = $framework;
-        $this->security = $security;
-        $this->requestStack = $requestStack;
-        $this->scopeMatcher = $scopeMatcher;
-    }
 
     /**
      * @param Request $request
@@ -102,10 +67,10 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         if ($this->isFrontend())
         {
             // Set adapters
-            $controllerAdapter = $this->framework->getAdapter(Controller::class);
-            $inputAdapter = $this->framework->getAdapter(Input::class);
+            $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+            $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
 
-            if (($objUser = $this->security->getUser()) instanceof FrontendUser)
+            if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
             {
                 $this->objUser = $objUser;
             }
@@ -133,6 +98,21 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
     }
 
     /**
+     * @return array
+     */
+    public static function getSubscribedServices(): array
+    {
+        $services = parent::getSubscribedServices();
+
+        $services['contao.framework'] = ContaoFramework::class;
+        $services['security.helper'] = Security::class;
+        $services['request_stack'] = RequestStack::class;
+        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
+
+        return $services;
+    }
+
+    /**
      * @param Template $template
      * @param ModuleModel $model
      * @param Request $request
@@ -143,10 +123,10 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         $this->template = $template;
 
         // Set adapters
-        $messageAdapter = $this->framework->getAdapter(Message::class);
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
+        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
+        $calendarEventsMemberModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsMemberModel::class);
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
 
         // Handle messages
         if ($this->objUser->email == '' || !$validatorAdapter->isEmail($this->objUser->email))
@@ -172,7 +152,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
      */
     protected function isFrontend(): bool
     {
-        return $this->requestStack->getCurrentRequest() !== null ? $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()) : false;
+        return $this->get('request_stack')->getCurrentRequest() !== null ? $this->get('contao.routing.scope_matcher')->isFrontendRequest($this->get('request_stack')->getCurrentRequest()) : false;
     }
 
     /**
@@ -182,16 +162,16 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
     protected function unregisterUserFromEvent($registrationId, $notificationId)
     {
         // Set adapters
-        $messageAdapter = $this->framework->getAdapter(Message::class);
-        $notificationAdapter = $this->framework->getAdapter(Notification::class);
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $eventsAdapter = $this->framework->getAdapter(Events::class);
-        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $systemAdapter = $this->framework->getAdapter(System::class);
-        $configAdapter = $this->framework->getAdapter(Config::class);
+        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
+        $notificationAdapter = $this->get('contao.framework')->getAdapter(Notification::class);
+        $calendarEventsMemberModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsMemberModel::class);
+        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $eventsAdapter = $this->get('contao.framework')->getAdapter(Events::class);
+        $userModelAdapter = $this->get('contao.framework')->getAdapter(UserModel::class);
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+        $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
 
         $blnHasError = true;
         $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event abgemeldet werden. Bitte nimm mit dem verantwortlichen Leiter Kontakt auf.';
@@ -325,8 +305,8 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
      */
     protected function addMessagesToTemplate(): void
     {
-        $messageAdapter = $this->framework->getAdapter(Message::class);
-        $systemAdapter = $this->framework->getAdapter(System::class);
+        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
+        $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
 
         if ($messageAdapter->hasInfo())
         {
