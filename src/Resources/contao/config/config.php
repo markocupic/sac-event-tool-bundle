@@ -291,7 +291,7 @@ $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic.sac_event_too
 /** Cron jobs **/
 $GLOBALS['TL_CRON']['monthly']['replaceDefaultPassword'] = array('markocupic.sac_event_tool_bundle.services.backend_user.replace_default_password', 'replaceDefaultPasswordAndSendNew');
 $GLOBALS['TL_CRON']['hourly']['syncSacMemberDatabase'] = array('markocupic.sac_event_tool_bundle.services.sac_member_database.sync_sac_member_database', 'run');
-$GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = array('markocupic.sac_event_tool_bundle.services.pdf.print_workshops_as_pdf', 'generateWorkshopPdfBooklet');
+$GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = array('markocupic.sac_event_tool_bundle.services.pdf.print_workshops_as_pdf', 'printWorkshopsAsPdf');
 $GLOBALS['TL_CRON']['daily']['anonymizeOrphanedCalendarEventsMemberDataRecords'] = array('markocupic.sac_event_tool_bundle.services.frontend_user.clear_frontend_user_data', 'anonymizeOrphanedCalendarEventsMemberDataRecords');
 
 /** Replace insert tags **/

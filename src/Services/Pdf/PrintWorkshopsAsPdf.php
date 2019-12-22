@@ -11,6 +11,7 @@
 namespace Markocupic\SacEventToolBundle\Services\Pdf;
 
 use Contao\CalendarEventsModel;
+use Contao\CalendarModel;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
 use Contao\Database;
@@ -22,6 +23,7 @@ use Contao\System;
 use Contao\UserModel;
 use Contao\Config;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use TCPDF_FONTS;
 
 /**
@@ -52,6 +54,11 @@ class PrintWorkshopsAsPdf
     protected $eventId = null;
 
     /**
+     * @var PrintWorkshopsAsPdf
+     */
+    protected $download = false;
+
+    /**
      * @var bool
      */
     protected $addToc = false;
@@ -68,37 +75,79 @@ class PrintWorkshopsAsPdf
 
     /**
      * PrintWorkshopsAsPdf constructor.
-     * @param null $year
-     * @param null $calendarId
-     * @param null $eventId
-     * @param bool $download
+     * @param ContaoFramework $framework
      */
-    public function __construct($year = null, $calendarId = null, $eventId = null, $download = true)
+    public function __construct(ContaoFramework $framework)
     {
-        $this->download = $download;
-        if ($year > 2016 && $calendarId > 0)
-        {
-            $this->calendarId = $calendarId;
-            $this->year = $year;
-        }
-        elseif ($eventId > 0)
-        {
-            $this->calendarId = null;
-            $this->eventId = $eventId;
-        }
-        else
-        {
-            new \Exception('Please add more parameters.');
-        }
+        $this->framework = $framework;
+        $this->framework->initialize(true);
 
-        if ($this->year === null)
-        {
-            $this->year = Date::parse('Y');
-        }
+        // Set defaults
+        $this->year = Config::get('SAC_EVT_WORKSHOP_FLYER_YEAR');
+        $this->calendarId = Config::get('SAC_WORKSHOP_FLYER_CALENDAR_ID');
+        $this->download = false;
     }
 
     /**
-     * Launch method cia CronJob (Geplante Aufgaben on Plesk)
+     * @param $year
+     * @return PrintWorkshopsAsPdf
+     * @throws \Exception
+     */
+    public function setYear($year): self
+    {
+        if (Date::parse('Y', strtotime($year)) != $year)
+        {
+            throw new \Exception('Please use a valid year number as first parameter.');
+        }
+        $this->year = $year;
+        return $this;
+    }
+
+    /**
+     * @param $calendarId
+     * @return PrintWorkshopsAsPdf
+     * @throws \Exception
+     */
+    public function setCalendarId($calendarId): self
+    {
+        $objCalendar = CalendarModel::findByPk($calendarId);
+        if ($objCalendar === null)
+        {
+            throw new \Exception('Please use a valid calendar id as first parameter.');
+        }
+        $this->calendarId = $calendarId;
+        return $this;
+    }
+
+    /**
+     * @param $eventId
+     * @return PrintWorkshopsAsPdf
+     * @throws \Exception
+     */
+    public function setEventId($eventId): self
+    {
+        $objEvent = CalendarEventsModel::findByPk($eventId);
+        if ($objEvent === null)
+        {
+            throw new \Exception('Please use a valid event id as first parameter.');
+        }
+        $this->eventId = $objEvent->id;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $download
+     * @return PrintWorkshopsAsPdf
+     */
+    public function setDownload(bool $download): self
+    {
+        $this->download = $download;
+        return $this;
+    }
+
+    /**
+     * Launch method via CronJob (Geplante Aufgaben on Plesk)
      */
     public function printWorkshopsAsPdf()
     {
@@ -109,12 +158,12 @@ class PrintWorkshopsAsPdf
         $this->addCover = true;
 
         // Print single event
-        if ($this->eventId)
+        if (null !== ($objEvent = CalendarEventsModel::findByPk($this->eventId)))
         {
             $this->printSingleEvent = true;
             $this->addToc = false;
             $this->addCover = false;
-            $this->calendarId = CalendarEventsModel::findByPk($this->eventId)->pid;
+            $this->calendarId = $objEvent->pid;
         }
 
         // Get the font directory
@@ -207,7 +256,6 @@ class PrintWorkshopsAsPdf
             $this->pdf->endTOCPage();
         }
 
-        $container = System::getContainer();
         $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'));
         $fileSRC = sprintf($filenamePattern, $this->year);
 
