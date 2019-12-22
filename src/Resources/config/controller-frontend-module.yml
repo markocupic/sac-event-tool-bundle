@@ -2,33 +2,29 @@ services:
 
   markocupic.sac_event_tool_bundle.controller.frontend_module.tour_difficulty_list_controller:
     class: Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListController
-    arguments:
-    - '@contao.framework'
+    calls:
+    - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
     - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: container.service_subscriber }
     public: true
 
   markocupic.sac_event_tool_bundle.controller.frontend_module.csv_event_member_export:
     class: Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvEventMemberExportController
-    arguments:
-    - '@contao.framework'
-    - '@database_connection'
-    - '@request_stack'
+    calls:
+    - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
     - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: container.service_subscriber }
     public: true
 
   markocupic.sac_event_tool_bundle.controller.frontend_module.event_registration_form:
     class: Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationFormController
-    arguments:
-    - '@contao.framework'
-    - '@database_connection'
-    - '%kernel.project_dir%'
-    - '@security.helper'
-    - '@request_stack'
-    - '@contao.routing.scope_matcher'
+    calls:
+    - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
     - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: container.service_subscriber }
     public: true
 
   markocupic.sac_event_tool_bundle.controller.frontend_module.activate_member_account:
@@ -58,13 +54,11 @@ services:
   # Member dashboard module: show past events
   markocupic.sac_event_tool_bundle.controller.frontend_module.member_dashboard_past_events:
     class: Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardPastEventsController
-    arguments:
-    - '@contao.framework'
-    - '@security.helper'
-    - '@request_stack'
-    - '@contao.routing.scope_matcher'
+    calls:
+    - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
     - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: container.service_subscriber }
     public: true
 
   # Member dashboard module: list event reports and the form to generate new event reports

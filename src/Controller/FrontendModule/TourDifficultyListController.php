@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
-
 /**
  * Class TourDifficultyListController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
@@ -30,17 +29,28 @@ class TourDifficultyListController extends AbstractFrontendModuleController
 {
 
     /**
-     * @var ContaoFramework
+     * @param Request $request
+     * @param ModuleModel $model
+     * @param string $section
+     * @param array|null $classes
+     * @param PageModel|null $page
+     * @return Response
      */
-    private $framework;
+    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    {
+        return parent::__invoke($request, $model, $section, $classes);
+    }
 
     /**
-     * TourDifficultyListController constructor.
-     * @param ContaoFramework $framework
+     * @return array
      */
-    public function __construct(ContaoFramework $framework)
+    public static function getSubscribedServices(): array
     {
-        $this->framework = $framework;
+        $services = parent::getSubscribedServices();
+
+        $services['contao.framework'] = ContaoFramework::class;
+
+        return $services;
     }
 
     /**
@@ -54,7 +64,7 @@ class TourDifficultyListController extends AbstractFrontendModuleController
         $arrDifficulty = [];
         $pid = 0;
         $options = array('order' => 'code ASC');
-        $tourDifficultyAdapter = $this->framework->getAdapter(TourDifficultyModel::class);
+        $tourDifficultyAdapter = $this->get('contao.framework')->getAdapter(TourDifficultyModel::class);
         $objDifficulty = $tourDifficultyAdapter->findAll($options);
 
         if ($objDifficulty !== null)
@@ -64,7 +74,7 @@ class TourDifficultyListController extends AbstractFrontendModuleController
                 if ($pid !== $objDifficulty->pid)
                 {
                     $objDifficulty->catStart = true;
-                    $tourDifficultyCategoryAdapter = $this->framework->getAdapter(TourDifficultyCategoryModel::class);
+                    $tourDifficultyCategoryAdapter = $this->get('contao.framework')->getAdapter(TourDifficultyCategoryModel::class);
                     $objDifficultyCategory = $tourDifficultyCategoryAdapter->findByPk($objDifficulty->pid);
                     if ($objDifficultyCategory !== null)
                     {

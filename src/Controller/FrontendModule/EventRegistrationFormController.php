@@ -56,34 +56,9 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
 {
 
     /**
-     * @var ContaoFramework
-     */
-    protected $framework;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
      * @var string
      */
     protected $projectDir;
-
-    /**
-     * @var Security
-     */
-    protected $security;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var ScopeMatcher
-     */
-    protected $scopeMatcher;
 
     /**
      * @var ModuleModel
@@ -121,25 +96,6 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
     protected $objForm;
 
     /**
-     * EventRegistrationFormController constructor.
-     * @param ContaoFramework $framework
-     * @param Connection $connection
-     * @param string $projectDir
-     * @param Security $security
-     * @param RequestStack $requestStack
-     * @param ScopeMatcher $scopeMatcher
-     */
-    public function __construct(ContaoFramework $framework, Connection $connection, string $projectDir, Security $security, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
-    {
-        $this->framework = $framework;
-        $this->connection = $connection;
-        $this->projectDir = $projectDir;
-        $this->security = $security;
-        $this->requestStack = $requestStack;
-        $this->scopeMatcher = $scopeMatcher;
-    }
-
-    /**
      * @param Request $request
      * @param ModuleModel $model
      * @param string $section
@@ -151,16 +107,19 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
     {
         if ($this->isFrontend())
         {
+            /** @var projectDir */
+            $this->projectDir = System::getContainer()->getParameter('kernel.project_dir');
+
             // Set the module object (Contao\ModuleModel)
             $this->model = $model;
 
             // Set adapters
-            $configAdapter = $this->framework->getAdapter(Config::class);
-            $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-            $notificationAdapter = $this->framework->getAdapter(Notification::class);
-            $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+            $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+            $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+            $notificationAdapter = $this->get('contao.framework')->getAdapter(Notification::class);
+            $userModelAdapter = $this->get('contao.framework')->getAdapter(UserModel::class);
 
-            if (($objUser = $this->security->getUser()) instanceof FrontendUser)
+            if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
             {
                 $this->objUser = $objUser;
             }
@@ -202,6 +161,22 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
     }
 
     /**
+     * @return array
+     */
+    public static function getSubscribedServices(): array
+    {
+        $services = parent::getSubscribedServices();
+
+        $services['contao.framework'] = ContaoFramework::class;
+        $services['database_connection'] = Connection::class;
+        $services['security.helper'] = Security::class;
+        $services['request_stack'] = RequestStack::class;
+        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
+
+        return $services;
+    }
+
+    /**
      * @param Template $template
      * @param ModuleModel $model
      * @param Request $request
@@ -214,13 +189,20 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $scope = $this->isFrontend() ? 'FE' : 'BE';
 
         // Set adapters
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
-        $messageAdapter = $this->framework->getAdapter(Message::class);
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-        $dateAdapter = $this->framework->getAdapter(Date::class);
-        $configAdapter = $this->framework->getAdapter(Config::class);
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
+        /** @var Database $databaseAdapter */
+        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+        /** @var Message $messageAdapter */
+        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
+        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
+        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
+        /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
+        $calendarEventsMemberModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsMemberModel::class);
+        /** @var Date $dateAdapter */
+        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
+        /** @var Config $configAdapter */
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+        /** @var Validator $validatorAdapter */
+        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
 
         $this->template->objUser = $this->objUser;
         $this->template->objEvent = $this->objEvent;
@@ -342,18 +324,27 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
     protected function generateForm()
     {
         // Set adapters
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
-        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-        $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-        $configAdapter = $this->framework->getAdapter(Config::class);
+        /** @var Database $databaseAdapter */
+        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+        /** @var Controller $controllerAdapter */
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
+        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
+        /** @var Environment $environmentAdapter */
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+        /** @var  CalendarEventsJourneyModel$calendarEventsJourneyModelAdapter */
+        $calendarEventsJourneyModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsJourneyModel::class);
+        /** @var CalendarEventsModel $calendarEventsModelAdapter */
+        $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+        /** @var PageModel $pageModelAdapter */
+        $pageModelAdapter = $this->get('contao.framework')->getAdapter(PageModel::class);
+        /** @var MemberModel $memberModelAdapter */
+        $memberModelAdapter = $this->get('contao.framework')->getAdapter(MemberModel::class);
+        /** @var Config $configAdapter */
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
 
         // Get the request object
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->get('request_stack')->getCurrentRequest();
 
         $objEvent = $calendarEventsModelAdapter->findByIdOrAlias($request->query->get('events'));
         if ($objEvent === null)
@@ -362,7 +353,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         }
 
         $objForm = new Form('form-event-registration', 'POST', function ($objHaste) {
-            $request = $this->requestStack->getCurrentRequest();
+            $request = $this->get('request_stack')->getCurrentRequest();
             return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
@@ -561,11 +552,16 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $hasError = false;
 
         // Set adapters
-        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-        $dateAdapter = $this->framework->getAdapter(Date::class);
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $eventsAdapter = $this->framework->getAdapter(Events::class);
+        /** @var UserModel $userModelAdapter */
+        $userModelAdapter = $this->get('contao.framework')->getAdapter(UserModel::class);
+        /** @var Date $dateAdapter */
+        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
+        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
+        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
+        /** @var Environment $environmentAdapter */
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+        /** @var Events $eventsAdapter */
+        $eventsAdapter = $this->get('contao.framework')->getAdapter(Events::class);
 
         // Switch sender/recipient if the main instructor has delegated event registrations administration work to somebody else
         $bypassRegistration = false;
@@ -647,10 +643,14 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
      */
     private function setTemplateVars()
     {
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-        $eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+        /** @var StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+        /** @var EventOrganizerModel $eventOrganizerModelAdapter */
+        $eventOrganizerModelAdapter = $this->get('contao.framework')->getAdapter(EventOrganizerModel::class);
+        /** @var Validator $validatorAdapter */
+        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
+        /** @var FilesModel $filesModelAdapter */
+        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
 
         if ($this->objEvent->eventType === 'tour' || $this->objEvent->eventType === 'last-minute-tour' || $this->objEvent->eventType === 'course')
         {
@@ -700,7 +700,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
      */
     protected function isFrontend()
     {
-        return $this->requestStack->getCurrentRequest() !== null ? $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()) : false;
+        return $this->get('request_stack')->getCurrentRequest() !== null ? $this->get('contao.routing.scope_matcher')->isFrontendRequest($this->get('request_stack')->getCurrentRequest()) : false;
     }
 
 }

@@ -30,7 +30,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
-
 /**
  * Class CsvEventMemberExportController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
@@ -38,20 +37,6 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
  */
 class CsvEventMemberExportController extends AbstractFrontendModuleController
 {
-    /**
-     * @var ContaoFramework
-     */
-    protected $framework;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
 
     /**
      * @var
@@ -79,16 +64,17 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     protected $arrLines = array();
 
     /**
-     * CsvEventMemberExportController constructor.
-     * @param ContaoFramework $framework
-     * @param Connection $connection
-     * @param RequestStack $request
+     * @return array
      */
-    public function __construct(ContaoFramework $framework, Connection $connection, RequestStack $request)
+    public static function getSubscribedServices(): array
     {
-        $this->framework = $framework;
-        $this->connection = $connection;
-        $this->requestStack = $request;
+        $services = parent::getSubscribedServices();
+
+        $services['contao.framework'] = ContaoFramework::class;
+        $services['database_connection'] = Connection::class;
+        $services['request_stack'] = RequestStack::class;
+
+        return $services;
     }
 
     /**
@@ -102,7 +88,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     {
         $this->generateForm();
         $template->form = $this->objForm;
-        $template->dateFormat = $this->framework->getAdapter(Config::class)->get('dateFormat');
+        $template->dateFormat = $this->get('contao.framework')->getAdapter(Config::class)->get('dateFormat');
 
         return $template->getResponse();
     }
@@ -114,11 +100,11 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     private function generateForm()
     {
         $objForm = new Form('form-event-member-export', 'POST', function ($objHaste) {
-            $request = $this->requestStack->getCurrentRequest();
+            $request = $this->get('request_stack')->getCurrentRequest();
             return $request->get('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
-        $environment = $this->framework->getAdapter(Environment::class);
+        $environment = $this->get('contao.framework')->getAdapter(Environment::class);
         $objForm->setFormActionFromUri($environment->get('uri'));
 
         // Now let's add form fields:
@@ -160,7 +146,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
         if ($objForm->validate())
         {
-            $request = $this->requestStack->getCurrentRequest();
+            $request = $this->get('request_stack')->getCurrentRequest();
             if ($request->get('FORM_SUBMIT') === 'form-event-member-export')
             {
                 $eventType = $request->get('event-type');
@@ -169,7 +155,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                 $endDate = strtotime($request->get('endDate'));
                 $this->getHeadline($arrFields);
 
-                $statement1 = $this->connection->executeQuery('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate', array($startDate, $endDate));
+                $statement1 = $this->get('database_connection')->executeQuery('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate', array($startDate, $endDate));
                 while (false !== ($objEvent = $statement1->fetch(\PDO::FETCH_OBJ)))
                 {
                     if ($eventType != 'all')
@@ -189,13 +175,13 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                     }
 
                     // Set tl_member.disable to true if member was not found in the csv-file
-                    $statement2 = $this->connection->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname', array($objEvent->id));
+                    $statement2 = $this->get('database_connection')->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname', array($objEvent->id));
                     while (false !== ($objEventMember = $statement2->fetch(\PDO::FETCH_OBJ)))
                     {
                         $this->addLine($arrFields, $objEventMember);
                     }
                 }
-                $date = $this->framework->getAdapter(Date::class);
+                $date = $this->get('contao.framework')->getAdapter(Date::class);
 
                 $this->printCsv(sprintf('Event-Member-Export_%s.csv', $date->parse('Y-m-d')));
             }
@@ -225,7 +211,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     private function getHeadline($arrFields)
     {
         // Write headline
-        $controller = $this->framework->getAdapter(Controller::class);
+        $controller = $this->get('contao.framework')->getAdapter(Controller::class);
         $arrHeadline = array();
         foreach ($arrFields as $field)
         {
@@ -255,12 +241,12 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
      */
     private function getField($field, $objEventMember)
     {
-        $date = $this->framework->getAdapter(Date::class);
-        $config = $this->framework->getAdapter(Config::class);
-        $controller = $this->framework->getAdapter(Controller::class);
-        $calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
-        $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
-        $memberModel = $this->framework->getAdapter(MemberModel::class);
+        $date = $this->get('contao.framework')->getAdapter(Date::class);
+        $config = $this->get('contao.framework')->getAdapter(Config::class);
+        $controller = $this->get('contao.framework')->getAdapter(Controller::class);
+        $calendarEventsHelper = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsModel = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+        $memberModel = $this->get('contao.framework')->getAdapter(MemberModel::class);
 
         if ($field === 'password')
         {
