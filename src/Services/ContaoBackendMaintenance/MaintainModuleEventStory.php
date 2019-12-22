@@ -66,10 +66,6 @@ class MaintainModuleEventStory
         // Get the image upload path
         $eventStoriesUploadPath = $configAdapter->get('SAC_EVT_EVENT_STORIES_UPLOAD_PATH');
 
-        // Get the logger class
-        $level = LogLevel::INFO;
-        $logger = System::getContainer()->get('monolog.logger.contao');
-
         $arrScan = scan($this->projectDir . '/' . $eventStoriesUploadPath);
         foreach ($arrScan as $folder)
         {
@@ -78,8 +74,10 @@ class MaintainModuleEventStory
                 $objFolder = new Folder($eventStoriesUploadPath . '/' . $folder);
                 if (null === $calendarEventsStoryModelAdapter->findByPk($folder))
                 {
+                    // Log
+                    $logger = System::getContainer()->get('monolog.logger.contao');
                     $strText = sprintf('Successfully deleted event story media folder "%s".', $objFolder->path);
-                    $logger->log($level, $strText, array('contao' => new ContaoContext(__METHOD__, $level)));
+                    $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)));
 
                     // Display the confirmation message in the backend maintenance module
                     Message::addConfirmation($strText, PurgeData::class);

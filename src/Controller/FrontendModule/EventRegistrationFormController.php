@@ -17,6 +17,7 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Database;
 use Contao\Date;
@@ -38,6 +39,7 @@ use Doctrine\DBAL\Connection;
 use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use NotificationCenter\Model\Notification;
+use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -301,7 +303,11 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                 $this->template->hasErrorMessage = true;
                 $session = System::getContainer()->get('session')->getFlashBag()->get('contao.FE.error');
                 $this->template->errorMessage = $session[0];
-                System::log(sprintf('Event registration error: "%s"', $session[0]), __FILE__ . ' Line: ' . __LINE__, $configAdapter->get('SAC_EVT_LOG_EVENT_SUBSCRIPTION_ERROR'));
+
+                // Log
+                $logger = System::getContainer()->get('monolog.logger.contao');
+                $strText = sprintf('Event registration error: "%s"', $session[0]);
+                $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_EVENT_SUBSCRIPTION_ERROR'))));
             }
             if ($messageAdapter->hasInfo())
             {
@@ -519,7 +525,11 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                     $arrData = array_filter($arrData);
                     $objEventRegistration->setRow($arrData);
                     $objEventRegistration->save();
-                    System::log(sprintf('New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").', $objMemberModel->firstname, $objMemberModel->lastname, $objMemberModel->id, $this->objEvent->id, $this->objEvent->title), __FILE__ . ' Line: ' . __LINE__, $configAdapter->get('SAC_EVT_LOG_EVENT_SUBSCRIPTION'));
+
+                    // Log
+                    $logger = System::getContainer()->get('monolog.logger.contao');
+                    $strText = sprintf('New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").', $objMemberModel->firstname, $objMemberModel->lastname, $objMemberModel->id, $this->objEvent->id, $this->objEvent->title);
+                    $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_EVENT_SUBSCRIPTION'))));
 
                     $notified = $this->notifyMember($arrData, $objMemberModel, $this->objEvent, $objEventRegistration);
 

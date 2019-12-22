@@ -14,12 +14,14 @@ use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Contao\Date;
 use Contao\Folder;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\System;
+use Psr\Log\LogLevel;
 
 /**
  * Class ClearFrontendUserData
@@ -109,7 +111,10 @@ class ClearFrontendUserData
             {
                 if (!$objCalendarEventsMember->anonymized)
                 {
-                    System::log(sprintf('Anonymized tl_calendar_events_member.id=%s. Firstname: %s, Lastname: %s (%s)"', $objCalendarEventsMember->id, $objCalendarEventsMember->firstname, $objCalendarEventsMember->lastname, $objCalendarEventsMember->sacMemberId), __FILE__ . ' Line: ' . __LINE__, 'ANONYMIZED_CALENDAR_EVENTS_MEMBER_DATA');
+                    // Log
+                    $container = System::getContainer();
+                    $logger = $container->get('monolog.logger.contao');
+                    $logger->log(LogLevel::INFO, sprintf('Anonymized tl_calendar_events_member.id=%s. Firstname: %s, Lastname: %s (%s)"', $objCalendarEventsMember->id, $objCalendarEventsMember->firstname, $objCalendarEventsMember->lastname, $objCalendarEventsMember->sacMemberId), array('contao' => new ContaoContext(__FILE__ . ' Line: ' . __LINE__, 'ANONYMIZED_CALENDAR_EVENTS_MEMBER_DATA')));
 
                     $objCalendarEventsMember->firstname = 'Vorname [anonymisiert]';
                     $objCalendarEventsMember->lastname = 'Nachname [anonymisiert]';
@@ -149,7 +154,11 @@ class ClearFrontendUserData
         $objMember = $memberModelAdapter->findByPk($memberId);
         if ($objMember !== null)
         {
-            System::log(sprintf('Login for member with ID:%s has been deactivated.', $objMember->id), __FILE__ . ' Line: ' . __LINE__, $configAdapter->get('DISABLE_MEMBER_LOGIN'));
+            // Log
+            $container = System::getContainer();
+            $logger = $container->get('monolog.logger.contao');
+            $logger->log(LogLevel::INFO, sprintf('Login for member with ID:%s has been deactivated.', $objMember->id), array('contao' => new ContaoContext(__FILE__ . ' Line: ' . __LINE__, $configAdapter->get('DISABLE_MEMBER_LOGIN'))));
+
             $objMember->login = '';
             $objMember->password = '';
             $objMember->save();
@@ -170,7 +179,11 @@ class ClearFrontendUserData
         $objMember = $memberModelAdapter->findByPk($memberId);
         if ($objMember !== null)
         {
-            System::log(sprintf('Member with ID:%s has been deleted.', $objMember->id), __FILE__ . ' Line: ' . __LINE__, $configAdapter->get('DELETE_MEMBER'));
+            // Log
+            $logger = System::getContainer()->get('monolog.logger.contao');
+            $strText = sprintf('Member with ID:%s has been deleted.', $objMember->id);
+            $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, $configAdapter->get('DELETE_MEMBER'))));
+
             $objMember->delete();
         }
     }
@@ -286,7 +299,11 @@ class ClearFrontendUserData
             $objDir = new Folder($strDir);
             if ($objDir !== null)
             {
-                System::log(sprintf('Deleted avatar directory "%s" for member with ID:%s.', $strDir, $memberId), __FILE__ . ' Line: ' . __LINE__, 'DELETED_AVATAR_DORECTORY');
+                // Log
+                $logger = System::getContainer()->get('monolog.logger.contao');
+                $strText = sprintf('Deleted avatar directory "%s" for member with ID:%s.', $strDir, $memberId);
+                $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, 'DELETED_AVATAR_DIRECTORY')));
+
                 $objDir->purge();
                 $objDir->delete();
             }

@@ -14,6 +14,7 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Database;
 use Contao\Date;
@@ -30,6 +31,7 @@ use Doctrine\DBAL\Connection;
 use Haste\Form\Form;
 use Haste\Util\Url;
 use NotificationCenter\Model\Notification;
+use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -618,7 +620,9 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
                     $_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['step'] = 4;
 
                     // Log
-                    System::log(sprintf('User %s %s [%s] has successfully activated her/his member account.', $objMemberModel->firstname, $objMemberModel->lastname, $objMemberModel->sacMemberId), __METHOD__, 'MEMBER_ACCOUNT_ACTIVATION');
+                    $logger = System::getContainer()->get('monolog.logger.contao');
+                    $strText = sprintf('User %s %s [%s] has successfully activated her/his member account.', $objMemberModel->firstname, $objMemberModel->lastname, $objMemberModel->sacMemberId);
+                    $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, 'MEMBER_ACCOUNT_ACTIVATION')));
 
                     // Redirect
                     $url = $urlAdapter->removeQueryString(['step']);
