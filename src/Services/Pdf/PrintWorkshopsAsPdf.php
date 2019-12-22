@@ -95,9 +95,9 @@ class PrintWorkshopsAsPdf
      */
     public function setYear($year): self
     {
-        if (Date::parse('Y', strtotime($year)) != $year)
+        if (!checkdate(1, 1, $year))
         {
-            throw new \Exception('Please use a valid year number as first parameter.');
+            throw new \Exception(sprintf('%s is not a valid year number. Please use a valid year number f.ex. "2020" as first parameter.', Date::parse('Y', strtotime($year))));
         }
         $this->year = $year;
         return $this;
