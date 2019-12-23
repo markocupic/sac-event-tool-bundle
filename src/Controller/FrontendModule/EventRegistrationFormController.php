@@ -50,7 +50,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class EventRegistrationFormController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
- * @FrontendModule(category="sac_event_tool_fe_modules", type="event_registration_form")
+ * @FrontendModule(category="sac_event_tool_frontend_modules", type="event_registration_form")
  */
 class EventRegistrationFormController extends AbstractFrontendModuleController
 {

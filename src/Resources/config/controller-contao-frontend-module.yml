@@ -5,7 +5,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -14,7 +14,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -23,7 +23,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -32,7 +32,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -42,7 +42,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -52,7 +52,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -62,7 +62,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -72,7 +72,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -82,7 +82,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -92,7 +92,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -102,7 +102,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_fe_modules }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 

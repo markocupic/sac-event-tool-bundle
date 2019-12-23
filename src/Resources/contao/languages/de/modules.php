@@ -25,7 +25,7 @@ $GLOBALS['TL_LANG']['MOD']['sac_user_role_tool'] = array('Vereinsfunktionen-Tool
 $GLOBALS['TL_LANG']['MOD']['sac_event_type_tool'] = array('SAC Event-Art-Tool');
 
 // Frontend modules
-$GLOBALS['TL_LANG']['FMD']['sac_event_tool_fe_modules'] = array('SAC Frontend Module');
+$GLOBALS['TL_LANG']['FMD']['sac_event_tool_frontend_modules'] = array('SAC Frontend Module');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryList'] = array('SAC Tourenberichte Listen Modul');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryReader'] = array('SAC Tourenberichte Reader Modul');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventlist'] = array('SAC Touren- und Kurse-Auflistungs Modul');

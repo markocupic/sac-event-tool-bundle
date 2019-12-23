@@ -1,0 +1,10 @@
+services:
+
+  markocupic.sac_event_tool_bundle.controller.content_element.user_portrait_controller:
+    class: Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController
+    calls:
+    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+    tags:
+    - { name: contao.content_element, category: sac_event_tool_content_elements, type: user_portrait }
+    - { name: container.service_subscriber }
+    public: true

@@ -42,7 +42,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Class ActivateMemberAccountController
  * @package Markocupic\SacEventToolBundle\Controller\ActivateMemberAccountController
- * @FrontendModule(category="sac_event_tool_fe_modules", type="activate_member_account")
+ * @FrontendModule(category="sac_event_tool_frontend_modules", type="activate_member_account")
  */
 class ActivateMemberAccountController extends AbstractFrontendModuleController
 {

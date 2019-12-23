@@ -81,8 +81,8 @@ $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containers';
 $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
 
 // Frontend Modules Contao 4 style
-// Contao 5 ready fe modules are registered in service.yml
-$GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
+// Contao 5 ready fe modules are registered in controller-frontend-module.yml
+$GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = array(
     'eventToolCalendarEventStoryList'        => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryList',
     'eventToolCalendarEventStoryReader'      => 'Markocupic\SacEventToolBundle\ModuleSacEventToolCalendarEventStoryReader',
     'eventToolCalendarEventlist'             => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventlist',
@@ -97,8 +97,7 @@ $GLOBALS['FE_MOD']['sac_event_tool_fe_modules'] = array(
 $GLOBALS['TL_CTE']['sac_calendar_newsletter'] = array(
     'calendar_newsletter' => 'CalendarNewsletter',
 );
-$GLOBALS['TL_CTE']['sac_content_elements'] = array(
-    'userPortrait'     => 'Markocupic\SacEventToolBundle\ContentUserPortrait',
+$GLOBALS['TL_CTE']['sac_event_tool_content_elements'] = array(
     'userPortraitList' => 'Markocupic\SacEventToolBundle\ContentUserPortraitList',
     'cabanneSacList'   => 'Markocupic\SacEventToolBundle\ContentCabanneSacList',
     'cabanneSacDetail' => 'Markocupic\SacEventToolBundle\ContentCabanneSacDetail',

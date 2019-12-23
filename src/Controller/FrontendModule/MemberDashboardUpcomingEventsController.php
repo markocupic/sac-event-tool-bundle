@@ -38,7 +38,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class MemberDashboardUpcomingEventsController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
- * @FrontendModule(category="sac_event_tool_fe_modules", type="member_dashboard_upcoming_events")
+ * @FrontendModule(category="sac_event_tool_frontend_modules", type="member_dashboard_upcoming_events")
  */
 class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleController
 {

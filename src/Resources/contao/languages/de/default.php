@@ -13,7 +13,7 @@
 $GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
 $GLOBALS['TL_LANG']['MSC']['yourUpcomingEvents'] = 'Deine nächsten Events';
 
-$GLOBALS['TL_LANG']['CTE']['userPortrait'] = array('SAC-User-Portrait');
+$GLOBALS['TL_LANG']['CTE']['user_portrait'] = array('SAC-User-Portrait');
 $GLOBALS['TL_LANG']['CTE']['userPortraitList'] = array('SAC-User-Portrait-Liste');
 $GLOBALS['TL_LANG']['CTE']['sac_calendar_newsletter'] = array('SAC-Events-Elemente');
 $GLOBALS['TL_LANG']['CTE']['calendar_newsletter'] = array('SAC-Events als Cleverreach Template-Vorlage herunterladen');

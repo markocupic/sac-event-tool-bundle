@@ -23,7 +23,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class TourDifficultyListController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
- * @FrontendModule(category="sac_event_tool_fe_modules", type="tour_difficulty_list")
+ * @FrontendModule(category="sac_event_tool_frontend_modules", type="tour_difficulty_list")
  */
 class TourDifficultyListController extends AbstractFrontendModuleController
 {
