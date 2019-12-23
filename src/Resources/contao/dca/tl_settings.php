@@ -47,8 +47,8 @@ PaletteManipulator::create()
     ->addField(array('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
     //
     ->addField(array('SAC_EVT_WORKSHOP_FLYER_YEAR'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('SAC_WORKSHOP_FLYER_CALENDAR_ID'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(array('SAC_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
 
     ->applyToPalette('default', 'tl_settings');
 
@@ -277,9 +277,9 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD
     'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
 );
 
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_WORKSHOP_FLYER_CALENDAR_ID'] = array(
+$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID'] = array(
 
-    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_WORKSHOP_FLYER_CALENDAR_ID'],
+    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID'],
     'inputType' => 'text',
     'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
 );
@@ -291,9 +291,9 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_WORKSHOP_FLYER_YEAR'] = arr
     'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
 );
 
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'] = array(
+$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'] = array(
 
-    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'],
+    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'],
     'inputType' => 'text',
     'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
 );

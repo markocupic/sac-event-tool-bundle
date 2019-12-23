@@ -47,7 +47,7 @@ class WorkshopTCPDF extends \TCPDF
         // Set background-image
         if ($this->type == 'cover')
         {
-            $this->backgroundImage = Config::get('SAC_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE');;
+            $this->backgroundImage = Config::get('SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE');;
         }
         elseif ($this->type == 'TOC')
         {

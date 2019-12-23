@@ -84,7 +84,7 @@ class PrintWorkshopsAsPdf
 
         // Set defaults
         $this->year = Config::get('SAC_EVT_WORKSHOP_FLYER_YEAR');
-        $this->calendarId = Config::get('SAC_WORKSHOP_FLYER_CALENDAR_ID');
+        $this->calendarId = Config::get('SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID');
         $this->download = false;
     }
 

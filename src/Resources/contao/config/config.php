@@ -289,10 +289,10 @@ $GLOBALS['TL_HOOKS']['importUser'][] = array('markocupic.sac_event_tool_bundle.e
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic.sac_event_tool_bundle.event_listener.parse_backend_template_listener', 'onParseBackendTemplate');
 
 /** Cron jobs **/
-$GLOBALS['TL_CRON']['monthly']['replaceDefaultPassword'] = array('markocupic.sac_event_tool_bundle.services.backend_user.replace_default_password', 'replaceDefaultPasswordAndSendNew');
-$GLOBALS['TL_CRON']['hourly']['syncSacMemberDatabase'] = array('markocupic.sac_event_tool_bundle.services.sac_member_database.sync_sac_member_database', 'run');
-$GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = array('markocupic.sac_event_tool_bundle.services.pdf.print_workshops_as_pdf', 'printWorkshopsAsPdf');
-$GLOBALS['TL_CRON']['daily']['anonymizeOrphanedCalendarEventsMemberDataRecords'] = array('markocupic.sac_event_tool_bundle.services.frontend_user.clear_frontend_user_data', 'anonymizeOrphanedCalendarEventsMemberDataRecords');
+$GLOBALS['TL_CRON']['monthly']['replaceDefaultPassword'] = array(Markocupic\SacEventToolBundle\Cron\Contao\MonthlyCron::class, 'replaceDefaultPasswordAndSendNew');
+$GLOBALS['TL_CRON']['hourly']['syncSacMemberDatabase'] = array(Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron::class, 'syncSacMemberDatabase');
+$GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = array(Markocupic\SacEventToolBundle\Cron\Contao\DailyCron::class, 'generateWorkshopPdfBooklet');
+$GLOBALS['TL_CRON']['daily']['anonymizeOrphanedCalendarEventsMemberDataRecords'] = array(Markocupic\SacEventToolBundle\Cron\Contao\DailyCron::class, 'anonymizeOrphanedCalendarEventsMemberDataRecords');
 
 /** Replace insert tags **/
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('markocupic.sac_event_tool_bundle.event_listener.replace_insert_tags_listener', 'onReplaceInsertTags');
