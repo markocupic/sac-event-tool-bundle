@@ -9,8 +9,9 @@
 
 namespace Markocupic\SacEventToolBundle\Controller;
 
-use Contao\System;
+use Contao\Date;
 use Contao\Input;
+use Contao\System;
 use Markocupic\SacEventToolBundle\Services\Newsletter\SendPasswordToMembers;
 use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -76,6 +77,7 @@ class CronjobController extends AbstractController
      * Generate workshop pdf booklet
      * @see $GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet']
      * /_cronjob/generate_workshop_pdf_booklet
+     * /_cronjob/generate_workshop_pdf_booklet?year=2019
      * @Route("/_cronjob/generate_workshop_pdf_booklet", name="sac_event_tool_cronjob_generate_workshop_pdf_booklet", defaults={"_scope" = "frontend", "_token_check" = false})
      */
     public function generateWorkshopPdfBooklet()
@@ -93,17 +95,21 @@ class CronjobController extends AbstractController
 
         if (!empty($year))
         {
+            if ($year == 'current')
+            {
+                $year = Date::parse('Y');
+            }
             $pdf->setYear($year);
         }
         if (!empty($calendarId))
         {
             $pdf->setCalendarId($calendarId);
         }
-        if(!empty($eventId))
+        if (!empty($eventId))
         {
             $pdf->setEventId($eventId);
         }
-        if($download === false)
+        if ($download === false)
         {
             $pdf->setDownload(false);
         }

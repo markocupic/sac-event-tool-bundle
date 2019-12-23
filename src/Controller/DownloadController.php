@@ -13,6 +13,7 @@ namespace Markocupic\SacEventToolBundle\Controller;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\Date;
 use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Services\Docx\ExportEvents2Docx;
@@ -47,6 +48,10 @@ class DownloadController extends AbstractController
 
         if (!empty($year))
         {
+            if ($year == 'current')
+            {
+                $year = Date::parse('Y');
+            }
             $pdf = $pdf->setYear($year);
         }
         if (!empty($calendarId))
