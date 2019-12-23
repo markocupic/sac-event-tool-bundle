@@ -45,11 +45,11 @@ class DownloadController extends AbstractController
         $year = Input::get('year') != '' ? Input::get('year') : null;
         $calendarId = Input::get('calendarId') != '' ? Input::get('calendarId') : null;
 
-        if ($year !== null)
+        if (!empty($year))
         {
             $pdf = $pdf->setYear($year);
         }
-        if ($calendarId !== null)
+        if (!empty($calendarId))
         {
             $pdf = $pdf->setCalendarId($calendarId);
         }

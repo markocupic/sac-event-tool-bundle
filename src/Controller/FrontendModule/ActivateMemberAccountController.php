@@ -600,7 +600,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
                     $objMemberModel->groups = serialize($arrGroups);
                     $objMemberModel->save();
 
-                    // Set sesion data
+                    // Set session data
                     $_SESSION['SAC_EVT_TOOL']['memberAccountActivation']['step'] = 4;
 
                     // Log

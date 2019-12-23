@@ -91,15 +91,15 @@ class CronjobController extends AbstractController
         $eventId = Input::get('eventId') ? Input::get('eventId') : null;
         $download = Input::get('download') ? true : false;
 
-        if($year !== null)
+        if (!empty($year))
         {
             $pdf->setYear($year);
         }
-        if($calendarId !== null)
+        if (!empty($calendarId))
         {
             $pdf->setCalendarId($calendarId);
         }
-        if($eventId !== null)
+        if(!empty($eventId))
         {
             $pdf->setEventId($eventId);
         }
