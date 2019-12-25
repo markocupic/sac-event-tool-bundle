@@ -88,35 +88,33 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         // Return empty string, if user is not logged in as a frontend user
-        if ($this->isFrontend())
+
+        // Set adapters
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+        $notificationAdapter = $this->get('contao.framework')->getAdapter(Notification::class);
+        $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+
+        if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
         {
-            // Set adapters
-            $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
-            $notificationAdapter = $this->get('contao.framework')->getAdapter(Notification::class);
-            $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
-            $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
-
-            if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
-            {
-                $this->objUser = $objUser;
-            }
-
-            // Get groups from model
-            $this->arrGroups = $stringUtilAdapter->deserialize($model->reg_groups, true);
-
-            // Use terminal42/notification_center
-            $this->objNotification = $notificationAdapter->findByPk($model->activateMemberAccountNotificationId);
-
-            // Redirect to first step, if there is no step param set in the url
-            if ($request->query->get('step') == '')
-            {
-                $url = $urlAdapter->addQueryString('step=1');
-                $controllerAdapter->redirect($url);
-            }
-
-            // Get the step number from url
-            $this->step = $request->query->get('step');
+            $this->objUser = $objUser;
         }
+
+        // Get groups from model
+        $this->arrGroups = $stringUtilAdapter->deserialize($model->reg_groups, true);
+
+        // Use terminal42/notification_center
+        $this->objNotification = $notificationAdapter->findByPk($model->activateMemberAccountNotificationId);
+
+        // Redirect to first step, if there is no step param set in the url
+        if ($request->query->get('step') == '')
+        {
+            $url = $urlAdapter->addQueryString('step=1');
+            $controllerAdapter->redirect($url);
+        }
+
+        // Get the step number from url
+        $this->step = $request->query->get('step');
 
         // Call parent __invoke
         return parent::__invoke($request, $model, $section, $classes);
@@ -130,7 +128,6 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         $services['database_connection'] = Connection::class;
         $services['security.helper'] = Security::class;
         $services['request_stack'] = RequestStack::class;
-        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
         $services['translator'] = TranslatorInterface::class;
 
         return $services;
@@ -647,15 +644,6 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
             return true;
         }
         return false;
-    }
-
-    /**
-     * Identify the Contao scope (TL_MODE) of the current request
-     * @return bool
-     */
-    protected function isFrontend(): bool
-    {
-        return $this->get('request_stack')->getCurrentRequest() !== null ? $this->get('contao.routing.scope_matcher')->isFrontendRequest($this->get('request_stack')->getCurrentRequest()) : false;
     }
 
 }

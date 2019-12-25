@@ -14,10 +14,8 @@ $GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
 $GLOBALS['TL_LANG']['MSC']['yourUpcomingEvents'] = 'Deine nächsten Events';
 
 $GLOBALS['TL_LANG']['CTE']['user_portrait'] = array('SAC-User-Portrait');
-$GLOBALS['TL_LANG']['CTE']['userPortraitList'] = array('SAC-User-Portrait-Liste');
+$GLOBALS['TL_LANG']['CTE']['user_portrait_list'] = array('SAC-User-Portrait-Liste');
 $GLOBALS['TL_LANG']['CTE']['sac_calendar_newsletter'] = array('SAC-Events-Elemente');
-$GLOBALS['TL_LANG']['CTE']['calendar_newsletter'] = array('SAC-Events als Cleverreach Template-Vorlage herunterladen');
-
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_1'] = 'Freie Plätze!';
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_2'] = 'Anmeldefrist für Event ist abgelaufen!';
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_3'] = 'Event ausgebucht!';

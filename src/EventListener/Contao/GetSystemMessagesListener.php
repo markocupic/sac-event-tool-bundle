@@ -20,6 +20,7 @@ use Contao\Database;
 use Contao\Date;
 use Contao\System;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -33,25 +34,22 @@ class GetSystemMessagesListener
      */
     private $framework;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+
 
     /**
-     * @var ScopeMatcher
+     * @var ContaoMode;
      */
-    private $scopeMatcher;
+    private $contaoMode;
 
     /**
      * GetSystemMessagesListener constructor.
      * @param ContaoFramework $framework
+     * @param ContaoMode $contaoMode
      */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
+    public function __construct(ContaoFramework $framework,  ContaoMode $contaoMode)
     {
         $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->scopeMatcher = $scopeMatcher;
+        $this->contaoMode = $contaoMode;
     }
 
     /**
@@ -61,7 +59,7 @@ class GetSystemMessagesListener
     public function listUntreatedEventSubscriptions()
     {
         $strBuffer = '';
-        if ($this->isBackend())
+        if ($this->contaoMode->isBackend())
         {
             $backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
             $databaseAdapter = $this->framework->getAdapter(Database::class);
@@ -107,12 +105,4 @@ class GetSystemMessagesListener
         return $strBuffer;
     }
 
-    /**
-     * Identify the Contao scope (TL_MODE) of the current request
-     * @return bool
-     */
-    private function isBackend(): bool
-    {
-        return $this->scopeMatcher->isBackendRequest($this->requestStack->getCurrentRequest());
-    }
 }

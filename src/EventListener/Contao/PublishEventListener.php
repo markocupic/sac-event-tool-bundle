@@ -18,6 +18,7 @@ use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Email;
+use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -32,26 +33,19 @@ class PublishEventListener
     private $framework;
 
     /**
-     * @var RequestStack
+     * @var ContaoMode;
      */
-    private $requestStack;
-
-    /**
-     * @var ScopeMatcher
-     */
-    private $scopeMatcher;
+    private $contaoMode;
 
     /**
      * PublishEventListener constructor.
      * @param ContaoFramework $framework
-     * @param RequestStack $requestStack
-     * @param ScopeMatcher $scopeMatcher
+     * @param ContaoMode $contaoMode
      */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
+    public function __construct(ContaoFramework $framework, ContaoMode $contaoMode)
     {
         $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->scopeMatcher = $scopeMatcher;
+        $this->contaoMode = $contaoMode;
     }
 
     /**
@@ -60,7 +54,7 @@ class PublishEventListener
      */
     public function onPublishEvent(CalendarEventsModel $objEvent): void
     {
-        if ($this->isBackend())
+        if ($this->contaoMode->isBackend())
         {
             $backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
             $configAdapter = $this->framework->getAdapter(Config::class);
@@ -79,15 +73,6 @@ class PublishEventListener
                 }
             }
         }
-    }
-
-    /**
-     * Identify the Contao scope (TL_MODE) of the current request
-     * @return bool
-     */
-    protected function isBackend(): bool
-    {
-        return $this->scopeMatcher->isBackendRequest($this->requestStack->getCurrentRequest());
     }
 
 }

@@ -77,16 +77,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['isSacMember'] = array(
     'sql'       => "char(1) NOT NULL default ''",
 );
 
-// newsletterSent
-$GLOBALS['TL_DCA']['tl_member']['fields']['newsletterSent'] = array(
-    'label'     => &$GLOBALS['TL_LANG']['tl_member']['newsletterSent'],
-    'exclude'   => true,
-    'filter'    => true,
-    'inputType' => 'checkbox',
-    'eval'      => array('submitOnChange' => false),
-    'sql'       => "char(1) NOT NULL default ''",
-);
-
 // sacMemberId
 $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['sacMemberId'],

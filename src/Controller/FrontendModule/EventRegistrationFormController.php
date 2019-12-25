@@ -105,57 +105,55 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        if ($this->isFrontend())
+        /** @var projectDir */
+        $this->projectDir = System::getContainer()->getParameter('kernel.project_dir');
+
+        // Set the module object (Contao\ModuleModel)
+        $this->model = $model;
+
+        // Set adapters
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+        $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+        $notificationAdapter = $this->get('contao.framework')->getAdapter(Notification::class);
+        $userModelAdapter = $this->get('contao.framework')->getAdapter(UserModel::class);
+
+        if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
         {
-            /** @var projectDir */
-            $this->projectDir = System::getContainer()->getParameter('kernel.project_dir');
-
-            // Set the module object (Contao\ModuleModel)
-            $this->model = $model;
-
-            // Set adapters
-            $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
-            $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
-            $notificationAdapter = $this->get('contao.framework')->getAdapter(Notification::class);
-            $userModelAdapter = $this->get('contao.framework')->getAdapter(UserModel::class);
-
-            if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
-            {
-                $this->objUser = $objUser;
-            }
-
-            // Set the item from the auto_item parameter
-            if (!$request->query->get('events') && $configAdapter->get('useAutoItem') && isset($_GET['auto_item']))
-            {
-                $request->query->set('events', $_GET['auto_item']);
-                $request->query->set('auto_item', $_GET['auto_item']);
-            }
-
-            $blnShowModule = false;
-
-            // Get $this->objEvent
-            if ($request->query->get('events') != '')
-            {
-                $objEvent = $calendarEventsModelAdapter->findByIdOrAlias($request->query->get('events'));
-                if ($objEvent !== null && $this->objUser !== null)
-                {
-                    $this->objEvent = $objEvent;
-                    $blnShowModule = true;
-                }
-            }
-
-            if (!$blnShowModule)
-            {
-                // Return empty string
-                return new Response('', Response::HTTP_NO_CONTENT);
-            }
-
-            // Use terminal42/notification_center
-            $this->objNotification = $notificationAdapter->findByPk($this->model->receiptEventRegistrationNotificationId);
-
-            // Get instructor object from UserModel
-            $this->objInstructor = $userModelAdapter->findByPk($this->objEvent->mainInstructor);
+            $this->objUser = $objUser;
         }
+
+        // Set the item from the auto_item parameter
+        if (!$request->query->get('events') && $configAdapter->get('useAutoItem') && isset($_GET['auto_item']))
+        {
+            $request->query->set('events', $_GET['auto_item']);
+            $request->query->set('auto_item', $_GET['auto_item']);
+        }
+
+        $blnShowModule = false;
+
+        // Get $this->objEvent
+        if ($request->query->get('events') != '')
+        {
+            $objEvent = $calendarEventsModelAdapter->findByIdOrAlias($request->query->get('events'));
+            if ($objEvent !== null && $this->objUser !== null)
+            {
+                $this->objEvent = $objEvent;
+                $blnShowModule = true;
+            }
+        }
+
+        if (!$blnShowModule)
+        {
+            // Return empty string
+            return new Response('', Response::HTTP_NO_CONTENT);
+        }
+
+        // Use terminal42/notification_center
+        $this->objNotification = $notificationAdapter->findByPk($this->model->receiptEventRegistrationNotificationId);
+
+        // Get instructor object from UserModel
+        $this->objInstructor = $userModelAdapter->findByPk($this->objEvent->mainInstructor);
+
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }
@@ -171,7 +169,6 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $services['database_connection'] = Connection::class;
         $services['security.helper'] = Security::class;
         $services['request_stack'] = RequestStack::class;
-        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
 
         return $services;
     }
@@ -186,7 +183,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
     {
         $this->template = $template;
 
-        $scope = $this->isFrontend() ? 'FE' : 'BE';
+        $scope = 'FE';
 
         // Set adapters
         /** @var Database $databaseAdapter */
@@ -254,7 +251,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         }
         elseif ($this->objEvent->startDate - 60 * 60 * 24 < time())
         {
-            $messageAdapter->addInfo($_GET['auto_item'] . $this->objEvent->startDate . 'Die Anmeldefrist für diesen Event ist abgelaufen.', $scope);
+            $messageAdapter->addInfo('Die Anmeldefrist für diesen Event ist abgelaufen.', $scope);
         }
         elseif ($this->objUser && true === $calendarEventsHelperAdapter->areBookingDatesOccupied($this->objEvent->id, $this->objUser->id))
         {
@@ -332,7 +329,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
         /** @var Environment $environmentAdapter */
         $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
-        /** @var  CalendarEventsJourneyModel$calendarEventsJourneyModelAdapter */
+        /** @var  CalendarEventsJourneyModel $calendarEventsJourneyModelAdapter */
         $calendarEventsJourneyModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsJourneyModel::class);
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
@@ -692,15 +689,6 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                 }
             }
         }
-    }
-
-    /**
-     * Identify the Contao scope (TL_MODE) of the current request
-     * @return bool
-     */
-    protected function isFrontend()
-    {
-        return $this->get('request_stack')->getCurrentRequest() !== null ? $this->get('contao.routing.scope_matcher')->isFrontendRequest($this->get('request_stack')->getCurrentRequest()) : false;
     }
 
 }

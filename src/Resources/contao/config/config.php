@@ -7,15 +7,18 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-$rootDir = Contao\System::getContainer()->getParameter('kernel.project_dir');
+$projectDir = \Contao\System::getContainer()->getParameter('kernel.project_dir');
+
+/** @var Markocupic\SacEventToolBundle\ContaoMode\ContaoMode $contaoMode */
+$contaoMode = \Contao\System::getContainer()->get('Markocupic\SacEventToolBundle\ContaoMode\ContaoMode');
 
 // Add notification center configs
-require_once($rootDir . '/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/config/notification_center_config.php');
+require_once($projectDir . '/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/config/notification_center_config.php');
 
 // include custom functions
-require_once($rootDir . '/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/functions/functions.php');
+require_once($projectDir . '/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/functions/functions.php');
 
-if (TL_MODE == 'BE')
+if ($contaoMode->isBackend())
 {
     // Add Backend CSS
     $GLOBALS['TL_CSS'][] = 'bundles/markocupicsaceventtool/css/be_stylesheet.css|static';
@@ -93,24 +96,14 @@ $GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = array(
     'eventToolEventFilterForm'               => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventEventFilterForm',
 );
 
-// Content Elements
-$GLOBALS['TL_CTE']['sac_calendar_newsletter'] = array(
-    'calendar_newsletter' => 'CalendarNewsletter',
-);
-$GLOBALS['TL_CTE']['sac_event_tool_content_elements'] = array(
-    'userPortraitList' => 'Markocupic\SacEventToolBundle\ContentUserPortraitList',
-    'cabanneSacList'   => 'Markocupic\SacEventToolBundle\ContentCabanneSacList',
-    'cabanneSacDetail' => 'Markocupic\SacEventToolBundle\ContentCabanneSacDetail',
-);
-
 // Maintenance
 // Delete unused event-story folders
 $GLOBALS['TL_PURGE']['custom']['sac_event_story'] = array(
-    'callback' => array('markocupic.sac_event_tool_bundle.services.contao_backend_maintenance.maintain_module_event_story', 'run')
+    'callback' => array('markocupic.sac_event_tool_bundle.services.contao_backend_maintenance.maintain_module_event_story', 'run'),
 );
 
 // Do not index a page if one of the following parameters is set
-$GLOBALS['TL_NOINDEX_KEYS'][] = 'xhrAction';
+//$GLOBALS['TL_NOINDEX_KEYS'][] = 'xhrAction';
 
 // TL_CONFIG
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'] = array(
@@ -157,7 +150,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = array(
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'] = array(
     'deceased', // verstorben
     'recission', // Rücktritt
-    'leaving' // Austritt
+    'leaving', // Austritt
 );
 
 // TL_CONFIG
@@ -224,7 +217,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'] = array(
     '5 Abende'          => array('dateRows' => 5),
     '6 Abende'          => array('dateRows' => 6),
     '7 Abende'          => array('dateRows' => 7),
-    '1 Abend und 1 Tag' => array('dateRows' => 2)
+    '1 Abend und 1 Tag' => array('dateRows' => 2),
 );
 
 // Car seats info used in the event registration form
@@ -247,6 +240,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = array(
     'Nichts',
 );
 
+// CONTAO HOOKS:
 /** Get page layout: purge script cache in dev mode **/
 $GLOBALS['TL_HOOKS']['getPageLayout'][] = array('markocupic.sac_event_tool_bundle.event_listener.get_page_layout', 'purgeScriptCacheInDebugMode');
 

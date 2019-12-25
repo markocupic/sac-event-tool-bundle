@@ -25,8 +25,8 @@ class tl_content_sac_event_tool extends tl_content
             $objDb = $this->Database->prepare("SELECT * FROM tl_content WHERE id=?")->limit(1)->execute($dc->id);
             if ($objDb->numRows)
             {
-                // Set palette for contednt element "userPortraitList"
-                if ($objDb->type === 'userPortraitList')
+                // Set palette for contednt element "user_portrait_list"
+                if ($objDb->type === 'user_portrait_list')
                 {
                     if ($objDb->userList_selectMode === 'selectUsers')
                     {
@@ -83,7 +83,7 @@ class tl_content_sac_event_tool extends tl_content
      */
     public function getUserListTemplates()
     {
-        return $this->getTemplateGroup('ce_user_portrait_list_');
+        return $this->getTemplateGroup('ce_user_portrait_list');
     }
 
 

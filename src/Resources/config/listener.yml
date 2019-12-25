@@ -22,8 +22,7 @@ services:
     class: Markocupic\SacEventToolBundle\EventListener\Contao\ChangeEventReleaseLevelListener
     arguments:
     - "@contao.framework"
-    - '@request_stack'
-    - '@contao.routing.scope_matcher'
+    - '@Markocupic\SacEventToolBundle\ContaoMode\ContaoMode'
     tags:
     - { name: kernel.event_listener, event: contao.change_event_release_level, method: onChangeEventReleaseLevel }
 
@@ -33,8 +32,7 @@ services:
     class: Markocupic\SacEventToolBundle\EventListener\Contao\PublishEventListener
     arguments:
     - "@contao.framework"
-    - '@request_stack'
-    - '@contao.routing.scope_matcher'
+    - '@Markocupic\SacEventToolBundle\ContaoMode\ContaoMode'
     tags:
     - { name: kernel.event_listener, event: contao.publish_event, method: onPublishEvent }
 
@@ -55,8 +53,8 @@ services:
     class: Markocupic\SacEventToolBundle\EventListener\Contao\GetSystemMessagesListener
     arguments:
     - "@contao.framework"
-    - '@request_stack'
-    - '@contao.routing.scope_matcher'
+    - '@Markocupic\SacEventToolBundle\ContaoMode\ContaoMode'
+
     tags:
     - { name: kernel.event_listener, event: get_system_messages_listener, method: listUntreatedEventSubscriptions }
 

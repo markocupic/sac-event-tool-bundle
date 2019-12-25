@@ -19,6 +19,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Email;
 use Contao\EventReleaseLevelPolicyModel;
+use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -33,26 +34,19 @@ class ChangeEventReleaseLevelListener
     private $framework;
 
     /**
-     * @var RequestStack
+     * @var ContaoMode
      */
-    private $requestStack;
-
-    /**
-     * @var ScopeMatcher
-     */
-    private $scopeMatcher;
+    private $contaoMode;
 
     /**
      * ChangeEventReleaseLevelListener constructor.
      * @param ContaoFramework $framework
-     * @param RequestStack $requestStack
-     * @param ScopeMatcher $scopeMatcher
+     * @param ContaoMode $contaoMode
      */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
+    public function __construct(ContaoFramework $framework, ContaoMode $contaoMode)
     {
         $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->scopeMatcher = $scopeMatcher;
+        $this->contaoMode = $contaoMode;
     }
 
     /**
@@ -62,7 +56,7 @@ class ChangeEventReleaseLevelListener
      */
     public function onChangeEventReleaseLevel(CalendarEventsModel $objEvent, string $strDirection): void
     {
-        if ($this->isBackend())
+        if ($this->contaoMode->isBackend())
         {
             $eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
             $backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
@@ -95,15 +89,6 @@ class ChangeEventReleaseLevelListener
                 }
             }
         }
-    }
-
-    /**
-     * Identify the Contao scope (TL_MODE) of the current request
-     * @return bool
-     */
-    private function isBackend(): bool
-    {
-        return $this->scopeMatcher->isBackendRequest($this->requestStack->getCurrentRequest());
     }
 
 }

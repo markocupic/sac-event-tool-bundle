@@ -71,25 +71,15 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        // Return empty string, if user is not logged in as a frontend user
-        if ($this->isFrontend())
+        // Get logged in member object
+        if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
         {
-            // Get logged in member object
-            if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
-            {
-                $this->objUser = $objUser;
-            }
-
-            // Do not allow for not authorized users
-            if ($this->objUser === null)
-            {
-                throw new UnauthorizedHttpException();
-            }
-
-            // Neither cache nor search page
-            $page->noSearch = 1;
-            $page->cache = 0;
+            $this->objUser = $objUser;
         }
+
+        // Neither cache nor search page
+        $page->noSearch = 1;
+        $page->cache = 0;
 
         $this->projectDir = System::getContainer()->getParameter('kernel.project_dir');
 
@@ -106,8 +96,6 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
 
         $services['contao.framework'] = ContaoFramework::class;
         $services['security.helper'] = Security::class;
-        $services['request_stack'] = RequestStack::class;
-        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
 
         return $services;
     }
@@ -120,6 +108,12 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
+        // Do not allow for not authorized users
+        if ($this->objUser === null)
+        {
+            throw new UnauthorizedHttpException();
+        }
+
         $this->template = $template;
 
         // Set adapters
@@ -144,15 +138,6 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
         $this->template->arrEventStories = $this->getEventStories($model);
 
         return $this->template->getResponse();
-    }
-
-    /**
-     * Identify the Contao scope (TL_MODE) of the current request
-     * @return bool
-     */
-    protected function isFrontend(): bool
-    {
-        return $this->get('request_stack')->getCurrentRequest() !== null ? $this->get('contao.routing.scope_matcher')->isFrontendRequest($this->get('request_stack')->getCurrentRequest()) : false;
     }
 
     /**

@@ -37,6 +37,8 @@ class MarkocupicSacEventToolExtension extends Extension
         $loader->load('controller-contao-frontend-module.yml');
         $loader->load('controller-contao-content-element.yml');
         $loader->load('cron.yml');
+        $loader->load('contao-mode.yml');
+
 
         // Merge parameters
         if (!empty($GLOBALS['TL_CONFIG']) && is_array($GLOBALS['TL_CONFIG']))

@@ -112,7 +112,7 @@ class ExecutePreActionsListener
                 if (($objUser = $backendUserAdapter->getInstance()) !== null)
                 {
                     /** @var  BackendTemplate $objTemplate */
-                    $objTemplate = new BackendTemplate('edit_all_navbar_helper');
+                    $objTemplate = new BackendTemplate('be_edit_all_navbar_helper');
                     $json['navbar'] = $objTemplate->parse();
                     $json['status'] = 'success';
                 }

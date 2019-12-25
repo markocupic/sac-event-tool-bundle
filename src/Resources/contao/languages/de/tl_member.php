@@ -40,7 +40,6 @@ $GLOBALS['TL_LANG']['tl_member']['sectionInfo4'] = array('Bemerkungen Sektion', 
 $GLOBALS['TL_LANG']['tl_member']['debit'] = array('Debit', '');
 $GLOBALS['TL_LANG']['tl_member']['memberStatus'] = array('Mitgliederstatus', '');
 $GLOBALS['TL_LANG']['tl_member']['disable'] = array('Inaktives SAC-Mitglied (ausgetreten)', '');
-$GLOBALS['TL_LANG']['tl_member']['newsletterSent'] = array('Newsletter versandt', '');
 $GLOBALS['TL_LANG']['tl_member']['foodHabits'] = array('Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)', '');
 
 // References

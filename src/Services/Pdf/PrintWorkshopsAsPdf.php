@@ -169,7 +169,7 @@ class PrintWorkshopsAsPdf
         // Get the font directory
         $container = System::getContainer();
         $bundleSRC = $container->get('kernel')->locateResource('@MarkocupicSacEventToolBundle');
-        $fontDirectory = $bundleSRC . 'Resources/contao/fonts/opensans';
+        $fontDirectory = $bundleSRC . 'Services/Pdf/fonts/opensans';
 
         // create new PDF document
         // Extend TCPDF for special footer and header handling

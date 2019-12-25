@@ -67,32 +67,24 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         // Return empty string, if user is not logged in as a frontend user
-        if ($this->isFrontend())
+
+        // Set adapters
+        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+
+        // Get logged in member object
+        if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
         {
-            // Set adapters
-            $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+            $this->objUser = $objUser;
+        }
 
-            // Get logged in member object
-            if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
-            {
-                $this->objUser = $objUser;
-            }
+        // Neither cache nor search page
+        $page->noSearch = 1;
+        $page->cache = 0;
 
-            // Neither cache nor search page
-            $page->noSearch = 1;
-            $page->cache = 0;
-
-            // Do not allow for not authorized users
-            if ($this->objUser === null)
-            {
-                throw new UnauthorizedHttpException();
-            }
-
-            // Print course certificate
-            if ($inputAdapter->get('do') === 'download_course_certificate' && strlen($inputAdapter->get('id')) && $this->objUser !== null)
-            {
-                $this->downloadCourseCertificate();
-            }
+        // Print course certificate
+        if ($inputAdapter->get('do') === 'download_course_certificate' && strlen($inputAdapter->get('id')) && $this->objUser !== null)
+        {
+            $this->downloadCourseCertificate();
         }
 
         // Call the parent method
@@ -108,8 +100,6 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
         $services['contao.framework'] = ContaoFramework::class;
         $services['security.helper'] = Security::class;
-        $services['request_stack'] = RequestStack::class;
-        $services['contao.routing.scope_matcher'] = ScopeMatcher::class;
 
         return $services;
     }
@@ -122,6 +112,12 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
+        // Do not allow for not authorized users
+        if ($this->objUser === null)
+        {
+            throw new UnauthorizedHttpException();
+        }
+
         $this->template = $template;
 
         // Set adapters
@@ -173,15 +169,6 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         $this->template->arrPastEvents = $arrEvents;
 
         return $this->template->getResponse();
-    }
-
-    /**
-     * Identify the Contao scope (TL_MODE) of the current request
-     * @return bool
-     */
-    protected function isFrontend(): bool
-    {
-        return $this->get('request_stack')->getCurrentRequest() !== null ? $this->get('contao.routing.scope_matcher')->isFrontendRequest($this->get('request_stack')->getCurrentRequest()) : false;
     }
 
     /**
