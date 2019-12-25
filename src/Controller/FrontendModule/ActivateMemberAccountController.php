@@ -107,7 +107,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         $this->objNotification = $notificationAdapter->findByPk($model->activateMemberAccountNotificationId);
 
         // Redirect to first step, if there is no step param set in the url
-        if ($request->query->get('step') == '')
+        if ($request->query->get('step') == '' || !is_numeric($request->query->get('step')))
         {
             $url = $urlAdapter->addQueryString('step=1');
             $controllerAdapter->redirect($url);

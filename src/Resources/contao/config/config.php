@@ -281,15 +281,15 @@ $GLOBALS['TL_HOOKS']['importUser'][] = array('Markocupic\SacEventToolBundle\Even
 /** Parse backend template hook **/
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\ParseBackendTemplateListener', 'onParseBackendTemplate');
 
-/** Cron jobs **/
-$GLOBALS['TL_CRON']['monthly']['replaceDefaultPassword'] = array(Markocupic\SacEventToolBundle\Cron\Contao\MonthlyCron::class, 'replaceDefaultPasswordAndSendNew');
-$GLOBALS['TL_CRON']['hourly']['syncSacMemberDatabase'] = array(Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron::class, 'syncSacMemberDatabase');
-$GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = array(Markocupic\SacEventToolBundle\Cron\Contao\DailyCron::class, 'generateWorkshopPdfBooklet');
-$GLOBALS['TL_CRON']['daily']['anonymizeOrphanedCalendarEventsMemberDataRecords'] = array(Markocupic\SacEventToolBundle\Cron\Contao\DailyCron::class, 'anonymizeOrphanedCalendarEventsMemberDataRecords');
-
 /** Replace insert tags **/
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\ReplaceInsertTagsListener', 'onReplaceInsertTags');
 
 /** Parse template (Check if frontend login is allowed, if not replace the default error message and redirect to account activation page) */
 $GLOBALS['TL_HOOKS']['parseTemplate'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\ParseTemplateListener', 'onParseTemplate');
+
+/** Cron jobs **/
+$GLOBALS['TL_CRON']['monthly']['replaceDefaultPassword'] = array(Markocupic\SacEventToolBundle\Cron\Contao\MonthlyCron::class, 'replaceDefaultPasswordAndSendNew');
+$GLOBALS['TL_CRON']['hourly']['syncSacMemberDatabase'] = array(Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron::class, 'syncSacMemberDatabase');
+$GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = array(Markocupic\SacEventToolBundle\Cron\Contao\DailyCron::class, 'generateWorkshopPdfBooklet');
+$GLOBALS['TL_CRON']['daily']['anonymizeOrphanedCalendarEventsMemberDataRecords'] = array(Markocupic\SacEventToolBundle\Cron\Contao\DailyCron::class, 'anonymizeOrphanedCalendarEventsMemberDataRecords');
 
