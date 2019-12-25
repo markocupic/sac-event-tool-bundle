@@ -101,7 +101,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         if ($inputAdapter->get('do') === 'rotate-image' && $inputAdapter->get('fileId') != '')
         {
             // Get the image rotate service
-            $objRotateImage = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.image.rotate_image');
+            $objRotateImage = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\Image\RotateImage');
             $objFiles = FilesModel::findOneById($inputAdapter->get('fileId'));
             $objRotateImage->rotate($objFiles);
             $controllerAdapter->redirect($page->getFrontendUrl());

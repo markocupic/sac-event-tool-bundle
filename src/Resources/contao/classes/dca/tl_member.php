@@ -35,7 +35,7 @@ class tl_member_sac_bundle extends Backend
         // Delete avatar directory
         if ($objMember->activeRecord->id > 0)
         {
-            $objClearFrontendUserData = \Contao\System::getContainer()->get('markocupic.sac_event_tool_bundle.services.frontend_user.clear_frontend_user_data');
+            $objClearFrontendUserData = \Contao\System::getContainer()->get('Markocupic\SacEventToolBundle\Services\FrontendUser\ClearFrontendUserData');
 
             $memberModel = \Contao\MemberModel::findByPk($objMember->activeRecord->id);
             if ($memberModel !== null)

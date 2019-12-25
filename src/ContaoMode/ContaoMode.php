@@ -108,7 +108,13 @@ class ContaoMode
     {
         if ($this->framework->isInitialized())
         {
-            return $this->scopeMatcher->isBackendRequest($this->requestStack->getMasterRequest());
+            if ($this->requestStack !== null)
+            {
+                if ($this->requestStack->getMasterRequest() instanceof RequestStack)
+                {
+                    return $this->scopeMatcher->isBackendRequest($this->requestStack->getMasterRequest());
+                }
+            }
         }
         return false;
     }

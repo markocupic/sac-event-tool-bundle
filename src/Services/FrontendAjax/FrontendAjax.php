@@ -430,7 +430,7 @@ class FrontendAjax
 
         // Get the image rotate service
         $objFiles = $filesModelAdapter->findOneById($fileId);
-        $objRotateImage = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.image.rotate_image');
+        $objRotateImage = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\Image\RotateImage');
         if ($objRotateImage->rotate($objFiles))
         {
             $json = array('status' => 'success');

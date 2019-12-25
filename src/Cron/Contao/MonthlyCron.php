@@ -50,7 +50,7 @@ class MonthlyCron
     public function replaceDefaultPasswordAndSendNew()
     {
         /** @var  ReplaceDefaultPassword $cron */
-        $cron = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.backend_user.replace_default_password');
+        $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\BackendUser\ReplaceDefaultPassword');
         $cron->replaceDefaultPasswordAndSendNew();
     }
 

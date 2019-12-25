@@ -1,25 +1,22 @@
 services:
   # CorsListener Enable Cors requests
-  markocupic.sac_event_tool_bundle.event_listener.cors.cors_listener:
-    class:  Markocupic\SacEventToolBundle\EventListener\Cors\CorsListener
+  Markocupic\SacEventToolBundle\EventListener\Cors\CorsListener:
     tags:
     - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
 
   # CONTAO HOOKS:
   # Contao add custom regexp hook
-  markocupic.sac_event_tool_bundle.event_listener.add_custom_regexp:
+  Markocupic\SacEventToolBundle\EventListener\Contao\AddCustomRegexpListener:
     public: true
-    class: Markocupic\SacEventToolBundle\EventListener\Contao\AddCustomRegexpListener
     arguments:
     - "@contao.framework"
     tags:
     - { name: kernel.event_listener, event: contao.add_custom_regexp, method: onAddCustomRegexp }
 
   # Contao change event release level hook
-  markocupic.sac_event_tool_bundle.event_listener.change_event_release_level:
+  Markocupic\SacEventToolBundle\EventListener\Contao\ChangeEventReleaseLevelListener:
     public: true
-    class: Markocupic\SacEventToolBundle\EventListener\Contao\ChangeEventReleaseLevelListener
     arguments:
     - "@contao.framework"
     - '@Markocupic\SacEventToolBundle\ContaoMode\ContaoMode'
@@ -27,9 +24,8 @@ services:
     - { name: kernel.event_listener, event: contao.change_event_release_level, method: onChangeEventReleaseLevel }
 
   # Contao publish event hook
-  markocupic.sac_event_tool_bundle.event_listener.publish_event:
+  Markocupic\SacEventToolBundle\EventListener\Contao\PublishEventListener:
     public: true
-    class: Markocupic\SacEventToolBundle\EventListener\Contao\PublishEventListener
     arguments:
     - "@contao.framework"
     - '@Markocupic\SacEventToolBundle\ContaoMode\ContaoMode'
@@ -37,7 +33,7 @@ services:
     - { name: kernel.event_listener, event: contao.publish_event, method: onPublishEvent }
 
   # Contao get page layout hook (purge script cache in debug mode only frontend)
-  markocupic.sac_event_tool_bundle.event_listener.get_page_layout:
+  Markocupic\SacEventToolBundle\EventListener\Contao\GetPageLayoutListener:
     public: true
     class: Markocupic\SacEventToolBundle\EventListener\Contao\GetPageLayoutListener
     arguments:
@@ -48,9 +44,8 @@ services:
     - { name: kernel.event_listener, event: contao.get_page_layout, method: purgeScriptCacheInDebugMode }
 
   # Contao get system messages hook (list untreated event subscriptions when logging in into the backend)
-  markocupic.sac_event_tool_bundle.event_listener.get_system_messages_listener:
+  Markocupic\SacEventToolBundle\EventListener\Contao\GetSystemMessagesListener:
     public: true
-    class: Markocupic\SacEventToolBundle\EventListener\Contao\GetSystemMessagesListener
     arguments:
     - "@contao.framework"
     - '@Markocupic\SacEventToolBundle\ContaoMode\ContaoMode'
@@ -59,9 +54,8 @@ services:
     - { name: kernel.event_listener, event: get_system_messages_listener, method: listUntreatedEventSubscriptions }
 
   # Contao execute pre actions hook
-  markocupic.sac_event_tool_bundle.event_listener.execute_pre_actions_listener:
+  Markocupic\SacEventToolBundle\EventListener\Contao\ExecutePreActionsListener:
     public: true
-    class: Markocupic\SacEventToolBundle\EventListener\Contao\ExecutePreActionsListener
     arguments:
     - "@contao.framework"
     - "@database_connection"
@@ -70,9 +64,8 @@ services:
     - { name: kernel.event_listener, event: execute_pre_actions_listener, method: onExecutePreActions }
 
   # Contao import user hook (Allow users to login into the backend with their sacMemberId)
-  markocupic.sac_event_tool_bundle.event_listener.import_user_listener:
+  Markocupic\SacEventToolBundle\EventListener\Contao\ImportUserListener:
     public: true
-    class: Markocupic\SacEventToolBundle\EventListener\Contao\ImportUserListener
     arguments:
     - "@contao.framework"
     - '@request_stack'
@@ -80,18 +73,16 @@ services:
     - { name: kernel.event_listener, event: import_user_listener, method: onImportUser }
 
   # Contao initialize system hook (Prepare the SAC Event Tool plugin environment)
-  markocupic.sac_event_tool_bundle.event_listener.initialize_system_listener:
+  Markocupic\SacEventToolBundle\EventListener\Contao\InitializeSystemListener:
     public: true
-    class: Markocupic\SacEventToolBundle\EventListener\Contao\InitializeSystemListener
     arguments:
     - "@contao.framework"
     tags:
     - { name: kernel.event_listener, event: initialize_system_listener, method: onInitializeSystem }
 
   # Contao parse template hook (Check if frontend login is allowed, if not replace the default error message and redirect to account activation page)
-  markocupic.sac_event_tool_bundle.event_listener.parse_template_listener:
+  Markocupic\SacEventToolBundle\EventListener\Contao\ParseTemplateListener:
     public: true
-    class: Markocupic\SacEventToolBundle\EventListener\Contao\ParseTemplateListener
     arguments:
     - "@contao.framework"
     - '@request_stack'
@@ -100,9 +91,8 @@ services:
     - { name: kernel.event_listener, event: parse_template_listener, method: onParseTemplate }
 
   # Contao post login hook (Create backend user home directories if they does not exist & remove no more used directories)
-  markocupic.sac_event_tool_bundle.event_listener.post_login_listener:
+  Markocupic\SacEventToolBundle\EventListener\Contao\PostLoginListener:
     public: true
-    class: Markocupic\SacEventToolBundle\EventListener\Contao\PostLoginListener
     arguments:
     - "@contao.framework"
     - "@database_connection"
@@ -111,18 +101,16 @@ services:
     - { name: kernel.event_listener, event: post_login_listener, method: onPostLogin }
 
   # Contao parse backend template hook (manipulate backend templates)
-  markocupic.sac_event_tool_bundle.event_listener.parse_backend_template_listener:
+  Markocupic\SacEventToolBundle\EventListener\Contao\ParseBackendTemplateListener:
     public: true
-    class: Markocupic\SacEventToolBundle\EventListener\Contao\ParseBackendTemplateListener
     arguments:
     - "@contao.framework"
     tags:
     - { name: kernel.event_listener, event: parse_backend_template_listener, method: onParseBackendTemplate }
 
   # Contao replace insert tags hook (Use custom inserttags)
-  markocupic.sac_event_tool_bundle.event_listener.replace_insert_tags_listener:
+  Markocupic\SacEventToolBundle\EventListener\Contao\ReplaceInsertTagsListener:
     public: true
-    class: Markocupic\SacEventToolBundle\EventListener\Contao\ReplaceInsertTagsListener
     arguments:
     - "@contao.framework"
     tags:

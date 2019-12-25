@@ -50,7 +50,7 @@ class HourlyCron
     public function syncSacMemberDatabase()
     {
         /** @var  SyncSacMemberDatabase $cron */
-        $cron = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.sac_member_database.sync_sac_member_database');
+        $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase');
         $cron->run();
     }
 

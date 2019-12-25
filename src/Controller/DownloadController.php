@@ -41,7 +41,7 @@ class DownloadController extends AbstractController
         $this->container->get('contao.framework')->initialize();
 
         /** @var $pdf PrintWorkshopsAsPdf */
-        $pdf = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.pdf.print_workshops_as_pdf');
+        $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf');
 
         $year = Input::get('year') != '' ? Input::get('year') : null;
         $calendarId = Input::get('calendarId') != '' ? Input::get('calendarId') : null;
@@ -98,7 +98,7 @@ class DownloadController extends AbstractController
         $this->container->get('contao.framework')->initialize();
 
         /** @var $pdf PrintWorkshopsAsPdf */
-        $pdf = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.pdf.print_workshops_as_pdf');
+        $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf');
 
         $eventId = Input::get('eventId') ? Input::get('eventId') : null;
 

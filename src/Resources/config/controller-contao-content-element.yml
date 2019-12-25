@@ -1,7 +1,6 @@
 services:
 
-  markocupic.sac_event_tool_bundle.controller.content_element.user_portrait_controller:
-    class: Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController
+  Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
@@ -9,8 +8,7 @@ services:
     - { name: container.service_subscriber }
     public: true
 
-  markocupic.sac_event_tool_bundle.controller.content_element.cabanne_sac_detail_controller:
-    class: Markocupic\SacEventToolBundle\Controller\ContentElement\CabanneSacDetailController
+  Markocupic\SacEventToolBundle\Controller\ContentElement\CabanneSacDetailController:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
@@ -18,8 +16,7 @@ services:
     - { name: container.service_subscriber }
     public: true
 
-  markocupic.sac_event_tool_bundle.controller.content_element.cabanne_sac_list_controller:
-    class: Markocupic\SacEventToolBundle\Controller\ContentElement\CabanneSacListController
+  Markocupic\SacEventToolBundle\Controller\ContentElement\CabanneSacListController:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
@@ -27,8 +24,7 @@ services:
     - { name: container.service_subscriber }
     public: true
 
-  markocupic.sac_event_tool_bundle.controller.content_element.user_portrait_list_controller:
-    class: Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController
+  Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:

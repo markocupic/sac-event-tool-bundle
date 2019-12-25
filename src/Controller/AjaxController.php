@@ -30,7 +30,7 @@ class AjaxController extends AbstractController
     {
         $framework = $this->container->get('contao.framework');
         $framework->initialize();
-        $controller = $this->container->get('markocupic.sac_event_tool_bundle.services.frontend_ajax.frontend_ajax');
+        $controller = $this->container->get('Markocupic\SacEventToolBundle\Services\FrontendAjax\FrontendAjax');
 
 
         // Do allow only xhr requests

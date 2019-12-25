@@ -217,7 +217,7 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
         if ($objUser !== null)
         {
             // Create Backend Users home directory
-            $objCreateDir = \Contao\System::getContainer()->get('markocupic.sac_event_tool_bundle.services.backend_user.maintain_backend_users_home_directory');
+            $objCreateDir = \Contao\System::getContainer()->get('Markocupic\SacEventToolBundle\Services\BackendUser\MaintainBackendUsersHomeDirectory');
             $objCreateDir->createBackendUsersHomeDirectory($objUser);
 
             if ($arrSet['inherit'] !== 'extend')

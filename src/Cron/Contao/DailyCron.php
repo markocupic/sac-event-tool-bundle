@@ -57,7 +57,7 @@ class DailyCron
         $calendarId = $configAdapter->get('SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID');
 
         /** @var PrintWorkshopsAsPdf $pdf */
-        $pdf = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.pdf.print_workshops_as_pdf');
+        $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf');
         $pdf->setYear($year)
             ->setCalendarId($calendarId)
             ->setDownload(false)
@@ -70,7 +70,7 @@ class DailyCron
     public function anonymizeOrphanedCalendarEventsMemberDataRecords()
     {
         /** @var  ClearFrontendUserData $cron */
-        $cron = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.frontend_user.clear_frontend_user_data');
+        $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\FrontendUser\ClearFrontendUserData');
         $cron->anonymizeOrphanedCalendarEventsMemberDataRecords();
     }
 

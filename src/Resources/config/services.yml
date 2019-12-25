@@ -1,79 +1,69 @@
 services:
 
   # Handle Frontend Ajax requests
-  markocupic.sac_event_tool_bundle.services.frontend_ajax.frontend_ajax:
+  Markocupic\SacEventToolBundle\Services\FrontendAjax\FrontendAjax:
     public: true
-    class: Markocupic\SacEventToolBundle\Services\FrontendAjax\FrontendAjax
     arguments:
     - '@contao.framework'
 
   # Get Event data by Ajax request (allow origin *)
-  markocupic.sac_event_tool_bundle.services.frontend_ajax.event_api:
+  Markocupic\SacEventToolBundle\Services\FrontendAjax\EventApi:
     public: true
-    class: Markocupic\SacEventToolBundle\Services\FrontendAjax\EventApi
     arguments:
     - '@contao.framework'
 
   # Contao Backend Module "Maintenance": Delete no more used event stories media directories
-  markocupic.sac_event_tool_bundle.services.contao_backend_maintenance.maintain_module_event_story:
+  Markocupic\SacEventToolBundle\Services\ContaoBackendMaintenance\MaintainModuleEventStory:
     public: true
-    class: Markocupic\SacEventToolBundle\Services\ContaoBackendMaintenance\MaintainModuleEventStory
     arguments:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
   # Generate event rapports docx and pdf files
-  markocupic.sac_event_tool_bundle.services.event_rapport.event_rapport:
+  Markocupic\SacEventToolBundle\Services\EventRapport\EventRapport:
     public: true
-    class: Markocupic\SacEventToolBundle\Services\EventRapport\EventRapport
     arguments:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
   # Clear/Anonymize frontend user data f.ex if frontend user has been deleted
-  markocupic.sac_event_tool_bundle.services.frontend_user.clear_frontend_user_data:
+  Markocupic\SacEventToolBundle\Services\FrontendUser\ClearFrontendUserData:
     public: true
-    class: Markocupic\SacEventToolBundle\Services\FrontendUser\ClearFrontendUserData
     arguments:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
   # Generate backend users home directory / remove old backend user home directories
-  markocupic.sac_event_tool_bundle.services.backend_user.maintain_backend_users_home_directory:
+  Markocupic\SacEventToolBundle\Services\BackendUser\MaintainBackendUsersHomeDirectory:
     public: true
-    class: Markocupic\SacEventToolBundle\Services\BackendUser\MaintainBackendUsersHomeDirectory
     arguments:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
   # Cron: Replace default password and send email to user with new pw
-  markocupic.sac_event_tool_bundle.services.backend_user.replace_default_password:
+  Markocupic\SacEventToolBundle\Services\BackendUser\ReplaceDefaultPassword:
     public: true
-    class: Markocupic\SacEventToolBundle\Services\BackendUser\ReplaceDefaultPassword
     arguments:
     - '@contao.framework'
 
   # Rotate image
-  markocupic.sac_event_tool_bundle.services.image.rotate_image:
+  Markocupic\SacEventToolBundle\Services\Image\RotateImage:
     public: true
-    class: Markocupic\SacEventToolBundle\Services\Image\RotateImage
     arguments:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
   # Sync member database form bern with contao tl_member
-  markocupic.sac_event_tool_bundle.services.sac_member_database.sync_sac_member_database:
+  Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase:
     public: true
-    class: Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase
     arguments:
     - '@contao.framework'
     - '@database_connection'
     - '%kernel.project_dir%'
 
   # Generate worhshop booklet
-  markocupic.sac_event_tool_bundle.services.pdf.print_workshops_as_pdf:
+  Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf:
     public: true
-    class: Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf
     arguments:
     - '@contao.framework'
 

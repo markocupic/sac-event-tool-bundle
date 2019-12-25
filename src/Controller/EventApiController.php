@@ -33,7 +33,7 @@ class EventApiController extends AbstractController
         $framework = $this->container->get('contao.framework');
         $framework->initialize();
 
-        $objApi = $this->container->get('markocupic.sac_event_tool_bundle.services.frontend_ajax.event_api');
+        $objApi = $this->container->get('Markocupic\SacEventToolBundle\Services\FrontendAjax\EventApi');
 
         /** @var Input $inputAdapter */
         $inputAdapter = $framework->getAdapter(Input::class);

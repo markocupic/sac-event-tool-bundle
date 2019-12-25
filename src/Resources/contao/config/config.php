@@ -99,7 +99,7 @@ $GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = array(
 // Maintenance
 // Delete unused event-story folders
 $GLOBALS['TL_PURGE']['custom']['sac_event_story'] = array(
-    'callback' => array('markocupic.sac_event_tool_bundle.services.contao_backend_maintenance.maintain_module_event_story', 'run'),
+    'callback' => array('Markocupic\SacEventToolBundle\Services\ContaoBackendMaintenance\MaintainModuleEventStory', 'run'),
 );
 
 // Do not index a page if one of the following parameters is set
@@ -242,44 +242,44 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = array(
 
 // CONTAO HOOKS:
 /** Get page layout: purge script cache in dev mode **/
-$GLOBALS['TL_HOOKS']['getPageLayout'][] = array('markocupic.sac_event_tool_bundle.event_listener.get_page_layout', 'purgeScriptCacheInDebugMode');
+$GLOBALS['TL_HOOKS']['getPageLayout'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\GetPageLayoutListener', 'purgeScriptCacheInDebugMode');
 
 /** Get system messages: list untreated event subscriptions in the backend (start page) **/
-$GLOBALS['TL_HOOKS']['getSystemMessages'][] = array('markocupic.sac_event_tool_bundle.event_listener.get_system_messages_listener', 'listUntreatedEventSubscriptions');
+$GLOBALS['TL_HOOKS']['getSystemMessages'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\GetSystemMessagesListener', 'listUntreatedEventSubscriptions');
 
 /** Custom Hook publish Event **/
 if (!isset($GLOBALS['TL_HOOKS']['publishEvent']) || !is_array($GLOBALS['TL_HOOKS']['publishEvent']))
 {
     $GLOBALS['TL_HOOKS']['publishEvent'] = array();
 }
-$GLOBALS['TL_HOOKS']['publishEvent'][] = array('markocupic.sac_event_tool_bundle.event_listener.publish_event', 'onPublishEvent');
+$GLOBALS['TL_HOOKS']['publishEvent'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\PublishEventListener', 'onPublishEvent');
 
 /** Custom Hook change event release level **/
 if (!isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) || !is_array($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']))
 {
     $GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] = array();
 }
-$GLOBALS['TL_HOOKS']['changeEventReleaseLevel'][] = array('markocupic.sac_event_tool_bundle.event_listener.change_event_release_level', 'onChangeEventReleaseLevel');
+$GLOBALS['TL_HOOKS']['changeEventReleaseLevel'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\ChangeEventReleaseLevelListener', 'onChangeEventReleaseLevel');
 
 /** Route prepare plugin environment **/
-$GLOBALS['TL_HOOKS']['initializeSystem'][] = array('markocupic.sac_event_tool_bundle.event_listener.initialize_system_listener', 'preparePluginEnvironment');
+$GLOBALS['TL_HOOKS']['initializeSystem'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\InitializeSystemListener', 'preparePluginEnvironment');
 
 /** Handle Ajax calls from the backend **/
-$GLOBALS['TL_HOOKS']['executePreActions'][] = array('markocupic.sac_event_tool_bundle.event_listener.execute_pre_actions_listener', 'onExecutePreActions');
+$GLOBALS['TL_HOOKS']['executePreActions'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\ExecutePreActionsListener', 'onExecutePreActions');
 
 /** Handle custom rgxp in the backend **/
-$GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('markocupic.sac_event_tool_bundle.event_listener.add_custom_regexp', 'onAddCustomRegexp');
+$GLOBALS['TL_HOOKS']['addCustomRegexp'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\AddCustomRegexpListener', 'onAddCustomRegexp');
 
 /** Prepare User accounts (create user directories, etc.
  * @deprecated PostLogin Hook will be be removed in Contao 5.0.
  **/
-$GLOBALS['TL_HOOKS']['postLogin'][] = array('markocupic.sac_event_tool_bundle.event_listener.post_login_listener', 'onPostLogin');
+$GLOBALS['TL_HOOKS']['postLogin'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\PostLoginListener', 'onPostLogin');
 
 /** Allow backend users to authenticate with their sacMemberId **/
-$GLOBALS['TL_HOOKS']['importUser'][] = array('markocupic.sac_event_tool_bundle.event_listener.import_user_listener', 'onImportUser');
+$GLOBALS['TL_HOOKS']['importUser'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\ImportUserListener', 'onImportUser');
 
 /** Parse backend template hook **/
-$GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('markocupic.sac_event_tool_bundle.event_listener.parse_backend_template_listener', 'onParseBackendTemplate');
+$GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\ParseBackendTemplateListener', 'onParseBackendTemplate');
 
 /** Cron jobs **/
 $GLOBALS['TL_CRON']['monthly']['replaceDefaultPassword'] = array(Markocupic\SacEventToolBundle\Cron\Contao\MonthlyCron::class, 'replaceDefaultPasswordAndSendNew');
@@ -288,8 +288,8 @@ $GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = array(Markocupic\Sa
 $GLOBALS['TL_CRON']['daily']['anonymizeOrphanedCalendarEventsMemberDataRecords'] = array(Markocupic\SacEventToolBundle\Cron\Contao\DailyCron::class, 'anonymizeOrphanedCalendarEventsMemberDataRecords');
 
 /** Replace insert tags **/
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('markocupic.sac_event_tool_bundle.event_listener.replace_insert_tags_listener', 'onReplaceInsertTags');
+$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\ReplaceInsertTagsListener', 'onReplaceInsertTags');
 
 /** Parse template (Check if frontend login is allowed, if not replace the default error message and redirect to account activation page) */
-$GLOBALS['TL_HOOKS']['parseTemplate'][] = array('markocupic.sac_event_tool_bundle.event_listener.parse_template_listener', 'onParseTemplate');
+$GLOBALS['TL_HOOKS']['parseTemplate'][] = array('Markocupic\SacEventToolBundle\EventListener\Contao\ParseTemplateListener', 'onParseTemplate');
 

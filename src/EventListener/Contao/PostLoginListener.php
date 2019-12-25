@@ -69,7 +69,7 @@ class PostLoginListener
             $qb->select('id')->from('tl_user');
             $result = $qb->execute();
 
-            $objBackendUserDir = System::getContainer()->get('markocupic.sac_event_tool_bundle.services.backend_user.maintain_backend_users_home_directory');
+            $objBackendUserDir = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\BackendUser\MaintainBackendUsersHomeDirectory');
 
             // Create user directories if they does not exist
             while (false !== ($row = $result->fetch()))
