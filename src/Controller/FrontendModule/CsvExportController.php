@@ -8,35 +8,44 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle;
+declare(strict_types=1);
 
-use Contao\BackendTemplate;
+namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
+
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Translation\Translator;
 use Contao\Database;
+use Contao\Database\Result;
 use Contao\Date;
 use Contao\Environment;
 use Contao\Input;
-use Contao\Module;
+use Contao\MemberGroupModel;
+use Contao\ModuleModel;
 use Contao\StringUtil;
+use Contao\Template;
+use Contao\UserGroupModel;
 use Contao\UserModel;
+use Contao\UserRoleModel;
 use Haste\Form\Form;
 use League\Csv\Reader;
 use League\Csv\Writer;
-use Patchwork\Utf8;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
- * Class ModuleSacEventToolCsvExport
- * @package Markocupic\SacEventToolBundle
+ * Class CsvExportController
+ * @package Markocupic\SacEventToolBundle\Controller\CsvExportController
+ * @FrontendModule(category="sac_event_tool_frontend_modules", type="csv_export")
  */
-class ModuleSacEventToolCsvExport extends Module
+class CsvExportController extends AbstractFrontendModuleController
 {
 
-    /**
-     * Template
-     * @var string
-     */
-    protected $strTemplate = 'sac_event_tool_csv_export';
+    private const FIELD_DELIMITER = ';';
+    private const FIELD_ENCLOSURE = '"';
 
     /**
      * @var
@@ -44,86 +53,78 @@ class ModuleSacEventToolCsvExport extends Module
     protected $objForm;
 
     /**
-     * @var string
+     * @return array
      */
-    protected $strDelimiter = ';';
-
-    /**
-     * @var string
-     */
-    protected $strEnclosure = '"';
-
-    /**
-     * @var
-     */
-    protected $defaultPassword;
-
-    /**
-     * Display a wildcard in the back end
-     *
-     * @return string
-     */
-    public function generate()
+    public static function getSubscribedServices(): array
     {
-        if (TL_MODE == 'BE')
-        {
-            /** @var BackendTemplate|object $objTemplate */
-            $objTemplate = new BackendTemplate('be_wildcard');
+        $services = parent::getSubscribedServices();
 
-            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['eventToolCsvExport'][0]) . ' ###';
-            $objTemplate->title = $this->headline;
-            $objTemplate->id = $this->id;
-            $objTemplate->link = $this->name;
-            $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
+        $services['contao.framework'] = ContaoFramework::class;
 
-            return $objTemplate->parse();
-        }
-
-        $this->defaultPassword = Config::get('SAC_EVT_DEFAULT_BACKEND_PASSWORD');
-
-        return parent::generate();
+        return $services;
     }
 
     /**
-     * Generate the module
+     * @param Template $template
+     * @param ModuleModel $model
+     * @param Request $request
+     * @return null|Response
+     * @throws \League\Csv\Exception
      */
-    protected function compile()
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
         $this->generateForm();
-        $this->Template->form = $this->objForm;
+        $template->form = $this->objForm;
+
+        return $template->getResponse();
     }
 
     /**
      * @throws \League\Csv\Exception
-     * @throws \TypeError
      */
-    private function generateForm()
+    private function generateForm(): void
     {
+        /** @var Database $databaseAdapter */
+        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+
+        /** @var Input $inputAdapter */
+        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+
+        /** @var Environment $environmentAdapter */
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+
+        /** @var Form $objForm */
         $objForm = new Form('form-user-export', 'POST', function ($objHaste) {
-            return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
+            /** @var Input $inputAdapter */
+            $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+            return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
         $arrUserRoles = array();
-        $objUserRole = Database::getInstance()->execute('SELECT * FROM tl_user_role ORDER BY sorting');
+        $objUserRole = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user_role ORDER BY sorting');
         while ($objUserRole->next())
         {
             $arrUserRoles[$objUserRole->id] = $objUserRole->title;
         }
 
-        $objForm->setFormActionFromUri(Environment::get('uri'));
+        $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
         $objForm->addFormField('export-type', array(
             'label'     => array('Export auswählen', ''),
             'inputType' => 'select',
-            'options'   => array('user-role-export' => 'SAC Benutzerrollen exportieren', 'user-group-export' => 'User und Benutzergruppenzugehörigkeit exportieren', 'member-group-export' => 'Mitglieder und Benutzerzugehörigkeit exportieren'),
+            'options'   => array(
+                'user-role-export'    => 'Backend-User mit SAC-Benutzerrollen exportieren (tl_user_role)',
+                'user-group-export'   => 'Backend-User mit Benutzergruppenzugehörigkeit exportieren (tl_user_group)',
+                'member-group-export' => 'Frontend-User mit Benutzerzugehörigkeit exportieren (tl_member_group)',
+            ),
         ));
 
         $objForm->addFormField('user-roles', array(
             'label'     => array('Benutzerrollen-Filter (ODER-Verknüpfung)', ''),
             'inputType' => 'select',
             'options'   => $arrUserRoles,
-            'eval'      => array('multiple' => true)
+            'eval'      => array('multiple' => true),
         ));
 
         $objForm->addFormField('keep-groups-in-one-line', array(
@@ -139,37 +140,37 @@ class ModuleSacEventToolCsvExport extends Module
 
         if ($objForm->validate())
         {
-            if (Input::post('FORM_SUBMIT') === 'form-user-export')
+            if ($inputAdapter->post('FORM_SUBMIT') === 'form-user-export')
             {
-                $blnKeepGroupsInOneLine = Input::post('keep-groups-in-one-line');
+                $blnKeepGroupsInOneLine = $inputAdapter->post('keep-groups-in-one-line');
 
-                $exportType = Input::post('export-type');
+                $exportType = $inputAdapter->post('export-type');
 
-                if (Input::post('export-type') === 'user-role-export')
+                if ($inputAdapter->post('export-type') === 'user-role-export')
                 {
                     $strTable = 'tl_user';
                     $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'admin', 'lastLogin', 'password', 'pwChange', 'userRole');
                     $strGroupFieldName = 'userRole';
-                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
-                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, 'UserRoleModel', $blnKeepGroupsInOneLine);
+                    $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
+                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, UserRoleModel::class, $blnKeepGroupsInOneLine);
                 }
 
-                if (Input::post('export-type') === 'user-group-export')
+                if ($inputAdapter->post('export-type') === 'user-group-export')
                 {
                     $strTable = 'tl_user';
                     $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'admin', 'lastLogin', 'password', 'pwChange', 'groups');
                     $strGroupFieldName = 'groups';
-                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
-                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, 'UserGroupModel', $blnKeepGroupsInOneLine);
+                    $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
+                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, UserGroupModel::class, $blnKeepGroupsInOneLine);
                 }
 
-                if (Input::post('export-type') === 'member-group-export')
+                if ($inputAdapter->post('export-type') === 'member-group-export')
                 {
                     $strTable = 'tl_member';
                     $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups');
                     $strGroupFieldName = 'groups';
-                    $objUser = Database::getInstance()->execute('SELECT * FROM tl_member ORDER BY lastname, firstname');
-                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, 'MemberGroupModel', $blnKeepGroupsInOneLine);
+                    $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_member ORDER BY lastname, firstname');
+                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, MemberGroupModel::class, $blnKeepGroupsInOneLine);
                 }
             }
         }
@@ -178,19 +179,33 @@ class ModuleSacEventToolCsvExport extends Module
     }
 
     /**
-     * @param $type
-     * @param $strTable
-     * @param $arrFields
-     * @param $strGroupFieldName
-     * @param $objUser
+     * @param string $type
+     * @param string $strTable
+     * @param array $arrFields
+     * @param string $strGroupFieldName
+     * @param Result $objUser
      * @param $GroupModel
      * @param bool $blnKeepGroupsInOneLine
      * @throws \League\Csv\Exception
-     * @throws \TypeError
      */
-    private function exportTable($type, $strTable, $arrFields, $strGroupFieldName, $objUser, $GroupModel, $blnKeepGroupsInOneLine = false)
+    private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $objUser, $GroupModel, bool $blnKeepGroupsInOneLine = false): void
     {
-        $filename = $type . '_' . \Date::parse('Y-m-d_H-i-s') . '.csv';
+        /** @var Input $inputAdapter */
+        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+
+        /** @var Date $dateAdapter */
+        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
+
+        /** @var StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+
+        /**
+         * @var  $groupModelAdapter
+         * $groupModelAdapter can be instance of Contao\UserRoleModel or Contao\MemberGroupModel or Contao\UserGroupModel
+         */
+        $groupModelAdapter = $this->get('contao.framework')->getAdapter($GroupModel);
+
+        $filename = $type . '_' . $dateAdapter->parse('Y-m-d_H-i-s') . '.csv';
         $arrData = array();
 
         // Write headline
@@ -198,9 +213,9 @@ class ModuleSacEventToolCsvExport extends Module
 
         // Filter by user role
         $blnHasUserRoleFilter = false;
-        if (!empty(Input::post('user-roles') && is_array(Input::post('user-roles'))))
+        if (!empty($inputAdapter->post('user-roles') && is_array($inputAdapter->post('user-roles'))))
         {
-            $arrFilterRoles = Input::post('user-roles');
+            $arrFilterRoles = $inputAdapter->post('user-roles');
             $blnHasUserRoleFilter = true;
         }
 
@@ -210,7 +225,7 @@ class ModuleSacEventToolCsvExport extends Module
             // Filter by user role
             if ($blnHasUserRoleFilter)
             {
-                $arrUserRoles = StringUtil::deserialize($objUser->userRole, true);
+                $arrUserRoles = $stringUtilAdapter->deserialize($objUser->userRole, true);
                 if (count(array_intersect($arrFilterRoles, $arrUserRoles)) < 1)
                 {
                     continue;
@@ -223,15 +238,15 @@ class ModuleSacEventToolCsvExport extends Module
                 if ($field === $strGroupFieldName)
                 {
                     $hasGroups = false;
-                    $arrGroups = StringUtil::deserialize($objUser->{$field}, true);
+                    $arrGroups = $stringUtilAdapter->deserialize($objUser->{$field}, true);
 
                     if (count($arrGroups) > 0)
                     {
                         // Write all the groups/roles in one line
                         if ($blnKeepGroupsInOneLine)
                         {
-                            $arrUser[] = implode(', ', array_filter(array_map(function ($id) use ($GroupModel) {
-                                $objGroupModel = $GroupModel::findByPk($id);
+                            $arrUser[] = implode(', ', array_filter(array_map(function ($id) use ($groupModelAdapter) {
+                                $objGroupModel = $groupModelAdapter->findByPk($id);
                                 if ($objGroupModel !== null)
                                 {
                                     if ($objGroupModel->name != '')
@@ -262,7 +277,7 @@ class ModuleSacEventToolCsvExport extends Module
                                         continue;
                                     }
                                 }
-                                $objGroupModel = $GroupModel::findByPk($groupId);
+                                $objGroupModel = $groupModelAdapter->findByPk($groupId);
                                 if ($objGroupModel !== null)
                                 {
                                     if ($objGroupModel->name != '')
@@ -308,31 +323,45 @@ class ModuleSacEventToolCsvExport extends Module
     }
 
     /**
-     * @param $arrFields
+     * @param array $arrFields
+     * @param string $strTable
      * @return array
      */
-    private function getHeadline($arrFields, $strTable)
+    private function getHeadline(array $arrFields, string $strTable): array
     {
-        Controller::loadLanguageFile($strTable);
+        /** @var Controller $controllerAdapter */
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+
+        $controllerAdapter->loadLanguageFile($strTable);
+
+        /** @var Translator $translator */
+        $translator = $this->get('translator');
+
         // Write headline
         $arrHeadline = array();
         foreach ($arrFields as $field)
         {
-            $arrHeadline[] = isset($GLOBALS['TL_LANG'][$strTable][$field][0]) ? $GLOBALS['TL_LANG'][$strTable][$field][0] : $field;
+            $fieldname = $translator->trans(sprintf('%s.%s.0', $strTable, $field), [], 'contao_default') ?: $field;
+            $arrHeadline[] = $fieldname;
         }
         return $arrHeadline;
     }
 
     /**
-     * @param $field
-     * @param $objUser
+     * @param string $field
+     * @param Result $objUser
      * @return string
      */
-    private function getField($field, $objUser)
+    private function getField(string $field, Result $objUser): string
     {
+        /** @var Config $configAdapter */
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+
         if ($field === 'password')
         {
-            if (password_verify($this->defaultPassword, $objUser->password))
+            $defaultPassword = $configAdapter->get('SAC_EVT_DEFAULT_BACKEND_PASSWORD');
+
+            if (password_verify($defaultPassword, $objUser->password))
             {
                 // Activate pwchange (=side efect) ;-)
                 $objUserModel = UserModel::findByPk($objUser->id);
@@ -342,7 +371,7 @@ class ModuleSacEventToolCsvExport extends Module
                     $objUserModel->save();
                 }
 
-                return $this->defaultPassword;
+                return $defaultPassword;
             }
             else
             {
@@ -364,13 +393,16 @@ class ModuleSacEventToolCsvExport extends Module
     }
 
     /**
-     * @param $arrData
-     * @param $filename
+     * @param array $arrData
+     * @param string $filename
+     * @return string
      * @throws \League\Csv\Exception
-     * @throws \TypeError
      */
-    private function printCsv($arrData, $filename)
+    private function printCsv(array $arrData, string $filename): string
     {
+        /** @var Writer $writerAdapter */
+        $writerAdapter = $this->get('contao.framework')->getAdapter(Writer::class);
+
         // Convert special chars
         $arrFinal = array();
         foreach ($arrData as $arrRow)
@@ -387,11 +419,11 @@ class ModuleSacEventToolCsvExport extends Module
         header('Content-Disposition: attachment; filename="' . $filename);
 
         // Load the CSV document from a string
-        $csv = Writer::createFromString('');
+        $csv = $writerAdapter->createFromString('');
         $csv->setOutputBOM(Reader::BOM_UTF8);
 
-        $csv->setDelimiter($this->strDelimiter);
-        $csv->setEnclosure($this->strEnclosure);
+        $csv->setDelimiter(static::FIELD_DELIMITER);
+        $csv->setEnclosure(static::FIELD_ENCLOSURE);
 
         // Insert all the records
         $csv->insertAll($arrFinal);

@@ -95,3 +95,20 @@ services:
     - { name: container.service_subscriber }
     public: true
 
+  # Csv Export module: Export members ans users as a csv spreadsheet
+  Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvExportController:
+    calls:
+    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+    tags:
+    - { name: contao.frontend_module, category: csv_export }
+    - { name: container.service_subscriber }
+    public: true
+
+  # Event filter form module
+  Markocupic\SacEventToolBundle\Controller\FrontendModule\EventFilterFormController:
+    calls:
+    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+    tags:
+    - { name: contao.frontend_module, category: event_filter_form }
+    - { name: container.service_subscriber }
+    public: true
