@@ -22,9 +22,7 @@ use Haste\Form\Form;
 use Contao\ModuleModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Routing\ScopeMatcher;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
@@ -74,12 +72,15 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
             $this->objUser = $objUser;
         }
 
-        // Neither cache nor search page
-        $page->noSearch = 1;
-        $page->cache = 0;
+        if ($page !== null)
+        {
+            // Neither cache nor search page
+            $page->noSearch = 1;
+            $page->cache = 0;
 
-        // Set the page object
-        $this->objPage = $page;
+            // Set the page object
+            $this->objPage = $page;
+        }
 
         $this->projectDir = System::getContainer()->getParameter('kernel.project_dir');
 
@@ -111,7 +112,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         // Do not allow for not authorized users
         if ($this->objUser === null)
         {
-            throw new UnauthorizedHttpException();
+            throw new UnauthorizedHttpException('Not authorized. Please log in as frontend user.');
         }
 
         $this->template = $template;

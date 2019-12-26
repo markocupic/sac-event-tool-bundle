@@ -19,7 +19,6 @@ use Contao\FilesModel;
 use Contao\Folder;
 use Contao\FrontendUser;
 use Contao\Input;
-use Contao\StringUtil;
 use Contao\Template;
 use Contao\MemberModel;
 use Contao\Message;
@@ -29,9 +28,7 @@ use Haste\Form\Form;
 use Contao\ModuleModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Routing\ScopeMatcher;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
@@ -84,18 +81,16 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             $this->objUser = $objUser;
         }
 
-        // Do not allow for not authorized users
-        if ($this->objUser === null)
+        if ($page !== null)
         {
-            throw new UnauthorizedHttpException();
+            // Neither cache nor search page
+            $page->noSearch = 1;
+            $page->cache = 0;
+
+            // Set the page object
+            $this->objPage = $page;
         }
 
-        // Neither cache nor search page
-        $page->noSearch = 1;
-        $page->cache = 0;
-
-        // Set the page object
-        $this->objPage = $page;
 
         // Rotate image by 90°
         if ($inputAdapter->get('do') === 'rotate-image' && $inputAdapter->get('fileId') != '')
@@ -134,6 +129,12 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
+        // Do not allow for not authorized users
+        if ($this->objUser === null)
+        {
+            throw new UnauthorizedHttpException('Not authorized. Please log in as frontend user.');
+        }
+
         $this->template = $template;
 
         // Set adapters

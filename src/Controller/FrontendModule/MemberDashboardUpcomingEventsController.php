@@ -15,7 +15,6 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Environment;
 use Contao\Events;
 use Contao\FrontendUser;
@@ -29,7 +28,6 @@ use Contao\UserModel;
 use Contao\Validator;
 use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
@@ -74,9 +72,12 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
             $this->objUser = $objUser;
         }
 
-        // Neither cache nor search page
-        $page->noSearch = 1;
-        $page->cache = 0;
+        if ($page !== null)
+        {
+            // Neither cache nor search page
+            $page->noSearch = 1;
+            $page->cache = 0;
+        }
 
         // Sign out from Event
         if ($inputAdapter->get('do') === 'unregisterUserFromEvent')
@@ -113,7 +114,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         // Do not allow for not authorized users
         if ($this->objUser === null)
         {
-            throw new UnauthorizedHttpException();
+            throw new UnauthorizedHttpException('Not authorized. Please log in as frontend user.');
         }
 
         $this->template = $template;

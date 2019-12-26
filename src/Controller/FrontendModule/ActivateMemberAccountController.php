@@ -15,7 +15,6 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
@@ -36,8 +35,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Symfony\Component\Translation\TranslatorInterface;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
  * Class ActivateMemberAccountController

@@ -12,7 +12,6 @@ namespace Markocupic\SacEventToolBundle\Controller;
 
 use Markocupic\SacEventToolBundle\FrontendAjax\EventApi;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Contao\Input;
 use Symfony\Component\Routing\Annotation\Route;
