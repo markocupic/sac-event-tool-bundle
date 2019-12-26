@@ -134,7 +134,7 @@ class WorkshopTCPDF extends \TCPDF
             $this->setY(275);
             $this->setFillColorArray(array(255, 255, 255));  // white
             $this->setTextColor(55, 55, 55);
-            $date = \Date('Y', $this->Event->startDate);
+            $date = \Date('Y', (int) $this->Event->startDate);
             $this->Cell(210, 10, 'SAC Sektion Pilatus Ausbildung ' . $date, 0, 1, 'C', 1, '', 0);
         }
 

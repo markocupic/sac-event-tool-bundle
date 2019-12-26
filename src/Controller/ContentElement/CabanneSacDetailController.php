@@ -79,7 +79,7 @@ class CabanneSacDetailController extends AbstractContentElementController
         $projectDir = System::getContainer()->getParameter('kernel.project_dir');
 
         // Add data to template
-        $objCabanne = $cabanneSacModelAdapter::findByPk($model->cabanneSac);
+        $objCabanne = $cabanneSacModelAdapter->findByPk($model->cabanneSac);
         if ($objCabanne !== null)
         {
             $skip = array('id', 'tstamp');

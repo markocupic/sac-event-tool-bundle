@@ -327,19 +327,19 @@ class PrintWorkshopsAsPdf
         $objPartial->organizers = implode(', ', $arrItems);
 
         // Teasertext
-        $objPartial->teaser = nl2br($objCalendar->teaser);
+        $objPartial->teaser = $this->nl2br($objCalendar->teaser);
 
         // Event terms
-        $objPartial->terms = nl2br($objCalendar->terms);
+        $objPartial->terms = $this->nl2br($objCalendar->terms);
 
         // Event Issues
-        $objPartial->issues = nl2br($objCalendar->issues);
+        $objPartial->issues = $this->nl2br($objCalendar->issues);
 
         // Requirements
-        $objPartial->requirements = nl2br($objCalendar->requirements);
+        $objPartial->requirements = $this->nl2br($objCalendar->requirements);
 
         // Event location
-        $objPartial->location = nl2br($objCalendar->location);
+        $objPartial->location = $this->nl2br($objCalendar->location);
 
         // Mountainguide
         $objPartial->mountainguide = $objCalendar->mountainguide;
@@ -358,19 +358,19 @@ class PrintWorkshopsAsPdf
         $objPartial->instructor = implode(', ', $arrItems);
 
         // Services/Leistungen
-        $objPartial->leistungen = nl2br($objCalendar->leistungen);
+        $objPartial->leistungen = $this->nl2br($objCalendar->leistungen);
 
         // Signin
-        $objPartial->bookingEvent = str_replace('(at)', '@', html_entity_decode(nl2br($objCalendar->bookingEvent)));
+        $objPartial->bookingEvent = str_replace('(at)', '@', html_entity_decode($this->nl2br($objCalendar->bookingEvent)));
 
         // Equipment
-        $objPartial->equipment = nl2br($objCalendar->equipment);
+        $objPartial->equipment = $this->nl2br($objCalendar->equipment);
 
         // Meeting point
-        $objPartial->meetingPoint = nl2br($objCalendar->meetingPoint);
+        $objPartial->meetingPoint = $this->nl2br($objCalendar->meetingPoint);
 
         // Miscelaneous
-        $objPartial->miscellaneous = nl2br($objCalendar->miscellaneous);
+        $objPartial->miscellaneous = $this->nl2br($objCalendar->miscellaneous);
 
         // Styles
         $objPartial->titleStyle = "color:#000000; font-family: 'opensansbold'; font-size: 20px";
@@ -386,6 +386,19 @@ class PrintWorkshopsAsPdf
         $objPartial->cellStyleC = "color: #000000; font-family: 'opensansbold'; font-size: 9px";
 
         return $objPartial->parse();
+    }
+
+    /**
+     * @param string $string
+     * @return string
+     */
+    protected function nl2br($string = ''): string
+    {
+        if (null === $string)
+        {
+            return '';
+        }
+        return nl2br($string);
     }
 
     /**
