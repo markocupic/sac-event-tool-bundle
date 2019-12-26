@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\ContentElement;
 
+use Contao\CabanneSacModel;
 use Contao\ContentModel;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
@@ -72,36 +73,44 @@ class CabanneSacDetailController extends AbstractContentElementController
         /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
 
+        /** @var CabanneSacModel $cabanneSacModelAdapter */
+        $cabanneSacModelAdapter = $this->get('contao.framework')->getAdapter(CabanneSacModel::class);
+
         $projectDir = System::getContainer()->getParameter('kernel.project_dir');
 
         // Add data to template
-        $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_cabanne_sac WHERE id=?')->execute($model->cabanneSac);
-        if ($objDb->numRows)
+        $objCabanne = $cabanneSacModelAdapter::findByPk($model->cabanneSac);
+        if ($objCabanne !== null)
         {
             $skip = array('id', 'tstamp');
-            foreach ($objDb->fetchAssoc() as $k => $v)
+            foreach ($objCabanne->row() as $k => $v)
             {
                 if (!in_array($k, $skip))
                 {
                     $template->$k = $v;
                 }
             }
-        }
-        $objFiles = $filesModelAdapter->findByUuid($objDb->singleSRC);
+            $objFiles = $filesModelAdapter->findByUuid($objCabanne->singleSRC);
 
-        if ($objFiles !== null && is_file($projectDir . '/' . $objFiles->path))
-        {
-            $model->singleSRC = $objFiles->path;
-            $controllerAdapter->addImageToTemplate($template, $model->row(), null, 'cabanneDetail', $objFiles);
+            if ($objFiles !== null && is_file($projectDir . '/' . $objFiles->path))
+            {
+                $model->singleSRC = $objFiles->path;
+                $controllerAdapter->addImageToTemplate($template, $model->row(), null, 'cabanneDetail', $objFiles);
+            }
+
+            // coordsCH1903
+            if (!empty($objCabanne->coordsCH1903))
+            {
+                if (strpos($objCabanne->coordsCH1903, '/') !== false)
+                {
+                    $template->hasCoords = true;
+                    $arrCoord = explode('/', $objCabanne->coordsCH1903);
+                    $template->coordsCH1903X = trim($arrCoord[0]);
+                    $template->coordsCH1903Y = trim($arrCoord[1]);
+                }
+            }
         }
 
-        // coordsCH1903
-        if (strpos($model->coordsCH1903, '/') !== false)
-        {
-            $arrCoord = explode('/', $model->coordsCH1903);
-            $template->coordsCH1903X = trim($arrCoord[0]);
-            $template->coordsCH1903Y = trim($arrCoord[1]);
-        }
         return $template->getResponse();
     }
 

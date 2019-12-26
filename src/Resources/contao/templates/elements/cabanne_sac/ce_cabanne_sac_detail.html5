@@ -143,10 +143,12 @@
 
 
         <div class="col-xl-4">
+            <?php if($this->hasCoords): ?>
             <?php $geoLink = '//map.geo.admin.ch/embed.html?lang=de&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege&E=%s.00&N=%s.00&zoom=7&crosshair=marker'; ?>
             <div class="embed-responsive embed-responsive-4by3">
                 <iframe src="<?= sprintf($geoLink, $this->coordsCH1903X, $this->coordsCH1903Y) ?>"></iframe>
             </div>
+            <?php endif; ?>
         </div>
     </div><!-- end row -->
 
