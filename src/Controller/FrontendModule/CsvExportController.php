@@ -142,7 +142,7 @@ class CsvExportController extends AbstractFrontendModuleController
         {
             if ($inputAdapter->post('FORM_SUBMIT') === 'form-user-export')
             {
-                $blnKeepGroupsInOneLine = $inputAdapter->post('keep-groups-in-one-line');
+                $blnKeepGroupsInOneLine = $inputAdapter->post('keep-groups-in-one-line') ? true : false;
 
                 $exportType = $inputAdapter->post('export-type');
 
@@ -408,7 +408,7 @@ class CsvExportController extends AbstractFrontendModuleController
         foreach ($arrData as $arrRow)
         {
             $arrLine = array_map(function ($v) {
-                return html_entity_decode(htmlspecialchars_decode($v));
+                return html_entity_decode(htmlspecialchars_decode((string)$v));
             }, $arrRow);
             $arrFinal[] = $arrLine;
         }

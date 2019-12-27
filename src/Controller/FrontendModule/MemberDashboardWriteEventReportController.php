@@ -231,7 +231,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                         // Add security token
                         $insertId = $objInsertStmt->insertId;
                         $set = array();
-                        $set['securityToken'] = md5(rand(100000000, 999999999)) . $insertId;
+                        $set['securityToken'] = (string)md5((string)rand(100000000, 999999999)) . $insertId;
                         $databaseAdapter->getInstance()->prepare('UPDATE tl_calendar_events_story %s WHERE id=?')->set($set)->execute($insertId);
                     }
                     $objReportModel = $calendarEventsStoryModelAdapter->findByPk($insertId);
@@ -313,7 +313,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             'label'     => 'Touren-/Lager-/Kursbericht',
             'inputType' => 'textarea',
             'eval'      => array('decodeEntities' => true),
-            'value'     => html_entity_decode($objEventStoryModel->text)
+            'value'     => html_entity_decode((string)$objEventStoryModel->text)
 
         ));
 

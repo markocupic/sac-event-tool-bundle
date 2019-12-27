@@ -374,7 +374,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         foreach ($arrData as $arrRow)
         {
             $arrLine = array_map(function ($v) {
-                return html_entity_decode(htmlspecialchars_decode($v));
+                return html_entity_decode(htmlspecialchars_decode((string)$v));
             }, $arrRow);
             $arrFinal[] = $arrLine;
         }

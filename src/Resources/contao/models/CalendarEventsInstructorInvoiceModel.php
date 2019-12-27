@@ -16,6 +16,7 @@ namespace Contao;
 /**
  * Class CalendarEventsInstructorInvoiceModel
  * @package Contao
+ * @method findByPk($invoiceId)
  */
 class CalendarEventsInstructorInvoiceModel extends \Model
 {
