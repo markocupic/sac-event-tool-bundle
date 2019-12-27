@@ -30,10 +30,10 @@ class tl_calendar_events_story extends Backend
     public function setPalettes()
     {
         // Overwrite readonly attribute for admins
-        if($this->User->admin)
+        if ($this->User->admin)
         {
             $fields = array('sacMemberId', 'eventId', 'authorName');
-            foreach($fields as $field)
+            foreach ($fields as $field)
             {
                 $GLOBALS['TL_DCA']['tl_calendar_events_story']['fields'][$field]['eval']['readonly'] = false;
             }
@@ -50,7 +50,6 @@ class tl_calendar_events_story extends Backend
         // Delete old and unpublished stories
         $limit = time() - 60 * 60 * 24 * 30;
         Database::getInstance()->prepare('DELETE FROM tl_calendar_events_story WHERE tstamp<? AND publishState<?')->execute($limit, 3);
-
 
         // Delete unfinished stories older the 14 days
         $limit = time() - 60 * 60 * 24 * 14;
@@ -82,7 +81,6 @@ class tl_calendar_events_story extends Backend
         }
     }
 
-
     /**
      * @param $strContent
      * @param $strTemplate
@@ -90,9 +88,7 @@ class tl_calendar_events_story extends Backend
      */
     public function parseBackendTemplate($strContent, $strTemplate)
     {
-
     }
-
 
     /**
      * Add an image to each record
@@ -118,138 +114,4 @@ class tl_calendar_events_story extends Backend
         return $args;
     }
 
-
-    /**
-     * Return the "toggle visibility" button
-     *
-     * @param array $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     *
-     * @return string
-     */
-    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-    {
-        if (strlen(Input::get('tid')))
-        {
-            $this->toggleVisibility(Input::get('tid'), (Input::get('state') == 1), (@func_get_arg(12) ?: null));
-            $this->redirect($this->getReferer());
-        }
-
-
-        // Allow full access only to admins, owners and allowed groups
-        if ($this->User->isAdmin)
-        {
-            // Full access to admins
-        }
-        elseif (array_intersect(StringUtil::deserialize($this->User->groups, true), array(Config::get('SAC_EVT_GRUPPE_EVENTERFASSUNG_HAUPTREDAKTOREN'))))
-        {
-            // If user belongs to group "Hauptredaktor" grant full rights.
-        }
-        else
-        {
-            $id = Input::get('id');
-            $objEvent = CalendarEventsModel::findByPk($id);
-            if ($objEvent !== null)
-            {
-                $arrAuthors = StringUtil::deserialize($objEvent->author, true);
-                if (!in_array($this->User->id, $arrAuthors))
-                {
-                    return '';
-                }
-            }
-        }
-
-
-        $href .= '&amp;tid=' . $row['id'] . '&amp;state=' . $row['disable'];
-
-        if ($row['disable'])
-        {
-            $icon = 'invisible.svg';
-        }
-
-        return '<a href="' . $this->addToUrl($href) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, 'data-state="' . ($row['disable'] ? 0 : 1) . '"') . '</a> ';
-    }
-
-
-    /**
-     * Disable/enable a registration
-     *
-     * @param integer $intId
-     * @param boolean $blnVisible
-     * @param DataContainer $dc
-     *
-     * @throws \Contao\CoreBundle\Exception\AccessDeniedException
-     */
-    public function toggleVisibility($intId, $blnVisible, DataContainer $dc = null)
-    {
-        // Set the ID and action
-        Input::setGet('id', $intId);
-        Input::setGet('act', 'toggle');
-
-        if ($dc)
-        {
-            $dc->id = $intId; // see #8043
-        }
-
-
-        // Allow full access only to admins, owners and allowed groups
-        if ($this->User->isAdmin)
-        {
-        }
-        elseif (array_intersect(StringUtil::deserialize($this->User->groups, true), array(Config::get('SAC_EVT_GRUPPE_EVENTERFASSUNG_HAUPTREDAKTOREN'))))
-        {
-            // If user belongs to group "Hauptredaktor" grant full rights.
-        }
-        else
-        {
-            $id = Input::get('id');
-            $objEvent = CalendarEventsModel::findByPk($id);
-            if ($objEvent !== null)
-            {
-                $arrAuthors = StringUtil::deserialize($objEvent->author, true);
-                if (!in_array($this->User->id, $arrAuthors))
-                {
-                    throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to activate/deactivate registration ID ' . $id . '.');
-                }
-            }
-        }
-
-
-        $objVersions = new Versions('tl_calendar_events_story', $intId);
-        $objVersions->initialize();
-
-        // Reverse the logic (members have disabled=1)
-        $blnVisible = !$blnVisible;
-
-        // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_calendar_events_story']['fields']['disable']['save_callback']))
-        {
-            foreach ($GLOBALS['TL_DCA']['tl_calendar_events_story']['fields']['disable']['save_callback'] as $callback)
-            {
-                if (is_array($callback))
-                {
-                    $this->import($callback[0]);
-                    $blnVisible = $this->{$callback[0]}->{$callback[1]}($blnVisible, ($dc ?: $this));
-                }
-                elseif (is_callable($callback))
-                {
-                    $blnVisible = $callback($blnVisible, ($dc ?: $this));
-                }
-            }
-        }
-
-        $time = time();
-
-        // Update the database
-        $this->Database->prepare("UPDATE tl_calendar_events_story SET tstamp=$time, disable='" . ($blnVisible ? '1' : '') . "' WHERE id=?")
-            ->execute($intId);
-
-        $objVersions->create();
-
-
-    }
 }

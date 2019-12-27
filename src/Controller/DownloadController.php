@@ -45,14 +45,14 @@ class DownloadController extends AbstractController
         /** @var $pdf PrintWorkshopsAsPdf */
         $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf');
 
-        $year = Input::get('year') != '' ? Input::get('year') : null;
-        $calendarId = Input::get('calendarId') != '' ? Input::get('calendarId') : null;
+        $year = Input::get('year') != '' ? (int)Input::get('year') : null;
+        $calendarId = Input::get('calendarId') != '' ? (int)Input::get('calendarId') : null;
 
         if (!empty($year))
         {
             if ($year == 'current')
             {
-                $year = Date::parse('Y');
+                $year = (int)Date::parse('Y');
             }
             $pdf = $pdf->setYear($year);
         }
@@ -102,7 +102,7 @@ class DownloadController extends AbstractController
         /** @var $pdf PrintWorkshopsAsPdf */
         $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf');
 
-        $eventId = Input::get('eventId') ? Input::get('eventId') : null;
+        $eventId = Input::get('eventId') ? (int)Input::get('eventId') : null;
 
         if ($eventId !== null)
         {

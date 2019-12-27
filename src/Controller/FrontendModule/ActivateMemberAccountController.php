@@ -49,7 +49,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
 {
 
     /**
-     * @var integer
+     * @var int
      */
     protected $step;
 
@@ -74,7 +74,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
     protected $partial;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $activationLinkLifetime = 3600;
 

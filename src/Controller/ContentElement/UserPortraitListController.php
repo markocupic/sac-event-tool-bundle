@@ -94,9 +94,9 @@ class UserPortraitListController extends AbstractContentElementController
         }
 
         $arrIDS = array();
+        $arrSelectedRoles = $stringUtilAdapter->deserialize($model->userList_userRoles, true);
         if ($model->userList_selectMode === 'selectUserRoles')
         {
-            $arrSelectedRoles = $stringUtilAdapter->deserialize($model->userList_userRoles, true);
             $queryType = $model->userList_queryType;
             if (count($arrSelectedRoles) > 0)
             {

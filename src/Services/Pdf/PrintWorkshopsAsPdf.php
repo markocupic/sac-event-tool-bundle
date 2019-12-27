@@ -91,11 +91,11 @@ class PrintWorkshopsAsPdf
     }
 
     /**
-     * @param $year
+     * @param int $year
      * @return PrintWorkshopsAsPdf
      * @throws \Exception
      */
-    public function setYear($year): self
+    public function setYear(int $year): self
     {
         if (!checkdate(1, 1, $year))
         {
@@ -106,11 +106,11 @@ class PrintWorkshopsAsPdf
     }
 
     /**
-     * @param $calendarId
+     * @param int $calendarId
      * @return PrintWorkshopsAsPdf
      * @throws \Exception
      */
-    public function setCalendarId($calendarId): self
+    public function setCalendarId(int $calendarId): self
     {
         $objCalendar = CalendarModel::findByPk($calendarId);
         if ($objCalendar === null)
@@ -122,11 +122,11 @@ class PrintWorkshopsAsPdf
     }
 
     /**
-     * @param $eventId
+     * @param int $eventId
      * @return PrintWorkshopsAsPdf
      * @throws \Exception
      */
-    public function setEventId($eventId): self
+    public function setEventId(int $eventId): self
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
         if ($objEvent === null)

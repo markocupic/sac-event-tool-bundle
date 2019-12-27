@@ -455,7 +455,7 @@ class EventRapport
             $transportInfo = '';
             if (strlen($objEventMember->carInfo))
             {
-                if ((integer)$objEventMember->carInfo > 0)
+                if ((int)$objEventMember->carInfo > 0)
                 {
                     $transportInfo .= sprintf(' Auto mit %s Plätzen', $objEventMember->carInfo);
                 }
