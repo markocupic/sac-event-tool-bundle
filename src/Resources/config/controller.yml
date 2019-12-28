@@ -1,0 +1,4 @@
+services:
+  Markocupic\SacEventToolBundle\Controller\AjaxController:
+    public: true
+

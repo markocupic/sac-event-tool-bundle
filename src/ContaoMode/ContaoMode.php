@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * SAC Event Tool Web Plugin for Contao
  * Copyright (c) 2008-2020 Marko Cupic
@@ -7,8 +9,6 @@
  * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
-
-declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\ContaoMode;
 
@@ -58,7 +58,13 @@ class ContaoMode
         $this->scopeMatcher = $scopeMatcher;
 
         // Set the contao mode
-        $this->_setMode();
+        if ($framework !== null)
+        {
+            if ($this->framework->isInitialized())
+            {
+                $this->_setMode();
+            }
+        }
     }
 
     /**
@@ -95,9 +101,12 @@ class ContaoMode
      */
     public function isFrontend(): bool
     {
-        if ($this->framework->isInitialized() && $this->requestStack->getMasterRequest() && !$this->isBackend())
+        if ($this->framework !== null)
         {
-            return true;
+            if ($this->framework->isInitialized() && $this->requestStack->getMasterRequest() && !$this->isBackend())
+            {
+                return true;
+            }
         }
         return false;
     }
@@ -108,13 +117,16 @@ class ContaoMode
      */
     public function isBackend(): bool
     {
-        if ($this->framework->isInitialized())
+        if ($this->framework !== null)
         {
-            if ($this->requestStack !== null)
+            if ($this->framework->isInitialized())
             {
-                if ($this->requestStack->getMasterRequest() !== null)
+                if ($this->requestStack !== null)
                 {
-                    return $this->scopeMatcher->isBackendRequest($this->requestStack->getMasterRequest());
+                    if ($this->requestStack->getMasterRequest() !== null)
+                    {
+                        return $this->scopeMatcher->isBackendRequest($this->requestStack->getMasterRequest());
+                    }
                 }
             }
         }

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * SAC Event Tool Web Plugin for Contao
  * Copyright (c) 2008-2020 Marko Cupic
@@ -6,8 +9,6 @@
  * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
-
-declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DependencyInjection;
 
@@ -35,6 +36,7 @@ class MarkocupicSacEventToolExtension extends Extension
         $loader->load('listener.yml');
         $loader->load('parameters.yml');
         $loader->load('services.yml');
+        //$loader->load('controller.yml');
         $loader->load('controller-contao-frontend-module.yml');
         $loader->load('controller-contao-content-element.yml');
         $loader->load('cron.yml');
