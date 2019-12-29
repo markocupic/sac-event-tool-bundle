@@ -1,11 +1,5 @@
 services:
 
-  # Handle Frontend Ajax requests
-  Markocupic\SacEventToolBundle\Services\FrontendAjax\FrontendAjax:
-    public: true
-    arguments:
-    - '@contao.framework'
-
   # Get Event data by Ajax request (allow origin *)
   Markocupic\SacEventToolBundle\Services\FrontendAjax\EventApi:
     public: true

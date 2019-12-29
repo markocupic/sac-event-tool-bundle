@@ -28,7 +28,6 @@ use Contao\Environment;
 use Contao\EventOrganizerModel;
 use Contao\File;
 use Contao\FilesModel;
-use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
@@ -36,16 +35,15 @@ use Contao\UserModel;
 use Contao\System;
 use Contao\Validator;
 use Haste\Util\Url;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Class AjaxMemberDashboardWriteEventReportController
+ * Class MemberDashboardWriteEventReportController
  * @package Markocupic\SacEventToolBundle\Controller
  */
-class AjaxMemberDashboardWriteEventReportController extends AbstractController
+class MemberDashboardWriteEventReportController extends AbstractController
 {
     /**
      * @var ContaoFramework
@@ -73,7 +71,7 @@ class AjaxMemberDashboardWriteEventReportController extends AbstractController
     private $tokenName;
 
     /**
-     * AjaxMemberDashboardWriteEventReportController constructor.
+     * MemberDashboardWriteEventReportController constructor.
      * Handles ajax requests.
      * Allow if ...
      * - user is logged in frontend user
@@ -122,7 +120,7 @@ class AjaxMemberDashboardWriteEventReportController extends AbstractController
         // Do allow only xhr requests
         if (!$request->isXmlHttpRequest())
         {
-            throw $this->createNotFoundException('The route "/ajax" is allowed to XMLHttpRequest requests only.');
+            throw $this->createNotFoundException('The route "/ajaxMemberDashboardWriteEventReport" is allowed to XMLHttpRequest requests only.');
         }
     }
 

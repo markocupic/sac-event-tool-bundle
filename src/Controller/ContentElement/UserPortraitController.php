@@ -101,7 +101,7 @@ class UserPortraitController extends AbstractContentElementController
         $arrUser = $this->objUser->row();
         $template->user = $arrUser;
 
-        // List all courses
+        // List all events
         $arrEvents = array();
         $objEvent = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE published=? AND startTime > ? ORDER BY startDate')->execute('1', time());
         while ($objEvent->next())
