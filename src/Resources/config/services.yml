@@ -1,11 +1,5 @@
 services:
 
-  # Get Event data by Ajax request (allow origin *)
-  Markocupic\SacEventToolBundle\Services\FrontendAjax\EventApi:
-    public: true
-    arguments:
-    - '@contao.framework'
-
   # Contao Backend Module "Maintenance": Delete no more used event stories media directories
   Markocupic\SacEventToolBundle\Services\ContaoBackendMaintenance\MaintainModuleEventStory:
     public: true
