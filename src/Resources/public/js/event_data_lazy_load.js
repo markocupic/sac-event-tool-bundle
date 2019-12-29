@@ -28,9 +28,8 @@
                     let arrXHR = arrDataXhr;
                     arrDataXhr = [];
                     if (arrXHR.length) {
-                        jQuery.post('ajax', {
+                        jQuery.post('ajaxEventList', {
                             'REQUEST_TOKEN': rt,
-                            'action': 'getEventData',
                             'data': JSON.stringify(arrXHR),
                         }).done(function (json) {
                             if (json.status === 'success') {

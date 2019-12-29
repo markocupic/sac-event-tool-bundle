@@ -143,9 +143,8 @@
                     $('.form-sent-please-wait-content').removeClass('d-none');
                     $('.event-story-form-buttons').removeClass('d-flex').addClass('d-none');
                     var publishState = this.value;
-                    var jqxhr = $.post('ajax', {
+                    var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/setPublishState', {
                         'REQUEST_TOKEN': '{{request_token}}',
-                        'action': 'setPublishState',
                         'eventId': '<?= Contao\Input::get('eventId') ?>',
                         'publishState': publishState,
                         'moduleId': '<?= $this->id ?>'
@@ -210,9 +209,8 @@
                     $(modal).attr('data-item', item);
 
                     // Get caption text by xhr request
-                    var jqxhr = $.post('ajax', {
+                    var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/getCaption', {
                         'REQUEST_TOKEN': '{{request_token}}',
-                        'action': 'getCaption',
                         'fileUuid': fileUuid
                     }).done(function (json) {
                         if (json.status != 'success') {
@@ -241,9 +239,8 @@
                     $(modal).modal('hide');
 
 
-                    var jqxhr = $.post('ajax', {
+                    var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/setCaption', {
                         'REQUEST_TOKEN': '{{request_token}}',
-                        'action': 'setCaption',
                         'fileUuid': fileUuid,
                         'caption': caption,
                         'photographer': photographer
@@ -275,10 +272,9 @@
                     if (elImage.length) {
                         var uuid = $(elImage).data('file-uuid');
                         if (typeof uuid !== 'undefined') {
-                            var jqxhr = $.post('ajax', {
+                            var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/removeImage', {
                                 'REQUEST_TOKEN': '{{request_token}}',
                                 'eventId': '<?= Contao\Input::get('eventId') ?>',
-                                'action': 'removeImage',
                                 'uuid': uuid
                             }).done(function (json) {
                                 if (json.status != 'success') {
@@ -299,10 +295,9 @@
                     if (elImage.length) {
                         var fileId = $(elImage).data('file-id');
                         if (typeof fileId !== 'undefined') {
-                            var jqxhr = $.post('ajax', {
+                            var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/rotateImage', {
                                 'REQUEST_TOKEN': '{{request_token}}',
                                 //'eventId': '<?= Contao\Input::get('eventId') ?>',
-                                'action': 'rotate-image',
                                 'fileId': fileId
                             }).done(function (json) {
                                 if (json.status != 'success') {
@@ -331,10 +326,9 @@
                         $(collection).each(function (index) {
                             arrUuid.push($(this).data('fileUuid'));
                         });
-                        var jqxhr = $.post('ajax', {
+                        var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/sortGallery', {
                             'REQUEST_TOKEN': '{{request_token}}',
                             'eventId': '<?= Contao\Input::get('eventId') ?>',
-                            'action': 'sortGallery',
                             'uuids': JSON.stringify(arrUuid)
                         }).done(function (json) {
                             if (json.status != 'success') {
