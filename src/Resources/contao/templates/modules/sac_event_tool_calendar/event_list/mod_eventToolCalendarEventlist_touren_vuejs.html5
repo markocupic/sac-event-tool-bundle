@@ -92,7 +92,7 @@
     <?php echo $this->events; ?>
 </script>
 
-<script src="bundles/markocupicsaceventtool/js/eventlist_vue.js"></script>
+<script src="bundles/markocupicsaceventtool/js/eventlist__vue.js"></script>
 
 <?php endif; ?>
 
