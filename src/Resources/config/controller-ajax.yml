@@ -21,4 +21,5 @@ services:
     arguments:
     - '@contao.framework'
     - '@request_stack'
+    - "@database_connection"
     public: true

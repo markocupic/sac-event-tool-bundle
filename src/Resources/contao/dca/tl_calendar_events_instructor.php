@@ -18,7 +18,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = array
     (
         'dataContainer'     => 'Table',
         'notCopyable'       => true,
-        'ptable'            => 'tl_course_main_type',
+        'ptable'            => 'tl_calendar_events',
         // Do not copy nor delete records, if an item has been deleted!
         'onload_callback'   => array
         (//
@@ -90,6 +90,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = array
         (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
         ),
+        // Parent: tl_calendar_events.id
         'pid'              => array
         (
             'sql' => "int(10) unsigned NOT NULL default 0",
@@ -98,6 +99,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = array
         (
             'sql' => "int(10) unsigned NOT NULL default 0",
         ),
+        // Parent tl_user.id
         'userId'           => array
         (
             'sql' => "int(10) unsigned NOT NULL default 0",

@@ -81,6 +81,9 @@
     // Lazyload data by ajax
     Eventlist = {
         ids: [],
+        offset: 0,
+        limitOnFirstRequest: 50,
+        limit: 200,
         url: 'ajaxEventApi/getEventDataByIds',
         requestToken: '{{request_token}}',
         fields: ['title', 'eventType', 'eventTitle', 'eventUrl', 'instructors', 'tourTypesShortcuts', 'tourTechDifficulties', 'bookingCounter', 'id', 'eventState', 'eventStateLabel', 'eventDuration', 'eventPeriodLg', 'eventPeriodSm', 'tourTypesIds']

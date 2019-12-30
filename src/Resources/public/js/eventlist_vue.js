@@ -24,9 +24,11 @@ new Vue({
             // If set to false use the button on the bottom of the list to load more items
             enableAutoloading: false,
             // Load x items per request
-            itemsPerRequest: 200,
+            limit: Eventlist.limit,
             // Set number of items that are loaded onthe first request
-            itemsOnFirstRequest: 100,
+            limitOnFirstRequest: Eventlist.limitOnFirstRequest,
+            // Set offset
+            offset: Eventlist.offset,
             // If set to true all items will be loaded at once on the second request
             loadAllOnSecondRequest: false,
 
@@ -42,12 +44,12 @@ new Vue({
     },
     methods: {
         // Prepare ajax request
-        prepareRequest: function prepareRequest() {
+        prepareRequest: function prepareRequest(isPreloadRequest = false) {
             var self = this;
 
             if (self.isBusy === false && self.eventlist.ids.length > self.loadedItems) {
                 self.isBusy = true;
-                self.getDataByXhr();
+                self.getDataByXhr(isPreloadRequest);
                 console.log('Loading events...')
             }
 
@@ -60,38 +62,49 @@ new Vue({
             }
 
         },
+        preload: function preload()
+        {
+            var self = this;
+            self.prepareRequest(true);
+        },
         // Get data by xhr
-        getDataByXhr: function getDataByXhr() {
+        getDataByXhr: function getDataByXhr(isPreloadRequest) {
             var self = this;
             var ids = [];
             var counter = 0;
-            var itemsPerRequest = self.itemsPerRequest;
+            var limit = self.limit;
 
             if (self.allEventsLoaded === true) {
                 return;
             }
 
             if (self.loadedItems === 0) {
-                itemsPerRequest = self.itemsOnFirstRequest;
+                limit = self.limitOnFirstRequest;
             }
 
             if (self.loadedItems > 0 && self.loadAllOnSecondRequest === true) {
-                itemsPerRequest = self.eventlist.ids.length;
+                limit = self.eventlist.ids.length;
             }
 
             for (var i = self.loadedItems; i < self.eventlist.ids.length; i++) {
                 ids.push(self.eventlist.ids[i]);
                 counter++;
 
-                if (counter === itemsPerRequest) {
+                if (counter === limit) {
                     break;
                 }
             }
 
+            var offset = self.offset + self.loadedItems;
+
             var data = {
                 'REQUEST_TOKEN': self.eventlist.requestToken,
-                'ids': ids,
-                'fields': self.eventlist.fields
+                'ids': self.eventlist.ids,
+                'offset': offset,
+                'limit': limit,
+                'fields': self.eventlist.fields,
+                'sessionCacheToken': btoa(window.location.href),
+                'isPreloadRequest': isPreloadRequest,
             };
 
             var url = self.eventlist.url;
@@ -100,11 +113,12 @@ new Vue({
                 type: 'POST',
                 url: url,
                 data: data,
-                dataType: 'json'
+                dataType: 'json',
             });
 
             xhr.done(function (data) {
                 self.isBusy = false;
+
                 data['arrEventData'].forEach(function (row) {
                     self.rows.push(row);
                     self.loadedItems++;
@@ -117,8 +131,14 @@ new Vue({
                 if (self.allEventsLoaded === false && self.eventlist.ids.length === self.loadedItems) {
                     self.allEventsLoaded = true;
                     console.log('Finished downloading process. ' + self.loadedItems + ' events loaded.');
+                }else{
+                    console.log(data['isPreloadRequest']);
+                    if(data['isPreloadRequest'] === false)
+                    {
+                        // Preload
+                        self.preload();
+                    }
                 }
-
             });
         }
     }
