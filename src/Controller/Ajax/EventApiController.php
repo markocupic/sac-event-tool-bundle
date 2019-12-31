@@ -14,13 +14,14 @@ namespace Markocupic\SacEventToolBundle\Controller\Ajax;
 
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\FrontendCache\SessionCache\SessionCache;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -45,10 +46,15 @@ class EventApiController extends AbstractController
     private $connection;
 
     /**
-     * Cache response in session
-     * @const CACHE_TIMEOUT seconds
+     * @var SessionCache
      */
-    private const CACHE_TIMEOUT = 180;
+    private $sessionCache;
+
+    /**
+     * Cache response in session
+     * @const CACHE_EXPIRATION_TIMEOUT seconds
+     */
+    private const CACHE_EXPIRATION_TIMEOUT = 180;
 
     /**
      * @var string
@@ -63,11 +69,12 @@ class EventApiController extends AbstractController
      * @param ContaoFramework $framework
      * @param RequestStack $requestStack
      */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, SessionCache $sessionCache)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
+        $this->sessionCache = $sessionCache;
 
         $this->framework->initialize();
 
@@ -89,6 +96,7 @@ class EventApiController extends AbstractController
      */
     public function getEventDataByIds(): JsonResponse
     {
+
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
@@ -106,23 +114,19 @@ class EventApiController extends AbstractController
         $isPreloadRequest = ($request->request->get('isPreloadRequest') != 'true') ? false : true;
 
         $this->sessionCacheToken = $request->request->get('sessionCacheToken');
-        if (!isset($_SESSION[$this->sessionCacheToken]))
-        {
-            $_SESSION[$this->sessionCacheToken] = array();
-        }
 
         $arrJSON = array(
-            'CACHE_TIMEOUT'          => static::CACHE_TIMEOUT,
-            'loadedItemsFromSession' => 0,
-            'status'                 => 'success',
-            'isPreloadRequest'       => $isPreloadRequest,
-            'sessionCacheToken'           => $this->sessionCacheToken,
-            'countItems'             => 0,
-            'offset'                 => $offset,
-            'limit'                  => $limit,
-            'eventIds'               => $arrIds,
-            'arrFields'              => $arrFields,
-            'arrEventData'           => array(),
+            'CACHE_EXPIRATION_TIMEOUT' => static::CACHE_EXPIRATION_TIMEOUT,
+            'loadedItemsFromSession'   => 0,
+            'status'                   => 'success',
+            'isPreloadRequest'         => $isPreloadRequest,
+            'sessionCacheToken'        => $this->sessionCacheToken,
+            'countItems'               => 0,
+            'offset'                   => $offset,
+            'limit'                    => $limit,
+            'eventIds'                 => $arrIds,
+            'arrFields'                => $arrFields,
+            'arrEventData'             => array(),
         );
 
         /** @var QueryBuilder $qb */
@@ -157,9 +161,9 @@ class EventApiController extends AbstractController
             $objEvent = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
             if ($objEvent !== null)
             {
-                if ($this->hasInSessionCache($arrEvent['id'], 'data'))
+                $strToken = $this->sessionCacheToken . $arrEvent['id'];
+                if (null !== ($oData = $this->sessionCache->get($strToken)))
                 {
-                    $oData = $this->getFromSessionCache($arrEvent['id'], 'data');
                     $arrJSON['loadedItemsFromSession']++;
                 }
                 if ($oData === null)
@@ -171,7 +175,7 @@ class EventApiController extends AbstractController
                         $objEventsHelper = $calendarEventsHelperAdapter->getEventData($objEvent, $field);
                         $oData->{$field} = $objEventsHelper;
                     }
-                    $this->saveToSessionCache($arrEvent['id'], 'data', $oData);
+                    $this->sessionCache->set($strToken, $oData, static::CACHE_EXPIRATION_TIMEOUT + time());
                 }
 
                 $arrJSON['arrEventData'][] = $oData;
@@ -188,63 +192,6 @@ class EventApiController extends AbstractController
 
         // Allow cross domain requests
         return new JsonResponse($arrJSON, 200, array('Access-Control-Allow-Origin' => '*'));
-    }
-
-    /**
-     * @param $eventId
-     * @param $key
-     * @param $value
-     */
-    private function saveToSessionCache($eventId, string $key, $value): void
-    {
-        if (!isset($_SESSION[$this->sessionCacheToken]))
-        {
-            $_SESSION[$this->sessionCacheToken] = array();
-        }
-        $_SESSION[$this->sessionCacheToken][$eventId][$key] = $value;
-        $_SESSION[$this->sessionCacheToken][$eventId]['tstamp'] = time();
-    }
-
-    /**
-     * @param $eventId
-     * @param string $key
-     * @return mixed|null
-     */
-    private function getFromSessionCache($eventId, string $key)
-    {
-        if (!isset($_SESSION[$this->sessionCacheToken]))
-        {
-            $_SESSION[$this->sessionCacheToken] = array();
-        }
-
-        if (isset($_SESSION[$this->sessionCacheToken][$eventId]['tstamp']) && isset($_SESSION[$this->sessionCacheToken][$eventId][$key]))
-        {
-            if ((int)$_SESSION[$this->sessionCacheToken][$eventId]['tstamp'] + (int)static::CACHE_TIMEOUT > time())
-            {
-                return $_SESSION[$this->sessionCacheToken][$eventId][$key];
-            }
-            else
-            {
-                unset($_SESSION[$this->sessionCacheToken][$eventId]);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param $eventId
-     * @param string $key
-     * @return bool
-     */
-    private function hasInSessionCache($eventId, string $key): bool
-    {
-        if (null !== $this->getFromSessionCache($eventId, $key))
-        {
-            return true;
-        }
-
-        return false;
     }
 
 }

@@ -1,4 +1,7 @@
 services:
+  # Simple session cache service for the usage in the event lsit module
+  Markocupic\SacEventToolBundle\FrontendCache\SessionCache\SessionCache:
+    public: true
 
   # Contao Backend Module "Maintenance": Delete no more used event stories media directories
   Markocupic\SacEventToolBundle\Services\ContaoBackendMaintenance\MaintainModuleEventStory:

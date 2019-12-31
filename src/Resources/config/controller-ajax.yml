@@ -21,5 +21,6 @@ services:
     arguments:
     - '@contao.framework'
     - '@request_stack'
-    - "@database_connection"
+    - '@database_connection'
+    - '@Markocupic\SacEventToolBundle\FrontendCache\SessionCache\SessionCache'
     public: true
