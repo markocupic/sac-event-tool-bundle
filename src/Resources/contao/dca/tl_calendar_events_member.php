@@ -460,6 +460,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['bookingType'],
             'exclude'   => true,
             'inputType' => 'select',
+            'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
             'options'   => array('onlineForm', 'manually'),
             'eval'      => array('doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true,),
             'sql'       => "varchar(255) NOT NULL default 'manually'",
