@@ -146,7 +146,7 @@
         <tr class="event-export-row-body row-fe-edit d-none" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
           <td class="event-export-editEvent"></td>
           <td class="event-export-editEvent">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal_event_<?= $arrEvent['id'] ?>">Bearbeiten</button>
+            <button type="button" class="btn btn-primary" data-targetmodal="editCourseModal" data-eventid="<?= $arrEvent['id'] ?>">Bearbeiten</button>
           </td>
         </tr>
 
@@ -156,28 +156,28 @@
     </tbody>
   </table>
 
-  <?php foreach ($this->courses as $arrEvent): ?>
-    <!-- The Modal for frontend editing-->
-    <div class="modal" id="modal_event_<?= $arrEvent['id'] ?>">
+    <!-- The Course Modal for frontend editing-->
+    <div class="modal" id="editCourseModal">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <!-- Modal Header -->
           <div class="modal-header">
-            <h4 class="modal-title"><?= $arrEvent['title'] ?></h4>
+            <h4 class="modal-title" data-event="title"></h4>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
           <!-- Modal body -->
           <div class="modal-body">
-            <form id="editEventForm_<?= $arrEvent['id'] ?>" method="post" action="{{env::request}}">
+            <form method="post" action="{{env::request}}">
               <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
               <input type="hidden" name="FORM_SUBMIT" value="edit-event">
-              <input type="hidden" name="id" value="<?= $arrEvent['id'] ?>">
-              <input type="hidden" name="submitted_fields" value="<?= implode(';', $arrEvent['feEditables']) ?>">
-              <?php foreach ($arrEvent['feEditables'] as $field): ?>
+              <input type="hidden" name="EVENT_TYPE" value="course">
+              <input type="hidden" name="id" data-event="id" value="">
+              <?php foreach ($this->courseFeEditableFields as $field): ?>
+                <?php if($field === 'title') continue; ?>
                 <!-- <?= $field ?> -->
                 <div class="form-group">
                   <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?></label>
-                  <textarea class="form-control" rows="3" id="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>" name="<?= $field ?>"><?= \Contao\CalendarEventsModel::findByPk($arrEvent['id'])->{$field} ?></textarea>
+                  <textarea class="form-control" rows="3" data-event="<?= $field ?>" name="<?= $field ?>"></textarea>
                 </div>
               <?php endforeach; ?>
               <button type="button" class="btn btn-primary send-form">Änderungen Speichern</button>
@@ -190,8 +190,7 @@
         </div>
       </div>
     </div>
-    <!-- End modal -->
-    <?php endforeach; ?>
+    <!-- End Course modal -->
 
 
 <?php endif; ?>
@@ -356,7 +355,7 @@
           <tr class="event-export-row-body row-fe-edit d-none" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
             <td class="event-export-editEvent"></td>
             <td class="event-export-editEvent">
-              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal_event_<?= $arrEvent['id'] ?>">Bearbeiten</button>
+              <button type="button" class="btn btn-primary" data-targetmodal="editTourModal" data-eventid="<?= $arrEvent['id'] ?>">Bearbeiten</button>
             </td>
           </tr>
 
@@ -367,54 +366,93 @@
   <?php endif; ?>
 <?php endforeach; ?>
 
-<?php $arrTypes = array('tours', 'general_events'); ?>
-<?php foreach($arrTypes as $type): ?>
-  <?php if ($this->{$type}): ?>
-    <?php foreach ($this->{$type} as $arrOrganizer): ?>
-      <?php foreach ($arrOrganizer['events'] as $arrEvent): ?>
-        <!-- The Modal for frontend editing-->
-        <div class="modal" id="modal_event_<?= $arrEvent['id'] ?>">
-          <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-              <!-- Modal Header -->
-              <div class="modal-header">
-                <h4 class="modal-title"><?= $arrEvent['title'] ?></h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-              </div>
-              <!-- Modal body -->
-              <div class="modal-body">
-                <form id="editEventForm_<?= $arrEvent['id'] ?>" method="post" action="{{env::request}}">
-                  <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
-                  <input type="hidden" name="FORM_SUBMIT" value="edit-event">
-                  <input type="hidden" name="id" value="<?= $arrEvent['id'] ?>">
-                  <input type="hidden" name="submitted_fields" value="<?= implode(';', $arrOrganizer['feEditables']) ?>">
-                    <?php foreach ($arrOrganizer['feEditables'] as $field): ?>
-                      <!-- <?= $field ?> -->
-                      <div class="form-group">
-                        <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?></label>
-                        <textarea class="form-control" rows="3" id="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>" name="<?= $field ?>"><?= \Contao\CalendarEventsModel::findByPk($arrEvent['id'])->{$field} ?></textarea>
-                      </div>
-                    <?php endforeach; ?>
-                  <button type="button" class="btn btn-danger send-form">Änderungen Speichern</button>
-                </form>
-              </div>
-              <!-- Modal footer -->
-              <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-              </div>
-            </div>
+<!-- The Tour Modal for frontend editing-->
+<div class="modal" id="editTourModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title" data-event="title"></h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body">
+        <form method="post" action="{{env::request}}">
+          <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
+          <input type="hidden" name="FORM_SUBMIT" value="edit-event">
+          <input type="hidden" name="EVENT_TYPE" value="course">
+          <input type="hidden" name="id" data-event="id" value="">
+          <?php foreach ($this->tourFeEditableFields as $field): ?>
+          <?php if($field === 'title') continue; ?>
+          <!-- <?= $field ?> -->
+          <div class="form-group">
+            <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?></label>
+            <textarea class="form-control" rows="3" data-event="<?= $field ?>" name="<?= $field ?>"></textarea>
           </div>
-        </div>
-        <!-- End modal -->
-        <?php endforeach; ?>
-      <?php endforeach; ?>
-  <?php endif; ?>
-<?php endforeach; ?>
-
+          <?php endforeach; ?>
+          <button type="button" class="btn btn-primary send-form">Änderungen Speichern</button>
+        </form>
+      </div>
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Schliessen</button>
+      </div>
+    </div>
+  </div>
+</div><!-- End Course modal -->
 
 <script>
     (function ($) {
         $(document).ready(function () {
+
+
+            /**
+             * Catch event data from API
+             */
+            $('button[data-targetmodal]').click(function(e){
+                e.stopPropagation();
+                var modal = $('#' + $(e.target).data('targetmodal'));
+
+                var eventId = $(e.target).data('eventid');
+
+                $(modal).on('show.bs.modal', function (e) {
+                    var form = $(modal).find('form');
+                    form.find('[name="id"').val(eventId);
+                    var formData = $(form).serialize();
+
+                    // Clear modal
+                    $(modal).find('[data-event="title"]').text('');
+                    $(modal).find('textarea[data-event]').val('');
+                    // Fetch data
+                    $.ajax({
+                        url: 'ajaxEventApi/getEventById',
+                        type: 'POST',
+                        data: formData
+                    }).done(function (response) {
+                        if(response['status'] === 'success')
+                        {
+                            var aEvent = response['arrEventData'];
+                            // Show event title in the modal header
+                            $(modal).find('[data-event="title"]').text(aEvent['title']);
+
+                            // Fill textareas with values
+                            for (fieldname in aEvent) {
+                                if ($(modal).find('textarea[data-event="' + fieldname + '"')) {
+                                    $(modal).find('textarea[data-event="' + fieldname + '"').first().val(aEvent[fieldname]);
+                                }
+                            }
+                        }
+                    });
+                });
+                // Open modal
+                $(modal).modal('show');
+
+                // !important: unbind event from modal
+                $(modal).off('show.bs.modal');
+                $(modal).unbind('show.bs.modal');
+            });
+
+
 
             // Set fe-edit-button label and toggle "d-none" class
             if(sessionStorage.getItem('enable-frontend-edit') == 'true'){
@@ -456,12 +494,17 @@
                 }
             });
 
+            /**
+             * Scroll to last position
+             */
             if (sessionStorage.getItem('scroll-top') > 0) {
                 $(document).scrollTop(sessionStorage.getItem('scroll-top'));
                 sessionStorage.setItem('scroll-top', 0);
             }
 
-            // Click event
+            /**
+             * Save datarecord and close modal
+             */
             $("button.send-form").click(function () {
                 if(confirm('Willst du deine Änderungen am Event wirklich speichern?')) {
                     var modal = $(this).closest('.modal')
@@ -474,8 +517,7 @@
                         type: request_method,
                         data: form_data
                     }).done(function (response) {
-                        var objResponse = jQuery.parseJSON(response);
-                        if (objResponse.status === 'success') {
+                        if (response['status'] === 'success') {
                             var scrollTop = $(document).scrollTop();
                             sessionStorage.setItem('scroll-top', scrollTop);
                             // Reload page
@@ -483,7 +525,7 @@
                             $(formReload).find('.submit').trigger('click');
                             $(modal).modal('hide');
                         } else {
-                            console.log(objResponse.message);
+                            console.log(response.message);
                         }
                     });
                 }

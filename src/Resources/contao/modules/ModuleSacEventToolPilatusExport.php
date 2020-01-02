@@ -15,6 +15,7 @@ use Contao\Calendar;
 use Contao\CalendarEventsJourneyModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
+use Contao\System;
 use Contao\Controller;
 use Contao\Database;
 use Contao\Date;
@@ -26,6 +27,7 @@ use Contao\StringUtil;
 use Contao\Validator;
 use Haste\Form\Form;
 use Patchwork\Utf8;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class ModuleSacEventToolPilatusExport
@@ -91,6 +93,18 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     protected $generalEvents = null;
 
     /**
+     * Editable course fields
+     * @var array
+     */
+    protected $courseFeEditableFields = array('teaser', 'issues', 'terms', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous');
+
+    /**
+     * Editable tour fields
+     * @var array
+     */
+    protected $tourFeEditableFields = array('teaser', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous');
+
+    /**
      * Display a wildcard in the back end
      *
      * @return string
@@ -113,22 +127,50 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
 
         if (Input::post('FORM_SUBMIT') === 'edit-event')
         {
-            $set = array();
-            foreach (explode(';', Input::post('submitted_fields')) as $field)
+            if (Input::post('EVENT_TYPE') === 'course')
             {
-                $set[$field] = Input::post($field);
+                $arrFields = $this->courseFeEditableFields;
             }
-            $objUpdateStmt = Database::getInstance()->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute(Input::post('id'));
-            if ($objUpdateStmt->affectedRows)
+            elseif (Input::post('EVENT_TYPE') === 'tour')
             {
-                $arrReturn = array('status' => 'success', 'message' => 'Saved changes successfully to the Database.');
-            }
-            else
-            {
-                $arrReturn = array('status' => 'error', 'message' => 'Error during the upload process.');
+                $arrFields = $this->tourFeEditableFields;
             }
 
-            die(\json_encode($arrReturn));
+            /** @var Request $request */
+            $request = System::getContainer()->get('request_stack')->getCurrentRequest();
+
+            $set = array();
+            foreach ($arrFields as $field)
+            {
+                $set[$field] = $request->request->get($field);
+            }
+
+            $id = $request->request->get('id');
+
+            $arrReturn = array(
+                'status'  => 'error',
+                'eventId' => $id,
+                'message' => '',
+                'set'     => $set,
+            );
+
+            if ($id > 0 && count($set) > 0)
+            {
+                try
+                {
+                    Database::getInstance()->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($id);
+                    $arrReturn['status'] = 'success';
+                    $arrReturn['message'] = sprintf('Saved datarecord with ID %s successfully to the Database (tl_calendar_events).', $id);
+                } catch (\Exception $e)
+                {
+                    $arrReturn['status'] = 'error';
+                    $arrReturn['message'] = 'Error during the upload process: ' . $e->getMessage();
+                }
+            }
+
+            $json = new JsonResponse($arrReturn, 200);
+            $json->send();
+            exit;
         }
 
         Controller::loadLanguageFile('tl_calendar_events');
@@ -141,6 +183,9 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
      */
     protected function compile()
     {
+        $this->Template->courseFeEditableFields = $this->courseFeEditableFields;
+        $this->Template->tourFeEditableFields = $this->tourFeEditableFields;
+
         // Load language file
         Controller::loadLanguageFile('tl_calendar_events');
 
@@ -502,9 +547,6 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                     }
                     $arrRow['headline'] = implode(' > ', $arrHeadline);
 
-                    // Fe-editable textareas
-                    $arrRow['feEditables'] = array('teaser', 'issues', 'terms', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous',);
-
                     // Add row to $arrTour
                     $arrEvents[] = $arrRow;
                 }
@@ -571,18 +613,14 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 }
                 $arrRow['headline'] = implode(' > ', $arrHeadline);
 
-                // Fe-editable textareas
-                $arrFeEditables = array('teaser', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous',);
-
                 // Add row to $arrOrganizerEvents
                 $arrOrganizerEvents[] = $arrRow;
             }
 
             $arrOrganizerContainer[] = array(
-                'id'          => $objOrganizer->id,
-                'title'       => $objOrganizer->title,
-                'events'      => $arrOrganizerEvents,
-                'feEditables' => $arrFeEditables
+                'id'     => $objOrganizer->id,
+                'title'  => $objOrganizer->title,
+                'events' => $arrOrganizerEvents,
             );
         }
 
@@ -599,7 +637,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     {
         $arrRow = $objEvent->row();
         $arrRow['url'] = Environment::get('url') . '/' . Events::generateEventUrl($objEvent);
-        if($this->showQrCode)
+        if ($this->showQrCode)
         {
             $arrRow['qrCode'] = CalendarEventsHelper::getEventQrCode($objEvent);
         }
@@ -638,7 +676,17 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         }
         $arrRow['minMaxMembers'] = implode('/', $arrMinMaxMembers);
 
-        return $arrRow;
+        $arrEvents = array();
+        foreach ($arrRow as $k => $v)
+        {
+            if (strpos($v, '{{'))
+            {
+                //die($v);
+            }
+            $arrEvents[$k] = Controller::replaceInsertTags($v);
+        }
+
+        return $arrEvents;
     }
 
 }

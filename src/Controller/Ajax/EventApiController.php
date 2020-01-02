@@ -14,9 +14,11 @@ namespace Markocupic\SacEventToolBundle\Controller\Ajax;
 
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Validator;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\FrontendCache\SessionCache\SessionCache;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -89,6 +91,56 @@ class EventApiController extends AbstractController
     }
 
     /**
+     * Get event data by id and use the session cache
+     * This controller is used for the "pilatus" export, where events are loaded by ajax when the modal windows opens
+     * $_POST['REQUEST_TOKEN'], $_POST['id'], $_POST['fields'] as comma separated string is optional
+     * @Route("/ajaxEventApi/getEventById", name="sac_event_tool_event_ajax_event_api_get_event_by_id", defaults={"_scope" = "frontend", "_token_check" = false})
+     */
+    public function getEventById(): JsonResponse
+    {
+        /** @var Request $request */
+        $request = $this->requestStack->getCurrentRequest();
+
+        $eventId = (int)$request->request->get('id');
+        $arrFields = $request->get('fields') != '' ? explode(',', $request->get('fields')) : [];
+
+        $arrJSON = array(
+            'status'       => 'error',
+            'arrEventData' => '',
+            'eventId'      => $eventId,
+            'arrFields'    => $arrFields,
+        );
+
+        /** @var QueryBuilder $qb */
+        $qb = $this->connection->createQueryBuilder();
+        $strFields = empty($arrFields) ? '*' : implode(',', $arrFields);
+        $qb->select($strFields)
+            ->from('tl_calendar_events', 't')
+            ->where('t.id = :id')
+            ->setParameter('id', $eventId);
+
+        $qb->setMaxResults(1);
+
+        /** @var \Doctrine\DBAL\Driver\PDOStatement $results */
+        $results = $qb->execute();
+
+        while (false !== ($arrEvent = $results->fetch()))
+        {
+            $arrJSON['status'] = 'success';
+            $aEvent = array();
+
+            foreach ($arrEvent as $k => $v)
+            {
+                $aEvent[$k] = $this->prepareValue($v);
+            }
+            $arrJSON['arrEventData'] = $aEvent;
+        }
+
+        // Allow cross domain requests
+        return new JsonResponse($arrJSON, 200, array('Access-Control-Allow-Origin' => '*'));
+    }
+
+    /**
      * Get event data by ids and use the session cache
      * This controller is used for the tour list, where events are loaded by vue.js
      * $_POST['REQUEST_TOKEN'], $_POST['ids'], $_POST['fields'] are mandatory
@@ -96,7 +148,6 @@ class EventApiController extends AbstractController
      */
     public function getEventDataByIds(): JsonResponse
     {
-
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
@@ -171,9 +222,8 @@ class EventApiController extends AbstractController
                     $oData = new \stdClass();
                     foreach ($arrFields as $field)
                     {
-                        /** @var  CalendarEventsHelper $objEventsHelper */
-                        $objEventsHelper = $calendarEventsHelperAdapter->getEventData($objEvent, $field);
-                        $oData->{$field} = $objEventsHelper;
+                        $v = $calendarEventsHelperAdapter->getEventData($objEvent, $field);
+                        $oData->{$field} = $this->prepareValue($v);
                     }
                     $this->sessionCache->set($strToken, $oData, static::CACHE_EXPIRATION_TIMEOUT + time());
                 }
@@ -194,4 +244,52 @@ class EventApiController extends AbstractController
         return new JsonResponse($arrJSON, 200, array('Access-Control-Allow-Origin' => '*'));
     }
 
+    /**
+     * Deserialize arrays and convert binary uuids
+     * @param $varValue
+     * @return array|null|string
+     */
+    private function prepareValue($varValue)
+    {
+        /** @var  Validator $validatorAdapter */
+        $validatorAdapter = $this->framework->getAdapter(Validator::class);
+
+        /** @var StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+
+        // Transform binuuids
+        $varValue = $validatorAdapter->isBinaryUuid($varValue) ? $stringUtilAdapter->binToUuid($varValue) : $varValue;
+
+        // Deserialize arrays and convert binuuids
+        $tmp = $stringUtilAdapter->deserialize($varValue);
+        if (!empty($tmp))
+        {
+            $tmp = $this->arrayMapRecursive($tmp, function ($v) {
+                /** @var  Validator $validatorAdapter */
+                $validatorAdapter = $this->framework->getAdapter(Validator::class);
+
+                /** @var StringUtil $stringUtilAdapter */
+                $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+
+                return (is_string($v) && $validatorAdapter->isBinaryUuid($v)) ? $stringUtilAdapter->binToUuid($v) : $v;
+            });
+        }
+        $varValue = (!empty($tmp) && is_array($tmp)) ? $tmp : $varValue;
+
+        $varValue = is_string($varValue) ? $stringUtilAdapter->decodeEntities($varValue) : $varValue;
+        return $varValue;
+    }
+
+    /**
+     * array_map for deep arrays
+     * @param $arr
+     * @param $fn
+     * @return array
+     */
+    private function arrayMapRecursive(&$arr, $fn)
+    {
+        return array_map(function ($item) use ($fn) {
+            return is_array($item) ? $this->arrayMapRecursive($item, $fn) : $fn($item);
+        }, $arr);
+    }
 }
