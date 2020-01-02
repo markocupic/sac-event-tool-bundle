@@ -104,7 +104,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             $controllerAdapter->redirect($page->getFrontendUrl());
         }
 
-        $this->projectDir = System::getContainer()->getParameter('kernel.project_dir');
+        $this->projectDir = $this->getParameter('kernel.project_dir');
 
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);

@@ -99,7 +99,8 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             $this->objPage = $page;
         }
 
-        $this->projectDir = System::getContainer()->getParameter('kernel.project_dir');
+        // Get the project dir (TL_ROOT is deprecated)
+        $this->projectDir = $this->getParameter('kernel.project_dir');
 
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
