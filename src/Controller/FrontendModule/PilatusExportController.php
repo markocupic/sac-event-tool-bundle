@@ -118,7 +118,6 @@ class PilatusExportController extends AbstractPrintExportController
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        // Set the module object (Contao\ModuleModel)
         $this->model = $model;
 
         /** @var Request $request */
@@ -197,6 +196,7 @@ class PilatusExportController extends AbstractPrintExportController
         /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
 
+        // Load language file
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
 
         // Generate the filter form
@@ -218,7 +218,7 @@ class PilatusExportController extends AbstractPrintExportController
         // The event array() courses, tours, generalEvents
         $template->events = $this->events;
 
-        // Pass editable fields
+        // Pass editable fields to the template object
         $template->courseFeEditableFields = $this->courseFeEditableFields;
         $template->tourFeEditableFields = $this->tourFeEditableFields;
 
@@ -242,6 +242,7 @@ class PilatusExportController extends AbstractPrintExportController
         /** @var Validator $validatorAdapter */
         $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
 
+        /** @var Form $objForm */
         $objForm = new Form('form-pilatus-export', 'POST', function ($objHaste) {
             $request = $this->get('request_stack')->getCurrentRequest();
             return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
@@ -265,11 +266,9 @@ class PilatusExportController extends AbstractPrintExportController
             'label'     => 'Zeitspanne (fixe Zeitspanne)',
             'inputType' => 'select',
             'options'   => $range,
-            //'default'   => $this->User->emergencyPhone,
             'eval'      => array('mandatory' => false),
         ));
 
-        // Now let's add form fields:
         $objForm->addFormField('timeRangeStart', array(
             'label'     => array('Zeitspanne manuelle Eingabe (Startdatum)', 'sdff'),
             'inputType' => 'text',
@@ -277,7 +276,6 @@ class PilatusExportController extends AbstractPrintExportController
             'value'     => $request->request->get('timeRangeStart')
         ));
 
-        // Now let's add form fields:
         $objForm->addFormField('timeRangeEnd', array(
             'label'     => 'Zeitspanne manuelle Eingabe (Enddatum)',
             'inputType' => 'text',
@@ -322,7 +320,7 @@ class PilatusExportController extends AbstractPrintExportController
                 $this->showQrCode = true;
             }
 
-            // Alternatively you can add the date manualy
+            // Alternatively the user can add the date manualy
             elseif ($request->request->get('timeRangeStart') != '' && $request->request->get('timeRangeEnd') != '')
             {
                 if (strtotime($request->request->get('timeRangeStart')) > 0 && strtotime($request->request->get('timeRangeStart')) > 0)
@@ -487,7 +485,7 @@ class PilatusExportController extends AbstractPrintExportController
         /** @var  Calendar $calendarAdapter */
         $calendarAdapter = $this->get('contao.framework')->getAdapter(Calendar::class);
 
-        if ($dateFormat == '')
+        if (empty($dateFormat))
         {
             $dateFormat = $configAdapter->get('dateFormat');
         }
@@ -499,13 +497,11 @@ class PilatusExportController extends AbstractPrintExportController
             $dateFormatShortened['from'] = 'd.';
             $dateFormatShortened['to'] = 'd.';
         }
-
         elseif ($dateFormat === 'j.m.')
         {
             $dateFormatShortened['from'] = 'j.';
             $dateFormatShortened['to'] = 'j.m.';
         }
-
         elseif ($dateFormat === 'j.-j. F')
         {
             $dateFormatShortened['from'] = 'j.';
@@ -529,6 +525,7 @@ class PilatusExportController extends AbstractPrintExportController
         {
             return $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getStartDate($id));
         }
+        
         if ($eventDuration == 2 && $span != $eventDuration)
         {
             return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($id)) . ' & ' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($id));
@@ -605,17 +602,19 @@ class PilatusExportController extends AbstractPrintExportController
                     $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'j.-j. F');
                     $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'D');
                     $arrHeadline[] = $eventModel->title;
+                    
                     if (isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$eventModel->courseLevel]))
                     {
                         $arrHeadline[] = 'Kursstufe ' . $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$eventModel->courseLevel];
                     }
+                    
                     if ($eventModel->courseId != '')
                     {
                         $arrHeadline[] = 'Kurs-Nr. ' . $eventModel->courseId;
                     }
                     $arrRow['headline'] = implode(' > ', $arrHeadline);
 
-                    // Add row to $arrTour
+                    // Add record to the collection
                     $arrEvents[] = $arrRow;
                 }
             }
@@ -687,6 +686,7 @@ class PilatusExportController extends AbstractPrintExportController
                 $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'D');
                 $arrHeadline[] = $eventModel->title;
                 $strDifficulties = implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($eventModel->id));
+                
                 if ($strDifficulties != '')
                 {
                     $arrHeadline[] = $strDifficulties;
@@ -777,10 +777,7 @@ class PilatusExportController extends AbstractPrintExportController
         $arrEvents = array();
         foreach ($arrRow as $k => $v)
         {
-            if (strpos($v, '{{'))
-            {
-                //die($v);
-            }
+            // Replace Contao insert tags
             $arrEvents[$k] = $controllerAdapter->replaceInsertTags($v);
         }
 
