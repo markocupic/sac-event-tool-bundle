@@ -112,3 +112,12 @@ services:
     - { name: contao.frontend_module, category: event_filter_form }
     - { name: container.service_subscriber }
     public: true
+
+  # Event filter form module
+  Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExportController:
+    calls:
+    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+    tags:
+    - { name: contao.frontend_module, category: pilatus_export }
+    - { name: container.service_subscriber }
+    public: true

@@ -35,13 +35,14 @@ class MarkocupicSacEventToolExtension extends Extension
 
         $loader->load('listener.yml');
         $loader->load('parameters.yml');
-        $loader->load('services.yml');
+        $loader->load('controller-download.yml');
         $loader->load('controller-ajax.yml');
         $loader->load('controller-contao-frontend-module.yml');
         $loader->load('controller-contao-content-element.yml');
+        $loader->load('cache.yml');
         $loader->load('cron.yml');
         $loader->load('contao-mode.yml');
-
+        $loader->load('services.yml');
 
         // Merge parameters
         if (!empty($GLOBALS['TL_CONFIG']) && is_array($GLOBALS['TL_CONFIG']))

@@ -8,39 +8,43 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle;
+namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
-use Contao\BackendTemplate;
 use Contao\Calendar;
 use Contao\CalendarEventsJourneyModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
-use Contao\System;
 use Contao\Controller;
 use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
 use Contao\Events;
 use Contao\FrontendTemplate;
-use Contao\Input;
+use Contao\ModuleModel;
+use Contao\PageModel;
 use Contao\StringUtil;
+use Contao\Template;
 use Contao\Validator;
 use Haste\Form\Form;
-use Patchwork\Utf8;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
- * Class ModuleSacEventToolPilatusExport
- * @package Markocupic\SacEventToolBundle
+ * Class PilatusExportController
+ * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
+ * @FrontendModule(category="sac_event_tool_frontend_modules", type="pilatus_export")
  */
-class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
+class PilatusExportController extends AbstractPrintExportController
 {
 
     /**
-     * Template
-     * @var string
+     * @var ModuleModel
      */
-    protected $strTemplate = 'mod_sac_event_tool_event_pilatus_export';
+    protected $model;
 
     /**
      * @var
@@ -48,17 +52,17 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     protected $objForm;
 
     /**
-     * @var
+     * @var int
      */
     protected $startDate;
 
     /**
-     * @var
+     * @var int
      */
     protected $endDate;
 
     /**
-     * @var
+     * @var int|null
      */
     protected $eventReleaseLevel;
 
@@ -78,19 +82,19 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     protected $allEventsTable = null;
 
     /**
-     * @var null
+     * @var string
      */
-    protected $courses = null;
+    protected $htmlCourseTable = '';
 
     /**
-     * @var null
+     * @var string
      */
-    protected $tours = null;
+    protected $htmlTourTable = '';
 
     /**
-     * @var null
+     * @var array
      */
-    protected $generalEvents = null;
+    protected $events = array();
 
     /**
      * Editable course fields
@@ -105,39 +109,35 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
     protected $tourFeEditableFields = array('teaser', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous');
 
     /**
-     * Display a wildcard in the back end
-     *
-     * @return string
+     * @param Request $request
+     * @param ModuleModel $model
+     * @param string $section
+     * @param array|null $classes
+     * @param PageModel|null $page
+     * @return Response
      */
-    public function generate()
+    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        if (TL_MODE == 'BE')
+        // Set the module object (Contao\ModuleModel)
+        $this->model = $model;
+
+        /** @var Request $request */
+        $request = $this->get('request_stack')->getCurrentRequest();
+
+        /** @var Database $databaseAdapter */
+        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+
+        // Handle form submits and reload page
+        if ($request->request->get('FORM_SUBMIT') === 'edit-event')
         {
-            /** @var BackendTemplate|object $objTemplate */
-            $objTemplate = new BackendTemplate('be_wildcard');
-
-            $objTemplate->wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['eventToolEventToolPilatusExport'][0]) . ' ###';
-            $objTemplate->title = $this->headline;
-            $objTemplate->id = $this->id;
-            $objTemplate->link = $this->name;
-            $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
-
-            return $objTemplate->parse();
-        }
-
-        if (Input::post('FORM_SUBMIT') === 'edit-event')
-        {
-            if (Input::post('EVENT_TYPE') === 'course')
+            if ($request->request->get('EVENT_TYPE') === 'course')
             {
                 $arrFields = $this->courseFeEditableFields;
             }
-            elseif (Input::post('EVENT_TYPE') === 'tour')
+            elseif ($request->request->get('EVENT_TYPE') === 'tour')
             {
                 $arrFields = $this->tourFeEditableFields;
             }
-
-            /** @var Request $request */
-            $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
             $set = array();
             foreach ($arrFields as $field)
@@ -158,7 +158,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             {
                 try
                 {
-                    Database::getInstance()->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($id);
+                    $databaseAdapter->getInstance()->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($id);
                     $arrReturn['status'] = 'success';
                     $arrReturn['message'] = sprintf('Saved datarecord with ID %s successfully to the Database (tl_calendar_events).', $id);
                 } catch (\Exception $e)
@@ -173,38 +173,56 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             exit;
         }
 
-        Controller::loadLanguageFile('tl_calendar_events');
+        // Call the parent method
+        return parent::__invoke($request, $model, $section, $classes);
+    }
 
-        return parent::generate();
+    /**
+     * @return array
+     */
+    public static function getSubscribedServices(): array
+    {
+        $services = parent::getSubscribedServices();
+
+        $services['request_stack'] = RequestStack::class;
+
+        return $services;
     }
 
     /**
      * Generate the module
      */
-    protected function compile()
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
-        $this->Template->courseFeEditableFields = $this->courseFeEditableFields;
-        $this->Template->tourFeEditableFields = $this->tourFeEditableFields;
+        /** @var Controller $controllerAdapter */
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
 
-        // Load language file
-        Controller::loadLanguageFile('tl_calendar_events');
+        $controllerAdapter->loadLanguageFile('tl_calendar_events');
 
+        // Generate the filter form
         $this->generateForm();
-
-        $this->Template->form = $this->objForm;
+        $template->form = $this->objForm;
 
         // Course table
+        /** @var  FrontendTemplate $objPartial */
         $objPartial = new FrontendTemplate('mod_sac_event_tool_event_pilatus_export_all_event_table_partial');
-        $objPartial->eventTable = $this->courseTable;
-        $this->Template->courseTable = $objPartial->parse();
-        $this->Template->courses = $this->courses;
+        $objPartial->eventTable = $this->htmlCourseTable;
+        $template->htmlCourseTable = $objPartial->parse();
 
         // Tour table
+        /** @var  FrontendTemplate $objPartial */
         $objPartial = new FrontendTemplate('mod_sac_event_tool_event_pilatus_export_all_event_table_partial');
-        $objPartial->eventTable = $this->tourTable;
-        $this->Template->tourTable = $objPartial->parse();
-        $this->Template->tours = $this->tours;
-        $this->Template->generalEvents = $this->generalEvents;
+        $objPartial->eventTable = $this->htmlTourTable;
+        $template->htmlTourTable = $objPartial->parse();
+
+        // The event array() courses, tours, generalEvents
+        $template->events = $this->events;
+
+        // Pass editable fields
+        $template->courseFeEditableFields = $this->courseFeEditableFields;
+        $template->tourFeEditableFields = $this->tourFeEditableFields;
+
+        return $template->getResponse();
     }
 
     /**
@@ -212,23 +230,34 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
      */
     protected function generateForm()
     {
+        /** @var Request $request */
+        $request = $this->get('request_stack')->getCurrentRequest();
+
+        /** @var Date $dateAdapter */
+        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
+
+        /** @var  Environment $environmentAdapter */
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+
+        /** @var Validator $validatorAdapter */
+        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
+
         $objForm = new Form('form-pilatus-export', 'POST', function ($objHaste) {
-            return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
+            $request = $this->get('request_stack')->getCurrentRequest();
+            return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
         });
-        $objForm->setFormActionFromUri(Environment::get('uri'));
+        $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         $range = array();
         $range[0] = '---';
 
-        $now = Date::parse('n');
+        $now = $dateAdapter->parse('n');
         $start = $now % 2 > 0 ? -7 : -6;
 
         for ($i = $start; $i < $start + 16; $i += 2)
         {
-            // echo Date::parse('Y-m-d',strtotime(Date::parse("Y-m-1", strtotime($i . " month"))));
-            //echo "<br>";
-            $key = Date::parse("Y-m-01", strtotime($i . " month")) . '|' . Date::parse("Y-m-t", strtotime($i + 1 . "  month"));
-            $range[$key] = Date::parse("01.m.Y", strtotime($i . " month")) . '-' . Date::parse("t.m.Y", strtotime($i + 1 . "  month"));
+            $key = $dateAdapter->parse("Y-m-01", strtotime($i . " month")) . '|' . $dateAdapter->parse("Y-m-t", strtotime($i + 1 . "  month"));
+            $range[$key] = $dateAdapter->parse("01.m.Y", strtotime($i . " month")) . '-' . $dateAdapter->parse("t.m.Y", strtotime($i + 1 . "  month"));
         }
 
         // Now let's add form fields:
@@ -245,7 +274,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             'label'     => array('Zeitspanne manuelle Eingabe (Startdatum)', 'sdff'),
             'inputType' => 'text',
             'eval'      => array('mandatory' => false, 'maxlength' => '10', 'minlength' => 8, 'placeholder' => 'dd.mm.YYYY'),
-            'value'     => Input::post('timeRangeStart')
+            'value'     => $request->request->get('timeRangeStart')
         ));
 
         // Now let's add form fields:
@@ -253,7 +282,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             'label'     => 'Zeitspanne manuelle Eingabe (Enddatum)',
             'inputType' => 'text',
             'eval'      => array('mandatory' => false, 'maxlength' => '10', 'minlength' => 8, 'placeholder' => 'dd.mm.YYYY'),
-            'value'     => Input::post('timeRangeEnd')
+            'value'     => $request->request->get('timeRangeEnd')
         ));
 
         $objForm->addFormField('eventReleaseLevel', array(
@@ -278,9 +307,9 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
         // validate() also checks whether the form has been submitted
         if ($objForm->validate())
         {
-            if (Input::post('timeRange') != 0)
+            if ($request->request->get('timeRange') != 0)
             {
-                $arrRange = explode('|', Input::post('timeRange'));
+                $arrRange = explode('|', $request->request->get('timeRange'));
                 $this->startDate = strtotime($arrRange[0]);
                 $this->endDate = strtotime($arrRange[1]);
                 $objForm->getWidget('timeRangeStart')->value = '';
@@ -288,23 +317,23 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             }
 
             // Generate QR code
-            if (Input::post('showQrCode'))
+            if ($request->request->get('showQrCode'))
             {
                 $this->showQrCode = true;
             }
 
             // Alternatively you can add the date manualy
-            elseif (Input::post('timeRangeStart') != '' && Input::post('timeRangeEnd') != '')
+            elseif ($request->request->get('timeRangeStart') != '' && $request->request->get('timeRangeEnd') != '')
             {
-                if (strtotime(Input::post('timeRangeStart')) > 0 && strtotime(Input::post('timeRangeStart')) > 0)
+                if (strtotime($request->request->get('timeRangeStart')) > 0 && strtotime($request->request->get('timeRangeStart')) > 0)
                 {
                     $objWidgetStart = $objForm->getWidget('timeRangeStart');
                     $objWidgetEnd = $objForm->getWidget('timeRangeEnd');
 
-                    $intStart = strtotime(Input::post('timeRangeStart'));
-                    $intEnd = strtotime(Input::post('timeRangeEnd'));
+                    $intStart = strtotime($request->request->get('timeRangeStart'));
+                    $intEnd = strtotime($request->request->get('timeRangeEnd'));
 
-                    if ($intStart > $intEnd || !Validator::isDate($objWidgetStart->value) || !Validator::isDate($objWidgetEnd->value))
+                    if ($intStart > $intEnd || !$validatorAdapter->isDate($objWidgetStart->value) || !$validatorAdapter->isDate($objWidgetEnd->value))
                     {
                         $strError = 'Ungültige Datumseingabe. Gib das Datum im Format \'dd.mm.YYYY\' ein. Das Startdatum muss kleiner sein als das Enddatum.';
                         $objForm->getWidget('timeRangeStart')->addError($strError);
@@ -314,7 +343,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                     {
                         $this->startDate = $intStart;
                         $this->endDate = $intEnd;
-                        Input::setPost('timeRange', '');
+                        $request->request->set('timeRange', '');
                         $objForm->getWidget('timeRange')->value = '';
                     }
                 }
@@ -322,9 +351,9 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
 
             if ($this->startDate && $this->endDate)
             {
-                $this->eventReleaseLevel = Input::post('eventReleaseLevel') > 0 ? Input::post('eventReleaseLevel') : null;
-                $this->courseTable = $this->generateEventTable(['course']);
-                $this->tourTable = $this->generateEventTable(['tour', 'generalEvent']);
+                $this->eventReleaseLevel = (int)$request->request->get('eventReleaseLevel') > 0 ? (int)$request->request->get('eventReleaseLevel') : null;
+                $this->htmlCourseTable = $this->generateEventTable(['course']);
+                $this->htmlTourTable = $this->generateEventTable(['tour', 'generalEvent']);
 
                 $this->generateCourses();
                 $this->generateEvents('tour');
@@ -342,7 +371,22 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
      */
     protected function generateEventTable($arrAllowedEventType)
     {
-        $objDatabase = Database::getInstance();
+        /** @var Date $dateAdapter */
+        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
+
+        /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
+        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
+
+        /** @var Database $databaseAdapter */
+        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+
+        /** @var  StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+
+        /** @var CalendarEventsModel $calendarEventsModelAdapter */
+        $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+
+        $objDatabase = $databaseAdapter->getInstance();
         $arrTours = array();
 
         $oEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate ASC')->execute($this->startDate, $this->endDate);
@@ -353,14 +397,14 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 continue;
             }
 
-            $objEvent = CalendarEventsModel::findByPk($oEvent->id);
+            $objEvent = $calendarEventsModelAdapter->findByPk($oEvent->id);
             if (null === $objEvent)
             {
                 continue;
             }
 
             // Check if event has allowed type
-            $arrAllowedEventTypes = StringUtil::deserialize($this->print_export_allowedEventTypes, true);
+            $arrAllowedEventTypes = $stringUtilAdapter->deserialize($this->model->print_export_allowedEventTypes, true);
             if (!in_array($objEvent->eventType, $arrAllowedEventTypes))
             {
                 continue;
@@ -373,15 +417,15 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             }
 
             $arrRow = $objEvent->row();
-            $arrRow['week'] = Date::parse('W', $objEvent->startDate) . ', ' . Date::parse('j.', $this->getFirstDayOfWeekTimestamp($objEvent->startDate)) . '-' . Date::parse('j. F', $this->getLastDayOfWeekTimestamp($objEvent->startDate));
+            $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate) . ', ' . $dateAdapter->parse('j.', $this->getFirstDayOfWeekTimestamp($objEvent->startDate)) . '-' . $dateAdapter->parse('j. F', $this->getLastDayOfWeekTimestamp($objEvent->startDate));
             $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, 'd.');
             $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
             $arrRow['title'] = $objEvent->title . ($objEvent->eventType === 'lastMinuteTour' ? ' (LAST MINUTE TOUR!)' : '');
-            $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false));
-            $arrRow['organizers'] = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'titlePrint'));
+            $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->id, false, false));
+            $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->id, 'titlePrint'));
 
             // tourType
-            $arrEventType = CalendarEventsHelper::getTourTypesAsArray($objEvent->id, 'shortcut', false);
+            $arrEventType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent->id, 'shortcut', false);
             if ($objEvent->eventType === 'course')
             {
                 // KU = Kurs
@@ -403,7 +447,10 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
      */
     private function getFirstDayOfWeekTimestamp($timestamp)
     {
-        $date = Date::parse('d-m-Y', $timestamp);
+        /** @var Date $dateAdapter */
+        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
+
+        $date = $dateAdapter->parse('d-m-Y', $timestamp);
         $day = \DateTime::createFromFormat('d-m-Y', $date);
         $day->setISODate((int)$day->format('o'), (int)$day->format('W'), 1);
         return $day->getTimestamp();
@@ -428,9 +475,21 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
      */
     private function getEventPeriod($id, $dateFormat = '')
     {
+        /** @var Date $dateAdapter */
+        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
+
+        /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
+        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
+
+        /** @var  Config $configAdapter */
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+
+        /** @var  Calendar $calendarAdapter */
+        $calendarAdapter = $this->get('contao.framework')->getAdapter(Calendar::class);
+
         if ($dateFormat == '')
         {
-            $dateFormat = Config::get('dateFormat');
+            $dateFormat = $configAdapter->get('dateFormat');
         }
 
         $dateFormatShortened = array();
@@ -463,28 +522,28 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             $dateFormatShortened['to'] = 'j.m.';
         }
 
-        $eventDuration = count(CalendarEventsHelper::getEventTimestamps($id));
-        $span = Calendar::calculateSpan(CalendarEventsHelper::getStartDate($id), CalendarEventsHelper::getEndDate($id)) + 1;
+        $eventDuration = count($calendarEventsHelperAdapter->getEventTimestamps($id));
+        $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($id), $calendarEventsHelperAdapter->getEndDate($id)) + 1;
 
         if ($eventDuration == 1)
         {
-            return Date::parse($dateFormatShortened['to'], CalendarEventsHelper::getStartDate($id));
+            return $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getStartDate($id));
         }
         if ($eventDuration == 2 && $span != $eventDuration)
         {
-            return Date::parse($dateFormatShortened['from'], CalendarEventsHelper::getStartDate($id)) . ' & ' . Date::parse($dateFormatShortened['to'], CalendarEventsHelper::getEndDate($id));
+            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($id)) . ' & ' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($id));
         }
         elseif ($span == $eventDuration)
         {
-            return Date::parse($dateFormatShortened['from'], CalendarEventsHelper::getStartDate($id)) . '-' . Date::parse($dateFormatShortened['to'], CalendarEventsHelper::getEndDate($id));
+            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($id)) . '-' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($id));
         }
         else
         {
             $arrDates = array();
-            $dates = CalendarEventsHelper::getEventTimestamps($id);
+            $dates = $calendarEventsHelperAdapter->getEventTimestamps($id);
             foreach ($dates as $date)
             {
-                $arrDates[] = Date::parse($dateFormatShortened['to'], $date);
+                $arrDates[] = $dateAdapter->parse($dateFormatShortened['to'], $date);
             }
 
             return implode(', ', $arrDates);
@@ -497,7 +556,16 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
      */
     protected function generateCourses()
     {
-        $objDatabase = Database::getInstance();
+        /** @var Database $databaseAdapter */
+        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+
+        /** @var  StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+
+        /** @var CalendarEventsModel $calendarEventsModelAdapter */
+        $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+
+        $objDatabase = $databaseAdapter->getInstance();
         $arrEvents = array();
 
         // Order By tl_course_main_type, tl_course_sub_type
@@ -510,14 +578,14 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE eventType=? AND startDate>=? AND startDate<=? AND courseTypeLevel1=? ORDER BY courseId, startDate ASC')->execute('course', $this->startDate, $this->endDate, $objCourseSubType->id);
                 while ($objEvent->next())
                 {
-                    $eventModel = CalendarEventsModel::findByPk($objEvent->id);
+                    $eventModel = $calendarEventsModelAdapter->findByPk($objEvent->id);
                     if (null === $eventModel)
                     {
                         continue;
                     }
 
                     // Check if event has allowed type
-                    $arrAllowedEventTypes = StringUtil::deserialize($this->print_export_allowedEventTypes, true);
+                    $arrAllowedEventTypes = $stringUtilAdapter->deserialize($this->model->print_export_allowedEventTypes, true);
                     if (!in_array($eventModel->eventType, $arrAllowedEventTypes))
                     {
                         continue;
@@ -552,7 +620,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 }
             }
         }
-        $this->courses = count($arrEvents) > 0 ? $arrEvents : null;
+        $this->events['courses'] = count($arrEvents) > 0 ? $arrEvents : null;
     }
 
     /**
@@ -562,10 +630,22 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
      */
     function generateEvents($type)
     {
-        $objDatabase = Database::getInstance();
+        /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
+        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
+
+        /** @var Database $databaseAdapter */
+        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+
+        /** @var  StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+
+        /** @var CalendarEventsModel $calendarEventsModelAdapter */
+        $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+
+        $objDatabase = $databaseAdapter->getInstance();
         $arrOrganizerContainer = array();
 
-        $objOrganizer = Database::getInstance()->prepare('SELECT * FROM tl_event_organizer ORDER BY sorting')->execute();
+        $objOrganizer = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_event_organizer ORDER BY sorting')->execute();
         while ($objOrganizer->next())
         {
             $arrOrganizerEvents = array();
@@ -573,20 +653,20 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             $objEvent = $objDatabase->prepare('SELECT * FROM tl_calendar_events WHERE (eventType=?) AND startDate>=? AND startDate<=? ORDER BY startDate ASC')->execute($type, $this->startDate, $this->endDate);
             while ($objEvent->next())
             {
-                $eventModel = CalendarEventsModel::findByPk($objEvent->id);
+                $eventModel = $calendarEventsModelAdapter->findByPk($objEvent->id);
                 if (null === $eventModel)
                 {
                     continue;
                 }
 
-                $arrOrganizers = StringUtil::deserialize($eventModel->organizers, true);
+                $arrOrganizers = $stringUtilAdapter->deserialize($eventModel->organizers, true);
                 if (!in_array($objOrganizer->id, $arrOrganizers))
                 {
                     continue;
                 }
 
                 // Check if event has allowed type
-                $arrAllowedEventTypes = StringUtil::deserialize($this->print_export_allowedEventTypes, true);
+                $arrAllowedEventTypes = $stringUtilAdapter->deserialize($this->model->print_export_allowedEventTypes, true);
                 if (!in_array($eventModel->eventType, $arrAllowedEventTypes))
                 {
                     continue;
@@ -606,7 +686,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
                 $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'j.-j. F');
                 $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'D');
                 $arrHeadline[] = $eventModel->title;
-                $strDifficulties = implode(', ', CalendarEventsHelper::getTourTechDifficultiesAsArray($eventModel->id));
+                $strDifficulties = implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($eventModel->id));
                 if ($strDifficulties != '')
                 {
                     $arrHeadline[] = $strDifficulties;
@@ -624,7 +704,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             );
         }
 
-        $this->{$type . 's'} = $arrOrganizerContainer;
+        $this->events[$type . 's'] = $arrOrganizerContainer;
     }
 
     /**
@@ -635,20 +715,38 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
      */
     private function getEventDetails($objEvent)
     {
+        /** @var Date $dateAdapter */
+        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
+
+        /** @var  Environment $environmentAdapter */
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+
+        /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
+        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
+
+        /** @var Events $eventsAdapter */
+        $eventsAdapter = $this->get('contao.framework')->getAdapter(Events::class);
+
+        /** @var  CalendarEventsJourneyModel $calendarEventsJourneyModelAdapter */
+        $calendarEventsJourneyModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsJourneyModel::class);
+
+        /** @var Controller $controllerAdapter */
+        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+
         $arrRow = $objEvent->row();
-        $arrRow['url'] = Environment::get('url') . '/' . Events::generateEventUrl($objEvent);
+        $arrRow['url'] = $environmentAdapter->get('url') . '/' . $eventsAdapter->generateEventUrl($objEvent);
         if ($this->showQrCode)
         {
-            $arrRow['qrCode'] = CalendarEventsHelper::getEventQrCode($objEvent);
+            $arrRow['qrCode'] = $calendarEventsHelperAdapter->getEventQrCode($objEvent);
         }
         $arrRow['eventState'] = $objEvent->eventState != '' ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
-        $arrRow['week'] = Date::parse('W', $objEvent->startDate);
+        $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate);
         $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);
         $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
-        $arrRow['instructors'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false));
-        $arrRow['organizers'] = implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'title'));
-        $arrRow['tourProfile'] = implode('<br>', CalendarEventsHelper::getTourProfileAsArray($objEvent->id));
-        $arrRow['journey'] = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : '';
+        $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->id, false, false));
+        $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->id, 'title'));
+        $arrRow['tourProfile'] = implode('<br>', $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent->id));
+        $arrRow['journey'] = $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey) !== null ? $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey)->title : '';
 
         // Textareas
         $arrTextareas = array('teaser', 'terms', 'issues', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous',);
@@ -661,7 +759,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
 
         if ($objEvent->setRegistrationPeriod)
         {
-            $arrRow['registrationPeriod'] = Date::parse('j.m.Y H:i', $objEvent->registrationStartDate) . ' bis ' . Date::parse('j.m.Y H:i', $objEvent->registrationEndDate);
+            $arrRow['registrationPeriod'] = $dateAdapter->parse('j.m.Y H:i', $objEvent->registrationStartDate) . ' bis ' . $dateAdapter->parse('j.m.Y H:i', $objEvent->registrationEndDate);
         }
 
         // MinMaxMembers
@@ -683,7 +781,7 @@ class ModuleSacEventToolPilatusExport extends ModuleSacEventToolPrintExport
             {
                 //die($v);
             }
-            $arrEvents[$k] = Controller::replaceInsertTags($v);
+            $arrEvents[$k] = $controllerAdapter->replaceInsertTags($v);
         }
 
         return $arrEvents;

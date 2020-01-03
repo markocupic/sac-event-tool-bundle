@@ -19,24 +19,24 @@
 
 <!-- course table -->
 <h3 class="ce_headline">Monatsprogramm Kurse</h3>
-<?php if (!$this->courseTable): ?>
+<?php if (!$this->htmlCourseTable): ?>
   <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
 <?php endif; ?>
-<?php if ($this->courseTable): ?>
+<?php if ($this->htmlCourseTable): ?>
   <!-- insert partial -->
-  <?= $this->courseTable ?>
+  <?= $this->htmlCourseTable ?>
 <?php endif; ?>
 
 
 <!-- courses -->
 <h3 class="ce_headline">Monatsprogramm Kurse</h3>
-<?php if (!$this->courses): ?>
+<?php if (!$this->events['courses']): ?>
   <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
 <?php endif; ?>
-<?php if ($this->courses): ?>
+<?php if ($this->events['courses']): ?>
   <table class="event-export-table event-export-table-courses table table-sm">
     <tbody>
-    <?php foreach ($this->courses as $arrEvent): ?>
+    <?php foreach ($this->events['courses'] as $arrEvent): ?>
       <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
         <td class="event-export-event-separator" colspan="2">&nbsp;</td>
       </tr>
@@ -200,18 +200,18 @@
 
 
 <h3 class="ce_headline">Monatsprogramm Touren</h3>
-<?php if (!$this->tourTable): ?>
+<?php if (!$this->htmlTourTable): ?>
 <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
 <?php endif; ?>
-<?php if ($this->tourTable): ?>
+<?php if ($this->htmlTourTable): ?>
   <!-- insert partial -->
-  <?= $this->tourTable ?>
+  <?= $this->htmlTourTable ?>
 <?php endif; ?>
 
 <!-- tours grouped by organizers -->
 <?php $arrTypes = array('tours', 'generalEvents'); ?>
 <?php foreach($arrTypes as $type): ?>
-  <?php if ($this->{$type}): ?>
+  <?php if ($this->events[$type]): ?>
     <?php if($type === 'tours'): ?>
     <h3 class="ce_headline">Monatsprogramm Touren</h3>
     <?php endif; ?>
@@ -221,7 +221,7 @@
     <table class="event-export-table event-export-table-courses table table-sm">
 
       <tbody>
-      <?php foreach ($this->{$type} as $arrOrganizer): ?>
+      <?php foreach ($this->events[$type] as $arrOrganizer): ?>
         <tr class="event-export-row-body">
           <?php if($type === 'tours'): ?>
           <td class="event-export-tour-organizer" colspan="2"><h4>Touren <?= $arrOrganizer['title'] ?></h4></td>

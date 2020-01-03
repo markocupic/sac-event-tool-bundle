@@ -8,19 +8,42 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle;
-
+namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\EventReleaseLevelPolicyModel;
-use Contao\Module;
-
+use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\ModuleModel;
+use Contao\PageModel;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class ModuleSacEventToolPrintExport
+ * Class AbstractModuleSacEventToolPrintExport
  * @package Markocupic\SacEventToolBundle
  */
-abstract class ModuleSacEventToolPrintExport extends Module
+abstract class AbstractPrintExportController extends AbstractFrontendModuleController
 {
+
+    /**
+     * @param Request $request
+     * @param ModuleModel $model
+     * @param string $section
+     * @param array|null $classes
+     * @param PageModel|null $page
+     * @return Response
+     */
+    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    {
+        // Call parent __invoke
+        return parent::__invoke($request, $model, $section, $classes);
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        $services = parent::getSubscribedServices();
+
+        return $services;
+    }
 
     /**
      * @param $objEvent
@@ -35,7 +58,6 @@ abstract class ModuleSacEventToolPrintExport extends Module
 
         if ($objEvent !== null)
         {
-
             if ($objEvent->eventReleaseLevel > 0)
             {
                 $objEventReleaseLevel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
@@ -43,7 +65,6 @@ abstract class ModuleSacEventToolPrintExport extends Module
                 {
                     if ($minLevel === null)
                     {
-
                         $nextLevelModel = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
                         $lastLevelModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
                         if ($nextLevelModel !== null && $lastLevelModel !== null)
@@ -56,10 +77,10 @@ abstract class ModuleSacEventToolPrintExport extends Module
                     }
                     else
                     {
-                       if($objEventReleaseLevel->level >= $minLevel)
-                       {
-                           return true;
-                       }
+                        if ($objEventReleaseLevel->level >= $minLevel)
+                        {
+                            return true;
+                        }
                     }
                 }
             }
@@ -74,7 +95,6 @@ abstract class ModuleSacEventToolPrintExport extends Module
      */
     public function searchAndReplace($strValue)
     {
-
         $arrReplace = array(
             // Replace (at) with @
             '(at)'         => '@',

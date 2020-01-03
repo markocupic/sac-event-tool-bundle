@@ -65,11 +65,13 @@ class EventApiController extends AbstractController
 
     /**
      * EventApiController constructor.
-     * Get event data: The controller is used for the tour list, where events are loaded by vue.js
+     * Get event data as json object
      * Allow if ...
      * - is XmlHttpRequest
      * @param ContaoFramework $framework
      * @param RequestStack $requestStack
+     * @param Connection $connection
+     * @param SessionCache $sessionCache
      */
     public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, SessionCache $sessionCache)
     {
@@ -98,6 +100,12 @@ class EventApiController extends AbstractController
      */
     public function getEventById(): JsonResponse
     {
+        /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
+        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+
+        /** @var  CalendarEventsModel $calendarEventsModelAdapter */
+        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
@@ -111,27 +119,24 @@ class EventApiController extends AbstractController
             'arrFields'    => $arrFields,
         );
 
-        /** @var QueryBuilder $qb */
-        $qb = $this->connection->createQueryBuilder();
-        $strFields = empty($arrFields) ? '*' : implode(',', $arrFields);
-        $qb->select($strFields)
-            ->from('tl_calendar_events', 't')
-            ->where('t.id = :id')
-            ->setParameter('id', $eventId);
-
-        $qb->setMaxResults(1);
-
-        /** @var \Doctrine\DBAL\Driver\PDOStatement $results */
-        $results = $qb->execute();
-
-        while (false !== ($arrEvent = $results->fetch()))
+        if (null !== ($objEvent = $calendarEventsModelAdapter->findOneById($eventId)))
         {
+            $arrEvent = $objEvent->row();
             $arrJSON['status'] = 'success';
             $aEvent = array();
 
             foreach ($arrEvent as $k => $v)
             {
-                $aEvent[$k] = $this->prepareValue($v);
+                // If $arrFields is empty send all properties
+                if (!empty($arrFields))
+                {
+                    if (!in_array($k, $arrFields))
+                    {
+                        continue;
+                    }
+                }
+
+                $aEvent[$k] = $this->prepareValue($calendarEventsHelperAdapter->getEventData($objEvent, $k));
             }
             $arrJSON['arrEventData'] = $aEvent;
         }
@@ -208,11 +213,14 @@ class EventApiController extends AbstractController
         {
             $count++;
             $oData = null;
+
             /** @var  CalendarEventsModel $objEvent */
             $objEvent = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
             if ($objEvent !== null)
             {
                 $strToken = $this->sessionCacheToken . $arrEvent['id'];
+
+                // Try to load from cache
                 if (null !== ($oData = $this->sessionCache->get($strToken)))
                 {
                     $arrJSON['loadedItemsFromSession']++;
@@ -225,6 +233,8 @@ class EventApiController extends AbstractController
                         $v = $calendarEventsHelperAdapter->getEventData($objEvent, $field);
                         $oData->{$field} = $this->prepareValue($v);
                     }
+
+                    // Cache data
                     $this->sessionCache->set($strToken, $oData, static::CACHE_EXPIRATION_TIMEOUT + time());
                 }
 
@@ -262,7 +272,7 @@ class EventApiController extends AbstractController
 
         // Deserialize arrays and convert binuuids
         $tmp = $stringUtilAdapter->deserialize($varValue);
-        if (!empty($tmp))
+        if (!empty($tmp) && is_array($tmp))
         {
             $tmp = $this->arrayMapRecursive($tmp, function ($v) {
                 /** @var  Validator $validatorAdapter */

@@ -1,0 +1,5 @@
+services:
+
+  # Simple session cache service for the usage in the event lsit module
+  Markocupic\SacEventToolBundle\FrontendCache\SessionCache\SessionCache:
+    public: true

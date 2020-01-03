@@ -31,7 +31,7 @@ use Patchwork\Utf8;
  * Class ModuleSacEventToolJahresprogrammExport
  * @package Markocupic\SacEventToolBundle
  */
-class ModuleSacEventToolJahresprogrammExport extends ModuleSacEventToolPrintExport
+class ModuleSacEventToolJahresprogrammExport extends AbstractModuleSacEventToolPrintExport
 {
 
     /**
