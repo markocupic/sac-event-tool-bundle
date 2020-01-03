@@ -217,13 +217,13 @@ class PilatusExportController extends AbstractPrintExportController
 
         // Course table
         /** @var  FrontendTemplate $objPartial */
-        $objPartial = new FrontendTemplate('mod_sac_event_tool_event_pilatus_export_all_event_table_partial');
+        $objPartial = new FrontendTemplate('mod_pilatus_export_events_table_partial');
         $objPartial->eventTable = $this->htmlCourseTable;
         $template->htmlCourseTable = $objPartial->parse();
 
-        // Tour table
+        // Tour & general event table
         /** @var  FrontendTemplate $objPartial */
-        $objPartial = new FrontendTemplate('mod_sac_event_tool_event_pilatus_export_all_event_table_partial');
+        $objPartial = new FrontendTemplate('mod_pilatus_export_events_table_partial');
         $objPartial->eventTable = $this->htmlTourTable;
         $template->htmlTourTable = $objPartial->parse();
 
