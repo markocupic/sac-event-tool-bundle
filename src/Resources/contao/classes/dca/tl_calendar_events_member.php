@@ -134,8 +134,12 @@ class tl_calendar_events_member extends Backend
                 }
                 else
                 {
-                    /** @noinspection PhpUndefinedMethodInspection */
-                    $objEvent = CalendarEventsMemberModel::findByPk($id)->getRelated('eventId');
+                    /** @var CalendarEventsMemberModel $objEvent */
+                    if(null !== ($objMember = CalendarEventsMemberModel::findByPk($id)))
+                    {
+                        /** @var CalendarEventsModel $objEvent */
+                        $objEvent = $objMember->getRelated('eventId');
+                    }
                 }
 
                 if ($objEvent !== null)
@@ -171,13 +175,17 @@ class tl_calendar_events_member extends Backend
             $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['sendEmail'];
             $options = array();
 
-            // First get instructors
+            /**
+             * Get the event instructor
+             * @var CalendarEventsModel $objEvent
+             */
             $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
             if ($objEvent !== null)
             {
                 $arrGuideIDS = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
                 foreach ($arrGuideIDS as $userId)
                 {
+                    /** @var UserModel $objInstructor */
                     $objInstructor = UserModel::findByPk($userId);
                     if ($objInstructor !== null)
                     {

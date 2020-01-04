@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * SAC Event Tool Web Plugin for Contao
  * Copyright (c) 2008-2020 Marko Cupic
@@ -266,7 +268,7 @@ class PilatusExportController extends AbstractPrintExportController
         $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
 
         /** @var Form $objForm */
-        $objForm = new Form('form-pilatus-export', 'POST', function ($objHaste) {
+        $objForm = new Form('form-pilatus-export', 'POST', function (Form $objHaste): bool {
             $request = $this->get('request_stack')->getCurrentRequest();
             return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
         });
@@ -319,7 +321,7 @@ class PilatusExportController extends AbstractPrintExportController
             'eval'      => array('mandatory' => false),
         ));
 
-        // Let's add  a submit button
+        // Let's add a submit button
         $objForm->addFormField('submit', array(
             'label'     => 'Export starten',
             'inputType' => 'submit',
@@ -456,9 +458,9 @@ class PilatusExportController extends AbstractPrintExportController
             }
 
             $arrRow = $objEvent->row();
-            $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate) . ', ' . $dateAdapter->parse('j.', $this->getFirstDayOfWeekTimestamp($objEvent->startDate)) . '-' . $dateAdapter->parse('j. F', $this->getLastDayOfWeekTimestamp($objEvent->startDate));
-            $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, 'd.');
-            $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
+            $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate) . ', ' . $dateAdapter->parse('j.', $this->getFirstDayOfWeekTimestamp((int)$objEvent->startDate)) . '-' . $dateAdapter->parse('j. F', $this->getLastDayOfWeekTimestamp((int)$objEvent->startDate));
+            $arrRow['eventDates'] = $this->getEventPeriod($objEvent, 'd.');
+            $arrRow['weekday'] = $this->getEventPeriod($objEvent, 'D');
             $arrRow['title'] = $objEvent->title . ($objEvent->eventType === 'lastMinuteTour' ? ' (LAST MINUTE TOUR!)' : '');
             $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->id, false, false));
             $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->id, 'titlePrint'));
@@ -484,7 +486,7 @@ class PilatusExportController extends AbstractPrintExportController
      * @param int $timestamp
      * @return int
      */
-    private function getFirstDayOfWeekTimestamp(int $timestamp): int
+    protected function getFirstDayOfWeekTimestamp(int $timestamp): int
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
@@ -500,19 +502,18 @@ class PilatusExportController extends AbstractPrintExportController
      * @param int $timestamp
      * @return int
      */
-    private function getLastDayOfWeekTimestamp(int $timestamp): int
+    protected function getLastDayOfWeekTimestamp(int $timestamp): int
     {
-        return $this->getFirstDayOfWeekTimestamp($timestamp) + 6 * 24 * 3600;
+        return $this->getFirstDayOfWeekTimestamp((int)$timestamp) + 6 * 24 * 3600;
     }
 
     /**
      * Helper method
-     * @param int $id
+     * @param CalendarEventsModel $objEvent
      * @param string $dateFormat
      * @return string
-     * @throws \Exception
      */
-    private function getEventPeriod(int $id, string $dateFormat = ''): string
+    protected function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = ''): string
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
@@ -559,26 +560,26 @@ class PilatusExportController extends AbstractPrintExportController
             $dateFormatShortened['to'] = 'j.m.';
         }
 
-        $eventDuration = count($calendarEventsHelperAdapter->getEventTimestamps($id));
-        $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($id), $calendarEventsHelperAdapter->getEndDate($id)) + 1;
+        $eventDuration = count($calendarEventsHelperAdapter->getEventTimestamps($objEvent->id));
+        $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent->id), $calendarEventsHelperAdapter->getEndDate($objEvent->id)) + 1;
 
         if ($eventDuration == 1)
         {
-            return $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getStartDate($id));
+            return $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getStartDate($objEvent->id));
         }
 
         if ($eventDuration == 2 && $span != $eventDuration)
         {
-            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($id)) . ' & ' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($id));
+            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($objEvent->id)) . ' & ' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($objEvent->id));
         }
         elseif ($span == $eventDuration)
         {
-            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($id)) . '-' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($id));
+            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($objEvent->id)) . '-' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($objEvent->id));
         }
         else
         {
             $arrDates = array();
-            $dates = $calendarEventsHelperAdapter->getEventTimestamps($id);
+            $dates = $calendarEventsHelperAdapter->getEventTimestamps($objEvent->id);
             foreach ($dates as $date)
             {
                 $arrDates[] = $dateAdapter->parse($dateFormatShortened['to'], $date);
@@ -605,9 +606,12 @@ class PilatusExportController extends AbstractPrintExportController
 
         $eventType = 'course';
 
+        $arrAllowedEventTypes = $stringUtilAdapter->deserialize($this->model->print_export_allowedEventTypes, true);
+
         /** @var  Connection $conn */
         $conn = System::getContainer()->get('database_connection');
 
+        // Select statement with 2 subqueries ;-)
         // SELECT * FROM tl_calendar_events t1 WHERE
         // (t1.eventType = :eventtype) AND
         // (t1.startDate >= :startdate) AND
@@ -633,10 +637,12 @@ class PilatusExportController extends AbstractPrintExportController
         $qb->select('*')
             ->from('tl_calendar_events', 't1')
             ->where('t1.eventType = :eventtype')
+            ->andWhere($qb->expr()->in('t1.eventType', ':arrAllowedEventTypes'))
             ->andWhere('t1.startDate >= :startdate')
             ->andWhere('t1.startDate <= :enddate')
             ->andWhere($qb->expr()->in('t1.courseTypeLevel1', $qbSub->getSQL()))
             ->setParameter('eventtype', $eventType)
+            ->setParameter('arrAllowedEventTypes', $arrAllowedEventTypes, Connection::PARAM_STR_ARRAY)
             ->setParameter('startdate', $this->startDate)
             ->setParameter('enddate', $this->endDate)
             ->orderBy('t1.courseId')
@@ -653,13 +659,6 @@ class PilatusExportController extends AbstractPrintExportController
                 continue;
             }
 
-            // Check if event has allowed type
-            $arrAllowedEventTypes = $stringUtilAdapter->deserialize($this->model->print_export_allowedEventTypes, true);
-            if (!in_array($eventModel->eventType, $arrAllowedEventTypes))
-            {
-                continue;
-            }
-
             // Check if event is on an enough high level
             if (!$this->hasValidReleaseLevel($eventModel, $this->eventReleaseLevel))
             {
@@ -671,8 +670,8 @@ class PilatusExportController extends AbstractPrintExportController
 
             // Headline
             $arrHeadline = array();
-            $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'j.-j. F');
-            $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'D');
+            $arrHeadline[] = $this->getEventPeriod($eventModel, 'j.-j. F');
+            $arrHeadline[] = $this->getEventPeriod($eventModel, 'D');
             $arrHeadline[] = $eventModel->title;
 
             if (isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$eventModel->courseLevel]))
@@ -698,7 +697,7 @@ class PilatusExportController extends AbstractPrintExportController
      * @param string $eventType
      * @throws \Exception
      */
-    function generateEvents(string $eventType): void
+    protected function generateEvents(string $eventType): void
     {
         /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
@@ -710,6 +709,9 @@ class PilatusExportController extends AbstractPrintExportController
         $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
 
         $arrOrganizerContainer = array();
+
+        // Check if event has allowed type
+        $arrAllowedEventTypes = $stringUtilAdapter->deserialize($this->model->print_export_allowedEventTypes, true);
 
         /** @var  Connection $conn */
         $conn = System::getContainer()->get('database_connection');
@@ -732,9 +734,11 @@ class PilatusExportController extends AbstractPrintExportController
             $qbEvents->select('*')
                 ->from('tl_calendar_events', 't1')
                 ->where('t1.eventType = :eventtype')
+                ->andWhere($qbEvents->expr()->in('t1.eventType', ':arrAllowedEventTypes'))
                 ->andWhere('t1.startDate >= :startdate')
                 ->andWhere('t1.startDate <= :enddate')
                 ->setParameter('eventtype', $eventType)
+                ->setParameter('arrAllowedEventTypes', $arrAllowedEventTypes, Connection::PARAM_STR_ARRAY)
                 ->setParameter('startdate', $this->startDate)
                 ->setParameter('enddate', $this->endDate)
                 ->orderBy('t1.startDate', 'ASC');
@@ -756,13 +760,6 @@ class PilatusExportController extends AbstractPrintExportController
                     continue;
                 }
 
-                // Check if event has allowed type
-                $arrAllowedEventTypes = $stringUtilAdapter->deserialize($this->model->print_export_allowedEventTypes, true);
-                if (!in_array($eventModel->eventType, $arrAllowedEventTypes))
-                {
-                    continue;
-                }
-
                 // Check if event is at least on second highest level (Level 3/4)
                 if (!$this->hasValidReleaseLevel($eventModel, $this->eventReleaseLevel))
                 {
@@ -774,8 +771,8 @@ class PilatusExportController extends AbstractPrintExportController
 
                 // Headline
                 $arrHeadline = array();
-                $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'j.-j. F');
-                $arrHeadline[] = $this->getEventPeriod($eventModel->id, 'D');
+                $arrHeadline[] = $this->getEventPeriod($eventModel, 'j.-j. F');
+                $arrHeadline[] = $this->getEventPeriod($eventModel, 'D');
                 $arrHeadline[] = $eventModel->title;
                 $strDifficulties = implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($eventModel->id));
 
@@ -800,7 +797,7 @@ class PilatusExportController extends AbstractPrintExportController
     }
 
     /**
-     * Helper methos
+     * Helper method
      * @param CalendarEventsModel $objEvent
      * @return array
      * @throws \Exception
@@ -833,21 +830,12 @@ class PilatusExportController extends AbstractPrintExportController
         }
         $arrRow['eventState'] = $objEvent->eventState != '' ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
         $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate);
-        $arrRow['eventDates'] = $this->getEventPeriod($objEvent->id, $this->dateFormat);
-        $arrRow['weekday'] = $this->getEventPeriod($objEvent->id, 'D');
+        $arrRow['eventDates'] = $this->getEventPeriod($objEvent, $this->dateFormat);
+        $arrRow['weekday'] = $this->getEventPeriod($objEvent, 'D');
         $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->id, false, false));
         $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->id, 'title'));
         $arrRow['tourProfile'] = implode('<br>', $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent->id));
         $arrRow['journey'] = $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey) !== null ? $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey)->title : '';
-
-        // Textareas
-        $arrTextareas = array('teaser', 'terms', 'issues', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous',);
-        foreach ($arrTextareas as $field)
-        {
-            $arrRow[$field] = nl2br($objEvent->{$field});
-            $arrRow[$field] = $this->searchAndReplace($arrRow[$field]);
-            $arrFeEditables[] = $field;
-        }
 
         if ($objEvent->setRegistrationPeriod)
         {
@@ -869,8 +857,9 @@ class PilatusExportController extends AbstractPrintExportController
         $arrEvents = array();
         foreach ($arrRow as $k => $v)
         {
+            $strValue = nl2br((string)$v);
             // Replace Contao insert tags
-            $arrEvents[$k] = $controllerAdapter->replaceInsertTags($v);
+            $arrEvents[$k] = $controllerAdapter->replaceInsertTags($strValue);
         }
 
         return $arrEvents;

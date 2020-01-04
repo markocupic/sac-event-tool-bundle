@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * SAC Event Tool Web Plugin for Contao
  * Copyright (c) 2008-2020 Marko Cupic
@@ -10,6 +12,7 @@
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Contao\CalendarEventsModel;
 use Contao\EventReleaseLevelPolicyModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\ModuleModel;
@@ -25,32 +28,15 @@ abstract class AbstractPrintExportController extends AbstractFrontendModuleContr
 {
 
     /**
-     * @param Request $request
-     * @param ModuleModel $model
-     * @param string $section
-     * @param array|null $classes
-     * @param PageModel|null $page
-     * @return Response
-     */
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
-    {
-        // Call parent __invoke
-        return parent::__invoke($request, $model, $section, $classes);
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
-
-        return $services;
-    }
-
-    /**
-     * @param $objEvent
+     * @param CalendarEventsModel $objEvent
+     * @param int|null $minLevel
      * @return bool
      */
-    public function hasValidReleaseLevel($objEvent, $minLevel = null)
+    public function hasValidReleaseLevel(CalendarEventsModel $objEvent, int $minLevel = null): bool
     {
+        /** @var EventReleaseLevelPolicyModel $eventReleaseLevelPolicyModelAdapter */
+        $eventReleaseLevelPolicyModelAdapter = $this->get('contao.framework')->getAdapter(EventReleaseLevelPolicyModel::class);
+
         if ($objEvent->published)
         {
             return true;
@@ -60,13 +46,14 @@ abstract class AbstractPrintExportController extends AbstractFrontendModuleContr
         {
             if ($objEvent->eventReleaseLevel > 0)
             {
-                $objEventReleaseLevel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+                $objEventReleaseLevel = $eventReleaseLevelPolicyModelAdapter->findByPk($objEvent->eventReleaseLevel);
                 if ($objEventReleaseLevel !== null)
                 {
                     if ($minLevel === null)
                     {
-                        $nextLevelModel = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
-                        $lastLevelModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
+                        /** @var  EventReleaseLevelPolicyModel $nextLevelModel */
+                        $nextLevelModel = $eventReleaseLevelPolicyModelAdapter->findNextLevel($objEvent->eventReleaseLevel);
+                        $lastLevelModel = $eventReleaseLevelPolicyModelAdapter->findLastLevelByEventId($objEvent->id);
                         if ($nextLevelModel !== null && $lastLevelModel !== null)
                         {
                             if ($nextLevelModel->id === $lastLevelModel->id)
@@ -89,21 +76,24 @@ abstract class AbstractPrintExportController extends AbstractFrontendModuleContr
     }
 
     /**
-     * Replace unwanted chars
-     * @param $strValue
-     * @return mixed
+     * Replace chars
+     * @param string $strValue
+     * @return string
      */
-    public function searchAndReplace($strValue)
+    public function searchAndReplace(string $strValue = ''): string
     {
-        $arrReplace = array(
-            // Replace (at) with @
-            '(at)'         => '@',
-            '&#40;at&#41;' => '@',
-        );
-
-        foreach ($arrReplace as $k => $v)
+        if (!empty($strValue))
         {
-            $strValue = str_replace($k, $v, $strValue);
+            $arrReplace = array(
+                // Replace (at) with @
+                '(at)'         => '@',
+                '&#40;at&#41;' => '@',
+            );
+
+            foreach ($arrReplace as $k => $v)
+            {
+                $strValue = str_replace($k, $v, $strValue);
+            }
         }
 
         return $strValue;
