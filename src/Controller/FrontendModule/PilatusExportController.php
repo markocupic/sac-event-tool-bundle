@@ -396,11 +396,11 @@ class PilatusExportController extends AbstractPrintExportController
     }
 
     /**
-     * @param $arrAllowedEventType
+     * @param array $arrAllowedEventType
      * @return array|null
      * @throws \Exception
      */
-    protected function generateEventTable($arrAllowedEventType): ?array
+    protected function generateEventTable(array $arrAllowedEventType): ?array
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
@@ -481,10 +481,10 @@ class PilatusExportController extends AbstractPrintExportController
 
     /**
      * Helper method
-     * @param $timestamp
+     * @param int $timestamp
      * @return int
      */
-    private function getFirstDayOfWeekTimestamp($timestamp): int
+    private function getFirstDayOfWeekTimestamp(int $timestamp): int
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
@@ -497,22 +497,22 @@ class PilatusExportController extends AbstractPrintExportController
 
     /**
      * Helper method
-     * @param $timestamp
+     * @param int $timestamp
      * @return int
      */
-    private function getLastDayOfWeekTimestamp($timestamp): int
+    private function getLastDayOfWeekTimestamp(int $timestamp): int
     {
         return $this->getFirstDayOfWeekTimestamp($timestamp) + 6 * 24 * 3600;
     }
 
     /**
      * Helper method
-     * @param $id
+     * @param int $id
      * @param string $dateFormat
      * @return string
      * @throws \Exception
      */
-    private function getEventPeriod($id, $dateFormat = ''): string
+    private function getEventPeriod(int $id, string $dateFormat = ''): string
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
@@ -695,10 +695,10 @@ class PilatusExportController extends AbstractPrintExportController
 
     /**
      * Generate tours and generalEvents
-     * @param $eventType
+     * @param string $eventType
      * @throws \Exception
      */
-    function generateEvents($eventType): void
+    function generateEvents(string $eventType): void
     {
         /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
@@ -805,7 +805,7 @@ class PilatusExportController extends AbstractPrintExportController
      * @return array
      * @throws \Exception
      */
-    private function getEventDetails($objEvent): array
+    private function getEventDetails(CalendarEventsModel $objEvent): array
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
