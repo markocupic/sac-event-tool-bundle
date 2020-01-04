@@ -127,59 +127,9 @@ class PilatusExportController extends AbstractPrintExportController
         $request = $this->get('request_stack')->getCurrentRequest();
 
         // Handle form submits and reload page
-        if ($request->request->get('FORM_SUBMIT') === 'edit-event')
+        if ($request->request->get('FORM_SUBMIT') === 'update-record')
         {
-            if ($request->request->get('EVENT_TYPE') === 'course')
-            {
-                $arrFields = $this->courseFeEditableFields;
-            }
-            elseif ($request->request->get('EVENT_TYPE') === 'tour')
-            {
-                $arrFields = $this->tourFeEditableFields;
-            }
-
-            $set = array();
-            foreach ($arrFields as $field)
-            {
-                $set[$field] = $request->request->get($field);
-            }
-
-            $eventId = $request->request->get('id');
-
-            $arrReturn = array(
-                'status'  => 'error',
-                'eventId' => $eventId,
-                'message' => '',
-                'set'     => $set,
-            );
-
-            if ($eventId > 0 && count($set) > 0)
-            {
-                try
-                {
-                    /** @var  Connection $conn */
-                    $conn = System::getContainer()->get('database_connection');
-
-                    /** @var QueryBuilder $qb */
-                    $qb = $conn->createQueryBuilder();
-                    $qb->update('tl_calendar_events', 't')
-                        ->values($set)
-                        ->where('t.id = :id')
-                        ->setParameter('id', $eventId);
-                    $qb->execute();
-
-                    $arrReturn['status'] = 'success';
-                    $arrReturn['message'] = sprintf('Saved datarecord with ID %s successfully to the Database (tl_calendar_events).', $eventId);
-                } catch (\Exception $e)
-                {
-                    $arrReturn['status'] = 'error';
-                    $arrReturn['message'] = 'Error during the upload process: ' . $e->getMessage();
-                }
-            }
-
-            /** @var JsonResponse $json */
-            $json = new JsonResponse($arrReturn, 200);
-            $json->send();
+            $this->updateRecord();
             exit;
         }
 
@@ -201,7 +151,11 @@ class PilatusExportController extends AbstractPrintExportController
     }
 
     /**
-     * Generate the module
+     * @param Template $template
+     * @param ModuleModel $model
+     * @param Request $request
+     * @return null|Response
+     * @throws \Exception
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
@@ -238,9 +192,66 @@ class PilatusExportController extends AbstractPrintExportController
     }
 
     /**
-     * @return Form
+     * Update Record
+     * @return JsonResponse
      */
-    protected function generateForm()
+    protected function updateRecord(): JsonResponse
+    {
+        /** @var Request $request */
+        $request = $this->get('request_stack')->getCurrentRequest();
+
+        $arrFields = [];
+        if ($request->request->get('EVENT_TYPE') === 'course')
+        {
+            $arrFields = $this->courseFeEditableFields;
+        }
+        elseif ($request->request->get('EVENT_TYPE') === 'tour')
+        {
+            $arrFields = $this->tourFeEditableFields;
+        }
+
+        $set = array();
+        foreach ($arrFields as $field)
+        {
+            $set[$field] = $request->request->get($field);
+        }
+
+        $eventId = $request->request->get('id');
+
+        $arrReturn = array(
+            'status'  => 'error',
+            'eventId' => $eventId,
+            'message' => '',
+            'set'     => $set,
+        );
+
+        if ($eventId > 0 && count($set) > 0)
+        {
+            try
+            {
+                /** @var  Connection $conn */
+                $conn = System::getContainer()->get('database_connection');
+                $conn->update('tl_calendar_events', $set, array('id' => $eventId));
+
+                $arrReturn['status'] = 'success';
+                $arrReturn['message'] = sprintf('Saved datarecord with ID %s successfully to the Database (tl_calendar_events).', $eventId);
+            } catch (\Exception $e)
+            {
+                $arrReturn['status'] = 'error';
+                $arrReturn['message'] = 'Error during the upload process: ' . $e->getMessage();
+            }
+        }
+
+        /** @var JsonResponse $json */
+        $json = new JsonResponse($arrReturn, 200);
+        return $json->send();
+    }
+
+    /**
+     * Generate the form
+     * @throws \Exception
+     */
+    protected function generateForm(): void
     {
         /** @var Request $request */
         $request = $this->get('request_stack')->getCurrentRequest();
@@ -329,6 +340,7 @@ class PilatusExportController extends AbstractPrintExportController
             // If the user has set the start & end date manually
             elseif ($request->request->get('timeRangeStart') != '' || $request->request->get('timeRangeEnd') != '')
             {
+                $addError = false;
                 if ($request->request->get('timeRangeStart') == '' || $request->request->get('timeRangeEnd') == '')
                 {
                     $addError = true;
@@ -388,7 +400,7 @@ class PilatusExportController extends AbstractPrintExportController
      * @return array|null
      * @throws \Exception
      */
-    protected function generateEventTable($arrAllowedEventType)
+    protected function generateEventTable($arrAllowedEventType): ?array
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
@@ -472,7 +484,7 @@ class PilatusExportController extends AbstractPrintExportController
      * @param $timestamp
      * @return int
      */
-    private function getFirstDayOfWeekTimestamp($timestamp)
+    private function getFirstDayOfWeekTimestamp($timestamp): int
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
@@ -488,7 +500,7 @@ class PilatusExportController extends AbstractPrintExportController
      * @param $timestamp
      * @return int
      */
-    private function getLastDayOfWeekTimestamp($timestamp)
+    private function getLastDayOfWeekTimestamp($timestamp): int
     {
         return $this->getFirstDayOfWeekTimestamp($timestamp) + 6 * 24 * 3600;
     }
@@ -500,7 +512,7 @@ class PilatusExportController extends AbstractPrintExportController
      * @return string
      * @throws \Exception
      */
-    private function getEventPeriod($id, $dateFormat = '')
+    private function getEventPeriod($id, $dateFormat = ''): string
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
@@ -581,7 +593,7 @@ class PilatusExportController extends AbstractPrintExportController
      * array: $this->events['courses']
      * @throws \Exception
      */
-    protected function generateCourses()
+    protected function generateCourses(): void
     {
         /** @var  StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
@@ -683,10 +695,10 @@ class PilatusExportController extends AbstractPrintExportController
 
     /**
      * Generate tours and generalEvents
-     * @param $type
+     * @param $eventType
      * @throws \Exception
      */
-    function generateEvents($eventType)
+    function generateEvents($eventType): void
     {
         /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
@@ -788,12 +800,12 @@ class PilatusExportController extends AbstractPrintExportController
     }
 
     /**
-     * Helper method
-     * @param $objEvent
-     * @return mixed
+     * Helper methos
+     * @param CalendarEventsModel $objEvent
+     * @return array
      * @throws \Exception
      */
-    private function getEventDetails($objEvent)
+    private function getEventDetails($objEvent): array
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
@@ -817,7 +829,7 @@ class PilatusExportController extends AbstractPrintExportController
         $arrRow['url'] = $environmentAdapter->get('url') . '/' . $eventsAdapter->generateEventUrl($objEvent);
         if ($this->showQrCode)
         {
-            $arrRow['qrCode'] = $calendarEventsHelperAdapter->getEventQrCode($objEvent);
+            $arrRow['qrCode'] = $calendarEventsHelperAdapter->getEventQrCode($objEvent, ['scale' => 4]);
         }
         $arrRow['eventState'] = $objEvent->eventState != '' ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
         $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate);

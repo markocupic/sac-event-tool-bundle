@@ -1314,7 +1314,7 @@ class CalendarEventsHelper
             // Defaults
             $opt = [
                 'version'    => 5,
-                'scale'      => 2,
+                'scale'      => 4,
                 'outputType' => QRCode::OUTPUT_IMAGE_PNG,
                 'eccLevel'   => QRCode::ECC_L,
                 'cachefile'  => $filepath

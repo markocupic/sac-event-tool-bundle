@@ -10,6 +10,7 @@
     }
   ],
   "require": {
+    "ext-pdo": "*",
     "contao/core-bundle": "^4.6",
     "terminal42/notification_center": "^1.5",
     "markocupic/export_table": "^3.0",

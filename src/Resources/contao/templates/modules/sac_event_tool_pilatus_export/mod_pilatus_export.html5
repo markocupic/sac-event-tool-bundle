@@ -1,3 +1,5 @@
+<?php $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/mod_pilatus_export.js|static"; ?>
+
 <?php $this->extend('block_unsearchable'); ?>
 
 <?php $this->block('content'); ?>
@@ -20,183 +22,178 @@
 <!-- course table -->
 <h3 class="ce_headline">Monatsprogramm Kurse</h3>
 <?php if (!$this->htmlCourseTable): ?>
-  <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
+<p>Zu dieser Anfrage wurden keine Events gefunden!</p>
 <?php endif; ?>
 <?php if ($this->htmlCourseTable): ?>
-  <!-- insert partial -->
-  <?= $this->htmlCourseTable ?>
+<!-- insert partial -->
+<?= $this->htmlCourseTable ?>
 <?php endif; ?>
 
 
 <!-- courses -->
 <h3 class="ce_headline">Monatsprogramm Kurse</h3>
 <?php if (!$this->events['courses']): ?>
-  <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
+<p>Zu dieser Anfrage wurden keine Events gefunden!</p>
 <?php endif; ?>
 <?php if ($this->events['courses']): ?>
-  <table class="event-export-table event-export-table-courses table table-sm">
+<table class="event-export-table event-export-table-courses table table-sm">
     <tbody>
     <?php foreach ($this->events['courses'] as $arrEvent): ?>
-      <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
         <td class="event-export-event-separator" colspan="2">&nbsp;</td>
-      </tr>
-        <?php if ($arrEvent['headline'] != ''): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-headline" colspan="2"><strong><?= $arrEvent['headline'] ?></strong></td>
-        </tr>
-        <?php endif; ?>
-        <?php if ($arrEvent['eventState'] != ''): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-eventState" colspan="2"><strong><?= $arrEvent['eventState'] ?></strong></td>
-        </tr>
-        <?php endif; ?>
-        <?php if ($arrEvent['teaser'] != ''): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-teaser" colspan="2"><?= $arrEvent['teaser'] ?></td>
-        </tr>
-        <?php endif; ?>
-        <?php if ($arrEvent['issues'] != ''): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-issues">Kursziele</td>
-          <td class="event-export-issues"><?= $arrEvent['issues'] ?></td>
-        </tr>
-        <?php endif; ?>
-        <?php if ($arrEvent['terms'] != ''): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-terms">Kursinhalte</td>
-          <td class="event-export-terms"><?= $arrEvent['terms'] ?></td>
-        </tr>
-        <?php endif; ?>
-        <?php if ($arrEvent['requirements'] != ''): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-requirements">Voraussetzungen</td>
-          <td class="event-export-requirements"><?= $arrEvent['requirements'] ?></td>
-        </tr>
-        <?php endif; ?>
-        <?php if ($arrEvent['location'] != ''): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-location">Kursort</td>
-          <td class="event-export-location"><?= $arrEvent['location'] ?></td>
-        </tr>
-        <?php endif; ?>
-        <?php if ($arrEvent['instructors'] != ''): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-instructors">Kursleitung</td>
-          <td class="event-export-instructors"><strong><?= $arrEvent['instructors'] ?></strong></td>
-        </tr>
-        <?php endif; ?>
-        <?php if ($arrEvent['minMaxMembers'] != ''): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-minMaxMembers">Teilnehmer</td>
-          <td class="event-export-minMaxMembers"><?= $arrEvent['minMaxMembers'] ?></td>
-        </tr>
-        <?php endif; ?>
-        <?php if ($arrEvent['equipment'] != ''): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-equipment">Mitbringen</td>
-          <td class="event-export-equipment"><?= $arrEvent['equipment'] ?></td>
-        </tr>
-        <?php endif; ?>
-        <?php if ($arrEvent['miscellaneous'] != ''): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-miscellaneous">Sonstiges</td>
-          <td class="event-export-miscellaneous"><?= $arrEvent['miscellaneous'] ?></td>
-        </tr>
-        <?php endif; ?>
-        <?php if ($arrEvent['journey'] != '' && $arrEvent['journey'] != 'Keine Angabe'): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-journey">Anfahrt</td>
-          <td class="event-export-journey"><?= $arrEvent['journey'] ?></td>
-        </tr>
-        <?php endif; ?>
-        <?php if ($arrEvent['leistungen'] != ''): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-leistungen">Preis/Leistungen</td>
-          <td class="event-export-leistungen"><?= $arrEvent['leistungen'] ?></td>
-        </tr>
-        <?php endif; ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-bookingEvent">Anmeldung</td>
-          <td class="event-export-bookingEvent">
+    </tr>
+    <?php if ($arrEvent['headline'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-headline" colspan="2"><strong><?= $arrEvent['headline'] ?></strong></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['eventState'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-eventState" colspan="2"><strong><?= $arrEvent['eventState'] ?></strong></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['teaser'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-teaser" colspan="2"><?= $arrEvent['teaser'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['issues'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-issues">Kursziele</td>
+        <td class="event-export-issues"><?= $arrEvent['issues'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['terms'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-terms">Kursinhalte</td>
+        <td class="event-export-terms"><?= $arrEvent['terms'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['requirements'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-requirements">Voraussetzungen</td>
+        <td class="event-export-requirements"><?= $arrEvent['requirements'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['location'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-location">Kursort</td>
+        <td class="event-export-location"><?= $arrEvent['location'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['instructors'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-instructors">Kursleitung</td>
+        <td class="event-export-instructors"><strong><?= $arrEvent['instructors'] ?></strong></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['minMaxMembers'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-minMaxMembers">Teilnehmer</td>
+        <td class="event-export-minMaxMembers"><?= $arrEvent['minMaxMembers'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['equipment'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-equipment">Mitbringen</td>
+        <td class="event-export-equipment"><?= $arrEvent['equipment'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['miscellaneous'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-miscellaneous">Sonstiges</td>
+        <td class="event-export-miscellaneous"><?= $arrEvent['miscellaneous'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['journey'] != '' && $arrEvent['journey'] != 'Keine Angabe'): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-journey">Anfahrt</td>
+        <td class="event-export-journey"><?= $arrEvent['journey'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['leistungen'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-leistungen">Preis/Leistungen</td>
+        <td class="event-export-leistungen"><?= $arrEvent['leistungen'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-bookingEvent">Anmeldung</td>
+        <td class="event-export-bookingEvent">
             <?php if (!$arrEvent['disableOnlineRegistration']): ?>
-              Online Anmeldung: Kursnummer: <?= $arrEvent['courseId'] ?>
+            Online Anmeldung: Kursnummer: <?= $arrEvent['courseId'] ?>
             <?php endif; ?>
             <?php if (isset($arrEvent['registrationPeriod'])): ?>
-              {{br}}Anmeldung möglich vom <?= $arrEvent['registrationPeriod'] ?>
+            {{br}}Anmeldung möglich vom <?= $arrEvent['registrationPeriod'] ?>
             <?php endif; ?>
             <?php if($arrEvent['bookingEvent'] != ''): ?>
-              {{br}}<?= $arrEvent['bookingEvent'] ?>
+            {{br}}<?= $arrEvent['bookingEvent'] ?>
             <?php endif; ?>
             <?php if($arrEvent['generateMainInstructorContactDataFromDb']): ?>
-              {{br}}<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateMainInstructorContactDataFromDb($arrEvent['id']); ?>
+            {{br}}<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateMainInstructorContactDataFromDb($arrEvent['id']); ?>
             <?php endif; ?>
-          </td>
-        </tr>
-        <?php if(isset($arrEvent['qrCode'])): ?>
-        <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-qr-code"></td>
-          <td class="event-qr-code">
+        </td>
+    </tr>
+    <?php if(isset($arrEvent['qrCode'])): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-qr-code"></td>
+        <td class="event-qr-code">
             <img style="border:1px solid black;" src="<?= $arrEvent['qrCode'] ?>"/>
             {{br}}
             <small class="event-qr-code-link"><?= $arrEvent['url'] ?></small>
-          </td>
-        </tr>
-        <?php endif; ?>
+        </td>
+    </tr>
+    <?php endif; ?>
 
-        <tr class="event-export-row-body row-fe-edit d-none" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-          <td class="event-export-editEvent"></td>
-          <td class="event-export-editEvent">
+    <tr class="event-export-row-body row-fe-edit d-none" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-editEvent"></td>
+        <td class="event-export-editEvent">
             <button type="button" class="btn btn-primary" data-targetmodal="editCourseModal" data-eventid="<?= $arrEvent['id'] ?>">Bearbeiten</button>
-          </td>
-        </tr>
-
-
+        </td>
+    </tr>
 
     <?php endforeach; ?>
     </tbody>
-  </table>
+</table>
 
-    <!-- The Course Modal for frontend editing-->
-    <div class="modal" id="editCourseModal">
-      <div class="modal-dialog modal-lg">
+
+<!-- The Course Modal for frontend editing-->
+<div class="modal" id="editCourseModal">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <!-- Modal Header -->
-          <div class="modal-header">
-            <h4 class="modal-title" data-event="title"></h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-          <!-- Modal body -->
-          <div class="modal-body">
-            <form method="post" action="{{env::request}}">
-              <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
-              <input type="hidden" name="FORM_SUBMIT" value="edit-event">
-              <input type="hidden" name="EVENT_TYPE" value="course">
-              <input type="hidden" name="id" data-event="id" value="">
-              <?php foreach ($this->courseFeEditableFields as $field): ?>
-                <?php if($field === 'title') continue; ?>
-                <!-- <?= $field ?> -->
-                <div class="form-group">
-                  <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?></label>
-                  <textarea class="form-control" rows="3" data-event="<?= $field ?>" name="<?= $field ?>"></textarea>
-                </div>
-              <?php endforeach; ?>
-              <button type="button" class="btn btn-primary send-form">Änderungen Speichern</button>
-            </form>
-          </div>
-          <!-- Modal footer -->
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Schliessen</button>
-          </div>
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title" data-event="title"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form method="post" action="{{env::request}}">
+                    <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
+                    <input type="hidden" name="FORM_SUBMIT" value="update-record">
+                    <input type="hidden" name="EVENT_TYPE" value="course">
+                    <input type="hidden" name="id" data-event="id" value="">
+                    <?php foreach ($this->courseFeEditableFields as $field): ?>
+                    <?php if($field === 'title') continue; ?>
+                    <!-- <?= $field ?> -->
+                    <div class="form-group">
+                        <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?></label>
+                        <textarea class="form-control" rows="3" data-event="<?= $field ?>" name="<?= $field ?>"></textarea>
+                    </div>
+                    <?php endforeach; ?>
+                    <button type="button" class="btn btn-primary send-form">Änderungen Speichern</button>
+                </form>
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Schliessen</button>
+            </div>
         </div>
-      </div>
     </div>
-    <!-- End Course modal -->
-
+</div>
+<!-- End Course modal -->
 
 <?php endif; ?>
-
-
-
 
 
 <h3 class="ce_headline">Monatsprogramm Touren</h3>
@@ -204,335 +201,203 @@
 <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
 <?php endif; ?>
 <?php if ($this->htmlTourTable): ?>
-  <!-- insert partial -->
-  <?= $this->htmlTourTable ?>
+<!-- insert partial -->
+<?= $this->htmlTourTable ?>
 <?php endif; ?>
 
 <!-- tours grouped by organizers -->
 <?php $arrTypes = array('tours', 'generalEvents'); ?>
 <?php foreach($arrTypes as $type): ?>
-  <?php if ($this->events[$type]): ?>
-    <?php if($type === 'tours'): ?>
-    <h3 class="ce_headline">Monatsprogramm Touren</h3>
-    <?php endif; ?>
-    <?php if($type === 'generalEvents'): ?>
-    <h3 class="ce_headline">Monatsprogramm allgemeine Anlässe</h3>
-    <?php endif; ?>
-    <table class="event-export-table event-export-table-courses table table-sm">
+<?php if ($this->events[$type]): ?>
+<?php if($type === 'tours'): ?>
+<h3 class="ce_headline">Monatsprogramm Touren</h3>
+<?php endif; ?>
+<?php if($type === 'generalEvents'): ?>
+<h3 class="ce_headline">Monatsprogramm allgemeine Anlässe</h3>
+<?php endif; ?>
+<table class="event-export-table event-export-table-courses table table-sm">
 
-      <tbody>
-      <?php foreach ($this->events[$type] as $arrOrganizer): ?>
-        <tr class="event-export-row-body">
-          <?php if($type === 'tours'): ?>
-          <td class="event-export-tour-organizer" colspan="2"><h4>Touren <?= $arrOrganizer['title'] ?></h4></td>
-          <?php endif; ?>
-          <?php if($type === 'generalEvents'): ?>
-          <td class="event-export-tour-organizer" colspan="2"><h4>Allgemeine Anlässe <?= $arrOrganizer['title'] ?></h4></td>
-          <?php endif; ?>
-        </tr>
-        <?php if (!$arrOrganizer['events']): ?>
-        <tr class="event-export-row-body">
-          <td class="event-export-tour-nor-result-found" colspan="2">Zu dieser Anfrage wurden von diesem Organisator keine Events gefunden!</td>
-        </tr>
+    <tbody>
+    <?php foreach ($this->events[$type] as $arrOrganizer): ?>
+    <tr class="event-export-row-body">
+        <?php if($type === 'tours'): ?>
+        <td class="event-export-tour-organizer" colspan="2"><h4>Touren <?= $arrOrganizer['title'] ?></h4></td>
         <?php endif; ?>
+        <?php if($type === 'generalEvents'): ?>
+        <td class="event-export-tour-organizer" colspan="2"><h4>Allgemeine Anlässe <?= $arrOrganizer['title'] ?></h4></td>
+        <?php endif; ?>
+    </tr>
+    <?php if (!$arrOrganizer['events']): ?>
+    <tr class="event-export-row-body">
+        <td class="event-export-tour-nor-result-found" colspan="2">Zu dieser Anfrage wurden von diesem Organisator keine Events gefunden!</td>
+    </tr>
+    <?php endif; ?>
 
-        <?php foreach ($arrOrganizer['events'] as $arrEvent): ?>
-          <?php if ($arrEvent['eventType'] == 'generalEvent'): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-headline" colspan="2" style="color:red"><strong><?= \EventTypeModel::findByAlias($arrEvent['eventType'])->title ?></strong></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['headline'] != ''): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-headline" colspan="2"><strong><?= $arrEvent['headline'] ?></strong></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['eventState'] != ''): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-eventState" colspan="2"><strong><?= $arrEvent['eventState'] ?></strong></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['teaser'] != ''): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-teaser" colspan="2"><?= $arrEvent['teaser'] ?></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['tourDetailText'] != ''): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-tourDetailText">Details</td>
-            <td class="event-export-tourDetailText"><?= $arrEvent['tourDetailText'] ?></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['tourProfile'] != ''): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-tourProfile">Profil</td>
-            <td class="event-export-tourProfile"><?= $arrEvent['tourProfile'] ?></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['requirements'] != ''): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-requirements">Voraussetzungen</td>
-            <td class="event-export-requirements"><?= $arrEvent['requirements'] ?></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['meetingPoint'] != ''): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-meetingPoint">Treffpunkt/Zeit</td>
-            <td class="event-export-meetingPoint"><?= $arrEvent['meetingPoint'] ?></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['journey'] != '' && $arrEvent['journey'] != 'Keine Angabe'): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-journey">Anfahrt</td>
-            <td class="event-export-journey"><?= $arrEvent['journey'] ?></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['instructors'] != ''): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-instructors">Leitung</td>
-            <td class="event-export-instructors"><strong><?= $arrEvent['instructors'] ?></strong></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['minMaxMembers'] != ''): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-minMaxMembers">Teilnehmer</td>
-            <td class="event-export-minMaxMembers"><?= $arrEvent['minMaxMembers'] ?></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['equipment'] != ''): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-equipment">Mitbringen</td>
-            <td class="event-export-equipment"><?= $arrEvent['equipment'] ?></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['miscellaneous'] != ''): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-miscellaneous">Sonstiges</td>
-            <td class="event-export-miscellaneous"><?= $arrEvent['miscellaneous'] ?></td>
-          </tr>
-          <?php endif; ?>
-          <?php if ($arrEvent['leistungen'] != ''): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-leistungen">Preis/Leistungen</td>
-            <td class="event-export-leistungen"><?= $arrEvent['leistungen'] ?></td>
-          </tr>
-          <?php endif; ?>
-          <time class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-bookingEvent">Anmeldung</td>
-            <?php $arrText = array(); ?>
-            <?php if (!$arrEvent['disableOnlineRegistration']): ?>
-              <?php $arrText[] = sprintf("Online Anmeldung: Tour-/Anlassnummer: %s-%s", Date::parse('Y', $arrEvent['startDate']), $arrEvent['id'], $arrEvent['bookingEvent']); ?>
-            <?php endif; ?>
-            <?php if($arrEvent['bookingEvent'] != ''): ?>
-            <!-- experimental: Redaktion muss diese Einträge prüfen und evtl. doppelt vorhandene Inhalte manuell löschen -->
-            <?php $arrText[] = '<span style="background-color: #FFFF00">' . trim($arrEvent['bookingEvent']) . '</span>'; ?>
-            <?php endif; ?>
-            <!-- end experimental --->
+    <?php foreach ($arrOrganizer['events'] as $arrEvent): ?>
+    <?php if ($arrEvent['eventType'] == 'generalEvent'): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-headline" colspan="2" style="color:red"><strong><?= \EventTypeModel::findByAlias($arrEvent['eventType'])->title ?></strong></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['headline'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-headline" colspan="2"><strong><?= $arrEvent['headline'] ?></strong></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['eventState'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-eventState" colspan="2"><strong><?= $arrEvent['eventState'] ?></strong></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['teaser'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-teaser" colspan="2"><?= $arrEvent['teaser'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['tourDetailText'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-tourDetailText">Details</td>
+        <td class="event-export-tourDetailText"><?= $arrEvent['tourDetailText'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['tourProfile'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-tourProfile">Profil</td>
+        <td class="event-export-tourProfile"><?= $arrEvent['tourProfile'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['requirements'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-requirements">Voraussetzungen</td>
+        <td class="event-export-requirements"><?= $arrEvent['requirements'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['meetingPoint'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-meetingPoint">Treffpunkt/Zeit</td>
+        <td class="event-export-meetingPoint"><?= $arrEvent['meetingPoint'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['journey'] != '' && $arrEvent['journey'] != 'Keine Angabe'): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-journey">Anfahrt</td>
+        <td class="event-export-journey"><?= $arrEvent['journey'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['instructors'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-instructors">Leitung</td>
+        <td class="event-export-instructors"><strong><?= $arrEvent['instructors'] ?></strong></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['minMaxMembers'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-minMaxMembers">Teilnehmer</td>
+        <td class="event-export-minMaxMembers"><?= $arrEvent['minMaxMembers'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['equipment'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-equipment">Mitbringen</td>
+        <td class="event-export-equipment"><?= $arrEvent['equipment'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['miscellaneous'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-miscellaneous">Sonstiges</td>
+        <td class="event-export-miscellaneous"><?= $arrEvent['miscellaneous'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($arrEvent['leistungen'] != ''): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-leistungen">Preis/Leistungen</td>
+        <td class="event-export-leistungen"><?= $arrEvent['leistungen'] ?></td>
+    </tr>
+    <?php endif; ?>
+    <time class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-bookingEvent">Anmeldung</td>
+        <?php $arrText = array(); ?>
+        <?php if (!$arrEvent['disableOnlineRegistration']): ?>
+        <?php $arrText[] = sprintf("Online Anmeldung: Tour-/Anlassnummer: %s-%s", Date::parse('Y', $arrEvent['startDate']), $arrEvent['id'], $arrEvent['bookingEvent']); ?>
+        <?php endif; ?>
+        <?php if($arrEvent['bookingEvent'] != ''): ?>
+        <!-- experimental: Redaktion muss diese Einträge prüfen und evtl. doppelt vorhandene Inhalte manuell löschen -->
+        <?php $arrText[] = '<span style="background-color: #FFFF00">' . trim($arrEvent['bookingEvent']) . '</span>'; ?>
+        <?php endif; ?>
+        <!-- end experimental --->
 
-            <?php if(($strBookingPeriod = Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingPeriod($arrEvent['id'], 'd.m.', 'd.m.Y')) != ''): ?>
-            <?php $arrText[] = 'Anmeldezeitraum: <time>' . $strBookingPeriod . '</time>'; ?>
-            <?php endif; ?>
+        <?php if(($strBookingPeriod = Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingPeriod($arrEvent['id'], 'd.m.', 'd.m.Y')) != ''): ?>
+        <?php $arrText[] = 'Anmeldezeitraum: <time>' . $strBookingPeriod . '
+    </time>
+    '; ?>
+    <?php endif; ?>
 
-            <?php if($arrEvent['generateMainInstructorContactDataFromDb']): ?>
-              <?php $arrText[] = Markocupic\SacEventToolBundle\CalendarEventsHelper::generateMainInstructorContactDataFromDb($arrEvent['id']); ?>
-            <?php endif; ?>
-            <?php if(empty($arrText)): ?>
-              <?php $arrText[] = 'Kontaktdaten siehe JP'; ?>
-            <?php endif; ?>
-            <td class="event-export-bookingEvent"><?= implode('{{br}}', array_filter($arrText)) ?></td>
-          </tr>
-          <?php if(isset($arrEvent['qrCode'])): ?>
-          <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-qr-code"></td>
-            <td class="event-qr-code">
-              <img style="border:1px solid black;" src="<?= $arrEvent['qrCode'] ?>"/>
-              {{br}}
-              <small class="event-qr-code-link"><?= $arrEvent['url'] ?></small>
-            </td>
-          </tr>
-          <?php endif; ?>
+    <?php if($arrEvent['generateMainInstructorContactDataFromDb']): ?>
+    <?php $arrText[] = Markocupic\SacEventToolBundle\CalendarEventsHelper::generateMainInstructorContactDataFromDb($arrEvent['id']); ?>
+    <?php endif; ?>
+    <?php if(empty($arrText)): ?>
+    <?php $arrText[] = 'Kontaktdaten siehe JP'; ?>
+    <?php endif; ?>
+    <td class="event-export-bookingEvent"><?= implode('{{br}}', array_filter($arrText)) ?></td>
+    </tr>
+    <?php if(isset($arrEvent['qrCode'])): ?>
+    <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-qr-code"></td>
+        <td class="event-qr-code">
+            <img style="border:1px solid black;" src="<?= $arrEvent['qrCode'] ?>"/>
+            {{br}}
+            <small class="event-qr-code-link"><?= $arrEvent['url'] ?></small>
+        </td>
+    </tr>
+    <?php endif; ?>
 
-          <tr class="event-export-row-body row-fe-edit d-none" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-            <td class="event-export-editEvent"></td>
-            <td class="event-export-editEvent">
-              <button type="button" class="btn btn-primary" data-targetmodal="editTourModal" data-eventid="<?= $arrEvent['id'] ?>">Bearbeiten</button>
-            </td>
-          </tr>
+    <tr class="event-export-row-body row-fe-edit d-none" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+        <td class="event-export-editEvent"></td>
+        <td class="event-export-editEvent">
+            <button type="button" class="btn btn-primary" data-targetmodal="editTourModal" data-eventid="<?= $arrEvent['id'] ?>">Bearbeiten</button>
+        </td>
+    </tr>
 
-        <?php endforeach; ?>
-      <?php endforeach; ?>
-      </tbody>
-    </table>
-  <?php endif; ?>
+    <?php endforeach; ?>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+<?php endif; ?>
 <?php endforeach; ?>
 
 <!-- The Tour Modal for frontend editing-->
 <div class="modal" id="editTourModal">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title" data-event="title"></h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <!-- Modal body -->
-      <div class="modal-body">
-        <form method="post" action="{{env::request}}">
-          <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
-          <input type="hidden" name="FORM_SUBMIT" value="edit-event">
-          <input type="hidden" name="EVENT_TYPE" value="course">
-          <input type="hidden" name="id" data-event="id" value="">
-          <?php foreach ($this->tourFeEditableFields as $field): ?>
-          <?php if($field === 'title') continue; ?>
-          <!-- <?= $field ?> -->
-          <div class="form-group">
-            <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?></label>
-            <textarea class="form-control" rows="3" data-event="<?= $field ?>" name="<?= $field ?>"></textarea>
-          </div>
-          <?php endforeach; ?>
-          <button type="button" class="btn btn-primary send-form">Änderungen Speichern</button>
-        </form>
-      </div>
-      <!-- Modal footer -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-dismiss="modal">Schliessen</button>
-      </div>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title" data-event="title"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form method="post" action="{{env::request}}">
+                    <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
+                    <input type="hidden" name="FORM_SUBMIT" value="update-record">
+                    <input type="hidden" name="EVENT_TYPE" value="course">
+                    <input type="hidden" name="id" data-event="id" value="">
+                    <?php foreach ($this->tourFeEditableFields as $field): ?>
+                    <?php if($field === 'title') continue; ?>
+                    <!-- <?= $field ?> -->
+                    <div class="form-group">
+                        <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?></label>
+                        <textarea class="form-control" rows="3" data-event="<?= $field ?>" name="<?= $field ?>"></textarea>
+                    </div>
+                    <?php endforeach; ?>
+                    <button type="button" class="btn btn-primary send-form">Änderungen Speichern</button>
+                </form>
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Schliessen</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div><!-- End Course modal -->
-
-<script>
-    (function ($) {
-        $(document).ready(function () {
-
-
-            /**
-             * Catch event data from API
-             */
-            $('button[data-targetmodal]').click(function(e){
-                e.stopPropagation();
-                var modal = $('#' + $(e.target).data('targetmodal'));
-
-                var eventId = $(e.target).data('eventid');
-
-                $(modal).on('show.bs.modal', function (e) {
-                    var form = $(modal).find('form');
-                    form.find('[name="id"').val(eventId);
-                    var formData = $(form).serialize();
-
-                    // Clear modal
-                    $(modal).find('[data-event="title"]').text('');
-                    $(modal).find('textarea[data-event]').val('');
-                    // Fetch data
-                    $.ajax({
-                        url: 'ajaxEventApi/getEventById',
-                        type: 'POST',
-                        data: formData
-                    }).done(function (response) {
-                        if(response['status'] === 'success')
-                        {
-                            var aEvent = response['arrEventData'];
-                            // Show event title in the modal header
-                            $(modal).find('[data-event="title"]').text(aEvent['title']);
-
-                            // Fill textareas with values
-                            for (fieldname in aEvent) {
-                                if ($(modal).find('textarea[data-event="' + fieldname + '"')) {
-                                    $(modal).find('textarea[data-event="' + fieldname + '"').first().val(aEvent[fieldname]);
-                                }
-                            }
-                        }
-                    });
-                });
-                // Open modal
-                $(modal).modal('show');
-
-                // !important: unbind event from modal
-                $(modal).off('show.bs.modal');
-                $(modal).unbind('show.bs.modal');
-            });
-
-
-
-            // Set fe-edit-button label and toggle "d-none" class
-            if(sessionStorage.getItem('enable-frontend-edit') == 'true'){
-                $('tr.row-fe-edit').removeClass('d-none');
-                $('.enable-fe-editing').html($('.enable-fe-editing').data('label-disable'));
-            }else{
-                $('tr.row-fe-edit').addClass('d-none');
-                $('.enable-fe-editing').html($('.enable-fe-editing').data('label-enable'));
-            }
-
-            // Click Event for fe-edit-button
-            $('.enable-fe-editing').click(function(){
-              $('tr.row-fe-edit').toggleClass('d-none');
-              if($('tr.row-fe-edit').hasClass('d-none'))
-              {
-                  alert('Frontend-Editing wurde deaktiviert.');
-                  sessionStorage.setItem('enable-frontend-edit', 'false');
-                  $(this).html($(this).data('label-enable'));
-              }
-              else
-              {
-                  alert('Frontend-Editing wurde aktiviert. Die Events können nun bearbeitet werden. !Achtung gemachte Änderungen können nicht rückgängig gemacht werden.');
-                  sessionStorage.setItem('enable-frontend-edit', 'true');
-                  $(this).html($(this).data('label-disable'));
-              }
-            });
-
-            // Click Event for toggle-recurring-events-button
-            $('.toggle-recurring-events').click(function(){
-                if($('body').hasClass('hide-recurring-events')) {
-                    $('body').removeClass('hide-recurring-events');
-                  $('*[data-recurringevent="true"]').show();
-                    $(this).html($(this).data('label-hide'));
-
-                }else {
-                    $('body').addClass('hide-recurring-events');
-                    $('*[data-recurringevent="true"]').hide();
-                    $(this).html($(this).data('label-show'));
-                }
-            });
-
-            /**
-             * Scroll to last position
-             */
-            if (sessionStorage.getItem('scroll-top') > 0) {
-                $(document).scrollTop(sessionStorage.getItem('scroll-top'));
-                sessionStorage.setItem('scroll-top', 0);
-            }
-
-            /**
-             * Save datarecord and close modal
-             */
-            $("button.send-form").click(function () {
-                if(confirm('Willst du deine Änderungen am Event wirklich speichern?')) {
-                    var modal = $(this).closest('.modal')
-                    var form = $(this).closest('form');
-                    var form_data = $(form).serialize();
-                    var request_method = $(form).attr("method");
-                    var url = $(form).attr("action");
-                    $.ajax({
-                        url: url,
-                        type: request_method,
-                        data: form_data
-                    }).done(function (response) {
-                        if (response['status'] === 'success') {
-                            var scrollTop = $(document).scrollTop();
-                            sessionStorage.setItem('scroll-top', scrollTop);
-                            // Reload page
-                            var formReload = $('input[name="FORM_SUBMIT"][value="form-pilatus-export"]').closest('form');
-                            $(formReload).find('.submit').trigger('click');
-                            $(modal).modal('hide');
-                        } else {
-                            console.log(response.message);
-                        }
-                    });
-                }
-            });
-        });
-    })(jQuery);
-</script>
-
 
 <?php $this->endblock(); ?>
