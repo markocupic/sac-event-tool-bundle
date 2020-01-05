@@ -30,7 +30,6 @@ $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryList'] = array('SAC Toure
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryReader'] = array('SAC Tourenberichte Reader Modul');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventlist'] = array('SAC Touren- und Kurse-Auflistungs Modul');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = array('Event Reader Vorschau');
-$GLOBALS['TL_LANG']['FMD']['eventToolEventToolJahresprogrammExport'] = array('SAC Event-Export f&uuml;r Jahresprogramm');
 
 // Contao 5 ready frontend modules
 $GLOBALS['TL_LANG']['FMD']['tour_difficulty_list'] = array('Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster');
@@ -47,4 +46,5 @@ $GLOBALS['TL_LANG']['FMD']['member_dashboard_avatar_upload'] = array('SAC Mitgli
 $GLOBALS['TL_LANG']['FMD']['csv_export'] = array('SAC-Member- und Backend-User CSV-Export-Funktion');
 $GLOBALS['TL_LANG']['FMD']['event_filter_form'] = array('SAC-Event-Liste-Filter');
 $GLOBALS['TL_LANG']['FMD']['pilatus_export'] = array('SAC Event-Export für Monatszeitschrift');
+$GLOBALS['TL_LANG']['FMD']['jahresprogramm_export'] = array('SAC Event-Export f&uuml;r Jahresprogramm');
 

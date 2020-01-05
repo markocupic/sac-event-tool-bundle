@@ -28,6 +28,4 @@ $GLOBALS['TL_LANG']['tl_module']['activateMemberAccountNotificationId'] = array(
 $GLOBALS['TL_LANG']['tl_module']['jumpToWhenNotActivated'] = array('Weiterleitung zur Seite mit Kontoaktivierungsmodul', 'Legen Sie fest zu welcher Seite ein Mitglied weitergeleitet wird, wenn das Mitgliederkonto deaktiviert ist (login = false)');
 $GLOBALS['TL_LANG']['tl_module']['eventType'] = array('Event Art', 'Legen Sie fest welche Event-Arten angezeigt werden sollen.');
 $GLOBALS['TL_LANG']['tl_module']['eventFilterBoardFields'] = array('Event-Filter-Felder', 'Legen Sie hier die Felder fest, die im Filter angezeigt werden sollen.');
-
-
-
+$GLOBALS['TL_LANG']['tl_module']['print_export_allowedEventTypes'] = array('Anzuzeigende Event-Typen', 'Geben Sie die anzuzeigenden Event-Typen an.');
