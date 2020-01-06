@@ -122,7 +122,7 @@ services:
     - { name: container.service_subscriber }
     public: true
 
-    # Event filter form module
+  # Event filter form module
   Markocupic\SacEventToolBundle\Controller\FrontendModule\JahresprogrammExportController:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]

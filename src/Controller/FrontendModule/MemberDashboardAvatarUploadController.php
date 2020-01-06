@@ -39,7 +39,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class MemberDashboardAvatarUploadController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
- * @FrontendModule(category="sac_event_tool_frontend_modules", type="member_dashboard_avatar_upload")
+ * @FrontendModule("member_dashboard_avatar_upload", category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardAvatarUploadController extends AbstractFrontendModuleController
 {

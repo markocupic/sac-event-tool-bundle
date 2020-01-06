@@ -33,7 +33,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class MemberDashboardEditProfileController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
- * @FrontendModule(category="sac_event_tool_frontend_modules", type="member_dashboard_edit_profile")
+ * @FrontendModule("member_dashboard_edit_profile", category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardEditProfileController extends AbstractFrontendModuleController
 {

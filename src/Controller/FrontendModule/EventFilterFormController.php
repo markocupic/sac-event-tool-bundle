@@ -31,7 +31,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class EventFilterFormController
  * @package Markocupic\SacEventToolBundle\Controller\EventEventFilterFormController
- * @FrontendModule(category="sac_event_tool_frontend_modules", type="event_filter_form")
+ * @FrontendModule("event_filter_form", category="sac_event_tool_frontend_modules")
  */
 class EventFilterFormController extends AbstractFrontendModuleController
 {

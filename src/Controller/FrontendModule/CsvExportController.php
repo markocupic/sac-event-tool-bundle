@@ -39,7 +39,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class CsvExportController
  * @package Markocupic\SacEventToolBundle\Controller\CsvExportController
- * @FrontendModule(category="sac_event_tool_frontend_modules", type="csv_export")
+ * @FrontendModule("csv_export", category="sac_event_tool_frontend_modules")
  */
 class CsvExportController extends AbstractFrontendModuleController
 {

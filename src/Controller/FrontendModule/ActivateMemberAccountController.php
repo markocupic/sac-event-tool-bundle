@@ -43,7 +43,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class ActivateMemberAccountController
  * @package Markocupic\SacEventToolBundle\Controller\ActivateMemberAccountController
- * @FrontendModule(category="sac_event_tool_frontend_modules", type="activate_member_account")
+ * @FrontendModule("activate_member_account", category="sac_event_tool_frontend_modules")
  */
 class ActivateMemberAccountController extends AbstractFrontendModuleController
 {

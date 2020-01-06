@@ -35,7 +35,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class CsvEventMemberExportController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
- * @FrontendModule(category="sac_event_tool_frontend_modules", type="csv_event_member_export")
+ * @FrontendModule("csv_event_member_export", category="sac_event_tool_frontend_modules")
  */
 class CsvEventMemberExportController extends AbstractFrontendModuleController
 {

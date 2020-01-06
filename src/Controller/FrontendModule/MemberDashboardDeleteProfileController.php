@@ -32,7 +32,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class MemberDashboardDeleteProfileController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
- * @FrontendModule(category="sac_event_tool_frontend_modules", type="member_dashboard_delete_profile")
+ * @FrontendModule("member_dashboard_delete_profile", category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardDeleteProfileController extends AbstractFrontendModuleController
 {

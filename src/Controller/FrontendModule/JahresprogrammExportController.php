@@ -38,7 +38,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class JahresprogrammExportController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
- * @FrontendModule(category="sac_event_tool_frontend_modules", type="jahresprogramm_export")
+ * @FrontendModule("jahresprogramm_export", category="sac_event_tool_frontend_modules")
  */
 class JahresprogrammExportController extends AbstractPrintExportController
 {

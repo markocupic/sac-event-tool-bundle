@@ -48,7 +48,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class MemberDashboardWriteEventReportController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
- * @FrontendModule(category="sac_event_tool_frontend_modules", type="member_dashboard_write_event_report")
+ * @FrontendModule("member_dashboard_write_event_report", category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardWriteEventReportController extends AbstractFrontendModuleController
 {

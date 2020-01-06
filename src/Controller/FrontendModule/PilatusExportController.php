@@ -41,7 +41,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 /**
  * Class PilatusExportController
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
- * @FrontendModule(category="sac_event_tool_frontend_modules", type="pilatus_export")
+ * @FrontendModule("pilatus_export", category="sac_event_tool_frontend_modules")
  */
 class PilatusExportController extends AbstractPrintExportController
 {
