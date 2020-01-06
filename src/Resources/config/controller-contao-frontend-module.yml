@@ -100,7 +100,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: csv_export }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -109,7 +109,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: event_filter_form }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -118,7 +118,7 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: pilatus_export }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
 
@@ -127,6 +127,6 @@ services:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
-    - { name: contao.frontend_module, category: jahresprogramm_export }
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
