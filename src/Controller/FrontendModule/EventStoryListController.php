@@ -148,6 +148,7 @@ class EventStoryListController extends AbstractFrontendModuleController
             $arrStory['authorId'] = $objMember->id;
             $arrStory['authorName'] = $objMember !== null ? $objMember->firstname . ' ' . $objMember->lastname : $arrStory['authorName'];
             $arrStory['href'] = $objPageModel !== null ? ampersand($objPageModel->getFrontendUrl(($configAdapter->get('useAutoItem') ? '/' : '/items/') . $this->stories->id)) : null;
+
             $multiSRC = $stringUtilAdapter->deserialize($arrStory['multiSRC'], true);
 
             // Add a random image to the list

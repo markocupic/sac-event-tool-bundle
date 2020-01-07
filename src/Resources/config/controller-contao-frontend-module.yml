@@ -122,8 +122,17 @@ services:
     - { name: container.service_subscriber }
     public: true
 
-  # Event filter form module
+  # Event story list module
   Markocupic\SacEventToolBundle\Controller\FrontendModule\EventStoryListController:
+    calls:
+    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+    - { name: container.service_subscriber }
+    public: true
+
+  # Event story reader module
+  Markocupic\SacEventToolBundle\Controller\FrontendModule\EventStoryReaderController:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:

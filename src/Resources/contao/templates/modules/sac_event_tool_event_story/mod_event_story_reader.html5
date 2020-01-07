@@ -1,0 +1,47 @@
+<div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
+
+    <?php if ($this->headline): ?>
+    <h1 class="ce_headline"><?= $this->headline ?></h1>
+    <?php endif; ?>
+
+    <?php if($this->eventSubstitutionText != ''): ?>
+    <h4 class="mt-0 mb-3" style="color: red"><!-- indexer::stop -->Ausweichtour:<!-- indexer::continue --> <?= $this->eventSubstitutionText ?></h4>
+    <?php endif; ?>
+
+    <div>
+        <p><?= nl2br($this->text) ?></p>
+    </div>
+
+    <?php if ($this->images): ?>
+    <div class="ce_gallery">
+        <div class="row tiny-gutter">
+            <!-- indexer::stop -->
+            <?php foreach ($this->images as $image): ?>
+            <figure class="col-12 col-sm-6 col-md-3 image_container thumbnail responsive">
+                <a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement" title="<?=  $image['linkTitle']  ?>">
+                    {{image::<?= Contao\StringUtil::binToUuid($image['uuid']) ?>?width=400&height=400&mode=crop&alt=<?= $image['alt'] ?>}}
+                </a>
+                <figcaption class="figure-caption"><?= $image['strFigureCaption'] ?></figcaption>
+            </figure>
+            <?php endforeach; ?>
+            <!-- indexer::continue -->
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($this->youtubeId): ?>
+    {{br}}
+    <div class="ce_bootstrapYoutubeResponsiveEmbed block">
+        <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" src="//www.youtube.com/embed/<?= $this->youtubeId ?>?rel=0" allowfullscreen=""></iframe>
+        </div>
+    </div>
+    <?php endif; ?>
+    </div>
+
+
+</div>
+
+
+
+

@@ -29,7 +29,6 @@
     <?php endforeach; ?>
 </div>
 <?= $this->pagination ?>
-</div>
 
 <?php $this->endblock(); ?>
 
