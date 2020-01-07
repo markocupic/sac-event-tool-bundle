@@ -70,7 +70,7 @@ class MaintainBackendUsersHomeDirectory
         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
         
         /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->framework->getAdapter(FilesModel::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         new Folder($configAdapter->get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $objUser->id);
         new Folder($configAdapter->get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $objUser->id . '/avatar');
