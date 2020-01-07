@@ -21,6 +21,7 @@ use Contao\UserModel;
 use Psr\Log\LogLevel;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Folder;
+use Contao\StringUtil;
 
 /**
  * Class MaintainBackendUsersHomeDirectory
@@ -67,6 +68,9 @@ class MaintainBackendUsersHomeDirectory
 
         /** @var FilesModel $filesModelAdapter */
         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+        
+        /** @var StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->framework->getAdapter(FilesModel::class);
 
         new Folder($configAdapter->get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $objUser->id);
         new Folder($configAdapter->get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $objUser->id . '/avatar');
@@ -85,7 +89,7 @@ class MaintainBackendUsersHomeDirectory
         // Add filemount for the user directory
         $strFolder = $configAdapter->get('SAC_EVT_BE_USER_DIRECTORY_ROOT') . '/' . $objUser->id;
         $objFile = $filesModelAdapter->findByPath($strFolder);
-        $arrFileMounts = unserialize($objUser->filemounts);
+        $arrFileMounts = $stringUtilAdapter->deserialize($objUser->filemounts, true);
         $arrFileMounts[] = $objFile->uuid;
 
         $objUser->filemounts = serialize(array_unique($arrFileMounts));
