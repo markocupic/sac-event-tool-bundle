@@ -26,8 +26,6 @@ $GLOBALS['TL_LANG']['MOD']['sac_event_type_tool'] = array('SAC Event-Art-Tool');
 
 // Frontend modules
 $GLOBALS['TL_LANG']['FMD']['sac_event_tool_frontend_modules'] = array('SAC Frontend Module');
-$GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryList'] = array('SAC Tourenberichte Listen Modul');
-$GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventStoryReader'] = array('SAC Tourenberichte Reader Modul');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventlist'] = array('SAC Touren- und Kurse-Auflistungs Modul');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = array('Event Reader Vorschau');
 
@@ -47,4 +45,5 @@ $GLOBALS['TL_LANG']['FMD']['csv_export'] = array('SAC-Member- und Backend-User C
 $GLOBALS['TL_LANG']['FMD']['event_filter_form'] = array('SAC-Event-Liste-Filter');
 $GLOBALS['TL_LANG']['FMD']['pilatus_export'] = array('SAC Event-Export für Monatszeitschrift');
 $GLOBALS['TL_LANG']['FMD']['jahresprogramm_export'] = array('SAC Event-Export f&uuml;r Jahresprogramm');
-
+$GLOBALS['TL_LANG']['FMD']['event_story_list'] = array('SAC Tourenberichte Listen Modul');
+$GLOBALS['TL_LANG']['FMD']['event_story_reader'] = array('SAC Tourenberichte Reader Modul');
