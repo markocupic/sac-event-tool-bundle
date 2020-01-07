@@ -13,15 +13,15 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Services\BackendUser;
 
 use Contao\Config;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Files;
 use Contao\FilesModel;
+use Contao\Folder;
+use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Psr\Log\LogLevel;
-use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Folder;
-use Contao\StringUtil;
 
 /**
  * Class MaintainBackendUsersHomeDirectory
@@ -68,7 +68,7 @@ class MaintainBackendUsersHomeDirectory
 
         /** @var FilesModel $filesModelAdapter */
         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
-        
+
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
