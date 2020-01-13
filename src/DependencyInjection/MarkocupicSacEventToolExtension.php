@@ -39,6 +39,7 @@ class MarkocupicSacEventToolExtension extends Extension
         $loader->load('controller-ajax.yml');
         $loader->load('controller-contao-frontend-module.yml');
         $loader->load('controller-contao-content-element.yml');
+        $loader->load('sac-member-database.yml');
         $loader->load('cache.yml');
         $loader->load('cron.yml');
         $loader->load('contao-mode.yml');

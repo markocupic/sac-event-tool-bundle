@@ -14,7 +14,7 @@ namespace Markocupic\SacEventToolBundle\Cron\Contao;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
-use Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase;
+use Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase;
 
 /**
  * Class HourlyCron
@@ -53,7 +53,7 @@ class HourlyCron
     public function syncSacMemberDatabase()
     {
         /** @var  SyncSacMemberDatabase $cron */
-        $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase');
+        $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase');
         $cron->run();
     }
 

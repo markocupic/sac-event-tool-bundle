@@ -10,19 +10,19 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Services\SacMemberDatabase;
+namespace Markocupic\SacEventToolBundle\SacMemberDatabase;
 
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\Database;
 use Contao\File;
-use Contao\System;
-use Doctrine\DBAL\Connection;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
  * Class SyncSacMemberDatabase
- * @package Markocupic\SacEventToolBundle\Services\SacMemberDatabase
+ * @package Markocupic\SacEventToolBundle\SacMemberDatabase
  */
 class SyncSacMemberDatabase
 {
@@ -32,9 +32,9 @@ class SyncSacMemberDatabase
     private $framework;
 
     /**
-     * @var Connection
+     * @var ?LoggerInterface
      */
-    private $connection;
+    private $logger;
 
     /**
      * string $projectDir
@@ -84,21 +84,21 @@ class SyncSacMemberDatabase
     /**
      * SyncSacMemberDatabase constructor.
      * @param ContaoFramework $framework
-     * @param Connection $connection
+     * @param null|LoggerInterface $logger
      * @param $projectDir
      */
-    public function __construct(ContaoFramework $framework, Connection $connection, $projectDir)
+    public function __construct(ContaoFramework $framework, ?LoggerInterface $logger = null, $projectDir)
     {
         $this->framework = $framework;
-        $this->connection = $connection;
         $this->projectDir = $projectDir;
+        $this->logger = $logger;
 
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
 
         $this->ftp_hostname = $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME');
-        $this->ftp_username = (string)$configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME');
-        $this->ftp_password = (string)$configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD');
+        $this->ftp_username = (string) $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME');
+        $this->ftp_password = (string) $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD');
         $this->section_ids = explode(',', $configAdapter->get('SAC_EVT_SAC_SECTION_IDS'));
     }
 
@@ -107,14 +107,14 @@ class SyncSacMemberDatabase
      */
     public function run()
     {
-        $this->loadFilesFtp();
+        $this->fetchFilesFromFtp();
         $this->syncContaoDatabase();
     }
 
     /**
      * @throws \Exception
      */
-    private function loadFilesFtp(): void
+    private function fetchFilesFromFtp(): void
     {
         // Open FTP connection
         $connId = $this->openFtpConnection();
@@ -135,6 +135,7 @@ class SyncSacMemberDatabase
             {
                 $msg = 'Could not find/download ' . $remoteFile . ' from ' . $this->ftp_hostname;
                 $this->log(LogLevel::CRITICAL, $msg, __METHOD__, ContaoContext::ERROR);
+
                 throw new \Exception($msg);
             }
         }
@@ -151,8 +152,8 @@ class SyncSacMemberDatabase
         if (!\ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId)
         {
             $msg = 'Could not establish ftp connection to ' . $this->ftp_hostname;
+            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, self::ERROR);
 
-            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, ContaoContext::ERROR);
             throw new \Exception($msg);
         }
 
@@ -160,16 +161,19 @@ class SyncSacMemberDatabase
     }
 
     /**
-     * @throws \Doctrine\DBAL\ConnectionException
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Exception
      */
     private function syncContaoDatabase(): void
     {
         $startTime = \time();
         sleep(2);
-        $statement = $this->connection->query('SELECT sacMemberId FROM tl_member');
-        $arrMemberIDS = $statement->fetchAll(\PDO::FETCH_COLUMN);
+        $arrMemberIDS = [];
 
+        $statement = Database::getInstance()->execute('SELECT sacMemberId FROM tl_member');
+        if ($statement->numRows)
+        {
+            $arrMemberIDS = $statement->fetchEach('sacMemberId');
+        }
         $arrMember = array();
         foreach ($this->section_ids as $sectionId)
         {
@@ -189,7 +193,7 @@ class SyncSacMemberDatabase
                     $set['sacMemberId'] = \intval($arrLine[0]);
                     $set['username'] = \intval($arrLine[0]);
                     // Mehrere Sektionsmitgliedschaften möglich
-                    $set['sectionId'] = array((string)ltrim($arrLine[1], '0'));
+                    $set['sectionId'] = array((string) ltrim($arrLine[1], '0'));
                     $set['lastname'] = $arrLine[2];
                     $set['firstname'] = $arrLine[3];
                     $set['addressExtra'] = $arrLine[4];
@@ -242,13 +246,31 @@ class SyncSacMemberDatabase
             }
         }
 
-        // Set tl_member.isSacMember to empty string
-        $this->connection->executeUpdate('UPDATE tl_member SET isSacMember = ?', array(''));
+        @ini_set('max_execution_time', '0');
+        // Consider the suhosin.memory_limit
+        if (\extension_loaded('suhosin'))
+        {
+            if (($limit = ini_get('suhosin.memory_limit')) !== '')
+            {
+                @ini_set('memory_limit', (string) $limit);
+            }
+        }
+        else
+        {
+            @ini_set('memory_limit', '-1');
+        }
 
-        // Start transaction (big thank to cyon.ch)
-        $this->connection->beginTransaction();
         try
         {
+            // Lock table tl_member for writing
+            Database::getInstance()->lockTables(array('tl_member' => 'WRITE'));
+
+            // Start transaction (big thank to cyon.ch)
+            Database::getInstance()->beginTransaction();
+
+            // Set tl_member.isSacMember to empty string
+            Database::getInstance()->prepare('UPDATE tl_member SET isSacMember = ?')->execute('');
+
             $i = 0;
             foreach ($arrMember as $sacMemberId => $arrValues)
             {
@@ -256,8 +278,10 @@ class SyncSacMemberDatabase
 
                 if (!in_array($sacMemberId, $arrMemberIDS))
                 {
-                    // Add new user
-                    $this->connection->insert('tl_member', $arrValues);
+                    $arrValues['dateAdded'] = time();
+
+                    // Add new member
+                    Database::getInstance()->prepare('INSERT INTO tl_member %s')->set($arrValues)->execute();
 
                     // Log
                     $msg = \sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
@@ -266,33 +290,36 @@ class SyncSacMemberDatabase
                 else
                 {
                     // Sync datarecord
-                    $this->connection->update('tl_member', $arrValues, array('sacMemberId' => $sacMemberId));
+                    Database::getInstance()->prepare('UPDATE tl_member %s WHERE sacMemberId=?')->set($arrValues)->execute($sacMemberId);
                 }
 
                 $i++;
             }
-            $this->connection->commit();
+
+            Database::getInstance()->commitTransaction();
         } catch (\Exception $e)
         {
             $msg = 'Error during the database sync process. Starting transaction rollback, now.';
-            $this->log(LogLevel::ERROR, $msg, __METHOD__, self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR);
+            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR);
 
             //transaction rollback
-            $this->connection->rollBack();
+            Database::getInstance()->rollbackTransaction();
+
+            Database::getInstance()->unlockTables();
 
             // Throw exception
             throw $e;
         }
 
         // Set tl_member.disable to true if member was not found in the csv-file
-        $statement = $this->connection->executeQuery('SELECT * FROM tl_member WHERE disable=? AND isSacMember=?', array('', ''));
-        while (false !== ($objDisabledMember = $statement->fetch(\PDO::FETCH_OBJ)))
+        $objDisabledMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE disable=? AND isSacMember=?')->execute('', '');
+        while ($objDisabledMember->next())
         {
             $arrSet = array(
                 'tstamp'  => \time(),
                 'disable' => '1',
             );
-            $this->connection->update('tl_member', $arrSet, array('id' => $objDisabledMember->id));
+            Database::getInstance()->prepare('UPDATE tl_member %s WHERE id=?')->set($arrSet)->execute($objDisabledMember->id);
 
             // Log
             $msg = \sprintf('Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. The user can not be found in the SAC main database from Bern.', $objDisabledMember->firstname, $objDisabledMember->lastname, $objDisabledMember->sacMemberId);
@@ -317,11 +344,13 @@ class SyncSacMemberDatabase
      */
     private function log(string $strLogLevel, string $strText, string $strMethod, string $strCategory): void
     {
-        $logger = System::getContainer()->get('monolog.logger.contao');
-        $logger->log(
-            $strLogLevel,
-            $strText,
-            array('contao' => new ContaoContext($strMethod, $strCategory))
-        );
+        if ($this->logger !== null)
+        {
+            $this->logger->log(
+                $strLogLevel,
+                $strText,
+                array('contao' => new ContaoContext($strMethod, $strCategory))
+            );
+        }
     }
 }

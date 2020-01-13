@@ -41,14 +41,6 @@ services:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
-  # Sync member database form bern with contao tl_member
-  Markocupic\SacEventToolBundle\Services\SacMemberDatabase\SyncSacMemberDatabase:
-    public: true
-    arguments:
-    - '@contao.framework'
-    - '@database_connection'
-    - '%kernel.project_dir%'
-
   # Generate worhshop booklet
   Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf:
     public: true

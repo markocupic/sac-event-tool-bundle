@@ -1,0 +1,9 @@
+services:
+
+  # Sync member database form Bern with contao core database tl_member
+  Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase:
+    public: true
+    arguments:
+    - '@contao.framework'
+    - '@monolog.logger.contao'
+    - '%kernel.project_dir%'
