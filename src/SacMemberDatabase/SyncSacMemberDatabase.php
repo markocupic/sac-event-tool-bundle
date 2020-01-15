@@ -96,10 +96,17 @@ class SyncSacMemberDatabase
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
 
+        /** @var string ftp_hostname */
         $this->ftp_hostname = $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME');
+
+        /** @var string ftp_username */
         $this->ftp_username = (string) $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME');
+
+        /** @var string ftp_password */
         $this->ftp_password = (string) $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD');
-        $this->section_ids = explode(',', $configAdapter->get('SAC_EVT_SAC_SECTION_IDS'));
+ 
+        /** @var array section_ids */
+        $this->section_ids = !empty($configAdapter->get('SAC_EVT_SAC_SECTION_IDS')) ? explode(',', $configAdapter->get('SAC_EVT_SAC_SECTION_IDS')) : [];
     }
 
     /**
@@ -130,7 +137,8 @@ class SyncSacMemberDatabase
             }
 
             $remoteFile = 'Adressen_0000' . $sectionId . '.csv';
-            // Download file
+
+            // Fetch file
             if (!\ftp_get($connId, $localFile, $remoteFile, FTP_BINARY))
             {
                 $msg = 'Could not find/download ' . $remoteFile . ' from ' . $this->ftp_hostname;
