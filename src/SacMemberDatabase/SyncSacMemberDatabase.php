@@ -166,7 +166,6 @@ class SyncSacMemberDatabase
     private function syncContaoDatabase(): void
     {
         $startTime = \time();
-        sleep(2);
         $arrMemberIDS = [];
 
         $statement = Database::getInstance()->execute('SELECT sacMemberId FROM tl_member');
