@@ -27,6 +27,7 @@ use Contao\EventOrganizerModel;
 use Contao\Events;
 use Contao\FilesModel;
 use Contao\FrontendUser;
+use Contao\Input;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\ModuleModel;
@@ -39,6 +40,7 @@ use Contao\Validator;
 use Doctrine\DBAL\Connection;
 use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
 use NotificationCenter\Model\Notification;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Request;
@@ -116,33 +118,36 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
         $notificationAdapter = $this->get('contao.framework')->getAdapter(Notification::class);
         $userModelAdapter = $this->get('contao.framework')->getAdapter(UserModel::class);
+        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
 
         if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
         {
-            $this->objUser = $objUser;
+            /** @var MemberModel objUser */
+            $this->objUser = MemberModel::findByPk($objUser->id);
         }
 
         // Set the item from the auto_item parameter
-        if (!$request->query->get('events') && $configAdapter->get('useAutoItem') && isset($_GET['auto_item']))
+        if (!isset($_GET['events']) && $configAdapter->get('useAutoItem') && isset($_GET['auto_item']))
         {
-            $request->query->set('events', $_GET['auto_item']);
-            $request->query->set('auto_item', $_GET['auto_item']);
+            $inputAdapter->setGet('events', $inputAdapter->get('auto_item'));
         }
 
         $blnShowModule = false;
 
         // Get $this->objEvent
-        if ($request->query->get('events') != '')
+        if ($inputAdapter->get('events') != '')
         {
-            $objEvent = $calendarEventsModelAdapter->findByIdOrAlias($request->query->get('events'));
-            if ($objEvent !== null && $this->objUser !== null)
+            $objEvent = $calendarEventsModelAdapter->findByIdOrAlias($inputAdapter->get('events'));
+            if ($objEvent !== null)
             {
                 $this->objEvent = $objEvent;
                 $blnShowModule = true;
             }
         }
 
-        if (!$blnShowModule)
+        /** @var ContaoMode $scope */
+        $scope = System::getContainer()->get('Markocupic\SacEventToolBundle\ContaoMode\ContaoMode');
+        if ($scope->isFrontend() && !$blnShowModule)
         {
             // Return empty string
             return new Response('', Response::HTTP_NO_CONTENT);
@@ -220,12 +225,12 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         {
             $messageAdapter->addInfo('Eine Online-Anmeldung zu diesem Event ist nicht möglich.', $scope);
         }
-        elseif (!$this->objUser)
+        elseif ($this->objUser === null)
         {
             $messageAdapter->addInfo('Bitte logge dich mit deinem Mitglieder-Konto ein, um dich für den Event anzumelden.', $scope);
             $this->template->showLoginForm = true;
         }
-        elseif ($this->objUser && true === $calendarEventsMemberModelAdapter->isRegistered($this->objUser->id, $this->objEvent->id))
+        elseif ($this->objUser !== null && true === $calendarEventsMemberModelAdapter->isRegistered($this->objUser->id, $this->objEvent->id))
         {
             $messageAdapter->addInfo('Du hast dich bereits für diesen Event angemeldet.', $scope);
         }
@@ -261,17 +266,21 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         {
             $messageAdapter->addError('Der Hauptleiter mit ID ' . $this->objEvent->mainInstructor . ' wurde nicht in der Datenbank gefunden. Bitte nimm persönlich Kontakt mit dem Leiter auf.', $scope);
         }
-        elseif ($this->objInstructor->email == '' || !$validatorAdapter->isEmail($this->objInstructor->email))
+        elseif (empty($this->objInstructor->email) || !$validatorAdapter->isEmail($this->objInstructor->email))
         {
             $messageAdapter->addError('Dem Hauptleiter mit ID ' . $this->objEvent->mainInstructor . ' ist keine gültige E-Mail zugewiesen. Bitte nimm persönlich mit dem Leiter Kontakt auf.', $scope);
         }
-        elseif ($this->objUser->email == '' || !$validatorAdapter->isEmail($this->objUser->email))
+        elseif (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email))
         {
             $messageAdapter->addError('Leider wurde für dieses Mitgliederkonto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlege auf auf der Internetseite des Zentralverbands deine E-Mail-Adresse.');
         }
         elseif ($this->objNotification === null)
         {
             $messageAdapter->addError('Systemfehler: Für das Modul ist keine Benachrichtigung (terminal42/notification_center) eingestellt worden. Bitte melde den Fehler bei der Geschäftsstelle der Sektion.', $scope);
+        }
+        else
+        {
+            // All ok! Show the registration form;
         }
 
         // Add messages to the template
@@ -339,19 +348,19 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $memberModelAdapter = $this->get('contao.framework')->getAdapter(MemberModel::class);
         /** @var Config $configAdapter */
         $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+        /** @var Input $inputAdapter */
+        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
 
-        // Get the request object
-        $request = $this->get('request_stack')->getCurrentRequest();
-
-        $objEvent = $calendarEventsModelAdapter->findByIdOrAlias($request->query->get('events'));
+        $objEvent = $calendarEventsModelAdapter->findByIdOrAlias($inputAdapter->get('events'));
         if ($objEvent === null)
         {
             return null;
         }
 
         $objForm = new Form('form-event-registration', 'POST', function ($objHaste) {
-            $request = $this->get('request_stack')->getCurrentRequest();
-            return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
+            /** @var Input $inputAdapter */
+            $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+            return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
@@ -440,11 +449,15 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $arrFields = array('mobile', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits');
         foreach ($arrFields as $field)
         {
-            $objWidget = $objForm->getWidget($field);
-            if ($objWidget->value == '')
+            if ($objForm->hasFormField($field))
             {
                 $objWidget = $objForm->getWidget($field);
-                $objWidget->value = $this->objUser->{$field};
+
+                if ($objWidget->value == '')
+                {
+                    $objWidget = $objForm->getWidget($field);
+                    $objWidget->value = $this->objUser->{$field};
+                }
             }
         }
 
