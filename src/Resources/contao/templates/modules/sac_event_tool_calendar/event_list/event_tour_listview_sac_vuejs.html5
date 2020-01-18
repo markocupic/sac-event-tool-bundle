@@ -1,1 +1,2 @@
-Eventlist.ids.push(<?= $this->id ?>);
+<?php if(!isset($GLOBALS['modEventListArrIds'])) $GLOBALS['modEventListArrIds'] = []; ?>
+<?php $GLOBALS['modEventListArrIds'][] = $this->id ?>

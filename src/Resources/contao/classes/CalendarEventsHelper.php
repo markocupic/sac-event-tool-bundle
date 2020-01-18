@@ -118,11 +118,32 @@ class CalendarEventsHelper
             case 'tourTypesTitles':
                 $value = implode('<br>', static::getTourTypesAsArray($objEvent->id, 'title', false));
                 break;
+            case 'startDateDay':
+                $value = Date::parse('d', $objEvent->startDate);
+                break;
+            case 'startDateMonth':
+                $value = Date::parse('M', $objEvent->startDate);
+                break;
+            case 'startDateYear':
+                $value = Date::parse('y', $objEvent->startDate);
+                break;
+            case 'endDateDay':
+                $value = Date::parse('d', $objEvent->endDate);
+                break;
+            case 'endDateMonth':
+                $value = Date::parse('M', $objEvent->endDate);
+                break;
+            case 'endDateYear':
+                $value = Date::parse('y', $objEvent->endDate);
+                break;
             case 'eventPeriodSm':
                 $value = static::getEventPeriod($objEvent->id, 'd.m.Y', false);
                 break;
             case 'eventPeriodSmTooltip':
                 $value = static::getEventPeriod($objEvent->id, 'd.m.Y', false, true);
+                break;
+            case 'eventPeriodLgInline':
+                $value = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false, true, true);
                 break;
             case 'eventPeriodLg':
                 $value = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false);
@@ -588,7 +609,7 @@ class CalendarEventsHelper
      * @return string
      * @throws \Exception
      */
-    public static function getEventPeriod($id, $dateFormat = '', $blnAppendEventDuration = true, $blnTooltip = true)
+    public static function getEventPeriod($id, $dateFormat = '', $blnAppendEventDuration = true, $blnTooltip = true, $blnInline = false)
     {
         if ($dateFormat == '')
         {
@@ -623,7 +644,7 @@ class CalendarEventsHelper
             }
             if ($blnTooltip)
             {
-                return Date::parse($dateFormat, self::getStartDate($id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '') . '<br><a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Eventdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
+                return Date::parse($dateFormat, self::getStartDate($id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '') . (!$blnInline ? '<br>' : ' ' ) . '<a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Eventdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
             }
             else
             {
@@ -755,7 +776,7 @@ class CalendarEventsHelper
 
         if ($objEvent->durationInfo != '')
         {
-            return (string)$objEvent->durationInfo;
+            return (string) $objEvent->durationInfo;
         }
         elseif (is_array($arrDates) && !empty($arrDates))
         {

@@ -19,81 +19,102 @@
         </div>
 
         <?php if (!FE_USER_LOGGED_IN): ?>
-        {{br}}
-        <div class="alert alert-info" role="alert">
-            Bitte melde dich mit deinem Mitgliederkonto an, um die Kontaktdaten und mehr von <strong><?=$this->user['name'] ?></strong> zu sehen.
-        </div>
-        {{br}}
-        <?php endif ?>
+            {{br}}
+            <div class="alert alert-info" role="alert">
+                Bitte melde dich mit deinem Mitgliederkonto an, um die Kontaktdaten und mehr von <strong><?=$this->user['name'] ?></strong> zu sehen.
+            </div>
+            {{br}}
+            <?php endif ?>
 
-        <?php if (FE_USER_LOGGED_IN): ?>
-        <div class="ce_user_portrait_street">
-            <?= $this->user['street'] ?>
-        </div>
+            <?php if (FE_USER_LOGGED_IN): ?>
+            <div class="ce_user_portrait_street">
+                <?= $this->user['street'] ?>
+            </div>
 
-        <div class="ce_user_portrait_city">
-            <?= $this->user['postal'] ?> <?= $this->user['city'] ?>
-        </div>
-        <!-- Show personal data to logged users only -->
-        <?php if($this->user['phone'] !== ''): ?>
-        <div class="ce_user_portrait_phone">
-            <?= $this->user['phone'] ?>
-        </div>
-        <?php endif; ?>
+            <div class="ce_user_portrait_city">
+                <?= $this->user['postal'] ?> <?= $this->user['city'] ?>
+            </div>
+            <!-- Show personal data to logged users only -->
+            <?php if($this->user['phone'] !== ''): ?>
+            <div class="ce_user_portrait_phone">
+                <?= $this->user['phone'] ?>
+            </div>
+            <?php endif; ?>
 
-        <?php if($this->user['mobile'] !== ''): ?>
-        <div class="ce_user_portrait_mobile">
-            <?= $this->user['mobile'] ?>
-        </div>
-        <?php endif; ?>
+            <?php if($this->user['mobile'] !== ''): ?>
+            <div class="ce_user_portrait_mobile">
+                <?= $this->user['mobile'] ?>
+            </div>
+            <?php endif; ?>
 
-        <div class="ce_user_portrait_email">
-            {{email::<?= $this->user['email'] ?>}}
-        </div>
+            <div class="ce_user_portrait_email">
+                {{email::<?= $this->user['email'] ?>}}
+            </div>
 
-        <?php if ($this->user['hobbies'] != ''): ?>
-        <div class="ce_user_portrait_hobbies">
-            <h5 class="ce_headline">Hobbys</h5>
-            <?= nl2br($this->user['hobbies']) ?>
-        </div>
-        <?php endif; ?>
+            <?php if ($this->user['hobbies'] != ''): ?>
+            <div class="ce_user_portrait_hobbies">
+                <h5 class="ce_headline">Hobbys</h5>
+                <?= nl2br($this->user['hobbies']) ?>
+            </div>
+            <?php endif; ?>
 
-        <?php if ($this->user['introducing'] != ''): ?>
-        <h5 class="ce_headline">Selbstportrait</h5>
-        <div class="ce_user_portrait_introducing">
-            <?= nl2br($this->user['introducing']) ?>
-        </div>
-        <?php endif; ?>
+            <?php if ($this->user['introducing'] != ''): ?>
+            <h5 class="ce_headline">Selbstportrait</h5>
+            <div class="ce_user_portrait_introducing">
+                <?= nl2br($this->user['introducing']) ?>
+            </div>
+            <?php endif; ?>
         <?php endif; ?>
 
     </div>
 </div>
 <br>
-
 <br>
+
+
 <?php $arrEvents = $this->events; ?>
+
+
+
 <?php if (!empty($arrEvents['tour']) && is_array($arrEvents['tour'])): ?>
-<h2 class="ce_headline">Die n&auml;chsten Touren mit <?= $this->user['name'] ?></h2>
-<?php
-$GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/event_data_lazy_load.js|static";
-?>
-<div data-request-token="{{request_token}}" style="display:none"></div>
-<table class="table">
-    <tr>
-        <th>Datum</th>
-        <th class="d-none d-md-table-cell">Dauer</th>
-        <th></th>
-        <th>Tour</th>
-        <th class="d-none d-md-table-cell">Anz.</th>
-        <th class="d-none d-md-table-cell">Anf.</th>
-        <th class="d-none d-md-table-cell">Art</th>
-        <th>Leitung</th>
-    </tr>
+
+    <h2 class="ce_headline">Die n&auml;chsten Touren mit <?= $this->user['name'] ?></h2>
+
+    <?php $arrIds = []; ?>
     <?php foreach ($arrEvents['tour'] as $event): ?>
-    <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateEventRow($event['id'], array('tour', 'lastMinuteTour'), 'partial_event_tour_row_layout_table') ?>
+    <?php $arrIds[] = $event['id']; ?>
     <?php endforeach; ?>
-</table>
+
+    <?php $vueOptions = [
+        'arrIds' => $arrIds,
+        'limitOnFirstRequest' => 50,
+        'limit' => 200
+    ]; ?>
+
+    <?php $this->insert('partial_event_tour_item_vuejs', $vueOptions); ?>
+
 <?php endif; ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <?php if (!empty($arrEvents['course']) && is_array($arrEvents['course'])): ?>
 <h2 class="ce_headline">Die n&auml;chsten Kurse mit <?= $this->user['name'] ?></h2>

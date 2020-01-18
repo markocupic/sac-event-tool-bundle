@@ -1,1 +1,0 @@
-<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateEventRow($this->id, array('tour', 'lastMinuteTour', 'generalEvent'), 'partial_event_tour_row_layout_table') ?>

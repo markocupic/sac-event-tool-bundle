@@ -15,90 +15,23 @@
 </div>
 <!-- end button bar -->
 
-<?php if(!$this->hasItems): ?>
+<?php if(!$GLOBALS['modEventListArrIds']): ?>
 <div class="alert alert-dark" role="alert">
     <p>Leider wurden zu deiner Suchanfrage keine Events gefunden. Bitte überprüfe die Filtereinstellungen.</p>
 </div>
 <?php endif; ?>
 
-<?php if($this->hasItems): ?>
-<div  id="event-list" class="table-responsive">
-    <span><small>Es wurden <?= $this->countItems ?> Events gefunden. </small></span>
-    <span v-if="isBusy === true" class="text-success"><small>Lade events...</small></span>
 
-    <table class="event-container table layout-table">
-        <thead>
-        <tr>
-            <th>Datum</th>
-            <th class="d-none d-md-table-cell">Dauer</th>
-            <th></th>
-            <th>Tour</th>
-            <th class="d-none d-md-table-cell">Anz.</th>
-            <th class="d-none d-md-table-cell">Anf.</th>
-            <th class="d-none d-md-table-cell">Art</th>
-            <th>Leitung</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="(row, index) of rows" class="event-item event-item-tour event" v-bind:data-id="row.id" v-bind:data-event-type="row.tourTypesIds">
-            <td>
-                <span class="d-lg-none" v-html="row.eventPeriodSm"></span>
-                <span class="d-none d-lg-block" v-html="row.eventPeriodLg"></span>
-            </td>
-            <td class="d-none d-md-table-cell" v-html="row.eventDuration"></td>
-            <td>
-                <span data-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:title="row.eventStateLabel"><i class="event-state-icon fa-fw" v-bind:class="row.eventState"></i></span>
-            </td>
-            <td>
-                <span class="last-minute-tour small" v-if="row.eventType === 'lastMinuteTour'"><i class="fa fa-clock"></i> LAST MINUTE TOUR<br></span>
-                <a v-bind:href="row.eventUrl" v-html="row.eventTitle" class="event-title-link"></a>
-            </td>
-            <td class="d-none d-md-table-cell" v-html="row.bookingCounter"></td>
-            <td class="tourTechDifficulty d-none d-md-table-cell" v-html="row.tourTechDifficulties"></td>
-            <td class="tourType d-none d-md-table-cell" v-html="row.tourTypesShortcuts"></td>
-            <td v-html="row.instructors"></td>
-        </tr>
-        </tbody>
-    </table>
-
-    <div v-if="isBusy === true">
-        <div class="d-flex justify-content-center">
-            <div mt-3 mb-3><i class="fas fa-2x fa-circle-notch fa-spin"></i></div>
-        </div>
-        <div class="d-flex justify-content-center">
-            <div mb-3>... lade Events ...</div>
-        </div>
-    </div>
-    <div v-if="isBusy === false && enableAutoloading === false && allEventsLoaded === false" v-on:click="prepareRequest()">
-        <div class="d-flex justify-content-center">
-        <button class="btn btn-lg btn-danger btn-block">Weitere Events laden?</button>
-        </div>
-    </div>
-</div>
-
-<!-- Preparing the Eventlist object -->
-<script>
-    // Lazyload data by ajax
-    Eventlist = {
-        ids: [],
-        offset: 0,
-        limitOnFirstRequest: 50,
-        limit: 200,
-        url: 'ajaxEventApi/getEventDataByIds',
-        requestToken: '{{request_token}}',
-        fields: ['title', 'eventType', 'eventTitle', 'eventUrl', 'instructors', 'tourTypesShortcuts', 'tourTechDifficulties', 'bookingCounter', 'id', 'eventState', 'eventStateLabel', 'eventDuration', 'eventPeriodLg', 'eventPeriodSm', 'tourTypesIds']
-    };
-    // Get the event ids here:
-    <?php echo $this->events; ?>
-</script>
-
-<script src="bundles/markocupicsaceventtool/js/eventlist__vue.js"></script>
-
+<?php if($GLOBALS['modEventListArrIds']): ?>
+<?php $vueOptions = [
+    'arrIds' => $GLOBALS['modEventListArrIds'],
+    'limitOnFirstRequest' => 50,
+    'limit' => 200
+]; ?>
+<?php $this->insert('partial_event_tour_item_vuejs', $vueOptions); ?>
 <?php endif; ?>
 
-<?php if($this->pagination): ?>
-<?= $this->pagination ?>
-<?php endif; ?>
+
 
 <?php $this->endblock(); ?>
 
