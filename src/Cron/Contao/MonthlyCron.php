@@ -14,7 +14,7 @@ namespace Markocupic\SacEventToolBundle\Cron\Contao;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
-use Markocupic\SacEventToolBundle\Services\BackendUser\ReplaceDefaultPassword;
+use Markocupic\SacEventToolBundle\User\BackendUser\ReplaceDefaultPassword;
 
 /**
  * Class MonthlyCron
@@ -53,7 +53,7 @@ class MonthlyCron
     public function replaceDefaultPasswordAndSendNew()
     {
         /** @var  ReplaceDefaultPassword $cron */
-        $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\BackendUser\ReplaceDefaultPassword');
+        $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\User\BackendUser\ReplaceDefaultPassword');
         $cron->replaceDefaultPasswordAndSendNew();
     }
 

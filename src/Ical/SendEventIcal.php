@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Services\Ical;
+namespace Markocupic\SacEventToolBundle\Ical;
 
 use Contao\CalendarEventsModel;
 use Contao\Controller;
@@ -21,7 +21,7 @@ use Eluceo\iCal\Component\Event;
 
 /**
  * Class SendEventIcal
- * @package Markocupic\SacEventToolBundle\Services\Ical
+ * @package Markocupic\SacEventToolBundle\Ical
  */
 class SendEventIcal
 {
@@ -29,7 +29,7 @@ class SendEventIcal
     /**
      * @param CalendarEventsModel $objEvent
      */
-    public function sendIcsFile(CalendarEventsModel $objEvent): void
+    public function sendIcsFile(CalendarEventsModel $objEvent)
     {
         $vCalendar = new Calendar(Environment::get('url') . '/' . Events::generateEventUrl($objEvent));
         $vEvent = new Event();

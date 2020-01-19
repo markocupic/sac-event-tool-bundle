@@ -221,7 +221,7 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
                 if (!$blnError)
                 {
                     // Clear account
-                    $objClearFrontendUserData = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\FrontendUser\ClearFrontendUserData');
+                    $objClearFrontendUserData = System::getContainer()->get('Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData');
                     $objClearFrontendUserData->clearMemberProfile((int)$this->objUser->id);
                     $objClearFrontendUserData->disableLogin((int)$this->objUser->id);
                     $objClearFrontendUserData->deleteFrontendAccount((int)$this->objUser->id);

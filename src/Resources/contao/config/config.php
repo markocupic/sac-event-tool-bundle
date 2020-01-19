@@ -93,7 +93,7 @@ $GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = array(
 // Maintenance
 // Delete unused event-story folders
 $GLOBALS['TL_PURGE']['custom']['sac_event_story'] = array(
-    'callback' => array('Markocupic\SacEventToolBundle\Services\ContaoBackendMaintenance\MaintainModuleEventStory', 'run'),
+    'callback' => array('Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainModuleEventStory', 'run'),
 );
 
 // Do not index a page if one of the following parameters is set

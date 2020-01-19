@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Services\FrontendUser;
+namespace Markocupic\SacEventToolBundle\User\FrontendUser;
 
 use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
@@ -27,7 +27,7 @@ use Psr\Log\LogLevel;
 
 /**
  * Class ClearFrontendUserData
- * @package Markocupic\SacEventToolBundle\Services\FrontendUser
+ * @package Markocupic\SacEventToolBundle\User\FrontendUser
  */
 class ClearFrontendUserData
 {
@@ -88,25 +88,22 @@ class ClearFrontendUserData
                 }
                 if (!$blnFound)
                 {
-                    $this->anonymizeCalendarEventsMemberDataRecord($objEventsMember->id);
+                    $this->anonymizeCalendarEventsMemberDataRecord($objEventsMember);
                 }
             }
         }
     }
 
     /**
-     * @param int $calendarEventsMemberId
+     * @param CalendarEventsMemberModel $objCalendarEventsMember
      * @return bool
      */
-    public function anonymizeCalendarEventsMemberDataRecord(int $calendarEventsMemberId): bool
+    public function anonymizeCalendarEventsMemberDataRecord(CalendarEventsMemberModel $objCalendarEventsMember): bool
     {
-        /** @var  CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
 
         /** @var  Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
-        $objCalendarEventsMember = $calendarEventsMemberModelAdapter->findByPk($calendarEventsMemberId);
         if ($objCalendarEventsMember !== null)
         {
             if ($objCalendarEventsMember !== null)
@@ -273,7 +270,7 @@ class ClearFrontendUserData
                     $objEventsMember = $calendarEventsMemberModelAdapter->findByPk($eventsMemberId);
                     if ($objEventsMember !== null)
                     {
-                        $this->anonymizeCalendarEventsMemberDataRecord($objEventsMember->id);
+                        $this->anonymizeCalendarEventsMemberDataRecord($objEventsMember);
                     }
                 }
                 // Delete avatar directory

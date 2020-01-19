@@ -18,9 +18,9 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Date;
 use Contao\System;
-use Markocupic\SacEventToolBundle\Services\Docx\ExportEvents2Docx;
-use Markocupic\SacEventToolBundle\Services\Ical\SendEventIcal;
-use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
+use Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx;
+use Markocupic\SacEventToolBundle\Ical\SendEventIcal;
+use Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,7 +65,7 @@ class DownloadController extends AbstractController
     public function printWorkshopBookletAsPdfAction()
     {
         /** @var $pdf PrintWorkshopsAsPdf */
-        $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf');
+        $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf');
 
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
@@ -137,7 +137,7 @@ class DownloadController extends AbstractController
         $request = $this->requestStack->getCurrentRequest();
 
         /** @var $pdf PrintWorkshopsAsPdf */
-        $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf');
+        $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf');
 
         $eventId = $request->query->get('eventId') ? (int)$request->query->get('eventId') : null;
 
@@ -171,7 +171,7 @@ class DownloadController extends AbstractController
                 if ($objEvent !== null)
                 {
                     /** @var  SendEventIcal $ical */
-                    $ical = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\Ical\SendEventIcal');
+                    $ical = System::getContainer()->get('Markocupic\SacEventToolBundle\Ical\SendEventIcal');
                     $ical->sendIcsFile($objEvent);
                 }
             }

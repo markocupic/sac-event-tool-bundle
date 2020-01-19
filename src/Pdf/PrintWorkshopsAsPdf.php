@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Services\Pdf;
+namespace Markocupic\SacEventToolBundle\Pdf;
 
 use Contao\CalendarEventsModel;
 use Contao\CalendarModel;
@@ -30,7 +30,7 @@ use TCPDF_FONTS;
 
 /**
  * Class PrintWorkshopsAsPdf
- * @package Markocupic\SacEventToolBundle\Services\Pdf
+ * @package Markocupic\SacEventToolBundle\Pdf
  */
 class PrintWorkshopsAsPdf
 {
@@ -171,7 +171,7 @@ class PrintWorkshopsAsPdf
         // Get the font directory
         $container = System::getContainer();
         $bundleSRC = $container->get('kernel')->locateResource('@MarkocupicSacEventToolBundle');
-        $fontDirectory = $bundleSRC . 'Services/Pdf/fonts/opensans';
+        $fontDirectory = $bundleSRC . 'Pdf/fonts/opensans';
 
         // create new PDF document
         // Extend TCPDF for special footer and header handling

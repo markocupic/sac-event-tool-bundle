@@ -441,7 +441,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
 
         // Get the image rotate service
         $objFiles = $filesModelAdapter->findOneById($fileId);
-        $objRotateImage = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\Image\RotateImage');
+        $objRotateImage = System::getContainer()->get('Markocupic\SacEventToolBundle\Image\RotateImage');
         if ($objRotateImage->rotate($objFiles))
         {
             $json = array('status' => 'success');

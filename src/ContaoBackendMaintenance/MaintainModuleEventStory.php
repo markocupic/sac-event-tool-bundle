@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Services\ContaoBackendMaintenance;
+namespace Markocupic\SacEventToolBundle\ContaoBackendMaintenance;
 
 use Contao\CalendarEventsStoryModel;
 use Contao\Config;
@@ -24,7 +24,7 @@ use Contao\PurgeData;
 
 /**
  * Class MaintainModuleEventStory
- * @package Markocupic\SacEventToolBundle\Services\ContaoBackendMaintenance
+ * @package Markocupic\SacEventToolBundle\ContaoBackendMaintenance
  */
 class MaintainModuleEventStory
 {

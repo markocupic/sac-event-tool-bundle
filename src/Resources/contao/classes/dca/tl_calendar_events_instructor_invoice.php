@@ -10,7 +10,7 @@
 
 namespace Contao;
 
-use Markocupic\SacEventToolBundle\Services\EventRapport\EventRapport;
+use Markocupic\SacEventToolBundle\EventRapport\EventRapport;
 
 /**
  * Class tl_calendar_events_instructor_invoice
@@ -85,13 +85,13 @@ class tl_calendar_events_instructor_invoice extends Backend
     {
         if (Input::get('action') === 'generateInvoiceDocx')
         {
-            $objRapport = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\EventRapport\EventRapport');
+            $objRapport = System::getContainer()->get('Markocupic\SacEventToolBundle\EventRapport\EventRapport');
             $objRapport->generateInvoice(Input::get('id'), 'docx');
         }
 
         if (Input::get('action') === 'generateInvoicePdf')
         {
-            $objRapport = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\EventRapport\EventRapport');
+            $objRapport = System::getContainer()->get('Markocupic\SacEventToolBundle\EventRapport\EventRapport');
             $objRapport->generateInvoice(Input::get('id'), 'pdf');
         }
     }

@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Services\Image;
+namespace Markocupic\SacEventToolBundle\Image;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\File;
@@ -20,7 +20,7 @@ use Contao\Message;
 
 /**
  * Class RotateImage
- * @package Markocupic\SacEventToolBundle\Services\Image
+ * @package Markocupic\SacEventToolBundle\Image
  */
 class RotateImage
 {

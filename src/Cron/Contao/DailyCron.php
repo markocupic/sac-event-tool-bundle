@@ -15,8 +15,8 @@ namespace Markocupic\SacEventToolBundle\Cron\Contao;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
-use Markocupic\SacEventToolBundle\Services\FrontendUser\ClearFrontendUserData;
-use Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf;
+use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
+use Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf;
 
 /**
  * Class DailyCron
@@ -60,7 +60,7 @@ class DailyCron
         $calendarId = (int)$configAdapter->get('SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID');
 
         /** @var PrintWorkshopsAsPdf $pdf */
-        $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf');
+        $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf');
         $pdf->setYear($year)
             ->setCalendarId($calendarId)
             ->setDownload(false)
@@ -73,7 +73,7 @@ class DailyCron
     public function anonymizeOrphanedCalendarEventsMemberDataRecords()
     {
         /** @var  ClearFrontendUserData $cron */
-        $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\Services\FrontendUser\ClearFrontendUserData');
+        $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData');
         $cron->anonymizeOrphanedCalendarEventsMemberDataRecords();
     }
 

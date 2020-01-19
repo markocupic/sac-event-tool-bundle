@@ -1,54 +1,54 @@
 services:
 
   # Contao Backend Module "Maintenance": Delete no more used event stories media directories
-  Markocupic\SacEventToolBundle\Services\ContaoBackendMaintenance\MaintainModuleEventStory:
+  Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainModuleEventStory:
     public: true
     arguments:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
   # Generate event rapports docx and pdf files
-  Markocupic\SacEventToolBundle\Services\EventRapport\EventRapport:
+  Markocupic\SacEventToolBundle\EventRapport\EventRapport:
     public: true
     arguments:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
   # Clear/Anonymize frontend user data f.ex if frontend user has been deleted
-  Markocupic\SacEventToolBundle\Services\FrontendUser\ClearFrontendUserData:
+  Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData:
     public: true
     arguments:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
   # Generate backend users home directory / remove old backend user home directories
-  Markocupic\SacEventToolBundle\Services\BackendUser\MaintainBackendUsersHomeDirectory:
+  Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory:
     public: true
     arguments:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
   # Cron: Replace default password and send email to user with new pw
-  Markocupic\SacEventToolBundle\Services\BackendUser\ReplaceDefaultPassword:
+  Markocupic\SacEventToolBundle\User\BackendUser\ReplaceDefaultPassword:
     public: true
     arguments:
     - '@contao.framework'
 
   # Rotate image
-  Markocupic\SacEventToolBundle\Services\Image\RotateImage:
+  Markocupic\SacEventToolBundle\Image\RotateImage:
     public: true
     arguments:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
   # Generate worhshop booklet
-  Markocupic\SacEventToolBundle\Services\Pdf\PrintWorkshopsAsPdf:
+  Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf:
     public: true
     arguments:
     - '@contao.framework'
 
   # Send ical
-  Markocupic\SacEventToolBundle\Services\Ical\SendEventIcal:
+  Markocupic\SacEventToolBundle\Ical\SendEventIcal:
     public: true
 
 

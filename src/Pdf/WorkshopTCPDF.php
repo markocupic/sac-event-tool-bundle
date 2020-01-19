@@ -10,14 +10,14 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Services\Pdf;
+namespace Markocupic\SacEventToolBundle\Pdf;
 
 use Contao\System;
 use Contao\Config;
 
 /**
  * Class WorkshopTCPDF
- * @package Markocupic\SacEventToolBundle\Services\Pdf
+ * @package Markocupic\SacEventToolBundle\Pdf
  */
 class WorkshopTCPDF extends \TCPDF
 {

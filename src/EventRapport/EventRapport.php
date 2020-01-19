@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Services\EventRapport;
+namespace Markocupic\SacEventToolBundle\EventRapport;
 
 use Contao\CalendarEventsInstructorInvoiceModel;
 use Contao\CalendarEventsJourneyModel;
@@ -35,7 +35,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
  * Class EventRapport
- * @package Markocupic\SacEventToolBundle\Services\EventRapport
+ * @package Markocupic\SacEventToolBundle\EventRapport
  */
 class EventRapport
 {

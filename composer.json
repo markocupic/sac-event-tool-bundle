@@ -32,8 +32,7 @@
       "Markocupic\\SacEventToolBundle\\": "src/"
     },
     "classmap": [
-      "src/Resources/contao",
-      "src/Services"
+      "src/Resources/contao"
     ],
     "exclude-from-classmap": [
       "src/Resources/contao/assets",

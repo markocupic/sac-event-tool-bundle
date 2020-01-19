@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Services\BackendUser;
+namespace Markocupic\SacEventToolBundle\User\BackendUser;
 
 use Contao\Config;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -23,7 +23,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 
 /**
  * Class ReplaceDefaultPassword
- * @package Markocupic\SacEventToolBundle\Services\BackendUser
+ * @package Markocupic\SacEventToolBundle\User\BackendUser
  */
 class ReplaceDefaultPassword
 {
@@ -58,7 +58,7 @@ class ReplaceDefaultPassword
     /**
      * Replace default password and send new
      */
-    public function replaceDefaultPasswordAndSendNew()
+    public function replaceDefaultPasswordAndSendNew(): void
     {
         /** @var  Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);

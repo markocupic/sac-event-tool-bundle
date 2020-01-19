@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Services\BackendUser;
+namespace Markocupic\SacEventToolBundle\User\BackendUser;
 
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -25,7 +25,7 @@ use Psr\Log\LogLevel;
 
 /**
  * Class MaintainBackendUsersHomeDirectory
- * @package Markocupic\SacEventToolBundle\Services\BackendUser
+ * @package Markocupic\SacEventToolBundle\User\BackendUser
  */
 class MaintainBackendUsersHomeDirectory
 {
@@ -58,7 +58,7 @@ class MaintainBackendUsersHomeDirectory
      * Create backend users home directories
      * @param \Markocupic\SacEventToolBundle\UserModel $objUser
      */
-    public function createBackendUsersHomeDirectory(UserModel $objUser)
+    public function createBackendUsersHomeDirectory(UserModel $objUser): void
     {
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
@@ -100,7 +100,7 @@ class MaintainBackendUsersHomeDirectory
     /**
      * Remove no more user backend user home directories
      */
-    public function removeUnusedBackendUsersHomeDirectories()
+    public function removeUnusedBackendUsersHomeDirectories(): void
     {
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
