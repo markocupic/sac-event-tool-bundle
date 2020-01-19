@@ -63,7 +63,7 @@ class OauthController extends AbstractController
         return new Response('This extension is under construction.', 200);
 
         // Retrieve the username from openid connect
-        $username = 'xxxxx';
+        $username = 'xxxxxxxxxxxxxxxxx';
 
         $userClass = FrontendUser::class;
 
@@ -100,7 +100,7 @@ class OauthController extends AbstractController
         return new Response('This extension is under construction.', 200);
 
         // Retrieve the username from openid connect
-        $username = 'xxxxxx';
+        $username = 'xxxxxxxxxxxx';
 
         $userClass = BackendUser::class;
 

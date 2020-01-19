@@ -12,10 +12,14 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\OpenIdConnect\Authentication;
 
+use Contao\BackendUser;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Security\User\ContaoUserProvider;
 use Contao\CoreBundle\Security\User\UserChecker;
+use Contao\FrontendUser;
+use Contao\MemberModel;
+use Contao\UserModel;
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -110,7 +114,9 @@ class Authentication
     {
         if (!\is_string($username) && (!\is_object($username) || !method_exists($username, '__toString')))
         {
-            throw new BadRequestHttpException(sprintf('The username "%s" must be a string, "%s" given.', \gettype($username)));
+            throw new BadRequestHttpException(
+                sprintf('The username "%s" must be a string, "%s" given.', \gettype($username))
+            );
         }
 
         $username = trim($username);
@@ -134,6 +140,28 @@ class Authentication
                 'Username does not exists.'
             );
         }
+
+        if ($user instanceof FrontendUser)
+        {
+            if (null !== ($objMember = MemberModel::findByUsername($user->username)))
+            {
+                $objMember->login = '1';
+                $objMember->locked = 0;
+                $objMember->save();
+            }
+        }
+
+        if ($user instanceof BackendUser)
+        {
+            if (null !== ($objUser = UserModel::findByUsername($user->username)))
+            {
+                $objUser->locked = 0;
+                $objUser->save();
+            }
+        }
+
+        // Refresh user
+        $user = $userProvider->refreshUser($user);
 
         // Check if account is locked
         // Check if account is disabled
