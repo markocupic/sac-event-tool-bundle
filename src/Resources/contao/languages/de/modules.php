@@ -47,3 +47,4 @@ $GLOBALS['TL_LANG']['FMD']['pilatus_export'] = array('SAC Event-Export für Mona
 $GLOBALS['TL_LANG']['FMD']['jahresprogramm_export'] = array('SAC Event-Export f&uuml;r Jahresprogramm');
 $GLOBALS['TL_LANG']['FMD']['event_story_list'] = array('SAC Tourenberichte Listen Modul');
 $GLOBALS['TL_LANG']['FMD']['event_story_reader'] = array('SAC Tourenberichte Reader Modul');
+$GLOBALS['TL_LANG']['FMD']['event_list'] = array('SAC Event Auflistungs Modul');

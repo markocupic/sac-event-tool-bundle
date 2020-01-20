@@ -148,3 +148,12 @@ services:
     - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
     - { name: container.service_subscriber }
     public: true
+
+    # Event Auflistungs Modul
+  Markocupic\SacEventToolBundle\Controller\FrontendModule\EventListController:
+    calls:
+    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+    - { name: container.service_subscriber }
+    public: true
