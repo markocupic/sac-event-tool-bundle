@@ -1,5 +1,5 @@
 <?php $GLOBALS['TL_JAVASCRIPT'][] = "https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"; ?>
-<?php $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/eventlist_vue_new.js'; ?>
+<?php $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/eventlist_vue_new.js|static'; ?>
 
 <?php $this->extend('block_unsearchable'); ?>
 
