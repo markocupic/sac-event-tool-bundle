@@ -36,6 +36,7 @@ class VueTourList {
                     requestToken: params.requestToken,
                     fields: params.fields,
                     rows: [],
+                    arrIds: null,
                     isBusy: false,
                     // total found items
                     itemsFound: 0,
@@ -89,6 +90,7 @@ class VueTourList {
                         'ajaxEndpoint': self.ajaxEndpoint,
                         'requestToken': self.requestToken,
                         'fields': self.fields,
+                        'arrIds': self.arrIds,
                         'filterParam': self.filterParam,
                         'sessionCacheToken': btoa(window.location.href),
                         'isPreloadRequest': isPreloadRequest,
@@ -113,6 +115,8 @@ class VueTourList {
                             self.rows.push(row);
                             self.loadedItems++;
                         });
+                        // Get ids to speed up requests
+                        self.arrIds = data['arrIds'];
 
                         if (data['isPreloadRequest'] === false) {
                             if (i === 0 || parseInt(data['itemsFound']) === self.loadedItems) {
