@@ -16,6 +16,7 @@ use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\EventOrganizerModel;
+use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
@@ -102,6 +103,8 @@ class EventApiController extends AbstractController
      */
     public function getEventList(): JsonResponse
     {
+        System::getContainer()->get('contao.framework')->initialize();
+
         /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
 
@@ -125,6 +128,7 @@ class EventApiController extends AbstractController
             'limitTotal'        => (int) $request->request->get('limitTotal'),
             'moduleId'          => $request->request->get('moduleId'),
             'calendarIds'       => $stringUtilAdapter->deserialize(base64_decode($request->request->get('calendarIds')), true),
+            'imgSize'           => $stringUtilAdapter->deserialize(base64_decode($request->request->get('imgSize')), true),
             'arrIds'            => $request->request->get('arrIds'),
             // filterboard params
             'eventTypes'        => $stringUtilAdapter->deserialize(base64_decode($request->request->get('eventTypes')), true),
@@ -133,7 +137,7 @@ class EventApiController extends AbstractController
             'sessionCacheToken' => $request->request->get('sessionCacheToken'),
             'isPreloadRequest'  => $request->request->get('isPreloadRequest'),
         ];
-        
+
         if ($param['arrIds'] !== null)
         {
             $arrIds = $param['arrIds'];
@@ -365,7 +369,7 @@ class EventApiController extends AbstractController
             'offset'                   => $offset,
             'limitPerRequest'          => $limitPerRequest,
             'limitTotal'               => $param['limitTotal'],
-            'arrIds'                 => $arrIds,
+            'arrIds'                   => $arrIds,
             'arrFields'                => $arrFields,
             'arrEventData'             => array(),
             'itemsFound'               => count($arrIds),
@@ -417,6 +421,8 @@ class EventApiController extends AbstractController
                     foreach ($arrFields as $field)
                     {
                         $v = $calendarEventsHelperAdapter->getEventData($objEvent, $field);
+                        $aField = explode('||', $field);
+                        $field = $aField[0];
                         $oData->{$field} = $this->prepareValue($v);
                     }
 

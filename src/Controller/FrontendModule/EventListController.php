@@ -12,18 +12,11 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
-use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Date;
-use Contao\Environment;
-use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\StringUtil;
 use Contao\Template;
-use Haste\Form\Form;
-use Haste\Util\Url;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
@@ -36,16 +29,6 @@ class EventListController extends AbstractFrontendModuleController
 {
 
     /**
-     * @var array
-     */
-    protected $arrAllowedFields;
-
-    /**
-     * @var PageModel
-     */
-    protected $objPage;
-
-    /**
      * @param Request $request
      * @param ModuleModel $model
      * @param string $section
@@ -55,8 +38,6 @@ class EventListController extends AbstractFrontendModuleController
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        $this->objPage = $page;
-
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }
@@ -67,8 +48,6 @@ class EventListController extends AbstractFrontendModuleController
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
-
-        $services['contao.framework'] = ContaoFramework::class;
 
         return $services;
     }
@@ -88,13 +67,16 @@ class EventListController extends AbstractFrontendModuleController
         {
             $arrFilterParam = $arrQuery;
         }
-        $template->filterParam = base64_encode(serialize($arrFilterParam));
 
-        $template->moduleId = $model->id;
-        $template->calendarIds = base64_encode($model->cal_calendar);
-        $template->eventTypes = base64_encode($model->eventType);
-        $template->limitTotal = $model->cal_limit;
-        $template->limitPerRequest = $model->perPage;
+        $template->arrPartialOpt = [
+            'filterParam'     => base64_encode(serialize($arrFilterParam)),
+            'imgSize'         => base64_encode($model->imgSize),
+            'moduleId'        => $model->id,
+            'calendarIds'     => base64_encode($model->cal_calendar),
+            'eventTypes'      => base64_encode($model->eventType),
+            'limitTotal'      => $model->eventListLimitTotal,
+            'limitPerRequest' => $model->eventListLimitPerRequest,
+        ];
 
         return $template->getResponse();
     }

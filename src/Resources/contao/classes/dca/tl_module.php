@@ -27,4 +27,14 @@ class tl_module_sac_event_tool extends tl_module
         }
         return $opt;
     }
+
+    /**
+     * Return all calendar templates as array
+     *
+     * @return array
+     */
+    public function getEventListTemplates()
+    {
+        return $this->getTemplateGroup('event_list_partial_');
+    }
 }

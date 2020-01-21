@@ -26,6 +26,7 @@ use Contao\Date;
 use Contao\EventOrganizerModel;
 use Contao\Events;
 use Contao\EventTypeModel;
+use Contao\File;
 use Contao\FilesModel;
 use Contao\Folder;
 use Contao\FrontendTemplate;
@@ -92,10 +93,12 @@ class CalendarEventsHelper
         // Load language files
         Controller::loadLanguageFile('tl_calendar_events');
         Controller::loadLanguageFile('default');
-
         $value = '';
 
-        switch ($strProperty)
+        // eventImage||5
+        $arrProperty = explode('||', $strProperty);
+
+        switch ($arrProperty[0])
         {
             case 'id':
                 $value = $objEvent->id;
@@ -189,6 +192,14 @@ class CalendarEventsHelper
                 break;
             case 'eventImagePath':
                 $value = static::getEventImagePath($objEvent->id);
+                break;
+            case 'eventImage':
+                if (isset($arrProperty[1]))
+                {
+                    $pictureSize = $arrProperty[1];
+                    $src = static::getEventImagePath($objEvent->id);
+                    $value = Controller::replaceInsertTags(sprintf('{{picture::%s?size=%s}}', $src, $pictureSize));
+                }
                 break;
             case 'courseTypeLevel0Name':
                 $value = CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name;
@@ -583,6 +594,7 @@ class CalendarEventsHelper
     {
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+        System::getContainer()->get('contao.framework')->initialize();
 
         $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
         if ($objEvent->numRows)
@@ -644,7 +656,7 @@ class CalendarEventsHelper
             }
             if ($blnTooltip)
             {
-                return Date::parse($dateFormat, self::getStartDate($id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '') . (!$blnInline ? '<br>' : ' ' ) . '<a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Eventdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
+                return Date::parse($dateFormat, self::getStartDate($id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '') . (!$blnInline ? '<br>' : ' ') . '<a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Eventdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
             }
             else
             {

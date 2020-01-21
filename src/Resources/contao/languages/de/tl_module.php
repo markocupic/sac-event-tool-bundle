@@ -14,7 +14,6 @@ $GLOBALS['TL_LANG']['tl_module']['member_dashboard_event_type_filter_legend'] = 
 $GLOBALS['TL_LANG']['tl_module']['jumpTo_legend'] = 'Weiterleitungs-Einstellungen';
 $GLOBALS['TL_LANG']['tl_module']['events_story_legend'] = 'Touren- und Kursberichte-Einstellungen';
 
-
 // Fields
 $GLOBALS['TL_LANG']['tl_module']['unregisterFromEventNotificationId'] = array('Notification Center: Benachrichtigungs-ID bei Eventabsage eines Mitglieds', 'Geben Sie eine Benachrichtigung aus dem Notification Center ein.');
 $GLOBALS['TL_LANG']['tl_module']['timeSpanForCreatingNewEventStory'] = array('Frist in Tagen wie lange nach Event-Ende noch Berichte eröffnet werden können', 'Geben Sie in Tagen an, wie lange nach Event-Ende es möglich sein soll, Berichte zu einem Event schreiben zu können.');
@@ -29,3 +28,5 @@ $GLOBALS['TL_LANG']['tl_module']['jumpToWhenNotActivated'] = array('Weiterleitun
 $GLOBALS['TL_LANG']['tl_module']['eventType'] = array('Event Art', 'Legen Sie fest welche Event-Arten angezeigt werden sollen.');
 $GLOBALS['TL_LANG']['tl_module']['eventFilterBoardFields'] = array('Event-Filter-Felder', 'Legen Sie hier die Felder fest, die im Filter angezeigt werden sollen.');
 $GLOBALS['TL_LANG']['tl_module']['print_export_allowedEventTypes'] = array('Anzuzeigende Event-Typen', 'Geben Sie die anzuzeigenden Event-Typen an.');
+$GLOBALS['TL_LANG']['tl_module']['eventListLimitTotal'] = array('Total anzuzeigende Events', 'Legen Sie die Anzahl anzuzeigender Events fest. 0 für alle.');
+$GLOBALS['TL_LANG']['tl_module']['eventListLimitPerRequest'] = array('Anzahl zu ladende Events pro Request', 'Legen Sie die Anzahl zu ladende Events pro Request fest. 0 für alle.');

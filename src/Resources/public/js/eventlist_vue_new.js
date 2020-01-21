@@ -15,35 +15,44 @@ class VueTourList {
             el: elId,
             created: function created() {
                 var self = this;
-                self.prepareRequest();
-                if (self.enableAutoloading === true) {
-                    self.interval = setInterval(function () {
-                        self.prepareRequest();
-                    }, 200);
-                }
+
+                self.prepareRequest(false);
             },
+
             data: function data() {
                 return {
 
                     // Load x items per request
                     limitPerRequest: params.limitPerRequest,
+                    // Limit total results
                     limitTotal: params.limitTotal,
+                    // The frontend module id
                     moduleId: params.moduleId,
+                    // Calendar ids
                     calendarIds: params.calendarIds,
+                    // Image size array
+                    imgSize: params.imgSize,
+                    // Event types array
                     eventTypes: params.eventTypes,
+                    // Filter param array base64 encoded
                     filterParam: params.filterParam,
+                    // Endpoint url
                     ajaxEndpoint: params.ajaxEndpoint,
+                    // Contao request token
                     requestToken: params.requestToken,
+                    // Fields array
                     fields: params.fields,
+                    // Result row
                     rows: [],
+                    // Requested event ids
                     arrIds: null,
-                    isBusy: false,
+                    // is busy bool
+                    blnIsBusy: false,
                     // total found items
                     itemsFound: 0,
                     // already loaded items
                     loadedItems: 0,
-
-                    interval: null,
+                    // all events loades bool
                     blnAllEventsLoaded: false,
                 };
             },
@@ -52,18 +61,14 @@ class VueTourList {
                 prepareRequest: function prepareRequest(isPreloadRequest = false) {
                     var self = this;
 
-                    if (self.isBusy === false) {
-                        self.isBusy = true;
+                    if (self.blnIsBusy === false) {
+                        self.blnIsBusy = true;
                         self.getDataByXhr(isPreloadRequest);
                         console.log('Loading events...')
                     }
-
-                    if (self.blnAllEventsLoaded === true) {
-                        clearInterval(self.interval);
-                    }
-
                 },
 
+                // Preload and use the session cache
                 preload: function preload() {
                     var self = this;
                     self.prepareRequest(true);
@@ -85,6 +90,7 @@ class VueTourList {
                         'limitPerRequest': self.limitPerRequest,
                         'limitTotal': self.limitTotal,
                         'moduleId': self.moduleId,
+                        'imgSize': self.imgSize,
                         'calendarIds': self.calendarIds,
                         'eventTypes': self.eventTypes,
                         'ajaxEndpoint': self.ajaxEndpoint,
@@ -96,17 +102,15 @@ class VueTourList {
                         'isPreloadRequest': isPreloadRequest,
                     };
 
-                    var url = self.ajaxEndpoint;
-
                     var xhr = $.ajax({
                         type: 'POST',
-                        url: url,
+                        url: self.ajaxEndpoint,
                         data: data,
                         dataType: 'json',
                     });
 
                     xhr.done(function (data) {
-                        self.isBusy = false;
+                        self.blnIsBusy = false;
 
                         let i = 0;
                         self.itemsFound = data['itemsFound'];
@@ -115,6 +119,7 @@ class VueTourList {
                             self.rows.push(row);
                             self.loadedItems++;
                         });
+
                         // Get ids to speed up requests
                         self.arrIds = data['arrIds'];
 
