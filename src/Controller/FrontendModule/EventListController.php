@@ -13,9 +13,9 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\ModuleModel;
 use Contao\PageModel;
+use Contao\StringUtil;
 use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -60,6 +60,9 @@ class EventListController extends AbstractFrontendModuleController
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
+        /** @var  StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+
         // Get filter params from request
         $arrQuery = $request->query->all();
         $arrFilterParam = [];
@@ -68,9 +71,14 @@ class EventListController extends AbstractFrontendModuleController
             $arrFilterParam = $arrQuery;
         }
 
+        // Get picture Id
+        $arrPicture = $stringUtilAdapter->deserialize($model->imgSize, true);
+        $pictureId = (isset($arrPicture[2]) && is_numeric($arrPicture[2])) ? $arrPicture[2] : '0';
+
         $template->arrPartialOpt = [
             'filterParam'     => base64_encode(serialize($arrFilterParam)),
             'imgSize'         => base64_encode($model->imgSize),
+            'pictureId'       => $pictureId,
             'moduleId'        => $model->id,
             'calendarIds'     => base64_encode($model->cal_calendar),
             'eventTypes'      => base64_encode($model->eventType),

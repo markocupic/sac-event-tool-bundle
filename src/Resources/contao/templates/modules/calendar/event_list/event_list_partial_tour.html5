@@ -1,12 +1,9 @@
 <?php $GLOBALS['TL_JAVASCRIPT'][] = "https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"; ?>
-<?php $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/eventlist_vue_new.js|static'; ?>
+<?php $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/eventlist_vue.js|static'; ?>
 
-<?php $this->extend('block_unsearchable'); ?>
 
-<?php $this->block('content'); ?>
-
-<div id="event-list">
-    <span v-if="itemsFound > 0" class="text-muted"><small>Es wurden {{ itemsFound }} Events gefunden. </small></span>
+<div id="tour-list">
+    <span v-if="itemsFound > 0" class="text-muted"><small>Zu deiner Suchanfrage wurden {{ itemsFound }} Events gefunden. </small></span>
     <span v-if="blnIsBusy === true" class="ml-2 text-success"><small>Lade events...</small></span>
     <div class="event-container row">
         <div v-for="(row, index) of rows" class="event-item event-item-tour event col-12 col-lg-6" v-bind:data-id="row.id" v-bind:data-event-type="row.tourTypesIds">
@@ -60,6 +57,9 @@
 
                 </div>
                 <!-- end right col -->
+
+                <div v-html="row.eventImage"></div>
+
             </div>
         </div>
 
@@ -85,16 +85,17 @@
     </div>
 </div>
 
-
 <!-- Set up the Vuejs tour list -->
 <script>
-    new VueTourList('#event-list', {
+    new VueTourList('#tour-list', {
         'moduleId': '<?= $this->moduleId ?>',
         'calendarIds': '<?= $this->calendarIds ?>',
         'eventTypes': '<?= $this->eventTypes ?>',
         'filterParam': '<?= $this->filterParam ?>',
         'limitPerRequest': '<?= $this->limitPerRequest ?>',
         'limitTotal': '<?= $this->limitTotal ?>',
+        'imgSize': '<?= $this->imgSize ?>',
+        'pictureId': '<?= $this->pictureId ?>',
         'ajaxEndpoint': 'ajaxEventApi/getEventList',
         'requestToken': '{{request_token}}',
         'fields': [
@@ -113,10 +114,9 @@
             'eventStateLabel',
             'eventDuration',
             'eventPeriodLgInline',
-            'tourTypesIds'
+            'tourTypesIds',
         ],
     });
 </script>
 
 
-<?php $this->endblock(); ?>

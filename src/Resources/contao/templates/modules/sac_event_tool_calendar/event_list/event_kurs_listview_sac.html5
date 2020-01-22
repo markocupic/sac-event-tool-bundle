@@ -1,4 +1,0 @@
-<?= Markocupic\SacEventToolBundle\CalendarEventsHelper::generateEventRow($this->id, array('course'), 'partial_event_course_row_layout_default') ?>
-
-
-

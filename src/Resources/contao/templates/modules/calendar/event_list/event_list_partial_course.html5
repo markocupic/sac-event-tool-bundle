@@ -1,5 +1,5 @@
 <?php $GLOBALS['TL_JAVASCRIPT'][] = "https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"; ?>
-<?php $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/eventlist_vue_new.js|static'; ?>
+<?php $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/eventlist_vue.js|static'; ?>
 
 
 <div id="course-list">
@@ -10,14 +10,13 @@
 
         <div v-for="(row, index) of rows" class="col-xl-6 event-item event-item-course event layout_upcoming" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
             <div class="row">
+                <!-- Start left col -->
                 <div class="col-sm-3 col-xl-5 d-none d-sm-block">
-                    <a v-bind:href="row.eventUrl" v-bind:title="row.title" class="responsive event-title-link">
-                        <div v-html="row.eventImage">
+                    <a v-bind:href="row.eventUrl" v-bind:title="row.title" v-html="row.eventImage" class="responsive event-title-link">
 
-                        </div>
                     </a>
                 </div>
-
+                <!-- Start right col -->
                 <div class="col-sm-9 col-xl-7">
                     <div class="title">
                         <a v-bind:href="row.eventUrl" class="event-title-link">
@@ -29,17 +28,17 @@
                         <i class="fa fa-fw fa-user"></i>Leitung: {{ row.instructorsWithQualification }}
                     </div>
                     <div class="detail-item">
-                        <i class="fa fa-fw fa-calendar-alt"></i><span v-html="row.eventPeriodLg"></span>
+                        <i class="fa fa-fw fa-calendar-alt"></i>
+                        <span v-html="row.eventPeriodLgInline"></span>
                     </div>
-                    <div class="detail-item">
+                    <div class="detail-item d-flex">
                         <div v-html="row.bookingCounter"></div>
+                        &nbsp;
                         <div v-html="row.eventStateLabel"></div>
                     </div>
                 </div>
             </div>
         </div>
-
-
     </div>
 
     <div v-if="blnIsBusy === true">
@@ -72,17 +71,18 @@
         'limitPerRequest': '<?= $this->limitPerRequest ?>',
         'limitTotal': '<?= $this->limitTotal ?>',
         'imgSize': '<?= $this->imgSize ?>',
+        'pictureId': '<?= $this->pictureId ?>',
         'ajaxEndpoint': 'ajaxEventApi/getEventList',
         'requestToken': '{{request_token}}',
         'fields': [
             'title',
             'eventUrl',
             'courseTypeLevel1',
-            'eventImage||20',
+            'eventImage||<?= $this->pictureId ?>',
             'courseTypeLevel0Name',
             'courseTypeLevel1Name',
             'instructorsWithQualification',
-            'eventPeriodLg',
+            'eventPeriodLgInline',
             'bookingCounter',
             'eventStateLabel',
         ],

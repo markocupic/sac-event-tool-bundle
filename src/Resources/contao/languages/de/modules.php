@@ -26,7 +26,6 @@ $GLOBALS['TL_LANG']['MOD']['sac_event_type_tool'] = array('SAC Event-Art-Tool');
 
 // Frontend modules
 $GLOBALS['TL_LANG']['FMD']['sac_event_tool_frontend_modules'] = array('SAC Frontend Module');
-$GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventlist'] = array('SAC Touren- und Kurse-Auflistungs Modul');
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = array('Event Reader Vorschau');
 
 // Contao 5 ready frontend modules

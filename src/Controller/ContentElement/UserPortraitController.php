@@ -101,23 +101,6 @@ class UserPortraitController extends AbstractContentElementController
         $arrUser = $this->objUser->row();
         $template->user = $arrUser;
 
-        // List all events
-        $arrEvents = array();
-        $objEvent = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE published=? AND startTime > ? ORDER BY startDate')->execute('1', time());
-        while ($objEvent->next())
-        {
-            $eventModel = $calendarEventsModelAdapter->findByPk($objEvent->id);
-            if ($eventModel !== null)
-            {
-                $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent->id, true);
-                if (in_array($this->objUser->id, $arrInstructors))
-                {
-                    $arrEvents[$objEvent->eventType][] = $objEvent->row();
-                }
-            }
-        }
-        $template->events = $arrEvents;
-
         return $template->getResponse();
     }
 

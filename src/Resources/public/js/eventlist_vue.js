@@ -15,36 +15,47 @@ class VueTourList {
             el: elId,
             created: function created() {
                 var self = this;
-                self.prepareRequest();
-                if (self.enableAutoloading === true) {
-                    self.interval = setInterval(function () {
-                        self.prepareRequest();
-                    }, 200);
-                }
+
+                self.prepareRequest(false);
             },
+
             data: function data() {
                 return {
 
-                    // If set to false use the button on the bottom of the list to load more items
-                    enableAutoloading: false,
                     // Load x items per request
-                    limit: params.limit,
-                    // Set number of items that are loaded onthe first request
-                    limitOnFirstRequest: params.limitOnFirstRequest,
-                    // Set offset
-                    offset: params.offset,
-                    // If set to true all items will be loaded at once on the second request
-                    loadAllOnSecondRequest: false,
-
-                    // Don't touch from here
-                    params: params,
-                    total: params.ids.length,
+                    limitPerRequest: params.limitPerRequest,
+                    // Limit total results
+                    limitTotal: params.limitTotal,
+                    // The frontend module id
+                    moduleId: params.moduleId,
+                    // Calendar ids
+                    calendarIds: params.calendarIds,
+                    // Image size array
+                    imgSize: params.imgSize,
+                    // Picture id
+                    pictureId: params.pictureId,
+                    // Event types array
+                    eventTypes: params.eventTypes,
+                    // Filter param array base64 encoded
+                    filterParam: params.filterParam,
+                    // Endpoint url
+                    ajaxEndpoint: params.ajaxEndpoint,
+                    // Contao request token
+                    requestToken: params.requestToken,
+                    // Fields array
+                    fields: params.fields,
+                    // Result row
                     rows: [],
-                    isBusy: false,
+                    // Requested event ids
+                    arrIds: null,
+                    // is busy bool
+                    blnIsBusy: false,
+                    // total found items
+                    itemsFound: 0,
+                    // already loaded items
                     loadedItems: 0,
-                    interval: null,
-                    allEventsLoaded: false,
-
+                    // all events loades bool
+                    blnAllEventsLoaded: false,
                 };
             },
             methods: {
@@ -52,91 +63,82 @@ class VueTourList {
                 prepareRequest: function prepareRequest(isPreloadRequest = false) {
                     var self = this;
 
-                    if (self.isBusy === false && self.params.ids.length > self.loadedItems) {
-                        self.isBusy = true;
+                    if (self.blnIsBusy === false) {
+                        self.blnIsBusy = true;
                         self.getDataByXhr(isPreloadRequest);
                         console.log('Loading events...')
                     }
-
-                    if (self.allEventsLoaded === false && self.params.ids.length === self.loadedItems) {
-                        self.allEventsLoaded = true;
-                        if (self.enableAutoloading === true && self.interval !== null) {
-
-                            clearInterval(self.interval);
-                        }
-                    }
-
                 },
+
+                // Preload and use the session cache
                 preload: function preload() {
                     var self = this;
                     self.prepareRequest(true);
                 },
+
                 // Get data by xhr
                 getDataByXhr: function getDataByXhr(isPreloadRequest) {
                     var self = this;
-                    var ids = [];
                     var counter = 0;
-                    var limit = self.limit;
+                    var limitPerRequest = self.limitPerRequest;
 
-                    if (self.allEventsLoaded === true) {
+                    if (self.blnAllEventsLoaded === true) {
                         return;
                     }
 
-                    if (self.loadedItems === 0) {
-                        limit = self.limitOnFirstRequest;
-                    }
-
-                    if (self.loadedItems > 0 && self.loadAllOnSecondRequest === true) {
-                        limit = self.params.ids.length;
-                    }
-
-                    for (var i = self.loadedItems; i < self.params.ids.length; i++) {
-                        ids.push(self.params.ids[i]);
-                        counter++;
-
-                        if (counter === limit) {
-                            break;
-                        }
-                    }
-
-                    var offset = self.offset + self.loadedItems;
-
                     var data = {
-                        'REQUEST_TOKEN': self.params.requestToken,
-                        'ids': self.params.ids,
-                        'offset': offset,
-                        'limit': limit,
-                        'fields': self.params.fields,
+                        'REQUEST_TOKEN': self.requestToken,
+                        'offset': self.loadedItems,
+                        'limitPerRequest': self.limitPerRequest,
+                        'limitTotal': self.limitTotal,
+                        'moduleId': self.moduleId,
+                        'imgSize': self.imgSize,
+                        'pictureId': self.pictureId,
+                        'calendarIds': self.calendarIds,
+                        'eventTypes': self.eventTypes,
+                        'ajaxEndpoint': self.ajaxEndpoint,
+                        'requestToken': self.requestToken,
+                        'fields': self.fields,
+                        'arrIds': self.arrIds,
+                        'filterParam': self.filterParam,
                         'sessionCacheToken': btoa(window.location.href),
                         'isPreloadRequest': isPreloadRequest,
                     };
 
-                    var url = self.params.ajaxEndpoint;
-
                     var xhr = $.ajax({
                         type: 'POST',
-                        url: url,
+                        url: self.ajaxEndpoint,
                         data: data,
                         dataType: 'json',
                     });
 
                     xhr.done(function (data) {
-                        self.isBusy = false;
+                        self.blnIsBusy = false;
 
+                        let i = 0;
+                        self.itemsFound = data['itemsFound'];
                         data['arrEventData'].forEach(function (row) {
+                            i++;
                             self.rows.push(row);
                             self.loadedItems++;
                         });
+
+                        // Get ids to speed up requests
+                        self.arrIds = data['arrIds'];
+
+                        if (data['isPreloadRequest'] === false) {
+                            if (i === 0 || parseInt(data['itemsFound']) === self.loadedItems) {
+                                self.blnAllEventsLoaded = true
+                            }
+                        }
 
                         window.setTimeout(function () {
                             $(self.$el).find('[data-toggle="tooltip"]').tooltip();
                         }, 100);
 
-                        if (self.allEventsLoaded === false && self.params.ids.length === self.loadedItems) {
-                            self.allEventsLoaded = true;
+                        if (self.blnAllEventsLoaded === true) {
                             console.log('Finished downloading process. ' + self.loadedItems + ' events loaded.');
                         } else {
-                            console.log(data['isPreloadRequest']);
                             if (data['isPreloadRequest'] === false) {
                                 // Preload
                                 self.preload();

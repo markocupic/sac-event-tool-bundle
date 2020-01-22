@@ -65,77 +65,7 @@
             </div>
             <?php endif; ?>
         <?php endif; ?>
-
     </div>
 </div>
-<br>
-<br>
-
-
-<?php $arrEvents = $this->events; ?>
-
-
-
-<?php if (!empty($arrEvents['tour']) && is_array($arrEvents['tour'])): ?>
-
-    <h2 class="ce_headline">Die n&auml;chsten Touren mit <?= $this->user['name'] ?></h2>
-
-    <?php $arrIds = []; ?>
-    <?php foreach ($arrEvents['tour'] as $event): ?>
-    <?php $arrIds[] = $event['id']; ?>
-    <?php endforeach; ?>
-
-    <?php $vueOptions = [
-        'arrIds' => $arrIds,
-        'limitOnFirstRequest' => 50,
-        'limit' => 200
-    ]; ?>
-
-    <?php $this->insert('partial_event_tour_item_vuejs', $vueOptions); ?>
-
-<?php endif; ?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<?php if (!empty($arrEvents['course']) && is_array($arrEvents['course'])): ?>
-<h2 class="ce_headline">Die n&auml;chsten Kurse mit <?= $this->user['name'] ?></h2>
-<table class="table">
-    <?php foreach ($arrEvents['course'] as $event): ?>
-    <tr class="event-item event-item-course event" data-id="<?= $event['id'] ?>" data-event-type="<?= $event['courseTypeLevel1'] ?>">
-        <td><?= \Date::parse('d.m.Y', $event['startDate']) ?></td>
-        <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventDuration($event['id']) ?></td>
-        <td>
-            <?php $eventState = Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($event['id']); ?>
-            <?php $eventStateLabel = $GLOBALS['TL_LANG']['CTE']['calendar_events'][Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventState($event['id'])]; ?>
-            <i class="event-state-icon fa-fw <?= $eventState ?>" aria-label="<?= htmlspecialchars($eventStateLabel) ?>" data-toggle="tooltip" data-placement="top" title="<?= $eventStateLabel ?>"></i></td>
-        <td>
-            <a href="{{event_url::<?php echo $event['id']; ?>}}">{{event_title::<?= $event['id'] ?>}}</a>
-        </td>
-        <td><?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingCounter($event['id']) ?></td>
-        <?php $arrInstructors = Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($event['id'], false, true); ?>
-        <td><?= implode(', ', $arrInstructors) ?></td>
-    </tr>
-    <?php endforeach; ?>
-</table>
-<?php endif; ?>
 
 <?php $this->endblock(); ?>

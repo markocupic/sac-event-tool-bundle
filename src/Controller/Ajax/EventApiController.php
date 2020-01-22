@@ -117,6 +117,9 @@ class EventApiController extends AbstractController
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
+        /** @var UserModel $userModelAdapter */
+        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+
         /** @var  EventOrganizerModel $eventOrganizerModelAdapter */
         $eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
 
@@ -129,6 +132,7 @@ class EventApiController extends AbstractController
             'moduleId'          => $request->request->get('moduleId'),
             'calendarIds'       => $stringUtilAdapter->deserialize(base64_decode($request->request->get('calendarIds')), true),
             'imgSize'           => $stringUtilAdapter->deserialize(base64_decode($request->request->get('imgSize')), true),
+            'pictureId'         => $request->request->get('pictureId'),
             'arrIds'            => $request->request->get('arrIds'),
             // filterboard params
             'eventTypes'        => $stringUtilAdapter->deserialize(base64_decode($request->request->get('eventTypes')), true),
@@ -138,6 +142,8 @@ class EventApiController extends AbstractController
             'isPreloadRequest'  => $request->request->get('isPreloadRequest'),
         ];
 
+        // Event ids can be passed with $_POST
+        // (f.ex. second request in the vue.js event list application)
         if ($param['arrIds'] !== null)
         {
             $arrIds = $param['arrIds'];
@@ -155,6 +161,29 @@ class EventApiController extends AbstractController
                 ->setParameter('published', '1')
                 ->setParameter('calendarIds', $param['calendarIds'], Connection::PARAM_INT_ARRAY)
                 ->setParameter('eventTypes', $param['eventTypes'], Connection::PARAM_STR_ARRAY);
+
+            // Filter by a certain instructor $_GET['username']
+            if (!empty($instructorUsername = $param['filterParam']['username']))
+            {
+                if (($user = $userModelAdapter->findByUsername($instructorUsername)) === null)
+                {
+                    // Do not show any events if username does not exist
+                    $userId = 0;
+                }
+                else
+                {
+                    $userId = $user->id;
+                }
+                $qb2 = $this->connection->createQueryBuilder();
+                $qb2->select('pid')
+                    ->from('tl_calendar_events_instructor', 't')
+                    ->where('t.userId = :instructorId')
+                    ->setParameter('instructorId', $userId);
+                $arrEvents = $qb2->execute()->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+                $qb->andWhere($qb->expr()->in('t.id', ':arrEvents'));
+                $qb->setParameter('arrEvents', $arrEvents, Connection::PARAM_INT_ARRAY);
+            }
 
             // Filterboard: year filter
             if ((int) $param['filterParam']['year'] > 2000)
@@ -535,6 +564,7 @@ class EventApiController extends AbstractController
     }
 
     /**
+     * !!!!! Not used at the moment: Replaced by self::getEventList
      * Get event data by ids and use the session cache
      * This controller is used for the tour list, where events are loaded by vue.js
      * $_POST['REQUEST_TOKEN'], $_POST['ids'], $_POST['fields'] are mandatory
