@@ -415,6 +415,7 @@ class EventApiController extends AbstractController
                 {
                     $arrJSON['loadedItemsFromSession']++;
                 }
+
                 if ($oData === null)
                 {
                     $oData = new \stdClass();

@@ -8,7 +8,7 @@
     <div class="event-container row">
 
 
-        <div  v-for="(row, index) of rows" class="col-xl-6 event-item event-item-course event layout_upcoming" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
+        <div v-for="(row, index) of rows" class="col-xl-6 event-item event-item-course event layout_upcoming" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
             <div class="row">
                 <div class="col-sm-3 col-xl-5 d-none d-sm-block">
                     <a v-bind:href="row.eventUrl" v-bind:title="row.title" class="responsive event-title-link">
@@ -39,35 +39,6 @@
             </div>
         </div>
 
-        <!-- Set up the Vuejs tour list -->
-        <script>
-            new VueTourList('#course-list', {
-                'moduleId': '<?= $this->moduleId ?>',
-                'calendarIds': '<?= $this->calendarIds ?>',
-                'eventTypes': '<?= $this->eventTypes ?>',
-                'filterParam': '<?= $this->filterParam ?>',
-                'limitPerRequest': '<?= $this->limitPerRequest ?>',
-                'limitTotal': '<?= $this->limitTotal ?>',
-                'imgSize': '<?= $this->imgSize ?>',
-                'ajaxEndpoint': 'ajaxEventApi/getEventList',
-                'requestToken': '{{request_token}}',
-                'fields': [
-                    'title',
-                    'eventUrl',
-                    'courseTypeLevel1',
-                    'eventImage||20',
-                    'courseTypeLevel0Name',
-                    'courseTypeLevel1Name',
-                    'instructorsWithQualification',
-                    'eventPeriodLg',
-                    'bookingCounter',
-                    'eventStateLabel',
-                ],
-            });
-        </script>
-
-
-
 
     </div>
 
@@ -91,9 +62,9 @@
     </div>
 </div>
 
-<!-- Set up the Vuejs tour list -->
+<!-- Set up the Vuejs course list -->
 <script>
-    new VueTourList('#tour-list', {
+    new VueTourList('#course-list', {
         'moduleId': '<?= $this->moduleId ?>',
         'calendarIds': '<?= $this->calendarIds ?>',
         'eventTypes': '<?= $this->eventTypes ?>',
@@ -105,23 +76,16 @@
         'requestToken': '{{request_token}}',
         'fields': [
             'title',
-            'startDateDay',
-            'startDateMonth',
-            'eventType',
-            'eventTitle',
             'eventUrl',
-            'instructors',
-            'tourTypesShortcuts',
-            'tourTechDifficulties',
+            'courseTypeLevel1',
+            'eventImage||20',
+            'courseTypeLevel0Name',
+            'courseTypeLevel1Name',
+            'instructorsWithQualification',
+            'eventPeriodLg',
             'bookingCounter',
-            'id',
-            'eventState',
             'eventStateLabel',
-            'eventDuration',
-            'eventPeriodLgInline',
-            'tourTypesIds',
         ],
     });
 </script>
-
 
