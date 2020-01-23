@@ -133,24 +133,22 @@ class EventApiController extends AbstractController
             'calendarIds'       => $stringUtilAdapter->deserialize(base64_decode($request->request->get('calendarIds')), true),
             'imgSize'           => $stringUtilAdapter->deserialize(base64_decode($request->request->get('imgSize')), true),
             'pictureId'         => $request->request->get('pictureId'),
-            'arrIds'            => $request->request->get('arrIds'),
-            // filterboard params
+            'arrIds'            => base64_decode($request->request->get('arrIds')),
             'eventTypes'        => $stringUtilAdapter->deserialize(base64_decode($request->request->get('eventTypes')), true),
-            'filterParam'       => $stringUtilAdapter->deserialize(base64_decode($request->request->get('filterParam')), true),
-            'fields'            => $request->request->get('fields'),
+            'fields'            => !empty(base64_decode($request->request->get('fields'))) ? explode(',', base64_decode($request->request->get('fields'))) : [],
             'sessionCacheToken' => $request->request->get('sessionCacheToken'),
             'isPreloadRequest'  => $request->request->get('isPreloadRequest'),
+            // filterboard params
+            'filterParam'       => $stringUtilAdapter->deserialize(base64_decode($request->request->get('filterParam')), true),
         ];
 
         // Event ids can be passed with $_POST
         // (f.ex. second request in the vue.js event list application)
-        if ($param['arrIds'] !== null)
+        if ($param['arrIds'] === 'null')
         {
-            $arrIds = $param['arrIds'];
-        }
+            // The FormData object will sind null value as string "null"
+            $arrIds = null;
 
-        if (empty($param['arrIds']) && !is_array($param['arrIds']))
-        {
             /** @var QueryBuilder $qb */
             $qb = $this->connection->createQueryBuilder();
             $qb->select('*')
@@ -191,8 +189,8 @@ class EventApiController extends AbstractController
                 $year = (int) $param['filterParam']['year'];
                 $intStart = strtotime('01-01-' . $year);
                 $intEnd = (int) (strtotime('31-12-' . $year) + 24 * 3600 - 1);
-                $qb->having($qb->expr()->gte('t.startDate', ':startDate'));
-                $qb->andHaving($qb->expr()->lte('t.startDate', ':endDate'));
+                $qb->andWhere($qb->expr()->gte('t.startDate', ':startDate'));
+                $qb->andWhere($qb->expr()->lte('t.startDate', ':endDate'));
                 $qb->setParameter('startDate', $intStart);
                 $qb->setParameter('endDate', $intEnd);
             }
@@ -200,7 +198,7 @@ class EventApiController extends AbstractController
             {
                 // Show upcoming events
                 $intNow = (int) strtotime($dateAdapter->parse('Y-m-d'));
-                $qb->having($qb->expr()->gte('t.endDate', ':intNow'));
+                $qb->andWhere($qb->expr()->gte('t.endDate', ':intNow'));
                 $qb->setParameter('intNow', $intNow);
             }
 
@@ -210,7 +208,7 @@ class EventApiController extends AbstractController
                 $dateStart = strtotime($param['filterParam']['dateStart']);
                 if ($dateStart > 0)
                 {
-                    $qb->andHaving($qb->expr()->gte('t.startDate', ':dateStart'));
+                    $qb->andWhere($qb->expr()->gte('t.startDate', ':dateStart'));
                     $qb->setParameter('dateStart', $dateStart);
                 }
             }
@@ -220,7 +218,7 @@ class EventApiController extends AbstractController
             {
                 $strId = preg_replace('/\s/', '', $param['filterParam']['eventId']);
                 $arrChunk = explode('-', $strId);
-                if (isset($arrChunk[1]) && is_numeric($arrChunk[1]))
+                if (isset($arrChunk[1]) && is_numeric((int)$arrChunk[1]))
                 {
                     if (is_numeric($arrChunk[1]))
                     {
@@ -237,7 +235,7 @@ class EventApiController extends AbstractController
                 $strId = trim($param['filterParam']['courseId']);
                 if (!empty($strId))
                 {
-                    $qb->expr()->like('t.courseId', $qb->expr()->literal('%' . $strId . '%'));
+                    $qb->andWhere($qb->expr()->like('t.courseId', $qb->expr()->literal('%' . $strId . '%')));
                 }
             }
 
@@ -401,7 +399,7 @@ class EventApiController extends AbstractController
             'arrIds'                   => $arrIds,
             'arrFields'                => $arrFields,
             'arrEventData'             => array(),
-            'itemsFound'               => count($arrIds),
+            'itemsFound'               => is_array($arrIds) ? count($arrIds) : 0,
         );
 
         /** @var QueryBuilder $qb */
