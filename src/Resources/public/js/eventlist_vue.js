@@ -56,6 +56,8 @@ class VueTourList {
                     loadedItems: 0,
                     // all events loades bool
                     blnAllEventsLoaded: false,
+                    // Callbacks
+                    callbacks: params.callbacks,
                 };
             },
             methods: {
@@ -101,9 +103,12 @@ class VueTourList {
                     data.append('filterParam', self.filterParam);
                     data.append('sessionCacheToken', btoa(window.location.href));
                     data.append('isPreloadRequest', isPreloadRequest);
+
+                    // Handle arrays correctly
                     for (let i = 0; i < self.fields.length; ++i) {
                         data.append('fields[]', self.fields[i]);
                     }
+
                     if (self.arrIds === null) {
                         data.append('arrIds', null);
                     }
@@ -126,7 +131,6 @@ class VueTourList {
                         return res.json();
                     }).then(function (json) {
 
-                        console.log(json);
                         self.blnIsBusy = false;
 
                         let i = 0;
@@ -146,10 +150,6 @@ class VueTourList {
                             }
                         }
 
-                        window.setTimeout(function () {
-                            $(self.$el).find('[json-toggle="tooltip"]').tooltip();
-                        }, 100);
-
                         if (self.blnAllEventsLoaded === true) {
                             console.log('Finished downloading process. ' + self.loadedItems + ' events loaded.');
                         } else {
@@ -160,6 +160,12 @@ class VueTourList {
                         }
                         return json;
 
+                    }).then(function (json) {
+                        // Trigger oninsert callback
+                        if (self.callbacks.oninsert && typeof self.callbacks.oninsert === "function") {
+                            self.callbacks.oninsert(self, json);
+                        }
+                        return json;
                     });
                 }
             }

@@ -117,6 +117,13 @@
             'eventPeriodLgInline',
             'tourTypesIds',
         ],
+        'callbacks': {
+            'oninsert': function (vue, json) {
+                window.setTimeout(function () {
+                    $('[data-toggle="tooltip"]').tooltip();
+                }, 100);
+            }
+        }
     });
 </script>
 
