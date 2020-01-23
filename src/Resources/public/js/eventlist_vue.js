@@ -9,45 +9,62 @@
  */
 class VueTourList {
 
-    constructor(elId, params) {
+    constructor(elId, opt) {
 
+        // Defaults
+        const defaults = {
+            'requestToken': '',
+            'apiParams': {
+                'organizers': [],
+                'eventTypes': [],
+                'tourType': '',
+                'courseType': '',
+                'courseId': '',
+                'year': '',
+                'dateStart': '',
+                'searchterm': '',
+                'eventId': '',
+                'arrIds': [],
+                'username': '',
+                'calendarIds': [],
+                'limitPerRequest': '50',
+                'offset': '0',
+            },
+            'fields': [],
+            'callbacks': {
+                'oninsert': function (vue, json) {
+                    //
+                }
+            }
+        };
+
+        // Merge options and defaults
+        let params = {...defaults, ...opt};
+
+        // Instantiate vue.js application
         new Vue({
             el: elId,
             created: function created() {
-                var self = this;
+                let self = this;
+                if (self.apiParams.arrIds.length < 1) {
+                    self.apiParams.arrIds = null;
+                }
 
                 self.prepareRequest(false);
             },
 
             data: function data() {
                 return {
-
-                    // Load x items per request
-                    limitPerRequest: params.limitPerRequest,
-                    // Limit total results
-                    limitTotal: params.limitTotal,
-                    // The frontend module id
-                    moduleId: params.moduleId,
-                    // Calendar ids
-                    calendarIds: params.calendarIds,
-                    // Image size array
-                    imgSize: params.imgSize,
-                    // Picture id
-                    pictureId: params.pictureId,
-                    // Event types array
-                    eventTypes: params.eventTypes,
-                    // Filter param array base64 encoded
-                    filterParam: params.filterParam,
-                    // Endpoint url
-                    ajaxEndpoint: params.ajaxEndpoint,
+                    // Api params
+                    apiParams: params.apiParams,
                     // Contao request token
                     requestToken: params.requestToken,
                     // Fields array
                     fields: (params.fields && Array.isArray(params.fields)) ? params.fields : null,
+                    // Callbacks
+                    callbacks: params.callbacks,
                     // Result row
                     rows: [],
-                    // Requested event ids
-                    arrIds: (params.arrIds && Array.isArray(params.arrIds)) ? params.arrIds : null,
                     // is busy bool
                     blnIsBusy: false,
                     // total found items
@@ -56,14 +73,13 @@ class VueTourList {
                     loadedItems: 0,
                     // all events loades bool
                     blnAllEventsLoaded: false,
-                    // Callbacks
-                    callbacks: params.callbacks,
+
                 };
             },
             methods: {
                 // Prepare ajax request
                 prepareRequest: function prepareRequest(isPreloadRequest = false) {
-                    var self = this;
+                    let self = this;
 
                     if (self.blnIsBusy === false) {
                         self.blnIsBusy = true;
@@ -74,15 +90,13 @@ class VueTourList {
 
                 // Preload and use the session cache
                 preload: function preload() {
-                    var self = this;
+                    let self = this;
                     self.prepareRequest(true);
                 },
 
                 // Get data by xhr
                 getDataByXhr: function getDataByXhr(isPreloadRequest) {
-                    var self = this;
-                    var counter = 0;
-                    var limitPerRequest = self.limitPerRequest;
+                    let self = this;
 
                     if (self.blnAllEventsLoaded === true) {
                         return;
@@ -90,36 +104,33 @@ class VueTourList {
 
                     let data = new FormData();
                     data.append('REQUEST_TOKEN', self.requestToken);
-                    data.append('offset', self.loadedItems);
-                    data.append('limitPerRequest', self.limitPerRequest);
-                    data.append('limitTotal', self.limitTotal);
-                    data.append('moduleId', self.moduleId);
-                    data.append('imgSize', self.imgSize);
-                    data.append('pictureId', self.pictureId);
-                    data.append('calendarIds', self.calendarIds);
-                    data.append('eventTypes', self.eventTypes);
-                    data.append('ajaxEndpoint', self.ajaxEndpoint);
                     data.append('requestToken', self.requestToken);
-                    data.append('filterParam', self.filterParam);
                     data.append('sessionCacheToken', btoa(window.location.href));
                     data.append('isPreloadRequest', isPreloadRequest);
 
                     // Handle arrays correctly
+                    for (let prop in self.apiParams) {
+                        let property = self.apiParams[prop];
+                        if (prop === 'offset') {
+                            data.append('offset', parseInt(self.apiParams.offset) + self.loadedItems);
+                        }
+                        else if (Array.isArray(property)) {
+                            for (let i = 0; i < property.length; ++i) {
+                                data.append(prop + '[]', property[i]);
+                            }
+                        }
+                        else {
+                            data.append(prop, property);
+                        }
+                    }
+
+                    // Handle fields correctly
                     for (let i = 0; i < self.fields.length; ++i) {
                         data.append('fields[]', self.fields[i]);
                     }
 
-                    if (self.arrIds === null) {
-                        data.append('arrIds', null);
-                    }
-                    else {
-                        for (let i = 0; i < self.arrIds.length; ++i) {
-                            data.append('arrIds[]', self.arrIds[i]);
-                        }
-                    }
-
                     // Fetch
-                    fetch(self.ajaxEndpoint, {
+                    fetch('ajaxEventApi/getEventList', {
 
                             method: "POST",
                             body: data,

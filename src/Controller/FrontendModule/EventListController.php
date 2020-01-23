@@ -64,29 +64,84 @@ class EventListController extends AbstractFrontendModuleController
         $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
 
         // Get filter params from request
-        $arrQuery = $request->query->all();
-        $arrFilterParam = [];
-        if (!empty($arrQuery) && is_array($arrQuery))
+        $arrKeys = ['organizers', 'tourType', 'courseType', 'courseId', 'year', 'dateStart', 'searchterm', 'eventId', 'courseId', 'arrIds'];
+
+        $ApiParam = [];
+        foreach ($arrKeys as $key)
         {
-            $arrFilterParam = $arrQuery;
+            $ApiParam[$key] = $this->getApiParam($key, $request->query->get($key));
         }
+        $ApiParam['limitPerRequest'] = $model->eventListLimitPerRequest;
+        $ApiParam['calendarIds'] = implode(',', $stringUtilAdapter->deserialize($model->cal_calendar, true));
+        $ApiParam['eventType'] = implode(',', $this->getApiParam('eventType', $model->eventType));
 
         // Get picture Id
         $arrPicture = $stringUtilAdapter->deserialize($model->imgSize, true);
         $pictureId = (isset($arrPicture[2]) && is_numeric($arrPicture[2])) ? $arrPicture[2] : '0';
 
         $template->arrPartialOpt = [
-            'filterParam'     => base64_encode(serialize($arrFilterParam)),
-            'imgSize'         => base64_encode($model->imgSize),
-            'pictureId'       => $pictureId,
-            'moduleId'        => $model->id,
-            'calendarIds'     => base64_encode($model->cal_calendar),
-            'eventTypes'      => base64_encode($model->eventType),
-            'limitTotal'      => $model->eventListLimitTotal,
-            'limitPerRequest' => $model->eventListLimitPerRequest,
+            'pictureId' => $pictureId,
+            'moduleId'  => $model->id,
+            'apiParam'  => $ApiParam,
         ];
 
         return $template->getResponse();
+    }
+
+    private function getApiParam($strKey, $value = '')
+    {
+        /** @var  StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+
+        switch ($strKey)
+        {
+            case 'organizers':
+
+                if (!empty($value))
+                {
+                    // The organizers GET param can be transmitted like this: organizers=5
+                    if (is_array($value))
+                    {
+                        $value = implode(',', $value);
+                    }
+                    elseif (is_numeric($value))
+                    {
+                        $value = $value;
+                    }
+                    // Or the organizers GET param can be transmitted like this: organizers=5,7,3
+                    elseif (strpos($value, ','))
+                    {
+                        $value = $value;
+                    }
+                    else
+                    {
+                        // Or the organizers GET param can be transmitted like this: organizers[]=5&organizers[]=7&organizers[]=3
+                        $value = implode(',', $stringUtilAdapter->deserialize($value, true));
+                    }
+                }
+
+                break;
+            case 'eventType':
+                $value = $stringUtilAdapter->deserialize($value, true);
+                $value = array_map(function ($el) {
+                    return '"' . $el . '"';
+                }, $value);
+
+                break;
+
+            case 'tourType':
+            case 'courseType':
+            case 'courseId':
+            case 'year':
+            case 'dateStart':
+            case 'searchterm':
+            case 'eventId':
+            case 'courseId':
+            case 'arrIds':
+                break;
+        }
+
+        return $value;
     }
 
 }

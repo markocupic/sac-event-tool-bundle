@@ -124,22 +124,45 @@ class EventApiController extends AbstractController
         $eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
 
         $request = $this->requestStack->getCurrentRequest();
+        /**
+         * 'apiParams': {
+         * 'organizers': [<?= $this->apiParam['organizers'] ?>],
+         * 'tourType': '<?= $this->apiParam['tourType'] ?>',
+         * 'courseType': '<?= $this->apiParam['courseType'] ?>',
+         * 'courseId': '<?= $this->apiParam['courseId'] ?>',
+         * 'year': '<?= $this->apiParam['year'] ?>',
+         * 'dateStart': '<?= $this->apiParam['dateStart'] ?>',
+         * 'searchterm': '<?= $this->apiParam['searchterm'] ?>',
+         * 'eventId': '<?= $this->apiParam['eventId'] ?>',
+         * 'arrIds': [<?= $this->apiParam['eventId'] ?>],
+         * 'calendarIds': [<?= $this->apiParam['calendarIds'] ?>],
+         * 'limitPerRequest': '<?= $this->apiParam['limitPerRequest'] ?>',
+         * },
+         **/
 
         $param = [
-            'offset'            => (int) $request->request->get('offset'),
-            'limitPerRequest'   => (int) $request->request->get('limitPerRequest'),
-            'limitTotal'        => (int) $request->request->get('limitTotal'),
-            'moduleId'          => $request->request->get('moduleId'),
-            'calendarIds'       => $stringUtilAdapter->deserialize(base64_decode($request->request->get('calendarIds')), true),
-            'imgSize'           => $stringUtilAdapter->deserialize(base64_decode($request->request->get('imgSize')), true),
-            'pictureId'         => $request->request->get('pictureId'),
-            'arrIds'            => $request->request->get('arrIds'),
-            'eventTypes'        => $stringUtilAdapter->deserialize(base64_decode($request->request->get('eventTypes')), true),
+            // Arrays
+            'organizers'        => $request->request->get('organizers'),
+            'eventTypes'        => $request->request->get('eventTypes'),
+            'calendarIds'       => $request->request->get('calendarIds'),
             'fields'            => $request->request->get('fields'),
+            // Array or string null
+            'arrIds'            => $request->request->get('arrIds'),
+            // Integers
+            'offset'            => (int) $request->request->get('offset'),
+            'tourType'          => (int) $request->request->get('tourType'),
+            'courseType'        => (int) $request->request->get('courseType'),
+            'year'              => (int) $request->request->get('year'),
+            'limitPerRequest'   => (int) $request->request->get('limitPerRequest'),
+            // Strings
+            'courseId'          => $request->request->get('courseId'),
+            'eventId'           => $request->request->get('eventId'),
+            'dateStart'         => $request->request->get('dateStart'),
+            'searchterm'        => $request->request->get('searchterm'),
+            'username'          => $request->request->get('username'),
             'sessionCacheToken' => $request->request->get('sessionCacheToken'),
+            // Boolean
             'isPreloadRequest'  => $request->request->get('isPreloadRequest'),
-            // filterboard params
-            'filterParam'       => $stringUtilAdapter->deserialize(base64_decode($request->request->get('filterParam')), true),
         ];
 
         // Event ids can be passed with $_POST
@@ -164,7 +187,7 @@ class EventApiController extends AbstractController
                 ->setParameter('eventTypes', $param['eventTypes'], Connection::PARAM_STR_ARRAY);
 
             // Filter by a certain instructor $_GET['username']
-            if (!empty($instructorUsername = $param['filterParam']['username']))
+            if (!empty($instructorUsername = $param['username']))
             {
                 if (($user = $userModelAdapter->findByUsername($instructorUsername)) === null)
                 {
@@ -187,9 +210,9 @@ class EventApiController extends AbstractController
             }
 
             // Filterboard: year filter
-            if ((int) $param['filterParam']['year'] > 2000)
+            if ((int) $param['year'] > 2000)
             {
-                $year = (int) $param['filterParam']['year'];
+                $year = (int) $param['year'];
                 $intStart = strtotime('01-01-' . $year);
                 $intEnd = (int) (strtotime('31-12-' . $year) + 24 * 3600 - 1);
                 $qb->andWhere($qb->expr()->gte('t.startDate', ':startDate'));
@@ -206,9 +229,9 @@ class EventApiController extends AbstractController
             }
 
             // Filterboard: dateStart filter
-            if (!empty($param['filterParam']['dateStart']))
+            if (!empty($param['dateStart']))
             {
-                $dateStart = strtotime($param['filterParam']['dateStart']);
+                $dateStart = strtotime($param['dateStart']);
                 if ($dateStart > 0)
                 {
                     $qb->andWhere($qb->expr()->gte('t.startDate', ':dateStart'));
@@ -217,9 +240,9 @@ class EventApiController extends AbstractController
             }
 
             // Filterboard: eventId filter
-            if (!empty($param['filterParam']['eventId']))
+            if (!empty($param['eventId']))
             {
-                $strId = preg_replace('/\s/', '', $param['filterParam']['eventId']);
+                $strId = preg_replace('/\s/', '', $param['eventId']);
                 $arrChunk = explode('-', $strId);
                 if (isset($arrChunk[1]) && is_numeric((int) $arrChunk[1]))
                 {
@@ -233,9 +256,9 @@ class EventApiController extends AbstractController
             }
 
             // Filterboard: courseId
-            if (!empty($param['filterParam']['courseId']))
+            if (!empty($param['courseId']))
             {
-                $strId = trim($param['filterParam']['courseId']);
+                $strId = trim($param['courseId']);
                 if (!empty($strId))
                 {
                     $qb->andWhere($qb->expr()->like('t.courseId', $qb->expr()->literal('%' . $strId . '%')));
@@ -252,28 +275,9 @@ class EventApiController extends AbstractController
             {
                 // Filter items that can not be filtered in the query above
                 // Filterboard: organizers
-                if (!empty($param['filterParam']['organizers']))
+                if (!empty($param['organizers']))
                 {
-                    // The organizers GET param can be transmitted like this: organizers=5
-                    if (is_array($param['filterParam']['organizers']))
-                    {
-                        $arrOrganizers = $param['filterParam']['organizers'];
-                    }
-                    elseif (is_numeric($param['filterParam']['organizers']))
-                    {
-                        $arrOrganizers = [$param['filterParam']['organizers']];
-                    }
-                    // Or the organizers GET param can be transmitted like this: organizers=5,7,3
-                    elseif (strpos($param['filterParam']['organizers'], ',', 1))
-                    {
-                        $arrOrganizers = explode(',', $param['filterParam']['organizers']);
-                    }
-                    else
-                    {
-                        // Or the organizers GET param can be transmitted like this: organizers[]=5&organizers[]=7&organizers[]=3
-                        $arrOrganizers = $stringUtilAdapter->deserialize($param['filterParam']['organizers'], true);
-                    }
-
+                    $arrOrganizers = $param['organizers'];
                     $arrEventOrganizers = $stringUtilAdapter->deserialize($event['organizers'], true);
                     $objEventOrganizerModel = $eventOrganizerModelAdapter->findByIds($arrEventOrganizers);
                     $blnIgnoreOrganizerFilter = false;
@@ -298,26 +302,26 @@ class EventApiController extends AbstractController
                 }
 
                 // Filterboard: tourType
-                if ($param['filterParam']['tourType'] > 0)
+                if ($param['tourType'] > 0)
                 {
                     $arrTourTypes = $stringUtilAdapter->deserialize($event['tourType'], true);
-                    if (!in_array($param['filterParam']['tourType'], $arrTourTypes))
+                    if (!in_array($param['tourType'], $arrTourTypes))
                     {
                         continue;
                     }
                 }
 
                 // Filterboard: courseType
-                if ($param['filterParam']['courseType'] > 0)
+                if ($param['courseType'] > 0)
                 {
                     $arrCourseTypes = $stringUtilAdapter->deserialize($event['courseTypeLevel1'], true);
-                    if (!in_array($param['filterParam']['courseType'], $arrCourseTypes))
+                    if (!in_array($param['courseType'], $arrCourseTypes))
                     {
                         continue;
                     }
                 }
 
-                $strSearchterm = $param['filterParam']['searchterm'];
+                $strSearchterm = $param['searchterm'];
                 if ($strSearchterm != '')
                 {
                     $intFound = 0;
@@ -376,11 +380,6 @@ class EventApiController extends AbstractController
         }
 
         // Second query
-
-        if ($param['limitTotal'] > 0)
-        {
-            $arrIds = array_slice($arrIds, 0, $param['limitTotal']);
-        }
         $arrFields = empty($param['fields']) ? [] : $param['fields'];
 
         $offset = empty($param['offset']) ? 0 : (int) $param['offset'];
@@ -397,7 +396,6 @@ class EventApiController extends AbstractController
             'countItems'               => 0,
             'offset'                   => $offset,
             'limitPerRequest'          => $limitPerRequest,
-            'limitTotal'               => $param['limitTotal'],
             'arrIds'                   => $arrIds,
             'arrFields'                => $arrFields,
             'arrEventData'             => array(),

@@ -88,17 +88,23 @@
 <!-- Set up the Vuejs tour list -->
 <script>
     new VueTourList('#tour-list', {
-        'moduleId': '<?= $this->moduleId ?>',
-        'calendarIds': '<?= $this->calendarIds ?>',
-        'eventTypes': '<?= $this->eventTypes ?>',
-        'filterParam': '<?= $this->filterParam ?>',
-        'limitPerRequest': '<?= $this->limitPerRequest ?>',
-        'limitTotal': '<?= $this->limitTotal ?>',
-        'imgSize': '<?= $this->imgSize ?>',
-        'pictureId': '<?= $this->pictureId ?>',
-        'ajaxEndpoint': 'ajaxEventApi/getEventList',
         'requestToken': '{{request_token}}',
-        //'arrIds': [4310, 5534, 4289],
+        'apiParams': {
+            'organizers': [<?= $this->apiParam['organizers'] ?>],
+            'eventTypes': [<?= $this->apiParam['eventType'] ?>],
+            'tourType': '<?= $this->apiParam['tourType'] ?>',
+            'courseType': '<?= $this->apiParam['courseType'] ?>',
+            'courseId': '<?= $this->apiParam['courseId'] ?>',
+            'year': '<?= $this->apiParam['year'] ?>',
+            'dateStart': '<?= $this->apiParam['dateStart'] ?>',
+            'searchterm': '<?= $this->apiParam['searchterm'] ?>',
+            'eventId': '<?= $this->apiParam['eventId'] ?>',
+            'arrIds': [<?= $this->apiParam['eventId'] ?>],
+            'username': '',
+            'calendarIds': [<?= $this->apiParam['calendarIds'] ?>],
+            'limitPerRequest': '<?= $this->apiParam['limitPerRequest'] ?>',
+            'offset': '0',
+        },
         'fields': [
             'title',
             'startDateDay',
