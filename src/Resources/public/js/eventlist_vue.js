@@ -162,11 +162,21 @@ class VueTourList {
 
                     }).then(function (json) {
                         // Trigger oninsert callback
-                        if (self.callbacks.oninsert && typeof self.callbacks.oninsert === "function") {
+                        if (self.callbackExists('oninsert')) {
                             self.callbacks.oninsert(self, json);
                         }
                         return json;
                     });
+
+
+                },
+                // Check if callback exists
+                callbackExists: function callbackExists(strCallback) {
+                    let self = this;
+                    if (typeof self.callbacks !== "undefined" && typeof self.callbacks[strCallback] !== "undefined" && typeof self.callbacks[strCallback] === "function") {
+                        return true;
+                    }
+                    return false;
                 }
             }
         });
