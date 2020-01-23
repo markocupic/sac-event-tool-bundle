@@ -43,11 +43,11 @@ class VueTourList {
                     // Contao request token
                     requestToken: params.requestToken,
                     // Fields array
-                    fields: params.fields,
+                    fields: (params.fields && Array.isArray(params.fields)) ? params.fields : null,
                     // Result row
                     rows: [],
                     // Requested event ids
-                    arrIds: null,
+                    arrIds: (params.arrIds && Array.isArray(params.arrIds)) ? params.arrIds : null,
                     // is busy bool
                     blnIsBusy: false,
                     // total found items
@@ -98,11 +98,20 @@ class VueTourList {
                     data.append('eventTypes', self.eventTypes);
                     data.append('ajaxEndpoint', self.ajaxEndpoint);
                     data.append('requestToken', self.requestToken);
-                    data.append('fields', btoa(self.fields));
-                    data.append('arrIds', btoa(self.arrIds));
                     data.append('filterParam', self.filterParam);
                     data.append('sessionCacheToken', btoa(window.location.href));
                     data.append('isPreloadRequest', isPreloadRequest);
+                    for (let i = 0; i < self.fields.length; ++i) {
+                        data.append('fields[]', self.fields[i]);
+                    }
+                    if (self.arrIds === null) {
+                        data.append('arrIds', null);
+                    }
+                    else {
+                        for (let i = 0; i < self.arrIds.length; ++i) {
+                            data.append('arrIds[]', self.arrIds[i]);
+                        }
+                    }
 
                     // Fetch
                     fetch(self.ajaxEndpoint, {
@@ -115,36 +124,36 @@ class VueTourList {
                         }
                     ).then(function (res) {
                         return res.json();
-                    }).then(function (data) {
+                    }).then(function (json) {
 
-                        console.log(data);
+                        console.log(json);
                         self.blnIsBusy = false;
 
                         let i = 0;
-                        self.itemsFound = data['itemsFound'];
-                        data['arrEventData'].forEach(function (row) {
+                        self.itemsFound = json['itemsFound'];
+                        json['arrEventData'].forEach(function (row) {
                             i++;
                             self.rows.push(row);
                             self.loadedItems++;
                         });
 
                         // Get ids to speed up requests
-                        self.arrIds = data['arrIds'];
+                        self.arrIds = json['arrIds'];
 
-                        if (data['isPreloadRequest'] === false) {
-                            if (i === 0 || parseInt(data['itemsFound']) === self.loadedItems) {
+                        if (json['isPreloadRequest'] === false) {
+                            if (i === 0 || parseInt(json['itemsFound']) === self.loadedItems) {
                                 self.blnAllEventsLoaded = true
                             }
                         }
 
                         window.setTimeout(function () {
-                            $(self.$el).find('[data-toggle="tooltip"]').tooltip();
+                            $(self.$el).find('[json-toggle="tooltip"]').tooltip();
                         }, 100);
 
                         if (self.blnAllEventsLoaded === true) {
                             console.log('Finished downloading process. ' + self.loadedItems + ' events loaded.');
                         } else {
-                            if (data['isPreloadRequest'] === false) {
+                            if (json['isPreloadRequest'] === false) {
                                 // Preload
                                 self.preload();
                             }

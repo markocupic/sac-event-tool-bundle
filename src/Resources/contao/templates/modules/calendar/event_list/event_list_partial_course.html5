@@ -71,6 +71,7 @@
         'pictureId': '<?= $this->pictureId ?>',
         'ajaxEndpoint': 'ajaxEventApi/getEventList',
         'requestToken': '{{request_token}}',
+        //'arrIds': [4310, 5534, 4289],
         'fields': [
             'title',
             'eventUrl',

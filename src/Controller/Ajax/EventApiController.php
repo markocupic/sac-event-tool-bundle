@@ -133,9 +133,9 @@ class EventApiController extends AbstractController
             'calendarIds'       => $stringUtilAdapter->deserialize(base64_decode($request->request->get('calendarIds')), true),
             'imgSize'           => $stringUtilAdapter->deserialize(base64_decode($request->request->get('imgSize')), true),
             'pictureId'         => $request->request->get('pictureId'),
-            'arrIds'            => base64_decode($request->request->get('arrIds')),
+            'arrIds'            => $request->request->get('arrIds'),
             'eventTypes'        => $stringUtilAdapter->deserialize(base64_decode($request->request->get('eventTypes')), true),
-            'fields'            => !empty(base64_decode($request->request->get('fields'))) ? explode(',', base64_decode($request->request->get('fields'))) : [],
+            'fields'            => $request->request->get('fields'),
             'sessionCacheToken' => $request->request->get('sessionCacheToken'),
             'isPreloadRequest'  => $request->request->get('isPreloadRequest'),
             // filterboard params
@@ -144,11 +144,14 @@ class EventApiController extends AbstractController
 
         // Event ids can be passed with $_POST
         // (f.ex. second request in the vue.js event list application)
+        if ($param['arrIds'] !== 'null')
+        {
+            // The FormData object will send null value as string "null"
+            $arrIds = $param['arrIds'];
+        }
+
         if ($param['arrIds'] === 'null')
         {
-            // The FormData object will sind null value as string "null"
-            $arrIds = null;
-
             /** @var QueryBuilder $qb */
             $qb = $this->connection->createQueryBuilder();
             $qb->select('*')
@@ -218,7 +221,7 @@ class EventApiController extends AbstractController
             {
                 $strId = preg_replace('/\s/', '', $param['filterParam']['eventId']);
                 $arrChunk = explode('-', $strId);
-                if (isset($arrChunk[1]) && is_numeric((int)$arrChunk[1]))
+                if (isset($arrChunk[1]) && is_numeric((int) $arrChunk[1]))
                 {
                     if (is_numeric($arrChunk[1]))
                     {
@@ -385,7 +388,6 @@ class EventApiController extends AbstractController
         $isPreloadRequest = ($param['isPreloadRequest'] != 'true') ? false : true;
 
         $this->sessionCacheToken = $param['sessionCacheToken'];
-
         $arrJSON = array(
             'CACHE_EXPIRATION_TIMEOUT' => static::CACHE_EXPIRATION_TIMEOUT,
             'loadedItemsFromSession'   => 0,
@@ -402,13 +404,16 @@ class EventApiController extends AbstractController
             'itemsFound'               => is_array($arrIds) ? count($arrIds) : 0,
         );
 
-        /** @var QueryBuilder $qb */
-        $qb = $this->connection->createQueryBuilder();
-        $qb->select('*')
-            ->from('tl_calendar_events', 't')
-            ->where($qb->expr()->in('t.id', ':ids'))
-            ->setParameter('ids', $arrIds, Connection::PARAM_INT_ARRAY)
-            ->orderBy('t.startDate', 'ASC');
+        if ($arrIds !== null && is_array($arrIds))
+        {
+            /** @var QueryBuilder $qb */
+            $qb = $this->connection->createQueryBuilder();
+            $qb->select('*')
+                ->from('tl_calendar_events', 't')
+                ->where($qb->expr()->in('t.id', ':ids'))
+                ->setParameter('ids', $arrIds, Connection::PARAM_INT_ARRAY)
+                ->orderBy('t.startDate', 'ASC');
+        }
 
         // Offset
         if ($offset > 0)
