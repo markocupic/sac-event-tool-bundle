@@ -21,7 +21,7 @@
                 <!-- right col -->
                 <div>
                     <!-- row event period -->
-                    <div class="d-flex">
+                    <div class="d-flex flex-wrap">
                         <div class="small mr-1"><span v-html="row.eventPeriodLgInline"></span></div>
                         <div class="small text-muted mr-1">(Dauer: <span v-html="row.eventDuration"></span>)</div>
                     </div>

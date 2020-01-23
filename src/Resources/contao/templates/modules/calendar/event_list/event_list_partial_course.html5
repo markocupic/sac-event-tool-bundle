@@ -12,9 +12,7 @@
             <div class="row">
                 <!-- Start left col -->
                 <div class="col-sm-3 col-xl-5 d-none d-sm-block">
-                    <a v-bind:href="row.eventUrl" v-bind:title="row.title" v-html="row.eventImage" class="responsive event-title-link">
-
-                    </a>
+                    <a v-bind:href="row.eventUrl" v-bind:title="row.title" v-html="row.eventImage" class="responsive event-title-link"></a>
                 </div>
                 <!-- Start right col -->
                 <div class="col-sm-9 col-xl-7">
@@ -32,8 +30,7 @@
                         <span v-html="row.eventPeriodLgInline"></span>
                     </div>
                     <div class="detail-item d-flex">
-                        <div v-html="row.bookingCounter"></div>
-                        &nbsp;
+                        <div v-html="row.bookingCounter" class="mr-1"></div>
                         <div v-html="row.eventStateLabel"></div>
                     </div>
                 </div>

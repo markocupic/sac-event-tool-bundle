@@ -86,33 +86,38 @@ class VueTourList {
                         return;
                     }
 
-                    var data = {
-                        'REQUEST_TOKEN': self.requestToken,
-                        'offset': self.loadedItems,
-                        'limitPerRequest': self.limitPerRequest,
-                        'limitTotal': self.limitTotal,
-                        'moduleId': self.moduleId,
-                        'imgSize': self.imgSize,
-                        'pictureId': self.pictureId,
-                        'calendarIds': self.calendarIds,
-                        'eventTypes': self.eventTypes,
-                        'ajaxEndpoint': self.ajaxEndpoint,
-                        'requestToken': self.requestToken,
-                        'fields': self.fields,
-                        'arrIds': self.arrIds,
-                        'filterParam': self.filterParam,
-                        'sessionCacheToken': btoa(window.location.href),
-                        'isPreloadRequest': isPreloadRequest,
-                    };
+                    let data = new FormData();
+                    data.append('REQUEST_TOKEN', self.requestToken);
+                    data.append('offset', self.loadedItems);
+                    data.append('limitPerRequest', self.limitPerRequest);
+                    data.append('limitTotal', self.limitTotal);
+                    data.append('moduleId', self.moduleId);
+                    data.append('imgSize', self.imgSize);
+                    data.append('pictureId', self.pictureId);
+                    data.append('calendarIds', self.calendarIds);
+                    data.append('eventTypes', self.eventTypes);
+                    data.append('ajaxEndpoint', self.ajaxEndpoint);
+                    data.append('requestToken', self.requestToken);
+                    data.append('fields', btoa(self.fields));
+                    data.append('arrIds', btoa(self.arrIds));
+                    data.append('filterParam', self.filterParam);
+                    data.append('sessionCacheToken', btoa(window.location.href));
+                    data.append('isPreloadRequest', isPreloadRequest);
 
-                    var xhr = $.ajax({
-                        type: 'POST',
-                        url: self.ajaxEndpoint,
-                        data: data,
-                        dataType: 'json',
-                    });
+                    // Fetch
+                    fetch(self.ajaxEndpoint, {
 
-                    xhr.done(function (data) {
+                            method: "POST",
+                            body: data,
+                            headers: {
+                                'x-requested-with': 'XMLHttpRequest'
+                            },
+                        }
+                    ).then(function (res) {
+                        return res.json();
+                    }).then(function (data) {
+
+                        console.log(data);
                         self.blnIsBusy = false;
 
                         let i = 0;
@@ -144,6 +149,8 @@ class VueTourList {
                                 self.preload();
                             }
                         }
+                        return json;
+
                     });
                 }
             }
