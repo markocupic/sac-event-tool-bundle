@@ -28,6 +28,9 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 class EventListController extends AbstractFrontendModuleController
 {
 
+    /** @var  ModuleModel */
+    protected $model;
+
     /**
      * @param Request $request
      * @param ModuleModel $model
@@ -38,6 +41,8 @@ class EventListController extends AbstractFrontendModuleController
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
+        $this->model = $model;
+
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }
@@ -64,16 +69,13 @@ class EventListController extends AbstractFrontendModuleController
         $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
 
         // Get filter params from request
-        $arrKeys = ['organizers', 'tourType', 'courseType', 'courseId', 'year', 'dateStart', 'searchterm', 'eventId', 'courseId', 'arrIds'];
+        $arrKeys = ['limit', 'calendarIds', 'eventType', 'organizers', 'tourType', 'courseType', 'courseId', 'year', 'dateStart', 'searchterm', 'eventId', 'courseId', 'arrIds'];
 
         $ApiParam = [];
         foreach ($arrKeys as $key)
         {
             $ApiParam[$key] = $this->getApiParam($key, $request->query->get($key));
         }
-        $ApiParam['limitPerRequest'] = $model->eventListLimitPerRequest;
-        $ApiParam['calendarIds'] = implode(',', $stringUtilAdapter->deserialize($model->cal_calendar, true));
-        $ApiParam['eventType'] = implode(',', $this->getApiParam('eventType', $model->eventType));
 
         // Get picture Id
         $arrPicture = $stringUtilAdapter->deserialize($model->imgSize, true);
@@ -121,12 +123,21 @@ class EventListController extends AbstractFrontendModuleController
                 }
 
                 break;
+
             case 'eventType':
-                $value = $stringUtilAdapter->deserialize($value, true);
+                $value = $stringUtilAdapter->deserialize($this->model->eventType, true);
                 $value = array_map(function ($el) {
                     return '"' . $el . '"';
                 }, $value);
+                $value = implode(',', $value);
+                break;
 
+            case 'limit';
+                $value = $this->model->eventListLimitPerRequest;
+                break;
+
+            case 'calendarIds';
+                $value = implode(',', $stringUtilAdapter->deserialize($this->model->cal_calendar, true));
                 break;
 
             case 'tourType':

@@ -88,10 +88,9 @@
 <!-- Set up the Vuejs tour list -->
 <script>
     new VueTourList('#tour-list', {
-        'requestToken': '{{request_token}}',
         'apiParams': {
             'organizers': [<?= $this->apiParam['organizers'] ?>],
-            'eventTypes': [<?= $this->apiParam['eventType'] ?>],
+            'eventType': [<?= $this->apiParam['eventType'] ?>],
             'tourType': '<?= $this->apiParam['tourType'] ?>',
             'courseType': '<?= $this->apiParam['courseType'] ?>',
             'courseId': '<?= $this->apiParam['courseId'] ?>',
@@ -99,10 +98,10 @@
             'dateStart': '<?= $this->apiParam['dateStart'] ?>',
             'searchterm': '<?= $this->apiParam['searchterm'] ?>',
             'eventId': '<?= $this->apiParam['eventId'] ?>',
-            'arrIds': [<?= $this->apiParam['eventId'] ?>],
+            'arrIds': [<?= $this->apiParam['arrIds'] ?>],
             'username': '',
             'calendarIds': [<?= $this->apiParam['calendarIds'] ?>],
-            'limitPerRequest': '<?= $this->apiParam['limitPerRequest'] ?>',
+            'limit': '<?= $this->apiParam['limit'] ?>',
             'offset': '0',
         },
         'fields': [

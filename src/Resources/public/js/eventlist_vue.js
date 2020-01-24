@@ -13,10 +13,9 @@ class VueTourList {
 
         // Defaults
         const defaults = {
-            'requestToken': '',
             'apiParams': {
                 'organizers': [],
-                'eventTypes': [],
+                'eventType': ["tour","generalEvent","lastMinuteTour"],
                 'tourType': '',
                 'courseType': '',
                 'courseId': '',
@@ -24,10 +23,10 @@ class VueTourList {
                 'dateStart': '',
                 'searchterm': '',
                 'eventId': '',
-                'arrIds': [],
                 'username': '',
+                // Let empty for all published
                 'calendarIds': [],
-                'limitPerRequest': '50',
+                'limit': '50',
                 'offset': '0',
             },
             'fields': [],
@@ -46,9 +45,6 @@ class VueTourList {
             el: elId,
             created: function created() {
                 let self = this;
-                if (self.apiParams.arrIds.length < 1) {
-                    self.apiParams.arrIds = null;
-                }
 
                 self.prepareRequest(false);
             },
@@ -57,8 +53,6 @@ class VueTourList {
                 return {
                     // Api params
                     apiParams: params.apiParams,
-                    // Contao request token
-                    requestToken: params.requestToken,
                     // Fields array
                     fields: (params.fields && Array.isArray(params.fields)) ? params.fields : null,
                     // Callbacks
@@ -73,7 +67,6 @@ class VueTourList {
                     loadedItems: 0,
                     // all events loades bool
                     blnAllEventsLoaded: false,
-
                 };
             },
             methods: {
@@ -103,7 +96,6 @@ class VueTourList {
                     }
 
                     let data = new FormData();
-                    data.append('REQUEST_TOKEN', self.requestToken);
                     data.append('requestToken', self.requestToken);
                     data.append('sessionCacheToken', btoa(window.location.href));
                     data.append('isPreloadRequest', isPreloadRequest);
@@ -152,8 +144,6 @@ class VueTourList {
                             self.loadedItems++;
                         });
 
-                        // Get ids to speed up requests
-                        self.arrIds = json['arrIds'];
 
                         if (json['isPreloadRequest'] === false) {
                             if (i === 0 || parseInt(json['itemsFound']) === self.loadedItems) {
