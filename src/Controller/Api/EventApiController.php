@@ -15,7 +15,6 @@ namespace Markocupic\SacEventToolBundle\Controller\Api;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
-use Contao\EventOrganizerModel;
 use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
@@ -70,8 +69,6 @@ class EventApiController extends AbstractController
     /**
      * EventApiController constructor.
      * Get event data as json object
-     * Allow if ...
-     * - is XmlHttpRequest
      * @param ContaoFramework $framework
      * @param RequestStack $requestStack
      * @param Connection $connection
@@ -102,17 +99,11 @@ class EventApiController extends AbstractController
         /** @var  CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        /** @var  StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
         /** @var UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-
-        /** @var  EventOrganizerModel $eventOrganizerModelAdapter */
-        $eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
 
         $request = $this->requestStack->getCurrentRequest();
 
@@ -355,7 +346,7 @@ class EventApiController extends AbstractController
 
         $query = $qb->getSQL();
 
-        /** @var \Doctrine\DBAL\Driver\PDOStatement $arrIds */
+        /** @var array $arrIds */
         $arrIds = $qb->execute()->fetchAll(\PDO::FETCH_COLUMN, 0);
 
         $endTime = microtime(true);
@@ -457,44 +448,12 @@ class EventApiController extends AbstractController
     }
 
     /**
-     * Helper method of event filtering
-     * @param $strNeedle
-     * @param $strHaystack
-     * @return bool
-     */
-    protected function textSearch($strNeedle = '', $strHaystack = '')
-    {
-        if ($strNeedle == '')
-        {
-            return true;
-        }
-        elseif (trim($strNeedle) == '')
-        {
-            return true;
-        }
-        elseif ($strHaystack == '')
-        {
-            return false;
-        }
-        elseif (trim($strHaystack) == '')
-        {
-            return false;
-        }
-        else
-        {
-            if (preg_match('/' . $strNeedle . '/i', $strHaystack))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Get event data by id and use the session cache
      * This controller is used for the "pilatus" export, where events are loaded by ajax when the modal windows opens
-     * $_POST['REQUEST_TOKEN'], $_POST['id'], $_POST['fields'] as comma separated string is optional
+     * $_POST['id'], $_POST['fields'] as comma separated string is optional
      * @Route("/eventApi/getEventById", name="sac_event_tool_api_event_api_get_event_by_id", defaults={"_scope" = "frontend", "_token_check" = false})
+     * @return JsonResponse
+     * @throws \Exception
      */
     public function getEventById(): JsonResponse
     {
@@ -549,6 +508,8 @@ class EventApiController extends AbstractController
      * This controller is used for the tour list, where events are loaded by vue.js
      * $_POST['ids'], $_POST['fields'] are mandatory
      * @Route("/eventApi/getEventDataByIds", name="sac_event_tool_api_event_api_get_event_data_by_ids", defaults={"_scope" = "frontend", "_token_check" = false})
+     * @return JsonResponse
+     * @throws \Exception
      */
     public function getEventDataByIds(): JsonResponse
     {
