@@ -17,7 +17,7 @@ services:
     - '%contao.csrf_token_name%'
     public: true
 
-  Markocupic\SacEventToolBundle\Controller\Ajax\EventApiController:
+  Markocupic\SacEventToolBundle\Controller\Api\EventApiController:
     arguments:
     - '@contao.framework'
     - '@request_stack'

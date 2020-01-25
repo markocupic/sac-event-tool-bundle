@@ -10,11 +10,10 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Controller\Ajax;
+namespace Markocupic\SacEventToolBundle\Controller\Api;
 
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Database;
 use Contao\Date;
 use Contao\EventOrganizerModel;
 use Contao\System;
@@ -33,7 +32,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Class EventApiController
- * @package Markocupic\SacEventToolBundle\Controller
+ * @package Markocupic\SacEventToolBundle\Controller\Api
  */
 class EventApiController extends AbstractController
 {
@@ -91,7 +90,7 @@ class EventApiController extends AbstractController
     /**
      * Get event list filtered by params delivered from a filter board
      * This controller is used for the vje.js event list module
-     * @Route("/eventApi/getEventList", name="sac_event_tool_event_ajax_event_api_get_event_list", defaults={"_scope" = "frontend", "_token_check" = false})
+     * @Route("/eventApi/getEventList", name="sac_event_tool_api_event_api_get_event_list", defaults={"_scope" = "frontend", "_token_check" = false})
      */
     public function getEventList(): JsonResponse
     {
@@ -150,7 +149,7 @@ class EventApiController extends AbstractController
 
         /** @var QueryBuilder $qb */
         $qb = $this->connection->createQueryBuilder();
-        $qb->select('*')
+        $qb->select('id')
             ->from('tl_calendar_events', 't')
             ->where('t.published = :published')
             ->setParameter('published', '1');
@@ -177,9 +176,9 @@ class EventApiController extends AbstractController
         }
 
         // Filter by a certain instructor $_GET['username']
-        if (!empty($instructorUsername = $param['username']))
+        if (!empty($param['username']))
         {
-            if (($user = $userModelAdapter->findByUsername($instructorUsername)) === null)
+            if (($user = $userModelAdapter->findByUsername($param['username'])) === null)
             {
                 // Do not show any events if username does not exist
                 $userId = 0;
@@ -202,41 +201,91 @@ class EventApiController extends AbstractController
         // Searchterm (search for expression in tl_calendar_events.title and tl_calendar_events.teaser
         if (!empty($param['searchterm']))
         {
-            $orx = $qb->expr()->orX();
+            $orxSearchTerm = $qb->expr()->orX();
 
+            // Support multiple search expressions
             foreach (explode(' ', $param['searchterm']) as $strNeedle)
             {
-
-                $orx->add($qb->expr()->like('t.title', $qb->expr()->literal('%' . $strNeedle . '%')));
-                $orx->add($qb->expr()->like('t.teaser', $qb->expr()->literal('%' . $strNeedle . '%')));
-
-
-                $qb3 = $this->connection->createQueryBuilder();
-                $qb3->select('id')
-                    ->from('tl_user', 'u')
-                    ->where($qb3->expr()->like('u.name', $qb3->expr()->literal('%' . $strNeedle . '%')));
-                $arrInst = $qb3->execute()->fetchAll(\PDO::FETCH_COLUMN, 0);
-
-                foreach($arrInst as $instrId)
+                if (empty(trim($strNeedle)))
                 {
-                    $orx->add($qb->expr()->in(
+                    continue;
+                }
+
+                $strNeedle = trim($strNeedle);
+
+                // Search expression in title & teaser
+                $orxSearchTerm->add($qb->expr()->like('t.title', $qb->expr()->literal('%' . $strNeedle . '%')));
+                $orxSearchTerm->add($qb->expr()->like('t.teaser', $qb->expr()->literal('%' . $strNeedle . '%')));
+
+                // Check if search expression is the name of an instructor
+                $qbSt = $this->connection->createQueryBuilder();
+                $qbSt->select('id')
+                    ->from('tl_user', 'u')
+                    ->where($qbSt->expr()->like('u.name', $qbSt->expr()->literal('%' . $strNeedle . '%')));
+                $arrInst = $qbSt->execute()->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+                // Check if instructor is the instructor in this event
+                foreach ($arrInst as $instrId)
+                {
+                    $orxSearchTerm->add($qb->expr()->in(
                         't.id',
                         $this->connection->createQueryBuilder()
                             ->select('pid')
                             ->from('tl_calendar_events_instructor', 't2')
-                            ->where('t2.userId = :qbxInstructorid'.$instrId)
+                            ->where('t2.userId = :qbStInstructorid' . $instrId)
                             ->getSQL()
-                        ));
-                    $qb->setParameter('qbxInstructorid'.$instrId, $instrId);
+                    ));
+                    $qb->setParameter('qbStInstructorid' . $instrId, $instrId);
                 }
-
-                //die($param['searchterm']);
-                $qb->andWhere($orx);
             }
-            $qb->andWhere($orx);
-
+            $qb->andWhere($orxSearchTerm);
         }
 
+        // Filter by organizers
+        if (!empty($param['organizers']) && is_array($param['organizers']))
+        {
+            $qbEvtOrg = $this->connection->createQueryBuilder();
+            $qbEvtOrg->select('id')
+                ->from('tl_event_organizer', 'o')
+                ->where('o.ignoreFilterInEventList = :true')
+                ->setParameter('true', '1');
+            $arrIgnoredOrganizer = $qbEvtOrg->execute()->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+            $orxOrg = $qb->expr()->orX();
+
+            // Show event if it has an organizer with the flag ignoreFilterInEventList=true
+            if (!empty($arrIgnoredOrganizer) && is_array($arrIgnoredOrganizer))
+            {
+                foreach ($arrIgnoredOrganizer as $orgId)
+                {
+                    $orxOrg->add($qb->expr()->like('t.organizers', $qb->expr()->literal('%:"' . $orgId . '";%')));
+                }
+            }
+            // Show event if its organizer is in the search param
+            foreach ($param['organizers'] as $orgId)
+            {
+                if (!in_array($orgId, $arrIgnoredOrganizer))
+                {
+                    $orxOrg->add($qb->expr()->like('t.organizers', $qb->expr()->literal('%:"' . $orgId . '";%')));
+                }
+            }
+            $qb->andWhere($orxOrg);
+        }
+
+        // Filter by tour type
+        if (!empty($param['tourType']) && $param['tourType'] > 0)
+        {
+            $qb->andWhere($qb->expr()->like('t.tourType', $qb->expr()->literal('%:"' . $param['tourType'] . '";%')));
+        }
+
+        // Filter by course type
+        if (!empty($param['courseType']) && $param['courseType'] > 0)
+        {
+            $qb->andWhere('t.courseTypeLevel1 = :courseType');
+            $qb->setParameter('courseType', $param['courseType']);
+        }
+
+        // Filter by course id
         if (!empty($param['courseId']))
         {
             $strId = preg_replace('/\s/', '', $param['courseId']);
@@ -247,6 +296,7 @@ class EventApiController extends AbstractController
             }
         }
 
+        // Filter by event id
         if (!empty($param['eventId']))
         {
             $strId = preg_replace('/\s/', '', $param['eventId']);
@@ -300,67 +350,13 @@ class EventApiController extends AbstractController
             }
         }
 
+        // Order by startDate ASC
         $qb->orderBy('t.startDate', 'ASC');
 
         $query = $qb->getSQL();
 
-        /** @var \Doctrine\DBAL\Driver\PDOStatement $results */
-        $results = $qb->execute();
-
-        $arrIds = [];
-        while (false !== ($event = $results->fetch()))
-        {
-            // Filter items that can not be filtered in the query above
-            // Filterboard: organizers
-            if (!empty($param['organizers']))
-            {
-                $arrOrganizers = $param['organizers'];
-                $arrEventOrganizers = $stringUtilAdapter->deserialize($event['organizers'], true);
-                $objEventOrganizerModel = $eventOrganizerModelAdapter->findByIds($arrEventOrganizers);
-                $blnIgnoreOrganizerFilter = false;
-                if ($objEventOrganizerModel !== null)
-                {
-                    while ($objEventOrganizerModel->next())
-                    {
-                        // Ignore organizers filter if event belongs to organizer where the ignoreFilterInEventList flas is set to true
-                        // tl_event_organizer.ignoreFilterInEventList
-                        // Thanks to Peter Erni, 22.11.2019
-                        if ($objEventOrganizerModel->ignoreFilterInEventList)
-                        {
-                            $blnIgnoreOrganizerFilter = true;
-                        }
-                    }
-                }
-
-                if ($blnIgnoreOrganizerFilter === false && count(array_intersect($arrOrganizers, $arrEventOrganizers)) < 1)
-                {
-                    continue;
-                }
-            }
-
-            // Filterboard: tourType
-            if ($param['tourType'] > 0)
-            {
-                $arrTourTypes = $stringUtilAdapter->deserialize($event['tourType'], true);
-                if (!in_array($param['tourType'], $arrTourTypes))
-                {
-                    continue;
-                }
-            }
-
-            // Filterboard: courseType
-            if ($param['courseType'] > 0)
-            {
-                $arrCourseTypes = $stringUtilAdapter->deserialize($event['courseTypeLevel1'], true);
-                if (!in_array($param['courseType'], $arrCourseTypes))
-                {
-                    continue;
-                }
-            }
-
-            // Pass the filter
-            $arrIds[] = $event['id'];
-        }
+        /** @var \Doctrine\DBAL\Driver\PDOStatement $arrIds */
+        $arrIds = $qb->execute()->fetchAll(\PDO::FETCH_COLUMN, 0);
 
         $endTime = microtime(true);
         $queryTime = $endTime - $startTime;
@@ -498,7 +494,7 @@ class EventApiController extends AbstractController
      * Get event data by id and use the session cache
      * This controller is used for the "pilatus" export, where events are loaded by ajax when the modal windows opens
      * $_POST['REQUEST_TOKEN'], $_POST['id'], $_POST['fields'] as comma separated string is optional
-     * @Route("/eventApi/getEventById", name="sac_event_tool_event_ajax_event_api_get_event_by_id", defaults={"_scope" = "frontend", "_token_check" = false})
+     * @Route("/eventApi/getEventById", name="sac_event_tool_api_event_api_get_event_by_id", defaults={"_scope" = "frontend", "_token_check" = false})
      */
     public function getEventById(): JsonResponse
     {
@@ -551,8 +547,8 @@ class EventApiController extends AbstractController
      * !!!!! Not used at the moment: Replaced by self::getEventList
      * Get event data by ids and use the session cache
      * This controller is used for the tour list, where events are loaded by vue.js
-     * $_POST['REQUEST_TOKEN'], $_POST['ids'], $_POST['fields'] are mandatory
-     * @Route("/eventApi/getEventDataByIds", name="sac_event_tool_event_ajax_event_api_get_event_data_by_ids", defaults={"_scope" = "frontend", "_token_check" = false})
+     * $_POST['ids'], $_POST['fields'] are mandatory
+     * @Route("/eventApi/getEventDataByIds", name="sac_event_tool_api_event_api_get_event_data_by_ids", defaults={"_scope" = "frontend", "_token_check" = false})
      */
     public function getEventDataByIds(): JsonResponse
     {

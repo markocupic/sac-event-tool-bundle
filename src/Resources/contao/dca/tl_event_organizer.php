@@ -134,6 +134,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['ignoreFilterInEventList'],
             'exclude'   => true,
+            'filter'    => true,
             'inputType' => 'checkbox',
             'eval'      => array('tl_class' => 'clr m12'),
             'sql'       => "char(1) NOT NULL default ''",
