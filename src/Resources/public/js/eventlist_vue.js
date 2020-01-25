@@ -122,7 +122,7 @@ class VueTourList {
                     }
 
                     // Fetch
-                    fetch('ajaxEventApi/getEventList', {
+                    fetch('eventApi/getEventList', {
 
                             method: "POST",
                             body: data,

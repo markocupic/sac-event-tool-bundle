@@ -14,6 +14,7 @@ namespace Markocupic\SacEventToolBundle\Controller\Ajax;
 
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Database;
 use Contao\Date;
 use Contao\EventOrganizerModel;
 use Contao\System;
@@ -90,7 +91,7 @@ class EventApiController extends AbstractController
     /**
      * Get event list filtered by params delivered from a filter board
      * This controller is used for the vje.js event list module
-     * @Route("/ajaxEventApi/getEventList", name="sac_event_tool_event_ajax_event_api_get_event_list", defaults={"_scope" = "frontend", "_token_check" = false})
+     * @Route("/eventApi/getEventList", name="sac_event_tool_event_ajax_event_api_get_event_list", defaults={"_scope" = "frontend", "_token_check" = false})
      */
     public function getEventList(): JsonResponse
     {
@@ -141,6 +142,8 @@ class EventApiController extends AbstractController
             'isPreloadRequest'  => $request->get('isPreloadRequest') === 'true' ? true : false,
 
         ];
+
+        $startTime = microtime(true);
 
         // Ignore date range, ff certain query params were set
         $blnIgnoreDate = false;
@@ -194,6 +197,44 @@ class EventApiController extends AbstractController
 
             $qb->andWhere($qb->expr()->in('t.id', ':arrEvents'));
             $qb->setParameter('arrEvents', $arrEvents, Connection::PARAM_INT_ARRAY);
+        }
+
+        // Searchterm (search for expression in tl_calendar_events.title and tl_calendar_events.teaser
+        if (!empty($param['searchterm']))
+        {
+            $orx = $qb->expr()->orX();
+
+            foreach (explode(' ', $param['searchterm']) as $strNeedle)
+            {
+
+                $orx->add($qb->expr()->like('t.title', $qb->expr()->literal('%' . $strNeedle . '%')));
+                $orx->add($qb->expr()->like('t.teaser', $qb->expr()->literal('%' . $strNeedle . '%')));
+
+
+                $qb3 = $this->connection->createQueryBuilder();
+                $qb3->select('id')
+                    ->from('tl_user', 'u')
+                    ->where($qb3->expr()->like('u.name', $qb3->expr()->literal('%' . $strNeedle . '%')));
+                $arrInst = $qb3->execute()->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+                foreach($arrInst as $instrId)
+                {
+                    $orx->add($qb->expr()->in(
+                        't.id',
+                        $this->connection->createQueryBuilder()
+                            ->select('pid')
+                            ->from('tl_calendar_events_instructor', 't2')
+                            ->where('t2.userId = :qbxInstructorid'.$instrId)
+                            ->getSQL()
+                        ));
+                    $qb->setParameter('qbxInstructorid'.$instrId, $instrId);
+                }
+
+                //die($param['searchterm']);
+                $qb->andWhere($orx);
+            }
+            $qb->andWhere($orx);
+
         }
 
         if (!empty($param['courseId']))
@@ -317,61 +358,12 @@ class EventApiController extends AbstractController
                 }
             }
 
-            $strSearchterm = $param['searchterm'];
-            if ($strSearchterm != '')
-            {
-                $intFound = 0;
-                foreach (explode(' ', $strSearchterm) as $strNeedle)
-                {
-                    if ($intFound)
-                    {
-                        continue;
-                    }
-
-                    // Suche nach Namen des Kursleiters
-                    $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($event['id']);
-                    $strLeiter = implode(', ', array_map(function ($userId) {
-                        /** @var UserModel $userModelAdapter */
-                        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-                        return $userModelAdapter->findByPk($userId)->name;
-                    }, $arrInstructors));
-
-                    if ($intFound == 0)
-                    {
-                        if ($this->textSearch($strNeedle, $strLeiter))
-                        {
-                            $intFound++;
-                        }
-                    }
-
-                    if ($intFound == 0)
-                    {
-                        // Suchbegriff im Titel suchen
-                        if ($this->textSearch($strNeedle, $event['title']))
-                        {
-                            $intFound++;
-                        }
-                    }
-
-                    if ($intFound == 0)
-                    {
-                        // Suchbegriff im Teaser suchen
-                        if ($this->textSearch($strNeedle, $event['teaser']))
-                        {
-                            $intFound++;
-                        }
-                    }
-                }
-
-                if ($intFound < 1)
-                {
-                    continue;
-                }
-            }
-
             // Pass the filter
             $arrIds[] = $event['id'];
         }
+
+        $endTime = microtime(true);
+        $queryTime = $endTime - $startTime;
 
         // Now we have all the ids, let's prepare the second query
         $arrFields = empty($param['fields']) ? [] : $param['fields'];
@@ -383,6 +375,7 @@ class EventApiController extends AbstractController
             'status'                   => 'success',
             'countItems'               => 0,
             'itemsFound'               => count($arrIds),
+            'queryTime'                => $queryTime,
             'query'                    => $query,
         ];
 
@@ -505,7 +498,7 @@ class EventApiController extends AbstractController
      * Get event data by id and use the session cache
      * This controller is used for the "pilatus" export, where events are loaded by ajax when the modal windows opens
      * $_POST['REQUEST_TOKEN'], $_POST['id'], $_POST['fields'] as comma separated string is optional
-     * @Route("/ajaxEventApi/getEventById", name="sac_event_tool_event_ajax_event_api_get_event_by_id", defaults={"_scope" = "frontend", "_token_check" = false})
+     * @Route("/eventApi/getEventById", name="sac_event_tool_event_ajax_event_api_get_event_by_id", defaults={"_scope" = "frontend", "_token_check" = false})
      */
     public function getEventById(): JsonResponse
     {
@@ -559,7 +552,7 @@ class EventApiController extends AbstractController
      * Get event data by ids and use the session cache
      * This controller is used for the tour list, where events are loaded by vue.js
      * $_POST['REQUEST_TOKEN'], $_POST['ids'], $_POST['fields'] are mandatory
-     * @Route("/ajaxEventApi/getEventDataByIds", name="sac_event_tool_event_ajax_event_api_get_event_data_by_ids", defaults={"_scope" = "frontend", "_token_check" = false})
+     * @Route("/eventApi/getEventDataByIds", name="sac_event_tool_event_ajax_event_api_get_event_data_by_ids", defaults={"_scope" = "frontend", "_token_check" = false})
      */
     public function getEventDataByIds(): JsonResponse
     {

@@ -27,7 +27,7 @@
                 $(modal).find('textarea[data-event]').val('');
                 // Fetch data
                 $.ajax({
-                    url: 'ajaxEventApi/getEventById',
+                    url: 'eventApi/getEventById',
                     type: 'POST',
                     data: formData
                 }).done(function (response) {
