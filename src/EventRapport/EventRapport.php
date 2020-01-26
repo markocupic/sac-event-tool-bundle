@@ -176,12 +176,12 @@ class EventRapport
 
     /**
      * @param MsWordTemplateProcessor $objPhpWord
-     * @param $objEvent
+     * @param CalendarEventsModel $objEvent
      * @param $objEventMember
      * @param $objEventInvoice
      * @param $objBiller
      */
-    protected function getTourRapportData(MsWordTemplateProcessor $objPhpWord, $objEvent, $objEventMember, $objEventInvoice, $objBiller)
+    protected function getTourRapportData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, $objEventMember, $objEventInvoice, $objBiller)
     {
         // Set adapters
         /** @var  Controller $controllerAdapter */
@@ -196,7 +196,7 @@ class EventRapport
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
 
         $countParticipants = $objEventMember->numRows;
-        $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent->id, false);
+        $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent, false);
         $countInstructors = count($arrInstructors);
         $countParticipantsTotal = $countParticipants + $countInstructors;
 
@@ -270,9 +270,9 @@ class EventRapport
 
     /**
      * @param MsWordTemplateProcessor $objPhpWord
-     * @param $objEvent
+     * @param CalendarEventsModel $objEvent
      */
-    protected function getEventData(MsWordTemplateProcessor $objPhpWord, $objEvent)
+    protected function getEventData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent)
     {
         // Set adapters
         /** @var  Controller $controllerAdapter */
@@ -289,7 +289,7 @@ class EventRapport
         // Event data
         $objPhpWord->replace('eventTitle', $this->prepareString($objEvent->title));
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
-        $arrEventTstamps = $calendarEventsHelperAdapter->getEventTimestamps($objEvent->id);
+        $arrEventTstamps = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
 
         if ($objEvent->eventType === 'course')
         {
@@ -333,7 +333,7 @@ class EventRapport
 
         $objPhpWord->replace('eventDates', $this->prepareString($strEventDuration));
         $objPhpWord->replace('eventMeetingpoint', $this->prepareString($objEvent->meetingPoint));
-        $objPhpWord->replace('eventTechDifficulties', $this->prepareString(implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent->id, false))));
+        $objPhpWord->replace('eventTechDifficulties', $this->prepareString(implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent, false))));
         $objPhpWord->replace('eventEquipment', $this->prepareString($objEvent->equipment), array('multiline' => true));
         $objPhpWord->replace('eventTourProfile', $this->prepareString($strTourProfile), array('multiline' => true));
         $objPhpWord->replace('emergencyConcept', $this->prepareString($strEmergencyConcept), array('multiline' => true));
@@ -342,10 +342,10 @@ class EventRapport
 
     /**
      * @param MsWordTemplateProcessor $objPhpWord
-     * @param $objEvent
+     * @param CalendarEventsModel $objEvent
      * @param $objEventMember
      */
-    protected function getEventMemberData(MsWordTemplateProcessor $objPhpWord, $objEvent, $objEventMember)
+    protected function getEventMemberData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, $objEventMember)
     {
         // Set adapters
         /** @var  UserModel $userModelAdapter */
@@ -360,7 +360,7 @@ class EventRapport
         $i = 0;
 
         // TL
-        $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent->id, false);
+        $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent, false);
         if (!empty($arrInstructors) && is_array($arrInstructors))
         {
             foreach ($arrInstructors as $userId)
@@ -467,7 +467,7 @@ class EventRapport
         }
 
         // Event instructors
-        $aInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent->id, false);
+        $aInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent, false);
 
         $arrInstructors = array_map(function ($id) {
             $userModelAdapter = $this->framework->getAdapter(UserModel::class);

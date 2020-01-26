@@ -384,7 +384,7 @@ class PilatusExportController extends AbstractPrintExportController
 
             if ($this->startDate && $this->endDate)
             {
-                $this->eventReleaseLevel = (int)$request->request->get('eventReleaseLevel') > 0 ? (int)$request->request->get('eventReleaseLevel') : null;
+                $this->eventReleaseLevel = (int) $request->request->get('eventReleaseLevel') > 0 ? (int) $request->request->get('eventReleaseLevel') : null;
                 $this->htmlCourseTable = $this->generateEventTable(['course']);
                 $this->htmlTourTable = $this->generateEventTable(['tour', 'generalEvent']);
 
@@ -458,11 +458,11 @@ class PilatusExportController extends AbstractPrintExportController
             }
 
             $arrRow = $objEvent->row();
-            $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate) . ', ' . $dateAdapter->parse('j.', $this->getFirstDayOfWeekTimestamp((int)$objEvent->startDate)) . '-' . $dateAdapter->parse('j. F', $this->getLastDayOfWeekTimestamp((int)$objEvent->startDate));
+            $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate) . ', ' . $dateAdapter->parse('j.', $this->getFirstDayOfWeekTimestamp((int) $objEvent->startDate)) . '-' . $dateAdapter->parse('j. F', $this->getLastDayOfWeekTimestamp((int) $objEvent->startDate));
             $arrRow['eventDates'] = $this->getEventPeriod($objEvent, 'd.');
             $arrRow['weekday'] = $this->getEventPeriod($objEvent, 'D');
             $arrRow['title'] = $objEvent->title . ($objEvent->eventType === 'lastMinuteTour' ? ' (LAST MINUTE TOUR!)' : '');
-            $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->id, false, false));
+            $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, false));
             $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->id, 'titlePrint'));
 
             // tourType
@@ -493,7 +493,7 @@ class PilatusExportController extends AbstractPrintExportController
 
         $date = $dateAdapter->parse('d-m-Y', $timestamp);
         $day = \DateTime::createFromFormat('d-m-Y', $date);
-        $day->setISODate((int)$day->format('o'), (int)$day->format('W'), 1);
+        $day->setISODate((int) $day->format('o'), (int) $day->format('W'), 1);
         return $day->getTimestamp();
     }
 
@@ -504,7 +504,7 @@ class PilatusExportController extends AbstractPrintExportController
      */
     protected function getLastDayOfWeekTimestamp(int $timestamp): int
     {
-        return $this->getFirstDayOfWeekTimestamp((int)$timestamp) + 6 * 24 * 3600;
+        return $this->getFirstDayOfWeekTimestamp((int) $timestamp) + 6 * 24 * 3600;
     }
 
     /**
@@ -560,7 +560,7 @@ class PilatusExportController extends AbstractPrintExportController
             $dateFormatShortened['to'] = 'j.m.';
         }
 
-        $eventDuration = count($calendarEventsHelperAdapter->getEventTimestamps($objEvent->id));
+        $eventDuration = count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
         $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent->id), $calendarEventsHelperAdapter->getEndDate($objEvent->id)) + 1;
 
         if ($eventDuration == 1)
@@ -579,7 +579,7 @@ class PilatusExportController extends AbstractPrintExportController
         else
         {
             $arrDates = array();
-            $dates = $calendarEventsHelperAdapter->getEventTimestamps($objEvent->id);
+            $dates = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
             foreach ($dates as $date)
             {
                 $arrDates[] = $dateAdapter->parse($dateFormatShortened['to'], $date);
@@ -774,7 +774,7 @@ class PilatusExportController extends AbstractPrintExportController
                 $arrHeadline[] = $this->getEventPeriod($eventModel, 'j.-j. F');
                 $arrHeadline[] = $this->getEventPeriod($eventModel, 'D');
                 $arrHeadline[] = $eventModel->title;
-                $strDifficulties = implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($eventModel->id));
+                $strDifficulties = implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($eventModel));
 
                 if ($strDifficulties != '')
                 {
@@ -832,7 +832,7 @@ class PilatusExportController extends AbstractPrintExportController
         $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate);
         $arrRow['eventDates'] = $this->getEventPeriod($objEvent, $this->dateFormat);
         $arrRow['weekday'] = $this->getEventPeriod($objEvent, 'D');
-        $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->id, false, false));
+        $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, false));
         $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->id, 'title'));
         $arrRow['tourProfile'] = implode('<br>', $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent->id));
         $arrRow['journey'] = $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey) !== null ? $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey)->title : '';
@@ -857,7 +857,7 @@ class PilatusExportController extends AbstractPrintExportController
         $arrEvents = array();
         foreach ($arrRow as $k => $v)
         {
-            $strValue = nl2br((string)$v);
+            $strValue = nl2br((string) $v);
             // Replace Contao insert tags
             $arrEvents[$k] = $controllerAdapter->replaceInsertTags($strValue);
         }

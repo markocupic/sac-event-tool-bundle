@@ -445,56 +445,63 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             }, $arrFields);
             $csv->insertOne($arrHeadline);
 
-            $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE pid=? ORDER BY startDate ASC')->execute(Input::get('id'));
-            while ($objEvent->next())
+            $objEvent = CalendarEventsModel::findAll(
+                array('tl_calendar_events.pid'),
+                array(Input::get('id')),
+                array('limit' => 2, 'order' => 'tl_calendar_events.startDate ASC')
+            );
+            if($objEvent !== null)
             {
-                $arrRow = array();
-                foreach ($arrFields as $field)
+                while ($objEvent->next())
                 {
-                    if ($field === 'mainInstructor')
+                    $arrRow = array();
+                    foreach ($arrFields as $field)
                     {
-                        $objUser = \Contao\UserModel::findByPk($objEvent->{$field});
-                        $arrRow[] = $objUser !== null ? html_entity_decode($objUser->lastname . ' ' . $objUser->firstname) : '';
+                        if ($field === 'mainInstructor')
+                        {
+                            $objUser = \Contao\UserModel::findByPk($objEvent->{$field});
+                            $arrRow[] = $objUser !== null ? html_entity_decode($objUser->lastname . ' ' . $objUser->firstname) : '';
+                        }
+                        elseif ($field === 'tourTechDifficulty')
+                        {
+                            $arrDiff = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent, false);
+                            $arrRow[] = implode(' und ', $arrDiff);
+                        }
+                        elseif ($field === 'eventDates')
+                        {
+                            $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent);
+                            $arrDates = array_map(function ($tstamp) {
+                                return \Contao\Date::parse(\Contao\Config::get('dateFormat'), $tstamp);
+                            }, $arrTimestamps);
+                            $arrRow[] = implode(',', $arrDates);
+                        }
+                        elseif ($field === 'organizers')
+                        {
+                            $arrOrganizers = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'title');
+                            $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
+                        }
+                        elseif ($field === 'instructor')
+                        {
+                            $arrInstructors = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($objEvent, false, false);
+                            $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
+                        }
+                        elseif ($field === 'tourType')
+                        {
+                            $arrTourTypes = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($objEvent->id, 'title');
+                            $arrRow[] = html_entity_decode(implode(',', $arrTourTypes));
+                        }
+                        elseif ($field === 'eventReleaseLevel')
+                        {
+                            $objFS = \Contao\EventReleaseLevelPolicyModel::findByPk($objEvent->{$field});
+                            $arrRow[] = $objFS !== null ? $objFS->level : '';
+                        }
+                        else
+                        {
+                            $arrRow[] = $objEvent->{$field};
+                        }
                     }
-                    elseif ($field === 'tourTechDifficulty')
-                    {
-                        $arrDiff = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent->id, false);
-                        $arrRow[] = implode(' und ', $arrDiff);
-                    }
-                    elseif ($field === 'eventDates')
-                    {
-                        $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent->id);
-                        $arrDates = array_map(function ($tstamp) {
-                            return \Contao\Date::parse(\Contao\Config::get('dateFormat'), $tstamp);
-                        }, $arrTimestamps);
-                        $arrRow[] = implode(',', $arrDates);
-                    }
-                    elseif ($field === 'organizers')
-                    {
-                        $arrOrganizers = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventOrganizersAsArray($objEvent->id, 'title');
-                        $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
-                    }
-                    elseif ($field === 'instructor')
-                    {
-                        $arrInstructors = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($objEvent->id, false, false);
-                        $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
-                    }
-                    elseif ($field === 'tourType')
-                    {
-                        $arrTourTypes = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($objEvent->id, 'title');
-                        $arrRow[] = html_entity_decode(implode(',', $arrTourTypes));
-                    }
-                    elseif ($field === 'eventReleaseLevel')
-                    {
-                        $objFS = \Contao\EventReleaseLevelPolicyModel::findByPk($objEvent->{$field});
-                        $arrRow[] = $objFS !== null ? $objFS->level : '';
-                    }
-                    else
-                    {
-                        $arrRow[] = $objEvent->{$field};
-                    }
+                    $csv->insertOne($arrRow);
                 }
-                $csv->insertOne($arrRow);
             }
 
             $objCalendar = \Contao\CalendarModel::findByPk(Input::get('id'));
@@ -755,10 +762,11 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             return;
         }
 
-        $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($dc->activeRecord->id);
-        if ($objEvent->numRows > 0)
+        $objEvent = \Contao\CalendarEventsModel::findByPk($dc->activeRecord->id);
+
+        if ($objEvent !== null)
         {
-            $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent->id);
+            $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent);
             if ($objEvent->durationInfo != '' && !empty($arrTimestamps) && is_array($arrTimestamps))
             {
                 $countTimestamps = count($arrTimestamps);
@@ -1843,9 +1851,9 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $objEvent = CalendarEventsModel::findByPk($eventId);
         }
 
-        if (\Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent->id) !== false)
+        if (\Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent) !== false)
         {
-            $countTimestamps = count(\Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent->id));
+            $countTimestamps = count(\Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent));
 
             $arrDuration = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$strDuration];
             if (!empty($arrDuration) && is_array($arrDuration))

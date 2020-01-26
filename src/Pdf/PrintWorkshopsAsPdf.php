@@ -293,27 +293,27 @@ class PrintWorkshopsAsPdf
     private function generateHtmlContent()
     {
         System::loadLanguageFile('tl_calendar_events');
-        $objCalendar = CalendarEventsModel::findByPk($this->pdf->Event->id);
-        $this->pdf->Bookmark(html_entity_decode($objCalendar->title), 0, 0, '', 'I', array(0, 0, 0));
+        $objEvent = CalendarEventsModel::findByPk($this->pdf->Event->id);
+        $this->pdf->Bookmark(html_entity_decode($objEvent->title), 0, 0, '', 'I', array(0, 0, 0));
 
         // Create template object
         $objPartial = new FrontendTemplate('tcpdf_template_sac_kurse');
 
         // Title
-        $objPartial->title = $objCalendar->title;
+        $objPartial->title = $objEvent->title;
 
         // Dates
-        $objPartial->date = $this->getDateString($objCalendar->id);
+        $objPartial->date = $this->getDateString($objEvent->id);
 
         // Duration
-        $objPartial->durationInfo = $objCalendar->durationInfo;
+        $objPartial->durationInfo = $objEvent->durationInfo;
 
         // Course type
-        $objPartial->courseTypeLevel0 = CourseMainTypeModel::findByPk($objCalendar->courseTypeLevel0)->name;
-        $objPartial->courseTypeLevel1 = CourseSubTypeModel::findByPk($objCalendar->courseTypeLevel1)->name;
+        $objPartial->courseTypeLevel0 = CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name;
+        $objPartial->courseTypeLevel1 = CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
 
         // Course level
-        $objPartial->courseLevel = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objCalendar->courseLevel];
+        $objPartial->courseLevel = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel];
 
         // organisierende Gruppen
         $arrItems = array_map(function ($item) {
@@ -323,34 +323,34 @@ class PrintWorkshopsAsPdf
                 $item = $objOrganizer->title;
             }
             return $item;
-        }, StringUtil::deserialize($objCalendar->organizers, true));
+        }, StringUtil::deserialize($objEvent->organizers, true));
         $objPartial->organizers = implode(', ', $arrItems);
 
         // Teasertext
-        $objPartial->teaser = $this->nl2br($objCalendar->teaser);
+        $objPartial->teaser = $this->nl2br($objEvent->teaser);
 
         // Event terms
-        $objPartial->terms = $this->nl2br($objCalendar->terms);
+        $objPartial->terms = $this->nl2br($objEvent->terms);
 
         // Event Issues
-        $objPartial->issues = $this->nl2br($objCalendar->issues);
+        $objPartial->issues = $this->nl2br($objEvent->issues);
 
         // Requirements
-        $objPartial->requirements = $this->nl2br($objCalendar->requirements);
+        $objPartial->requirements = $this->nl2br($objEvent->requirements);
 
         // Event location
-        $objPartial->location = $this->nl2br($objCalendar->location);
+        $objPartial->location = $this->nl2br($objEvent->location);
 
         // Mountainguide
-        $objPartial->mountainguide = $objCalendar->mountainguide;
+        $objPartial->mountainguide = $objEvent->mountainguide;
 
         // Instructors
-        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objCalendar->id);
+        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent);
         $arrItems = array_map(function ($userId) {
             $objUser = UserModel::findByPk($userId);
             if ($objUser !== null)
             {
-                $strQuali = CalendarEventsHelper::getMainQualifikation($userId) != '' ? ' (' . CalendarEventsHelper::getMainQualifikation($userId) . ')' : '';
+                $strQuali = CalendarEventsHelper::getMainQualifikation($objUser) != '' ? ' (' . CalendarEventsHelper::getMainQualifikation($objUser) . ')' : '';
                 return $objUser->name . $strQuali;
             }
             return '';
@@ -358,19 +358,19 @@ class PrintWorkshopsAsPdf
         $objPartial->instructor = implode(', ', $arrItems);
 
         // Services/Leistungen
-        $objPartial->leistungen = $this->nl2br($objCalendar->leistungen);
+        $objPartial->leistungen = $this->nl2br($objEvent->leistungen);
 
         // Signin
-        $objPartial->bookingEvent = str_replace('(at)', '@', html_entity_decode($this->nl2br($objCalendar->bookingEvent)));
+        $objPartial->bookingEvent = str_replace('(at)', '@', html_entity_decode($this->nl2br($objEvent->bookingEvent)));
 
         // Equipment
-        $objPartial->equipment = $this->nl2br($objCalendar->equipment);
+        $objPartial->equipment = $this->nl2br($objEvent->equipment);
 
         // Meeting point
-        $objPartial->meetingPoint = $this->nl2br($objCalendar->meetingPoint);
+        $objPartial->meetingPoint = $this->nl2br($objEvent->meetingPoint);
 
         // Miscelaneous
-        $objPartial->miscellaneous = $this->nl2br($objCalendar->miscellaneous);
+        $objPartial->miscellaneous = $this->nl2br($objEvent->miscellaneous);
 
         // Styles
         $objPartial->titleStyle = "color:#000000; font-family: 'opensansbold'; font-size: 20px";
@@ -407,27 +407,35 @@ class PrintWorkshopsAsPdf
      */
     public function getDateString($eventId)
     {
-        $arr = CalendarEventsHelper::getEventTimestamps($eventId);
-        if (count($arr) > 1)
+        $objEvent = CalendarEventsModel::findByPk($eventId);
+        $strDates = '';
+        if($objEvent !== null)
         {
-            $arrValue = array();
-            foreach ($arr as $k => $v)
+            $arr = CalendarEventsHelper::getEventTimestamps($objEvent);
+            if ($arr !== false)
             {
-                if ($k == count($arr) - 1)
+                if (count($arr) > 1)
                 {
-                    $arrValue[] = 'und ' . Date::parse('d.m.Y', $v);
+                    $arrValue = array();
+                    foreach ($arr as $k => $v)
+                    {
+                        if ($k == count($arr) - 1)
+                        {
+                            $arrValue[] = 'und ' . Date::parse('d.m.Y', $v);
+                        }
+                        else
+                        {
+                            $arrValue[] = Date::parse('d.m.', $v);
+                        }
+                    }
+                    $strDates = implode(', ', $arrValue);
+                    $strDates = str_replace(', und ', ' und ', $strDates);
                 }
                 else
                 {
-                    $arrValue[] = Date::parse('d.m.', $v);
+                    $strDates = Date::parse('d.m.Y', $arr[0]);
                 }
             }
-            $strDates = implode(', ', $arrValue);
-            $strDates = str_replace(', und ', ' und ', $strDates);
-        }
-        else
-        {
-            $strDates = Date::parse('d.m.Y', $arr[0]);
         }
         return $strDates;
     }

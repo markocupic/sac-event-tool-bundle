@@ -180,10 +180,10 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
                 $arrEventStory['date'] = $dateAdapter->parse($configAdapter->get('dateFormat'), $objEventStory->eventStartDate);
 
                 // Check if event still exists
-                if ($calendarEventsModelAdapter->findByPk($objEventStory->eventId) !== null)
+                if (($objEvent = $calendarEventsModelAdapter->findByPk($objEventStory->eventId)) !== null)
                 {
                     // Overwrite date if event still exists in tl_calendar_events
-                    $arrEventStory['date'] = $calendarEventsHelperAdapter->getEventPeriod($objEventStory->eventId, $configAdapter->get('dateFormat'), false);
+                    $arrEventStory['date'] = $calendarEventsHelperAdapter->getEventPeriod($objEvent, $configAdapter->get('dateFormat'), false);
                     $objPage = $pageModelAdapter->findByPk($model->eventStoryFormJumpTo);
                     if ($objPage !== null)
                     {

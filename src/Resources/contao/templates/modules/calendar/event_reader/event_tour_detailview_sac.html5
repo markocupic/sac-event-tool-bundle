@@ -157,7 +157,7 @@
             <?php if ($this->getEventData('eventType') === 'tour'): ?>
             <div class="tour-difficulties event-detail event-info-box icon-box-small">
                 <h5>Schwierigkeit</h5>
-                <p><?= implode(', ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($this->getEventData('id'))) ?></p>
+                <p><?= implode(', ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($this->getEventData('model'))) ?></p>
             </div>
             <?php endif; ?>
 

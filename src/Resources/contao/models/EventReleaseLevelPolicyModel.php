@@ -182,7 +182,7 @@ class EventReleaseLevelPolicyModel extends \Model
         }
 
         $arrGroupsUserBelongsTo = \StringUtil::deserialize($objBackendUser->groups, true);
-        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
+        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent, false);
 
         $allow = false;
 
@@ -290,7 +290,7 @@ class EventReleaseLevelPolicyModel extends \Model
         }
 
         $arrGroupsUserBelongsTo = \StringUtil::deserialize($objBackendUser->groups, true);
-        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
+        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent, false);
 
         $allow = false;
 
@@ -374,7 +374,7 @@ class EventReleaseLevelPolicyModel extends \Model
         }
 
         $arrGroupsUserBelongsTo = \StringUtil::deserialize($objBackendUser->groups, true);
-        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
+        $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent, false);
 
         $allow = false;
 

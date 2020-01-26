@@ -182,7 +182,7 @@ class tl_calendar_events_member extends Backend
             $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
             if ($objEvent !== null)
             {
-                $arrGuideIDS = CalendarEventsHelper::getInstructorsAsArray($objEvent->id, false);
+                $arrGuideIDS = CalendarEventsHelper::getInstructorsAsArray($objEvent, false);
                 foreach ($arrGuideIDS as $userId)
                 {
                     /** @var UserModel $objInstructor */
@@ -853,7 +853,7 @@ class tl_calendar_events_member extends Backend
                 $objEvent = $objRegistration->getRelated('eventId');
 
                 // Get event dates as a comma separated string
-                $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent->id);
+                $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent);
                 $strDates = implode(', ', array_map(function ($tstamp) {
                     return Date::parse(Config::get('dateFormat'), $tstamp);
                 }, $eventDates));

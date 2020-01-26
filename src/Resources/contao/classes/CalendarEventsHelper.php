@@ -47,48 +47,13 @@ class CalendarEventsHelper
 {
 
     /**
-     * Generate/parse event row (usage in tour/course listing modules)
-     * @param $eventId
-     * @param array $arrAllowedEventTypes
-     * @param string $strTemplate
-     * @return string
-     * @throws \Exception
-     */
-    public static function generateEventRow($eventId, $arrAllowedEventTypes = array(), $strTemplate = 'partial_event_tour_row_layout_table')
-    {
-        $objEvent = CalendarEventsModel::findByPk($eventId);
-        if ($objEvent === null)
-        {
-            return '';
-        }
-
-        if (empty($arrAllowedEventTypes) || !is_array($arrAllowedEventTypes))
-        {
-            return '';
-        }
-
-        if (!in_array($objEvent->eventType, $arrAllowedEventTypes))
-        {
-            return '';
-        }
-
-        $objTemplate = new FrontendTemplate($strTemplate);
-        $objTemplate->id = $objEvent->id;
-
-        // Add event data to template
-        self::addEventDataToTemplate($objTemplate);
-
-        return $objTemplate->parse();
-    }
-
-    /**
      * @param $objEvent
      * @param $strProperty
      * @param null $objTemplate
      * @return array|string
      * @throws \Exception
      */
-    public static function getEventData($objEvent, $strProperty, $objTemplate = null)
+    public static function getEventData(CalendarEventsModel $objEvent, $strProperty, $objTemplate = null)
     {
         // Load language files
         Controller::loadLanguageFile('tl_calendar_events');
@@ -100,6 +65,9 @@ class CalendarEventsHelper
 
         switch ($arrProperty[0])
         {
+            case 'model':
+                $value = $objEvent;
+                break;
             case 'id':
                 $value = $objEvent->id;
                 break;
@@ -140,28 +108,28 @@ class CalendarEventsHelper
                 $value = Date::parse('y', $objEvent->endDate);
                 break;
             case 'eventPeriodSm':
-                $value = static::getEventPeriod($objEvent->id, 'd.m.Y', false);
+                $value = static::getEventPeriod($objEvent, 'd.m.Y', false);
                 break;
             case 'eventPeriodSmTooltip':
-                $value = static::getEventPeriod($objEvent->id, 'd.m.Y', false, true);
+                $value = static::getEventPeriod($objEvent, 'd.m.Y', false, true);
                 break;
             case 'eventPeriodLgInline':
-                $value = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false, true, true);
+                $value = static::getEventPeriod($objEvent, 'D, d.m.Y', false, true, true);
                 break;
             case 'eventPeriodLg':
-                $value = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false);
+                $value = static::getEventPeriod($objEvent, 'D, d.m.Y', false);
                 break;
             case 'eventPeriodLgTooltip':
-                $value = static::getEventPeriod($objEvent->id, 'D, d.m.Y', false, true);
+                $value = static::getEventPeriod($objEvent, 'D, d.m.Y', false, true);
                 break;
             case 'eventDuration':
-                $value = static::getEventDuration($objEvent->id);
+                $value = static::getEventDuration($objEvent);
                 break;
             case 'eventState':
-                $value = static::getEventState($objEvent->id);
+                $value = static::getEventState($objEvent);
                 break;
             case 'eventStateLabel':
-                $value = $GLOBALS['TL_LANG']['CTE']['calendar_events'][static::getEventState($objEvent->id)] != '' ? $GLOBALS['TL_LANG']['CTE']['calendar_events'][static::getEventState($objEvent->id)] : static::getEventState($objEvent->id);
+                $value = $GLOBALS['TL_LANG']['CTE']['calendar_events'][static::getEventState($objEvent)] != '' ? $GLOBALS['TL_LANG']['CTE']['calendar_events'][static::getEventState($objEvent)] : static::getEventState($objEvent);
                 break;
             case 'isLastMinuteTour':
                 $value = $objEvent->eventType === 'lastMinuteTour' ? true : false;
@@ -179,25 +147,25 @@ class CalendarEventsHelper
                 $value = static::getBookingCounter($objEvent->id);
                 break;
             case 'tourTechDifficulties':
-                $value = implode(' ', static::getTourTechDifficultiesAsArray($objEvent->id, true));
+                $value = implode(' ', static::getTourTechDifficultiesAsArray($objEvent, true));
                 break;
             case 'instructors':
-                $value = implode(', ', static::getInstructorNamesAsArray($objEvent->id, false, true));
+                $value = implode(', ', static::getInstructorNamesAsArray($objEvent, false, true));
                 break;
             case 'instructorsWithQualification':
-                $value = implode(', ', static::getInstructorNamesAsArray($objEvent->id, true, true));
+                $value = implode(', ', static::getInstructorNamesAsArray($objEvent, true, true));
                 break;
             case 'courseTypeLevel1':
                 $value = $objEvent->courseTypeLevel1;
                 break;
             case 'eventImagePath':
-                $value = static::getEventImagePath($objEvent->id);
+                $value = static::getEventImagePath($objEvent);
                 break;
             case 'eventImage':
                 if (isset($arrProperty[1]))
                 {
                     $pictureSize = $arrProperty[1];
-                    $src = static::getEventImagePath($objEvent->id);
+                    $src = static::getEventImagePath($objEvent);
                     $value = Controller::replaceInsertTags(sprintf('{{picture::%s?size=%s}}', $src, $pictureSize));
                 }
                 break;
@@ -214,7 +182,7 @@ class CalendarEventsHelper
                 $value = implode('<br>', static::getEventOrganizersAsArray($objEvent->id, 'title'));
                 break;
             case 'mainInstructorContactDataFromDb':
-                $value = static::generateMainInstructorContactDataFromDb($objEvent->id);
+                $value = static::generateMainInstructorContactDataFromDb($objEvent);
                 break;
             case 'instructorContactBoxes':
                 $value = static::generateInstructorContactBoxes($objEvent);
@@ -273,12 +241,12 @@ class CalendarEventsHelper
      * @param CalendarEventsModel $objEvent
      * @return string
      */
-    public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent)
+    public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent): string
     {
         $strHtml = '';
         if ($objEvent !== null)
         {
-            $arrInstructors = static::getInstructorsAsArray($objEvent->id, true);
+            $arrInstructors = static::getInstructorsAsArray($objEvent, true);
             foreach ($arrInstructors as $userId)
             {
                 $strHtml .= '<div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4"><div class="">';
@@ -297,9 +265,9 @@ class CalendarEventsHelper
                     // Start instructor name
                     $strHtml .= '<div class="instructor-name">';
                     $strQuali = '';
-                    if (static::getMainQualifikation($userId) != '')
+                    if (static::getMainQualifikation($objUser) != '')
                     {
-                        $strQuali .= ' (' . static::getMainQualifikation($userId) . ')';
+                        $strQuali .= ' (' . static::getMainQualifikation($objUser) . ')';
                     }
 
                     if (!$objUser->hideInFrontendListings)
@@ -339,21 +307,20 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $id
+     * @param CalendarEventsModel $objEvent
      * @return string
      * @throws \Exception
      */
-    public static function getEventState($id)
+    public static function getEventState(CalendarEventsModel $objEvent): string
     {
-        $objEvent = CalendarEventsModel::findByPk($id);
         if ($objEvent === null)
         {
-            throw new \Exception(sprintf('Calendar Event with ID %s not found.', $id));
+            throw new \Exception(sprintf('Calendar Event with ID %s not found.', $objEvent->id));
         }
 
         $objDb = Database::getInstance();
-        $objEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($id, 'subscription-accepted');
-        $registrationCount = $objEventsMember->numRows;
+        $objEventsMember = $objDb->prepare('SELECT COUNT(id) AS registrationCount FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
+        $registrationCount = $objEventsMember->registrationCount;
 
         // Event canceled
         if ($objEvent->eventState === 'event_canceled')
@@ -384,6 +351,8 @@ class CalendarEventsHelper
         {
             return 'event_status_5'; // fa-circle orange
         }
+
+        // If online registration is disabeld in the event settings
         elseif ($objEvent->disableOnlineRegistration)
         {
             return 'event_status_7';
@@ -396,15 +365,14 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $eventId
+     * @param CalendarEventsModel $objEvent
      * @return bool
      */
-    public static function eventIsFullyBooked($eventId)
+    public static function eventIsFullyBooked(CalendarEventsModel $objEvent): bool
     {
-        $objEvent = CalendarEventsModel::findByPk($eventId);
         if ($objEvent !== null)
         {
-            $objEventsMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
+            $objEventsMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
             $registrationCount = $objEventsMember->numRows;
             if ($objEvent->eventState === 'event_fully_booked' || ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers))
             {
@@ -415,16 +383,15 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $id
+     * @param CalendarEventsModel $objEvent
      * @return string
      */
-    public static function getMainInstructorName($id)
+    public static function getMainInstructorName(CalendarEventsModel $objEvent): string
     {
         $strName = '';
-        $objDb = Database::getInstance();
-        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
-        if ($objEvent->numRows)
+        if ($objEvent !== null)
         {
+            $objDb = Database::getInstance();
             $objInstructor = $objDb->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid=? AND isMainInstructor=?')->limit(1)->execute($objEvent->id, '1');
             if ($objInstructor->numRows)
             {
@@ -443,16 +410,14 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $id
+     * @param CalendarEventsModel $objEvent
      * @return string
      */
-    public static function generateMainInstructorContactDataFromDb($id)
+    public static function generateMainInstructorContactDataFromDb(CalendarEventsModel $objEvent): string
     {
-        $objDb = Database::getInstance();
-        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
-        if ($objEvent->numRows)
+        if ($objEvent !== null)
         {
-            $arrInstructors = static::getInstructorsAsArray($objEvent->id, false);
+            $arrInstructors = static::getInstructorsAsArray($objEvent, false);
             $objUser = UserModel::findByPk($arrInstructors[0]);
             if ($objUser !== null)
             {
@@ -470,19 +435,18 @@ class CalendarEventsHelper
 
     /**
      * Get instructors as array
-     * @param $eventId
+     * @param CalendarEventsModel $objEvent
      * @param bool $blnShowPublishedOnly
      * @return array
      */
-    public static function getInstructorsAsArray($eventId, $blnShowPublishedOnly = true)
+    public static function getInstructorsAsArray(CalendarEventsModel $objEvent, $blnShowPublishedOnly = true): array
     {
         $arrInstructors = array();
-        $objDb = Database::getInstance();
-        $objEvent = CalendarEventsModel::findByPk($eventId);
         if ($objEvent !== null)
         {
             // Get all instructors from an event, list mainInstructor first
-            $objInstructor = $objDb->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid=? ORDER BY isMainInstructor DESC')->execute($eventId);
+            $objDb = Database::getInstance();
+            $objInstructor = $objDb->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid=? ORDER BY isMainInstructor DESC')->execute($objEvent->id);
             while ($objInstructor->next())
             {
                 $objUser = UserModel::findByPk($objInstructor->userId);
@@ -502,34 +466,36 @@ class CalendarEventsHelper
 
     /**
      * Get instructors names as array
-     * @param $eventId
+     * @param CalendarEventsModel $objEvent
      * @param bool $blnAddMainQualification
      * @param bool $blnShowPublishedOnly
      * @return array
      */
-    public static function getInstructorNamesAsArray($eventId, $blnAddMainQualification = false, $blnShowPublishedOnly = true)
+    public static function getInstructorNamesAsArray(CalendarEventsModel $objEvent, $blnAddMainQualification = false, $blnShowPublishedOnly = true): array
     {
         $arrInstructors = array();
-
-        $arrUsers = static::getInstructorsAsArray($eventId, $blnShowPublishedOnly);
-        foreach ($arrUsers as $userId)
+        if ($objEvent !== null)
         {
-            $objUser = UserModel::findByPk($userId);
-            if ($objUser !== null)
+            $arrUsers = static::getInstructorsAsArray($objEvent, $blnShowPublishedOnly);
+            foreach ($arrUsers as $userId)
             {
-                if ($blnShowPublishedOnly === true && $objUser->disable)
+                $objUser = UserModel::findByPk($userId);
+                if ($objUser !== null)
                 {
-                    continue;
-                }
+                    if ($blnShowPublishedOnly === true && $objUser->disable)
+                    {
+                        continue;
+                    }
 
-                $strName = trim($objUser->lastname . ' ' . $objUser->firstname);
-                if ($blnAddMainQualification && static::getMainQualifikation($objUser->id) != '')
-                {
-                    $arrInstructors[] = $strName . ' (' . static::getMainQualifikation($objUser->id) . ')';
-                }
-                else
-                {
-                    $arrInstructors[] = $strName;
+                    $strName = trim($objUser->lastname . ' ' . $objUser->firstname);
+                    if ($blnAddMainQualification && static::getMainQualifikation($objUser) != '')
+                    {
+                        $arrInstructors[] = $strName . ' (' . static::getMainQualifikation($objUser) . ')';
+                    }
+                    else
+                    {
+                        $arrInstructors[] = $strName;
+                    }
                 }
             }
         }
@@ -538,13 +504,12 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $id
+     * @param UserModel $objUser
      * @return string
      */
-    public static function getMainQualifikation($id)
+    public static function getMainQualifikation(UserModel $objUser): string
     {
         $strQuali = '';
-        $objUser = UserModel::findByPk($id);
         if ($objUser !== null)
         {
             $arrQuali = StringUtil::deserialize($objUser->leiterQualifikation, true);
@@ -587,17 +552,16 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $id
+     * @param CalendarEventsModel $objEvent
      * @return string
      */
-    public static function getEventImagePath($id)
+    public static function getEventImagePath(CalendarEventsModel $objEvent): string
     {
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
         System::getContainer()->get('contao.framework')->initialize();
 
-        $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
-        if ($objEvent->numRows)
+        if ($objEvent !== null)
         {
             if ($objEvent->singleSRC != '')
             {
@@ -614,15 +578,21 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $id
+     * @param CalendarEventsModel $objEvent
      * @param string $dateFormat
      * @param bool $blnAppendEventDuration
      * @param bool $blnTooltip
+     * @param bool $blnInline
      * @return string
      * @throws \Exception
      */
-    public static function getEventPeriod($id, $dateFormat = '', $blnAppendEventDuration = true, $blnTooltip = true, $blnInline = false)
+    public static function getEventPeriod(CalendarEventsModel $objEvent, $dateFormat = '', $blnAppendEventDuration = true, $blnTooltip = true, $blnInline = false)
     {
+        if ($objEvent === null)
+        {
+            return '';
+        }
+
         if ($dateFormat == '')
         {
             $dateFormat = Config::get('dateFormat');
@@ -634,38 +604,38 @@ class CalendarEventsHelper
             $dateFormatShortened = 'd.m.';
         }
 
-        $eventDuration = count(self::getEventTimestamps($id));
-        $span = Calendar::calculateSpan(self::getStartDate($id), self::getEndDate($id)) + 1;
+        $eventDuration = count(self::getEventTimestamps($objEvent));
+        $span = Calendar::calculateSpan(self::getStartDate($objEvent->id), self::getEndDate($objEvent->id)) + 1;
 
         if ($eventDuration == 1)
         {
-            return Date::parse($dateFormat, self::getStartDate($id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '');
+            return Date::parse($dateFormat, self::getStartDate($objEvent->id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '');
         }
         elseif ($span == $eventDuration)
         {
             // von bis
-            return Date::parse($dateFormatShortened, self::getStartDate($id)) . ' - ' . Date::parse($dateFormat, self::getEndDate($id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '');
+            return Date::parse($dateFormatShortened, self::getStartDate($objEvent->id)) . ' - ' . Date::parse($dateFormat, self::getEndDate($objEvent->id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '');
         }
         else
         {
             $arrDates = array();
-            $dates = self::getEventTimestamps($id);
+            $dates = self::getEventTimestamps($objEvent);
             foreach ($dates as $date)
             {
                 $arrDates[] = Date::parse($dateFormat, $date);
             }
             if ($blnTooltip)
             {
-                return Date::parse($dateFormat, self::getStartDate($id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($id) . ')' : '') . (!$blnInline ? '<br>' : ' ') . '<a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Eventdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
+                return Date::parse($dateFormat, self::getStartDate($objEvent->id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '') . (!$blnInline ? '<br>' : ' ') . '<a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Eventdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
             }
             else
             {
                 $dateString = '';
-                foreach (self::getEventTimestamps($id) as $tstamp)
+                foreach (self::getEventTimestamps($objEvent) as $tstamp)
                 {
                     $dateString .= sprintf('<time datetime="%s">%s</time>', Date::parse('Y-m-d', $tstamp), Date::parse('D, d.m.Y', $tstamp));
                 }
-                $dateString .= $blnAppendEventDuration ? sprintf('<time>(%s)</time>', self::getEventDuration($id)) : '';
+                $dateString .= $blnAppendEventDuration ? sprintf('<time>(%s)</time>', self::getEventDuration($objEvent)) : '';
                 return $dateString;
             }
         }
@@ -704,15 +674,13 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $id
+     * @param CalendarEventsModel $objEvent
      * @return array|bool
      */
-    public static function getEventTimestamps($id)
+    public static function getEventTimestamps(CalendarEventsModel $objEvent)
     {
         $arrRepeats = array();
-        $objDb = Database::getInstance();
-        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
-        if ($objEvent->numRows)
+        if ($objEvent !== null)
         {
             $arrDates = StringUtil::deserialize($objEvent->eventDates);
             if (!is_array($arrDates) || empty($arrDates))
@@ -771,17 +739,15 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $id
+     * @param CalendarEventsModel $objEvent
      * @return string
      * @throws \Exception
      */
-    public static function getEventDuration($id)
+    public static function getEventDuration(CalendarEventsModel $objEvent): string
     {
-        $objDb = Database::getInstance();
-        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($id);
-        if ($objEvent->numRows === null)
+        if ($objEvent === null)
         {
-            throw new \Exception(sprintf('Calendar Event with ID %s not found.', $id));
+            throw new \Exception(sprintf('Calendar Event with ID %s not found.', $objEvent->id));
         }
 
         $arrDates = StringUtil::deserialize($objEvent->eventDates);
@@ -801,16 +767,16 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $eventId
+     * @param CalendarEventsModel $objEvent
+     * @param bool $tooltip
      * @return array
      */
-    public static function getTourTechDifficultiesAsArray($eventId, $tooltip = false)
+    public static function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, $tooltip = false): array
     {
         $arrReturn = array();
-        $objEventModel = CalendarEventsModel::findByPk($eventId);
-        if ($objEventModel !== null)
+        if ($objEvent !== null)
         {
-            $arrValues = StringUtil::deserialize($objEventModel->tourTechDifficulty, true);
+            $arrValues = StringUtil::deserialize($objEvent->tourTechDifficulty, true);
             if (!empty($arrValues) && is_array($arrValues))
             {
                 $arrDiff = array();
@@ -1112,7 +1078,6 @@ class CalendarEventsHelper
             }
         }
 
-        $arrOccupiedDates = array();
         // Get all future events of the member
         $objMemberEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId!=? AND contaoMemberId=? AND stateOfSubscription=? AND hasParticipated=?')
             ->execute($objEvent->id, $objMember->id, 'subscription-accepted', '');

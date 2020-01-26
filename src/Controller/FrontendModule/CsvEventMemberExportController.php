@@ -324,7 +324,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
             $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
             if ($objEvent !== null)
             {
-                return $calendarEventsHelper->getMainInstructorName($objEventMember->eventId);
+                return $calendarEventsHelper->getMainInstructorName($objEvent);
             }
             else
             {

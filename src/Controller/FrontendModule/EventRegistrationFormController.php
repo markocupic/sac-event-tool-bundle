@@ -315,7 +315,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
             }
 
             // Check if event is already fully booked
-            if ($calendarEventsHelperAdapter->eventIsFullyBooked($this->objEvent->id) === true)
+            if ($calendarEventsHelperAdapter->eventIsFullyBooked($this->objEvent) === true)
             {
                 $this->template->bookingLimitReaches = true;
             }
@@ -417,7 +417,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         ));
 
         // Only show this field if it is a multi day event
-        $durationInDays = count($calendarEventsHelperAdapter->getEventTimestamps($objEvent->id));
+        $durationInDays = count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
         $startDate = $calendarEventsHelperAdapter->getStartDate($objEvent->id);
         $endDate = $calendarEventsHelperAdapter->getEndDate($objEvent->id);
         if ($durationInDays > 1 && $startDate + ($durationInDays - 1) * 86400 === $endDate)
@@ -605,7 +605,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
 
             // Check if event is already fully booked
             $eventFullyBooked = false;
-            if ($calendarEventsHelperAdapter->eventIsFullyBooked($objEvent->id) === true)
+            if ($calendarEventsHelperAdapter->eventIsFullyBooked($objEvent) === true)
             {
                 $eventFullyBooked = true;
                 $objEventRegistration->stateOfSubscription = 'subscription-waitlisted';

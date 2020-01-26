@@ -72,15 +72,6 @@ class UserPortraitController extends AbstractContentElementController
         /** @var  Input $inputAdapter */
         $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
 
-        /** @var  Database $databaseAdapter */
-        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
-
-        /** @var  CalendarEventsModel $calendarEventsModelAdapter */
-        $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
-
-        /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
-        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
-
         /** @var  UserModel $userModelAdapter */
         $userModelAdapter = $this->get('contao.framework')->getAdapter(UserModel::class);
 
@@ -98,8 +89,7 @@ class UserPortraitController extends AbstractContentElementController
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 
-        $arrUser = $this->objUser->row();
-        $template->user = $arrUser;
+        $template->objUser = $this->objUser;
 
         return $template->getResponse();
     }

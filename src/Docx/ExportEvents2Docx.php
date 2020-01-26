@@ -199,11 +199,9 @@ class ExportEvents2Docx
      * @param $objEvent
      * @return string
      */
-    public static function formatValue($field, $value = '', $objEvent): string
+    public static function formatValue($field, $value = '', CalendarEventsModel $objEvent): string
     {
         $table = self::$strTable;
-        $dataRecord = self::$arrDatarecord;
-        $dca = self::$dca;
 
         if ($table == 'tl_calendar_events')
         {
@@ -248,7 +246,7 @@ class ExportEvents2Docx
 
             if ($field == 'instructor')
             {
-                $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent->id);
+                $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent);
                 $arrValue = array_map(function ($v) {
                     return UserModel::findByPk($v)->name;
                 }, $arrInstructors);
@@ -283,7 +281,8 @@ class ExportEvents2Docx
             // Kusdatendaten in der Form d.m.Y, d.m.Y, ...
             if ($field == 'eventDates')
             {
-                $arr = CalendarEventsHelper::getEventTimestamps(self::$arrDatarecord['id']);
+                $objEvent = CalendarEventsModel::findByPk(self::$arrDatarecord['id']);
+                $arr = CalendarEventsHelper::getEventTimestamps($objEvent);
                 $arr = array_map(function ($tstamp) {
                     return Date::parse('d.m.Y', $tstamp);
                 }, $arr);

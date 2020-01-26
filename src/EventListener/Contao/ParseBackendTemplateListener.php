@@ -99,8 +99,8 @@ class ParseBackendTemplateListener
                         // Event details
                         $strLegend .= '<div class="event-detail-legend">';
                         $strLegend .= '<h3>' . $stringUtilAdapter->substr($objEvent->title, 30, '...') . '</h3>';
-                        $strLegend .= '<p>' . $calendarEventsHelperAdapter->getEventPeriod($objEvent->id) . '</p>';
-                        $strLegend .= '<p><strong>Leiter:</strong><br>' . implode("<br>", $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->id)) . '</p>';
+                        $strLegend .= '<p>' . $calendarEventsHelperAdapter->getEventPeriod($objEvent) . '</p>';
+                        $strLegend .= '<p><strong>Leiter:</strong><br>' . implode("<br>", $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent)) . '</p>';
                         $strLegend .= '</div>';
 
                         $strLegend .= '<div class="subscription-state-legend">';
