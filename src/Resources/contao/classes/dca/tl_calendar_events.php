@@ -464,12 +464,12 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         }
                         elseif ($field === 'tourTechDifficulty')
                         {
-                            $arrDiff = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent, false);
+                            $arrDiff = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent->current(), false);
                             $arrRow[] = implode(' und ', $arrDiff);
                         }
                         elseif ($field === 'eventDates')
                         {
-                            $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent);
+                            $arrTimestamps = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getEventTimestamps($objEvent->current());
                             $arrDates = array_map(function ($tstamp) {
                                 return \Contao\Date::parse(\Contao\Config::get('dateFormat'), $tstamp);
                             }, $arrTimestamps);
@@ -482,7 +482,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         }
                         elseif ($field === 'instructor')
                         {
-                            $arrInstructors = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($objEvent, false, false);
+                            $arrInstructors = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getInstructorNamesAsArray($objEvent->current(), false, false);
                             $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
                         }
                         elseif ($field === 'tourType')

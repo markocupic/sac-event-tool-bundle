@@ -335,7 +335,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
             {
                 while ($objEvent->next())
                 {
-                    $arrInstructors = array_merge($arrInstructors, $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent, false));
+                    $arrInstructors = array_merge($arrInstructors, $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent->current(), false));
 
                     // tourType && date format
                     $arrTourType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent->id, 'shortcut', false);
@@ -356,12 +356,12 @@ class JahresprogrammExportController extends AbstractPrintExportController
                         'courseTypeLevel0' => ($courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0) !== null) ? $courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0)->name : '',
                         'courseTypeLevel1' => ($courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1) !== null) ? $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1)->name : '',
                         'title'            => $objEvent->title,
-                        'date'             => $this->getEventPeriod($objEvent, $dateFormat),
+                        'date'             => $this->getEventPeriod($objEvent->current(), $dateFormat),
                         'month'            => $dateAdapter->parse('F', $objEvent->startDate),
                         'durationInfo'     => $objEvent->durationInfo,
-                        'instructors'      => implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, false)),
+                        'instructors'      => implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->current(), false, false)),
                         'tourType'         => implode(', ', $arrTourType),
-                        'difficulty'       => implode(',', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent)),
+                        'difficulty'       => implode(',', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent->current())),
                     );
                 }
             }

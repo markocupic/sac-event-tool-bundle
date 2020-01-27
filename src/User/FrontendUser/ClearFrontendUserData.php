@@ -88,7 +88,7 @@ class ClearFrontendUserData
                 }
                 if (!$blnFound)
                 {
-                    $this->anonymizeCalendarEventsMemberDataRecord($objEventsMember);
+                    $this->anonymizeCalendarEventsMemberDataRecord($objEventsMember->current());
                 }
             }
         }

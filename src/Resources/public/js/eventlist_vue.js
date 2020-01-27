@@ -37,8 +37,8 @@ class VueTourList {
             }
         };
 
-        // Merge options and defaults
-        let params = {...defaults, ...opt};
+        // Use lodash to merge options and defaults
+        let params = _.merge(defaults, opt);
 
         // Instantiate vue.js application
         new Vue({

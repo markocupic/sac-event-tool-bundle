@@ -95,81 +95,88 @@ class ExportEvents2Docx
         $widthCol_1 = round(45 * $twip);
         $widthCol_2 = round(115 * $twip);
 
-        $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE pid=? AND published=? ORDER BY courseTypeLevel0, title, startDate')->execute($calendarId, 1);
-        while ($objEvent->next())
+        $objEvent = CalendarEventsModel::findAll(
+            ['tl_calendar_events.pid=?', 'tl_calendar_events.published=?'],
+            [$calendarId, '1'],
+            ['order' => 'courseTypeLevel0, title, startDate']
+        );
+        if($objEvent !== null)
         {
-            if ($eventId > 0)
+            while ($objEvent->next())
             {
-                if ($eventId != $objEvent->id)
+                if ($eventId > 0)
                 {
-                    continue;
+                    if ($eventId != $objEvent->id)
+                    {
+                        continue;
+                    }
                 }
-            }
 
-            self::$arrDatarecord = CalendarEventsModel::findByPk($objEvent->id)->row();
+                self::$arrDatarecord = $objEvent->row();
 
-            // Adding an empty Section to the document...
-            $section = $phpWord->addSection();
+                // Adding an empty Section to the document...
+                $section = $phpWord->addSection();
 
-            // Add page header
-            $header = $section->addHeader();
-            $header->firstPage();
-            $table = $header->addTable();
-            $table->addRow();
-            $cell = $table->addCell(4500);
-            $textrun = $cell->addTextRun();
-            $textrun->addLink(Environment::get('host') . '/', htmlspecialchars('KURSPROGRAMM ' . $year, ENT_COMPAT, 'UTF-8'), $fStyleMediumRed);
-            $table->addCell(4500)->addImage($rootDir . '/files/fileadmin/page_assets/kursbroschuere/logo-sac-pilatus.png', array('height' => 40, 'align' => 'right'));
-
-            // Add footer
-            //$footer = $section->addFooter();
-            //$footer->addPreserveText(htmlspecialchars('Page {PAGE} of {NUMPAGES}.', ENT_COMPAT, 'UTF-8'), null, null);
-            //$footer->addLink('https://github.com/PHPOffice/PHPWord', htmlspecialchars('PHPWord on GitHub', ENT_COMPAT, 'UTF-8'));
-
-            // Add the title
-            $title = htmlspecialchars(self::formatValue('title', $objEvent->title, $objEvent));
-            $phpWord->addTitleStyle(1, $fStyleTitle, null);
-            $section->addTitle(htmlspecialchars($title, ENT_COMPAT, 'UTF-8'), 1);
-
-            // Add the table
-            //$firstRowStyle = array('bgColor' => '66BBFF');
-            $firstRowStyle = array();
-            $phpWord->addTableStyle('Event-Item', $tableStyle, $firstRowStyle);
-            $table = $section->addTable('Event-Item');
-
-            $arrFields = array(
-                "Datum"                 => 'eventDates',
-                "Autor (-en)"           => 'author',
-                "Kursart"               => 'kursart',
-                "Kursstufe"             => 'courseLevel',
-                "Organisierende Gruppe" => 'organizers',
-                "Einführungstext"       => 'teaser',
-                "Kursziele"             => 'terms',
-                "Kursinhalte"           => 'issues',
-                "Voraussetzungen"       => 'requirements',
-                "Bergf./Tourenl."       => 'mountainguide',
-                "Leiter"                => 'instructor',
-                "Preis/Leistungen"      => 'leistungen',
-                "Anmeldung"             => 'bookingEvent',
-                "Material"              => 'equipment',
-                "Weiteres"              => 'miscellaneous',
-            );
-
-            foreach ($arrFields as $label => $fieldname)
-            {
+                // Add page header
+                $header = $section->addHeader();
+                $header->firstPage();
+                $table = $header->addTable();
                 $table->addRow();
-                $table->addCell($widthCol_1)->addText(htmlspecialchars($label . ":"), 'fStyleBold', 'pStyle');
-                $objCell = $table->addCell($widthCol_2);
-                $value = self::formatValue($fieldname, $objEvent->{$fieldname}, $objEvent);
-                // Add multiline text
-                self::addMultilineText($objCell, $value);
+                $cell = $table->addCell(4500);
+                $textrun = $cell->addTextRun();
+                $textrun->addLink(Environment::get('host') . '/', htmlspecialchars('KURSPROGRAMM ' . $year, ENT_COMPAT, 'UTF-8'), $fStyleMediumRed);
+                $table->addCell(4500)->addImage($rootDir . '/files/fileadmin/page_assets/kursbroschuere/logo-sac-pilatus.png', array('height' => 40, 'align' => 'right'));
+
+                // Add footer
+                //$footer = $section->addFooter();
+                //$footer->addPreserveText(htmlspecialchars('Page {PAGE} of {NUMPAGES}.', ENT_COMPAT, 'UTF-8'), null, null);
+                //$footer->addLink('https://github.com/PHPOffice/PHPWord', htmlspecialchars('PHPWord on GitHub', ENT_COMPAT, 'UTF-8'));
+
+                // Add the title
+                $title = htmlspecialchars(self::formatValue('title', $objEvent->title, $objEvent->current()));
+                $phpWord->addTitleStyle(1, $fStyleTitle, null);
+                $section->addTitle(htmlspecialchars($title, ENT_COMPAT, 'UTF-8'), 1);
+
+                // Add the table
+                //$firstRowStyle = array('bgColor' => '66BBFF');
+                $firstRowStyle = array();
+                $phpWord->addTableStyle('Event-Item', $tableStyle, $firstRowStyle);
+                $table = $section->addTable('Event-Item');
+
+                $arrFields = array(
+                    "Datum"                 => 'eventDates',
+                    "Autor (-en)"           => 'author',
+                    "Kursart"               => 'kursart',
+                    "Kursstufe"             => 'courseLevel',
+                    "Organisierende Gruppe" => 'organizers',
+                    "Einführungstext"       => 'teaser',
+                    "Kursziele"             => 'terms',
+                    "Kursinhalte"           => 'issues',
+                    "Voraussetzungen"       => 'requirements',
+                    "Bergf./Tourenl."       => 'mountainguide',
+                    "Leiter"                => 'instructor',
+                    "Preis/Leistungen"      => 'leistungen',
+                    "Anmeldung"             => 'bookingEvent',
+                    "Material"              => 'equipment',
+                    "Weiteres"              => 'miscellaneous',
+                );
+
+                foreach ($arrFields as $label => $fieldname)
+                {
+                    $table->addRow();
+                    $table->addCell($widthCol_1)->addText(htmlspecialchars($label . ":"), 'fStyleBold', 'pStyle');
+                    $objCell = $table->addCell($widthCol_2);
+                    $value = self::formatValue($fieldname, $objEvent->{$fieldname}, $objEvent->current());
+                    // Add multiline text
+                    self::addMultilineText($objCell, $value);
+                }
+
+                $section->addText('event-alias: ' . $objEvent->alias, 'fStyleSmall', 'pStyle');
+                $section->addText('event-id: ' . $objEvent->id, 'fStyleSmall', 'pStyle');
+                $section->addText('version-date: ' . Date::parse('Y-m-d'), 'fStyleSmall', 'pStyle');
+
+                $section->addPageBreak();
             }
-
-            $section->addText('event-alias: ' . $objEvent->alias, 'fStyleSmall', 'pStyle');
-            $section->addText('event-id: ' . $objEvent->id, 'fStyleSmall', 'pStyle');
-            $section->addText('version-date: ' . Date::parse('Y-m-d'), 'fStyleSmall', 'pStyle');
-
-            $section->addPageBreak();
         }
         // Saving the document as OOXML file...
         $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
