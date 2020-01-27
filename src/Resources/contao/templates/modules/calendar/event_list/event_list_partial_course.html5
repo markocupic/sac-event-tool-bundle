@@ -19,7 +19,7 @@
                 <div class="col-sm-9 col-xl-7">
                     <div class="title">
                         <a v-bind:href="row.eventUrl" class="event-title-link">
-                            <h3 class="headline">{{ row.title }}</h3>
+                            <h3 class="headline"><u>{{ row.title }}</u></h3>
                         </a>
                         <h5>{{ row.courseTypeLevel0Name }}: {{ row.courseTypeLevel1Name }}</h5>
                     </div>

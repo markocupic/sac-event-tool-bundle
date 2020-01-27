@@ -463,7 +463,7 @@ class PilatusExportController extends AbstractPrintExportController
             $arrRow['weekday'] = $this->getEventPeriod($objEvent, 'D');
             $arrRow['title'] = $objEvent->title . ($objEvent->eventType === 'lastMinuteTour' ? ' (LAST MINUTE TOUR!)' : '');
             $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, false));
-            $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->id, 'titlePrint'));
+            $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent, 'titlePrint'));
 
             // tourType
             $arrEventType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent->id, 'shortcut', false);
@@ -833,8 +833,8 @@ class PilatusExportController extends AbstractPrintExportController
         $arrRow['eventDates'] = $this->getEventPeriod($objEvent, $this->dateFormat);
         $arrRow['weekday'] = $this->getEventPeriod($objEvent, 'D');
         $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, false));
-        $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->id, 'title'));
-        $arrRow['tourProfile'] = implode('<br>', $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent->id));
+        $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent, 'title'));
+        $arrRow['tourProfile'] = implode('<br>', $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent));
         $arrRow['journey'] = $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey) !== null ? $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey)->title : '';
 
         if ($objEvent->setRegistrationPeriod)

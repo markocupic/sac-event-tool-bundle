@@ -351,7 +351,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                         'id'               => $objEvent->id,
                         'eventType'        => $objEvent->eventType,
                         'courseId'         => $objEvent->courseId,
-                        'organizers'       => implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->id, 'title')),
+                        'organizers'       => implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->current(), 'title')),
                         'courseLevel'      => isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel]) ? $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel] : '',
                         'courseTypeLevel0' => ($courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0) !== null) ? $courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0)->name : '',
                         'courseTypeLevel1' => ($courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1) !== null) ? $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1)->name : '',

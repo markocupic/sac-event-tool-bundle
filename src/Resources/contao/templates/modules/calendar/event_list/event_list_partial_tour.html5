@@ -40,7 +40,7 @@
                         <span data-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:title="row.eventStateLabel">
                             <i class="event-state-icon fa-fw" v-bind:class="row.eventState"></i>
                         </span>
-                        <a v-bind:href="row.eventUrl" v-html="row.eventTitle" class="event-title-link font-weight-bold text-dark"></a>
+                        <a v-bind:href="row.eventUrl"  class="event-title-link font-weight-bold text-dark"><u>{{ row.eventTitle }}</u></a>
                     </div>
                     <!-- end row state icon -->
 

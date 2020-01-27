@@ -176,10 +176,10 @@ class CalendarEventsHelper
                 $value = CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
                 break;
             case 'eventOrganizerLogos':
-                $value = implode('', static::getEventOrganizersLogoAsHtml($objEvent->id, '{{image::%s?width=60}}', false));
+                $value = implode('', static::getEventOrganizersLogoAsHtml($objEvent, '{{image::%s?width=60}}', false));
                 break;
             case 'eventOrganizers':
-                $value = implode('<br>', static::getEventOrganizersAsArray($objEvent->id, 'title'));
+                $value = implode('<br>', static::getEventOrganizersAsArray($objEvent, 'title'));
                 break;
             case 'mainInstructorContactDataFromDb':
                 $value = static::generateMainInstructorContactDataFromDb($objEvent);
@@ -188,7 +188,7 @@ class CalendarEventsHelper
                 $value = static::generateInstructorContactBoxes($objEvent);
                 break;
             case 'arrTourProfile':
-                $value = static::getTourProfileAsArray($objEvent->id);
+                $value = static::getTourProfileAsArray($objEvent);
                 break;
             case 'gallery':
                 $value = static::getGallery(array(
@@ -841,7 +841,7 @@ class CalendarEventsHelper
         $objEventModel = CalendarEventsModel::findByPk($eventId);
         if ($objEventModel !== null)
         {
-            $arrValues = StringUtil::deserialize($objEventModel->tourType, true);
+            $arrValues = StringUtil::deserialize($objEvent->tourType, true);
             if (!empty($arrValues) && is_array($arrValues))
             {
                 foreach ($arrValues as $id)
@@ -1023,13 +1023,12 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $eventId
+     * @param CalendarEventsModel $objEvent
      * @param string $field
      * @return array
      */
-    public static function getEventOrganizersAsArray($eventId, $field = 'title')
+    public static function getEventOrganizersAsArray(CalendarEventsModel $objEvent, $field = 'title'): array
     {
-        $objEvent = CalendarEventsModel::findByPk($eventId);
         $arrReturn = array();
         if ($objEvent !== null)
         {
@@ -1052,14 +1051,12 @@ class CalendarEventsHelper
 
     /**
      * Check if event dates are not already occupied by an other booked event
-     * @param $eventId
-     * @param $memberId
+     * @param CalendarEventsModel $objEvent
+     * @param MemberModel $objMember
      * @return bool
      */
-    public static function areBookingDatesOccupied($eventId, $memberId)
+    public static function areBookingDatesOccupied(CalendarEventsModel $objEvent, MemberModel $objMember): bool
     {
-        $objEvent = CalendarEventsModel::findByPk($eventId);
-        $objMember = MemberModel::findByPk($memberId);
         if ($objEvent === null || $objMember === null)
         {
             return true;
@@ -1138,19 +1135,18 @@ class CalendarEventsHelper
 
     /**
      * Get tour profile as array
-     * @param $eventId
+     * @param CalendarEventsModel $objEvent
      * @return array
      */
-    public static function getTourProfileAsArray($eventId)
+    public static function getTourProfileAsArray(CalendarEventsModel $objEvent): array
     {
         $arrProfile = array();
-        $objEventModel = CalendarEventsModel::findByPk($eventId);
-        if ($objEventModel !== null)
+        if ($objEvent !== null)
         {
-            if (!empty($objEventModel->tourProfile) && is_array(deserialize($objEventModel->tourProfile)))
+            if (!empty($objEvent->tourProfile) && is_array(StringUtil::deserialize($objEvent->tourProfile)))
             {
                 $m = 0;
-                $arrTourProfile = StringUtil::deserialize($objEventModel->tourProfile, true);
+                $arrTourProfile = StringUtil::deserialize($objEvent->tourProfile, true);
                 foreach ($arrTourProfile as $profile)
                 {
                     if ($profile['tourProfileAscentMeters'] == '' && $profile['tourProfileAscentTime'] == '' && $profile['tourProfileDescentMeters'] == '' && $profile['tourProfileDescentTime'] == '')
@@ -1249,18 +1245,18 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $eventId
+     * @param CalendarEventsModel $objEvent
      * @param string $strInsertTag
+     * @param bool $allowDuplicate
      * @return array
      */
-    public function getEventOrganizersLogoAsHtml($eventId, $strInsertTag = '{{image::%s}}', $allowDuplicate = false)
+    public function getEventOrganizersLogoAsHtml(CalendarEventsModel $objEvent, $strInsertTag = '{{image::%s}}', $allowDuplicate = false): array
     {
         $arrHtml = array();
         $arrUuids = array();
-        $objEventModel = CalendarEventsModel::findByPk($eventId);
-        if ($objEventModel !== null)
+        if ($objEvent !== null)
         {
-            $arrOrganizers = StringUtil::deserialize($objEventModel->organizers, true);
+            $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
             foreach ($arrOrganizers as $orgId)
             {
                 $objOrganizer = EventOrganizerModel::findByPk($orgId);

@@ -317,7 +317,7 @@ class EventRapport
         $strEventDuration = implode(', ', $arrEventDates);
 
         // Get tour profile
-        $arrTourProfile = $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent->id);
+        $arrTourProfile = $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent);
         $strTourProfile = implode("\r\n", $arrTourProfile);
         $strTourProfile = str_replace('Tag: ', 'Tag:' . "\r\n", $strTourProfile);
 

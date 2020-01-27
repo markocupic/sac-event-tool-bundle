@@ -446,7 +446,7 @@ class tl_calendar_events_member extends Backend
             {
                 // Check if member has already booked at the same time
                 $objMember = MemberModel::findBySacMemberId($objEventMemberModel->sacMemberId);
-                if ($varValue === 'subscription-accepted' && $objMember !== null && CalendarEventsHelper::areBookingDatesOccupied($objEventMemberModel->eventId, $objMember->id))
+                if ($varValue === 'subscription-accepted' && $objMember !== null && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember))
                 {
                     $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht bestätigt serden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde.';
                     $varValue = $objEventMemberModel->stateOfSubscription;
@@ -804,7 +804,8 @@ class tl_calendar_events_member extends Backend
 
                         // Check if member has already booked at the same time
                         $objMember = MemberModel::findBySacMemberId($objRegistration->sacMemberId);
-                        if (Input::get('call') === 'acceptWithEmail' && $objMember !== null && CalendarEventsHelper::areBookingDatesOccupied($objRegistration->eventId, $objMember->id))
+                        $objEvent = CalendarEventsModel::findByPk($objRegistration->eventId);
+                        if (Input::get('call') === 'acceptWithEmail' && $objMember !== null && $objEvent !== null && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember))
                         {
                             $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht bestätigt serden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde.';
                         }

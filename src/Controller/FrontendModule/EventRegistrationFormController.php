@@ -258,7 +258,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         {
             $messageAdapter->addInfo('Die Anmeldefrist für diesen Event ist abgelaufen.', $scope);
         }
-        elseif ($this->objUser && true === $calendarEventsHelperAdapter->areBookingDatesOccupied($this->objEvent->id, $this->objUser->id))
+        elseif ($this->objUser && true === $calendarEventsHelperAdapter->areBookingDatesOccupied($this->objEvent, $this->objUser))
         {
             $messageAdapter->addInfo('Die Anmeldung zu diesem Event ist nicht möglich, da die Event-Daten sich mit den Daten eines anderen Events überschneiden, wo deine Teilnahme bereits bestätigt ist. Bitte nimm persönlich Kontakt mit dem Touren-/Kursleiter auf, falls du der Ansicht bist, dass keine zeitliche Überschneidung vorliegt und deine Teilnahme an beiden Events möglich ist.', $scope);
         }
@@ -485,7 +485,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
             }
             if (!$hasError)
             {
-                if (true === $calendarEventsHelperAdapter->areBookingDatesOccupied($this->objEvent->id, $objMember->id))
+                if (true === $calendarEventsHelperAdapter->areBookingDatesOccupied($this->objEvent, $this->objUser))
                 {
                     $this->template->bookingErrorMsg = 'Die Anmeldung zu diesem Event ist nicht möglich, da die Event-Daten sich mit den Daten eines anderen Events überschneiden, wo deine Teilnahme bereits bestätigt ist. Bitte nimm persönlich Kontakt mit dem Touren-/Kursleiter auf, falls du der Ansicht bist, dass keine zeitliche Überschneidung vorliegt und deine Teilnahme an beiden Events möglich ist.';
                     $hasError = true;
