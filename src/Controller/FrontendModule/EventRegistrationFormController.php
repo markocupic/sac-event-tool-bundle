@@ -418,8 +418,8 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
 
         // Only show this field if it is a multi day event
         $durationInDays = count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
-        $startDate = $calendarEventsHelperAdapter->getStartDate($objEvent->id);
-        $endDate = $calendarEventsHelperAdapter->getEndDate($objEvent->id);
+        $startDate = $calendarEventsHelperAdapter->getStartDate($objEvent);
+        $endDate = $calendarEventsHelperAdapter->getEndDate($objEvent);
         if ($durationInDays > 1 && $startDate + ($durationInDays - 1) * 86400 === $endDate)
         {
             $objForm->addFormField('foodHabits', array(

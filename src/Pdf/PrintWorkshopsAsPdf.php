@@ -350,7 +350,7 @@ class PrintWorkshopsAsPdf
             $objUser = UserModel::findByPk($userId);
             if ($objUser !== null)
             {
-                $strQuali = CalendarEventsHelper::getMainQualifikation($objUser) != '' ? ' (' . CalendarEventsHelper::getMainQualifikation($objUser) . ')' : '';
+                $strQuali = CalendarEventsHelper::getMainQualification($objUser) != '' ? ' (' . CalendarEventsHelper::getMainQualification($objUser) . ')' : '';
                 return $objUser->name . $strQuali;
             }
             return '';

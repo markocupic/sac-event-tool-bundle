@@ -15,7 +15,7 @@
     <div class="col-sm-8 col-lg-9">
         <h5 class="ce_headline"><?= trim($this->objUser->lastname . ' ' . $this->objUser->firstname) ?></h5>
         <div class="ce_user_portrait_qualification">
-            <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualifikation($this->objUser) ?>
+            <?= Markocupic\SacEventToolBundle\CalendarEventsHelper::getMainQualification($this->objUser) ?>
         </div>
 
         <?php if (!FE_USER_LOGGED_IN): ?>

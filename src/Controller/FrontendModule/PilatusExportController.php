@@ -561,20 +561,20 @@ class PilatusExportController extends AbstractPrintExportController
         }
 
         $eventDuration = count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
-        $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent->id), $calendarEventsHelperAdapter->getEndDate($objEvent->id)) + 1;
+        $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent), $calendarEventsHelperAdapter->getEndDate($objEvent)) + 1;
 
         if ($eventDuration == 1)
         {
-            return $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getStartDate($objEvent->id));
+            return $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getStartDate($objEvent));
         }
 
         if ($eventDuration == 2 && $span != $eventDuration)
         {
-            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($objEvent->id)) . ' & ' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($objEvent->id));
+            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($objEvent)) . ' & ' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($objEvent));
         }
         elseif ($span == $eventDuration)
         {
-            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($objEvent->id)) . '-' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($objEvent->id));
+            return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($objEvent)) . '-' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($objEvent));
         }
         else
         {

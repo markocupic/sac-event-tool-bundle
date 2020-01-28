@@ -144,7 +144,7 @@ class CalendarEventsHelper
                 $value = $objEvent->eventType === 'course' ? true : false;
                 break;
             case 'bookingCounter':
-                $value = static::getBookingCounter($objEvent->id);
+                $value = static::getBookingCounter($objEvent);
                 break;
             case 'tourTechDifficulties':
                 $value = implode(' ', static::getTourTechDifficultiesAsArray($objEvent, true));
@@ -265,9 +265,9 @@ class CalendarEventsHelper
                     // Start instructor name
                     $strHtml .= '<div class="instructor-name">';
                     $strQuali = '';
-                    if (static::getMainQualifikation($objUser) != '')
+                    if (static::getMainQualification($objUser) != '')
                     {
-                        $strQuali .= ' (' . static::getMainQualifikation($objUser) . ')';
+                        $strQuali .= ' (' . static::getMainQualification($objUser) . ')';
                     }
 
                     if (!$objUser->hideInFrontendListings)
@@ -488,9 +488,9 @@ class CalendarEventsHelper
                     }
 
                     $strName = trim($objUser->lastname . ' ' . $objUser->firstname);
-                    if ($blnAddMainQualification && static::getMainQualifikation($objUser) != '')
+                    if ($blnAddMainQualification && static::getMainQualification($objUser) != '')
                     {
-                        $arrInstructors[] = $strName . ' (' . static::getMainQualifikation($objUser) . ')';
+                        $arrInstructors[] = $strName . ' (' . static::getMainQualification($objUser) . ')';
                     }
                     else
                     {
@@ -507,7 +507,7 @@ class CalendarEventsHelper
      * @param UserModel $objUser
      * @return string
      */
-    public static function getMainQualifikation(UserModel $objUser): string
+    public static function getMainQualification(UserModel $objUser): string
     {
         $strQuali = '';
         if ($objUser !== null)
@@ -525,7 +525,7 @@ class CalendarEventsHelper
      * @param $arrData
      * @return string
      */
-    public static function getGallery($arrData)
+    public static function getGallery(array $arrData): string
     {
         $arrData['type'] = 'gallery';
 
@@ -586,7 +586,7 @@ class CalendarEventsHelper
      * @return string
      * @throws \Exception
      */
-    public static function getEventPeriod(CalendarEventsModel $objEvent, $dateFormat = '', $blnAppendEventDuration = true, $blnTooltip = true, $blnInline = false)
+    public static function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = '', bool $blnAppendEventDuration = true, bool $blnTooltip = true, bool $blnInline = false)
     {
         if ($objEvent === null)
         {
@@ -605,16 +605,16 @@ class CalendarEventsHelper
         }
 
         $eventDuration = count(self::getEventTimestamps($objEvent));
-        $span = Calendar::calculateSpan(self::getStartDate($objEvent->id), self::getEndDate($objEvent->id)) + 1;
+        $span = Calendar::calculateSpan(self::getStartDate($objEvent), self::getEndDate($objEvent)) + 1;
 
         if ($eventDuration == 1)
         {
-            return Date::parse($dateFormat, self::getStartDate($objEvent->id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '');
+            return Date::parse($dateFormat, self::getStartDate($objEvent)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '');
         }
         elseif ($span == $eventDuration)
         {
             // von bis
-            return Date::parse($dateFormatShortened, self::getStartDate($objEvent->id)) . ' - ' . Date::parse($dateFormat, self::getEndDate($objEvent->id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '');
+            return Date::parse($dateFormatShortened, self::getStartDate($objEvent)) . ' - ' . Date::parse($dateFormat, self::getEndDate($objEvent)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '');
         }
         else
         {
@@ -626,7 +626,7 @@ class CalendarEventsHelper
             }
             if ($blnTooltip)
             {
-                return Date::parse($dateFormat, self::getStartDate($objEvent->id)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '') . (!$blnInline ? '<br>' : ' ') . '<a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Eventdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
+                return Date::parse($dateFormat, self::getStartDate($objEvent)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '') . (!$blnInline ? '<br>' : ' ') . '<a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Eventdaten: ' . implode(', ', $arrDates) . '">und weitere</a>';
             }
             else
             {
@@ -697,43 +697,39 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $eventId
+     * @param CalendarEventsModel $objEvent
      * @return int
      */
-    public static function getStartDate($eventId)
+    public static function getStartDate(CalendarEventsModel $objEvent): int
     {
         $tstamp = 0;
-        $objDb = Database::getInstance();
-        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($eventId);
-        if ($objEvent->numRows)
+        if ($objEvent !== null)
         {
             $arrDates = StringUtil::deserialize($objEvent->eventDates);
             if (!is_array($arrDates) || empty($arrDates))
             {
                 return $tstamp;
             }
-            $tstamp = $arrDates[0]['new_repeat'];
+            $tstamp = (int) $arrDates[0]['new_repeat'];
         }
         return $tstamp;
     }
 
     /**
-     * @param $eventId
+     * @param CalendarEventsModel $objEvent
      * @return int
      */
-    public static function getEndDate($eventId)
+    public static function getEndDate(CalendarEventsModel $objEvent): int
     {
         $tstamp = 0;
-        $objDb = Database::getInstance();
-        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute($eventId);
-        if ($objEvent->numRows)
+        if ($objEvent !== null)
         {
             $arrDates = StringUtil::deserialize($objEvent->eventDates);
             if (!is_array($arrDates) || empty($arrDates))
             {
                 return $tstamp;
             }
-            $tstamp = $arrDates[count($arrDates) - 1]['new_repeat'];
+            $tstamp = (int) $arrDates[count($arrDates) - 1]['new_repeat'];
         }
         return $tstamp;
     }
@@ -868,16 +864,15 @@ class CalendarEventsHelper
 
     /**
      * Return a bootstrap badge with some booking count information
-     * @param $eventId
+     * @param CalendarEventsModel $objEvent
      * @return string
      */
-    public static function getBookingCounter($eventId)
+    public static function getBookingCounter(CalendarEventsModel $objEvent): string
     {
         $strBadge = '<span class="badge badge-pill badge-%s" data-toggle="tooltip" data-placement="top" title="%s">%s</span>';
-        $objDb = Database::getInstance();
-        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($eventId);
-        if ($objEvent->numRows)
+        if ($objEvent !== null)
         {
+            $objDb = Database::getInstance();
             $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
             $memberCount = $calendarEventsMember->numRows;
 
@@ -910,17 +905,17 @@ class CalendarEventsHelper
     }
 
     /**
+     * Not in use????
      * Is event bookable
      * Are there some free places?
-     * @param $eventId
-     * @return string
+     * @param CalendarEventsModel $objEvent
+     * @return bool
      */
-    public static function isEventBookable($eventId)
+    public static function XXXXXXXXXXXXXXXXXXXXXXisEventBookable(CalendarEventsModel $objEvent): bool
     {
-        $objDb = Database::getInstance();
-        $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($eventId);
-        if ($objEvent->numRows)
+        if ($objEvent !== null)
         {
+            $objDb = Database::getInstance();
             $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
             $memberCount = $calendarEventsMember->numRows;
 

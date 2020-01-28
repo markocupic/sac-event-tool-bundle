@@ -442,26 +442,26 @@ class JahresprogrammExportController extends AbstractPrintExportController
         }
 
         $eventDuration = count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
-        $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent->id), $calendarEventsHelperAdapter->getEndDate($objEvent->id)) + 1;
+        $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent), $calendarEventsHelperAdapter->getEndDate($objEvent)) + 1;
 
         if ($eventDuration == 1)
         {
-            return $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getStartDate($objEvent->id));
+            return $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getStartDate($objEvent));
         }
         if ($eventDuration == 2 && $span != $eventDuration)
         {
-            return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent->id)) . '+' . $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent->id));
+            return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)) . '+' . $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
         }
         elseif ($span == $eventDuration)
         {
             // Check if event dates are not in the same month
-            if ($dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getStartDate($objEvent->id)) === $dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getEndDate($objEvent->id)))
+            if ($dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getStartDate($objEvent)) === $dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getEndDate($objEvent)))
             {
-                return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent->id)) . '-' . $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent->id));
+                return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)) . '-' . $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
             }
             else
             {
-                return $dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getStartDate($objEvent->id)) . '-' . $dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getEndDate($objEvent->id));
+                return $dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getStartDate($objEvent)) . '-' . $dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getEndDate($objEvent));
             }
         }
         else
