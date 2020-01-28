@@ -154,7 +154,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         $template->headline = $this->story->title;
 
         // Fallback if author is no more findable in tl_member
-        $objAuthor = $memberModelModelAdapter->findBySacMemberId($this->story->sacMemberId);
+        $objAuthor = $memberModelModelAdapter->findOneBySacMemberId($this->story->sacMemberId);
         $template->authorName = $objAuthor !== null ? $objAuthor->firstname . ' ' . $objAuthor->lastname : $this->story->authorName;
 
         // !!! $objEvent can be NULL, if the related event no more exists

@@ -61,7 +61,7 @@ class ImportUserListener
         {
             if (trim($strUsername) !== '' && is_numeric($strUsername))
             {
-                $objUser = $userModelAdapter->findBySacMemberId($strUsername);
+                $objUser = $userModelAdapter->findOneBySacMemberId($strUsername);
                 if ($objUser !== null)
                 {
                     if ($objUser->sacMemberId > 0 && $objUser->sacMemberId === $strUsername)

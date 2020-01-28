@@ -370,7 +370,7 @@ class EventRapport
                 {
                     // Check club membership
                     $isMember = false;
-                    $objMember = $memberModelAdapter->findBySacMemberId($objUserModel->sacMemberId);
+                    $objMember = $memberModelAdapter->findByOneSacMemberId($objUserModel->sacMemberId);
                     if ($objMember !== null)
                     {
                         if ($objMember->isSacMember && !$objMember->disable)
@@ -418,7 +418,7 @@ class EventRapport
             $strIsActiveMember = '!inaktiv/keinMitglied';
             if ($objEventMember->sacMemberId != '')
             {
-                $objMemberModel = $memberModelAdapter->findBySacMemberId($objEventMember->sacMemberId);
+                $objMemberModel = $memberModelAdapter->findOneBySacMemberId($objEventMember->sacMemberId);
                 if ($objMemberModel !== null)
                 {
                     if ($objMemberModel->isSacMember && !$objMemberModel->disable)

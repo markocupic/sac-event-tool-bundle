@@ -195,7 +195,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
             {
                 if ($this->objUser->sacMemberId == $objRegistration->sacMemberId)
                 {
-                    $objMember = $memberModelAdapter->findBySacMemberId($this->objUser->sacMemberId);
+                    $objMember = $memberModelAdapter->findOneBySacMemberId($this->objUser->sacMemberId);
                     $startDate = '';
                     $arrDates = array();
                     $courseId = '';

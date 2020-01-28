@@ -77,7 +77,7 @@ class ExecutePreActionsListener
         {
             // Output
             $json = array('status' => 'error');
-            $objMemberModel = $memberModelAdapter->findBySacMemberId(Input::post('sacMemberId'));
+            $objMemberModel = $memberModelAdapter->findOneBySacMemberId(Input::post('sacMemberId'));
             if ($objMemberModel !== null)
             {
                 $json = $objMemberModel->row();

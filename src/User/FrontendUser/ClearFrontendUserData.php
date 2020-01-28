@@ -81,7 +81,7 @@ class ClearFrontendUserData
                 }
                 if ($objEventsMember->sacMemberId > 0)
                 {
-                    if ($memberModelAdapter->findBySacMemberId($objEventsMember->sacMemberId) !== null)
+                    if ($memberModelAdapter->findOneBySacMemberId($objEventsMember->sacMemberId) !== null)
                     {
                         $blnFound = true;
                     }

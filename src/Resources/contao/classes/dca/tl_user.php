@@ -56,7 +56,7 @@ class tl_user_sac_event_tool extends Backend
                     {
                         if ($objUser->sacMemberId > 0)
                         {
-                            $objMember = MemberModel::findBySacMemberId($objUser->sacMemberId);
+                            $objMember = MemberModel::findOneBySacMemberId($objUser->sacMemberId);
                             if ($objMember !== null)
                             {
                                 if (!$objMember->disable)

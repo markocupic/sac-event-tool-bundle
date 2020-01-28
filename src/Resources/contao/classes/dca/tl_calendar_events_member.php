@@ -370,7 +370,7 @@ class tl_calendar_events_member extends Backend
         $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE tl_calendar_events_member.contaoMemberId < ? AND tl_calendar_events_member.sacMemberId > ? AND tl_calendar_events_member.sacMemberId IN (SELECT sacMemberId FROM tl_member)')->execute(1, 0);
         while ($objDb->next())
         {
-            $objMemberModel = MemberModel::findBySacMemberId($objDb->sacMemberId);
+            $objMemberModel = MemberModel::findOneBySacMemberId($objDb->sacMemberId);
             if ($objMemberModel !== null)
             {
                 $set = array(
@@ -401,7 +401,7 @@ class tl_calendar_events_member extends Backend
         {
             if ($varValue != '')
             {
-                $objMemberModel = MemberModel::findBySacMemberId($varValue);
+                $objMemberModel = MemberModel::findOneBySacMemberId($varValue);
                 if ($objMemberModel !== null)
                 {
                     $set = array(
@@ -445,7 +445,7 @@ class tl_calendar_events_member extends Backend
             if ($objEvent !== null && $objEventMemberModel->stateOfSubscription != $varValue)
             {
                 // Check if member has already booked at the same time
-                $objMember = MemberModel::findBySacMemberId($objEventMemberModel->sacMemberId);
+                $objMember = MemberModel::findOneBySacMemberId($objEventMemberModel->sacMemberId);
                 if ($varValue === 'subscription-accepted' && $objMember !== null && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember))
                 {
                     $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht bestätigt serden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde.';
@@ -803,7 +803,7 @@ class tl_calendar_events_member extends Backend
                         );
 
                         // Check if member has already booked at the same time
-                        $objMember = MemberModel::findBySacMemberId($objRegistration->sacMemberId);
+                        $objMember = MemberModel::findOneBySacMemberId($objRegistration->sacMemberId);
                         $objEvent = CalendarEventsModel::findByPk($objRegistration->eventId);
                         if (Input::get('call') === 'acceptWithEmail' && $objMember !== null && $objEvent !== null && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember))
                         {

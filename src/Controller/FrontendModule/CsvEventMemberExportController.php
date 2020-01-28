@@ -345,7 +345,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         }
         elseif ($field === 'phone')
         {
-            $objMember = $memberModel->findBySacMemberId($objEventMember->sacMemberId);
+            $objMember = $memberModel->findOneBySacMemberId($objEventMember->sacMemberId);
             if ($objMember !== null)
             {
                 return $objMember->$field;

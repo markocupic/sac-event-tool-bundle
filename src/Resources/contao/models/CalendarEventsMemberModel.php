@@ -81,7 +81,7 @@ class CalendarEventsMemberModel extends \Model
 
             if ($blnInstructorRole)
             {
-                $objUser = UserModel::findBySacMemberId($objMember->sacMemberId);
+                $objUser = UserModel::findOneBySacMemberId($objMember->sacMemberId);
                 if ($objUser !== null)
                 {
                     $objJoinedEventsAsInstructor = \Database::getInstance()->prepare("SELECT * FROM tl_calendar_events_instructor WHERE userId=?")->execute($objUser->id);

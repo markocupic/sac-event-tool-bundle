@@ -144,7 +144,7 @@ class EventStoryListController extends AbstractFrontendModuleController
         {
             $arrStory = $this->stories->row();
 
-            $objMember = $memberModelModelAdapter->findBySacMemberId($arrStory['sacMemberId']);
+            $objMember = $memberModelModelAdapter->findOneBySacMemberId($arrStory['sacMemberId']);
             $arrStory['authorId'] = $objMember->id;
             $arrStory['authorName'] = $objMember !== null ? $objMember->firstname . ' ' . $objMember->lastname : $arrStory['authorName'];
             $arrStory['href'] = $objPageModel !== null ? ampersand($objPageModel->getFrontendUrl(($configAdapter->get('useAutoItem') ? '/' : '/items/') . $this->stories->id)) : null;

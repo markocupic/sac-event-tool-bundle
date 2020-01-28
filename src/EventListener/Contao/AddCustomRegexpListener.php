@@ -55,7 +55,7 @@ class AddCustomRegexpListener
         {
             if (trim($varValue) !== '')
             {
-                $objMemberModel = $memberModelAdapter->findBySacMemberId(trim($varValue));
+                $objMemberModel = $memberModelAdapter->findOneBySacMemberId(trim($varValue));
                 if ($objMemberModel === null)
                 {
                     $objWidget->addError('Field ' . $objWidget->label . ' should be a valid sac member id.');
@@ -74,7 +74,7 @@ class AddCustomRegexpListener
             }
             elseif (trim($varValue) !== '' && $varValue > 0)
             {
-                $objMemberModel = $memberModelAdapter->findBySacMemberId(trim($varValue));
+                $objMemberModel = $memberModelAdapter->findOneBySacMemberId(trim($varValue));
                 if ($objMemberModel === null)
                 {
                     $objWidget->addError('Field ' . $objWidget->label . ' should be a valid sac member id.');
