@@ -84,10 +84,10 @@ class CalendarEventsHelper
                 $value = implode(StringUtil::deserialize($objEvent->tourType, true));
                 break;
             case 'tourTypesShortcuts':
-                $value = implode(' ', static::getTourTypesAsArray($objEvent->id, 'shortcut', true));
+                $value = implode(' ', static::getTourTypesAsArray($objEvent, 'shortcut', true));
                 break;
             case 'tourTypesTitles':
-                $value = implode('<br>', static::getTourTypesAsArray($objEvent->id, 'title', false));
+                $value = implode('<br>', static::getTourTypesAsArray($objEvent, 'title', false));
                 break;
             case 'startDateDay':
                 $value = Date::parse('d', $objEvent->startDate);
@@ -830,16 +830,16 @@ class CalendarEventsHelper
     }
 
     /**
-     * @param $eventId
+     * @param CalendarEventsModel $objEvent
      * @param string $field
+     * @param bool $tooltip
      * @return array
      */
-    public static function getTourTypesAsArray($eventId, $field = 'shortcut', $tooltip = false)
+    public static function getTourTypesAsArray(CalendarEventsModel $objEvent, $field = 'shortcut', $tooltip = false): array
     {
         $arrReturn = array();
 
-        $objEventModel = CalendarEventsModel::findByPk($eventId);
-        if ($objEventModel !== null)
+        if ($objEvent !== null)
         {
             $arrValues = StringUtil::deserialize($objEvent->tourType, true);
             if (!empty($arrValues) && is_array($arrValues))

@@ -466,7 +466,7 @@ class PilatusExportController extends AbstractPrintExportController
             $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent, 'titlePrint'));
 
             // tourType
-            $arrEventType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent->id, 'shortcut', false);
+            $arrEventType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent, 'shortcut', false);
             if ($objEvent->eventType === 'course')
             {
                 // KU = Kurs

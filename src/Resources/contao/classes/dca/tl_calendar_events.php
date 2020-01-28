@@ -487,7 +487,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         }
                         elseif ($field === 'tourType')
                         {
-                            $arrTourTypes = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($objEvent->id, 'title');
+                            $arrTourTypes = \Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTypesAsArray($objEvent->current(), 'title');
                             $arrRow[] = html_entity_decode(implode(',', $arrTourTypes));
                         }
                         elseif ($field === 'eventReleaseLevel')

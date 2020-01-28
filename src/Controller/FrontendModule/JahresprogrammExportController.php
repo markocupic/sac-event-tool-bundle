@@ -338,7 +338,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $arrInstructors = array_merge($arrInstructors, $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent->current(), false));
 
                     // tourType && date format
-                    $arrTourType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent->id, 'shortcut', false);
+                    $arrTourType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent->current(), 'shortcut', false);
                     $dateFormat = 'j.';
 
                     if ($objEvent->eventType === 'course')
