@@ -370,7 +370,7 @@ class EventRapport
                 {
                     // Check club membership
                     $isMember = false;
-                    $objMember = $memberModelAdapter->findByOneSacMemberId($objUserModel->sacMemberId);
+                    $objMember = $memberModelAdapter->findOneBySacMemberId($objUserModel->sacMemberId);
                     if ($objMember !== null)
                     {
                         if ($objMember->isSacMember && !$objMember->disable)
