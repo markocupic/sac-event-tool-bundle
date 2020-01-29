@@ -63,7 +63,11 @@ class EventStoryListController extends AbstractFrontendModuleController
         $arrOptions = array('order' => 'addedOn DESC');
 
         /** @var  CalendarEventsStoryModel $objStories */
-        $objStories = $calendarEventsStoryModelAdapter->findBy(array('tl_calendar_events_story.publishState=?'), array('3'), $arrOptions);
+        $objStories = $calendarEventsStoryModelAdapter->findBy(
+            array('tl_calendar_events_story.publishState=?'),
+            array('3'),
+            $arrOptions
+        );
 
         if ($objStories !== null)
         {

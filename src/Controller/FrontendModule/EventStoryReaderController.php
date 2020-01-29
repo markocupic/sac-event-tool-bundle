@@ -88,13 +88,13 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
             if (!empty($inputAdapter->get('securityToken')))
             {
-                $arrColumns = array('tl_calendar_events_story.securityToken=? AND tl_calendar_events_story.id=?');
-                $arrValues = array($inputAdapter->get('securityToken'), $inputAdapter->get('items'));
+                $arrColumns = ['tl_calendar_events_story.securityToken=?', 'tl_calendar_events_story.id=?'];
+                $arrValues = [$inputAdapter->get('securityToken'), $inputAdapter->get('items')];
             }
             else
             {
-                $arrColumns = array('tl_calendar_events_story.publishState=? AND tl_calendar_events_story.id=?');
-                $arrValues = array('3', $inputAdapter->get('items'));
+                $arrColumns = ['tl_calendar_events_story.publishState=?', 'tl_calendar_events_story.id=?'];
+                $arrValues = ['3', $inputAdapter->get('items')];
             }
 
             $this->story = $calendarEventsStoryModelAdapter->findBy($arrColumns, $arrValues);
