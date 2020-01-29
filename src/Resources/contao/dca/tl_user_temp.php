@@ -11,270 +11,235 @@
 /**
  * Table tl_user_temp
  */
-$GLOBALS['TL_DCA']['tl_user_temp'] = array
-(
+$GLOBALS['TL_DCA']['tl_user_temp'] = [
 
     // Config
-    'config'   => array
-    (
+    'config'   => [
         'dataContainer'     => 'Table',
         'enableVersioning'  => true,
-        'onload_callback'   => array
-        (//array('tl_user_temp', 'getSacMemberId'),
-        ),
-        'onsubmit_callback' => array
-        (//array('tl_user_temp', 'storeDateAdded')
-        ),
-        'sql'               => array
-        (
-            'keys' => array
-            (
+        'onload_callback'   => [//array('tl_user_temp', 'getSacMemberId'),
+        ],
+        'onsubmit_callback' => [//array('tl_user_temp', 'storeDateAdded')
+        ],
+        'sql'               => [
+            'keys' => [
                 'id'          => 'primary',
                 'username'    => 'unique',
                 'email'       => 'index',
                 'sacMemberId' => 'index',
-            ),
-        ),
-    ),
+            ],
+        ],
+    ],
 
     // List
-    'list'     => array
-    (
-        'sorting'           => array
-        (
+    'list'     => [
+        'sorting'           => [
             'mode'        => 2,
-            'fields'      => array('lastname DESC'),
+            'fields'      => ['lastname DESC'],
             'flag'        => 1,
             'panelLayout' => 'filter;sort,search,limit',
-        ),
-        'label'             => array
-        (
-            'fields'         => array('icon', 'firstname', 'lastname', 'sacMemberId'),
+        ],
+        'label'             => [
+            'fields'         => ['icon', 'firstname', 'lastname', 'sacMemberId'],
             'showColumns'    => true,
-            'label_callback' => array('tl_user_temp', 'addIcon'),
-        ),
-        'global_operations' => array
-        (
-            'all' => array
-            (
+            'label_callback' => ['tl_user_temp', 'addIcon'],
+        ],
+        'global_operations' => [
+            'all' => [
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-            ),
-        ),
-        'operations'        => array
-        (
-            'edit'   => array
-            (
+            ],
+        ],
+        'operations'        => [
+            'edit'   => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_user_temp']['edit'],
                 'href'            => 'act=edit',
                 'icon'            => 'edit.svg',
-                'button_callback' => array('tl_user_temp', 'editUser'),
-            ),
-            'copy'   => array
-            (
+                'button_callback' => ['tl_user_temp', 'editUser'],
+            ],
+            'copy'   => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_user_temp']['copy'],
                 'href'            => 'act=copy',
                 'icon'            => 'copy.svg',
-                'button_callback' => array('tl_user_temp', 'copyUser'),
-            ),
-            'delete' => array
-            (
+                'button_callback' => ['tl_user_temp', 'copyUser'],
+            ],
+            'delete' => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_user_temp']['delete'],
                 'href'            => 'act=delete',
                 'icon'            => 'delete.svg',
                 'attributes'      => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"',
-                'button_callback' => array('tl_user_temp', 'deleteUser'),
-            ),
-            'toggle' => array
-            (
+                'button_callback' => ['tl_user_temp', 'deleteUser'],
+            ],
+            'toggle' => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_user_temp']['toggle'],
                 'icon'            => 'visible.svg',
                 'attributes'      => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => array('tl_user_temp', 'toggleIcon'),
-            ),
-            'show'   => array
-            (
+                'button_callback' => ['tl_user_temp', 'toggleIcon'],
+            ],
+            'show'   => [
                 'label' => &$GLOBALS['TL_LANG']['tl_user_temp']['show'],
                 'href'  => 'act=show',
                 'icon'  => 'show.svg',
-            ),
-        ),
-    ),
+            ],
+        ],
+    ],
 
     // Palettes
-    'palettes' => array
-    (
+    'palettes' => [
         'default' => '{name_legend},username,firstname,lastname,name,sacMemberId,sectionId,street,postal,city,mobile,email,userRoleTemp;{backend_legend:hide},language,uploader,showHelp,thumbnails,useRTE,useCE;{theme_legend:hide},backendTheme,fullscreen;{password_legend:hide},pwChange,password;{admin_legend},admin;{groups_legend},groups,inherit;{account_legend},disable,start,stop',
-    ),
+    ],
 
     // Fields
-    'fields'   => array
-    (
-        'id'           => array
-        (
+    'fields'   => [
+        'id'           => [
             'sql' => "int(10) unsigned NOT NULL auto_increment",
-        ),
-        'tstamp'       => array
-        (
+        ],
+        'tstamp'       => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
-        ),
-        'username'     => array
-        (
+        ],
+        'username'     => [
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['username'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'rgxp' => 'extnd', 'nospace' => true, 'unique' => true, 'maxlength' => 64, 'tl_class' => 'w50'),
+            'eval'      => ['mandatory' => false, 'rgxp' => 'extnd', 'nospace' => true, 'unique' => true, 'maxlength' => 64, 'tl_class' => 'w50'],
             'sql'       => "varchar(64) BINARY NULL",
-        ),
-        'name'         => array
-        (
+        ],
+        'name'         => [
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['name'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'),
+            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'firstname'    => array
-        (
+        ],
+        'firstname'    => [
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['name'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'),
+            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'sectionId'    => array(
+        ],
+        'sectionId'    => [
             'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionId'],
             'reference' => &$GLOBALS['TL_LANG']['tl_member']['section'],
             'inputType' => 'checkbox',
             'filter'    => true,
-            'eval'      => array('multiple' => true, 'tl_class' => 'clr'),
+            'eval'      => ['multiple' => true, 'tl_class' => 'clr'],
             'options'   => range(4250, 4254),
             'sql'       => "blob NULL",
-        ),
-        'lastname'     => array
-        (
+        ],
+        'lastname'     => [
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['lastname'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'),
+            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'mobile'       => array
-        (
+        ],
+        'mobile'       => [
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['mobile'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'),
+            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'sacMemberId'  => array
-        (
+        ],
+        'sacMemberId'  => [
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['sacMemberId'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'),
+            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'street'       => array
-        (
+        ],
+        'street'       => [
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['street'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'),
+            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'postal'       => array
-        (
+        ],
+        'postal'       => [
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['postal'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'),
+            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'city'         => array
-        (
+        ],
+        'city'         => [
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['city'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'),
+            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50 clr'],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'email'        => array
-        (
+        ],
+        'email'        => [
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['email'],
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'rgxp' => 'email', 'maxlength' => 255, 'unique' => true, 'decodeEntities' => true, 'tl_class' => 'w50'),
+            'eval'      => ['mandatory' => false, 'rgxp' => 'email', 'maxlength' => 255, 'unique' => true, 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'language'     => array
-        (
+        ],
+        'language'     => [
             'label'            => &$GLOBALS['TL_LANG']['tl_user_temp']['language'],
             'default'          => str_replace('-', '_', $GLOBALS['TL_LANGUAGE']),
             'exclude'          => true,
             'filter'           => true,
             'inputType'        => 'select',
-            'eval'             => array('rgxp' => 'locale', 'tl_class' => 'w50'),
+            'eval'             => ['rgxp' => 'locale', 'tl_class' => 'w50'],
             'options_callback' => function () {
                 return System::getLanguages(true);
             },
             'sql'              => "varchar(5) NOT NULL default ''",
-        ),
-        'userRoleTemp' => array
-        (
+        ],
+        'userRoleTemp' => [
             'label'     => &$GLOBALS['TL_LANG']['tl_user_temp']['userRoleTemp'],
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'text',
             'sql'       => "varchar(255) NOT NULL default ''",
-            'eval'      => array('tl_class' => 'clr'),
+            'eval'      => ['tl_class' => 'clr'],
 
-        ),
-        'disable'      => array
-        (
+        ],
+        'disable'      => [
             'label'         => &$GLOBALS['TL_LANG']['tl_user_temp']['disable'],
             'exclude'       => true,
             'filter'        => true,
             'flag'          => 2,
             'inputType'     => 'checkbox',
-            'save_callback' => array
-            (//array('tl_user_temp', 'checkAdminDisable')
-            ),
+            'save_callback' => [//array('tl_user_temp', 'checkAdminDisable')
+            ],
             'sql'           => "char(1) NOT NULL default ''",
-        ),
+        ],
 
-    ),
-);
+    ],
+];
 
 /**
  * Provide miscellaneous methods that are used by the data configuration array.
@@ -326,7 +291,7 @@ class tl_user_temp extends Backend
             }
             else // Noch nicht existierende User aufnehmen
             {
-                $set = array();
+                $set = [];
                 $username = strtolower($objDb->firstname . $objDb->lastname);
                 $username = str_replace('ä', 'ae', $username);
                 $username = str_replace('ö', 'oe', $username);
@@ -519,7 +484,7 @@ class tl_user_temp extends Backend
         }
 
         $router = \System::getContainer()->get('router');
-        $url = $router->generate('contao_backend', array('_switch_user' => $row['username']));
+        $url = $router->generate('contao_backend', ['_switch_user' => $row['username']]);
 
         return '<a href="' . $url . '" title="' . StringUtil::specialchars($title) . '">' . Image::getHtml($icon, $label) . '</a> ';
     }
@@ -582,7 +547,7 @@ class tl_user_temp extends Backend
      */
     public function getModules()
     {
-        $arrModules = array();
+        $arrModules = [];
 
         foreach ($GLOBALS['BE_MOD'] as $k => $v)
         {

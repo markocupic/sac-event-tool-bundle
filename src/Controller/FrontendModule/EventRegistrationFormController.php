@@ -295,7 +295,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                 // Log
                 $logger = System::getContainer()->get('monolog.logger.contao');
                 $strText = sprintf('Event registration error: "%s"', $session[0]);
-                $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_EVENT_SUBSCRIPTION_ERROR'))));
+                $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_EVENT_SUBSCRIPTION_ERROR'))]);
             }
             if ($messageAdapter->hasInfo())
             {
@@ -371,12 +371,12 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         {
             if ($objJourney->alias === 'public-transport')
             {
-                $objForm->addFormField('ticketInfo', array(
+                $objForm->addFormField('ticketInfo', [
                     'label'     => 'Ich besitze ein/eine',
                     'inputType' => 'select',
                     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
-                    'eval'      => array('includeBlankOption' => true, 'mandatory' => true),
-                ));
+                    'eval'      => ['includeBlankOption' => true, 'mandatory' => true],
+                ]);
             }
         }
 
@@ -385,36 +385,36 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         {
             if ($objJourney->alias === 'car')
             {
-                $objForm->addFormField('carInfo', array(
+                $objForm->addFormField('carInfo', [
                     'label'     => 'Ich könnte ein Auto mit ... Plätzen (inkl. Fahrer) mitnehmen',
                     'inputType' => 'select',
                     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
-                    'eval'      => array('includeBlankOption' => true, 'mandatory' => true),
-                ));
+                    'eval'      => ['includeBlankOption' => true, 'mandatory' => true],
+                ]);
             }
         }
 
-        $objForm->addFormField('mobile', array(
+        $objForm->addFormField('mobile', [
             'label'     => 'Mobilnummer',
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'rgxp' => 'phone'),
-        ));
-        $objForm->addFormField('emergencyPhone', array(
+            'eval'      => ['mandatory' => false, 'rgxp' => 'phone'],
+        ]);
+        $objForm->addFormField('emergencyPhone', [
             'label'     => 'Notfalltelefonnummer/In Notfällen zu kontaktieren',
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true, 'rgxp' => 'phone'),
-        ));
-        $objForm->addFormField('emergencyPhoneName', array(
+            'eval'      => ['mandatory' => true, 'rgxp' => 'phone'],
+        ]);
+        $objForm->addFormField('emergencyPhoneName', [
             'label'     => 'Name und Bezug der angehörigen Person, welche im Notfall zu kontaktieren ist',
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true),
-        ));
-        $objForm->addFormField('notes', array(
+            'eval'      => ['mandatory' => true],
+        ]);
+        $objForm->addFormField('notes', [
             'label'     => 'Anmerkungen/Erfahrungen/Referenztouren',
             'inputType' => 'textarea',
-            'eval'      => array('mandatory' => true, 'rows' => 4),
+            'eval'      => ['mandatory' => true, 'rows' => 4],
             'class'     => '',
-        ));
+        ]);
 
         // Only show this field if it is a multi day event
         $durationInDays = count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
@@ -422,31 +422,31 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $endDate = $calendarEventsHelperAdapter->getEndDate($objEvent);
         if ($durationInDays > 1 && $startDate + ($durationInDays - 1) * 86400 === $endDate)
         {
-            $objForm->addFormField('foodHabits', array(
+            $objForm->addFormField('foodHabits', [
                 'label'     => 'Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)',
                 'inputType' => 'text',
-                'eval'      => array('mandatory' => false),
-            ));
+                'eval'      => ['mandatory' => false],
+            ]);
         }
 
-        $objForm->addFormField('agb', array(
-            'label'     => array('', 'Ich akzeptiere <a href="#" data-toggle="modal" data-target="#agbModal">das Kurs- und Tourenreglement.</a>'),
+        $objForm->addFormField('agb', [
+            'label'     => ['', 'Ich akzeptiere <a href="#" data-toggle="modal" data-target="#agbModal">das Kurs- und Tourenreglement.</a>'],
             'inputType' => 'checkbox',
-            'eval'      => array('mandatory' => true),
-        ));
+            'eval'      => ['mandatory' => true],
+        ]);
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', array(
+        $objForm->addFormField('submit', [
             'label'     => 'Für Event anmelden',
             'inputType' => 'submit',
-        ));
+        ]);
 
         // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields.
         // DO NOT use this method with generate() as the "form" template provides those fields by default.
         $objForm->addContaoHiddenFields();
 
         // Get form presets from tl_member
-        $arrFields = array('mobile', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits');
+        $arrFields = ['mobile', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits'];
         foreach ($arrFields as $field)
         {
             if ($objForm->hasFormField($field))
@@ -530,7 +530,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                     // Log
                     $logger = System::getContainer()->get('monolog.logger.contao');
                     $strText = sprintf('New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").', $objMemberModel->firstname, $objMemberModel->lastname, $objMemberModel->id, $this->objEvent->id, $this->objEvent->title);
-                    $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_EVENT_SUBSCRIPTION'))));
+                    $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_EVENT_SUBSCRIPTION'))]);
 
                     $notified = $this->notifyMember($arrData, $objMemberModel, $this->objEvent, $objEventRegistration);
 
@@ -613,7 +613,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
             }
 
             // Set token array
-            $arrTokens = array(
+            $arrTokens = [
                 'event_name'                       => html_entity_decode($eventType . $this->objEvent->title),
                 'event_type'                       => html_entity_decode($objEvent->eventType),
                 'event_course_id'                  => $objEvent->courseId,
@@ -635,7 +635,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                 'event_id'                         => $objEvent->id,
                 'event_link_detail'                => 'https://' . $environmentAdapter->get('host') . '/' . $eventsAdapter->generateEventUrl($this->objEvent),
                 'event_state'                      => $eventFullyBooked === true ? 'fully-booked' : '',
-            );
+            ];
 
             if ($hasError)
             {

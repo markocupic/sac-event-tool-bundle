@@ -8,11 +8,10 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 // Legends
 $GLOBALS['TL_LANG']['tl_user_group']['allowed_event_types_legend'] = 'SAC-Event-Tool Einstellungen';
 
 // Fields
-$GLOBALS['TL_LANG']['tl_user_group']['calendar_containers'] = array('Erlaubte SAC-Event-Jahrescontainer', '');
-$GLOBALS['TL_LANG']['tl_user_group']['calendar_containerp'] = array('SAC-Event-Jahrescontainer Rechte', '');
-$GLOBALS['TL_LANG']['tl_user_group']['allowedEventTypes'] = array('Erlaubte Event-Arten (SAC-Event-Tool)', 'Legen Sie fest, welche Art von Events ein MItglied dieser Gruppe erstellen kann.');
+$GLOBALS['TL_LANG']['tl_user_group']['calendar_containers'] = ['Erlaubte SAC-Event-Jahrescontainer', ''];
+$GLOBALS['TL_LANG']['tl_user_group']['calendar_containerp'] = ['SAC-Event-Jahrescontainer Rechte', ''];
+$GLOBALS['TL_LANG']['tl_user_group']['allowedEventTypes'] = ['Erlaubte Event-Arten (SAC-Event-Tool)', 'Legen Sie fest, welche Art von Events ein MItglied dieser Gruppe erstellen kann.'];

@@ -76,7 +76,7 @@ class ExecutePreActionsListener
         if ($strAction === 'autocompleterLoadMemberDataFromSacMemberId')
         {
             // Output
-            $json = array('status' => 'error');
+            $json = ['status' => 'error'];
             $objMemberModel = $memberModelAdapter->findOneBySacMemberId(Input::post('sacMemberId'));
             if ($objMemberModel !== null)
             {
@@ -105,7 +105,7 @@ class ExecutePreActionsListener
         {
             if ($request->request->get('subaction') === 'loadNavbar')
             {
-                $json = array();
+                $json = [];
                 $json['navbar'] = '';
                 $json['status'] = 'error';
                 $json['subaction'] = $request->request->get('subaction');
@@ -122,10 +122,10 @@ class ExecutePreActionsListener
 
             if ($request->request->get('subaction') === 'getSessionData')
             {
-                $json = array();
+                $json = [];
                 $json['session'] = '';
                 $json['status'] = 'error';
-                $json['sessionData'] = array();
+                $json['sessionData'] = [];
                 $strTable = $request->query->get('table');
                 $strKey = $strTable != '' ? $strTable : '';
                 if (($objUser = $backendUserAdapter->getInstance()) !== null)
@@ -144,7 +144,7 @@ class ExecutePreActionsListener
                         $arrSession = $stringUtilAdapter->deserialize($user['session'], true);
                         if (!isset($arrSession['editAllHelper'][$strKey]))
                         {
-                            $arrChecked = array();
+                            $arrChecked = [];
                         }
                         else
                         {
@@ -161,7 +161,7 @@ class ExecutePreActionsListener
 
             if ($request->request->get('subaction') === 'saveSessionData')
             {
-                $json = array();
+                $json = [];
                 $json['status'] = 'error';
                 $json['sessionData'] = '';
                 $strTable = $request->query->get('table');

@@ -181,10 +181,10 @@ class EventFilterFormController extends AbstractFrontendModuleController
         });
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', array(
+        $objForm->addFormField('submit', [
             'label'     => $translator->trans('tl_event_filter_form.submitBtn', [], 'contao_default'),
             'inputType' => 'submit'
-        ));
+        ]);
 
         // Set form field value from $_GET
         if (isset($_GET) && is_array($this->arrAllowedFields) && !empty($this->arrAllowedFields))

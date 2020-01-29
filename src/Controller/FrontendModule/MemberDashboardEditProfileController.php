@@ -174,30 +174,30 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
-        $objForm->addFormField('emergencyPhone', array(
+        $objForm->addFormField('emergencyPhone', [
             'label'     => 'Notfallnummer',
             'inputType' => 'text',
-            'eval'      => array('rgxp' => 'phone', 'mandatory' => true),
-        ));
-        $objForm->addFormField('emergencyPhoneName', array(
+            'eval'      => ['rgxp' => 'phone', 'mandatory' => true],
+        ]);
+        $objForm->addFormField('emergencyPhoneName', [
             'label'     => 'Name und Bezug des Angeh&ouml;rigen',
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true),
-        ));
-        $objForm->addFormField('foodHabits', array(
+            'eval'      => ['mandatory' => true],
+        ]);
+        $objForm->addFormField('foodHabits', [
             'label'     => 'Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)',
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false),
-        ));
+            'eval'      => ['mandatory' => false],
+        ]);
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', array(
+        $objForm->addFormField('submit', [
             'label'     => 'Speichern',
             'inputType' => 'submit',
-        ));
+        ]);
 
         // Get form presets from tl_member
-        $arrFields = array('emergencyPhone', 'emergencyPhoneName', 'foodHabits');
+        $arrFields = ['emergencyPhone', 'emergencyPhoneName', 'foodHabits'];
         foreach ($arrFields as $field)
         {
             $objWidget = $objForm->getWidget($field);

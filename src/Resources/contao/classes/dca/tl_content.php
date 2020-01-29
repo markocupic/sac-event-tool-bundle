@@ -19,7 +19,6 @@ class tl_content_sac_event_tool extends tl_content
      */
     public function setPalette(DataContainer $dc)
     {
-
         if ($dc->id > 0)
         {
             $objDb = $this->Database->prepare("SELECT * FROM tl_content WHERE id=?")->limit(1)->execute($dc->id);
@@ -47,8 +46,7 @@ class tl_content_sac_event_tool extends tl_content
      */
     public function getCabannes()
     {
-
-        $options = array();
+        $options = [];
         $objDb = \Database::getInstance()->prepare('SELECT * FROM tl_cabanne_sac')->execute();
         while ($objDb->next())
         {
@@ -56,7 +54,6 @@ class tl_content_sac_event_tool extends tl_content
         }
 
         return $options;
-
     }
 
     /**
@@ -64,8 +61,7 @@ class tl_content_sac_event_tool extends tl_content
      */
     public function optionsCallbackUserRoles()
     {
-
-        $options = array();
+        $options = [];
         $objDb = \Database::getInstance()->prepare('SELECT * FROM tl_user_role ORDER BY sorting ASC')->execute();
         while ($objDb->next())
         {
@@ -73,7 +69,6 @@ class tl_content_sac_event_tool extends tl_content
         }
 
         return $options;
-
     }
 
     /**
@@ -85,7 +80,6 @@ class tl_content_sac_event_tool extends tl_content
     {
         return $this->getTemplateGroup('ce_user_portrait_list');
     }
-
 
     /**
      * Return all user portrait list partial templates as array

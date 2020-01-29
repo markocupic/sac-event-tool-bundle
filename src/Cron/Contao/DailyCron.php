@@ -56,8 +56,8 @@ class DailyCron
     {
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
-        $year = (int)$configAdapter->get('SAC_EVT_WORKSHOP_FLYER_YEAR');
-        $calendarId = (int)$configAdapter->get('SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID');
+        $year = (int) $configAdapter->get('SAC_EVT_WORKSHOP_FLYER_YEAR');
+        $calendarId = (int) $configAdapter->get('SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID');
 
         /** @var PrintWorkshopsAsPdf $pdf */
         $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf');

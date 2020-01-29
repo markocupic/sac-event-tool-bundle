@@ -18,7 +18,7 @@ class tl_module_sac_event_tool extends tl_module
      */
     public function getEventFilterBoardFields()
     {
-        $opt = array();
+        $opt = [];
         \Contao\Controller::loadDataContainer('tl_event_filter_form');
         \Contao\System::loadLanguageFile('tl_event_filter_form');
         foreach ($GLOBALS['TL_DCA']['tl_event_filter_form']['fields'] as $k => $v)

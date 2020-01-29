@@ -47,13 +47,13 @@ class InitializeSystemListener
         $configAdapter = $this->framework->getAdapter(Config::class);
 
         // Check for the this directories
-        $arrDirectories = array(
+        $arrDirectories = [
             'SAC_EVT_FE_USER_DIRECTORY_ROOT',
             'SAC_EVT_FE_USER_AVATAR_DIRECTORY',
             'SAC_EVT_BE_USER_DIRECTORY_ROOT',
             'SAC_EVT_TEMP_PATH',
             'SAC_EVT_EVENT_STORIES_UPLOAD_PATH',
-        );
+        ];
 
         foreach ($arrDirectories as $strDir)
         {
@@ -64,12 +64,12 @@ class InitializeSystemListener
             }
 
             // Create directory
-            $this->framework->createInstance(Folder::class, array($configAdapter->get($strDir)));
+            $this->framework->createInstance(Folder::class, [$configAdapter->get($strDir)]);
             $dbafsAdapter->addResource($configAdapter->get($strDir));
         }
 
         // Check for other system vars in system/localconfig.php
-        $arrConfig = array(
+        $arrConfig = [
             'cloudconvertApiKey',
             'SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME',
             'SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME',
@@ -102,7 +102,7 @@ class InitializeSystemListener
             'SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID',
             'SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE',
             'SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT',
-        );
+        ];
 
         foreach ($arrConfig as $strConfig)
         {

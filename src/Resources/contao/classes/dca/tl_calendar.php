@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 /**
  * Class tl_calendar_sac_event_tool
  */

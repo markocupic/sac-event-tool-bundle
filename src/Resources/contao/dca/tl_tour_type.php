@@ -8,130 +8,107 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-$GLOBALS['TL_DCA']['tl_tour_type'] = array
-(
-    'config'   => array
-    (
+$GLOBALS['TL_DCA']['tl_tour_type'] = [
+    'config'   => [
         'dataContainer'    => 'Table',
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
         'switchToEdit'     => true,
-        'sql'              => array
-        (
-            'keys' => array
-            (
+        'sql'              => [
+            'keys' => [
                 'id' => 'primary',
-            ),
-        ),
-    ),
-    'list'     => array
-    (
-        'sorting'           => array
-        (
+            ],
+        ],
+    ],
+    'list'     => [
+        'sorting'           => [
             'mode'                  => 5,
-            'fields'                => array('sorting'),
+            'fields'                => ['sorting'],
             'flag'                  => 1,
             'panelLayout'           => 'filter;search,limit',
-            'paste_button_callback' => array('tl_tour_type', 'pasteTag'),
-        ),
-        'label'             => array
-        (
-            'fields' => array('shortcut', 'title'),
+            'paste_button_callback' => ['tl_tour_type', 'pasteTag'],
+        ],
+        'label'             => [
+            'fields' => ['shortcut', 'title'],
             'format' => '%s %s',
-        ),
-        'global_operations' => array
-        (
-            'all' => array
-            (
+        ],
+        'global_operations' => [
+            'all' => [
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
-            ),
-        ),
-        'operations'        => array
-        (
-            'edit'   => array
-            (
+            ],
+        ],
+        'operations'        => [
+            'edit'   => [
                 'label' => &$GLOBALS['TL_LANG']['tl_tour_type']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.gif',
-            ),
-            'copy'   => array
-            (
+            ],
+            'copy'   => [
                 'label' => &$GLOBALS['TL_LANG']['tl_tour_type']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.gif',
-            ),
-            'cut'    => array
-            (
+            ],
+            'cut'    => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_tour_type']['cut'],
                 'href'       => 'act=paste&mode=cut',
                 'icon'       => 'cut.gif',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
-            ),
-            'delete' => array
-            (
+            ],
+            'delete' => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_tour_type']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"',
-            ),
-        ),
-    ),
-    'palettes' => array
-    (
+            ],
+        ],
+    ],
+    'palettes' => [
         'default' => 'shortcut,title,description',
-    ),
+    ],
 
-    'fields' => array
-    (
-        'id'          => array
-        (
+    'fields' => [
+        'id'          => [
             'sql' => "int(10) unsigned NOT NULL auto_increment",
-        ),
-        'tstamp'      => array
-        (
+        ],
+        'tstamp'      => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
-        ),
-        'pid'         => array
-        (
+        ],
+        'pid'         => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
-        ),
-        'sorting'     => array
-        (
+        ],
+        'sorting'     => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
-        ),
-        'title'       => array
-        (
+        ],
+        'title'       => [
             'label'     => &$GLOBALS['TL_LANG']['tl_tour_type']['title'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => false,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true, 'maxlength' => 255),
+            'eval'      => ['mandatory' => true, 'maxlength' => 255],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'shortcut'    => array
-        (
+        ],
+        'shortcut'    => [
             'label'     => &$GLOBALS['TL_LANG']['tl_tour_type']['shortcut'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => false,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true, 'maxlength' => 255),
+            'eval'      => ['mandatory' => true, 'maxlength' => 255],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'description' => array
-        (
+        ],
+        'description' => [
             'label'     => &$GLOBALS['TL_LANG']['tl_tour_type']['description'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => false,
             'inputType' => 'textarea',
-            'eval'      => array('mandatory' => false),
+            'eval'      => ['mandatory' => false],
             'sql'       => "text NULL",
-        ),
-    ),
-);
+        ],
+    ],
+];
 

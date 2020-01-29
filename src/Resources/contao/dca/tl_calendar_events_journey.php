@@ -8,107 +8,87 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
-$GLOBALS['TL_DCA']['tl_calendar_events_journey'] = array
-(
-    'config' => array
-    (
+$GLOBALS['TL_DCA']['tl_calendar_events_journey'] = [
+    'config' => [
         'dataContainer'    => 'Table',
         'enableVersioning' => true,
         'switchToEdit'     => true,
-        'sql'              => array
-        (
-            'keys' => array
-            (
+        'sql'              => [
+            'keys' => [
                 'id' => 'primary'
-            )
-        )
-    ),
+            ]
+        ]
+    ],
 
-    'list'     => array
-    (
-        'sorting'           => array
-        (
+    'list'     => [
+        'sorting'           => [
             'mode'        => 1,
-            'fields'      => array('title ASC'),
+            'fields'      => ['title ASC'],
             'flag'        => 1,
             'panelLayout' => 'filter;sort,search,limit'
-        ),
-        'label'             => array
-        (
-            'fields'      => array('title'),
+        ],
+        'label'             => [
+            'fields'      => ['title'],
             'showColumns' => true,
-        ),
-        'global_operations' => array
-        (
-            'all' => array
-            (
+        ],
+        'global_operations' => [
+            'all' => [
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"'
-            )
-        ),
-        'operations'        => array
-        (
-            'edit'   => array
-            (
+            ]
+        ],
+        'operations'        => [
+            'edit'   => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_journey']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.svg'
-            ),
-            'copy'   => array
-            (
+            ],
+            'copy'   => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_journey']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.gif'
-            ),
-            'delete' => array
-            (
+            ],
+            'delete' => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_journey']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"'
-            )
-        )
-    ),
-    'palettes' => array
-    (
+            ]
+        ]
+    ],
+    'palettes' => [
         'default' => 'title,alias'
-    ),
+    ],
 
-    'fields' => array
-    (
-        'id'     => array
-        (
+    'fields' => [
+        'id'     => [
             'sql' => "int(10) unsigned NOT NULL auto_increment"
-        ),
-        'tstamp' => array
-        (
+        ],
+        'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'"
-        ),
-        'title'  => array
-        (
+        ],
+        'title'  => [
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_journey']['title'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'filter'    => true,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true),
+            'eval'      => ['mandatory' => true],
             'sql'       => "varchar(255) NOT NULL default ''"
-        ),
-        'alias'  => array
-        (
+        ],
+        'alias'  => [
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_journey']['alias'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'filter'    => true,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true),
+            'eval'      => ['mandatory' => true],
             'sql'       => "varchar(255) NOT NULL default ''"
-        )
-    )
-);
+        ]
+    ]
+];
 

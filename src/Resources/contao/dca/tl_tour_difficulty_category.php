@@ -8,104 +8,84 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
-$GLOBALS['TL_DCA']['tl_tour_difficulty_category'] = array
-(
-    'config'   => array
-    (
+$GLOBALS['TL_DCA']['tl_tour_difficulty_category'] = [
+    'config'   => [
         'dataContainer'    => 'Table',
-        'ctable'           => array('tl_tour_difficulty'),
+        'ctable'           => ['tl_tour_difficulty'],
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
         'switchToEdit'     => true,
-        'sql'              => array
-        (
-            'keys' => array
-            (
+        'sql'              => [
+            'keys' => [
                 'id' => 'primary',
-            ),
-        ),
-    ),
-    'list'     => array
-    (
-        'sorting'           => array
-        (
+            ],
+        ],
+    ],
+    'list'     => [
+        'sorting'           => [
             'mode'        => 1,
-            'fields'      => array('title ASC'),
+            'fields'      => ['title ASC'],
             'flag'        => 1,
             'panelLayout' => 'filter;sort,search,limit',
-        ),
-        'label'             => array
-        (
-            'fields'      => array('title'),
+        ],
+        'label'             => [
+            'fields'      => ['title'],
             'showColumns' => true,
-        ),
-        'global_operations' => array
-        (
-            'all' => array
-            (
+        ],
+        'global_operations' => [
+            'all' => [
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
-            ),
-        ),
-        'operations'        => array
-        (
-            'edit'       => array
-            (
+            ],
+        ],
+        'operations'        => [
+            'edit'       => [
                 'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['edit'],
                 'href'  => 'table=tl_tour_difficulty',
                 'icon'  => 'edit.svg',
-            ),
-            'editheader' => array
-            (
+            ],
+            'editheader' => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['editheader'],
                 'href'            => 'table=tl_tour_difficulty_category&amp;act=edit',
                 'icon'            => 'header.svg',
-                'button_callback' => array('tl_tour_difficulty_category', 'editHeader'),
-            ),
-            'copy'       => array
-            (
+                'button_callback' => ['tl_tour_difficulty_category', 'editHeader'],
+            ],
+            'copy'       => [
                 'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.gif',
-            ),
-            'delete'     => array
-            (
+            ],
+            'delete'     => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"',
-            ),
-        ),
-    ),
-    'palettes' => array
-    (
+            ],
+        ],
+    ],
+    'palettes' => [
         'default' => 'title',
-    ),
+    ],
 
-    'fields' => array
-    (
-        'id'     => array
-        (
+    'fields' => [
+        'id'     => [
             'sql' => "int(10) unsigned NOT NULL auto_increment",
-        ),
-        'tstamp' => array
-        (
+        ],
+        'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
-        ),
-        'title'  => array
-        (
+        ],
+        'title'  => [
             'label'     => &$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['title'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'filter'    => true,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true),
+            'eval'      => ['mandatory' => true],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-    ),
-);
+        ],
+    ],
+];
 

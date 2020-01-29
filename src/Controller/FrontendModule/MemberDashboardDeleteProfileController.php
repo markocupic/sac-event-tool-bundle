@@ -183,22 +183,22 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
 
         // Now let's add form fields:
         // Now let's add form fields:
-        $objForm->addFormField('deleteProfile', array(
-            'label'     => array('Profil löschen', ''),
+        $objForm->addFormField('deleteProfile', [
+            'label'     => ['Profil löschen', ''],
             'inputType' => 'select',
-            'options'   => array('false' => 'Nein', 'true' => 'Ja'),
-        ));
+            'options'   => ['false' => 'Nein', 'true' => 'Ja'],
+        ]);
 
-        $objForm->addFormField('sacMemberId', array(
-            'label'     => array('SAC-Mitgliedernummer', ''),
+        $objForm->addFormField('sacMemberId', [
+            'label'     => ['SAC-Mitgliedernummer', ''],
             'inputType' => 'text',
-        ));
+        ]);
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', array(
+        $objForm->addFormField('submit', [
             'label'     => 'Profil unwiederkehrlich löschen',
             'inputType' => 'submit',
-        ));
+        ]);
 
         if ($objForm->validate())
         {
@@ -222,9 +222,9 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
                 {
                     // Clear account
                     $objClearFrontendUserData = System::getContainer()->get('Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData');
-                    $objClearFrontendUserData->clearMemberProfile((int)$this->objUser->id);
-                    $objClearFrontendUserData->disableLogin((int)$this->objUser->id);
-                    $objClearFrontendUserData->deleteFrontendAccount((int)$this->objUser->id);
+                    $objClearFrontendUserData->clearMemberProfile((int) $this->objUser->id);
+                    $objClearFrontendUserData->disableLogin((int) $this->objUser->id);
+                    $objClearFrontendUserData->deleteFrontendAccount((int) $this->objUser->id);
                     $objClearFrontendUserData->redirect('');
                 }
             }

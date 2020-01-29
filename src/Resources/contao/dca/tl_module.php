@@ -36,112 +36,111 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['event_list'] = '{title_legend},name
 
 // Manipulate palettes
 Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-    ->addField(array('jumpToWhenNotActivated'), 'redirect_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
+    ->addField(['jumpToWhenNotActivated'], 'redirect_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
     ->applyToPalette('login', 'tl_module');
 
 // Fields
-$GLOBALS['TL_DCA']['tl_module']['fields']['eventType'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventType'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_module']['eventType'],
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'select',
     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-    'eval'      => array('mandatory' => true, 'multiple' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
+    'eval'      => ['mandatory' => true, 'multiple' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql'       => "blob NULL",
-);
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['unregisterFromEventNotificationId'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['unregisterFromEventNotificationId'] = [
     'label'      => &$GLOBALS['TL_LANG']['tl_module']['unregisterFromEventNotificationId'],
     'exclude'    => true,
     'search'     => true,
     'inputType'  => 'select',
     'foreignKey' => 'tl_nc_notification.title',
-    'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
+    'eval'       => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
-);
+    'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['receiptEventRegistrationNotificationId'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['receiptEventRegistrationNotificationId'] = [
     'label'      => &$GLOBALS['TL_LANG']['tl_module']['receiptEventRegistrationNotificationId'],
     'exclude'    => true,
     'search'     => true,
     'inputType'  => 'select',
     'foreignKey' => 'tl_nc_notification.title',
-    'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
+    'eval'       => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
-);
+    'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['notifyOnEventStoryPublishedNotificationId'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['notifyOnEventStoryPublishedNotificationId'] = [
     'label'      => &$GLOBALS['TL_LANG']['tl_module']['notifyOnEventStoryPublishedNotificationId'],
     'exclude'    => true,
     'search'     => true,
     'inputType'  => 'select',
     'foreignKey' => 'tl_nc_notification.title',
-    'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
+    'eval'       => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
-);
+    'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['activateMemberAccountNotificationId'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['activateMemberAccountNotificationId'] = [
     'label'      => &$GLOBALS['TL_LANG']['tl_module']['activateMemberAccountNotificationId'],
     'exclude'    => true,
     'search'     => true,
     'inputType'  => 'select',
     'foreignKey' => 'tl_nc_notification.title',
-    'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
+    'eval'       => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
-);
+    'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryFormJumpTo'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryFormJumpTo'] = [
 
     'label'      => &$GLOBALS['TL_LANG']['tl_module']['eventStoryFormJumpTo'],
     'exclude'    => true,
     'inputType'  => 'pageTree',
     'foreignKey' => 'tl_page.title',
-    'eval'       => array('mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'),
+    'eval'       => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
     'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
-);
+    'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryJumpTo'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryJumpTo'] = [
 
     'label'      => &$GLOBALS['TL_LANG']['tl_module']['eventStoryJumpTo'],
     'exclude'    => true,
     'inputType'  => 'pageTree',
     'foreignKey' => 'tl_page.title',
-    'eval'       => array('mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'),
+    'eval'       => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
     'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
-);
+    'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryUploadFolder'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryUploadFolder'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_module']['eventStoryUploadFolder'],
     'exclude'   => true,
     'inputType' => 'fileTree',
-    'eval'      => array('fieldType' => 'radio', 'filesOnly' => false, 'mandatory' => true, 'tl_class' => 'clr'),
+    'eval'      => ['fieldType' => 'radio', 'filesOnly' => false, 'mandatory' => true, 'tl_class' => 'clr'],
     'sql'       => "binary(16) NULL"
-);
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['timeSpanForCreatingNewEventStory'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['timeSpanForCreatingNewEventStory'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_module']['timeSpanForCreatingNewEventStory'],
     'inputType' => 'select',
     'options'   => range(5, 365),
-    'eval'      => array('mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr', 'rgxp' => 'natural'),
+    'eval'      => ['mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr', 'rgxp' => 'natural'],
     'sql'       => "int(10) unsigned NOT NULL default '0'",
-);
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['story_limit'] = array
-(
+$GLOBALS['TL_DCA']['tl_module']['fields']['story_limit'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_module']['story_limit'],
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => array('rgxp' => 'natural', 'tl_class' => 'w50'),
+    'eval'      => ['rgxp' => 'natural', 'tl_class' => 'w50'],
     'sql'       => "smallint(5) unsigned NOT NULL default '0'",
-);
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['story_eventOrganizers'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['story_eventOrganizers'] = [
     'label'      => &$GLOBALS['TL_LANG']['tl_module']['story_eventOrganizers'],
     'exclude'    => true,
     'search'     => true,
@@ -149,53 +148,51 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['story_eventOrganizers'] = array(
     'sorting'    => true,
     'inputType'  => 'checkbox',
     'foreignKey' => 'tl_event_organizer.title',
-    'relation'   => array('type' => 'hasMany', 'load' => 'lazy'),
-    'eval'       => array('multiple' => true, 'mandatory' => false, 'tl_class' => 'clr m12'),
+    'relation'   => ['type' => 'hasMany', 'load' => 'lazy'],
+    'eval'       => ['multiple' => true, 'mandatory' => false, 'tl_class' => 'clr m12'],
     'sql'        => "blob NULL",
-);
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_module']['print_export_allowedEventTypes'],
     'inputType' => 'select',
     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-    'eval'      => array('mandatory' => false, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'),
+    'eval'      => ['mandatory' => false, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql'       => "blob NULL"
-);
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['jumpToWhenNotActivated'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['jumpToWhenNotActivated'] = [
     'label'      => &$GLOBALS['TL_LANG']['tl_module']['jumpToWhenNotActivated'],
     'exclude'    => true,
     'inputType'  => 'pageTree',
     'foreignKey' => 'tl_page.title',
-    'eval'       => array('fieldType' => 'radio'),
+    'eval'       => ['fieldType' => 'radio'],
     'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'eager')
-);
+    'relation'   => ['type' => 'hasOne', 'load' => 'eager']
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = array(
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = [
     'label'            => &$GLOBALS['TL_LANG']['tl_module']['eventFilterBoardFields'],
     'inputType'        => 'checkboxWizard',
-    'options_callback' => array('tl_module_sac_event_tool', 'getEventFilterBoardFields'),
-    'eval'             => array('mandatory' => false, 'multiple' => true, 'ooorderField' => 'orderSRC', 'tl_class' => 'clr'),
+    'options_callback' => ['tl_module_sac_event_tool', 'getEventFilterBoardFields'],
+    'eval'             => ['mandatory' => false, 'multiple' => true, 'ooorderField' => 'orderSRC', 'tl_class' => 'clr'],
     'sql'              => "blob NULL"
-);
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['eventListPartialTpl'] = array
-(
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventListPartialTpl'] = [
     'exclude'          => true,
     'inputType'        => 'select',
-    'options_callback' => array('tl_module_sac_event_tool', 'getEventListTemplates'),
-    'eval'             => array('tl_class' => 'w50'),
+    'options_callback' => ['tl_module_sac_event_tool', 'getEventListTemplates'],
+    'eval'             => ['tl_class' => 'w50'],
     'sql'              => "varchar(64) NOT NULL default 'event_list_partial_tour'"
-);
+];
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['eventListLimitPerRequest'] = array
-(
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventListLimitPerRequest'] = [
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => array('rgxp' => 'natural', 'tl_class' => 'w50'),
+    'eval'      => ['rgxp' => 'natural', 'tl_class' => 'w50'],
     'sql'       => "smallint(5) unsigned NOT NULL default 0"
-);
+];
 
 
 
