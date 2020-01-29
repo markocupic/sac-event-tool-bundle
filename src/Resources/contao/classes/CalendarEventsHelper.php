@@ -26,7 +26,6 @@ use Contao\Date;
 use Contao\EventOrganizerModel;
 use Contao\Events;
 use Contao\EventTypeModel;
-use Contao\File;
 use Contao\FilesModel;
 use Contao\Folder;
 use Contao\FrontendTemplate;
@@ -873,7 +872,7 @@ class CalendarEventsHelper
         if ($objEvent !== null)
         {
             $objDb = Database::getInstance();
-            $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
+            $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? && stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
             $memberCount = $calendarEventsMember->numRows;
 
             if ($objEvent->eventState === 'event_canceled')
@@ -916,7 +915,7 @@ class CalendarEventsHelper
         if ($objEvent !== null)
         {
             $objDb = Database::getInstance();
-            $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? && stateOfSubscription=?')->execute($eventId, 'subscription-accepted');
+            $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? && stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
             $memberCount = $calendarEventsMember->numRows;
 
             if ($objEvent->eventState === 'event_canceled')

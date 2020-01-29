@@ -445,7 +445,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             }, $arrFields);
             $csv->insertOne($arrHeadline);
 
-            $objEvent = CalendarEventsModel::findAll(
+            $objEvent = CalendarEventsModel::findBy(
                 array('tl_calendar_events.pid'),
                 array(Input::get('id')),
                 array('limit' => 2, 'order' => 'tl_calendar_events.startDate ASC')

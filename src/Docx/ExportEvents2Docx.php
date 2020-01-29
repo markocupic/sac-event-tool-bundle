@@ -95,12 +95,12 @@ class ExportEvents2Docx
         $widthCol_1 = round(45 * $twip);
         $widthCol_2 = round(115 * $twip);
 
-        $objEvent = CalendarEventsModel::findAll(
+        $objEvent = CalendarEventsModel::findBy(
             ['tl_calendar_events.pid=?', 'tl_calendar_events.published=?'],
             [$calendarId, '1'],
             ['order' => 'courseTypeLevel0, title, startDate']
         );
-        if($objEvent !== null)
+        if ($objEvent !== null)
         {
             while ($objEvent->next())
             {
