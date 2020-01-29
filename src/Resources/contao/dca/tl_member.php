@@ -15,245 +15,245 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('section_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
     ->addLegend('emergency_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
     ->addLegend('avatar_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
-    ->addField(['avatar'], 'avatar_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(['foodHabits'], 'food_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
-    ->addField(['isSacMember', 'sacMemberId', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'phoneBusiness', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'], 'section_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(['emergencyPhone', 'emergencyPhoneName'], 'emergency_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('avatar'), 'avatar_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('foodHabits'), 'food_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
+    ->addField(array('isSacMember', 'sacMemberId', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'phoneBusiness', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'), 'section_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('emergencyPhone', 'emergencyPhoneName'), 'emergency_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_member');
 
 /**
  * Table tl_member
  */
-$GLOBALS['TL_DCA']['tl_member']['list']['sorting']['fields'] = ['lastname ASC'];
-$GLOBALS['TL_DCA']['tl_member']['config']['ondelete_callback'][] = ['tl_member_sac_bundle', 'ondeleteCallback'];
+$GLOBALS['TL_DCA']['tl_member']['list']['sorting']['fields'] = array('lastname ASC');
+$GLOBALS['TL_DCA']['tl_member']['config']['ondelete_callback'][] = array('tl_member_sac_bundle', 'ondeleteCallback');
 
 // Add tl_member.sacMemberId to index
 $GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index';
 
 // More fields...
 // Avatar
-$GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['avatar'],
     'exclude'   => true,
     'inputType' => 'fileTree',
-    'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
+    'eval'      => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'),
     'sql'       => "binary(16) NULL"
-];
+);
 
 // activationLinkLifetime
-$GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['activationLinkLifetime'],
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => ['rgxp' => 'datim', 'mandatory' => false, 'datepicker' => true, 'tl_class' => 'clr wizard'],
+    'eval'      => array('rgxp' => 'datim', 'mandatory' => false, 'datepicker' => true, 'tl_class' => 'clr wizard'),
     'sql'       => "int(10) unsigned NULL",
-];
+);
 
 // activation
-$GLOBALS['TL_DCA']['tl_member']['fields']['activation'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['activation'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['activation'],
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => ['mandatory' => false, 'tl_class' => 'w50'],
+    'eval'      => array('mandatory' => false, 'tl_class' => 'w50'),
     'sql'       => "varchar(64) NOT NULL default ''",
-];
+);
 
 // activationFalseTokenCounter
-$GLOBALS['TL_DCA']['tl_member']['fields']['activationFalseTokenCounter'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['activationFalseTokenCounter'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['activationFalseTokenCounter'],
     'exclude'   => true,
     'inputType' => 'text',
-    'eval'      => ['rgxp' => 'natural'],
+    'eval'      => array('rgxp' => 'natural'),
     'sql'       => "int(10) unsigned NULL",
-];
+);
 
 // isSacMember
-$GLOBALS['TL_DCA']['tl_member']['fields']['isSacMember'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['isSacMember'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['isSacMember'],
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'checkbox',
-    'eval'      => ['submitOnChange' => false],
+    'eval'      => array('submitOnChange' => false),
     'sql'       => "char(1) NOT NULL default ''",
-];
+);
 
 // sacMemberId
-$GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['sacMemberId'],
     'exclude'   => true,
     'search'    => true,
     'sorting'   => true,
     'flag'      => 1,
     'inputType' => 'text',
-    'eval'      => ['doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'rgxp' => 'natural'],
+    'eval'      => array('doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'rgxp' => 'natural'),
     'sql'       => "int(10) unsigned NOT NULL default '0'",
-];
+);
 
 // sectionId
-$GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionId'],
     //'exclude'   => true,
     'reference' => &$GLOBALS['TL_LANG']['tl_member']['section'],
     'inputType' => 'checkbox',
     'filter'    => true,
-    'eval'      => ['multiple' => true, 'tl_class' => 'clr'],
+    'eval'      => array('multiple' => true, 'tl_class' => 'clr'),
     'options'   => explode(',', Config::get('SAC_EVT_SAC_SECTION_IDS')),
     'sql'       => "blob NULL",
-];
+);
 
 // profession
-$GLOBALS['TL_DCA']['tl_member']['fields']['profession'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['profession'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['profession'],
     'exclude'   => true,
     'search'    => true,
     'sorting'   => true,
     'flag'      => 1,
     'inputType' => 'text',
-    'eval'      => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
+    'eval'      => array('maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'),
     'sql'       => "varchar(255) NOT NULL default ''",
-];
+);
 
 // addressExtra
-$GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['addressExtra'],
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
+    'eval'      => array('maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'),
     'sql'       => "varchar(255) NOT NULL default ''",
-];
+);
 
 // streetExtra
-$GLOBALS['TL_DCA']['tl_member']['fields']['streetExtra'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['streetExtra'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['streetExtra'],
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
+    'eval'      => array('maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'),
     'sql'       => "varchar(255) NOT NULL default ''",
-];
+);
 
 // phoneBusiness
-$GLOBALS['TL_DCA']['tl_member']['fields']['phoneBusiness'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['phoneBusiness'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['phoneBusiness'],
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+    'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
     'sql'       => "varchar(64) NOT NULL default ''",
-];
+);
 
 // entryYear
-$GLOBALS['TL_DCA']['tl_member']['fields']['entryYear'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['entryYear'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['entryYear'],
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'text',
-    'eval'      => ['tl_class' => 'w50'],
+    'eval'      => array('tl_class' => 'w50'),
     'sql'       => "varchar(5) NOT NULL default ''",
-];
+);
 
 // membershipType
-$GLOBALS['TL_DCA']['tl_member']['fields']['membershipType'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['membershipType'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['membershipType'],
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'text',
-    'eval'      => ['tl_class' => 'w50'],
+    'eval'      => array('tl_class' => 'w50'),
     'sql'       => "varchar(256) NOT NULL default ''",
-];
+);
 
 // sectionInfo1
-$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo1'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo1'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionInfo1'],
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'text',
-    'eval'      => ['tl_class' => 'w50'],
+    'eval'      => array('tl_class' => 'w50'),
     'sql'       => "varchar(256) NOT NULL default ''",
-];
+);
 
 // sectionInfo2
-$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo2'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo2'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionInfo2'],
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'text',
-    'eval'      => ['tl_class' => 'w50'],
+    'eval'      => array('tl_class' => 'w50'),
     'sql'       => "varchar(256) NOT NULL default ''",
-];
+);
 
 // sectionInfo3
-$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo3'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo3'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionInfo3'],
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'text',
-    'eval'      => ['tl_class' => 'w50'],
+    'eval'      => array('tl_class' => 'w50'),
     'sql'       => "varchar(256) NOT NULL default ''",
-];
+);
 
 // sectionInfo4
-$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo4'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo4'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionInfo4'],
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'text',
-    'eval'      => ['tl_class' => 'w50'],
+    'eval'      => array('tl_class' => 'w50'),
     'sql'       => "varchar(256) NOT NULL default ''",
-];
+);
 
 // debit
-$GLOBALS['TL_DCA']['tl_member']['fields']['debit'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['debit'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['debit'],
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'text',
-    'eval'      => ['tl_class' => 'w50'],
+    'eval'      => array('tl_class' => 'w50'),
     'sql'       => "varchar(256) NOT NULL default ''",
-];
+);
 
 // memberStatus
-$GLOBALS['TL_DCA']['tl_member']['fields']['memberStatus'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['memberStatus'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['memberStatus'],
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'text',
-    'eval'      => ['tl_class' => 'w50'],
+    'eval'      => array('tl_class' => 'w50'),
     'sql'       => "varchar(256) NOT NULL default ''",
-];
+);
 
 // emergencyPhone
-$GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhone'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhone'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['emergencyPhone'],
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+    'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
     'sql'       => "varchar(64) NOT NULL default ''",
-];
+);
 
 // emergencyPhoneName
-$GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhoneName'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhoneName'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['emergencyPhoneName'],
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['maxlength' => 64, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+    'eval'      => array('maxlength' => 64, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
     'sql'       => "varchar(64) NOT NULL default ''",
-];
+);
 
 // foodHabits
-$GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = [
+$GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['foodHabits'],
     'exclude'   => true,
     'search'    => true,
     'inputType' => 'text',
-    'eval'      => ['tl_class' => 'clr'],
+    'eval'      => array('tl_class' => 'clr'),
     'sql'       => "varchar(1024) NOT NULL default ''",
-];
+);
 
-if (TL_MODE == 'BE')
+if(TL_MODE == 'BE')
 {
     // Fields (readonly fields)
     $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId']['eval']['readonly'] = 'readonly';

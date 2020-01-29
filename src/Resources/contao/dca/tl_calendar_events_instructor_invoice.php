@@ -8,226 +8,264 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-$GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
-    'config' => [
+
+$GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = array
+(
+    'config' => array
+    (
         'dataContainer'    => 'Table',
         'ptable'           => 'tl_calendar_events',
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
         'switchToEdit'     => true,
-        'onload_callback'  => [
-            ['tl_calendar_events_instructor_invoice', 'checkAccesRights'],
-            ['tl_calendar_events_instructor_invoice', 'routeActions'],
-            ['tl_calendar_events_instructor_invoice', 'warnIfReportFormHasNotFilledIn'],
-            ['tl_calendar_events_instructor_invoice', 'reviseTable'],
-        ],
-        'sql'              => [
-            'keys' => [
+        'onload_callback'  => array(
+            array('tl_calendar_events_instructor_invoice', 'checkAccesRights'),
+            array('tl_calendar_events_instructor_invoice', 'routeActions'),
+            array('tl_calendar_events_instructor_invoice', 'warnIfReportFormHasNotFilledIn'),
+            array('tl_calendar_events_instructor_invoice', 'reviseTable'),
+        ),
+        'sql'              => array
+        (
+            'keys' => array
+            (
                 'pid' => 'index',
                 'id'  => 'primary'
-            ]
-        ]
-    ],
+            )
+        )
+    ),
 
     // Buttons callback
-    'edit'   => [
-        'buttons_callback' => [['tl_calendar_events_instructor_invoice', 'buttonsCallback']]
-    ],
+    'edit'   => array(
+        'buttons_callback' => array(array('tl_calendar_events_instructor_invoice', 'buttonsCallback'))
+    ),
 
-    'list'     => [
-        'sorting'           => [
+
+    'list'     => array
+    (
+        'sorting'           => array
+        (
             'mode'                  => 4,
-            'fields'                => ['userPid'],
+            'fields'                => array('userPid'),
             'panelLayout'           => 'filter;search,limit',
-            'headerFields'          => ['title'],
+            'headerFields'          => array('title'),
             'disableGrouping'       => true,
-            'child_record_callback' => ['tl_calendar_events_instructor_invoice', 'listInvoices']
-        ],
-        'label'             => [
-            'fields'      => ['pid'],
+            'child_record_callback' => array('tl_calendar_events_instructor_invoice', 'listInvoices')
+        ),
+        'label'             => array
+        (
+            'fields'      => array('pid'),
             'showColumns' => true,
-        ],
-        'global_operations' => [
-            'all' => [
+        ),
+        'global_operations' => array
+        (
+            'all' => array
+            (
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"'
-            ]
-        ],
-        'operations'        => [
-            'edit'                => [
+            )
+        ),
+        'operations'        => array
+        (
+            'edit'                => array
+            (
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.gif'
-            ],
-            'copy'                => [
+            ),
+            'copy'                => array
+            (
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.gif'
-            ],
-            'delete'              => [
+            ),
+            'delete'              => array
+            (
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"'
-            ],
-            'generateInvoicePdf'  => [
+            ),
+            'generateInvoicePdf'  => array
+            (
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoicePdf'],
                 'href'       => 'action=generateInvoicePdf',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/pdf.png',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['generateInvoice'] . '\')) return false; Backend.getScrollOffset();"'
-            ],
-            'generateInvoiceDocx' => [
+            ),
+            'generateInvoiceDocx' => array
+            (
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoiceDocx'],
                 'href'       => 'action=generateInvoiceDocx',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['generateInvoice'] . '\')) return false; Backend.getScrollOffset();"'
-            ]
-        ]
-    ],
-    'palettes' => [
+            )
+        )
+    ),
+    'palettes' => array
+    (
         'default' => 'userPid;{event_legend},eventDuration;{expenses_legend},sleepingTaxes,sleepingTaxesText,miscTaxes,miscTaxesText;{transport_legend},railwTaxes,railwTaxesText,cabelCarTaxes,cabelCarTaxesText,roadTaxes,carTaxesKm,countCars;{phone_costs_legend},phoneTaxes;{iban_legend},iban;{notice_legend},notice'
-    ],
+    ),
 
-    'fields' => [
-        'id'                => [
+    'fields' => array
+    (
+        'id'                => array
+        (
             'sql' => "int(10) unsigned NOT NULL auto_increment"
-        ],
-        'pid'               => [
+        ),
+        'pid'               => array
+        (
             'foreignKey' => 'tl_calendar_events.title',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => ['type' => 'belongsTo', 'load' => 'eager']
-        ],
-        'userPid'           => [
+            'relation'   => array('type' => 'belongsTo', 'load' => 'eager')
+        ),
+        'userPid'           => array
+        (
             'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['userPid'],
             'default'    => BackendUser::getInstance()->id,
             'foreignKey' => 'tl_user.name',
             'inputType'  => 'select',
-            'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
-            'eval'       => ['mandatory' => true, 'multiple' => false, 'class' => 'clr'],
+            'relation'   => array('type' => 'belongsTo', 'load' => 'eager'),
+            'eval'       => array('mandatory' => true, 'multiple' => false, 'class' => 'clr'),
             'sql'        => "int(10) unsigned NOT NULL default '0'",
-        ],
-        'tstamp'            => [
+        ),
+        'tstamp'            => array
+        (
             'sql' => "int(10) unsigned NOT NULL default '0'"
-        ],
-        'eventDuration'     => [
+        ),
+        'eventDuration'     => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['eventDuration'],
             'exclude'   => true,
             'default'   => '0',
             'options'   => range(0, 30),
             'inputType' => 'select',
-            'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 2, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 2, 'tl_class' => 'clr'),
             'sql'       => "varchar(6) NOT NULL default '0'"
-        ],
-        'iban'              => [
+        ),
+        'iban'              => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['iban'],
             'default'   => BackendUser::getInstance()->iban,
             'exclude'   => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 34, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => true, 'maxlength' => 34, 'tl_class' => 'clr'),
             'sql'       => "varchar(34) NOT NULL default ''"
-        ],
-        'sleepingTaxes'     => [
+        ),
+        'sleepingTaxes'     => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['sleepingTaxes'],
             'exclude'   => true,
             'default'   => '0',
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'),
             'sql'       => "varchar(6) NOT NULL default '0'"
-        ],
-        'sleepingTaxesText' => [
+        ),
+        'sleepingTaxesText' => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['sleepingTaxesText'],
             'exclude'   => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'miscTaxes'         => [
+        ),
+        'miscTaxes'         => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['miscTaxes'],
             'exclude'   => true,
             'default'   => '0',
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'),
             'sql'       => "varchar(6) NOT NULL default '0'"
-        ],
-        'miscTaxesText'     => [
+        ),
+        'miscTaxesText'     => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['miscTaxesText'],
             'exclude'   => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'railwTaxes'        => [
+        ),
+        'railwTaxes'        => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['railwTaxes'],
             'exclude'   => true,
             'default'   => '0',
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'),
             'sql'       => "varchar(6) NOT NULL default '0'"
-        ],
-        'railwTaxesText'    => [
+        ),
+        'railwTaxesText'    => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['railwTaxesText'],
             'exclude'   => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'cabelCarTaxes'     => [
+        ),
+        'cabelCarTaxes'     => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['cabelCarTaxes'],
             'exclude'   => true,
             'default'   => '0',
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'),
             'sql'       => "varchar(6) NOT NULL default '0'"
-        ],
-        'cabelCarTaxesText' => [
+        ),
+        'cabelCarTaxesText' => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['cabelCarTaxesText'],
             'exclude'   => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'roadTaxes'         => [
+        ),
+        'roadTaxes'         => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['roadTaxes'],
             'exclude'   => true,
             'default'   => '0',
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'),
             'sql'       => "varchar(6) NOT NULL default '0'"
-        ],
-        'carTaxesKm'        => [
+        ),
+        'carTaxesKm'        => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['carTaxesKm'],
             'exclude'   => true,
             'default'   => '0',
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 6, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 6, 'tl_class' => 'clr'),
             'sql'       => "varchar(6) NOT NULL default '0'"
-        ],
-        'countCars'         => [
+        ),
+        'countCars'         => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['countCars'],
             'exclude'   => true,
             'default'   => '0',
             'inputType' => 'select',
             'options'   => range(0, 9),
-            'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 1, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 1, 'tl_class' => 'clr'),
             'sql'       => "varchar(1) NOT NULL default '0'"
-        ],
-        'phoneTaxes'        => [
+        ),
+        'phoneTaxes'        => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['phoneTaxes'],
             'exclude'   => true,
             'default'   => '0',
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 3, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 3, 'tl_class' => 'clr'),
             'sql'       => "varchar(3) NOT NULL default '0'"
-        ],
-        'notice'            => [
+        ),
+        'notice'            => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['notice'],
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => ['mandatory' => false, 'tl_class' => 'clr'],
+            'eval'      => array('mandatory' => false, 'tl_class' => 'clr'),
             'sql'       => "text NULL",
-        ],
-    ]
-];
+        ),
+    )
+);
 

@@ -108,8 +108,8 @@ class WorkshopTCPDF extends \TCPDF
         {
             // Transparent header
             $this->setAlpha(0.65);
-            $style = ['L' => 0, 'T' => 0, 'R' => 0, 'B' => 0];
-            $this->Rect(0, 0, 210, 50, 'DF', $style, [255, 255, 255]);
+            $style = array('L' => 0, 'T' => 0, 'R' => 0, 'B' => 0);
+            $this->Rect(0, 0, 210, 50, 'DF', $style, array(255, 255, 255));
             $this->setAlpha(1);
         }
 
@@ -118,8 +118,8 @@ class WorkshopTCPDF extends \TCPDF
         {
             //$this->setAlpha(0.95);
             // Border Style
-            $style = ['L' => 0, 'T' => 0, 'R' => 0, 'B' => 0];
-            $this->Rect(15, 35, 180, 230, 'DF', $style, [255, 255, 255]);
+            $style = array('L' => 0, 'T' => 0, 'R' => 0, 'B' => 0);
+            $this->Rect(15, 35, 180, 230, 'DF', $style, array(255, 255, 255));
             $this->setAlpha(1);
         }
 
@@ -129,10 +129,10 @@ class WorkshopTCPDF extends \TCPDF
         // Stripe bottom
         if ($this->type == 'eventPage')
         {
-            $style = ['L' => 0, 'T' => 0, 'R' => 0, 'B' => 0];
-            $this->Rect(0, 275, 210, 10, 'DF', $style, [255, 255, 255]);
+            $style = array('L' => 0, 'T' => 0, 'R' => 0, 'B' => 0);
+            $this->Rect(0, 275, 210, 10, 'DF', $style, array(255, 255, 255));
             $this->setY(275);
-            $this->setFillColorArray([255, 255, 255]);  // white
+            $this->setFillColorArray(array(255, 255, 255));  // white
             $this->setTextColor(55, 55, 55);
             $date = \Date('Y', (int) $this->Event->startDate);
             $this->Cell(210, 10, 'SAC Sektion Pilatus Ausbildung ' . $date, 0, 1, 'C', 1, '', 0);
@@ -142,12 +142,12 @@ class WorkshopTCPDF extends \TCPDF
         if ($this->type == 'eventPage')
         {
             // Background-image
-            $style = [
+            $style = array(
                 'border'  => 0,
                 'padding' => 5,
-                'fgcolor' => [0, 0, 0],
-                'bgcolor' => [255, 255, 255],
-            ];
+                'fgcolor' => array(0, 0, 0),
+                'bgcolor' => array(255, 255, 255),
+            );
             // QR-CODE - Im Moment deaktiviert
             //$this->write2DBarcode('http://sac-kurse.kletterkader.com/kurse-detail/' . $this->Event->id, 'QRCODE,H', 175, 267, 25, 25, $style, 'N');
         }

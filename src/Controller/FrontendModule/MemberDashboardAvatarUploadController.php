@@ -93,6 +93,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             $this->objPage = $page;
         }
 
+
         // Rotate image by 90°
         if ($inputAdapter->get('do') === 'rotate-image' && $inputAdapter->get('fileId') != '')
         {
@@ -211,21 +212,21 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
-        $objForm->addFormField('avatar', [
+        $objForm->addFormField('avatar', array(
             'label'     => 'Profilbild hochladen',
             'inputType' => 'upload',
-            'eval'      => ['class' => 'custom-input-file', 'mandatory' => false],
-        ]);
-        $objForm->addFormField('delete-avatar', [
-            'label'     => ['Profilbild löschen'],
+            'eval'      => array('class' => 'custom-input-file', 'mandatory' => false),
+        ));
+        $objForm->addFormField('delete-avatar', array(
+            'label'     => array('Profilbild löschen'),
             'inputType' => 'checkbox',
-        ]);
+        ));
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submit', array(
             'label'     => 'Speichern',
             'inputType' => 'submit',
-        ]);
+        ));
 
         // Create the folder if it not exists
         $objUploadFolder = new Folder($configAdapter->get('SAC_EVT_FE_USER_AVATAR_DIRECTORY') . '/' . $this->objUser->id);

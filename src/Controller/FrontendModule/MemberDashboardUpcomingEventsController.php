@@ -246,7 +246,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                     // Load language file
                     $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
-                    $arrTokens = [
+                    $arrTokens = array(
                         'state_of_subscription' => $GLOBALS['TL_LANG']['tl_calendar_events_member'][$objEventsMember->stateOfSubscription],
                         'event_course_id'       => $objEvent->courseId,
                         'event_name'            => $objEvent->title,
@@ -257,7 +257,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                         'participant_email'     => $objEventsMember->email,
                         'event_link_detail'     => $environmentAdapter->get('url') . '/' . $eventsAdapter->generateEventUrl($objEvent),
                         'sac_member_id'         => $objEventsMember->sacMemberId != '' ? $objEventsMember->sacMemberId : 'keine',
-                    ];
+                    );
 
                     if ($objEvent->registrationGoesTo > 0)
                     {

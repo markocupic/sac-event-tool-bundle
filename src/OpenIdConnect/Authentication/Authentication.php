@@ -186,7 +186,7 @@ class Authentication
             $this->logger->log(
                 LogLevel::INFO,
                 sprintf('User "%s" has logged in with openid connect.', $username),
-                ['contao' => new ContaoContext(__METHOD__, ContaoContext::ACCESS)]
+                array('contao' => new ContaoContext(__METHOD__, ContaoContext::ACCESS))
             );
         }
     }

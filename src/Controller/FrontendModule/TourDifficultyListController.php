@@ -65,7 +65,7 @@ class TourDifficultyListController extends AbstractFrontendModuleController
     {
         $arrDifficulty = [];
         $pid = 0;
-        $options = ['order' => 'code ASC'];
+        $options = array('order' => 'code ASC');
         $tourDifficultyAdapter = $this->get('contao.framework')->getAdapter(TourDifficultyModel::class);
         $objDifficulty = $tourDifficultyAdapter->findAll($options);
 

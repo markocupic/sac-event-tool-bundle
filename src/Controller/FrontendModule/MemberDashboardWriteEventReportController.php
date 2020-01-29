@@ -191,7 +191,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                 {
                     $blnAllow = false;
                     $intStartDateMin = $model->timeSpanForCreatingNewEventStory > 0 ? time() - $model->timeSpanForCreatingNewEventStory * 24 * 3600 : time();
-                    $arrAllowedEvents = $calendarEventsMemberModelAdapter->findEventsByMemberId($this->objUser->id, [], $intStartDateMin, time(), true);
+                    $arrAllowedEvents = $calendarEventsMemberModelAdapter->findEventsByMemberId($this->objUser->id, array(), $intStartDateMin, time(), true);
                     foreach ($arrAllowedEvents as $allowedEvent)
                     {
                         if ($allowedEvent['id'] == $inputAdapter->get('eventId'))
@@ -221,7 +221,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                         $aDates[] = $arrDate['new_repeat'];
                     }
 
-                    $set = [
+                    $set = array(
                         'title'                 => $objEvent->title,
                         'eventTitle'            => $objEvent->title,
                         'eventSubstitutionText' => ($objEvent->executionState === 'event_adapted' && $objEvent->eventSubstitutionText != '') ? $objEvent->eventSubstitutionText : '',
@@ -234,7 +234,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                         'eventId'               => $inputAdapter->get('eventId'),
                         'tstamp'                => time(),
                         'addedOn'               => time(),
-                    ];
+                    );
                     $objInsertStmt = $databaseAdapter->getInstance()->prepare('INSERT INTO tl_calendar_events_story %s')->set($set)->execute();
 
                     // Set security token for frontend preview
@@ -242,8 +242,8 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                     {
                         // Add security token
                         $insertId = $objInsertStmt->insertId;
-                        $set = [];
-                        $set['securityToken'] = (string) md5((string) rand(100000000, 999999999)) . $insertId;
+                        $set = array();
+                        $set['securityToken'] = (string)md5((string)rand(100000000, 999999999)) . $insertId;
                         $databaseAdapter->getInstance()->prepare('UPDATE tl_calendar_events_story %s WHERE id=?')->set($set)->execute($insertId);
                     }
                     $objReportModel = $calendarEventsStoryModelAdapter->findByPk($insertId);
@@ -327,27 +327,27 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         $objForm->setFormActionFromUri($url);
 
         // Add some fields
-        $objForm->addFormField('text', [
+        $objForm->addFormField('text', array(
             'label'     => 'Touren-/Lager-/Kursbericht',
             'inputType' => 'textarea',
-            'eval'      => ['decodeEntities' => true],
-            'value'     => html_entity_decode((string) $objEventStoryModel->text)
+            'eval'      => array('decodeEntities' => true),
+            'value'     => html_entity_decode((string)$objEventStoryModel->text)
 
-        ]);
+        ));
 
         // Add some fields
-        $objForm->addFormField('youtubeId', [
+        $objForm->addFormField('youtubeId', array(
             'label'     => 'Youtube Film-Id',
             'inputType' => 'text',
-            'eval'      => [],
+            'eval'      => array(),
             'value'     => $objEventStoryModel->youtubeId
-        ]);
+        ));
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submit', array(
             'label'     => 'absenden',
             'inputType' => 'submit',
-        ]);
+        ));
 
         // Add attributes
         $objWidgetYt = $objForm->getWidget('youtubeId');
@@ -431,26 +431,26 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         $objForm->setFormActionFromUri($url);
 
         // Add some fields
-        $objForm->addFormField('fileupload', [
+        $objForm->addFormField('fileupload', array(
             'label'     => 'Bildupload',
             'inputType' => 'fineUploader',
-            'eval'      => ['extensions'   => 'jpg,jpeg',
-                            'storeFile'    => true,
-                            'addToDbafs'   => true,
-                            'isGallery'    => false,
-                            'directUpload' => false,
-                            'multiple'     => true,
-                            'useHomeDir'   => false,
-                            'uploadFolder' => $objUploadFolder->path,
-                            'mandatory'    => true
-            ],
-        ]);
+            'eval'      => array('extensions'   => 'jpg,jpeg',
+                                 'storeFile'    => true,
+                                 'addToDbafs'   => true,
+                                 'isGallery'    => false,
+                                 'directUpload' => false,
+                                 'multiple'     => true,
+                                 'useHomeDir'   => false,
+                                 'uploadFolder' => $objUploadFolder->path,
+                                 'mandatory'    => true
+            ),
+        ));
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submit', array(
             'label'     => 'upload starten',
             'inputType' => 'submit',
-        ]);
+        ));
 
         // Add attributes
         $objWidgetFileupload = $objForm->getWidget('fileupload');
@@ -499,13 +499,13 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                                             $arrMeta = $stringUtilAdapter->deserialize($oFileModel->meta, true);
                                             if (!isset($arrMeta[$this->objPage->language]))
                                             {
-                                                $arrMeta[$this->objPage->language] = [
+                                                $arrMeta[$this->objPage->language] = array(
                                                     'title'        => '',
                                                     'alt'          => '',
                                                     'link'         => '',
                                                     'caption'      => '',
                                                     'photographer' => '',
-                                                ];
+                                                );
                                             }
                                             $arrMeta[$this->objPage->language]['photographer'] = $this->objUser->firstname . ' ' . $this->objUser->lastname;
                                             $oFileModel->meta = serialize($arrMeta);
@@ -525,7 +525,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                                     // Log
                                     $strText = sprintf('User with username %s has uploadad a new picture ("%s").', $this->objUser->username, $objModel->path);
                                     $logger = System::getContainer()->get('monolog.logger.contao');
-                                    $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, 'EVENT STORY PICTURE UPLOAD')]);
+                                    $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, 'EVENT STORY PICTURE UPLOAD')));
                                 }
                             }
                         }
@@ -560,7 +560,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         /** @var FilesModel $filesModelAdapter */
         $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
 
-        $images = [];
+        $images = array();
         $arrMultiSRC = $stringUtilAdapter->deserialize($objStory->multiSRC, true);
         foreach ($arrMultiSRC as $uuid)
         {
@@ -576,7 +576,8 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                         if ($objFile->isImage)
                         {
                             $arrMeta = $stringUtilAdapter->deserialize($objFiles->meta, true);
-                            $images[$objFiles->path] = [
+                            $images[$objFiles->path] = array
+                            (
                                 'id'         => $objFiles->id,
                                 'path'       => $objFiles->path,
                                 'uuid'       => $objFiles->uuid,
@@ -586,7 +587,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                                 'filesModel' => $objFiles->current(),
                                 'caption'    => isset($arrMeta['de']['caption']) ? $arrMeta['de']['caption'] : '',
                                 'alt'        => isset($arrMeta['de']['alt']) ? $arrMeta['de']['alt'] : '',
-                            ];
+                            );
                         }
                     }
                 }
@@ -662,7 +663,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             // Log
             $strText = 'File "' . $strImage . '" is too big to be resized automatically';
             $logger = System::getContainer()->get('monolog.logger.contao');
-            $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, TL_FILES)]);
+            $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, TL_FILES)));
 
             return false;
         }
@@ -675,7 +676,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             $blnResize = true;
             $intWidth = $configAdapter->get('maxImageWidth');
             $intHeight = round($configAdapter->get('maxImageWidth') * $arrImageSize[1] / $arrImageSize[0]);
-            $arrImageSize = [$intWidth, $intHeight];
+            $arrImageSize = array($intWidth, $intHeight);
         }
 
         // The image exceeds the maximum image height
@@ -684,7 +685,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             $blnResize = true;
             $intWidth = round($configAdapter->get('maxImageWidth') * $arrImageSize[0] / $arrImageSize[1]);
             $intHeight = $configAdapter->get('maxImageWidth');
-            $arrImageSize = [$intWidth, $intHeight];
+            $arrImageSize = array($intWidth, $intHeight);
         }
 
         // Resized successfully
@@ -692,7 +693,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         {
             System::getContainer()
                 ->get('contao.image.image_factory')
-                ->create($this->projectDir . '/' . $strImage, [$arrImageSize[0], $arrImageSize[1]], $this->projectDir . '/' . $strImage);
+                ->create($this->projectDir . '/' . $strImage, array($arrImageSize[0], $arrImageSize[1]), $this->projectDir . '/' . $strImage);
 
             $this->blnHasResized = true;
 

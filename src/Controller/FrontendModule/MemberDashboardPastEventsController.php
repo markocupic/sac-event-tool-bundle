@@ -148,7 +148,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
         // Past events
         $arrPastEvents = $calendarEventsMemberModelAdapter->findPastEventsByMemberId($this->objUser->id, $arrEventTypeFilter);
-        $arrEvents = [];
+        $arrEvents = array();
         foreach ($arrPastEvents as $k => $event)
         {
             // Do only list if member has participated
@@ -197,7 +197,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                 {
                     $objMember = $memberModelAdapter->findOneBySacMemberId($this->objUser->sacMemberId);
                     $startDate = '';
-                    $arrDates = [];
+                    $arrDates = array();
                     $courseId = '';
                     $eventTitle = $objRegistration->eventName;
 

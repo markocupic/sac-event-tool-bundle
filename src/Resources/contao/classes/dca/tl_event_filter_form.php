@@ -18,7 +18,7 @@ class tl_event_filter_form extends Backend
      */
     public function getTourTypes()
     {
-        $arrOptions = [];
+        $arrOptions = array();
         $objTourType = \Contao\TourTypeModel::findAll();
         while ($objTourType->next())
         {
@@ -32,11 +32,11 @@ class tl_event_filter_form extends Backend
      */
     public function getCourseTypes()
     {
-        $opt = [];
+        $opt = array();
         $mainTypes = \Contao\CourseMainTypeModel::findAll();
         while ($mainTypes->next())
         {
-            $opt[$mainTypes->name] = [];
+            $opt[$mainTypes->name] = array();
             $subTypes = \Contao\CourseSubTypeModel::findByPid($mainTypes->id);
             while ($subTypes->next())
             {
@@ -51,7 +51,7 @@ class tl_event_filter_form extends Backend
      */
     public function getOrganizers()
     {
-        $arrOptions = [];
+        $arrOptions = array();
         $objOrganizer = Contao\Database::getInstance()->prepare('SELECT * FROM tl_event_organizer WHERE hideInEventFilter=? ORDER BY sorting')->execute('');
         while ($objOrganizer->next())
         {

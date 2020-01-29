@@ -63,7 +63,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     /**
      * @var array
      */
-    protected $arrLines = [];
+    protected $arrLines = array();
 
     /**
      * @return array
@@ -110,41 +110,41 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $objForm->setFormActionFromUri($environment->get('uri'));
 
         // Now let's add form fields:
-        $objForm->addFormField('event-type', [
-            'label'     => ['Event-Typ auswählen', ''],
+        $objForm->addFormField('event-type', array(
+            'label'     => array('Event-Typ auswählen', ''),
             'inputType' => 'select',
-            'options'   => ['all' => 'Alle Events', 'tour' => 'Tour', 'course' => 'Kurs'],
-        ]);
+            'options'   => array('all' => 'Alle Events', 'tour' => 'Tour', 'course' => 'Kurs'),
+        ));
 
-        $objForm->addFormField('startDate', [
+        $objForm->addFormField('startDate', array(
             'label'     => 'Startdatum',
             'inputType' => 'text',
-            'eval'      => ['rgxp' => 'date', 'mandatory' => true],
-        ]);
+            'eval'      => array('rgxp' => 'date', 'mandatory' => true),
+        ));
 
-        $objForm->addFormField('endDate', [
+        $objForm->addFormField('endDate', array(
             'label'     => 'Enddatum',
             'inputType' => 'text',
-            'eval'      => ['rgxp' => 'date', 'mandatory' => true],
-        ]);
+            'eval'      => array('rgxp' => 'date', 'mandatory' => true),
+        ));
 
-        $objForm->addFormField('endDate', [
+        $objForm->addFormField('endDate', array(
             'label'     => 'Enddatum',
             'inputType' => 'text',
-            'eval'      => ['rgxp' => 'date', 'mandatory' => true],
-        ]);
+            'eval'      => array('rgxp' => 'date', 'mandatory' => true),
+        ));
 
-        $objForm->addFormField('mountainguide', [
-            'label'     => ['Bergführer', 'Nur Events mit Bergführer exportieren'],
+        $objForm->addFormField('mountainguide', array(
+            'label'     => array('Bergführer', 'Nur Events mit Bergführer exportieren'),
             'inputType' => 'checkbox',
-            'eval'      => [],
-        ]);
+            'eval'      => array(),
+        ));
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submit', array(
             'label'     => 'Export starten',
             'inputType' => 'submit',
-        ]);
+        ));
 
         if ($objForm->validate())
         {
@@ -152,12 +152,12 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
             if ($request->get('FORM_SUBMIT') === 'form-event-member-export')
             {
                 $eventType = $request->get('event-type');
-                $arrFields = ['id', 'eventId', 'eventName', 'startDate', 'endDate', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'addedOn'];
+                $arrFields = array('id', 'eventId', 'eventName', 'startDate', 'endDate', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'addedOn');
                 $startDate = strtotime($request->get('startDate'));
                 $endDate = strtotime($request->get('endDate'));
                 $this->getHeadline($arrFields);
 
-                $statement1 = $this->get('database_connection')->executeQuery('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate', [$startDate, $endDate]);
+                $statement1 = $this->get('database_connection')->executeQuery('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate', array($startDate, $endDate));
                 while (false !== ($objEvent = $statement1->fetch(\PDO::FETCH_OBJ)))
                 {
                     if ($eventType != 'all')
@@ -177,7 +177,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                     }
 
                     // Set tl_member.disable to true if member was not found in the csv-file
-                    $statement2 = $this->get('database_connection')->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname', [$objEvent->id]);
+                    $statement2 = $this->get('database_connection')->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname', array($objEvent->id));
                     while (false !== ($objEventMember = $statement2->fetch(\PDO::FETCH_OBJ)))
                     {
                         $this->addLine($arrFields, $objEventMember);
@@ -198,7 +198,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
      */
     private function addLine($arrFields, $objEventMember)
     {
-        $arrLine = [];
+        $arrLine = array();
         foreach ($arrFields as $field)
         {
             $arrLine[] = $this->getField($field, $objEventMember);
@@ -214,7 +214,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     {
         // Write headline
         $controller = $this->get('contao.framework')->getAdapter(Controller::class);
-        $arrHeadline = [];
+        $arrHeadline = array();
         foreach ($arrFields as $field)
         {
             if ($field === 'mainInstructor' || $field === 'mountainguide' || $field === 'startDate' || $field === 'endDate' || $field === 'eventState' || $field === 'executionState')
@@ -370,11 +370,11 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $arrData = $this->arrLines;
 
         // Convert special chars
-        $arrFinal = [];
+        $arrFinal = array();
         foreach ($arrData as $arrRow)
         {
             $arrLine = array_map(function ($v) {
-                return html_entity_decode(htmlspecialchars_decode((string) $v));
+                return html_entity_decode(htmlspecialchars_decode((string)$v));
             }, $arrRow);
             $arrFinal[] = $arrLine;
         }

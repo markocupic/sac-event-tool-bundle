@@ -25,7 +25,7 @@ class tl_tour_difficulty_category extends Backend
     /**
      * Return the edit header button
      *
-     * @param array $row
+     * @param array  $row
      * @param string $href
      * @param string $label
      * @param string $title
@@ -36,7 +36,7 @@ class tl_tour_difficulty_category extends Backend
      */
     public function editHeader($row, $href, $label, $title, $icon, $attributes)
     {
-        return $this->User->canEditFieldsOf('tl_tour_difficulty_category') ? '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ' : Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)) . ' ';
+        return $this->User->canEditFieldsOf('tl_tour_difficulty_category') ? '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
     }
 
 }

@@ -171,26 +171,26 @@ class MemberDashboardWriteEventReportController extends AbstractController
 
         if (!$request->request->get('eventId') || !FE_USER_LOGGED_IN)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
 
         $objUser = $this->security->getUser();
         if (!$objUser instanceof FrontendUser)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
 
         // Save new image order to db
         $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? AND eventId=? AND publishState<?')->limit(1)->execute($objUser->sacMemberId, $request->request->get('eventId'), 3);
         if (!$objDb->numRows)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
 
         $objStory = $calendarEventsStoryModelAdapter->findByPk($objDb->id);
         if ($objStory === null)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
 
         // Notify office if there is a new story
@@ -229,7 +229,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
                 }
 
                 // Notify webmaster
-                $arrNotifyEmail = [];
+                $arrNotifyEmail = array();
                 $arrOrganizers = $stringUtilAdapter->deserialize($objEvent->organizers, true);
                 foreach ($arrOrganizers as $orgId)
                 {
@@ -258,7 +258,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
 
                 if ($objEvent !== null)
                 {
-                    $arrTokens = [
+                    $arrTokens = array(
                         'event_title'          => $objEvent->title,
                         'event_id'             => $objEvent->id,
                         'instructor_name'      => $instructorName != '' ? $instructorName : 'keine Angabe',
@@ -272,7 +272,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
                         'story_link_frontend'  => $previewLink,
                         'story_title'          => $objStory->title,
                         'story_text'           => $objStory->text,
-                    ];
+                    );
                 }
 
                 // Send notification
@@ -284,7 +284,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
         $objStory->publishState = $request->request->get('publishState');
         $objStory->save();
 
-        return new JsonResponse(['status' => 'success']);
+        return new JsonResponse(array('status' => 'success'));
     }
 
     /**
@@ -304,26 +304,26 @@ class MemberDashboardWriteEventReportController extends AbstractController
 
         if (!$request->request->get('uuids') || !$request->request->get('eventId') || !FE_USER_LOGGED_IN)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
 
         $objUser = $this->security->getUser();
         if (!$objUser instanceof FrontendUser)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
 
         // Save new image order to db
         $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? AND eventId=?')->limit(1)->execute($objUser->sacMemberId, $request->request->get('eventId'));
         if (!$objDb->numRows)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
 
         $objStory = $calendarEventsStoryModelAdapter->findByPk($objDb->id);
         if ($objStory === null)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
 
         $arrSorting = json_decode($request->request->get('uuids'));
@@ -336,7 +336,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
         $objStory->orderSRC = serialize($arrSorting);
         $objStory->save();
 
-        return new JsonResponse(['status' => 'success']);
+        return new JsonResponse(array('status' => 'success'));
     }
 
     /**
@@ -366,24 +366,24 @@ class MemberDashboardWriteEventReportController extends AbstractController
 
         if (!$request->request->get('eventId') || !$request->request->get('uuid') || !FE_USER_LOGGED_IN)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
 
         $objUser = $this->security->getUser();
         if (!$objUser instanceof FrontendUser)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
         // Save new image order to db
         $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=? && publishState<?')->limit(1)->execute($objUser->sacMemberId, $request->request->get('eventId'), 3);
         if (!$objDb->numRows)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
         $objStory = $calendarEventsStoryModelAdapter->findByPk($objDb->id);
         if ($objStory === null)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
         $multiSrc = $stringUtilAdapter->deserialize($objStory->multiSRC, true);
         $orderSrc = $stringUtilAdapter->deserialize($objStory->orderSRC, true);
@@ -392,7 +392,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
 
         if (!$validatorAdapter->isUuid($uuid))
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
 
         $key = array_search($uuid, $multiSrc);
@@ -422,7 +422,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
             $oFile->delete();
             $objFile->delete();
         }
-        return new JsonResponse(['status' => 'success']);
+        return new JsonResponse(array('status' => 'success'));
     }
 
     /**
@@ -444,11 +444,11 @@ class MemberDashboardWriteEventReportController extends AbstractController
         $objRotateImage = System::getContainer()->get('Markocupic\SacEventToolBundle\Image\RotateImage');
         if ($objRotateImage->rotate($objFiles))
         {
-            $json = ['status' => 'success'];
+            $json = array('status' => 'success');
         }
         else
         {
-            $json = ['status' => 'error'];
+            $json = array('status' => 'error');
         }
         return new JsonResponse($json);
     }
@@ -471,7 +471,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
         $objUser = $this->security->getUser();
         if (!$objUser instanceof FrontendUser)
         {
-            return new JsonResponse(['status' => 'error']);
+            return new JsonResponse(array('status' => 'error'));
         }
 
         if ($request->request->get('fileUuid') != '')
@@ -502,14 +502,14 @@ class MemberDashboardWriteEventReportController extends AbstractController
                     }
                 }
 
-                return new JsonResponse([
+                return new JsonResponse(array(
                     'status'       => 'success',
                     'caption'      => html_entity_decode($caption),
                     'photographer' => $photographer,
-                ]);
+                ));
             }
         }
-        return new JsonResponse(['status' => 'error']);
+        return new JsonResponse(array('status' => 'error'));
     }
 
     /**
@@ -532,7 +532,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
             $objUser = $this->security->getUser();
             if (!$objUser instanceof FrontendUser)
             {
-                return new JsonResponse(['status' => 'error']);
+                return new JsonResponse(array('status' => 'error'));
             }
 
             $objFile = $filesModelAdapter->findByUuid($request->request->get('fileUuid'));
@@ -541,22 +541,22 @@ class MemberDashboardWriteEventReportController extends AbstractController
                 $arrMeta = $stringUtilAdapter->deserialize($objFile->meta, true);
                 if (!isset($arrMeta['de']))
                 {
-                    $arrMeta['de'] = [
+                    $arrMeta['de'] = array(
                         'title'        => '',
                         'alt'          => '',
                         'link'         => '',
                         'caption'      => '',
                         'photographer' => '',
-                    ];
+                    );
                 }
                 $arrMeta['de']['caption'] = $request->request->get('caption');
                 $arrMeta['de']['photographer'] = $request->request->get('photographer') ?: $objUser->firstname . ' ' . $objUser->lastname;
 
                 $objFile->meta = serialize($arrMeta);
                 $objFile->save();
-                return new JsonResponse(['status' => 'success']);
+                return new JsonResponse(array('status' => 'success'));
             }
         }
-        return new JsonResponse(['status' => 'error']);
+        return new JsonResponse(array('status' => 'error'));
     }
 }

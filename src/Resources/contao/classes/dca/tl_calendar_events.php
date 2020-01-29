@@ -80,7 +80,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             if ($objCalendarEventsModel->eventState === 'event_deferred')
             {
                 \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-                    ->addField(['eventDeferDate'], 'eventState', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
+                    ->addField(array('eventDeferDate'), 'eventState', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
                     ->applyToPalette('default', 'tl_calendar_events')
                     ->applyToPalette('tour', 'tl_calendar_events')
                     ->applyToPalette('lastMinuteTour', 'tl_calendar_events')
@@ -145,7 +145,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         // Minimize header fields for default users
         if (!$this->User->isAdmin)
         {
-            $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['headerFields'] = ['title'];
+            $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['headerFields'] = array('title');
         }
 
         // Minimize operations for default users
@@ -205,7 +205,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             if ($this->User->isAdmin || $allow === true)
             {
                 \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-                    ->addField(['eventReleaseLevel'], 'title_legend', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+                    ->addField(array('eventReleaseLevel'), 'title_legend', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
                     ->applyToPalette('default', 'tl_calendar_events');
             }
         }
@@ -271,7 +271,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         // User has no write access to the datarecord, that's why we display field values without a form input
                         foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] as $field => $dca)
                         {
-                            $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['input_field_callback'] = ['tl_calendar_events_sac_event_tool', 'showFieldValue'];
+                            $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['input_field_callback'] = array('tl_calendar_events_sac_event_tool', 'showFieldValue');
                         }
                         if (Input::post('FORM_SUBMIT') === 'tl_calendar_events')
                         {
@@ -299,7 +299,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                                             {
                                                 if ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEdititingOnFirstReleaseLevelOnly'] == true && $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['inputType'] != '')
                                                 {
-                                                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['input_field_callback'] = ['tl_calendar_events_sac_event_tool', 'showFieldValue'];
+                                                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['input_field_callback'] = array('tl_calendar_events_sac_event_tool', 'showFieldValue');
                                                 }
                                             }
                                         }
@@ -331,7 +331,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         // Only list record where the logged in user has write permissions
         if (Input::get('act') === 'select' || Input::get('act') === 'editAll')
         {
-            $arrIDS = [0];
+            $arrIDS = array(0);
             $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE pid=?')->execute(CURRENT_ID);
             while ($objDb->next())
             {
@@ -368,7 +368,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                                     {
                                         if (Input::get('act') === 'editAll')
                                         {
-                                            $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['input_field_callback'] = ['tl_calendar_events_sac_event_tool', 'showFieldValue'];
+                                            $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['input_field_callback'] = array('tl_calendar_events_sac_event_tool', 'showFieldValue');
                                         }
                                         else
                                         {
@@ -436,7 +436,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $csv->setDelimiter(';');
 
             // Selected fields
-            $arrFields = ['id', 'title', 'eventDates', 'organizers', 'mainInstructor', 'instructor', 'eventType', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel'];
+            $arrFields = array('id', 'title', 'eventDates', 'organizers', 'mainInstructor', 'instructor', 'eventType', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel');
 
             // Insert headline first
             \Contao\Controller::loadLanguageFile('tl_calendar_events');
@@ -446,15 +446,15 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $csv->insertOne($arrHeadline);
 
             $objEvent = CalendarEventsModel::findBy(
-                ['tl_calendar_events.pid=?'],
-                [Input::get('id')],
-                ['order' => 'tl_calendar_events.startDate ASC']
+                array('tl_calendar_events.pid=?'),
+                array(Input::get('id')),
+                array('order' => 'tl_calendar_events.startDate ASC')
             );
-            if ($objEvent !== null)
+            if($objEvent !== null)
             {
                 while ($objEvent->next())
                 {
-                    $arrRow = [];
+                    $arrRow = array();
                     foreach ($arrFields as $field)
                     {
                         if ($field === 'mainInstructor')
@@ -543,7 +543,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                     }
 
                     $arrRepeats = StringUtil::deserialize($objEvent->eventDates, true);
-                    $newArrRepeats = [];
+                    $newArrRepeats = array();
                     if (count($arrRepeats) > 0)
                     {
                         foreach ($arrRepeats as $repeat)
@@ -577,7 +577,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             // Set logged in User as author
             $objEventsModel->author = $this->User->id;
             $objEventsModel->mainInstructor = $this->User->id;
-            $objEventsModel->instructor = serialize([['instructorId' => $this->User->id]]);
+            $objEventsModel->instructor = serialize(array(array('instructorId' => $this->User->id)));
 
             // Set customEventRegistrationConfirmationEmailText
             $objEventsModel->customEventRegistrationConfirmationEmailText = str_replace('{{br}}', "\n", Config::get('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'));
@@ -651,7 +651,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             return;
         }
 
-        $arrSet['size'] = serialize(["", "", 11]);
+        $arrSet['size'] = serialize(array("", "", 11));
         $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($dc->activeRecord->id);
     }
 
@@ -673,20 +673,20 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             return;
         }
 
-        $aNew = [];
+        $aNew = array();
         foreach ($arrDates as $k => $v)
         {
             $objDate = new Date($v['new_repeat']);
             $aNew[$objDate->timestamp] = $objDate->timestamp;
         }
         ksort($aNew);
-        $arrDates = [];
+        $arrDates = array();
         foreach ($aNew as $v)
         {
             // Save as timestamp
-            $arrDates[] = ['new_repeat' => $v];
+            $arrDates[] = array('new_repeat' => $v);
         }
-        $arrSet = [];
+        $arrSet = array();
         $arrSet['eventDates'] = serialize($arrDates);
         $startTime = !empty($arrDates[0]['new_repeat']) ? $arrDates[0]['new_repeat'] : 0;
         $endTime = !empty($arrDates[count($arrDates) - 1]['new_repeat']) ? $arrDates[count($arrDates) - 1]['new_repeat'] : 0;
@@ -719,7 +719,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         $eventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($dc->activeRecord->id);
         if ($eventReleaseLevelModel !== null)
         {
-            $set = ['eventReleaseLevel' => $eventReleaseLevelModel->id];
+            $set = array('eventReleaseLevel' => $eventReleaseLevelModel->id);
             $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
         }
     }
@@ -778,7 +778,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                         $duration = $arrDuration['dateRows'];
                         if ($duration != $countTimestamps)
                         {
-                            $arrSet = [];
+                            $arrSet = array();
                             $arrSet['durationInfo'] = '';
                             $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($objEvent->id);
                             \Contao\Message::addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein. Setzen SIe für jeden Event-Tag eine Datumszeile!', $objEvent->title, $objEvent->id), TL_MODE);
@@ -852,7 +852,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                             $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
                             if ($oEventReleaseLevelModel !== null)
                             {
-                                $set = ['eventReleaseLevel' => $oEventReleaseLevelModel->id];
+                                $set = array('eventReleaseLevel' => $oEventReleaseLevelModel->id);
                                 $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
                             }
                         }
@@ -862,7 +862,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 {
                     // Add eventReleaseLevel when creating a new event...
                     $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
-                    $set = ['eventReleaseLevel' => $oEventReleaseLevelModel->id];
+                    $set = array('eventReleaseLevel' => $oEventReleaseLevelModel->id);
                     $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
                 }
             }
@@ -872,11 +872,11 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         // Set filledInEventReportForm, now the invoice form can be printed in tl_calendar_events_instructor_invoice
         if (Input::get('call') === 'writeTourReport')
         {
-            $set = ['filledInEventReportForm' => '1'];
+            $set = array('filledInEventReportForm' => '1');
             $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
         }
 
-        $set = ['alias' => 'event-' . $dc->id];
+        $set = array('alias' => 'event-' . $dc->id);
         $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
     }
 
@@ -915,7 +915,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
 
         // Get all fields
         $fields = array_keys($row);
-        $allowedFields = ['id', 'pid', 'sorting', 'tstamp'];
+        $allowedFields = array('id', 'pid', 'sorting', 'tstamp');
 
         if (is_array($GLOBALS['TL_DCA'][$strTable]['fields']))
         {
@@ -963,7 +963,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             {
                 if (!empty($value) && is_array($value))
                 {
-                    $arrDate = [];
+                    $arrDate = array();
                     foreach ($value as $arrTstamp)
                     {
                         $arrDate[] = \Date::parse('D, d.m.Y', $arrTstamp['new_repeat']);
@@ -974,7 +974,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             elseif ($i === 'tourProfile')
             {
                 // Special treatment for tourProfile
-                $arrProfile = [];
+                $arrProfile = array();
                 $m = 0;
                 if (!empty($value) && is_array($value))
                 {
@@ -1000,7 +1000,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             elseif ($i === 'instructor')
             {
                 // Special treatment for instructor
-                $arrInstructors = [];
+                $arrInstructors = array();
                 foreach ($value as $arrInstructor)
                 {
                     if ($arrInstructor['instructorId'] > 0)
@@ -1023,7 +1023,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             elseif ($i === 'tourTechDifficulty')
             {
                 // Special treatment for tourTechDifficulty
-                $arrDiff = [];
+                $arrDiff = array();
                 foreach ($value as $difficulty)
                 {
                     $strDiff = '';
@@ -1061,10 +1061,10 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             }
             elseif (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['foreignKey']))
             {
-                $temp = [];
+                $temp = array();
                 $chunks = explode('.', $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['foreignKey'], 2);
 
-                foreach ((array) $value as $v)
+                foreach ((array)$value as $v)
                 {
                     $objKey = $this->Database->prepare("SELECT " . $chunks[1] . " AS value FROM " . $chunks[0] . " WHERE id=?")
                         ->limit(1)
@@ -1136,7 +1136,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             {
                 $row[$i] = $value ? \Date::parse(\Config::get('timeFormat'), $value) : '-';
             }
-            elseif ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] == 'datim' || in_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['flag'], [5, 6, 7, 8, 9, 10]) || $i == 'tstamp')
+            elseif ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] == 'datim' || in_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['flag'], array(5, 6, 7, 8, 9, 10)) || $i == 'tstamp')
             {
                 $row[$i] = $value ? \Date::parse(\Config::get('datimFormat'), $value) : '-';
             }
@@ -1252,9 +1252,9 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         }
         else
         {
-            $opt = [];
+            $opt = array();
         }
-        $arrOpt = [];
+        $arrOpt = array();
         foreach ($opt as $k => $v)
         {
             $arrOpt[] = $k;
@@ -1267,7 +1267,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function optionsCallbackGetOrganizers()
     {
-        $arrOptions = [];
+        $arrOptions = array();
         $objOrganizer = Database::getInstance()->prepare('SELECT * FROM tl_event_organizer ORDER BY sorting')->execute();
         while ($objOrganizer->next())
         {
@@ -1281,7 +1281,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function optionsCallbackCourseTypeLevel0()
     {
-        $arrOpt = [];
+        $arrOpt = array();
         $objDatabase = Database::getInstance()->execute('SELECT * FROM tl_course_main_type ORDER BY code');
         while ($objDatabase->next())
         {
@@ -1296,7 +1296,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function optionsCallbackTourDifficulties(MultiColumnWizard $dc)
     {
-        $options = [];
+        $options = array();
         $objDb = $this->Database->execute('SELECT * FROM tl_tour_difficulty ORDER BY pid ASC, code ASC');
         while ($objDb->next())
         {
@@ -1307,7 +1307,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 {
                     if (!isset($options[$objDiffCat->title]))
                     {
-                        $options[$objDiffCat->title] = [];
+                        $options[$objDiffCat->title] = array();
                     }
 
                     $options[$objDiffCat->title][$objDb->id] = $objDb->shortcut;
@@ -1324,7 +1324,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function optionsCallbackEventType(DataContainer $dc)
     {
-        $arrEventTypes = [];
+        $arrEventTypes = array();
         if (!$dc->id && CURRENT_ID > 0)
         {
             $objCalendar = CalendarModel::findByPk(CURRENT_ID);
@@ -1334,7 +1334,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             $objCalendar = CalendarEventsModel::findByPk($dc->id)->getRelated('pid');
         }
 
-        $arrAllowedEventTypes = [];
+        $arrAllowedEventTypes = array();
         $objUser = \Contao\BackendUser::getInstance();
         if ($objUser !== null)
         {
@@ -1370,7 +1370,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function optionsCallbackCourseSubType()
     {
-        $options = [];
+        $options = array();
         if (Input::get('act') === 'edit')
         {
             $objEvent = CalendarEventsModel::findByPk(Input::get('id'));
@@ -1397,10 +1397,10 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
      */
     public function optionsCallbackListReleaseLevels(DataContainer $dc)
     {
-        $options = [];
+        $options = array();
 
         $objUser = \Contao\BackendUser::getInstance();
-        $arrAllowedEventTypes = [];
+        $arrAllowedEventTypes = array();
 
         if ($objUser !== null)
         {
@@ -1460,15 +1460,15 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
     {
         $columnFields = null;
 
-        $columnFields = [
-            'new_repeat' => [
+        $columnFields = array(
+            'new_repeat' => array(
                 'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['kurstage'],
                 'exclude'   => true,
                 'inputType' => 'text',
                 'default'   => time(),
-                'eval'      => ['rgxp' => 'date', 'datepicker' => true, 'doNotCopy' => false, 'style' => 'width:100px', 'tl_class' => 'wizard'],
-            ],
-        ];
+                'eval'      => array('rgxp' => 'date', 'datepicker' => true, 'doNotCopy' => false, 'style' => 'width:100px', 'tl_class' => 'wizard'),
+            ),
+        );
 
         return $columnFields;
     }
@@ -1722,12 +1722,12 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             foreach ($arrInstructors as $arrInstructor)
             {
                 // Rebuild instructor table
-                $set = [
+                $set = array(
                     'pid'              => $dc->id,
                     'userId'           => $arrInstructor['instructorId'],
                     'tstamp'           => time(),
                     'isMainInstructor' => $i < 1 ? '1' : ''
-                ];
+                );
                 $this->Database->prepare('INSERT INTO tl_calendar_events_instructor %s')->set($set)->execute();
                 $i++;
             }
@@ -1738,13 +1738,13 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
                 $intInstructor = $arrInstructors[0]['instructorId'];
                 if (\Contao\UserModel::findByPk($intInstructor) !== null)
                 {
-                    $set = ['mainInstructor' => $intInstructor];
+                    $set = array('mainInstructor' => $intInstructor);
                     $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->id);
                     return $varValue;
                 }
             }
 
-            $set = ['mainInstructor' => 0];
+            $set = array('mainInstructor' => 0);
             $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->id);
         }
 

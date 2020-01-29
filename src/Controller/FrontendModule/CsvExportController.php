@@ -100,7 +100,7 @@ class CsvExportController extends AbstractFrontendModuleController
             return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
         });
 
-        $arrUserRoles = [];
+        $arrUserRoles = array();
         $objUserRole = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user_role ORDER BY sorting');
         while ($objUserRole->next())
         {
@@ -110,33 +110,33 @@ class CsvExportController extends AbstractFrontendModuleController
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
-        $objForm->addFormField('export-type', [
-            'label'     => ['Export auswählen', ''],
+        $objForm->addFormField('export-type', array(
+            'label'     => array('Export auswählen', ''),
             'inputType' => 'select',
-            'options'   => [
+            'options'   => array(
                 'user-role-export'    => 'Backend-User mit SAC-Benutzerrollen exportieren (tl_user_role)',
                 'user-group-export'   => 'Backend-User mit Benutzergruppenzugehörigkeit exportieren (tl_user_group)',
                 'member-group-export' => 'Frontend-User mit Benutzerzugehörigkeit exportieren (tl_member_group)',
-            ],
-        ]);
+            ),
+        ));
 
-        $objForm->addFormField('user-roles', [
-            'label'     => ['Benutzerrollen-Filter (ODER-Verknüpfung)', ''],
+        $objForm->addFormField('user-roles', array(
+            'label'     => array('Benutzerrollen-Filter (ODER-Verknüpfung)', ''),
             'inputType' => 'select',
             'options'   => $arrUserRoles,
-            'eval'      => ['multiple' => true],
-        ]);
+            'eval'      => array('multiple' => true),
+        ));
 
-        $objForm->addFormField('keep-groups-in-one-line', [
-            'label'     => ['', 'Rollen einzeilig darstellen'],
+        $objForm->addFormField('keep-groups-in-one-line', array(
+            'label'     => array('', 'Rollen einzeilig darstellen'),
             'inputType' => 'checkbox',
-        ]);
+        ));
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submit', array(
             'label'     => 'Export starten',
             'inputType' => 'submit',
-        ]);
+        ));
 
         if ($objForm->validate())
         {
@@ -149,7 +149,7 @@ class CsvExportController extends AbstractFrontendModuleController
                 if ($inputAdapter->post('export-type') === 'user-role-export')
                 {
                     $strTable = 'tl_user';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'admin', 'lastLogin', 'password', 'pwChange', 'userRole'];
+                    $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'admin', 'lastLogin', 'password', 'pwChange', 'userRole');
                     $strGroupFieldName = 'userRole';
                     $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, UserRoleModel::class, $blnKeepGroupsInOneLine);
@@ -158,7 +158,7 @@ class CsvExportController extends AbstractFrontendModuleController
                 if ($inputAdapter->post('export-type') === 'user-group-export')
                 {
                     $strTable = 'tl_user';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'admin', 'lastLogin', 'password', 'pwChange', 'groups'];
+                    $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'admin', 'lastLogin', 'password', 'pwChange', 'groups');
                     $strGroupFieldName = 'groups';
                     $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, UserGroupModel::class, $blnKeepGroupsInOneLine);
@@ -167,7 +167,7 @@ class CsvExportController extends AbstractFrontendModuleController
                 if ($inputAdapter->post('export-type') === 'member-group-export')
                 {
                     $strTable = 'tl_member';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups'];
+                    $arrFields = array('id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups');
                     $strGroupFieldName = 'groups';
                     $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_member ORDER BY lastname, firstname');
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, MemberGroupModel::class, $blnKeepGroupsInOneLine);
@@ -206,7 +206,7 @@ class CsvExportController extends AbstractFrontendModuleController
         $groupModelAdapter = $this->get('contao.framework')->getAdapter($GroupModel);
 
         $filename = $type . '_' . $dateAdapter->parse('Y-m-d_H-i-s') . '.csv';
-        $arrData = [];
+        $arrData = array();
 
         // Write headline
         $arrData[] = $this->getHeadline($arrFields, $strTable);
@@ -232,7 +232,7 @@ class CsvExportController extends AbstractFrontendModuleController
                 }
             }
 
-            $arrUser = [];
+            $arrUser = array();
             foreach ($arrFields as $field)
             {
                 if ($field === $strGroupFieldName)
@@ -338,7 +338,7 @@ class CsvExportController extends AbstractFrontendModuleController
         $translator = $this->get('translator');
 
         // Write headline
-        $arrHeadline = [];
+        $arrHeadline = array();
         foreach ($arrFields as $field)
         {
             $fieldname = $translator->trans(sprintf('%s.%s.0', $strTable, $field), [], 'contao_default') ?: $field;
@@ -404,11 +404,11 @@ class CsvExportController extends AbstractFrontendModuleController
         $writerAdapter = $this->get('contao.framework')->getAdapter(Writer::class);
 
         // Convert special chars
-        $arrFinal = [];
+        $arrFinal = array();
         foreach ($arrData as $arrRow)
         {
             $arrLine = array_map(function ($v) {
-                return html_entity_decode(htmlspecialchars_decode((string) $v));
+                return html_entity_decode(htmlspecialchars_decode((string)$v));
             }, $arrRow);
             $arrFinal[] = $arrLine;
         }

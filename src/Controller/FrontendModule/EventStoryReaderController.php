@@ -191,7 +191,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
                                 $photographer = $arrMeta['de']['photographer'];
                             }
 
-                            $arrFigureCaption = [];
+                            $arrFigureCaption = array();
                             if ($caption != '')
                             {
                                 $arrFigureCaption[] = $caption;
@@ -206,7 +206,8 @@ class EventStoryReaderController extends AbstractFrontendModuleController
                             $linkTitle .= $caption != '' ? $caption : '';
                             $linkTitle .= $photographer != '' ? ' (Foto: ' . $photographer . ')' : '';
 
-                            $images[$objFiles->path] = [
+                            $images[$objFiles->path] = array
+                            (
                                 'id'               => $objFiles->id,
                                 'path'             => $objFiles->path,
                                 'uuid'             => $objFiles->uuid,
@@ -219,7 +220,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
                                 'photographer'     => $stringUtilAdapter->specialchars($photographer),
                                 'strFigureCaption' => $stringUtilAdapter->specialchars($strFigureCaption),
                                 'linkTitle'        => $stringUtilAdapter->specialchars($linkTitle),
-                            ];
+                            );
                         }
                     }
                 }
