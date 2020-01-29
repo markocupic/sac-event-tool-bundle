@@ -8,8 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
-
-$GLOBALS['TL_LANG']['tl_course_sub_type']['pid'] = array("Hauptkategorie", "W&auml;hlen Sie eine Hauptkategorie aus.");
-$GLOBALS['TL_LANG']['tl_course_sub_type']['code'] = array("Zahlencode", "W&auml;hlen Sie einen Zahlencode aus.");
-$GLOBALS['TL_LANG']['tl_course_sub_type']['name'] = array("Bezeichung", "Geben Sie eine Bezeichnung an.");
+$GLOBALS['TL_LANG']['tl_course_sub_type']['pid'] = ["Hauptkategorie", "W&auml;hlen Sie eine Hauptkategorie aus."];
+$GLOBALS['TL_LANG']['tl_course_sub_type']['code'] = ["Zahlencode", "W&auml;hlen Sie einen Zahlencode aus."];
+$GLOBALS['TL_LANG']['tl_course_sub_type']['name'] = ["Bezeichung", "Geben Sie eine Bezeichnung an."];

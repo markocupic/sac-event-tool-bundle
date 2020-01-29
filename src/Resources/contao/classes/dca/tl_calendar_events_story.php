@@ -32,7 +32,7 @@ class tl_calendar_events_story extends Backend
         // Overwrite readonly attribute for admins
         if ($this->User->admin)
         {
-            $fields = array('sacMemberId', 'eventId', 'authorName');
+            $fields = ['sacMemberId', 'eventId', 'authorName'];
             foreach ($fields as $field)
             {
                 $GLOBALS['TL_DCA']['tl_calendar_events_story']['fields'][$field]['eval']['readonly'] = false;

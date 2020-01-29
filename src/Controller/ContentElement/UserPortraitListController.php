@@ -93,7 +93,7 @@ class UserPortraitListController extends AbstractContentElementController
             $template->strTemplate = $model->userList_template;
         }
 
-        $arrIDS = array();
+        $arrIDS = [];
         $arrSelectedRoles = $stringUtilAdapter->deserialize($model->userList_userRoles, true);
         if ($model->userList_selectMode === 'selectUserRoles')
         {
@@ -168,8 +168,8 @@ class UserPortraitListController extends AbstractContentElementController
                 // Roles
                 $arrIDS = $stringUtilAdapter->deserialize($objUser->userRole, true);
                 $objRoles = $userRoleModelAdapter->findMultipleByIds($arrIDS);
-                $arrRoleEmails = array();
-                $arrRoles = array();
+                $arrRoleEmails = [];
+                $arrRoles = [];
                 if ($objRoles !== null)
                 {
                     while ($objRoles->next())
@@ -227,7 +227,7 @@ class UserPortraitListController extends AbstractContentElementController
                         }
 
                         $objPartial->singleSRC = $objModel->path;
-                        $arrUser = (array)$objPartial;
+                        $arrUser = (array) $objPartial;
                         $objTemplate->addImage = true;
 
                         $controllerAdapter->addImageToTemplate($objTemplate, $arrUser, null, null, $objModel);

@@ -12,19 +12,16 @@
 $GLOBALS['TL_LANG']['tl_calendar']['event_type_legend'] = 'Event Typen Einstellungen';
 
 // Fields
-$GLOBALS['TL_LANG']['tl_calendar']['allowedEventTypes'] = array("Erlaubte Event Typen", "W&auml;hlen Sie die Event Typen, die im Kalender ausgew&auml;hlt werden d&uuml;rfen, aus.");
-$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventReleaseLevelChange'] = array("Benachrichtigen bei Freigabestufen-Änderung", "Geben Sie eine Kommaseparierte Liste mit E-Mail-Adressen an.");
-$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventPublish'] = array("Benachrichtigen bei Event-Veröffentlichung", "Geben Sie eine Kommaseparierte Liste mit E-Mail-Adressen an.");
-
-
+$GLOBALS['TL_LANG']['tl_calendar']['allowedEventTypes'] = ["Erlaubte Event Typen", "W&auml;hlen Sie die Event Typen, die im Kalender ausgew&auml;hlt werden d&uuml;rfen, aus."];
+$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventReleaseLevelChange'] = ["Benachrichtigen bei Freigabestufen-Änderung", "Geben Sie eine Kommaseparierte Liste mit E-Mail-Adressen an."];
+$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventPublish'] = ["Benachrichtigen bei Event-Veröffentlichung", "Geben Sie eine Kommaseparierte Liste mit E-Mail-Adressen an."];
 
 // References
 $GLOBALS['TL_LANG']['tl_calendar']['course'] = "SAC-Kurskalender";
 $GLOBALS['TL_LANG']['tl_calendar']['tour'] = "SAC-Tourenkalender";
 
-
 // Operations
-$GLOBALS['TL_LANG']['tl_calendar']['cut'] = array('Kalender verschieben', "Event ID %s verschieben");
+$GLOBALS['TL_LANG']['tl_calendar']['cut'] = ['Kalender verschieben', "Event ID %s verschieben"];
 
 
 

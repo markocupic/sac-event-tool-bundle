@@ -252,7 +252,7 @@ class PrintWorkshopsAsPdf
 
             // add a simple Table Of Content at first page
             // (check the example n. 59 for the HTML version)
-            $this->pdf->addTOC(2, 'opensanslight', '.', 'INDEX', 'B', array(255, 255, 255));
+            $this->pdf->addTOC(2, 'opensanslight', '.', 'INDEX', 'B', [255, 255, 255]);
 
             // end of TOC page
             $this->pdf->endTOCPage();
@@ -294,7 +294,7 @@ class PrintWorkshopsAsPdf
     {
         System::loadLanguageFile('tl_calendar_events');
         $objEvent = CalendarEventsModel::findByPk($this->pdf->Event->id);
-        $this->pdf->Bookmark(html_entity_decode($objEvent->title), 0, 0, '', 'I', array(0, 0, 0));
+        $this->pdf->Bookmark(html_entity_decode($objEvent->title), 0, 0, '', 'I', [0, 0, 0]);
 
         // Create template object
         $objPartial = new FrontendTemplate('tcpdf_template_sac_kurse');
@@ -409,14 +409,14 @@ class PrintWorkshopsAsPdf
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
         $strDates = '';
-        if($objEvent !== null)
+        if ($objEvent !== null)
         {
             $arr = CalendarEventsHelper::getEventTimestamps($objEvent);
             if ($arr !== false)
             {
                 if (count($arr) > 1)
                 {
-                    $arrValue = array();
+                    $arrValue = [];
                     foreach ($arr as $k => $v)
                     {
                         if ($k == count($arr) - 1)

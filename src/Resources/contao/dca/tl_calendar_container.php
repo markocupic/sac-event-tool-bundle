@@ -8,127 +8,104 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
-$GLOBALS['TL_DCA']['tl_calendar_container'] = array
-(
+$GLOBALS['TL_DCA']['tl_calendar_container'] = [
 
     // Config
-    'config'      => array
-    (
+    'config'      => [
         'dataContainer'    => 'Table',
-        'ctable'           => array('tl_calendar'),
+        'ctable'           => ['tl_calendar'],
         'switchToEdit'     => true,
         'enableVersioning' => true,
-        'onload_callback'  => array
-        (
-            array('tl_calendar_container', 'checkPermission'),
-        ),
-        'sql'              => array
-        (
-            'keys' => array
-            (
+        'onload_callback'  => [
+            ['tl_calendar_container', 'checkPermission'],
+        ],
+        'sql'              => [
+            'keys' => [
                 'id' => 'primary'
-            )
-        )
-    ),
+            ]
+        ]
+    ],
 
     // List
-    'list'        => array
-    (
-        'sorting'           => array
-        (
+    'list'        => [
+        'sorting'           => [
             'mode'            => 1,
-            'fields'          => array('title'),
+            'fields'          => ['title'],
             'flag'            => 2,
             'panelLayout'     => 'filter;search,limit',
             'disableGrouping' => true
-        ),
-        'label'             => array
-        (
-            'fields' => array('title'),
+        ],
+        'label'             => [
+            'fields' => ['title'],
             'format' => '%s'
-        ),
-        'global_operations' => array
-        (
-            'all' => array
-            (
+        ],
+        'global_operations' => [
+            'all' => [
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
-            )
-        ),
-        'operations'        => array
-        (
-            'edit'       => array
-            (
+            ]
+        ],
+        'operations'        => [
+            'edit'       => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['edit'],
                 'href'  => 'table=tl_calendar',
                 'icon'  => 'edit.svg'
-            ),
-            'editheader' => array
-            (
+            ],
+            'editheader' => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_calendar_container']['editheader'],
                 'href'            => 'act=edit',
                 'icon'            => 'header.svg',
-                'button_callback' => array('tl_calendar_container', 'editHeader')
-            ),
-            'copy'       => array
-            (
+                'button_callback' => ['tl_calendar_container', 'editHeader']
+            ],
+            'copy'       => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_calendar_container']['copy'],
                 'href'            => 'act=copy',
                 'icon'            => 'copy.svg',
-                'button_callback' => array('tl_calendar_container', 'copyCalendarContainer')
-            ),
-            'delete'     => array
-            (
+                'button_callback' => ['tl_calendar_container', 'copyCalendarContainer']
+            ],
+            'delete'     => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_calendar_container']['delete'],
                 'href'            => 'act=delete',
                 'icon'            => 'delete.svg',
                 'attributes'      => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"',
-                'button_callback' => array('tl_calendar_container', 'deleteCalendarContainer')
-            ),
-            'show'       => array
-            (
+                'button_callback' => ['tl_calendar_container', 'deleteCalendarContainer']
+            ],
+            'show'       => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['show'],
                 'href'  => 'act=show',
                 'icon'  => 'show.svg'
-            )
-        )
-    ),
+            ]
+        ]
+    ],
 
     // Palettes
-    'palettes'    => array
-    (
-        '__selector__' => array(),
+    'palettes'    => [
+        '__selector__' => [],
         'default'      => '{title_legend},title'
-    ),
+    ],
 
     // Subpalettes
-    'subpalettes' => array
-    (
+    'subpalettes' => [
         //
-    ),
+    ],
 
     // Fields
-    'fields'      => array
-    (
-        'id'     => array
-        (
+    'fields'      => [
+        'id'     => [
             'sql' => "int(10) unsigned NOT NULL auto_increment"
-        ),
-        'tstamp' => array
-        (
+        ],
+        'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'"
-        ),
-        'title'  => array
-        (
+        ],
+        'title'  => [
             'label'     => &$GLOBALS['TL_LANG']['tl_calendar_container']['title'],
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
+            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''"
-        )
-    )
-);
+        ]
+    ]
+];

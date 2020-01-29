@@ -40,7 +40,7 @@ class tl_member_sac_bundle extends Backend
             $memberModel = \Contao\MemberModel::findByPk($objMember->activeRecord->id);
             if ($memberModel !== null)
             {
-                if (false === $objClearFrontendUserData->clearMemberProfile((int)$memberModel->id))
+                if (false === $objClearFrontendUserData->clearMemberProfile((int) $memberModel->id))
                 {
                     $arrErrorMsg = sprintf('Das Mitglied mit ID:%s kann nicht gelöscht werden, weil es bei Events noch auf der Buchungsliste steht.', $objMember->activeRecord->id);
                     \Contao\Message::add($arrErrorMsg, 'TL_ERROR', TL_MODE);

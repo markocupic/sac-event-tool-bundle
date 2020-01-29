@@ -82,7 +82,7 @@ class CabanneSacDetailController extends AbstractContentElementController
         $objCabanne = $cabanneSacModelAdapter->findByPk($model->cabanneSac);
         if ($objCabanne !== null)
         {
-            $skip = array('id', 'tstamp');
+            $skip = ['id', 'tstamp'];
             foreach ($objCabanne->row() as $k => $v)
             {
                 if (!in_array($k, $skip))

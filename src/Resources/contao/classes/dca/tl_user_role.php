@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-
 /**
  * Class tl_user_role
  */
@@ -50,8 +49,7 @@ class tl_user_role extends Backend
      */
     public function checkForUsage($row, $label, DataContainer $dc, $args)
     {
-
-        $arrRoles = array();
+        $arrRoles = [];
         $objDb = $this->Database->execute('SELECT * FROM tl_user');
         if ($objDb->numRows)
         {

@@ -9,10 +9,9 @@
  */
 
 // Buttons
-$GLOBALS['TL_LANG']['tl_tour_type']['new'] = array("Neuen Tourentyp anlegen", "Legen Sie einen neuen Tourentyp an.");
-
+$GLOBALS['TL_LANG']['tl_tour_type']['new'] = ["Neuen Tourentyp anlegen", "Legen Sie einen neuen Tourentyp an."];
 
 // Fields
-$GLOBALS['TL_LANG']['tl_tour_type']['shortcut'] = array("Abk&uuml;rzung", "Geben Sie eine Abk&uuml;rzung für den Tourentyp ein.");
-$GLOBALS['TL_LANG']['tl_tour_type']['title'] = array("Tourentyp", "Geben Sie eine Tourentyp Bezeichnung ein.");
-$GLOBALS['TL_LANG']['tl_tour_type']['description'] = array("Beschreibung f&uuml;r den Tourentyp", "Geben Sie eine Beschreibung ein.");
+$GLOBALS['TL_LANG']['tl_tour_type']['shortcut'] = ["Abk&uuml;rzung", "Geben Sie eine Abk&uuml;rzung für den Tourentyp ein."];
+$GLOBALS['TL_LANG']['tl_tour_type']['title'] = ["Tourentyp", "Geben Sie eine Tourentyp Bezeichnung ein."];
+$GLOBALS['TL_LANG']['tl_tour_type']['description'] = ["Beschreibung f&uuml;r den Tourentyp", "Geben Sie eine Beschreibung ein."];

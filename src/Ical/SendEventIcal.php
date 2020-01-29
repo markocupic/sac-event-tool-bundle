@@ -39,8 +39,8 @@ class SendEventIcal
             $noTime = true;
         }
         $vEvent
-            ->setDtStart(\DateTime::createFromFormat('d.m.Y - H:i:s', date('d.m.Y - H:i:s', (int)$objEvent->startTime)))
-            ->setDtEnd(\DateTime::createFromFormat('d.m.Y - H:i:s', date('d.m.Y - H:i:s', (int)$objEvent->endTime)))
+            ->setDtStart(\DateTime::createFromFormat('d.m.Y - H:i:s', date('d.m.Y - H:i:s', (int) $objEvent->startTime)))
+            ->setDtEnd(\DateTime::createFromFormat('d.m.Y - H:i:s', date('d.m.Y - H:i:s', (int) $objEvent->endTime)))
             ->setSummary(strip_tags(Controller::replaceInsertTags($objEvent->title)))
             ->setUseUtc(false)
             ->setLocation($objEvent->location)

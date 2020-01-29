@@ -8,99 +8,98 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+$GLOBALS['TL_DCA']['tl_course_sub_type'] = [
 
-$GLOBALS['TL_DCA']['tl_course_sub_type'] = array(
-
-    'config'   => array(
+    'config'   => [
         'dataContainer'    => 'Table',
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
         'switchToEdit'     => true,
         'ptable'           => 'tl_course_main_type',
-        'sql'              => array(
-            'keys' => array(
+        'sql'              => [
+            'keys' => [
                 'id'  => 'primary',
                 'pid' => 'index',
-            ),
-        ),
-    ),
-    'list'     => array(
-        'sorting'           => array(
+            ],
+        ],
+    ],
+    'list'     => [
+        'sorting'           => [
             'mode'        => 2,
-            'fields'      => array('code ASC'),
+            'fields'      => ['code ASC'],
             'flag'        => 1,
             'panelLayout' => 'filter;sort,search,limit',
-        ),
-        'label'             => array(
-            'fields'      => array('code', 'pid:tl_course_main_type.name', 'name'),
+        ],
+        'label'             => [
+            'fields'      => ['code', 'pid:tl_course_main_type.name', 'name'],
             'showColumns' => true,
-        ),
-        'global_operations' => array(
-            'all' => array(
+        ],
+        'global_operations' => [
+            'all' => [
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
-            ),
-        ),
-        'operations'        => array(
-            'edit'   => array(
+            ],
+        ],
+        'operations'        => [
+            'edit'   => [
                 'label' => &$GLOBALS['TL_LANG']['tl_course_sub_type']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.gif',
-            ),
-            'copy'   => array(
+            ],
+            'copy'   => [
                 'label' => &$GLOBALS['TL_LANG']['tl_news']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.gif',
-            ),
-            'delete' => array(
+            ],
+            'delete' => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_course_sub_type']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"',
-            ),
-        ),
-    ),
-    'palettes' => array(
+            ],
+        ],
+    ],
+    'palettes' => [
         'default' => 'pid,code,name,',
-    ),
-    'fields'   => array(
-        'id'     => array(
+    ],
+    'fields'   => [
+        'id'     => [
             'sql' => "int(10) unsigned NOT NULL auto_increment",
-        ),
-        'pid'    => array(
+        ],
+        'pid'    => [
             'label'      => &$GLOBALS['TL_LANG']['tl_course_sub_type']['pid'],
             'inputType'  => 'select',
             'sorting'    => true,
             'filter'     => true,
             'foreignKey' => 'tl_course_main_type.name',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => array('type' => 'belongsTo', 'load' => 'eager'),
-        ),
-        'tstamp' => array(
+            'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
+        ],
+        'tstamp' => [
             'label' => &$GLOBALS['TL_LANG']['tl_course_sub_type']['tstamp'],
             'flag'  => 6,
             'sql'   => "int(10) unsigned NOT NULL default '0'",
 
-        ),
-        'code'   => array(
+        ],
+        'code'   => [
             'label'     => &$GLOBALS['TL_LANG']['tl_course_sub_type']['code'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true, 'unique' => true),
+            'eval'      => ['mandatory' => true, 'unique' => true],
             'sql'       => "varchar(5) NOT NULL default ''",
-        ),
-        'name'   => array(
+        ],
+        'name'   => [
             'label'     => &$GLOBALS['TL_LANG']['tl_course_sub_type']['name'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true, 'maxlength' => 255),
+            'eval'      => ['mandatory' => true, 'maxlength' => 255],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-    ),
-);
+        ],
+    ],
+];

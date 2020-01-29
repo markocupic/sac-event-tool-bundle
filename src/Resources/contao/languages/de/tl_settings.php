@@ -11,7 +11,6 @@
 // Settings
 $GLOBALS['TL_LANG']['tl_settings']['sacEventTool_legend'] = "SAC Event Tool";
 
-
 // Fields
-$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'] = array("Touren- und Kursadministration Name", "Geben Sie einen Namen ein.");
-$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'] = array("Touren- und Kursadministration E-Mail-Adresse", "Geben Sie eine E-Mail-Adresse ein.");
+$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'] = ["Touren- und Kursadministration Name", "Geben Sie einen Namen ein."];
+$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'] = ["Touren- und Kursadministration E-Mail-Adresse", "Geben Sie eine E-Mail-Adresse ein."];

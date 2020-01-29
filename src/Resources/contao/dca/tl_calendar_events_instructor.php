@@ -11,103 +11,83 @@
 /**
  * Table tl_calendar_events_instructor
  */
-$GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = array
-(
+$GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = [
 
-    'config'      => array
-    (
+    'config'      => [
         'dataContainer'     => 'Table',
         'notCopyable'       => true,
         'ptable'            => 'tl_calendar_events',
         // Do not copy nor delete records, if an item has been deleted!
-        'onload_callback'   => array
-        (//
-        ),
-        'onsubmit_callback' => array(),
-        'ondelete_callback' => array(),
-        'sql'               => array
-        (
-            'keys' => array
-            (
+        'onload_callback'   => [//
+        ],
+        'onsubmit_callback' => [],
+        'ondelete_callback' => [],
+        'sql'               => [
+            'keys' => [
                 'id'     => 'primary',
                 'pid'    => 'index',
                 'userId' => 'index'
-            ),
-        ),
-    ),
+            ],
+        ],
+    ],
     // Buttons callback
-    'edit'        => array(//'buttons_callback' => array(array('tl_calendar_events_instructor', 'buttonsCallback')),
-    ),
+    'edit'        => [//'buttons_callback' => array(array('tl_calendar_events_instructor', 'buttonsCallback')),
+    ],
 
     // List
-    'list'        => array
-    (
-        'sorting'           => array
-        (//
-        ),
-        'label'             => array
-        (//
-        ),
-        'global_operations' => array
-        (
-            'all' => array
-            (
+    'list'        => [
+        'sorting'           => [//
+        ],
+        'label'             => [//
+        ],
+        'global_operations' => [
+            'all' => [
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-            ),
-        ),
-        'operations'        => array
-        (
-            'edit'   => array
-            (
+            ],
+        ],
+        'operations'        => [
+            'edit'   => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.svg',
-            ),
-            'delete' => array
-            (
+            ],
+            'delete' => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"',
-            ),
-        ),
-    ),
+            ],
+        ],
+    ],
 
     // Palettes
-    'palettes'    => array(),
+    'palettes'    => [],
 
     // Subpalettes
-    'subpalettes' => array
-    (),
+    'subpalettes' => [],
 
     // Fields
-    'fields'      => array
-    (
-        'id'               => array
-        (
+    'fields'      => [
+        'id'               => [
             'sql' => "int(10) unsigned NOT NULL auto_increment",
-        ),
+        ],
         // Parent: tl_calendar_events.id
-        'pid'              => array
-        (
+        'pid'              => [
             'sql' => "int(10) unsigned NOT NULL default 0",
-        ),
-        'tstamp'           => array
-        (
+        ],
+        'tstamp'           => [
             'sql' => "int(10) unsigned NOT NULL default 0",
-        ),
+        ],
         // Parent tl_user.id
-        'userId'           => array
-        (
+        'userId'           => [
             'sql' => "int(10) unsigned NOT NULL default 0",
-        ),
-        'isMainInstructor' => array
-        (
+        ],
+        'isMainInstructor' => [
             'sql' => "char(1) NOT NULL default ''",
-        ),
-    ),
-);
+        ],
+    ],
+];
 
