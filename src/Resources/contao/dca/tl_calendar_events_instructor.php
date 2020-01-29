@@ -11,83 +11,103 @@
 /**
  * Table tl_calendar_events_instructor
  */
-$GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = [
+$GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = array
+(
 
-    'config'      => [
+    'config'      => array
+    (
         'dataContainer'     => 'Table',
         'notCopyable'       => true,
         'ptable'            => 'tl_calendar_events',
         // Do not copy nor delete records, if an item has been deleted!
-        'onload_callback'   => [//
-        ],
-        'onsubmit_callback' => [],
-        'ondelete_callback' => [],
-        'sql'               => [
-            'keys' => [
+        'onload_callback'   => array
+        (//
+        ),
+        'onsubmit_callback' => array(),
+        'ondelete_callback' => array(),
+        'sql'               => array
+        (
+            'keys' => array
+            (
                 'id'     => 'primary',
                 'pid'    => 'index',
                 'userId' => 'index'
-            ],
-        ],
-    ],
+            ),
+        ),
+    ),
     // Buttons callback
-    'edit'        => [//'buttons_callback' => array(array('tl_calendar_events_instructor', 'buttonsCallback')),
-    ],
+    'edit'        => array(//'buttons_callback' => array(array('tl_calendar_events_instructor', 'buttonsCallback')),
+    ),
 
     // List
-    'list'        => [
-        'sorting'           => [//
-        ],
-        'label'             => [//
-        ],
-        'global_operations' => [
-            'all' => [
+    'list'        => array
+    (
+        'sorting'           => array
+        (//
+        ),
+        'label'             => array
+        (//
+        ),
+        'global_operations' => array
+        (
+            'all' => array
+            (
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-            ],
-        ],
-        'operations'        => [
-            'edit'   => [
+            ),
+        ),
+        'operations'        => array
+        (
+            'edit'   => array
+            (
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.svg',
-            ],
-            'delete' => [
+            ),
+            'delete' => array
+            (
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"',
-            ],
-        ],
-    ],
+            ),
+        ),
+    ),
 
     // Palettes
-    'palettes'    => [],
+    'palettes'    => array(),
 
     // Subpalettes
-    'subpalettes' => [],
+    'subpalettes' => array
+    (),
 
     // Fields
-    'fields'      => [
-        'id'               => [
+    'fields'      => array
+    (
+        'id'               => array
+        (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
-        ],
+        ),
         // Parent: tl_calendar_events.id
-        'pid'              => [
+        'pid'              => array
+        (
             'sql' => "int(10) unsigned NOT NULL default 0",
-        ],
-        'tstamp'           => [
+        ),
+        'tstamp'           => array
+        (
             'sql' => "int(10) unsigned NOT NULL default 0",
-        ],
+        ),
         // Parent tl_user.id
-        'userId'           => [
+        'userId'           => array
+        (
             'sql' => "int(10) unsigned NOT NULL default 0",
-        ],
-        'isMainInstructor' => [
+        ),
+        'isMainInstructor' => array
+        (
             'sql' => "char(1) NOT NULL default ''",
-        ],
-    ],
-];
+        ),
+    ),
+);
 

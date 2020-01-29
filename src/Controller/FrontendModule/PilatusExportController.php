@@ -99,19 +99,19 @@ class PilatusExportController extends AbstractPrintExportController
     /**
      * @var array
      */
-    protected $events = [];
+    protected $events = array();
 
     /**
      * Editable course fields
      * @var array
      */
-    protected $courseFeEditableFields = ['teaser', 'issues', 'terms', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous'];
+    protected $courseFeEditableFields = array('teaser', 'issues', 'terms', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous');
 
     /**
      * Editable tour fields
      * @var array
      */
-    protected $tourFeEditableFields = ['teaser', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous'];
+    protected $tourFeEditableFields = array('teaser', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous');
 
     /**
      * @param Request $request
@@ -212,7 +212,7 @@ class PilatusExportController extends AbstractPrintExportController
             $arrFields = $this->tourFeEditableFields;
         }
 
-        $set = [];
+        $set = array();
         foreach ($arrFields as $field)
         {
             $set[$field] = $request->request->get($field);
@@ -220,12 +220,12 @@ class PilatusExportController extends AbstractPrintExportController
 
         $eventId = $request->request->get('id');
 
-        $arrReturn = [
+        $arrReturn = array(
             'status'  => 'error',
             'eventId' => $eventId,
             'message' => '',
             'set'     => $set,
-        ];
+        );
 
         if ($eventId > 0 && count($set) > 0)
         {
@@ -233,7 +233,7 @@ class PilatusExportController extends AbstractPrintExportController
             {
                 /** @var  Connection $conn */
                 $conn = System::getContainer()->get('database_connection');
-                $conn->update('tl_calendar_events', $set, ['id' => $eventId]);
+                $conn->update('tl_calendar_events', $set, array('id' => $eventId));
 
                 $arrReturn['status'] = 'success';
                 $arrReturn['message'] = sprintf('Saved datarecord with ID %s successfully to the Database (tl_calendar_events).', $eventId);
@@ -274,7 +274,7 @@ class PilatusExportController extends AbstractPrintExportController
         });
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
-        $range = [];
+        $range = array();
         $range[0] = '---';
 
         $now = $dateAdapter->parse('n');
@@ -287,45 +287,45 @@ class PilatusExportController extends AbstractPrintExportController
         }
 
         // Now let's add form fields:
-        $objForm->addFormField('timeRange', [
+        $objForm->addFormField('timeRange', array(
             'label'     => 'Zeitspanne (fixe Zeitspanne)',
             'inputType' => 'select',
             'options'   => $range,
-            'eval'      => ['mandatory' => false],
-        ]);
+            'eval'      => array('mandatory' => false),
+        ));
 
-        $objForm->addFormField('timeRangeStart', [
-            'label'     => ['Zeitspanne manuelle Eingabe (Startdatum)'],
+        $objForm->addFormField('timeRangeStart', array(
+            'label'     => array('Zeitspanne manuelle Eingabe (Startdatum)'),
             'inputType' => 'text',
-            'eval'      => ['mandatory' => false, 'maxlength' => '10', 'minlength' => 8, 'placeholder' => 'dd.mm.YYYY'],
+            'eval'      => array('mandatory' => false, 'maxlength' => '10', 'minlength' => 8, 'placeholder' => 'dd.mm.YYYY'),
             'value'     => $request->request->get('timeRangeStart')
-        ]);
+        ));
 
-        $objForm->addFormField('timeRangeEnd', [
+        $objForm->addFormField('timeRangeEnd', array(
             'label'     => 'Zeitspanne manuelle Eingabe (Enddatum)',
             'inputType' => 'text',
-            'eval'      => ['mandatory' => false, 'maxlength' => '10', 'minlength' => 8, 'placeholder' => 'dd.mm.YYYY'],
+            'eval'      => array('mandatory' => false, 'maxlength' => '10', 'minlength' => 8, 'placeholder' => 'dd.mm.YYYY'),
             'value'     => $request->request->get('timeRangeEnd')
-        ]);
+        ));
 
-        $objForm->addFormField('eventReleaseLevel', [
+        $objForm->addFormField('eventReleaseLevel', array(
             'label'     => 'Zeige an ab Freigabestufe (Wenn leer gelassen, wird ab 2. höchster FS gelistet!)',
             'inputType' => 'select',
-            'options'   => [1 => 'FS1', 2 => 'FS2', 3 => 'FS3', 4 => 'FS4'],
-            'eval'      => ['mandatory' => false, 'includeBlankOption' => true],
-        ]);
+            'options'   => array(1 => 'FS1', 2 => 'FS2', 3 => 'FS3', 4 => 'FS4'),
+            'eval'      => array('mandatory' => false, 'includeBlankOption' => true),
+        ));
 
-        $objForm->addFormField('showQrCode', [
-            'label'     => ['QR Code', 'QR Code anzeigen?'],
+        $objForm->addFormField('showQrCode', array(
+            'label'     => array('QR Code', 'QR Code anzeigen?'),
             'inputType' => 'checkbox',
-            'eval'      => ['mandatory' => false],
-        ]);
+            'eval'      => array('mandatory' => false),
+        ));
 
         // Let's add a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submit', array(
             'label'     => 'Export starten',
             'inputType' => 'submit',
-        ]);
+        ));
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate())
@@ -416,7 +416,7 @@ class PilatusExportController extends AbstractPrintExportController
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
 
-        $arrTours = [];
+        $arrTours = array();
 
         /** @var Connection $conn */
         $conn = System::getContainer()->get('database_connection');
@@ -532,7 +532,7 @@ class PilatusExportController extends AbstractPrintExportController
             $dateFormat = $configAdapter->get('dateFormat');
         }
 
-        $dateFormatShortened = [];
+        $dateFormatShortened = array();
 
         if ($dateFormat === 'd.')
         {
@@ -578,7 +578,7 @@ class PilatusExportController extends AbstractPrintExportController
         }
         else
         {
-            $arrDates = [];
+            $arrDates = array();
             $dates = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
             foreach ($dates as $date)
             {
@@ -602,7 +602,7 @@ class PilatusExportController extends AbstractPrintExportController
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
 
-        $arrEvents = [];
+        $arrEvents = array();
 
         $eventType = 'course';
 
@@ -669,7 +669,7 @@ class PilatusExportController extends AbstractPrintExportController
             $arrRow = $this->getEventDetails($eventModel);
 
             // Headline
-            $arrHeadline = [];
+            $arrHeadline = array();
             $arrHeadline[] = $this->getEventPeriod($eventModel, 'j.-j. F');
             $arrHeadline[] = $this->getEventPeriod($eventModel, 'D');
             $arrHeadline[] = $eventModel->title;
@@ -708,7 +708,7 @@ class PilatusExportController extends AbstractPrintExportController
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
 
-        $arrOrganizerContainer = [];
+        $arrOrganizerContainer = array();
 
         // Check if event has allowed type
         $arrAllowedEventTypes = $stringUtilAdapter->deserialize($this->model->print_export_allowedEventTypes, true);
@@ -727,7 +727,7 @@ class PilatusExportController extends AbstractPrintExportController
 
         while (false !== ($objOrganizer = $resultsOrganizers->fetch(\PDO::FETCH_OBJ)))
         {
-            $arrOrganizerEvents = [];
+            $arrOrganizerEvents = array();
 
             /** @var QueryBuilder $qb */
             $qbEvents = $conn->createQueryBuilder();
@@ -770,7 +770,7 @@ class PilatusExportController extends AbstractPrintExportController
                 $arrRow = $this->getEventDetails($eventModel);
 
                 // Headline
-                $arrHeadline = [];
+                $arrHeadline = array();
                 $arrHeadline[] = $this->getEventPeriod($eventModel, 'j.-j. F');
                 $arrHeadline[] = $this->getEventPeriod($eventModel, 'D');
                 $arrHeadline[] = $eventModel->title;
@@ -786,11 +786,11 @@ class PilatusExportController extends AbstractPrintExportController
                 $arrOrganizerEvents[] = $arrRow;
             }
 
-            $arrOrganizerContainer[] = [
+            $arrOrganizerContainer[] = array(
                 'id'     => $objOrganizer->id,
                 'title'  => $objOrganizer->title,
                 'events' => $arrOrganizerEvents,
-            ];
+            );
         }
 
         $this->events[$eventType . 's'] = $arrOrganizerContainer;
@@ -843,7 +843,7 @@ class PilatusExportController extends AbstractPrintExportController
         }
 
         // MinMaxMembers
-        $arrMinMaxMembers = [];
+        $arrMinMaxMembers = array();
         if ($objEvent->addMinAndMaxMembers && $objEvent->minMembers > 0)
         {
             $arrMinMaxMembers[] = 'min. ' . $objEvent->minMembers;
@@ -854,7 +854,7 @@ class PilatusExportController extends AbstractPrintExportController
         }
         $arrRow['minMaxMembers'] = implode('/', $arrMinMaxMembers);
 
-        $arrEvents = [];
+        $arrEvents = array();
         foreach ($arrRow as $k => $v)
         {
             $strValue = nl2br((string) $v);

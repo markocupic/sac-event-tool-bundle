@@ -253,31 +253,31 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         $url = $environmentAdapter->get('uri');
         $objForm->setFormActionFromUri($url);
 
-        $objForm->addFormField('username', [
+        $objForm->addFormField('username', array(
             'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_sacMemberId'],
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true],
-        ]);
-        $objForm->addFormField('email', [
+            'eval'      => array('mandatory' => true),
+        ));
+        $objForm->addFormField('email', array(
             'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_email'],
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'rgxp' => 'email'],
-        ]);
-        $objForm->addFormField('dateOfBirth', [
+            'eval'      => array('mandatory' => true, 'maxlength' => 255, 'rgxp' => 'email'),
+        ));
+        $objForm->addFormField('dateOfBirth', array(
             'label'     => sprintf($GLOBALS['TL_LANG']['MSC']['activateMemberAccount_dateOfBirth'], $configAdapter->get('dateFormat')),
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true],
-        ]);
-        $objForm->addFormField('agb', [
-            'label'     => ['', sprintf($GLOBALS['TL_LANG']['MSC']['activateMemberAccount_agb'], '<a href="#" data-toggle="modal" data-target="#agbModal">', '</a>')],
+            'eval'      => array('mandatory' => true, 'rgxp' => 'date', 'datepicker' => true),
+        ));
+        $objForm->addFormField('agb', array(
+            'label'     => array('', sprintf($GLOBALS['TL_LANG']['MSC']['activateMemberAccount_agb'], '<a href="#" data-toggle="modal" data-target="#agbModal">', '</a>')),
             'inputType' => 'checkbox',
-            'eval'      => ['mandatory' => true],
-        ]);
+            'eval'      => array('mandatory' => true),
+        ));
         // Let's add  a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submit', array(
             'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_startActivationProcess'],
             'inputType' => 'submit',
-        ]);
+        ));
 
         // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields.
         // DO NOT use this method with generate() as the "form" template provides those fields by default.
@@ -424,17 +424,17 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         // Password
-        $objForm->addFormField('activationToken', [
+        $objForm->addFormField('activationToken', array(
             'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_pleaseEnterTheActivationCode'],
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'minlength' => 6, 'maxlength' => 6],
-        ]);
+            'eval'      => array('mandatory' => true, 'minlength' => 6, 'maxlength' => 6),
+        ));
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submit', array(
             'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_proceedActivationProcess'],
             'inputType' => 'submit',
-        ]);
+        ));
 
         // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields.
         // DO NOT use this method with generate() as the "form" template provides those fields by default.
@@ -547,17 +547,17 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         // Password
-        $objForm->addFormField('password', [
+        $objForm->addFormField('password', array(
             'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_pleaseEnterPassword'],
             'inputType' => 'password',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255],
-        ]);
+            'eval'      => array('mandatory' => true, 'maxlength' => 255),
+        ));
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submit', array(
             'label'     => $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_activateMemberAccount'],
             'inputType' => 'submit',
-        ]);
+        ));
 
         // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields.
         // DO NOT use this method with generate() as the "form" template provides those fields by default.
@@ -604,7 +604,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
                     // Log
                     $logger = System::getContainer()->get('monolog.logger.contao');
                     $strText = sprintf('User %s %s [%s] has successfully activated her/his member account.', $objMemberModel->firstname, $objMemberModel->lastname, $objMemberModel->sacMemberId);
-                    $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, 'MEMBER_ACCOUNT_ACTIVATION')]);
+                    $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, 'MEMBER_ACCOUNT_ACTIVATION')));
 
                     // Redirect
                     $url = $urlAdapter->removeQueryString(['step']);
@@ -627,7 +627,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         if ($this->objNotification !== null)
         {
             // Set token array
-            $arrTokens = [
+            $arrTokens = array(
                 'firstname'   => html_entity_decode($objMember->firstname),
                 'lastname'    => html_entity_decode($objMember->lastname),
                 'street'      => html_entity_decode($objMember->street),
@@ -638,7 +638,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
                 'username'    => html_entity_decode($objMember->username),
                 'sacMemberId' => html_entity_decode($objMember->username),
                 'email'       => $objMember->email,
-            ];
+            );
 
             $this->objNotification->send($arrTokens, 'de');
 

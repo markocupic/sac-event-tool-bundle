@@ -29,7 +29,7 @@ class SessionCache implements SessionInterface
     {
         if (!isset($_SESSION[static::SESSION_KEY]))
         {
-            $_SESSION[static::SESSION_KEY] = [];
+            $_SESSION[static::SESSION_KEY] = array();
         }
     }
 

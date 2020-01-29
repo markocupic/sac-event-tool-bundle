@@ -75,14 +75,14 @@ class tl_calendar_events_member extends Backend
         if (Input::get('call') === 'sendEmail')
         {
             // Delete E-Mail fields
-            $opt = [
+            $opt = array(
                 'emailRecipients'    => '',
                 'emailSubject'       => '',
                 'emailText'          => '',
                 'emailSendCopy'      => '',
                 'addEmailAttachment' => '',
                 'emailAttachment'    => '',
-            ];
+            );
             $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($opt)->execute(Input::get('id'));
         }
     }
@@ -135,7 +135,7 @@ class tl_calendar_events_member extends Backend
                 else
                 {
                     /** @var CalendarEventsMemberModel $objEvent */
-                    if (null !== ($objMember = CalendarEventsMemberModel::findByPk($id)))
+                    if(null !== ($objMember = CalendarEventsMemberModel::findByPk($id)))
                     {
                         /** @var CalendarEventsModel $objEvent */
                         $objEvent = $objMember->getRelated('eventId');
@@ -173,7 +173,7 @@ class tl_calendar_events_member extends Backend
         {
             // Set Recipient Array for the checkbox list
             $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['sendEmail'];
-            $options = [];
+            $options = array();
 
             /**
              * Get the event instructor
@@ -226,7 +226,7 @@ class tl_calendar_events_member extends Backend
             // Send E-Mail
             if (Input::post('FORM_SUBMIT') === 'tl_calendar_events_member' && isset($_POST['saveNclose']))
             {
-                $arrRecipients = [];
+                $arrRecipients = array();
                 foreach (Input::post('emailRecipients') as $key)
                 {
                     if (strpos($key, 'tl_user-') !== false)
@@ -267,21 +267,21 @@ class tl_calendar_events_member extends Backend
                 if ($objEmail !== null)
                 {
                     // Set token array
-                    $arrTokens = [
+                    $arrTokens = array(
                         'email_sender_name'  => html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME')),
                         'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
                         'reply_to'           => $this->User->email,
                         'email_subject'      => html_entity_decode(Input::post('emailSubject')),
                         'email_text'         => html_entity_decode(strip_tags(Input::post('emailText'))),
                         'attachment_tokens'  => '',
-                    ];
+                    );
 
                     if (Input::post('emailSendCopy'))
                     {
                         $arrTokens['recipient_bcc'] = $this->User->email;
                     }
 
-                    $arrFiles = [];
+                    $arrFiles = array();
 
                     // Add attachment
                     if (Input::post('addEmailAttachment'))
@@ -373,7 +373,7 @@ class tl_calendar_events_member extends Backend
             $objMemberModel = MemberModel::findOneBySacMemberId($objDb->sacMemberId);
             if ($objMemberModel !== null)
             {
-                $set = [
+                $set = array(
                     'contaoMemberId' => $objMemberModel->id,
                     'gender'         => $objMemberModel->gender,
                     'firstname'      => $objMemberModel->firstname,
@@ -383,7 +383,7 @@ class tl_calendar_events_member extends Backend
                     'postal'         => $objMemberModel->postal,
                     'city'           => $objMemberModel->city,
                     'mobile'         => $objMemberModel->mobile,
-                ];
+                );
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($objDb->id);
             }
         }
@@ -404,27 +404,27 @@ class tl_calendar_events_member extends Backend
                 $objMemberModel = MemberModel::findOneBySacMemberId($varValue);
                 if ($objMemberModel !== null)
                 {
-                    $set = [
+                    $set = array(
                         'contaoMemberId' => $objMemberModel->id,
-                    ];
+                    );
                     $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
                 }
                 else
                 {
                     $varValue = '';
-                    $set = [
+                    $set = array(
                         'sacMemberId'    => '',
                         'contaoMemberId' => '',
-                    ];
+                    );
                     $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
                 }
             }
             else
             {
-                $set = [
+                $set = array(
                     'sacMemberId'    => '',
                     'contaoMemberId' => '',
-                ];
+                );
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
             }
         }
@@ -457,13 +457,13 @@ class tl_calendar_events_member extends Backend
                     $objNotification = Notification::findOneByType('onchange_state_of_subscription');
                     if ($objNotification !== null)
                     {
-                        $arrTokens = [
+                        $arrTokens = array(
                             'participant_state_of_subscription' => html_entity_decode($GLOBALS['TL_LANG']['tl_calendar_events_member'][$varValue]),
                             'event_name'                        => html_entity_decode($objEvent->title),
                             'participant_name'                  => html_entity_decode($objEventMemberModel->firstname . ' ' . $objEventMemberModel->lastname),
                             'participant_email'                 => $objEventMemberModel->email,
                             'event_link_detail'                 => 'https://' . Environment::get('host') . '/' . Events::generateEventUrl($objEvent),
-                        ];
+                        );
                         $objNotification->send($arrTokens, 'de');
                     }
                 }
@@ -485,9 +485,9 @@ class tl_calendar_events_member extends Backend
             // Set correct addedOn timestamp
             if (!$objEventMemberModel->addedOn)
             {
-                $set = [
+                $set = array(
                     'addedOn' => time(),
-                ];
+                );
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
             }
 
@@ -497,10 +497,10 @@ class tl_calendar_events_member extends Backend
             if ($objEventModel !== null)
             {
                 // Set correct event title and eventId
-                $set = [
+                $set = array(
                     'eventName' => $objEventModel->title,
                     'eventId'   => $eventId,
-                ];
+                );
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
             }
         }
@@ -570,7 +570,7 @@ class tl_calendar_events_member extends Backend
             $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
             if ($objRegistration !== null)
             {
-                $set = ['stateOfSubscription' => 'subscription-refused'];
+                $set = array('stateOfSubscription' => 'subscription-refused');
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
                 $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail von der Event-Teilnahme abgelehnt und muss noch darüber informiert werden.';
             }
@@ -583,7 +583,7 @@ class tl_calendar_events_member extends Backend
             $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
             if ($objRegistration !== null)
             {
-                $set = ['stateOfSubscription' => 'subscription-accepted'];
+                $set = array('stateOfSubscription' => 'subscription-accepted');
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
                 $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail zum Event zugelassen und muss noch darüber informiert werden.';
             }
@@ -596,7 +596,7 @@ class tl_calendar_events_member extends Backend
             $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
             if ($objRegistration !== null)
             {
-                $set = ['stateOfSubscription' => 'subscription-waitlisted'];
+                $set = array('stateOfSubscription' => 'subscription-waitlisted');
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
                 $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail auf die Warteliste gesetzt und muss noch darüber informiert werden.';
             }
@@ -716,32 +716,32 @@ class tl_calendar_events_member extends Backend
         session_start();
 
         // Build action array first
-        $arrActions = [
-            'acceptWithEmail' => [
+        $arrActions = array(
+            'acceptWithEmail' => array(
                 'formId'              => 'subscription-accepted-form',
                 'headline'            => 'Zusage zum Event',
                 'stateOfSubscription' => 'subscription-accepted',
                 'sessionInfoText'     => 'Dem Benutzer wurde mit einer E-Mail eine Zusage für diesen Event versandt.',
                 'emailTemplate'       => 'be_email_templ_accept_registration',
                 'emailSubject'        => 'Zusage für %s'
-            ],
-            'addToWaitlist'   => [
+            ),
+            'addToWaitlist'   => array(
                 'formId'              => 'subscription-waitlisted-form',
                 'headline'            => 'Auf Warteliste setzen',
                 'stateOfSubscription' => 'subscription-waitlisted',
                 'sessionInfoText'     => 'Dem Benutzer wurde auf die Warteliste gesetzt und mit einer E-Mail darüber informiert.',
                 'emailTemplate'       => 'be_email_templ_added_to_waitlist',
                 'emailSubject'        => 'Auf Warteliste für %s'
-            ],
-            'refuseWithEmail' => [
+            ),
+            'refuseWithEmail' => array(
                 'formId'              => 'subscription-refused-form',
                 'headline'            => 'Absage mitteilen',
                 'stateOfSubscription' => 'subscription-refused',
                 'sessionInfoText'     => 'Dem Benutzer wurde mit einer E-Mail eine Absage versandt.',
                 'emailTemplate'       => 'be_email_templ_refuse_registration',
                 'emailSubject'        => 'Absage für %s'
-            ],
-        ];
+            ),
+        );
 
         if (Input::get('call') == '' || !is_array($arrActions[Input::get('call')]) || empty($arrActions[Input::get('call')]))
         {
@@ -757,20 +757,20 @@ class tl_calendar_events_member extends Backend
             return \Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
         // Now let's add form fields:
-        $objForm->addFormField('subject', [
+        $objForm->addFormField('subject', array(
             'label'     => 'Betreff',
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true]
-        ]);
-        $objForm->addFormField('text', [
+            'eval'      => array('mandatory' => true)
+        ));
+        $objForm->addFormField('text', array(
             'label'     => 'Nachricht',
             'inputType' => 'textarea',
-            'eval'      => ['rows' => 20, 'cols' => 80, 'mandatory' => true]
-        ]);
-        $objForm->addFormField('submit', [
+            'eval'      => array('rows' => 20, 'cols' => 80, 'mandatory' => true)
+        ));
+        $objForm->addFormField('submit', array(
             'label'     => 'Nachricht absenden',
             'inputType' => 'submit',
-        ]);
+        ));
 
         // Send notification
         if (Input::post('FORM_SUBMIT') === 'tl_calendar_events_member')
@@ -790,7 +790,7 @@ class tl_calendar_events_member extends Backend
                     if ($objEmail !== null)
                     {
                         // Set token array
-                        $arrTokens = [
+                        $arrTokens = array(
                             'email_sender_name'  => html_entity_decode(html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'))),
                             'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
                             'send_to'            => $objRegistration->email,
@@ -800,7 +800,7 @@ class tl_calendar_events_member extends Backend
                             'email_subject'      => html_entity_decode(Input::post('subject')),
                             'email_text'         => html_entity_decode(strip_tags(Input::post('text'))),
                             'email_html'         => html_entity_decode(''),
-                        ];
+                        );
 
                         // Check if member has already booked at the same time
                         $objMember = MemberModel::findOneBySacMemberId($objRegistration->sacMemberId);
@@ -813,7 +813,7 @@ class tl_calendar_events_member extends Backend
                         elseif (Validator::isEmail($objRegistration->email))
                         {
                             $objEmail->send($arrTokens, 'de');
-                            $set = ['stateOfSubscription' => $arrAction['stateOfSubscription']];
+                            $set = array('stateOfSubscription' => $arrAction['stateOfSubscription']);
                             $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
                             $_SESSION['addInfo'] = $arrAction['sessionInfoText'];
                         }
@@ -860,7 +860,7 @@ class tl_calendar_events_member extends Backend
                 }, $eventDates));
 
                 // Build token array
-                $arrTokens = [
+                $arrTokens = array(
                     'participantFirstname' => $objRegistration->firstname,
                     'participantLastname'  => $objRegistration->lastname,
                     'eventName'            => $objEvent->title,
@@ -877,7 +877,7 @@ class tl_calendar_events_member extends Backend
                     'instructorPostal'     => $this->User->postal,
                     'instructorCity'       => $this->User->city,
                     'instructorEmail'      => $this->User->email,
-                ];
+                );
 
                 if (Input::get('call') === 'acceptWithEmail' && $objEvent->customizeEventRegistrationConfirmationEmailText && $objEvent->customEventRegistrationConfirmationEmailText != '')
                 {
@@ -951,7 +951,7 @@ class tl_calendar_events_member extends Backend
         // Remove all buttons
         if (Input::get('call') === 'refuseWithEmail' || Input::get('call') === 'acceptWithEmail' || Input::get('call') === 'addToWaitlist')
         {
-            $arrButtons = [];
+            $arrButtons = array();
         }
 
         if (Input::get('call') === 'sendEmail')

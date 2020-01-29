@@ -51,6 +51,7 @@ class tl_calendar_container extends Backend
         $this->import('BackendUser', 'User');
     }
 
+
     /**
      * Check permissions to edit table tl_calendar
      *
@@ -74,7 +75,7 @@ class tl_calendar_container extends Backend
         // Set root IDs
         if (!is_array($this->User->calendar_containers) || empty($this->User->calendar_containers))
         {
-            $root = [0];
+            $root = array(0);
         }
         else
         {
@@ -88,6 +89,7 @@ class tl_calendar_container extends Backend
         {
             $GLOBALS['TL_DCA']['tl_calendar_container']['config']['closed'] = true;
         }
+
 
         /** @var Symfony\Component\HttpFoundation\Session\SessionInterface $objSession */
         $objSession = System::getContainer()->get('session');
@@ -172,7 +174,7 @@ class tl_calendar_container extends Backend
                 $session = $objSession->all();
                 if (Input::get('act') == 'deleteAll' && !$this->User->hasAccess('delete', 'calendar_containerp'))
                 {
-                    $session['CURRENT']['IDS'] = [];
+                    $session['CURRENT']['IDS'] = array();
                 }
                 else
                 {
@@ -189,6 +191,7 @@ class tl_calendar_container extends Backend
                 break;
         }
     }
+
 
     /**
      * Return the edit header button
@@ -207,6 +210,7 @@ class tl_calendar_container extends Backend
         return $this->User->canEditFieldsOf('tl_calendar_container') ? '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ' : Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)) . ' ';
     }
 
+
     /**
      * Return the copy calendar button
      *
@@ -223,6 +227,7 @@ class tl_calendar_container extends Backend
     {
         return $this->User->hasAccess('create', 'calendar_containerp') ? '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . StringUtil::specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label) . '</a> ' : Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)) . ' ';
     }
+
 
     /**
      * Return the delete calendar button

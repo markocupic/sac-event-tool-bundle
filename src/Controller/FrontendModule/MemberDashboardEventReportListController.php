@@ -158,7 +158,7 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
         $pageModelAdapter = $this->get('contao.framework')->getAdapter(PageModel::class);
         $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
 
-        $arrEventStories = [];
+        $arrEventStories = array();
 
         if ($this->objUser !== null)
         {
@@ -219,9 +219,9 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
 
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
-        $arrOptions = [];
+        $arrOptions = array();
         $intStartDateMin = $model->timeSpanForCreatingNewEventStory > 0 ? time() - $model->timeSpanForCreatingNewEventStory * 24 * 3600 : time();
-        $arrEvents = $calendarEventsMemberModelAdapter->findEventsByMemberId($this->objUser->id, [], $intStartDateMin, time(), true);
+        $arrEvents = $calendarEventsMemberModelAdapter->findEventsByMemberId($this->objUser->id, array(), $intStartDateMin, time(), true);
 
         if (is_array($arrEvents) && !empty($arrEvents))
         {
@@ -236,18 +236,18 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
         }
 
         // Now let's add form fields:
-        $objForm->addFormField('event', [
+        $objForm->addFormField('event', array(
             'label'     => 'Tourenbericht zu einem Event erstellen',
             'inputType' => 'select',
             'options'   => $arrOptions,
-            'eval'      => ['mandatory' => true],
-        ]);
+            'eval'      => array('mandatory' => true),
+        ));
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submit', array(
             'label'     => 'Weiter',
             'inputType' => 'submit',
-        ]);
+        ));
 
         if ($objForm->validate())
         {

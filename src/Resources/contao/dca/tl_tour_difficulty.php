@@ -8,116 +8,140 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-$GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
-    'config' => [
+
+$GLOBALS['TL_DCA']['tl_tour_difficulty'] = array
+(
+    'config' => array
+    (
         'dataContainer'      => 'Table',
         'ptable'             => 'tl_tour_difficulty_category',
         'doNotCopyRecords'   => true,
         'enableVersioning'   => true,
         'switchToEdit'       => true,
         'doNotDeleteRecords' => true,
-        'sql'                => [
-            'keys' => [
+        'sql'                => array
+        (
+            'keys' => array
+            (
                 'id' => 'primary',
-            ],
-        ],
-    ],
+            ),
+        ),
+    ),
 
-    'list'     => [
-        'sorting'           => [
+    'list'     => array
+    (
+        'sorting'           => array
+        (
             'mode'                  => 4,
-            'fields'                => ['code ASC'],
+            'fields'                => array('code ASC'),
             'flag'                  => 1,
             'panelLayout'           => 'filter;sort,search,limit',
-            'headerFields'          => ['level', 'title'],
+            'headerFields'          => array('level', 'title'),
             'disableGrouping'       => true,
-            'child_record_callback' => ['tl_tour_difficulty', 'listDifficulties'],
-        ],
-        'label'             => [
-            'fields'      => ['title', 'shortcut'],
+            'child_record_callback' => array('tl_tour_difficulty', 'listDifficulties'),
+        ),
+        'label'             => array
+        (
+            'fields'      => array('title', 'shortcut'),
             'showColumns' => true,
-        ],
-        'global_operations' => [
-            'all' => [
+        ),
+        'global_operations' => array
+        (
+            'all' => array
+            (
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
-            ],
-        ],
-        'operations'        => [
-            'edit'   => [
+            ),
+        ),
+        'operations'        => array
+        (
+            'edit'   => array
+            (
                 'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.gif',
-            ],
-            'copy'   => [
+            ),
+            'copy'   => array
+            (
                 'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.gif',
-            ],
-            'delete' => [
+            ),
+            'delete' => array
+            (
                 'label'      => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"',
-            ],
-        ],
-    ],
-    'palettes' => [
+            ),
+        ),
+    ),
+    'palettes' => array
+    (
         'default' => 'code,shortcut,title,description',
-    ],
+    ),
 
-    'fields' => [
-        'id'          => [
+    'fields' => array
+    (
+        'id'          => array
+        (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
-        ],
-        'pid'         => [
+        ),
+        'pid'         => array
+        (
             'foreignKey' => 'tl_tour_difficulty_category.title',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
-        ],
-        'sorting'     => [
+            'relation'   => array('type' => 'belongsTo', 'load' => 'eager'),
+        ),
+        'sorting'     => array
+        (
             'sql' => "int(10) unsigned NOT NULL default '0'",
-        ],
-        'tstamp'      => [
+        ),
+        'tstamp'      => array
+        (
             'sql' => "int(10) unsigned NOT NULL default '0'",
-        ],
-        'shortcut'    => [
+        ),
+        'shortcut'    => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['shortcut'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'eval'      => array('mandatory' => true, 'maxlength' => 255),
             'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'title'       => [
+        ),
+        'title'       => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['title'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'eval'      => array('mandatory' => true, 'maxlength' => 255),
             'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'code'        => [
+        ),
+        'code'        => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['code'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'eval'      => array('mandatory' => true, 'maxlength' => 255),
             'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'description' => [
+        ),
+        'description' => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['description'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'textarea',
-            'eval'      => ['mandatory' => true],
+            'eval'      => array('mandatory' => true),
             'sql'       => "text NULL",
-        ],
-    ],
-];
+        ),
+    ),
+);

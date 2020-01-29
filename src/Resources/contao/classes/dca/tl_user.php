@@ -165,7 +165,7 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
                     }
                 }
 
-                $set = [
+                $set = array(
                     'firstname'   => $objSAC->firstname,
                     'lastname'    => $objSAC->lastname,
                     'sectionId'   => $objSAC->sectionId,
@@ -178,7 +178,7 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
                     'gender'      => $objSAC->gender,
                     'phone'       => $objSAC->phone,
                     'mobile'      => $objSAC->mobile,
-                ];
+                );
                 $this->Database->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objUser->id);
             }
             else
@@ -261,7 +261,7 @@ Marko Cupic (Kernteam 'Neue Webseite SAC Pilatus')
      */
     public function optionsCallbackUserRoles()
     {
-        $options = [];
+        $options = array();
         $objDb = \Database::getInstance()->prepare('SELECT * FROM tl_user_role ORDER BY sorting ASC')->execute();
         while ($objDb->next())
         {

@@ -78,7 +78,7 @@ class CabanneSacListController extends AbstractContentElementController
         $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_cabanne_sac WHERE id=?')->execute($model->cabanneSac);
         if ($objDb->numRows)
         {
-            $skip = ['id', 'tstamp', 'singleSRC'];
+            $skip = array('id', 'tstamp', 'singleSRC');
             foreach ($objDb->fetchAssoc() as $k => $v)
             {
                 if (!in_array($k, $skip))

@@ -69,28 +69,28 @@ class ExportEvents2Docx
         $phpWord = new PhpWord();
 
         // Styles
-        $fStyleTitle = ['color' => '000000', 'size' => 16, 'bold' => true, 'name' => 'Century Gothic'];
+        $fStyleTitle = array('color' => '000000', 'size' => 16, 'bold' => true, 'name' => 'Century Gothic');
 
-        $fStyle = ['color' => '000000', 'size' => 10, 'bold' => false, 'name' => 'Century Gothic'];
+        $fStyle = array('color' => '000000', 'size' => 10, 'bold' => false, 'name' => 'Century Gothic');
         $phpWord->addFontStyle('fStyle', $fStyle);
 
-        $fStyleSmall = ['color' => '000000', 'size' => 9, 'bold' => false, 'name' => 'Century Gothic'];
+        $fStyleSmall = array('color' => '000000', 'size' => 9, 'bold' => false, 'name' => 'Century Gothic');
         $phpWord->addFontStyle('fStyleSmall', $fStyleSmall);
 
-        $fStyleMediumRed = ['color' => 'ff0000', 'size' => 12, 'bold' => true, 'name' => 'Century Gothic'];
+        $fStyleMediumRed = array('color' => 'ff0000', 'size' => 12, 'bold' => true, 'name' => 'Century Gothic');
         $phpWord->addFontStyle('fStyleMediumRed', $fStyleMediumRed);
 
-        $fStyleBold = ['color' => '000000', 'size' => 10, 'bold' => true, 'name' => 'Century Gothic'];
+        $fStyleBold = array('color' => '000000', 'size' => 10, 'bold' => true, 'name' => 'Century Gothic');
         $phpWord->addFontStyle('fStyleBold', $fStyleBold);
 
-        $pStyle = ['lineHeight' => '1.0', 'spaceBefore' => 0, 'spaceAfter' => 0];
+        $pStyle = array('lineHeight' => '1.0', 'spaceBefore' => 0, 'spaceAfter' => 0);
         $phpWord->addParagraphStyle('pStyle', $pStyle);
 
-        $tableStyle = [
+        $tableStyle = array(
             'borderColor' => '000000',
             'borderSize'  => 6,
             'cellMargin'  => 50,
-        ];
+        );
         $twip = 56.6928; // 1mm = 56.6928 twip
         $widthCol_1 = round(45 * $twip);
         $widthCol_2 = round(115 * $twip);
@@ -125,7 +125,7 @@ class ExportEvents2Docx
                 $cell = $table->addCell(4500);
                 $textrun = $cell->addTextRun();
                 $textrun->addLink(Environment::get('host') . '/', htmlspecialchars('KURSPROGRAMM ' . $year, ENT_COMPAT, 'UTF-8'), $fStyleMediumRed);
-                $table->addCell(4500)->addImage($rootDir . '/files/fileadmin/page_assets/kursbroschuere/logo-sac-pilatus.png', ['height' => 40, 'align' => 'right']);
+                $table->addCell(4500)->addImage($rootDir . '/files/fileadmin/page_assets/kursbroschuere/logo-sac-pilatus.png', array('height' => 40, 'align' => 'right'));
 
                 // Add footer
                 //$footer = $section->addFooter();
@@ -139,11 +139,11 @@ class ExportEvents2Docx
 
                 // Add the table
                 //$firstRowStyle = array('bgColor' => '66BBFF');
-                $firstRowStyle = [];
+                $firstRowStyle = array();
                 $phpWord->addTableStyle('Event-Item', $tableStyle, $firstRowStyle);
                 $table = $section->addTable('Event-Item');
 
-                $arrFields = [
+                $arrFields = array(
                     "Datum"                 => 'eventDates',
                     "Autor (-en)"           => 'author',
                     "Kursart"               => 'kursart',
@@ -159,7 +159,7 @@ class ExportEvents2Docx
                     "Anmeldung"             => 'bookingEvent',
                     "Material"              => 'equipment',
                     "Weiteres"              => 'miscellaneous',
-                ];
+                );
 
                 foreach ($arrFields as $label => $fieldname)
                 {

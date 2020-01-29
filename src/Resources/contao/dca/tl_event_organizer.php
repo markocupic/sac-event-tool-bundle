@@ -8,195 +8,226 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-$GLOBALS['TL_DCA']['tl_event_organizer'] = [
+$GLOBALS['TL_DCA']['tl_event_organizer'] = array
+(
 
-    'config' => [
+    'config' => array
+    (
         'dataContainer'    => 'Table',
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
         'switchToEdit'     => true,
-        'sql'              => [
-            'keys' => [
+        'sql'              => array
+        (
+            'keys' => array
+            (
                 'id' => 'primary',
-            ],
-        ],
-    ],
+            ),
+        ),
+    ),
 
-    'list'        => [
-        'sorting'           => [
+    'list'        => array
+    (
+        'sorting'           => array
+        (
             'mode'        => 2,
-            'fields'      => ['sorting ASC'],
+            'fields'      => array('sorting ASC'),
             'flag'        => 1,
             'panelLayout' => 'filter;sort,search,limit',
-        ],
-        'label'             => [
-            'fields'      => ['title'],
+        ),
+        'label'             => array
+        (
+            'fields'      => array('title'),
             'showColumns' => true,
-        ],
-        'global_operations' => [
-            'all' => [
+        ),
+        'global_operations' => array
+        (
+            'all' => array
+            (
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
-            ],
-        ],
-        'operations'        => [
-            'edit'   => [
+            ),
+        ),
+        'operations'        => array
+        (
+            'edit'   => array
+            (
                 'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.gif',
-            ],
-            'copy'   => [
+            ),
+            'copy'   => array
+            (
                 'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.gif',
-            ],
-            'delete' => [
+            ),
+            'delete' => array
+            (
                 'label'      => &$GLOBALS['TL_LANG']['tl_event_organizer']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"',
-            ],
-            'show'   => [
+            ),
+            'show'   => array
+            (
                 'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['show'],
                 'href'  => 'act=show',
                 'icon'  => 'show.svg',
-            ],
-        ],
-    ],
-    'palettes'    => [
-        '__selector__' => ['addLogo'],
+            ),
+        ),
+    ),
+    'palettes'    => array
+    (
+        '__selector__' => array('addLogo'),
         'default'      => '{title_legend},title,titlePrint,sorting;{eventList_legend},ignoreFilterInEventList,hideInEventFilter;{event_regulation_legend},tourRegulationExtract,tourRegulationSRC,courseRegulationExtract,courseRegulationSRC;{event_story_legend},notifyWebmasterOnNewEventStory;{emergency_concept_legend},emergencyConcept;{logo_legend},addLogo',
-    ],
+    ),
     // Subpalettes
-    'subpalettes' => [
+    'subpalettes' => array
+    (
         'addLogo' => 'singleSRC',
-    ],
+    ),
 
-    'fields' => [
-        'id'                             => [
+    'fields' => array
+    (
+        'id'                             => array
+        (
             'sql' => "int(10) unsigned NOT NULL auto_increment",
-        ],
-        'tstamp'                         => [
+        ),
+        'tstamp'                         => array
+        (
             'sql' => "int(10) unsigned NOT NULL default '0'",
-        ],
-        'title'                          => [
+        ),
+        'title'                          => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['title'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'eval'      => array('mandatory' => true, 'maxlength' => 255),
             'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'titlePrint'                     => [
+        ),
+        'titlePrint'                     => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['titlePrint'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'eval'      => array('mandatory' => true, 'maxlength' => 255),
             'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'sorting'                        => [
+        ),
+        'sorting'                        => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['sorting'],
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => ['rgxp' => 'digit', 'mandatory' => true, 'maxlength' => 255],
+            'eval'      => array('rgxp' => 'digit', 'mandatory' => true, 'maxlength' => 255),
             'sql'       => "int(10) unsigned NOT NULL default '0'",
-        ],
-        'ignoreFilterInEventList'        => [
+        ),
+        'ignoreFilterInEventList'        => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['ignoreFilterInEventList'],
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'checkbox',
-            'eval'      => ['tl_class' => 'clr m12'],
+            'eval'      => array('tl_class' => 'clr m12'),
             'sql'       => "char(1) NOT NULL default ''",
-        ],
-        'hideInEventFilter'              => [
+        ),
+        'hideInEventFilter'              => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['hideInEventFilter'],
             'exclude'   => true,
             'inputType' => 'checkbox',
-            'eval'      => ['tl_class' => 'clr m12'],
+            'eval'      => array('tl_class' => 'clr m12'),
             'sql'       => "char(1) NOT NULL default ''",
-        ],
-        'tourRegulationExtract'          => [
+        ),
+        'tourRegulationExtract'          => array(
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationExtract'],
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => ['tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true],
+            'eval'      => array('tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true),
             'sql'       => "text NULL",
-        ],
-        'courseRegulationExtract'        => [
+        ),
+        'courseRegulationExtract'        => array(
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationExtract'],
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => ['tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true],
+            'eval'      => array('tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true),
             'sql'       => "text NULL",
-        ],
-        'tourRegulationSRC'              => [
+        ),
+        'tourRegulationSRC'              => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationSRC'],
             'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
+            'eval'      => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'),
             'sql'       => "binary(16) NULL",
-        ],
-        'courseRegulationSRC'            => [
+        ),
+        'courseRegulationSRC'            => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationSRC'],
             'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
+            'eval'      => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'),
             'sql'       => "binary(16) NULL",
-        ],
-        'singleSRC'                      => [
+        ),
+        'singleSRC'                      => array
+        (
             'label'         => &$GLOBALS['TL_LANG']['tl_event_organizer']['singleSRC'],
             'exclude'       => true,
             'inputType'     => 'fileTree',
-            'eval'          => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
-            'load_callback' => [
-                ['tl_event_organizer', 'setSingleSrcFlags'],
-            ],
+            'eval'          => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'),
+            'load_callback' => array
+            (
+                array('tl_event_organizer', 'setSingleSrcFlags'),
+            ),
             'sql'           => "binary(16) NULL",
-        ],
-        'notifyWebmasterOnNewEventStory' => [
+        ),
+        'notifyWebmasterOnNewEventStory' => array(
             'label'      => &$GLOBALS['TL_LANG']['tl_event_organizer']['notifyWebmasterOnNewEventStory'],
             'exclude'    => true,
             'filter'     => true,
             'inputType'  => 'select',
-            'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
+            'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
             'foreignKey' => 'tl_user.name',
-            'eval'       => ['multiple' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'],
+            'eval'       => array('multiple' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'),
             'sql'        => "blob NULL",
-        ],
-        'emergencyConcept'               => [
+        ),
+        'emergencyConcept'               => array(
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['emergencyConcept'],
             'exclude'   => true,
             'inputType' => 'textarea',
-            'eval'      => ['tl_class' => 'clr m12', 'mandatory' => true],
+            'eval'      => array('tl_class' => 'clr m12', 'mandatory' => true),
             'sql'       => "text NULL",
-        ],
-        'addLogo'                        => [
+        ),
+        'addLogo'                        => array
+        (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_organizer']['addLogo'],
             'exclude'   => true,
             'inputType' => 'checkbox',
-            'eval'      => ['submitOnChange' => true],
+            'eval'      => array('submitOnChange' => true),
             'sql'       => "char(1) NOT NULL default ''",
-        ],
-        'singleSRC'                      => [
+        ),
+        'singleSRC'                      => array
+        (
             'label'         => &$GLOBALS['TL_LANG']['tl_event_organizer']['singleSRC'],
             'exclude'       => true,
             'inputType'     => 'fileTree',
-            'eval'          => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
-            'load_callback' => [
-                ['tl_event_organizer', 'setSingleSrcFlags'],
-            ],
+            'eval'          => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'),
+            'load_callback' => array
+            (
+                array('tl_event_organizer', 'setSingleSrcFlags'),
+            ),
             'sql'           => "binary(16) NULL",
-        ],
-    ],
-];
+        ),
+    ),
+);
 
 
 

@@ -84,11 +84,11 @@ abstract class AbstractPrintExportController extends AbstractFrontendModuleContr
     {
         if (!empty($strValue))
         {
-            $arrReplace = [
+            $arrReplace = array(
                 // Replace (at) with @
                 '(at)'         => '@',
                 '&#40;at&#41;' => '@',
-            ];
+            );
 
             foreach ($arrReplace as $k => $v)
             {
