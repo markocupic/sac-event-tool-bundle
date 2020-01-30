@@ -1,9 +1,0 @@
-services:
-
-  Markocupic\SacEventToolBundle\Controller\Oauth\OauthController:
-    arguments:
-    - '@contao.framework'
-    - '@Markocupic\SacEventToolBundle\OpenIdConnect\Authentication\Authentication'
-    public: true
-
-
