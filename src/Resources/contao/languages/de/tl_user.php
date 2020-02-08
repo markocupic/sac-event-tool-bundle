@@ -18,6 +18,7 @@ $GLOBALS['TL_LANG']['tl_user']['recission_legend'] = "Benutzer-Deaktivierungs-Ei
 
 
 // Fields
+$GLOBALS['TL_LANG']['tl_user']['uuid'] = array('UUID (Zentralkommitee Bern)', '');
 $GLOBALS['TL_LANG']['tl_user']['userRole'] = array('Rolle/Funktion im Verein', 'Geben Sie hier bitte eine oder mehrere Rollen/Funktionen an.');
 $GLOBALS['TL_LANG']['tl_user']['sacMemberId'] = array('SAC-Mitgliedernummer', 'Schreibe eine "0", falls der User kein Sektionsmitglied ist.');
 $GLOBALS['TL_LANG']['tl_user']['firstname'] = array('Vorname', '');

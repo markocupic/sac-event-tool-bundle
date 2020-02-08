@@ -17,7 +17,7 @@ Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addLegend('avatar_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
     ->addField(array('avatar'), 'avatar_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('foodHabits'), 'food_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
-    ->addField(array('isSacMember', 'sacMemberId', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'phoneBusiness', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'), 'section_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+    ->addField(array('isSacMember', 'sacMemberId', 'uuid', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'phoneBusiness', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'), 'section_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->addField(array('emergencyPhone', 'emergencyPhoneName'), 'emergency_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_member');
 
@@ -38,6 +38,15 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = array(
     'inputType' => 'fileTree',
     'eval'      => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'),
     'sql'       => "binary(16) NULL"
+);
+
+// Uuid from SAC central committee in Bern
+$GLOBALS['TL_DCA']['tl_member']['fields']['uuid'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_member']['uuid'],
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => array('mandatory' => false, 'tl_class' => 'w50'),
+    'sql'       => "varchar(128) NOT NULL default ''",
 );
 
 // activationLinkLifetime
@@ -256,6 +265,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = array(
 if(TL_MODE == 'BE')
 {
     // Fields (readonly fields)
+    $GLOBALS['TL_DCA']['tl_member']['fields']['uuid']['eval']['readonly'] = 'readonly';
     $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId']['eval']['readonly'] = 'readonly';
     $GLOBALS['TL_DCA']['tl_member']['fields']['gender']['eval']['readonly'] = 'readonly';
     $GLOBALS['TL_DCA']['tl_member']['fields']['firstname']['eval']['readonly'] = 'readonly';

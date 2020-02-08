@@ -20,7 +20,7 @@ if (TL_MODE === 'FE')
 {
     $GLOBALS['TL_LANG']['tl_member']['username'] = array('SAC Mitgliedernummer', 'Gib deine 6-stellige SAC-Mitgliedernummer ein.');
 }
-
+$GLOBALS['TL_LANG']['tl_member']['uuid'] = array('UUID (Zentralkommitee Bern)', '');
 $GLOBALS['TL_LANG']['tl_member']['activation'] = array('Aktivierungscode', '');
 $GLOBALS['TL_LANG']['tl_member']['activationLinkLifetime'] = array('G&uuml;ltigkeitsdauer Aktivierungstoken', '');
 $GLOBALS['TL_LANG']['tl_member']['isSacMember'] = array('Dieser User ist ein SAC-Mitglied', 'Dieses Mitglied wurde in der Datenbank (CSV-File) beim t&auml;glichen Sync gefunden.');
