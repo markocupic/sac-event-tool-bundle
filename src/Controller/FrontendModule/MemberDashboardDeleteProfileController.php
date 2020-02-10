@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Environment;
@@ -225,7 +226,7 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
                     $objClearFrontendUserData->clearMemberProfile((int)$this->objUser->id);
                     $objClearFrontendUserData->disableLogin((int)$this->objUser->id);
                     $objClearFrontendUserData->deleteFrontendAccount((int)$this->objUser->id);
-                    $objClearFrontendUserData->redirect('');
+                    Controller::redirect('');
                 }
             }
         }
