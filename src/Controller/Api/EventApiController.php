@@ -364,6 +364,7 @@ class EventApiController extends AbstractController
             'itemsFound'               => count($arrIds),
             'queryTime'                => $queryTime,
             'query'                    => $query,
+            'arrEventIds'              => [],
         ];
 
         foreach ($param as $k => $v)
@@ -410,6 +411,11 @@ class EventApiController extends AbstractController
                 $objEvent = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
                 if ($objEvent !== null)
                 {
+                    if ($param['isPreloadRequest'] === false)
+                    {
+                        $arrJSON['arrEventIds'][] = $arrEvent['id'];
+                    }
+
                     $strToken = $this->sessionCacheToken . $arrEvent['id'];
 
                     // Try to load from cache

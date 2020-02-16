@@ -15,7 +15,7 @@ class VueTourList {
         const defaults = {
             'apiParams': {
                 'organizers': [],
-                'eventType': ["tour","generalEvent","lastMinuteTour"],
+                'eventType': ["tour", "generalEvent", "lastMinuteTour"],
                 'tourType': '',
                 'courseType': '',
                 'courseId': '',
@@ -59,6 +59,8 @@ class VueTourList {
                     callbacks: params.callbacks,
                     // Result row
                     rows: [],
+                    // Loaded events (ids)
+                    arrEventIds: [],
                     // is busy bool
                     blnIsBusy: false,
                     // total found items
@@ -144,6 +146,12 @@ class VueTourList {
                             self.loadedItems++;
                         });
 
+                        // Store all ids of loaded events in self.arrEventIds
+                        if (json['isPreloadRequest'] === false) {
+                            json['arrEventIds'].forEach(function (id) {
+                                self.arrEventIds.push(id);
+                            });
+                        }
 
                         if (json['isPreloadRequest'] === false) {
                             if (i === 0 || parseInt(json['itemsFound']) === self.loadedItems) {

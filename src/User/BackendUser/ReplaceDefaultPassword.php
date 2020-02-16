@@ -83,7 +83,7 @@ class ReplaceDefaultPassword
             {
                 $objUserModel = $userModelAdapter->findByPk($objDb->id);
                 $objUserModel->pwChange = '1';
-                $objUserModel->password = password_hash($pw, PASSWORD_DEFAULT);
+                $objUserModel->password = password_hash((string) $pw, PASSWORD_DEFAULT);
                 $objUserModel->save();
 
                 // Generate text
@@ -94,21 +94,21 @@ class ReplaceDefaultPassword
                 if ($objEmail !== null)
                 {
                     // Set token array
-                    $arrTokens = array(
+                    $arrTokens = [
                         'email_sender_name'  => 'Administrator SAC Pilatus',
                         'email_sender_email' => $configAdapter->get('adminEmail'),
                         'reply_to'           => $configAdapter->get('adminEmail'),
                         'email_subject'      => html_entity_decode('Passwortänderung für Backend-Zugang auf der Webseite der SAC Sektion Pilatus'),
                         'email_text'         => $bodyText,
                         'send_to'            => $objUserModel->email
-                    );
+                    ];
 
                     $objEmail->send($arrTokens, 'de');
 
                     // System log
                     $strText = sprintf('The default password for backend user %s has been replaced and sent by e-mail.', $objUserModel->name);
                     $logger = System::getContainer()->get('monolog.logger.contao');
-                    $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, 'REPLACE DEFAULT PASSWORD')));
+                    $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, 'REPLACE DEFAULT PASSWORD')]);
 
                     // Limitize emails
                     $counter++;
