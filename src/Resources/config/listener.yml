@@ -94,9 +94,8 @@ services:
   Markocupic\SacEventToolBundle\EventListener\Contao\PostLoginListener:
     public: true
     arguments:
-    - "@contao.framework"
-    - "@database_connection"
-    - '%kernel.project_dir%'
+    - '@contao.framework'
+    - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory'
     tags:
     - { name: kernel.event_listener, event: post_login_listener, method: onPostLogin }
 

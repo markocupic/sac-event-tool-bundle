@@ -14,11 +14,9 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\BackendUser;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\System;
 use Contao\User;
 use Contao\UserModel;
-use Doctrine\DBAL\Connection;
-use Markocupic\SacEventToolBundle\MaintainBackendUsersHomeDirectory;
+use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory;
 
 /**
  * Class PostLoginListener
@@ -33,58 +31,46 @@ class PostLoginListener
     private $framework;
 
     /**
-     * @var string $rootDir
+     * @var MaintainBackendUsersHomeDirectory
      */
-    private $rootDir;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private $maintainBackendUsersHomeDirectory;
 
     /**
      * PostLoginListener constructor.
      * @param ContaoFramework $framework
-     * @param Connection $connection
-     * @param $rootDir
+     * @param MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory
      */
-    public function __construct(ContaoFramework $framework, Connection $connection, $rootDir)
+    public function __construct(ContaoFramework $framework, MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory)
     {
         $this->framework = $framework;
-        $this->connection = $connection;
-        $this->rootDir = $rootDir;
+        $this->maintainBackendUsersHomeDirectory = $maintainBackendUsersHomeDirectory;
+        $this->framework->initialize();
     }
 
     /**
-     * Create user directories if they does not exist and remove no more used directories
+     * Create user directories if they do not exist
+     * and remove them if they are no more used
      * @param User $user
      */
     public function onPostLogin(User $user)
     {
+        /** @var UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
         if ($user instanceof BackendUser)
         {
-            // Get all users
-            /** @var  Doctrine\DBAL\Query\QueryBuilder $qb */
-            $qb = $this->connection->createQueryBuilder();
-            $qb->select('id')->from('tl_user');
-            $result = $qb->execute();
-
-            $objBackendUserDir = System::getContainer()->get('Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory');
-
-            // Create user directories if they does not exist
-            while (false !== ($row = $result->fetch()))
+            $userModel = $userModelAdapter->findAll();
+            if ($userModel !== null)
             {
-                $userModel = $userModelAdapter->findByPk($row['id']);
-                if ($userModel !== null)
+                // Create user directories if they do not exist
+                while ($userModel->next())
                 {
-                    $objBackendUserDir->createBackendUsersHomeDirectory($userModel);
+                    $this->maintainBackendUsersHomeDirectory->createBackendUsersHomeDirectory($userModel->current());
                 }
             }
 
-            // Scan for unused old directories and remove them
-            $objBackendUserDir->removeUnusedBackendUsersHomeDirectories();
+            // Scan for unused/old directories and remove them
+            $this->maintainBackendUsersHomeDirectory->removeUnusedBackendUsersHomeDirectories();
         }
     }
 
