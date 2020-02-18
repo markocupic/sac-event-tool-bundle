@@ -6,14 +6,17 @@
     background-color: #f47c00;
     z-index: 2000;
 }
-#editAllNavbarHelper ul{
-    display:flex;
+
+#editAllNavbarHelper ul {
+    display: flex;
 }
-#editAllNavbarHelper ul,#editAllNavbarHelper li{
-    padding:0;
-    margin:0;
+
+#editAllNavbarHelper ul, #editAllNavbarHelper li {
+    padding: 0;
+    margin: 0;
     list-style-type: none;
 }
+
 #editAllNavbarHelper button {
     margin: 15px 8px;
     padding: 6px;
@@ -21,7 +24,8 @@
     color: #fff;
     border: 0;
 }
-#editAllNavbarHelper button:hover{
+
+#editAllNavbarHelper button:hover {
     background-color: #aa0000;
 }
 
@@ -239,3 +243,35 @@ div.tl_header_tour_rapport table td {
 }
 
 
+/** event dashboard buttons **/
+.event-dashboard .tl_submit_container ul {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.event-dashboard .tl_submit_container ul li {
+
+    margin: 2px 4px 2px 2px;
+}
+
+
+
+
+/** Stick navigation to the bottom for large screens **/
+@media (min-width: 1160px) {
+    #main {
+        padding-bottom: 50px;
+    }
+
+    .event-dashboard {
+        position: fixed;
+        bottom: 0;
+        z-index: 900;
+        width: 100%;
+        max-width: 1198px;
+    }
+
+    .event-dashboard .tl_submit_container {
+        background-color: #172b3b !important;
+    }
+}

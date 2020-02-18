@@ -115,4 +115,19 @@ services:
     - "@contao.framework"
     tags:
     - { name: kernel.event_listener, event: replace_insert_tags_listener, method: onReplaceInsertTags }
+
+  Markocupic\SacEventToolBundle\EventListener\Contao\PreviewUrlCreateListener:
+    arguments:
+    - '@request_stack'
+    - '@contao.framework'
+    tags:
+    - { name: kernel.event_listener, event: contao.preview_url_create, method: onPreviewUrlCreate }
+
+  Markocupic\SacEventToolBundle\EventListener\Contao\PreviewUrlConvertListener:
+    arguments:
+    - '@request_stack'
+    - '@contao.framework'
+    tags:
+    - { name: kernel.event_listener, event: contao.preview_url_convert, method: onPreviewUrlConvert }
+
   # END CONTAO HOOKS

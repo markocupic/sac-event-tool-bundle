@@ -23,6 +23,9 @@ use Contao\EventReleaseLevelPolicyModel;
 use Contao\Input;
 use Contao\StringUtil;
 use Contao\System;
+use Knp\Menu\Matcher\Matcher;
+use Knp\Menu\MenuFactory;
+use Knp\Menu\Renderer\ListRenderer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
@@ -185,31 +188,69 @@ class ParseBackendTemplateListener
         $module = $inputAdapter->get('do');
 
         $objTemplate = new BackendTemplate('be_calendar_events_event_dashboard');
-        $objTemplate->objEvent = $objEvent;
-        // Set button href
-        $objTemplate->eventListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, $requestToken, $refererId);
-        $objTemplate->writeTourReportHref = $controllerAdapter->addToUrl('call=writeTourReport&rt=' . $requestToken, true);
-        $objTemplate->participantListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
-        $objTemplate->invoiceListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
 
-        // Check if user is allowed
+        // Use KnpMenu to generate button-menu
+        $factory = new MenuFactory();
+        $menu = $factory->createItem('Event Dashboard');
+
+        // Go to event list button
+        $eventListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, $requestToken, $refererId);
+        $menu->addChild('Eventliste', ['uri' => $eventListHref])
+            ->setLinkAttribute('role', 'button')
+            ->setLinkAttribute('class', 'tl_submit')
+            ->setLinkAttribute('target', '_blank')
+            //->setLinkAttribute('accesskey', 'm')
+            ->setLinkAttribute('title', 'Eventliste anzeigen');
+
+        // Go to event preview button
+        if (($previewHref = $calendarEventsHelperAdapter->generateEventPreviewUrl($objEvent)) != '')
+        {
+            $menu->addChild('Vorschau', ['uri' => $previewHref])
+                ->setLinkAttribute('role', 'button')
+                ->setLinkAttribute('class', 'tl_submit')
+                ->setLinkAttribute('target', '_blank')
+                ->setLinkAttribute('accesskey', 'p')
+                ->setLinkAttribute('title', 'Vorschau anzeigen [ALT + p]');
+        }
+
+        // Go to event participant list button
+        if ($eventReleaseLevelPolicyModelAdapter->hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id)
+        {
+            $participantListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
+            $menu->addChild('Teilnehmerliste', ['uri' => $participantListHref])
+                ->setAttribute('role', 'button')
+                ->setLinkAttribute('class', 'tl_submit')
+                ->setLinkAttribute('target', '_blank')
+                ->setLinkAttribute('accesskey', 'm')
+                ->setLinkAttribute('title', 'Teilnehmerliste anzeigen [ALT + m]');
+        }
+
+        // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und Vergütungsformular drucken" button
         if ($eventReleaseLevelPolicyModelAdapter->hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id)
         {
             if ($objEvent->eventType === 'tour' || $objEvent->eventType === 'lastMinuteTour')
             {
-                $objTemplate->allowTourReportButton = true;
-                $objTemplate->allowInvoiceListButton = true;
+                $writeTourReportHref = $controllerAdapter->addToUrl('call=writeTourReport&rt=' . $requestToken, true);
+                $menu->addChild('Tourrapport erfassen', ['uri' => $writeTourReportHref])
+                    ->setLinkAttribute('role', 'button')
+                    ->setLinkAttribute('class', 'tl_submit')
+                    ->setLinkAttribute('target', '_blank')
+                    ->setLinkAttribute('accesskey', 'r')
+                    ->setLinkAttribute('title', 'Tourrapport anzeigen [ALT + r]');
+
+                $invoiceListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
+                $menu->addChild('Tourrapport und Verg&uuml;tungsformulare drucken', ['uri' => $invoiceListHref])
+                    ->setAttribute('role', 'button')
+                    ->setLinkAttribute('class', 'tl_submit')
+                    ->setLinkAttribute('target', '_blank')
+                    ->setLinkAttribute('accesskey', 'i')
+                    ->setLinkAttribute('title', 'Tourrapport und Verguetungsformulare drucken [ALT + i]');
             }
-
-            $objTemplate->allowParticipantListButton = true;
         }
 
-        $objTemplate->allowEventPreviewButton = true;
-        $objTemplate->eventPreviewUrl = $calendarEventsHelperAdapter->generateEventPreviewUrl($objEvent);
-        if ($objTemplate->eventPreviewUrl !== '')
-        {
-            $objTemplate->allowEventPreviewButton = true;
-        }
+        $renderer = new ListRenderer(new Matcher());
+        $objTemplate->menu = $renderer->render($menu);
+
         return $objTemplate->parse();
     }
 
