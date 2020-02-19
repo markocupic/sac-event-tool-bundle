@@ -10,6 +10,7 @@
 
 // Settings
 $GLOBALS['TL_LANG']['tl_settings']['sacEventTool_legend'] = "SAC Event Tool";
+$GLOBALS['TL_LANG']['tl_settings']['sacWorkshopFlyer_legend'] = "Einstellungen SAC Kursprogramm PDF Broschüre";
 
 
 // Fields
