@@ -77,6 +77,18 @@ services:
     - { name: container.service_subscriber }
     public: true
 
+  # Member dashboard module: display the forms for editing the member profile
+  Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardAvatarController:
+    calls:
+    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+    arguments:
+    - '@request_stack'
+    - '@contao.routing.scope_matcher'
+    tags:
+    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+    - { name: container.service_subscriber }
+    public: true
+
   # Member dashboard module: display the forms for deleting the member profile
   Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardDeleteProfileController:
     calls:
