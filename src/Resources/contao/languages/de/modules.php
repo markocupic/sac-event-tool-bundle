@@ -40,6 +40,7 @@ $GLOBALS['TL_LANG']['FMD']['member_dashboard_write_event_report'] = array('SAC M
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_edit_profile'] = array('SAC Mitgliederkonto Dashboard - Profil bearbeiten');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_delete_profile'] = array('SAC Mitgliederkonto Dashboard - Profil löschen');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_avatar_upload'] = array('SAC Mitgliederkonto Dashboard - Avatar-Upload-Formular');
+$GLOBALS['TL_LANG']['FMD']['member_dashboard_avatar'] = array('SAC Mitgliederkonto Dashboard - Mitglieder Avatar');
 $GLOBALS['TL_LANG']['FMD']['csv_export'] = array('SAC-Member- und Backend-User CSV-Export-Funktion');
 $GLOBALS['TL_LANG']['FMD']['event_filter_form'] = array('SAC-Event-Liste-Filter');
 $GLOBALS['TL_LANG']['FMD']['pilatus_export'] = array('SAC Event-Export für Monatszeitschrift');
