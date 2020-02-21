@@ -218,7 +218,8 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             'eval'      => array('class' => 'custom-input-file', 'mandatory' => false),
         ));
         $objForm->addFormField('delete-avatar', array(
-            'label'     => array('Profilbild löschen'),
+            // Do not show the legend and display the label only
+            'label'     => array('','Profilbild löschen'),
             'inputType' => 'checkbox',
         ));
 
