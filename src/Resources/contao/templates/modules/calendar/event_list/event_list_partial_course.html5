@@ -1,5 +1,5 @@
 <?php $GLOBALS['TL_JAVASCRIPT'][] = "https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"; ?>
-<?php $GLOBALS['TL_JAVASCRIPT'][] = "https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"; ?>
+<?php $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao-component-vue-js/vue/dist/vue.min.js|static'; ?>
 <?php $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/eventlist_vue.js|static'; ?>
 
 
