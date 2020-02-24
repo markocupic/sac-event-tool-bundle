@@ -33,8 +33,12 @@ class EventStory {
             created: function created() {
                 let self = this;
 
-
-                self.prepareRequest('/api/module?id=' + self.options.params.listModuleId);
+                let page = self.getUrlParam('page_e' + self.options.params.listModuleId, null);
+                if (page === null) {
+                    self.prepareRequest('/api/module?id=' + self.options.params.listModuleId);
+                } else {
+                    self.prepareRequest('/api/module?id=' + self.options.params.listModuleId + '&page_e' + self.options.params.listModuleId + '=' + page);
+                }
             },
 
             methods: {
@@ -129,6 +133,11 @@ class EventStory {
                         self._initLightbox();
                     });
                 },
+
+                /**
+                 * Init Lightbox
+                 * @private
+                 */
                 _initLightbox: function _initLightbox() {
                     jQuery(function ($) {
                         $('a[data-lightbox]').map(function () {
@@ -141,6 +150,34 @@ class EventStory {
                             });
                         });
                     });
+                },
+
+                /**
+                 * Get url param
+                 * @param parameter
+                 * @param defaultvalue
+                 * @returns {*}
+                 * @private
+                 */
+                getUrlParam: function getUrlParam(parameter, defaultvalue) {
+                    let self = this;
+                    var urlparameter = defaultvalue;
+                    if (window.location.href.indexOf(parameter) > -1) {
+                        urlparameter = self._getUrlVars()[parameter];
+                    }
+                    return urlparameter;
+                },
+
+                /**
+                 *
+                 * @private
+                 */
+                _getUrlVars: function _getUrlVars() {
+                    var vars = {};
+                    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+                        vars[key] = value;
+                    });
+                    return vars;
                 }
             }
         });
