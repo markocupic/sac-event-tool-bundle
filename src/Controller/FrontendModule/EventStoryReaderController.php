@@ -56,54 +56,52 @@ class EventStoryReaderController extends AbstractFrontendModuleController
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        if ($page)
+        /** @var  CalendarEventsStoryModel $calendarEventsStoryModelAdapter */
+        $calendarEventsStoryModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsStoryModel::class);
+
+        /** @var Config $configAdapter */
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+
+        /** @var Environment $environmentAdapter */
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+
+        /** @var Input $inputAdapter */
+        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+
+        // Set the item from the auto_item parameter
+        if (!isset($_GET['items']) && $configAdapter->get('useAutoItem') && isset($_GET['auto_item']))
         {
-            /** @var  CalendarEventsStoryModel $calendarEventsStoryModelAdapter */
-            $calendarEventsStoryModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsStoryModel::class);
-
-            /** @var Config $configAdapter */
-            $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
-
-            /** @var Environment $environmentAdapter */
-            $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
-
-            /** @var Input $inputAdapter */
-            $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
-
-            // Set the item from the auto_item parameter
-            if (!isset($_GET['items']) && $configAdapter->get('useAutoItem') && isset($_GET['auto_item']))
-            {
-                $inputAdapter->setGet('items', $inputAdapter->get('auto_item'));
-            }
-
-            // Do not index or cache the page if no event has been specified
-            if ($page && empty($inputAdapter->get('items')))
-            {
-                $page->noSearch = 1;
-                $page->cache = 0;
-
-                // Return empty string
-                return new Response('', Response::HTTP_NO_CONTENT);
-            }
-
-            if (!empty($inputAdapter->get('securityToken')))
-            {
-                $arrColumns = ['tl_calendar_events_story.securityToken=?', 'tl_calendar_events_story.id=?'];
-                $arrValues = [$inputAdapter->get('securityToken'), $inputAdapter->get('items')];
-            }
-            else
-            {
-                $arrColumns = ['tl_calendar_events_story.publishState=?', 'tl_calendar_events_story.id=?'];
-                $arrValues = ['3', $inputAdapter->get('items')];
-            }
-
-            $this->story = $calendarEventsStoryModelAdapter->findBy($arrColumns, $arrValues);
-
-            if ($this->story === null)
-            {
-                throw new PageNotFoundException('Page not found: ' . $environmentAdapter->get('uri'));
-            }
+            $inputAdapter->setGet('items', $inputAdapter->get('auto_item'));
         }
+
+        // Do not index or cache the page if no event has been specified
+        if ($page && empty($inputAdapter->get('items')))
+        {
+            $page->noSearch = 1;
+            $page->cache = 0;
+
+            // Return empty string
+            return new Response('', Response::HTTP_NO_CONTENT);
+        }
+
+        if (!empty($inputAdapter->get('securityToken')))
+        {
+            $arrColumns = ['tl_calendar_events_story.securityToken=?', 'tl_calendar_events_story.id=?'];
+            $arrValues = [$inputAdapter->get('securityToken'), $inputAdapter->get('items')];
+        }
+        else
+        {
+            $arrColumns = ['tl_calendar_events_story.publishState=?', 'tl_calendar_events_story.id=?'];
+            $arrValues = ['3', $inputAdapter->get('items')];
+        }
+
+        $this->story = $calendarEventsStoryModelAdapter->findBy($arrColumns, $arrValues);
+
+        if ($this->story === null)
+        {
+            throw new PageNotFoundException('Page not found: ' . $environmentAdapter->get('uri'));
+        }
+
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }
@@ -191,7 +189,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
                                 $photographer = $arrMeta['de']['photographer'];
                             }
 
-                            $arrFigureCaption = array();
+                            $arrFigureCaption = [];
                             if ($caption != '')
                             {
                                 $arrFigureCaption[] = $caption;
@@ -206,8 +204,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
                             $linkTitle .= $caption != '' ? $caption : '';
                             $linkTitle .= $photographer != '' ? ' (Foto: ' . $photographer . ')' : '';
 
-                            $images[$objFiles->path] = array
-                            (
+                            $images[$objFiles->path] = [
                                 'id'               => $objFiles->id,
                                 'path'             => $objFiles->path,
                                 'uuid'             => $objFiles->uuid,
@@ -220,7 +217,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
                                 'photographer'     => $stringUtilAdapter->specialchars($photographer),
                                 'strFigureCaption' => $stringUtilAdapter->specialchars($strFigureCaption),
                                 'linkTitle'        => $stringUtilAdapter->specialchars($linkTitle),
-                            );
+                            ];
                         }
                     }
                 }

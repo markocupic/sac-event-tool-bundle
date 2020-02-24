@@ -28,7 +28,9 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 class EventListController extends AbstractFrontendModuleController
 {
 
-    /** @var  ModuleModel */
+    /**
+     * @var ModuleModel
+     */
     protected $model;
 
     /**
@@ -42,6 +44,7 @@ class EventListController extends AbstractFrontendModuleController
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         $this->model = $model;
+
 
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);

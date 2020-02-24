@@ -8,7 +8,6 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 class VueTourList {
-
     constructor(elId, opt) {
 
         // Defaults
@@ -191,3 +190,4 @@ class VueTourList {
         });
     }
 }
+

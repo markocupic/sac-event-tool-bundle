@@ -44,6 +44,11 @@ class EventStoryListController extends AbstractFrontendModuleController
     protected $stories;
 
     /**
+     * @var bool
+     */
+    protected $isAjaxRequest;
+
+    /**
      * @param Request $request
      * @param ModuleModel $model
      * @param string $section
@@ -59,13 +64,17 @@ class EventStoryListController extends AbstractFrontendModuleController
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
 
-        $arrIDS = array();
-        $arrOptions = array('order' => 'addedOn DESC');
+        /** @var Environment $environmentAdapter */
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+        $this->isAjaxRequest = $environmentAdapter->get('isAjaxRequest');
+
+        $arrIDS = [];
+        $arrOptions = ['order' => 'addedOn DESC'];
 
         /** @var  CalendarEventsStoryModel $objStories */
         $objStories = $calendarEventsStoryModelAdapter->findBy(
-            array('tl_calendar_events_story.publishState=?'),
-            array('3'),
+            ['tl_calendar_events_story.publishState=?'],
+            ['3'],
             $arrOptions
         );
 
@@ -137,17 +146,20 @@ class EventStoryListController extends AbstractFrontendModuleController
         /** @var PageModel $pageModelAdapter */
         $pageModelAdapter = $this->get('contao.framework')->getAdapter(PageModel::class);
 
+        $template->isAjaxRequest = $this->isAjaxRequest;
+
         $objPageModel = null;
         if ($model->jumpTo)
         {
             $objPageModel = $pageModelAdapter->findByPk($model->jumpTo);
         }
 
-        $arrAllStories = array();
+        $arrAllStories = [];
+        $arrAllIds = [];
         while ($this->stories->next())
         {
             $arrStory = $this->stories->row();
-
+            $arrAllIds[] = $arrStory['id'];
             $objMember = $memberModelModelAdapter->findOneBySacMemberId($arrStory['sacMemberId']);
             $arrStory['authorId'] = $objMember->id;
             $arrStory['authorName'] = $objMember !== null ? $objMember->firstname . ' ' . $objMember->lastname : $arrStory['authorName'];
@@ -168,7 +180,7 @@ class EventStoryListController extends AbstractFrontendModuleController
                     {
                         if (is_file($projectDir . '/' . $objFiles->path))
                         {
-                            $arrStory['singleSRC'] = array(
+                            $arrStory['singleSRC'] = [
                                 'id'         => $objFiles->id,
                                 'path'       => $objFiles->path,
                                 'uuid'       => $stringUtilAdapter->binToUuid($objFiles->uuid),
@@ -176,7 +188,7 @@ class EventStoryListController extends AbstractFrontendModuleController
                                 'singleSRC'  => $objFiles->path,
                                 'title'      => $stringUtilAdapter->specialchars($objFiles->name),
                                 'filesModel' => $objFiles->current(),
-                            );
+                            ];
                         }
                     }
                 }
@@ -184,6 +196,8 @@ class EventStoryListController extends AbstractFrontendModuleController
 
             $arrAllStories[] = $arrStory;
         }
+        $template->arrAllIds = $arrAllIds;
+
 
         $total = count($arrAllStories);
         $limit = $total;
