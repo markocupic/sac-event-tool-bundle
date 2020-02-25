@@ -7,7 +7,7 @@
  * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
-class EventStory {
+class ItemWatcher {
     constructor(elId, opt) {
 
         // Defaults
@@ -90,9 +90,9 @@ class EventStory {
                     ).then(function (res) {
                         return res.json();
                     }).then(function (json) {
-                        $(elId + ' .event-story-list-container').css('opacity', 0);
+                        $(elId + ' .list-container').css('opacity', 0);
                         self.listContent = json.compiledHTML;
-                        $(elId + ' .event-story-list-container').fadeTo('slow', 1);
+                        $(elId + ' .list-container').fadeTo('slow', 1);
                     }).then(function () {
                         // trigger same height for item boxes
                         // see: vendor\markocupic\contao-theme-sac-pilatus\src\Resources\contao\files\theme-sac-pilatus\js\theme.js
@@ -111,7 +111,7 @@ class EventStory {
                             self.currentPage = parseInt(page);
                         });
                     }).then(function () {
-                        let cssSelectorStr = elId + ' a.event-reader-link';
+                        let cssSelectorStr = elId + ' a.item-reader-link';
                         $(cssSelectorStr).off("click");
                         $(cssSelectorStr).click(function (e) {
                             e.stopPropagation();
@@ -134,7 +134,7 @@ class EventStory {
                             }
 
                             // Fetch reader content
-                            self.currentItemId = itemId;
+                            self.currentItemId = parseInt(itemId);
                         });
                     });
                 },
@@ -182,7 +182,7 @@ class EventStory {
                  */
                 goToNextItem: function goToNextItem() {
                     let self = this;
-                    self.currentItemId = self.itemIds[self.currentItemIndex + 1];
+                    self.currentItemId = parseInt(self.itemIds[self.currentItemIndex + 1]);
                 },
 
                 /**
@@ -204,7 +204,7 @@ class EventStory {
                 goToPrevItem: function goToPrevItem() {
                     let self = this;
                     // Fetch reader content
-                    self.currentItemId = self.itemIds[self.currentItemIndex - 1];
+                    self.currentItemId = parseInt(self.itemIds[self.currentItemIndex - 1]);
                 },
 
                 /**
