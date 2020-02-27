@@ -49,7 +49,7 @@ class ItemWatcher {
                 });
 
                 // Handle modal
-                $(elId).on('hidden.bs.modal', '.modal', function () {
+                $('body').on('hidden.bs.modal', elId + ' .modal', function () {
                     self.currentItemId = null;
                     self.readerContent = '';
                 });
