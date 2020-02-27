@@ -48,6 +48,11 @@ class ItemWatcher {
                     self._checkKeyPress(e);
                 });
 
+                // Handle modal
+                $(elId).on('hidden.bs.modal', '.modal', function () {
+                    self.currentItemId = null;
+                    self.readerContent = '';
+                });
             },
 
             watch: {
@@ -58,12 +63,16 @@ class ItemWatcher {
                 currentItemId: function (val) {
                     let self = this;
 
-                    // Adjust current page
-                    self.currentItemIndex = self.itemIds.indexOf(parseInt(self.currentItemId));
-                    self.currentPage = Math.floor(parseInt(self.currentItemIndex) / parseInt(self.options.params.perPage)) + 1;
+                    // currentItemId === null do not change page
+                    if(self.currentItemId !== null)
+                    {
+                        // Adjust current page
+                        self.currentItemIndex = self.itemIds.indexOf(parseInt(self.currentItemId));
+                        self.currentPage = Math.floor(parseInt(self.currentItemIndex) / parseInt(self.options.params.perPage)) + 1;
 
-                    // Fetch detail page
-                    self.fetchReaderContent();
+                        // Fetch detail page
+                        self.fetchReaderContent();
+                    }
                 },
 
             },
