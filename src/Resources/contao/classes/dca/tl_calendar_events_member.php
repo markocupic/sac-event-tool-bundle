@@ -363,25 +363,26 @@ class tl_calendar_events_member extends Backend
                 $arrRow = [];
                 foreach ($arrFields as $field)
                 {
+                    $value = html_entity_decode($objEventMember->{$field});
                     if ($field === 'stateOfSubscription')
                     {
-                        $arrRow[] = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$objEventMember->{$field}] != '' ? $GLOBALS['TL_LANG']['tl_calendar_events_member'][$objEventMember->{$field}] : $objEventMember->{$field};
+                        $arrRow[] = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$value] != '' ? $GLOBALS['TL_LANG']['tl_calendar_events_member'][$value] : $value;
                     }
                     elseif ($field === 'gender')
                     {
-                        $arrRow[] = $GLOBALS['TL_LANG']['MSC'][$objEventMember->{$field}] != '' ? $GLOBALS['TL_LANG']['MSC'][$objEventMember->{$field}] : $objEventMember->{$field};
+                        $arrRow[] = $GLOBALS['TL_LANG']['MSC'][$value] != '' ? $GLOBALS['TL_LANG']['MSC'][$value] : $value;
                     }
                     elseif ($field === 'addedOn')
                     {
-                        $arrRow[] = Date::parse(Config::get('datimFormat'), $objEventMember->{$field});
+                        $arrRow[] = Date::parse(Config::get('datimFormat'), $value);
                     }
                     elseif ($field === 'dateOfBirth')
                     {
-                        $arrRow[] = Date::parse(Config::get('dateFormat'), $objEventMember->{$field});
+                        $arrRow[] = Date::parse(Config::get('dateFormat'), $value);
                     }
                     else
                     {
-                        $arrRow[] = $objEventMember->{$field};
+                        $arrRow[] = $value;
                     }
                 }
                 $csv->insertOne($arrRow);
