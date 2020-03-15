@@ -45,7 +45,6 @@ $GLOBALS['TL_LANG']['MSC']['lastMinuteTour'] = 'Last Minute Tour';
 $GLOBALS['TL_LANG']['MSC']['generalEvent'] = 'Veranstaltung (Fitnesstrainings, Skiturnen, Kultur, Vorträge + sektionsübergreifende Events)';
 
 // Buttons
-$GLOBALS['TL_LANG']['MSC']['downloadEventMemberList'] = 'Teilnehmerliste downloaden';
 $GLOBALS['TL_LANG']['MSC']['sendEmail'] = 'E-Mail senden';
 $GLOBALS['TL_LANG']['MSC']['plus1year'] = '+1 Jahr';
 $GLOBALS['TL_LANG']['MSC']['minus1year'] = '-1 Jahr';

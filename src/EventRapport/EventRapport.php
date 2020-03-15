@@ -392,8 +392,8 @@ class EventRapport
                     // Push data to clone
                     $objPhpWord->addToClone('i', 'i', $i, array('multiline' => false));
                     $objPhpWord->addToClone('i', 'role', 'TL', array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'firstname', $this->prepareString($objUserModel->name), array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'lastname', '', array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'firstname', $this->prepareString($objUserModel->firstname), array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'lastname', $this->prepareString($objUserModel->lastname), array('multiline' => false));
                     $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. ' . $objUserModel->sacMemberId, array('multiline' => false));
                     $objPhpWord->addToClone('i', 'isNotSacMember', $isMember ? ' ' : '!inaktiv/kein Mitglied', array('multiline' => false));
                     $objPhpWord->addToClone('i', 'street', $this->prepareString($objUserModel->street), array('multiline' => false));
@@ -510,7 +510,7 @@ class EventRapport
 
         if ($objEvent !== null)
         {
-            $objEventMember = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
+            $objEventMember = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=? ORDER BY lastname, firstname')->execute($objEvent->id, 'subscription-accepted');
             if (!$objEventMember->numRows)
             {
                 // Send error message if there are no members assigned to the event
