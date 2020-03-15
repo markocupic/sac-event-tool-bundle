@@ -124,6 +124,22 @@ class CalendarEventsHelper
             case 'eventDuration':
                 $value = static::getEventDuration($objEvent);
                 break;
+            case 'registrationStartDateFormated':
+                $value = Date::parse(Config::get('dateFormat'), $objEvent->registrationStartDate);
+                break;
+            case 'registrationEndDateFormated':
+                // If registration end time! is set to default --> 23:59 then only show registration end date!
+                $endDate = Date::parse(Config::get('dateFormat'), $objEvent->registrationEndDate);
+                if (abs($objEvent->registrationEndDate - strtotime($endDate)) === (24 * 3600) - 60)
+                {
+                    $formatedEndDate = Date::parse(Config::get('dateFormat'), $objEvent->registrationEndDate);
+                }
+                else
+                {
+                    $formatedEndDate = Date::parse(Config::get('datimFormat'), $objEvent->registrationEndDate);
+                }
+                $value = $formatedEndDate;
+                break;
             case 'eventState':
                 $value = static::getEventState($objEvent);
                 break;
@@ -190,15 +206,15 @@ class CalendarEventsHelper
                 $value = static::getTourProfileAsArray($objEvent);
                 break;
             case 'gallery':
-                $value = static::getGallery(array(
+                $value = static::getGallery([
                     'multiSRC'   => $objEvent->multiSRC,
                     'orderSRC'   => $objEvent->orderSRC,
                     'sortBy'     => 'custom',
                     'perRow'     => 4,
-                    'size'       => serialize(array(400, 400, 'center_center', 'proportional')),
+                    'size'       => serialize([400, 400, 'center_center', 'proportional']),
                     'fullsize'   => true,
                     'galleryTpl' => 'gallery_bootstrap_col-4'
-                ));
+                ]);
                 break;
             default:
                 $arrEvent = $objEvent->row();
@@ -397,7 +413,7 @@ class CalendarEventsHelper
                 $objUser = UserModel::findByPk($objInstructor->id);
                 if ($objUser !== null)
                 {
-                    $arrName = array();
+                    $arrName = [];
                     $arrName[] = $objUser->lastname;
                     $arrName[] = $objUser->firstname;
                     $arrName = array_filter($arrName);
@@ -420,7 +436,7 @@ class CalendarEventsHelper
             $objUser = UserModel::findByPk($arrInstructors[0]);
             if ($objUser !== null)
             {
-                $arrContact = array();
+                $arrContact = [];
                 $arrContact[] = sprintf('<strong>%s %s</strong>', $objUser->lastname, $objUser->firstname);
                 $arrContact[] = sprintf('Tel.: %s', $objUser->phone);
                 $arrContact[] = sprintf('Mobile: %s', $objUser->mobile);
@@ -440,7 +456,7 @@ class CalendarEventsHelper
      */
     public static function getInstructorsAsArray(CalendarEventsModel $objEvent, $blnShowPublishedOnly = true): array
     {
-        $arrInstructors = array();
+        $arrInstructors = [];
         if ($objEvent !== null)
         {
             // Get all instructors from an event, list mainInstructor first
@@ -472,7 +488,7 @@ class CalendarEventsHelper
      */
     public static function getInstructorNamesAsArray(CalendarEventsModel $objEvent, $blnAddMainQualification = false, $blnShowPublishedOnly = true): array
     {
-        $arrInstructors = array();
+        $arrInstructors = [];
         if ($objEvent !== null)
         {
             $arrUsers = static::getInstructorsAsArray($objEvent, $blnShowPublishedOnly);
@@ -617,7 +633,7 @@ class CalendarEventsHelper
         }
         else
         {
-            $arrDates = array();
+            $arrDates = [];
             $dates = self::getEventTimestamps($objEvent);
             foreach ($dates as $date)
             {
@@ -678,7 +694,7 @@ class CalendarEventsHelper
      */
     public static function getEventTimestamps(CalendarEventsModel $objEvent)
     {
-        $arrRepeats = array();
+        $arrRepeats = [];
         if ($objEvent !== null)
         {
             $arrDates = StringUtil::deserialize($objEvent->eventDates);
@@ -768,13 +784,13 @@ class CalendarEventsHelper
      */
     public static function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, $tooltip = false): array
     {
-        $arrReturn = array();
+        $arrReturn = [];
         if ($objEvent !== null)
         {
             $arrValues = StringUtil::deserialize($objEvent->tourTechDifficulty, true);
             if (!empty($arrValues) && is_array($arrValues))
             {
-                $arrDiff = array();
+                $arrDiff = [];
                 foreach ($arrValues as $difficulty)
                 {
                     $strDiff = '';
@@ -832,7 +848,7 @@ class CalendarEventsHelper
      */
     public static function getTourTypesAsArray(CalendarEventsModel $objEvent, $field = 'shortcut', $tooltip = false): array
     {
-        $arrReturn = array();
+        $arrReturn = [];
 
         if ($objEvent !== null)
         {
@@ -1023,7 +1039,7 @@ class CalendarEventsHelper
      */
     public static function getEventOrganizersAsArray(CalendarEventsModel $objEvent, $field = 'title'): array
     {
-        $arrReturn = array();
+        $arrReturn = [];
         if ($objEvent !== null)
         {
             $arrValues = StringUtil::deserialize($objEvent->organizers, true);
@@ -1056,7 +1072,7 @@ class CalendarEventsHelper
             return true;
         }
 
-        $arrEventDates = array();
+        $arrEventDates = [];
         $arrEventRepeats = StringUtil::deserialize($objEvent->eventDates, true);
         if (!empty($arrEventRepeats) && is_array($arrEventRepeats))
         {
@@ -1134,7 +1150,7 @@ class CalendarEventsHelper
      */
     public static function getTourProfileAsArray(CalendarEventsModel $objEvent): array
     {
-        $arrProfile = array();
+        $arrProfile = [];
         if ($objEvent !== null)
         {
             if (!empty($objEvent->tourProfile) && is_array(StringUtil::deserialize($objEvent->tourProfile)))
@@ -1149,8 +1165,8 @@ class CalendarEventsHelper
                     }
                     $m++;
 
-                    $arrAsc = array();
-                    $arrDesc = array();
+                    $arrAsc = [];
+                    $arrDesc = [];
                     if (count($arrTourProfile) > 1)
                     {
                         $strProfile = sprintf('%s. Tag: ', $m);
@@ -1246,8 +1262,8 @@ class CalendarEventsHelper
      */
     public function getEventOrganizersLogoAsHtml(CalendarEventsModel $objEvent, $strInsertTag = '{{image::%s}}', $allowDuplicate = false): array
     {
-        $arrHtml = array();
-        $arrUuids = array();
+        $arrHtml = [];
+        $arrUuids = [];
         if ($objEvent !== null)
         {
             $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
@@ -1285,7 +1301,7 @@ class CalendarEventsHelper
      * @return null|string
      * @throws \Exception
      */
-    public static function getEventQrCode(CalendarEventsModel $objEvent, array $arrOptions = array(), bool $blnAbsoluteUrl = true, bool $blnCache = true)
+    public static function getEventQrCode(CalendarEventsModel $objEvent, array $arrOptions = [], bool $blnAbsoluteUrl = true, bool $blnCache = true)
     {
         if ($objEvent !== null)
         {
