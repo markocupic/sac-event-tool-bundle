@@ -138,6 +138,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = array(
     3 => "Psychologe FSP",
     4 => "Scheesportlehrer",
     5 => "Dr. med.",
+    6 => "J%S Leiter",
 );
 
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'] = array(
@@ -228,9 +229,9 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'] = array(
 
 // Ticket info used in the event registration form
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = array(
+    'Nichts',
     'GA',
     'Halbtax-Abo',
-    'Nichts',
 );
 
 // CONTAO HOOKS:

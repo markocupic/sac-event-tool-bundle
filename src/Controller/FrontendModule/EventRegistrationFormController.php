@@ -375,7 +375,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                     'label'     => 'Ich besitze ein/eine',
                     'inputType' => 'select',
                     'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
-                    'eval'      => array('includeBlankOption' => true, 'mandatory' => true),
+                    'eval'      => array('includeBlankOption' => false, 'mandatory' => true),
                 ));
             }
         }

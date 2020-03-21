@@ -252,6 +252,10 @@ class EventRapport
         // Iban & account holder
         $objPhpWord->replace('iban', $this->prepareString($objEventInvoice->iban));
         $objPhpWord->replace('accountHolder', $this->prepareString($objBiller->name));
+
+        // Printing date
+        $objPhpWord->replace('printingDate', Date::parse('d.m.Y'));
+
     }
 
     /**
