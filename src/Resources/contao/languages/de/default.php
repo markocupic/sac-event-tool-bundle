@@ -34,7 +34,7 @@ if (TL_MODE === 'FE')
 }
 
 // References
-$GLOBALS['TL_LANG']['MSC']['courseLevel'][1] = 'Einf&uuml;hrungskurs';
+$GLOBALS['TL_LANG']['MSC']['courseLevel'][1] = 'Einführungskurs';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][2] = 'Grundstufe';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][3] = 'Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][4] = 'Tourenleiter Fortbildungskurs';
@@ -50,33 +50,34 @@ $GLOBALS['TL_LANG']['MSC']['plus1year'] = '+1 Jahr';
 $GLOBALS['TL_LANG']['MSC']['minus1year'] = '-1 Jahr';
 $GLOBALS['TL_LANG']['MSC']['plusOneReleaseLevel'] = 'Freigabestufe ++';
 $GLOBALS['TL_LANG']['MSC']['minusOneReleaseLevel'] = 'Freigabestufe --';
-$GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'] = 'Verg&uuml;tungsformular';
+$GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'] = 'Vergütungsformular';
 $GLOBALS['TL_LANG']['MSC']['writeTourReportButton'] = 'Tourenrapport';
-$GLOBALS['TL_LANG']['MSC']['backToEvent'] = 'Zur&uuml;ck zum Event';
+$GLOBALS['TL_LANG']['MSC']['backToEvent'] = 'Zurück zum Event';
 $GLOBALS['TL_LANG']['MSC']['onloadCallbackExportCalendar'] = 'Events exportieren';
 
 // Confirm messages
-$GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] = 'M&ouml;chten Sie wirklich die Eventzeitpunkte aller Events in diesem Kalender um 1 Jahr nach vorne schieben?';
-$GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] = 'M&ouml;chten Sie wirklich die Eventzeitpunkte aller Events in diesem Kalender um 1 Jahr nach vorne schieben?';
-$GLOBALS['TL_LANG']['MSC']['plusOneReleaseLevelConfirm'] = 'M&ouml;chten Sie wirklich alle hier gelisteten Events um eine Freigabestufe erh&ouml;hen?';
-$GLOBALS['TL_LANG']['MSC']['minusOneReleaseLevelConfirm'] = 'M&ouml;chten Sie wirklich alle hier gelisteten Events um eine Freigabestufe vermindern?';
-$GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'] = 'F&uuml;r den Event mit ID %s sind Anmeldungen vorhanden. Bitte l&ouml;schen Sie diese bevor Sie den Event selber l&ouml;schen.';
-$GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'] = 'Die Freigabestufe f&uuml;r Event mit ID %s wurde auf Level %s gesetzt.';
-$GLOBALS['TL_LANG']['MSC']['publishedEvent'] = 'Der Event mit ID %s wurde ver&ouml;ffentlicht.';
-$GLOBALS['TL_LANG']['MSC']['unpublishedEvent'] = 'Der Event mit ID %s ist nicht mehr ver&ouml;ffentlicht.';
-$GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck'] = 'Das Datum f&uuml;r den Anfang des Anmeldezeitraums musste angepasst werden. Bitte kontrollieren Sie dieses nochmals.';
-$GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck'] = 'Das Datum f&uuml;r das Ende des Anmeldezeitraums musste angepasst werden. Bitte kontrollieren Sie dieses nochmals.';
+$GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] = 'Möchten Sie wirklich die Eventzeitpunkte aller Events in diesem Kalender um 1 Jahr nach vorne schieben?';
+$GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] = 'Möchten Sie wirklich die Eventzeitpunkte aller Events in diesem Kalender um 1 Jahr nach vorne schieben?';
+$GLOBALS['TL_LANG']['MSC']['plusOneReleaseLevelConfirm'] = 'Möchten Sie wirklich alle hier gelisteten Events um eine Freigabestufe erhöhen?';
+$GLOBALS['TL_LANG']['MSC']['minusOneReleaseLevelConfirm'] = 'Möchten Sie wirklich alle hier gelisteten Events um eine Freigabestufe vermindern?';
+$GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'] = 'Für den Event mit ID %s sind Anmeldungen vorhanden. Bitte löschen Sie diese bevor Sie den Event selber löschen.';
+$GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'] = 'Die Freigabestufe für Event mit ID %s wurde auf Level %s gesetzt.';
+$GLOBALS['TL_LANG']['MSC']['publishedEvent'] = 'Der Event mit ID %s wurde veröffentlicht.';
+$GLOBALS['TL_LANG']['MSC']['unpublishedEvent'] = 'Der Event mit ID %s ist nicht mehr veröffentlicht.';
+$GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck'] = 'Das Datum für den Anfang des Anmeldezeitraums musste angepasst werden. Bitte kontrollieren Sie dieses nochmals.';
+$GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck'] = 'Das Datum für das Ende des Anmeldezeitraums musste angepasst werden. Bitte kontrollieren Sie dieses nochmals.';
 $GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'] = 'Sie haben nicht die erforderlichen Berechtigungen den Datensatz mit ID %s zu bearbeiten.';
-$GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'] = 'Sie haben nicht die erforderlichen Berechtigungen den Datensatz mit ID %s zu l&ouml;schen.';
-$GLOBALS['TL_LANG']['MSC']['missingPermissionsToPublishOrUnpublishEvent'] = 'Sie haben nicht die erforderlichen Berechtigungen den Datensatz mit ID %s zu ver&ouml;ffentlichen.';
-$GLOBALS['TL_LANG']['MSC']['generateInvoice'] = 'M&ouml;chten Sie das Verg&uuml;tungsformular ausdrucken?';
-$GLOBALS['TL_LANG']['MSC']['writeTourReport'] = 'M&ouml;chten Sie den Tourenrapport erstellen/bearbeiten?';
-$GLOBALS['TL_LANG']['MSC']['goToPartcipantList'] = 'M&ouml;chten Sie zur Teilnehmerliste wechseln?';
-$GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'M&ouml;chten Sie das Verg&uuml;tungsformular bearbeiten/erstellen?';
+$GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'] = 'Sie haben nicht die erforderlichen Berechtigungen den Datensatz mit ID %s zu löschen.';
+$GLOBALS['TL_LANG']['MSC']['missingPermissionsToPublishOrUnpublishEvent'] = 'Sie haben nicht die erforderlichen Berechtigungen den Datensatz mit ID %s zu veröffentlichen.';
+$GLOBALS['TL_LANG']['MSC']['generateInvoice'] = 'Möchten Sie das Vergütungsformular ausdrucken?';
+$GLOBALS['TL_LANG']['MSC']['generateTourRapport'] = 'Möchten Sie den Tour-Rapport ausdrucken?';
+$GLOBALS['TL_LANG']['MSC']['writeTourReport'] = 'Möchten Sie den Tourenrapport erstellen/bearbeiten?';
+$GLOBALS['TL_LANG']['MSC']['goToPartcipantList'] = 'Möchten Sie zur Teilnehmerliste wechseln?';
+$GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'Möchten Sie das Vergütungsformular bearbeiten/erstellen?';
 
 // Miscelaneous
-$GLOBALS['TL_LANG']['MSC']['published'] = 'ver&ouml;ffentlicht';
-$GLOBALS['TL_LANG']['MSC']['unpublished'] = 'unver&ouml;ffentlicht';
+$GLOBALS['TL_LANG']['MSC']['published'] = 'veröffentlicht';
+$GLOBALS['TL_LANG']['MSC']['unpublished'] = 'unveröffentlicht';
 
 // Meta wizard
 $GLOBALS['TL_LANG']['MSC']['aw_photographer'] = 'Photograph';
@@ -98,9 +99,9 @@ $GLOBALS['TL_LANG']['MSC']['activateMemberAccount_activateMemberAccount'] = 'Mit
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_couldNotAssignUserToSacMemberId'] = 'Für die eingegebene Mitgliedernummer %s konnte kein Benutzer gefunden werden.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberIdAndDateOfBirthDoNotMatch'] = 'Mitgliedernummer und Geburtsdatum stimmen nicht überein.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberEmailNotRegistered'] = 'Du hast beim SAC noch keine E-Mail-Adresse hinterlegt. Die Kontoaktivierung ist so nicht möglich. Bitte hinterlege auf der Webseite des SAC Zentralverbands deine E-Mail-Adresse <a href="https://www.sac-cas.ch/de/login">LINK</a>. Bitte beachte, dass im Minimum 1-2 Tage vergehen, bis diese Änderung auf unserer Webseite wirksam wird, und du einen erneuten Aktivierungsversuch starten kannst.';
-$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberIdAndEmailDoNotMatch'] = 'Mitgliedernummer und E-Mail-Adresse stimmen nicht &uuml;berein.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_sacMemberIdAndEmailDoNotMatch'] = 'Mitgliedernummer und E-Mail-Adresse stimmen nicht überein.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountWithThisSacMemberIdIsAllreadyRegistered'] = 'Das Konto mit der eingegebenen Mitgliedernummer %s wurde bereits aktiviert.';
-$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountWithThisSacMemberIdHasBeendDeactivatedAndIsNoMoreValid'] = 'Das Konto mit der eingegebenen Mitgliedernummer %s ist deaktiviert und nicht mehr g&uuml;ltig.';
+$GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountWithThisSacMemberIdHasBeendDeactivatedAndIsNoMoreValid'] = 'Das Konto mit der eingegebenen Mitgliedernummer %s ist deaktiviert und nicht mehr gültig.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_couldNotTerminateActivationProcess'] = 'Der Aktivierungsprozess konnte nicht abgeschlossen werden. Bitte probiere es nochmals oder nimm mit der Geschäftsstelle Kontakt auf.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountActivationStoppedAccountIsDeactivated'] = 'Es ist ein Fehler aufgetreten. Dein Mitgliederkonto ist deaktiviert. Bitte nimm gegebenenfalls mit der Geschäftsstelle Kontakt auf.';
 $GLOBALS['TL_LANG']['ERR']['activateMemberAccount_accountActivationStoppedInvalidActivationCodeAndTooMuchTries'] = 'Ungültiger Aktivierungscode und zu viele Anzahl ungültiger Versuche. Bitte starte den Aktivierungsprozess von vorne. %sAktivierungsprozess neu starten%s';

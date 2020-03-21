@@ -86,13 +86,25 @@ class tl_calendar_events_instructor_invoice extends Backend
         if (Input::get('action') === 'generateInvoiceDocx')
         {
             $objRapport = System::getContainer()->get('Markocupic\SacEventToolBundle\EventRapport\EventRapport');
-            $objRapport->generateInvoice(Input::get('id'), 'docx');
+            $objRapport->generateInvoice(Input::get('id'), 'docx', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
         }
 
         if (Input::get('action') === 'generateInvoicePdf')
         {
             $objRapport = System::getContainer()->get('Markocupic\SacEventToolBundle\EventRapport\EventRapport');
-            $objRapport->generateInvoice(Input::get('id'), 'pdf');
+            $objRapport->generateInvoice(Input::get('id'), 'pdf', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
+        }
+
+        if (Input::get('action') === 'generateTourRapportDocx')
+        {
+            $objRapport = System::getContainer()->get('Markocupic\SacEventToolBundle\EventRapport\EventRapport');
+            $objRapport->generateInvoice(Input::get('id'), 'docx', Config::get('SAC_EVT_EVENT_RAPPORT_TOUR_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_RAPPORT_FILE_NAME_PATTERN'));
+        }
+
+        if (Input::get('action') === 'generateTourRapportPdf')
+        {
+            $objRapport = System::getContainer()->get('Markocupic\SacEventToolBundle\EventRapport\EventRapport');
+            $objRapport->generateInvoice(Input::get('id'), 'pdf', Config::get('SAC_EVT_EVENT_RAPPORT_TOUR_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_RAPPORT_FILE_NAME_PATTERN'));
         }
     }
 
@@ -104,7 +116,7 @@ class tl_calendar_events_instructor_invoice extends Backend
     {
         if (CURRENT_ID != '')
         {
-            if (Input::get('action') === 'generateInvoiceDocx' || Input::get('action') === 'generateInvoicePdf')
+            if (Input::get('action') === 'generateInvoiceDocx' || Input::get('action') === 'generateInvoicePdf' || Input::get('action') === 'generateTourRapportDocx' || Input::get('action') === 'generateTourRapportPdf')
             {
                 $objInvoice = \Contao\CalendarEventsInstructorInvoiceModel::findByPk(Input::get('id'));
                 if ($objInvoice !== null)

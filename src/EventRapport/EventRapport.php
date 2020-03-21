@@ -66,9 +66,12 @@ class EventRapport
     /**
      * @param $invoiceId
      * @param string $outputType
-     * @throws \Exception
+     * @param string $templateSRC
+     * @param string $strFilenamePattern
+     * @throws \PhpOffice\PhpWord\Exception\CopyFileException
+     * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
      */
-    public function generateInvoice($invoiceId, $outputType = 'docx')
+    public function generateInvoice($invoiceId, $outputType = 'docx', string $templateSRC, string $strFilenamePattern)
     {
         // Set adapters
         /** @var  Config $configAdapter */
@@ -100,7 +103,7 @@ class EventRapport
                     $objFile = new File($configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $file);
                     if ($objFile !== null)
                     {
-                        if ((int)$objFile->mtime + 60 * 60 * 24 * 7 < time())
+                        if ((int) $objFile->mtime + 60 * 60 * 24 * 7 < time())
                         {
                             $objFile->delete();
                         }
@@ -128,9 +131,9 @@ class EventRapport
                     $controllerAdapter->redirect(System::getReferer());
                 }
 
-                $filenamePattern = str_replace('%%s', '%s', $configAdapter->get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
+                $filenamePattern = str_replace('%%s', '%s', $strFilenamePattern);
                 $destFilename = $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
-                $strTemplateSrc = (string)$configAdapter->get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC');
+                $strTemplateSrc = (string) $templateSRC;
                 $objPhpWord = new MsWordTemplateProcessor($strTemplateSrc, $destFilename);
 
                 // Page #1
@@ -157,7 +160,7 @@ class EventRapport
                         ->generate();
 
                     // Generate pdf
-                    $objConversion = new DocxToPdfConversion($destFilename, (string)$configAdapter->get('cloudconvertApiKey'));
+                    $objConversion = new DocxToPdfConversion($destFilename, (string) $configAdapter->get('cloudconvertApiKey'));
                     $objConversion->sendToBrowser(true)->createUncached(true)->convert();
                 }
 
@@ -192,13 +195,50 @@ class EventRapport
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         /** @var  CalendarEventsJourneyModel $calendarEventsJourneyModel */
         $calendarEventsJourneyModel = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
+        /** @var UserModel $userModel */
+        $userModel = $this->framework->getAdapter(UserModel::class);
 
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
 
-        $countParticipants = $objEventMember->numRows;
+        $countFemale = 0;
+        $countMale = 0;
+
+        // Count participants
+        if ($objEventMember->numRows)
+        {
+            while ($objEventMember->next())
+            {
+                if ($objEventMember->gender === 'female')
+                {
+                    $countFemale++;
+                }
+                else
+                {
+                    $countMale++;
+                }
+            }
+        }
+        $objEventMember->reset();
+        $countParticipants = $countFemale + $countMale;
+
+        // Count instructors
         $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent, false);
         $countInstructors = count($arrInstructors);
-        $countParticipantsTotal = $countParticipants + $countInstructors;
+        $objUser = $userModel->findMultipleByIds($arrInstructors);
+        if ($objUser !== null)
+        {
+            while ($objUser->next())
+            {
+                if ($objUser->gender === 'female')
+                {
+                    $countFemale++;
+                }
+                else
+                {
+                    $countMale++;
+                }
+            }
+        }
 
         $transport = $calendarEventsJourneyModel->findByPk($objEvent->journey) !== null ? $calendarEventsJourneyModel->findByPk($objEvent->journey)->title : 'keine Angabe';
         $objPhpWord->replace('eventTransport', $this->prepareString($transport));
@@ -213,13 +253,15 @@ class EventRapport
         $objPhpWord->replace('eventInstructorStreet', $this->prepareString($objBiller->street));
         $objPhpWord->replace('eventInstructorPostalCity', $this->prepareString($objBiller->postal . ' ' . $objBiller->city));
         $objPhpWord->replace('eventInstructorPhone', $this->prepareString($objBiller->phone));
-        $objPhpWord->replace('countParticipants', $this->prepareString($countParticipantsTotal));
+        $objPhpWord->replace('countParticipants', $this->prepareString($countParticipants + $countInstructors));
+        $objPhpWord->replace('countMale', $this->prepareString($countMale));
+        $objPhpWord->replace('countFemale', $this->prepareString($countFemale));
 
         $objPhpWord->replace('weatherConditions', $this->prepareString($objEvent->tourWeatherConditions));
         $objPhpWord->replace('avalancheConditions', $this->prepareString($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->tourAvalancheConditions][0]));
         $objPhpWord->replace('specialIncidents', $this->prepareString($objEvent->tourSpecialIncidents));
 
-        $arrFields = array('sleepingTaxes', 'sleepingTaxesText', 'miscTaxes', 'miscTaxesText', 'railwTaxes', 'railwTaxesText', 'cabelCarTaxes', 'cabelCarTaxesText', 'roadTaxes', 'carTaxesKm', 'countCars', 'phoneTaxes');
+        $arrFields = ['sleepingTaxes', 'sleepingTaxesText', 'miscTaxes', 'miscTaxesText', 'railwTaxes', 'railwTaxesText', 'cabelCarTaxes', 'cabelCarTaxesText', 'roadTaxes', 'carTaxesKm', 'countCars', 'phoneTaxes'];
         foreach ($arrFields as $field)
         {
             $objPhpWord->replace($field, $this->prepareString($objEventInvoice->{$field}));
@@ -243,11 +285,11 @@ class EventRapport
 
         // Notice
         $notice = $objEventInvoice->notice == '' ? '---' : $objEventInvoice->notice;
-        $objPhpWord->replace('notice', $this->prepareString($notice), array('multiline' => true));
+        $objPhpWord->replace('notice', $this->prepareString($notice), ['multiline' => true]);
 
         // eventReportAdditionalNotices
         $eventReportAdditionalNotices = $objEvent->eventReportAdditionalNotices == '' ? '---' : $objEvent->eventReportAdditionalNotices;
-        $objPhpWord->replace('eventReportAdditionalNotices', $this->prepareString($eventReportAdditionalNotices), array('multiline' => true));
+        $objPhpWord->replace('eventReportAdditionalNotices', $this->prepareString($eventReportAdditionalNotices), ['multiline' => true]);
 
         // Iban & account holder
         $objPhpWord->replace('iban', $this->prepareString($objEventInvoice->iban));
@@ -255,7 +297,6 @@ class EventRapport
 
         // Printing date
         $objPhpWord->replace('printingDate', Date::parse('d.m.Y'));
-
     }
 
     /**
@@ -269,7 +310,7 @@ class EventRapport
             return '';
         }
 
-        return htmlspecialchars(html_entity_decode((string)$string));
+        return htmlspecialchars(html_entity_decode((string) $string));
     }
 
     /**
@@ -305,7 +346,7 @@ class EventRapport
         }
 
         // Generate event duration string
-        $arrEventDates = array();
+        $arrEventDates = [];
         foreach ($arrEventTstamps as $i => $v)
         {
             if ((count($arrEventTstamps) - 1) == $i)
@@ -326,7 +367,7 @@ class EventRapport
         $strTourProfile = str_replace('Tag: ', 'Tag:' . "\r\n", $strTourProfile);
 
         // emergencyConcept
-        $arrEmergencyConcept = array();
+        $arrEmergencyConcept = [];
         $arrOrganizers = $stringUtilAdapter->deserialize($objEvent->organizers, true);
         foreach ($arrOrganizers as $organizer)
         {
@@ -338,10 +379,10 @@ class EventRapport
         $objPhpWord->replace('eventDates', $this->prepareString($strEventDuration));
         $objPhpWord->replace('eventMeetingpoint', $this->prepareString($objEvent->meetingPoint));
         $objPhpWord->replace('eventTechDifficulties', $this->prepareString(implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent, false))));
-        $objPhpWord->replace('eventEquipment', $this->prepareString($objEvent->equipment), array('multiline' => true));
-        $objPhpWord->replace('eventTourProfile', $this->prepareString($strTourProfile), array('multiline' => true));
-        $objPhpWord->replace('emergencyConcept', $this->prepareString($strEmergencyConcept), array('multiline' => true));
-        $objPhpWord->replace('eventMiscellaneous', $this->prepareString($objEvent->miscellaneous), array('multiline' => true));
+        $objPhpWord->replace('eventEquipment', $this->prepareString($objEvent->equipment), ['multiline' => true]);
+        $objPhpWord->replace('eventTourProfile', $this->prepareString($strTourProfile), ['multiline' => true]);
+        $objPhpWord->replace('emergencyConcept', $this->prepareString($strEmergencyConcept), ['multiline' => true]);
+        $objPhpWord->replace('eventMiscellaneous', $this->prepareString($objEvent->miscellaneous), ['multiline' => true]);
     }
 
     /**
@@ -394,21 +435,21 @@ class EventRapport
                     $objPhpWord->createClone('i');
 
                     // Push data to clone
-                    $objPhpWord->addToClone('i', 'i', $i, array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'role', 'TL', array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'firstname', $this->prepareString($objUserModel->firstname), array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'lastname', $this->prepareString($objUserModel->lastname), array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. ' . $objUserModel->sacMemberId, array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'isNotSacMember', $isMember ? ' ' : '!inaktiv/kein Mitglied', array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'street', $this->prepareString($objUserModel->street), array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'postal', $this->prepareString($objUserModel->postal), array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'city', $this->prepareString($objUserModel->city), array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'emergencyPhone', $this->prepareString($objUserModel->emergencyPhone), array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'emergencyPhoneName', $this->prepareString($objUserModel->emergencyPhoneName), array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'mobile', $this->prepareString($mobile), array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'email', $this->prepareString($objUserModel->email), array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'transportInfo', $this->prepareString($transportInfo), array('multiline' => false));
-                    $objPhpWord->addToClone('i', 'dateOfBirth', $objUserModel->dateOfBirth != '' ? $dateAdapter->parse('Y', $objUserModel->dateOfBirth) : '', array('multiline' => false));
+                    $objPhpWord->addToClone('i', 'i', $i, ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'role', 'TL', ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'firstname', $this->prepareString($objUserModel->firstname), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'lastname', $this->prepareString($objUserModel->lastname), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. ' . $objUserModel->sacMemberId, ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'isNotSacMember', $isMember ? ' ' : '!inaktiv/kein Mitglied', ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'street', $this->prepareString($objUserModel->street), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'postal', $this->prepareString($objUserModel->postal), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'city', $this->prepareString($objUserModel->city), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'emergencyPhone', $this->prepareString($objUserModel->emergencyPhone), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'emergencyPhoneName', $this->prepareString($objUserModel->emergencyPhoneName), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'mobile', $this->prepareString($mobile), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'email', $this->prepareString($objUserModel->email), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'transportInfo', $this->prepareString($transportInfo), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'dateOfBirth', $objUserModel->dateOfBirth != '' ? $dateAdapter->parse('Y', $objUserModel->dateOfBirth) : '', ['multiline' => false]);
                 }
             }
         }
@@ -435,7 +476,7 @@ class EventRapport
             $transportInfo = '';
             if (strlen($objEventMember->carInfo))
             {
-                if ((int)$objEventMember->carInfo > 0)
+                if ((int) $objEventMember->carInfo > 0)
                 {
                     $transportInfo .= sprintf(' Auto mit %s Plätzen', $objEventMember->carInfo);
                 }
@@ -453,21 +494,21 @@ class EventRapport
             $objPhpWord->createClone('i');
 
             // Push data to clone
-            $objPhpWord->addToClone('i', 'i', $i, array('multiline' => false));
-            $objPhpWord->addToClone('i', 'role', 'TN', array('multiline' => false));
-            $objPhpWord->addToClone('i', 'firstname', $this->prepareString($objEventMember->firstname), array('multiline' => false));
-            $objPhpWord->addToClone('i', 'lastname', $this->prepareString($objEventMember->lastname), array('multiline' => false));
-            $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. ' . $objEventMember->sacMemberId, array('multiline' => false));
-            $objPhpWord->addToClone('i', 'isNotSacMember', $strIsActiveMember, array('multiline' => false));
-            $objPhpWord->addToClone('i', 'street', $this->prepareString($objEventMember->street), array('multiline' => false));
-            $objPhpWord->addToClone('i', 'postal', $this->prepareString($objEventMember->postal), array('multiline' => false));
-            $objPhpWord->addToClone('i', 'city', $this->prepareString($objEventMember->city), array('multiline' => false));
-            $objPhpWord->addToClone('i', 'mobile', $this->prepareString($mobile), array('multiline' => false));
-            $objPhpWord->addToClone('i', 'emergencyPhone', $this->prepareString($objEventMember->emergencyPhone), array('multiline' => false));
-            $objPhpWord->addToClone('i', 'emergencyPhoneName', $this->prepareString($objEventMember->emergencyPhoneName), array('multiline' => false));
-            $objPhpWord->addToClone('i', 'email', $this->prepareString($objEventMember->email), array('multiline' => false));
-            $objPhpWord->addToClone('i', 'transportInfo', $this->prepareString($transportInfo), array('multiline' => false));
-            $objPhpWord->addToClone('i', 'dateOfBirth', $objEventMember->dateOfBirth != '' ? $dateAdapter->parse('Y', $objEventMember->dateOfBirth) : '', array('multiline' => false));
+            $objPhpWord->addToClone('i', 'i', $i, ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'role', 'TN', ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'firstname', $this->prepareString($objEventMember->firstname), ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'lastname', $this->prepareString($objEventMember->lastname), ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. ' . $objEventMember->sacMemberId, ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'isNotSacMember', $strIsActiveMember, ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'street', $this->prepareString($objEventMember->street), ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'postal', $this->prepareString($objEventMember->postal), ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'city', $this->prepareString($objEventMember->city), ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'mobile', $this->prepareString($mobile), ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'emergencyPhone', $this->prepareString($objEventMember->emergencyPhone), ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'emergencyPhoneName', $this->prepareString($objEventMember->emergencyPhoneName), ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'email', $this->prepareString($objEventMember->email), ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'transportInfo', $this->prepareString($transportInfo), ['multiline' => false]);
+            $objPhpWord->addToClone('i', 'dateOfBirth', $objEventMember->dateOfBirth != '' ? $dateAdapter->parse('Y', $objEventMember->dateOfBirth) : '', ['multiline' => false]);
         }
 
         // Event instructors
@@ -525,7 +566,7 @@ class EventRapport
             // Create phpWord instance
             $filenamePattern = str_replace('%%s', '%s', $configAdapter->get('SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'));
             $destFile = $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
-            $objPhpWord = new MsWordTemplateProcessor((string)$configAdapter->get('SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'), $destFile);
+            $objPhpWord = new MsWordTemplateProcessor((string) $configAdapter->get('SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'), $destFile);
 
             // Get event data
             $this->getEventData($objPhpWord, $objEvent);
@@ -545,7 +586,7 @@ class EventRapport
                     ->generate();
 
                 // Generate pdf
-                $objConversion = new DocxToPdfConversion($destFile, (string)$configAdapter->get('cloudconvertApiKey'));
+                $objConversion = new DocxToPdfConversion($destFile, (string) $configAdapter->get('cloudconvertApiKey'));
                 $objConversion->sendToBrowser(true)->createUncached(true)->convert();
             }
 
