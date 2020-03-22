@@ -73,7 +73,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'downloadEventMemberList2Csv' => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Csv'],
                 'href'       => 'action=onloadCallbackExportMemberlist',
-                'class'      => 'global_op_icon_class',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
@@ -102,7 +101,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'backToEventSettings'            => [
                 'label'           => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
                 'href'            => 'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
-                'class'           => 'global_op_icon_class',
                 'button_callback' => ['tl_calendar_events_member', 'buttonCbBackToEventSettings'],
                 'icon'            => 'bundles/markocupicsaceventtool/icons/back.svg',
                 'attributes'      => 'onclick="Backend.getScrollOffset()" accesskey="e"',
