@@ -7,8 +7,29 @@ services:
     - '@contao.framework'
     - '%kernel.project_dir%'
 
-  # Generate event rapports docx and pdf files
-  Markocupic\SacEventToolBundle\EventRapport\EventRapport:
+  # Generate docx/pdf event memberlists from docx templates
+  Markocupic\SacEventToolBundle\DocxTemplater\EventMemberList2Docx:
+    public: true
+    arguments:
+    - '@contao.framework'
+    - '%kernel.project_dir%'
+
+  # Generate docx/pdf event rapports and event invoices from docx templates
+  Markocupic\SacEventToolBundle\DocxTemplater\EventRapport2Docx:
+    public: true
+    arguments:
+    - '@contao.framework'
+    - '%kernel.project_dir%'
+
+  # Generate docx/pdf event rapports, event invoices and event memberlists from docx templates
+  Markocupic\SacEventToolBundle\DocxTemplater\Helper\Event:
+    public: true
+    arguments:
+    - '@contao.framework'
+    - '%kernel.project_dir%'
+
+  # Generate docx/pdf event rapports, event invoices and event memberlists from docx templates
+  Markocupic\SacEventToolBundle\DocxTemplater\Helper\EventMember:
     public: true
     arguments:
     - '@contao.framework'

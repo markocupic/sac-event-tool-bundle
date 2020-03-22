@@ -18,7 +18,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Date;
 use Contao\System;
-use Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx;
+use Markocupic\SacEventToolBundle\DocxTemplater\ExportEvents2Docx;
 use Markocupic\SacEventToolBundle\Ical\SendEventIcal;
 use Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf;
 use Psr\Log\LogLevel;

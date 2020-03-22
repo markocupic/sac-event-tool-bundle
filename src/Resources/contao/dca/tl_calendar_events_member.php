@@ -63,15 +63,15 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'downloadEventMemberListDocx'        => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList'],
+            'downloadEventMemberList2Docx'        => [
+                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Docx'],
                 'href'       => 'act=downloadEventMemberList',
                 'class'      => 'download_registration_list',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'downloadEventMemberListCsv' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberListCsv'],
+            'downloadEventMemberList2Csv' => [
+                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Csv'],
                 'href'       => 'action=onloadCallbackExportMemberlist',
                 'class'      => 'global_op_icon_class',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',

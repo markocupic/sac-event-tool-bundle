@@ -166,7 +166,7 @@ class tl_calendar_events_member extends Backend
         // Download the registration list as a docx file
         if (Input::get('act') === 'downloadEventMemberList')
         {
-            $objMemberList = System::getContainer()->get('Markocupic\SacEventToolBundle\EventRapport\EventRapport');
+            $objMemberList = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplater\EventMemberList2Docx');
             $objMemberList->generateMemberList(Input::get('id'), 'docx');
             exit;
         }
