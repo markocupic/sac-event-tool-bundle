@@ -9,8 +9,8 @@
  */
 
 // Global operations
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['onloadCallbackExportMemberlist'] = 'Teilnehmerliste Excel';
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList'] = 'Teilnehmerliste Word';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberListCsv'] = 'Teilnehmerliste Excel';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberListDocx'] = 'Teilnehmerliste Word';
 
 // Operations
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['toggleStateOfParticipation'] = ["Status der Teilnahme aendern", "Ändern Sie hier den Teilnahmestatus des Teilnehmers mit ID %s."];

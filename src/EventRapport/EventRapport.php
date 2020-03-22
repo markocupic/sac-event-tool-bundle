@@ -14,6 +14,7 @@ namespace Markocupic\SacEventToolBundle\EventRapport;
 
 use Contao\CalendarEventsInstructorInvoiceModel;
 use Contao\CalendarEventsJourneyModel;
+use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
@@ -26,6 +27,7 @@ use Contao\File;
 use Contao\Folder;
 use Contao\MemberModel;
 use Contao\Message;
+use Contao\Model\Collection;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
@@ -64,14 +66,15 @@ class EventRapport
     }
 
     /**
-     * @param $invoiceId
+     * @param string $type
+     * @param CalendarEventsInstructorInvoiceModel $objEventInvoice
      * @param string $outputType
      * @param string $templateSRC
      * @param string $strFilenamePattern
      * @throws \PhpOffice\PhpWord\Exception\CopyFileException
      * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
      */
-    public function generateInvoice($invoiceId, $outputType = 'docx', string $templateSRC, string $strFilenamePattern)
+    public function runExport(string $type, CalendarEventsInstructorInvoiceModel $objEventInvoice, $outputType = 'docx', string $templateSRC, string $strFilenamePattern)
     {
         // Set adapters
         /** @var  Config $configAdapter */
@@ -86,94 +89,74 @@ class EventRapport
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
         /** @var  Dbafs $dbafsAdapter */
         $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
-        /** @var  Database $databaseAdapter */
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
-        /** @var  CalendarEventsInstructorInvoiceModel $calendarEventsInstructorInvoiceModelAdapter */
-        $calendarEventsInstructorInvoiceModelAdapter = $this->framework->getAdapter(CalendarEventsInstructorInvoiceModel::class);
 
-        $objEventInvoice = $calendarEventsInstructorInvoiceModelAdapter->findByPk($invoiceId);
-        if ($objEventInvoice !== null)
+        $objEvent = $calendarEventsModelAdapter->findByPk($objEventInvoice->pid);
+
+        // Delete old tmp files
+        $this->deleteOldTempFiles();
+
+        if (!$this->checkEventRapportHasFillesInCorrectly($objEventInvoice))
         {
-            // Delete tmp files older the 1 week
-            $arrScan = scan($this->projectDir . '/' . $configAdapter->get('SAC_EVT_TEMP_PATH'));
-            foreach ($arrScan as $file)
+            $messageAdapter->addError('Bitte f&uuml;llen Sie den Touren-Rapport vollst&auml;ndig aus, bevor Sie das Verg&uuml;tungsformular herunterladen.');
+            $controllerAdapter->redirect(System::getReferer());
+        }
+
+        if ($this->getParticipatedEventMembers($objEvent) === null)
+        {
+            // Send error message if there are no members assigned to the event
+            $messageAdapter->addError('Bitte &uuml;berpr&uuml;fe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, die am Event teilgenommen haben.');
+            $controllerAdapter->redirect(System::getReferer());
+        }
+
+        // $objBiller "Der Rechnungssteller"
+        $objBiller = $userModelAdapter->findByPk($objEventInvoice->userPid);
+        if ($objEvent !== null && $objBiller !== null)
+        {
+            $filenamePattern = str_replace('%%s', '%s', $strFilenamePattern);
+            $destFilename = $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
+            $strTemplateSrc = (string) $templateSRC;
+            $objPhpWord = new MsWordTemplateProcessor($strTemplateSrc, $destFilename);
+
+            // Page #1
+            // Tour rapport
+            $this->getTourRapportData($objPhpWord, $objEvent, $objEventInvoice, $objBiller);
+
+            // Page #1 + #2
+            // Get event data
+            $this->getEventData($objPhpWord, $objEvent);
+
+            // Page #2
+            // Member list
+            if ($type === 'rapport')
             {
-                if (is_file($this->projectDir . '/' . $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $file))
-                {
-                    $objFile = new File($configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $file);
-                    if ($objFile !== null)
-                    {
-                        if ((int) $objFile->mtime + 60 * 60 * 24 * 7 < time())
-                        {
-                            $objFile->delete();
-                        }
-                    }
-                }
+                $this->getEventMemberData($objPhpWord, $objEvent, $this->getParticipatedEventMembers($objEvent));
             }
 
-            $objEvent = $calendarEventsModelAdapter->findByPk($objEventInvoice->pid);
-            // $objBiller "Der Rechnungssteller"
-            $objBiller = $userModelAdapter->findByPk($objEventInvoice->userPid);
-            if ($objEvent !== null && $objBiller !== null)
+            // Create temporary folder, if it not exists.
+            new Folder($configAdapter->get('SAC_EVT_TEMP_PATH'));
+            $dbafsAdapter->addResource($configAdapter->get('SAC_EVT_TEMP_PATH'));
+
+            if ($outputType === 'pdf')
             {
-                // Check if tour report has filled in
-                if (!$objEvent->filledInEventReportForm || $objEvent->tourAvalancheConditions === '')
-                {
-                    $messageAdapter->addError('Bitte f&uuml;llen Sie den Touren-Rapport vollst&auml;ndig aus, bevor Sie das Verg&uuml;tungsformular herunterladen.');
-                    $controllerAdapter->redirect(System::getReferer());
-                }
+                // Generate Docx file from template;
+                $objPhpWord->generateUncached(true)
+                    ->sendToBrowser(false)
+                    ->generate();
 
-                $objEventMember = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND hasParticipated=?')->execute($objEvent->id, '1');
-                if (!$objEventMember->numRows)
-                {
-                    // Send error message if there are no members assigned to the event
-                    $messageAdapter->addError('Bitte &uuml;berpr&uuml;fe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, die am Event teilgenommen haben.');
-                    $controllerAdapter->redirect(System::getReferer());
-                }
-
-                $filenamePattern = str_replace('%%s', '%s', $strFilenamePattern);
-                $destFilename = $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
-                $strTemplateSrc = (string) $templateSRC;
-                $objPhpWord = new MsWordTemplateProcessor($strTemplateSrc, $destFilename);
-
-                // Page #1
-                // Tour rapport
-                $this->getTourRapportData($objPhpWord, $objEvent, $objEventMember, $objEventInvoice, $objBiller);
-
-                // Page #1 + #2
-                // Get event data
-                $this->getEventData($objPhpWord, $objEvent);
-
-                // Page #2
-                // Member list
-                $this->getEventMemberData($objPhpWord, $objEvent, $objEventMember);
-
-                // Create temporary folder, if it not exists.
-                new Folder($configAdapter->get('SAC_EVT_TEMP_PATH'));
-                $dbafsAdapter->addResource($configAdapter->get('SAC_EVT_TEMP_PATH'));
-
-                if ($outputType === 'pdf')
-                {
-                    // Generate Docx file from template;
-                    $objPhpWord->generateUncached(true)
-                        ->sendToBrowser(false)
-                        ->generate();
-
-                    // Generate pdf
-                    $objConversion = new DocxToPdfConversion($destFilename, (string) $configAdapter->get('cloudconvertApiKey'));
-                    $objConversion->sendToBrowser(true)->createUncached(true)->convert();
-                }
-
-                if ($outputType === 'docx')
-                {
-                    // Generate Docx file from template;
-                    $objPhpWord->generateUncached(true)
-                        ->sendToBrowser(true)
-                        ->generate();
-                }
-
-                exit();
+                // Generate pdf
+                $objConversion = new DocxToPdfConversion($destFilename, (string) $configAdapter->get('cloudconvertApiKey'));
+                $objConversion->sendToBrowser(true)->createUncached(true)->convert();
             }
+
+            if ($outputType === 'docx')
+            {
+                // Generate Docx file from template;
+                $objPhpWord->generateUncached(true)
+                    ->sendToBrowser(true)
+                    ->generate();
+            }
+
+            exit();
         }
     }
 
@@ -184,7 +167,7 @@ class EventRapport
      * @param $objEventInvoice
      * @param $objBiller
      */
-    protected function getTourRapportData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, $objEventMember, $objEventInvoice, $objBiller)
+    protected function getTourRapportData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, $objEventInvoice, $objBiller)
     {
         // Set adapters
         /** @var  Controller $controllerAdapter */
@@ -204,7 +187,8 @@ class EventRapport
         $countMale = 0;
 
         // Count participants
-        if ($objEventMember->numRows)
+        $objEventMember = $this->getParticipatedEventMembers($objEvent);
+        if ($objEventMember !== null)
         {
             while ($objEventMember->next())
             {
@@ -217,8 +201,10 @@ class EventRapport
                     $countMale++;
                 }
             }
+            // Reset Contao model collection
+            $objEventMember->reset();
         }
-        $objEventMember->reset();
+
         $countParticipants = $countFemale + $countMale;
 
         // Count instructors
@@ -239,6 +225,8 @@ class EventRapport
                 }
             }
         }
+
+        $countParticipantsTotal = $countInstructors + $countParticipants;
 
         $transport = $calendarEventsJourneyModel->findByPk($objEvent->journey) !== null ? $calendarEventsJourneyModel->findByPk($objEvent->journey)->title : 'keine Angabe';
         $objPhpWord->replace('eventTransport', $this->prepareString($transport));
@@ -388,9 +376,9 @@ class EventRapport
     /**
      * @param MsWordTemplateProcessor $objPhpWord
      * @param CalendarEventsModel $objEvent
-     * @param $objEventMember
+     * @param Collection $objEventMember
      */
-    protected function getEventMemberData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, $objEventMember)
+    protected function getEventMemberData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, Collection $objEventMember)
     {
         // Set adapters
         /** @var  UserModel $userModelAdapter */
@@ -455,60 +443,63 @@ class EventRapport
         }
 
         // TN
-        while ($objEventMember->next())
+        if (null !== $objEventMember)
         {
-            $i++;
-
-            // Check club membership
-            $strIsActiveMember = '!inaktiv/keinMitglied';
-            if ($objEventMember->sacMemberId != '')
+            while ($objEventMember->next())
             {
-                $objMemberModel = $memberModelAdapter->findOneBySacMemberId($objEventMember->sacMemberId);
-                if ($objMemberModel !== null)
+                $i++;
+
+                // Check club membership
+                $strIsActiveMember = '!inaktiv/keinMitglied';
+                if ($objEventMember->sacMemberId != '')
                 {
-                    if ($objMemberModel->isSacMember && !$objMemberModel->disable)
+                    $objMemberModel = $memberModelAdapter->findOneBySacMemberId($objEventMember->sacMemberId);
+                    if ($objMemberModel !== null)
                     {
-                        $strIsActiveMember = ' ';
+                        if ($objMemberModel->isSacMember && !$objMemberModel->disable)
+                        {
+                            $strIsActiveMember = ' ';
+                        }
                     }
                 }
-            }
 
-            $transportInfo = '';
-            if (strlen($objEventMember->carInfo))
-            {
-                if ((int) $objEventMember->carInfo > 0)
+                $transportInfo = '';
+                if (strlen($objEventMember->carInfo))
                 {
-                    $transportInfo .= sprintf(' Auto mit %s Plätzen', $objEventMember->carInfo);
+                    if ((int) $objEventMember->carInfo > 0)
+                    {
+                        $transportInfo .= sprintf(' Auto mit %s Plätzen', $objEventMember->carInfo);
+                    }
                 }
+
+                // GA, Halbtax, Tageskarte
+                if (strlen($objEventMember->ticketInfo))
+                {
+                    $transportInfo .= sprintf(' Ticket: Mit %s', $objEventMember->ticketInfo);
+                }
+
+                // Phone
+                $mobile = $objEventMember->mobile != '' ? $objEventMember->mobile : '----';
+                // Clone row
+                $objPhpWord->createClone('i');
+
+                // Push data to clone
+                $objPhpWord->addToClone('i', 'i', $i, ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'role', 'TN', ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'firstname', $this->prepareString($objEventMember->firstname), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'lastname', $this->prepareString($objEventMember->lastname), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. ' . $objEventMember->sacMemberId, ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'isNotSacMember', $strIsActiveMember, ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'street', $this->prepareString($objEventMember->street), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'postal', $this->prepareString($objEventMember->postal), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'city', $this->prepareString($objEventMember->city), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'mobile', $this->prepareString($mobile), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'emergencyPhone', $this->prepareString($objEventMember->emergencyPhone), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'emergencyPhoneName', $this->prepareString($objEventMember->emergencyPhoneName), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'email', $this->prepareString($objEventMember->email), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'transportInfo', $this->prepareString($transportInfo), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'dateOfBirth', $objEventMember->dateOfBirth != '' ? $dateAdapter->parse('Y', $objEventMember->dateOfBirth) : '', ['multiline' => false]);
             }
-
-            // GA, Halbtax, Tageskarte
-            if (strlen($objEventMember->ticketInfo))
-            {
-                $transportInfo .= sprintf(' Ticket: Mit %s', $objEventMember->ticketInfo);
-            }
-
-            // Phone
-            $mobile = $objEventMember->mobile != '' ? $objEventMember->mobile : '----';
-            // Clone row
-            $objPhpWord->createClone('i');
-
-            // Push data to clone
-            $objPhpWord->addToClone('i', 'i', $i, ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'role', 'TN', ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'firstname', $this->prepareString($objEventMember->firstname), ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'lastname', $this->prepareString($objEventMember->lastname), ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. ' . $objEventMember->sacMemberId, ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'isNotSacMember', $strIsActiveMember, ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'street', $this->prepareString($objEventMember->street), ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'postal', $this->prepareString($objEventMember->postal), ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'city', $this->prepareString($objEventMember->city), ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'mobile', $this->prepareString($mobile), ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'emergencyPhone', $this->prepareString($objEventMember->emergencyPhone), ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'emergencyPhoneName', $this->prepareString($objEventMember->emergencyPhoneName), ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'email', $this->prepareString($objEventMember->email), ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'transportInfo', $this->prepareString($transportInfo), ['multiline' => false]);
-            $objPhpWord->addToClone('i', 'dateOfBirth', $objEventMember->dateOfBirth != '' ? $dateAdapter->parse('Y', $objEventMember->dateOfBirth) : '', ['multiline' => false]);
         }
 
         // Event instructors
@@ -548,15 +539,20 @@ class EventRapport
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
         /** @var  Dbafs $dbafsAdapter */
         $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
-        /** @var  Database $databaseAdapter */
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
+        /** @var  CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
+        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
 
         $objEvent = $calendarEventsModelAdapter->findByPk($eventId);
 
         if ($objEvent !== null)
         {
-            $objEventMember = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=? ORDER BY lastname, firstname')->execute($objEvent->id, 'subscription-accepted');
-            if (!$objEventMember->numRows)
+            $objEventMember = $calendarEventsMemberModelAdapter->findBy(
+                ['tl_calendar_events_member.eventId=?', 'tl_calendar_events_member.stateOfSubscription=?'],
+                [$objEvent->id, 'subscription-accepted'],
+                ['order' => 'tl_calendar_events_member.lastname , tl_calendar_events_member.firstname']
+            );
+
+            if ($objEventMember === null)
             {
                 // Send error message if there are no members assigned to the event
                 $messageAdapter->addError('Bitte &uuml;berpr&uuml;fe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, deren Teilname best&auml;tigt ist.');
@@ -600,6 +596,76 @@ class EventRapport
 
             exit();
         }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    protected function deleteOldTempFiles()
+    {
+        /** @var  Config $configAdapter */
+        $configAdapter = $this->framework->getAdapter(Config::class);
+
+        // Delete tmp files older the 1 week
+        $arrScan = scan($this->projectDir . '/' . $configAdapter->get('SAC_EVT_TEMP_PATH'));
+        foreach ($arrScan as $file)
+        {
+            if (is_file($this->projectDir . '/' . $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $file))
+            {
+                $objFile = new File($configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $file);
+                if ($objFile !== null)
+                {
+                    if ((int) $objFile->mtime + 60 * 60 * 24 * 7 < time())
+                    {
+                        $objFile->delete();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param CalendarEventsInstructorInvoiceModel $objEventInvoice
+     * @return bool
+     */
+    protected function checkEventRapportHasFillesInCorrectly(CalendarEventsInstructorInvoiceModel $objEventInvoice): bool
+    {
+        /** @var  CalendarEventsModel $calendarEventsModelAdapter */
+        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+
+        /** @var UserModel $userModelAdapter */
+        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+
+        $objEvent = $calendarEventsModelAdapter->findByPk($objEventInvoice->pid);
+
+        // $objBiller "Der Rechnungssteller"
+        $objBiller = $userModelAdapter->findByPk($objEventInvoice->userPid);
+        if ($objEvent !== null && $objBiller !== null)
+        {
+            // Check if tour report has filled in
+            if ($objEvent->filledInEventReportForm && $objEvent->tourAvalancheConditions !== '')
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $objEvent
+     * @return mixed
+     */
+    protected function getParticipatedEventMembers($objEvent)
+    {
+        /** @var  CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
+        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+
+        $objEventsMember = $calendarEventsMemberModelAdapter->findBy(
+            ['tl_calendar_events_member.eventId=?', 'tl_calendar_events_member.hasParticipated=?'],
+            [$objEvent->id, '1']
+        );
+        return $objEventsMember;
     }
 
 }

@@ -1001,13 +1001,11 @@ class tl_calendar_events_member extends Backend
      */
     public function buttonCbBackToEventSettings($href, $label, $title, $class, $attributes, $table)
     {
-        $label = 'Zum Event';
         $href = ampersand('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s');
         $eventId = Input::get('id');
         $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
         $href = sprintf($href, $eventId, REQUEST_TOKEN, $refererId);
-
-        return ' <a href="' . $href . '" title="' . StringUtil::specialchars('Zur&uuml;ck zum Event') . '"' . $attributes . '>' . Image::getHtml('back.svg', $label) . ' ' . $label . '</a> ';
+        return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $href, $class, $title, $attributes, $label);
     }
 
     /**

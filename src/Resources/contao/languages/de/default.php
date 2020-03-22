@@ -50,8 +50,8 @@ $GLOBALS['TL_LANG']['MSC']['plus1year'] = '+1 Jahr';
 $GLOBALS['TL_LANG']['MSC']['minus1year'] = '-1 Jahr';
 $GLOBALS['TL_LANG']['MSC']['plusOneReleaseLevel'] = 'Freigabestufe ++';
 $GLOBALS['TL_LANG']['MSC']['minusOneReleaseLevel'] = 'Freigabestufe --';
-$GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'] = 'Vergütungsformular';
-$GLOBALS['TL_LANG']['MSC']['writeTourReportButton'] = 'Tourenrapport';
+$GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'] = 'Vergütungsformular und Rapport drucken';
+$GLOBALS['TL_LANG']['MSC']['writeTourReportButton'] = 'Tourenrapport bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['backToEvent'] = 'Zurück zum Event';
 $GLOBALS['TL_LANG']['MSC']['onloadCallbackExportCalendar'] = 'Events exportieren';
 

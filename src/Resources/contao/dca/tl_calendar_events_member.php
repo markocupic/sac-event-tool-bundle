@@ -63,11 +63,18 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'downloadEventMemberList'        => [
+            'downloadEventMemberListDocx'        => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList'],
                 'href'       => 'act=downloadEventMemberList',
                 'class'      => 'download_registration_list',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+            ],
+            'downloadEventMemberListCsv' => [
+                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberListCsv'],
+                'href'       => 'action=onloadCallbackExportMemberlist',
+                'class'      => 'global_op_icon_class',
+                'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'writeTourReport'                => [
@@ -84,13 +91,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'onloadCallbackExportMemberlist' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['onloadCallbackExportMemberlist'],
-                'href'       => 'action=onloadCallbackExportMemberlist',
-                'class'      => 'global_op_icon_class',
-                'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',
-                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-            ],
+
             'sendEmail'                      => [
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['sendEmail'],
                 'href'       => 'act=edit&call=sendEmail',
@@ -101,8 +102,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'backToEventSettings'            => [
                 'label'           => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
                 'href'            => 'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
-                'class'           => 'back_to_event_settings',
+                'class'           => 'global_op_icon_class',
                 'button_callback' => ['tl_calendar_events_member', 'buttonCbBackToEventSettings'],
+                'icon'            => 'bundles/markocupicsaceventtool/icons/back.svg',
                 'attributes'      => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
         ],
