@@ -10,7 +10,7 @@
 
 namespace Contao;
 
-use Markocupic\SacEventToolBundle\DocxTemplater\EventRapport2Docx;
+use Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx;
 use Markocupic\SacEventToolBundle\EventRapport\EventRapport;
 
 /**
@@ -87,27 +87,27 @@ class tl_calendar_events_instructor_invoice extends Backend
         $objEventInvoice = CalendarEventsInstructorInvoiceModel::findByPk(Input::get('id'));
         if ($objEventInvoice !== null)
         {
-            /** @var EventRapport2Docx $objTemplater */
-            $objTemplater = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplater\EventRapport2Docx');
+            /** @var EventRapport2Docx $objTemplator */
+            $objTemplator = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx');
 
             if (Input::get('action') === 'generateInvoiceDocx')
             {
-                $objTemplater->generate('invoice', $objEventInvoice, 'docx', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
+                $objTemplator->generate('invoice', $objEventInvoice, 'docx', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
             }
 
             if (Input::get('action') === 'generateInvoicePdf')
             {
-                $objTemplater->generate('invoice', $objEventInvoice, 'pdf', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
+                $objTemplator->generate('invoice', $objEventInvoice, 'pdf', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
             }
 
             if (Input::get('action') === 'generateTourRapportDocx')
             {
-                $objTemplater->generate('rapport', $objEventInvoice, 'docx', Config::get('SAC_EVT_EVENT_RAPPORT_TOUR_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_RAPPORT_FILE_NAME_PATTERN'));
+                $objTemplator->generate('rapport', $objEventInvoice, 'docx', Config::get('SAC_EVT_EVENT_RAPPORT_TOUR_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_RAPPORT_FILE_NAME_PATTERN'));
             }
 
             if (Input::get('action') === 'generateTourRapportPdf')
             {
-                $objTemplater->generate('rapport', $objEventInvoice, 'pdf', Config::get('SAC_EVT_EVENT_RAPPORT_TOUR_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_RAPPORT_FILE_NAME_PATTERN'));
+                $objTemplator->generate('rapport', $objEventInvoice, 'pdf', Config::get('SAC_EVT_EVENT_RAPPORT_TOUR_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_RAPPORT_FILE_NAME_PATTERN'));
             }
         }
     }

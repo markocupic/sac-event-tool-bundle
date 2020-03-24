@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\DocxTemplater\Helper;
+namespace Markocupic\SacEventToolBundle\DocxTemplator\Helper;
 
 use Contao\CalendarEventsInstructorInvoiceModel;
 use Contao\CalendarEventsJourneyModel;
@@ -28,7 +28,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
  * Class Event
- * @package Markocupic\SacEventToolBundle\DocxTemplater\Helper
+ * @package Markocupic\SacEventToolBundle\DocxTemplator\Helper
  */
 class Event
 {
@@ -43,7 +43,7 @@ class Event
     private $projectDir;
 
     /**
-     * EventRapport constructor.
+     * Event constructor.
      * @param ContaoFramework $framework
      * @param string $projectDir
      */
@@ -60,7 +60,7 @@ class Event
      * @param MsWordTemplateProcessor $objPhpWord
      * @param CalendarEventsModel $objEvent
      */
-    public function getEventData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent)
+    public function setEventData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent): void
     {
         // Set adapters
         /** @var  Controller $controllerAdapter */
@@ -131,11 +131,10 @@ class Event
     /**
      * @param MsWordTemplateProcessor $objPhpWord
      * @param CalendarEventsModel $objEvent
-     * @param $objEventMember
-     * @param $objEventInvoice
-     * @param $objBiller
+     * @param CalendarEventsInstructorInvoiceModel $objEventInvoice
+     * @param UserModel $objBiller
      */
-    public function getTourRapportData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, $objEventInvoice, $objBiller)
+    public function setTourRapportData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, CalendarEventsInstructorInvoiceModel $objEventInvoice, UserModel $objBiller): void
     {
         // Set adapters
         /** @var  Controller $controllerAdapter */
@@ -157,7 +156,7 @@ class Event
         // Count participants
         // Member list
         /** @var EventMember $objEventMemberHelper */
-        $objEventMemberHelper = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplater\Helper\EventMember');
+        $objEventMemberHelper = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember');
         $objEventMember = $objEventMemberHelper->getParticipatedEventMembers($objEvent);
         if ($objEventMember !== null)
         {

@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\DocxTemplater;
+namespace Markocupic\SacEventToolBundle\DocxTemplator;
 
 use Contao\CalendarEventsInstructorInvoiceModel;
 use Contao\CalendarEventsModel;
@@ -25,12 +25,12 @@ use Contao\System;
 use Contao\UserModel;
 use Markocupic\CloudconvertBundle\Services\DocxToPdfConversion;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
-use Markocupic\SacEventToolBundle\DocxTemplater\Helper\Event;
-use Markocupic\SacEventToolBundle\DocxTemplater\Helper\EventMember;
+use Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event;
+use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
 
 /**
  * Class EventRapport2Docx
- * @package Markocupic\SacEventToolBundle\DocxTemplater
+ * @package Markocupic\SacEventToolBundle\DocxTemplator
  */
 class EventRapport2Docx
 {
@@ -67,7 +67,7 @@ class EventRapport2Docx
      * @throws \PhpOffice\PhpWord\Exception\CopyFileException
      * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
      */
-    public function generate(string $type, CalendarEventsInstructorInvoiceModel $objEventInvoice, $outputType = 'docx', string $templateSRC, string $strFilenamePattern)
+    public function generate(string $type, CalendarEventsInstructorInvoiceModel $objEventInvoice, string $outputType = 'docx', string $templateSRC, string $strFilenamePattern): void
     {
         // Set adapters
         /** @var  Config $configAdapter */
@@ -84,16 +84,16 @@ class EventRapport2Docx
         $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
 
         /** @var Event $objEventHelper */
-        $objEventHelper = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplater\Helper\Event');
+        $objEventHelper = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event');
 
         /** @var EventMember $objEventMemberHelper */
-        $objEventMemberHelper = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplater\Helper\EventMember');
+        $objEventMemberHelper = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember');
 
+        /** @var CalendarEventsModel $objEvent */
         $objEvent = $calendarEventsModelAdapter->findByPk($objEventInvoice->pid);
 
         // Delete old tmp files
         $this->deleteOldTempFiles();
-
 
         if (!$objEventHelper->checkEventRapportHasFilledInCorrectly($objEventInvoice))
         {
@@ -119,17 +119,17 @@ class EventRapport2Docx
 
             // Page #1
             // Tour rapport
-            $objEventHelper->getTourRapportData($objPhpWord, $objEvent, $objEventInvoice, $objBiller);
+            $objEventHelper->setTourRapportData($objPhpWord, $objEvent, $objEventInvoice, $objBiller);
 
             // Page #1 + #2
             // Get event data
-            $objEventHelper->getEventData($objPhpWord, $objEvent);
+            $objEventHelper->setEventData($objPhpWord, $objEvent);
 
             // Page #2
             // Member list
             if ($type === 'rapport')
             {
-                $objEventMemberHelper->getEventMemberData($objPhpWord, $objEvent, $objEventMemberHelper->getParticipatedEventMembers($objEvent));
+                $objEventMemberHelper->setEventMemberData($objPhpWord, $objEvent, $objEventMemberHelper->getParticipatedEventMembers($objEvent));
             }
 
             // Create temporary folder, if it not exists.
@@ -163,7 +163,7 @@ class EventRapport2Docx
     /**
      * @throws \Exception
      */
-    protected function deleteOldTempFiles()
+    protected function deleteOldTempFiles(): void
     {
         /** @var  Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
@@ -185,8 +185,5 @@ class EventRapport2Docx
             }
         }
     }
-
-
-
 
 }

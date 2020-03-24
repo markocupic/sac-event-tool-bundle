@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\DocxTemplater\Helper;
+namespace Markocupic\SacEventToolBundle\DocxTemplator\Helper;
 
 use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
@@ -24,7 +24,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
  * Class EventMember
- * @package Markocupic\SacEventToolBundle\DocxTemplater\Helper
+ * @package Markocupic\SacEventToolBundle\DocxTemplator\Helper
  */
 class EventMember
 {
@@ -39,7 +39,7 @@ class EventMember
     private $projectDir;
 
     /**
-     * EventRapport constructor.
+     * EventMember constructor.
      * @param ContaoFramework $framework
      * @param string $projectDir
      */
@@ -55,9 +55,9 @@ class EventMember
     /**
      * @param MsWordTemplateProcessor $objPhpWord
      * @param CalendarEventsModel $objEvent
-     * @param Collection $objEventMember
+     * @param Collection|null $objEventMember
      */
-    public function getEventMemberData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, Collection $objEventMember)
+    public function setEventMemberData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, ?Collection $objEventMember): void
     {
         // Set adapters
         /** @var  UserModel $userModelAdapter */
@@ -201,9 +201,9 @@ class EventMember
 
     /**
      * @param $objEvent
-     * @return mixed
+     * @return Collection|null
      */
-    public function getParticipatedEventMembers($objEvent)
+    public function getParticipatedEventMembers($objEvent): ?Collection
     {
         /** @var  CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
@@ -219,7 +219,7 @@ class EventMember
      * @param string $string
      * @return string
      */
-    protected function prepareString($string = ''): string
+    protected function prepareString(string $string = ''): string
     {
         if (null === $string)
         {

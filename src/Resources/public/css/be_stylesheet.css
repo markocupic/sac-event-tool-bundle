@@ -51,7 +51,9 @@ table#ctrl_eventDates thead tr:first-child {
 }
 
 /** Global operations**/
-#tl_buttons .header_icon {
+#tl_buttons .header_icon.download_registration_list,
+#tl_buttons .header_icon.send_email,
+#tl_buttons .header_icon.global_op_icon_class {
     background-size: 16px 16px;
     padding: 3px 0 3px 21px;
     background-position: left center;
