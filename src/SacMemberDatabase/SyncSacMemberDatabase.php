@@ -64,7 +64,7 @@ class SyncSacMemberDatabase
     /**
      * @var array
      */
-    private $section_ids = array();
+    private $section_ids = [];
 
     /**
      * @var string
@@ -104,7 +104,7 @@ class SyncSacMemberDatabase
 
         /** @var string ftp_password */
         $this->ftp_password = (string) $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD');
- 
+
         /** @var array section_ids */
         $this->section_ids = !empty($configAdapter->get('SAC_EVT_SAC_SECTION_IDS')) ? explode(',', $configAdapter->get('SAC_EVT_SAC_SECTION_IDS')) : [];
     }
@@ -181,7 +181,7 @@ class SyncSacMemberDatabase
         {
             $arrMemberIDS = $statement->fetchEach('sacMemberId');
         }
-        $arrMember = array();
+        $arrMember = [];
         foreach ($this->section_ids as $sectionId)
         {
             $objFile = new File('system/tmp/Adressen_0000' . $sectionId . '.csv');
@@ -196,15 +196,15 @@ class SyncSacMemberDatabase
                         continue;
                     }
                     $arrLine = \explode('$', $line);
-                    $set = array();
+                    $set = [];
                     $set['sacMemberId'] = \intval($arrLine[0]);
                     $set['username'] = \intval($arrLine[0]);
                     // Mehrere Sektionsmitgliedschaften möglich
-                    $set['sectionId'] = array((string) ltrim($arrLine[1], '0'));
+                    $set['sectionId'] = [(string) \ltrim((string) $arrLine[1], '0')];
                     $set['lastname'] = $arrLine[2];
                     $set['firstname'] = $arrLine[3];
                     $set['addressExtra'] = $arrLine[4];
-                    $set['street'] = trim($arrLine[5]);
+                    $set['street'] = \trim((string) $arrLine[5]);
                     $set['streetExtra'] = $arrLine[6];
                     $set['postal'] = $arrLine[7];
                     $set['city'] = $arrLine[8];
@@ -233,7 +233,7 @@ class SyncSacMemberDatabase
                     $set = \array_map(function ($value) {
                         if (!\is_array($value))
                         {
-                            $value = \is_string($value) ? \trim($value) : $value;
+                            $value = \is_string($value) ? \trim((string) $value) : $value;
                             $value = \is_string($value) ? \utf8_encode($value) : $value;
                             return $value;
                         }
@@ -270,7 +270,7 @@ class SyncSacMemberDatabase
         try
         {
             // Lock table tl_member for writing
-            Database::getInstance()->lockTables(array('tl_member' => 'WRITE'));
+            Database::getInstance()->lockTables(['tl_member' => 'WRITE']);
 
             // Start transaction (big thank to cyon.ch)
             Database::getInstance()->beginTransaction();
@@ -322,10 +322,10 @@ class SyncSacMemberDatabase
         $objDisabledMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE disable=? AND isSacMember=?')->execute('', '');
         while ($objDisabledMember->next())
         {
-            $arrSet = array(
+            $arrSet = [
                 'tstamp'  => \time(),
                 'disable' => '1',
-            );
+            ];
             Database::getInstance()->prepare('UPDATE tl_member %s WHERE id=?')->set($arrSet)->execute($objDisabledMember->id);
 
             // Log
@@ -356,7 +356,7 @@ class SyncSacMemberDatabase
             $this->logger->log(
                 $strLogLevel,
                 $strText,
-                array('contao' => new ContaoContext($strMethod, $strCategory))
+                ['contao' => new ContaoContext($strMethod, $strCategory)]
             );
         }
     }
