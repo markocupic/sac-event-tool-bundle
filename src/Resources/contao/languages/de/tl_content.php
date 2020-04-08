@@ -17,14 +17,14 @@ $GLOBALS['TL_LANG']['tl_content']['config_legend'] = 'Element-Einstellungen';
 
 
 // Fields
-$GLOBALS['TL_LANG']['tl_content']['userList_selectMode'] = array('Auswahltyp', 'W&auml;hlen Sie einen Auswahltyp aus.');
-$GLOBALS['TL_LANG']['tl_content']['userList_users'] = array('Anzuzeigende Benutzer', 'W&auml;hlen Sie einen oder mehrere Benutzer aus, die angezeigt werden, aus.');
-$GLOBALS['TL_LANG']['tl_content']['userList_userRoles'] = array('Benutzer abh&auml;ngig nach ihrer Rolle ausw&auml;hlen', 'W&auml;hlen Sie eine oder mehrere Rollen aus.');
+$GLOBALS['TL_LANG']['tl_content']['userList_selectMode'] = array('Auswahltyp', 'Wählen Sie einen Auswahltyp aus.');
+$GLOBALS['TL_LANG']['tl_content']['userList_users'] = array('Anzuzeigende Benutzer', 'Wählen Sie einen oder mehrere Benutzer aus, die angezeigt werden, aus.');
+$GLOBALS['TL_LANG']['tl_content']['userList_userRoles'] = array('Benutzer abhängig nach ihrer Rolle auswählen', 'Wählen Sie eine oder mehrere Rollen aus.');
 $GLOBALS['TL_LANG']['tl_content']['userList_replacePrivateAdressWithRoleAdress'] = array('Private Adressen-Angaben mit Rollen-Adressen-Angaben überschreiben', 'Geben Sie an, welche private Adressen-Angaben durch Rollen-Adressen-Angaben überschrieben werden sollen.');
-$GLOBALS['TL_LANG']['tl_content']['userList_queryType'] = array('Abfragetyp (UND/ODER)', 'W&auml;hlen Sie einen Abfragetyp aus.');
+$GLOBALS['TL_LANG']['tl_content']['userList_queryType'] = array('Abfragetyp (UND/ODER)', 'Wählen Sie einen Abfragetyp aus.');
 $GLOBALS['TL_LANG']['tl_content']['userList_showFieldsToGuests'] = array('Zeige Felder unangemeldeten Gästen', 'Zeige diese Felder unangemeldeten Gästen');
-$GLOBALS['TL_LANG']['tl_content']['imgSize'] = array('Bildgr&ouml;sse', 'W&auml;hlen Sie eine Bildgr&ouml;sse aus.');
-$GLOBALS['TL_LANG']['tl_content']['jumpTo'] = array('Weiterleitungsseite', 'W&auml;hlen Sie eine Weiterleitungsseite aus.');
+$GLOBALS['TL_LANG']['tl_content']['imgSize'] = array('Bildgrösse', 'Wählen Sie eine Bildgrösse aus.');
+$GLOBALS['TL_LANG']['tl_content']['jumpTo'] = array('Weiterleitungsseite', 'Wählen Sie eine Weiterleitungsseite aus.');
 
 // References
 $GLOBALS['TL_LANG']['tl_content']['selectUserRoles'] = 'Anhand Benutzer-Rollen';

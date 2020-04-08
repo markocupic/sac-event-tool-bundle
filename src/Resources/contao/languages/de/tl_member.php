@@ -22,14 +22,14 @@ if (TL_MODE === 'FE')
 }
 $GLOBALS['TL_LANG']['tl_member']['uuid'] = array('UUID (Zentralkommitee Bern)', '');
 $GLOBALS['TL_LANG']['tl_member']['activation'] = array('Aktivierungscode', '');
-$GLOBALS['TL_LANG']['tl_member']['activationLinkLifetime'] = array('G&uuml;ltigkeitsdauer Aktivierungstoken', '');
-$GLOBALS['TL_LANG']['tl_member']['isSacMember'] = array('Dieser User ist ein SAC-Mitglied', 'Dieses Mitglied wurde in der Datenbank (CSV-File) beim t&auml;glichen Sync gefunden.');
+$GLOBALS['TL_LANG']['tl_member']['activationLinkLifetime'] = array('Gültigkeitsdauer Aktivierungstoken', '');
+$GLOBALS['TL_LANG']['tl_member']['isSacMember'] = array('Dieser User ist ein SAC-Mitglied', 'Dieses Mitglied wurde in der Datenbank (CSV-File) beim täglichen Sync gefunden.');
 $GLOBALS['TL_LANG']['tl_member']['sacMemberId'] = array('Mitgliedernummer', '');
 $GLOBALS['TL_LANG']['tl_member']['emergencyPhone'] = array('Notfall-Benachrichtigungs-Telefonnummer', 'Geben Sie die Telefonnummer einer Ihnen vertrauten Person an, welche in einem Notfall kontaktiert werden kann.');
 $GLOBALS['TL_LANG']['tl_member']['emergencyPhoneName'] = array('Kontaktperson für Notfallbenachrichtigung', 'Geben Sie den Namen der Kontaktperson ein, welche im FAlle eines Notfalls benachrichtigt werden soll.');
 $GLOBALS['TL_LANG']['tl_member']['sectionId'] = array('Sektion', '');
 $GLOBALS['TL_LANG']['tl_member']['addressExtra'] = array('Adresszusatz', '');
-$GLOBALS['TL_LANG']['tl_member']['phoneBusiness'] = array('Telefon Gesch&auml;ft', '');
+$GLOBALS['TL_LANG']['tl_member']['phoneBusiness'] = array('Telefon Geschäft', '');
 $GLOBALS['TL_LANG']['tl_member']['profession'] = array('Beruf', '');
 $GLOBALS['TL_LANG']['tl_member']['entryYear'] = array('Eintrittsjahr', '');
 $GLOBALS['TL_LANG']['tl_member']['membershipType'] = array('Mitglieder Typ', '');

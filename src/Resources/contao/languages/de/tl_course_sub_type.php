@@ -10,6 +10,6 @@
 
 
 
-$GLOBALS['TL_LANG']['tl_course_sub_type']['pid'] = array("Hauptkategorie", "W&auml;hlen Sie eine Hauptkategorie aus.");
-$GLOBALS['TL_LANG']['tl_course_sub_type']['code'] = array("Zahlencode", "W&auml;hlen Sie einen Zahlencode aus.");
+$GLOBALS['TL_LANG']['tl_course_sub_type']['pid'] = array("Hauptkategorie", "Wählen Sie eine Hauptkategorie aus.");
+$GLOBALS['TL_LANG']['tl_course_sub_type']['code'] = array("Zahlencode", "Wählen Sie einen Zahlencode aus.");
 $GLOBALS['TL_LANG']['tl_course_sub_type']['name'] = array("Bezeichung", "Geben Sie eine Bezeichnung an.");

@@ -17,7 +17,7 @@ $GLOBALS['TL_LANG']['tl_tour_difficulty_category']['new'] = array("Neue Schwieri
 // Buttons
 $GLOBALS['TL_LANG']['tl_tour_difficulty_category']['edit'] = array("Bearbeiten", "Schwierigkeitsgrad-Kategorie mit ID %s bearbeiten.");
 $GLOBALS['TL_LANG']['tl_tour_difficulty_category']['editheader'] = array("Bearbeiten", "Schwierigkeitsgrad-Kategorie mit ID %s Einstellungen bearbeiten.");
-$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['delete'] = array("L&ouml;schen", "Schwierigkeitsgrad-Kategorie mit ID %s l&ouml;schen.");
+$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['delete'] = array("Löschen", "Schwierigkeitsgrad-Kategorie mit ID %s löschen.");
 $GLOBALS['TL_LANG']['tl_tour_difficulty_category']['copy'] = array("Kopieren", "Schwierigkeitsgrad-Kategorie mit ID %s kopieren.");
 $GLOBALS['TL_LANG']['tl_tour_difficulty_category']['show'] = array("Ansehen", "Schwierigkeitsgrad-Kategorie mit ID %s ansehen.");
 

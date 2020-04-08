@@ -9,7 +9,7 @@
  */
 
 // Fields
-$GLOBALS['TL_LANG']['tl_tour_difficulty']['shortcut'] = array("Schwierigkeitsgrad", "W&auml;hlen Sie einen Schwierigkeitsgrad aus.");
-$GLOBALS['TL_LANG']['tl_tour_difficulty']['code'] = array("Bezeichnungscode", "W&auml;hlen Sie einen Bezeichnungscode aus.");
+$GLOBALS['TL_LANG']['tl_tour_difficulty']['shortcut'] = array("Schwierigkeitsgrad", "Wählen Sie einen Schwierigkeitsgrad aus.");
+$GLOBALS['TL_LANG']['tl_tour_difficulty']['code'] = array("Bezeichnungscode", "Wählen Sie einen Bezeichnungscode aus.");
 $GLOBALS['TL_LANG']['tl_tour_difficulty']['title'] = array("Schwierigkeitsgrad-Bezeichnung", "Geben Sie eine Bezeichnung ein.");
 $GLOBALS['TL_LANG']['tl_tour_difficulty']['description'] = array("Schwierigkeitsgrad-Beschreibung", "Geben Sie eine Beschreibung ein.");

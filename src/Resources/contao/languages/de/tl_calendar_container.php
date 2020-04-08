@@ -11,7 +11,7 @@
 
 
 // Global operations
-$GLOBALS['TL_LANG']['tl_calendar_container']['new'] = array("Neuen SAC-Event-Jahrescontainer erstellen", "Neues Jahr hinzuf&uuml;gen");
+$GLOBALS['TL_LANG']['tl_calendar_container']['new'] = array("Neuen SAC-Event-Jahrescontainer erstellen", "Neues Jahr hinzufügen");
 
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar_container']['title_legend'] = "Titel Einstellungen";
@@ -19,7 +19,7 @@ $GLOBALS['TL_LANG']['tl_calendar_container']['title_legend'] = "Titel Einstellun
 // Buttons
 $GLOBALS['TL_LANG']['tl_calendar_container']['edit'] = array("SAC-Event-Jahrescontainer bearbeiten", "SAC-Event-Jahrescontainer ID %s bearbeiten");
 $GLOBALS['TL_LANG']['tl_calendar_container']['editheader'] = array("SAC-Event-Jahrescontainer bearbeiten", "Die SAC-Event-Jahrescontainer-Einstellungen bearbeiten");
-$GLOBALS['TL_LANG']['tl_calendar_container']['delete'] = array("SAC-Event-Jahrescontainer l&ouml;schen", "SAC-Event-Jahrescontainer ID %s l&ouml;schen");
+$GLOBALS['TL_LANG']['tl_calendar_container']['delete'] = array("SAC-Event-Jahrescontainer löschen", "SAC-Event-Jahrescontainer ID %s löschen");
 $GLOBALS['TL_LANG']['tl_calendar_container']['copy'] = array("SAC-Event-Jahrescontainer duplizieren", "SAC-Event-Jahrescontainer ID %s duplizieren");
 $GLOBALS['TL_LANG']['tl_calendar_container']['show'] = array("SAC-Event-Jahrescontainer-Details", "Details des SAC-Event-Jahrescontainer ID %s anzeigen");
 

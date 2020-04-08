@@ -8,11 +8,11 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-$GLOBALS['TL_LANG']['tl_event_organizer']['new'] = array("Neue Gruppe/OG", "Neue Gruppe/OG hinzuf&uuml;gen.");
+$GLOBALS['TL_LANG']['tl_event_organizer']['new'] = array("Neue Gruppe/OG", "Neue Gruppe/OG hinzufügen.");
 
 // Operations
 $GLOBALS['TL_LANG']['tl_event_organizer']['edit'] = array("Bearbeiten", "Gruppe mit ID %s bearbeiten.");
-$GLOBALS['TL_LANG']['tl_event_organizer']['delete'] = array("L&ouml;schen", "Gruppe mit ID %s l&ouml;schen.");
+$GLOBALS['TL_LANG']['tl_event_organizer']['delete'] = array("Löschen", "Gruppe mit ID %s löschen.");
 $GLOBALS['TL_LANG']['tl_event_organizer']['copy'] = array("Kopieren", "Gruppe mit ID %s kopieren.");
 $GLOBALS['TL_LANG']['tl_event_organizer']['show'] = array("Ansehen", "Gruppe mit ID %s ansehen.");
 
@@ -25,8 +25,8 @@ $GLOBALS['TL_LANG']['tl_event_organizer']['event_regulation_legend'] = 'Kurs- un
 $GLOBALS['TL_LANG']['tl_event_organizer']['eventList_legend'] = 'Event Listing Einstellungen';
 
 // Fields
-$GLOBALS['TL_LANG']['tl_event_organizer']['title'] = array("Gruppenbezeichnung", "Geben Sie eine Bezeichnung f&uuml;r die Gruppe/OG an.");
-$GLOBALS['TL_LANG']['tl_event_organizer']['titlePrint'] = array("Gruppenbezeichnung für Print/Jahresprogramm/Monatszeitschrift", "Geben Sie eine Bezeichnung f&uuml;r die Gruppe/OG an.");
+$GLOBALS['TL_LANG']['tl_event_organizer']['title'] = array("Gruppenbezeichnung", "Geben Sie eine Bezeichnung für die Gruppe/OG an.");
+$GLOBALS['TL_LANG']['tl_event_organizer']['titlePrint'] = array("Gruppenbezeichnung für Print/Jahresprogramm/Monatszeitschrift", "Geben Sie eine Bezeichnung für die Gruppe/OG an.");
 $GLOBALS['TL_LANG']['tl_event_organizer']['sorting'] = array("Sortierrang", "Geben Sie einen Sortierrang an.");
 $GLOBALS['TL_LANG']['tl_event_organizer']['ignoreFilterInEventList'] = array("Filter 'Organisierende Gruppe' im Eventlisting Modul ignorieren.", "Wird ein Event dieser organisierenden Gruppe zugewiesen, wird der 'Organisierende Gruppe'-Filter im Event-Listing-Modul ignoriert.");
 $GLOBALS['TL_LANG']['tl_event_organizer']['hideInEventFilter'] = array("Diese organisierende Gruppe im Event-Listing-Filter nicht anzeigen", "Geben Sie an, ob Sie diese organisierende Gruppe im Event-Listing-Filter nicht anzeigen möchten.");

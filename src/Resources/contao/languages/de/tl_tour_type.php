@@ -13,6 +13,6 @@ $GLOBALS['TL_LANG']['tl_tour_type']['new'] = array("Neuen Tourentyp anlegen", "L
 
 
 // Fields
-$GLOBALS['TL_LANG']['tl_tour_type']['shortcut'] = array("Abk&uuml;rzung", "Geben Sie eine Abk&uuml;rzung für den Tourentyp ein.");
+$GLOBALS['TL_LANG']['tl_tour_type']['shortcut'] = array("Abkürzung", "Geben Sie eine Abkürzung für den Tourentyp ein.");
 $GLOBALS['TL_LANG']['tl_tour_type']['title'] = array("Tourentyp", "Geben Sie eine Tourentyp Bezeichnung ein.");
-$GLOBALS['TL_LANG']['tl_tour_type']['description'] = array("Beschreibung f&uuml;r den Tourentyp", "Geben Sie eine Beschreibung ein.");
+$GLOBALS['TL_LANG']['tl_tour_type']['description'] = array("Beschreibung für den Tourentyp", "Geben Sie eine Beschreibung ein.");

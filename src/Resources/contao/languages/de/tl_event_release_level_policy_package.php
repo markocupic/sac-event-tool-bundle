@@ -17,7 +17,7 @@ $GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['new'] = array("Neu
 // Buttons
 $GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['edit'] = array("Bearbeiten", "Freigabestufen-System mit ID %s bearbeiten.");
 $GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['editheader'] = array("Bearbeiten", "Freigabestufen-System-Einstellungen bearbeiten.");
-$GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['delete'] = array("L&ouml;schen", "Freigabestufen-System mit ID %s l&ouml;schen.");
+$GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['delete'] = array("Löschen", "Freigabestufen-System mit ID %s löschen.");
 $GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['copy'] = array("Kopieren", "Freigabestufen-System mit ID %s kopieren.");
 $GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['show'] = array("Ansehen", "Freigabestufen-System mit ID %s ansehen.");
 
