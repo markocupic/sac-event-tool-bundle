@@ -13,7 +13,6 @@
     "ext-pdo": "*",
     "contao/core-bundle": "^4.6",
     "terminal42/notification_center": "^1.5",
-    "markocupic/export_table": "^3.0",
     "markocupic/notification-center-default-email-bundle": "^1.0",
     "menatwork/contao-multicolumnwizard": "^3.3",
     "codefog/contao-haste": "^4.21",
