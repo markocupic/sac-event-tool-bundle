@@ -30,9 +30,12 @@
                         <i class="fa fa-fw fa-calendar-alt"></i>
                         <span v-html="row.eventPeriodLgInline"></span>
                     </div>
-                    <div class="detail-item d-flex">
+                    <div class="detail-item">
                         <div v-html="row.bookingCounter" class="mr-1"></div>
-                        <div v-html="row.eventStateLabel"></div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="event-state-icon" v-bind:class="row.eventState"> </span>
+                        <span v-html="row.eventStateLabel"></span>
                     </div>
                 </div>
             </div>
@@ -89,6 +92,7 @@
             'eventPeriodLgInline',
             'bookingCounter',
             'eventStateLabel',
+            'eventState',
         ],
         'callbacks': {
             'oninsert': function (vue, json) {

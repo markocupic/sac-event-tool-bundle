@@ -240,7 +240,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         }
         elseif ($this->objEvent->eventState === 'event_canceled')
         {
-            $messageAdapter->addInfo('Dieser Anlass ist abgesagt worden.', $scope);
+            $messageAdapter->addInfo('Dieser Anlass wurde abgesagt. Es ist keine Anmeldung möglich.', $scope);
         }
         elseif ($this->objEvent->eventState === 'event_deferred')
         {
