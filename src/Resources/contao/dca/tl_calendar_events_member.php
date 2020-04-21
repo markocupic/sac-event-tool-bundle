@@ -63,17 +63,16 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'downloadEventMemberListDocx'        => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList'],
+            'downloadEventMemberList2Docx'        => [
+                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Docx'],
                 'href'       => 'act=downloadEventMemberList',
                 'class'      => 'download_registration_list',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'downloadEventMemberListCsv' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberListCsv'],
+            'downloadEventMemberList2Csv' => [
+                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Csv'],
                 'href'       => 'action=onloadCallbackExportMemberlist',
-                'class'      => 'global_op_icon_class',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
@@ -102,7 +101,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'backToEventSettings'            => [
                 'label'           => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
                 'href'            => 'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
-                'class'           => 'global_op_icon_class',
                 'button_callback' => ['tl_calendar_events_member', 'buttonCbBackToEventSettings'],
                 'icon'            => 'bundles/markocupicsaceventtool/icons/back.svg',
                 'attributes'      => 'onclick="Backend.getScrollOffset()" accesskey="e"',
@@ -198,9 +196,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'filter'        => true,
             'inputType'     => 'select',
             'save_callback' => [['tl_calendar_events_member', 'saveCallbackStateOfSubscription']],
-            'default'       => 'subscription-not-confirmed',
+            'default'       => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'][0],
             'reference'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
-            'options'       => ['subscription-not-confirmed', 'subscription-accepted', 'subscription-refused', 'subscription-waitlisted', 'user-has-unsubscribed'],
+            'options'       => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'],
             'eval'          => ['doNotShow' => false, 'readonly' => false, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'           => "varchar(255) NOT NULL default ''",
         ],

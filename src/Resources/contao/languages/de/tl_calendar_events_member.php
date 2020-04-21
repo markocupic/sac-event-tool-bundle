@@ -70,6 +70,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['subscription-accepted'] = 'Anm
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['subscription-refused'] = 'Anmeldung abgelehnt';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['subscription-waitlisted'] = 'Auf Warteliste';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['user-has-unsubscribed'] = 'Vom Event abgemeldet';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['subscription-state-undefined'] = 'Anmeldestatus unbekannt';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['manually'] = 'Manuelle Erfassung der Personalien des Event-Teilnehmers';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['onlineForm'] = 'Buchung über Online-Buchungsformular';
 

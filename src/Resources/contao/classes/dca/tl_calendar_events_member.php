@@ -210,18 +210,16 @@ class tl_calendar_events_member extends Backend
             {
                 if (Validator::isEmail($objDb->email))
                 {
-                    if ($objDb->stateOfSubscription === 'subscription-not-confirmed')
+                    $arrSubscriptionStates = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'];
+                    if (empty($arrSubscriptionStates) || !is_array($arrSubscriptionStates))
                     {
-                        $options['tl_calendar_events_member-' . $objDb->id] = $objDb->firstname . ' ' . $objDb->lastname . ' (unbest&auml;tigt)';
+                        throw new \Exception('$GLOBALS["TL_CONFIG"]["SAC-EVENT-TOOL-CONFIG"]["MEMBER-SUBSCRIPTION-STATE"] not found. Please check the config file.');
                     }
-                    elseif ($objDb->stateOfSubscription === 'subscription-refused')
-                    {
-                        $options['tl_calendar_events_member-' . $objDb->id] = $objDb->firstname . ' ' . $objDb->lastname . ' (Teilnahme abgelehnt)';
-                    }
-                    else
-                    {
-                        $options['tl_calendar_events_member-' . $objDb->id] = $objDb->firstname . ' ' . $objDb->lastname . ' (Teilnahme best&auml;tigt)';
-                    }
+
+                    $memberState = (string) $objDb->stateOfSubscription;
+                    $memberState = in_array($memberState, $arrSubscriptionStates) ? $memberState : 'subscription-state-undefined';
+                    $strLabel = isset($GLOBALS['TL_LANG']['tl_calendar_events_member'][$memberState]) ? $GLOBALS['TL_LANG']['tl_calendar_events_member'][$memberState] : $memberState;
+                    $options['tl_calendar_events_member-' . $objDb->id] = $objDb->firstname . ' ' . $objDb->lastname . ' (' . $strLabel . ')';
                 }
             }
 

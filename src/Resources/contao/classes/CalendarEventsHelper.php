@@ -920,51 +920,6 @@ class CalendarEventsHelper
     }
 
     /**
-     * Not in use????
-     * Is event bookable
-     * Are there some free places?
-     * @param CalendarEventsModel $objEvent
-     * @return bool
-     */
-    public static function XXXXXXXXXXXXXXXXXXXXXXisEventBookable(CalendarEventsModel $objEvent): bool
-    {
-        if ($objEvent !== null)
-        {
-            $objDb = Database::getInstance();
-            $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? && stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
-            $memberCount = $calendarEventsMember->numRows;
-
-            if ($objEvent->eventState === 'event_canceled')
-            {
-                return false;
-            }
-
-            if (!$objEvent->disableOnlineRegistration)
-            {
-                if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0)
-                {
-                    if ($memberCount >= $objEvent->maxMembers)
-                    {
-                        // Event fully booked
-                        return false;
-                    }
-                    if ($memberCount < $objEvent->maxMembers)
-                    {
-                        // Free places
-                        return true;
-                    }
-                }
-                else
-                {
-                    // There is no booking limit.
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
      * @param $objEvent
      * @return string
      */
