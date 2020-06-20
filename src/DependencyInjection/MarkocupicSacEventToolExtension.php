@@ -12,10 +12,8 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DependencyInjection;
 
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 /**
  * Class MarkocupicSacEventToolExtension
@@ -28,23 +26,6 @@ class MarkocupicSacEventToolExtension extends Extension
      */
     public function load(array $mergedConfig, ContainerBuilder $container)
     {
-        $loader = new YamlFileLoader(
-            $container,
-            new FileLocator(__DIR__ . '/../Resources/config')
-        );
-
-        $loader->load('listener.yml');
-        $loader->load('parameters.yml');
-        $loader->load('controller-download.yml');
-        $loader->load('controller-ajax.yml');
-        $loader->load('controller-contao-frontend-module.yml');
-        $loader->load('controller-contao-content-element.yml');
-        $loader->load('sac-member-database.yml');
-        $loader->load('cache.yml');
-        $loader->load('cron.yml');
-        $loader->load('contao-mode.yml');
-        $loader->load('services.yml');
-
         // Merge parameters
         if (!empty($GLOBALS['TL_CONFIG']) && is_array($GLOBALS['TL_CONFIG']))
         {
