@@ -20,3 +20,6 @@ services:
     arguments:
     - '@contao.framework'
     - '%kernel.project_dir%'
+
+
+

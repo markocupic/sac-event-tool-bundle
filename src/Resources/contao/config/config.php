@@ -292,6 +292,7 @@ $GLOBALS['TL_HOOKS']['parseTemplate'][] = ['Markocupic\SacEventToolBundle\EventL
 /** Cron jobs **/
 $GLOBALS['TL_CRON']['monthly']['replaceDefaultPassword'] = [Markocupic\SacEventToolBundle\Cron\Contao\MonthlyCron::class, 'replaceDefaultPasswordAndSendNew'];
 $GLOBALS['TL_CRON']['hourly']['syncSacMemberDatabase'] = [Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron::class, 'syncSacMemberDatabase'];
+$GLOBALS['TL_CRON']['hourly']['syncMemberWithUser'] = [Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron::class, 'syncMemberWithUser'];
 $GLOBALS['TL_CRON']['daily']['generateWorkshopPdfBooklet'] = [Markocupic\SacEventToolBundle\Cron\Contao\DailyCron::class, 'generateWorkshopPdfBooklet'];
 $GLOBALS['TL_CRON']['daily']['anonymizeOrphanedCalendarEventsMemberDataRecords'] = [Markocupic\SacEventToolBundle\Cron\Contao\DailyCron::class, 'anonymizeOrphanedCalendarEventsMemberDataRecords'];
 

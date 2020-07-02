@@ -55,6 +55,13 @@ services:
     arguments:
     - '@contao.framework'
 
+  # Cron: Sync tl_member with tl_user
+  Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser:
+    public: true
+    arguments:
+    - '@contao.framework'
+    - '@monolog.logger.contao'
+
   # Rotate image
   Markocupic\SacEventToolBundle\Image\RotateImage:
     public: true
