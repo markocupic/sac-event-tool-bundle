@@ -11,7 +11,7 @@
 /**
  * Class tl_user_sac_event_tool
  */
-class tl_user_sac_event_tool extends Backend
+class tl_user_sac_event_tool extends \Contao\Backend
 {
 
     /**
@@ -23,22 +23,23 @@ class tl_user_sac_event_tool extends Backend
         $this->import('BackendUser', 'User');
 
         // Import js
-        if (Input::get('do') === 'user' && Input::get('act') === 'edit' && Input::get('ref') != '')
+        if (\Contao\Input::get('do') === 'user' && \Contao\Input::get('act') === 'edit' && \Contao\Input::get('ref') != '')
         {
             $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/backend_member_autocomplete.js';
         }
     }
 
     /**
+     * Onload callback
      * See readonly fields
      * @param DataContainer $dc
      */
     public function addReadonlyAttributeToSyncedFields(DataContainer $dc)
     {
         // User profile
-        if (Input::get('do') === 'login')
+        if (\Contao\Input::get('do') === 'login')
         {
-            if (Input::get('do') === 'login')
+            if (\Contao\Input::get('do') === 'login')
             {
                 $id = $this->User->id;
             }
@@ -51,12 +52,12 @@ class tl_user_sac_event_tool extends Backend
             {
                 if (!$this->User->admin)
                 {
-                    $objUser = UserModel::findByPk($id);
+                    $objUser = \Contao\UserModel::findByPk($id);
                     if ($objUser !== null)
                     {
                         if ($objUser->sacMemberId > 0)
                         {
-                            $objMember = MemberModel::findOneBySacMemberId($objUser->sacMemberId);
+                            $objMember = \Contao\MemberModel::findOneBySacMemberId($objUser->sacMemberId);
                             if ($objMember !== null)
                             {
                                 if (!$objMember->disable)
@@ -79,6 +80,20 @@ class tl_user_sac_event_tool extends Backend
                 }
             }
         }
+    }
+
+    /**
+     * Onload callback
+     * @param DataContainer $dc
+     */
+    public function showReadonlyFieldsInfoMessage(DataContainer $dc)
+    {
+        if ($dc->id == '' || !is_numeric($dc->id))
+        {
+            return;
+        }
+        
+        \Contao\Message::addInfo('Einige Felder werden mit der Datenbank des Zentralverbandes synchronisiert. Wenn Sie Änderungen machen möchten, müssen Sie diese zuerst dort vornehmen.');
     }
 
     /**
