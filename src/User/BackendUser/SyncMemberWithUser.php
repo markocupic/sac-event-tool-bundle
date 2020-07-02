@@ -62,9 +62,9 @@ class SyncMemberWithUser
     {
         // Sync tl_user with tl_member
         $objUser = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE sacMemberId>?')->execute(0);
+        $count = 0;
         while ($objUser->next())
         {
-            $count = 0;
             $objSAC = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')->limit(1)->execute($objUser->sacMemberId);
             if ($objSAC->numRows)
             {
@@ -89,11 +89,10 @@ class SyncMemberWithUser
             {
                 Database::getInstance()->prepare('UPDATE tl_user SET sacMemberId=? WHERE id=?')->execute(0, $objUser->id);
             }
-
-            // Log
-            $msg = \sprintf('Synced tl_user with tl_member. %s entries/rows affected.', $count);
-            $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_SYNC_MEMBER_WITH_USER);
         }
+        // Log
+        $msg = \sprintf('Synced tl_user with tl_member. %s entries/rows affected.', $count);
+        $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_SYNC_MEMBER_WITH_USER);
     }
 
     /**
