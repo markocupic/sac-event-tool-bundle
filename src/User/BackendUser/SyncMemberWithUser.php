@@ -62,7 +62,6 @@ class SyncMemberWithUser
     {
         // Sync tl_user with tl_member
         $objUser = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE sacMemberId>?')->execute(0);
-        $count = 0;
         while ($objUser->next())
         {
             $objSAC = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')->limit(1)->execute($objUser->sacMemberId);
@@ -82,17 +81,19 @@ class SyncMemberWithUser
                     'phone'       => $objSAC->phone,
                     'mobile'      => $objSAC->mobile,
                 ];
-                Database::getInstance()->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objUser->id);
-                $count++;
+                $objUpdateStmt = Database::getInstance()->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objUser->id);
+                if ($objUpdateStmt->affectedRows)
+                {
+                    // Log
+                    $msg = \sprintf('Synced tl_user with tl_member. Update tl_user (%s %s [SAC Member-ID: %s]).', $objSAC->firstname, $objSAC->lastname, $objSAC->sacMemberId);
+                    $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_SYNC_MEMBER_WITH_USER);
+                }
             }
             else
             {
                 Database::getInstance()->prepare('UPDATE tl_user SET sacMemberId=? WHERE id=?')->execute(0, $objUser->id);
             }
         }
-        // Log
-        $msg = \sprintf('Synced tl_user with tl_member. %s entries/rows affected.', $count);
-        $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_SYNC_MEMBER_WITH_USER);
     }
 
     /**
