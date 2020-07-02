@@ -60,32 +60,31 @@ class SyncMemberWithUser
      */
     public function syncMemberWithUser()
     {
-        // Sync tl_user with tl_member
         $objUser = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE sacMemberId>?')->execute(0);
         while ($objUser->next())
         {
-            $objSAC = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')->limit(1)->execute($objUser->sacMemberId);
-            if ($objSAC->numRows)
+            $objMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')->limit(1)->execute($objUser->sacMemberId);
+            if ($objMember->numRows)
             {
                 $set = [
-                    'firstname'   => $objSAC->firstname,
-                    'lastname'    => $objSAC->lastname,
-                    'sectionId'   => $objSAC->sectionId,
-                    'dateOfBirth' => $objSAC->dateOfBirth,
-                    'email'       => $objSAC->email != '' ? $objSAC->email : 'invalid_' . $objUser->username . '_' . $objUser->sacMemberId . '@noemail.ch',
-                    'street'      => $objSAC->street,
-                    'postal'      => $objSAC->postal,
-                    'city'        => $objSAC->city,
-                    'country'     => $objSAC->country,
-                    'gender'      => $objSAC->gender,
-                    'phone'       => $objSAC->phone,
-                    'mobile'      => $objSAC->mobile,
+                    'firstname'   => $objMember->firstname,
+                    'lastname'    => $objMember->lastname,
+                    'sectionId'   => $objMember->sectionId,
+                    'dateOfBirth' => $objMember->dateOfBirth,
+                    'email'       => $objMember->email != '' ? $objMember->email : 'invalid_' . $objUser->username . '_' . $objUser->sacMemberId . '@noemail.ch',
+                    'street'      => $objMember->street,
+                    'postal'      => $objMember->postal,
+                    'city'        => $objMember->city,
+                    'country'     => $objMember->country,
+                    'gender'      => $objMember->gender,
+                    'phone'       => $objMember->phone,
+                    'mobile'      => $objMember->mobile,
                 ];
                 $objUpdateStmt = Database::getInstance()->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objUser->id);
                 if ($objUpdateStmt->affectedRows)
                 {
                     // Log
-                    $msg = \sprintf('Synced tl_user with tl_member. Update tl_user (%s %s [SAC Member-ID: %s]).', $objSAC->firstname, $objSAC->lastname, $objSAC->sacMemberId);
+                    $msg = \sprintf('Synced tl_user with tl_member. Updated tl_user (%s %s [SAC Member-ID: %s]).', $objMember->firstname, $objMember->lastname, $objMember->sacMemberId);
                     $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_SYNC_MEMBER_WITH_USER);
                 }
             }
