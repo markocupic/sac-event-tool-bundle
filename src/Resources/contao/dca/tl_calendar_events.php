@@ -588,7 +588,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationGoesTo'] = [
     'filter'     => true,
     'inputType'  => 'select',
     'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
-    'foreignKey' => 'tl_user.name',
+    'foreignKey' => 'tl_user.CONCAT(name,", ",city)',
     'eval'       => ['multiple' => false, 'chosen' => false, 'includeBlankOption' => true, 'tl_class' => 'clr'],
     'sql'        => "int(10) unsigned NOT NULL default '0'",
 ];
