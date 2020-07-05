@@ -32,22 +32,27 @@ class SyncSacMemberDatabase
     private $framework;
 
     /**
-     * @var ?LoggerInterface
-     */
-    private $logger;
-
-    /**
      * string $projectDir
      */
     private $projectDir;
 
     /**
-     * Log type for new member
+     * @var ?LoggerInterface
      */
-    const SAC_EVT_LOG_ADD_NEW_MEMBER = 'ADD_NEW_MEMBER';
+    private $logger;
 
     /**
-     * Log type for a successfull sync
+     * Log type for new member
+     */
+    const SAC_EVT_LOG_ADD_NEW_MEMBER = 'MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER';
+
+    /**
+     * Log type for member update
+     */
+    const SAC_EVT_LOG_UPDATE_MEMBER = 'MEMBER_DATABASE_SYNC_UPDATE_MEMBER';
+
+    /**
+     * Log type for a successful sync
      */
     const SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC = 'MEMBER_DATABASE_SYNC';
 
@@ -84,10 +89,10 @@ class SyncSacMemberDatabase
     /**
      * SyncSacMemberDatabase constructor.
      * @param ContaoFramework $framework
-     * @param null|LoggerInterface $logger
      * @param $projectDir
+     * @param null|LoggerInterface $logger
      */
-    public function __construct(ContaoFramework $framework, ?LoggerInterface $logger = null, $projectDir)
+    public function __construct(ContaoFramework $framework, $projectDir, ?LoggerInterface $logger = null)
     {
         $this->framework = $framework;
         $this->projectDir = $projectDir;
@@ -169,6 +174,7 @@ class SyncSacMemberDatabase
     }
 
     /**
+     * Sync tl_member with Navision db dump
      * @throws \Exception
      */
     private function syncContaoDatabase(): void
@@ -181,6 +187,10 @@ class SyncSacMemberDatabase
         {
             $arrMemberIDS = $statement->fetchEach('sacMemberId');
         }
+
+        // Valid/active members
+        $arrSacMemberIds = [];
+
         $arrMember = [];
         foreach ($this->section_ids as $sectionId)
         {
@@ -196,6 +206,9 @@ class SyncSacMemberDatabase
                         continue;
                     }
                     $arrLine = \explode('$', $line);
+
+                    $arrSacMemberIds[] = \intval($arrLine[0]);
+
                     $set = [];
                     $set['sacMemberId'] = \intval($arrLine[0]);
                     $set['username'] = \intval($arrLine[0]);
@@ -226,9 +239,7 @@ class SyncSacMemberDatabase
                     $set['sectionInfo4'] = $arrLine[27];
                     $set['debit'] = $arrLine[28];
                     $set['memberStatus'] = $arrLine[29];
-                    $set['tstamp'] = \time();
                     $set['disable'] = '';
-                    $set['isSacMember'] = '1';
 
                     $set = \array_map(function ($value) {
                         if (!\is_array($value))
@@ -275,7 +286,7 @@ class SyncSacMemberDatabase
             // Start transaction (big thank to cyon.ch)
             Database::getInstance()->beginTransaction();
 
-            // Set tl_member.isSacMember to empty string
+            // Set tl_member.disable to false for all entries
             Database::getInstance()->prepare('UPDATE tl_member SET isSacMember = ?')->execute('');
 
             $i = 0;
@@ -285,31 +296,51 @@ class SyncSacMemberDatabase
 
                 if (!in_array($sacMemberId, $arrMemberIDS))
                 {
-                    $arrValues['dateAdded'] = time();
+                    $arrValues['dateAdded'] = \time();
+                    $arrValues['tstamp'] = \time();
 
-                    // Add new member
-                    Database::getInstance()->prepare('INSERT INTO tl_member %s')->set($arrValues)->execute();
+                    // Insert new member
 
-                    // Log
-                    $msg = \sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
-                    $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_ADD_NEW_MEMBER);
+                    /** @var Database\Statement $objInsertStmt */
+                    $objInsertStmt = Database::getInstance()->prepare('INSERT INTO tl_member %s')->set($arrValues)->execute();
+
+                    if ($objInsertStmt->affectedRows)
+                    {
+                        // Log
+                        $msg = \sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
+                        $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_ADD_NEW_MEMBER);
+                    }
                 }
                 else
                 {
-                    // Sync datarecord
-                    Database::getInstance()->prepare('UPDATE tl_member %s WHERE sacMemberId=?')->set($arrValues)->execute($sacMemberId);
+                    // Update/sync datarecord
+
+                    /** @var Database\Statement $objUpdateStmt */
+                    $objUpdateStmt = Database::getInstance()->prepare('UPDATE tl_member %s WHERE sacMemberId=?')->set($arrValues)->execute($sacMemberId);
+                    if ($objUpdateStmt->affectedRows)
+                    {
+                        Database::getInstance()->prepare('UPDATE tl_member SET tstamp=? WHERE sacMemberId=?')->execute(time(), $sacMemberId);
+                        $msg = \sprintf('Update SAC-member "%s %s" with SAC-User-ID: %s in tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
+                        $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_UPDATE_MEMBER);
+                    }
                 }
 
                 $i++;
             }
 
+            // Reset sacMemberId to true if member exists in downloaded database dump
+            if (!empty($arrSacMemberIds))
+            {
+                Database::getInstance()->execute('UPDATE tl_member SET isSacMember="1" WHERE sacMemberId IN (' . implode(',', $arrSacMemberIds) . ')');
+            }
+
             Database::getInstance()->commitTransaction();
         } catch (\Exception $e)
         {
-            $msg = 'Error during the database sync process. Starting transaction rollback, now.';
+            $msg = 'Error during the database sync process. Starting transaction rollback now.';
             $this->log(LogLevel::CRITICAL, $msg, __METHOD__, self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR);
 
-            //transaction rollback
+            // Transaction rollback
             Database::getInstance()->rollbackTransaction();
 
             Database::getInstance()->unlockTables();
@@ -318,7 +349,7 @@ class SyncSacMemberDatabase
             throw $e;
         }
 
-        // Set tl_member.disable to true if member was not found in the csv-file
+        // Reset tl_member.disable to true if member was not found in the csv-file
         $objDisabledMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE disable=? AND isSacMember=?')->execute('', '');
         while ($objDisabledMember->next())
         {

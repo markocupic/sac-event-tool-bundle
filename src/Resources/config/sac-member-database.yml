@@ -5,5 +5,6 @@ services:
     public: true
     arguments:
     - '@contao.framework'
-    - '@monolog.logger.contao'
     - '%kernel.project_dir%'
+    - '@monolog.logger.contao'
+
