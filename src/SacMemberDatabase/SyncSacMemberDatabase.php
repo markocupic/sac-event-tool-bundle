@@ -67,6 +67,21 @@ class SyncSacMemberDatabase
     const SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR = 'MEMBER_DATABASE_TRANSACTION_ERROR';
 
     /**
+     * FTP db dump filepath
+     */
+    const FTP_DB_DUMP_FILE_PATH = 'system/tmp/Adressen_0000%s.csv';
+
+    /**
+     * End of file string
+     */
+    const FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
+
+    /**
+     * Field delimiter
+     */
+    const FTP_DB_DUMP_FIELD_DELIMITER = '$';
+
+    /**
      * @var array
      */
     private $section_ids = [];
@@ -133,20 +148,19 @@ class SyncSacMemberDatabase
 
         foreach ($this->section_ids as $sectionId)
         {
-            $localFile = $this->projectDir . '/system/tmp/Adressen_0000' . $sectionId . '.csv';
-            // Check for old file
+            $localFile = $this->projectDir . '/' . sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId);
+            $remoteFile = basename($localFile);
+
+            // Delete old file
             if (is_file($localFile))
             {
-                // Delete old file
                 unlink($localFile);
             }
-
-            $remoteFile = 'Adressen_0000' . $sectionId . '.csv';
 
             // Fetch file
             if (!\ftp_get($connId, $localFile, $remoteFile, FTP_BINARY))
             {
-                $msg = 'Could not find/download ' . $remoteFile . ' from ' . $this->ftp_hostname;
+                $msg = sprintf('Could not find db dump "%s" at "%s".', $remoteFile, $this->ftp_hostname);
                 $this->log(LogLevel::CRITICAL, $msg, __METHOD__, ContaoContext::ERROR);
 
                 throw new \Exception($msg);
@@ -164,7 +178,7 @@ class SyncSacMemberDatabase
         $connId = \ftp_connect($this->ftp_hostname);
         if (!\ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId)
         {
-            $msg = 'Could not establish ftp connection to ' . $this->ftp_hostname;
+            $msg = sprintf('Could not establish ftp connection to %s.', $this->ftp_hostname);
             $this->log(LogLevel::CRITICAL, $msg, __METHOD__, self::ERROR);
 
             throw new \Exception($msg);
@@ -194,25 +208,25 @@ class SyncSacMemberDatabase
         $arrMember = [];
         foreach ($this->section_ids as $sectionId)
         {
-            $objFile = new File('system/tmp/Adressen_0000' . $sectionId . '.csv');
+            $objFile = new File(sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId));
             if ($objFile !== null)
             {
                 $arrFile = $objFile->getContentAsArray();
                 foreach ($arrFile as $line)
                 {
                     // End of line
-                    if (\strpos($line, '* * * Dateiende * * *') !== false)
+                    if (\strpos($line, static::FTP_DB_DUMP_END_OF_FILE_STRING) !== false)
                     {
                         continue;
                     }
-                    $arrLine = \explode('$', $line);
+                    $arrLine = \explode(static::FTP_DB_DUMP_FIELD_DELIMITER, $line);
 
                     $arrSacMemberIds[] = \intval($arrLine[0]);
 
                     $set = [];
                     $set['sacMemberId'] = \intval($arrLine[0]);
                     $set['username'] = \intval($arrLine[0]);
-                    // Mehrere Sektionsmitgliedschaften möglich
+                    // Allow multi membership
                     $set['sectionId'] = [(string) \ltrim((string) $arrLine[1], '0')];
                     $set['lastname'] = $arrLine[2];
                     $set['firstname'] = $arrLine[3];
@@ -239,7 +253,7 @@ class SyncSacMemberDatabase
                     $set['sectionInfo4'] = $arrLine[27];
                     $set['debit'] = $arrLine[28];
                     $set['memberStatus'] = $arrLine[29];
-                    $set['disable'] = '';
+                    $arrValues['disable'] = '';
 
                     $set = \array_map(function ($value) {
                         if (!\is_array($value))
@@ -251,7 +265,7 @@ class SyncSacMemberDatabase
                         return $value;
                     }, $set);
 
-                    // Check if the member is already in the array
+                    // Check if member is already in the array
                     if (isset($arrMember[$set['sacMemberId']]))
                     {
                         $arrMember[$set['sacMemberId']]['sectionId'] = \array_merge($arrMember[$set['sacMemberId']]['sectionId'], $set['sectionId']);
@@ -336,7 +350,7 @@ class SyncSacMemberDatabase
                 $i++;
             }
 
-            // Reset sacMemberId to true if member exists in downloaded database dump
+            // Reset sacMemberId to true, if member exists in the downloaded database dump
             if (!empty($arrSacMemberIds))
             {
                 Database::getInstance()->execute('UPDATE tl_member SET isSacMember="1" WHERE sacMemberId IN (' . implode(',', $arrSacMemberIds) . ')');
@@ -351,13 +365,14 @@ class SyncSacMemberDatabase
             // Transaction rollback
             Database::getInstance()->rollbackTransaction();
 
+            // Unlock tables
             Database::getInstance()->unlockTables();
 
             // Throw exception
             throw $e;
         }
 
-        // Reset tl_member.disable to true if member was not found in the csv-file
+        // Set tl_member.disable to true if member was not found in the csv-file (is no more a valid SAC member)
         $objDisabledMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE disable=? AND isSacMember=?')->execute('', '');
         while ($objDisabledMember->next())
         {
