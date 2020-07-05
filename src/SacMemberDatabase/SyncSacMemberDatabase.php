@@ -286,8 +286,14 @@ class SyncSacMemberDatabase
             // Start transaction (big thank to cyon.ch)
             Database::getInstance()->beginTransaction();
 
-            // Set tl_member.disable to false for all entries
-            Database::getInstance()->prepare('UPDATE tl_member SET isSacMember = ?')->execute('');
+            // Set tl_member.isSacMember to false for all entries
+            Database::getInstance()->prepare('UPDATE tl_member SET isSacMember=?')->execute('');
+
+            /** @var int $countInserts */
+            $countInserts = 0;
+
+            /** @var int $countUpdates */
+            $countUpdates = 0;
 
             $i = 0;
             foreach ($arrMember as $sacMemberId => $arrValues)
@@ -309,6 +315,7 @@ class SyncSacMemberDatabase
                         // Log
                         $msg = \sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
                         $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_ADD_NEW_MEMBER);
+                        $countInserts++;
                     }
                 }
                 else
@@ -322,6 +329,7 @@ class SyncSacMemberDatabase
                         Database::getInstance()->prepare('UPDATE tl_member SET tstamp=? WHERE sacMemberId=?')->execute(time(), $sacMemberId);
                         $msg = \sprintf('Update SAC-member "%s %s" with SAC-User-ID: %s in tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
                         $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_UPDATE_MEMBER);
+                        $countUpdates++;
                     }
                 }
 
@@ -369,7 +377,12 @@ class SyncSacMemberDatabase
             $duration = \time() - $startTime;
 
             // Log
-            $msg = 'Finished syncing SAC member database with tl_member. Synced ' . \count($arrMember) . ' entries. Duration: ' . $duration . ' s';
+            $msg = sprintf('Finished syncing SAC member database with tl_member. Traversed %s entries. Total inserts: %s. Total updates: %s. Duration: %s s.',
+                \count($arrMember),
+                $countInserts,
+                $countUpdates,
+                $duration
+            );
             $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC);
         }
     }
