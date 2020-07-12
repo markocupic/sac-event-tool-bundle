@@ -193,6 +193,7 @@ class SyncSacMemberDatabase
      */
     private function syncContaoDatabase(): void
     {
+
         $startTime = \time();
         $arrMemberIDS = [];
 
