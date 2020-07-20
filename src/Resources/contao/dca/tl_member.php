@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = array(
 // sectionId
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = array(
     'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionId'],
-    //'exclude'   => true,
+    'exclude'   => true,
     'reference' => &$GLOBALS['TL_LANG']['tl_member']['section'],
     'inputType' => 'checkbox',
     'filter'    => true,

@@ -240,6 +240,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['startDate']['flag'] = 5;
 // teaser
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['rte'] = null;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['mandatory'] = true;
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['maxlength'] = 520;
 
 // minMembers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId'] = [

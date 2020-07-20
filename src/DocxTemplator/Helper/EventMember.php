@@ -104,15 +104,29 @@ class EventMember
                     // Push data to clone
                     $objPhpWord->addToClone('i', 'i', $i, ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'role', 'TL', ['multiline' => false]);
-                    $objPhpWord->addToClone('i', 'firstname', $this->prepareString($objUserModel->firstname), ['multiline' => false]);
-                    $objPhpWord->addToClone('i', 'lastname', $this->prepareString($objUserModel->lastname), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'firstname', $this->prepareString((string) $objUserModel->firstname), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'lastname', $this->prepareString((string) $objUserModel->lastname), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. ' . $objUserModel->sacMemberId, ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'isNotSacMember', $isMember ? ' ' : '!inaktiv/kein Mitglied', ['multiline' => false]);
-                    $objPhpWord->addToClone('i', 'street', $this->prepareString($objUserModel->street), ['multiline' => false]);
-                    $objPhpWord->addToClone('i', 'postal', $this->prepareString($objUserModel->postal), ['multiline' => false]);
-                    $objPhpWord->addToClone('i', 'city', $this->prepareString($objUserModel->city), ['multiline' => false]);
-                    $objPhpWord->addToClone('i', 'emergencyPhone', $this->prepareString($objUserModel->emergencyPhone), ['multiline' => false]);
-                    $objPhpWord->addToClone('i', 'emergencyPhoneName', $this->prepareString($objUserModel->emergencyPhoneName), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'street', $this->prepareString((string) $objUserModel->street), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'postal', $this->prepareString((string) $objUserModel->postal), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'city', $this->prepareString((string) $objUserModel->city), ['multiline' => false]);
+
+                    // Fallback for emergency phone & -name
+                    $emergencyPhone = $objUserModel->emergencyPhone;
+                    if ($emergencyPhone == '' && $objMember !== null)
+                    {
+                        $emergencyPhone = $objMember->emergencyPhone;
+                    }
+
+                    $emergencyPhoneName = $objUserModel->emergencyPhone;
+                    if ($emergencyPhoneName == '' && $objMember !== null)
+                    {
+                        $emergencyPhoneName = $objMember->emergencyPhoneName;
+                    }
+
+                    $objPhpWord->addToClone('i', 'emergencyPhone', $this->prepareString((string) $emergencyPhone), ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'emergencyPhoneName', $this->prepareString((string) $emergencyPhoneName), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'mobile', $this->prepareString($mobile), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'email', $this->prepareString($objUserModel->email), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'transportInfo', $this->prepareString($transportInfo), ['multiline' => false]);
@@ -165,17 +179,17 @@ class EventMember
                 // Push data to clone
                 $objPhpWord->addToClone('i', 'i', $i, ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'role', 'TN', ['multiline' => false]);
-                $objPhpWord->addToClone('i', 'firstname', $this->prepareString($objEventMember->firstname), ['multiline' => false]);
-                $objPhpWord->addToClone('i', 'lastname', $this->prepareString($objEventMember->lastname), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'firstname', $this->prepareString((string) $objEventMember->firstname), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'lastname', $this->prepareString((string) $objEventMember->lastname), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. ' . $objEventMember->sacMemberId, ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'isNotSacMember', $strIsActiveMember, ['multiline' => false]);
-                $objPhpWord->addToClone('i', 'street', $this->prepareString($objEventMember->street), ['multiline' => false]);
-                $objPhpWord->addToClone('i', 'postal', $this->prepareString($objEventMember->postal), ['multiline' => false]);
-                $objPhpWord->addToClone('i', 'city', $this->prepareString($objEventMember->city), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'street', $this->prepareString((string) $objEventMember->street), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'postal', $this->prepareString((string) $objEventMember->postal), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'city', $this->prepareString((string) $objEventMember->city), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'mobile', $this->prepareString($mobile), ['multiline' => false]);
-                $objPhpWord->addToClone('i', 'emergencyPhone', $this->prepareString($objEventMember->emergencyPhone), ['multiline' => false]);
-                $objPhpWord->addToClone('i', 'emergencyPhoneName', $this->prepareString($objEventMember->emergencyPhoneName), ['multiline' => false]);
-                $objPhpWord->addToClone('i', 'email', $this->prepareString($objEventMember->email), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'emergencyPhone', $this->prepareString((string) $objEventMember->emergencyPhone), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'emergencyPhoneName', $this->prepareString((string) $objEventMember->emergencyPhoneName), ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'email', $this->prepareString((string) $objEventMember->email), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'transportInfo', $this->prepareString($transportInfo), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'dateOfBirth', $objEventMember->dateOfBirth != '' ? $dateAdapter->parse('Y', $objEventMember->dateOfBirth) : '', ['multiline' => false]);
             }
