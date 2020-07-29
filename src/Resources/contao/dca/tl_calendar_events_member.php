@@ -73,7 +73,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'downloadEventMemberList2Csv' => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Csv'],
                 'href'       => 'action=onloadCallbackExportMemberlist',
-                'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',
+                'class'      => 'header_icon',
+                'icon'       => 'bundles/markocupicsaceventtool/icons/excel.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'writeTourReport'                => [

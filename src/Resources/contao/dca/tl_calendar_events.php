@@ -168,6 +168,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year
     'label'      => &$GLOBALS['TL_LANG']['MSC']['plus1year'],
     'href'       => 'transformDates=+52weeks',
     'class'      => 'global_op_icon_class',
+    //'class'      => 'header_icon',
     'icon'       => 'bundles/markocupicsaceventtool/icons/calendar-plus.svg',
     'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
 ];
@@ -176,6 +177,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
     'label'      => &$GLOBALS['TL_LANG']['MSC']['minus1year'],
     'href'       => 'transformDates=-52weeks',
     'class'      => 'global_op_icon_class',
+    //'class'      => 'header_icon',
     'icon'       => 'bundles/markocupicsaceventtool/icons/calendar-minus.svg',
     'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] . '\'))return false;Backend.getScrollOffset()" accesskey="e"',
 ];
@@ -183,8 +185,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
     'label'      => &$GLOBALS['TL_LANG']['MSC']['onloadCallbackExportCalendar'],
     'href'       => 'action=onloadCallbackExportCalendar',
-    'class'      => 'global_op_icon_class',
-    'icon'       => 'bundles/markocupicsaceventtool/icons/excel-file.svg',
+    //'class'      => 'global_op_icon_class',
+    'class'      => 'header_icon',
+    'icon'       => 'bundles/markocupicsaceventtool/icons/excel.svg',
     'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 ];
 
