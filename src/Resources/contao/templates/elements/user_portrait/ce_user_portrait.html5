@@ -2,9 +2,8 @@
 
 <?php $this->block('content'); ?>
 
-
 <!-- indexer::stop -->
-<p class="back"><a href="{{env::referer}}" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
+{{link::back}}{{br}}{{br}}
 <!-- indexer::continue -->
 
 <div class="row">
