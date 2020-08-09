@@ -3,6 +3,7 @@
 /**
  * SAC Event Tool Web Plugin for Contao
  * Copyright (c) 2008-2020 Marko Cupic
+ *
  * @package sac-event-tool-bundle
  * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -11,7 +12,6 @@
 namespace Contao;
 
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx;
-use Markocupic\SacEventToolBundle\EventRapport\EventRapport;
 
 /**
  * Class tl_calendar_events_instructor_invoice
@@ -24,6 +24,7 @@ class tl_calendar_events_instructor_invoice extends Backend
      */
     public function __construct()
     {
+
         // Set correct referer
         if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('ref') != '')
         {
@@ -63,6 +64,7 @@ class tl_calendar_events_instructor_invoice extends Backend
      */
     public function reviseTable()
     {
+
         $reload = false;
 
         // Delete orphaned records
@@ -84,6 +86,7 @@ class tl_calendar_events_instructor_invoice extends Backend
      */
     public function routeActions()
     {
+
         $objEventInvoice = CalendarEventsInstructorInvoiceModel::findByPk(Input::get('id'));
         if ($objEventInvoice !== null)
         {
@@ -118,6 +121,7 @@ class tl_calendar_events_instructor_invoice extends Backend
      */
     public function checkAccesRights()
     {
+
         if (CURRENT_ID != '')
         {
             if (Input::get('action') === 'generateInvoiceDocx' || Input::get('action') === 'generateInvoicePdf' || Input::get('action') === 'generateTourRapportDocx' || Input::get('action') === 'generateTourRapportPdf')
@@ -159,6 +163,7 @@ class tl_calendar_events_instructor_invoice extends Backend
      */
     public function warnIfReportFormHasNotFilledIn()
     {
+
         if (CURRENT_ID != '')
         {
             $objEvent = CalendarEventsModel::findByPk(CURRENT_ID);
@@ -182,17 +187,20 @@ class tl_calendar_events_instructor_invoice extends Backend
      */
     public function listInvoices($row)
     {
+
         return '<div class="tl_content_left"><span class="level">Verg&uuml;tungsformular (mit Tour Rapport) von: ' . UserModel::findByPk($row['userPid'])->name . '</span> <span>[' . CalendarEventsModel::findByPk($row['pid'])->title . ']</span></div>';
     }
 
     /**
      * buttons_callback buttonsCallback
+     *
      * @param $arrButtons
      * @param $dc
      * @return mixed
      */
     public function buttonsCallback($arrButtons, $dc)
     {
+
         if (\Contao\Input::get('act') === 'edit')
         {
             unset($arrButtons['saveNcreate']);
@@ -202,5 +210,44 @@ class tl_calendar_events_instructor_invoice extends Backend
         }
 
         return $arrButtons;
+    }
+
+    /**
+     * load callback for tl_calendar_events_instructor_invoice.iban
+     *
+     * @param $value
+     * @param DataContainer $dc
+     * @return mixed
+     */
+    public function getIbanFromUser($value, \Contao\DataContainer $dc)
+    {
+
+        if ($dc->activeRecord)
+        {
+            if (null !== ($objInvoice = CalendarEventsInstructorInvoiceModel::findByPk($dc->activeRecord->id)))
+            {
+                if ($objInvoice->userPid > 0 && null !== ($objUser = UserModel::findByPk($objInvoice->userPid)))
+                {
+                    if ($objUser->iban != '')
+                    {
+                        if ($value != $objUser->iban)
+                        {
+                            $value = $objUser->iban;
+                            $objInvoice->iban = $value;
+                            $objInvoice->save();
+                            Message::addInfo(
+                                sprintf('Die IBAN Nummer für "%s" wurde aus der Benutzerdatenbank übernommen. Falls die IBAN nicht stimmt, muss diese zuerst unter "Profil" berichtigt werden!',
+                                    $objUser->name
+                                )
+                            );
+                        }
+
+                        $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice']['fields']['iban']['eval']['readonly'] = true;
+                    }
+                }
+            }
+        }
+
+        return $value;
     }
 }
