@@ -244,6 +244,10 @@ class tl_calendar_events_instructor_invoice extends Backend
 
                         $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice']['fields']['iban']['eval']['readonly'] = true;
                     }
+                    else
+                    {
+                        Message::addInfo('Leider wurde für deinen Namen keine IBAN gefunden. Bitte hinterlege deine IBAN in deinem Profil, damit diese in Zukunft automatisch beim Erstellen einer Abrechnung im Feld "IBAN" eingefügt werden kann.');
+                    }
                 }
             }
         }
