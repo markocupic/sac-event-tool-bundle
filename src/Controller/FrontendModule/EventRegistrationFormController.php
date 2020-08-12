@@ -5,6 +5,7 @@ declare(strict_types=1);
 /**
  * SAC Event Tool Web Plugin for Contao
  * Copyright (c) 2008-2020 Marko Cupic
+ *
  * @package sac-event-tool-bundle
  * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -47,10 +48,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
  * Class EventRegistrationFormController
+ *
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
  * @FrontendModule("event_registration_form", category="sac_event_tool_frontend_modules")
  */
@@ -107,6 +108,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
+
         /** @var projectDir */
         $this->projectDir = System::getContainer()->getParameter('kernel.project_dir');
 
@@ -168,6 +170,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
      */
     public static function getSubscribedServices(): array
     {
+
         $services = parent::getSubscribedServices();
 
         $services['contao.framework'] = ContaoFramework::class;
@@ -186,6 +189,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
+
         $this->template = $template;
 
         $scope = 'FE';
@@ -252,11 +256,11 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         }
         elseif ($this->objEvent->setRegistrationPeriod && $this->objEvent->registrationEndDate < time())
         {
-            $messageAdapter->addInfo('Die Anmeldefrist für diesen Event ist abgelaufen.', $scope);
+            $messageAdapter->addInfo(sprintf('Die Anmeldefrist für diesen Event ist am %s abgelaufen.', $dateAdapter->parse('d.m.Y \u\m H:i', $this->objEvent->registrationEndDate)), $scope);
         }
-        elseif ($this->objEvent->startDate - 60 * 60 * 24 < time())
+        elseif (!$this->objEvent->setRegistrationPeriod && $this->objEvent->startDate - 60 * 60 * 24 < time())
         {
-            $messageAdapter->addInfo('Die Anmeldefrist für diesen Event ist abgelaufen.', $scope);
+            $messageAdapter->addInfo('Die Anmeldefrist für diesen Event ist abgelaufen. Du kannst dich bis 24 Stunden vor Event-Beginn anmelden. Nimm gegebenenfalls mit dem Leiter Kontakt auf.', $scope);
         }
         elseif ($this->objUser && true === $calendarEventsHelperAdapter->areBookingDatesOccupied($this->objEvent, $this->objUser))
         {
@@ -329,6 +333,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
      */
     protected function generateForm()
     {
+
         // Set adapters
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
@@ -358,6 +363,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         }
 
         $objForm = new Form('form-event-registration', 'POST', function ($objHaste) {
+
             /** @var Input $inputAdapter */
             $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
             return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
@@ -559,6 +565,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
      */
     protected function notifyMember(array $arrData, MemberModel $objMember, CalendarEventsModel $objEvent, CalendarEventsMemberModel $objEventRegistration)
     {
+
         $hasError = false;
 
         // Set adapters
@@ -653,6 +660,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
      */
     private function setTemplateVars()
     {
+
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
         /** @var EventOrganizerModel $eventOrganizerModelAdapter */
