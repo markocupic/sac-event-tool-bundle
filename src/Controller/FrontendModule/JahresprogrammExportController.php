@@ -5,6 +5,7 @@ declare(strict_types=1);
 /**
  * SAC Event Tool Web Plugin for Contao
  * Copyright (c) 2008-2020 Marko Cupic
+ *
  * @package sac-event-tool-bundle
  * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -37,6 +38,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
  * Class JahresprogrammExportController
+ *
  * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
  * @FrontendModule("jahresprogramm_export", category="sac_event_tool_frontend_modules")
  */
@@ -103,6 +105,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
      */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
+
         $this->model = $model;
 
         // Call the parent method
@@ -114,6 +117,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
      */
     public static function getSubscribedServices(): array
     {
+
         $services = parent::getSubscribedServices();
 
         $services['request_stack'] = RequestStack::class;
@@ -131,6 +135,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
+
         $this->template = $template;
 
         /** @var  Controller $controllerAdapter */
@@ -150,6 +155,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
      */
     protected function generateForm(): Form
     {
+
         /** @var Request $request */
         $request = $this->get('request_stack')->getCurrentRequest();
 
@@ -164,6 +170,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
         /** @var Form $objForm */
         $objForm = new Form('form-jahresprogramm-export', 'POST', function (Form $objHaste): bool {
+
             /** @var Request $request */
             $request = $this->get('request_stack')->getCurrentRequest();
 
@@ -173,64 +180,64 @@ class JahresprogrammExportController extends AbstractPrintExportController
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
-        $objForm->addFormField('eventType', array(
+        $objForm->addFormField('eventType', [
             'label'     => 'Event-Typ',
             'reference' => $GLOBALS['TL_LANG']['MSC'],
             'inputType' => 'select',
             'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-            'eval'      => array('includeBlankOption' => true, 'mandatory' => true),
-        ));
+            'eval'      => ['includeBlankOption' => true, 'mandatory' => true],
+        ]);
 
-        $arrOrganizers = array();
+        $arrOrganizers = [];
         $objOrganizer = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_event_organizer ORDER BY sorting')->execute();
         while ($objOrganizer->next())
         {
             $arrOrganizers[$objOrganizer->id] = $objOrganizer->title;
         }
-        $objForm->addFormField('organizer', array(
+        $objForm->addFormField('organizer', [
             'label'     => 'Organisierende Gruppe',
             'inputType' => 'select',
             'options'   => $arrOrganizers,
-            'eval'      => array('includeBlankOption' => true, 'mandatory' => false),
-        ));
+            'eval'      => ['includeBlankOption' => true, 'mandatory' => false],
+        ]);
 
-        $objForm->addFormField('startDate', array(
+        $objForm->addFormField('startDate', [
             'label'     => 'Startdatum',
             'inputType' => 'text',
-            'eval'      => array('rgxp' => 'date', 'mandatory' => true),
-        ));
+            'eval'      => ['rgxp' => 'date', 'mandatory' => true],
+        ]);
 
-        $objForm->addFormField('endDate', array(
+        $objForm->addFormField('endDate', [
             'label'     => 'Enddatum',
             'inputType' => 'text',
-            'eval'      => array('rgxp' => 'date', 'mandatory' => true),
-        ));
+            'eval'      => ['rgxp' => 'date', 'mandatory' => true],
+        ]);
 
-        $objForm->addFormField('eventReleaseLevel', array(
+        $objForm->addFormField('eventReleaseLevel', [
             'label'     => 'Zeige an ab Freigabestufe (Wenn leer gelassen, wird ab 2. höchster FS gelistet!)',
             'inputType' => 'select',
-            'options'   => array(1 => 'FS1', 2 => 'FS2', 3 => 'FS3', 4 => 'FS4'),
-            'eval'      => array('mandatory' => false, 'includeBlankOption' => true),
-        ));
+            'options'   => [1 => 'FS1', 2 => 'FS2', 3 => 'FS3', 4 => 'FS4'],
+            'eval'      => ['mandatory' => false, 'includeBlankOption' => true],
+        ]);
 
-        $arrUserRoles = array();
+        $arrUserRoles = [];
         $objUserRoles = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_user_role ORDER BY title')->execute();
         while ($objUserRoles->next())
         {
             $arrUserRoles[$objUserRoles->id] = $objUserRoles->title;
         }
-        $objForm->addFormField('userRoles', array(
+        $objForm->addFormField('userRoles', [
             'label'     => 'Neben den Event-Leitern zus&auml;tzliche Funktion&auml;re anzeigen',
             'inputType' => 'select',
             'options'   => $arrUserRoles,
-            'eval'      => array('multiple' => true, 'mandatory' => false),
-        ));
+            'eval'      => ['multiple' => true, 'mandatory' => false],
+        ]);
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', array(
+        $objForm->addFormField('submit', [
             'label'     => 'Export starten',
             'inputType' => 'submit',
-        ));
+        ]);
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate())
@@ -268,6 +275,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
      */
     protected function getEventsAndInstructors(): void
     {
+
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
 
@@ -289,14 +297,17 @@ class JahresprogrammExportController extends AbstractPrintExportController
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
 
-        $arrEvents = array();
+        /** @var  EventOrganizerModel $eventOrganizerModelAdapter */
+        $eventOrganizerModelAdapter = $this->get('contao.framework')->getAdapter(EventOrganizerModel::class);
+
+        $arrEvents = [];
         $objEvents = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=?')->execute($this->startDate, $this->endDate);
 
         while ($objEvents->next())
         {
             // Check if event is at least on second highest level (Level 3/4)
             $eventModel = $calendarEventsModelAdapter->findByPk($objEvents->id);
-            if (!$this->hasValidReleaseLevel($eventModel, (int)$this->eventReleaseLevel))
+            if (!$this->hasValidReleaseLevel($eventModel, (int) $this->eventReleaseLevel))
             {
                 continue;
             }
@@ -317,10 +328,10 @@ class JahresprogrammExportController extends AbstractPrintExportController
             $arrEvents[] = intval($objEvents->id);
         }
 
-        $arrInstructors = array();
+        $arrInstructors = [];
         if (count($arrEvents) > 0)
         {
-            $arrEvent = array();
+            $arrEvent = [];
 
             // Let's use different queries for each event type
             if ($this->eventType === 'course')
@@ -331,7 +342,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
             {
                 $objEvent = CalendarEventsModel::findMultipleByIds($arrEvents, ['order' => 'tl_calendar_events.startDate, tl_calendar_events.endDate']);
             }
-            if($objEvent !== null)
+            if ($objEvent !== null)
             {
                 while ($objEvent->next())
                 {
@@ -347,7 +358,19 @@ class JahresprogrammExportController extends AbstractPrintExportController
                         $arrTourType[] = 'KU';
                         $dateFormat = 'j.n.';
                     }
-                    $arrEvent[] = array(
+                    $showHeadline = true;
+                    $showTeaser = true;
+                    $showDetails = true;
+                    if ($this->organizer)
+                    {
+                        if (null !== ($eventOrganizerModel = $eventOrganizerModelAdapter->findByPk($this->organizer)))
+                        {
+                            $showHeadline = $eventOrganizerModel->annualProgramShowHeadline ? true : false;
+                            $showTeaser = $eventOrganizerModel->annualProgramShowTeaser ? true : false;
+                            $showDetails = $eventOrganizerModel->annualProgramShowDetails ? true : false;
+                        }
+                    }
+                    $arrEvent[] = [
                         'id'               => $objEvent->id,
                         'eventType'        => $objEvent->eventType,
                         'courseId'         => $objEvent->courseId,
@@ -362,24 +385,28 @@ class JahresprogrammExportController extends AbstractPrintExportController
                         'instructors'      => implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->current(), false, false)),
                         'tourType'         => implode(', ', $arrTourType),
                         'difficulty'       => implode(',', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent->current())),
-                    );
+                        // Layout settings
+                        'showHeadline'     => $showHeadline,
+                        'showTeaser'       => $showTeaser,
+                        'showDetails'      => $showDetails,
+                    ];
                 }
             }
 
             $this->events = $arrEvent;
 
             $arrInstructors = array_unique($arrInstructors);
-            $aInstructors = array();
+            $aInstructors = [];
             $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user WHERE id IN (' . implode(',', array_map('\intval', $arrInstructors)) . ') ORDER BY lastname, firstname');
             while ($objUser->next())
             {
-                $arrLeft = array();
+                $arrLeft = [];
                 $arrLeft[] = trim($objUser->lastname . ' ' . $objUser->firstname);
                 $arrLeft[] = $objUser->street;
                 $arrLeft[] = trim($objUser->postal . ' ' . $objUser->city);
                 $arrLeft = array_filter($arrLeft);
 
-                $arrRight = array();
+                $arrRight = [];
                 if ($objUser->phone != '')
                 {
                     $arrRight[] = 'P ' . $objUser->phone;
@@ -393,15 +420,83 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $arrRight[] = $objUser->email;
                 }
 
-                $aInstructors[] = array(
+                $aInstructors[] = [
                     'id'       => $objUser->id,
                     'leftCol'  => implode(', ', $arrLeft),
                     'rightCol' => implode(', ', $arrRight),
-                );
+                ];
             }
             $arrInstructors = $aInstructors;
             $this->instructors = $arrInstructors;
         }
+    }
+
+    /**
+     * @param array $arrUserRoles
+     * @return array
+     */
+    protected function getUsersByUserRole(array $arrUserRoles): array
+    {
+
+        /** @var  StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+
+        /** @var UserRoleModel $userRoleModelAdapter */
+        $userRoleModelAdapter = $this->get('contao.framework')->getAdapter(UserRoleModel::class);
+
+        /** @var Database $databaseAdapter */
+        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+
+        $specialUsers = [];
+        if (is_array($arrUserRoles) && !empty($arrUserRoles))
+        {
+            $objUserRoles = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user_role WHERE id IN(' . implode(',', array_map('\intval', $arrUserRoles)) . ') ORDER BY sorting');
+            while ($objUserRoles->next())
+            {
+                $userRole = $objUserRoles->id;
+                $arrUsers = [];
+                $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
+                while ($objUser->next())
+                {
+                    $userRoles = $stringUtilAdapter->deserialize($objUser->userRole, true);
+                    if (in_array($userRole, $userRoles))
+                    {
+                        $arrLeft = [];
+                        $arrLeft[] = trim($objUser->lastname . ' ' . $objUser->firstname);
+                        $arrLeft[] = $objUser->street;
+                        $arrLeft[] = trim($objUser->postal . ' ' . $objUser->city);
+                        $arrLeft = array_filter($arrLeft);
+
+                        $arrRight = [];
+                        if ($objUser->phone != '')
+                        {
+                            $arrRight[] = 'P ' . $objUser->phone;
+                        }
+                        if ($objUser->mobile != '')
+                        {
+                            $arrRight[] = 'M ' . $objUser->mobile;
+                        }
+                        if ($objUser->email != '')
+                        {
+                            $arrRight[] = $objUser->email;
+                        }
+
+                        $arrUsers[] = [
+                            'id'       => $objUser->id,
+                            'leftCol'  => implode(', ', $arrLeft),
+                            'rightCol' => implode(', ', $arrRight),
+                        ];
+                    }
+                }
+
+                $specialUsers[] = [
+
+                    'title' => $userRoleModelAdapter->findByPk($userRole)->title,
+                    'users' => $arrUsers,
+                ];
+            }
+        }
+        return $specialUsers;
     }
 
     /**
@@ -411,6 +506,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
      */
     private function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = ''): string
     {
+
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
 
@@ -466,7 +562,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
         }
         else
         {
-            $arrDates = array();
+            $arrDates = [];
             $dates = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
             foreach ($dates as $date)
             {
@@ -475,73 +571,6 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
             return implode('+', $arrDates);
         }
-    }
-
-    /**
-     * @param array $arrUserRoles
-     * @return array
-     */
-    protected function getUsersByUserRole(array $arrUserRoles): array
-    {
-        /** @var  StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
-
-        /** @var UserRoleModel $userRoleModelAdapter */
-        $userRoleModelAdapter = $this->get('contao.framework')->getAdapter(UserRoleModel::class);
-
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
-
-        $specialUsers = array();
-        if (is_array($arrUserRoles) && !empty($arrUserRoles))
-        {
-            $objUserRoles = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user_role WHERE id IN(' . implode(',', array_map('\intval', $arrUserRoles)) . ') ORDER BY sorting');
-            while ($objUserRoles->next())
-            {
-                $userRole = $objUserRoles->id;
-                $arrUsers = array();
-                $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
-                while ($objUser->next())
-                {
-                    $userRoles = $stringUtilAdapter->deserialize($objUser->userRole, true);
-                    if (in_array($userRole, $userRoles))
-                    {
-                        $arrLeft = array();
-                        $arrLeft[] = trim($objUser->lastname . ' ' . $objUser->firstname);
-                        $arrLeft[] = $objUser->street;
-                        $arrLeft[] = trim($objUser->postal . ' ' . $objUser->city);
-                        $arrLeft = array_filter($arrLeft);
-
-                        $arrRight = array();
-                        if ($objUser->phone != '')
-                        {
-                            $arrRight[] = 'P ' . $objUser->phone;
-                        }
-                        if ($objUser->mobile != '')
-                        {
-                            $arrRight[] = 'M ' . $objUser->mobile;
-                        }
-                        if ($objUser->email != '')
-                        {
-                            $arrRight[] = $objUser->email;
-                        }
-
-                        $arrUsers[] = array(
-                            'id'       => $objUser->id,
-                            'leftCol'  => implode(', ', $arrLeft),
-                            'rightCol' => implode(', ', $arrRight),
-                        );
-                    }
-                }
-
-                $specialUsers[] = array(
-
-                    'title' => $userRoleModelAdapter->findByPk($userRole)->title,
-                    'users' => $arrUsers,
-                );
-            }
-        }
-        return $specialUsers;
     }
 
 }

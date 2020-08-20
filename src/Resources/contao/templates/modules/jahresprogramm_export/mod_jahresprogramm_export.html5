@@ -3,6 +3,23 @@
 <?php $this->block('content'); ?>
 
 <?= $this->form ?>
+<?php $arrOrganizers = []; ?>
+<?php $arrOrganizers['Stammsektion Aktive'] = 1; ?>
+<?php $arrOrganizers['Stammsektion Senioren Tourengruppe'] = 16; ?>
+<?php $arrOrganizers['Stammsektion Senioren Wandergruppe'] = 17; ?>
+<?php $arrOrganizers['Stammsektion Jugend'] = 5; ?>
+<?php $arrOrganizers['Stammsektion Kinderbergsteigen'] = 6; ?>
+<?php $arrOrganizers['Stammsektion Familienbergsteigen'] = 14; ?>
+<?php $arrOrganizers['OG Surental Aktive'] = 3; ?>
+<?php $arrOrganizers['OG Surental Senioren'] = 12; ?>
+<?php $arrOrganizers['OG Surental Jugend'] = 11; ?>
+<?php $arrOrganizers['OG Surental Kinderbergsteigen'] = 13; ?>
+<?php $arrOrganizers['OG Rigi'] = 2; ?>
+<?php $arrOrganizers['OG Rigi Familienbergsteigen'] = 20; ?>
+<?php $arrOrganizers['OG Napf'] = 4; ?>
+<?php $arrOrganizers['OG Hochdorf'] = 10; ?>
+<?php $arrOrganizers['Sektionsübergreifend'] = 18; ?>
+
 
 <script>
     //Set Datepicker
