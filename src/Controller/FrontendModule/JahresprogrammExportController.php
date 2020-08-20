@@ -350,7 +350,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
                     // tourType && date format
                     $arrTourType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent->current(), 'shortcut', false);
-                    $dateFormat = 'j.';
+                    $dateFormat = 'D, j.';
 
                     if ($objEvent->eventType === 'course')
                     {
@@ -361,6 +361,18 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $showHeadline = true;
                     $showTeaser = true;
                     $showDetails = true;
+
+                    // Details
+                    $minMax = [];
+                    if($objEvent->minMembers)
+                    {
+                        $minMax[] = 'min. ' . $objEvent->minMembers;
+                    }
+                    if($objEvent->maxMembers)
+                    {
+                        $minMax[] = 'max. ' . $objEvent->maxMembers;
+                    }
+
                     if ($this->organizer)
                     {
                         if (null !== ($eventOrganizerModel = $eventOrganizerModelAdapter->findByPk($this->organizer)))
@@ -370,26 +382,33 @@ class JahresprogrammExportController extends AbstractPrintExportController
                             $showDetails = $eventOrganizerModel->annualProgramShowDetails ? true : false;
                         }
                     }
-                    $arrEvent[] = [
-                        'id'               => $objEvent->id,
-                        'eventType'        => $objEvent->eventType,
-                        'courseId'         => $objEvent->courseId,
-                        'organizers'       => implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->current(), 'title')),
-                        'courseLevel'      => isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel]) ? $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel] : '',
-                        'courseTypeLevel0' => ($courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0) !== null) ? $courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0)->name : '',
-                        'courseTypeLevel1' => ($courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1) !== null) ? $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1)->name : '',
-                        'title'            => $objEvent->title,
-                        'date'             => $this->getEventPeriod($objEvent->current(), $dateFormat),
-                        'month'            => $dateAdapter->parse('F', $objEvent->startDate),
-                        'durationInfo'     => $objEvent->durationInfo,
-                        'instructors'      => implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->current(), false, false)),
-                        'tourType'         => implode(', ', $arrTourType),
-                        'difficulty'       => implode(',', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent->current())),
-                        // Layout settings
-                        'showHeadline'     => $showHeadline,
-                        'showTeaser'       => $showTeaser,
-                        'showDetails'      => $showDetails,
-                    ];
+                    $arrData = $objEvent->row();
+
+                    $arrData['eventId'] = $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'eventId');
+                    $arrData['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->current(), 'title'));
+                    $arrData['courseLevel'] = isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel]) ? $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel] : '';
+                    $arrData['courseTypeLevel0'] = ($courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0) !== null) ? $courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0)->name : '';
+                    $arrData['courseTypeLevel1'] = ($courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1) !== null) ? $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1)->name : '';
+                    $arrData['date'] = $this->getEventPeriod($objEvent->current(), $dateFormat);
+                    $arrData['month'] = $dateAdapter->parse('F', $objEvent->startDate);
+                    $arrData['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->current(), false, false));
+                    $arrData['tourType'] = implode(', ', $arrTourType);
+                    $arrData['difficulty'] = implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent->current()));
+                    // Layout settings
+                    $arrData['showHeadline'] = $showHeadline;
+                    $arrData['showTeaser'] = $showTeaser;
+                    $arrData['showDetails'] = $showDetails;
+
+
+                    // Details
+                    $arrData['arrTourProfile'] = $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'arrTourProfile');
+                    $arrData['journey'] = $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'journey');
+                    $arrData['minMaxMembers'] = implode('/', $minMax);
+
+                    $arrData['bookingInfo'] = (!$objEvent->disableOnlineRegistration) ? 'Online Anmeldung: Tour-/Anlassnummer ' . $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'eventId') : '';
+
+
+                    $arrEvent[] = $arrData;
                 }
             }
 
@@ -553,11 +572,11 @@ class JahresprogrammExportController extends AbstractPrintExportController
             // Check if event dates are not in the same month
             if ($dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getStartDate($objEvent)) === $dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getEndDate($objEvent)))
             {
-                return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)) . '-' . $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
+                return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)) . ' - ' . $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
             }
             else
             {
-                return $dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getStartDate($objEvent)) . '-' . $dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getEndDate($objEvent));
+                return $dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getStartDate($objEvent)) . ' - ' . $dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getEndDate($objEvent));
             }
         }
         else

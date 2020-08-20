@@ -13,6 +13,7 @@ namespace Markocupic\SacEventToolBundle;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use Contao\Calendar;
+use Contao\CalendarEventsJourneyModel;
 use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
@@ -166,6 +167,9 @@ class CalendarEventsHelper
                 break;
             case 'instructors':
                 $value = implode(', ', static::getInstructorNamesAsArray($objEvent, false, true));
+                break;
+            case 'journey':
+                $value = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : '';
                 break;
             case 'instructorsWithQualification':
                 $value = implode(', ', static::getInstructorNamesAsArray($objEvent, true, true));
