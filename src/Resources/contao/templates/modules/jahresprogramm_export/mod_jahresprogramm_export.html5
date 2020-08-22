@@ -38,7 +38,6 @@
     <tr class="event-export-row-body">
         <td class="event-export-course-type-level-0" colspan="5" style="text-align:center"><strong><?= strtoupper($arrEvent['courseTypeLevel0']) ?><strong></td>
     </tr>
-
     <?php endif; ?>
     <?php $courseTypeLevel0 = $arrEvent['courseTypeLevel0']; ?>
 
@@ -47,6 +46,7 @@
         <td class="event-export-course-type-level-1" colspan="5" style="text-align:center"><strong><?= $arrEvent['courseTypeLevel1'] ?><strong></td>
     </tr>
     <?php endif; ?>
+    <?php $courseTypeLevel1 = $arrEvent['courseTypeLevel1']; ?>
 
     <tr class="event-export-row-headline">
         <td class="event-export-date" style="min-width:220px;"><?= $arrEvent['date'] ?></td>
@@ -72,27 +72,30 @@
         <td class="event-export-requirements font-italic">Voraussetzung</td>
         <td class="event-export-requirements do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['requirements']) ?></td>
     </tr>
-
+<!--
     <tr class="event-export-row-details">
         <td class="event-export-location font-italic">Kursort</td>
         <td class="event-export-location do-not-show-row-when-empty" colspan="4"><?= $arrEvent['location'] ?></td>
     </tr>
-
+-->
+<!--
     <tr class="event-export-row-details">
         <td class="event-export-meeting-point font-italic">Treffpunkt/Zeit</td>
         <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['meetingPoint']) ?></td>
     </tr>
-
+-->
+<!--
     <tr class="event-export-row-details">
         <td class="event-export-duration font-italic">Dauer</td>
         <td class="event-export-duration do-not-show-row-when-empty" colspan="4"><?= $arrEvent['duration'] ?></td>
     </tr>
-
+-->
+<!--
     <tr class="event-export-row-details">
         <td class="event-export-journey font-italic">Anfahrt</td>
         <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= $arrEvent['journey'] != 'Keine Angabe' ? $arrEvent['journey'] : '' ?></td>
     </tr>
-
+-->
     <tr class="event-export-row-details">
         <td class="event-export-min-max-members font-italic">Teilnehmer</td>
         <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= $arrEvent['minMaxMembers'] ?></td>
@@ -102,20 +105,22 @@
         <td class="event-export-leistungen font-italic">Preis/Leistung</td>
         <td class="event-export-leistungen do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['leistungen']) ?></td>
     </tr>
-
+<!--
     <tr class="event-export-row-details">
         <td class="event-export-equipment font-italic">Material/Ausrüstung</td>
         <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['equipment']) ?></td>
     </tr>
-
+-->
     <tr class="event-export-row-details">
         <td class="event-export-leistungen font-italic">Anmeldung</td>
         <td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">
             <?= $arrEvent['bookingInfo'] ?>
+            <!--
             <?php if($arrEvent['bookingInfo'] != ''): ?>
             {{br}}
             <?= nl2br($arrEvent['bookingEvent']) ?>
             <?php endif; ?>
+            -->
         </td>
     </tr>
     <?php endforeach; ?>
