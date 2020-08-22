@@ -356,7 +356,9 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     {
                         // KU = Kurs
                         $arrTourType[] = 'KU';
-                        $dateFormat = 'j.n.';
+                        //$dateFormat = 'j.n.';
+                        $dateFormat = 'D, j.n.';
+
                     }
                     $showHeadline = true;
                     $showTeaser = true;
@@ -406,8 +408,10 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $arrData['minMaxMembers'] = implode('/', $minMax);
 
                     $arrData['bookingInfo'] = (!$objEvent->disableOnlineRegistration) ? 'Online Anmeldung: Tour-/Anlassnummer ' . $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'eventId') : '';
-
-
+                    if ($objEvent->eventType === 'course')
+                    {
+                        $arrData['bookingInfo'] = (!$objEvent->disableOnlineRegistration) ? 'Online Anmeldung: Kursnummer ' . $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'courseId') : '';
+                    }
                     $arrEvent[] = $arrData;
                 }
             }
@@ -565,7 +569,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
         }
         if ($eventDuration == 2 && $span != $eventDuration)
         {
-            return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)) . '+' . $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
+            return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)) . ' + ' . $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
         }
         elseif ($span == $eventDuration)
         {
@@ -588,7 +592,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 $arrDates[] = $dateAdapter->parse($dateFormat, $date);
             }
 
-            return implode('+', $arrDates);
+            return implode(' + ', $arrDates);
         }
     }
 
