@@ -384,10 +384,28 @@ class JahresprogrammExportController extends AbstractPrintExportController
                             $showDetails = $eventOrganizerModel->annualProgramShowDetails ? true : false;
                         }
                     }
+
+                    $arrTitle = [];
+                    $arrTitlePrint = [];
+                    if($objEvent->organizers != '')
+                    {
+                        $arrOrganizers = $stringUtilAdapter->deserialize($objEvent->organizers,true);
+                        foreach($arrOrganizers as $orgId)
+                        {
+                            $arrTitle[] = $eventOrganizerModelAdapter->findByPk($orgId)->title;
+                            $arrTitlePrint[] = $eventOrganizerModelAdapter->findByPk($orgId)->titlePrint;
+                        }
+                    }
+                    $organizerTitle = implode(', ', $arrTitle);
+                    $organizerTitlePrint = implode(', ', $arrTitlePrint);
+
+
                     $arrData = $objEvent->row();
 
                     $arrData['eventId'] = $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'eventId');
                     $arrData['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->current(), 'title'));
+                    $arrData['organizerTitle'] = $organizerTitle;
+                    $arrData['organizerTitlePrint'] = $organizerTitlePrint;
                     $arrData['courseLevel'] = isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel]) ? $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel] : '';
                     $arrData['courseTypeLevel0'] = ($courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0) !== null) ? $courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0)->name : '';
                     $arrData['courseTypeLevel1'] = ($courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1) !== null) ? $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1)->name : '';

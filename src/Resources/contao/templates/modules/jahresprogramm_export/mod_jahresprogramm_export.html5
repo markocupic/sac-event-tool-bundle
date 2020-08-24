@@ -50,7 +50,8 @@
 
     <tr class="event-export-row-headline">
         <td class="event-export-date" style="min-width:220px;"><?= $arrEvent['date'] ?></td>
-        <td class="event-export-title" colspan="4"><?= $arrEvent['title'] ?> / Kursstufe <?= $arrEvent['courseLevel'] ?></td>
+        <td class="event-export-title" colspan="3"><?= $arrEvent['title'] ?> / Kursstufe <?= $arrEvent['courseLevel'] ?></td>
+        <td class="event-export-organizer-title"><?= $arrEvent['organizerTitlePrint'] ?></td>
     </tr>
     <tr class="event-export-row-subheadline">
         <td class="event-export-date"><?= $arrEvent['courseTypeLevel1'] ?></td>
