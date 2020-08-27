@@ -202,7 +202,7 @@
     </tr>
 
     <tr class="event-export-row-details">
-        <td class="event-export-equipment font-italic">Mitbringen</td>
+        <td class="event-export-equipment font-italic">Ausrüstung</td>
         <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['equipment']) ?></td>
     </tr>
 
@@ -300,7 +300,7 @@
     </tr>
 
     <tr class="event-export-row-details">
-        <td class="event-export-equipment font-italic">Mitbringen</td>
+        <td class="event-export-equipment font-italic">Ausrüstung</td>
         <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['equipment']) ?></td>
     </tr>
 
