@@ -210,7 +210,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                         // Get event dates from event object
                         $arrDates = array_map(function ($tstmp) {
                             $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
-                            return $dateAdapter->parse('m.d.Y', $tstmp);
+                            return $dateAdapter->parse('d.m.Y', $tstmp);
                         }, $calendarEventsHelperAdapter->getEventTimestamps($objEvent));
 
                         // Course id

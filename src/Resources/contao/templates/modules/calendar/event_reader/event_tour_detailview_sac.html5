@@ -13,7 +13,6 @@
     <h4 class="ce_headline last-minute-tour">Last minute tour (Spontantour)</h4>
     <?php endif; ?>
 
-
     <div class="row">
         <!-- Col left -->
         <div class="col-lg-6">
