@@ -19,6 +19,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventReleaseL
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['ctable'][] = 'tl_calendar_events_instructor';
 
 // Callbacks
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = ['tl_calendar_events_sac_event_tool', 'test'];
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = ['tl_calendar_events_sac_event_tool', 'onloadCallback'];
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = ['tl_calendar_events_sac_event_tool', 'setPaletteWhenCreatingNew'];
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = ['tl_calendar_events_sac_event_tool', 'onloadCallbackExportCalendar'];
@@ -781,6 +782,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourDetailText'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourDetailText'],
     'exclude'   => true,
     'inputType' => 'textarea',
+    /** @todo maxlength 700 */
     'eval'      => ['tl_class' => 'clr m12', 'mandatory' => true],
     'sql'       => "text NULL",
 ];

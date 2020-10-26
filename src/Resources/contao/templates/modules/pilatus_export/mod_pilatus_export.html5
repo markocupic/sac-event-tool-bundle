@@ -255,6 +255,18 @@
     </tr>
     <?php endif; ?>
     <?php if ($arrEvent['tourDetailText'] != ''): ?>
+    <?php
+        // Limit strlen for group aktive to 700 chars
+        $limit = 700;
+        if(false !== strpos('Stammsektion Aktive', $arrEvent['organizers']))
+        {
+            if(mb_strlen($arrEvent['tourDetailText'], 'UTF-8') > $limit)
+            {
+                $arrEvent['tourDetailText'] = \Contao\StringUtil::substr($arrEvent['tourDetailText'], $limit);
+                $arrEvent['tourDetailText'] = sprintf('%s<br><span style="color:red">weitere Informationen auf der Webseite</span><br>', $arrEvent['tourDetailText']);
+            }
+        }
+    ?>
     <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
         <td class="event-export-tourDetailText">Details</td>
         <td class="event-export-tourDetailText"><?= $arrEvent['tourDetailText'] ?></td>

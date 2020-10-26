@@ -57,6 +57,50 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
         return parent::__construct();
     }
 
+    public function test()
+    {
+        if($this->User->username == 'markocupic')
+        {
+            return;
+            $this->import('Database');
+            $arrEmail = [];
+            /** Create temp field tourDetailTextJp2021
+            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events')->execute();
+            while($objDb->next()) {
+                $set = [
+                    'tourDetailTextJp2021' => $objDb->tourDetailText
+                ];
+                $this->Database
+                    ->prepare('UPDATE tl_calendar_events %s WHERE id=?')
+                    ->set($set)
+                    ->execute($objDb->id);
+            }**/
+
+            $objDb = $this->Database
+                ->prepare('SELECT * FROM tl_calendar_events WHERE eventType=? AND startTime>? ORDER BY mainInstructor, startTime')
+                ->execute('tour', strtotime('2021-01-01'));
+            while($objDb->next())
+            {
+                // Aktive und Jugend
+                $arrOrgFilter = [1,5];
+                $arrOrganizer = \Contao\StringUtil::deserialize($objDb->organizers,true);
+                if(!array_intersect($arrOrgFilter,$arrOrganizer))
+                {
+                    continue;
+                }
+                if(mb_strlen($objDb->tourDetailText, 'UTF-8') > 700)
+                {
+                    echo $objDb->id . ';' . $objDb->title . ';Length: ' . mb_strlen($objDb->tourDetailText, 'UTF-8') . ';' . \Contao\UserModel::findByPk($objDb->mainInstructor)->name.';' . \Contao\UserModel::findByPk($objDb->mainInstructor)->email.'<br>';
+                    $arrEmail[] = \Contao\UserModel::findByPk($objDb->mainInstructor)->email;
+                }
+
+            }
+            $arrEmail = array_unique($arrEmail);
+            die(implode(';',$arrEmail));
+            die();
+        }
+    }
+
     /**
      * Manipulate palette when creating a new datarecord
      *
