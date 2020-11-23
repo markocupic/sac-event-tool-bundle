@@ -148,6 +148,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = [
     5 => "Dr. med.",
     6 => "J%S Leiter",
     7 => "Wanderleiter",
+    8 => "IGKA Instruktor",
 ];
 
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'] = [
