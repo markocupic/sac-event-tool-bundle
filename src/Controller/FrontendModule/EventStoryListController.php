@@ -56,7 +56,7 @@ class EventStoryListController extends AbstractFrontendModuleController
      * @param PageModel|null $page
      * @return Response
      */
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
         /** @var  CalendarEventsStoryModel $calendarEventsStoryModelAdapter */
         $calendarEventsStoryModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsStoryModel::class);
@@ -99,7 +99,7 @@ class EventStoryListController extends AbstractFrontendModuleController
         }
 
         // Call the parent method
-        return parent::__invoke($request, $model, $section, $classes);
+        return parent::__invoke($request, $model, $section, $classes, $page);
     }
 
     /**

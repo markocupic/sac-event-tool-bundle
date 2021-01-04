@@ -86,7 +86,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
      * @param PageModel|null $page
      * @return Response
      */
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
         // Return empty string, if user is not logged in as a frontend user
 
@@ -118,7 +118,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         $this->step = $request->query->get('step');
 
         // Call parent __invoke
-        return parent::__invoke($request, $model, $section, $classes);
+         return parent::__invoke($request, $model, $section, $classes, $page);
     }
 
     public static function getSubscribedServices(): array

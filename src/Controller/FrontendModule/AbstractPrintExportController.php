@@ -15,10 +15,6 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 use Contao\CalendarEventsModel;
 use Contao\EventReleaseLevelPolicyModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
-use Contao\ModuleModel;
-use Contao\PageModel;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class AbstractModuleSacEventToolPrintExport

@@ -66,7 +66,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
      * @param PageModel|null $page
      * @return Response
      */
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
         // Get logged in member object
         if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
@@ -87,7 +87,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         $this->projectDir = $this->getParameter('kernel.project_dir');
 
         // Call the parent method
-        return parent::__invoke($request, $model, $section, $classes);
+         return parent::__invoke($request, $model, $section, $classes, $page);
     }
 
     /**

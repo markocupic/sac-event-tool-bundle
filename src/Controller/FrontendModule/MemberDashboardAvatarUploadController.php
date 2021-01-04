@@ -72,7 +72,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
      * @param PageModel|null $page
      * @return Response
      */
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
         $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
         $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
@@ -107,7 +107,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         $this->projectDir = $this->getParameter('kernel.project_dir');
 
         // Call the parent method
-        return parent::__invoke($request, $model, $section, $classes);
+        return parent::__invoke($request, $model, $section, $classes, $page);
     }
 
     /**

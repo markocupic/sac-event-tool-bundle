@@ -64,7 +64,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
      * @param PageModel|null $page
      * @return Response
      */
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
         // Return empty string, if user is not logged in as a frontend user
 
@@ -91,7 +91,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         }
 
         // Call the parent method
-        return parent::__invoke($request, $model, $section, $classes);
+         return parent::__invoke($request, $model, $section, $classes, $page);
     }
 
     /**
