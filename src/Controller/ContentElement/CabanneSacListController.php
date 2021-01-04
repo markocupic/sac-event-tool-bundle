@@ -16,6 +16,7 @@ use Contao\ContentModel;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
+use Contao\PageModel;
 use Contao\Template;
 use Contao\System;
 use Contao\FilesModel;
@@ -37,11 +38,12 @@ class CabanneSacListController extends AbstractContentElementController
      * @param ContentModel $model
      * @param string $section
      * @param array|null $classes
+     * @param PageModel|null $pageModel
      * @return Response
      */
-    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null): Response
+    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, ?PageModel $pageModel = null): Response
     {
-        return parent::__invoke($request, $model, $section, $classes);
+        return parent::__invoke($request, $model, $section, $classes, $pageModel);
     }
 
     /**

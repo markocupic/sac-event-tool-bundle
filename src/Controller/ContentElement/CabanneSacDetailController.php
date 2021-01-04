@@ -18,6 +18,7 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FilesModel;
+use Contao\PageModel;
 use Contao\System;
 use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,9 +40,10 @@ class CabanneSacDetailController extends AbstractContentElementController
      * @param ContentModel $model
      * @param string $section
      * @param array|null $classes
+     * @param PageModel|null $pageModel
      * @return Response
      */
-    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null): Response
+    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, ?PageModel $pageModel = null): Response
     {
         /** @var CabanneSacModel $cabanneSacModelAdapter */
         $cabanneSacModelAdapter = $this->get('contao.framework')->getAdapter(CabanneSacModel::class);
@@ -52,7 +54,7 @@ class CabanneSacDetailController extends AbstractContentElementController
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 
-        return parent::__invoke($request, $model, $section, $classes);
+        return parent::__invoke($request, $model, $section, $classes, $pageModel);
     }
 
     /**

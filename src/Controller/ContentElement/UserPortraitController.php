@@ -12,18 +12,17 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\ContentElement;
 
-use Contao\CalendarEventsModel;
 use Contao\ContentModel;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Database;
 use Contao\Input;
 use Contao\Template;
 use Contao\UserModel;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Contao\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Contao\CoreBundle\ServiceAnnotation\ContentElement;
+
 
 /**
  * Class UserPortraitController
@@ -43,11 +42,12 @@ class UserPortraitController extends AbstractContentElementController
      * @param ContentModel $model
      * @param string $section
      * @param array|null $classes
+     * @param PageModel|null $pageModel
      * @return Response
      */
-    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null): Response
+    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, ?PageModel $pageModel = null): Response
     {
-        return parent::__invoke($request, $model, $section, $classes);
+        return parent::__invoke($request, $model, $section, $classes, $pageModel);
     }
 
     /**

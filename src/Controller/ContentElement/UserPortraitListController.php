@@ -23,6 +23,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\Template;
 use Contao\UserModel;
+use Contao\PageModel;
 use Contao\UserRoleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,11 +42,12 @@ class UserPortraitListController extends AbstractContentElementController
      * @param ContentModel $model
      * @param string $section
      * @param array|null $classes
+     * @param PageModel|null $pageModel
      * @return Response
      */
-    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null): Response
+    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, ?PageModel $pageModel = null): Response
     {
-        return parent::__invoke($request, $model, $section, $classes);
+        return parent::__invoke($request, $model, $section, $classes, $pageModel);
     }
 
     /**
