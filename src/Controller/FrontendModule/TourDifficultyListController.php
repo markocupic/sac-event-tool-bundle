@@ -20,6 +20,7 @@ use Contao\TourDifficultyCategoryModel;
 use Contao\TourDifficultyModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Contao\PageModel;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
@@ -38,9 +39,9 @@ class TourDifficultyListController extends AbstractFrontendModuleController
      * @param PageModel|null $page
      * @return Response
      */
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
-        return parent::__invoke($request, $model, $section, $classes);
+        return parent::__invoke($request, $model, $section, $classes, $page);
     }
 
     /**

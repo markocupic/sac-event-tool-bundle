@@ -124,7 +124,7 @@ class tl_calendar_events_sac_event_tool extends tl_calendar_events
             if ($objCalendarEventsModel->eventState === 'event_deferred')
             {
                 \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-                    ->addField(array('eventDeferDate'), 'eventState', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
+                    //->addField(array('eventDeferDate'), 'eventState', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
                     ->applyToPalette('default', 'tl_calendar_events')
                     ->applyToPalette('tour', 'tl_calendar_events')
                     ->applyToPalette('lastMinuteTour', 'tl_calendar_events')
