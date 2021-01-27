@@ -831,8 +831,7 @@ class TlCalendarEvents extends \tl_calendar_events
         $field = $dc->field;
 
         $strTable = 'tl_calendar_events';
-
-        if (!\strlen($dc->activeRecord->id)) {
+        if (!\strlen((string)$dc->activeRecord->id)) {
             return '';
         }
         $intId = $dc->activeRecord->id;
@@ -944,7 +943,7 @@ class TlCalendarEvents extends \tl_calendar_events
                 foreach ($value as $difficulty) {
                     $strDiff = '';
 
-                    if (\strlen($difficulty['tourTechDifficultyMin']) && \strlen($difficulty['tourTechDifficultyMax'])) {
+                    if (\strlen((string)$difficulty['tourTechDifficultyMin']) && \strlen($difficulty['tourTechDifficultyMax'])) {
                         $objDiff = $this->Database->prepare('SELECT * FROM tl_tour_difficulty WHERE id=?')->limit(1)->execute((int) ($difficulty['tourTechDifficultyMin']));
 
                         if ($objDiff->numRows) {
@@ -958,7 +957,7 @@ class TlCalendarEvents extends \tl_calendar_events
                         }
 
                         $arrDiff[] = $strDiff;
-                    } elseif (\strlen($difficulty['tourTechDifficultyMin'])) {
+                    } elseif (\strlen((string)$difficulty['tourTechDifficultyMin'])) {
                         $objDiff = $this->Database->prepare('SELECT * FROM tl_tour_difficulty WHERE id=?')->limit(1)->execute((int) ($difficulty['tourTechDifficultyMin']));
 
                         if ($objDiff->numRows) {
@@ -1405,7 +1404,7 @@ class TlCalendarEvents extends \tl_calendar_events
      */
     public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
     {
-        if (\strlen(Input::get('tid'))) {
+        if (\strlen((string)Input::get('tid'))) {
             $this->toggleVisibility(Input::get('tid'), ('1' === Input::get('state')), (@func_get_arg(12) ?: null));
             $this->redirect($this->getReferer());
         }
