@@ -178,7 +178,7 @@ class TlCalendarContainer extends Backend
                 break;
 
             default:
-                if (\strlen(Input::get('act'))) {
+                if (\strlen((string) Input::get('act'))) {
                     throw new AccessDeniedException('Not enough permissions to '.Input::get('act').' calendar_containers.');
                 }
                 break;

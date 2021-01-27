@@ -35,7 +35,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
-use Haste\Form;
+use Haste\Form\Form;
 use League\Csv\CharsetConverter;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
@@ -144,7 +144,7 @@ class TlCalendarEventsMember extends Backend
             }
 
             if ('delete' === Input::get('act') || 'toggle' === Input::get('act') || 'edit' === Input::get('act') || 'select' === Input::get('act')) {
-                $id = \strlen(Input::get('id')) ? Input::get('id') : CURRENT_ID;
+                $id = \strlen((string) Input::get('id')) ? Input::get('id') : CURRENT_ID;
 
                 if ('select' === Input::get('act')) {
                     $objEvent = CalendarEventsModel::findByPk($id);
@@ -269,11 +269,11 @@ class TlCalendarEventsMember extends Backend
                 if (null !== $objEmail) {
                     // Set token array
                     $arrTokens = [
-                        'email_sender_name' => html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME')),
+                        'email_sender_name' => html_entity_decode((string) Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME')),
                         'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
                         'reply_to' => $this->User->email,
-                        'email_subject' => html_entity_decode(Input::post('emailSubject')),
-                        'email_text' => html_entity_decode(strip_tags(Input::post('emailText'))),
+                        'email_subject' => html_entity_decode((string) Input::post('emailSubject')),
+                        'email_text' => html_entity_decode((string) strip_tags(Input::post('emailText'))),
                         'attachment_tokens' => '',
                     ];
 
@@ -362,7 +362,7 @@ class TlCalendarEventsMember extends Backend
                 $arrRow = [];
 
                 foreach ($arrFields as $field) {
-                    $value = html_entity_decode($objEventMember->{$field});
+                    $value = html_entity_decode((string) $objEventMember->{$field});
 
                     if ('stateOfSubscription' === $field) {
                         $arrRow[] = '' !== $GLOBALS['TL_LANG']['tl_calendar_events_member'][$value] ? $GLOBALS['TL_LANG']['tl_calendar_events_member'][$value] : $value;
@@ -511,8 +511,8 @@ class TlCalendarEventsMember extends Backend
 
                     if (null !== $objNotification) {
                         $arrTokens = [
-                            'participant_state_of_subscription' => html_entity_decode($GLOBALS['TL_LANG']['tl_calendar_events_member'][$varValue]),
-                            'event_name' => html_entity_decode($objEvent->title),
+                            'participant_state_of_subscription' => html_entity_decode((string) $GLOBALS['TL_LANG']['tl_calendar_events_member'][$varValue]),
+                            'event_name' => html_entity_decode((string) $objEvent->title),
                             'participant_name' => html_entity_decode($objEventMemberModel->firstname.' '.$objEventMemberModel->lastname),
                             'participant_email' => $objEventMemberModel->email,
                             'event_link_detail' => 'https://'.Environment::get('host').'/'.Events::generateEventUrl($objEvent),
@@ -823,14 +823,14 @@ class TlCalendarEventsMember extends Backend
                     if (null !== $objEmail) {
                         // Set token array
                         $arrTokens = [
-                            'email_sender_name' => html_entity_decode(html_entity_decode(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'))),
+                            'email_sender_name' => html_entity_decode((string) html_entity_decode((string) Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'))),
                             'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
                             'send_to' => $objRegistration->email,
                             'reply_to' => $this->User->email,
                             // 'recipient_cc'       => '',
                             // 'recipient_bcc'      => '',
-                            'email_subject' => html_entity_decode(Input::post('subject')),
-                            'email_text' => html_entity_decode(strip_tags(Input::post('text'))),
+                            'email_subject' => html_entity_decode((string) Input::post('subject')),
+                            'email_text' => html_entity_decode((string) strip_tags(Input::post('text'))),
                             'email_html' => html_entity_decode(''),
                         ];
 
@@ -928,7 +928,7 @@ class TlCalendarEventsMember extends Backend
                 }
 
                 // Get event type
-                $eventType = \strlen($GLOBALS['TL_LANG']['MSC'][$objEvent->eventType]) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType].': ' : 'Event: ';
+                $eventType = \strlen((string) $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType]) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType].': ' : 'Event: ';
 
                 // Add value to ffields
                 $objForm->getWidget('subject')->value = sprintf($arrAction['emailSubject'], $eventType.$objEvent->title);
@@ -1004,7 +1004,7 @@ class TlCalendarEventsMember extends Backend
      */
     public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
     {
-        if (\strlen(Input::get('tid'))) {
+        if (\strlen((string) Input::get('tid'))) {
             $this->toggleVisibility(Input::get('tid'), 1 === (int) Input::get('state'), (@func_get_arg(12) ?: null));
             $this->redirect($this->getReferer());
         }

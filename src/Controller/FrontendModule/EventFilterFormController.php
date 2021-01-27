@@ -184,7 +184,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
                                 $arrOrganizers = [$inputAdapter->get('organizers')];
                             }
                             // Or the organizers GET param can be transmitted like this: organizers=5,7,3
-                            elseif (strpos($inputAdapter->get('organizers'), ',', 1)) {
+                            elseif (!empty($inputAdapter->get('organizers')) && strpos($inputAdapter->get('organizers'), ',', 1)) {
                                 $arrOrganizers = explode(',', $inputAdapter->get('organizers'));
                             } else {
                                 // Or the organizers GET param can be transmitted like this: organizers[]=5&organizers[]=7&organizers[]=3

@@ -457,13 +457,13 @@ class TlCalendarEvents extends \tl_calendar_events
                             $arrRow[] = implode(',', $arrDates);
                         } elseif ('organizers' === $field) {
                             $arrOrganizers = CalendarEventsHelper::getEventOrganizersAsArray($objEvent->current(), 'title');
-                            $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
+                            $arrRow[] = html_entity_decode((string) implode(',', $arrOrganizers));
                         } elseif ('instructor' === $field) {
                             $arrInstructors = CalendarEventsHelper::getInstructorNamesAsArray($objEvent->current(), false, false);
-                            $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
+                            $arrRow[] = html_entity_decode((string) implode(',', $arrInstructors));
                         } elseif ('tourType' === $field) {
                             $arrTourTypes = CalendarEventsHelper::getTourTypesAsArray($objEvent->current(), 'title');
-                            $arrRow[] = html_entity_decode(implode(',', $arrTourTypes));
+                            $arrRow[] = html_entity_decode((string) implode(',', $arrTourTypes));
                         } elseif ('eventReleaseLevel' === $field) {
                             $objFS = EventReleaseLevelPolicyModel::findByPk($objEvent->{$field});
                             $arrRow[] = null !== $objFS ? $objFS->level : '';
@@ -831,7 +831,8 @@ class TlCalendarEvents extends \tl_calendar_events
         $field = $dc->field;
 
         $strTable = 'tl_calendar_events';
-        if (!\strlen((string)$dc->activeRecord->id)) {
+
+        if (!\strlen((string) $dc->activeRecord->id)) {
             return '';
         }
         $intId = $dc->activeRecord->id;
@@ -943,7 +944,7 @@ class TlCalendarEvents extends \tl_calendar_events
                 foreach ($value as $difficulty) {
                     $strDiff = '';
 
-                    if (\strlen((string)$difficulty['tourTechDifficultyMin']) && \strlen($difficulty['tourTechDifficultyMax'])) {
+                    if (\strlen((string) $difficulty['tourTechDifficultyMin']) && \strlen($difficulty['tourTechDifficultyMax'])) {
                         $objDiff = $this->Database->prepare('SELECT * FROM tl_tour_difficulty WHERE id=?')->limit(1)->execute((int) ($difficulty['tourTechDifficultyMin']));
 
                         if ($objDiff->numRows) {
@@ -957,7 +958,7 @@ class TlCalendarEvents extends \tl_calendar_events
                         }
 
                         $arrDiff[] = $strDiff;
-                    } elseif (\strlen((string)$difficulty['tourTechDifficultyMin'])) {
+                    } elseif (\strlen((string) $difficulty['tourTechDifficultyMin'])) {
                         $objDiff = $this->Database->prepare('SELECT * FROM tl_tour_difficulty WHERE id=?')->limit(1)->execute((int) ($difficulty['tourTechDifficultyMin']));
 
                         if ($objDiff->numRows) {
@@ -1404,7 +1405,7 @@ class TlCalendarEvents extends \tl_calendar_events
      */
     public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
     {
-        if (\strlen((string)Input::get('tid'))) {
+        if (\strlen((string) Input::get('tid'))) {
             $this->toggleVisibility(Input::get('tid'), ('1' === Input::get('state')), (@func_get_arg(12) ?: null));
             $this->redirect($this->getReferer());
         }
