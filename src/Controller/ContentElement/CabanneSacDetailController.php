@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -17,49 +19,39 @@ use Contao\ContentModel;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\ServiceAnnotation\ContentElement;
 use Contao\FilesModel;
 use Contao\PageModel;
 use Contao\System;
 use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Contao\CoreBundle\ServiceAnnotation\ContentElement;
 
 /**
- * Class CabanneSacDetailController
- * @package Markocupic\SacEventToolBundle\Controller\ContentElement
+ * Class CabanneSacDetailController.
+ *
  * @ContentElement("cabanne_sac_detail", category="sac_event_tool_content_elements", template="ce_cabanne_sac_detail")
  */
 class CabanneSacDetailController extends AbstractContentElementController
 {
-    /** @var  CabanneSacModel */
+    /**
+     * @var CabanneSacModel
+     */
     protected $objCabanne;
 
-    /**
-     * @param Request $request
-     * @param ContentModel $model
-     * @param string $section
-     * @param array|null $classes
-     * @param PageModel|null $pageModel
-     * @return Response
-     */
     public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, ?PageModel $pageModel = null): Response
     {
         /** @var CabanneSacModel $cabanneSacModelAdapter */
         $cabanneSacModelAdapter = $this->get('contao.framework')->getAdapter(CabanneSacModel::class);
 
         // Add data to template
-        if (null === ($this->objCabanne = $cabanneSacModelAdapter->findByPk($model->cabanneSac)))
-        {
+        if (null === ($this->objCabanne = $cabanneSacModelAdapter->findByPk($model->cabanneSac))) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 
         return parent::__invoke($request, $model, $section, $classes, $pageModel);
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
@@ -68,15 +60,9 @@ class CabanneSacDetailController extends AbstractContentElementController
         return $services;
     }
 
-    /**
-     * @param Template $template
-     * @param ContentModel $model
-     * @param Request $request
-     * @return null|Response
-     */
     protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
     {
-        /** @var  FilesModel $filesModelAdapter */
+        /** @var FilesModel $filesModelAdapter */
         $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
 
         /** @var Controller $controllerAdapter */
@@ -86,26 +72,22 @@ class CabanneSacDetailController extends AbstractContentElementController
 
         // Add data to template
         $skip = ['id', 'tstamp'];
-        foreach ($this->objCabanne->row() as $k => $v)
-        {
-            if (!in_array($k, $skip,true))
-            {
+
+        foreach ($this->objCabanne->row() as $k => $v) {
+            if (!\in_array($k, $skip, true)) {
                 $template->$k = $v;
             }
         }
         $objFiles = $filesModelAdapter->findByUuid($this->objCabanne->singleSRC);
 
-        if ($objFiles !== null && is_file($projectDir . '/' . $objFiles->path))
-        {
+        if (null !== $objFiles && is_file($projectDir.'/'.$objFiles->path)) {
             $model->singleSRC = $objFiles->path;
             $controllerAdapter->addImageToTemplate($template, $model->row(), null, 'cabanneDetail', $objFiles);
         }
 
         // coordsCH1903
-        if (!empty($this->objCabanne->coordsCH1903))
-        {
-            if (strpos($this->objCabanne->coordsCH1903, '/') !== false)
-            {
+        if (!empty($this->objCabanne->coordsCH1903)) {
+            if (false !== strpos($this->objCabanne->coordsCH1903, '/')) {
                 $template->hasCoords = true;
                 $arrCoord = explode('/', $this->objCabanne->coordsCH1903);
                 $template->coordsCH1903X = trim($arrCoord[0]);
@@ -115,5 +97,4 @@ class CabanneSacDetailController extends AbstractContentElementController
 
         return $template->getResponse();
     }
-
 }

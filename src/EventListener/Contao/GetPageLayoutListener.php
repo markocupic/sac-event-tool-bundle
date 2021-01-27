@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -22,8 +24,7 @@ use Contao\StringUtil;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Class GetPageLayoutListener
- * @package Markocupic\SacEventToolBundle\EventListener\Contao
+ * Class GetPageLayoutListener.
  */
 class GetPageLayoutListener
 {
@@ -44,9 +45,6 @@ class GetPageLayoutListener
 
     /**
      * GetPageLayoutListener constructor.
-     * @param ContaoFramework $framework
-     * @param KernelInterface $kernel
-     * @param string $projectDir
      */
     public function __construct(ContaoFramework $framework, KernelInterface $kernel, string $projectDir)
     {
@@ -66,21 +64,19 @@ class GetPageLayoutListener
         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
 
         // Purge script cache in dev mode
-        if ($this->kernel->isDebug())
-        {
+        if ($this->kernel->isDebug()) {
             $objAutomator = new Automator();
             $objAutomator->purgeScriptCache();
-            if ($objLayout->external !== '')
-            {
+
+            if ('' !== $objLayout->external) {
                 $arrExternal = $stringUtilAdapter->deserialize($objLayout->external);
-                if (!empty($arrExternal) && is_array($arrExternal))
-                {
+
+                if (!empty($arrExternal) && \is_array($arrExternal)) {
                     $objFile = $filesModelAdapter->findMultipleByUuids($arrExternal);
-                    while ($objFile->next())
-                    {
-                        if (is_file($this->projectDir . '/' . $objFile->path))
-                        {
-                            touch($this->projectDir . '/' . $objFile->path);
+
+                    while ($objFile->next()) {
+                        if (is_file($this->projectDir.'/'.$objFile->path)) {
+                            touch($this->projectDir.'/'.$objFile->path);
                         }
                     }
                 }

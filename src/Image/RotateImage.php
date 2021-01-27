@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -19,12 +21,10 @@ use Contao\Folder;
 use Contao\Message;
 
 /**
- * Class RotateImage
- * @package Markocupic\SacEventToolBundle\Image
+ * Class RotateImage.
  */
 class RotateImage
 {
-
     /**
      * @var ContaoFramework
      */
@@ -37,8 +37,6 @@ class RotateImage
 
     /**
      * RotateImage constructor.
-     * @param ContaoFramework $framework
-     * @param string $projectDir
      */
     public function __construct(ContaoFramework $framework, string $projectDir)
     {
@@ -47,16 +45,11 @@ class RotateImage
     }
 
     /**
-     * @param FilesModel|null $objFiles
-     * @param int $angle
-     * @param string $target
-     * @return bool
      * @throws \ImagickException
      */
     public function rotate(FilesModel $objFiles = null, int $angle = 270, string $target = ''): bool
     {
-        if ($objFiles === null)
-        {
+        if (null === $objFiles) {
             return false;
         }
 
@@ -68,32 +61,30 @@ class RotateImage
 
         $src = $objFiles->path;
 
-        if (!file_exists($this->projectDir . '/' . $src))
-        {
+        if (!file_exists($this->projectDir.'/'.$src)) {
             $messageAdapter->addError(sprintf('File "%s" not found.', $src));
+
             return false;
         }
 
         $objFile = new File($src);
-        if (!$objFile->isGdImage)
-        {
+
+        if (!$objFile->isGdImage) {
             $messageAdapter->addError(sprintf('File "%s" could not be rotated, because it is not an image.', $src));
+
             return false;
         }
 
-        $source = $this->projectDir . '/' . $src;
-        if ($target === '')
-        {
+        $source = $this->projectDir.'/'.$src;
+
+        if ('' === $target) {
             $target = $source;
-        }
-        else
-        {
-            new Folder(dirname($target));
-            $target = $this->projectDir . '/' . $target;
+        } else {
+            new Folder(\dirname($target));
+            $target = $this->projectDir.'/'.$target;
         }
 
-        if (class_exists('Imagick') && class_exists('ImagickPixel'))
-        {
+        if (class_exists('Imagick') && class_exists('ImagickPixel')) {
             $imagick = new \Imagick();
 
             $imagick->readImage($source);
@@ -101,11 +92,12 @@ class RotateImage
             $imagick->writeImage($target);
             $imagick->clear();
             $imagick->destroy();
+
             return true;
         }
-        elseif (function_exists('imagerotate'))
-        {
-            $source = imagecreatefromjpeg($this->projectDir . '/' . $src);
+
+        if (\function_exists('imagerotate')) {
+            $source = imagecreatefromjpeg($this->projectDir.'/'.$src);
 
             //rotate
             $imgTmp = imagerotate($source, $angle, 0);
@@ -114,16 +106,16 @@ class RotateImage
             imagejpeg($imgTmp, $target);
 
             imagedestroy($source);
-            if (is_file($target))
-            {
+
+            if (is_file($target)) {
                 return true;
             }
-        }
-        else
-        {
+        } else {
             $messageAdapter->addError(sprintf('Please install class "%s" or php function "%s" for rotating images.', 'Imagick', 'imagerotate'));
+
             return false;
         }
+
         return false;
     }
 }

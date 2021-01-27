@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -15,16 +17,14 @@ namespace Markocupic\SacEventToolBundle\Cron\Contao;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
-use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 use Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf;
+use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 
 /**
- * Class DailyCron
- * @package Markocupic\SacEventToolBundle\Cron\Contao
+ * Class DailyCron.
  */
 class DailyCron
 {
-
     /**
      * @var ContaoFramework
      */
@@ -37,8 +37,6 @@ class DailyCron
 
     /**
      * DailyCron constructor.
-     * @param ContaoFramework $framework
-     * @param string $projectDir
      */
     public function __construct(ContaoFramework $framework, string $projectDir)
     {
@@ -50,31 +48,31 @@ class DailyCron
     }
 
     /**
-     * Generate workshop pdf booklet
+     * Generate workshop pdf booklet.
      */
-    public function generateWorkshopPdfBooklet()
+    public function generateWorkshopPdfBooklet(): void
     {
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
-        $year = (int)$configAdapter->get('SAC_EVT_WORKSHOP_FLYER_YEAR');
-        $calendarId = (int)$configAdapter->get('SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID');
+        $year = (int) $configAdapter->get('SAC_EVT_WORKSHOP_FLYER_YEAR');
+        $calendarId = (int) $configAdapter->get('SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID');
 
         /** @var PrintWorkshopsAsPdf $pdf */
         $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf');
         $pdf->setYear($year)
             ->setCalendarId($calendarId)
             ->setDownload(false)
-            ->printWorkshopsAsPdf();
+            ->printWorkshopsAsPdf()
+        ;
     }
 
     /**
-     * Anonymize orphaned calendar events member datarecords
+     * Anonymize orphaned calendar events member datarecords.
      */
-    public function anonymizeOrphanedCalendarEventsMemberDataRecords()
+    public function anonymizeOrphanedCalendarEventsMemberDataRecords(): void
     {
-        /** @var  ClearFrontendUserData $cron */
+        /** @var ClearFrontendUserData $cron */
         $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData');
         $cron->anonymizeOrphanedCalendarEventsMemberDataRecords();
     }
-
 }

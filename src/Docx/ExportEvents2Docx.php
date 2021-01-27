@@ -2,40 +2,39 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
 namespace Markocupic\SacEventToolBundle\Docx;
 
-use Contao\Environment;
-use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\IOFactory;
-use Contao\Controller;
-use Contao\Database;
 use Contao\CalendarEventsModel;
+use Contao\Config;
+use Contao\Controller;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
-use Contao\UserModel;
-use Contao\StringUtil;
 use Contao\Date;
+use Contao\Environment;
 use Contao\EventOrganizerModel;
 use Contao\Folder;
+use Contao\StringUtil;
 use Contao\System;
-use Contao\Config;
+use Contao\UserModel;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\PhpWord;
 
 /**
- * Class ExportEvents2Docx
- * @package Markocupic\SacEventToolBundle
+ * Class ExportEvents2Docx.
  */
 class ExportEvents2Docx
 {
-
     /**
      * @var
      */
@@ -69,28 +68,28 @@ class ExportEvents2Docx
         $phpWord = new PhpWord();
 
         // Styles
-        $fStyleTitle = array('color' => '000000', 'size' => 16, 'bold' => true, 'name' => 'Century Gothic');
+        $fStyleTitle = ['color' => '000000', 'size' => 16, 'bold' => true, 'name' => 'Century Gothic'];
 
-        $fStyle = array('color' => '000000', 'size' => 10, 'bold' => false, 'name' => 'Century Gothic');
+        $fStyle = ['color' => '000000', 'size' => 10, 'bold' => false, 'name' => 'Century Gothic'];
         $phpWord->addFontStyle('fStyle', $fStyle);
 
-        $fStyleSmall = array('color' => '000000', 'size' => 9, 'bold' => false, 'name' => 'Century Gothic');
+        $fStyleSmall = ['color' => '000000', 'size' => 9, 'bold' => false, 'name' => 'Century Gothic'];
         $phpWord->addFontStyle('fStyleSmall', $fStyleSmall);
 
-        $fStyleMediumRed = array('color' => 'ff0000', 'size' => 12, 'bold' => true, 'name' => 'Century Gothic');
+        $fStyleMediumRed = ['color' => 'ff0000', 'size' => 12, 'bold' => true, 'name' => 'Century Gothic'];
         $phpWord->addFontStyle('fStyleMediumRed', $fStyleMediumRed);
 
-        $fStyleBold = array('color' => '000000', 'size' => 10, 'bold' => true, 'name' => 'Century Gothic');
+        $fStyleBold = ['color' => '000000', 'size' => 10, 'bold' => true, 'name' => 'Century Gothic'];
         $phpWord->addFontStyle('fStyleBold', $fStyleBold);
 
-        $pStyle = array('lineHeight' => '1.0', 'spaceBefore' => 0, 'spaceAfter' => 0);
+        $pStyle = ['lineHeight' => '1.0', 'spaceBefore' => 0, 'spaceAfter' => 0];
         $phpWord->addParagraphStyle('pStyle', $pStyle);
 
-        $tableStyle = array(
+        $tableStyle = [
             'borderColor' => '000000',
-            'borderSize'  => 6,
-            'cellMargin'  => 50,
-        );
+            'borderSize' => 6,
+            'cellMargin' => 50,
+        ];
         $twip = 56.6928; // 1mm = 56.6928 twip
         $widthCol_1 = round(45 * $twip);
         $widthCol_2 = round(115 * $twip);
@@ -100,14 +99,11 @@ class ExportEvents2Docx
             [$calendarId, '1'],
             ['order' => 'courseTypeLevel0, title, startDate']
         );
-        if ($objEvent !== null)
-        {
-            while ($objEvent->next())
-            {
-                if ($eventId > 0)
-                {
-                    if ($eventId != $objEvent->id)
-                    {
+
+        if (null !== $objEvent) {
+            while ($objEvent->next()) {
+                if ($eventId > 0) {
+                    if ($eventId !== $objEvent->id) {
                         continue;
                     }
                 }
@@ -124,8 +120,8 @@ class ExportEvents2Docx
                 $table->addRow();
                 $cell = $table->addCell(4500);
                 $textrun = $cell->addTextRun();
-                $textrun->addLink(Environment::get('host') . '/', htmlspecialchars('KURSPROGRAMM ' . $year, ENT_COMPAT, 'UTF-8'), $fStyleMediumRed);
-                $table->addCell(4500)->addImage($rootDir . '/files/fileadmin/page_assets/kursbroschuere/logo-sac-pilatus.png', array('height' => 40, 'align' => 'right'));
+                $textrun->addLink(Environment::get('host').'/', htmlspecialchars('KURSPROGRAMM '.$year, ENT_COMPAT, 'UTF-8'), $fStyleMediumRed);
+                $table->addCell(4500)->addImage($rootDir.'/files/fileadmin/page_assets/kursbroschuere/logo-sac-pilatus.png', ['height' => 40, 'align' => 'right']);
 
                 // Add footer
                 //$footer = $section->addFooter();
@@ -139,41 +135,40 @@ class ExportEvents2Docx
 
                 // Add the table
                 //$firstRowStyle = array('bgColor' => '66BBFF');
-                $firstRowStyle = array();
+                $firstRowStyle = [];
                 $phpWord->addTableStyle('Event-Item', $tableStyle, $firstRowStyle);
                 $table = $section->addTable('Event-Item');
 
-                $arrFields = array(
-                    "Datum"                 => 'eventDates',
-                    "Autor (-en)"           => 'author',
-                    "Kursart"               => 'kursart',
-                    "Kursstufe"             => 'courseLevel',
-                    "Organisierende Gruppe" => 'organizers',
-                    "Einführungstext"       => 'teaser',
-                    "Kursziele"             => 'terms',
-                    "Kursinhalte"           => 'issues',
-                    "Voraussetzungen"       => 'requirements',
-                    "Bergf./Tourenl."       => 'mountainguide',
-                    "Leiter"                => 'instructor',
-                    "Preis/Leistungen"      => 'leistungen',
-                    "Anmeldung"             => 'bookingEvent',
-                    "Material"              => 'equipment',
-                    "Weiteres"              => 'miscellaneous',
-                );
+                $arrFields = [
+                    'Datum' => 'eventDates',
+                    'Autor (-en)' => 'author',
+                    'Kursart' => 'kursart',
+                    'Kursstufe' => 'courseLevel',
+                    'Organisierende Gruppe' => 'organizers',
+                    'Einführungstext' => 'teaser',
+                    'Kursziele' => 'terms',
+                    'Kursinhalte' => 'issues',
+                    'Voraussetzungen' => 'requirements',
+                    'Bergf./Tourenl.' => 'mountainguide',
+                    'Leiter' => 'instructor',
+                    'Preis/Leistungen' => 'leistungen',
+                    'Anmeldung' => 'bookingEvent',
+                    'Material' => 'equipment',
+                    'Weiteres' => 'miscellaneous',
+                ];
 
-                foreach ($arrFields as $label => $fieldname)
-                {
+                foreach ($arrFields as $label => $fieldname) {
                     $table->addRow();
-                    $table->addCell($widthCol_1)->addText(htmlspecialchars($label . ":"), 'fStyleBold', 'pStyle');
+                    $table->addCell($widthCol_1)->addText(htmlspecialchars($label.':'), 'fStyleBold', 'pStyle');
                     $objCell = $table->addCell($widthCol_2);
                     $value = self::formatValue($fieldname, $objEvent->{$fieldname}, $objEvent->current());
                     // Add multiline text
                     self::addMultilineText($objCell, $value);
                 }
 
-                $section->addText('event-alias: ' . $objEvent->alias, 'fStyleSmall', 'pStyle');
-                $section->addText('event-id: ' . $objEvent->id, 'fStyleSmall', 'pStyle');
-                $section->addText('version-date: ' . Date::parse('Y-m-d'), 'fStyleSmall', 'pStyle');
+                $section->addText('event-alias: '.$objEvent->alias, 'fStyleSmall', 'pStyle');
+                $section->addText('event-id: '.$objEvent->id, 'fStyleSmall', 'pStyle');
+                $section->addText('version-date: '.Date::parse('Y-m-d'), 'fStyleSmall', 'pStyle');
 
                 $section->addPageBreak();
             }
@@ -181,10 +176,10 @@ class ExportEvents2Docx
         // Saving the document as OOXML file...
         $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
         new Folder(Config::get('SAC_EVT_TEMP_PATH'));
-        $objWriter->save($rootDir . '/' . Config::get('SAC_EVT_TEMP_PATH') . '/sac-jahresprogramm.docx');
+        $objWriter->save($rootDir.'/'.Config::get('SAC_EVT_TEMP_PATH').'/sac-jahresprogramm.docx');
         sleep(1);
 
-        $fileSRC = Config::get('SAC_EVT_TEMP_PATH') . '/sac-jahresprogramm.docx';
+        $fileSRC = Config::get('SAC_EVT_TEMP_PATH').'/sac-jahresprogramm.docx';
         Controller::sendFileToBrowser($fileSRC, false);
     }
 
@@ -194,8 +189,7 @@ class ExportEvents2Docx
      */
     public static function addMultilineText($objCell, $textlines): void
     {
-        foreach (explode("\n", $textlines) as $line)
-        {
+        foreach (explode("\n", $textlines) as $line) {
             $objCell->addText(htmlspecialchars($line), 'fStyle', 'pStyle');
         }
     }
@@ -204,101 +198,102 @@ class ExportEvents2Docx
      * @param $field
      * @param string $value
      * @param $objEvent
-     * @return string
      */
-    public static function formatValue($field, $value = '', CalendarEventsModel $objEvent): string
+    public static function formatValue($field, $value, CalendarEventsModel $objEvent): string
     {
         $table = self::$strTable;
 
-        if ($table === 'tl_calendar_events')
-        {
-            if ($field === 'courseLevel')
-            {
-                if ($value != '')
-                {
+        if ('tl_calendar_events' === $table) {
+            if ('courseLevel' === $field) {
+                if ('' !== $value) {
                     $value = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$value];
                 }
             }
 
-            if ($field === 'kursart')
-            {
+            if ('kursart' === $field) {
                 $levelMain = $objEvent->courseTypeLevel0;
                 $levelSub = $objEvent->courseTypeLevel1;
                 $strSub = '';
                 $strMain = '';
                 $objMain = CourseMainTypeModel::findByPk($levelMain);
-                if ($objMain !== null)
-                {
+
+                if (null !== $objMain) {
                     $strMain = $objMain->name;
                 }
                 $objSub = CourseSubTypeModel::findByPk($levelSub);
-                if ($objSub !== null)
-                {
-                    $strSub = $objSub->code . ' - ' . $objSub->name;
+
+                if (null !== $objSub) {
+                    $strSub = $objSub->code.' - '.$objSub->name;
                 }
-                $value = $strMain . ': ' . $strSub;
+                $value = $strMain.': '.$strSub;
             }
 
-            if ($field === 'author')
-            {
+            if ('author' === $field) {
                 $value = StringUtil::deserialize($value, true);
-                if (is_array(StringUtil::deserialize($value)) && !empty($value))
-                {
-                    $arrValue = array_map(function ($v) {
-                        return UserModel::findByPk(intval($v))->name;
-                    }, StringUtil::deserialize($value));
+
+                if (\is_array(StringUtil::deserialize($value)) && !empty($value)) {
+                    $arrValue = array_map(
+                        static function ($v) {
+                            return UserModel::findByPk((int) $v)->name;
+                        },
+                        StringUtil::deserialize($value)
+                    );
                     $value = implode(', ', $arrValue);
                 }
             }
 
-            if ($field === 'instructor')
-            {
+            if ('instructor' === $field) {
                 $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent);
-                $arrValue = array_map(function ($v) {
-                    return UserModel::findByPk($v)->name;
-                }, $arrInstructors);
+                $arrValue = array_map(
+                    static function ($v) {
+                        return UserModel::findByPk($v)->name;
+                    },
+                    $arrInstructors
+                );
                 $value = implode(', ', $arrValue);
             }
 
-            if ($field === 'organizers')
-            {
+            if ('organizers' === $field) {
                 $value = StringUtil::deserialize($value, true);
-                if (is_array(StringUtil::deserialize($value)) && !empty($value))
-                {
-                    $arrValue = array_map(function ($v) {
-                        $objOrganizer = EventOrganizerModel::findByPk($v);
-                        if ($objOrganizer !== null)
-                        {
-                            $v = $objOrganizer->title;
-                        }
-                        return $v;
-                    }, StringUtil::deserialize($value));
+
+                if (\is_array(StringUtil::deserialize($value)) && !empty($value)) {
+                    $arrValue = array_map(
+                        static function ($v) {
+                            $objOrganizer = EventOrganizerModel::findByPk($v);
+
+                            if (null !== $objOrganizer) {
+                                $v = $objOrganizer->title;
+                            }
+
+                            return $v;
+                        },
+                        StringUtil::deserialize($value)
+                    );
                     $value = implode(', ', $arrValue);
                 }
             }
 
-            if ($field === 'startDate' || $field === 'endDate' || $field === 'tstamp')
-            {
-                if ($value > 0)
-                {
+            if ('startDate' === $field || 'endDate' === $field || 'tstamp' === $field) {
+                if ($value > 0) {
                     $value = Date::parse('d.m.Y', $value);
                 }
             }
 
             // Kusdatendaten in der Form d.m.Y, d.m.Y, ...
-            if ($field === 'eventDates')
-            {
+            if ('eventDates' === $field) {
                 $objEvent = CalendarEventsModel::findByPk(self::$arrDatarecord['id']);
                 $arr = CalendarEventsHelper::getEventTimestamps($objEvent);
-                $arr = array_map(function ($tstamp) {
-                    return Date::parse('d.m.Y', $tstamp);
-                }, $arr);
+                $arr = array_map(
+                    static function ($tstamp) {
+                        return Date::parse('d.m.Y', $tstamp);
+                    },
+                    $arr
+                );
                 $value = implode(', ', $arr);
             }
 
-            if ($field === 'mountainguide')
-            {
-                $value = ($value > 0) ? 'Mit Bergfuehrer' : 'Mit SAC-Kursleiter';
+            if ('mountainguide' === $field) {
+                $value = $value > 0 ? 'Mit Bergfuehrer' : 'Mit SAC-Kursleiter';
                 $value = utf8_encode($value);
             }
             /*
@@ -313,10 +308,9 @@ class ExportEvents2Docx
             }
             */
 
-            $value = $value != '' ? html_entity_decode($value, ENT_QUOTES) : '';
+            $value = '' !== $value ? html_entity_decode($value, ENT_QUOTES) : '';
         }
 
         return $value;
     }
-
 }

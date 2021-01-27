@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
 namespace Markocupic\SacEventToolBundle\FrontendCache;
 
 /**
- * Interface SessionInterface
- * @package Markocupic\SacEventToolBundle\FrontendCache
+ * Interface SessionInterface.
  */
 interface SessionInterface
 {
@@ -23,5 +24,4 @@ interface SessionInterface
     public function get(string $strKey);
 
     public function has(string $strKey);
-
 }

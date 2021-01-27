@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -14,7 +16,6 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\BackendTemplate;
 use Contao\BackendUser;
-use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
@@ -29,12 +30,10 @@ use Knp\Menu\Renderer\ListRenderer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
- * Class ParseBackendTemplateListener
- * @package Markocupic\SacEventToolBundle\EventListener\Contao
+ * Class ParseBackendTemplateListener.
  */
 class ParseBackendTemplateListener
 {
-
     /**
      * @var ContaoFramework
      */
@@ -42,7 +41,6 @@ class ParseBackendTemplateListener
 
     /**
      * ParseBackendTemplateListener constructor.
-     * @param ContaoFramework $framework
      */
     public function __construct(ContaoFramework $framework)
     {
@@ -52,7 +50,7 @@ class ParseBackendTemplateListener
     /**
      * @param $strBuffer
      * @param $strTemplate
-     * @return string
+     *
      * @throws \Exception
      */
     public function onParseBackendTemplate($strBuffer, $strTemplate): string
@@ -65,34 +63,26 @@ class ParseBackendTemplateListener
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
         $configAdapter = $this->framework->getAdapter(Config::class);
 
-        if ($strTemplate === 'be_main')
-        {
+        if ('be_main' === $strTemplate) {
             // Add icon explanation legend to tl_calendar_events_member
-            if ($inputAdapter->get('do') === 'sac_calendar_events_tool' && $inputAdapter->get('table') === 'tl_calendar_events' && $inputAdapter->get('act') === 'edit')
-            {
-                if (preg_match('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $strBuffer, $matches))
-                {
-                    if ($inputAdapter->get('call') !== 'writeTourReport')
-                    {
+            if ('sac_calendar_events_tool' === $inputAdapter->get('do') && 'tl_calendar_events' === $inputAdapter->get('table') && 'edit' === $inputAdapter->get('act')) {
+                if (preg_match('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $strBuffer, $matches)) {
+                    if ('writeTourReport' !== $inputAdapter->get('call')) {
                         $strDashboard = $this->_generateEventDashboard();
-                        $strBuffer = preg_replace('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $matches[0] . $strDashboard, $strBuffer);
-                    }
-                    else
-                    {
+                        $strBuffer = preg_replace('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $matches[0].$strDashboard, $strBuffer);
+                    } else {
                         $strDashboard = $this->_generateEventDashboard();
-                        $strBuffer = preg_replace('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $matches[0] . $strDashboard, $strBuffer);
+                        $strBuffer = preg_replace('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $matches[0].$strDashboard, $strBuffer);
                     }
                 }
             }
 
             // Add icon explanation legend to tl_calendar_events_member
-            if ($inputAdapter->get('do') === 'sac_calendar_events_tool' && $inputAdapter->get('table') === 'tl_calendar_events_member')
-            {
+            if ('sac_calendar_events_tool' === $inputAdapter->get('do') && 'tl_calendar_events_member' === $inputAdapter->get('table')) {
                 $objEvent = $calendarEventsModelAdapter->findByPk($inputAdapter->get('id'));
-                if ($objEvent !== null)
-                {
-                    if (preg_match('/<table class=\"tl_listing(.*)<\/table>/sU', $strBuffer))
-                    {
+
+                if (null !== $objEvent) {
+                    if (preg_match('/<table class=\"tl_listing(.*)<\/table>/sU', $strBuffer)) {
                         $controllerAdapter->loadDataContainer('tl_calendar_events_member');
                         $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
                         $strLegend = '';
@@ -101,17 +91,17 @@ class ParseBackendTemplateListener
 
                         // Event details
                         $strLegend .= '<div class="event-detail-legend">';
-                        $strLegend .= '<h3>' . $stringUtilAdapter->substr($objEvent->title, 30, '...') . '</h3>';
-                        $strLegend .= '<p>' . $calendarEventsHelperAdapter->getEventPeriod($objEvent) . '</p>';
-                        $strLegend .= '<p><strong>Leiter:</strong><br>' . implode("<br>", $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent)) . '</p>';
+                        $strLegend .= '<h3>'.$stringUtilAdapter->substr($objEvent->title, 30, '...').'</h3>';
+                        $strLegend .= '<p>'.$calendarEventsHelperAdapter->getEventPeriod($objEvent).'</p>';
+                        $strLegend .= '<p><strong>Leiter:</strong><br>'.implode('<br>', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent)).'</p>';
                         $strLegend .= '</div>';
 
                         $strLegend .= '<div class="subscription-state-legend">';
                         $strLegend .= '<h3>Status der Event-Anmeldung</h3>';
                         $strLegend .= '<ul>';
                         $arrStates = $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields']['stateOfSubscription']['options'];
-                        foreach ($arrStates as $state)
-                        {
+
+                        foreach ($arrStates as $state) {
                             $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', $configAdapter->get('SAC_EVT_ASSETS_DIR'), $state, $GLOBALS['TL_LANG']['tl_calendar_events_member'][$state]);
                         }
                         $strLegend .= '</ul>';
@@ -128,16 +118,14 @@ class ParseBackendTemplateListener
                         $strLegend .= '</div>';
 
                         // Add legend to the listing table
-                        $strBuffer = preg_replace('/<table class=\"tl_listing(.*)<\/table>/sU', '${0}' . $strLegend, $strBuffer);
+                        $strBuffer = preg_replace('/<table class=\"tl_listing(.*)<\/table>/sU', '${0}'.$strLegend, $strBuffer);
                     }
                 }
             }
 
             // Do not show submit container in the e-mail mode of tl_calendar_events_member
-            if ($inputAdapter->get('do') === 'sac_calendar_events_tool' && $inputAdapter->get('table') === 'tl_calendar_events_member' && ($inputAdapter->get('call') === 'refuseWithEmail' || $inputAdapter->get('call') === 'accept_with_email'))
-            {
-                if (preg_match('/<div class=\"tl_formbody_submit(.*)<\/form>/sU', $strBuffer))
-                {
+            if ('sac_calendar_events_tool' === $inputAdapter->get('do') && 'tl_calendar_events_member' === $inputAdapter->get('table') && ('refuseWithEmail' === $inputAdapter->get('call') || 'accept_with_email' === $inputAdapter->get('call'))) {
+                if (preg_match('/<div class=\"tl_formbody_submit(.*)<\/form>/sU', $strBuffer)) {
                     // Remove submit tl_formbody_submit
                     $strBuffer = preg_replace('/<div class=\"tl_formbody_submit(.*)<\/form>/sU', '</form>', $strBuffer);
                 }
@@ -147,9 +135,6 @@ class ParseBackendTemplateListener
         return $strBuffer;
     }
 
-    /**
-     * @return string
-     */
     private function _generateEventDashboard(): string
     {
         // Set adapters
@@ -165,19 +150,18 @@ class ParseBackendTemplateListener
         $requestToken = $container->get('contao.csrf.token_manager')->getToken($container->getParameter('contao.csrf_token_name'))->getValue();
 
         $objEvent = $calendarEventsModelAdapter->findByPk($inputAdapter->get('id'));
-        if ($objEvent === null)
-        {
+
+        if (null === $objEvent) {
             return '';
         }
 
-        if (!$objEvent->tstamp || $objEvent->title === '')
-        {
+        if (!$objEvent->tstamp || '' === $objEvent->title) {
             return '';
         }
 
         $objCalendar = $objEvent->getRelated('pid');
-        if ($objCalendar === null)
-        {
+
+        if (null === $objCalendar) {
             return '';
         }
 
@@ -200,43 +184,43 @@ class ParseBackendTemplateListener
             ->setLinkAttribute('class', 'tl_submit')
             ->setLinkAttribute('target', '_blank')
             //->setLinkAttribute('accesskey', 'm')
-            ->setLinkAttribute('title', 'Eventliste anzeigen');
+            ->setLinkAttribute('title', 'Eventliste anzeigen')
+        ;
 
         // Go to event preview button
-        if (($previewHref = $calendarEventsHelperAdapter->generateEventPreviewUrl($objEvent)) != '')
-        {
+        if (($previewHref = $calendarEventsHelperAdapter->generateEventPreviewUrl($objEvent)) !== '') {
             $menu->addChild('Vorschau', ['uri' => $previewHref])
                 ->setLinkAttribute('role', 'button')
                 ->setLinkAttribute('class', 'tl_submit')
                 ->setLinkAttribute('target', '_blank')
                 ->setLinkAttribute('accesskey', 'p')
-                ->setLinkAttribute('title', 'Vorschau anzeigen [ALT + p]');
+                ->setLinkAttribute('title', 'Vorschau anzeigen [ALT + p]')
+            ;
         }
 
         // Go to event participant list button
-        if ($eventReleaseLevelPolicyModelAdapter->hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id)
-        {
+        if ($eventReleaseLevelPolicyModelAdapter->hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id) {
             $participantListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
             $menu->addChild('Teilnehmerliste', ['uri' => $participantListHref])
                 ->setAttribute('role', 'button')
                 ->setLinkAttribute('class', 'tl_submit')
                 ->setLinkAttribute('target', '_blank')
                 ->setLinkAttribute('accesskey', 'm')
-                ->setLinkAttribute('title', 'Teilnehmerliste anzeigen [ALT + m]');
+                ->setLinkAttribute('title', 'Teilnehmerliste anzeigen [ALT + m]')
+            ;
         }
 
         // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und Vergütungsformular drucken" button
-        if ($eventReleaseLevelPolicyModelAdapter->hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id)
-        {
-            if ($objEvent->eventType === 'tour' || $objEvent->eventType === 'lastMinuteTour')
-            {
-                $writeTourReportHref = $controllerAdapter->addToUrl('call=writeTourReport&rt=' . $requestToken, true);
+        if ($eventReleaseLevelPolicyModelAdapter->hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id) {
+            if ('tour' === $objEvent->eventType || 'lastMinuteTour' === $objEvent->eventType) {
+                $writeTourReportHref = $controllerAdapter->addToUrl('call=writeTourReport&rt='.$requestToken, true);
                 $menu->addChild('Tourrapport erfassen', ['uri' => $writeTourReportHref])
                     ->setLinkAttribute('role', 'button')
                     ->setLinkAttribute('class', 'tl_submit')
                     ->setLinkAttribute('target', '_blank')
                     ->setLinkAttribute('accesskey', 'r')
-                    ->setLinkAttribute('title', 'Tourrapport anzeigen [ALT + r]');
+                    ->setLinkAttribute('title', 'Tourrapport anzeigen [ALT + r]')
+                ;
 
                 $invoiceListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
                 $menu->addChild('Tourrapport und Verg&uuml;tungsformulare drucken', ['uri' => $invoiceListHref])
@@ -244,7 +228,8 @@ class ParseBackendTemplateListener
                     ->setLinkAttribute('class', 'tl_submit')
                     ->setLinkAttribute('target', '_blank')
                     ->setLinkAttribute('accesskey', 'i')
-                    ->setLinkAttribute('title', 'Tourrapport und Verguetungsformulare drucken [ALT + i]');
+                    ->setLinkAttribute('title', 'Tourrapport und Verguetungsformulare drucken [ALT + i]')
+                ;
             }
         }
 
@@ -253,5 +238,4 @@ class ParseBackendTemplateListener
 
         return $objTemplate->parse();
     }
-
 }

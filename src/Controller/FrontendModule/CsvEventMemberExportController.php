@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -17,29 +19,30 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Date;
 use Contao\Environment;
 use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\Template;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Haste\Form\Form;
+use League\Csv\Exception;
 use League\Csv\Reader;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
- * Class CsvEventMemberExportController
- * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
+ * Class CsvEventMemberExportController.
+ *
  * @FrontendModule("csv_event_member_export", category="sac_event_tool_frontend_modules")
  */
 class CsvEventMemberExportController extends AbstractFrontendModuleController
 {
-
     /**
      * @var
      */
@@ -63,11 +66,8 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     /**
      * @var array
      */
-    protected $arrLines = array();
+    protected $arrLines = [];
 
-    /**
-     * @return array
-     */
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
@@ -80,11 +80,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     }
 
     /**
-     * @param Template $template
-     * @param ModuleModel $model
-     * @param Request $request
-     * @return null|Response
-     * @throws \League\Csv\Exception
+     * @throws Exception
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
@@ -96,90 +92,90 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \League\Csv\Exception
+     * @throws DBALException
+     * @throws Exception
      */
-    private function generateForm()
+    private function generateForm(): void
     {
-        $objForm = new Form('form-event-member-export', 'POST', function ($objHaste) {
-            $request = $this->get('request_stack')->getCurrentRequest();
-            return $request->get('FORM_SUBMIT') === $objHaste->getFormId();
-        });
+        $objForm = new Form(
+            'form-event-member-export',
+            'POST',
+            function ($objHaste) {
+                $request = $this->get('request_stack')->getCurrentRequest();
+
+                return $request->get('FORM_SUBMIT') === $objHaste->getFormId();
+            }
+        );
 
         $environment = $this->get('contao.framework')->getAdapter(Environment::class);
         $objForm->setFormActionFromUri($environment->get('uri'));
 
         // Now let's add form fields:
-        $objForm->addFormField('event-type', array(
-            'label'     => array('Event-Typ auswählen', ''),
+        $objForm->addFormField('event-type', [
+            'label' => ['Event-Typ auswählen', ''],
             'inputType' => 'select',
-            'options'   => array('all' => 'Alle Events', 'tour' => 'Tour', 'course' => 'Kurs'),
-        ));
+            'options' => ['all' => 'Alle Events', 'tour' => 'Tour', 'course' => 'Kurs'],
+        ]);
 
-        $objForm->addFormField('startDate', array(
-            'label'     => 'Startdatum',
+        $objForm->addFormField('startDate', [
+            'label' => 'Startdatum',
             'inputType' => 'text',
-            'eval'      => array('rgxp' => 'date', 'mandatory' => true),
-        ));
+            'eval' => ['rgxp' => 'date', 'mandatory' => true],
+        ]);
 
-        $objForm->addFormField('endDate', array(
-            'label'     => 'Enddatum',
+        $objForm->addFormField('endDate', [
+            'label' => 'Enddatum',
             'inputType' => 'text',
-            'eval'      => array('rgxp' => 'date', 'mandatory' => true),
-        ));
+            'eval' => ['rgxp' => 'date', 'mandatory' => true],
+        ]);
 
-        $objForm->addFormField('endDate', array(
-            'label'     => 'Enddatum',
+        $objForm->addFormField('endDate', [
+            'label' => 'Enddatum',
             'inputType' => 'text',
-            'eval'      => array('rgxp' => 'date', 'mandatory' => true),
-        ));
+            'eval' => ['rgxp' => 'date', 'mandatory' => true],
+        ]);
 
-        $objForm->addFormField('mountainguide', array(
-            'label'     => array('Bergführer', 'Nur Events mit Bergführer exportieren'),
+        $objForm->addFormField('mountainguide', [
+            'label' => ['Bergführer', 'Nur Events mit Bergführer exportieren'],
             'inputType' => 'checkbox',
-            'eval'      => array(),
-        ));
+            'eval' => [],
+        ]);
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', array(
-            'label'     => 'Export starten',
+        $objForm->addFormField('submit', [
+            'label' => 'Export starten',
             'inputType' => 'submit',
-        ));
+        ]);
 
-        if ($objForm->validate())
-        {
+        if ($objForm->validate()) {
             $request = $this->get('request_stack')->getCurrentRequest();
-            if ($request->get('FORM_SUBMIT') === 'form-event-member-export')
-            {
+
+            if ('form-event-member-export' === $request->get('FORM_SUBMIT')) {
                 $eventType = $request->get('event-type');
-                $arrFields = array('id', 'eventId', 'eventName', 'startDate', 'endDate', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'addedOn');
+                $arrFields = ['id', 'eventId', 'eventName', 'startDate', 'endDate', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'addedOn'];
                 $startDate = strtotime($request->get('startDate'));
                 $endDate = strtotime($request->get('endDate'));
                 $this->getHeadline($arrFields);
 
-                $statement1 = $this->get('database_connection')->executeQuery('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate', array($startDate, $endDate));
-                while (false !== ($objEvent = $statement1->fetch(\PDO::FETCH_OBJ)))
-                {
-                    if ($eventType != 'all')
-                    {
-                        if ($objEvent->eventType != $eventType)
-                        {
+                $statement1 = $this->get('database_connection')->executeQuery('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=? ORDER BY startDate', [$startDate, $endDate]);
+
+                while (false !== ($objEvent = $statement1->fetch(\PDO::FETCH_OBJ))) {
+                    if ('all' !== $eventType) {
+                        if ($objEvent->eventType !== $eventType) {
                             continue;
                         }
                     }
 
-                    if ($request->get('mountainguide'))
-                    {
-                        if (!$objEvent->mountainguide)
-                        {
+                    if ($request->get('mountainguide')) {
+                        if (!$objEvent->mountainguide) {
                             continue;
                         }
                     }
 
                     // Set tl_member.disable to true if member was not found in the csv-file
-                    $statement2 = $this->get('database_connection')->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname', array($objEvent->id));
-                    while (false !== ($objEventMember = $statement2->fetch(\PDO::FETCH_OBJ)))
-                    {
+                    $statement2 = $this->get('database_connection')->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname', [$objEvent->id]);
+
+                    while (false !== ($objEventMember = $statement2->fetch(\PDO::FETCH_OBJ))) {
                         $this->addLine($arrFields, $objEventMember);
                     }
                 }
@@ -196,11 +192,11 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
      * @param $arrFields
      * @param $objEventMember
      */
-    private function addLine($arrFields, $objEventMember)
+    private function addLine($arrFields, $objEventMember): void
     {
-        $arrLine = array();
-        foreach ($arrFields as $field)
-        {
+        $arrLine = [];
+
+        foreach ($arrFields as $field) {
             $arrLine[] = $this->getField($field, $objEventMember);
         }
 
@@ -210,27 +206,22 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     /**
      * @param $arrFields
      */
-    private function getHeadline($arrFields)
+    private function getHeadline($arrFields): void
     {
         // Write headline
         $controller = $this->get('contao.framework')->getAdapter(Controller::class);
-        $arrHeadline = array();
-        foreach ($arrFields as $field)
-        {
-            if ($field === 'mainInstructor' || $field === 'mountainguide' || $field === 'startDate' || $field === 'endDate' || $field === 'eventState' || $field === 'executionState')
-            {
+        $arrHeadline = [];
+
+        foreach ($arrFields as $field) {
+            if ('mainInstructor' === $field || 'mountainguide' === $field || 'startDate' === $field || 'endDate' === $field || 'eventState' === $field || 'executionState' === $field) {
                 $controller->loadLanguageFile('tl_calendar_events');
-                $arrHeadline[] = isset($GLOBALS['TL_LANG']['tl_calendar_events'][$field][0]) ? $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] : $field;
-            }
-            elseif ($field === 'phone')
-            {
+                $arrHeadline[] = $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?? $field;
+            } elseif ('phone' === $field) {
                 $controller->loadLanguageFile('tl_member');
-                $arrHeadline[] = isset($GLOBALS['TL_LANG']['tl_member'][$field][0]) ? $GLOBALS['TL_LANG']['tl_member'][$field][0] : $field;
-            }
-            else
-            {
+                $arrHeadline[] = $GLOBALS['TL_LANG']['tl_member'][$field][0] ?? $field;
+            } else {
                 $controller->loadLanguageFile('tl_calendar_events_member');
-                $arrHeadline[] = isset($GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0]) ? $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] : $field;
+                $arrHeadline[] = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] ?? $field;
             }
         }
         $this->arrLines[] = $arrHeadline;
@@ -239,6 +230,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     /**
      * @param $field
      * @param $objEventMember
+     *
      * @return string
      */
     private function getField($field, $objEventMember)
@@ -250,132 +242,102 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $calendarEventsModel = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
         $memberModel = $this->get('contao.framework')->getAdapter(MemberModel::class);
 
-        if ($field === 'password')
-        {
+        if ('password' === $field) {
             return '#######';
         }
-        elseif ($field === 'addedOn')
-        {
+
+        if ('addedOn' === $field) {
             return $date->parse('Y-m-d', $objEventMember->addedOn);
         }
-        elseif ($field === 'dateOfBirth')
-        {
-            if (is_numeric($objEventMember->$field))
-            {
+
+        if ('dateOfBirth' === $field) {
+            if (is_numeric($objEventMember->$field)) {
                 return $date->parse($config->get('dateFormat'), $objEventMember->$field);
             }
-        }
-        elseif ($field === 'stateOfSubscription')
-        {
-            return isset($GLOBALS['TL_LANG']['tl_calendar_events_member'][$objEventMember->$field]) ? $GLOBALS['TL_LANG']['tl_calendar_events_member'][$objEventMember->$field] : $objEventMember->$field;
-        }
-        elseif ($field === 'startDate')
-        {
+        } elseif ('stateOfSubscription' === $field) {
+            return $GLOBALS['TL_LANG']['tl_calendar_events_member'][$objEventMember->$field] ?? $objEventMember->$field;
+        } elseif ('startDate' === $field) {
             $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
-            if ($objEvent !== null)
-            {
+
+            if (null !== $objEvent) {
                 return $date->parse('Y-m-d', $objEvent->startDate);
             }
-            else
-            {
-                return '';
-            }
-        }
-        elseif ($field === 'endDate')
-        {
+
+            return '';
+        } elseif ('endDate' === $field) {
             $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
-            if ($objEvent !== null)
-            {
+
+            if (null !== $objEvent) {
                 return $date->parse('Y-m-d', $objEvent->endDate);
             }
-            else
-            {
-                return '';
-            }
-        }
-        elseif ($field === 'executionState')
-        {
+
+            return '';
+        } elseif ('executionState' === $field) {
             $controller->loadLanguageFile('tl_calendar_events');
             $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
-            if ($objEvent !== null)
-            {
-                return isset($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0]) ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] : $objEvent->$field;
+
+            if (null !== $objEvent) {
+                return $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] ?? $objEvent->$field;
             }
-            else
-            {
-                return '';
-            }
-        }
-        elseif ($field === 'eventState')
-        {
+
+            return '';
+        } elseif ('eventState' === $field) {
             $controller->loadLanguageFile('tl_calendar_events');
             $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
-            if ($objEvent !== null)
-            {
-                return isset($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0]) ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] : $objEvent->$field;
+
+            if (null !== $objEvent) {
+                return $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->$field][0] ?? $objEvent->$field;
             }
-            else
-            {
-                return '';
-            }
-        }
-        elseif ($field === 'mainInstructor')
-        {
+
+            return '';
+        } elseif ('mainInstructor' === $field) {
             $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
-            if ($objEvent !== null)
-            {
+
+            if (null !== $objEvent) {
                 return $calendarEventsHelper->getMainInstructorName($objEvent);
             }
-            else
-            {
-                return '';
-            }
-        }
-        elseif ($field === 'mountainguide')
-        {
+
+            return '';
+        } elseif ('mountainguide' === $field) {
             $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
-            if ($objEvent !== null)
-            {
+
+            if (null !== $objEvent) {
                 return $objEvent->$field;
             }
-            else
-            {
-                return '';
-            }
-        }
-        elseif ($field === 'phone')
-        {
+
+            return '';
+        } elseif ('phone' === $field) {
             $objMember = $memberModel->findOneBySacMemberId($objEventMember->sacMemberId);
-            if ($objMember !== null)
-            {
+
+            if (null !== $objMember) {
                 return $objMember->$field;
             }
-            else
-            {
-                return '';
-            }
-        }
-        else
-        {
+
+            return '';
+        } else {
             return $objEventMember->{$field};
         }
     }
 
     /**
      * @param $filename
-     * @throws \League\Csv\Exception
+     *
+     * @throws Exception
      */
-    private function printCsv($filename)
+    private function printCsv($filename): void
     {
         $arrData = $this->arrLines;
 
         // Convert special chars
-        $arrFinal = array();
-        foreach ($arrData as $arrRow)
-        {
-            $arrLine = array_map(function ($v) {
-                return html_entity_decode(htmlspecialchars_decode((string)$v));
-            }, $arrRow);
+        $arrFinal = [];
+
+        foreach ($arrData as $arrRow) {
+            $arrLine = array_map(
+                static function ($v) {
+                    return html_entity_decode(htmlspecialchars_decode((string) $v));
+                },
+                $arrRow
+            );
             $arrFinal[] = $arrLine;
         }
 

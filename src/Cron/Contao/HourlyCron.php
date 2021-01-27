@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -18,12 +20,10 @@ use Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase;
 use Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser;
 
 /**
- * Class HourlyCron
- * @package Markocupic\SacEventToolBundle\Cron\Contao
+ * Class HourlyCron.
  */
 class HourlyCron
 {
-
     /**
      * @var ContaoFramework
      */
@@ -36,8 +36,6 @@ class HourlyCron
 
     /**
      * HourlyCron constructor.
-     * @param ContaoFramework $framework
-     * @param string $projectDir
      */
     public function __construct(ContaoFramework $framework, string $projectDir)
     {
@@ -49,23 +47,22 @@ class HourlyCron
     }
 
     /**
-     * Sync SAC member database
+     * Sync SAC member database.
      */
-    public function syncSacMemberDatabase()
+    public function syncSacMemberDatabase(): void
     {
-        /** @var  SyncSacMemberDatabase $cron */
+        /** @var SyncSacMemberDatabase $cron */
         $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase');
         $cron->run();
     }
 
     /**
-     * Sync tl_member with tl_user
+     * Sync tl_member with tl_user.
      */
-    public function syncMemberWithUser()
+    public function syncMemberWithUser(): void
     {
-        /** @var  SyncMemberWithUser $cron */
+        /** @var SyncMemberWithUser $cron */
         $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser');
         $cron->syncMemberWithUser();
     }
-
 }

@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -27,10 +29,11 @@ use Markocupic\CloudconvertBundle\Services\DocxToPdfConversion;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
+use PhpOffice\PhpWord\Exception\CopyFileException;
+use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 
 /**
- * Class EventRapport2Docx
- * @package Markocupic\SacEventToolBundle\DocxTemplator
+ * Class EventRapport2Docx.
  */
 class EventRapport2Docx
 {
@@ -46,8 +49,6 @@ class EventRapport2Docx
 
     /**
      * EventRapport constructor.
-     * @param ContaoFramework $framework
-     * @param string $projectDir
      */
     public function __construct(ContaoFramework $framework, string $projectDir)
     {
@@ -59,28 +60,23 @@ class EventRapport2Docx
     }
 
     /**
-     * @param string $type
-     * @param CalendarEventsInstructorInvoiceModel $objEventInvoice
-     * @param string $outputType
-     * @param string $templateSRC
-     * @param string $strFilenamePattern
-     * @throws \PhpOffice\PhpWord\Exception\CopyFileException
-     * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
+     * @throws CopyFileException
+     * @throws CreateTemporaryFileException
      */
-    public function generate(string $type, CalendarEventsInstructorInvoiceModel $objEventInvoice, string $outputType = 'docx', string $templateSRC, string $strFilenamePattern): void
+    public function generate(string $type, CalendarEventsInstructorInvoiceModel $objEventInvoice, string $outputType, string $templateSRC, string $strFilenamePattern): void
     {
         // Set adapters
-        /** @var  Config $configAdapter */
+        /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
-        /** @var  CalendarEventsModel CalendarEventsModel $calendarEventsModelAdapter */
+        /** @var CalendarEventsModel CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-        /** @var  UserModel $userModelAdapter */
+        /** @var UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-        /** @var  Message $messageAdapter */
+        /** @var Message $messageAdapter */
         $messageAdapter = $this->framework->getAdapter(Message::class);
-        /** @var  Controller $controllerAdapter */
+        /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        /** @var  Dbafs $dbafsAdapter */
+        /** @var Dbafs $dbafsAdapter */
         $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
 
         /** @var Event $objEventHelper */
@@ -95,14 +91,12 @@ class EventRapport2Docx
         // Delete old tmp files
         $this->deleteOldTempFiles();
 
-        if (!$objEventHelper->checkEventRapportHasFilledInCorrectly($objEventInvoice))
-        {
+        if (!$objEventHelper->checkEventRapportHasFilledInCorrectly($objEventInvoice)) {
             $messageAdapter->addError('Bitte f&uuml;llen Sie den Touren-Rapport vollst&auml;ndig aus, bevor Sie das Verg&uuml;tungsformular herunterladen.');
             $controllerAdapter->redirect(System::getReferer());
         }
 
-        if ($objEventMemberHelper->getParticipatedEventMembers($objEvent) === null)
-        {
+        if (null === $objEventMemberHelper->getParticipatedEventMembers($objEvent)) {
             // Send error message if there are no members assigned to the event
             $messageAdapter->addError('Bitte &uuml;berpr&uuml;fe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, die am Event teilgenommen haben.');
             $controllerAdapter->redirect(System::getReferer());
@@ -110,10 +104,10 @@ class EventRapport2Docx
 
         // $objBiller "Der Rechnungssteller"
         $objBiller = $userModelAdapter->findByPk($objEventInvoice->userPid);
-        if ($objEvent !== null && $objBiller !== null)
-        {
+
+        if (null !== $objEvent && null !== $objBiller) {
             $filenamePattern = str_replace('%%s', '%s', $strFilenamePattern);
-            $destFilename = $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . sprintf($filenamePattern, time(), 'docx');
+            $destFilename = $configAdapter->get('SAC_EVT_TEMP_PATH').'/'.sprintf($filenamePattern, time(), 'docx');
             $strTemplateSrc = (string) $templateSRC;
             $objPhpWord = new MsWordTemplateProcessor($strTemplateSrc, $destFilename);
 
@@ -127,8 +121,7 @@ class EventRapport2Docx
 
             // Page #2
             // Member list
-            if ($type === 'rapport')
-            {
+            if ('rapport' === $type) {
                 $objEventMemberHelper->setEventMemberData($objPhpWord, $objEvent, $objEventMemberHelper->getParticipatedEventMembers($objEvent));
             }
 
@@ -136,24 +129,24 @@ class EventRapport2Docx
             new Folder($configAdapter->get('SAC_EVT_TEMP_PATH'));
             $dbafsAdapter->addResource($configAdapter->get('SAC_EVT_TEMP_PATH'));
 
-            if ($outputType === 'pdf')
-            {
+            if ('pdf' === $outputType) {
                 // Generate Docx file from template;
                 $objPhpWord->generateUncached(true)
                     ->sendToBrowser(false)
-                    ->generate();
+                    ->generate()
+                ;
 
                 // Generate pdf
                 $objConversion = new DocxToPdfConversion($destFilename, (string) $configAdapter->get('cloudconvertApiKey'));
                 $objConversion->sendToBrowser(true)->createUncached(true)->convert();
             }
 
-            if ($outputType === 'docx')
-            {
+            if ('docx' === $outputType) {
                 // Generate Docx file from template;
                 $objPhpWord->generateUncached(true)
                     ->sendToBrowser(true)
-                    ->generate();
+                    ->generate()
+                ;
             }
 
             exit();
@@ -165,25 +158,22 @@ class EventRapport2Docx
      */
     protected function deleteOldTempFiles(): void
     {
-        /** @var  Config $configAdapter */
+        /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
 
         // Delete tmp files older the 1 week
-        $arrScan = scan($this->projectDir . '/' . $configAdapter->get('SAC_EVT_TEMP_PATH'));
-        foreach ($arrScan as $file)
-        {
-            if (is_file($this->projectDir . '/' . $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $file))
-            {
-                $objFile = new File($configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $file);
-                if ($objFile !== null)
-                {
-                    if ((int) $objFile->mtime + 60 * 60 * 24 * 7 < time())
-                    {
+        $arrScan = scan($this->projectDir.'/'.$configAdapter->get('SAC_EVT_TEMP_PATH'));
+
+        foreach ($arrScan as $file) {
+            if (is_file($this->projectDir.'/'.$configAdapter->get('SAC_EVT_TEMP_PATH').'/'.$file)) {
+                $objFile = new File($configAdapter->get('SAC_EVT_TEMP_PATH').'/'.$file);
+
+                if (null !== $objFile) {
+                    if ((int) $objFile->mtime + 60 * 60 * 24 * 7 < time()) {
                         $objFile->delete();
                     }
                 }
             }
         }
     }
-
 }

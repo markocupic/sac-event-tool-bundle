@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -18,13 +20,12 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Folder;
 use Contao\Message;
+use Contao\PurgeData;
 use Contao\System;
 use Psr\Log\LogLevel;
-use Contao\PurgeData;
 
 /**
- * Class MaintainModuleEventStory
- * @package Markocupic\SacEventToolBundle\ContaoBackendMaintenance
+ * Class MaintainModuleEventStory.
  */
 class MaintainModuleEventStory
 {
@@ -40,8 +41,6 @@ class MaintainModuleEventStory
 
     /**
      * MaintainModuleEventStory constructor.
-     * @param ContaoFramework $framework
-     * @param string $projectDir
      */
     public function __construct(ContaoFramework $framework, string $projectDir)
     {
@@ -53,7 +52,8 @@ class MaintainModuleEventStory
     }
 
     /**
-     * Delete image upload folders that aren't assigned to an event story
+     * Delete image upload folders that aren't assigned to an event story.
+     *
      * @throws \Exception
      */
     public function run(): void
@@ -68,18 +68,17 @@ class MaintainModuleEventStory
         // Get the image upload path
         $eventStoriesUploadPath = $configAdapter->get('SAC_EVT_EVENT_STORIES_UPLOAD_PATH');
 
-        $arrScan = scan($this->projectDir . '/' . $eventStoriesUploadPath);
-        foreach ($arrScan as $folder)
-        {
-            if (is_dir($this->projectDir . '/' . $eventStoriesUploadPath . '/' . $folder) && $folder !== 'tmp')
-            {
-                $objFolder = new Folder($eventStoriesUploadPath . '/' . $folder);
-                if (null === $calendarEventsStoryModelAdapter->findByPk($folder))
-                {
+        $arrScan = scan($this->projectDir.'/'.$eventStoriesUploadPath);
+
+        foreach ($arrScan as $folder) {
+            if (is_dir($this->projectDir.'/'.$eventStoriesUploadPath.'/'.$folder) && 'tmp' !== $folder) {
+                $objFolder = new Folder($eventStoriesUploadPath.'/'.$folder);
+
+                if (null === $calendarEventsStoryModelAdapter->findByPk($folder)) {
                     // Log
                     $logger = System::getContainer()->get('monolog.logger.contao');
                     $strText = sprintf('Successfully deleted event story media folder "%s".', $objFolder->path);
-                    $logger->log(LogLevel::INFO, $strText, array('contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)));
+                    $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
 
                     // Display the confirmation message in the backend maintenance module
                     Message::addConfirmation($strText, PurgeData::class);
@@ -89,9 +88,8 @@ class MaintainModuleEventStory
         }
 
         // Purge the tmp folder
-        if (is_dir($this->projectDir . '/' . $eventStoriesUploadPath . '/tmp'))
-        {
-            $objFolder = new Folder($eventStoriesUploadPath . '/tmp');
+        if (is_dir($this->projectDir.'/'.$eventStoriesUploadPath.'/tmp')) {
+            $objFolder = new Folder($eventStoriesUploadPath.'/tmp');
             $objFolder->purge();
         }
     }

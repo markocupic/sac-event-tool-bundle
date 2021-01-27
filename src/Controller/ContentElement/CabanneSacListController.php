@@ -2,53 +2,43 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
 namespace Markocupic\SacEventToolBundle\Controller\ContentElement;
 
 use Contao\ContentModel;
+use Contao\Controller;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\ServiceAnnotation\ContentElement;
 use Contao\Database;
-use Contao\PageModel;
-use Contao\Template;
-use Contao\System;
 use Contao\FilesModel;
-use Contao\Controller;
+use Contao\PageModel;
+use Contao\System;
+use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Contao\CoreBundle\ServiceAnnotation\ContentElement;
 
 /**
- * Class CabanneSacListController
- * @package Markocupic\SacEventToolBundle\Controller\ContentElement
+ * Class CabanneSacListController.
+ *
  * @ContentElement("cabanne_sac_list", category="sac_event_tool_content_elements", template="ce_cabanne_sac_list")
  */
 class CabanneSacListController extends AbstractContentElementController
 {
-
-    /**
-     * @param Request $request
-     * @param ContentModel $model
-     * @param string $section
-     * @param array|null $classes
-     * @param PageModel|null $pageModel
-     * @return Response
-     */
     public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, ?PageModel $pageModel = null): Response
     {
         return parent::__invoke($request, $model, $section, $classes, $pageModel);
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
@@ -57,18 +47,12 @@ class CabanneSacListController extends AbstractContentElementController
         return $services;
     }
 
-    /**
-     * @param Template $template
-     * @param ContentModel $model
-     * @param Request $request
-     * @return null|Response
-     */
     protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
     {
-        /** @var  FilesModel $filesModelAdapter */
+        /** @var FilesModel $filesModelAdapter */
         $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
 
-        /** @var  Database $databaseAdapter */
+        /** @var Database $databaseAdapter */
         $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
 
         /** @var Controller $controllerAdapter */
@@ -78,13 +62,12 @@ class CabanneSacListController extends AbstractContentElementController
 
         // Add data to template
         $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_cabanne_sac WHERE id=?')->execute($model->cabanneSac);
-        if ($objDb->numRows)
-        {
-            $skip = array('id', 'tstamp', 'singleSRC');
-            foreach ($objDb->fetchAssoc() as $k => $v)
-            {
-                if (!in_array($k, $skip,true))
-                {
+
+        if ($objDb->numRows) {
+            $skip = ['id', 'tstamp', 'singleSRC'];
+
+            foreach ($objDb->fetchAssoc() as $k => $v) {
+                if (!\in_array($k, $skip, true)) {
                     $template->$k = $v;
                 }
             }
@@ -92,12 +75,11 @@ class CabanneSacListController extends AbstractContentElementController
 
         $objFiles = $filesModelAdapter->findByUuid($model->singleSRC);
 
-        if ($objFiles !== null && is_file($projectDir . '/' . $objFiles->path))
-        {
+        if (null !== $objFiles && is_file($projectDir.'/'.$objFiles->path)) {
             $model->singleSRC = $objFiles->path;
             $controllerAdapter->addImageToTemplate($template, $model->row(), null, 'cabanne_sac_list', $objFiles);
         }
+
         return $template->getResponse();
     }
-
 }

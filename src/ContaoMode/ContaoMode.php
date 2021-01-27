@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -17,8 +19,7 @@ use Contao\CoreBundle\Routing\ScopeMatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class ContaoMode
- * @package Markocupic\SacEventToolBundle\ContaoMode
+ * Class ContaoMode.
  */
 class ContaoMode
 {
@@ -47,9 +48,6 @@ class ContaoMode
 
     /**
      * ContaoMode constructor.
-     * @param ContaoFramework $framework
-     * @param RequestStack $requestStack
-     * @param ScopeMatcher $scopeMatcher
      */
     public function __construct(ContaoFramework $framework, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
     {
@@ -58,37 +56,15 @@ class ContaoMode
         $this->scopeMatcher = $scopeMatcher;
 
         // Set the contao mode
-        if ($framework !== null)
-        {
-            if ($this->framework->isInitialized())
-            {
+        if (null !== $framework) {
+            if ($this->framework->isInitialized()) {
                 $this->_setMode();
             }
         }
     }
 
     /**
-     * Set contao mode
-     */
-    private function _setMode(): void
-    {
-        if ($this->isBackend())
-        {
-            $this->contaoMode = static::BACKEND_MODE;
-        }
-        elseif ($this->isFrontend())
-        {
-            $this->contaoMode = static::FRONTEND_MODE;
-        }
-        else
-        {
-            $this->contaoMode = '';
-        }
-    }
-
-    /**
-     * Get contao mode
-     * @return string
+     * Get contao mode.
      */
     public function getMode(): string
     {
@@ -96,41 +72,48 @@ class ContaoMode
     }
 
     /**
-     * Identify the Contao scope (TL_MODE) of the current request
-     * @return bool
+     * Identify the Contao scope (TL_MODE) of the current request.
      */
     public function isFrontend(): bool
     {
-        if ($this->framework !== null)
-        {
-            if ($this->framework->isInitialized() && $this->requestStack->getMasterRequest() && !$this->isBackend())
-            {
+        if (null !== $this->framework) {
+            if ($this->framework->isInitialized() && $this->requestStack->getMasterRequest() && !$this->isBackend()) {
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * Identify the Contao scope (TL_MODE) of the current request
-     * @return bool
+     * Identify the Contao scope (TL_MODE) of the current request.
      */
     public function isBackend(): bool
     {
-        if ($this->framework !== null)
-        {
-            if ($this->framework->isInitialized())
-            {
-                if ($this->requestStack !== null)
-                {
-                    if ($this->requestStack->getMasterRequest() !== null)
-                    {
+        if (null !== $this->framework) {
+            if ($this->framework->isInitialized()) {
+                if (null !== $this->requestStack) {
+                    if (null !== $this->requestStack->getMasterRequest()) {
                         return $this->scopeMatcher->isBackendRequest($this->requestStack->getMasterRequest());
                     }
                 }
             }
         }
+
         return false;
     }
 
+    /**
+     * Set contao mode.
+     */
+    private function _setMode(): void
+    {
+        if ($this->isBackend()) {
+            $this->contaoMode = static::BACKEND_MODE;
+        } elseif ($this->isFrontend()) {
+            $this->contaoMode = static::FRONTEND_MODE;
+        } else {
+            $this->contaoMode = '';
+        }
+    }
 }

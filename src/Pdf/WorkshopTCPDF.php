@@ -2,22 +2,24 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
 namespace Markocupic\SacEventToolBundle\Pdf;
 
-use Contao\System;
 use Contao\Config;
+use Contao\FilesModel;
+use Contao\System;
 
 /**
- * Class WorkshopTCPDF
- * @package Markocupic\SacEventToolBundle\Pdf
+ * Class WorkshopTCPDF.
  */
 class WorkshopTCPDF extends \TCPDF
 {
@@ -33,47 +35,39 @@ class WorkshopTCPDF extends \TCPDF
     /**
      * @var null
      */
-    public $backgroundImage = null;
+    public $backgroundImage;
 
     /**
      * @var null
      */
-    public $backgroundImageBottom = null;
+    public $backgroundImageBottom;
 
     // Page header
-    public function Header()
+    public function Header(): void
     {
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
         // Set background-image
-        if ($this->type === 'cover')
-        {
-            $this->backgroundImage = Config::get('SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE');;
-        }
-        elseif ($this->type === 'TOC')
-        {
+        if ('cover' === $this->type) {
+            $this->backgroundImage = Config::get('SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE');
+        } elseif ('TOC' === $this->type) {
             $this->backgroundImage = 'files/fileadmin/page_assets/kursbroschuere/toc.jpg';
             $this->backgroundImageBottom = 'files/fileadmin/page_assets/kursbroschuere/background.png';
-        }
-        elseif ($this->type === 'eventPage')
-        {
+        } elseif ('eventPage' === $this->type) {
             // default
             $this->backgroundImage = 'files/fileadmin/page_assets/kursbroschuere/hochtour.jpg';
             $this->backgroundImageBottom = 'files/fileadmin/page_assets/kursbroschuere/background.png';
 
             // set background image
-            if ($this->Event->singleSRCBroschuere != '')
-            {
-                $objImage = \FilesModel::findByUuid($this->Event->singleSRCBroschuere);
-                if ($objImage !== null)
-                {
+            if ('' !== $this->Event->singleSRCBroschuere) {
+                $objImage = FilesModel::findByUuid($this->Event->singleSRCBroschuere);
+
+                if (null !== $objImage) {
                     $this->backgroundImage = $objImage->path;
                 }
             }
-        }
-        else
-        {
+        } else {
             $this->backgroundImage = $objImage->path;
         }
 
@@ -85,18 +79,15 @@ class WorkshopTCPDF extends \TCPDF
         $this->SetMargins(0, 0, 0, 0);
 
         // Background-image
-        if ($this->backgroundImage !== null)
-        {
-            $this->Image($rootDir . '/' . $this->backgroundImage, 0, 0, 210, 297, '', '', '', false, 300, '', false, false, 0);
+        if (null !== $this->backgroundImage) {
+            $this->Image($rootDir.'/'.$this->backgroundImage, 0, 0, 210, 297, '', '', '', false, 300, '', false, false, 0);
         }
         // Rec background bottom
-        if ($this->backgroundImageBottom !== null)
-        {
-            $this->Image($rootDir . '/' . $this->backgroundImageBottom, 0, 0, 210, 297, '', '', '', false, 300, '', false, false, 0);
+        if (null !== $this->backgroundImageBottom) {
+            $this->Image($rootDir.'/'.$this->backgroundImageBottom, 0, 0, 210, 297, '', '', '', false, 300, '', false, false, 0);
         }
 
-        if ($this->type === 'cover')
-        {
+        if ('cover' === $this->type) {
             // Transparent overlay
             //$this->setAlpha(0.45);
             //$style = array('L' => 0, 'T' => 0, 'R' => 0, 'B' => 0);
@@ -104,52 +95,50 @@ class WorkshopTCPDF extends \TCPDF
         }
 
         // White background for the table of content
-        if ($this->type === 'TOC' || $this->type === 'eventPage')
-        {
+        if ('TOC' === $this->type || 'eventPage' === $this->type) {
             // Transparent header
             $this->setAlpha(0.65);
-            $style = array('L' => 0, 'T' => 0, 'R' => 0, 'B' => 0);
-            $this->Rect(0, 0, 210, 50, 'DF', $style, array(255, 255, 255));
+            $style = ['L' => 0, 'T' => 0, 'R' => 0, 'B' => 0];
+            $this->Rect(0, 0, 210, 50, 'DF', $style, [255, 255, 255]);
             $this->setAlpha(1);
         }
 
         // White background for the table of content
-        if ($this->type === 'TOC')
-        {
+        if ('TOC' === $this->type) {
             //$this->setAlpha(0.95);
             // Border Style
-            $style = array('L' => 0, 'T' => 0, 'R' => 0, 'B' => 0);
-            $this->Rect(15, 35, 180, 230, 'DF', $style, array(255, 255, 255));
+            $style = ['L' => 0, 'T' => 0, 'R' => 0, 'B' => 0];
+            $this->Rect(15, 35, 180, 230, 'DF', $style, [255, 255, 255]);
             $this->setAlpha(1);
         }
 
         // logo
-        $this->Image($rootDir . '/files/fileadmin/page_assets/kursbroschuere/logo-sac-2000.png', 150, 5, 50, '', '', '', '', false, 300, '', false, false, 0);
+        $this->Image($rootDir.'/files/fileadmin/page_assets/kursbroschuere/logo-sac-2000.png', 150, 5, 50, '', '', '', '', false, 300, '', false, false, 0);
 
         // Stripe bottom
-        if ($this->type === 'eventPage')
-        {
-            $style = array('L' => 0, 'T' => 0, 'R' => 0, 'B' => 0);
-            $this->Rect(0, 275, 210, 10, 'DF', $style, array(255, 255, 255));
+        if ('eventPage' === $this->type) {
+            $style = ['L' => 0, 'T' => 0, 'R' => 0, 'B' => 0];
+            $this->Rect(0, 275, 210, 10, 'DF', $style, [255, 255, 255]);
             $this->setY(275);
-            $this->setFillColorArray(array(255, 255, 255));  // white
+            $this->setFillColorArray([255, 255, 255]); // white
             $this->setTextColor(55, 55, 55);
-            $date = \Date('Y', (int) $this->Event->startDate);
-            $this->Cell(210, 10, 'SAC Sektion Pilatus Ausbildung ' . $date, 0, 1, 'C', 1, '', 0);
+            $date = date('Y', (int) $this->Event->startDate);
+            $this->Cell(210, 10, 'SAC Sektion Pilatus Ausbildung '.$date, 0, 1, 'C', 1, '', 0);
         }
 
         // QRCODE,H : QR-CODE Best error correction
-        if ($this->type === 'eventPage')
-        {
+        if ('eventPage' === $this->type) {
             // Background-image
-            $style = array(
-                'border'  => 0,
+            /*
+            $style = [
+                'border' => 0,
                 'padding' => 5,
-                'fgcolor' => array(0, 0, 0),
-                'bgcolor' => array(255, 255, 255),
-            );
+                'fgcolor' => [0, 0, 0],
+                'bgcolor' => [255, 255, 255],
+            ];
             // QR-CODE - Im Moment deaktiviert
-            //$this->write2DBarcode('http://sac-kurse.kletterkader.com/kurse-detail/' . $this->Event->id, 'QRCODE,H', 175, 267, 25, 25, $style, 'N');
+            $this->write2DBarcode('http://sac-kurse.kletterkader.com/kurse-detail/' . $this->Event->id, 'QRCODE,H', 175, 267, 25, 25, $style, 'N');
+            */
         }
 
         // Restore AutoPageBreak
@@ -157,8 +146,8 @@ class WorkshopTCPDF extends \TCPDF
 
         // Set margins
         $this->SetMargins(20, 20, 20, 20);
-        if ($this->type === 'TOC')
-        {
+
+        if ('TOC' === $this->type) {
             $this->SetAutoPageBreak(true, 30);
             $this->SetMargins(20, 40, 20, 20);
         }

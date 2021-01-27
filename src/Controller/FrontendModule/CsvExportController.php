@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -16,6 +18,7 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\CoreBundle\Translation\Translator;
 use Contao\Database;
 use Contao\Database\Result;
@@ -30,20 +33,19 @@ use Contao\UserGroupModel;
 use Contao\UserModel;
 use Contao\UserRoleModel;
 use Haste\Form\Form;
+use League\Csv\Exception;
 use League\Csv\Reader;
 use League\Csv\Writer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
- * Class CsvExportController
- * @package Markocupic\SacEventToolBundle\Controller\CsvExportController
+ * Class CsvExportController.
+ *
  * @FrontendModule("csv_export", category="sac_event_tool_frontend_modules")
  */
 class CsvExportController extends AbstractFrontendModuleController
 {
-
     private const FIELD_DELIMITER = ';';
     private const FIELD_ENCLOSURE = '"';
 
@@ -52,9 +54,6 @@ class CsvExportController extends AbstractFrontendModuleController
      */
     protected $objForm;
 
-    /**
-     * @return array
-     */
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
@@ -65,11 +64,7 @@ class CsvExportController extends AbstractFrontendModuleController
     }
 
     /**
-     * @param Template $template
-     * @param ModuleModel $model
-     * @param Request $request
-     * @return null|Response
-     * @throws \League\Csv\Exception
+     * @throws Exception
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
@@ -80,7 +75,7 @@ class CsvExportController extends AbstractFrontendModuleController
     }
 
     /**
-     * @throws \League\Csv\Exception
+     * @throws Exception
      */
     private function generateForm(): void
     {
@@ -94,16 +89,21 @@ class CsvExportController extends AbstractFrontendModuleController
         $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
 
         /** @var Form $objForm */
-        $objForm = new Form('form-user-export', 'POST', function ($objHaste) {
-            /** @var Input $inputAdapter */
-            $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
-            return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
-        });
+        $objForm = new Form(
+            'form-user-export',
+            'POST',
+            function ($objHaste) {
+                /** @var Input $inputAdapter */
+                $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+
+                return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
+            }
+        );
 
         $arrUserRoles = [];
         $objUserRole = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user_role ORDER BY sorting');
-        while ($objUserRole->next())
-        {
+
+        while ($objUserRole->next()) {
             $arrUserRoles[$objUserRole->id] = $objUserRole->title;
         }
 
@@ -111,43 +111,40 @@ class CsvExportController extends AbstractFrontendModuleController
 
         // Now let's add form fields:
         $objForm->addFormField('export-type', [
-            'label'     => ['Export auswählen', ''],
+            'label' => ['Export auswählen', ''],
             'inputType' => 'select',
-            'options'   => [
-                'user-role-export'    => 'Backend-User mit SAC-Benutzerrollen exportieren (tl_user_role)',
-                'user-group-export'   => 'Backend-User mit Benutzergruppenzugehörigkeit exportieren (tl_user_group)',
+            'options' => [
+                'user-role-export' => 'Backend-User mit SAC-Benutzerrollen exportieren (tl_user_role)',
+                'user-group-export' => 'Backend-User mit Benutzergruppenzugehörigkeit exportieren (tl_user_group)',
                 'member-group-export' => 'Frontend-User mit Benutzerzugehörigkeit exportieren (tl_member_group)',
             ],
         ]);
 
         $objForm->addFormField('user-roles', [
-            'label'     => ['Benutzerrollen-Filter (ODER-Verknüpfung)', ''],
+            'label' => ['Benutzerrollen-Filter (ODER-Verknüpfung)', ''],
             'inputType' => 'select',
-            'options'   => $arrUserRoles,
-            'eval'      => ['multiple' => true],
+            'options' => $arrUserRoles,
+            'eval' => ['multiple' => true],
         ]);
 
         $objForm->addFormField('keep-groups-in-one-line', [
-            'label'     => ['', 'Rollen einzeilig darstellen'],
+            'label' => ['', 'Rollen einzeilig darstellen'],
             'inputType' => 'checkbox',
         ]);
 
         // Let's add  a submit button
         $objForm->addFormField('submit', [
-            'label'     => 'Export starten',
+            'label' => 'Export starten',
             'inputType' => 'submit',
         ]);
 
-        if ($objForm->validate())
-        {
-            if ($inputAdapter->post('FORM_SUBMIT') === 'form-user-export')
-            {
+        if ($objForm->validate()) {
+            if ('form-user-export' === $inputAdapter->post('FORM_SUBMIT')) {
                 $blnKeepGroupsInOneLine = $inputAdapter->post('keep-groups-in-one-line') ? true : false;
 
                 $exportType = $inputAdapter->post('export-type');
 
-                if ($inputAdapter->post('export-type') === 'user-role-export')
-                {
+                if ('user-role-export' === $inputAdapter->post('export-type')) {
                     $strTable = 'tl_user';
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'admin', 'lastLogin', 'password', 'pwChange', 'userRole'];
                     $strGroupFieldName = 'userRole';
@@ -155,8 +152,7 @@ class CsvExportController extends AbstractFrontendModuleController
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, UserRoleModel::class, $blnKeepGroupsInOneLine);
                 }
 
-                if ($inputAdapter->post('export-type') === 'user-group-export')
-                {
+                if ('user-group-export' === $inputAdapter->post('export-type')) {
                     $strTable = 'tl_user';
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'admin', 'lastLogin', 'password', 'pwChange', 'groups'];
                     $strGroupFieldName = 'groups';
@@ -164,8 +160,7 @@ class CsvExportController extends AbstractFrontendModuleController
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, UserGroupModel::class, $blnKeepGroupsInOneLine);
                 }
 
-                if ($inputAdapter->post('export-type') === 'member-group-export')
-                {
+                if ('member-group-export' === $inputAdapter->post('export-type')) {
                     $strTable = 'tl_member';
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
@@ -179,14 +174,9 @@ class CsvExportController extends AbstractFrontendModuleController
     }
 
     /**
-     * @param string $type
-     * @param string $strTable
-     * @param array $arrFields
-     * @param string $strGroupFieldName
-     * @param Result $objUser
      * @param $GroupModel
-     * @param bool $blnKeepGroupsInOneLine
-     * @throws \League\Csv\Exception
+     *
+     * @throws Exception
      */
     private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $objUser, $GroupModel, bool $blnKeepGroupsInOneLine = false): void
     {
@@ -200,12 +190,12 @@ class CsvExportController extends AbstractFrontendModuleController
         $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
 
         /**
-         * @var  $groupModelAdapter
-         * $groupModelAdapter can be instance of Contao\UserRoleModel or Contao\MemberGroupModel or Contao\UserGroupModel
+         * @var $groupModelAdapter
+         *                         $groupModelAdapter can be instance of Contao\UserRoleModel or Contao\MemberGroupModel or Contao\UserGroupModel
          */
         $groupModelAdapter = $this->get('contao.framework')->getAdapter($GroupModel);
 
-        $filename = $type . '_' . $dateAdapter->parse('Y-m-d_H-i-s') . '.csv';
+        $filename = $type.'_'.$dateAdapter->parse('Y-m-d_H-i-s').'.csv';
         $arrData = [];
 
         // Write headline
@@ -213,107 +203,86 @@ class CsvExportController extends AbstractFrontendModuleController
 
         // Filter by user role
         $blnHasUserRoleFilter = false;
-        if (!empty($inputAdapter->post('user-roles') && is_array($inputAdapter->post('user-roles'))))
-        {
+
+        if (!empty($inputAdapter->post('user-roles') && \is_array($inputAdapter->post('user-roles')))) {
             $arrFilterRoles = $inputAdapter->post('user-roles');
             $blnHasUserRoleFilter = true;
         }
 
         // Write rows
-        while ($objUser->next())
-        {
+        while ($objUser->next()) {
             // Filter by user role
-            if ($blnHasUserRoleFilter)
-            {
+            if ($blnHasUserRoleFilter) {
                 $arrUserRoles = $stringUtilAdapter->deserialize($objUser->userRole, true);
-                if (count(array_intersect($arrFilterRoles, $arrUserRoles)) < 1)
-                {
+
+                if (\count(array_intersect($arrFilterRoles, $arrUserRoles)) < 1) {
                     continue;
                 }
             }
 
             $arrUser = [];
-            foreach ($arrFields as $field)
-            {
-                if ($field === $strGroupFieldName)
-                {
+
+            foreach ($arrFields as $field) {
+                if ($field === $strGroupFieldName) {
                     $hasGroups = false;
                     $arrGroups = $stringUtilAdapter->deserialize($objUser->{$field}, true);
 
-                    if (count($arrGroups) > 0)
-                    {
+                    if (\count($arrGroups) > 0) {
                         // Write all the groups/roles in one line
-                        if ($blnKeepGroupsInOneLine)
-                        {
-                            $arrUser[] = implode(', ', array_filter(array_map(function ($id) use ($groupModelAdapter) {
-                                $objGroupModel = $groupModelAdapter->findByPk($id);
-                                if ($objGroupModel !== null)
-                                {
-                                    if ($objGroupModel->name != '')
-                                    {
-                                        return $objGroupModel->name;
-                                    }
-                                    else
-                                    {
+                        if ($blnKeepGroupsInOneLine) {
+                            $arrUser[] = implode(', ', array_filter(array_map(
+                                static function ($id) use ($groupModelAdapter) {
+                                    $objGroupModel = $groupModelAdapter->findByPk($id);
+
+                                    if (null !== $objGroupModel) {
+                                        if ('' !== $objGroupModel->name) {
+                                            return $objGroupModel->name;
+                                        }
+
                                         return $objGroupModel->title;
                                     }
-                                }
-                                else
-                                {
+
                                     return '';
-                                }
-                            }, $arrGroups)));
+                                },
+                                $arrGroups
+                            )));
                         }
                         // Make a row for each group/role
-                        else
-                        {
+                        else {
                             $hasGroups = true;
-                            foreach ($arrGroups as $groupId)
-                            {
-                                if ($blnHasUserRoleFilter && count($arrFilterRoles) > 0)
-                                {
-                                    if (!in_array($groupId, $arrFilterRoles, false))
-                                    {
+
+                            foreach ($arrGroups as $groupId) {
+                                if ($blnHasUserRoleFilter && \count($arrFilterRoles) > 0) {
+                                    if (!\in_array($groupId, $arrFilterRoles, false)) {
                                         continue;
                                     }
                                 }
                                 $objGroupModel = $groupModelAdapter->findByPk($groupId);
-                                if ($objGroupModel !== null)
-                                {
-                                    if ($objGroupModel->name != '')
-                                    {
+
+                                if (null !== $objGroupModel) {
+                                    if ('' !== $objGroupModel->name) {
                                         $arrUser[] = $objGroupModel->name;
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         $arrUser[] = $objGroupModel->title;
                                     }
-                                }
-                                else
-                                {
-                                    $arrUser[] = 'Unbekannte Gruppe/Rolle mit ID:' . $groupId;
+                                } else {
+                                    $arrUser[] = 'Unbekannte Gruppe/Rolle mit ID:'.$groupId;
                                 }
                                 $arrData[] = $arrUser;
                                 array_pop($arrUser);
                             }
                         }
-                    }
-                    else
-                    {
+                    } else {
                         $arrUser[] = '';
                     }
-                }
-                else
-                {
+                } else {
                     $arrUser[] = $this->getField($field, $objUser);
                 }
             }
-            if (!$hasGroups)
-            {
+
+            if (!$hasGroups) {
                 $arrData[] = $arrUser;
-            }
-            else
-            {
+            } else {
                 $hasGroups = false;
             }
         }
@@ -322,11 +291,6 @@ class CsvExportController extends AbstractFrontendModuleController
         $this->printCsv($arrData, $filename);
     }
 
-    /**
-     * @param array $arrFields
-     * @param string $strTable
-     * @return array
-     */
     private function getHeadline(array $arrFields, string $strTable): array
     {
         /** @var Controller $controllerAdapter */
@@ -339,64 +303,51 @@ class CsvExportController extends AbstractFrontendModuleController
 
         // Write headline
         $arrHeadline = [];
-        foreach ($arrFields as $field)
-        {
+
+        foreach ($arrFields as $field) {
             $fieldname = $translator->trans(sprintf('%s.%s.0', $strTable, $field), [], 'contao_default') ?: $field;
             $arrHeadline[] = $fieldname;
         }
+
         return $arrHeadline;
     }
 
-    /**
-     * @param string $field
-     * @param Result $objUser
-     * @return string
-     */
     private function getField(string $field, Result $objUser): string
     {
         /** @var Config $configAdapter */
         $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
 
-        if ($field === 'password')
-        {
+        if ('password' === $field) {
             $defaultPassword = $configAdapter->get('SAC_EVT_DEFAULT_BACKEND_PASSWORD');
 
-            if (password_verify($defaultPassword, $objUser->password))
-            {
+            if (password_verify($defaultPassword, $objUser->password)) {
                 // Activate pwchange (=side efect) ;-)
                 $objUserModel = UserModel::findByPk($objUser->id);
-                if ($objUserModel->sacMemberId > 1)
-                {
+
+                if ($objUserModel->sacMemberId > 1) {
                     $objUserModel->pwChange = '1';
                     $objUserModel->save();
                 }
 
                 return $defaultPassword;
             }
-            else
-            {
-                return '#######';
-            }
+
+            return '#######';
         }
-        elseif ($field === 'lastLogin')
-        {
+
+        if ('lastLogin' === $field) {
             return Date::parse('Y-m-d', $objUser->lastLogin);
         }
-        elseif ($field === 'phone' || $field === 'mobile')
-        {
+
+        if ('phone' === $field || 'mobile' === $field) {
             return beautifyPhoneNumber($objUser->{$field});
         }
-        else
-        {
-            return $objUser->{$field};
-        }
+
+        return $objUser->{$field};
     }
 
     /**
-     * @param array $arrData
-     * @param string $filename
-     * @return string
-     * @throws \League\Csv\Exception
+     * @throws Exception
      */
     private function printCsv(array $arrData, string $filename): string
     {
@@ -405,18 +356,21 @@ class CsvExportController extends AbstractFrontendModuleController
 
         // Convert special chars
         $arrFinal = [];
-        foreach ($arrData as $arrRow)
-        {
-            $arrLine = array_map(function ($v) {
-                return html_entity_decode(htmlspecialchars_decode((string) $v));
-            }, $arrRow);
+
+        foreach ($arrData as $arrRow) {
+            $arrLine = array_map(
+                static function ($v) {
+                    return html_entity_decode(htmlspecialchars_decode((string) $v));
+                },
+                $arrRow
+            );
             $arrFinal[] = $arrLine;
         }
 
         // Send file to browser
         header('Content-Encoding: UTF-8');
         header('Content-type: text/csv; charset=UTF-8');
-        header('Content-Disposition: attachment; filename="' . $filename);
+        header('Content-Disposition: attachment; filename="'.$filename);
 
         // Load the CSV document from a string
         $csv = $writerAdapter->createFromString('');

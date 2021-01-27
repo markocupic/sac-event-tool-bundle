@@ -1,10 +1,14 @@
 <?php
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+declare(strict_types=1);
+
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -13,14 +17,12 @@ namespace Markocupic\SacEventToolBundle\Dca;
 use Contao\Backend;
 
 /**
- * Class TlTourDifficulty
- * @package Markocupic\SacEventToolBundle\Dca
+ * Class TlTourDifficulty.
  */
 class TlTourDifficulty extends Backend
 {
-
     /**
-     * List a style sheet
+     * List a style sheet.
      *
      * @param array $row
      *
@@ -28,6 +30,6 @@ class TlTourDifficulty extends Backend
      */
     public function listDifficulties($row)
     {
-        return '<div class="tl_content_left"><span class="level">' . $row['title'] . '</span> ' . $row['shortcut'] . "</div>\n";
+        return '<div class="tl_content_left"><span class="level">'.$row['title'].'</span> '.$row['shortcut']."</div>\n";
     }
 }

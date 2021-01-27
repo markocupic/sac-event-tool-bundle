@@ -2,24 +2,25 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Config;
-use Contao\Folder;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
+use Contao\Folder;
 
 /**
- * Class InitializeSystemListener
- * @package Markocupic\SacEventToolBundle\EventListener\Contao
+ * Class InitializeSystemListener.
  */
 class InitializeSystemListener
 {
@@ -30,7 +31,6 @@ class InitializeSystemListener
 
     /**
      * InitializeSystemListener constructor.
-     * @param ContaoFramework $framework
      */
     public function __construct(ContaoFramework $framework)
     {
@@ -38,7 +38,7 @@ class InitializeSystemListener
     }
 
     /**
-     * Prepare the SAC Event Tool plugin environment
+     * Prepare the SAC Event Tool plugin environment.
      */
     public function preparePluginEnvironment(): void
     {
@@ -47,29 +47,27 @@ class InitializeSystemListener
         $configAdapter = $this->framework->getAdapter(Config::class);
 
         // Check for the this directories
-        $arrDirectories = array(
+        $arrDirectories = [
             'SAC_EVT_FE_USER_DIRECTORY_ROOT',
             'SAC_EVT_FE_USER_AVATAR_DIRECTORY',
             'SAC_EVT_BE_USER_DIRECTORY_ROOT',
             'SAC_EVT_TEMP_PATH',
             'SAC_EVT_EVENT_STORIES_UPLOAD_PATH',
-        );
+        ];
 
-        foreach ($arrDirectories as $strDir)
-        {
+        foreach ($arrDirectories as $strDir) {
             // Check if directory path was set in system/localconfig.php
-            if (empty($configAdapter->get($strDir)))
-            {
+            if (empty($configAdapter->get($strDir))) {
                 throw new \Exception(sprintf('%s is not set in system/localconfig.php. Please log into the Contao Backend and set the missing values in the backend-settings. Error in %s on Line: %s', $strDir, __METHOD__, __LINE__));
             }
 
             // Create directory
-            $this->framework->createInstance(Folder::class, array($configAdapter->get($strDir)));
+            $this->framework->createInstance(Folder::class, [$configAdapter->get($strDir)]);
             $dbafsAdapter->addResource($configAdapter->get($strDir));
         }
 
         // Check for other system vars in system/localconfig.php
-        $arrConfig = array(
+        $arrConfig = [
             'cloudconvertApiKey',
             'SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME',
             'SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME',
@@ -102,16 +100,13 @@ class InitializeSystemListener
             'SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID',
             'SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE',
             'SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT',
-        );
+        ];
 
-        foreach ($arrConfig as $strConfig)
-        {
+        foreach ($arrConfig as $strConfig) {
             // Check if directory path was set in system/localconfig.php
-            if (empty($configAdapter->get($strConfig)))
-            {
+            if (empty($configAdapter->get($strConfig))) {
                 throw new \Exception(sprintf('%s is not set in system/localconfig.php. Please log into the Contao Backend and set the missing values in the backend-settings. Error in %s on Line: %s', $strConfig, __METHOD__, __LINE__));
             }
         }
     }
-
 }

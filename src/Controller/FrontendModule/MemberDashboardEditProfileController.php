@@ -2,42 +2,43 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Environment;
 use Contao\FrontendUser;
 use Contao\Input;
-use Contao\Template;
 use Contao\MemberModel;
 use Contao\Message;
+use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\System;
+use Contao\Template;
 use Haste\Form\Form;
-use Contao\ModuleModel;
-use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
- * Class MemberDashboardEditProfileController
- * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
+ * Class MemberDashboardEditProfileController.
+ *
  * @FrontendModule("member_dashboard_edit_profile", category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardEditProfileController extends AbstractFrontendModuleController
 {
-
     /**
      * @var string
      */
@@ -58,24 +59,14 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
      */
     protected $objPage;
 
-    /**
-     * @param Request $request
-     * @param ModuleModel $model
-     * @param string $section
-     * @param array|null $classes
-     * @param PageModel|null $page
-     * @return Response
-     */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
         // Get logged in member object
-        if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
-        {
+        if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser) {
             $this->objUser = $objUser;
         }
 
-        if ($page !== null)
-        {
+        if (null !== $page) {
             // Neither cache nor search page
             $page->noSearch = 1;
             $page->cache = 0;
@@ -87,12 +78,9 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         $this->projectDir = $this->getParameter('kernel.project_dir');
 
         // Call the parent method
-         return parent::__invoke($request, $model, $section, $classes, $page);
+        return parent::__invoke($request, $model, $section, $classes, $page);
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
@@ -103,17 +91,10 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         return $services;
     }
 
-    /**
-     * @param Template $template
-     * @param ModuleModel $model
-     * @param Request $request
-     * @return null|Response
-     */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
         // Do not allow for not authorized users
-        if ($this->objUser === null)
-        {
+        if (null === $this->objUser) {
             throw new UnauthorizedHttpException('Not authorized. Please log in as frontend user.');
         }
 
@@ -131,22 +112,20 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
     }
 
     /**
-     * Add messages from session to template
+     * Add messages from session to template.
      */
     protected function addMessagesToTemplate(): void
     {
         $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
         $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
 
-        if ($messageAdapter->hasInfo())
-        {
+        if ($messageAdapter->hasInfo()) {
             $this->template->hasInfoMessage = true;
             $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.info');
             $this->template->infoMessage = $session[0];
         }
 
-        if ($messageAdapter->hasError())
-        {
+        if ($messageAdapter->hasError()) {
             $this->template->hasErrorMessage = true;
             $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.error');
             $this->template->errorMessage = $session[0];
@@ -157,7 +136,8 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
     }
 
     /**
-     * Generate the avatar upload form
+     * Generate the avatar upload form.
+     *
      * @return Form
      */
     protected function generateUserProfileForm()
@@ -166,43 +146,48 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
         $memberModelAdapter = $this->get('contao.framework')->getAdapter(MemberModel::class);
 
-        $objForm = new Form('form-user-profile', 'POST', function ($objHaste) {
-            $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
-            return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
-        });
+        $objForm = new Form(
+            'form-user-profile',
+            'POST',
+            function ($objHaste) {
+                $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+
+                return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
+            }
+        );
 
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
-        $objForm->addFormField('emergencyPhone', array(
-            'label'     => 'Notfallnummer',
+        $objForm->addFormField('emergencyPhone', [
+            'label' => 'Notfallnummer',
             'inputType' => 'text',
-            'eval'      => array('rgxp' => 'phone', 'mandatory' => true),
-        ));
-        $objForm->addFormField('emergencyPhoneName', array(
-            'label'     => 'Name und Bezug des Angeh&ouml;rigen',
+            'eval' => ['rgxp' => 'phone', 'mandatory' => true],
+        ]);
+        $objForm->addFormField('emergencyPhoneName', [
+            'label' => 'Name und Bezug des Angeh&ouml;rigen',
             'inputType' => 'text',
-            'eval'      => array('mandatory' => true),
-        ));
-        $objForm->addFormField('foodHabits', array(
-            'label'     => 'Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)',
+            'eval' => ['mandatory' => true],
+        ]);
+        $objForm->addFormField('foodHabits', [
+            'label' => 'Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)',
             'inputType' => 'text',
-            'eval'      => array('mandatory' => false),
-        ));
+            'eval' => ['mandatory' => false],
+        ]);
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', array(
-            'label'     => 'Speichern',
+        $objForm->addFormField('submit', [
+            'label' => 'Speichern',
             'inputType' => 'submit',
-        ));
+        ]);
 
         // Get form presets from tl_member
-        $arrFields = array('emergencyPhone', 'emergencyPhoneName', 'foodHabits');
-        foreach ($arrFields as $field)
-        {
+        $arrFields = ['emergencyPhone', 'emergencyPhoneName', 'foodHabits'];
+
+        foreach ($arrFields as $field) {
             $objWidget = $objForm->getWidget($field);
-            if (empty($objWidget->value))
-            {
+
+            if (empty($objWidget->value)) {
                 $objWidget = $objForm->getWidget($field);
                 $objWidget->value = $this->objUser->{$field};
             }
@@ -212,13 +197,11 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         $objModel = $memberModelAdapter->findByPk($this->objUser->id);
         $objForm->bindModel($objModel);
 
-        if ($objForm->validate())
-        {
+        if ($objForm->validate()) {
             // The model will now contain the changes so you can save it
             $objModel->save();
         }
 
         return $objForm->generate();
     }
-
 }

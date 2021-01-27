@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -17,6 +19,7 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Date;
 use Contao\Frontend;
 use Contao\FrontendUser;
@@ -36,16 +39,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
- * Class MemberDashboardPastEventsController
- * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
+ * Class MemberDashboardPastEventsController.
+ *
  * @FrontendModule("member_dashboard_past_events", category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardPastEventsController extends AbstractFrontendModuleController
 {
-
     /**
      * @var FrontendUser
      */
@@ -56,14 +57,6 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
      */
     protected $template;
 
-    /**
-     * @param Request $request
-     * @param ModuleModel $model
-     * @param string $section
-     * @param array|null $classes
-     * @param PageModel|null $page
-     * @return Response
-     */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
         // Return empty string, if user is not logged in as a frontend user
@@ -72,31 +65,25 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
 
         // Get logged in member object
-        if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser)
-        {
+        if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser) {
             $this->objUser = $objUser;
         }
 
-        if ($page !== null)
-        {
+        if (null !== $page) {
             // Neither cache nor search page
             $page->noSearch = 1;
             $page->cache = 0;
         }
 
         // Print course certificate
-        if ($inputAdapter->get('do') === 'download_course_certificate' && strlen($inputAdapter->get('id')) && $this->objUser !== null)
-        {
+        if ('download_course_certificate' === $inputAdapter->get('do') && \strlen($inputAdapter->get('id')) && null !== $this->objUser) {
             $this->downloadCourseCertificate();
         }
 
         // Call the parent method
-         return parent::__invoke($request, $model, $section, $classes, $page);
+        return parent::__invoke($request, $model, $section, $classes, $page);
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
@@ -107,17 +94,10 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         return $services;
     }
 
-    /**
-     * @param Template $template
-     * @param ModuleModel $model
-     * @param Request $request
-     * @return null|Response
-     */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
         // Do not allow for not authorized users
-        if ($this->objUser === null)
-        {
+        if (null === $this->objUser) {
             throw new UnauthorizedHttpException('Not authorized. Please log in as frontend user.');
         }
 
@@ -132,8 +112,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         $frontendAdapter = $this->get('contao.framework')->getAdapter(Frontend::class);
 
         // Handle messages
-        if (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email))
-        {
+        if (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email)) {
             $messageAdapter->addInfo('Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
         }
 
@@ -148,23 +127,20 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
         // Past events
         $arrPastEvents = $calendarEventsMemberModelAdapter->findPastEventsByMemberId($this->objUser->id, $arrEventTypeFilter);
-        $arrEvents = array();
-        foreach ($arrPastEvents as $k => $event)
-        {
+        $arrEvents = [];
+
+        foreach ($arrPastEvents as $event) {
             // Do only list if member has participated
-            if ($event['role'] === 'member')
-            {
-                if ($event['eventRegistrationModel'] !== null)
-                {
-                    if (!$event['eventRegistrationModel']->hasParticipated)
-                    {
+            if ('member' === $event['role']) {
+                if (null !== $event['eventRegistrationModel']) {
+                    if (!$event['eventRegistrationModel']->hasParticipated) {
                         continue;
                     }
                 }
             }
-            if ($event['eventType'] === 'course')
-            {
-                $event['downloadCourseConfirmationLink'] = $frontendAdapter->addToUrl('do=download_course_certificate&amp;id=' . $event['registrationId']);
+
+            if ('course' === $event['eventType']) {
+                $event['downloadCourseConfirmationLink'] = $frontendAdapter->addToUrl('do=download_course_certificate&amp;id='.$event['registrationId']);
             }
             $arrEvents[] = $event;
         }
@@ -177,7 +153,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
     /**
      * @throws \Exception
      */
-    protected function downloadCourseCertificate()
+    protected function downloadCourseCertificate(): void
     {
         // Set adapters
         $calendarEventsMemberModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsMemberModel::class);
@@ -188,30 +164,32 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
         $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
 
-        if ($this->objUser !== null)
-        {
+        if (null !== $this->objUser) {
             $objRegistration = $calendarEventsMemberModelAdapter->findByPk($inputAdapter->get('id'));
-            if ($objRegistration !== null)
-            {
-                if ((int) $this->objUser->sacMemberId === (int) $objRegistration->sacMemberId)
-                {
+
+            if (null !== $objRegistration) {
+                if ((int) $this->objUser->sacMemberId === (int) $objRegistration->sacMemberId) {
                     $objMember = $memberModelAdapter->findOneBySacMemberId($this->objUser->sacMemberId);
                     $startDate = '';
-                    $arrDates = array();
+                    $arrDates = [];
                     $courseId = '';
                     $eventTitle = $objRegistration->eventName;
 
                     $objEvent = $objRegistration->getRelated('eventId');
-                    if ($objEvent !== null)
-                    {
+
+                    if (null !== $objEvent) {
                         $startDate = $dateAdapter->parse('Y', $objEvent->startDate);
 
                         // Build up $arrData;
                         // Get event dates from event object
-                        $arrDates = array_map(function ($tstmp) {
-                            $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
-                            return $dateAdapter->parse('d.m.Y', $tstmp);
-                        }, $calendarEventsHelperAdapter->getEventTimestamps($objEvent));
+                        $arrDates = array_map(
+                            function ($tstmp) {
+                                $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
+
+                                return $dateAdapter->parse('d.m.Y', $tstmp);
+                            },
+                            $calendarEventsHelperAdapter->getEventTimestamps($objEvent)
+                        );
 
                         // Course id
                         $courseId = htmlspecialchars(html_entity_decode($objEvent->courseId));
@@ -221,11 +199,11 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     }
 
                     // Log
-                    $systemAdapter->log(sprintf('New event confirmation download. SAC-User-ID: %s. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__ . ' Line: ' . __LINE__, $configAdapter->get('SAC_EVT_LOG_EVENT_CONFIRMATION_DOWNLOAD'));
+                    $systemAdapter->log(sprintf('New event confirmation download. SAC-User-ID: %s. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__.' Line: '.__LINE__, $configAdapter->get('SAC_EVT_LOG_EVENT_CONFIRMATION_DOWNLOAD'));
                     // Create phpWord instance
                     $filenamePattern = str_replace('%%s', '%s', $configAdapter->get('SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'));
                     $filename = sprintf($filenamePattern, $objMember->sacMemberId, $objRegistration->id, 'docx');
-                    $destFilename = $configAdapter->get('SAC_EVT_TEMP_PATH') . '/' . $filename;
+                    $destFilename = $configAdapter->get('SAC_EVT_TEMP_PATH').'/'.$filename;
                     $objPhpWord = new MsWordTemplateProcessor($configAdapter->get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'), $destFilename);
 
                     // Replace template vars
@@ -242,7 +220,8 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     // Generate ms word file and send it to the browser
                     $objPhpWord->generateUncached(false)
                         ->sendToBrowser(false)
-                        ->generate();
+                        ->generate()
+                    ;
 
                     // Generate pdf
                     $objConversion = new DocxToPdfConversion($destFilename, $configAdapter->get('cloudconvertApiKey'));
@@ -250,28 +229,27 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
                     exit();
                 }
+
                 throw new \Exception('There was an error while trying to generate the course confirmation.');
             }
         }
     }
 
     /**
-     * Add messages from session to template
+     * Add messages from session to template.
      */
     protected function addMessagesToTemplate(): void
     {
         $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
         $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
 
-        if ($messageAdapter->hasInfo())
-        {
+        if ($messageAdapter->hasInfo()) {
             $this->template->hasInfoMessage = true;
             $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.info');
             $this->template->infoMessage = $session[0];
         }
 
-        if ($messageAdapter->hasError())
-        {
+        if ($messageAdapter->hasError()) {
             $this->template->hasErrorMessage = true;
             $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.error');
             $this->template->errorMessage = $session[0];
@@ -280,5 +258,4 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
         $messageAdapter->reset();
     }
-
 }

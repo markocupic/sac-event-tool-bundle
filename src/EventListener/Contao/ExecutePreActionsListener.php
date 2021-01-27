@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -21,11 +23,11 @@ use Contao\Input;
 use Contao\MemberModel;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class ExecutePreActionsListener
- * @package Markocupic\SacEventToolBundle\EventListener\Contao
+ * Class ExecutePreActionsListener.
  */
 class ExecutePreActionsListener
 {
@@ -46,9 +48,6 @@ class ExecutePreActionsListener
 
     /**
      * ExecutePreActionsListener constructor.
-     * @param ContaoFramework $framework
-     * @param Connection $connection
-     * @param RequestStack $requestStack
      */
     public function __construct(ContaoFramework $framework, Connection $connection, RequestStack $requestStack)
     {
@@ -60,7 +59,7 @@ class ExecutePreActionsListener
     /**
      * @param string $strAction
      */
-    public function onExecutePreActions($strAction = '')
+    public function onExecutePreActions($strAction = ''): void
     {
         // Set adapters
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
@@ -73,20 +72,19 @@ class ExecutePreActionsListener
         $request = $this->requestStack->getCurrentRequest();
 
         // Autocompleter when registrating event members manually in the backend
-        if ($strAction === 'autocompleterLoadMemberDataFromSacMemberId')
-        {
+        if ('autocompleterLoadMemberDataFromSacMemberId' === $strAction) {
             // Output
-            $json = array('status' => 'error');
+            $json = ['status' => 'error'];
             $objMemberModel = $memberModelAdapter->findOneBySacMemberId(Input::post('sacMemberId'));
-            if ($objMemberModel !== null)
-            {
+
+            if (null !== $objMemberModel) {
                 $json = $objMemberModel->row();
-                $json['name'] = $json['firstname'] . ' ' . $json['lastname'];
+                $json['name'] = $json['firstname'].' '.$json['lastname'];
                 $json['username'] = str_replace(' ', '', strtolower($json['name']));
                 $json['dateOfBirth'] = $dateAdapter->parse($configAdapter->get('dateFormat'), $json['dateOfBirth']);
                 $json['status'] = 'success';
                 // Bin to hex otherwise there will be a json error
-                $json['avatar'] = $json['avatar'] != '' ? $stringUtilAdapter->binToUuid($json['avatar']) : '';
+                $json['avatar'] = '' !== $json['avatar'] ? $stringUtilAdapter->binToUuid($json['avatar']) : '';
                 $json['password'] = '';
 
                 $html = '<div>';
@@ -101,17 +99,15 @@ class ExecutePreActionsListener
         }
 
         // editAllNavbarHandler in the Contao backend when using the overrideAll or editAll mode
-        if ($strAction === 'editAllNavbarHandler')
-        {
-            if ($request->request->get('subaction') === 'loadNavbar')
-            {
-                $json = array();
+        if ('editAllNavbarHandler' === $strAction) {
+            if ('loadNavbar' === $request->request->get('subaction')) {
+                $json = [];
                 $json['navbar'] = '';
                 $json['status'] = 'error';
                 $json['subaction'] = $request->request->get('subaction');
-                if (($objUser = $backendUserAdapter->getInstance()) !== null)
-                {
-                    /** @var  BackendTemplate $objTemplate */
+
+                if (($objUser = $backendUserAdapter->getInstance()) !== null) {
+                    /** @var BackendTemplate $objTemplate */
                     $objTemplate = new BackendTemplate('be_edit_all_navbar_helper');
                     $json['navbar'] = $objTemplate->parse();
                     $json['status'] = 'success';
@@ -120,34 +116,31 @@ class ExecutePreActionsListener
                 $this->_jsonSend($json);
             }
 
-            if ($request->request->get('subaction') === 'getSessionData')
-            {
-                $json = array();
+            if ('getSessionData' === $request->request->get('subaction')) {
+                $json = [];
                 $json['session'] = '';
                 $json['status'] = 'error';
-                $json['sessionData'] = array();
+                $json['sessionData'] = [];
                 $strTable = $request->query->get('table');
-                $strKey = $strTable != '' ? $strTable : '';
-                if (($objUser = $backendUserAdapter->getInstance()) !== null)
-                {
-                    /** @var  Doctrine\DBAL\Query\QueryBuilder $qb */
+                $strKey = '' !== $strTable ? $strTable : '';
+
+                if (($objUser = $backendUserAdapter->getInstance()) !== null) {
+                    /** @var QueryBuilder $qb */
                     $qb = $this->connection->createQueryBuilder();
                     $qb->select('session')
                         ->from('tl_user', 't')
                         ->where('t.id = :id')
                         ->setParameter('id', $objUser->id)
-                        ->setMaxResults(1);
+                        ->setMaxResults(1)
+                    ;
                     $result = $qb->execute();
 
-                    if (false !== ($user = $result->fetch()))
-                    {
+                    if (false !== ($user = $result->fetch())) {
                         $arrSession = $stringUtilAdapter->deserialize($user['session'], true);
-                        if (!isset($arrSession['editAllHelper'][$strKey]))
-                        {
-                            $arrChecked = array();
-                        }
-                        else
-                        {
+
+                        if (!isset($arrSession['editAllHelper'][$strKey])) {
+                            $arrChecked = [];
+                        } else {
                             $arrChecked = $arrSession['editAllHelper'][$strKey];
                         }
 
@@ -159,38 +152,38 @@ class ExecutePreActionsListener
                 $this->_jsonSend($json);
             }
 
-            if ($request->request->get('subaction') === 'saveSessionData')
-            {
-                $json = array();
+            if ('saveSessionData' === $request->request->get('subaction')) {
+                $json = [];
                 $json['status'] = 'error';
                 $json['sessionData'] = '';
                 $strTable = $request->query->get('table');
-                $strKey = $strTable != '' ? $strTable : '';
-                if (($objUser = $backendUserAdapter->getInstance()) !== null)
-                {
-                    /** @var  Doctrine\DBAL\Query\QueryBuilder $qb */
+                $strKey = '' !== $strTable ? $strTable : '';
+
+                if (($objUser = $backendUserAdapter->getInstance()) !== null) {
+                    /** @var QueryBuilder $qb */
                     $qb = $this->connection->createQueryBuilder();
                     $qb->select('session')
                         ->from('tl_user', 't')
                         ->where('t.id = :id')
                         ->setParameter('id', $objUser->id)
-                        ->setMaxResults(1);
+                        ->setMaxResults(1)
+                    ;
                     $result = $qb->execute();
 
-                    if (false !== ($user = $result->fetch()))
-                    {
+                    if (false !== ($user = $result->fetch())) {
                         $arrSession = $stringUtilAdapter->deserialize($user['session'], true);
                         $arrSession['editAllHelper'][$strKey] = $request->request->get('checkedItems');
                         $json['sessionData'] = $arrSession['editAllHelper'];
 
                         // Update session
-                        /** @var  Doctrine\DBAL\Query\QueryBuilder $qb */
+                        /** @var QueryBuilder $qb */
                         $qb = $this->connection->createQueryBuilder();
                         $qb->update('tl_user', 't')
                             ->set('t.session', ':session')
                             ->where('t.id = :id')
                             ->setParameter('id', $objUser->id)
-                            ->setParameter('session', serialize($arrSession));
+                            ->setParameter('session', serialize($arrSession))
+                        ;
                         $result = $qb->execute();
                         $json['affectedRows'] = $result;
                         $json['status'] = 'success';
@@ -207,16 +200,14 @@ class ExecutePreActionsListener
      * @param $json
      * @param int $status
      */
-    private function _jsonSend($json, $status = 200)
+    private function _jsonSend($json, $status = 200): void
     {
         // !!! Do not use new JsonResponse($json) because session data will be overwritten
         // Send json data to the browser
         header('Content-Type: application/json');
-        header('Status: ' . $status);
+        header('Status: '.$status);
         // return the encoded json
         echo json_encode($json);
         exit();
     }
 }
-
-

@@ -1,15 +1,18 @@
 <?php
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Markocupic\SacEventToolBundle\Dca\TlModule;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Markocupic\SacEventToolBundle\Dca\TlModule;
+
 /**
  * Table tl_module
  */
@@ -39,158 +42,155 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['event_list'] = '{title_legend},name
 
 // Manipulate palettes
 PaletteManipulator::create()
-    ->addField(array('jumpToWhenNotActivated'), 'redirect_legend', PaletteManipulator::POSITION_PREPEND)
-    ->applyToPalette('login', 'tl_module');
+	->addField(array('jumpToWhenNotActivated'), 'redirect_legend', PaletteManipulator::POSITION_PREPEND)
+	->applyToPalette('login', 'tl_module');
 
 // Fields
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventType'] = array(
-    'exclude'   => true,
-    'search'    => true,
-    'inputType' => 'select',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-    'eval'      => array('mandatory' => true, 'multiple' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
-    'sql'       => "blob NULL",
+	'exclude'   => true,
+	'search'    => true,
+	'inputType' => 'select',
+	'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
+	'eval'      => array('mandatory' => true, 'multiple' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
+	'sql'       => "blob NULL",
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['unregisterFromEventNotificationId'] = array(
-    'exclude'    => true,
-    'search'     => true,
-    'inputType'  => 'select',
-    'foreignKey' => 'tl_nc_notification.title',
-    'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
+	'exclude'    => true,
+	'search'     => true,
+	'inputType'  => 'select',
+	'foreignKey' => 'tl_nc_notification.title',
+	'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
+	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['receiptEventRegistrationNotificationId'] = array(
-    'exclude'    => true,
-    'search'     => true,
-    'inputType'  => 'select',
-    'foreignKey' => 'tl_nc_notification.title',
-    'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
+	'exclude'    => true,
+	'search'     => true,
+	'inputType'  => 'select',
+	'foreignKey' => 'tl_nc_notification.title',
+	'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
+	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['notifyOnEventStoryPublishedNotificationId'] = array(
-    'exclude'    => true,
-    'search'     => true,
-    'inputType'  => 'select',
-    'foreignKey' => 'tl_nc_notification.title',
-    'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
+	'exclude'    => true,
+	'search'     => true,
+	'inputType'  => 'select',
+	'foreignKey' => 'tl_nc_notification.title',
+	'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
+	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['activateMemberAccountNotificationId'] = array(
-    'exclude'    => true,
-    'search'     => true,
-    'inputType'  => 'select',
-    'foreignKey' => 'tl_nc_notification.title',
-    'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
+	'exclude'    => true,
+	'search'     => true,
+	'inputType'  => 'select',
+	'foreignKey' => 'tl_nc_notification.title',
+	'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
+	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryFormJumpTo'] = array(
-    'exclude'    => true,
-    'inputType'  => 'pageTree',
-    'foreignKey' => 'tl_page.title',
-    'eval'       => array('mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'),
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
+	'exclude'    => true,
+	'inputType'  => 'pageTree',
+	'foreignKey' => 'tl_page.title',
+	'eval'       => array('mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'),
+	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryJumpTo'] = array(
-    'exclude'    => true,
-    'inputType'  => 'pageTree',
-    'foreignKey' => 'tl_page.title',
-    'eval'       => array('mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'),
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
+	'exclude'    => true,
+	'inputType'  => 'pageTree',
+	'foreignKey' => 'tl_page.title',
+	'eval'       => array('mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'),
+	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryUploadFolder'] = array(
-    'exclude'   => true,
-    'inputType' => 'fileTree',
-    'eval'      => array('fieldType' => 'radio', 'filesOnly' => false, 'mandatory' => true, 'tl_class' => 'clr'),
-    'sql'       => "binary(16) NULL"
+	'exclude'   => true,
+	'inputType' => 'fileTree',
+	'eval'      => array('fieldType' => 'radio', 'filesOnly' => false, 'mandatory' => true, 'tl_class' => 'clr'),
+	'sql'       => "binary(16) NULL"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['timeSpanForCreatingNewEventStory'] = array(
-    'inputType' => 'select',
-    'options'   => range(5, 365),
-    'eval'      => array('mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr', 'rgxp' => 'natural'),
-    'sql'       => "int(10) unsigned NOT NULL default '0'",
+	'inputType' => 'select',
+	'options'   => range(5, 365),
+	'eval'      => array('mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr', 'rgxp' => 'natural'),
+	'sql'       => "int(10) unsigned NOT NULL default '0'",
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['imageClass'] = array
 (
-    'exclude'   => true,
-    'inputType' => 'text',
-    'eval'      => array('tl_class' => 'w50'),
-    'sql'              => "varchar(512) NOT NULL default ''"
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => array('tl_class' => 'w50'),
+	'sql'              => "varchar(512) NOT NULL default ''"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['story_limit'] = array
 (
-    'exclude'   => true,
-    'inputType' => 'text',
-    'eval'      => array('rgxp' => 'natural', 'tl_class' => 'w50'),
-    'sql'       => "smallint(5) unsigned NOT NULL default '0'",
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => array('rgxp' => 'natural', 'tl_class' => 'w50'),
+	'sql'       => "smallint(5) unsigned NOT NULL default '0'",
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['story_eventOrganizers'] = array(
-    'exclude'    => true,
-    'search'     => true,
-    'filter'     => true,
-    'sorting'    => true,
-    'inputType'  => 'checkbox',
-    'foreignKey' => 'tl_event_organizer.title',
-    'relation'   => array('type' => 'hasMany', 'load' => 'lazy'),
-    'eval'       => array('multiple' => true, 'mandatory' => false, 'tl_class' => 'clr m12'),
-    'sql'        => "blob NULL",
+	'exclude'    => true,
+	'search'     => true,
+	'filter'     => true,
+	'sorting'    => true,
+	'inputType'  => 'checkbox',
+	'foreignKey' => 'tl_event_organizer.title',
+	'relation'   => array('type' => 'hasMany', 'load' => 'lazy'),
+	'eval'       => array('multiple' => true, 'mandatory' => false, 'tl_class' => 'clr m12'),
+	'sql'        => "blob NULL",
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = array(
-    'inputType' => 'select',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-    'eval'      => array('mandatory' => false, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'),
-    'sql'       => "blob NULL"
+	'inputType' => 'select',
+	'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
+	'eval'      => array('mandatory' => false, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'),
+	'sql'       => "blob NULL"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['jumpToWhenNotActivated'] = array(
-    'exclude'    => true,
-    'inputType'  => 'pageTree',
-    'foreignKey' => 'tl_page.title',
-    'eval'       => array('fieldType' => 'radio'),
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => array('type' => 'hasOne', 'load' => 'eager')
+	'exclude'    => true,
+	'inputType'  => 'pageTree',
+	'foreignKey' => 'tl_page.title',
+	'eval'       => array('fieldType' => 'radio'),
+	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'relation'   => array('type' => 'hasOne', 'load' => 'eager')
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = array(
-    'inputType'        => 'checkboxWizard',
-    'options_callback' => array(TlModule::class, 'getEventFilterBoardFields'),
-    'eval'             => array('mandatory' => false, 'multiple' => true, 'ooorderField' => 'orderSRC', 'tl_class' => 'clr'),
-    'sql'              => "blob NULL"
+	'inputType'        => 'checkboxWizard',
+	'options_callback' => array(TlModule::class, 'getEventFilterBoardFields'),
+	'eval'             => array('mandatory' => false, 'multiple' => true, 'ooorderField' => 'orderSRC', 'tl_class' => 'clr'),
+	'sql'              => "blob NULL"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventListPartialTpl'] = array
 (
-    'exclude'          => true,
-    'inputType'        => 'select',
-    'options_callback' => array(TlModule::class, 'getEventListTemplates'),
-    'eval'             => array('tl_class' => 'w50'),
-    'sql'              => "varchar(64) NOT NULL default 'event_list_partial_tour'"
+	'exclude'          => true,
+	'inputType'        => 'select',
+	'options_callback' => array(TlModule::class, 'getEventListTemplates'),
+	'eval'             => array('tl_class' => 'w50'),
+	'sql'              => "varchar(64) NOT NULL default 'event_list_partial_tour'"
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventListLimitPerRequest'] = array
 (
-    'exclude'   => true,
-    'inputType' => 'text',
-    'eval'      => array('rgxp' => 'natural', 'tl_class' => 'w50'),
-    'sql'       => "smallint(5) unsigned NOT NULL default 0"
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => array('rgxp' => 'natural', 'tl_class' => 'w50'),
+	'sql'       => "smallint(5) unsigned NOT NULL default 0"
 );
-
-
-

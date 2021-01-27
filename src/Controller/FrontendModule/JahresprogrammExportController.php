@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
+/*
+ * This file is part of SAC Event Tool Bundle.
  *
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -17,6 +18,7 @@ use Contao\Calendar;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
 use Contao\Database;
@@ -34,17 +36,14 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 
 /**
- * Class JahresprogrammExportController
+ * Class JahresprogrammExportController.
  *
- * @package Markocupic\SacEventToolBundle\Controller\FrontendModule
  * @FrontendModule("jahresprogramm_export", category="sac_event_tool_frontend_modules")
  */
 class JahresprogrammExportController extends AbstractPrintExportController
 {
-
     /**
      * @var ModuleModel
      */
@@ -83,41 +82,28 @@ class JahresprogrammExportController extends AbstractPrintExportController
     /**
      * @var null
      */
-    protected $events = null;
+    protected $events;
 
     /**
      * @var null
      */
-    protected $instructors = null;
+    protected $instructors;
 
     /**
      * @var null
      */
-    protected $specialUsers = null;
+    protected $specialUsers;
 
-    /**
-     * @param Request $request
-     * @param ModuleModel $model
-     * @param string $section
-     * @param array|null $classes
-     * @param PageModel|null $page
-     * @return Response
-     */
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
-
         $this->model = $model;
 
         // Call the parent method
-         return parent::__invoke($request, $model, $section, $classes, $page);
+        return parent::__invoke($request, $model, $section, $classes, $page);
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedServices(): array
     {
-
         $services = parent::getSubscribedServices();
 
         $services['request_stack'] = RequestStack::class;
@@ -127,18 +113,13 @@ class JahresprogrammExportController extends AbstractPrintExportController
     }
 
     /**
-     * @param Template $template
-     * @param ModuleModel $model
-     * @param Request $request
-     * @return null|Response
      * @throws \Exception
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
-
         $this->template = $template;
 
-        /** @var  Controller $controllerAdapter */
+        /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
 
         // Load language file
@@ -150,16 +131,14 @@ class JahresprogrammExportController extends AbstractPrintExportController
     }
 
     /**
-     * @return Form
      * @throws \Exception
      */
     protected function generateForm(): Form
     {
-
         /** @var Request $request */
         $request = $this->get('request_stack')->getCurrentRequest();
 
-        /** @var  EventOrganizerModel $eventOrganizerModelAdapter */
+        /** @var EventOrganizerModel $eventOrganizerModelAdapter */
         $eventOrganizerModelAdapter = $this->get('contao.framework')->getAdapter(EventOrganizerModel::class);
 
         /** @var Environment $environmentAdapter */
@@ -169,81 +148,82 @@ class JahresprogrammExportController extends AbstractPrintExportController
         $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
 
         /** @var Form $objForm */
-        $objForm = new Form('form-jahresprogramm-export', 'POST', function (Form $objHaste): bool {
+        $objForm = new Form(
+            'form-jahresprogramm-export',
+            'POST',
+            function (Form $objHaste): bool {
+                /** @var Request $request */
+                $request = $this->get('request_stack')->getCurrentRequest();
 
-            /** @var Request $request */
-            $request = $this->get('request_stack')->getCurrentRequest();
-
-            return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
-        });
+                return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
+            }
+        );
 
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
         $objForm->addFormField('eventType', [
-            'label'     => 'Event-Typ',
+            'label' => 'Event-Typ',
             'reference' => $GLOBALS['TL_LANG']['MSC'],
             'inputType' => 'select',
-            'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-            'eval'      => ['includeBlankOption' => true, 'mandatory' => true],
+            'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
+            'eval' => ['includeBlankOption' => true, 'mandatory' => true],
         ]);
 
         $arrOrganizers = [];
         $objOrganizer = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_event_organizer ORDER BY sorting')->execute();
-        while ($objOrganizer->next())
-        {
+
+        while ($objOrganizer->next()) {
             $arrOrganizers[$objOrganizer->id] = $objOrganizer->title;
         }
         $objForm->addFormField('organizer', [
-            'label'     => 'Organisierende Gruppe',
+            'label' => 'Organisierende Gruppe',
             'inputType' => 'select',
-            'options'   => $arrOrganizers,
-            'eval'      => ['includeBlankOption' => true, 'mandatory' => false],
+            'options' => $arrOrganizers,
+            'eval' => ['includeBlankOption' => true, 'mandatory' => false],
         ]);
 
         $objForm->addFormField('startDate', [
-            'label'     => 'Startdatum',
+            'label' => 'Startdatum',
             'inputType' => 'text',
-            'eval'      => ['rgxp' => 'date', 'mandatory' => true],
+            'eval' => ['rgxp' => 'date', 'mandatory' => true],
         ]);
 
         $objForm->addFormField('endDate', [
-            'label'     => 'Enddatum',
+            'label' => 'Enddatum',
             'inputType' => 'text',
-            'eval'      => ['rgxp' => 'date', 'mandatory' => true],
+            'eval' => ['rgxp' => 'date', 'mandatory' => true],
         ]);
 
         $objForm->addFormField('eventReleaseLevel', [
-            'label'     => 'Zeige an ab Freigabestufe (Wenn leer gelassen, wird ab 2. höchster FS gelistet!)',
+            'label' => 'Zeige an ab Freigabestufe (Wenn leer gelassen, wird ab 2. höchster FS gelistet!)',
             'inputType' => 'select',
-            'options'   => [1 => 'FS1', 2 => 'FS2', 3 => 'FS3', 4 => 'FS4'],
-            'eval'      => ['mandatory' => false, 'includeBlankOption' => true],
+            'options' => [1 => 'FS1', 2 => 'FS2', 3 => 'FS3', 4 => 'FS4'],
+            'eval' => ['mandatory' => false, 'includeBlankOption' => true],
         ]);
 
         $arrUserRoles = [];
         $objUserRoles = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_user_role ORDER BY title')->execute();
-        while ($objUserRoles->next())
-        {
+
+        while ($objUserRoles->next()) {
             $arrUserRoles[$objUserRoles->id] = $objUserRoles->title;
         }
         $objForm->addFormField('userRoles', [
-            'label'     => 'Neben den Event-Leitern zus&auml;tzliche Funktion&auml;re anzeigen',
+            'label' => 'Neben den Event-Leitern zus&auml;tzliche Funktion&auml;re anzeigen',
             'inputType' => 'select',
-            'options'   => $arrUserRoles,
-            'eval'      => ['multiple' => true, 'mandatory' => false],
+            'options' => $arrUserRoles,
+            'eval' => ['multiple' => true, 'mandatory' => false],
         ]);
 
         // Let's add  a submit button
         $objForm->addFormField('submit', [
-            'label'     => 'Export starten',
+            'label' => 'Export starten',
             'inputType' => 'submit',
         ]);
 
         // validate() also checks whether the form has been submitted
-        if ($objForm->validate())
-        {
-            if ($request->request->get('startDate') != '' && $request->request->get('endDate') != '' && $request->request->get('eventType') != '')
-            {
+        if ($objForm->validate()) {
+            if ('' !== $request->request->get('startDate') && '' !== $request->request->get('endDate') && '' !== $request->request->get('eventType')) {
                 $this->startDate = strtotime($request->request->get('startDate'));
                 $this->endDate = strtotime($request->request->get('endDate'));
                 $this->eventType = $request->request->get('eventType');
@@ -275,90 +255,80 @@ class JahresprogrammExportController extends AbstractPrintExportController
      */
     protected function getEventsAndInstructors(): void
     {
-
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
 
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
 
-        /** @var  CourseMainTypeModel $courseMainTypeModelAdapter */
+        /** @var CourseMainTypeModel $courseMainTypeModelAdapter */
         $courseMainTypeModelAdapter = $this->get('contao.framework')->getAdapter(CourseMainTypeModel::class);
 
-        /** @var  CourseSubTypeModel $courseSubTypeModelAdapter */
+        /** @var CourseSubTypeModel $courseSubTypeModelAdapter */
         $courseSubTypeModelAdapter = $this->get('contao.framework')->getAdapter(CourseSubTypeModel::class);
 
-        /** @var  CalendarEventsModel $calendarEventsModelAdapter */
+        /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
 
-        /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
+        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
 
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
 
-        /** @var  EventOrganizerModel $eventOrganizerModelAdapter */
+        /** @var EventOrganizerModel $eventOrganizerModelAdapter */
         $eventOrganizerModelAdapter = $this->get('contao.framework')->getAdapter(EventOrganizerModel::class);
 
         $arrEvents = [];
         $objEvents = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=?')->execute($this->startDate, $this->endDate);
 
-        while ($objEvents->next())
-        {
+        while ($objEvents->next()) {
             // Check if event is at least on second highest level (Level 3/4)
             $eventModel = $calendarEventsModelAdapter->findByPk($objEvents->id);
-            if (!$this->hasValidReleaseLevel($eventModel, (int) $this->eventReleaseLevel))
-            {
+
+            if (!$this->hasValidReleaseLevel($eventModel, (int) $this->eventReleaseLevel)) {
                 continue;
             }
 
-            if ($this->organizer)
-            {
+            if ($this->organizer) {
                 $arrOrganizer = $stringUtilAdapter->deserialize($objEvents->organizers, true);
-                if (!in_array($this->organizer, $arrOrganizer, false))
-                {
+
+                if (!\in_array($this->organizer, $arrOrganizer, false)) {
                     continue;
                 }
             }
 
-            if ($this->eventType !== $objEvents->eventType)
-            {
+            if ($this->eventType !== $objEvents->eventType) {
                 continue;
             }
-            $arrEvents[] = intval($objEvents->id);
+            $arrEvents[] = (int) ($objEvents->id);
         }
 
         $arrInstructors = [];
-        if (count($arrEvents) > 0)
-        {
+
+        if (\count($arrEvents) > 0) {
             $arrEvent = [];
 
             // Let's use different queries for each event type
-            if ($this->eventType === 'course')
-            {
+            if ('course' === $this->eventType) {
                 $objEvent = CalendarEventsModel::findMultipleByIds($arrEvents, ['order' => 'tl_calendar_events.courseTypeLevel0, tl_calendar_events.courseTypeLevel1, tl_calendar_events.startDate, tl_calendar_events.endDate, tl_calendar_events.courseId']);
-            }
-            else
-            {
+            } else {
                 $objEvent = CalendarEventsModel::findMultipleByIds($arrEvents, ['order' => 'tl_calendar_events.startDate, tl_calendar_events.endDate']);
             }
-            if ($objEvent !== null)
-            {
-                while ($objEvent->next())
-                {
+
+            if (null !== $objEvent) {
+                while ($objEvent->next()) {
                     $arrInstructors = array_merge($arrInstructors, $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent->current(), false));
 
                     // tourType && date format
                     $arrTourType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent->current(), 'shortcut', false);
                     $dateFormat = 'D, j.';
 
-                    if ($objEvent->eventType === 'course')
-                    {
+                    if ('course' === $objEvent->eventType) {
                         // KU = Kurs
                         $arrTourType[] = 'KU';
                         //$dateFormat = 'j.n.';
                         $dateFormat = 'D, j.n.';
-
                     }
                     $showHeadline = true;
                     $showTeaser = true;
@@ -366,19 +336,17 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
                     // Details
                     $minMax = [];
-                    if($objEvent->minMembers)
-                    {
-                        $minMax[] = 'min. ' . $objEvent->minMembers;
-                    }
-                    if($objEvent->maxMembers)
-                    {
-                        $minMax[] = 'max. ' . $objEvent->maxMembers;
+
+                    if ($objEvent->minMembers) {
+                        $minMax[] = 'min. '.$objEvent->minMembers;
                     }
 
-                    if ($this->organizer)
-                    {
-                        if (null !== ($eventOrganizerModel = $eventOrganizerModelAdapter->findByPk($this->organizer)))
-                        {
+                    if ($objEvent->maxMembers) {
+                        $minMax[] = 'max. '.$objEvent->maxMembers;
+                    }
+
+                    if ($this->organizer) {
+                        if (null !== ($eventOrganizerModel = $eventOrganizerModelAdapter->findByPk($this->organizer))) {
                             $showHeadline = $eventOrganizerModel->annualProgramShowHeadline ? true : false;
                             $showTeaser = $eventOrganizerModel->annualProgramShowTeaser ? true : false;
                             $showDetails = $eventOrganizerModel->annualProgramShowDetails ? true : false;
@@ -387,11 +355,11 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
                     $arrTitle = [];
                     $arrTitlePrint = [];
-                    if($objEvent->organizers != '')
-                    {
-                        $arrOrganizers = $stringUtilAdapter->deserialize($objEvent->organizers,true);
-                        foreach($arrOrganizers as $orgId)
-                        {
+
+                    if ('' !== $objEvent->organizers) {
+                        $arrOrganizers = $stringUtilAdapter->deserialize($objEvent->organizers, true);
+
+                        foreach ($arrOrganizers as $orgId) {
                             $arrTitle[] = $eventOrganizerModelAdapter->findByPk($orgId)->title;
                             $arrTitlePrint[] = $eventOrganizerModelAdapter->findByPk($orgId)->titlePrint;
                         }
@@ -399,16 +367,15 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $organizerTitle = implode(', ', $arrTitle);
                     $organizerTitlePrint = implode(', ', $arrTitlePrint);
 
-
                     $arrData = $objEvent->row();
 
                     $arrData['eventId'] = $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'eventId');
                     $arrData['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent->current(), 'title'));
                     $arrData['organizerTitle'] = $organizerTitle;
                     $arrData['organizerTitlePrint'] = $organizerTitlePrint;
-                    $arrData['courseLevel'] = isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel]) ? $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel] : '';
-                    $arrData['courseTypeLevel0'] = ($courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0) !== null) ? $courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0)->name : '';
-                    $arrData['courseTypeLevel1'] = ($courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1) !== null) ? $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1)->name : '';
+                    $arrData['courseLevel'] = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel] ?? '';
+                    $arrData['courseTypeLevel0'] = null !== $courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0) ? $courseMainTypeModelAdapter->findByPk($objEvent->courseTypeLevel0)->name : '';
+                    $arrData['courseTypeLevel1'] = null !== $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1) ? $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1)->name : '';
                     $arrData['date'] = $this->getEventPeriod($objEvent->current(), $dateFormat);
                     $arrData['month'] = $dateAdapter->parse('F', $objEvent->startDate);
                     $arrData['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->current(), false, false));
@@ -419,16 +386,15 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $arrData['showTeaser'] = $showTeaser;
                     $arrData['showDetails'] = $showDetails;
 
-
                     // Details
                     $arrData['arrTourProfile'] = $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'arrTourProfile');
                     $arrData['journey'] = $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'journey');
                     $arrData['minMaxMembers'] = implode('/', $minMax);
 
-                    $arrData['bookingInfo'] = (!$objEvent->disableOnlineRegistration) ? 'Online Anmeldung: Tour-/Anlassnummer ' . $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'eventId') : '';
-                    if ($objEvent->eventType === 'course')
-                    {
-                        $arrData['bookingInfo'] = (!$objEvent->disableOnlineRegistration) ? 'Online Anmeldung: Kursnummer ' . $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'courseId') : '';
+                    $arrData['bookingInfo'] = !$objEvent->disableOnlineRegistration ? 'Online Anmeldung: Tour-/Anlassnummer '.$calendarEventsHelperAdapter->getEventData($objEvent->current(), 'eventId') : '';
+
+                    if ('course' === $objEvent->eventType) {
+                        $arrData['bookingInfo'] = !$objEvent->disableOnlineRegistration ? 'Online Anmeldung: Kursnummer '.$calendarEventsHelperAdapter->getEventData($objEvent->current(), 'courseId') : '';
                     }
                     $arrEvent[] = $arrData;
                 }
@@ -438,32 +404,32 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
             $arrInstructors = array_unique($arrInstructors);
             $aInstructors = [];
-            $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user WHERE id IN (' . implode(',', array_map('\intval', $arrInstructors)) . ') ORDER BY lastname, firstname');
-            while ($objUser->next())
-            {
+            $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user WHERE id IN ('.implode(',', array_map('\intval', $arrInstructors)).') ORDER BY lastname, firstname');
+
+            while ($objUser->next()) {
                 $arrLeft = [];
-                $arrLeft[] = trim($objUser->lastname . ' ' . $objUser->firstname);
+                $arrLeft[] = trim($objUser->lastname.' '.$objUser->firstname);
                 $arrLeft[] = $objUser->street;
-                $arrLeft[] = trim($objUser->postal . ' ' . $objUser->city);
+                $arrLeft[] = trim($objUser->postal.' '.$objUser->city);
                 $arrLeft = array_filter($arrLeft);
 
                 $arrRight = [];
-                if ($objUser->phone != '')
-                {
-                    $arrRight[] = 'P ' . $objUser->phone;
+
+                if ('' !== $objUser->phone) {
+                    $arrRight[] = 'P '.$objUser->phone;
                 }
-                if ($objUser->mobile != '')
-                {
-                    $arrRight[] = 'M ' . $objUser->mobile;
+
+                if ('' !== $objUser->mobile) {
+                    $arrRight[] = 'M '.$objUser->mobile;
                 }
-                if ($objUser->email != '')
-                {
+
+                if ('' !== $objUser->email) {
                     $arrRight[] = $objUser->email;
                 }
 
                 $aInstructors[] = [
-                    'id'       => $objUser->id,
-                    'leftCol'  => implode(', ', $arrLeft),
+                    'id' => $objUser->id,
+                    'leftCol' => implode(', ', $arrLeft),
                     'rightCol' => implode(', ', $arrRight),
                 ];
             }
@@ -472,14 +438,9 @@ class JahresprogrammExportController extends AbstractPrintExportController
         }
     }
 
-    /**
-     * @param array $arrUserRoles
-     * @return array
-     */
     protected function getUsersByUserRole(array $arrUserRoles): array
     {
-
-        /** @var  StringUtil $stringUtilAdapter */
+        /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
 
         /** @var UserRoleModel $userRoleModelAdapter */
@@ -489,69 +450,63 @@ class JahresprogrammExportController extends AbstractPrintExportController
         $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
 
         $specialUsers = [];
-        if (is_array($arrUserRoles) && !empty($arrUserRoles))
-        {
-            $objUserRoles = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user_role WHERE id IN(' . implode(',', array_map('\intval', $arrUserRoles)) . ') ORDER BY sorting');
-            while ($objUserRoles->next())
-            {
+
+        if (!empty($arrUserRoles) && \is_array($arrUserRoles)) {
+            $objUserRoles = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user_role WHERE id IN('.implode(',', array_map('\intval', $arrUserRoles)).') ORDER BY sorting');
+
+            while ($objUserRoles->next()) {
                 $userRole = $objUserRoles->id;
                 $arrUsers = [];
                 $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
-                while ($objUser->next())
-                {
+
+                while ($objUser->next()) {
                     $userRoles = $stringUtilAdapter->deserialize($objUser->userRole, true);
-                    if (in_array($userRole, $userRoles, false))
-                    {
+
+                    if (\in_array($userRole, $userRoles, false)) {
                         $arrLeft = [];
-                        $arrLeft[] = trim($objUser->lastname . ' ' . $objUser->firstname);
+                        $arrLeft[] = trim($objUser->lastname.' '.$objUser->firstname);
                         $arrLeft[] = $objUser->street;
-                        $arrLeft[] = trim($objUser->postal . ' ' . $objUser->city);
+                        $arrLeft[] = trim($objUser->postal.' '.$objUser->city);
                         $arrLeft = array_filter($arrLeft);
 
                         $arrRight = [];
-                        if ($objUser->phone != '')
-                        {
-                            $arrRight[] = 'P ' . $objUser->phone;
+
+                        if ('' !== $objUser->phone) {
+                            $arrRight[] = 'P '.$objUser->phone;
                         }
-                        if ($objUser->mobile != '')
-                        {
-                            $arrRight[] = 'M ' . $objUser->mobile;
+
+                        if ('' !== $objUser->mobile) {
+                            $arrRight[] = 'M '.$objUser->mobile;
                         }
-                        if ($objUser->email != '')
-                        {
+
+                        if ('' !== $objUser->email) {
                             $arrRight[] = $objUser->email;
                         }
 
                         $arrUsers[] = [
-                            'id'       => $objUser->id,
-                            'leftCol'  => implode(', ', $arrLeft),
+                            'id' => $objUser->id,
+                            'leftCol' => implode(', ', $arrLeft),
                             'rightCol' => implode(', ', $arrRight),
                         ];
                     }
                 }
 
                 $specialUsers[] = [
-
                     'title' => $userRoleModelAdapter->findByPk($userRole)->title,
                     'users' => $arrUsers,
                 ];
             }
         }
+
         return $specialUsers;
     }
 
-    /**
-     * @param CalendarEventsModel $objEvent
-     * @param string $dateFormat
-     * @return string
-     */
     private function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = ''): string
     {
-
         /** @var Date $dateAdapter */
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
 
-        /** @var  CalendarEventsHelper $calendarEventsHelperAdapter */
+        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
 
         /** @var Config $configAdapter */
@@ -560,58 +515,45 @@ class JahresprogrammExportController extends AbstractPrintExportController
         /** @var Calendar $calendarAdapter */
         $calendarAdapter = $this->get('contao.framework')->getAdapter(Calendar::class);
 
-        if (empty($dateFormat))
-        {
+        if (empty($dateFormat)) {
             $dateFormat = $configAdapter->get('dateFormat');
         }
 
-        if ($dateFormat === 'j.n.')
-        {
+        if ('j.n.' === $dateFormat) {
             $dateFormatShortened = 'j.n.';
-        }
-        elseif ($dateFormat === 'j.')
-        {
+        } elseif ('j.' === $dateFormat) {
             $dateFormatShortened = 'j.';
-        }
-        else
-        {
+        } else {
             $dateFormatShortened = $dateFormat;
         }
 
-        $eventDuration = count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
+        $eventDuration = \count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
         $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent), $calendarEventsHelperAdapter->getEndDate($objEvent)) + 1;
 
-        if ($eventDuration === 1)
-        {
+        if (1 === $eventDuration) {
             return $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getStartDate($objEvent));
         }
-        if ($eventDuration === 2 && $span != $eventDuration)
-        {
-            return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)) . ' + ' . $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
+
+        if (2 === $eventDuration && $span !== $eventDuration) {
+            return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)).' + '.$dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
         }
-        elseif ($span === $eventDuration)
-        {
+
+        if ($span === $eventDuration) {
             // Check if event dates are not in the same month
-            if ($dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getStartDate($objEvent)) === $dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getEndDate($objEvent)))
-            {
-                return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)) . ' - ' . $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
-            }
-            else
-            {
-                return $dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getStartDate($objEvent)) . ' - ' . $dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getEndDate($objEvent));
-            }
-        }
-        else
-        {
-            $arrDates = [];
-            $dates = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
-            foreach ($dates as $date)
-            {
-                $arrDates[] = $dateAdapter->parse($dateFormat, $date);
+            if ($dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getStartDate($objEvent)) === $dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getEndDate($objEvent))) {
+                return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)).' - '.$dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
             }
 
-            return implode(' + ', $arrDates);
+            return $dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getStartDate($objEvent)).' - '.$dateAdapter->parse('j.n.', $calendarEventsHelperAdapter->getEndDate($objEvent));
         }
+
+        $arrDates = [];
+        $dates = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
+
+        foreach ($dates as $date) {
+            $arrDates[] = $dateAdapter->parse($dateFormat, $date);
+        }
+
+        return implode(' + ', $arrDates);
     }
-
 }

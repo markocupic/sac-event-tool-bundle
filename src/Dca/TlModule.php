@@ -1,10 +1,14 @@
 <?php
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+declare(strict_types=1);
+
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -14,7 +18,7 @@ use Contao\Controller;
 use Contao\System;
 
 /**
- * Class TlModule
+ * Class TlModule.
  */
 class TlModule extends \tl_module
 {
@@ -23,18 +27,19 @@ class TlModule extends \tl_module
      */
     public function getEventFilterBoardFields()
     {
-        $opt = array();
+        $opt = [];
         Controller::loadDataContainer('tl_event_filter_form');
         System::loadLanguageFile('tl_event_filter_form');
-        foreach ($GLOBALS['TL_DCA']['tl_event_filter_form']['fields'] as $k => $v)
-        {
-            $opt[$k] = isset($GLOBALS['TL_LANG']['tl_event_filter_form'][$k][0]) ? $GLOBALS['TL_LANG']['tl_event_filter_form'][$k][0] : $k;
+
+        foreach (array_keys($GLOBALS['TL_DCA']['tl_event_filter_form']['fields']) as $k) {
+            $opt[$k] = $GLOBALS['TL_LANG']['tl_event_filter_form'][$k][0] ?? $k;
         }
+
         return $opt;
     }
 
     /**
-     * Return all calendar templates as array
+     * Return all calendar templates as array.
      *
      * @return array
      */

@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -21,18 +23,56 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
- * Class SyncSacMemberDatabase
- * @package Markocupic\SacEventToolBundle\SacMemberDatabase
+ * Class SyncSacMemberDatabase.
  */
 class SyncSacMemberDatabase
 {
+    /**
+     * Log type for new member.
+     */
+    const SAC_EVT_LOG_ADD_NEW_MEMBER = 'MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER';
+
+    /**
+     * Log type for member update.
+     */
+    const SAC_EVT_LOG_UPDATE_MEMBER = 'MEMBER_DATABASE_SYNC_UPDATE_MEMBER';
+
+    /**
+     * Log type for a successful sync.
+     */
+    const SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC = 'MEMBER_DATABASE_SYNC';
+
+    /**
+     * Log type if a member has been disabled.
+     */
+    const SAC_EVT_LOG_DISABLE_MEMBER = 'DISABLE_MEMBER';
+
+    /**
+     * Log type if there is db transaction error.
+     */
+    const SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR = 'MEMBER_DATABASE_TRANSACTION_ERROR';
+
+    /**
+     * FTP db dump filepath.
+     */
+    const FTP_DB_DUMP_FILE_PATH = 'system/tmp/Adressen_0000%s.csv';
+
+    /**
+     * End of file string.
+     */
+    const FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
+
+    /**
+     * Field delimiter.
+     */
+    const FTP_DB_DUMP_FIELD_DELIMITER = '$';
     /**
      * @var ContaoFramework
      */
     private $framework;
 
     /**
-     * string $projectDir
+     * string $projectDir.
      */
     private $projectDir;
 
@@ -40,46 +80,6 @@ class SyncSacMemberDatabase
      * @var ?LoggerInterface
      */
     private $logger;
-
-    /**
-     * Log type for new member
-     */
-    const SAC_EVT_LOG_ADD_NEW_MEMBER = 'MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER';
-
-    /**
-     * Log type for member update
-     */
-    const SAC_EVT_LOG_UPDATE_MEMBER = 'MEMBER_DATABASE_SYNC_UPDATE_MEMBER';
-
-    /**
-     * Log type for a successful sync
-     */
-    const SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC = 'MEMBER_DATABASE_SYNC';
-
-    /**
-     * Log type if a member has been disabled
-     */
-    const SAC_EVT_LOG_DISABLE_MEMBER = 'DISABLE_MEMBER';
-
-    /**
-     * Log type if there is db transaction error
-     */
-    const SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR = 'MEMBER_DATABASE_TRANSACTION_ERROR';
-
-    /**
-     * FTP db dump filepath
-     */
-    const FTP_DB_DUMP_FILE_PATH = 'system/tmp/Adressen_0000%s.csv';
-
-    /**
-     * End of file string
-     */
-    const FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
-
-    /**
-     * Field delimiter
-     */
-    const FTP_DB_DUMP_FIELD_DELIMITER = '$';
 
     /**
      * @var array
@@ -103,9 +103,8 @@ class SyncSacMemberDatabase
 
     /**
      * SyncSacMemberDatabase constructor.
-     * @param ContaoFramework $framework
+     *
      * @param $projectDir
-     * @param null|LoggerInterface $logger
      */
     public function __construct(ContaoFramework $framework, $projectDir, ?LoggerInterface $logger = null)
     {
@@ -132,7 +131,7 @@ class SyncSacMemberDatabase
     /**
      * @throws \Exception
      */
-    public function run()
+    public function run(): void
     {
         $this->fetchFilesFromFtp();
         $this->syncContaoDatabase();
@@ -146,38 +145,36 @@ class SyncSacMemberDatabase
         // Open FTP connection
         $connId = $this->openFtpConnection();
 
-        foreach ($this->section_ids as $sectionId)
-        {
-            $localFile = $this->projectDir . '/' . sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId);
+        foreach ($this->section_ids as $sectionId) {
+            $localFile = $this->projectDir.'/'.sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId);
             $remoteFile = basename($localFile);
 
             // Delete old file
-            if (is_file($localFile))
-            {
+            if (is_file($localFile)) {
                 unlink($localFile);
             }
 
             // Fetch file
-            if (!\ftp_get($connId, $localFile, $remoteFile, FTP_BINARY))
-            {
+            if (!ftp_get($connId, $localFile, $remoteFile, FTP_BINARY)) {
                 $msg = sprintf('Could not find db dump "%s" at "%s".', $remoteFile, $this->ftp_hostname);
                 $this->log(LogLevel::CRITICAL, $msg, __METHOD__, ContaoContext::ERROR);
 
                 throw new \Exception($msg);
             }
         }
-        \ftp_close($connId);
+        ftp_close($connId);
     }
 
     /**
-     * @return resource
      * @throws \Exception
+     *
+     * @return resource
      */
     private function openFtpConnection()
     {
-        $connId = \ftp_connect($this->ftp_hostname);
-        if (!\ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId)
-        {
+        $connId = ftp_connect($this->ftp_hostname);
+
+        if (!ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId) {
             $msg = sprintf('Could not establish ftp connection to %s.', $this->ftp_hostname);
             $this->log(LogLevel::CRITICAL, $msg, __METHOD__, self::ERROR);
 
@@ -188,18 +185,18 @@ class SyncSacMemberDatabase
     }
 
     /**
-     * Sync tl_member with Navision db dump
+     * Sync tl_member with Navision db dump.
+     *
      * @throws \Exception
      */
     private function syncContaoDatabase(): void
     {
-
-        $startTime = \time();
+        $startTime = time();
         $arrMemberIDS = [];
 
         $statement = Database::getInstance()->execute('SELECT sacMemberId FROM tl_member');
-        if ($statement->numRows)
-        {
+
+        if ($statement->numRows) {
             $arrMemberIDS = $statement->fetchEach('sacMemberId');
         }
 
@@ -207,45 +204,44 @@ class SyncSacMemberDatabase
         $arrSacMemberIds = [];
 
         $arrMember = [];
-        foreach ($this->section_ids as $sectionId)
-        {
+
+        foreach ($this->section_ids as $sectionId) {
             $objFile = new File(sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId));
-            if ($objFile !== null)
-            {
+
+            if (null !== $objFile) {
                 $arrFile = $objFile->getContentAsArray();
-                foreach ($arrFile as $line)
-                {
+
+                foreach ($arrFile as $line) {
                     // End of line
-                    if (\strpos($line, static::FTP_DB_DUMP_END_OF_FILE_STRING) !== false)
-                    {
+                    if (false !== strpos($line, static::FTP_DB_DUMP_END_OF_FILE_STRING)) {
                         continue;
                     }
-                    $arrLine = \explode(static::FTP_DB_DUMP_FIELD_DELIMITER, $line);
+                    $arrLine = explode(static::FTP_DB_DUMP_FIELD_DELIMITER, $line);
 
-                    $arrSacMemberIds[] = \intval($arrLine[0]);
+                    $arrSacMemberIds[] = (int) ($arrLine[0]);
 
                     $set = [];
-                    $set['sacMemberId'] = \intval($arrLine[0]);
-                    $set['username'] = \intval($arrLine[0]);
+                    $set['sacMemberId'] = (int) ($arrLine[0]);
+                    $set['username'] = (int) ($arrLine[0]);
                     // Allow multi membership
-                    $set['sectionId'] = [(string) \ltrim((string) $arrLine[1], '0')];
+                    $set['sectionId'] = [(string) ltrim((string) $arrLine[1], '0')];
                     $set['lastname'] = $arrLine[2];
                     $set['firstname'] = $arrLine[3];
                     $set['addressExtra'] = $arrLine[4];
-                    $set['street'] = \trim((string) $arrLine[5]);
+                    $set['street'] = trim((string) $arrLine[5]);
                     $set['streetExtra'] = $arrLine[6];
                     $set['postal'] = $arrLine[7];
                     $set['city'] = $arrLine[8];
-                    $set['country'] = empty(\strtolower((string) $arrLine[9])) ? 'ch' : \strtolower((string) $arrLine[9]);
-                    $set['dateOfBirth'] = \strtotime((string) $arrLine[10]);
+                    $set['country'] = empty(strtolower((string) $arrLine[9])) ? 'ch' : strtolower((string) $arrLine[9]);
+                    $set['dateOfBirth'] = strtotime((string) $arrLine[10]);
                     $set['phoneBusiness'] = beautifyPhoneNumber($arrLine[11]);
                     $set['phone'] = beautifyPhoneNumber($arrLine[12]);
                     $set['mobile'] = beautifyPhoneNumber($arrLine[14]);
                     $set['fax'] = $arrLine[15];
                     $set['email'] = $arrLine[16];
-                    $set['gender'] = \strtolower((string) $arrLine[17]) === 'weiblich' ? 'female' : 'male';
+                    $set['gender'] = 'weiblich' === strtolower((string) $arrLine[17]) ? 'female' : 'male';
                     $set['profession'] = $arrLine[18];
-                    $set['language'] = \strtolower((string) $arrLine[19]) === 'd' ? 'de' : \strtolower((string) $arrLine[19]);
+                    $set['language'] = 'd' === strtolower((string) $arrLine[19]) ? 'de' : strtolower((string) $arrLine[19]);
                     $set['entryYear'] = $arrLine[20];
                     $set['membershipType'] = $arrLine[23];
                     $set['sectionInfo1'] = $arrLine[24];
@@ -256,23 +252,23 @@ class SyncSacMemberDatabase
                     $set['memberStatus'] = $arrLine[29];
                     $arrValues['disable'] = '';
 
-                    $set = \array_map(function ($value) {
-                        if (!\is_array($value))
-                        {
-                            $value = \is_string($value) ? \trim((string) $value) : $value;
-                            $value = \is_string($value) ? \utf8_encode($value) : $value;
+                    $set = array_map(
+                        static function ($value) {
+                            if (!\is_array($value)) {
+                                $value = \is_string($value) ? trim((string) $value) : $value;
+
+                                return \is_string($value) ? utf8_encode($value) : $value;
+                            }
+
                             return $value;
-                        }
-                        return $value;
-                    }, $set);
+                        },
+                        $set
+                    );
 
                     // Check if member is already in the array
-                    if (isset($arrMember[$set['sacMemberId']]))
-                    {
-                        $arrMember[$set['sacMemberId']]['sectionId'] = \array_merge($arrMember[$set['sacMemberId']]['sectionId'], $set['sectionId']);
-                    }
-                    else
-                    {
+                    if (isset($arrMember[$set['sacMemberId']])) {
+                        $arrMember[$set['sacMemberId']]['sectionId'] = array_merge($arrMember[$set['sacMemberId']]['sectionId'], $set['sectionId']);
+                    } else {
                         $arrMember[$set['sacMemberId']] = $set;
                     }
                 }
@@ -281,20 +277,15 @@ class SyncSacMemberDatabase
 
         @ini_set('max_execution_time', '0');
         // Consider the suhosin.memory_limit
-        if (\extension_loaded('suhosin'))
-        {
-            if (($limit = ini_get('suhosin.memory_limit')) !== '')
-            {
+        if (\extension_loaded('suhosin')) {
+            if (($limit = ini_get('suhosin.memory_limit')) !== '') {
                 @ini_set('memory_limit', (string) $limit);
             }
-        }
-        else
-        {
+        } else {
             @ini_set('memory_limit', '-1');
         }
 
-        try
-        {
+        try {
             // Lock table tl_member for writing
             Database::getInstance()->lockTables(['tl_member' => 'WRITE']);
 
@@ -311,55 +302,47 @@ class SyncSacMemberDatabase
             $countUpdates = 0;
 
             $i = 0;
-            foreach ($arrMember as $sacMemberId => $arrValues)
-            {
-                $arrValues['sectionId'] = \serialize($arrValues['sectionId']);
 
-                if (!in_array($sacMemberId, $arrMemberIDS, false))
-                {
-                    $arrValues['dateAdded'] = \time();
-                    $arrValues['tstamp'] = \time();
+            foreach ($arrMember as $sacMemberId => $arrValues) {
+                $arrValues['sectionId'] = serialize($arrValues['sectionId']);
+
+                if (!\in_array($sacMemberId, $arrMemberIDS, false)) {
+                    $arrValues['dateAdded'] = time();
+                    $arrValues['tstamp'] = time();
 
                     // Insert new member
-
-                    /** @var Database\Statement $objInsertStmt */
+                    /** @var Statement $objInsertStmt */
                     $objInsertStmt = Database::getInstance()->prepare('INSERT INTO tl_member %s')->set($arrValues)->execute();
 
-                    if ($objInsertStmt->affectedRows)
-                    {
+                    if ($objInsertStmt->affectedRows) {
                         // Log
-                        $msg = \sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
+                        $msg = sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
                         $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_ADD_NEW_MEMBER);
-                        $countInserts++;
+                        ++$countInserts;
                     }
-                }
-                else
-                {
+                } else {
                     // Update/sync datarecord
-
-                    /** @var Database\Statement $objUpdateStmt */
+                    /** @var Statement $objUpdateStmt */
                     $objUpdateStmt = Database::getInstance()->prepare('UPDATE tl_member %s WHERE sacMemberId=?')->set($arrValues)->execute($sacMemberId);
-                    if ($objUpdateStmt->affectedRows)
-                    {
+
+                    if ($objUpdateStmt->affectedRows) {
                         Database::getInstance()->prepare('UPDATE tl_member SET tstamp=? WHERE sacMemberId=?')->execute(time(), $sacMemberId);
-                        $msg = \sprintf('Update SAC-member "%s %s" with SAC-User-ID: %s in tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
+                        $msg = sprintf('Update SAC-member "%s %s" with SAC-User-ID: %s in tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
                         $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_UPDATE_MEMBER);
-                        $countUpdates++;
+                        ++$countUpdates;
                     }
                 }
 
-                $i++;
+                ++$i;
             }
 
             // Reset sacMemberId to true, if member exists in the downloaded database dump
-            if (!empty($arrSacMemberIds))
-            {
-                Database::getInstance()->execute('UPDATE tl_member SET isSacMember="1" WHERE sacMemberId IN (' . implode(',', $arrSacMemberIds) . ')');
+            if (!empty($arrSacMemberIds)) {
+                Database::getInstance()->execute('UPDATE tl_member SET isSacMember="1" WHERE sacMemberId IN ('.implode(',', $arrSacMemberIds).')');
             }
 
             Database::getInstance()->commitTransaction();
-        } catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $msg = 'Error during the database sync process. Starting transaction rollback now.';
             $this->log(LogLevel::CRITICAL, $msg, __METHOD__, self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR);
 
@@ -375,22 +358,21 @@ class SyncSacMemberDatabase
 
         // Set tl_member.disable to true if member was not found in the csv-file (is no more a valid SAC member)
         $objDisabledMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE disable=? AND isSacMember=?')->execute('', '');
-        while ($objDisabledMember->next())
-        {
+
+        while ($objDisabledMember->next()) {
             $arrSet = [
-                'tstamp'  => \time(),
+                'tstamp' => time(),
                 'disable' => '1',
             ];
             Database::getInstance()->prepare('UPDATE tl_member %s WHERE id=?')->set($arrSet)->execute($objDisabledMember->id);
 
             // Log
-            $msg = \sprintf('Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. The user can not be found in the SAC main database from Bern.', $objDisabledMember->firstname, $objDisabledMember->lastname, $objDisabledMember->sacMemberId);
+            $msg = sprintf('Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. The user can not be found in the SAC main database from Bern.', $objDisabledMember->firstname, $objDisabledMember->lastname, $objDisabledMember->sacMemberId);
             $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_DISABLE_MEMBER);
         }
 
-        if ($i === count($arrMember))
-        {
-            $duration = \time() - $startTime;
+        if ($i === \count($arrMember)) {
+            $duration = time() - $startTime;
 
             // Log
             $msg = sprintf('Finished syncing SAC member database with tl_member. Traversed %s entries. Total inserts: %s. Total updates: %s. Duration: %s s.',
@@ -403,16 +385,9 @@ class SyncSacMemberDatabase
         }
     }
 
-    /**
-     * @param string $strLogLevel
-     * @param string $strText
-     * @param string $strMethod
-     * @param string $strCategory
-     */
     private function log(string $strLogLevel, string $strText, string $strMethod, string $strCategory): void
     {
-        if ($this->logger !== null)
-        {
+        if (null !== $this->logger) {
             $this->logger->log(
                 $strLogLevel,
                 $strText,

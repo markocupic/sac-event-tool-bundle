@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -22,12 +24,10 @@ use Contao\System;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class ParseTemplateListener
- * @package Markocupic\SacEventToolBundle\EventListener\Contao
+ * Class ParseTemplateListener.
  */
 class ParseTemplateListener
 {
-
     /**
      * @var ContaoFramework
      */
@@ -45,9 +45,6 @@ class ParseTemplateListener
 
     /**
      * ParseTemplateListener constructor.
-     * @param ContaoFramework $framework
-     * @param RequestStack $requestStack
-     * @param ScopeMatcher $scopeMatcher
      */
     public function __construct(ContaoFramework $framework, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
     {
@@ -59,45 +56,49 @@ class ParseTemplateListener
     /**
      * @param $objTemplate
      */
-    public function onParseTemplate($objTemplate)
+    public function onParseTemplate($objTemplate): void
     {
-        if ($this->_isFrontend())
-        {
+        if ($this->_isFrontend()) {
             // Check if frontend login is allowed, if not replace the default error message and redirect to account activation page
-            if ($objTemplate->getName() === 'mod_login')
-            {
+            if ('mod_login' === $objTemplate->getName()) {
                 $this->_checkIfFrontenMemberAccountIsActivated($objTemplate);
             }
         }
     }
 
     /**
-     * Check if frontend login is allowed, if not replace the default error message and redirect to account activation page
+     * Identify the Contao scope (TL_MODE) of the current request.
+     */
+    protected function _isFrontend(): bool
+    {
+        return null !== $this->requestStack->getCurrentRequest() ? $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()) : false;
+    }
+
+    /**
+     * Check if frontend login is allowed, if not replace the default error message and redirect to account activation page.
+     *
      * @param $objTemplate
      */
-    private function _checkIfFrontenMemberAccountIsActivated($objTemplate)
+    private function _checkIfFrontenMemberAccountIsActivated($objTemplate): void
     {
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
         $moduleModelAdapter = $this->framework->getAdapter(ModuleModel::class);
         $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
-        if ($objTemplate->value !== '' && $objTemplate->hasError === true)
-        {
+        if ('' !== $objTemplate->value && true === $objTemplate->hasError) {
             $objMember = $memberModelAdapter->findByUsername($objTemplate->value);
-            if ($objMember !== null)
-            {
-                if (!$objMember->login)
-                {
+
+            if (null !== $objMember) {
+                if (!$objMember->login) {
                     // Redirect to account activation page if it is set
                     $objLoginModule = $moduleModelAdapter->findByPk($objTemplate->id);
-                    if ($objLoginModule !== null)
-                    {
-                        if ($objLoginModule->jumpToWhenNotActivated > 0)
-                        {
+
+                    if (null !== $objLoginModule) {
+                        if ($objLoginModule->jumpToWhenNotActivated > 0) {
                             $objPage = $pageModelAdapter->findByPk($objLoginModule->jumpToWhenNotActivated);
-                            if ($objPage !== null)
-                            {
+
+                            if (null !== $objPage) {
                                 // Before redirecting store error message in the session flash bag
                                 $session = System::getContainer()->get('session');
                                 $flashBag = $session->getFlashBag();
@@ -110,21 +111,9 @@ class ParseTemplateListener
                     }
                     $objTemplate->message = $GLOBALS['TL_LANG']['ERR']['memberAccountNotActivated'];
                 }
-            }
-            else
-            {
+            } else {
                 $objTemplate->message = sprintf($GLOBALS['TL_LANG']['ERR']['memberAccountNotFound'], $objTemplate->value);
             }
         }
     }
-
-    /**
-     * Identify the Contao scope (TL_MODE) of the current request
-     * @return bool
-     */
-    protected function _isFrontend(): bool
-    {
-        return $this->requestStack->getCurrentRequest() !== null ? $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()) : false;
-    }
-
 }

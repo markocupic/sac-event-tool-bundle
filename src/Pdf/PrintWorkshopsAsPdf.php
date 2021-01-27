@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -14,6 +16,8 @@ namespace Markocupic\SacEventToolBundle\Pdf;
 
 use Contao\CalendarEventsModel;
 use Contao\CalendarModel;
+use Contao\Config;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
 use Contao\Database;
@@ -23,18 +27,14 @@ use Contao\FrontendTemplate;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
-use Contao\Config;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use TCPDF_FONTS;
 
 /**
- * Class PrintWorkshopsAsPdf
- * @package Markocupic\SacEventToolBundle\Pdf
+ * Class PrintWorkshopsAsPdf.
  */
 class PrintWorkshopsAsPdf
 {
-
     /**
      * @var
      */
@@ -43,17 +43,17 @@ class PrintWorkshopsAsPdf
     /**
      * @var null
      */
-    protected $year = null;
+    protected $year;
 
     /**
      * @var null
      */
-    protected $calendarId = null;
+    protected $calendarId;
 
     /**
      * @var null
      */
-    protected $eventId = null;
+    protected $eventId;
 
     /**
      * @var PrintWorkshopsAsPdf
@@ -77,7 +77,6 @@ class PrintWorkshopsAsPdf
 
     /**
      * PrintWorkshopsAsPdf constructor.
-     * @param ContaoFramework $framework
      */
     public function __construct(ContaoFramework $framework)
     {
@@ -91,46 +90,47 @@ class PrintWorkshopsAsPdf
     }
 
     /**
-     * @param int $year
-     * @return PrintWorkshopsAsPdf
      * @throws \Exception
+     *
+     * @return PrintWorkshopsAsPdf
      */
     public function setYear(int $year): self
     {
-        if (!checkdate(1, 1, $year))
-        {
+        if (!checkdate(1, 1, $year)) {
             throw new \Exception(sprintf('%s is not a valid year number. Please use a valid year number f.ex. "2020" as first parameter.', Date::parse('Y', strtotime($year))));
         }
         $this->year = $year;
+
         return $this;
     }
 
     /**
-     * @param int $calendarId
-     * @return PrintWorkshopsAsPdf
      * @throws \Exception
+     *
+     * @return PrintWorkshopsAsPdf
      */
     public function setCalendarId(int $calendarId): self
     {
         $objCalendar = CalendarModel::findByPk($calendarId);
-        if ($objCalendar === null)
-        {
+
+        if (null === $objCalendar) {
             throw new \Exception('Please use a valid calendar id as first parameter.');
         }
         $this->calendarId = $calendarId;
+
         return $this;
     }
 
     /**
-     * @param int $eventId
-     * @return PrintWorkshopsAsPdf
      * @throws \Exception
+     *
+     * @return PrintWorkshopsAsPdf
      */
     public function setEventId(int $eventId): self
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
-        if ($objEvent === null)
-        {
+
+        if (null === $objEvent) {
             throw new \Exception('Please use a valid event id as first parameter.');
         }
         $this->eventId = $objEvent->id;
@@ -139,19 +139,19 @@ class PrintWorkshopsAsPdf
     }
 
     /**
-     * @param bool $download
      * @return PrintWorkshopsAsPdf
      */
     public function setDownload(bool $download): self
     {
         $this->download = $download;
+
         return $this;
     }
 
     /**
-     * Launch method via CronJob (Geplante Aufgaben on Plesk)
+     * Launch method via CronJob (Geplante Aufgaben on Plesk).
      */
-    public function printWorkshopsAsPdf()
+    public function printWorkshopsAsPdf(): void
     {
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
@@ -160,8 +160,7 @@ class PrintWorkshopsAsPdf
         $this->addCover = true;
 
         // Print single event
-        if (null !== ($objEvent = CalendarEventsModel::findByPk($this->eventId)))
-        {
+        if (null !== ($objEvent = CalendarEventsModel::findByPk($this->eventId))) {
             $this->printSingleEvent = true;
             $this->addToc = false;
             $this->addCover = false;
@@ -171,14 +170,14 @@ class PrintWorkshopsAsPdf
         // Get the font directory
         $container = System::getContainer();
         $bundleSRC = $container->get('kernel')->locateResource('@MarkocupicSacEventToolBundle');
-        $fontDirectory = $bundleSRC . 'Pdf/fonts/opensans';
+        $fontDirectory = $bundleSRC.'Pdf/fonts/opensans';
 
         // create new PDF document
         // Extend TCPDF for special footer and header handling
         $this->pdf = new WorkshopTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        TCPDF_FONTS::addTTFfont($fontDirectory . '/OpenSans-Light.ttf', 'TrueTypeUnicode', '', 96);
-        TCPDF_FONTS::addTTFfont($fontDirectory . '/OpenSans-Bold.ttf', 'TrueTypeUnicode', '', 96);
-        TCPDF_FONTS::addTTFfont($fontDirectory . '/OpenSans-LightItalic.ttf', 'TrueTypeUnicode', '', 96);
+        TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-Light.ttf', 'TrueTypeUnicode', '', 96);
+        TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-Bold.ttf', 'TrueTypeUnicode', '', 96);
+        TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-LightItalic.ttf', 'TrueTypeUnicode', '', 96);
 
         //$this->pdf->setPrintHeader(false);
         $this->pdf->setPrintFooter(false);
@@ -190,8 +189,7 @@ class PrintWorkshopsAsPdf
         // set auto page breaks false
         $this->pdf->SetAutoPageBreak(false, 0);
 
-        if ($this->addCover)
-        {
+        if ($this->addCover) {
             // Cover (first page)
             $this->pdf->type = 'cover';
             $this->pdf->AddPage('P', 'A4');
@@ -204,30 +202,27 @@ class PrintWorkshopsAsPdf
             $this->pdf->SetY(120);
             $this->pdf->SetFont('opensans', 'B', 45);
             $this->pdf->SetTextColor(255, 255, 255);
-            $this->pdf->MultiCell(0, 0, 'Kursprogramm ' . $this->year, 0, 'R', 0, 1, '', '', true, 0);
+            $this->pdf->MultiCell(0, 0, 'Kursprogramm '.$this->year, 0, 'R', 0, 1, '', '', true, 0);
 
             $this->pdf->Ln();
             $this->pdf->SetY(270);
             $this->pdf->SetFont('opensanslight', '', 8);
             $this->pdf->SetTextColor(0, 0, 0);
-            $this->pdf->MultiCell(0, 0, 'Ausgabe vom ' . Date::parse('d.m.Y H:i', time()), 0, 'R', 0, 1, '', '', true, 0);
+            $this->pdf->MultiCell(0, 0, 'Ausgabe vom '.Date::parse('d.m.Y H:i', time()), 0, 'R', 0, 1, '', '', true, 0);
         }
 
         // Event items
         $this->pdf->SetFont('opensanslight', '', 12);
         $this->pdf->SetTextColor(0, 0, 0);
         $objDb = Database::getInstance();
-        if ($this->eventId)
-        {
+
+        if ($this->eventId) {
             $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=? AND published=?')->execute($this->eventId, 1);
-        }
-        else
-        {
+        } else {
             $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE pid=? AND published=? ORDER BY courseTypeLevel0, title, startDate')->execute($this->calendarId, 1);
         }
 
-        while ($objEvent->next())
-        {
+        while ($objEvent->next()) {
             // Create a page for each event
             $this->pdf->type = 'eventPage';
             $this->pdf->Event = $objEvent;
@@ -236,8 +231,7 @@ class PrintWorkshopsAsPdf
             $this->pdf->writeHTML($html);
         }
 
-        if ($this->addToc)
-        {
+        if ($this->addToc) {
             $this->pdf->type = 'TOC';
             $this->pdf->addTOCPage('P', 'A4', 20);
 
@@ -252,7 +246,7 @@ class PrintWorkshopsAsPdf
 
             // add a simple Table Of Content at first page
             // (check the example n. 59 for the HTML version)
-            $this->pdf->addTOC(2, 'opensanslight', '.', 'INDEX', 'B', array(255, 255, 255));
+            $this->pdf->addTOC(2, 'opensanslight', '.', 'INDEX', 'B', [255, 255, 255]);
 
             // end of TOC page
             $this->pdf->endTOCPage();
@@ -261,30 +255,70 @@ class PrintWorkshopsAsPdf
         $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'));
         $fileSRC = sprintf($filenamePattern, $this->year);
 
-        if ($this->download === false)
-        {
+        if (false === $this->download) {
             // Close and output PDF document
-            if (file_exists($rootDir . '/' . $fileSRC))
-            {
-                unlink($rootDir . '/' . $fileSRC);
+            if (file_exists($rootDir.'/'.$fileSRC)) {
+                unlink($rootDir.'/'.$fileSRC);
             }
             sleep(1);
-            $this->pdf->Output($rootDir . '/' . $fileSRC, 'F');
-        }
-        else
-        {
+            $this->pdf->Output($rootDir.'/'.$fileSRC, 'F');
+        } else {
             // Send File to Browser
-            if ($this->printSingleEvent)
-            {
+            if ($this->printSingleEvent) {
                 $eventAlias = CalendarEventsModel::findByPk($this->eventId)->alias;
-                $this->pdf->Output($eventAlias . '.pdf', 'D');
-            }
-            else
-            {
+                $this->pdf->Output($eventAlias.'.pdf', 'D');
+            } else {
                 $filename = basename($fileSRC);
                 $this->pdf->Output($filename, 'D');
             }
         }
+    }
+
+    /**
+     * @param $eventId
+     *
+     * @return mixed|string
+     */
+    public function getDateString($eventId)
+    {
+        $objEvent = CalendarEventsModel::findByPk($eventId);
+        $strDates = '';
+
+        if (null !== $objEvent) {
+            $arr = CalendarEventsHelper::getEventTimestamps($objEvent);
+
+            if (false !== $arr) {
+                if (\count($arr) > 1) {
+                    $arrValue = [];
+
+                    foreach ($arr as $k => $v) {
+                        if ($k === \count($arr) - 1) {
+                            $arrValue[] = 'und '.Date::parse('d.m.Y', $v);
+                        } else {
+                            $arrValue[] = Date::parse('d.m.', $v);
+                        }
+                    }
+                    $strDates = implode(', ', $arrValue);
+                    $strDates = str_replace(', und ', ' und ', $strDates);
+                } else {
+                    $strDates = Date::parse('d.m.Y', $arr[0]);
+                }
+            }
+        }
+
+        return $strDates;
+    }
+
+    /**
+     * @param string $string
+     */
+    protected function nl2br($string = ''): string
+    {
+        if (null === $string) {
+            return '';
+        }
+
+        return nl2br($string);
     }
 
     /**
@@ -294,7 +328,7 @@ class PrintWorkshopsAsPdf
     {
         System::loadLanguageFile('tl_calendar_events');
         $objEvent = CalendarEventsModel::findByPk($this->pdf->Event->id);
-        $this->pdf->Bookmark(html_entity_decode($objEvent->title), 0, 0, '', 'I', array(0, 0, 0));
+        $this->pdf->Bookmark(html_entity_decode($objEvent->title), 0, 0, '', 'I', [0, 0, 0]);
 
         // Create template object
         $objPartial = new FrontendTemplate('tcpdf_template_sac_kurse');
@@ -316,14 +350,18 @@ class PrintWorkshopsAsPdf
         $objPartial->courseLevel = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel];
 
         // organisierende Gruppen
-        $arrItems = array_map(function ($item) {
-            $objOrganizer = EventOrganizerModel::findByPk($item);
-            if ($objOrganizer !== null)
-            {
-                $item = $objOrganizer->title;
-            }
-            return $item;
-        }, StringUtil::deserialize($objEvent->organizers, true));
+        $arrItems = array_map(
+            static function ($item) {
+                $objOrganizer = EventOrganizerModel::findByPk($item);
+
+                if (null !== $objOrganizer) {
+                    $item = $objOrganizer->title;
+                }
+
+                return $item;
+            },
+            StringUtil::deserialize($objEvent->organizers, true)
+        );
         $objPartial->organizers = implode(', ', $arrItems);
 
         // Teasertext
@@ -346,15 +384,20 @@ class PrintWorkshopsAsPdf
 
         // Instructors
         $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent);
-        $arrItems = array_map(function ($userId) {
-            $objUser = UserModel::findByPk($userId);
-            if ($objUser !== null)
-            {
-                $strQuali = CalendarEventsHelper::getMainQualification($objUser) != '' ? ' (' . CalendarEventsHelper::getMainQualification($objUser) . ')' : '';
-                return $objUser->name . $strQuali;
-            }
-            return '';
-        }, $arrInstructors);
+        $arrItems = array_map(
+            static function ($userId) {
+                $objUser = UserModel::findByPk($userId);
+
+                if (null !== $objUser) {
+                    $strQuali = '' !== CalendarEventsHelper::getMainQualification($objUser) ? ' ('.CalendarEventsHelper::getMainQualification($objUser).')' : '';
+
+                    return $objUser->name.$strQuali;
+                }
+
+                return '';
+            },
+            $arrInstructors
+        );
         $objPartial->instructor = implode(', ', $arrItems);
 
         // Services/Leistungen
@@ -374,8 +417,8 @@ class PrintWorkshopsAsPdf
 
         // Styles
         $objPartial->titleStyle = "color:#000000; font-family: 'opensansbold'; font-size: 20px";
-        $objPartial->rowStyleA = "background-color: #ffffff";
-        $objPartial->rowStyleB = "background-color: #ffffff";
+        $objPartial->rowStyleA = 'background-color: #ffffff';
+        $objPartial->rowStyleB = 'background-color: #ffffff';
 
         $objPartial->cellStyleA = "font-family: 'opensansbold';  width:40mm; font-weight:bold; font-size: 9px";
         $objPartial->cellStyleB = "font-family: 'opensanslight'; width:130mm; font-size: 9px";
@@ -387,57 +430,4 @@ class PrintWorkshopsAsPdf
 
         return $objPartial->parse();
     }
-
-    /**
-     * @param string $string
-     * @return string
-     */
-    protected function nl2br($string = ''): string
-    {
-        if (null === $string)
-        {
-            return '';
-        }
-        return nl2br($string);
-    }
-
-    /**
-     * @param $eventId
-     * @return mixed|string
-     */
-    public function getDateString($eventId)
-    {
-        $objEvent = CalendarEventsModel::findByPk($eventId);
-        $strDates = '';
-        if($objEvent !== null)
-        {
-            $arr = CalendarEventsHelper::getEventTimestamps($objEvent);
-            if ($arr !== false)
-            {
-                if (count($arr) > 1)
-                {
-                    $arrValue = array();
-                    foreach ($arr as $k => $v)
-                    {
-                        if ($k === count($arr) - 1)
-                        {
-                            $arrValue[] = 'und ' . Date::parse('d.m.Y', $v);
-                        }
-                        else
-                        {
-                            $arrValue[] = Date::parse('d.m.', $v);
-                        }
-                    }
-                    $strDates = implode(', ', $arrValue);
-                    $strDates = str_replace(', und ', ' und ', $strDates);
-                }
-                else
-                {
-                    $strDates = Date::parse('d.m.Y', $arr[0]);
-                }
-            }
-        }
-        return $strDates;
-    }
-
 }

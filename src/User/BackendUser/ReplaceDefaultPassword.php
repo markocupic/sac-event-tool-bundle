@@ -2,37 +2,32 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
 namespace Markocupic\SacEventToolBundle\User\BackendUser;
 
 use Contao\Config;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Contao\System;
 use Contao\UserModel;
 use NotificationCenter\Model\Notification;
 use Psr\Log\LogLevel;
-use Contao\CoreBundle\Framework\ContaoFramework;
 
 /**
- * Class ReplaceDefaultPassword
- * @package Markocupic\SacEventToolBundle\User\BackendUser
+ * Class ReplaceDefaultPassword.
  */
 class ReplaceDefaultPassword
 {
-
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
-
     /**
      * @var
      */
@@ -44,8 +39,12 @@ class ReplaceDefaultPassword
     protected $emailSendLimit = 20;
 
     /**
+     * @var ContaoFramework
+     */
+    private $framework;
+
+    /**
      * ReplaceDefaultPassword constructor.
-     * @param ContaoFramework $framework
      */
     public function __construct(ContaoFramework $framework)
     {
@@ -56,11 +55,11 @@ class ReplaceDefaultPassword
     }
 
     /**
-     * Replace default password and send new
+     * Replace default password and send new.
      */
     public function replaceDefaultPasswordAndSendNew(): void
     {
-        /** @var  Config $configAdapter */
+        /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
 
         /** @var Database $databaseAdapter */
@@ -77,10 +76,8 @@ class ReplaceDefaultPassword
         $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_user WHERE pwChange=?')->execute('1');
         $counter = 0;
 
-        while ($objDb->next())
-        {
-            if (($pw = $this->replaceDefaultPassword($objDb->id)) !== false)
-            {
+        while ($objDb->next()) {
+            if (($pw = $this->replaceDefaultPassword($objDb->id)) !== false) {
                 $objUserModel = $userModelAdapter->findByPk($objDb->id);
                 $objUserModel->pwChange = '1';
                 $objUserModel->password = password_hash((string) $pw, PASSWORD_DEFAULT);
@@ -91,16 +88,16 @@ class ReplaceDefaultPassword
 
                 // Use terminal42/notification_center
                 $objEmail = $notificationAdapter->findOneByType('default_email');
-                if ($objEmail !== null)
-                {
+
+                if (null !== $objEmail) {
                     // Set token array
                     $arrTokens = [
-                        'email_sender_name'  => 'Administrator SAC Pilatus',
+                        'email_sender_name' => 'Administrator SAC Pilatus',
                         'email_sender_email' => $configAdapter->get('adminEmail'),
-                        'reply_to'           => $configAdapter->get('adminEmail'),
-                        'email_subject'      => html_entity_decode('Passwortänderung für Backend-Zugang auf der Webseite der SAC Sektion Pilatus'),
-                        'email_text'         => $bodyText,
-                        'send_to'            => $objUserModel->email
+                        'reply_to' => $configAdapter->get('adminEmail'),
+                        'email_subject' => html_entity_decode('Passwortänderung für Backend-Zugang auf der Webseite der SAC Sektion Pilatus'),
+                        'email_text' => $bodyText,
+                        'send_to' => $objUserModel->email,
                     ];
 
                     $objEmail->send($arrTokens, 'de');
@@ -111,9 +108,9 @@ class ReplaceDefaultPassword
                     $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, 'REPLACE DEFAULT PASSWORD')]);
 
                     // Limitize emails
-                    $counter++;
-                    if ($counter > $this->emailSendLimit)
-                    {
+                    ++$counter;
+
+                    if ($counter > $this->emailSendLimit) {
                         exit;
                     }
                 }
@@ -123,6 +120,7 @@ class ReplaceDefaultPassword
 
     /**
      * @param $id
+     *
      * @return bool|int
      */
     private function replaceDefaultPassword($id)
@@ -132,22 +130,22 @@ class ReplaceDefaultPassword
 
         $objUser = $userModelAdapter->findByPk($id);
 
-        if (password_verify($this->defaultPassword, $objUser->password))
-        {
+        if (password_verify($this->defaultPassword, $objUser->password)) {
             // Generate pw
             $objUserModel = $userModelAdapter->findByPk($objUser->id);
-            if ($objUserModel->sacMemberId > 1)
-            {
-                $pw = rand(44444444, 99999999);
-                return $pw;
+
+            if ($objUserModel->sacMemberId > 1) {
+                return random_int(44444444, 99999999);
             }
         }
+
         return false;
     }
 
     /**
      * @param $objMember
      * @param $pw
+     *
      * @return string
      */
     private function generateEmailText($objMember, $pw)

@@ -1,49 +1,46 @@
 <?php
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+declare(strict_types=1);
+
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
 namespace Markocupic\SacEventToolBundle\Dca;
 
-use Contao\DataContainer;
 use Contao\Database;
+use Contao\DataContainer;
 
 /**
- * Class TlContent
- * @package Markocupic\SacEventToolBundle\Dca
+ * Class TlContent.
  */
 class TlContent extends \tl_content
 {
-
     /**
      * @param $dc
      */
-    public function setPalette(DataContainer $dc)
+    public function setPalette(DataContainer $dc): void
     {
-
-        if ($dc->id > 0)
-        {
+        if ($dc->id > 0) {
             $objDb = Database::getInstance()
-                ->prepare("SELECT * FROM tl_content WHERE id=?")
+                ->prepare('SELECT * FROM tl_content WHERE id=?')
                 ->limit(1)
-                ->execute($dc->id);
-            if ($objDb->numRows)
-            {
+                ->execute($dc->id)
+            ;
+
+            if ($objDb->numRows) {
                 // Set palette for contednt element "user_portrait_list"
-                if ($objDb->type === 'user_portrait_list')
-                {
-                    if ($objDb->userList_selectMode === 'selectUsers')
-                    {
+                if ('user_portrait_list' === $objDb->type) {
+                    if ('selectUsers' === $objDb->userList_selectMode) {
                         $GLOBALS['TL_DCA'][$dc->table]['palettes'] = str_replace(',userList_userRoles', '', $GLOBALS['TL_DCA'][$dc->table]['palettes']);
                         $GLOBALS['TL_DCA'][$dc->table]['palettes'] = str_replace(',userList_queryType', '', $GLOBALS['TL_DCA'][$dc->table]['palettes']);
-                    }
-                    else
-                    {
+                    } else {
                         $GLOBALS['TL_DCA'][$dc->table]['palettes'] = str_replace(',userList_users', '', $GLOBALS['TL_DCA'][$dc->table]['palettes']);
                     }
                 }
@@ -56,18 +53,17 @@ class TlContent extends \tl_content
      */
     public function getCabannes()
     {
-
-        $options = array();
+        $options = [];
         $objDb = Database::getInstance()
             ->prepare('SELECT * FROM tl_cabanne_sac')
-            ->execute();
-        while ($objDb->next())
-        {
+            ->execute()
+        ;
+
+        while ($objDb->next()) {
             $options[$objDb->id] = $objDb->name;
         }
 
         return $options;
-
     }
 
     /**
@@ -75,22 +71,21 @@ class TlContent extends \tl_content
      */
     public function optionsCallbackUserRoles()
     {
-
-        $options = array();
+        $options = [];
         $objDb = Database::getInstance()
             ->prepare('SELECT * FROM tl_user_role ORDER BY sorting ASC')
-            ->execute();
-        while ($objDb->next())
-        {
+            ->execute()
+        ;
+
+        while ($objDb->next()) {
             $options[$objDb->id] = $objDb->title;
         }
 
         return $options;
-
     }
 
     /**
-     * Return all user portrait list templates as array
+     * Return all user portrait list templates as array.
      *
      * @return array
      */
@@ -99,9 +94,8 @@ class TlContent extends \tl_content
         return $this->getTemplateGroup('ce_user_portrait_list');
     }
 
-
     /**
-     * Return all user portrait list partial templates as array
+     * Return all user portrait list partial templates as array.
      *
      * @return array
      */
@@ -110,4 +104,3 @@ class TlContent extends \tl_content
         return $this->getTemplateGroup('user_portrait_list_partial_');
     }
 }
-

@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -19,12 +21,10 @@ use Contao\MemberModel;
 use Contao\PageModel;
 
 /**
- * Class ReplaceInsertTagsListener
- * @package Markocupic\SacEventToolBundle\EventListener\Contao
+ * Class ReplaceInsertTagsListener.
  */
 class ReplaceInsertTagsListener
 {
-
     /**
      * @var ContaoFramework
      */
@@ -32,7 +32,6 @@ class ReplaceInsertTagsListener
 
     /**
      * ReplaceInsertTagsListener constructor.
-     * @param ContaoFramework $framework
      */
     public function __construct(ContaoFramework $framework)
     {
@@ -41,6 +40,7 @@ class ReplaceInsertTagsListener
 
     /**
      * @param $strTag
+     *
      * @return bool|string
      */
     public function onReplaceInsertTags($strTag)
@@ -52,40 +52,40 @@ class ReplaceInsertTagsListener
         $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
 
         // Trim whitespaces
-        $strTag = $strTag != '' ? trim($strTag) : $strTag;
+        $strTag = '' !== $strTag ? trim($strTag) : $strTag;
 
         // Replace external link
         // {{external_link::http://google.ch::more}}
-        if (strpos($strTag, 'external_link') !== false)
-        {
+        if (false !== strpos($strTag, 'external_link')) {
             $elements = explode('::', $strTag);
-            if (is_array($elements) && count($elements) > 1)
-            {
+
+            if (\is_array($elements) && \count($elements) > 1) {
                 $href = $elements[1];
                 $label = $href;
-                if (isset($elements[2]) && $elements[2] != '')
-                {
+
+                if (isset($elements[2]) && '' !== $elements[2]) {
                     $label = $elements[2];
                 }
+
                 return sprintf('<a href="%s" target="_blank">%s</a>', $href, $label);
             }
         }
 
         // {{member_avatar::###pictureSizeID###}}
         // Return picture of logged in member
-        if (strpos($strTag, 'member_avatar') !== false)
-        {
+        if (false !== strpos($strTag, 'member_avatar')) {
             $elements = explode('::', $strTag);
-            if (is_array($elements) && count($elements) > 1)
-            {
+
+            if (\is_array($elements) && \count($elements) > 1) {
                 $size = $elements[1];
-                if (FE_USER_LOGGED_IN)
-                {
+
+                if (FE_USER_LOGGED_IN) {
                     $objUser = $memberModelAdapter->findByPk($frontendUserAdapter->getInstance()->id);
-                    if ($objUser !== null)
-                    {
+
+                    if (null !== $objUser) {
                         $strUrl = getAvatar($objUser->id, 'FE');
-                        $strInsertTag = sprintf('{{picture::%s?size=%s&alt=&s}}', $strUrl, $size, $objUser->firstname . ' ' . $objUser->lastname);
+                        $strInsertTag = sprintf('{{picture::%s?size=%s&alt=&s}}', $strUrl, $size, $objUser->firstname.' '.$objUser->lastname);
+
                         return $controllerAdapter->replaceInsertTags($strInsertTag);
                     }
                 }
@@ -96,19 +96,18 @@ class ReplaceInsertTagsListener
         // {{redirect::###pageIdOrAlias###::###params###}}
         // {{redirect::konto-aktivieren}}
         // {{redirect::some-page-alias::?foo=bar&var=bla}}
-        if (strpos($strTag, 'redirect') !== false)
-        {
+        if (false !== strpos($strTag, 'redirect')) {
             $elements = explode('::', $strTag);
-            if (is_array($elements) && count($elements) > 1)
-            {
+
+            if (\is_array($elements) && \count($elements) > 1) {
                 $params = '';
-                if (isset($elements[2]))
-                {
+
+                if (isset($elements[2])) {
                     $params = $elements[2];
                 }
                 $objPage = $pageModelAdapter->findByIdOrAlias($elements[1]);
-                if ($objPage !== null)
-                {
+
+                if (null !== $objPage) {
                     $strLocation = sprintf('%s%s', $objPage->getFrontendUrl(), $params);
                     $controllerAdapter->redirect($strLocation);
                 }
@@ -117,7 +116,4 @@ class ReplaceInsertTagsListener
 
         return false;
     }
-
 }
-
-

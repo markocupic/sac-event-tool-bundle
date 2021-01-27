@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -29,8 +31,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Class DownloadController
- * @package Markocupic\SacEventToolBundle\Controller\Download
+ * Class DownloadController.
  */
 class DownloadController extends AbstractController
 {
@@ -46,8 +47,6 @@ class DownloadController extends AbstractController
 
     /**
      * DownloadController constructor.
-     * @param ContaoFramework $framework
-     * @param RequestStack $requestStack
      */
     public function __construct(ContaoFramework $framework, RequestStack $requestStack)
     {
@@ -60,12 +59,13 @@ class DownloadController extends AbstractController
     /**
      * Download workshops as pdf booklet
      * /_download/print_workshop_booklet_as_pdf?year=2019&cat=0
-     * /_download/print_workshop_booklet_as_pdf?year=current&cat=0
+     * /_download/print_workshop_booklet_as_pdf?year=current&cat=0.
+     *
      * @Route("/_download/print_workshop_booklet_as_pdf", name="sac_event_tool_download_print_workshop_booklet_as_pdf", defaults={"_scope" = "frontend", "_token_check" = false})
      */
-    public function printWorkshopBookletAsPdfAction()
+    public function printWorkshopBookletAsPdfAction(): void
     {
-        /** @var $pdf PrintWorkshopsAsPdf */
+        /** @var PrintWorkshopsAsPdf $pdf */
         $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf');
 
         /** @var Request $request */
@@ -77,20 +77,17 @@ class DownloadController extends AbstractController
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
 
-        $year = $request->query->get('year') != '' ? (int) $request->query->get('year') : null;
-        $calendarId = $request->query->get('calendarId') != '' ? (int) $request->query->get('calendarId') : null;
+        $year = '' !== $request->query->get('year') ? (int) $request->query->get('year') : null;
+        $calendarId = '' !== $request->query->get('calendarId') ? (int) $request->query->get('calendarId') : null;
 
-        if (!empty($year))
-        {
-            if ($year === 'current')
-            {
+        if (!empty($year)) {
+            if ('current' === $year) {
                 $year = (int) $dateAdapter->parse('Y');
             }
             $pdf = $pdf->setYear($year);
         }
 
-        if (!empty($calendarId))
-        {
+        if (!empty($calendarId)) {
             $pdf = $pdf->setCalendarId($calendarId);
         }
 
@@ -109,15 +106,16 @@ class DownloadController extends AbstractController
     /**
      * Download events as docx file
      * /_download/print_workshop_details_as_docx?calendarId=6&year=2017
-     * /_download/print_workshop_details_as_docx?calendarId=6&year=2017&eventId=89
+     * /_download/print_workshop_details_as_docx?calendarId=6&year=2017&eventId=89.
+     *
      * @Route("/_download/print_workshop_details_as_docx", name="sac_event_tool_download_print_workshop_details_as_docx", defaults={"_scope" = "frontend", "_token_check" = false})
      */
-    public function printWorkshopDetailsAsDocxAction()
+    public function printWorkshopDetailsAsDocxAction(): void
     {
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
-        /** @var  ExportEvents2Docx $exportEvents2DocxAdapter */
+        /** @var ExportEvents2Docx $exportEvents2DocxAdapter */
         $exportEvents2DocxAdapter = $this->framework->getAdapter(ExportEvents2Docx::class);
 
         /** @var CalendarModel $calendarModelAdapter */
@@ -126,8 +124,7 @@ class DownloadController extends AbstractController
         /** @var CalendarModel $objCalendar */
         $objCalendar = $calendarModelAdapter->findByPk($request->query->get('calendarId'));
 
-        if ($request->query->get('year') && $objCalendar !== null)
-        {
+        if ($request->query->get('year') && null !== $objCalendar) {
             $exportEvents2DocxAdapter->generate($objCalendar, $request->query->get('year'), $request->query->get('eventId'));
         }
         exit();
@@ -135,21 +132,21 @@ class DownloadController extends AbstractController
 
     /**
      * Download workshop details as pdf
-     * /_download/print_workshop_details_as_pdf?eventId=643
+     * /_download/print_workshop_details_as_pdf?eventId=643.
+     *
      * @Route("/_download/print_workshop_details_as_pdf", name="sac_event_tool_download_print_workshop_details_as_pdf", defaults={"_scope" = "frontend", "_token_check" = false})
      */
-    public function printWorkshopDetailsAsPdfAction()
+    public function printWorkshopDetailsAsPdfAction(): void
     {
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
-        /** @var $pdf PrintWorkshopsAsPdf */
+        /** @var PrintWorkshopsAsPdf $pdf */
         $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf');
 
         $eventId = $request->query->get('eventId') ? (int) $request->query->get('eventId') : null;
 
-        if ($eventId !== null)
-        {
+        if (null !== $eventId) {
             $pdf->setEventId($eventId);
         }
 
@@ -159,28 +156,26 @@ class DownloadController extends AbstractController
     }
 
     /**
-     * Send ical to the browser
+     * Send ical to the browser.
+     *
      * @Route("/_download/download_event_ical", name="sac_event_tool_download_download_event_ical", defaults={"_scope" = "frontend", "_token_check" = false})
      */
-    public function downloadEventIcalAction()
+    public function downloadEventIcalAction(): void
     {
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
-        /** @var  CalendarEventsModel $calendarEventsModelAdapter */
+        /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
         // Course Filter
-        if ($request->query->get('eventId') > 0)
-        {
+        if ($request->query->get('eventId') > 0) {
             $objEvent = $calendarEventsModelAdapter->findByPk($request->query->get('eventId'));
-            {
-                if ($objEvent !== null)
-                {
-                    /** @var  SendEventIcal $ical */
-                    $ical = System::getContainer()->get('Markocupic\SacEventToolBundle\Ical\SendEventIcal');
-                    $ical->sendIcsFile($objEvent);
-                }
+
+            if (null !== $objEvent) {
+                /** @var SendEventIcal $ical */
+                $ical = System::getContainer()->get('Markocupic\SacEventToolBundle\Ical\SendEventIcal');
+                $ical->sendIcsFile($objEvent);
             }
         }
         exit();
@@ -189,11 +184,12 @@ class DownloadController extends AbstractController
     /**
      * The defaultAction has to be at the bottom of the class
      * Handles download requests.
+     *
      * @Route("/_download/{slug}", name="sac_event_tool_download", defaults={"_scope" = "frontend", "_token_check" = false})
      */
-    public function defaultAction($slug = '')
+    public function defaultAction($slug = ''): void
     {
-        echo sprintf('Welcome to %s::%s. You have called the Service with this route: _download/%s', __CLASS__, __FUNCTION__, $slug);
+        echo sprintf('Welcome to %s::%s. You have called the Service with this route: _download/%s', self::class, __FUNCTION__, $slug);
         exit();
     }
 }

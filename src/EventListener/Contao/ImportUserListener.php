@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -18,8 +20,7 @@ use Contao\UserModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class ImportUserListener
- * @package Markocupic\SacEventToolBundle\EventListener\Contao
+ * Class ImportUserListener.
  */
 class ImportUserListener
 {
@@ -35,8 +36,6 @@ class ImportUserListener
 
     /**
      * ImportUserListener constructor.
-     * @param ContaoFramework $framework
-     * @param RequestStack $requestStack
      */
     public function __construct(ContaoFramework $framework, RequestStack $requestStack)
     {
@@ -45,11 +44,11 @@ class ImportUserListener
     }
 
     /**
-     * Allow backend users to authenticate with their sacMemberId
+     * Allow backend users to authenticate with their sacMemberId.
+     *
      * @param $strUsername
      * @param $strPassword
      * @param $strTable
-     * @return bool
      */
     public function onImportUser($strUsername, $strPassword, $strTable): bool
     {
@@ -57,21 +56,20 @@ class ImportUserListener
         $inputAdapter = $this->framework->getAdapter(Input::class);
 
         $request = $this->requestStack->getCurrentRequest();
-        if ($strTable === 'tl_user')
-        {
-            if (trim($strUsername) !== '' && is_numeric($strUsername))
-            {
+
+        if ('tl_user' === $strTable) {
+            if ('' !== trim($strUsername) && is_numeric($strUsername)) {
                 $objUser = $userModelAdapter->findOneBySacMemberId($strUsername);
-                if ($objUser !== null)
-                {
-                    if ($objUser->sacMemberId > 0 && $objUser->sacMemberId === $strUsername)
-                    {
+
+                if (null !== $objUser) {
+                    if ($objUser->sacMemberId > 0 && $objUser->sacMemberId === $strUsername) {
                         // Used for password recovery
                         /** @var Request $request */
                         $request->request->set('username', $objUser->username);
 
                         // Used for backend login
                         $inputAdapter->setPost('username', $objUser->username);
+
                         return true;
                     }
                 }
@@ -80,5 +78,4 @@ class ImportUserListener
 
         return false;
     }
-
 }

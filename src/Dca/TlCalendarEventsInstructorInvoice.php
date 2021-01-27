@@ -1,16 +1,20 @@
 <?php
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
+declare(strict_types=1);
+
+/*
+ * This file is part of SAC Event Tool Bundle.
  *
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
 namespace Markocupic\SacEventToolBundle\Dca;
 
+use Contao\Backend;
 use Contao\CalendarEventsInstructorInvoiceModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
@@ -21,43 +25,39 @@ use Contao\Message;
 use Contao\System;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx;
-use Contao\Backend;
 
 /**
- * Class TlCalendarEventsInstructorInvoice
- * @package Markocupic\SacEventToolBundle\Dca
+ * Class TlCalendarEventsInstructorInvoice.
  */
 class TlCalendarEventsInstructorInvoice extends Backend
 {
-
     /**
-     * Import the back end user object
+     * Import the back end user object.
      */
     public function __construct()
     {
         // Set correct referer
-        if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('ref') != '')
-        {
+        if ('sac_calendar_events_tool' === Input::get('do') && '' !== Input::get('ref')) {
             $objSession = static::getContainer()->get('session');
             $ref = Input::get('ref');
             $session = $objSession->get('referer');
-            if (isset($session[$ref]['tl_calendar_container']))
-            {
+
+            if (isset($session[$ref]['tl_calendar_container'])) {
                 $session[$ref]['tl_calendar_container'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar_container']);
                 $objSession->set('referer', $session);
             }
-            if (isset($session[$ref]['tl_calendar']))
-            {
+
+            if (isset($session[$ref]['tl_calendar'])) {
                 $session[$ref]['tl_calendar'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar']);
                 $objSession->set('referer', $session);
             }
-            if (isset($session[$ref]['tl_calendar_events']))
-            {
+
+            if (isset($session[$ref]['tl_calendar_events'])) {
                 $session[$ref]['tl_calendar_events'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar_events']);
                 $objSession->set('referer', $session);
             }
-            if (isset($session[$ref]['tl_calendar_events_instructor_invoice']))
-            {
+
+            if (isset($session[$ref]['tl_calendar_events_instructor_invoice'])) {
                 $session[$ref]['tl_calendar_events_instructor_invoice'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar_events_instructor_invoice']);
                 $objSession->set('referer', $session);
             }
@@ -65,60 +65,55 @@ class TlCalendarEventsInstructorInvoice extends Backend
 
         $this->import('Database');
         $this->import('BackendUser', 'User');
+
         return parent::__construct();
     }
 
     /**
      * onload_callback
-     * Delete orphaned records
+     * Delete orphaned records.
      */
-    public function reviseTable()
+    public function reviseTable(): void
     {
-
         $reload = false;
 
         // Delete orphaned records
         $objStmt = $this->Database->execute('DELETE FROM tl_calendar_events_instructor_invoice WHERE NOT EXISTS (SELECT * FROM tl_user WHERE tl_calendar_events_instructor_invoice.userPid = tl_user.id)');
-        if ($objStmt->affectedRows > 0)
-        {
+
+        if ($objStmt->affectedRows > 0) {
             $reload = true;
         }
 
-        if ($reload)
-        {
+        if ($reload) {
             $this->reload();
         }
     }
 
     /**
      * Onload_callback
-     * Route actions
+     * Route actions.
      */
-    public function routeActions()
+    public function routeActions(): void
     {
         $objEventInvoice = CalendarEventsInstructorInvoiceModel::findByPk(Input::get('id'));
-        if ($objEventInvoice !== null)
-        {
+
+        if (null !== $objEventInvoice) {
             /** @var EventRapport2Docx $objTemplator */
             $objTemplator = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx');
 
-            if (Input::get('action') === 'generateInvoiceDocx')
-            {
+            if ('generateInvoiceDocx' === Input::get('action')) {
                 $objTemplator->generate('invoice', $objEventInvoice, 'docx', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
             }
 
-            if (Input::get('action') === 'generateInvoicePdf')
-            {
+            if ('generateInvoicePdf' === Input::get('action')) {
                 $objTemplator->generate('invoice', $objEventInvoice, 'pdf', Config::get('SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'));
             }
 
-            if (Input::get('action') === 'generateTourRapportDocx')
-            {
+            if ('generateTourRapportDocx' === Input::get('action')) {
                 $objTemplator->generate('rapport', $objEventInvoice, 'docx', Config::get('SAC_EVT_EVENT_RAPPORT_TOUR_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_RAPPORT_FILE_NAME_PATTERN'));
             }
 
-            if (Input::get('action') === 'generateTourRapportPdf')
-            {
+            if ('generateTourRapportPdf' === Input::get('action')) {
                 $objTemplator->generate('rapport', $objEventInvoice, 'pdf', Config::get('SAC_EVT_EVENT_RAPPORT_TOUR_TEMPLATE_SRC'), Config::get('SAC_EVT_EVENT_TOUR_RAPPORT_FILE_NAME_PATTERN'));
             }
         }
@@ -126,39 +121,31 @@ class TlCalendarEventsInstructorInvoice extends Backend
 
     /**
      * Onload_callback
-     * Check if user has enough access rights
+     * Check if user has enough access rights.
      */
-    public function checkAccesRights()
+    public function checkAccesRights(): void
     {
-
-        if (CURRENT_ID != '')
-        {
-            if (Input::get('action') === 'generateInvoiceDocx' || Input::get('action') === 'generateInvoicePdf' || Input::get('action') === 'generateTourRapportDocx' || Input::get('action') === 'generateTourRapportPdf')
-            {
+        if (CURRENT_ID !== '') {
+            if ('generateInvoiceDocx' === Input::get('action') || 'generateInvoicePdf' === Input::get('action') || 'generateTourRapportDocx' === Input::get('action') || 'generateTourRapportPdf' === Input::get('action')) {
                 $objInvoice = CalendarEventsInstructorInvoiceModel::findByPk(Input::get('id'));
-                if ($objInvoice !== null)
-                {
-                    if ($objInvoice->getRelated('pid') !== null)
-                    {
+
+                if (null !== $objInvoice) {
+                    if (null !== $objInvoice->getRelated('pid')) {
                         $objEvent = $objInvoice->getRelated('pid');
                     }
                 }
-            }
-            else
-            {
+            } else {
                 $objEvent = CalendarEventsModel::findByPk(CURRENT_ID);
             }
 
-            if ($objEvent !== null)
-            {
+            if (null !== $objEvent) {
                 $blnAllow = EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objEvent->id);
-                if ($objEvent->registrationGoesTo === $this->User->id)
-                {
+
+                if ($objEvent->registrationGoesTo === $this->User->id) {
                     $blnAllow = true;
                 }
 
-                if (!$blnAllow)
-                {
+                if (!$blnAllow) {
                     Message::addError('Sie besitzen nicht die n&ouml;tigen Rechte, um diese Seite zu sehen.', 'BE');
                     $this->redirect($this->getReferer());
                 }
@@ -168,18 +155,15 @@ class TlCalendarEventsInstructorInvoice extends Backend
 
     /**
      * Onload_callback
-     * Show warning if report form is not filled in
+     * Show warning if report form is not filled in.
      */
-    public function warnIfReportFormHasNotFilledIn()
+    public function warnIfReportFormHasNotFilledIn(): void
     {
-
-        if (CURRENT_ID != '')
-        {
+        if (CURRENT_ID !== '') {
             $objEvent = CalendarEventsModel::findByPk(CURRENT_ID);
-            if ($objEvent !== null)
-            {
-                if (!$objEvent->filledInEventReportForm)
-                {
+
+            if (null !== $objEvent) {
+                if (!$objEvent->filledInEventReportForm) {
                     Message::addError('Bevor ein Verg&uuml;tungsformular erstellt wird, sollte der Rapport vollst&auml;ndig ausgef&uuml;llt worden sein.', 'BE');
                     $this->redirect($this->getReferer());
                 }
@@ -188,7 +172,7 @@ class TlCalendarEventsInstructorInvoice extends Backend
     }
 
     /**
-     * List a style sheet
+     * List a style sheet.
      *
      * @param array $row
      *
@@ -196,51 +180,40 @@ class TlCalendarEventsInstructorInvoice extends Backend
      */
     public function listInvoices($row)
     {
-
-        return '<div class="tl_content_left"><span class="level">Verg&uuml;tungsformular (mit Tour Rapport) von: ' . UserModel::findByPk($row['userPid'])->name . '</span> <span>[' . CalendarEventsModel::findByPk($row['pid'])->title . ']</span></div>';
+        return '<div class="tl_content_left"><span class="level">Verg&uuml;tungsformular (mit Tour Rapport) von: '.UserModel::findByPk($row['userPid'])->name.'</span> <span>['.CalendarEventsModel::findByPk($row['pid'])->title.']</span></div>';
     }
 
     /**
-     * buttons_callback buttonsCallback
+     * buttons_callback buttonsCallback.
      *
      * @param $arrButtons
      * @param $dc
+     *
      * @return mixed
      */
     public function buttonsCallback($arrButtons, $dc)
     {
-
-        if (Input::get('act') === 'edit')
-        {
-            unset($arrButtons['saveNcreate']);
-            unset($arrButtons['saveNduplicate']);
-            unset($arrButtons['saveNedit']);
-            unset($arrButtons['saveNback']);
+        if ('edit' === Input::get('act')) {
+            unset($arrButtons['saveNcreate'], $arrButtons['saveNduplicate'], $arrButtons['saveNedit'], $arrButtons['saveNback']);
         }
 
         return $arrButtons;
     }
 
     /**
-     * load callback for tl_calendar_events_instructor_invoice.iban
+     * load callback for tl_calendar_events_instructor_invoice.iban.
      *
      * @param $value
-     * @param DataContainer $dc
+     *
      * @return mixed
      */
     public function getIbanFromUser($value, DataContainer $dc)
     {
-
-        if ($dc->activeRecord)
-        {
-            if (null !== ($objInvoice = CalendarEventsInstructorInvoiceModel::findByPk($dc->activeRecord->id)))
-            {
-                if ($objInvoice->userPid > 0 && null !== ($objUser = UserModel::findByPk($objInvoice->userPid)))
-                {
-                    if ($objUser->iban != '')
-                    {
-                        if ($value != $objUser->iban)
-                        {
+        if ($dc->activeRecord) {
+            if (null !== ($objInvoice = CalendarEventsInstructorInvoiceModel::findByPk($dc->activeRecord->id))) {
+                if ($objInvoice->userPid > 0 && null !== ($objUser = UserModel::findByPk($objInvoice->userPid))) {
+                    if ('' !== $objUser->iban) {
+                        if ($value !== $objUser->iban) {
                             $value = $objUser->iban;
                             $objInvoice->iban = $value;
                             $objInvoice->save();
@@ -252,9 +225,7 @@ class TlCalendarEventsInstructorInvoice extends Backend
                         }
 
                         $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice']['fields']['iban']['eval']['readonly'] = true;
-                    }
-                    else
-                    {
+                    } else {
                         Message::addInfo('Leider wurde für deinen Namen keine IBAN gefunden. Bitte hinterlege deine IBAN in deinem Profil, damit diese in Zukunft automatisch beim Erstellen einer Abrechnung im Feld "IBAN" eingefügt werden kann.');
                     }
                 }

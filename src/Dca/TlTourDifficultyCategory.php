@@ -1,10 +1,14 @@
 <?php
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+declare(strict_types=1);
+
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -15,13 +19,12 @@ use Contao\Image;
 use Contao\StringUtil;
 
 /**
- * Class TlTourDifficultyCategory
- * @package Markocupic\SacEventToolBundle\Dca
+ * Class TlTourDifficultyCategory.
  */
 class TlTourDifficultyCategory extends Backend
 {
     /**
-     * Import the back end user object
+     * Import the back end user object.
      */
     public function __construct()
     {
@@ -30,7 +33,7 @@ class TlTourDifficultyCategory extends Backend
     }
 
     /**
-     * Return the edit header button
+     * Return the edit header button.
      *
      * @param array  $row
      * @param string $href
@@ -45,5 +48,4 @@ class TlTourDifficultyCategory extends Backend
     {
         return $this->User->canEditFieldsOf('tl_tour_difficulty_category') ? '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
     }
-
 }

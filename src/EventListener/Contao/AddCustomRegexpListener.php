@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -18,8 +20,7 @@ use Contao\MemberModel;
 use Contao\Widget;
 
 /**
- * Class AddCustomRegexpListener
- * @package Markocupic\SacEventToolBundle\EventListener\Contao
+ * Class AddCustomRegexpListener.
  */
 class AddCustomRegexpListener
 {
@@ -30,8 +31,6 @@ class AddCustomRegexpListener
 
     /**
      * Constructor.
-     *
-     * @param ContaoFramework $framework
      */
     public function __construct(ContaoFramework $framework)
     {
@@ -41,8 +40,6 @@ class AddCustomRegexpListener
     /**
      * @param $strRegexp
      * @param $varValue
-     * @param Widget $objWidget
-     * @return bool
      */
     public function onAddCustomRegexp($strRegexp, $varValue, Widget $objWidget): bool
     {
@@ -51,14 +48,12 @@ class AddCustomRegexpListener
         $databaseAdapter = $this->framework->getAdapter(Database::class);
 
         // Check for a valid/existent sacMemberId
-        if ($strRegexp === 'sacMemberId')
-        {
-            if (trim($varValue) !== '')
-            {
+        if ('sacMemberId' === $strRegexp) {
+            if ('' !== trim($varValue)) {
                 $objMemberModel = $memberModelAdapter->findOneBySacMemberId(trim($varValue));
-                if ($objMemberModel === null)
-                {
-                    $objWidget->addError('Field ' . $objWidget->label . ' should be a valid sac member id.');
+
+                if (null === $objMemberModel) {
+                    $objWidget->addError('Field '.$objWidget->label.' should be a valid sac member id.');
                 }
             }
 
@@ -66,24 +61,20 @@ class AddCustomRegexpListener
         }
 
         // Check for a valid/existent sacMemberId
-        if ($strRegexp === 'sacMemberIdIsUniqueAndValid')
-        {
-            if (!is_numeric($varValue))
-            {
+        if ('sacMemberIdIsUniqueAndValid' === $strRegexp) {
+            if (!is_numeric($varValue)) {
                 $objWidget->addError('Sac member id must be number >= 0');
-            }
-            elseif (trim($varValue) !== '' && $varValue > 0)
-            {
+            } elseif ('' !== trim($varValue) && $varValue > 0) {
                 $objMemberModel = $memberModelAdapter->findOneBySacMemberId(trim($varValue));
-                if ($objMemberModel === null)
-                {
-                    $objWidget->addError('Field ' . $objWidget->label . ' should be a valid sac member id.');
+
+                if (null === $objMemberModel) {
+                    $objWidget->addError('Field '.$objWidget->label.' should be a valid sac member id.');
                 }
 
                 $objUser = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_user WHERE sacMemberId=?')->execute($varValue);
-                if ($objUser->numRows > 1)
-                {
-                    $objWidget->addError('SAC member id ' . $varValue . ' is already in use.');
+
+                if ($objUser->numRows > 1) {
+                    $objWidget->addError('SAC member id '.$varValue.' is already in use.');
                 }
             }
 
@@ -92,7 +83,4 @@ class AddCustomRegexpListener
 
         return false;
     }
-
 }
-
-
