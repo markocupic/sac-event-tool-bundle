@@ -8,6 +8,9 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlEventFilterForm;
+use Contao\Date;
+
 $GLOBALS['TL_DCA']['tl_event_filter_form'] = array
 (
     'fields' => array
@@ -30,7 +33,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = array
         (
             'label'            => &$GLOBALS['TL_LANG']['tl_event_filter_form']['tourType'],
             'inputType'        => 'select',
-            'options_callback' => array('tl_event_filter_form', 'getTourTypes'),
+            'options_callback' => array(TlEventFilterForm::class, 'getTourTypes'),
             'eval'             => array('includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']),
 
         ),
@@ -38,7 +41,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = array
         (
             'label'            => &$GLOBALS['TL_LANG']['tl_event_filter_form']['courseType'],
             'inputType'        => 'select',
-            'options_callback' => array('tl_event_filter_form', 'getCourseTypes'),
+            'options_callback' => array(TlEventFilterForm::class, 'getCourseTypes'),
             'eval'             => array('includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']),
 
         ),
@@ -46,7 +49,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = array
         (
             'label'            => &$GLOBALS['TL_LANG']['tl_event_filter_form']['organizers'],
             'inputType'        => 'select',
-            'options_callback' => array('tl_event_filter_form', 'getOrganizers'),
+            'options_callback' => array(TlEventFilterForm::class, 'getOrganizers'),
             'eval'             => array('multiple' => true),
         ),
         'searchterm' => array
@@ -59,7 +62,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_event_filter_form']['eventId'],
             'inputType' => 'text',
-            'eval'      => array('placeholder' => Contao\Date::parse('Y') . '-****'),
+            'eval'      => array('placeholder' => Date::parse('Y') . '-****'),
         ),
         'courseId'   => array
         (

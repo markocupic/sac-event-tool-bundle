@@ -88,7 +88,7 @@ class CabanneSacDetailController extends AbstractContentElementController
         $skip = ['id', 'tstamp'];
         foreach ($this->objCabanne->row() as $k => $v)
         {
-            if (!in_array($k, $skip))
+            if (!in_array($k, $skip,true))
             {
                 $template->$k = $v;
             }

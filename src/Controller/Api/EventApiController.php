@@ -255,7 +255,7 @@ class EventApiController extends AbstractController
             // Show event if its organizer is in the search param
             foreach ($param['organizers'] as $orgId)
             {
-                if (!in_array($orgId, $arrIgnoredOrganizer))
+                if (!in_array($orgId, $arrIgnoredOrganizer,false))
                 {
                     $orxOrg->add($qb->expr()->like('t.organizers', $qb->expr()->literal('%:"' . $orgId . '";%')));
                 }
@@ -493,7 +493,7 @@ class EventApiController extends AbstractController
                 // If $arrFields is empty send all properties
                 if (!empty($arrFields))
                 {
-                    if (!in_array($k, $arrFields))
+                    if (!in_array($k, $arrFields,true))
                     {
                         continue;
                     }

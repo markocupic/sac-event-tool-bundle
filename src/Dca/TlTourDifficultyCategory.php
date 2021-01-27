@@ -8,10 +8,17 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+namespace Markocupic\SacEventToolBundle\Dca;
+
+use Contao\Backend;
+use Contao\Image;
+use Contao\StringUtil;
+
 /**
- * Class tl_tour_difficulty_category
+ * Class TlTourDifficultyCategory
+ * @package Markocupic\SacEventToolBundle\Dca
  */
-class tl_tour_difficulty_category extends Backend
+class TlTourDifficultyCategory extends Backend
 {
     /**
      * Import the back end user object

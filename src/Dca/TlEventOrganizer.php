@@ -8,14 +8,17 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+namespace Markocupic\SacEventToolBundle\Dca;
 
 use Contao\Backend;
 use Contao\Config;
+use Contao\DataContainer;
 
 /**
- * Class tl_event_organizer
+ * Class TlEventOrganizer
+ * @package Markocupic\SacEventToolBundle\Dca
  */
-class tl_event_organizer extends Backend
+class TlEventOrganizer extends Backend
 {
     /**
      * Dynamically add flags to the "singleSRC" field
@@ -27,10 +30,8 @@ class tl_event_organizer extends Backend
      */
     public function setSingleSrcFlags($varValue, DataContainer $dc)
     {
-        if ($dc->activeRecord)
-        {
-            switch ($dc->activeRecord->type)
-            {
+        if ($dc->activeRecord) {
+            switch ($dc->activeRecord->type) {
                 case 'text':
                 case 'hyperlink':
                 case 'image':

@@ -128,7 +128,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
 
         // Handle messages
-        if ($this->objUser->email == '' || !$validatorAdapter->isEmail($this->objUser->email))
+        if (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email))
         {
             $messageAdapter->addInfo('Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
         }
@@ -214,7 +214,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                     $errorMsg = 'Du konntest nicht vom Event "' . $objEvent->title . '" abgemeldet werden, da die Abmeldefrist von ' . $objEvent->deregistrationLimit . ' Tag(en) abgelaufen ist. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
                     $blnHasError = true;
                 }
-                elseif ($this->objUser->email == '' || !$validatorAdapter->isEmail($this->objUser->email))
+                elseif (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email))
                 {
                     $errorMsg = 'Leider wurde f&uuml;r dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschr&auml;nkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
                     $blnHasError = true;

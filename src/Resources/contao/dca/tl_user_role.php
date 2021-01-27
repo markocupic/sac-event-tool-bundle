@@ -8,6 +8,8 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlUserRole;
+
 $GLOBALS['TL_DCA']['tl_user_role'] = array
 (
     'config'   => array
@@ -34,13 +36,13 @@ $GLOBALS['TL_DCA']['tl_user_role'] = array
             'format'                => '%s %s',
             //'flag'                  => 1,
             'panelLayout'           => 'filter;search,limit',
-            'paste_button_callback' => array('tl_user_role', 'pasteTag'),
+            'paste_button_callback' => array(TlUserRole::class, 'pasteTag'),
         ),
         'label'             => array
         (
             'fields'         => array('title', 'email'),
             'showColumns'    => true,
-            'label_callback' => array('tl_user_role', 'checkForUsage'),
+            'label_callback' => array(TlUserRole::class, 'checkForUsage'),
         ),
         'global_operations' => array
         (

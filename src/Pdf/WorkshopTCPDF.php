@@ -47,16 +47,16 @@ class WorkshopTCPDF extends \TCPDF
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
         // Set background-image
-        if ($this->type == 'cover')
+        if ($this->type === 'cover')
         {
             $this->backgroundImage = Config::get('SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE');;
         }
-        elseif ($this->type == 'TOC')
+        elseif ($this->type === 'TOC')
         {
             $this->backgroundImage = 'files/fileadmin/page_assets/kursbroschuere/toc.jpg';
             $this->backgroundImageBottom = 'files/fileadmin/page_assets/kursbroschuere/background.png';
         }
-        elseif ($this->type == 'eventPage')
+        elseif ($this->type === 'eventPage')
         {
             // default
             $this->backgroundImage = 'files/fileadmin/page_assets/kursbroschuere/hochtour.jpg';
@@ -95,7 +95,7 @@ class WorkshopTCPDF extends \TCPDF
             $this->Image($rootDir . '/' . $this->backgroundImageBottom, 0, 0, 210, 297, '', '', '', false, 300, '', false, false, 0);
         }
 
-        if ($this->type == 'cover')
+        if ($this->type === 'cover')
         {
             // Transparent overlay
             //$this->setAlpha(0.45);
@@ -104,7 +104,7 @@ class WorkshopTCPDF extends \TCPDF
         }
 
         // White background for the table of content
-        if ($this->type == 'TOC' || $this->type == 'eventPage')
+        if ($this->type === 'TOC' || $this->type === 'eventPage')
         {
             // Transparent header
             $this->setAlpha(0.65);
@@ -114,7 +114,7 @@ class WorkshopTCPDF extends \TCPDF
         }
 
         // White background for the table of content
-        if ($this->type == 'TOC')
+        if ($this->type === 'TOC')
         {
             //$this->setAlpha(0.95);
             // Border Style
@@ -127,7 +127,7 @@ class WorkshopTCPDF extends \TCPDF
         $this->Image($rootDir . '/files/fileadmin/page_assets/kursbroschuere/logo-sac-2000.png', 150, 5, 50, '', '', '', '', false, 300, '', false, false, 0);
 
         // Stripe bottom
-        if ($this->type == 'eventPage')
+        if ($this->type === 'eventPage')
         {
             $style = array('L' => 0, 'T' => 0, 'R' => 0, 'B' => 0);
             $this->Rect(0, 275, 210, 10, 'DF', $style, array(255, 255, 255));
@@ -139,7 +139,7 @@ class WorkshopTCPDF extends \TCPDF
         }
 
         // QRCODE,H : QR-CODE Best error correction
-        if ($this->type == 'eventPage')
+        if ($this->type === 'eventPage')
         {
             // Background-image
             $style = array(
@@ -157,7 +157,7 @@ class WorkshopTCPDF extends \TCPDF
 
         // Set margins
         $this->SetMargins(20, 20, 20, 20);
-        if ($this->type == 'TOC')
+        if ($this->type === 'TOC')
         {
             $this->SetAutoPageBreak(true, 30);
             $this->SetMargins(20, 40, 20, 20);

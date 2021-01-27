@@ -8,10 +8,16 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+namespace Markocupic\SacEventToolBundle\Dca;
+
+use Contao\DataContainer;
+use Contao\Database;
+
 /**
- * Class tl_content_sac_event_tool
+ * Class TlContent
+ * @package Markocupic\SacEventToolBundle\Dca
  */
-class tl_content_sac_event_tool extends tl_content
+class TlContent extends \tl_content
 {
 
     /**
@@ -22,7 +28,10 @@ class tl_content_sac_event_tool extends tl_content
 
         if ($dc->id > 0)
         {
-            $objDb = $this->Database->prepare("SELECT * FROM tl_content WHERE id=?")->limit(1)->execute($dc->id);
+            $objDb = Database::getInstance()
+                ->prepare("SELECT * FROM tl_content WHERE id=?")
+                ->limit(1)
+                ->execute($dc->id);
             if ($objDb->numRows)
             {
                 // Set palette for contednt element "user_portrait_list"
@@ -49,7 +58,9 @@ class tl_content_sac_event_tool extends tl_content
     {
 
         $options = array();
-        $objDb = \Database::getInstance()->prepare('SELECT * FROM tl_cabanne_sac')->execute();
+        $objDb = Database::getInstance()
+            ->prepare('SELECT * FROM tl_cabanne_sac')
+            ->execute();
         while ($objDb->next())
         {
             $options[$objDb->id] = $objDb->name;
@@ -66,7 +77,9 @@ class tl_content_sac_event_tool extends tl_content
     {
 
         $options = array();
-        $objDb = \Database::getInstance()->prepare('SELECT * FROM tl_user_role ORDER BY sorting ASC')->execute();
+        $objDb = Database::getInstance()
+            ->prepare('SELECT * FROM tl_user_role ORDER BY sorting ASC')
+            ->execute();
         while ($objDb->next())
         {
             $options[$objDb->id] = $objDb->title;

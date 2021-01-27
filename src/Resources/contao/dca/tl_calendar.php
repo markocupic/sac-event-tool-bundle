@@ -8,12 +8,15 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\BackendUser;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
+
 // Table config
 $GLOBALS['TL_DCA']['tl_calendar']['config']['ptable'] = 'tl_calendar_container';
 
 // List
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['mode'] = 4;
-$GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['child_record_callback'] = array('tl_calendar_sac_event_tool', 'listCalendars');
+$GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['child_record_callback'] = array(Markocupic\SacEventToolBundle\Dca\TlCalendar::class, 'listCalendars');
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['headerFields'] = array('title');
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['disableGrouping'] = true;
 
@@ -28,8 +31,8 @@ if (BackendUser::getInstance()->isAdmin)
 }
 
 // Palettes
-Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-    ->addLegend('event_type_legend', 'protected_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_BEFORE)
+PaletteManipulator::create()
+    ->addLegend('event_type_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
     ->addField(array('allowedEventTypes,adviceOnEventReleaseLevelChange,adviceOnEventPublish'), 'event_type_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_calendar');
 

@@ -8,10 +8,19 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+namespace Markocupic\SacEventToolBundle\Dca;
+
+use Contao\Backend;
+use Contao\TourTypeModel;
+use Contao\CourseMainTypeModel;
+use Contao\CourseSubTypeModel;
+use Contao\Database;
+
+
 /**
- * Class tl_event_filter_form
+ * Class TlEventFilterForm
  */
-class tl_event_filter_form extends Backend
+class TlEventFilterForm extends Backend
 {
     /**
      * @return array
@@ -19,7 +28,7 @@ class tl_event_filter_form extends Backend
     public function getTourTypes()
     {
         $arrOptions = array();
-        $objTourType = \Contao\TourTypeModel::findAll();
+        $objTourType = TourTypeModel::findAll();
         while ($objTourType->next())
         {
             $arrOptions[$objTourType->id] = $objTourType->title;
@@ -33,11 +42,11 @@ class tl_event_filter_form extends Backend
     public function getCourseTypes()
     {
         $opt = array();
-        $mainTypes = \Contao\CourseMainTypeModel::findAll();
+        $mainTypes = CourseMainTypeModel::findAll();
         while ($mainTypes->next())
         {
             $opt[$mainTypes->name] = array();
-            $subTypes = \Contao\CourseSubTypeModel::findByPid($mainTypes->id);
+            $subTypes = CourseSubTypeModel::findByPid($mainTypes->id);
             while ($subTypes->next())
             {
                 $opt[$mainTypes->name][$subTypes->id] = $subTypes->name;
@@ -52,7 +61,9 @@ class tl_event_filter_form extends Backend
     public function getOrganizers()
     {
         $arrOptions = array();
-        $objOrganizer = Contao\Database::getInstance()->prepare('SELECT * FROM tl_event_organizer WHERE hideInEventFilter=? ORDER BY sorting')->execute('');
+        $objOrganizer = Database::getInstance()
+            ->prepare('SELECT * FROM tl_event_organizer WHERE hideInEventFilter=? ORDER BY sorting')
+            ->execute('');
         while ($objOrganizer->next())
         {
             $arrOptions[$objOrganizer->id] = $objOrganizer->title;

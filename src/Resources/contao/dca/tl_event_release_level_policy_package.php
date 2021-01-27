@@ -8,6 +8,7 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlEventReleaseLevelPolicyPackage;
 
 /**
  * Table tl_event_release_level_policy_package
@@ -69,7 +70,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = array
                 'label'           => &$GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['editheader'],
                 'href'            => 'table=tl_event_release_level_policy_package&amp;act=edit',
                 'icon'            => 'header.svg',
-                'button_callback' => array('tl_event_release_level_policy_package', 'editHeader'),
+                'button_callback' => array(TlEventReleaseLevelPolicyPackage::class, 'editHeader'),
             ),
             'copy'       => array
             (

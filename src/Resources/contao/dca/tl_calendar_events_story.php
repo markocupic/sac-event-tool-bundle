@@ -8,6 +8,8 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlCalendarEventsStory;
+
 /**
  * Table tl_calendar_events_story
  */
@@ -20,16 +22,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
         'dataContainer'     => 'Table',
         'enableVersioning'  => true,
         'notCopyable'       => true,
-        'onsubmit_callback' => array
-        (//
-        ),
         'onload_callback'   => array
         (
-            array('tl_calendar_events_story', 'setPalettes'),
-            array('tl_calendar_events_story', 'deleteUnfinishedAndOldEntries'),
-        ),
-        'ondelete_callback' => array
-        (//
+            array(TlCalendarEventsStory::class, 'setPalettes'),
+            array(TlCalendarEventsStory::class, 'deleteUnfinishedAndOldEntries'),
         ),
         'sql'               => array
         (
@@ -55,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
         (
             'fields'         => array('publishState', 'title', 'authorName'),
             'showColumns'    => true,
-            'label_callback' => array('tl_calendar_events_story', 'addIcon'),
+            'label_callback' => array(TlCalendarEventsStory::class, 'addIcon'),
         ),
         'global_operations' => array
         (

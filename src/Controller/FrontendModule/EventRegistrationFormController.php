@@ -460,7 +460,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
             {
                 $objWidget = $objForm->getWidget($field);
 
-                if ($objWidget->value == '')
+                if (empty($objWidget->value))
                 {
                     $objWidget = $objForm->getWidget($field);
                     $objWidget->value = $this->objUser->{$field};
@@ -517,12 +517,12 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                     $arrData['bookingType'] = 'onlineForm';
 
                     // Save emergency phone number to user profile
-                    if ($objMemberModel->emergencyPhone == '')
+                    if (empty($objMemberModel->emergencyPhone))
                     {
                         $objMemberModel->emergencyPhone = $arrData['emergencyPhone'];
                         $objMemberModel->save();
                     }
-                    if ($objMemberModel->emergencyPhoneName == '')
+                    if (empty($objMemberModel->emergencyPhoneName))
                     {
                         $objMemberModel->emergencyPhoneName = $arrData['emergencyPhoneName'];
                         $objMemberModel->save();

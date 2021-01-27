@@ -8,10 +8,15 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+namespace Markocupic\SacEventToolBundle\Dca;
+
+use Contao\Backend;
+
 /**
- * Class tl_tour_difficulty
+ * Class TlTourDifficulty
+ * @package Markocupic\SacEventToolBundle\Dca
  */
-class tl_tour_difficulty extends Backend
+class TlTourDifficulty extends Backend
 {
 
     /**

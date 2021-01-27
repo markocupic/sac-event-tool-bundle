@@ -9,6 +9,7 @@
  */
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Markocupic\SacEventToolBundle\Dca\TlCalendarEvents;
 
 // Keys
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['mountainguide'] = 'index';
@@ -19,33 +20,32 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['eventReleaseL
 $GLOBALS['TL_DCA']['tl_calendar_events']['config']['ctable'][] = 'tl_calendar_events_instructor';
 
 // Callbacks
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = ['tl_calendar_events_sac_event_tool', 'test'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = ['tl_calendar_events_sac_event_tool', 'onloadCallback'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = ['tl_calendar_events_sac_event_tool', 'setPaletteWhenCreatingNew'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = ['tl_calendar_events_sac_event_tool', 'onloadCallbackExportCalendar'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = ['tl_calendar_events_sac_event_tool', 'onloadCallbackShiftEventDates'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = ['tl_calendar_events_sac_event_tool', 'onloadCallbackSetPalettes'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = ['tl_calendar_events_sac_event_tool', 'onloadCallbackDeleteInvalidEvents'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = ['tl_calendar_events_sac_event_tool', 'setFilterSearchAndSortingBoard'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['oncreate_callback'][] = ['tl_calendar_events_sac_event_tool', 'oncreateCallback'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['oncopy_callback'][] = ['tl_calendar_events_sac_event_tool', 'oncopyCallback'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['ondelete_callback'][] = ['tl_calendar_events_sac_event_tool', 'ondeleteCallback'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = ['tl_calendar_events_sac_event_tool', 'onsubmitCallback'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = ['tl_calendar_events_sac_event_tool', 'adjustEndDate'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = ['tl_calendar_events_sac_event_tool', 'adjustRegistrationPeriod'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = ['tl_calendar_events_sac_event_tool', 'adjustImageSize'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = ['tl_calendar_events_sac_event_tool', 'adjustEventReleaseLevel'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = ['tl_calendar_events_sac_event_tool', 'adjustDurationInfo'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = ['tl_calendar_events_sac_event_tool', 'setEventToken'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = [TlCalendarEvents::class, 'onloadCallback'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = [TlCalendarEvents::class,  'setPaletteWhenCreatingNew'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = [TlCalendarEvents::class,  'onloadCallbackExportCalendar'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = [TlCalendarEvents::class, 'onloadCallbackShiftEventDates'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = [TlCalendarEvents::class, 'onloadCallbackSetPalettes'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = [TlCalendarEvents::class, 'onloadCallbackDeleteInvalidEvents'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onload_callback'][] = [TlCalendarEvents::class, 'setFilterSearchAndSortingBoard'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['oncreate_callback'][] = [TlCalendarEvents::class, 'oncreateCallback'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['oncopy_callback'][] = [TlCalendarEvents::class, 'oncopyCallback'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['ondelete_callback'][] = [TlCalendarEvents::class, 'ondeleteCallback'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = [TlCalendarEvents::class, 'onsubmitCallback'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = [TlCalendarEvents::class, 'adjustEndDate'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = [TlCalendarEvents::class, 'adjustRegistrationPeriod'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = [TlCalendarEvents::class, 'adjustImageSize'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = [TlCalendarEvents::class, 'adjustEventReleaseLevel'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = [TlCalendarEvents::class, 'adjustDurationInfo'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['onsubmit_callback'][] = [TlCalendarEvents::class, 'setEventToken'];
 
 // Buttons callback
-$GLOBALS['TL_DCA']['tl_calendar_events']['edit']['buttons_callback'][] = ['tl_calendar_events_sac_event_tool', 'buttonsCallback'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['edit']['buttons_callback'][] = [TlCalendarEvents::class, 'buttonsCallback'];
 
 // List
 // Sortierung nach Datum neuste Events zu letzt
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['disableGrouping'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['fields'] = ['startDate ASC'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['child_record_callback'] = ['tl_calendar_events_sac_event_tool', 'listEvents'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['child_record_callback'] = [TlCalendarEvents::class, 'listEvents'];
 
 // Subpalettes
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['allowDeregistration'] = 'deregistrationLimit';
@@ -197,7 +197,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle'] = [
     'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events']['toggle'],
     'icon'            => 'visible.svg',
     'attributes'      => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-    'button_callback' => ['tl_calendar_events_sac_event_tool', 'toggleIcon'],
+    'button_callback' => [TlCalendarEvents::class, 'toggleIcon'],
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = [
@@ -210,22 +210,22 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelPrev
     'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelPrev'],
     'href'            => 'action=releaseLevelPrev',
     'icon'            => 'bundles/markocupicsaceventtool/icons/arrow_down.png',
-    'button_callback' => ['tl_calendar_events_sac_event_tool', 'releaseLevelPrev'],
+    'button_callback' => [TlCalendarEvents::class, 'releaseLevelPrev'],
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelNext'] = [
     'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelNext'],
     'href'            => 'action=releaseLevelNext',
     'icon'            => 'bundles/markocupicsaceventtool/icons/arrow_up.png',
-    'button_callback' => ['tl_calendar_events_sac_event_tool', 'releaseLevelNext'],
+    'button_callback' => [TlCalendarEvents::class, 'releaseLevelNext'],
 ];
 
 // Operations Button Callbacks
-$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['delete']['button_callback'] = ['tl_calendar_events_sac_event_tool', 'deleteIcon'];
-$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['copy']['button_callback'] = ['tl_calendar_events_sac_event_tool', 'copyIcon'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['delete']['button_callback'] = [TlCalendarEvents::class, 'deleteIcon'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['copy']['button_callback'] = [TlCalendarEvents::class, 'copyIcon'];
 
 // alias
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['alias']['input_field_callback'] = ['tl_calendar_events_sac_event_tool', 'showFieldValue'];
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['alias']['input_field_callback'] = [TlCalendarEvents::class, 'showFieldValue'];
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['alias']['eval']['tl_class'] = 'clr';
 
 // title
@@ -286,8 +286,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = [
     'exclude'          => true,
     'filter'           => true,
     'inputType'        => 'select',
-    'options_callback' => ['tl_calendar_events_sac_event_tool', 'optionsCallbackEventType'],
-    'save_callback'    => [['tl_calendar_events_sac_event_tool', 'saveCallbackEventType']],
+    'options_callback' => [TlCalendarEvents::class, 'optionsCallbackEventType'],
+    'save_callback'    => [[TlCalendarEvents::class, 'saveCallbackEventType']],
     'eval'             => ['submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => true],
     'sql'              => "varchar(32) NOT NULL default ''",
 ];
@@ -323,7 +323,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
     'search'        => true,
     'inputType'     => 'multiColumnWizard',
     // Save instructors in a child table tl_calendar_events_instructors
-    'save_callback' => [['tl_calendar_events_sac_event_tool', 'saveCallbackSetMaininstructor']],
+    'save_callback' => [[TlCalendarEvents::class, 'saveCallbackSetMaininstructor']],
     'eval'          => [
         'mandatory'    => true,
         'columnFields' => [
@@ -404,7 +404,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0'] = [
     'search'           => true,
     'filter'           => true,
     'inputType'        => 'select',
-    'options_callback' => ['tl_calendar_events_sac_event_tool', 'optionsCallbackCourseTypeLevel0'],
+    'options_callback' => [TlCalendarEvents::class, 'optionsCallbackCourseTypeLevel0'],
     'eval'             => ['tl_class' => 'clr m12', 'submitOnChange' => true, 'includeBlankOption' => true, 'multiple' => false, 'mandatory' => true],
     'sql'              => "int(10) unsigned NOT NULL default '0'",
 ];
@@ -418,7 +418,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1'] = [
     'inputType'        => 'select',
     'foreignKey'       => 'tl_course_sub_type.name',
     'relation'         => ['type' => 'hasOne', 'load' => 'lazy'],
-    'options_callback' => ['tl_calendar_events_sac_event_tool', 'optionsCallbackCourseSubType'],
+    'options_callback' => [TlCalendarEvents::class, 'optionsCallbackCourseSubType'],
     'eval'             => ['tl_class' => 'clr m12', 'multiple' => false, 'mandatory' => true],
     'sql'              => "int(10) unsigned NOT NULL default '0'",
 ];
@@ -431,7 +431,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['organizers'] = [
     'filter'           => true,
     'sorting'          => true,
     'inputType'        => 'select',
-    'options_callback' => ['tl_calendar_events_sac_event_tool', 'optionsCallbackGetOrganizers'],
+    'options_callback' => [TlCalendarEvents::class, 'optionsCallbackGetOrganizers'],
     'eval'             => ['multiple' => true, 'chosen' => true, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr m12'],
     'sql'              => "blob NULL",
 ];
@@ -452,7 +452,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = [
     'filter'           => true,
     'exclude'          => true,
     'inputType'        => 'select',
-    'options_callback' => ['tl_calendar_events_sac_event_tool', 'optionsCallbackGetEventDuration'],
+    'options_callback' => [TlCalendarEvents::class, 'optionsCallbackGetEventDuration'],
     'eval'             => ['includeBlankOption' => true, 'tl_class' => 'clr m12', 'mandatory' => true],
     'sql'              => "varchar(32) NOT NULL default ''",
 ];
@@ -510,9 +510,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDates'] = [
     'label'         => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventDates'],
     'exclude'       => true,
     'inputType'     => 'multiColumnWizard',
-    'load_callback' => [['tl_calendar_events_sac_event_tool', 'loadCallbackeventDates']],
+    'load_callback' => [[TlCalendarEvents::class, 'loadCallbackeventDates']],
     'eval'          => [
-        'columnsCallback' => ['tl_calendar_events_sac_event_tool', 'listFixedDates'],
+        'columnsCallback' => [TlCalendarEvents::class, 'listFixedDates'],
         'buttons'         => ['up' => false, 'down' => false],
         'mandatory'       => true,
     ],
@@ -698,7 +698,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
                 'exclude'          => true,
                 'inputType'        => 'select',
                 'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'options_callback' => ['tl_calendar_events_sac_event_tool', 'optionsCallbackTourDifficulties'],
+                'options_callback' => [TlCalendarEvents::class, 'optionsCallbackTourDifficulties'],
                 'relation'         => ['type' => 'hasMany', 'load' => 'eager'],
                 'foreignKey'       => 'tl_tour_difficulty.shortcut',
                 'eval'             => [
@@ -712,7 +712,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
                 'exclude'          => true,
                 'inputType'        => 'select',
                 'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'options_callback' => ['tl_calendar_events_sac_event_tool', 'optionsCallbackTourDifficulties'],
+                'options_callback' => [TlCalendarEvents::class, 'optionsCallbackTourDifficulties'],
                 'relation'         => ['type' => 'hasMany', 'load' => 'eager'],
                 'foreignKey'       => 'tl_tour_difficulty.shortcut',
                 'eval'             => [
@@ -805,8 +805,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = [
     'inputType'        => 'select',
     'foreignKey'       => 'tl_event_release_level_policy.title',
     'relation'         => ['type' => 'hasOne', 'load' => 'lazy'],
-    'options_callback' => ['tl_calendar_events_sac_event_tool', 'optionsCallbackListReleaseLevels'],
-    'save_callback'    => [['tl_calendar_events_sac_event_tool', 'saveCallbackEventReleaseLevel']],
+    'options_callback' => [TlCalendarEvents::class, 'optionsCallbackListReleaseLevels'],
+    'save_callback'    => [[TlCalendarEvents::class, 'saveCallbackEventReleaseLevel']],
     'eval'             => ['mandatory' => true, 'tl_class' => 'clr m12'],
     'sql'              => "int(10) unsigned NOT NULL default '0'",
 ];

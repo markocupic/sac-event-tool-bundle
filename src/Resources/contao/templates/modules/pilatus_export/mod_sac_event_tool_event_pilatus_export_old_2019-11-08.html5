@@ -242,7 +242,7 @@
         <?php endif; ?>
 
         <?php foreach ($arrOrganizer['events'] as $arrEvent): ?>
-          <?php if ($arrEvent['eventType'] == 'generalEvent'): ?>
+          <?php if ($arrEvent['eventType'] === 'generalEvent'): ?>
           <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
             <td class="event-export-headline" colspan="2" style="color:red"><strong><?= \EventTypeModel::findByAlias($arrEvent['eventType'])->title ?></strong></td>
           </tr>

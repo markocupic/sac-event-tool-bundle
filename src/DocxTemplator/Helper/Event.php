@@ -92,7 +92,7 @@ class Event
         $arrEventDates = [];
         foreach ($arrEventTstamps as $i => $v)
         {
-            if ((count($arrEventTstamps) - 1) == $i)
+            if ((count($arrEventTstamps) - 1) === $i)
             {
                 $strFormat = 'd.m.Y';
             }
@@ -242,11 +242,11 @@ class Event
         $objPhpWord->replace('totalCosts', $this->prepareString(round($totalCosts, 2)));
 
         // Notice
-        $notice = $objEventInvoice->notice == '' ? '---' : $objEventInvoice->notice;
+        $notice = empty($objEventInvoice->notice) ? '---' : $objEventInvoice->notice;
         $objPhpWord->replace('notice', $this->prepareString($notice), ['multiline' => true]);
 
         // eventReportAdditionalNotices
-        $eventReportAdditionalNotices = $objEvent->eventReportAdditionalNotices == '' ? '---' : $objEvent->eventReportAdditionalNotices;
+        $eventReportAdditionalNotices = empty($objEvent->eventReportAdditionalNotices) ? '---' : $objEvent->eventReportAdditionalNotices;
         $objPhpWord->replace('eventReportAdditionalNotices', $this->prepareString($eventReportAdditionalNotices), ['multiline' => true]);
 
         // Iban & account holder

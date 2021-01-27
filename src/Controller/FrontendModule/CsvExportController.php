@@ -272,7 +272,7 @@ class CsvExportController extends AbstractFrontendModuleController
                             {
                                 if ($blnHasUserRoleFilter && count($arrFilterRoles) > 0)
                                 {
-                                    if (!in_array($groupId, $arrFilterRoles))
+                                    if (!in_array($groupId, $arrFilterRoles, false))
                                     {
                                         continue;
                                     }

@@ -108,7 +108,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         $this->objNotification = $notificationAdapter->findByPk($model->activateMemberAccountNotificationId);
 
         // Redirect to first step, if there is no step param set in the url
-        if ($request->query->get('step') == '' || !is_numeric($request->query->get('step')))
+        if (empty($request->query->get('step')) || !is_numeric($request->query->get('step')))
         {
             $url = $urlAdapter->addQueryString('step=1');
             $controllerAdapter->redirect($url);
@@ -320,7 +320,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
 
             if (!$hasError)
             {
-                if (strtolower($request->request->get('email')) !== "" && trim($objMember->email) == '')
+                if (!empty(strtolower((string) $request->request->get('email'))) && empty(trim((string)$objMember->email)))
                 {
                     $this->partial->errorMsg = $translator->trans('ERR.activateMemberAccount_sacMemberEmailNotRegistered', [], 'contao_default');
                     $hasError = true;

@@ -8,6 +8,7 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlTourDifficultyCategory;
 
 $GLOBALS['TL_DCA']['tl_tour_difficulty_category'] = array
 (
@@ -63,7 +64,7 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty_category'] = array
                 'label'           => &$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['editheader'],
                 'href'            => 'table=tl_tour_difficulty_category&amp;act=edit',
                 'icon'            => 'header.svg',
-                'button_callback' => array('tl_tour_difficulty_category', 'editHeader'),
+                'button_callback' => array(TlTourDifficultyCategory::class, 'editHeader'),
             ),
             'copy'       => array
             (

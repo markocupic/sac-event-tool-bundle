@@ -49,7 +49,7 @@ class ModuleSacEventToolEventPreviewReader extends Events
     public function generate()
     {
 
-        if (TL_MODE == 'BE')
+        if (TL_MODE === 'BE')
         {
             /** @var BackendTemplate|object $objTemplate */
             $objTemplate = new BackendTemplate('be_wildcard');
@@ -165,7 +165,7 @@ class ModuleSacEventToolEventPreviewReader extends Events
             {
                 $strDate = Date::parse($objPage->datimFormat, $intStartTime) . $GLOBALS['TL_LANG']['MSC']['cal_timeSeparator'] . Date::parse($objPage->datimFormat, $intEndTime);
             }
-            elseif ($intStartTime == $intEndTime)
+            elseif ((int)$intStartTime === (int)$intEndTime)
             {
                 $strTime = Date::parse($objPage->timeFormat, $intStartTime);
             }

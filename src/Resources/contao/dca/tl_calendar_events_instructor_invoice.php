@@ -9,6 +9,9 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlCalendarEventsInstructorInvoice;
+use Contao\BackendUser;
+
 $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
     'config' => [
         'dataContainer'    => 'Table',
@@ -17,10 +20,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
         'enableVersioning' => true,
         'switchToEdit'     => true,
         'onload_callback'  => [
-            ['tl_calendar_events_instructor_invoice', 'checkAccesRights'],
-            ['tl_calendar_events_instructor_invoice', 'routeActions'],
-            ['tl_calendar_events_instructor_invoice', 'warnIfReportFormHasNotFilledIn'],
-            ['tl_calendar_events_instructor_invoice', 'reviseTable'],
+            [TlCalendarEventsInstructorInvoice::class, 'checkAccesRights'],
+            [TlCalendarEventsInstructorInvoice::class, 'routeActions'],
+            [TlCalendarEventsInstructorInvoice::class, 'warnIfReportFormHasNotFilledIn'],
+            [TlCalendarEventsInstructorInvoice::class, 'reviseTable'],
         ],
         'sql'              => [
             'keys' => [
@@ -32,7 +35,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 
     // Buttons callback
     'edit'   => [
-        'buttons_callback' => [['tl_calendar_events_instructor_invoice', 'buttonsCallback']]
+        'buttons_callback' => [[TlCalendarEventsInstructorInvoice::class, 'buttonsCallback']]
     ],
 
     'list'     => [
@@ -42,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
             'panelLayout'           => 'filter;search,limit',
             'headerFields'          => ['title'],
             'disableGrouping'       => true,
-            'child_record_callback' => ['tl_calendar_events_instructor_invoice', 'listInvoices']
+            'child_record_callback' => [TlCalendarEventsInstructorInvoice::class, 'listInvoices']
         ],
         'label'             => [
             'fields'      => ['pid'],

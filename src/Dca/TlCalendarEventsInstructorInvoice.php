@@ -9,14 +9,25 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Contao;
+namespace Markocupic\SacEventToolBundle\Dca;
 
+use Contao\CalendarEventsInstructorInvoiceModel;
+use Contao\CalendarEventsModel;
+use Contao\Config;
+use Contao\DataContainer;
+use Contao\EventReleaseLevelPolicyModel;
+use Contao\Input;
+use Contao\Message;
+use Contao\System;
+use Contao\UserModel;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx;
+use Contao\Backend;
 
 /**
- * Class tl_calendar_events_instructor_invoice
+ * Class TlCalendarEventsInstructorInvoice
+ * @package Markocupic\SacEventToolBundle\Dca
  */
-class tl_calendar_events_instructor_invoice extends Backend
+class TlCalendarEventsInstructorInvoice extends Backend
 {
 
     /**
@@ -24,7 +35,6 @@ class tl_calendar_events_instructor_invoice extends Backend
      */
     public function __construct()
     {
-
         // Set correct referer
         if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('ref') != '')
         {
@@ -86,7 +96,6 @@ class tl_calendar_events_instructor_invoice extends Backend
      */
     public function routeActions()
     {
-
         $objEventInvoice = CalendarEventsInstructorInvoiceModel::findByPk(Input::get('id'));
         if ($objEventInvoice !== null)
         {
@@ -126,7 +135,7 @@ class tl_calendar_events_instructor_invoice extends Backend
         {
             if (Input::get('action') === 'generateInvoiceDocx' || Input::get('action') === 'generateInvoicePdf' || Input::get('action') === 'generateTourRapportDocx' || Input::get('action') === 'generateTourRapportPdf')
             {
-                $objInvoice = \Contao\CalendarEventsInstructorInvoiceModel::findByPk(Input::get('id'));
+                $objInvoice = CalendarEventsInstructorInvoiceModel::findByPk(Input::get('id'));
                 if ($objInvoice !== null)
                 {
                     if ($objInvoice->getRelated('pid') !== null)
@@ -201,7 +210,7 @@ class tl_calendar_events_instructor_invoice extends Backend
     public function buttonsCallback($arrButtons, $dc)
     {
 
-        if (\Contao\Input::get('act') === 'edit')
+        if (Input::get('act') === 'edit')
         {
             unset($arrButtons['saveNcreate']);
             unset($arrButtons['saveNduplicate']);
@@ -219,7 +228,7 @@ class tl_calendar_events_instructor_invoice extends Backend
      * @param DataContainer $dc
      * @return mixed
      */
-    public function getIbanFromUser($value, \Contao\DataContainer $dc)
+    public function getIbanFromUser($value, DataContainer $dc)
     {
 
         if ($dc->activeRecord)

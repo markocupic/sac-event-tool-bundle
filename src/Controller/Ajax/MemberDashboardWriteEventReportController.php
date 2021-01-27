@@ -194,7 +194,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
         }
 
         // Notify office if there is a new story
-        if ($request->request->get('publishState') == 2 && $objStory->publishState < 2 && $request->request->get('moduleId'))
+        if ($request->request->get('publishState') === '2' && $objStory->publishState < 2 && $request->request->get('moduleId'))
         {
             $objModule = $moduleModelAdapter->findByPk($request->request->get('moduleId'));
             if ($objModule !== null)

@@ -8,10 +8,15 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+namespace Markocupic\SacEventToolBundle\Dca;
+
+use Contao\Controller;
+use Contao\System;
+
 /**
- * Class tl_module_sac_event_tool
+ * Class TlModule
  */
-class tl_module_sac_event_tool extends tl_module
+class TlModule extends \tl_module
 {
     /**
      * @return array
@@ -19,8 +24,8 @@ class tl_module_sac_event_tool extends tl_module
     public function getEventFilterBoardFields()
     {
         $opt = array();
-        \Contao\Controller::loadDataContainer('tl_event_filter_form');
-        \Contao\System::loadLanguageFile('tl_event_filter_form');
+        Controller::loadDataContainer('tl_event_filter_form');
+        System::loadLanguageFile('tl_event_filter_form');
         foreach ($GLOBALS['TL_DCA']['tl_event_filter_form']['fields'] as $k => $v)
         {
             $opt[$k] = isset($GLOBALS['TL_LANG']['tl_event_filter_form'][$k][0]) ? $GLOBALS['TL_LANG']['tl_event_filter_form'][$k][0] : $k;

@@ -343,7 +343,7 @@ class PilatusExportController extends AbstractPrintExportController
             elseif ($request->request->get('timeRangeStart') != '' || $request->request->get('timeRangeEnd') != '')
             {
                 $addError = false;
-                if ($request->request->get('timeRangeStart') == '' || $request->request->get('timeRangeEnd') == '')
+                if (empty($request->request->get('timeRangeStart')) || empty($request->request->get('timeRangeEnd')))
                 {
                     $addError = true;
                 }
@@ -446,7 +446,7 @@ class PilatusExportController extends AbstractPrintExportController
 
             // Check if event has allowed type
             $arrAllowedEventTypes = $stringUtilAdapter->deserialize($this->model->print_export_allowedEventTypes, true);
-            if (!in_array($objEvent->eventType, $arrAllowedEventTypes))
+            if (!in_array($objEvent->eventType, $arrAllowedEventTypes, false))
             {
                 continue;
             }
@@ -563,16 +563,16 @@ class PilatusExportController extends AbstractPrintExportController
         $eventDuration = count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
         $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent), $calendarEventsHelperAdapter->getEndDate($objEvent)) + 1;
 
-        if ($eventDuration == 1)
+        if ($eventDuration === 1)
         {
             return $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getStartDate($objEvent));
         }
 
-        if ($eventDuration == 2 && $span != $eventDuration)
+        if ($eventDuration === 2 && $span !== $eventDuration)
         {
             return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($objEvent)) . ' & ' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($objEvent));
         }
-        elseif ($span == $eventDuration)
+        elseif ($span === $eventDuration)
         {
             return $dateAdapter->parse($dateFormatShortened['from'], $calendarEventsHelperAdapter->getStartDate($objEvent)) . '-' . $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getEndDate($objEvent));
         }
@@ -755,7 +755,7 @@ class PilatusExportController extends AbstractPrintExportController
                 }
 
                 $arrOrganizers = $stringUtilAdapter->deserialize($eventModel->organizers, true);
-                if (!in_array($objOrganizer->id, $arrOrganizers))
+                if (!in_array($objOrganizer->id, $arrOrganizers, false))
                 {
                     continue;
                 }

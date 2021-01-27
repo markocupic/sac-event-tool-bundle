@@ -210,9 +210,9 @@ class ExportEvents2Docx
     {
         $table = self::$strTable;
 
-        if ($table == 'tl_calendar_events')
+        if ($table === 'tl_calendar_events')
         {
-            if ($field == 'courseLevel')
+            if ($field === 'courseLevel')
             {
                 if ($value != '')
                 {
@@ -220,7 +220,7 @@ class ExportEvents2Docx
                 }
             }
 
-            if ($field == 'kursart')
+            if ($field === 'kursart')
             {
                 $levelMain = $objEvent->courseTypeLevel0;
                 $levelSub = $objEvent->courseTypeLevel1;
@@ -239,7 +239,7 @@ class ExportEvents2Docx
                 $value = $strMain . ': ' . $strSub;
             }
 
-            if ($field == 'author')
+            if ($field === 'author')
             {
                 $value = StringUtil::deserialize($value, true);
                 if (is_array(StringUtil::deserialize($value)) && !empty($value))
@@ -251,7 +251,7 @@ class ExportEvents2Docx
                 }
             }
 
-            if ($field == 'instructor')
+            if ($field === 'instructor')
             {
                 $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent);
                 $arrValue = array_map(function ($v) {
@@ -260,7 +260,7 @@ class ExportEvents2Docx
                 $value = implode(', ', $arrValue);
             }
 
-            if ($field == 'organizers')
+            if ($field === 'organizers')
             {
                 $value = StringUtil::deserialize($value, true);
                 if (is_array(StringUtil::deserialize($value)) && !empty($value))
@@ -277,7 +277,7 @@ class ExportEvents2Docx
                 }
             }
 
-            if ($field == 'startDate' || $field == 'endDate' || $field == 'tstamp')
+            if ($field === 'startDate' || $field === 'endDate' || $field === 'tstamp')
             {
                 if ($value > 0)
                 {
@@ -286,7 +286,7 @@ class ExportEvents2Docx
             }
 
             // Kusdatendaten in der Form d.m.Y, d.m.Y, ...
-            if ($field == 'eventDates')
+            if ($field === 'eventDates')
             {
                 $objEvent = CalendarEventsModel::findByPk(self::$arrDatarecord['id']);
                 $arr = CalendarEventsHelper::getEventTimestamps($objEvent);
@@ -296,13 +296,13 @@ class ExportEvents2Docx
                 $value = implode(', ', $arr);
             }
 
-            if ($field == 'mountainguide')
+            if ($field === 'mountainguide')
             {
                 $value = ($value > 0) ? 'Mit Bergfuehrer' : 'Mit SAC-Kursleiter';
                 $value = utf8_encode($value);
             }
             /*
-            if ($field == 'issues')
+            if ($field === 'issues')
             {
                 $value = str_replace('</li>', '', $value);
                 $value = str_replace('</ul>', '', $value);

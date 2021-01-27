@@ -8,24 +8,26 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlMember;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
 // Manipulate palette default
-Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-    ->addLegend('food_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
-    ->addLegend('section_info_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
-    ->addLegend('section_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
-    ->addLegend('emergency_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
-    ->addLegend('avatar_legend', 'contact_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
-    ->addField(array('avatar'), 'avatar_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('foodHabits'), 'food_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
-    ->addField(array('isSacMember', 'sacMemberId', 'uuid', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'phoneBusiness', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'), 'section_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
-    ->addField(array('emergencyPhone', 'emergencyPhoneName'), 'emergency_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND)
+PaletteManipulator::create()
+    ->addLegend('food_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
+    ->addLegend('section_info_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
+    ->addLegend('section_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
+    ->addLegend('emergency_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
+    ->addLegend('avatar_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
+    ->addField(array('avatar'), 'avatar_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('foodHabits'), 'food_legend', PaletteManipulator::POSITION_AFTER)
+    ->addField(array('isSacMember', 'sacMemberId', 'uuid', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'phoneBusiness', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'), 'section_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('emergencyPhone', 'emergencyPhoneName'), 'emergency_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_member');
 
 /**
  * Table tl_member
  */
 $GLOBALS['TL_DCA']['tl_member']['list']['sorting']['fields'] = array('lastname ASC');
-$GLOBALS['TL_DCA']['tl_member']['config']['ondelete_callback'][] = array('tl_member_sac_bundle', 'ondeleteCallback');
+$GLOBALS['TL_DCA']['tl_member']['config']['ondelete_callback'][] = array(TlMember::class, 'ondeleteCallback');
 
 // Add tl_member.sacMemberId to index
 $GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index';
@@ -262,7 +264,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = array(
     'sql'       => "varchar(1024) NOT NULL default ''",
 );
 
-if(TL_MODE == 'BE')
+if(TL_MODE === 'BE')
 {
     // Fields (readonly fields)
     $GLOBALS['TL_DCA']['tl_member']['fields']['uuid']['eval']['readonly'] = 'readonly';

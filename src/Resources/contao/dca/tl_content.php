@@ -8,16 +8,20 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-if (Input::get('do') == 'sac_calendar_events_tool')
+use Markocupic\SacEventToolBundle\Dca\TlContent;
+use Contao\Input;
+use Contao\BackendUser;
+
+if (Input::get('do') === 'sac_calendar_events_tool')
 {
     $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_calendar_events';
-    $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array('tl_content_calendar', 'checkPermission');
-    $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array('tl_content_calendar', 'generateFeed');
-    $GLOBALS['TL_DCA']['tl_content']['list']['operations']['toggle']['button_callback'] = array('tl_content_calendar', 'toggleIcon');
+    $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array(TlContent::class, 'checkPermission');
+    $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array(TlContent::class, 'generateFeed');
+    $GLOBALS['TL_DCA']['tl_content']['list']['operations']['toggle']['button_callback'] = array(TlContent::class, 'toggleIcon');
 }
 
 // Callbacks
-$GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array('tl_content_sac_event_tool', 'setPalette');
+$GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array(TlContent::class, 'setPalette');
 
 // Palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes']['user_portrait_list'] = 'name,type,headline;{config_legend},userList_selectMode,userList_queryType,userList_users,userList_userRoles,userList_replacePrivateAdressWithRoleAdress,userList_showFieldsToGuests;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{template_legend},userList_template,userList_partial_template;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
@@ -32,7 +36,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['cabanneSac'] = array
     'exclude'          => true,
     'search'           => true,
     'inputType'        => 'select',
-    'options_callback' => array('tl_content_sac_event_tool', 'getCabannes'),
+    'options_callback' => array(TlContent::class, 'getCabannes'),
     'eval'             => array('mandatory' => true, 'maxlength' => 200, 'tl_class' => 'w50 clr'),
     'sql'              => "int(10) unsigned NOT NULL default '0'",
 );
@@ -92,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_userRoles'] = array
     'exclude'          => true,
     'filter'           => true,
     'inputType'        => 'select',
-    'options_callback' => array('tl_content_sac_event_tool', 'optionsCallbackUserRoles'),
+    'options_callback' => array(TlContent::class, 'optionsCallbackUserRoles'),
     'eval'             => array('multiple' => true, 'chosen' => true, 'tl_class' => 'clr'),
     'sql'              => "blob NULL",
 );
@@ -124,7 +128,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_template'] = array
     'label'            => &$GLOBALS['TL_LANG']['tl_content']['userList_template'],
     'exclude'          => true,
     'inputType'        => 'select',
-    'options_callback' => array('tl_content_sac_event_tool', 'getUserListTemplates'),
+    'options_callback' => array(TlContent::class, 'getUserListTemplates'),
     'eval'             => array('tl_class' => 'w50'),
     'sql'              => "varchar(64) NOT NULL default ''"
 );
@@ -134,7 +138,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_partial_template'] = array
     'label'            => &$GLOBALS['TL_LANG']['tl_content']['userList_partial_template'],
     'exclude'          => true,
     'inputType'        => 'select',
-    'options_callback' => array('tl_content_sac_event_tool', 'getUserListPartialTemplates'),
+    'options_callback' => array(TlContent::class, 'getUserListPartialTemplates'),
     'eval'             => array('tl_class' => 'w50'),
     'sql'              => "varchar(64) NOT NULL default ''"
 );

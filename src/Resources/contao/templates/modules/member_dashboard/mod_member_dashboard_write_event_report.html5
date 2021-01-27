@@ -46,7 +46,7 @@
       <div class="mr-2">
         <select class="form-control" name="publishEventStory" id="publishEventStory">
           <option value="1"<?php if ($this->publishState < 2): ?> selected<?php endif; ?>>In Bearbeitung</option>
-          <option value="2"<?php if ($this->publishState == 2): ?> selected<?php endif; ?>>Bericht veröffentlichen</option>
+          <option value="2"<?php if ((int)$this->publishState === 2): ?> selected<?php endif; ?>>Bericht veröffentlichen</option>
         </select>
       </div>
       <?php endif; ?>

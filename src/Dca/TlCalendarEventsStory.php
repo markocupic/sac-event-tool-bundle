@@ -8,10 +8,18 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+namespace Markocupic\SacEventToolBundle\Dca;
+
+use Contao\Backend;
+use Contao\CalendarEventsStoryModel;
+use Contao\Database;
+use Contao\DataContainer;
+use Contao\StringUtil;
+
 /**
- * Class tl_calendar_events_story
+ * Class TlCalendarEventsStory
  */
-class tl_calendar_events_story extends Backend
+class TlCalendarEventsStory extends Backend
 {
 
     /**
@@ -49,17 +57,23 @@ class tl_calendar_events_story extends Backend
     {
         // Delete old and unpublished stories
         $limit = time() - 60 * 60 * 24 * 30;
-        Database::getInstance()->prepare('DELETE FROM tl_calendar_events_story WHERE tstamp<? AND publishState<?')->execute($limit, 3);
+        Database::getInstance()
+            ->prepare('DELETE FROM tl_calendar_events_story WHERE tstamp<? AND publishState<?')
+            ->execute($limit, 3);
 
         // Delete unfinished stories older the 14 days
         $limit = time() - 60 * 60 * 24 * 14;
-        Database::getInstance()->prepare('DELETE FROM tl_calendar_events_story WHERE tstamp<? AND text=? AND youtubeId=? AND multiSRC=?')->execute($limit, '', '', null);
+        Database::getInstance()
+            ->prepare('DELETE FROM tl_calendar_events_story WHERE tstamp<? AND text=? AND youtubeId=? AND multiSRC=?')
+            ->execute($limit, '', '', null);
 
         // Keep stories up to date, if events are renamed f.ex.
-        $objStory = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_story')->execute();
+        $objStory = Database::getInstance()
+            ->prepare('SELECT * FROM tl_calendar_events_story')
+            ->execute();
         while ($objStory->next())
         {
-            $objStoryModel = \Contao\CalendarEventsStoryModel::findByPk($objStory->id);
+            $objStoryModel = CalendarEventsStoryModel::findByPk($objStory->id);
             $objEvent = $objStoryModel->getRelated('eventId');
             if ($objEvent !== null)
             {
@@ -70,7 +84,7 @@ class tl_calendar_events_story extends Backend
                 $objStoryModel->organizers = $objEvent->organizers;
 
                 $aDates = [];
-                $arrDates = \Contao\StringUtil::deserialize($objEvent->eventDates, true);
+                $arrDates = StringUtil::deserialize($objEvent->eventDates, true);
                 foreach ($arrDates as $arrDate)
                 {
                     $aDates[] = $arrDate['new_repeat'];
@@ -81,14 +95,7 @@ class tl_calendar_events_story extends Backend
         }
     }
 
-    /**
-     * @param $strContent
-     * @param $strTemplate
-     * @return mixed
-     */
-    public function parseBackendTemplate($strContent, $strTemplate)
-    {
-    }
+
 
     /**
      * Add an image to each record

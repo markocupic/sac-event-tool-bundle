@@ -419,7 +419,7 @@ class PrintWorkshopsAsPdf
                     $arrValue = array();
                     foreach ($arr as $k => $v)
                     {
-                        if ($k == count($arr) - 1)
+                        if ($k === count($arr) - 1)
                         {
                             $arrValue[] = 'und ' . Date::parse('d.m.Y', $v);
                         }

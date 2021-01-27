@@ -8,6 +8,8 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlModule;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
 /**
  * Table tl_module
  */
@@ -36,8 +38,8 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['event_story_reader'] = '{title_lege
 $GLOBALS['TL_DCA']['tl_module']['palettes']['event_list'] = '{title_legend},name,headline,type;{config_legend},cal_calendar,eventType,cal_readerModule,eventListLimitPerRequest;{template_legend:hide},eventListPartialTpl;{image_legend:hide},imgSize;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
 // Manipulate palettes
-Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-    ->addField(array('jumpToWhenNotActivated'), 'redirect_legend', Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_PREPEND)
+PaletteManipulator::create()
+    ->addField(array('jumpToWhenNotActivated'), 'redirect_legend', PaletteManipulator::POSITION_PREPEND)
     ->applyToPalette('login', 'tl_module');
 
 // Fields
@@ -168,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['jumpToWhenNotActivated'] = array(
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = array(
     'inputType'        => 'checkboxWizard',
-    'options_callback' => array('tl_module_sac_event_tool', 'getEventFilterBoardFields'),
+    'options_callback' => array(TlModule::class, 'getEventFilterBoardFields'),
     'eval'             => array('mandatory' => false, 'multiple' => true, 'ooorderField' => 'orderSRC', 'tl_class' => 'clr'),
     'sql'              => "blob NULL"
 );
@@ -177,7 +179,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventListPartialTpl'] = array
 (
     'exclude'          => true,
     'inputType'        => 'select',
-    'options_callback' => array('tl_module_sac_event_tool', 'getEventListTemplates'),
+    'options_callback' => array(TlModule::class, 'getEventListTemplates'),
     'eval'             => array('tl_class' => 'w50'),
     'sql'              => "varchar(64) NOT NULL default 'event_list_partial_tour'"
 );

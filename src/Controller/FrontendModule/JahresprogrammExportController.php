@@ -315,7 +315,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
             if ($this->organizer)
             {
                 $arrOrganizer = $stringUtilAdapter->deserialize($objEvents->organizers, true);
-                if (!in_array($this->organizer, $arrOrganizer))
+                if (!in_array($this->organizer, $arrOrganizer, false))
                 {
                     continue;
                 }
@@ -500,7 +500,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 while ($objUser->next())
                 {
                     $userRoles = $stringUtilAdapter->deserialize($objUser->userRole, true);
-                    if (in_array($userRole, $userRoles))
+                    if (in_array($userRole, $userRoles, false))
                     {
                         $arrLeft = [];
                         $arrLeft[] = trim($objUser->lastname . ' ' . $objUser->firstname);
@@ -560,7 +560,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
         /** @var Calendar $calendarAdapter */
         $calendarAdapter = $this->get('contao.framework')->getAdapter(Calendar::class);
 
-        if ($dateFormat == '')
+        if (empty($dateFormat))
         {
             $dateFormat = $configAdapter->get('dateFormat');
         }
@@ -581,15 +581,15 @@ class JahresprogrammExportController extends AbstractPrintExportController
         $eventDuration = count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
         $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent), $calendarEventsHelperAdapter->getEndDate($objEvent)) + 1;
 
-        if ($eventDuration == 1)
+        if ($eventDuration === 1)
         {
             return $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getStartDate($objEvent));
         }
-        if ($eventDuration == 2 && $span != $eventDuration)
+        if ($eventDuration === 2 && $span != $eventDuration)
         {
             return $dateAdapter->parse($dateFormatShortened, $calendarEventsHelperAdapter->getStartDate($objEvent)) . ' + ' . $dateAdapter->parse($dateFormat, $calendarEventsHelperAdapter->getEndDate($objEvent));
         }
-        elseif ($span == $eventDuration)
+        elseif ($span === $eventDuration)
         {
             // Check if event dates are not in the same month
             if ($dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getStartDate($objEvent)) === $dateAdapter->parse('n.Y', $calendarEventsHelperAdapter->getEndDate($objEvent)))

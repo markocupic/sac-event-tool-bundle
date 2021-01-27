@@ -83,7 +83,7 @@ class CabanneSacListController extends AbstractContentElementController
             $skip = array('id', 'tstamp', 'singleSRC');
             foreach ($objDb->fetchAssoc() as $k => $v)
             {
-                if (!in_array($k, $skip))
+                if (!in_array($k, $skip,true))
                 {
                     $template->$k = $v;
                 }

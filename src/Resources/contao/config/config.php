@@ -72,10 +72,7 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
     ],
     'sac_user_role_tool'               => [
         'tables' => ['tl_user_role'],
-    ],
-    'sac_user_temp'                    => [
-        'tables' => ['tl_user_temp'],
-    ],
+    ]
 ];
 
 // Add permissions

@@ -201,7 +201,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         foreach ($arrFields as $field)
         {
             $objWidget = $objForm->getWidget($field);
-            if ($objWidget->value == '')
+            if (empty($objWidget->value))
             {
                 $objWidget = $objForm->getWidget($field);
                 $objWidget->value = $this->objUser->{$field};

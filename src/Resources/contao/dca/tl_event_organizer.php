@@ -9,6 +9,8 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlEventOrganizer;
+
 $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 
     'config' => [
@@ -158,7 +160,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
             'inputType'     => 'fileTree',
             'eval'          => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
             'load_callback' => [
-                ['tl_event_organizer', 'setSingleSrcFlags'],
+                [TlEventOrganizer::class, 'setSingleSrcFlags'],
             ],
             'sql'           => "binary(16) NULL",
         ],
@@ -192,7 +194,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
             'inputType'     => 'fileTree',
             'eval'          => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
             'load_callback' => [
-                ['tl_event_organizer', 'setSingleSrcFlags'],
+                [TlEventOrganizer::class, 'setSingleSrcFlags'],
             ],
             'sql'           => "binary(16) NULL",
         ],

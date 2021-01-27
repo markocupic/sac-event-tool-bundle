@@ -162,7 +162,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         $controllerAdapter->loadLanguageFile('tl_calendar_events_story');
 
         // Handle messages
-        if ($this->objUser->email == '' || !$validatorAdapter->isEmail($this->objUser->email))
+        if (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email))
         {
             $messageAdapter->addInfo('Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
         }
@@ -194,7 +194,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                     $arrAllowedEvents = $calendarEventsMemberModelAdapter->findEventsByMemberId($this->objUser->id, array(), $intStartDateMin, time(), true);
                     foreach ($arrAllowedEvents as $allowedEvent)
                     {
-                        if ($allowedEvent['id'] == $inputAdapter->get('eventId'))
+                        if ((int)$allowedEvent['id'] === (int)$inputAdapter->get('eventId'))
                         {
                             $blnAllow = true;
                             continue;

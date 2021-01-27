@@ -8,6 +8,7 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlEventType;
 
 /**
  * Table tl_event_type
@@ -109,7 +110,7 @@ $GLOBALS['TL_DCA']['tl_event_type'] = array
             'exclude'       => true,
             'search'        => true,
             'flag'          => 1,
-            'load_callback' => array(array('tl_event_type', 'loadCallbackAlias')),
+            'load_callback' => array(array(TlEventType::class, 'loadCallbackAlias')),
             'eval'          => array('mandatory' => true, 'rgxp' => 'alnum', 'maxlength' => 128, 'tl_class' => 'w50'),
             'sql'           => "varchar(128) NULL",
         ),

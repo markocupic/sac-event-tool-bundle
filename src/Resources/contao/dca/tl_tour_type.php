@@ -8,6 +8,8 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlTourType;
+
 $GLOBALS['TL_DCA']['tl_tour_type'] = array
 (
     'config'   => array
@@ -32,7 +34,7 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = array
             'fields'                => array('sorting'),
             'flag'                  => 1,
             'panelLayout'           => 'filter;search,limit',
-            'paste_button_callback' => array('tl_tour_type', 'pasteTag'),
+            'paste_button_callback' => array(TlTourType::class, 'pasteTag'),
         ),
         'label'             => array
         (

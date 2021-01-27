@@ -82,7 +82,7 @@ class DownloadController extends AbstractController
 
         if (!empty($year))
         {
-            if ($year == 'current')
+            if ($year === 'current')
             {
                 $year = (int) $dateAdapter->parse('Y');
             }

@@ -114,13 +114,13 @@ class EventMember
 
                     // Fallback for emergency phone & -name
                     $emergencyPhone = $objUserModel->emergencyPhone;
-                    if ($emergencyPhone == '' && $objMember !== null)
+                    if (empty($emergencyPhone) && $objMember !== null)
                     {
                         $emergencyPhone = $objMember->emergencyPhone;
                     }
 
                     $emergencyPhoneName = $objUserModel->emergencyPhone;
-                    if ($emergencyPhoneName == '' && $objMember !== null)
+                    if (empty($emergencyPhoneName) && $objMember !== null)
                     {
                         $emergencyPhoneName = $objMember->emergencyPhoneName;
                     }

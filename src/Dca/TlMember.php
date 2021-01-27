@@ -8,43 +8,43 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+namespace Markocupic\SacEventToolBundle\Dca;
+
+use Contao\Backend;
+use Contao\System;
+use Contao\MemberModel;
+use Contao\Message;
+use Contao\Controller;
+use Contao\DataContainer;
+
 /**
- * Class tl_member_sac_bundle
+ * Class TlMember
+ * @package Markocupic\SacEventToolBundle\Dca
  */
-class tl_member_sac_bundle extends Backend
+class TlMember extends Backend
 {
 
     /**
-     * Import the back end user object
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-        $this->import('Database');
-    }
-
-    /**
-     * @param DC_Table $objMember
+     * @param DataContainer $objMember
      * @param $undoId
      */
-    public function ondeleteCallback(DC_Table $objMember, $undoId)
+    public function ondeleteCallback(DataContainer $objMember, $undoId)
     {
         // Clear personal data f.ex.
         // Anonymize entries in tl_calendar_events_member
         // Delete avatar directory
         if ($objMember->activeRecord->id > 0)
         {
-            $objClearFrontendUserData = \Contao\System::getContainer()->get('Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData');
+            $objClearFrontendUserData = System::getContainer()->get('Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData');
 
-            $memberModel = \Contao\MemberModel::findByPk($objMember->activeRecord->id);
+            $memberModel = MemberModel::findByPk($objMember->activeRecord->id);
             if ($memberModel !== null)
             {
                 if (false === $objClearFrontendUserData->clearMemberProfile((int)$memberModel->id))
                 {
                     $arrErrorMsg = sprintf('Das Mitglied mit ID:%s kann nicht gelöscht werden, weil es bei Events noch auf der Buchungsliste steht.', $objMember->activeRecord->id);
-                    \Contao\Message::add($arrErrorMsg, 'TL_ERROR', TL_MODE);
-                    \Contao\Controller::redirect('contao?do=member');
+                    Message::add($arrErrorMsg, 'TL_ERROR', TL_MODE);
+                    Controller::redirect('contao?do=member');
                 }
             }
         }

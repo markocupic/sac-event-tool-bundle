@@ -115,7 +115,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
                 }
             }
             // Clean url dateStart url param & redirect
-            if ($inputAdapter->get('year') == '' && $inputAdapter->get('dateStart') != '')
+            if (empty($inputAdapter->get('year')) && !empty($inputAdapter->get('dateStart')))
             {
                 if ($dateAdapter->parse('Y') != $dateAdapter->parse('Y', strtotime($inputAdapter->get('dateStart'))))
                 {
@@ -171,7 +171,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
                 return false;
             }
 
-            if (!in_array($strField, $this->arrAllowedFields))
+            if (!in_array($strField, $this->arrAllowedFields, true))
             {
                 return false;
             }

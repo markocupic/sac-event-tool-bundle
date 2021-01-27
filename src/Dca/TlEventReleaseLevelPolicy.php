@@ -8,10 +8,14 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+namespace Markocupic\SacEventToolBundle\Dca;
+
+use Contao\Backend;
+
 /**
- * Class tl_event_release_level_policy
+ * Class TlEventReleaseLevelPolicy
  */
-class tl_event_release_level_policy extends Backend
+class TlEventReleaseLevelPolicy extends Backend
 {
     /**
      * List a style sheet

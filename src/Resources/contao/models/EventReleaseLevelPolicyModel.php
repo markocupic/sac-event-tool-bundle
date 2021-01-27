@@ -191,12 +191,12 @@ class EventReleaseLevelPolicyModel extends \Model
         {
             $allow = true;
         }
-        elseif (static::findPrevLevel($objEvent->eventReleaseLevel) === null && $objBackendUser->id == $objEvent->author && $objReleaseLevelModel->allowWriteAccessToAuthor)
+        elseif (static::findPrevLevel($objEvent->eventReleaseLevel) === null && (int)$objBackendUser->id === (int)$objEvent->author && $objReleaseLevelModel->allowWriteAccessToAuthor)
         {
             // The event is on the first level and the user is author and is allowed to write on this level
             $allow = true;
         }
-        elseif (static::findPrevLevel($objEvent->eventReleaseLevel) === null && $objReleaseLevelModel->allowWriteAccessToInstructors && in_array($objBackendUser->id, $arrInstructors))
+        elseif (static::findPrevLevel($objEvent->eventReleaseLevel) === null && $objReleaseLevelModel->allowWriteAccessToInstructors && in_array($objBackendUser->id, $arrInstructors, false))
         {
             // The event is on the first level and the user is set as a instructor in the current event
             $allow = true;
@@ -208,7 +208,7 @@ class EventReleaseLevelPolicyModel extends \Model
             $arrGroups = \StringUtil::deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
             foreach ($arrGroups as $k => $v)
             {
-                if (in_array($v['group'], $arrGroupsUserBelongsTo))
+                if (in_array($v['group'], $arrGroupsUserBelongsTo, false))
                 {
                     if ($v['writeAccess'])
                     {
@@ -299,12 +299,12 @@ class EventReleaseLevelPolicyModel extends \Model
         {
             $allow = true;
         }
-        elseif ($objBackendUser->id == $objEvent->author && $objReleaseLevelModel->allowWriteAccessToAuthor)
+        elseif ((int)$objBackendUser->id === (int)$objEvent->author && $objReleaseLevelModel->allowWriteAccessToAuthor)
         {
             // User is author and is allowed to write on this level
             $allow = true;
         }
-        elseif ($objReleaseLevelModel->allowWriteAccessToInstructors && in_array($objBackendUser->id, $arrInstructors))
+        elseif ($objReleaseLevelModel->allowWriteAccessToInstructors && in_array($objBackendUser->id, $arrInstructors, false))
         {
             // User is set as a instructor in the current event
             $allow = true;
@@ -316,7 +316,7 @@ class EventReleaseLevelPolicyModel extends \Model
             $arrGroups = \StringUtil::deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
             foreach ($arrGroups as $k => $v)
             {
-                if (in_array($v['group'], $arrGroupsUserBelongsTo))
+                if (in_array($v['group'], $arrGroupsUserBelongsTo, false))
                 {
                     if ($v['writeAccess'])
                     {
@@ -384,7 +384,7 @@ class EventReleaseLevelPolicyModel extends \Model
             $allow = true;
         }
 
-        elseif ($objBackendUser->id == $objEvent->author && $objReleaseLevelModel->allowWriteAccessToAuthor)
+        elseif ((int)$objBackendUser->id === (int)$objEvent->author && $objReleaseLevelModel->allowWriteAccessToAuthor)
         {
             // User is author and is allowed to switch up/down
             if ($direction === 'up' && $objReleaseLevelModel->allowSwitchingToNextLevel)
@@ -396,7 +396,7 @@ class EventReleaseLevelPolicyModel extends \Model
                 $allow = true;
             }
         }
-        elseif (in_array($objBackendUser->id, $arrInstructors))
+        elseif (in_array($objBackendUser->id, $arrInstructors, false))
         {
             // User is set as a instructor in the current event and is allowed to switch up/down
             if ($direction === 'up' && $objReleaseLevelModel->allowSwitchingToNextLevel)
@@ -417,7 +417,7 @@ class EventReleaseLevelPolicyModel extends \Model
             foreach ($arrGroups as $k => $v)
             {
                 $arrAllowedGroups[$v['group']] = $v;
-                if (in_array($v['group'], $arrGroupsUserBelongsTo))
+                if (in_array($v['group'], $arrGroupsUserBelongsTo, false))
                 {
                     if ($direction === 'up')
                     {

@@ -132,7 +132,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         $frontendAdapter = $this->get('contao.framework')->getAdapter(Frontend::class);
 
         // Handle messages
-        if ($this->objUser->email == '' || !$validatorAdapter->isEmail($this->objUser->email))
+        if (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email))
         {
             $messageAdapter->addInfo('Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
         }
@@ -193,7 +193,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
             $objRegistration = $calendarEventsMemberModelAdapter->findByPk($inputAdapter->get('id'));
             if ($objRegistration !== null)
             {
-                if ($this->objUser->sacMemberId == $objRegistration->sacMemberId)
+                if ((int) $this->objUser->sacMemberId === (int) $objRegistration->sacMemberId)
                 {
                     $objMember = $memberModelAdapter->findOneBySacMemberId($this->objUser->sacMemberId);
                     $startDate = '';

@@ -32,7 +32,7 @@ function isInGroup($userId, $groupId, $mode = 'BE')
     if ($objUser !== null)
     {
         $arrGroups = StringUtil::deserialize($objUser->groups, true);
-        if (in_array($groupId, $arrGroups))
+        if (in_array($groupId, $arrGroups, false))
         {
             return true;
         }
@@ -160,7 +160,7 @@ function userHasRole($userId, $strRole)
     if ($objUser !== null)
     {
         $arrRole = \StringUtil::deserialize($objUser->role, true);
-        if (in_array($strRole, $arrRole))
+        if (in_array($strRole, $arrRole, false))
         {
             return true;
         }

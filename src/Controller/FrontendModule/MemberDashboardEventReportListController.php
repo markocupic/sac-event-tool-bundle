@@ -124,7 +124,7 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
         $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
 
         // Handle messages
-        if ($this->objUser->email == '' || !$validatorAdapter->isEmail($this->objUser->email))
+        if (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email))
         {
             $messageAdapter->addInfo('Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
         }
@@ -160,6 +160,7 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
 
         $arrEventStories = array();
 
+
         if ($this->objUser !== null)
         {
             // Event Stories
@@ -171,7 +172,7 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
                 // Check if story is still editable
                 if ($objEventStory->eventEndDate + $model->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time())
                 {
-                    if ($objEventStory->publishState == 1)
+                    if ($objEventStory->publishState === '1')
                     {
                         $arrEventStory['canEditStory'] = true;
                     }

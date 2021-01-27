@@ -8,6 +8,10 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlCalendarEventsMember;
+use Contao\Config;
+use Contao\Input;
+
 /**
  * Table tl_calendar_events_member
  */
@@ -18,15 +22,15 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'notCopyable'       => true,
         // Do not copy nor delete records, if an item has been deleted!
         'onload_callback'   => [
-            ['tl_calendar_events_member', 'setStateOfSubscription'],
-            ['tl_calendar_events_member', 'onloadCallback'],
-            ['tl_calendar_events_member', 'reviseTable'],
-            ['tl_calendar_events_member', 'setContaoMemberIdFromSacMemberId'],
-            ['tl_calendar_events_member', 'setGlobalOperations'],
-            ['tl_calendar_events_member', 'onloadCallbackExportMemberlist'],
+            [TlCalendarEventsMember::class, 'setStateOfSubscription'],
+            [TlCalendarEventsMember::class, 'onloadCallback'],
+            [TlCalendarEventsMember::class,'reviseTable'],
+            [TlCalendarEventsMember::class, 'setContaoMemberIdFromSacMemberId'],
+            [TlCalendarEventsMember::class, 'setGlobalOperations'],
+            [TlCalendarEventsMember::class, 'onloadCallbackExportMemberlist'],
         ],
         'onsubmit_callback' => [
-            ['tl_calendar_events_member', 'onsubmitCallback'],
+            [TlCalendarEventsMember::class, 'onsubmitCallback'],
         ],
         'ondelete_callback' => [//
         ],
@@ -39,7 +43,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
     ],
     // Buttons callback
     'edit'        => [
-        'buttons_callback' => [['tl_calendar_events_member', 'buttonsCallback']],
+        'buttons_callback' => [[TlCalendarEventsMember::class, 'buttonsCallback']],
     ],
 
     // List
@@ -54,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'label'             => [
             'fields'         => ['stateOfSubscription', 'firstname', 'lastname', 'street', 'city'],
             'showColumns'    => true,
-            'label_callback' => ['tl_calendar_events_member', 'addIcon'],
+            'label_callback' => [TlCalendarEventsMember::class, 'addIcon'],
         ],
         'global_operations' => [
             'all'                            => [
@@ -102,7 +106,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'backToEventSettings'            => [
                 'label'           => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
                 'href'            => 'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
-                'button_callback' => ['tl_calendar_events_member', 'buttonCbBackToEventSettings'],
+                'button_callback' => [TlCalendarEventsMember::class, 'buttonCbBackToEventSettings'],
                 'icon'            => 'bundles/markocupicsaceventtool/icons/back.svg',
                 'attributes'      => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
@@ -196,7 +200,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'label'         => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['stateOfSubscription'],
             'filter'        => true,
             'inputType'     => 'select',
-            'save_callback' => [['tl_calendar_events_member', 'saveCallbackStateOfSubscription']],
+            'save_callback' => [[TlCalendarEventsMember::class, 'saveCallbackStateOfSubscription']],
             'default'       => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'][0],
             'reference'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
             'options'       => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'],
@@ -226,28 +230,28 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'dashboard'           => [
             'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['dashboard'],
             'inputType'            => 'text',
-            'input_field_callback' => ['tl_calendar_events_member', 'inputFieldCallbackDashboard'],
+            'input_field_callback' => [TlCalendarEventsMember::class, 'inputFieldCallbackDashboard'],
             'eval'                 => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'                  => "varchar(255) NOT NULL default ''",
         ],
         'refuseWithEmail'     => [
             'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['refuseWithEmail'],
             'inputType'            => 'text',
-            'input_field_callback' => ['tl_calendar_events_member', 'inputFieldCallbackNotifyMemberAboutSubscriptionState'],
+            'input_field_callback' => [TlCalendarEventsMember::class, 'inputFieldCallbackNotifyMemberAboutSubscriptionState'],
             'eval'                 => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'                  => "varchar(255) NOT NULL default ''",
         ],
         'acceptWithEmail'     => [
             'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['acceptWithEmail'],
             'inputType'            => 'text',
-            'input_field_callback' => ['tl_calendar_events_member', 'inputFieldCallbackNotifyMemberAboutSubscriptionState'],
+            'input_field_callback' => [TlCalendarEventsMember::class, 'inputFieldCallbackNotifyMemberAboutSubscriptionState'],
             'eval'                 => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'                  => "varchar(255) NOT NULL default ''",
         ],
         'addToWaitlist'       => [
             'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['acceptWithEmail'],
             'inputType'            => 'text',
-            'input_field_callback' => ['tl_calendar_events_member', 'inputFieldCallbackNotifyMemberAboutSubscriptionState'],
+            'input_field_callback' => [TlCalendarEventsMember::class, 'inputFieldCallbackNotifyMemberAboutSubscriptionState'],
             'eval'                 => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'                  => "varchar(255) NOT NULL default ''",
         ],
@@ -345,7 +349,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'sacMemberId'         => [
             'label'         => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['sacMemberId'],
             'inputType'     => 'text',
-            'save_callback' => [['tl_calendar_events_member', 'saveCallbackSacMemberId']],
+            'save_callback' => [[TlCalendarEventsMember::class, 'saveCallbackSacMemberId']],
             'eval'          => ['doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'],
             'sql'           => "varchar(255) NOT NULL default ''",
         ],

@@ -8,14 +8,19 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+namespace Markocupic\SacEventToolBundle\Dca;
+
+use Contao\Backend;
+
 /**
- * Class tl_calendar_events_instructor
+ * Class TlCalendarEventsInstructor
+ * @package Markocupic\SacEventToolBundle\Dca
  */
-class tl_calendar_events_instructor extends Backend
+class TlCalendarEventsInstructor extends Backend
 {
 
     /**
-     * tl_calendar_events_instructor constructor.
+     * TlCalendarEventsInstructor constructor.
      */
     public function __construct()
     {

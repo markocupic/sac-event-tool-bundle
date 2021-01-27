@@ -236,16 +236,16 @@ class SyncSacMemberDatabase
                     $set['streetExtra'] = $arrLine[6];
                     $set['postal'] = $arrLine[7];
                     $set['city'] = $arrLine[8];
-                    $set['country'] = \strtolower((string) $arrLine[9]) == '' ? 'ch' : \strtolower((string) $arrLine[9]);
+                    $set['country'] = empty(\strtolower((string) $arrLine[9])) ? 'ch' : \strtolower((string) $arrLine[9]);
                     $set['dateOfBirth'] = \strtotime((string) $arrLine[10]);
                     $set['phoneBusiness'] = beautifyPhoneNumber($arrLine[11]);
                     $set['phone'] = beautifyPhoneNumber($arrLine[12]);
                     $set['mobile'] = beautifyPhoneNumber($arrLine[14]);
                     $set['fax'] = $arrLine[15];
                     $set['email'] = $arrLine[16];
-                    $set['gender'] = \strtolower((string) $arrLine[17]) == 'weiblich' ? 'female' : 'male';
+                    $set['gender'] = \strtolower((string) $arrLine[17]) === 'weiblich' ? 'female' : 'male';
                     $set['profession'] = $arrLine[18];
-                    $set['language'] = \strtolower((string) $arrLine[19]) == 'd' ? 'de' : \strtolower((string) $arrLine[19]);
+                    $set['language'] = \strtolower((string) $arrLine[19]) === 'd' ? 'de' : \strtolower((string) $arrLine[19]);
                     $set['entryYear'] = $arrLine[20];
                     $set['membershipType'] = $arrLine[23];
                     $set['sectionInfo1'] = $arrLine[24];
@@ -315,7 +315,7 @@ class SyncSacMemberDatabase
             {
                 $arrValues['sectionId'] = \serialize($arrValues['sectionId']);
 
-                if (!in_array($sacMemberId, $arrMemberIDS))
+                if (!in_array($sacMemberId, $arrMemberIDS, false))
                 {
                     $arrValues['dateAdded'] = \time();
                     $arrValues['tstamp'] = \time();

@@ -102,7 +102,7 @@ class CalendarEventsMemberModel extends \Model
                     // Filter by event type
                     if (count($arrEventTypeFilter) > 0)
                     {
-                        if (!in_array($objEvents->eventType, $arrEventTypeFilter))
+                        if (!in_array($objEvents->eventType, $arrEventTypeFilter, false))
                         {
                             continue;
                         }

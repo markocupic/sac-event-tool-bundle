@@ -9,18 +9,40 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Contao;
+namespace Markocupic\SacEventToolBundle\Dca;
 
+use Contao\CalendarEventsMemberModel;
+use Contao\CalendarEventsModel;
+use Contao\Controller;
+use Contao\Database;
+use Contao\DataContainer;
+use Contao\Date;
+use Contao\Environment;
+use Contao\Events;
+use Contao\FilesModel;
+use Contao\MemberModel;
+use Contao\Message;
+use Contao\StringUtil;
+use Contao\System;
+use Contao\Backend;
+use Contao\Config;
+use Contao\UserModel;
+use Contao\Validator;
 use League\Csv\CharsetConverter;
 use League\Csv\Writer;
+use Contao\Input;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\ClearPersonalMemberData;
 use NotificationCenter\Model\Notification;
+use Contao\EventReleaseLevelPolicyModel;
+use Haste\Form;
+use Contao\BackendTemplate;
 
 /**
- * Class tl_calendar_events_member
+ * Class TlCalendarEventsMember
+ * @package Markocupic\SacEventToolBundle\Dca
  */
-class tl_calendar_events_member extends Backend
+class TlCalendarEventsMember extends Backend
 {
 
     /**
@@ -66,7 +88,10 @@ class tl_calendar_events_member extends Backend
             }
         }
 
-        $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=?')->limit(1)->execute(Input::get('id'));
+        $objDb = $this->Database
+            ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=?')
+            ->limit(1)
+            ->execute(Input::get('id'));
         if ($objDb->numRows)
         {
             $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail']['href'] = str_replace('sendEmail', 'sendEmail&id=' . $objDb->id . '&eventId=' . Input::get('id'), $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail']['href']);
@@ -87,17 +112,20 @@ class tl_calendar_events_member extends Backend
                 'addEmailAttachment' => '',
                 'emailAttachment'    => '',
             ];
-            $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($opt)->execute(Input::get('id'));
+            $this->Database
+                ->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')
+                ->set($opt)
+                ->execute(Input::get('id'));
         }
     }
 
     /**
      * OnLoad Callback
      *
-     * @param DC_Table $dc
+     * @param DataContainer $dc
      * @throws Exception
      */
-    public function onloadCallback(DC_Table $dc)
+    public function onloadCallback(DataContainer $dc)
     {
 
         // Allow full access only to admins, owners and allowed groups
@@ -118,7 +146,7 @@ class tl_calendar_events_member extends Backend
                 {
                     $arrAuthors = StringUtil::deserialize($objEvent->author, true);
                     $arrRegistrationGoesTo = StringUtil::deserialize($objEvent->registrationGoesTo, true);
-                    if (!in_array($this->User->id, $arrAuthors) && !in_array($this->User->id, $arrRegistrationGoesTo))
+                    if (!in_array($this->User->id, $arrAuthors, false) && !in_array($this->User->id, $arrRegistrationGoesTo))
                     {
                         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCreatable'];
                         unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['all']);
@@ -152,7 +180,7 @@ class tl_calendar_events_member extends Backend
                 {
                     $arrAuthors = StringUtil::deserialize($objEvent->author, true);
                     $arrRegistrationGoesTo = StringUtil::deserialize($objEvent->registrationGoesTo, true);
-                    if (!in_array($this->User->id, $arrAuthors) && !in_array($this->User->id, $arrRegistrationGoesTo))
+                    if (!in_array($this->User->id, $arrAuthors, false) && !in_array($this->User->id, $arrRegistrationGoesTo))
                     {
                         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notDeletable'];
                         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notEditable'];
@@ -222,7 +250,7 @@ class tl_calendar_events_member extends Backend
                     }
 
                     $memberState = (string) $objDb->stateOfSubscription;
-                    $memberState = in_array($memberState, $arrSubscriptionStates) ? $memberState : 'subscription-state-undefined';
+                    $memberState = in_array($memberState, $arrSubscriptionStates, true) ? $memberState : 'subscription-state-undefined';
                     $strLabel = isset($GLOBALS['TL_LANG']['tl_calendar_events_member'][$memberState]) ? $GLOBALS['TL_LANG']['tl_calendar_events_member'][$memberState] : $memberState;
                     $options['tl_calendar_events_member-' . $objDb->id] = $objDb->firstname . ' ' . $objDb->lastname . ' (' . $strLabel . ')';
                 }
@@ -363,7 +391,9 @@ class tl_calendar_events_member extends Backend
             $csv->insertOne($arrHeadline);
 
             $objEvent = CalendarEventsModel::findByPk(Input::get('id'));
-            $objEventMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname, firstname')->execute(Input::get('id'));
+            $objEventMember = Database::getInstance()
+                ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname, firstname')
+                ->execute(Input::get('id'));
 
             while ($objEventMember->next())
             {
@@ -445,9 +475,9 @@ class tl_calendar_events_member extends Backend
     /**
      * This method is used when an instructor signs in a member manualy
      *
-     * @param DC_Table $dc
+     * @param DataContainer $dc
      */
-    public function setContaoMemberIdFromSacMemberId(DC_Table $dc)
+    public function setContaoMemberIdFromSacMemberId(DataContainer $dc)
     {
 
         $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE tl_calendar_events_member.contaoMemberId < ? AND tl_calendar_events_member.sacMemberId > ? AND tl_calendar_events_member.sacMemberId IN (SELECT sacMemberId FROM tl_member)')->execute(1, 0);
@@ -474,11 +504,10 @@ class tl_calendar_events_member extends Backend
 
     /**
      * @param $varValue
-     * @param DC_Table $dc
+     * @param DataContainer $dc
      */
-    public function saveCallbackSacMemberId($varValue, DC_Table $dc)
+    public function saveCallbackSacMemberId($varValue, DataContainer $dc)
     {
-
         // Set correct contaoMemberId if there is a sacMemberId
         $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
         if ($objEventMemberModel !== null)
@@ -518,9 +547,9 @@ class tl_calendar_events_member extends Backend
 
     /**
      * @param $varValue
-     * @param DC_Table $dc
+     * @param DataContainer $dc
      */
-    public function saveCallbackStateOfSubscription($varValue, DC_Table $dc)
+    public function saveCallbackStateOfSubscription($varValue, DataContainer $dc)
     {
 
         $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
@@ -559,9 +588,9 @@ class tl_calendar_events_member extends Backend
     }
 
     /**
-     * @param DC_Table $dc
+     * @param DataContainer $dc
      */
-    public function onsubmitCallback(DC_Table $dc)
+    public function onsubmitCallback(DataContainer $dc)
     {
 
         // Set correct contaoMemberId if there is a sacMemberId
@@ -595,7 +624,7 @@ class tl_calendar_events_member extends Backend
     /**
      * @param DC $dc
      */
-    public function setStateOfSubscription(DC_Table $dc)
+    public function setStateOfSubscription(DataContainer $dc)
     {
 
         // start session
@@ -693,9 +722,9 @@ class tl_calendar_events_member extends Backend
     }
 
     /**
-     * @param DC_Table $dc
+     * @param DataContainer $dc
      */
-    public function setGlobalOperations(DC_Table $dc)
+    public function setGlobalOperations(DataContainer $dc)
     {
 
         // Remove edit_all (mehrere bearbeiten) button
@@ -765,11 +794,11 @@ class tl_calendar_events_member extends Backend
     }
 
     /**
-     * @param DC_Table $dc
+     * @param DataContainer $dc
      * @return string
      */
     public
-    function inputFieldCallbackDashboard(DC_Table $dc)
+    function inputFieldCallbackDashboard(DataContainer $dc)
     {
 
         $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
@@ -797,11 +826,11 @@ class tl_calendar_events_member extends Backend
     }
 
     /**
-     * @param DC_Table $dc
+     * @param DataContainer $dc
      * @return string
      * @throws Exception
      */
-    public function inputFieldCallbackNotifyMemberAboutSubscriptionState(DC_Table $dc)
+    public function inputFieldCallbackNotifyMemberAboutSubscriptionState(DataContainer $dc)
     {
 
         // Start session
@@ -835,7 +864,7 @@ class tl_calendar_events_member extends Backend
             ],
         ];
 
-        if (Input::get('call') == '' || !is_array($arrActions[Input::get('call')]) || empty($arrActions[Input::get('call')]))
+        if (empty(Input::get('call')) || !is_array($arrActions[Input::get('call')]) || empty($arrActions[Input::get('call')]))
         {
             $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten.';
             $this->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=' . Input::get('id') . '&act=edit&rt=' . Input::get('rt'));
@@ -845,9 +874,9 @@ class tl_calendar_events_member extends Backend
         $arrAction = $arrActions[Input::get('call')];
 
         // Generate form fields
-        $objForm = new \Haste\Form\Form($arrAction['formId'], 'POST', function ($objHaste) {
+        $objForm = new Form($arrAction['formId'], 'POST', function ($objHaste) {
 
-            return \Input::post('FORM_SUBMIT') === $objHaste->getFormId();
+            return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
         });
         // Now let's add form fields:
         $objForm->addFormField('subject', [
@@ -1037,10 +1066,10 @@ class tl_calendar_events_member extends Backend
      * buttons_callback
      *
      * @param $arrButtons
-     * @param DC_Table $dc
+     * @param DataContainer $dc
      * @return mixed
      */
-    public function buttonsCallback($arrButtons, DC_Table $dc)
+    public function buttonsCallback($arrButtons, DataContainer $dc)
     {
 
         // Remove all buttons
@@ -1079,7 +1108,7 @@ class tl_calendar_events_member extends Backend
 
         if (strlen(Input::get('tid')))
         {
-            $this->toggleVisibility(Input::get('tid'), (Input::get('state') == 1), (@func_get_arg(12) ?: null));
+            $this->toggleVisibility(Input::get('tid'), ((int)Input::get('state') === 1), (@func_get_arg(12) ?: null));
             $this->redirect($this->getReferer());
         }
 
@@ -1099,7 +1128,7 @@ class tl_calendar_events_member extends Backend
             if ($objEvent !== null)
             {
                 $arrAuthors = StringUtil::deserialize($objEvent->author, true);
-                if (!in_array($this->User->id, $arrAuthors))
+                if (!in_array($this->User->id, $arrAuthors, false))
                 {
                     return '';
                 }
@@ -1153,7 +1182,7 @@ class tl_calendar_events_member extends Backend
             if ($objEvent !== null)
             {
                 $arrAuthors = StringUtil::deserialize($objEvent->author, true);
-                if (!in_array($this->User->id, $arrAuthors))
+                if (!in_array($this->User->id, $arrAuthors, false))
                 {
                     throw new \Contao\CoreBundle\Exception\AccessDeniedException('Not enough permissions to activate/deactivate registration ID ' . $id . '.');
                 }

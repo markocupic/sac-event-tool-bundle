@@ -612,7 +612,7 @@ class CalendarEventsHelper
             return '';
         }
 
-        if ($dateFormat == '')
+        if (empty($dateFormat))
         {
             $dateFormat = Config::get('dateFormat');
         }
@@ -626,11 +626,11 @@ class CalendarEventsHelper
         $eventDuration = count(self::getEventTimestamps($objEvent));
         $span = Calendar::calculateSpan(self::getStartDate($objEvent), self::getEndDate($objEvent)) + 1;
 
-        if ($eventDuration == 1)
+        if ($eventDuration === 1)
         {
             return Date::parse($dateFormat, self::getStartDate($objEvent)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '');
         }
-        elseif ($span == $eventDuration)
+        elseif ($span === $eventDuration)
         {
             // von bis
             return Date::parse($dateFormatShortened, self::getStartDate($objEvent)) . ' - ' . Date::parse($dateFormat, self::getEndDate($objEvent)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '');
@@ -1059,7 +1059,7 @@ class CalendarEventsHelper
                     {
                         if (isset($repeat['new_repeat']) && !empty($repeat['new_repeat']))
                         {
-                            if (in_array($repeat['new_repeat'], $arrEventDates))
+                            if (in_array($repeat['new_repeat'], $arrEventDates, false))
                             {
                                 // This date is already occupied (do not allow booking)
                                 return true;
@@ -1118,7 +1118,7 @@ class CalendarEventsHelper
                 $arrTourProfile = StringUtil::deserialize($objEvent->tourProfile, true);
                 foreach ($arrTourProfile as $profile)
                 {
-                    if ($profile['tourProfileAscentMeters'] == '' && $profile['tourProfileAscentTime'] == '' && $profile['tourProfileDescentMeters'] == '' && $profile['tourProfileDescentTime'] == '')
+                    if (empty($profile['tourProfileAscentMeters']) && empty($profile['tourProfileAscentTime']) && empty($profile['tourProfileDescentMeters']) && empty($profile['tourProfileDescentTime']))
                     {
                         continue;
                     }
@@ -1193,8 +1193,8 @@ class CalendarEventsHelper
             }
             if ($field === 'phone' || $field === 'phone')
             {
-                $value = str_replace(' ', '', $value);
-                if (strlen($value) == 10)
+                $value = str_replace(' ', '', (string) $value);
+                if (strlen($value) === 10)
                 {
                     // Format phone numbers to 0xx xxx xx xx
                     $value = preg_replace('/^0(\d{2})(\d{3})(\d{2})(\d{2})/', '0${1} ${2} ${3} ${4}', $value, -1, $count);
@@ -1233,7 +1233,7 @@ class CalendarEventsHelper
                 {
                     if ($objOrganizer->addLogo && $objOrganizer->singleSRC != '')
                     {
-                        if (in_array($objOrganizer->singleSRC, $arrUuids) && !$allowDuplicate)
+                        if (in_array($objOrganizer->singleSRC, $arrUuids, false) && !$allowDuplicate)
                         {
                             continue;
                         }

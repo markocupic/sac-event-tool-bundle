@@ -176,7 +176,7 @@ class UserPortraitListController extends AbstractContentElementController
                 {
                     while ($objRoles->next())
                     {
-                        if (!in_array($objRoles->id, $arrSelectedRoles))
+                        if (!in_array($objRoles->id, $arrSelectedRoles,false))
                         {
                             continue;
                         }

@@ -8,6 +8,7 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Dca\TlEventReleaseLevelPolicy;
 
 $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
 (
@@ -36,7 +37,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = array
             'panelLayout'           => 'filter;search,limit',
             'headerFields'          => array('level', 'title'),
             'disableGrouping'       => true,
-            'child_record_callback' => array('tl_event_release_level_policy', 'listReleaseLevels'),
+            'child_record_callback' => array(TlEventReleaseLevelPolicy::class, 'listReleaseLevels'),
         ),
         'label'             => array
         (

@@ -1,20 +1,12 @@
 <?php
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
- * @link https://github.com/markocupic/sac-event-tool-bundle
- */
+namespace Markocupic\SacEventToolBundle\Dca;
 
+use Contao\Input;
+use Contao\System;
 
-/**
- * Class tl_calendar_sac_event_tool
- */
-class tl_calendar_sac_event_tool extends tl_calendar
+class TlCalendar extends \tl_calendar
 {
-
     /**
      * Import the back end user object
      */
@@ -23,7 +15,7 @@ class tl_calendar_sac_event_tool extends tl_calendar
         // Set correct referer
         if (Input::get('do') === 'sac_calendar_events_tool' && Input::get('ref') != '')
         {
-            $objSession = static::getContainer()->get('session');
+            $objSession = System::getContainer()->get('session');
             $ref = Input::get('ref');
             $session = $objSession->get('referer');
             if (isset($session[$ref]['tl_calendar_container']))

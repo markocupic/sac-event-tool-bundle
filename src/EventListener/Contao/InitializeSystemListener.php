@@ -58,7 +58,7 @@ class InitializeSystemListener
         foreach ($arrDirectories as $strDir)
         {
             // Check if directory path was set in system/localconfig.php
-            if ($configAdapter->get($strDir) == '')
+            if (empty($configAdapter->get($strDir)))
             {
                 throw new \Exception(sprintf('%s is not set in system/localconfig.php. Please log into the Contao Backend and set the missing values in the backend-settings. Error in %s on Line: %s', $strDir, __METHOD__, __LINE__));
             }
@@ -107,7 +107,7 @@ class InitializeSystemListener
         foreach ($arrConfig as $strConfig)
         {
             // Check if directory path was set in system/localconfig.php
-            if ($configAdapter->get($strConfig) == '')
+            if (empty($configAdapter->get($strConfig)))
             {
                 throw new \Exception(sprintf('%s is not set in system/localconfig.php. Please log into the Contao Backend and set the missing values in the backend-settings. Error in %s on Line: %s', $strConfig, __METHOD__, __LINE__));
             }
