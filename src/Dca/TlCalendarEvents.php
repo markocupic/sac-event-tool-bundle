@@ -31,6 +31,7 @@ use Contao\Encryption;
 use Contao\EventReleaseLevelPolicyModel;
 use Contao\EventReleaseLevelPolicyPackageModel;
 use Contao\Events;
+use Contao\EventTypeModel;
 use Contao\FilesModel;
 use Contao\Idna;
 use Contao\Image;
@@ -1280,7 +1281,6 @@ class TlCalendarEvents extends \tl_calendar_events
 
                 foreach ($arrAllowedEventTypes as $eventType) {
                     $objEventType = EventTypeModel::findByPk($eventType);
-
                     if (null !== $objEventType) {
                         $objEventReleasePackage = EventReleaseLevelPolicyPackageModel::findByPk($objEventType->levelAccessPermissionPackage);
 
