@@ -141,7 +141,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = array(
 			'label'         => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['iban'],
 			'exclude'       => true,
 			'inputType'     => 'text',
-			'load_callback' => array(array('tl_calendar_events_instructor_invoice', 'getIbanFromUser')),
+			'load_callback' => array(array(TlCalendarEventsInstructorInvoice::class, 'getIbanFromUser')),
 			'eval'          => array('mandatory' => true, 'maxlength' => 34, 'tl_class' => 'clr'),
 			'sql'           => "varchar(34) NOT NULL default ''"
 		),

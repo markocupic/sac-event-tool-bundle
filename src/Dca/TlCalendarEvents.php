@@ -1334,7 +1334,7 @@ class TlCalendarEvents extends \tl_calendar_events
      */
     public function generateEventToken($eventId)
     {
-        return md5(random_int(100000000, 999999999)).'-'.$eventId;
+        return md5((string) random_int(100000000, 999999999)).'-'.$eventId;
     }
 
     /**

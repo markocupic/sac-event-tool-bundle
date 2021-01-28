@@ -215,7 +215,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                         // Add security token
                         $insertId = $objInsertStmt->insertId;
                         $set = [];
-                        $set['securityToken'] = (string) md5((string) random_int(100000000, 999999999)).$insertId;
+                        $set['securityToken'] = md5((string) random_int(100000000, 999999999)).$insertId;
                         $databaseAdapter->getInstance()->prepare('UPDATE tl_calendar_events_story %s WHERE id=?')->set($set)->execute($insertId);
                     }
                     $objReportModel = $calendarEventsStoryModelAdapter->findByPk($insertId);
