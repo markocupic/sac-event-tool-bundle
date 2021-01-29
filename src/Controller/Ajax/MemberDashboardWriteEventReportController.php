@@ -483,7 +483,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
 
                 return new JsonResponse([
                     'status' => 'success',
-                    'caption' => html_entity_decode($caption),
+                    'caption' => html_entity_decode((string) $caption),
                     'photographer' => $photographer,
                 ]);
             }

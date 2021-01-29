@@ -328,7 +328,7 @@ class PrintWorkshopsAsPdf
     {
         System::loadLanguageFile('tl_calendar_events');
         $objEvent = CalendarEventsModel::findByPk($this->pdf->Event->id);
-        $this->pdf->Bookmark(html_entity_decode($objEvent->title), 0, 0, '', 'I', [0, 0, 0]);
+        $this->pdf->Bookmark(html_entity_decode((string) $objEvent->title), 0, 0, '', 'I', [0, 0, 0]);
 
         // Create template object
         $objPartial = new FrontendTemplate('tcpdf_template_sac_kurse');
@@ -404,7 +404,7 @@ class PrintWorkshopsAsPdf
         $objPartial->leistungen = $this->nl2br($objEvent->leistungen);
 
         // Signin
-        $objPartial->bookingEvent = str_replace('(at)', '@', html_entity_decode($this->nl2br($objEvent->bookingEvent)));
+        $objPartial->bookingEvent = str_replace('(at)', '@', html_entity_decode($this->nl2br((string) $objEvent->bookingEvent)));
 
         // Equipment
         $objPartial->equipment = $this->nl2br($objEvent->equipment);

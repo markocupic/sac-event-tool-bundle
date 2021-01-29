@@ -585,15 +585,15 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
         if (null !== $this->objNotification) {
             // Set token array
             $arrTokens = [
-                'firstname' => html_entity_decode($objMember->firstname),
-                'lastname' => html_entity_decode($objMember->lastname),
-                'street' => html_entity_decode($objMember->street),
-                'postal' => html_entity_decode($objMember->postal),
-                'city' => html_entity_decode($objMember->city),
-                'phone' => html_entity_decode($objMember->phone),
+                'firstname' => html_entity_decode((string) $objMember->firstname),
+                'lastname' => html_entity_decode((string) $objMember->lastname),
+                'street' => html_entity_decode((string) $objMember->street),
+                'postal' => html_entity_decode((string) $objMember->postal),
+                'city' => html_entity_decode((string) $objMember->city),
+                'phone' => html_entity_decode((string) $objMember->phone),
                 'activation' => $objMember->activation,
-                'username' => html_entity_decode($objMember->username),
-                'sacMemberId' => html_entity_decode($objMember->username),
+                'username' => html_entity_decode((string) $objMember->username),
+                'sacMemberId' => html_entity_decode((string) $objMember->username),
                 'email' => $objMember->email,
             ];
 

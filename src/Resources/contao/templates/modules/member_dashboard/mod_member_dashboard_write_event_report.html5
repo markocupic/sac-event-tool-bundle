@@ -168,7 +168,7 @@
     <h3>Vorschau</h3>
     <?php if (strlen($this->text) > 0): ?>
     <div class="ce_text block">
-      <?= nl2br(html_entity_decode(htmlspecialchars_decode($this->text))) ?>
+      <?= nl2br(html_entity_decode(htmlspecialchars_decode((string)$this->text))) ?>
     </div>
     <?php endif; ?>
     <!-- End text -->

@@ -192,10 +192,10 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                         );
 
                         // Course id
-                        $courseId = htmlspecialchars(html_entity_decode($objEvent->courseId));
+                        $courseId = htmlspecialchars(html_entity_decode((string) $objEvent->courseId));
 
                         // Event title
-                        $eventTitle = htmlspecialchars(html_entity_decode($objEvent->title));
+                        $eventTitle = htmlspecialchars(html_entity_decode((string) $objEvent->title));
                     }
 
                     // Log
@@ -208,11 +208,11 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
                     // Replace template vars
                     $objPhpWord->replace('eventDates', implode(', ', $arrDates));
-                    $objPhpWord->replace('firstname', htmlspecialchars(html_entity_decode($objMember->firstname)));
-                    $objPhpWord->replace('lastname', htmlspecialchars(html_entity_decode($objMember->lastname)));
+                    $objPhpWord->replace('firstname', htmlspecialchars(html_entity_decode((string) $objMember->firstname)));
+                    $objPhpWord->replace('lastname', htmlspecialchars(html_entity_decode((string) $objMember->lastname)));
                     $objPhpWord->replace('memberId', $objMember->sacMemberId);
                     $objPhpWord->replace('eventYear', $startDate);
-                    $objPhpWord->replace('eventId', htmlspecialchars(html_entity_decode($objRegistration->eventId)));
+                    $objPhpWord->replace('eventId', htmlspecialchars(html_entity_decode((string) $objRegistration->eventId)));
                     $objPhpWord->replace('eventName', $eventTitle);
                     $objPhpWord->replace('regId', $objRegistration->id);
                     $objPhpWord->replace('courseId', $courseId);

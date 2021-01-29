@@ -1281,6 +1281,7 @@ class TlCalendarEvents extends \tl_calendar_events
 
                 foreach ($arrAllowedEventTypes as $eventType) {
                     $objEventType = EventTypeModel::findByPk($eventType);
+
                     if (null !== $objEventType) {
                         $objEventReleasePackage = EventReleaseLevelPolicyPackageModel::findByPk($objEventType->levelAccessPermissionPackage);
 

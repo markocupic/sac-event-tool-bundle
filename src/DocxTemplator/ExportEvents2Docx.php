@@ -329,7 +329,7 @@ class ExportEvents2Docx
             }
             */
 
-            $value = '' !== $value ? html_entity_decode($value, ENT_QUOTES) : '';
+            $value = '' !== $value ? html_entity_decode((string) $value, ENT_QUOTES) : '';
         }
 
         return $value;

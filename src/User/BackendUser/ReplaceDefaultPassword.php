@@ -166,6 +166,6 @@ Administrator SAC Sektion Pilatus"
 ----------------------------
 Dies ist eine automatisch generierte Nachricht. Bitte antworte nicht darauf.';
 
-        return sprintf(html_entity_decode($text), $objMember->firstname, $this->defaultPassword, $pw);
+        return sprintf(html_entity_decode((string) $text), $objMember->firstname, $this->defaultPassword, $pw);
     }
 }
