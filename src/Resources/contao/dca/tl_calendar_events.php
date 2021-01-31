@@ -63,8 +63,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['customizeEventRegistrat
 // Reset palettes
 $strLegends = '
 {tour_report_legend:hide};{event_type_legend};
-{broschuere_legend:hide};{title_legend:hide};{date_legend:hide};{recurring_legend:hide};{details_legend:hide};
-{min_max_member_legend:hide};{registration_legend:hide};{deregistration_legend:hide};{event_registration_confirmation_legend:hide};{image_legend:hide};{gallery_legend:hide};
+{title_legend:hide};{date_legend:hide};{recurring_legend:hide};{details_legend:hide};
+{min_max_member_legend:hide};{registration_legend:hide};{deregistration_legend:hide};{event_registration_confirmation_legend:hide};
+{image_legend:hide};{gallery_legend:hide};{broschuere_legend:hide};
 {enclosure_legend:hide};{source_legend:hide};{expert_legend:hide}
 ';
 
