@@ -19,7 +19,6 @@ if (Input::get('do') === 'sac_calendar_events_tool')
 {
 	$GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_calendar_events';
 	$GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array(TlContent::class, 'checkPermission');
-	$GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array(TlContent::class, 'generateFeed');
 	$GLOBALS['TL_DCA']['tl_content']['list']['operations']['toggle']['button_callback'] = array(TlContent::class, 'toggleIcon');
 }
 
