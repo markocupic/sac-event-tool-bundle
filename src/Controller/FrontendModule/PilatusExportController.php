@@ -317,7 +317,7 @@ class PilatusExportController extends AbstractPrintExportController
         // validate() also checks whether the form has been submitted
         if ($objForm->validate()) {
             // User has selected a predefined time range
-            if (0 !== $request->request->get('timeRange')) {
+            if ($request->request->get('timeRange')) {
                 $arrRange = explode('|', $request->request->get('timeRange'));
                 $this->startDate = strtotime($arrRange[0]);
                 $this->endDate = strtotime($arrRange[1]);
