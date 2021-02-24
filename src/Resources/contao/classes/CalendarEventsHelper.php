@@ -48,10 +48,10 @@ use Haste\Util\Url;
 class CalendarEventsHelper
 {
 	/**
-	 * @param $objEvent
+	 * @param CalendarEventsModel $objEvent
 	 * @param $strProperty
-	 * @param  null         $objTemplate
-	 * @return array|string
+	 * @param  null                                            $objTemplate
+	 * @return array|bool|CalendarEventsModel|int|mixed|string
 	 * @throws \Exception
 	 */
 	public static function getEventData(CalendarEventsModel $objEvent, $strProperty, $objTemplate = null)
@@ -469,7 +469,6 @@ class CalendarEventsHelper
 	}
 
 	/**
-	 * Get instructors as array
 	 * @param  CalendarEventsModel $objEvent
 	 * @param  bool                $blnShowPublishedOnly
 	 * @return array
@@ -503,9 +502,8 @@ class CalendarEventsHelper
 	}
 
 	/**
-	 * Get instructors names as array
 	 * @param  CalendarEventsModel $objEvent
-	 * @param  bool                $blnAddMainQualification
+	 * @param  false               $blnAddMainQualification
 	 * @param  bool                $blnShowPublishedOnly
 	 * @return array
 	 */
@@ -652,16 +650,14 @@ class CalendarEventsHelper
 		}
 
 		$eventDuration = \count(self::getEventTimestamps($objEvent));
-		$span = Calendar::calculateSpan(self::getStartDate($objEvent), self::getEndDate($objEvent)) + 1;
+		$span = (int) Calendar::calculateSpan(self::getStartDate($objEvent), self::getEndDate($objEvent)) + 1;
 
 		if ($eventDuration === 1)
 		{
 			return Date::parse($dateFormat, self::getStartDate($objEvent)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '');
 		}
 
-	
-
-		if ((int) $span === $eventDuration)
+		if ($span === $eventDuration)
 		{
 			// von bis
 			return Date::parse($dateFormatShortened, self::getStartDate($objEvent)) . ' - ' . Date::parse($dateFormat, self::getEndDate($objEvent)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '');
@@ -1175,7 +1171,6 @@ class CalendarEventsHelper
 	}
 
 	/**
-	 * Get tour profile as array
 	 * @param  CalendarEventsModel $objEvent
 	 * @return array
 	 */
@@ -1254,7 +1249,7 @@ class CalendarEventsHelper
 	 * @param $strTable
 	 * @param $dataRecord
 	 * @param $dca
-	 * @return string
+	 * @return mixed|string|string[]|null
 	 */
 	public function exportRegistrationListHook($field, $value, $strTable, $dataRecord, $dca)
 	{
@@ -1272,7 +1267,7 @@ class CalendarEventsHelper
 			{
 				$value = str_replace(' ', '', (string) $value);
 
-				if (\strlen($value) === 10)
+				if (\strlen((string) $value) === 10)
 				{
 					// Format phone numbers to 0xx xxx xx xx
 					$value = preg_replace('/^0(\d{2})(\d{3})(\d{2})(\d{2})/', '0${1} ${2} ${3} ${4}', $value, -1, $count);
@@ -1296,7 +1291,7 @@ class CalendarEventsHelper
 	/**
 	 * @param  CalendarEventsModel $objEvent
 	 * @param  string              $strInsertTag
-	 * @param  bool                $allowDuplicate
+	 * @param  false               $allowDuplicate
 	 * @return array
 	 */
 	public function getEventOrganizersLogoAsHtml(CalendarEventsModel $objEvent, $strInsertTag = '{{image::%s}}', $allowDuplicate = false): array
@@ -1336,13 +1331,11 @@ class CalendarEventsHelper
 	}
 
 	/**
-	 * Use chillerlan\QRCode library to generate qur codes
 	 * @param  CalendarEventsModel $objEvent
 	 * @param  array               $arrOptions
 	 * @param  bool                $blnAbsoluteUrl
 	 * @param  bool                $blnCache
 	 * @return string|null
-	 * @throws \Exception
 	 */
 	public static function getEventQrCode(CalendarEventsModel $objEvent, array $arrOptions = array(), bool $blnAbsoluteUrl = true, bool $blnCache = true)
 	{

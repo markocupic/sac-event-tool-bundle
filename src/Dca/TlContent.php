@@ -22,7 +22,6 @@ use Contao\DataContainer;
  */
 class TlContent extends \tl_content
 {
-
     /**
      * @param $dc
      */
