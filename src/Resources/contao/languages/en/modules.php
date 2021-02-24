@@ -44,6 +44,7 @@ $GLOBALS['TL_LANG']['FMD']['member_dashboard_avatar'] = array('SAC Mitgliederkon
 $GLOBALS['TL_LANG']['FMD']['csv_export'] = array('SAC-Member- und Backend-User CSV-Export-Funktion');
 $GLOBALS['TL_LANG']['FMD']['event_filter_form'] = array('SAC-Event-Liste-Filter');
 $GLOBALS['TL_LANG']['FMD']['pilatus_export'] = array('SAC Event-Export für Monatszeitschrift');
+$GLOBALS['TL_LANG']['FMD']['pilatus_export_2021'] = array('SAC Event-Export 2021 für Monatszeitschrift');
 $GLOBALS['TL_LANG']['FMD']['jahresprogramm_export'] = array('SAC Event-Export für Jahresprogramm');
 $GLOBALS['TL_LANG']['FMD']['event_story_list'] = array('SAC Tourenberichte Listen Modul');
 $GLOBALS['TL_LANG']['FMD']['event_story_reader'] = array('SAC Tourenberichte Reader Modul');

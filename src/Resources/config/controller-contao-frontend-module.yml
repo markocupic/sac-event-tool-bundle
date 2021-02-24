@@ -116,8 +116,8 @@ services:
     - { name: container.service_subscriber }
     public: true
 
-  # Pilatus export module
-  Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExportController:
+  # Pilatus export module (old: in use till januar 2021)
+  Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExport2021Controller:
     calls:
     - ['setContainer', ['@Psr\Container\ContainerInterface']]
     tags:
@@ -125,6 +125,14 @@ services:
     - { name: container.service_subscriber }
     public: true
 
+  # Pilatus export module
+  Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExportController:
+    calls:
+      - ['setContainer', ['@Psr\Container\ContainerInterface']]
+    tags:
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
+    public: true
   # Jahresprpgramm export module
   Markocupic\SacEventToolBundle\Controller\FrontendModule\JahresprogrammExportController:
     calls:
