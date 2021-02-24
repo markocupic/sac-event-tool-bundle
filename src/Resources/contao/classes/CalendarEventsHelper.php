@@ -659,7 +659,9 @@ class CalendarEventsHelper
 			return Date::parse($dateFormat, self::getStartDate($objEvent)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '');
 		}
 
-		if ($span === $eventDuration)
+	
+
+		if ((int) $span === $eventDuration)
 		{
 			// von bis
 			return Date::parse($dateFormatShortened, self::getStartDate($objEvent)) . ' - ' . Date::parse($dateFormat, self::getEndDate($objEvent)) . ($blnAppendEventDuration ? ' (' . self::getEventDuration($objEvent) . ')' : '');

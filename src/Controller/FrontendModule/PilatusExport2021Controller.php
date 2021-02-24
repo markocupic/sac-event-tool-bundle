@@ -326,7 +326,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
         // validate() also checks whether the form has been submitted
         if ($objForm->validate()) {
             // User has selected a predefined time range
-            if ($request->request->get('timeRange') && $request->request->get('timeRange') !== '---') {
+            if ($request->request->get('timeRange') && '---' !== $request->request->get('timeRange')) {
                 $arrRange = explode('|', $request->request->get('timeRange'));
                 $this->startDate = strtotime($arrRange[0]);
                 $this->endDate = strtotime($arrRange[1]);
@@ -447,9 +447,9 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             $arrRow['title'] = $objEvent->title.('lastMinuteTour' === $objEvent->eventType ? ' (LAST MINUTE TOUR!)' : '');
             $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, false));
             $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent, 'titlePrint'));
-            $arrRow['eventId'] = date('Y', (int) $objEvent->startDate) . '-' . $objEvent->id;
-            if($objEvent->eventType === 'course')
-            {
+            $arrRow['eventId'] = date('Y', (int) $objEvent->startDate).'-'.$objEvent->id;
+
+            if ('course' === $objEvent->eventType) {
                 $arrRow['eventId'] = $objEvent->courseId;
             }
 
@@ -533,7 +533,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
         }
 
         $eventDuration = \count($calendarEventsHelperAdapter->getEventTimestamps($objEvent));
-        $span = $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent), $calendarEventsHelperAdapter->getEndDate($objEvent)) + 1;
+        $span = (int) $calendarAdapter->calculateSpan($calendarEventsHelperAdapter->getStartDate($objEvent), $calendarEventsHelperAdapter->getEndDate($objEvent)) + 1;
 
         if (1 === $eventDuration) {
             return $dateAdapter->parse($dateFormatShortened['to'], $calendarEventsHelperAdapter->getStartDate($objEvent));
