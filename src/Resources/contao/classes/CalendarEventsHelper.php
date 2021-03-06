@@ -1381,15 +1381,16 @@ class CalendarEventsHelper
 	}
 
 	public static function getSectionMembershipAsString(MemberModel $objMember): string
-    {
-        Controller::loadLanguageFile('tl_member');
-        $arrSections = [];
-        $sections = StringUtil::deserialize($objMember->sectionId,true);
+	{
+		Controller::loadLanguageFile('tl_member');
+		$arrSections = array();
+		$sections = StringUtil::deserialize($objMember->sectionId, true);
 
-        foreach ($sections as $id) {
-            $arrSections[] = $GLOBALS['TL_LANG']['tl_member']['section'][$id] ?: $id;
-        }
+		foreach ($sections as $id)
+		{
+			$arrSections[] = $GLOBALS['TL_LANG']['tl_member']['section'][$id] ?: $id;
+		}
 
-        return implode(', ', $arrSections);
-    }
+		return implode(', ', $arrSections);
+	}
 }
