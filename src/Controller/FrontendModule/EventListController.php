@@ -51,7 +51,7 @@ class EventListController extends AbstractFrontendModuleController
         $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
 
         // Get filter params from request
-        $arrKeys = ['limit', 'calendarIds', 'eventType', 'organizers', 'tourType', 'courseType', 'courseId', 'year', 'dateStart', 'searchterm', 'eventId', 'courseId', 'arrIds', 'username'];
+        $arrKeys = ['limit', 'calendarIds', 'eventType', 'suitableForBeginners', 'organizers', 'tourType', 'courseType', 'courseId', 'year', 'dateStart', 'searchterm', 'eventId', 'courseId', 'arrIds', 'username'];
 
         $ApiParam = [];
 

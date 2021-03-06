@@ -91,6 +91,7 @@
         'apiParams': {
             'organizers': [<?= $this->apiParam['organizers'] ?>],
             'eventType': [<?= $this->apiParam['eventType'] ?>],
+            'suitableForBeginners': '<?= $this->apiParam['suitableForBeginners'] ?>',
             'tourType': '<?= $this->apiParam['tourType'] ?>',
             'courseType': '<?= $this->apiParam['courseType'] ?>',
             'courseId': '<?= $this->apiParam['courseId'] ?>',

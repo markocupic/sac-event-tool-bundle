@@ -69,5 +69,10 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = array
 			'inputType' => 'text',
 			'eval'      => array('placeholder' => $GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'][0]),
 		),
+        'suitableForBeginners'   => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_event_filter_form']['suitableForBeginners'],
+            'inputType' => 'checkbox',
+        ),
 	),
 );

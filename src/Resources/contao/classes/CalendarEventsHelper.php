@@ -1379,4 +1379,17 @@ class CalendarEventsHelper
 
 		return null;
 	}
+
+	public static function getSectionMembershipAsString(MemberModel $objMember): string
+    {
+        $controllerAdapter->loadLanguageFile('tl_member');
+        $arrSections = [];
+        $sections = Controller::deserialize($objMember->sectionId,true);
+
+        foreach ($sections as $id) {
+            $arrSections[] = $GLOBALS['TL_LANG']['tl_member']['section'][$id] ?: $id;
+        }
+
+        return implode(', ', $arrSections);
+    }
 }

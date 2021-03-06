@@ -450,6 +450,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                     $arrData['addedOn'] = time();
                     $arrData['stateOfSubscription'] = 'subscription-not-confirmed';
                     $arrData['bookingType'] = 'onlineForm';
+                    $arrData['sectionIds'] = $objMemberModel->sectionId;
 
                     // Save emergency phone number to user profile
                     if (empty($objMemberModel->emergencyPhone)) {
@@ -545,6 +546,8 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                 $objEventRegistration->save();
             }
 
+
+
             // Set token array
             $arrTokens = [
                 'event_name' => html_entity_decode((string) $eventType.$this->objEvent->title),
@@ -561,6 +564,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                 'participant_city' => html_entity_decode((string) $objMember->city),
                 'participant_contao_member_id' => $objMember->id,
                 'participant_sac_member_id' => $objMember->sacMemberId,
+                'participant_section_membership' => $calendarEventsHelperAdapter->getSectionMembershipAsString($objMember),
                 'participant_mobile' => $arrData['mobile'],
                 'participant_date_of_birth' => $arrData['dateOfBirth'] > 0 ? $dateAdapter->parse('d.m.Y', $arrData['dateOfBirth']) : '---',
                 'participant_food_habits' => $arrData['foodHabits'],

@@ -106,6 +106,7 @@ class EventApiController extends AbstractController
 
         $request = $this->requestStack->getCurrentRequest();
 
+
         $param = [
             // Arrays
             'organizers' => $request->get('organizers'),
@@ -127,9 +128,12 @@ class EventApiController extends AbstractController
             'searchterm' => $request->get('searchterm'),
             'username' => $request->get('username'),
             'sessionCacheToken' => $request->get('sessionCacheToken'),
+            'suitableForBeginners' => $request->get('suitableForBeginners') ? '1' : '',
+
             // Boolean
             'isPreloadRequest' => 'true' === $request->get('isPreloadRequest') ? true : false,
         ];
+        //die( gettype($request->get('suitableForBeginners')));
 
         $startTime = microtime(true);
 
@@ -160,6 +164,12 @@ class EventApiController extends AbstractController
         if (!empty($param['eventType'])) {
             $qb->andWhere($qb->expr()->in('t.eventType', ':eventType'));
             $qb->setParameter('eventType', $param['eventType'], Connection::PARAM_STR_ARRAY);
+        }
+
+        // Filter by suitableForBeginners
+        if ($param['suitableForBeginners'] === '1') {
+            $qb->andWhere('t.suitableForBeginners', ':suitableForBeginners');
+            $qb->setParameter('suitableForBeginners', '1');
         }
 
         // Filter by a certain instructor $_GET['username']
