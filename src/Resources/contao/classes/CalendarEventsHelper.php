@@ -1382,7 +1382,7 @@ class CalendarEventsHelper
 
 	public static function getSectionMembershipAsString(MemberModel $objMember): string
     {
-        $controllerAdapter->loadLanguageFile('tl_member');
+        Controller::loadLanguageFile('tl_member');
         $arrSections = [];
         $sections = Controller::deserialize($objMember->sectionId,true);
 
