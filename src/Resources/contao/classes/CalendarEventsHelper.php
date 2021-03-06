@@ -1384,7 +1384,7 @@ class CalendarEventsHelper
     {
         Controller::loadLanguageFile('tl_member');
         $arrSections = [];
-        $sections = Controller::deserialize($objMember->sectionId,true);
+        $sections = StringUtil::deserialize($objMember->sectionId,true);
 
         foreach ($sections as $id) {
             $arrSections[] = $GLOBALS['TL_LANG']['tl_member']['section'][$id] ?: $id;
