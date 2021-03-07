@@ -2,6 +2,6 @@ services:
 
   Markocupic\SacEventToolBundle\Controller\Download\DownloadController:
     arguments:
-    - '@contao.framework'
-    - '@request_stack'
+      - '@contao.framework'
+      - '@request_stack'
     public: true

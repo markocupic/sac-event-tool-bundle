@@ -77,10 +77,12 @@ class EventMember
                     $isMember = false;
                     $objMember = $memberModelAdapter->findOneBySacMemberId($objUserModel->sacMemberId);
 
+                    $strMemberInSection = '';
                     if (null !== $objMember) {
                         if ($objMember->isSacMember && !$objMember->disable) {
                             $isMember = true;
                         }
+                        $strMemberInSection = '(' . CalendarEventsHelper::getSectionMembershipAsString($objMember) . ')';
                     }
                     // Keep this var empty
                     $transportInfo = '';
@@ -99,6 +101,7 @@ class EventMember
                     $objPhpWord->addToClone('i', 'firstname', $this->prepareString((string) $objUserModel->firstname), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'lastname', $this->prepareString((string) $objUserModel->lastname), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. '.$objUserModel->sacMemberId, ['multiline' => false]);
+                    $objPhpWord->addToClone('i', 'memberInSection', $strMemberInSection, ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'isNotSacMember', $isMember ? ' ' : '!inaktiv/kein Mitglied', ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'street', $this->prepareString((string) $objUserModel->street), ['multiline' => false]);
                     $objPhpWord->addToClone('i', 'postal', $this->prepareString((string) $objUserModel->postal), ['multiline' => false]);
@@ -138,10 +141,12 @@ class EventMember
                 if ('' !== $objEventMember->sacMemberId) {
                     $objMemberModel = $memberModelAdapter->findOneBySacMemberId($objEventMember->sacMemberId);
 
+                    $strMemberInSection = '';
                     if (null !== $objMemberModel) {
                         if ($objMemberModel->isSacMember && !$objMemberModel->disable) {
                             $strIsActiveMember = ' ';
                         }
+                        $strMemberInSection = '(' . CalendarEventsHelper::getSectionMembershipAsString($objMember) . ')';
                     }
                 }
 
@@ -169,6 +174,7 @@ class EventMember
                 $objPhpWord->addToClone('i', 'firstname', $this->prepareString((string) $objEventMember->firstname), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'lastname', $this->prepareString((string) $objEventMember->lastname), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'sacMemberId', 'Mitgl. No. '.$objEventMember->sacMemberId, ['multiline' => false]);
+                $objPhpWord->addToClone('i', 'memberInSection', $strMemberInSection, ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'isNotSacMember', $strIsActiveMember, ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'street', $this->prepareString((string) $objEventMember->street), ['multiline' => false]);
                 $objPhpWord->addToClone('i', 'postal', $this->prepareString((string) $objEventMember->postal), ['multiline' => false]);

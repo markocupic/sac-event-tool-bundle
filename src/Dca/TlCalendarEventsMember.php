@@ -424,28 +424,20 @@ class TlCalendarEventsMember extends Backend
         }
     }
 
-    /**
-     * @return array
-     */
-    public function listSections(): array{
-
-
-
-
+    public function listSections(): array
+    {
         Controller::loadLanguageFile('tl_member');
         $ids = Config::get('SAC_EVT_SAC_SECTION_IDS');
-        if($ids !== '')
-        {
+
+        if ('' !== $ids) {
             $arrIds = explode(',', $ids);
         }
 
         $arrOptions = [];
 
-        foreach($arrIds as $id)
-        {
-            $arrOptions[$id] = $GLOBALS['TL_LANG']['tl_member']['section'][$id] ? $GLOBALS['TL_LANG']['tl_member']['section'][$id] : $id;
+        foreach ($arrIds as $id) {
+            $arrOptions[$id] = $GLOBALS['TL_LANG']['tl_member']['section'][$id] ?: $id;
         }
-
 
         return $arrOptions;
     }

@@ -37,7 +37,19 @@
         </div>
     </div>
     <?php endif; ?>
+
+
+    <?php if($this->qrCodePath): ?>
+    <div class="event-story-reader-qrcode mt-3 mb-3">
+        <img src="<?= $this->qrCodePath ?>" style="border:1px solid red">
     </div>
+    <?php endif; ?>
+
+    <?php if($this->directLink): ?>
+    <div class="event-story-reader-direct-link mt-3 mb-3">
+        Direct link: <a href="<?= $this->directLink ?>"><?= $this->directLink ?></a>
+    </div>
+    <?php endif; ?>
 
 
 </div>

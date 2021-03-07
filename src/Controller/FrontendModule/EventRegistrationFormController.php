@@ -273,6 +273,8 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
 
     protected function generateForm()
     {
+
+
         // Set adapters
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
@@ -296,6 +298,15 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
 
         $objEvent = $calendarEventsModelAdapter->findByIdOrAlias($inputAdapter->get('events'));
+
+        $objDb = Database::getInstance()
+            ->prepare('SELECT * FROM tl_calendar_events_member WHERE ticketInfo=?')
+            ->execute('');
+        while($objDb->next())
+        {
+            //echo $objDb->firstname . '<br>';
+        }
+        //die();
 
         if (null === $objEvent) {
             return null;
@@ -545,8 +556,6 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                 $objEventRegistration->stateOfSubscription = 'subscription-waitlisted';
                 $objEventRegistration->save();
             }
-
-
 
             // Set token array
             $arrTokens = [

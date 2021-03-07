@@ -4,22 +4,22 @@ services:
   Markocupic\SacEventToolBundle\Cron\Contao\MonthlyCron:
     public: true
     arguments:
-    - '@contao.framework'
-    - '%kernel.project_dir%'
+      - '@contao.framework'
+      - '%kernel.project_dir%'
 
   # Contao Cron Controller
   Markocupic\SacEventToolBundle\Cron\Contao\DailyCron:
     public: true
     arguments:
-    - '@contao.framework'
-    - '%kernel.project_dir%'
+      - '@contao.framework'
+      - '%kernel.project_dir%'
 
   # Contao Cron Controller
   Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron:
     public: true
     arguments:
-    - '@contao.framework'
-    - '%kernel.project_dir%'
+      - '@contao.framework'
+      - '%kernel.project_dir%'
 
 
 

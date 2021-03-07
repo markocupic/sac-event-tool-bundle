@@ -2,133 +2,133 @@ services:
 
   Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvEventMemberExportController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationFormController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   Markocupic\SacEventToolBundle\Controller\FrontendModule\ActivateMemberAccountController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Member dashboard module: show upcoming events
   Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardUpcomingEventsController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Member dashboard module: show past events
   Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardPastEventsController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Member dashboard module: list event reports and the form to generate new event reports
   Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEventReportListController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Member dashboard module: display the forms for writing new event reports
   Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardWriteEventReportController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Member dashboard module: display the forms for editing the member profile
   Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEditProfileController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Member dashboard module: display the forms for editing the member profile
   Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardAvatarController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     arguments:
-    - '@request_stack'
-    - '@contao.routing.scope_matcher'
+      - '@request_stack'
+      - '@contao.routing.scope_matcher'
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Member dashboard module: display the forms for deleting the member profile
   Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardDeleteProfileController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Member dashboard module: display the avatar and the avatar upload form
   Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardAvatarUploadController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Event filter form module
   Markocupic\SacEventToolBundle\Controller\FrontendModule\EventFilterFormController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Pilatus export module (old: in use till januar 2021)
   Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExport2021Controller:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Pilatus export module
   Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExportController:
     calls:
-      - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
       - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
       - { name: container.service_subscriber }
@@ -136,44 +136,47 @@ services:
   # Jahresprpgramm export module
   Markocupic\SacEventToolBundle\Controller\FrontendModule\JahresprogrammExportController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Event story list module
   Markocupic\SacEventToolBundle\Controller\FrontendModule\EventStoryListController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Event story reader module
   Markocupic\SacEventToolBundle\Controller\FrontendModule\EventStoryReaderController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+    arguments:
+      - '@request_stack'
+      - '%kernel.project_dir%'
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
   # Csv Export module: Export members ans users as a csv spreadsheet
   Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvExportController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true
 
     # Event Auflistungs Modul
   Markocupic\SacEventToolBundle\Controller\FrontendModule\EventListController:
     calls:
-    - ['setContainer', ['@Psr\Container\ContainerInterface']]
+      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
     tags:
-    - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-    - { name: container.service_subscriber }
+      - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+      - { name: container.service_subscriber }
     public: true

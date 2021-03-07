@@ -4,7 +4,7 @@ services:
   Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase:
     public: true
     arguments:
-    - '@contao.framework'
-    - '%kernel.project_dir%'
-    - '@monolog.logger.contao'
+      - '@contao.framework'
+      - '%kernel.project_dir%'
+      - '@monolog.logger.contao'
 

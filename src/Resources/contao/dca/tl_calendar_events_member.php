@@ -423,13 +423,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 			'eval'      => array('doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true),
 			'sql'       => "varchar(255) NOT NULL default 'manually'",
 		),
-        'sectionIds'         => array(
-            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['sectionIds'],
-            'exclude'   => true,
-            'inputType' => 'select',
-            'options_callback' => array(TlCalendarEventsMember::class, 'listSections'),
-            'eval'      => array('multiple' => true, 'chosen' => true, 'doNotCopy' => true, 'readonly' => true, 'tl_class' => 'w50'),
-            'sql'       => "blob NULL",
-        ),
+		'sectionIds'         => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['sectionIds'],
+			'exclude'   => true,
+			'inputType' => 'select',
+			'options_callback' => array(TlCalendarEventsMember::class, 'listSections'),
+			'eval'      => array('multiple' => true, 'chosen' => true, 'doNotCopy' => true, 'readonly' => false, 'tl_class' => 'w50'),
+			'sql'       => "blob NULL",
+		),
 	),
 );

@@ -1,26 +1,26 @@
 services:
   Markocupic\SacEventToolBundle\Controller\Ajax\MemberDashboardWriteEventReportController:
     arguments:
-    - '@contao.framework'
-    - '@contao.csrf.token_manager'
-    - '@request_stack'
-    - '@security.helper'
-    - '%contao.csrf_token_name%'
+      - '@contao.framework'
+      - '@contao.csrf.token_manager'
+      - '@request_stack'
+      - '@security.helper'
+      - '%contao.csrf_token_name%'
     public: true
 
   Markocupic\SacEventToolBundle\Controller\Ajax\EventLazyLoadController:
     arguments:
-    - '@contao.framework'
-    - '@contao.csrf.token_manager'
-    - '@request_stack'
-    - '@security.helper'
-    - '%contao.csrf_token_name%'
+      - '@contao.framework'
+      - '@contao.csrf.token_manager'
+      - '@request_stack'
+      - '@security.helper'
+      - '%contao.csrf_token_name%'
     public: true
 
   Markocupic\SacEventToolBundle\Controller\Api\EventApiController:
     arguments:
-    - '@contao.framework'
-    - '@request_stack'
-    - '@database_connection'
-    - '@Markocupic\SacEventToolBundle\FrontendCache\SessionCache\SessionCache'
+      - '@contao.framework'
+      - '@request_stack'
+      - '@database_connection'
+      - '@Markocupic\SacEventToolBundle\FrontendCache\SessionCache\SessionCache'
     public: true

@@ -48,6 +48,11 @@
                         <div class="mr-2" v-html="row.bookingCounter"></div>
                         <div class="mr-2" v-html="row.tourTechDifficulties"></div>
                         <div class="mr-2" v-html="row.tourTypesShortcuts"></div>
+                        <div class="mr-2" v-if="row.suitableForBeginners">
+                            <span class="badge badge-pill badge-warning" data-toggle="tooltip" data-placement="top" title="Für Einsteiger geeignet">
+                                <i class="event-for-beginners"></i>
+                            </span>
+                        </div>
                     </div>
                     <!-- end row icons -->
 
@@ -122,6 +127,7 @@
             'eventDuration',
             'eventPeriodLgInline',
             'tourTypesIds',
+            'suitableForBeginners',
         ],
         'callbacks': {
             'oninsert': function (vue, json) {

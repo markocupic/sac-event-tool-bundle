@@ -1,12 +1,15 @@
 "use strict";
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
+
 class ItemWatcher {
     constructor(elId, opt) {
 
@@ -53,6 +56,14 @@ class ItemWatcher {
                     self.currentItemId = null;
                     self.readerContent = '';
                 });
+
+                // Open event story with id 120
+                // https://www.sac-pilatus.ch/home.html?showEventStory=120
+                let eventStoryId = null;
+                if (false !== (eventStoryId = self.getUrlParam('showEventStory', false))) {
+                    self.currentItemId = eventStoryId;
+                    self.fetchReaderContent();
+                }
             },
 
             watch: {
@@ -64,8 +75,7 @@ class ItemWatcher {
                     let self = this;
 
                     // currentItemId === null do not change page
-                    if(self.currentItemId !== null)
-                    {
+                    if (self.currentItemId !== null) {
                         // Adjust current page
                         self.currentItemIndex = self.itemIds.indexOf(parseInt(self.currentItemId));
                         self.currentPage = Math.floor(parseInt(self.currentItemIndex) / parseInt(self.options.params.perPage)) + 1;
@@ -86,7 +96,6 @@ class ItemWatcher {
                 fetchList: function fetchList() {
 
                     let self = this;
-
                     let url = '/api/module?id=' + self.options.params.listModuleId + '&page_e' + self.options.params.listModuleId + '=' + self.currentPage;
 
                     fetch(url, {
@@ -154,7 +163,11 @@ class ItemWatcher {
                  */
                 fetchReaderContent: function fetchReaderContent() {
                     let self = this;
-                    let url = '/api/module?id=' + self.options.params.readerModuleId + '&items=' + self.currentItemId;
+
+                    // Use referer param to generate qrcode in EventStoryReaderController
+                    let referer = btoa(window.location.href);
+
+                    let url = '/api/module?id=' + self.options.params.readerModuleId + '&items=' + self.currentItemId + '&referer=' + referer;
 
                     fetch(url, {
                             method: "GET",

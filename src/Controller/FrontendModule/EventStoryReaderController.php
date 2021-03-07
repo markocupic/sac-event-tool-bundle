@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Contao\CalendarEventsModel;
 use Contao\CalendarEventsStoryModel;
 use Contao\Config;
@@ -21,9 +23,11 @@ use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
+use Contao\CoreBundle\Util\SymlinkUtil;
 use Contao\Environment;
 use Contao\File;
 use Contao\FilesModel;
+use Contao\Folder;
 use Contao\Input;
 use Contao\MemberModel;
 use Contao\ModuleModel;
@@ -32,7 +36,9 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\Template;
 use Contao\Validator;
+use Haste\Util\Url;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -43,9 +49,28 @@ use Symfony\Component\HttpFoundation\Response;
 class EventStoryReaderController extends AbstractFrontendModuleController
 {
     /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var string
+     */
+    private $projectDir;
+
+    /**
      * @var CalendarEventsStoryModel
      */
-    protected $story;
+    private $story;
+
+    /**
+     * EventStoryReaderController constructor.
+     */
+    public function __construct(RequestStack $requestStack, string $projectDir)
+    {
+        $this->requestStack = $requestStack;
+        $this->projectDir = $projectDir;
+    }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
@@ -122,6 +147,9 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
 
+        /** @var Url $urlAdapter */
+        $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
+
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
 
@@ -138,6 +166,23 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         // !!! $objEvent can be NULL, if the related event no more exists
         $objEvent = $calendarEventsModelAdapter->findByPk($this->story->eventId);
         $template->objEvent = $objEvent;
+
+        // Add qrcode
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ($request->query->has('referer')) {
+            $url = base64_decode($request->query->get('referer', ''), true);
+            $url = $urlAdapter->addQueryString('showEventStory='.$this->story->id, $url);
+        } else {
+            $url = $urlAdapter->addQueryString('showEventStory='.$this->story->id);
+        }
+
+        if ('' !== $url) {
+            if (null !== ($qrCodePath = $this->getQrCodeFromUrl($url))) {
+                $template->qrCodePath = $qrCodePath;
+                $template->directLink = $url;
+            }
+        }
 
         // Add gallery
         $images = [];
@@ -239,5 +284,39 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         $template->youtubeId = '' !== $this->story->youtubeId ? $this->story->youtubeId : null;
 
         return $template->getResponse();
+    }
+
+    private function getQrCodeFromUrl(string $url): ?string
+    {
+        // Generate QR code folder
+        $objFolder = new Folder('system/eventstoryqrcodes');
+
+        // Symlink
+        SymlinkUtil::symlink($objFolder->path, 'web/'.$objFolder->path, $this->projectDir);
+
+        // Generate path
+        $filepath = sprintf($objFolder->path.'/'.'eventStoryQRcode_%s.png', md5($url));
+
+        // Defaults
+        $opt = [
+            'version' => 5,
+            'scale' => 4,
+            'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+            'eccLevel' => QRCode::ECC_L,
+            'cachefile' => $filepath,
+        ];
+
+        if (!$blnCache && isset($opt['cachefile'])) {
+            unset($opt['cachefile']);
+        }
+
+        $options = new QROptions($opt);
+
+        // Generate QR and return the image path
+        if ((new QRCode($options))->render($url, $filepath)) {
+            return $filepath;
+        }
+
+        return null;
     }
 }

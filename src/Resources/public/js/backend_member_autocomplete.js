@@ -1,10 +1,14 @@
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
+
+"use strict";
 
 window.addEvent('domready', function () {
 
@@ -20,7 +24,7 @@ window.addEvent('domready', function () {
         globalTimeout = setTimeout(function () {
             globalTimeout = null;
             // Get value from input field
-            sacMemberId = $$('input[name="sacMemberId"]')[0].get('value');
+            let sacMemberId = $$('input[name="sacMemberId"]')[0].get('value');
             if (sacMemberId.length > 5) {
                 new Request.JSON({
                     url: window.location.href,
@@ -44,10 +48,38 @@ window.addEvent('domready', function () {
 
                             // Autofill form inputs
                             $('btnAcceptAutocomplete').addEvent('click', function (event) {
-                                var fields = ['gender', 'name', 'username', 'firstname', 'lastname', 'street', 'postal', 'city', 'mobile', 'phone', 'email', 'dateOfBirth', 'foodHabits', 'emergencyPhone', 'emergencyPhoneName'];
+                                var fields = ['gender', 'name', 'username', 'firstname', 'lastname', 'street', 'postal', 'city', 'mobile', 'phone', 'email', 'dateOfBirth', 'foodHabits', 'emergencyPhone', 'emergencyPhoneName', 'sectionIds'];
                                 fields.each(function (field) {
                                     if ($('ctrl_' + field)) {
-                                        if (json[field] !== null) {
+                                        // Special handling for arrays
+                                        if (field === 'sectionIds') {
+                                            let arrSections = json[field];
+                                            let options = document.querySelectorAll('select#ctrl_' + field + ' option');
+                                            let i;
+                                            if (options) {
+                                                // First reset select field
+                                                for (i = 0; i < options.length; i++) {
+                                                    options[i].selected = false;
+                                                }
+                                            }
+
+                                            // Then add new entries
+                                            if (arrSections.length) {
+                                                let i;
+                                                for (i = 0; i < arrSections.length; i++) {
+                                                    let sectionId = arrSections[i];
+                                                    let option = document.querySelector('select#ctrl_' + field + ' option[value="' + sectionId + '"]')
+                                                    if (option) {
+                                                        option.selected = true;
+                                                    }
+                                                }
+                                                // Update chosen
+                                                if (document.querySelector('#ctrl_' + field + '_chzn')) {
+                                                    // Mootools
+                                                    $('ctrl_' + field).fireEvent("liszt:updated");
+                                                }
+                                            }
+                                        } else if (json[field] !== null) {
                                             $('ctrl_' + field).set('value', json[field]);
                                         }
                                     }
