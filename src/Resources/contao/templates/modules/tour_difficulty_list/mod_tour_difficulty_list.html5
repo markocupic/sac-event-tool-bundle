@@ -2,7 +2,7 @@
 
 <?php $this->block('content'); ?>
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tourDifficultiesModal">
+<button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#tourDifficultiesModal">
     Schwierigkeitsgrade
 </button>
 

@@ -45,14 +45,14 @@
 
                     <!-- start row icons -->
                     <div class="d-flex">
-                        <div class="mr-2" v-html="row.bookingCounter"></div>
-                        <div class="mr-2" v-html="row.tourTechDifficulties"></div>
-                        <div class="mr-2" v-html="row.tourTypesShortcuts"></div>
+                        <div class="mr-2" v-if="row.bookingCounter" v-html="row.bookingCounter"></div>
                         <div class="mr-2" v-if="row.suitableForBeginners">
                             <span class="badge badge-pill badge-warning" data-toggle="tooltip" data-placement="top" title="Für Einsteiger geeignet">
                                 <i class="event-for-beginners"></i>
                             </span>
                         </div>
+                        <div class="mr-2" v-if="row.tourTechDifficulties" v-html="row.tourTechDifficulties"></div>
+                        <div class="mr-2" v-if="row.tourTypesShortcuts" v-html="row.tourTypesShortcuts"></div>
                     </div>
                     <!-- end row icons -->
 
