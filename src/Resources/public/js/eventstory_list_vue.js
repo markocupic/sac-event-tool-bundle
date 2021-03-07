@@ -62,6 +62,13 @@ class ItemWatcher {
                 let eventStoryId = null;
                 if (false !== (eventStoryId = self.getUrlParam('showEventStory', false))) {
                     self.currentItemId = eventStoryId;
+
+                    // Adjust current page
+                    self.currentItemIndex = self.getCurrentItemIndex();
+                    self.currentPage = self.getCurrentPage();
+
+                    // Fetch detail page
+                    self.fetchReaderContent();
                     self.fetchReaderContent();
                 }
             },
@@ -77,8 +84,8 @@ class ItemWatcher {
                     // currentItemId === null do not change page
                     if (self.currentItemId !== null) {
                         // Adjust current page
-                        self.currentItemIndex = self.itemIds.indexOf(parseInt(self.currentItemId));
-                        self.currentPage = Math.floor(parseInt(self.currentItemIndex) / parseInt(self.options.params.perPage)) + 1;
+                        self.currentItemIndex = self.getCurrentItemIndex();
+                        self.currentPage = self.getCurrentPage();
 
                         // Fetch detail page
                         self.fetchReaderContent();
@@ -217,6 +224,16 @@ class ItemWatcher {
                         return true;
                     }
                     return false;
+                },
+
+                getCurrentItemIndex: function getCurrentItemIndex() {
+                    let self = this;
+                    return self.itemIds.indexOf(parseInt(self.currentItemId));
+                },
+
+                getCurrentPage: function getCurrentPage() {
+                    let self = this;
+                    return Math.floor(parseInt(self.currentItemIndex) / parseInt(self.options.params.perPage)) + 1;
                 },
 
                 /**
