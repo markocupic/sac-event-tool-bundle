@@ -64,6 +64,11 @@ class EventStoryReaderController extends AbstractFrontendModuleController
     private $story;
 
     /**
+     * @var bool
+     */
+    private $isPreviewMode = false;
+
+    /**
      * EventStoryReaderController constructor.
      */
     public function __construct(RequestStack $requestStack, string $projectDir)
@@ -103,6 +108,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         if (!empty($inputAdapter->get('securityToken'))) {
             $arrColumns = ['tl_calendar_events_story.securityToken=?', 'tl_calendar_events_story.id=?'];
             $arrValues = [$inputAdapter->get('securityToken'), $inputAdapter->get('items')];
+            $this->isPreviewMode = true;
         } else {
             $arrColumns = ['tl_calendar_events_story.publishState=?', 'tl_calendar_events_story.id=?'];
             $arrValues = ['3', $inputAdapter->get('items')];
@@ -167,20 +173,23 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         $objEvent = $calendarEventsModelAdapter->findByPk($this->story->eventId);
         $template->objEvent = $objEvent;
 
-        // Add qrcode
+        // Add qrcode, if it is not preview mode
         $request = $this->requestStack->getCurrentRequest();
 
-        if ($request->query->has('referer')) {
-            $url = base64_decode($request->query->get('referer', ''), true);
-            $url = $urlAdapter->addQueryString('showEventStory='.$this->story->id, $url);
-        } else {
-            $url = $urlAdapter->addQueryString('showEventStory='.$this->story->id);
-        }
+        if(!$this->isPreviewMode) {
 
-        if ('' !== $url) {
-            if (null !== ($qrCodePath = $this->getQrCodeFromUrl($url))) {
-                $template->qrCodePath = $qrCodePath;
-                $template->directLink = $url;
+            if ($request->query->has('referer')) {
+                $url = base64_decode($request->query->get('referer', ''), true);
+                $url = $urlAdapter->addQueryString('showEventStory='.$this->story->id, $url);
+            } else {
+                $url = $urlAdapter->addQueryString('showEventStory='.$this->story->id);
+            }
+
+            if ('' !== $url) {
+                if (null !== ($qrCodePath = $this->getQrCodeFromUrl($url))) {
+                    $template->qrCodePath = $qrCodePath;
+                    $template->directLink = $url;
+                }
             }
         }
 
