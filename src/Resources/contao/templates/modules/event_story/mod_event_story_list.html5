@@ -17,14 +17,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="eventStoryReaderModalTitle<?=$this->id ?>">Tourenberichte</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Schliessen">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Schliessen">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-end">
-                        <button type="button" v-if="hasPrevItem()" v-on:click="goToPrevItem()" class="btn btn-primary ml-0"><i class="fas fa-arrow-left"></i> Vorheriger Bericht</button>
-                        <button type="button" v-if="hasNextItem()" v-on:click="goToNextItem()" class="btn btn-primary ml-2">Nächster Bericht <i class="fas fa-arrow-right"></i></button>
+                        <button type="button" v-if="hasPrevItem()" v-on:click="goToPrevItem()" class="btn btn-primary ms-0"><i class="fas fa-arrow-left"></i> Vorheriger Bericht</button>
+                        <button type="button" v-if="hasNextItem()" v-on:click="goToNextItem()" class="btn btn-primary ms-2">Nächster Bericht <i class="fas fa-arrow-right"></i></button>
                     </div>
                     <div v-html="readerContent">
                         <div v-html="readerContent">
@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Schliessen</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Schliessen</button>
                 </div>
             </div>
         </div>
@@ -64,7 +64,7 @@
         <div class="card event-item">
             <div class="p-2 d-flex align-items-center">
                 {{image::<?= getAvatar($story['authorId'], 'FE') ?>?width=32&height=32&mode=crop&class=rounded-circle}}
-                <p class="card-text small ml-2">von <?= $story['authorName'] ?></p>
+                <p class="card-text small ms-2">von <?= $story['authorName'] ?></p>
             </div>
             <?php if ($story['singleSRC']): ?>
             <a href="<?= $story['href'] ?>" class="item-reader-link">

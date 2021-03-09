@@ -2,7 +2,7 @@
 
 <?php $this->block('content'); ?>
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#tourDifficultiesModal">
+<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tourDifficultiesModal">
     Schwierigkeitsgrade
 </button>
 
@@ -11,12 +11,8 @@
     <div class="modal-dialog modal-dialog-centered  modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <?php if ($this->headline): ?>
-                <h5 class="modal-title" id="agbTitle"><?= $this->headline ?></h5>
-                <?php endif; ?>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title" id="agbTitle">Schwierigkeitsgrade</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
             </div>
             <div class="modal-body">
                 <table class="table">
@@ -35,7 +31,7 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schliessen</button>
             </div>
         </div>
     </div>

@@ -8,7 +8,7 @@
         <div class="card event-item">
             <div class="p-2 d-flex align-items-center">
                 {{image::<?= getAvatar($story['authorId'], 'FE') ?>?width=32&height=32&mode=crop&class=rounded-circle}}
-                <p class="card-text small ml-2">von <?= $story['authorName'] ?></p>
+                <p class="card-text small ms-2">von <?= $story['authorName'] ?></p>
             </div>
             <?php if ($story['singleSRC']): ?>
             <a href="<?= $story['href'] ?>" class="event-reader-link">

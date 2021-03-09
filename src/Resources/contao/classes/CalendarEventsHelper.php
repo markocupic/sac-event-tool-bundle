@@ -873,7 +873,7 @@ class CalendarEventsHelper
 					{
 						if ($tooltip)
 						{
-							$html = '<span class="badge badge-pill badge-primary" data-toggle="tooltip" data-placement="top" title="Techn. Schwierigkeit: %s">%s</span>';
+							$html = '<span class="badge badge-pill bg-primary" data-toggle="tooltip" data-placement="top" title="Techn. Schwierigkeit: %s">%s</span>';
 							$arrReturn[] = sprintf($html, $strDiffTitle, $strDiff);
 						}
 						else
@@ -912,7 +912,7 @@ class CalendarEventsHelper
 					{
 						if ($tooltip)
 						{
-							$html = '<span class="badge badge-pill badge-secondary" data-toggle="tooltip" data-placement="top" title="Typ: %s">%s</span>';
+							$html = '<span class="badge badge-pill bg-secondary" data-toggle="tooltip" data-placement="top" title="Typ: %s">%s</span>';
 							$arrReturn[] = sprintf($html, $objModel->{'title'}, $objModel->{$field});
 						}
 						else
@@ -934,7 +934,7 @@ class CalendarEventsHelper
 	 */
 	public static function getBookingCounter(CalendarEventsModel $objEvent): string
 	{
-		$strBadge = '<span class="badge badge-pill badge-%s" data-toggle="tooltip" data-placement="top" title="%s">%s</span>';
+		$strBadge = '<span class="badge badge-pill bg-%s" data-toggle="tooltip" data-placement="top" title="%s">%s</span>';
 
 		if ($objEvent !== null)
 		{

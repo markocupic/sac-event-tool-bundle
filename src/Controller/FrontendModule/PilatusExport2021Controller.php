@@ -312,7 +312,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
         ]);
 
         $objForm->addFormField('showQrCode', [
-            'label' => ['QR Code', 'QR Code anzeigen?'],
+            'label' => ['', 'QR Code anzeigen?'],
             'inputType' => 'checkbox',
             'eval' => ['mandatory' => false],
         ]);
