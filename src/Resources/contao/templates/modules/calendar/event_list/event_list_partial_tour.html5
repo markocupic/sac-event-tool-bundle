@@ -10,10 +10,14 @@
 
             <div class="event-list-inner-box d-flex p-3 mb-3">
                 <!-- left col -->
-                <div class="event-list-badge-wrapper me-4 d-flex rounded-circle justify-content-center text-center">
-                    <div class="event-list-badge d-flex flex-column justify-content-center">
-                        <span class="event-list-badge-day small text-center" v-html="row.startDateDay"></span>
-                        <span class="event-list-badge-month text-uppercase small font-weight-bolder" v-html="row.startDateMonth"></span>
+                <div class="event-list-badge-wrapper me-4 rounded-circle d-flex align-items-center justify-content-center">
+                    <div class="d-flex flex-column">
+                        <span class="event-list-badge-day small text-center">
+                            <strong v-html="row.startDateDay"></strong>
+                        </span>
+                        <span class="event-list-badge-month text-uppercase small text-center font-weight-bolder">
+                            <strong v-html="row.startDateMonth"></strong>
+                        </span>
                     </div>
                 </div>
                 <!-- end left col -->
@@ -39,7 +43,7 @@
                         <span data-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:title="row.eventStateLabel">
                             <i class="event-state-icon fa-fw" v-bind:class="row.eventState"></i>
                         </span>
-                        <a v-bind:href="row.eventUrl"  class="event-title-link font-weight-bold text-dark"><u>{{ row.eventTitle }}</u></a>
+                        <a v-bind:href="row.eventUrl"  class="event-title-link font-weight-bold text-dark"><strong><u>{{ row.eventTitle }}</u></strong></a>
                     </div>
                     <!-- end row state icon -->
 
