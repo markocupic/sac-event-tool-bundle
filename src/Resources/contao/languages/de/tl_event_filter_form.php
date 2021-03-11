@@ -16,7 +16,7 @@ $GLOBALS['TL_LANG']['tl_event_filter_form']['courseType'] = array('Kurstyp', 'W�
 $GLOBALS['TL_LANG']['tl_event_filter_form']['searchterm'] = array('Im Text suchen', 'Setze Suchbegriffe ein, nach denen in der Datenbank gesucht werden soll.');
 $GLOBALS['TL_LANG']['tl_event_filter_form']['organizers'] = array('Veranstalter', 'Veranstalter ausw채hlen.');
 $GLOBALS['TL_LANG']['tl_event_filter_form']['eventId'] = array('Eventnummer', 'Eventnummer eingeben.');
-$GLOBALS['TL_LANG']['tl_event_filter_form']['suitableForBeginners'] = array('F체r Anf채nger geeignet', 'F체r Anf채nger geeignet');
+$GLOBALS['TL_LANG']['tl_event_filter_form']['suitableForBeginners'] = array('F체r Einsteiger geeignet', 'F체r Einsteiger geeignet');
 $GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'] = array('Kursnummer', 'Kursnummer eingeben.');
 
 // Labels

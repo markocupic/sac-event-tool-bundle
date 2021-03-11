@@ -27,7 +27,6 @@ $GLOBALS['TL_LANG']['tl_content']['imgSize'] = array('Bildgrösse', 'Wählen Sie
 $GLOBALS['TL_LANG']['tl_content']['jumpTo'] = array('Weiterleitungsseite', 'Wählen Sie eine Weiterleitungsseite aus.');
 $GLOBALS['TL_LANG']['tl_content']['cabanneSac'] = array('SAC Hütte', 'Wählen Sie eine SAC Hütte aus.');
 
-
 // References
 $GLOBALS['TL_LANG']['tl_content']['selectUserRoles'] = 'Anhand Benutzer-Rollen';
 $GLOBALS['TL_LANG']['tl_content']['selectUsers'] = 'Anhand Benutzer-Auswahl';
