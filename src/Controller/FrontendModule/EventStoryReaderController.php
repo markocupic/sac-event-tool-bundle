@@ -176,8 +176,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         // Add qrcode, if it is not preview mode
         $request = $this->requestStack->getCurrentRequest();
 
-        if(!$this->isPreviewMode) {
-
+        if (!$this->isPreviewMode) {
             if ($request->query->has('referer')) {
                 $url = base64_decode($request->query->get('referer', ''), true);
                 $url = $urlAdapter->addQueryString('showEventStory='.$this->story->id, $url);

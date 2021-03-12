@@ -78,11 +78,12 @@ class EventMember
                     $objMember = $memberModelAdapter->findOneBySacMemberId($objUserModel->sacMemberId);
 
                     $strMemberInSection = '';
+
                     if (null !== $objMember) {
                         if ($objMember->isSacMember && !$objMember->disable) {
                             $isMember = true;
                         }
-                        $strMemberInSection = '(' . CalendarEventsHelper::getSectionMembershipAsString($objMember) . ')';
+                        $strMemberInSection = '('.CalendarEventsHelper::getSectionMembershipAsString($objMember).')';
                     }
                     // Keep this var empty
                     $transportInfo = '';
@@ -142,11 +143,12 @@ class EventMember
                     $objMemberModel = $memberModelAdapter->findOneBySacMemberId($objEventMember->sacMemberId);
 
                     $strMemberInSection = '';
+
                     if (null !== $objMemberModel) {
                         if ($objMemberModel->isSacMember && !$objMemberModel->disable) {
                             $strIsActiveMember = ' ';
                         }
-                        $strMemberInSection = '(' . CalendarEventsHelper::getSectionMembershipAsString($objMember) . ')';
+                        $strMemberInSection = '('.CalendarEventsHelper::getSectionMembershipAsString($objMember).')';
                     }
                 }
 

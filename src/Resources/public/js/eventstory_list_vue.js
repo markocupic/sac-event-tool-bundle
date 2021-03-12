@@ -52,10 +52,16 @@ class ItemWatcher {
                 });
 
                 // Handle modal
-                $('body').on('hidden.bs.modal', elId + ' .modal', function () {
-                    self.currentItemId = null;
-                    self.readerContent = '';
-                });
+                window.setTimeout(function () {
+                    let modal = document.querySelector(elId + ' .modal');
+                    if (modal) {
+                        modal.addEventListener('hidden.bs.modal', function (event) {
+                            self.currentItemId = null;
+                            self.readerContent = '';
+                        });
+                    }
+                }, 1000);
+
 
                 // Open event story with id 120
                 // https://www.sac-pilatus.ch/home.html?showEventStory=120
@@ -159,6 +165,12 @@ class ItemWatcher {
                             }
 
                             // Fetch reader content
+                            itemId = parseInt(itemId);
+                            if (itemId === self.currentItemId) {
+                                self.fetchReaderContent();
+                                return;
+                            }
+
                             self.currentItemId = parseInt(itemId);
                         });
                     });
@@ -187,7 +199,10 @@ class ItemWatcher {
                     }).then(function (json) {
                         self.readerContent = json.compiledHTML;
                     }).then(function () {
-                        $(elId + ' .modal').first().modal();
+                        let modal = new bootstrap.Modal(document.querySelector(elId + ' .modal'));
+                        if (!self.isModalOpen()) {
+                            modal.show();
+                        }
                     }).then(function () {
                         self._initLightbox();
                     });

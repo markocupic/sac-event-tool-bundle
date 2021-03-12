@@ -64,7 +64,7 @@
                     <h5 class="mt-0">Leitung/Betreuung</h5>
                 </div>
                 <?php if($this->getEventData('instructorContactBoxes') !== ''): ?>
-                <div class="row mt-3 tiny-gutter">
+                <div class="row mt-3 gx-1 gy-2">
                     <?= $this->getEventData('instructorContactBoxes') ?>
                 </div>
                 <?php else: ?>

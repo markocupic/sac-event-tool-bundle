@@ -21,6 +21,9 @@ var EventFilter = {
 
         // Initialize Select2 for organizer input
         $('#ctrl_organizers').select2();
+        window.addEventListener('resize', function(){
+            $('#ctrl_organizers').select2();
+        });
         window.setTimeout(function () {
             $('.filter-board-widget').css('visibility', 'visible');
         }, 20);

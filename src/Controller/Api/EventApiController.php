@@ -106,7 +106,6 @@ class EventApiController extends AbstractController
 
         $request = $this->requestStack->getCurrentRequest();
 
-
         $param = [
             // Arrays
             'organizers' => $request->get('organizers'),
@@ -167,7 +166,7 @@ class EventApiController extends AbstractController
         }
 
         // Filter by suitableForBeginners
-        if ($param['suitableForBeginners'] === '1') {
+        if ('1' === $param['suitableForBeginners']) {
             $qb->andWhere('t.suitableForBeginners', ':suitableForBeginners');
             $qb->setParameter('suitableForBeginners', '1');
         }

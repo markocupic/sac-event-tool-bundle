@@ -86,7 +86,7 @@ class ExecutePreActionsListener
                 // Bin to hex otherwise there will be a json error
                 $json['avatar'] = '' !== $json['avatar'] ? $stringUtilAdapter->binToUuid($json['avatar']) : '';
                 $json['password'] = '';
-                $json['sectionIds'] = $stringUtilAdapter->deserialize($objMemberModel->sectionId,true);
+                $json['sectionIds'] = $stringUtilAdapter->deserialize($objMemberModel->sectionId, true);
 
                 $html = '<div>';
                 $html .= '<h1>Mitglied gefunden</h1>';

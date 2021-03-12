@@ -200,7 +200,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
             }
         }
 
-        if($objForm->hasFormField('suitableForBeginners')){
+        if ($objForm->hasFormField('suitableForBeginners')) {
             $objForm->getWidget('suitableForBeginners')->template = 'form_bs_switch';
         }
 

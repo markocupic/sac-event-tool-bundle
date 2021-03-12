@@ -12,14 +12,12 @@
     <div class="list-container" v-html="listContent"></div>
 
     <!-- Modal -->
-    <div class="modal fade" class="event-story-reader-modal" tabindex="-1" role="dialog" aria-labelledby="eventStoryReaderModalTitle<?=$this->id ?>" aria-hidden="true">
+    <div class="modal" class="event-story-reader-modal" tabindex="-1" role="dialog" aria-labelledby="eventStoryReaderModalTitle<?=$this->id ?>" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="eventStoryReaderModalTitle<?=$this->id ?>">Tourenberichte</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Schliessen">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-end">
@@ -40,15 +38,17 @@
 </div>
 
 <script>
-    // Instantiate ItemWatcher class
-    new ItemWatcher('#eventStoryList<?= $this->id ?>', {
-        'params': {
-            'listModuleId': '<?= $this->id ?>',
-            'readerModuleId': '336',
-            'perPage': '<?= $this->perPage ?>',
-            'itemIds': [<?= implode(',', $this->arrAllIds) ?>]
-        }
-    });
+    document.addEventListener('DOMContentLoaded', function(){
+        // Instantiate ItemWatcher class
+        new ItemWatcher('#eventStoryList<?= $this->id ?>', {
+            'params': {
+                'listModuleId': '<?= $this->id ?>',
+                'readerModuleId': '336',
+                'perPage': '<?= $this->perPage ?>',
+                'itemIds': [<?= implode(',', $this->arrAllIds) ?>]
+            }
+        });
+    }, false);
 </script>
 
 
@@ -58,7 +58,7 @@
 <?php endif; ?>
 
 <?php if($this->isAjaxRequest): ?>
-<div class="row tiny-gutter equal-height block">
+<div class="row gx-1 gy-2 equal-height block">
     <?php foreach ($this->stories as $story): ?>
     <div class="col-6 col-sm-4 col-md-3 col-lg-3" itemscope itemtype="http://schema.org/Article">
         <div class="card event-item">
@@ -75,7 +75,7 @@
                 <p class="card-date m-0">
                     <small><?= \Date::parse('d.m.Y', $story['addedOn']) ?></small>
                 </p>
-                <a href="<?= $story['href'] ?>" title="weiterlesen" class="item-reader-link">
+                <a href="<?= $story['href'] ?>" title="weiterlesen" class="text-decoration-none item-reader-link">
                     <h6 class="card-title mt-0"><?= $story['title'] ?></h6>
                 </a>
                 <p class="card-news-teaser"><?= \StringUtil::substr($story['text'], 80) ?></p>
