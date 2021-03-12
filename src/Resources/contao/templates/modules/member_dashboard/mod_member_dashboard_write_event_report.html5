@@ -170,7 +170,7 @@
     <!-- Start gallery -->
     <?php if (count($this->images)): ?>
     {{br}}
-    <div id="dashboardEventStoryGallery" class="<?php if ($this->publishState < 2): ?>sortable-thumbnail-container <?php endif; ?> dashboard-event-story-gallery row gx-1 gy-2">
+    <div id="dashboardEventStoryGallery" class="<?php if ($this->publishState < 2): ?>sortable-thumbnail-container <?php endif; ?> dashboard-event-story-gallery row gx-2 gy-1">
       <?php $i = 0; ?>
       <?php foreach ($this->images as $arrFile): ?>
       <div class="col-12 col-sm-6 col-md-3 thumbnail <?php if ($this->publishState < 2): ?>sortable-item <?php endif; ?>responsive" data-item="<?= $i ?>" data-path="<?= $arrFile['path'] ?>" data-file-id="<?= $arrFile['id'] ?>" data-file-uuid="<?= \StringUtil::binToUuid($arrFile['uuid']) ?>" title="Sortierung mit Drag and Drop &auml;ndern">

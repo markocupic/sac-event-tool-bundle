@@ -118,7 +118,7 @@
             <div class="grey-box-right p-4 mb-4" style="background-color:#eee">
                 <div class="instructor event-detail event-info-box icon-box-small">
                     <h5>Kursleitung</h5>
-                    <div class="row gx-1 gy-2">
+                    <div class="row gx-2 gy-1">
                         <?= $this->getEventData('instructorContactBoxes') ?>
                     </div>
                 </div>
