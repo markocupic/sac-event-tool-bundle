@@ -3,7 +3,7 @@
 <?php $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/eventlist_vue.js|static'; ?>
 
 <div id="tour-list">
-    <span v-if="itemsFound > 0" class="text-muted"><small>Zu deiner Suchanfrage wurden {{ itemsFound }} Events gefunden. </small></span>
+    <span v-if="itemsTotal > 0" class="text-muted"><small>Zu deiner Suchanfrage wurden {{ itemsTotal }} Events gefunden. </small></span>
     <span v-if="blnIsBusy === true" class="ms-2 text-success"><small>Lade events...</small></span>
     <div class="event-container row">
         <div v-for="(row, index) of rows" class="event-item event-item-tour event col-12 col-lg-6" v-bind:data-id="row.id" v-bind:data-event-type="row.tourTypesIds">
@@ -89,7 +89,7 @@
         </div>
     </div>
 
-    <div v-if="blnIsBusy === false && !itemsFound" class="alert alert-info">
+    <div v-if="blnIsBusy === false && !itemsTotal" class="alert alert-info">
         Zu deiner Suchanfrage wurden leider keine Events gefunden.
     </div>
 </div>
@@ -106,7 +106,7 @@
             'courseId': '<?= $this->apiParam['courseId'] ?>',
             'year': '<?= $this->apiParam['year'] ?>',
             'dateStart': '<?= $this->apiParam['dateStart'] ?>',
-            'searchterm': '<?= $this->apiParam['searchterm'] ?>',
+            'textsearch': '<?= $this->apiParam['textsearch'] ?>',
             'eventId': '<?= $this->apiParam['eventId'] ?>',
             'arrIds': [<?= $this->apiParam['arrIds'] ?>],
             'username': '<?= $this->apiParam['username'] ?>',

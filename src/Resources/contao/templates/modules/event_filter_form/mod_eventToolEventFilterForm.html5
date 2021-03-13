@@ -1,43 +1,4 @@
-<?php $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.js|static"; ?>
-<?php $this->extend('block_unsearchable'); ?>
 
-<?php $this->block('content'); ?>
-
-<div id="<?= $this->form->getFormId() ?>" class="filter-board <?= $this->form->getFormId() ?> block">
-    <form action="<?= $this->form->getFormAction() ?>" method="<?= $this->form->getMethod() ?>" enctype="<?= $this->form->getEnctype() ?>">
-        <div class="formbody">
-            <!-- start row-->
-            <div class="row">
-                <?php foreach($this->fields as $strField): ?>
-                    <?php if($this->form->hasFormField($strField)): ?>
-                    <!-- start widget <?= $strField ?> -->
-                    <div id="<?= $strField ?>" class="filter-board-widget col-6 col-sm-4">
-                       <?= $this->form->getWidget($strField)->parse() ?>
-                    </div>
-                    <!-- end widget <?= $strField ?> -->
-                <?php endif; ?>
-                <?php endforeach; ?>
-            </div>
-            <!-- end row -->
-            <div id="submit" class="filter-board-widget">
-                <div class="widget widget-submit">
-                    <button type="submit" id="ctrl_submit" class="submit" name>Filter anwenden</button>
-                </div>
-            </div>
-            <div class="mt-3 filter-board-widget">
-                <a href="#" class="small reset-form">Filter zur&uuml;cksetzen</a>
-            </div>
-        </div><!-- end formbody -->
-    </form>
-</div>
-
-<script>
-    $(document).ready(function () {
-        EventFilter.initialize();
-    });
-</script>
-
-<?php $this->endblock(); ?>
 
 
 

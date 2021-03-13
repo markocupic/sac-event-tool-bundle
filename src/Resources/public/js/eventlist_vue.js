@@ -23,7 +23,7 @@ class VueTourList {
                 'courseId': '',
                 'year': '',
                 'dateStart': '',
-                'searchterm': '',
+                'textsearch': '',
                 'eventId': '',
                 'username': '',
                 // Let empty for all published
@@ -66,7 +66,7 @@ class VueTourList {
                     // is busy bool
                     blnIsBusy: false,
                     // total found items
-                    itemsFound: 0,
+                    itemsTotal: 0,
                     // already loaded items
                     loadedItems: 0,
                     // all events loades bool
@@ -99,37 +99,32 @@ class VueTourList {
                         return;
                     }
 
-                    let data = new FormData();
-                    data.append('requestToken', self.requestToken);
-                    data.append('sessionCacheToken', btoa(window.location.href));
-                    data.append('isPreloadRequest', isPreloadRequest);
+                    let formData = new FormData();
+                    formData.append('isPreloadRequest', isPreloadRequest);
 
                     // Handle arrays correctly
                     for (let prop in self.apiParams) {
                         let property = self.apiParams[prop];
                         if (prop === 'offset') {
-                            data.append('offset', parseInt(self.apiParams.offset) + self.loadedItems);
-                        }
-                        else if (Array.isArray(property)) {
+                            formData.append('offset', parseInt(self.apiParams.offset) + self.loadedItems);
+                        } else if (Array.isArray(property)) {
                             for (let i = 0; i < property.length; ++i) {
-                                data.append(prop + '[]', property[i]);
+                                formData.append(prop + '[]', property[i]);
                             }
-                        }
-                        else {
-                            data.append(prop, property);
+                        } else {
+                            formData.append(prop, property);
                         }
                     }
 
                     // Handle fields correctly
                     for (let i = 0; i < self.fields.length; ++i) {
-                        data.append('fields[]', self.fields[i]);
+                        formData.append('fields[]', self.fields[i]);
                     }
 
-                    // Fetch
-                    fetch('eventApi/getEventList', {
+                    let params = new URLSearchParams(Array.from(formData)).toString()
 
-                            method: "POST",
-                            body: data,
+                    // Fetch
+                    fetch('eventApi/events?' + params, {
                             headers: {
                                 'x-requested-with': 'XMLHttpRequest'
                             },
@@ -141,22 +136,22 @@ class VueTourList {
                         self.blnIsBusy = false;
 
                         let i = 0;
-                        self.itemsFound = json['itemsFound'];
-                        json['arrEventData'].forEach(function (row) {
+                        self.itemsTotal = parseInt(json['meta']['itemsTotal']);
+                        json['data'].forEach(function (row) {
                             i++;
                             self.rows.push(row);
                             self.loadedItems++;
                         });
 
                         // Store all ids of loaded events in self.arrEventIds
-                        if (json['isPreloadRequest'] === false) {
-                            json['arrEventIds'].forEach(function (id) {
+                        if (json['meta']['isPreloadRequest'] === false) {
+                            json['meta']['arrEventIds'].forEach(function (id) {
                                 self.arrEventIds.push(id);
                             });
                         }
 
-                        if (json['isPreloadRequest'] === false) {
-                            if (i === 0 || parseInt(json['itemsFound']) === self.loadedItems) {
+                        if (json['meta']['isPreloadRequest'] === false) {
+                            if (i === 0 || parseInt(json['meta']['itemsTotal']) === self.loadedItems) {
                                 self.blnAllEventsLoaded = true
                             }
                         }
@@ -164,7 +159,7 @@ class VueTourList {
                         if (self.blnAllEventsLoaded === true) {
                             console.log('Finished downloading process. ' + self.loadedItems + ' events loaded.');
                         } else {
-                            if (json['isPreloadRequest'] === false) {
+                            if (json['meta']['isPreloadRequest'] === false) {
                                 // Preload
                                 self.preload();
                             }

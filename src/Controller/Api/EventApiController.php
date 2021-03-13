@@ -25,7 +25,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOStatement;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Markocupic\SacEventToolBundle\FrontendCache\SessionCache\SessionCache;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,12 +36,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class EventApiController extends AbstractController
 {
-    /**
-     * Cache response in session.
-     *
-     * @const CACHE_EXPIRATION_TIMEOUT seconds
-     */
-    private const CACHE_EXPIRATION_TIMEOUT = 180;
+    const CACHE_MAX_AGE = 180;
+
     /**
      * @var ContaoFramework
      */
@@ -59,25 +54,14 @@ class EventApiController extends AbstractController
     private $connection;
 
     /**
-     * @var SessionCache
-     */
-    private $sessionCache;
-
-    /**
-     * @var string
-     */
-    private $sessionCacheToken;
-
-    /**
      * EventApiController constructor.
      * Get event data as json object.
      */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, SessionCache $sessionCache)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
-        $this->sessionCache = $sessionCache;
 
         $this->framework->initialize();
     }
@@ -86,7 +70,7 @@ class EventApiController extends AbstractController
      * Get event list filtered by params delivered from a filter board
      * This controller is used for the vje.js event list module.
      *
-     * @Route("/eventApi/getEventList", name="sac_event_tool_api_event_api_get_event_list", defaults={"_scope" = "frontend", "_token_check" = false})
+     * @Route("/eventApi/events", name="sac_event_tool_api_event_api_get_events", defaults={"_scope" = "frontend", "_token_check" = false})
      */
     public function getEventList(): JsonResponse
     {
@@ -124,15 +108,13 @@ class EventApiController extends AbstractController
             'eventId' => $request->get('eventId'),
             'dateStart' => $request->get('dateStart'),
             'dateEnd' => $request->get('dateEnd'),
-            'searchterm' => $request->get('searchterm'),
+            'textsearch' => $request->get('textsearch'),
             'username' => $request->get('username'),
-            'sessionCacheToken' => $request->get('sessionCacheToken'),
             'suitableForBeginners' => $request->get('suitableForBeginners') ? '1' : '',
 
             // Boolean
             'isPreloadRequest' => 'true' === $request->get('isPreloadRequest') ? true : false,
         ];
-        //die( gettype($request->get('suitableForBeginners')));
 
         $startTime = microtime(true);
 
@@ -192,11 +174,11 @@ class EventApiController extends AbstractController
         }
 
         // Searchterm (search for expression in tl_calendar_events.title and tl_calendar_events.teaser
-        if (!empty($param['searchterm'])) {
+        if (!empty($param['textsearch'])) {
             $orxSearchTerm = $qb->expr()->orX();
 
             // Support multiple search expressions
-            foreach (explode(' ', $param['searchterm']) as $strNeedle) {
+            foreach (explode(' ', $param['textsearch']) as $strNeedle) {
                 if (empty(trim($strNeedle))) {
                     continue;
                 }
@@ -338,23 +320,23 @@ class EventApiController extends AbstractController
         // Now we have all the ids, let's prepare the second query
         $arrFields = empty($param['fields']) ? [] : $param['fields'];
 
-        $this->sessionCacheToken = $param['sessionCacheToken'];
         $arrJSON = [
-            'CACHE_EXPIRATION_TIMEOUT' => static::CACHE_EXPIRATION_TIMEOUT,
-            'loadedItemsFromSession' => 0,
-            'status' => 'success',
-            'countItems' => 0,
-            'itemsFound' => \count($arrIds),
-            'queryTime' => $queryTime,
-            'query' => $query,
-            'arrEventIds' => [],
+            'meta' => [
+                'isPreloadRequest' => $param['isPreloadRequest'],
+                'status' => 'success',
+                'countItems' => 0,
+                'itemsTotal' => \count($arrIds),
+                'queryTime' => $queryTime,
+                'sql' => $query,
+                'arrEventIds' => [],
+                'params' => [],
+            ],
+            'data' => [],
         ];
 
         foreach ($param as $k => $v) {
-            $arrJSON[$k] = $v;
+            $arrJSON['meta']['params'][$k] = $v;
         }
-
-        $arrJSON['arrEventData'] = [];
 
         if (!empty($arrIds)) {
             /** @var QueryBuilder $qb */
@@ -381,7 +363,7 @@ class EventApiController extends AbstractController
 
             while (false !== ($arrEvent = $results->fetch())) {
                 if (false === $param['isPreloadRequest']) {
-                    ++$arrJSON['countItems'];
+                    ++$arrJSON['meta']['countItems'];
                 }
                 $oData = null;
 
@@ -390,14 +372,7 @@ class EventApiController extends AbstractController
 
                 if (null !== $objEvent) {
                     if (false === $param['isPreloadRequest']) {
-                        $arrJSON['arrEventIds'][] = $arrEvent['id'];
-                    }
-
-                    $strToken = $this->sessionCacheToken.$arrEvent['id'];
-
-                    // Try to load from cache
-                    if ((null !== $this->sessionCacheToken) && (null !== ($oData = $this->sessionCache->get($strToken)))) {
-                        ++$arrJSON['loadedItemsFromSession'];
+                        $arrJSON['meta']['arrEventIds'][] = $arrEvent['id'];
                     }
 
                     if (null === $oData) {
@@ -409,26 +384,27 @@ class EventApiController extends AbstractController
                             $field = $aField[0];
                             $oData->{$field} = $this->prepareValue($v);
                         }
-
-                        // Cache data
-                        if (null !== $this->sessionCacheToken) {
-                            $this->sessionCache->set($strToken, $oData, static::CACHE_EXPIRATION_TIMEOUT + time());
-                        }
                     }
 
                     if (false === $param['isPreloadRequest']) {
-                        $arrJSON['arrEventData'][] = $oData;
+                        $arrJSON['data'][] = $oData;
                     }
                 }
             }
         }
 
         // Allow cross domain requests
-        return new JsonResponse($arrJSON, 200, ['Access-Control-Allow-Origin' => '*']);
+        $response = new JsonResponse($arrJSON, 200, ['Access-Control-Allow-Origin' => '*']);
+
+        // Enable cache
+        $response->setPublic();
+        $response->setSharedMaxAge(self::CACHE_MAX_AGE);
+        $response->setMaxAge(self::CACHE_MAX_AGE);
+
+        return $response;
     }
 
     /**
-     * Get event data by id and use the session cache
      * This controller is used for the "pilatus" export, where events are loaded by ajax when the modal windows opens
      * $_POST['id'], $_POST['fields'] as comma separated string is optional.
      *
@@ -494,7 +470,7 @@ class EventApiController extends AbstractController
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        // Transform binuuids
+        // Transform bin uuids
         $varValue = $validatorAdapter->isBinaryUuid($varValue) ? $stringUtilAdapter->binToUuid($varValue) : $varValue;
 
         // Deserialize arrays and convert binuuids

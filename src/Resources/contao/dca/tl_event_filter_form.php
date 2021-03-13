@@ -51,9 +51,9 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = array
 			'options_callback' => array(TlEventFilterForm::class, 'getOrganizers'),
 			'eval'             => array('multiple' => true),
 		),
-		'searchterm' => array
+		'textsearch' => array
 		(
-			'label'     => &$GLOBALS['TL_LANG']['tl_event_filter_form']['searchterm'],
+			'label'     => &$GLOBALS['TL_LANG']['tl_event_filter_form']['textsearch'],
 			'inputType' => 'text',
 			'eval'      => array('placeholder' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['enterSearchTerms']),
 		),
