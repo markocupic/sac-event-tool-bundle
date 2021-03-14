@@ -71,13 +71,12 @@ class EventMember
         if (!empty($arrInstructors) && \is_array($arrInstructors)) {
             foreach ($arrInstructors as $userId) {
                 $objUserModel = $userModelAdapter->findByPk($userId);
+                $strMemberInSection = '';
 
                 if (null !== $objUserModel) {
                     // Check club membership
                     $isMember = false;
                     $objMember = $memberModelAdapter->findOneBySacMemberId($objUserModel->sacMemberId);
-
-                    $strMemberInSection = '';
 
                     if (null !== $objMember) {
                         if ($objMember->isSacMember && !$objMember->disable) {
@@ -138,17 +137,16 @@ class EventMember
 
                 // Check club membership
                 $strIsActiveMember = '!inaktiv/keinMitglied';
+                $strMemberInSection = '';
 
                 if ('' !== $objEventMember->sacMemberId) {
                     $objMemberModel = $memberModelAdapter->findOneBySacMemberId($objEventMember->sacMemberId);
-
-                    $strMemberInSection = '';
 
                     if (null !== $objMemberModel) {
                         if ($objMemberModel->isSacMember && !$objMemberModel->disable) {
                             $strIsActiveMember = ' ';
                         }
-                        $strMemberInSection = '('.CalendarEventsHelper::getSectionMembershipAsString($objMember).')';
+                        $strMemberInSection = '('.CalendarEventsHelper::getSectionMembershipAsString($objMemberModel).')';
                     }
                 }
 

@@ -12,7 +12,10 @@
 
 use Contao\Config;
 use Contao\Input;
+use Contao\System;
 use Markocupic\SacEventToolBundle\Dca\TlCalendarEventsMember;
+
+System::loadLanguageFile('tl_member');
 
 /**
  * Table tl_calendar_events_member
@@ -424,9 +427,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 			'sql'       => "varchar(255) NOT NULL default 'manually'",
 		),
 		'sectionIds'         => array(
-			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['sectionIds'],
+            'sorting' => true,
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['sectionIds'],
 			'exclude'   => true,
 			'inputType' => 'select',
+			'reference' => &$GLOBALS['TL_LANG']['tl_member']['section'],
 			'options_callback' => array(TlCalendarEventsMember::class, 'listSections'),
 			'eval'      => array('multiple' => true, 'chosen' => true, 'doNotCopy' => true, 'readonly' => false, 'tl_class' => 'w50'),
 			'sql'       => "blob NULL",
