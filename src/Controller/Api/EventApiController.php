@@ -389,6 +389,8 @@ class EventApiController extends AbstractController
         // Enable cache
         $response->setPublic();
         $response->setSharedMaxAge(self::CACHE_MAX_AGE);
+        $response->setPrivate();
+        $response->setMaxAge(self::CACHE_MAX_AGE-10);
 
         return $response;
     }
