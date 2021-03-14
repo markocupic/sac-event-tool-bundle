@@ -111,9 +111,6 @@ class EventApiController extends AbstractController
             'textsearch' => $request->get('textsearch'),
             'username' => $request->get('username'),
             'suitableForBeginners' => $request->get('suitableForBeginners') ? '1' : '',
-
-            // Boolean
-            'isPreloadRequest' => 'true' === $request->get('isPreloadRequest') ? true : false,
         ];
 
         $startTime = microtime(true);
@@ -322,7 +319,6 @@ class EventApiController extends AbstractController
 
         $arrJSON = [
             'meta' => [
-                'isPreloadRequest' => $param['isPreloadRequest'],
                 'status' => 'success',
                 'countItems' => 0,
                 'itemsTotal' => \count($arrIds),
@@ -362,18 +358,14 @@ class EventApiController extends AbstractController
             $results = $qb->execute();
 
             while (false !== ($arrEvent = $results->fetch())) {
-                if (false === $param['isPreloadRequest']) {
-                    ++$arrJSON['meta']['countItems'];
-                }
+                ++$arrJSON['meta']['countItems'];
                 $oData = null;
 
                 /** @var CalendarEventsModel $objEvent */
                 $objEvent = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
 
                 if (null !== $objEvent) {
-                    if (false === $param['isPreloadRequest']) {
-                        $arrJSON['meta']['arrEventIds'][] = $arrEvent['id'];
-                    }
+                    $arrJSON['meta']['arrEventIds'][] = $arrEvent['id'];
 
                     if (null === $oData) {
                         $oData = new \stdClass();
@@ -386,9 +378,7 @@ class EventApiController extends AbstractController
                         }
                     }
 
-                    if (false === $param['isPreloadRequest']) {
-                        $arrJSON['data'][] = $oData;
-                    }
+                    $arrJSON['data'][] = $oData;
                 }
             }
         }
@@ -399,7 +389,6 @@ class EventApiController extends AbstractController
         // Enable cache
         $response->setPublic();
         $response->setSharedMaxAge(self::CACHE_MAX_AGE);
-        $response->setMaxAge(self::CACHE_MAX_AGE);
 
         return $response;
     }

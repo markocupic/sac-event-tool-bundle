@@ -48,7 +48,7 @@ class VueTourList {
             created: function created() {
                 let self = this;
 
-                self.prepareRequest(false);
+                self.prepareRequest();
             },
 
             data: function data() {
@@ -75,24 +75,18 @@ class VueTourList {
             },
             methods: {
                 // Prepare ajax request
-                prepareRequest: function prepareRequest(isPreloadRequest = false) {
+                prepareRequest: function prepareRequest() {
                     let self = this;
 
                     if (self.blnIsBusy === false) {
                         self.blnIsBusy = true;
-                        self.getDataByXhr(isPreloadRequest);
+                        self.getDataByXhr();
                         console.log('Loading events...')
                     }
                 },
 
-                // Preload and use the session cache
-                preload: function preload() {
-                    let self = this;
-                    self.prepareRequest(true);
-                },
-
                 // Get data by xhr
-                getDataByXhr: function getDataByXhr(isPreloadRequest) {
+                getDataByXhr: function getDataByXhr() {
                     let self = this;
 
                     if (self.blnAllEventsLoaded === true) {
@@ -100,7 +94,6 @@ class VueTourList {
                     }
 
                     let formData = new FormData();
-                    formData.append('isPreloadRequest', isPreloadRequest);
 
                     // Handle arrays correctly
                     for (let prop in self.apiParams) {
@@ -144,25 +137,16 @@ class VueTourList {
                         });
 
                         // Store all ids of loaded events in self.arrEventIds
-                        if (json['meta']['isPreloadRequest'] === false) {
-                            json['meta']['arrEventIds'].forEach(function (id) {
-                                self.arrEventIds.push(id);
-                            });
-                        }
+                        json['meta']['arrEventIds'].forEach(function (id) {
+                            self.arrEventIds.push(id);
+                        });
 
-                        if (json['meta']['isPreloadRequest'] === false) {
-                            if (i === 0 || parseInt(json['meta']['itemsTotal']) === self.loadedItems) {
-                                self.blnAllEventsLoaded = true
-                            }
+                        if (i === 0 || parseInt(json['meta']['itemsTotal']) === self.loadedItems) {
+                            self.blnAllEventsLoaded = true
                         }
 
                         if (self.blnAllEventsLoaded === true) {
                             console.log('Finished downloading process. ' + self.loadedItems + ' events loaded.');
-                        } else {
-                            if (json['meta']['isPreloadRequest'] === false) {
-                                // Preload
-                                self.preload();
-                            }
                         }
                         return json;
 

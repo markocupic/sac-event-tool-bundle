@@ -5,25 +5,24 @@
 
       <?php if ($this->hasErrorMessage): ?>
         <div class="alert alert-danger" role="alert">
-            <?= $this->errorMessage ?>
+          <i class="fas fa-exclamation-circle"></i>
+          <div><?= $this->errorMessage ?></div>
         </div>
       <?php endif; ?>
 
       <?php if ($this->hasInfoMessage): ?>
         <div class="alert alert-info" role="alert">
-            <?= $this->infoMessage ?>
+          <i class="fas fa-info-circle me-2"></i>
+          <div><?= $this->infoMessage ?></div>
         </div>
       <?php endif; ?>
 
       <?php if (!FE_USER_LOGGED_IN && $this->showLoginForm): ?>
         <!-- Login form -->
-        <?php if ($this->objEvent->eventType === 'course'): ?>
-            {{insert_module::369}}
-        <?php else: ?>
-            {{insert_module::368}}
-        <?php endif; ?>
+        <div class="mt-5 mb-4">
+          {{insert_module::406}}
+        </div>
       <?php endif; ?>
-
 
       <?php if ($this->form): ?>
         <h3 class="ce_headline">Für Event "<?= $this->objEvent->title ?>" anmelden</h3>
@@ -32,13 +31,15 @@
           <div class="col-md-8">
               <?php if ($this->bookingLimitReaches): ?>
                 <div class="alert alert-info" role="alert">
-                  Die maximale Teilnehmerzahl für diesen Event ist bereits erreicht. Wenn du dich trotzdem anmeldest, gelangst du auf die Warteliste und kannst bei Absagen evtl. nachr&uuml;cken. Du kannst selbstverst&auml;ndlich auch mit dem Leiter Kontakt aufnehmen, um Genaueres zu erfahren.
+                  <i class="fas fa-info-circle"></i>
+                  <div>Die maximale Teilnehmerzahl für diesen Event ist bereits erreicht. Wenn du dich trotzdem anmeldest, gelangst du auf die Warteliste und kannst bei Absagen evtl. nachr&uuml;cken. Du kannst selbstverst&auml;ndlich auch mit dem Leiter Kontakt aufnehmen, um Genaueres zu erfahren.</div>
                 </div>
               <?php endif; ?>
 
               <?php if ($this->hasBookingError): ?>
                 <div class="alert alert-info" role="alert">
-                    <?= $this->bookingErrorMsg ?>
+                  <i class="fas fa-exclamation-circle"></i>
+                  <div><?= $this->bookingErrorMsg ?></div>
                 </div>
               <?php endif; ?>
             <div class="hasteform_form-event-registration block">
@@ -65,7 +66,8 @@
                     <?php if ($this->objForm->hasFormField('mobile')): ?>
                         <?= $this->objForm->getWidget('mobile')->parse(); ?>
                       <div class="alert alert-success" role="alert">
-                        Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leergelassen werden. Damit der Leiter dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine <strong>Mobilnummer</strong> zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.
+                        <i class="fas fa-check-circle"></i>
+                        <div>Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leergelassen werden. Damit der Leiter dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine <strong>Mobilnummer</strong> zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.</div>
                       </div>
                       {{br}}
                     <?php endif; ?>
@@ -81,7 +83,10 @@
 
                     <?php if ($this->objForm->hasFormField('notes')): ?>
                       <?= $this->objForm->getWidget('notes')->parse(); ?>
-                      <div class="alert alert-success" role="alert">Bitte beschreibe in wenigen Worten dein Leistungsniveau und/oder beantworte, die in den Anmeldebestimmungen verlangten Angaben. (z.B. bereits absolvierte Referenztouren oder Essgewohnheiten bei Events mit &Uuml;bernachtung, etc.)</div>
+                      <div class="alert alert-success" role="alert">
+                        <i class="fas fa-check-circle"></i>
+                        <div>Bitte beschreibe in wenigen Worten dein Leistungsniveau und/oder beantworte, die in den Anmeldebestimmungen verlangten Angaben. (z.B. bereits absolvierte Referenztouren oder Essgewohnheiten bei Events mit &Uuml;bernachtung, etc.)</div>
+                      </div>
                       {{br}}
                     <?php endif; ?>
 
