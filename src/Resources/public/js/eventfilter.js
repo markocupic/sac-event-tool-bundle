@@ -21,10 +21,32 @@ var EventFilter = {
 
         // Initialize Select2 for organizer input
         $('#ctrl_organizers').select2();
+
+        if($('#ctrl_year'))
+        {
+            window.setInterval(() => {
+                if($('.select2-selection__choice').length)
+                {
+                    $('.select2-selection').css({
+                        'height': 'auto',
+                    });
+                }else{
+                    $('.select2-selection').css({
+                        'height': $('#ctrl_year').outerHeight() + 'px',
+                    });
+                }
+
+            },100);
+        }
+
         window.addEventListener('resize', function(){
-            $('#ctrl_organizers').select2();
+            $('.select2.select2-container').css({
+                'max-width': '100%',
+                'width': '100%',
+            });
         });
-        window.setTimeout(function () {
+
+        window.setTimeout(() => {
             $('.filter-board-widget').css('visibility', 'visible');
         }, 20);
 
