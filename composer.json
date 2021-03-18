@@ -22,7 +22,9 @@
     "chillerlan/php-qrcode": "^4.3",
     "markocupic/phpoffice-bundle": "^1.0",
     "markocupic/cloudconvert-bundle": "^1.0",
-    "markocupic/contao-component-vue-js": "^2.6"
+    "markocupic/contao-component-vue-js": "^2.6",
+    "markocupic/contao-utf8-arrows-insert-tag-bundle": "^1.0",
+    "openpsa/universalfeedcreator": "^1.8"
   },
   "require-dev": {
     "contao/test-case": ">=1.1"

@@ -425,11 +425,11 @@ class CalendarEventsHelper
 
 			if ($objInstructor->numRows)
 			{
-				$objUser = UserModel::findByPk($objInstructor->id);
+				$objUser = UserModel::findByPk($objInstructor->userId);
 
 				if ($objUser !== null)
 				{
-					$arrName = array();
+				    $arrName = array();
 					$arrName[] = $objUser->lastname;
 					$arrName[] = $objUser->firstname;
 					$arrName = array_filter($arrName);

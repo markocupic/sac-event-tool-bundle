@@ -63,6 +63,7 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface, ConfigPlu
         $loader->load(__DIR__.'/../Resources/config/controller-ajax.yml');
         $loader->load(__DIR__.'/../Resources/config/controller-contao-frontend-module.yml');
         $loader->load(__DIR__.'/../Resources/config/controller-contao-content-element.yml');
+        $loader->load(__DIR__.'/../Resources/config/controller-feed.yml');
         $loader->load(__DIR__.'/../Resources/config/sac-member-database.yml');
         $loader->load(__DIR__.'/../Resources/config/cron.yml');
         $loader->load(__DIR__.'/../Resources/config/contao-mode.yml');

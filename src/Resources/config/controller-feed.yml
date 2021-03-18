@@ -1,0 +1,7 @@
+services:
+
+  Markocupic\SacEventToolBundle\Controller\Feed\UpcomingEventsController:
+    arguments:
+      - '@contao.framework'
+      - '%kernel.project_dir%'
+    public: true
