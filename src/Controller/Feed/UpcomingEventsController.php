@@ -86,17 +86,15 @@ class UpcomingEventsController extends AbstractController
         $sectionName = $sacEvtConfig['SECTION_IDS'][$section];
 
         $rss = new \UniversalFeedCreator();
-        //$rss->useCached(); // use cached version if age < 1 hour
         $rss->title = $sectionName.' upcoming events';
-        $rss->description = 'Provide the latest events for https://www.sac-cas.ch/de/der-sac/sektionen';
-        $rss->link = $environmentAdapter->get('url').$environmentAdapter->get('request');
+        $rss->description = 'Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen';
+        $rss->link = $environmentAdapter->get('url');
         $rss->language = 'de';
         $rss->copyright = 'Copyright '.date('Y').', '.$sectionName;
-        $rss->pubDate = time();
-        $rss->lastBuildDate = time();
+        $rss->pubDate = date('r', time() - 3600);
+        $rss->lastBuildDate = date('r', time());
         $rss->ttl = 60;
-        //$rss->xslStyleSheet = '';
-        $rss->webmaster = 'Marko Cupic, Oberkirch';
+        $rss->category = 'Mountaineering events';
 
         $results = $this->getEvents($section);
 
@@ -107,14 +105,14 @@ class UpcomingEventsController extends AbstractController
                 $item->title = $arrEvent['title'];
                 $item->link = $eventsAdapter->generateEventUrl($eventsModel, true);
                 $item->description = $arrEvent['teaser'];
-                //$item->pubDate = $dateAdapter->parse('Y-m-d', $eventsModel->tstamp);
+                //$item->pubDate = date('r', (int) $eventsModel->tstamp);
                 //$item->author = CalendarEventsHelper::getMainInstructorName($eventsModel);
                 $additional = [
                     'guid' => $eventsAdapter->generateEventUrl($eventsModel, true),
-                    'pubDate' => $dateAdapter->parse('Y-m-d', $eventsModel->tstamp),
-                    'author' => $calendarEventsHelperAdapter->getMainInstructorName($eventsModel),
-                    'tourdb:startdate' => $dateAdapter->parse('Y-m-d', $eventsModel->startDate),
-                    'tourdb:enddate' => $dateAdapter->parse('Y-m-d', $eventsModel->endDate),
+                    'pubDate' => date('r', (int) $eventsModel->tstamp),
+                    //'author' => 'author@foo.bar',
+                    'tourdb:startdate' => date('Y-m-d', (int) $eventsModel->startDate),
+                    'tourdb:enddate' => date('Y-m-d', (int) $eventsModel->endDate),
                     'tourdb:eventtype' => $arrEvent['eventType'],
                     'tourdb:organizers' => implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($eventsModel)),
                     'tourdb:instructors' => implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel)),
@@ -130,9 +128,9 @@ class UpcomingEventsController extends AbstractController
             }
         }
 
-        $filename = 'rss_feed_' . str_replace(' ', '_', strtolower($sectionName)) . '.xml';
+        $filename = 'rss_feed_'.str_replace(' ', '_', strtolower($sectionName)).'.xml';
 
-        return new Response($rss->saveFeed('RSS2.0', $this->projectDir.'/web/share/' . $filename, true));
+        return new Response($rss->saveFeed('RSS2.0', $this->projectDir.'/web/share/'.$filename, true));
     }
 
     private function getEvents(int $section): ?Statement
