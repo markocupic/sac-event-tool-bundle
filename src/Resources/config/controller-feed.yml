@@ -3,5 +3,6 @@ services:
   Markocupic\SacEventToolBundle\Controller\Feed\UpcomingEventsController:
     arguments:
       - '@contao.framework'
+      - '@database_connection'
       - '%kernel.project_dir%'
     public: true
