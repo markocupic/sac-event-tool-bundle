@@ -427,8 +427,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 			'sql'       => "varchar(255) NOT NULL default 'manually'",
 		),
 		'sectionIds'         => array(
-			'sorting' => true,
-			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['sectionIds'],
+            'sorting' => true,
+            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['sectionIds'],
 			'exclude'   => true,
 			'inputType' => 'select',
 			'reference' => &$GLOBALS['TL_LANG']['tl_member']['section'],
