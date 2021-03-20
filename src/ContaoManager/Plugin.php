@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\ContaoManager;
 
+use Contao\CalendarBundle\ContaoCalendarBundle;
+use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
@@ -22,6 +24,8 @@ use Contao\ManagerPlugin\Routing\RoutingPluginInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Markocupic\RssFeedGeneratorBundle\MarkocupicRssFeedGeneratorBundle;
+use Markocupic\SacEventToolBundle\MarkocupicSacEventToolBundle;
 
 /**
  * Class Plugin
@@ -35,10 +39,11 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface, ConfigPlu
     public function getBundles(ParserInterface $parser)
     {
         return [
-            BundleConfig::create(Markocupic\SacEventToolBundle\MarkocupicSacEventToolBundle::class)
-                ->setLoadAfter([Contao\CoreBundle\ContaoCoreBundle::class])
-                ->setLoadAfter([Contao\CalendarBundle\ContaoCalendarBundle::class]),
-            BundleConfig::create('Markocupic\RssFeedGeneratorBundle\MarkocupicRssFeedGeneratorBundle')
+            BundleConfig::create(MarkocupicRssFeedGeneratorBundle::class),
+            BundleConfig::create(MarkocupicSacEventToolBundle::class)
+                ->setLoadAfter([MarkocupicRssFeedGeneratorBundle::class])
+                ->setLoadAfter([ContaoCoreBundle::class])
+                ->setLoadAfter([ContaoCalendarBundle::class]),
         ];
     }
 
@@ -58,7 +63,6 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface, ConfigPlu
      */
     public function registerContainerConfiguration(LoaderInterface $loader, array $managerConfig): void
     {
-
         $loader->load('@MarkocupicRssFeedGeneratorBundle/Resources/config/services.yml');
 
         $loader->load(__DIR__.'/../Resources/config/listener.yml');
