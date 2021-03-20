@@ -23,6 +23,7 @@ use Contao\Events;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDO\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,6 +42,11 @@ class UpcomingEventsController extends AbstractController
     private $framework;
 
     /**
+     * @var FeedFactory
+     */
+    private $feedFactory;
+
+    /**
      * @var Connection
      */
     private $connection;
@@ -53,9 +59,10 @@ class UpcomingEventsController extends AbstractController
     /**
      * UpcomingEventsController constructor.
      */
-    public function __construct(ContaoFramework $framework, Connection $connection, string $projectDir)
+    public function __construct(ContaoFramework $framework, FeedFactory $feedFactory, Connection $connection, string $projectDir)
     {
         $this->framework = $framework;
+        $this->feedFactory = $feedFactory;
         $this->connection = $connection;
         $this->projectDir = $projectDir;
 
@@ -72,7 +79,6 @@ class UpcomingEventsController extends AbstractController
     {
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-        $dateAdapter = $this->framework->getAdapter(Date::class);
         $eventsAdapter = $this->framework->getAdapter(Events::class);
         $configAdapter = $this->framework->getAdapter(Config::class);
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
@@ -85,52 +91,47 @@ class UpcomingEventsController extends AbstractController
 
         $sectionName = $sacEvtConfig['SECTION_IDS'][$section];
 
-        $rss = new \UniversalFeedCreator();
-        $rss->title = $sectionName.' upcoming events';
-        $rss->description = 'Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen';
-        $rss->link = $environmentAdapter->get('url');
-        $rss->language = 'de';
-        $rss->copyright = 'Copyright '.date('Y').', '.$sectionName;
-        $rss->pubDate = date('r', time() - 3600);
-        $rss->lastBuildDate = date('r', time());
-        $rss->ttl = 60;
-        $rss->category = 'Mountaineering events';
+        $rss = $this->feedFactory->createFeed('utf-8');
+
+        $rss->addTitle($sectionName.' upcoming events');
+        $rss->addDescription('Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen');
+        $rss->addLink($environmentAdapter->get('url'));
+        $rss->addLanguage('de');
+        $rss->addCopyright('Copyright '.date('Y').', '.$sectionName);
+        $rss->addPubDate(time() - 3600);
+        $rss->addLastBuildDate(time());
+        $rss->addTtl(60);
+        $rss->addCategory('Mountaineering events');
+        $rss->addGenerator(self::class);
 
         $results = $this->getEvents($section);
 
         if (null !== $results) {
             while (false !== ($arrEvent = $results->fetch())) {
                 $eventsModel = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
-                $item = new \FeedItem();
-                $item->title = $arrEvent['title'];
-                $item->link = $eventsAdapter->generateEventUrl($eventsModel, true);
-                $item->description = $arrEvent['teaser'];
-                //$item->pubDate = date('r', (int) $eventsModel->tstamp);
-                //$item->author = CalendarEventsHelper::getMainInstructorName($eventsModel);
-                $additional = [
-                    'guid' => $eventsAdapter->generateEventUrl($eventsModel, true),
-                    'pubDate' => date('r', (int) $eventsModel->tstamp),
-                    //'author' => 'author@foo.bar',
-                    'tourdb:startdate' => date('Y-m-d', (int) $eventsModel->startDate),
-                    'tourdb:enddate' => date('Y-m-d', (int) $eventsModel->endDate),
-                    'tourdb:eventtype' => $arrEvent['eventType'],
-                    'tourdb:organizers' => implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($eventsModel)),
-                    'tourdb:instructors' => implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel)),
-                    'tourdb:tourtype' => implode(', ', $calendarEventsHelperAdapter->getTourTypesAsArray($eventsModel, 'title')),
-                    'tourdb:difficulty' => implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($eventsModel)),
-                ];
-                $item->additionalElements = $additional;
+                $item = $this->feedFactory->createFeedItem();
+                $item->addTitle($arrEvent['title']);
+                $item->addLink($eventsAdapter->generateEventUrl($eventsModel, true));
+                $item->addDescription($arrEvent['teaser'], true);
+                $item->addPubDate((int) $eventsModel->tstamp);
+                //$item->addAuthor(CalendarEventsHelper::getMainInstructorName($eventsModel));
+                $item->addGuid($eventsAdapter->generateEventUrl($eventsModel, true));
+                //$item->addAdditional('tourdb:startdate', date('Y-m-d', (int) $eventsModel->startDate));
+                //$item->addAdditional('tourdb:enddate', date('Y-m-d', (int) $eventsModel->endDate));
+                //$item->addAdditional('tourdb:eventtype', $arrEvent['eventType']);
+                //$item->addAdditional('tourdb:organizers', implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($eventsModel)));
+                //$item->addAdditional('tourdb:instructors', implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel)));
+                //$item->addAdditional('tourdb:tourtype', implode(', ', $calendarEventsHelperAdapter->getTourTypesAsArray($eventsModel, 'title')));
+                //$item->addAdditional('tourdb:difficulty', implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($eventsModel)));
 
-                // Optional
-                $item->descriptionHtmlSyndicated = true;
-
+                // Add item node to the document
                 $rss->addItem($item);
             }
         }
 
         $filename = 'rss_feed_'.str_replace(' ', '_', strtolower($sectionName)).'.xml';
 
-        return new Response($rss->saveFeed('RSS2.0', $this->projectDir.'/web/share/'.$filename, true));
+        return $rss->render($this->projectDir.'/web/share/'.$filename);
     }
 
     private function getEvents(int $section): ?Statement

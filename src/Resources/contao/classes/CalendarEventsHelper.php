@@ -429,7 +429,7 @@ class CalendarEventsHelper
 
 				if ($objUser !== null)
 				{
-				    $arrName = array();
+					$arrName = array();
 					$arrName[] = $objUser->lastname;
 					$arrName[] = $objUser->firstname;
 					$arrName = array_filter($arrName);
