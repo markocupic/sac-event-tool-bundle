@@ -24,7 +24,7 @@
     "markocupic/cloudconvert-bundle": "^1.0",
     "markocupic/contao-component-vue-js": "^2.6",
     "markocupic/contao-utf8-arrows-insert-tag-bundle": "^1.0",
-    "markocupic/rss-feed-generator-bundle": "^1.0"
+    "markocupic/rss-feed-generator-bundle": "dev-main"
   },
   "require-dev": {
     "contao/test-case": ">=1.1"

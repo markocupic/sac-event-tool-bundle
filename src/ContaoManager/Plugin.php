@@ -37,7 +37,8 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface, ConfigPlu
         return [
             BundleConfig::create('Markocupic\SacEventToolBundle\MarkocupicSacEventToolBundle')
                 ->setLoadAfter(['Contao\CoreBundle\ContaoCoreBundle'])
-                ->setLoadAfter(['Contao\CalendarBundle\ContaoCalendarBundle']),
+                ->setLoadAfter(['Contao\CalendarBundle\ContaoCalendarBundle'])
+                ->setLoadAfter([Markocupic\RssFeedGeneratorBundle\MarkocupicRssFeedGeneratorBundle::class])
         ];
     }
 
