@@ -35,9 +35,9 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface, ConfigPlu
     public function getBundles(ParserInterface $parser)
     {
         return [
-            BundleConfig::create('Markocupic\SacEventToolBundle\MarkocupicSacEventToolBundle')
-                ->setLoadAfter(['Contao\CoreBundle\ContaoCoreBundle'])
-                ->setLoadAfter(['Contao\CalendarBundle\ContaoCalendarBundle'])
+            BundleConfig::create(Markocupic\SacEventToolBundle\MarkocupicSacEventToolBundle::class)
+                ->setLoadAfter([Contao\CoreBundle\ContaoCoreBundle::class])
+                ->setLoadAfter([Contao\CalendarBundle\ContaoCalendarBundle::class])
                 ->setLoadAfter([Markocupic\RssFeedGeneratorBundle\MarkocupicRssFeedGeneratorBundle::class])
         ];
     }
