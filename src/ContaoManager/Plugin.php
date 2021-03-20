@@ -38,7 +38,7 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface, ConfigPlu
             BundleConfig::create(Markocupic\SacEventToolBundle\MarkocupicSacEventToolBundle::class)
                 ->setLoadAfter([Contao\CoreBundle\ContaoCoreBundle::class])
                 ->setLoadAfter([Contao\CalendarBundle\ContaoCalendarBundle::class]),
-            BundleConfig::create(Markocupic\RssFeedGeneratorBundle\MarkocupicRssFeedGeneratorBundle::class)
+            BundleConfig::create('Markocupic\RssFeedGeneratorBundle\MarkocupicRssFeedGeneratorBundle')
         ];
     }
 
@@ -58,7 +58,8 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface, ConfigPlu
      */
     public function registerContainerConfiguration(LoaderInterface $loader, array $managerConfig): void
     {
-        $loader->load('@MarkocupicRssFeedGeneratorBundle/Resources/config/services.yml');
+
+        $loader->load('@MarkocupicRssFeedGeneratorBundle/Resources/config/config.yml');
 
         $loader->load(__DIR__.'/../Resources/config/listener.yml');
         $loader->load(__DIR__.'/../Resources/config/parameters.yml');
