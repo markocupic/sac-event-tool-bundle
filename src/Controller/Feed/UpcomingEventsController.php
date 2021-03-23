@@ -85,7 +85,7 @@ class UpcomingEventsController extends AbstractController
         $configAdapter = $this->framework->getAdapter(Config::class);
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
 
-        $sacEvtConfig = $configAdapter->get('SAC-EVENT-TOOL-CONFIG'); 
+        $sacEvtConfig = $configAdapter->get('SAC-EVENT-TOOL-CONFIG');
 
         if (!isset($sacEvtConfig['SECTION_IDS'][$section])) {
             return new Response('Section with ID '.$sectionName.' not found. Please use a valid section ID like '.implode(', ', array_keys($sacEvtConfig['SECTION_IDS'])).'.');
@@ -128,7 +128,11 @@ class UpcomingEventsController extends AbstractController
         );
 
         $rss->addChannelField(
-            new Item('category', 'Mountaineering events')
+            new Item('category', 'Mountaineering events: ' . $sectionName)
+        );
+
+        $rss->addChannelField(
+            new Item('category', 'Touren')
         );
 
         $rss->addChannelField(
