@@ -24,6 +24,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDO\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory;
+use Markocupic\RssFeedGeneratorBundle\Item\Item;
+use Markocupic\RssFeedGeneratorBundle\Item\ItemGroup;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -83,7 +85,7 @@ class UpcomingEventsController extends AbstractController
         $configAdapter = $this->framework->getAdapter(Config::class);
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
 
-        $sacEvtConfig = $configAdapter->get('SAC-EVENT-TOOL-CONFIG');
+        $sacEvtConfig = $configAdapter->get('SAC-EVENT-TOOL-CONFIG'); 
 
         if (!isset($sacEvtConfig['SECTION_IDS'][$section])) {
             return new Response('Section with ID '.$sectionName.' not found. Please use a valid section ID like '.implode(', ', array_keys($sacEvtConfig['SECTION_IDS'])).'.');
@@ -93,39 +95,69 @@ class UpcomingEventsController extends AbstractController
 
         $rss = $this->feedFactory->createFeed('utf-8');
 
-        $rss->addTitle($sectionName.' upcoming events');
-        $rss->addDescription('Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen');
-        $rss->addLink($environmentAdapter->get('url'));
-        $rss->addLanguage('de');
-        $rss->addCopyright('Copyright '.date('Y').', '.$sectionName);
-        $rss->addPubDate(time() - 3600);
-        $rss->addLastBuildDate(time());
-        $rss->addTtl(60);
-        $rss->addCategory('Mountaineering events');
-        $rss->addGenerator(self::class);
+        $rss->addChannelField(
+            new Item('title', $sectionName.' upcoming events')
+        );
+
+        $rss->addChannelField(
+            new Item('description', 'Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen')
+        );
+
+        $rss->addChannelField(
+            new Item('link', $environmentAdapter->get('url'))
+        );
+
+        $rss->addChannelField(
+            new Item('language', 'de')
+        );
+
+        $rss->addChannelField(
+            new Item('copyright', 'Copyright '.date('Y').', '.$sectionName)
+        );
+
+        $rss->addChannelField(
+            new Item('pubDate', date('r', (time() - 3600)))
+        );
+
+        $rss->addChannelField(
+            new Item('lastBuildDate', date('r', time()))
+        );
+
+        $rss->addChannelField(
+            new Item('ttl', (string) 60)
+        );
+
+        $rss->addChannelField(
+            new Item('category', 'Mountaineering events')
+        );
+
+        $rss->addChannelField(
+            new Item('generator', self::class)
+        );
 
         $results = $this->getEvents($section);
 
         if (null !== $results) {
             while (false !== ($arrEvent = $results->fetch())) {
                 $eventsModel = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
-                $item = $this->feedFactory->createFeedItem();
-                $item->addTitle($arrEvent['title']);
-                $item->addLink($eventsAdapter->generateEventUrl($eventsModel, true));
-                $item->addDescription($arrEvent['teaser'], true);
-                $item->addPubDate((int) $eventsModel->tstamp);
-                //$item->addAuthor(CalendarEventsHelper::getMainInstructorName($eventsModel));
-                $item->addGuid($eventsAdapter->generateEventUrl($eventsModel, true));
-                //$item->addAdditional('tourdb:startdate', date('Y-m-d', (int) $eventsModel->startDate));
-                //$item->addAdditional('tourdb:enddate', date('Y-m-d', (int) $eventsModel->endDate));
-                //$item->addAdditional('tourdb:eventtype', $arrEvent['eventType']);
-                //$item->addAdditional('tourdb:organizers', implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($eventsModel)));
-                //$item->addAdditional('tourdb:instructors', implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel)));
-                //$item->addAdditional('tourdb:tourtype', implode(', ', $calendarEventsHelperAdapter->getTourTypesAsArray($eventsModel, 'title')));
-                //$item->addAdditional('tourdb:difficulty', implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($eventsModel)));
 
-                // Add item node to the document
-                $rss->addItem($item);
+                $rss->addChannelItemField(
+                    new ItemGroup('item',[
+                        new Item('title', $arrEvent['title']),
+                        new Item('link',$eventsAdapter->generateEventUrl($eventsModel, true)),
+                        new Item('description',$arrEvent['teaser'], ['cdata' => true]),
+                        new Item('pubDate', date('r',(int)$eventsModel->tstamp)),
+                        //new Item('author',$calendarEventsHelperAdapter->getMainInstructorName($eventsModel)),
+                        new Item('guid',$eventsAdapter->generateEventUrl($eventsModel, true)),
+                        new Item('tourdb:startdate',date('Y-m-d', (int) $eventsModel->startDate)),
+                        new Item('tourdb:enddate',date('Y-m-d', (int) $eventsModel->endDate)),
+                        new Item('tourdb:eventtype',$arrEvent['eventType']),
+                        new Item('tourdb:organizers',implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($eventsModel))),
+                        new Item('tourdb:instructors',implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel))),
+                        new Item('tourdb:tourtype',implode(', ', $calendarEventsHelperAdapter->getTourTypesAsArray($eventsModel, 'title'))),
+                        new Item('tourdb:difficulty',implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($eventsModel))),
+                    ])
+                );
             }
         }
 
@@ -161,7 +193,7 @@ class UpcomingEventsController extends AbstractController
                     $qb->expr()->andX("t.eventType = 'lastMinuteTour'"),
                 )
             )
-            ;
+        ;
         $qb->setParameter('published', '1');
         $qb->setParameter('startDate', time());
 
