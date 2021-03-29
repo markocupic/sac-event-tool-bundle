@@ -77,6 +77,8 @@ class UpcomingEventsController extends AbstractController
      */
     public function printLatestEvents(int $section = 4250, int $limit = 50): Response
     {
+        $limit = $limit < 1 ? 0 : $limit;
+
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $eventsAdapter = $this->framework->getAdapter(Events::class);
@@ -98,15 +100,16 @@ class UpcomingEventsController extends AbstractController
 
         // Set namespace
         $rss->setRootAttributes([
-            'xmlns:tourdb' => $environmentAdapter->get('url') . '/touren-trainings-und-anlaesse.html',
-            'xmlns:atom'=>'http://www.w3.org/2005/Atom',
+            'xmlns:tourdb' => $environmentAdapter->get('url').'/touren-trainings-und-anlaesse.html',
+            'xmlns:media' => 'http://search.yahoo.com/mrss/',
+            'xmlns:atom' => 'http://www.w3.org/2005/Atom',
         ]);
 
         // Add channel fields
 
         // Add atom link
         $rss->addChannelField(
-            new Item('atom:link', '',[],[
+            new Item('atom:link', '', [], [
                 'href' => $environmentAdapter->get('url').$filePath,
                 'rel' => 'self',
                 'type' => 'application/rss+xml',
@@ -118,7 +121,7 @@ class UpcomingEventsController extends AbstractController
         );
 
         $rss->addChannelField(
-            new Item('description', 'Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen')
+            new Item('description', 'Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen', ['cdata' => false])
         );
 
         $rss->addChannelField(
@@ -134,7 +137,7 @@ class UpcomingEventsController extends AbstractController
         );
 
         $rss->addChannelField(
-            new Item('pubDate', date('r', (time() - 3600)))
+            new Item('pubDate', date('r', time() - 3600))
         );
 
         $rss->addChannelField(
@@ -146,7 +149,7 @@ class UpcomingEventsController extends AbstractController
         );
 
         $rss->addChannelField(
-            new Item('category', 'Mountaineering events: ' . $sectionName)
+            new Item('category', 'Mountaineering events: '.$sectionName)
         );
 
         $rss->addChannelField(
@@ -163,16 +166,16 @@ class UpcomingEventsController extends AbstractController
             while (false !== ($arrEvent = $results->fetch())) {
                 $eventsModel = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
                 $rss->addChannelItemField(
-                    new ItemGroup('item',[
+                    new ItemGroup('item', [
                         new Item('title', $arrEvent['title']),
-                        new Item('link',$eventsAdapter->generateEventUrl($eventsModel, true)),
-                        new Item('description',$arrEvent['teaser'], ['cdata' => false]),
-                        new Item('pubDate', date('r',(int)$eventsModel->tstamp)),
-                        new Item('author',implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel))),
+                        new Item('link', $eventsAdapter->generateEventUrl($eventsModel, true)),
+                        new Item('description', $arrEvent['teaser'], ['cdata' => false]),
+                        new Item('pubDate', date('r', (int) $eventsModel->startDate)),
+                        new Item('author', implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel))),
                         //new Item('author',$calendarEventsHelperAdapter->getMainInstructorName($eventsModel)),
-                        new Item('guid',$eventsAdapter->generateEventUrl($eventsModel, true)),
-                        new Item('tourdb:startdate',date('Y-m-d', (int) $eventsModel->startDate)),
-                        new Item('tourdb:enddate',date('Y-m-d', (int) $eventsModel->endDate)),
+                        new Item('guid', $eventsAdapter->generateEventUrl($eventsModel, true)),
+                        new Item('tourdb:startdate', date('Y-m-d', (int) $eventsModel->startDate)),
+                        new Item('tourdb:enddate', date('Y-m-d', (int) $eventsModel->endDate)),
                         //new Item('tourdb:eventtype',$arrEvent['eventType']),
                         //new Item('tourdb:organizers',implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($eventsModel))),
                         //new Item('tourdb:instructors',implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel))),
@@ -182,7 +185,6 @@ class UpcomingEventsController extends AbstractController
                 );
             }
         }
-
 
         return $rss->render($this->projectDir.'/web'.$filePath);
     }
