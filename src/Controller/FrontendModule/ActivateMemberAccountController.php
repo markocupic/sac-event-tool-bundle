@@ -251,7 +251,7 @@ class ActivateMemberAccountController extends AbstractFrontendModuleController
             'eval' => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true],
         ]);
         $objForm->addFormField('agb', [
-            'label' => ['', sprintf($GLOBALS['TL_LANG']['MSC']['activateMemberAccount_agb'], '<a href="#" data-toggle="modal" data-target="#agbModal">', '</a>')],
+            'label' => ['', sprintf($GLOBALS['TL_LANG']['MSC']['activateMemberAccount_agb'], '<a href="#" data-bs-toggle="modal" data-bs-target="#agbModal">', '</a>')],
             'inputType' => 'checkbox',
             'eval' => ['mandatory' => true],
         ]);

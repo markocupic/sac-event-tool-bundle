@@ -34,10 +34,10 @@
     <div class="event-story-form-buttons d-flex flex-row align-items-center">
       <?php if ($this->publishState < 2): ?>
       <div class="me-2">
-        <button class="btn btn-primary" data-toggle="modal" data-target=".write-story-text-and-yt"><i class="fa fa-pencil"></i> Bericht bearbeiten</button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target=".write-story-text-and-yt"><i class="fa fa-pencil"></i> Bericht bearbeiten</button>
       </div>
       <div class="me-2">
-        <button class="btn btn-primary" data-toggle="modal" data-target=".write-story-fotoupload"><i class="fa fa-images"></i> Foto-Upload</button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target=".write-story-fotoupload"><i class="fa fa-images"></i> Foto-Upload</button>
       </div>
       <?php endif; ?>
 

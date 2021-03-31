@@ -423,7 +423,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
 
         // Let's add  a submit button
         $objForm->addFormField('submit', [
-            'label' => 'upload starten',
+            'label' => 'Bildupload starten',
             'inputType' => 'submit',
         ]);
 

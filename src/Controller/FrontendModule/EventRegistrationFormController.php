@@ -387,7 +387,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         }
 
         $objForm->addFormField('agb', [
-            'label' => ['', 'Ich akzeptiere <a href="#" data-toggle="modal" data-target="#agbModal">das Kurs- und Tourenreglement.</a>'],
+            'label' => ['', 'Ich akzeptiere <a href="#" data-bs-toggle="modal" data-bs-target="#agbModal">das Kurs- und Tourenreglement.</a>'],
             'inputType' => 'checkbox',
             'eval' => ['mandatory' => true],
         ]);
