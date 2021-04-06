@@ -20,6 +20,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\Environment;
 use Contao\Events;
+use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDO\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -75,7 +76,7 @@ class UpcomingEventsController extends AbstractController
      *
      * @Route("/_rssfeeds/sac_cas_upcoming_events/{section}/{limit}", name="sac_event_tool_rss_feed_sac_cas_upcoming_events", defaults={"_scope" = "frontend"})
      */
-    public function printLatestEvents(int $section = 4250, int $limit = 50): Response
+    public function printLatestEvents(int $section = 4250, int $limit = 100): Response
     {
         $limit = $limit < 1 ? 0 : $limit;
 
@@ -84,6 +85,7 @@ class UpcomingEventsController extends AbstractController
         $eventsAdapter = $this->framework->getAdapter(Events::class);
         $configAdapter = $this->framework->getAdapter(Config::class);
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         $sacEvtConfig = $configAdapter->get('SAC-EVENT-TOOL-CONFIG');
 
@@ -93,14 +95,16 @@ class UpcomingEventsController extends AbstractController
 
         $sectionName = $sacEvtConfig['SECTION_IDS'][$section];
 
-        $filePath = '/share/rss_feed_'.str_replace(' ', '_', strtolower($sectionName)).'.xml';
+        $filePath = 'share/rss_feed_'.str_replace(' ', '_', strtolower($sectionName)).'.xml';
 
         // Create feed
         $rss = $this->feedFactory->createFeed('utf-8');
 
         // Set namespace
         $rss->setRootAttributes([
-            'xmlns:tourdb' => $environmentAdapter->get('url').'/touren-trainings-und-anlaesse.html',
+            // Add xmlns:tourdb' => 'http://www.tourenangebot.ch/schema/tourdbrss/1.0,
+            // otherwise SAC Bern will not recognize events startdates and enddates
+            'xmlns:tourdb' => 'http://www.tourenangebot.ch/schema/tourdbrss/1.0',
             'xmlns:media' => 'http://search.yahoo.com/mrss/',
             'xmlns:atom' => 'http://www.w3.org/2005/Atom',
         ]);
@@ -110,22 +114,26 @@ class UpcomingEventsController extends AbstractController
         // Add atom link
         $rss->addChannelField(
             new Item('atom:link', '', [], [
-                'href' => $environmentAdapter->get('url').$filePath,
+                'href' => $environmentAdapter->get('base').$filePath,
                 'rel' => 'self',
                 'type' => 'application/rss+xml',
             ])
         );
 
         $rss->addChannelField(
-            new Item('title', $sectionName.' upcoming events')
+            new Item('title', $stringUtilAdapter->specialchars(strip_tags($stringUtilAdapter->stripInsertTags($sectionName.' upcoming events'))))
         );
 
         $rss->addChannelField(
-            new Item('description', 'Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen', ['cdata' => false])
+            new Item('title2', '<>')
         );
 
         $rss->addChannelField(
-            new Item('link', $environmentAdapter->get('url'))
+            new Item('description', $stringUtilAdapter->specialchars('Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen'), ['cdata' => false])
+        );
+
+        $rss->addChannelField(
+            new Item('link', $stringUtilAdapter->specialchars($environmentAdapter->get('url')))
         );
 
         $rss->addChannelField(
@@ -157,7 +165,7 @@ class UpcomingEventsController extends AbstractController
         );
 
         $rss->addChannelField(
-            new Item('generator', self::class)
+            new Item('generator', $stringUtilAdapter->specialchars(self::class))
         );
 
         $results = $this->getEvents($section, $limit);
@@ -165,15 +173,20 @@ class UpcomingEventsController extends AbstractController
         if (null !== $results) {
             while (false !== ($arrEvent = $results->fetch())) {
                 $eventsModel = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
+
+                $arrEvent = array_map(function($varValue){
+                    return str_replace(array('[-]', '&shy;', '[nbsp]', '&nbsp;'), array('', '', ' ', ' '), $varValue);
+                },$arrEvent);
+
                 $rss->addChannelItemField(
                     new ItemGroup('item', [
-                        new Item('title', $arrEvent['title']),
-                        new Item('link', $eventsAdapter->generateEventUrl($eventsModel, true)),
-                        new Item('description', $arrEvent['teaser'], ['cdata' => false]),
+                        new Item('title', $stringUtilAdapter->specialchars(strip_tags($stringUtilAdapter->stripInsertTags($arrEvent['title'])))),
+                        new Item('link', $stringUtilAdapter->specialchars($eventsAdapter->generateEventUrl($eventsModel, true))),
+                        new Item('description', preg_replace('/[\n\r]+/', ' ', $arrEvent['teaser']), ['cdata' => true]),
                         new Item('pubDate', date('r', (int) $eventsModel->startDate)),
                         new Item('author', implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel))),
                         //new Item('author',$calendarEventsHelperAdapter->getMainInstructorName($eventsModel)),
-                        new Item('guid', $eventsAdapter->generateEventUrl($eventsModel, true)),
+                        new Item('guid', $stringUtilAdapter->specialchars($eventsAdapter->generateEventUrl($eventsModel, true))),
                         new Item('tourdb:startdate', date('Y-m-d', (int) $eventsModel->startDate)),
                         new Item('tourdb:enddate', date('Y-m-d', (int) $eventsModel->endDate)),
                         //new Item('tourdb:eventtype',$arrEvent['eventType']),
@@ -186,7 +199,7 @@ class UpcomingEventsController extends AbstractController
             }
         }
 
-        return $rss->render($this->projectDir.'/web'.$filePath);
+        return $rss->render($this->projectDir.'/web/'.$filePath);
     }
 
     private function getEvents(int $section, int $limit): ?Statement
