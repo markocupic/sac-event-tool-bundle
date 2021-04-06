@@ -124,9 +124,7 @@ class UpcomingEventsController extends AbstractController
             new Item('title', $stringUtilAdapter->specialchars(strip_tags($stringUtilAdapter->stripInsertTags($sectionName.' upcoming events'))))
         );
 
-        $rss->addChannelField(
-            new Item('title2', '<>')
-        );
+       
 
         $rss->addChannelField(
             new Item('description', $stringUtilAdapter->specialchars('Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen'), ['cdata' => false])
