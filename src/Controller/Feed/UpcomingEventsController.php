@@ -121,10 +121,8 @@ class UpcomingEventsController extends AbstractController
         );
 
         $rss->addChannelField(
-            new Item('title', $stringUtilAdapter->specialchars(strip_tags($stringUtilAdapter->stripInsertTags($sectionName.' upcoming events'))))
+            new Item('title', str_replace(['&quot;', '&#40;', '&#41;'], ['"', '(', ')'], $stringUtilAdapter->specialchars(strip_tags($stringUtilAdapter->stripInsertTags($sectionName.' upcoming events')))))
         );
-
-       
 
         $rss->addChannelField(
             new Item('description', $stringUtilAdapter->specialchars('Provides the latest events for https://www.sac-cas.ch/de/der-sac/sektionen'), ['cdata' => false])
@@ -172,15 +170,17 @@ class UpcomingEventsController extends AbstractController
             while (false !== ($arrEvent = $results->fetch())) {
                 $eventsModel = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
 
-                $arrEvent = array_map(function($varValue){
-                    return str_replace(array('[-]', '&shy;', '[nbsp]', '&nbsp;'), array('', '', ' ', ' '), $varValue);
-                },$arrEvent);
-
+                $arrEvent = array_map(
+                    static function ($varValue) {
+                        return str_replace(['&quot;', '&#40;', '&#41;', '[-]', '&shy;', '[nbsp]', '&nbsp;'], ['"', '(', ')', '', '', ' ', ' '], $varValue);
+                    },
+                    $arrEvent
+                );
                 $rss->addChannelItemField(
                     new ItemGroup('item', [
-                        new Item('title', $stringUtilAdapter->specialchars(strip_tags($stringUtilAdapter->stripInsertTags($arrEvent['title'])))),
+                        new Item('title', strip_tags($stringUtilAdapter->stripInsertTags($arrEvent['title'])), ['cdata' => true]),
                         new Item('link', $stringUtilAdapter->specialchars($eventsAdapter->generateEventUrl($eventsModel, true))),
-                        new Item('description', preg_replace('/[\n\r]+/', ' ', $arrEvent['teaser']), ['cdata' => true]),
+                        new Item('description', strip_tags(preg_replace('/[\n\r]+/', ' ', $arrEvent['teaser'])), ['cdata' => true]),
                         new Item('pubDate', date('r', (int) $eventsModel->startDate)),
                         new Item('author', implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel))),
                         //new Item('author',$calendarEventsHelperAdapter->getMainInstructorName($eventsModel)),
