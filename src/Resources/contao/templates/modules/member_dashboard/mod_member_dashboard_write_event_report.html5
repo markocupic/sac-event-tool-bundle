@@ -65,7 +65,7 @@
     <!-- Modal Box text and youtube -->
     <div class="modal fade write-story-text-and-yt" tabindex="-1" role="dialog" aria-labelledby="ModalUploadTextAndYt"
          aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-dialog modal-lg modal-fullscreen-xl-down" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Bericht erstellen</h5>
@@ -81,7 +81,7 @@
     <!-- Modal Box photo upload -->
     <div class="modal fade write-story-fotoupload" tabindex="-1" role="dialog" aria-labelledby="ModalUploadFoto"
          aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-dialog modal-fullscreen-xl-down modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Fotoupload</h5>
@@ -96,7 +96,7 @@
 
     <!-- Modal Box image caption -->
     <div class="modal fade write-story-image-caption" tabindex="-1" role="dialog" aria-labelledby="ModalImageCaption" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-dialog modal-fullscreen-xl-down modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="ModalImageCaption">Bildunterschrift</h5>
