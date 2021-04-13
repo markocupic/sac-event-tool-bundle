@@ -18,7 +18,7 @@
 <?php endif; ?>
 
 
-<div class="alert bg-light">
+<div class="alert flex-column bg-light">
   <?= $this->newEventStoryForm ?>
   <p class="small">*Tourenberichte können bis maximal <?= $this->timeSpanForCreatingNewEventStory ?> Tage nach Tourende verfasst werden.</p>
 </div>
