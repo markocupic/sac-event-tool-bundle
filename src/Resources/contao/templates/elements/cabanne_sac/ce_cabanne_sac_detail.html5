@@ -13,13 +13,13 @@
 
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="kontakt-tab" data-toggle="tab" href="#kontakt" role="tab" aria-controls="kontakt" aria-selected="true">Kontakt</a>
+                    <a class="nav-link active" id="kontakt-tab" data-bs-toggle="tab" href="#kontakt" role="tab" aria-controls="kontakt" aria-selected="true">Kontakt</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="false">Details</a>
+                    <a class="nav-link" id="details-tab" data-bs-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="false">Details</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="bewartung-tab" data-toggle="tab" href="#bewartung" role="tab" aria-controls="bewartung" aria-selected="false">Bewartung</a>
+                    <a class="nav-link" id="bewartung-tab" data-bs-toggle="tab" href="#bewartung" role="tab" aria-controls="bewartung" aria-selected="false">Bewartung</a>
                 </li>
             </ul>
 
