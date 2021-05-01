@@ -241,10 +241,54 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             }
         }
 
+        // Check if all images are labeled with a legend and a photographer name
+        if ($objReportModel) {
+            if (!$this->validateImageUploads($objReportModel)) {
+                $messageAdapter->addInfo('Es fehlen noch eine oder mehrere Bildlegenden oder der Fotografen-Name. Bitte ergänze diese Angaben, damit der Bericht veröffentlicht werden kann.');
+            }
+        }
+
         // Add messages to template
         $this->addMessagesToTemplate();
 
         return $this->template->getResponse();
+    }
+
+    protected function validateImageUploads(CalendarEventsStoryModel $objReportModel): bool
+    {
+        /** @var StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+
+        /** @var FilesModel $filesModelAdapter */
+        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
+
+        // Check for a valid photographer name an exiting image legends
+        if (!empty($objReportModel->multiSRC) && !empty($stringUtilAdapter->deserialize($objReportModel->multiSRC, true))) {
+            $arrUuids = $stringUtilAdapter->deserialize($objReportModel->multiSRC, true);
+            $objFiles = $filesModelAdapter->findMultipleByUuids($arrUuids);
+            $blnMissingLegend = false;
+            $blnMissingPhotographerName = false;
+
+            while ($objFiles->next()) {
+                if (null !== $objFiles) {
+                    $arrMeta = $stringUtilAdapter->deserialize($objFiles->meta, true);
+
+                    if (!isset($arrMeta['de']['caption']) || '' === $arrMeta['de']['caption']) {
+                        $blnMissingLegend = true;
+                    }
+
+                    if (!isset($arrMeta['de']['photographer']) || '' === $arrMeta['de']['photographer']) {
+                        $blnMissingPhotographerName = true;
+                    }
+                }
+            }
+
+            if ($blnMissingLegend || $blnMissingPhotographerName) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -300,20 +344,101 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         $url = $environmentAdapter->get('uri');
         $objForm->setFormActionFromUri($url);
 
-        // Add some fields
+        // do publish report in the club magazine
+        $objForm->addFormField('doPublishInClubMagazine', [
+            'label' => ['', 'Veröffentlichung im Pilatus (Clubzeitschrift)'],
+            'inputType' => 'checkbox',
+            'value' => $objEventStoryModel->doPublishInClubMagazine,
+        ]);
+
+        // text
         $objForm->addFormField('text', [
             'label' => 'Touren-/Lager-/Kursbericht',
             'inputType' => 'textarea',
-            'eval' => ['decodeEntities' => true],
+            'eval' => ['mandatory' => true, 'maxlength' => 1800, 'rows' => 8, 'decodeEntities' => true],
             'value' => html_entity_decode((string) $objEventStoryModel->text),
         ]);
 
-        // Add some fields
-        $objForm->addFormField('youtubeId', [
-            'label' => 'Youtube Film-Id',
-            'inputType' => 'text',
-            'eval' => [],
-            'value' => $objEventStoryModel->youtubeId,
+        // youtube id
+        $objForm->addFormField('youtubeId',
+            [
+                'label' => 'Youtube Film-Id',
+                'inputType' => 'text',
+                'eval' => [],
+                'value' => $objEventStoryModel->youtubeId,
+            ]
+        );
+
+        // Add attributes
+        $objWidgetYt = $objForm->getWidget('youtubeId');
+        $objWidgetYt->addAttribute('placeholder', 'z.B. G02hYgT3nGw');
+
+        // tour waypoints
+        $eval = ['class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
+
+        if ($objEventStoryModel->doPublishInClubMagazine) {
+            $eval['mandatory'] = true;
+        }
+        $objForm->addFormField(
+                'tourWaypoints',
+                [
+                    'label' => 'Tourenstationen mit Höhenangaben',
+                    'inputType' => 'textarea',
+                    'eval' => $eval,
+                    'value' => html_entity_decode((string) $objEventStoryModel->tourWaypoints),
+                ]
+            );
+
+        // tour profile
+        $eval = ['class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
+
+        if ($objEventStoryModel->doPublishInClubMagazine) {
+            $eval['mandatory'] = true;
+        }
+        $objForm->addFormField(
+                'tourProfile',
+                [
+                    'label' => 'Höhenmeter und Zeitangabe pro Tag',
+                    'inputType' => 'textarea',
+                    'eval' => $eval,
+                    'value' => html_entity_decode((string) $this->getTourProfile($objEventStoryModel)),
+                ]
+            );
+
+        // tour difficulties
+        $eval = ['class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
+
+        if ($objEventStoryModel->doPublishInClubMagazine) {
+            $eval['mandatory'] = true;
+        }
+        $objForm->addFormField('tourTechDifficulty', [
+            'label' => 'Technische Schwierigkeiten',
+            'inputType' => 'textarea',
+            'eval' => $eval,
+            'value' => html_entity_decode((string) $this->getTourTechDifficulties($objEventStoryModel)),
+        ]);
+
+        // tour highlights (not mandatory)
+        $eval = ['class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
+
+        $objForm->addFormField('tourHighlights', [
+            'label' => 'Highlights/Bemerkungen',
+            'inputType' => 'textarea',
+            'eval' => $eval,
+            'value' => html_entity_decode((string) $objEventStoryModel->tourHighlights),
+        ]);
+
+        // tour public transport info
+        $eval = ['class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
+
+        if ($objEventStoryModel->doPublishInClubMagazine) {
+            $eval['mandatory'] = true;
+        }
+        $objForm->addFormField('tourPublicTransportInfo', [
+            'label' => 'Mögliche ÖV-Verbindung',
+            'inputType' => 'textarea',
+            'eval' => $eval,
+            'value' => html_entity_decode((string) $objEventStoryModel->tourPublicTransportInfo),
         ]);
 
         // Let's add  a submit button
@@ -322,27 +447,107 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             'inputType' => 'submit',
         ]);
 
-        // Add attributes
-        $objWidgetYt = $objForm->getWidget('youtubeId');
-        $objWidgetText = $objForm->getWidget('text');
-
-        $objWidgetYt->addAttribute('placeholder', 'z.B. G02hYgT3nGw');
-
         // Bind model
         $objForm->bindModel($objEventStoryModel);
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate() && $inputAdapter->post('FORM_SUBMIT') === $objForm->getFormId()) {
             $objEventStoryModel->addedOn = time();
-            $objEventStoryModel->text = htmlspecialchars($objWidgetText->value);
-            $objEventStoryModel->youtubeId = $objWidgetYt->value;
+            $objEventStoryModel->text = htmlspecialchars((string) $objForm->getWidget('text')->value);
+            $objEventStoryModel->youtubeId = $objForm->getWidget('youtubeId')->value;
+            $objEventStoryModel->tourWaypoints = htmlspecialchars((string) $objForm->getWidget('tourWaypoints')->value);
+            $objEventStoryModel->tourProfile = htmlspecialchars((string) $objForm->getWidget('tourProfile')->value);
+            $objEventStoryModel->tourTechDifficulty = htmlspecialchars((string) $objForm->getWidget('tourTechDifficulty')->value);
+            $objEventStoryModel->tourHighlights = htmlspecialchars((string) $objForm->getWidget('tourHighlights')->value);
+            $objEventStoryModel->tourPublicTransportInfo = htmlspecialchars((string) $objForm->getWidget('tourPublicTransportInfo')->value);
+
             $objEventStoryModel->save();
 
+            $hasErrors = false;
+
+            // Check mandatory fields
+            if ('' === $objForm->getWidget('text')->value) {
+                $objForm->getWidget('text')
+                    ->addError('Bitte schreibe etwas zur Tour.')
+                ;
+                $hasErrors = true;
+            }
+
+            if ($objEventStoryModel->doPublishInClubMagazine) {
+                if ('' === $objEventStoryModel->tourWaypoints) {
+                    $objForm->getWidget('tourWaypoints')
+                        ->addError('Bitte ergänze die Tourenstationen mit den Höhenangaben.')
+                    ;
+                    $hasErrors = true;
+                }
+
+                if ('' === $objEventStoryModel->tourProfile) {
+                    $objForm->getWidget('tourProfile')
+                        ->addError('Bitte ergänzen Sie das Tourenprofil und mache Angaben zu den Höhenmetern und der Zeit.')
+                    ;
+                    $hasErrors = true;
+                }
+
+                if ('' === $objEventStoryModel->tourTechDifficulty) {
+                    $objForm->getWidget('tourTechDifficulty')
+                        ->addError('Bitte mache Angaben zu den technischen Schwierigkeiten der Tour.')
+                    ;
+                    $hasErrors = true;
+                }
+
+                if ('' === $objEventStoryModel->tourPublicTransportInfo) {
+                    $objForm->getWidget('tourPublicTransportInfo')
+                        ->addError('Bitte mache Angaben zu den möglichen ÖV-Verbindungen der Tour.')
+                    ;
+                    $hasErrors = true;
+                }
+            }
+
             // Reload page
-            $controllerAdapter->reload();
+            if (!$hasErrors) {
+                $controllerAdapter->reload();
+            }
         }
 
         return $objForm->generate();
+    }
+
+    protected function getTourProfile(CalendarEventsStoryModel $objEventStoryModel): string
+    {
+        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+
+        if (!empty($objEventStoryModel->tourProfile)) {
+            return $objEventStoryModel->tourProfile;
+        }
+        $objEvent = $calendarEventsModelAdapter->findByPk($objEventStoryModel->eventId);
+
+        if (null !== $objEvent) {
+            $arrData = $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent);
+
+            return implode("\r\n", $arrData);
+        }
+
+        return '';
+    }
+
+    protected function getTourTechDifficulties(CalendarEventsStoryModel $objEventStoryModel): string
+    {
+        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+
+        if (!empty($objEventStoryModel->tourTechDifficulty)) {
+            return $objEventStoryModel->tourTechDifficulty;
+        }
+        $objEvent = $calendarEventsModelAdapter->findByPk($objEventStoryModel->eventId);
+
+        if (null !== $objEvent) {
+            $arrData = $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent);
+
+            return implode("\r\n", $arrData);
+        }
+
+        return '';
     }
 
     /**

@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 	// Palettes
 	'palettes'    => array
 	(
-		'default' => '{publishState_legend},publishState;{author_legend},addedOn,sacMemberId,authorName;{event_legend},eventId,title,eventTitle,eventSubstitutionText,organizers,text,youtubeId,multiSRC;',
+		'default' => '{publishState_legend},publishState,doPublishInClubMagazine;{author_legend},addedOn,sacMemberId,authorName;{event_legend},eventId,title,eventTitle,eventSubstitutionText,organizers,text,youtubeId,multiSRC;{tourInfoBox_legend},tourWaypoints,tourProfile,tourTechDifficulty,tourHighlights',
 	),
 
 	// Subpalettes
@@ -122,7 +122,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 		),
 		'publishState'          => array
 		(
-			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['publishState'],
 			'filter'    => true,
 			'default'   => 1,
 			'reference' => $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'],
@@ -131,9 +130,16 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 			'eval'      => array('tl_class' => 'clr', 'submitOnChange' => true),
 			'sql'       => "char(1) NOT NULL default '1'",
 		),
+		'doPublishInClubMagazine'          => array
+		(
+			'filter'    => true,
+			'default'   => 1,
+			'inputType' => 'checkbox',
+			'eval'      => array('tl_class' => 'clr', 'submitOnChange' => false),
+			'sql'       => "char(1) NOT NULL default ''",
+		),
 		'authorName'            => array
 		(
-			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['authorName'],
 			'filter'    => true,
 			'sorting'   => true,
 			'inputType' => 'text',
@@ -142,21 +148,18 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 		),
 		'eventTitle'            => array
 		(
-			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['eventTitle'],
 			'inputType' => 'text',
 			'eval'      => array('doNotCopy' => true, 'mandatory' => true, 'readonly' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
 			'sql'       => "varchar(255) NOT NULL default ''",
 		),
 		'eventSubstitutionText' => array
 		(
-			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['eventSubstitutionText'],
 			'inputType' => 'text',
 			'eval'      => array('doNotCopy' => true, 'mandatory' => false, 'readonly' => true, 'maxlength' => 64, 'tl_class' => 'clr'),
 			'sql'       => "varchar(255) NOT NULL default ''",
 		),
 		'eventStartDate'        => array
 		(
-			'label'   => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['eventStartDate'],
 			'sorting' => true,
 			'flag'    => 6,
 			'sql'     => "int(10) unsigned NOT NULL default '0'",
@@ -171,35 +174,30 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 		),
 		'title'                 => array
 		(
-			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['title'],
 			'inputType' => 'text',
 			'eval'      => array('doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'),
 			'sql'       => "varchar(255) NOT NULL default ''",
 		),
 		'text'                  => array
 		(
-			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['text'],
 			'inputType' => 'textarea',
 			'eval'      => array('doNotCopy' => true, 'mandatory' => true, 'tl_class' => 'clr'),
 			'sql'       => "mediumtext NULL",
 		),
 		'youtubeId'             => array
 		(
-			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['youtubeId'],
 			'inputType' => 'text',
 			'eval'      => array('doNotCopy' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'),
 			'sql'       => "varchar(255) NOT NULL default ''",
 		),
 		'sacMemberId'           => array
 		(
-			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['sacMemberId'],
 			'inputType' => 'text',
 			'eval'      => array('mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'readonly' => true),
 			'sql'       => "varchar(255) NOT NULL default ''",
 		),
 		'multiSRC'              => array
 		(
-			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['multiSRC'],
 			'exclude'   => true,
 			'inputType' => 'fileTree',
 			'eval'      => array('doNotCopy' => true, 'isGallery' => true, 'extensions' => 'jpg,jpeg', 'multiple' => true, 'fieldType' => 'checkbox', 'orderField' => 'orderSRC', 'files' => true, 'mandatory' => false, 'tl_class' => 'clr'),
@@ -207,12 +205,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 		),
 		'orderSRC'              => array
 		(
-			'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['orderSRC'],
 			'eval'  => array('doNotCopy' => true),
 			'sql'   => "blob NULL",
 		),
 		'organizers'            => array(
-			'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['organizers'],
 			'exclude'    => true,
 			'search'     => true,
 			'filter'     => true,
@@ -228,13 +224,42 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 		),
 		'addedOn'               => array
 		(
-			'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['addedOn'],
 			'default'   => time(),
 			'flag'      => 8,
 			'sorting'   => true,
 			'inputType' => 'text',
 			'eval'      => array('rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => false, 'datepicker' => true, 'tl_class' => 'w50 wizard'),
 			'sql'       => "int(10) unsigned NULL",
+		),
+		'tourWaypoints'                  => array
+		(
+			'inputType' => 'textarea',
+			'eval'      => array('doNotCopy' => true, 'mandatory' => false, 'tl_class' => 'clr'),
+			'sql'       => "mediumtext NULL",
+		),
+		'tourProfile'                  => array
+		(
+			'inputType' => 'textarea',
+			'eval'      => array('doNotCopy' => true, 'mandatory' => false, 'tl_class' => 'clr'),
+			'sql'       => "mediumtext NULL",
+		),
+		'tourTechDifficulty'                  => array
+		(
+			'inputType' => 'textarea',
+			'eval'      => array('doNotCopy' => true, 'mandatory' => false, 'tl_class' => 'clr'),
+			'sql'       => "mediumtext NULL",
+		),
+		'tourHighlights'                  => array
+		(
+			'inputType' => 'textarea',
+			'eval'      => array('doNotCopy' => true, 'mandatory' => false, 'tl_class' => 'clr'),
+			'sql'       => "mediumtext NULL",
+		),
+		'tourPublicTransportInfo'                  => array
+		(
+			'inputType' => 'textarea',
+			'eval'      => array('doNotCopy' => true, 'mandatory' => false, 'tl_class' => 'clr'),
+			'sql'       => "mediumtext NULL",
 		),
 	),
 );

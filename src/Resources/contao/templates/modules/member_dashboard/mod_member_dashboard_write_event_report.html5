@@ -1,3 +1,5 @@
+<?php $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao-component-vue-js/vue/dist/vue.min.js|static'; ?>
+
 <?php $this->extend('block_unsearchable'); ?>
 
 <?php $this->block('content'); ?>
@@ -63,7 +65,7 @@
 
 
     <!-- Modal Box text and youtube -->
-    <div class="modal fade write-story-text-and-yt" tabindex="-1" role="dialog" aria-labelledby="ModalUploadTextAndYt"
+    <div id="ModalUploadTextAndYt" class="modal fade write-story-text-and-yt" tabindex="-1" role="dialog" aria-labelledby="ModalUploadTextAndYt"
          aria-hidden="true">
       <div class="modal-dialog modal-lg modal-fullscreen-xl-down" role="document">
         <div class="modal-content">
@@ -77,6 +79,44 @@
         </div>
       </div>
     </div>
+
+    <script>
+      (function ($) {
+        // Hide/Show fields if the report should be published in the club magazine
+        jQuery(document).ready(function () {
+
+          let checkBox = document.getElementById('opt_doPublishInClubMagazine_0');
+          checkBox.addEventListener('change', (event) => {
+            if(checkBox.checked)
+            {
+              $('.publish-clubmagazine-field').removeClass('d-none');
+            }else{
+              $('.publish-clubmagazine-field').addClass('d-none');
+            }
+          });
+
+          if(checkBox.checked)
+          {
+            $('.publish-clubmagazine-field').removeClass('d-none');
+          }else{
+            $('.publish-clubmagazine-field').addClass('d-none');
+          }
+        });
+      })(jQuery);
+    </script>
+
+    <script>
+      (function ($) {
+        jQuery(document).ready(function () {
+
+          if($('#ModalUploadTextAndYt .widget.error').length)
+          {
+            let modal = new bootstrap.Modal(document.getElementById('ModalUploadTextAndYt'));
+            modal.show();
+          }
+        });
+      })(jQuery);
+    </script>
 
     <!-- Modal Box photo upload -->
     <div class="modal fade write-story-fotoupload" tabindex="-1" role="dialog" aria-labelledby="ModalUploadFoto"
@@ -99,7 +139,7 @@
       <div class="modal-dialog modal-fullscreen-xl-down modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="ModalImageCaption">Bildunterschrift</h5>
+            <h5 class="modal-title" id="ModalImageCaption">Bildinformationen</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
           </div>
           <div class="modal-body">
@@ -107,14 +147,16 @@
               <img class="image-full-res" src=""/>
             </figure>
             {{br}}
-            <div class="form-group">
-              <label for="imageCaptionInput">Bildunterschrift</label>
-              <input class="form-control" id="imageCaptionInput" name="image-caption" type="text" placeholder="">
-            </div>
-            {{br}}
-            <div class="form-group">
-              <label for="imagePhotographerInput">Photograph/Bildeigent&uuml;mer</label>
-              <input class="form-control" id="imagePhotographerInput" name="image-photographer" type="text" placeholder="">
+            <div class="row">
+              <div class="col-12">
+                <label for="imageCaptionInput">Bildlegende</label>
+                <input class="form-control" id="imageCaptionInput" name="image-caption" type="text" placeholder="" required>
+              </div>
+              {{br}}
+              <div class="col-12">
+                <label for="imagePhotographerInput">Fotograf/Bildeigent&uuml;mer</label>
+                <input class="form-control" id="imagePhotographerInput" name="image-photographer" type="text" placeholder="">
+              </div>
             </div>
           </div>
           <div class="modal-footer">
@@ -188,12 +230,14 @@
     </div>
     <!-- End gallery -->
 
+
+
     <?php if ($this->publishState < 2): ?>
     <script>
         (function ($) {
             jQuery(document).ready(function () {
 
-                // Open modal for caption edit
+              // Open modal for caption edit
                 $('button.add-caption').click(function () {
                     var path = $(this).closest('.thumbnail').attr('data-path');
                     var item = $(this).closest('.thumbnail').attr('data-item');
@@ -243,7 +287,7 @@
                             console.log(json);
                         }
                     }).always(function () {
-                        //window.location.reload();
+                        window.location.reload();
                     });
                 });
             });

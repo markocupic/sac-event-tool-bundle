@@ -127,6 +127,9 @@ class MemberDashboardWriteEventReportController extends AbstractController
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
+        /** @var FilesModel $filesModelAdapter */
+        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
@@ -184,6 +187,32 @@ class MemberDashboardWriteEventReportController extends AbstractController
 
         if (null === $objStory) {
             return new JsonResponse(['status' => 'error']);
+        }
+
+        // Check for a valid photographer name an exiting image legends
+        if (!empty($objStory->multiSRC) && !empty($stringUtilAdapter->deserialize($objStory->multiSRC, true))) {
+            $arrUuids = $stringUtilAdapter->deserialize($objStory->multiSRC, true);
+            $objFiles = $filesModelAdapter->findMultipleByUuids($arrUuids);
+            $blnMissingLegend = false;
+            $blnMissingPhotographerName = false;
+
+            while ($objFiles->next()) {
+                if (null !== $objFiles) {
+                    $arrMeta = $stringUtilAdapter->deserialize($objFiles->meta, true);
+
+                    if (!isset($arrMeta['de']['caption']) || '' === $arrMeta['de']['caption']) {
+                        $blnMissingLegend = true;
+                    }
+
+                    if (!isset($arrMeta['de']['photographer']) || '' === $arrMeta['de']['photographer']) {
+                        $blnMissingPhotographerName = true;
+                    }
+                }
+            }
+
+            if ($blnMissingLegend || $blnMissingPhotographerName) {
+                return new JsonResponse(['status' => 'error']);
+            }
         }
 
         // Notify office if there is a new story
