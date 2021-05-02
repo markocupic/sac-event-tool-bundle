@@ -29,6 +29,7 @@ use Contao\MemberModel;
 use Contao\StringUtil;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\ZipBundle\Zip\Zip;
 
 /**
  * Class TlCalendarEventsStory.
@@ -138,7 +139,7 @@ class TlCalendarEventsStory extends Backend
                 $i = 0;
 
                 while ($objFiles->next()) {
-                    if(!is_file(TL_ROOT. '/' . $objFiles->path)){
+                    if (!is_file(TL_ROOT.'/'.$objFiles->path)) {
                         continue;
                     }
                     ++$i;
@@ -154,10 +155,33 @@ class TlCalendarEventsStory extends Backend
             }
         }
 
-        $objPhpWord->sendToBrowser(true)
+        $zipSrc = sprintf(
+            '%s/system/tmp/article_%s_%s.zip',
+            TL_ROOT,
+            $objArticle->id,
+            time()
+        );
+
+        // Generate docx and save it in system/tmp/...
+        $objPhpWord->sendToBrowser(false)
             ->generateUncached(true)
             ->generate()
         ;
+
+        // Zip archive
+        $zip = (new Zip())
+            ->ignoreDotFiles(false)
+            ->stripSourcePath(TL_ROOT.'/'.$targetDir)
+            ->addDirRecursive(TL_ROOT.'/'.$targetDir)
+            ->run($zipSrc)
+        ;
+
+        // Send zip archive to browser
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="'.basename($zipSrc).'"');
+        header('Content-Length: '.filesize($zipSrc));
+        readfile($zipSrc);
+        exit();
     }
 
     public function getMeta(FilesModel $objFile, string $lang = 'de'): array

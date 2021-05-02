@@ -23,6 +23,7 @@ use Contao\Events;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDO\Statement;
+use Doctrine\DBAL\ForwardCompatibility\Result;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory;
 use Markocupic\RssFeedGeneratorBundle\Item\Item;
@@ -200,7 +201,7 @@ class UpcomingEventsController extends AbstractController
         return $rss->render($this->projectDir.'/web/'.$filePath);
     }
 
-    private function getEvents(int $section, int $limit): ?Statement
+    private function getEvents(int $section, int $limit): ?Result
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select('id')
