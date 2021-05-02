@@ -8,6 +8,8 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+// Operations
+$GLOBALS['TL_LANG']['tl_calendar_events_story']['exportArticle'] = array("Artikel exportieren", "Artikel mit ID %s exportieren");
 
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishState_legend'] = "Status Einstellungen";
@@ -25,6 +27,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][3] = 'Bericht
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['addedOn'] = array("Erstellungsdatum", "Geben Sie das Erstellungsdatum en.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishState'] = array("Veröffentlichungsstatus", "Geben Sie den Veröffenlichungslevel ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['doPublishInClubMagazine'] = array("In Clubzeitschrift veröffentlichen", "Geben Sie an, ob der Bericht für die Veröffentlichung in der Clubzeitschrift vorgesehen werden soll.");
+$GLOBALS['TL_LANG']['tl_calendar_events_story']['checkedByInstructor'] = array("Durch Tourenleiter geprüft", "Geben Sie an, ob der Bericht durch den verantwortlichen Tourenleiter geprüft wurde.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['sacMemberId'] = array("SAC-Mitgliedernummer des Autors", "");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['authorName'] = array("Name des Autors", "Geben Sie den Namen des Autors an.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['pid'] = array("Event-ID", "Geben Sie die Event-ID an.");

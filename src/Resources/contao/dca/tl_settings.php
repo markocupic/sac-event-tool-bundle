@@ -13,9 +13,12 @@
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
 PaletteManipulator::create()
-	->addLegend('sacEventTool_legend', 'global_legend')
+	// Legends
+    ->addLegend('sacEventTool_legend', 'global_legend')
 	->addLegend('sacWorkshopFlyer_legend', 'global_legend')
-	->addField(array('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
+    ->addLegend('sacTourArticle_legend', 'global_legend')
+    // Fields
+    ->addField(array('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('SAC_EVT_SAC_SECTION_IDS'), 'sacEventTool_legend', PaletteManipulator::POSITION_APPEND)
@@ -52,7 +55,8 @@ PaletteManipulator::create()
 	->addField(array('SAC_EVT_WORKSHOP_FLYER_YEAR'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'), 'sacWorkshopFlyer_legend', PaletteManipulator::POSITION_APPEND)
-
+    ->addField(array('SAC_EVT_TOUR_ARTICLE_EXPORT_TEMPLATE_SRC'), 'sacTourArticle_legend', PaletteManipulator::POSITION_APPEND)
+    // Apply Palette
 	->applyToPalette('default', 'tl_settings');
 
 // Member Database Bern
@@ -282,4 +286,10 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_ACCEPT_REGISTRATION_EMAIL_T
 	'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'],
 	'inputType' => 'textarea',
 	'eval'      => array('mandatory' => true, 'preserveTags' => true, 'allowHtml' => true, 'decodeEntities' => false, 'tl_class' => 'clr'),
+);
+
+$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_TOUR_ARTICLE_EXPORT_TEMPLATE_SRC'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_TOUR_ARTICLE_EXPORT_TEMPLATE_SRC'],
+    'inputType' => 'text',
+    'eval'      => array('mandatory' => true, 'decodeEntities' => false, 'tl_class' => 'w50'),
 );

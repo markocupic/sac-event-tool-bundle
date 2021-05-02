@@ -17,9 +17,17 @@ namespace Markocupic\SacEventToolBundle\Dca;
 use Contao\Backend;
 use Contao\CalendarEventsModel;
 use Contao\CalendarEventsStoryModel;
+use Contao\Config;
 use Contao\Database;
 use Contao\DataContainer;
+use Contao\Environment;
+use Contao\Files;
+use Contao\FilesModel;
+use Contao\Folder;
+use Contao\Input;
+use Contao\MemberModel;
 use Contao\StringUtil;
+use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
@@ -34,6 +42,139 @@ class TlCalendarEventsStory extends Backend
     {
         parent::__construct();
         $this->import('BackendUser', 'User');
+
+        if ('exportArticle' === Input::get('action') && Input::get('id') && null !== CalendarEventsStoryModel::findByPk(Input::get('id'))) {
+            $objArticle = CalendarEventsStoryModel::findByPk(Input::get('id'));
+            $this->exportArticle($objArticle);
+        }
+    }
+
+    public function exportArticle(CalendarEventsStoryModel $objArticle): void
+    {
+        $objEvent = CalendarEventsModel::findByPk($objArticle->eventId);
+
+        if (null === $objEvent) {
+            throw new \Exception('Event not found.');
+        }
+
+        $templSrc = Config::get('SAC_EVT_TOUR_ARTICLE_EXPORT_TEMPLATE_SRC');
+
+        if (!is_file(TL_ROOT.'/'.$templSrc)) {
+            throw new \Exception('Template file not found.');
+        }
+        // target dir & file
+        $targetDir = sprintf('system/tmp/article_%s_%s', $objArticle->id, time());
+        $imageDir = sprintf('%s/images', $targetDir);
+        new Folder($imageDir);
+        $targetFile = sprintf('%s/event_article_%s.docx', $targetDir, $objArticle->id);
+        $objPhpWord = new MsWordTemplateProcessor($templSrc, $targetFile);
+
+        // Organizers
+        $arrOrganizers = CalendarEventsHelper::getEventOrganizersAsArray($objEvent);
+        $strOrganizers = implode(', ', $arrOrganizers);
+
+        // Instructors
+        $arrInstructors = CalendarEventsHelper::getInstructorNamesAsArray($objEvent);
+        $strInstructors = implode(', ', $arrInstructors);
+
+        $objMember = MemberModel::findBySacMemberId($objArticle->sacMemberId);
+        $strAuthorEmail = '';
+
+        if (null !== $objMember) {
+            $strAuthorEmail = $objMember->email;
+        }
+
+        // Event dates
+        $arrEventDates = CalendarEventsHelper::getEventTimestamps($objEvent);
+        $arrEventDates = array_map(
+            static function ($tstamp) {
+                return date('Y-m-d', (int) $tstamp);
+            },
+            $arrEventDates
+        );
+        $strEventDates = implode('\r\n', $arrEventDates);
+
+        // Do publish in the club magazine
+        $strDoPublishClubMagazine = $objArticle->doPublishClubMagazine ? 'Ja' : 'Nein';
+
+        // Checked by instructor
+        $strCheckedByInstructor = $objArticle->checkedByInstructor ? 'Ja' : 'Nein';
+
+        // Backend url
+        $strUrlBackend = sprintf(
+            '%s/contao?do=sac_calendar_event_stories_tool&act=edit&id=%s',
+            Environment::get('url'),
+            $objArticle->id
+        );
+
+        $options = ['multiline' => true];
+        $objPhpWord->replace('doPublishClubMagazine', $strDoPublishClubMagazine, $options);
+        $objPhpWord->replace('checkedByInstructor', $strCheckedByInstructor, $options);
+        $objPhpWord->replace('title', $objArticle->title, $options);
+        $objPhpWord->replace('text', $objArticle->text, $options);
+        $objPhpWord->replace('authorName', $objArticle->authorName, $options);
+        $objPhpWord->replace('sacMemberId', $objArticle->sacMemberId, $options);
+        $objPhpWord->replace('authorEmail', $strAuthorEmail, $options);
+        $objPhpWord->replace('addedOn', date('Y-m-d', (int) $objArticle->addedOn), $options);
+        $objPhpWord->replace('organizers', $strOrganizers, $options);
+        $objPhpWord->replace('instructors', $strInstructors, $options);
+        $objPhpWord->replace('eventDates', $strEventDates, $options);
+        $objPhpWord->replace('tourWaypoints', $objArticle->tourWaypoints, $options);
+        $objPhpWord->replace('tourTechDifficulty', $objArticle->tourTechDifficulty, $options);
+        $objPhpWord->replace('tourProfile', $objArticle->tourProfile, $options);
+        $objPhpWord->replace('tourHighlights', $objArticle->tourHighlights, $options);
+        $objPhpWord->replace('tourPublicTransportInfo', $objArticle->tourPublicTransportInfo, $options);
+        // Footer
+        $objPhpWord->replace('eventId', $objEvent->id);
+        $objPhpWord->replace('articleId', $objArticle->id);
+        $objPhpWord->replace('urlBackend', htmlentities($strUrlBackend));
+
+        // Images
+        if (!empty($objArticle->multiSRC)) {
+            $arrImages = StringUtil::deserialize($objArticle->multiSRC, true);
+
+            if (!empty($arrImages)) {
+                $objFiles = FilesModel::findMultipleByUuids($arrImages);
+                $i = 0;
+
+                while ($objFiles->next()) {
+                    if(!is_file(TL_ROOT. '/' . $objFiles->path)){
+                        continue;
+                    }
+                    ++$i;
+                    Files::getInstance()->copy($objFiles->path, $imageDir.'/'.$objFiles->name);
+                    $options = ['multiline' => false];
+                    $objPhpWord->createClone('i');
+                    $objPhpWord->addToClone('i', 'i', $i, $options);
+                    $objPhpWord->addToClone('i', 'fileName', $objFiles->name, $options);
+                    $arrMeta = $this->getMeta($objFiles->current(), 'de');
+                    $objPhpWord->addToClone('i', 'photographerName', $arrMeta['photographer'], $options);
+                    $objPhpWord->addToClone('i', 'imageCaption', $arrMeta['caption'], $options);
+                }
+            }
+        }
+
+        $objPhpWord->sendToBrowser(true)
+            ->generateUncached(true)
+            ->generate()
+        ;
+    }
+
+    public function getMeta(FilesModel $objFile, string $lang = 'de'): array
+    {
+        if (null !== $objFile) {
+            $arrMeta = StringUtil::deserialize($objFile->meta, true);
+
+            if (!isset($arrMeta[$lang]['caption'])) {
+                $arrMeta[$lang]['caption'] = '';
+            }
+
+            if (!isset($arrMeta[$lang]['photographer'])) {
+                $arrMeta[$lang]['photographer'] = '';
+            }
+
+            return $arrMeta[$lang];
+        }
     }
 
     /**

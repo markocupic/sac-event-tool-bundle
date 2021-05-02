@@ -87,13 +87,20 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 				'href'  => 'act=show',
 				'icon'  => 'show.svg',
 			),
+
+            'exportArticle' => array(
+                'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['exportArticle'],
+                'href'            => 'action=exportArticle',
+                'icon'            => 'bundles/markocupicsaceventtool/icons/docx.png',
+                //'button_callback' => array(TlCalendarEventsStory::class, 'exportArticle'),
+            ),
 		),
 	),
 
 	// Palettes
 	'palettes'    => array
 	(
-		'default' => '{publishState_legend},publishState,doPublishInClubMagazine;{author_legend},addedOn,sacMemberId,authorName;{event_legend},eventId,title,eventTitle,eventSubstitutionText,organizers,text,youtubeId,multiSRC;{tourInfoBox_legend},tourWaypoints,tourProfile,tourTechDifficulty,tourHighlights',
+		'default' => '{publishState_legend},publishState,doPublishInClubMagazine,checkedByInstructor;{author_legend},addedOn,sacMemberId,authorName;{event_legend},eventId,title,eventTitle,eventSubstitutionText,organizers,text,youtubeId,multiSRC;{tourInfoBox_legend},tourWaypoints,tourProfile,tourTechDifficulty,tourHighlights,tourPublicTransportInfo',
 	),
 
 	// Subpalettes
@@ -138,6 +145,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 			'eval'      => array('tl_class' => 'clr', 'submitOnChange' => false),
 			'sql'       => "char(1) NOT NULL default ''",
 		),
+        'checkedByInstructor'          => array
+        (
+            'filter'    => true,
+            'default'   => 1,
+            'inputType' => 'checkbox',
+            'eval'      => array('tl_class' => 'clr', 'submitOnChange' => false),
+            'sql'       => "char(1) NOT NULL default ''",
+        ),
 		'authorName'            => array
 		(
 			'filter'    => true,

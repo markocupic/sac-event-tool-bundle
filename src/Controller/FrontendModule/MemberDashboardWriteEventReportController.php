@@ -543,6 +543,9 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
 
         if (null !== $objEvent) {
             $arrData = $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent);
+            if(empty($arrData)){
+                return 'keine Angabe';
+            }
 
             return implode("\r\n", $arrData);
         }
