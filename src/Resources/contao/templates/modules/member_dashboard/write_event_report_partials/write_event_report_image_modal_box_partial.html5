@@ -1,0 +1,31 @@
+<!-- Modal Box image caption -->
+<div class="modal fade write-story-image-caption" tabindex="-1" role="dialog" aria-labelledby="ModalImageCaption" aria-hidden="true">
+	<div class="modal-dialog modal-fullscreen-xl-down modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="ModalImageCaption">Bildinformationen</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+			</div>
+			<div class="modal-body">
+				<figure>
+					<img class="image-full-res" src=""/>
+				</figure>
+				{{br}}
+				<div class="row">
+					<div class="col-12">
+						<label for="imageCaptionInput">Bildlegende</label>
+						<input class="form-control" id="imageCaptionInput" name="image-caption" type="text" placeholder="" required>
+					</div>
+					{{br}}
+					<div class="col-12">
+						<label for="imagePhotographerInput">Fotograf/Bildeigent&uuml;mer</label>
+						<input class="form-control" id="imagePhotographerInput" name="image-photographer" type="text" placeholder="">
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" id="saveCaptionButton" class="btn btn-primary">Speichern</button>
+			</div>
+		</div>
+	</div>
+</div>

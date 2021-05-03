@@ -411,6 +411,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         if ($objEventStoryModel->doPublishInClubMagazine) {
             $eval['mandatory'] = true;
         }
+
         $objForm->addFormField('tourTechDifficulty', [
             'label' => 'Technische Schwierigkeiten',
             'inputType' => 'textarea',
@@ -509,7 +510,15 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             }
         }
 
+        // Add some Vue.js attributes to the form widgets
+        $this->addVueAttributesToFormWidget($objForm);
+
         return $objForm->generate();
+    }
+
+    protected function addVueAttributesToFormWidget(Form $objForm): void
+    {
+        $objForm->getWidget('text')->addAttribute('v-bind-title', "ho == 'vue' ? 'len' : 'bla'");
     }
 
     protected function getTourProfile(CalendarEventsStoryModel $objEventStoryModel): string
@@ -543,7 +552,8 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
 
         if (null !== $objEvent) {
             $arrData = $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent);
-            if(empty($arrData)){
+
+            if (empty($arrData)) {
                 return 'keine Angabe';
             }
 

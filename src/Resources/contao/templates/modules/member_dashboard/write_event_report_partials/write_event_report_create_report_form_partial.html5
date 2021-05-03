@@ -1,0 +1,54 @@
+<!-- Modal Box text and youtube -->
+<div id="ModalUploadTextAndYt" class="modal fade write-story-text-and-yt" tabindex="-1" role="dialog" aria-labelledby="ModalUploadTextAndYt"
+		 aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-fullscreen-xl-down" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Bericht erstellen</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+			</div>
+			<div class="modal-body">
+				<?= $this->objEventStoryTextAndYoutubeForm ?>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+    (function ($) {
+        // Hide/Show fields if the report should be published in the club magazine
+        jQuery(document).ready(function () {
+
+            let checkBox = document.getElementById('opt_doPublishInClubMagazine_0');
+            checkBox.addEventListener('change', (event) => {
+                if(checkBox.checked)
+                {
+                    $('.publish-clubmagazine-field').removeClass('d-none');
+                }else{
+                    $('.publish-clubmagazine-field').addClass('d-none');
+                }
+            });
+
+            if(checkBox.checked)
+            {
+                $('.publish-clubmagazine-field').removeClass('d-none');
+            }else{
+                $('.publish-clubmagazine-field').addClass('d-none');
+            }
+        });
+    })(jQuery);
+</script>
+
+<script>
+    // Open modal on error
+		(function ($) {
+        jQuery(document).ready(function () {
+
+            if($('#ModalUploadTextAndYt .widget.error').length)
+            {
+                let modal = new bootstrap.Modal(document.getElementById('ModalUploadTextAndYt'));
+                modal.show();
+            }
+        });
+    })(jQuery);
+</script>

@@ -1,0 +1,170 @@
+<?php if (count($this->images)): ?>
+	{{br}}
+	<div id="dashboardEventStoryGallery" class="<?php if ($this->publishState < 2): ?>sortable-thumbnail-container <?php endif; ?> dashboard-event-story-gallery row gx-2 gy-1">
+		<?php $i = 0; ?>
+		<?php foreach ($this->images as $arrFile): ?>
+		<div class="col-12 col-sm-6 col-md-3 thumbnail <?php if ($this->publishState < 2): ?>sortable-item <?php endif; ?>responsive" data-item="<?= $i ?>" data-path="<?= $arrFile['path'] ?>" data-file-id="<?= $arrFile['id'] ?>" data-file-uuid="<?= \StringUtil::binToUuid($arrFile['uuid']) ?>" title="Sortierung mit Drag and Drop &auml;ndern">
+			{{image::<?= Contao\StringUtil::binToUuid($arrFile['uuid']) ?>?width=400&height=400&mode=crop}}
+			<?php if ($this->publishState < 2): ?>
+			<div class="dashboard-event-story-thumb-buttons-container d-flex">
+				<button class="btn btn-danger rotate-image" title="Bild im GUZ 90° drehen"><i class="fal fa-history"></i></button>
+				<button class="btn btn-danger remove-image" title="Bild löschen"><i class="fal fa-trash"></i></button>
+				<button class="btn btn-danger add-caption" title="Bildunterschrift hinzufügen"><i class="fal fa-pencil"></i></button>
+			</div>
+			<?php endif; ?>
+		</div>
+		<?php $i++; ?>
+		<?php endforeach; ?>
+	</div>
+	<!-- End gallery -->
+
+
+
+	<?php if ($this->publishState < 2): ?>
+	<script>
+			(function ($) {
+					jQuery(document).ready(function () {
+
+							// Open modal for caption edit
+							$('button.add-caption').click(function () {
+									var path = $(this).closest('.thumbnail').attr('data-path');
+									var item = $(this).closest('.thumbnail').attr('data-item');
+									var fileUuid = $(this).closest('.thumbnail').attr('data-file-uuid');
+									var modal = $('.modal.write-story-image-caption').first();
+									$(modal).find('.image-full-res').attr('src', path);
+									$(modal).attr('data-item', item);
+
+									// Get caption text by xhr request
+									var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/getCaption', {
+											'REQUEST_TOKEN': '{{request_token}}',
+											'fileUuid': fileUuid
+									}).done(function (json) {
+											if (json.status != 'success') {
+													console.log(json);
+											} else {
+													$(modal).modal('toggle');
+													$(modal).find('#imageCaptionInput').val(json.caption);
+													$(modal).find('#imagePhotographerInput').val(json.photographer);
+											}
+									}).always(function () {
+											//window.location.reload();
+									});
+							});
+
+
+							// Save caption to the server
+							$('.modal.write-story-image-caption button#saveCaptionButton').click(function () {
+									$('.write-story-image-caption').modal('hide');
+									var caption = $('.modal.write-story-image-caption #imageCaptionInput').val();
+									var photographer = $('.modal.write-story-image-caption #imagePhotographerInput').val();
+									var modal = $(this).closest('.modal');
+									var item = $(modal).attr('data-item');
+									var thumbnail = $('#dashboardEventStoryGallery').find('.thumbnail[data-item="' + item + '"]');
+									thumbnail.attr('data-caption', caption);
+									var fileUuid = $(thumbnail).attr('data-file-uuid');
+									$(modal).modal('hide');
+
+
+									var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/setCaption', {
+											'REQUEST_TOKEN': '{{request_token}}',
+											'fileUuid': fileUuid,
+											'caption': caption,
+											'photographer': photographer
+									}).done(function (json) {
+											if (json.status != 'success') {
+													console.log(json);
+											}
+									}).always(function () {
+											window.location.reload();
+									});
+							});
+					});
+			})(jQuery);
+	</script>
+	<?php endif; ?>
+
+
+	<?php if ($this->publishState < 2): ?>
+	<script>
+			/**
+			 * Remove image from collection
+			 */
+			(function ($) {
+					$(document).ready(function () {
+							"use strict";
+							$('.remove-image').on('click touchmove', function (e) {
+									e.preventDefault();
+									var elImage = $(this).closest('[data-file-uuid]');
+									if (elImage.length) {
+											var uuid = $(elImage).data('file-uuid');
+											if (typeof uuid !== 'undefined') {
+													var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/removeImage', {
+															'REQUEST_TOKEN': '{{request_token}}',
+															'eventId': '<?= Contao\Input::get('eventId') ?>',
+															'uuid': uuid
+													}).done(function (json) {
+															if (json.status != 'success') {
+																	console.log(json);
+															}
+															elImage.fadeOut(400, function () {
+																	$(this).remove();
+															});
+													});
+											}
+									}
+							});
+
+							// Rotate image
+							$('.rotate-image').on('click touchmove', function (e) {
+									e.preventDefault();
+									var elImage = $(this).closest('[data-file-id]');
+									if (elImage.length) {
+											var fileId = $(elImage).data('file-id');
+											if (typeof fileId !== 'undefined') {
+													var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/rotateImage', {
+															'REQUEST_TOKEN': '{{request_token}}',
+															//'eventId': '<?= Contao\Input::get('eventId') ?>',
+															'fileId': fileId
+													}).done(function (json) {
+															if (json.status != 'success') {
+																	console.log(json);
+															}else{
+																	window.location=document.URL;
+															}
+													});
+											}
+									}
+							});
+
+							/**
+							 * Image drag and drop sorting
+							 * @type {Element|*}
+							 */
+							var container = document.getElementById("dashboardEventStoryGallery");
+							var sort = Sortable.create(container, {
+									animation: 50, // ms, animation speed moving items when sorting, `0` — without animation
+									//handle: ".sortable-item", // Restricts sort start click/touch to the specified element
+									draggable: ".sortable-item", // Specifies which items inside the element should be sortable
+									onUpdate: function (event) {
+											var item = event.item; // the current dragged HTMLElement
+											var arrUuid = [];
+											var collection = $(item).closest('.sortable-thumbnail-container').find('.sortable-item');
+											$(collection).each(function (index) {
+													arrUuid.push($(this).data('fileUuid'));
+											});
+											var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/sortGallery', {
+													'REQUEST_TOKEN': '{{request_token}}',
+													'eventId': '<?= Contao\Input::get('eventId') ?>',
+													'uuids': JSON.stringify(arrUuid)
+											}).done(function (json) {
+													if (json.status != 'success') {
+															console.log(json);
+													}
+											});
+									}
+							});
+					});
+			})(jQuery);
+	</script>
+	<?php endif; ?>
+<?php endif; ?>

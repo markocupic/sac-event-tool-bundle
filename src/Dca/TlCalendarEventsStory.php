@@ -66,7 +66,10 @@ class TlCalendarEventsStory extends Backend
         // target dir & file
         $targetDir = sprintf('system/tmp/article_%s_%s', $objArticle->id, time());
         $imageDir = sprintf('%s/images', $targetDir);
+
+        // Create folder
         new Folder($imageDir);
+
         $targetFile = sprintf('%s/event_article_%s.docx', $targetDir, $objArticle->id);
         $objPhpWord = new MsWordTemplateProcessor($templSrc, $targetFile);
 
@@ -169,7 +172,7 @@ class TlCalendarEventsStory extends Backend
         ;
 
         // Zip archive
-        $zip = (new Zip())
+        (new Zip())
             ->ignoreDotFiles(false)
             ->stripSourcePath(TL_ROOT.'/'.$targetDir)
             ->addDirRecursive(TL_ROOT.'/'.$targetDir)
