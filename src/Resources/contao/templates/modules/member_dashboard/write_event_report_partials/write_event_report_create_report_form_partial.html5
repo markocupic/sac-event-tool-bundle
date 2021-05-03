@@ -1,18 +1,65 @@
+<?php $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao-component-vue-js/vue/dist/vue.min.js|static'; ?>
+
 <!-- Modal Box text and youtube -->
 <div id="ModalUploadTextAndYt" class="modal fade write-story-text-and-yt" tabindex="-1" role="dialog" aria-labelledby="ModalUploadTextAndYt"
 		 aria-hidden="true">
-	<div class="modal-dialog modal-lg modal-fullscreen-xl-down" role="document">
+	<div class="modal-dialog modal-dialog-scrollable modal-xl modal-fullscreen-xl-down" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title" id="exampleModalLabel">Bericht erstellen</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
 			</div>
 			<div class="modal-body">
-				<?= $this->objEventStoryTextAndYoutubeForm ?>
+				<div class="alert alert-dark">
+					Fallst du einer Veröffentlichung deines Berichts in der Clubzeitschrift zustimmst, wird deine Arbeit durch die Redaktion und die Tourenleiterin/den Tourenleiter geprüft und vielleicht im nächsten Heft publiziert. So oder so wird dein Bericht auf der Webseite nach redaktioneller Prüfung freigeschaltet.
+				</div>
+				<div id="editReportFormBox">
+					<?= $this->objEventStoryTextAndYoutubeForm ?>
+					<p id="ctrl_text_strLenRemaining" class="text-success">
+						Verbleibende Zeichen: {{ ctrl_text.strLenRemaining }}
+					</p>
+				</div>
 			</div>
+			<div id="modalFooter" class="modal-footer"></div>
 		</div>
 	</div>
 </div>
+
+<script>
+	// Vue js
+	let app = new Vue({
+			el: '#editReportFormBox',
+			data:{
+				ctrl_text: {
+				    value: null,
+						len: 0,
+						strLenRemaining: 0,
+				},
+			},
+			created: function () {
+			    this.ctrl_text.value = document.getElementById('ctrl_text').value;
+          this.ctrl_text.len = document.getElementById('ctrl_text').value.length;
+          this.ctrl_text.strLenRemaining = parseInt(document.getElementById('ctrl_text').getAttribute('maxlength')) - this.ctrl_text.len;
+					// Cut and append stringRemainig indicator
+          this.cutAndAppend(document.getElementById('ctrl_text_strLenRemaining'),document.getElementById('ctrl_text').parentElement);
+          this.cutAndAppend(document.getElementById('ctrl_submit'),document.getElementById('modalFooter'));
+
+      },
+			methods:{
+			    onKeyUp: function(elemId){
+			        if(elemId === 'ctrl_text')
+							{
+                  this.ctrl_text.len = document.getElementById('ctrl_text').value.length;
+                  this.ctrl_text.strLenRemaining = parseInt(document.getElementById('ctrl_text').getAttribute('maxlength')) - this.ctrl_text.len;
+							}
+          },
+          cutAndAppend: function(elem, parentNode) {
+						childElem = elem.parentElement.removeChild(elem);
+						parentNode.appendChild(childElem);
+  				}
+			}
+	})
+</script>
 
 <script>
     (function ($) {

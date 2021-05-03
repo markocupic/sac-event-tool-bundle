@@ -99,7 +99,7 @@ class TlCalendarEventsStory extends Backend
         $strEventDates = implode('\r\n', $arrEventDates);
 
         // Do publish in the club magazine
-        $strDoPublishClubMagazine = $objArticle->doPublishClubMagazine ? 'Ja' : 'Nein';
+        $strDoPublishClubMagazine = $objArticle->doPublishInClubMagazine ? 'Ja' : 'Nein';
 
         // Checked by instructor
         $strCheckedByInstructor = $objArticle->checkedByInstructor ? 'Ja' : 'Nein';

@@ -11,6 +11,8 @@
  */
 
 use Markocupic\SacEventToolBundle\Dca\TlCalendarEventsStory;
+use Contao\Config;
+use Contao\Input;
 
 /**
  * Table tl_calendar_events_story
@@ -213,9 +215,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 		),
 		'multiSRC'              => array
 		(
-			'exclude'   => true,
 			'inputType' => 'fileTree',
-			'eval'      => array('doNotCopy' => true, 'isGallery' => true, 'extensions' => 'jpg,jpeg', 'multiple' => true, 'fieldType' => 'checkbox', 'orderField' => 'orderSRC', 'files' => true, 'mandatory' => false, 'tl_class' => 'clr'),
+			'eval'      => array('path'=> Config::get('SAC_EVT_EVENT_STORIES_UPLOAD_PATH').'/' . Input::get('id'), 'doNotCopy' => true, 'isGallery' => true, 'extensions' => 'jpg,jpeg', 'multiple' => true, 'fieldType' => 'checkbox', 'orderField' => 'orderSRC', 'files' => true, 'mandatory' => false, 'tl_class' => 'clr'),
 			'sql'       => "blob NULL",
 		),
 		'orderSRC'              => array
@@ -224,7 +225,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 			'sql'   => "blob NULL",
 		),
 		'organizers'            => array(
-			'exclude'    => true,
 			'search'     => true,
 			'filter'     => true,
 			'sorting'    => true,

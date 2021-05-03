@@ -346,7 +346,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
 
         // do publish report in the club magazine
         $objForm->addFormField('doPublishInClubMagazine', [
-            'label' => ['', 'Veröffentlichung im Pilatus (Clubzeitschrift)'],
+            'label' => ['', 'Einer eventuellen Veröffentlichung des Berichts in der Clubzeitschrift zustimmen'],
             'inputType' => 'checkbox',
             'value' => $objEventStoryModel->doPublishInClubMagazine,
         ]);
@@ -444,7 +444,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
 
         // Let's add  a submit button
         $objForm->addFormField('submit', [
-            'label' => 'absenden',
+            'label' => 'Bericht speichern',
             'inputType' => 'submit',
         ]);
 
@@ -518,7 +518,9 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
 
     protected function addVueAttributesToFormWidget(Form $objForm): void
     {
-        $objForm->getWidget('text')->addAttribute('v-bind-title', "ho == 'vue' ? 'len' : 'bla'");
+        $objForm->getWidget('text')->addAttribute('v-model', 'ctrl_text.value');
+        $objForm->getWidget('text')->addAttribute('v-on:keyup', 'onKeyUp("ctrl_text")');
+
     }
 
     protected function getTourProfile(CalendarEventsStoryModel $objEventStoryModel): string
@@ -766,6 +768,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                                 'title' => $stringUtilAdapter->specialchars($objFile->basename),
                                 'filesModel' => $objFiles->current(),
                                 'caption' => $arrMeta['de']['caption'] ?? '',
+                                'photographer' => $arrMeta['de']['photographer'] ?? '',
                                 'alt' => $arrMeta['de']['alt'] ?? '',
                             ];
                         }

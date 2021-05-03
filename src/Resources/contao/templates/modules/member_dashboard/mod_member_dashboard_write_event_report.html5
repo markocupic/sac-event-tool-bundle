@@ -7,6 +7,7 @@
 
 <?php if ($this->hasInfoMessage): ?>
   <div class="alert alert-info" role="alert">
+    <i class="fas fa-exclamation-circle fa-w-16"></i>
       <?= $this->infoMessage ?>
   </div>
 <?php endif; ?>
@@ -48,7 +49,7 @@
         <div class="me-2">
           <select class="form-control" name="publishEventStory" id="publishEventStory">
             <option value="1"<?php if ($this->publishState < 2): ?> selected<?php endif; ?>>In Bearbeitung</option>
-            <option value="2"<?php if ((int)$this->publishState === 2): ?> selected<?php endif; ?>>Bericht veröffentlichen</option>
+            <option value="2"<?php if ((int)$this->publishState === 2): ?> selected<?php endif; ?>>Zur Veröffentlichung durch Redaktion freigeben</option>
           </select>
         </div>
         <?php endif; ?>
