@@ -346,14 +346,14 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
 
         // do publish report in the club magazine
         $objForm->addFormField('doPublishInClubMagazine', [
-            'label' => ['', 'Einer eventuellen Veröffentlichung des Berichts in der Clubzeitschrift zustimmen'],
+            'label' => ['', 'Ich stimmer einer eventuellen Veröffentlichung meines Berichts in der Mitgliederzeitschrift zu.'],
             'inputType' => 'checkbox',
             'value' => $objEventStoryModel->doPublishInClubMagazine,
         ]);
 
         // text
         $objForm->addFormField('text', [
-            'label' => 'Touren-/Lager-/Kursbericht',
+            'label' => 'Touren-/Lager-/Kursbericht (max. 1800 Zeichen)',
             'inputType' => 'textarea',
             'eval' => ['mandatory' => true, 'maxlength' => 1800, 'rows' => 8, 'decodeEntities' => true],
             'value' => html_entity_decode((string) $objEventStoryModel->text),
@@ -423,7 +423,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         $eval = ['class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
 
         $objForm->addFormField('tourHighlights', [
-            'label' => 'Highlights/Bemerkungen',
+            'label' => 'Highlights/Bemerkungen (max. 3 Sätze)',
             'inputType' => 'textarea',
             'eval' => $eval,
             'value' => html_entity_decode((string) $objEventStoryModel->tourHighlights),
@@ -520,7 +520,6 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
     {
         $objForm->getWidget('text')->addAttribute('v-model', 'ctrl_text.value');
         $objForm->getWidget('text')->addAttribute('v-on:keyup', 'onKeyUp("ctrl_text")');
-
     }
 
     protected function getTourProfile(CalendarEventsStoryModel $objEventStoryModel): string
@@ -591,6 +590,17 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         $dbafsAdapter = $this->get('contao.framework')->getAdapter(Dbafs::class);
         /** @var Message $messageAdapter */
         $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
+        /** @var Config $configAdapter */
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+
+        // Set max image widht and height
+        if ((int) $moduleModel->eventStoryMaxImageWidth > 0) {
+            $configAdapter->set('imageWidth', (int) $moduleModel->eventStoryMaxImageWidth);
+        }
+
+        if ((int) $moduleModel->eventStoryMaxImageHeight > 0) {
+            $configAdapter->set('imageHeight', (int) $moduleModel->eventStoryMaxImageHeight);
+        }
 
         $objUploadFolder = null;
 
@@ -666,9 +676,6 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                             $objFile = new File($objModel->path);
 
                             if ($objFile->isImage) {
-                                // Resize image
-                                $this->resizeUploadedImage($objModel->path);
-
                                 // Rename file
                                 $newFilename = sprintf('event-story-%s-img-%s.%s', $objEventStoryModel->id, $objModel->id, strtolower($objFile->extension));
                                 $newPath = $objUploadFolder->path.'/'.$newFilename;
@@ -809,72 +816,5 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         }
 
         return array_values($images);
-    }
-
-    /**
-     * Resize an uploaded image if necessary.
-     *
-     * @throws \Exception
-     */
-    protected function resizeUploadedImage(string $strImage): bool
-    {
-        // Set adapters
-        /** @var Config $configAdapter */
-        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
-
-        // If there is no limitation
-        if ($configAdapter->get('maxImageWidth') < 1) {
-            return false;
-        }
-
-        $objFile = new File($strImage);
-
-        // Return if file is not an image
-        if (!$objFile->isSvgImage && !$objFile->isGdImage) {
-            return false;
-        }
-        $arrImageSize = $objFile->imageSize;
-
-        // The image is too big to be handled by the GD library
-        if ($objFile->isGdImage && ($arrImageSize[0] > $configAdapter->get('gdMaxImgWidth') || $arrImageSize[1] > $configAdapter->get('gdMaxImgHeight'))) {
-            // Log
-            $strText = 'File "'.$strImage.'" is too big to be resized automatically';
-            $logger = System::getContainer()->get('monolog.logger.contao');
-            $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, TL_FILES)]);
-
-            return false;
-        }
-
-        $blnResize = false;
-
-        // The image exceeds the maximum image width
-        if ($arrImageSize[0] > $configAdapter->get('maxImageWidth')) {
-            $blnResize = true;
-            $intWidth = $configAdapter->get('maxImageWidth');
-            $intHeight = round($configAdapter->get('maxImageWidth') * $arrImageSize[1] / $arrImageSize[0]);
-            $arrImageSize = [$intWidth, $intHeight];
-        }
-
-        // The image exceeds the maximum image height
-        if ($arrImageSize[1] > $configAdapter->get('maxImageWidth')) {
-            $blnResize = true;
-            $intWidth = round($configAdapter->get('maxImageWidth') * $arrImageSize[0] / $arrImageSize[1]);
-            $intHeight = $configAdapter->get('maxImageWidth');
-            $arrImageSize = [$intWidth, $intHeight];
-        }
-
-        // Resized successfully
-        if ($blnResize) {
-            System::getContainer()
-                ->get('contao.image.image_factory')
-                ->create($this->projectDir.'/'.$strImage, [$arrImageSize[0], $arrImageSize[1]], $this->projectDir.'/'.$strImage)
-            ;
-
-            $this->blnHasResized = true;
-
-            return true;
-        }
-
-        return false;
     }
 }

@@ -22,7 +22,6 @@ use Contao\Environment;
 use Contao\Events;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\PDO\Statement;
 use Doctrine\DBAL\ForwardCompatibility\Result;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory;

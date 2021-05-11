@@ -11,7 +11,7 @@
 			</div>
 			<div class="modal-body">
 				<div class="alert alert-dark">
-					Fallst du einer Veröffentlichung deines Berichts in der Clubzeitschrift zustimmst, wird deine Arbeit durch die Redaktion und die Tourenleiterin/den Tourenleiter geprüft und vielleicht im nächsten Heft publiziert. So oder so wird dein Bericht auf der Webseite nach redaktioneller Prüfung freigeschaltet.
+					Fallst du einer Veröffentlichung deines Berichts in der Mitgliederzeitschrift zustimmst, wird deine Arbeit durch die Redaktion und die Tourenleiterin/den Tourenleiter geprüft und vielleicht im nächsten Heft publiziert. So oder so wird dein Bericht auf der Webseite nach redaktioneller Prüfung freigeschaltet.
 				</div>
 				<div id="editReportFormBox">
 					<?= $this->objEventStoryTextAndYoutubeForm ?>

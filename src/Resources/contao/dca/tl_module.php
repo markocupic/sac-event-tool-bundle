@@ -27,7 +27,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['activate_member_account'] = '{title
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_upcoming_events'] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},unregisterFromEventNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_past_events'] = '{title_legend},name,headline,type;{member_dashboard_event_type_filter_legend},eventType;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_event_report_list'] = '{title_legend},name,headline,type;{events_story_legend},timeSpanForCreatingNewEventStory,eventStoryFormJumpTo;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_write_event_report'] = '{title_legend},name,headline,type;{events_story_legend},timeSpanForCreatingNewEventStory,notifyOnEventStoryPublishedNotificationId,eventStoryUploadFolder;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_write_event_report'] = '{title_legend},name,headline,type;{events_story_legend},eventStoryMaxImageWidth,eventStoryMaxImageHeight,timeSpanForCreatingNewEventStory,notifyOnEventStoryPublishedNotificationId,eventStoryUploadFolder;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_edit_profile'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_avatar'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{image_legend:hide},imgSize,imageClass;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_delete_profile'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
@@ -112,6 +112,20 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryJumpTo'] = array(
 	'eval'       => array('mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'),
 	'sql'        => "int(10) unsigned NOT NULL default '0'",
 	'relation'   => array('type' => 'hasOne', 'load' => 'eager'),
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryMaxImageWidth'] = array(
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => array('rgxp' => 'natural', 'tl_class' => 'w50'),
+    'sql'       => "smallint(5) unsigned NOT NULL default '0'",
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryMaxImageHeight'] = array(
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => array('rgxp' => 'natural', 'tl_class' => 'w50'),
+    'sql'       => "smallint(5) unsigned NOT NULL default '0'",
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryUploadFolder'] = array(

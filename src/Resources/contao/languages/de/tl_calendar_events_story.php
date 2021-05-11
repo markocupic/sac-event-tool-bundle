@@ -15,7 +15,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_story']['exportArticle'] = array("Artike
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishState_legend'] = "Status Einstellungen";
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['author_legend'] = "Autor";
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['event_legend'] = "Event Einstellungen";
-$GLOBALS['TL_LANG']['tl_calendar_events_story']['tourInfoBox_legend'] = "Tour Info-Box Einstellungen";
+$GLOBALS['TL_LANG']['tl_calendar_events_story']['tourInfoBox_legend'] = "Zusatzfelder 'Veröffentlichen in Mitgliederzeitschrift'";
 
 // References
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][1] = 'Vom Autor noch in Bearbeitung';
@@ -26,7 +26,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][3] = 'Bericht
 // Fields
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['addedOn'] = array("Erstellungsdatum", "Geben Sie das Erstellungsdatum en.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishState'] = array("Veröffentlichungsstatus", "Geben Sie den Veröffenlichungslevel ein.");
-$GLOBALS['TL_LANG']['tl_calendar_events_story']['doPublishInClubMagazine'] = array("In Clubzeitschrift veröffentlichen", "Geben Sie an, ob der Bericht für die Veröffentlichung in der Clubzeitschrift vorgesehen werden soll.");
+$GLOBALS['TL_LANG']['tl_calendar_events_story']['doPublishInClubMagazine'] = array("In Mitgliederzeitschrift veröffentlichen", "Geben Sie an, ob der Bericht für die Veröffentlichung in der Mitgliederzeitschrift vorgesehen werden soll.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['checkedByInstructor'] = array("Durch Tourenleiter geprüft", "Geben Sie an, ob der Bericht durch den verantwortlichen Tourenleiter geprüft wurde.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['sacMemberId'] = array("SAC-Mitgliedernummer des Autors", "");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['authorName'] = array("Name des Autors", "Geben Sie den Namen des Autors an.");

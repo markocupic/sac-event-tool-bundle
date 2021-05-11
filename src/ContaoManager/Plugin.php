@@ -21,11 +21,11 @@ use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Config\ConfigPluginInterface;
 use Contao\ManagerPlugin\Routing\RoutingPluginInterface;
+use Markocupic\RssFeedGeneratorBundle\MarkocupicRssFeedGeneratorBundle;
+use Markocupic\SacEventToolBundle\MarkocupicSacEventToolBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Markocupic\RssFeedGeneratorBundle\MarkocupicRssFeedGeneratorBundle;
-use Markocupic\SacEventToolBundle\MarkocupicSacEventToolBundle;
 
 /**
  * Class Plugin
