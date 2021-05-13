@@ -24,6 +24,7 @@ use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\CoreBundle\Util\SymlinkUtil;
+use Contao\Database;
 use Contao\Environment;
 use Contao\File;
 use Contao\FilesModel;
@@ -168,6 +169,9 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
         // Set title as headline
         $template->headline = $this->story->title;
+
+
+
 
         // Fallback if author is no more findable in tl_member
         $objAuthor = $memberModelModelAdapter->findOneBySacMemberId($this->story->sacMemberId);
@@ -329,19 +333,19 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         }
 
         if ('' !== $this->story->tourWaypoints) {
-            $template->tourWaypoints = nl2br((string)$this->story->tourWaypoints);
+            $template->tourWaypoints = nl2br((string) $this->story->tourWaypoints);
         }
 
         if ('' !== $this->story->tourProfile) {
-            $template->tourProfile = nl2br((string)$this->story->tourProfile);
+            $template->tourProfile = nl2br((string) $this->story->tourProfile);
         }
 
         if ($this->story->doPublishInClubMagazine && '' !== $this->story->tourHighlights) {
-            $template->tourHighlights = nl2br((string)$this->story->tourHighlights);
+            $template->tourHighlights = nl2br((string) $this->story->tourHighlights);
         }
 
         if ($this->story->doPublishInClubMagazine && '' !== $this->story->tourPublicTransportInfo) {
-            $template->tourPublicTransportInfo = nl2br((string)$this->story->tourPublicTransportInfo);
+            $template->tourPublicTransportInfo = nl2br((string) $this->story->tourPublicTransportInfo);
         }
 
         return $template->getResponse();

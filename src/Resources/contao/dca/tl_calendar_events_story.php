@@ -103,16 +103,17 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 	'palettes'    => array
 	(
 		'__selector__' => array('doPublishInClubMagazine'),
-		'default' => '{publishState_legend},publishState,checkedByInstructor;
-		{tourInfoBox_legend},doPublishInClubMagazine;{author_legend},addedOn,sacMemberId,authorName;
-		{event_legend},eventId,title,eventTitle,eventSubstitutionText,organizers,text,youtubeId,multiSRC
-		',
+		'default' => '
+		{publishState_legend},publishState,checkedByInstructor;
+		{author_legend},addedOn,sacMemberId,authorName;
+		{event_legend},eventId,title,eventTitle,eventSubstitutionText,organizers,tourWaypoints,tourProfile,tourTechDifficulty,text,youtubeId,multiSRC;
+		{tourInfoBox_legend},doPublishInClubMagazine',
 	),
 
 	// Subpalettes
 	'subpalettes' => array
 	(
-		'doPublishInClubMagazine' => 'tourWaypoints,tourProfile,tourTechDifficulty,tourHighlights,tourPublicTransportInfo'
+		'doPublishInClubMagazine' => 'tourHighlights,tourPublicTransportInfo'
 	),
 
 	// Fields
