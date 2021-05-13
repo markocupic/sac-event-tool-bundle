@@ -25,6 +25,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 		'dataContainer'     => 'Table',
 		'enableVersioning'  => true,
 		'notCopyable'       => true,
+		'closed' => true,
 		'onload_callback'   => array
 		(
 			array(TlCalendarEventsStory::class, 'setPalettes'),

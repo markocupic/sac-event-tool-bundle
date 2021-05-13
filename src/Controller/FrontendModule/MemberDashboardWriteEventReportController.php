@@ -240,23 +240,23 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                 }
 
                 if ('' !== $objReportModel->tourWaypoints) {
-                    $this->template->tourWaypoints = nl2br($objReportModel->tourWaypoints);
+                    $this->template->tourWaypoints = nl2br((string) $objReportModel->tourWaypoints);
                 }
 
                 if ('' !== $objReportModel->tourProfile) {
-                    $this->template->tourProfile = nl2br($objReportModel->tourProfile);
+                    $this->template->tourProfile = nl2br((string) $objReportModel->tourProfile);
                 }
 
                 if ('' !== $objReportModel->tourTechDifficulty) {
-                    $this->template->tourTechDifficulty = nl2br($objReportModel->tourTechDifficulty);
+                    $this->template->tourTechDifficulty = nl2br((string) $objReportModel->tourTechDifficulty);
                 }
 
                 if ($objReportModel->doPublishInClubMagazine && '' !== $objReportModel->tourHighlights) {
-                    $this->template->tourHighlights = nl2br($objReportModel->tourHighlights);
+                    $this->template->tourHighlights = nl2br((string) $objReportModel->tourHighlights);
                 }
 
                 if ($objReportModel->doPublishInClubMagazine && '' !== $objReportModel->tourPublicTransportInfo) {
-                    $this->template->tourPublicTransportInfo = nl2br($objReportModel->tourPublicTransportInfo);
+                    $this->template->tourPublicTransportInfo = nl2br((string) $objReportModel->tourPublicTransportInfo);
                 }
 
                 // Generate forms
@@ -268,7 +268,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         // Check if all images are labeled with a legend and a photographer name
         if ($objReportModel) {
             if (!$this->validateImageUploads($objReportModel)) {
-                $messageAdapter->addInfo('Es fehlen noch eine oder mehrere Bildlegenden oder der Fotografen-Name. Bitte ergänze diese Angaben, damit der Bericht veröffentlicht werden kann.');
+                $messageAdapter->addInfo('Es fehlen noch eine oder mehrere Bildlegenden oder der Fotografen-Name. Bitte ergänze diese Pflichtangaben, damit der Bericht veröffentlicht werden kann.');
             }
         }
 
@@ -388,17 +388,13 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             [
                 'label' => 'Youtube Film-Id',
                 'inputType' => 'text',
-                'eval' => [],
+                'eval' => ['placeholder' => 'z.B. G02hYgT3nGw'],
                 'value' => $objEventStoryModel->youtubeId,
             ]
         );
 
-        // Add attributes
-        $objWidgetYt = $objForm->getWidget('youtubeId');
-        $objWidgetYt->addAttribute('placeholder', 'z.B. G02hYgT3nGw');
-
         // tour waypoints
-        $eval = ['rows' => 2, 'decodeEntities' => true];
+        $eval = ['rows' => 2, 'decodeEntities' => true,'placeholder' => 'z.B. Engelberg 1000m - Herrenrüti 1083 m - Galtiberg 1800 m - Einstieg 2000 m'];
 
         if ($objEventStoryModel->doPublishInClubMagazine) {
             $eval['mandatory'] = true;
@@ -414,7 +410,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             );
 
         // tour profile
-        $eval = ['rows' => 2, 'decodeEntities' => true];
+        $eval = ['rows' => 2, 'decodeEntities' => true, 'placeholder' => 'z.B. Aufst: 1500 Hm/8 h, Abst: 1500 Hm/3 h'];
 
         if ($objEventStoryModel->doPublishInClubMagazine) {
             $eval['mandatory'] = true;
@@ -468,7 +464,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
 
         // Let's add  a submit button
         $objForm->addFormField('submit', [
-            'label' => 'Bericht speichern',
+            'label' => 'Änderungen speichern',
             'inputType' => 'submit',
         ]);
 

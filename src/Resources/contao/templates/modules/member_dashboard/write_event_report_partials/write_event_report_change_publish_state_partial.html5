@@ -1,0 +1,77 @@
+<div class="me-2">
+	<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#ModalChangePublishState">
+		<i class="fas fa-eye"></i> Veröffentlichen
+	</button>
+</div>
+<div id="ModalChangePublishState" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalChangePublishState"
+		 aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-fullscreen-xl-down" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Bericht zur Überprüfung freigeben</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+			</div>
+			<div class="modal-body">
+				<div class="alert alert-dark">
+					<i class="fas fa-check-circle fa-w-16"></i>
+					<div>
+						Ändere hier das Veröffenlichungs-Level auf die nächsthöhere Stufe. Achtung! Führe diesen Schritt nur aus, wenn du sicher bist, dass du keine Änderungen am Bericht mehr machen willst. Du kannst diesen Schritt danach nicht mehr rückgängig machen und das Formular bleibt für weitere Eingaben gesperrt.
+						{{br}}
+						Der/die Tourenleiter/in wird nach der Heraufstufung benachrichtigt und er/sie wird deinen Bericht auf inhaltliche Korrektheit überprüfen.
+						{{br}}
+						Nach der Prüfung durch den/die Tourenleiter/in wird dein Bericht durch die Redaktion freigeschaltet und ist danach im Netz sichtbar.
+					</div>
+				</div>
+				<div class="me-2">Bericht zur Überprüfung freigeben:</div>
+				<div class="me-2">
+					<select class="form-control" name="publishEventStory" id="publishEventStory">
+						<option value="1"<?php if ($this->publishState < 2): ?> selected<?php endif; ?>>1 - In Bearbeitung</option>
+						<option value="2"<?php if ((int)$this->publishState === 2): ?> selected<?php endif; ?>>2 - Zur Veröffentlichung durch Redaktion freigeben</option>
+					</select>
+				</div>
+			</div>
+			<!--<div id="modalFooter" class="modal-footer"></div>-->
+		</div>
+	</div>
+</div>
+
+
+
+
+
+<?php if ($this->publishState < 3): ?>
+<div class="form-sent-please-wait d-flex justify-content-center">
+	<div class="form-sent-please-wait-content text-center mt-5 mb-2 d-none">
+		<i class="fal fa-spin fa-4x fa-spinner" aria-hidden="true"></i>
+		{{br}}{{br}}
+		<span>Bitte warten. Deine Anfrage wird gesendet.</span>
+	</div>
+</div>
+<?php endif; ?>
+
+<?php if ($this->publishState < 3): ?>
+<script>
+    (function ($) {
+        jQuery(document).ready(function () {
+            $('#publishEventStory').change(function () {
+                // Show spinner icon and hide form buttons
+                $('.form-sent-please-wait-content').removeClass('d-none');
+                $('.event-story-form-buttons').removeClass('d-flex').addClass('d-none');
+                var publishState = this.value;
+                var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/setPublishState', {
+                    'REQUEST_TOKEN': '{{request_token}}',
+                    'eventId': '<?= Contao\Input::get('eventId') ?>',
+                    'publishState': publishState,
+                    'moduleId': '<?= $this->id ?>'
+                }).done(function (json) {
+                    if (json.status != 'success') {
+                        console.log(json);
+                    }
+                }).always(function () {
+                    window.location.reload();
+                });
+            });
+        });
+    })(jQuery);
+</script>
+<?php endif; ?>
