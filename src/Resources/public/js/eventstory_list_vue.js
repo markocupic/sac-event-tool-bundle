@@ -10,6 +10,11 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+document.addEventListener("DOMContentLoaded", function(event){
+    window.FontAwesome.dom.watch();
+});
+
+
 class ItemWatcher {
     constructor(elId, opt) {
 

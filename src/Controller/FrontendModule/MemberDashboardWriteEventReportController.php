@@ -235,6 +235,30 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                 // Get the gallery
                 $this->template->images = $this->getGalleryImages($objReportModel);
 
+                if ($objReportModel->doPublishInClubMagazine) {
+                    $this->template->doPublishInClubMagazine = true;
+                }
+
+                if ('' !== $objReportModel->tourWaypoints) {
+                    $this->template->tourWaypoints = nl2br($objReportModel->tourWaypoints);
+                }
+
+                if ('' !== $objReportModel->tourProfile) {
+                    $this->template->tourProfile = nl2br($objReportModel->tourProfile);
+                }
+
+                if ('' !== $objReportModel->tourTechDifficulty) {
+                    $this->template->tourTechDifficulty = nl2br($objReportModel->tourTechDifficulty);
+                }
+
+                if ($objReportModel->doPublishInClubMagazine && '' !== $objReportModel->tourHighlights) {
+                    $this->template->tourHighlights = nl2br($objReportModel->tourHighlights);
+                }
+
+                if ($objReportModel->doPublishInClubMagazine && '' !== $objReportModel->tourPublicTransportInfo) {
+                    $this->template->tourPublicTransportInfo = nl2br($objReportModel->tourPublicTransportInfo);
+                }
+
                 // Generate forms
                 $this->template->objEventStoryTextAndYoutubeForm = $this->generateTextAndYoutubeForm($objReportModel);
                 $this->template->objEventStoryImageUploadForm = $this->generatePictureUploadForm($objReportModel, $model);
@@ -374,7 +398,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         $objWidgetYt->addAttribute('placeholder', 'z.B. G02hYgT3nGw');
 
         // tour waypoints
-        $eval = ['class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
+        $eval = ['rows' => 2, 'decodeEntities' => true];
 
         if ($objEventStoryModel->doPublishInClubMagazine) {
             $eval['mandatory'] = true;
@@ -385,12 +409,12 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                     'label' => 'Tourenstationen mit Höhenangaben',
                     'inputType' => 'textarea',
                     'eval' => $eval,
-                    'value' => html_entity_decode((string) $objEventStoryModel->tourWaypoints),
+                    'value' => html_entity_decode((string) $this->getTourWaypoints($objEventStoryModel)),
                 ]
             );
 
         // tour profile
-        $eval = ['class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
+        $eval = ['rows' => 2, 'decodeEntities' => true];
 
         if ($objEventStoryModel->doPublishInClubMagazine) {
             $eval['mandatory'] = true;
@@ -406,7 +430,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             );
 
         // tour difficulties
-        $eval = ['class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
+        $eval = ['rows' => 2, 'decodeEntities' => true];
 
         if ($objEventStoryModel->doPublishInClubMagazine) {
             $eval['mandatory'] = true;
@@ -536,6 +560,22 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             $arrData = $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent);
 
             return implode("\r\n", $arrData);
+        }
+
+        return '';
+    }
+
+    protected function getTourWaypoints(CalendarEventsStoryModel $objEventStoryModel): string
+    {
+        $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+
+        if (!empty($objEventStoryModel->tourWaypoints)) {
+            return $objEventStoryModel->tourWaypoints;
+        }
+        $objEvent = $calendarEventsModelAdapter->findByPk($objEventStoryModel->eventId);
+
+        if (null !== $objEvent) {
+            return !empty($objEvent->tourDetailText) ? $objEvent->tourDetailText : '';
         }
 
         return '';

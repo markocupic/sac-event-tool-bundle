@@ -8,49 +8,123 @@
     <h4 class="mt-0 mb-3" style="color: red"><!-- indexer::stop -->Ausweichtour:<!-- indexer::continue --> <?= $this->eventSubstitutionText ?></h4>
     <?php endif; ?>
 
-    <div>
-        <p><?= nl2br($this->text) ?></p>
+    <div class="row gx-4">
+        <!-- start col left -->
+        <div class="col-12 col-lg-8">
+            <div class="row gx-4 gy-1">
+                <?php if($this->authorName): ?>
+                <div class="col-auto">
+                    <h5 class="m-0"><span class="text-danger"><i class="fas fa-feather"></i> Autor/in:</span> <?= $this->authorName ?></h5>
+                </div>
+                <?php endif; ?>
+
+                <?php if($this->tourInstructors): ?>
+                <div class="col-auto">
+                    <h5 class="m-0 mb-2"><span class="text-danger"><i class="fas fa-user-check"></i> Leitung:</span> <?= $this->tourInstructors ?></h5>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- Here comes the text -->
+            <p class="mt-3"><?= nl2br($this->text) ?></p>
+
+            <?php if ($this->images): ?>
+            <div class="ce_gallery mt-3">
+                <div class="row gx-2 gy-1">
+                    <!-- indexer::stop -->
+                    <?php foreach ($this->images as $image): ?>
+                    <figure class="col-12 col-sm-6 col-md-4 image_container thumbnail responsive">
+                        <a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement" title="<?=  $image['linkTitle']  ?>">
+                            {{image::<?= Contao\StringUtil::binToUuid($image['uuid']) ?>?width=400&height=400&mode=crop&alt=<?= $image['alt'] ?>}}
+                        </a>
+                        <figcaption class="figure-caption"><?= $image['strFigureCaption'] ?></figcaption>
+                    </figure>
+                    <?php endforeach; ?>
+                    <!-- indexer::continue -->
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($this->youtubeId): ?>
+            {{br}}
+            <div class="ratio ratio-16x9">
+                <iframe src="//www.youtube.com/embed/<?= $this->youtubeId ?>?rel=0" allowfullscreen=""></iframe>
+            </div>
+            <?php endif; ?>
+        </div>
+        <!-- end col left -->
+
+        <!-- start col right -->
+        <div class="col-12 col-lg-4">
+            <?php if($this->eventOrganizers): ?>
+            <div class="event-info-box icon-box-small">
+                <h5 class="mt-lg-0">Gruppe</h5>
+                <p><?= $this->eventOrganizers ?></p>
+            </div>
+            <?php endif; ?>
+
+            <?php if($this->tourTechDifficulty): ?>
+            <div class="event-info-box icon-box-small">
+                <h5>Schwierigkeit</h5>
+                <p><?= $this->tourTechDifficulty ?></p>
+            </div>
+            <?php endif; ?>
+
+            <?php if($this->tourWaypoints): ?>
+            <div class="event-info-box icon-box-small">
+                <h5>Tourenstationen</h5>
+                <p><?= $this->tourWaypoints ?></p>
+            </div>
+            <?php endif; ?>
+
+            <?php if($this->doPublishInClubMagazine && $this->tourPublicTransportInfo): ?>
+            <div class="event-info-box icon-box-small">
+                <h5>ÖV</h5>
+                <p><?= $this->tourPublicTransportInfo ?></p>
+            </div>
+            <?php endif; ?>
+
+            <?php if($this->doPublishInClubMagazine && $this->tourHighlights): ?>
+            <div class="event-info-box icon-box-small">
+                <h5>Highlights</h5>
+                <p><?= $this->tourHighlights ?></p>
+            </div>
+            <?php endif; ?>
+
+            <?php if($this->tourProfile): ?>
+            <div class="event-info-box icon-box-small">
+                <h5>Eckdaten</h5>
+                <p><?= $this->tourProfile ?></p>
+            </div>
+            <?php endif; ?>
+
+            <div class="event-info-box icon-box-small">
+                <h5>Mehr</h5>
+                <p><a href="{{event_url::<?= $this->eventId ?>}}" target="_blank">Zur Tour-/Kurs-Ausschreibung</a></p>
+            </div>
+        </div>
+        <!-- end col right -->
     </div>
 
-    <?php if ($this->images): ?>
-    <div class="ce_gallery">
-        <div class="row gx-2 gy-1">
-            <!-- indexer::stop -->
-            <?php foreach ($this->images as $image): ?>
-            <figure class="col-12 col-sm-6 col-md-3 image_container thumbnail responsive">
-                <a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement" title="<?=  $image['linkTitle']  ?>">
-                    {{image::<?= Contao\StringUtil::binToUuid($image['uuid']) ?>?width=400&height=400&mode=crop&alt=<?= $image['alt'] ?>}}
-                </a>
-                <figcaption class="figure-caption"><?= $image['strFigureCaption'] ?></figcaption>
-            </figure>
-            <?php endforeach; ?>
-            <!-- indexer::continue -->
+    <!-- QR Code & direct link -->
+    <ul class="nav nav-pills mt-5 mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#eventStoryQrCode" type="button" role="tab" aria-controls="pills-home" aria-selected="true">QR Code</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#eventStoryDirectLink" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Direkt-Link</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="eventStoryQrCode" role="tabpanel" aria-labelledby="pills-home-tab">
+            <div class="event-story-reader-qrcode mt-3 mb-3">
+                <img src="<?= $this->qrCodePath ?>" style="border:1px solid red">
+            </div>
+        </div>
+        <div class="tab-pane fade" id="eventStoryDirectLink" role="tabpanel" aria-labelledby="pills-profile-tab">
+            <p>Direct link: <a href="<?= $this->directLink ?>"><?= $this->directLink ?></a></p>
         </div>
     </div>
-    <?php endif; ?>
-
-    <?php if ($this->youtubeId): ?>
-    {{br}}
-    <div class="ce_bootstrapYoutubeResponsiveEmbed block">
-        <div class="embed-responsive embed-responsive-16by9">
-            <iframe class="embed-responsive-item" src="//www.youtube.com/embed/<?= $this->youtubeId ?>?rel=0" allowfullscreen=""></iframe>
-        </div>
-    </div>
-    <?php endif; ?>
-
-
-    <?php if($this->qrCodePath): ?>
-    <div class="event-story-reader-qrcode mt-3 mb-3">
-        <img src="<?= $this->qrCodePath ?>" style="border:1px solid red">
-    </div>
-    <?php endif; ?>
-
-    <?php if($this->directLink): ?>
-    <div class="event-story-reader-direct-link mt-3 mb-3">
-        Direct link: <a href="<?= $this->directLink ?>"><?= $this->directLink ?></a>
-    </div>
-    <?php endif; ?>
-
 
 </div>
 

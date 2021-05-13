@@ -37,6 +37,7 @@ use Contao\System;
 use Contao\Template;
 use Contao\Validator;
 use Haste\Util\Url;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -152,6 +153,9 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+
+        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
+        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
 
         /** @var Url $urlAdapter */
         $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
@@ -290,6 +294,55 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
         // Add youtube movie
         $template->youtubeId = '' !== $this->story->youtubeId ? $this->story->youtubeId : null;
+
+        // tourTechDifficulty
+        $template->tourInstructors = null;
+        $arrTourInstructors = $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent);
+
+        if (!empty($arrTourInstructors)) {
+            $template->tourInstructors = implode(', ', $arrTourInstructors);
+        }
+
+        // tourTechDifficulty
+        $template->tourTechDifficulty = null;
+        $arrTourTechDiff = $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent);
+
+        if (!empty($arrTourTechDiff)) {
+            $template->tourTechDifficulty = implode(', ', $arrTourTechDiff);
+        }
+
+        // eventOrganizers
+        $template->eventOrganizers = null;
+        $arrEventOrganizers = $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent);
+
+        if (!empty($arrEventOrganizers)) {
+            $template->eventOrganizers = implode(', ', $arrEventOrganizers);
+        }
+
+        $template->tourProfile = null;
+        $template->tourWaypoints = null;
+        $template->tourHighlights = null;
+        $template->tourPublicTransportInfo = null;
+
+        if ($this->story->doPublishInClubMagazine) {
+            $template->doPublishInClubMagazine = true;
+        }
+
+        if ('' !== $this->story->tourWaypoints) {
+            $template->tourWaypoints = nl2br((string)$this->story->tourWaypoints);
+        }
+
+        if ('' !== $this->story->tourProfile) {
+            $template->tourProfile = nl2br((string)$this->story->tourProfile);
+        }
+
+        if ($this->story->doPublishInClubMagazine && '' !== $this->story->tourHighlights) {
+            $template->tourHighlights = nl2br((string)$this->story->tourHighlights);
+        }
+
+        if ($this->story->doPublishInClubMagazine && '' !== $this->story->tourPublicTransportInfo) {
+            $template->tourPublicTransportInfo = nl2br((string)$this->story->tourPublicTransportInfo);
+        }
 
         return $template->getResponse();
     }

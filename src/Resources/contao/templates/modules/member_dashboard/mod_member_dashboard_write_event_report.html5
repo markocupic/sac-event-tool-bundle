@@ -107,23 +107,63 @@
     {{br}}
 
     <!-- Start text -->
-    <h3>Vorschau</h3>
+    <p class="text-muted">------------------- Vorschau -------------------</p>
     <?php if (strlen((string)$this->text) > 0): ?>
-      <div class="ce_text block">
+      <div class="event-info-box icon-box-small">
+        <h5>Bericht</h5>
         <?= nl2br(html_entity_decode(htmlspecialchars_decode((string)$this->text))) ?>
       </div>
     <?php endif; ?>
-    <!-- End text -->
+        <!-- End text -->
+    <?php if($this->eventOrganizers): ?>
+    <div class="event-info-box icon-box-small">
+      <h5 class="mt-lg-0">Gruppe</h5>
+      <p><?= $this->eventOrganizers ?></p>
+    </div>
+    <?php endif; ?>
+
+    <?php if($this->tourTechDifficulty !== ''): ?>
+    <div class="event-info-box icon-box-small">
+      <h5>Schwierigkeit</h5>
+      <p><?= $this->tourTechDifficulty ?></p>
+    </div>
+    <?php endif; ?>
+
+    <?php if($this->tourWaypoints !== ''): ?>
+    <div class="event-info-box icon-box-small">
+      <h5>Tourenstationen</h5>
+      <p><?= $this->tourWaypoints ?></p>
+    </div>
+    <?php endif; ?>
+
+    <?php if($this->doPublishInClubMagazine && $this->tourPublicTransportInfo !== ''): ?>
+    <div class="event-info-box icon-box-small">
+      <h5>ÖV</h5>
+      <p><?= $this->tourPublicTransportInfo ?></p>
+    </div>
+    <?php endif; ?>
+
+    <?php if($this->doPublishInClubMagazine && $this->tourHighlights !== ''): ?>
+    <div class="event-info-box icon-box-small">
+      <h5>Highlights</h5>
+      <p><?= $this->tourHighlights ?></p>
+    </div>
+    <?php endif; ?>
+
+    <?php if($this->tourProfile !== ''): ?>
+    <div class="event-info-box icon-box-small">
+      <h5>Eckdaten</h5>
+      <p><?= $this->tourProfile ?></p>
+    </div>
+    <?php endif; ?>
 
     <!-- Start gallery -->
     <?php $this->insert('write_event_report_gallery_partial', $this->getData()); ?>
 
     <?php if ($this->youtubeId): ?>
       {{br}}
-      <div class="ce_bootstrapYoutubeResponsiveEmbed block">
-        <div class="embed-responsive embed-responsive-16by9">
-          <iframe class="embed-responsive-item" src="//www.youtube.com/embed/<?= $this->youtubeId ?>?rel=0" allowfullscreen=""></iframe>
-        </div>
+      <div class="ratio ratio-16x9">
+        <iframe src="//www.youtube.com/embed/<?= $this->youtubeId ?>?rel=0" allowfullscreen=""></iframe>
       </div>
     <?php endif; ?>
 <?php endif; ?>

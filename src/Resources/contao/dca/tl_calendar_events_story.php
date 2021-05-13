@@ -103,7 +103,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 	'palettes'    => array
 	(
 		'__selector__' => array('doPublishInClubMagazine'),
-		'default' => '{publishState_legend},publishState,checkedByInstructor;{tourInfoBox_legend},doPublishInClubMagazine;{author_legend},addedOn,sacMemberId,authorName;{event_legend},eventId,title,eventTitle,eventSubstitutionText,organizers,text,youtubeId,multiSRC',
+		'default' => '{publishState_legend},publishState,checkedByInstructor;
+		{tourInfoBox_legend},doPublishInClubMagazine;{author_legend},addedOn,sacMemberId,authorName;
+		{event_legend},eventId,title,eventTitle,eventSubstitutionText,organizers,text,youtubeId,multiSRC
+		',
 	),
 
 	// Subpalettes
