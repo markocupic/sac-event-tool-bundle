@@ -25,7 +25,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][3] = 'Bericht
 
 // Fields
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['addedOn'] = array("Erstellungsdatum", "Geben Sie das Erstellungsdatum en.");
-$GLOBALS['TL_LANG']['tl_calendar_events_story']['publishState'] = array("Veröffentlichungsstatus", "Geben Sie den Veröffenlichungslevel ein.");
+$GLOBALS['TL_LANG']['tl_calendar_events_story']['publishState'] = array("Veröffentlichungs-Level", "Geben Sie den Veröffenlichungslevel ein.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['doPublishInClubMagazine'] = array("In Mitgliederzeitschrift veröffentlichen", "Geben Sie an, ob der Bericht für die Veröffentlichung in der Mitgliederzeitschrift vorgesehen werden soll.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['checkedByInstructor'] = array("Durch Tourenleiter geprüft", "Geben Sie an, ob der Bericht durch den verantwortlichen Tourenleiter geprüft wurde.");
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['sacMemberId'] = array("SAC-Mitgliedernummer des Autors", "");
