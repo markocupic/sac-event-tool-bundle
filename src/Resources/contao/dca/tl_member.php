@@ -23,7 +23,7 @@ PaletteManipulator::create()
 	->addLegend('avatar_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
 	->addField(array('avatar'), 'avatar_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('foodHabits'), 'food_legend', PaletteManipulator::POSITION_AFTER)
-	->addField(array('isSacMember', 'sacMemberId', 'uuid', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'phoneBusiness', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'), 'section_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(array('isSacMember', 'sacMemberId', 'ahvNumber', 'uuid', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'phoneBusiness', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'), 'section_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('emergencyPhone', 'emergencyPhoneName'), 'emergency_legend', PaletteManipulator::POSITION_APPEND)
 	->applyToPalette('default', 'tl_member');
 
@@ -39,7 +39,6 @@ $GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index
 // More fields...
 // Avatar
 $GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['avatar'],
 	'exclude'   => true,
 	'inputType' => 'fileTree',
 	'eval'      => array('filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'),
@@ -48,7 +47,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = array(
 
 // Uuid from SAC central committee in Bern
 $GLOBALS['TL_DCA']['tl_member']['fields']['uuid'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['uuid'],
 	'exclude'   => true,
 	'inputType' => 'text',
 	'eval'      => array('mandatory' => false, 'tl_class' => 'w50'),
@@ -57,7 +55,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['uuid'] = array(
 
 // activationLinkLifetime
 $GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['activationLinkLifetime'],
 	'exclude'   => true,
 	'inputType' => 'text',
 	'eval'      => array('rgxp' => 'datim', 'mandatory' => false, 'datepicker' => true, 'tl_class' => 'clr wizard'),
@@ -66,7 +63,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = array(
 
 // activation
 $GLOBALS['TL_DCA']['tl_member']['fields']['activation'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['activation'],
 	'exclude'   => true,
 	'inputType' => 'text',
 	'eval'      => array('mandatory' => false, 'tl_class' => 'w50'),
@@ -75,7 +71,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['activation'] = array(
 
 // activationFalseTokenCounter
 $GLOBALS['TL_DCA']['tl_member']['fields']['activationFalseTokenCounter'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['activationFalseTokenCounter'],
 	'exclude'   => true,
 	'inputType' => 'text',
 	'eval'      => array('rgxp' => 'natural'),
@@ -84,7 +79,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['activationFalseTokenCounter'] = array
 
 // isSacMember
 $GLOBALS['TL_DCA']['tl_member']['fields']['isSacMember'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['isSacMember'],
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'checkbox',
@@ -94,7 +88,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['isSacMember'] = array(
 
 // sacMemberId
 $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['sacMemberId'],
 	'exclude'   => true,
 	'search'    => true,
 	'sorting'   => true,
@@ -104,9 +97,17 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = array(
 	'sql'       => "int(10) unsigned NOT NULL default '0'",
 );
 
+// ahvNumber
+$GLOBALS['TL_DCA']['tl_member']['fields']['ahvNumber'] = array(
+    'exclude'   => true,
+    'search'    => true,
+    'inputType' => 'text',
+    'eval'      => array('mandatory' => false, 'maxlength' => 16, 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
+    'sql'       => "varchar(255) NOT NULL default ''",
+);
+
 // sectionId
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionId'],
 	'exclude'   => true,
 	'reference' => &$GLOBALS['TL_LANG']['tl_member']['section'],
 	'inputType' => 'checkbox',
@@ -118,7 +119,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = array(
 
 // profession
 $GLOBALS['TL_DCA']['tl_member']['fields']['profession'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['profession'],
 	'exclude'   => true,
 	'search'    => true,
 	'sorting'   => true,
@@ -130,7 +130,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['profession'] = array(
 
 // addressExtra
 $GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['addressExtra'],
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
@@ -140,7 +139,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra'] = array(
 
 // streetExtra
 $GLOBALS['TL_DCA']['tl_member']['fields']['streetExtra'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['streetExtra'],
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
@@ -150,7 +148,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['streetExtra'] = array(
 
 // phoneBusiness
 $GLOBALS['TL_DCA']['tl_member']['fields']['phoneBusiness'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['phoneBusiness'],
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
@@ -160,7 +157,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['phoneBusiness'] = array(
 
 // entryYear
 $GLOBALS['TL_DCA']['tl_member']['fields']['entryYear'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['entryYear'],
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'text',
@@ -170,7 +166,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['entryYear'] = array(
 
 // membershipType
 $GLOBALS['TL_DCA']['tl_member']['fields']['membershipType'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['membershipType'],
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'text',
@@ -180,7 +175,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['membershipType'] = array(
 
 // sectionInfo1
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo1'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionInfo1'],
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'text',
@@ -190,7 +184,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo1'] = array(
 
 // sectionInfo2
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo2'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionInfo2'],
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'text',
@@ -200,7 +193,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo2'] = array(
 
 // sectionInfo3
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo3'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionInfo3'],
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'text',
@@ -210,7 +202,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo3'] = array(
 
 // sectionInfo4
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo4'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['sectionInfo4'],
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'text',
@@ -220,7 +211,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo4'] = array(
 
 // debit
 $GLOBALS['TL_DCA']['tl_member']['fields']['debit'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['debit'],
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'text',
@@ -230,7 +220,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['debit'] = array(
 
 // memberStatus
 $GLOBALS['TL_DCA']['tl_member']['fields']['memberStatus'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['memberStatus'],
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'text',
@@ -240,7 +229,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['memberStatus'] = array(
 
 // emergencyPhone
 $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhone'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['emergencyPhone'],
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
@@ -250,7 +238,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhone'] = array(
 
 // emergencyPhoneName
 $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhoneName'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['emergencyPhoneName'],
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
@@ -260,7 +247,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhoneName'] = array(
 
 // foodHabits
 $GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = array(
-	'label'     => &$GLOBALS['TL_LANG']['tl_member']['foodHabits'],
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',

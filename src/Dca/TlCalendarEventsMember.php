@@ -339,7 +339,7 @@ class TlCalendarEventsMember extends Backend
             $csv->setDelimiter(';');
 
             // Selected fields
-            $arrFields = ['id', 'stateOfSubscription', 'addedOn', 'carInfo', 'ticketInfo', 'notes', 'instructorNotes', 'bookingType', 'sacMemberId', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'foodHabits', 'street', 'postal', 'city', 'mobile', 'email', 'emergencyPhone', 'emergencyPhoneName', 'hasParticipated'];
+            $arrFields = ['id', 'stateOfSubscription', 'addedOn', 'carInfo', 'ticketInfo', 'notes', 'instructorNotes', 'bookingType', 'sacMemberId', 'ahvNumber', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'foodHabits', 'street', 'postal', 'city', 'mobile', 'email', 'emergencyPhone', 'emergencyPhoneName', 'hasParticipated'];
 
             // Insert headline first
             Controller::loadLanguageFile('tl_calendar_events_member');
@@ -520,8 +520,8 @@ class TlCalendarEventsMember extends Backend
                 // Check if member has already booked at the same time
                 $objMember = MemberModel::findOneBySacMemberId($objEventMemberModel->sacMemberId);
 
-                if ('subscription-accepted' === $varValue && null !== $objMember && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember)) {
-                    $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht bestätigt serden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde.';
+                if ('subscription-accepted' === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember)) {
+                    $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".';
                     $varValue = $objEventMemberModel->stateOfSubscription;
                 } elseif (Validator::isEmail($objEventMemberModel->email)) {
                     // Use terminal42/notification_center
@@ -628,9 +628,9 @@ class TlCalendarEventsMember extends Backend
         }
 
         if (isset($_POST['refuseWithoutEmail'])) {
-            $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
+            $objEventMemberModel = CalendarEventsMemberModel::findByPk(Input::get('id'));
 
-            if (null !== $objRegistration) {
+            if (null !== $objEventMemberModel) {
                 $set = ['stateOfSubscription' => 'subscription-refused'];
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
                 $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail von der Event-Teilnahme abgelehnt und muss noch darüber informiert werden.';
@@ -640,9 +640,9 @@ class TlCalendarEventsMember extends Backend
         }
 
         if (isset($_POST['acceptWithoutEmail'])) {
-            $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
+            $objEventMemberModel = CalendarEventsMemberModel::findByPk(Input::get('id'));
 
-            if (null !== $objRegistration) {
+            if (null !== $objEventMemberModel) {
                 $set = ['stateOfSubscription' => 'subscription-accepted'];
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
                 $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail zum Event zugelassen und muss noch darüber informiert werden.';
@@ -652,9 +652,9 @@ class TlCalendarEventsMember extends Backend
         }
 
         if (isset($_POST['addToWaitlist'])) {
-            $objRegistration = CalendarEventsMemberModel::findByPk(Input::get('id'));
+            $objEventMemberModel = CalendarEventsMemberModel::findByPk(Input::get('id'));
 
-            if (null !== $objRegistration) {
+            if (null !== $objEventMemberModel) {
                 $set = ['stateOfSubscription' => 'subscription-waitlisted'];
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
                 $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail auf die Warteliste gesetzt und muss noch darüber informiert werden.';
@@ -732,19 +732,19 @@ class TlCalendarEventsMember extends Backend
      */
     public function inputFieldCallbackDashboard(DataContainer $dc)
     {
-        $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
+        $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
 
-        if (null !== $objRegistration) {
+        if (null !== $objEventMemberModel) {
             $objTemplate = new BackendTemplate('be_calendar_events_registration_dashboard');
-            $objTemplate->objRegistration = $objRegistration;
-            $objTemplate->stateOfSubscription = $objRegistration->stateOfSubscription;
-            $objEvent = CalendarEventsModel::findByPk($objRegistration->eventId);
+            $objTemplate->objRegistration = $objEventMemberModel;
+            $objTemplate->stateOfSubscription = $objEventMemberModel->stateOfSubscription;
+            $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
 
             if (null !== $objEvent) {
                 $objTemplate->objEvent = $objEvent;
 
-                if (!$objRegistration->hasParticipated && '' !== $objRegistration->email) {
-                    if (Validator::isEmail($objRegistration->email)) {
+                if (!$objEventMemberModel->hasParticipated && '' !== $objEventMemberModel->email) {
+                    if (Validator::isEmail($objEventMemberModel->email)) {
                         $objTemplate->showEmailButtons = true;
                     }
                 }
@@ -829,9 +829,9 @@ class TlCalendarEventsMember extends Backend
         // Send notification
         if ('tl_calendar_events_member' === Input::post('FORM_SUBMIT')) {
             if ('' !== Input::post('subject') && '' !== Input::post('text')) {
-                $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
+                $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
 
-                if (null !== $objRegistration) {
+                if (null !== $objEventMemberModel) {
                     if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'))) {
                         throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in '.__METHOD__.' LINE: '.__LINE__);
                     }
@@ -843,7 +843,7 @@ class TlCalendarEventsMember extends Backend
                         $arrTokens = [
                             'email_sender_name' => html_entity_decode((string) html_entity_decode((string) Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'))),
                             'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
-                            'send_to' => $objRegistration->email,
+                            'send_to' => $objEventMemberModel->email,
                             'reply_to' => $this->User->email,
                             // 'recipient_cc'       => '',
                             // 'recipient_bcc'      => '',
@@ -853,14 +853,14 @@ class TlCalendarEventsMember extends Backend
                         ];
 
                         // Check if member has already booked at the same time
-                        $objMember = MemberModel::findOneBySacMemberId($objRegistration->sacMemberId);
-                        $objEvent = CalendarEventsModel::findByPk($objRegistration->eventId);
+                        $objMember = MemberModel::findOneBySacMemberId($objEventMemberModel->sacMemberId);
+                        $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
 
-                        if ('acceptWithEmail' === Input::get('call') && null !== $objMember && null !== $objEvent && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember)) {
-                            $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht bestätigt serden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde.';
+                        if ('acceptWithEmail' === Input::get('call') && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && null !== $objEvent && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember)) {
+                            $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".';
                         }
                         // Send email
-                        elseif (Validator::isEmail($objRegistration->email)) {
+                        elseif (Validator::isEmail($objEventMemberModel->email)) {
                             $objEmail->send($arrTokens, 'de');
                             $set = ['stateOfSubscription' => $arrAction['stateOfSubscription']];
                             $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
@@ -890,11 +890,11 @@ class TlCalendarEventsMember extends Backend
             }
         } else { // Prefill form
             // Get the registration object
-            $objRegistration = CalendarEventsMemberModel::findByPk($dc->id);
+            $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
 
-            if (null !== $objRegistration) {
+            if (null !== $objEventMemberModel) {
                 // Get the event object
-                $objEvent = $objRegistration->getRelated('eventId');
+                $objEvent = $objEventMemberModel->getRelated('eventId');
 
                 // Get event dates as a comma separated string
                 $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent);
@@ -907,8 +907,8 @@ class TlCalendarEventsMember extends Backend
 
                 // Build token array
                 $arrTokens = [
-                    'participantFirstname' => $objRegistration->firstname,
-                    'participantLastname' => $objRegistration->lastname,
+                    'participantFirstname' => $objEventMemberModel->firstname,
+                    'participantLastname' => $objEventMemberModel->lastname,
                     'eventName' => $objEvent->title,
                     'courseId' => $objEvent->courseId,
                     'eventType' => $objEvent->eventType,

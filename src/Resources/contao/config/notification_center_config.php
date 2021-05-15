@@ -36,8 +36,8 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['sac_event_tool'] = array
 		'recipients'           => array('participant_email', 'instructor_email'),
 		'email_replyTo'        => array('instructor_email'),
 		'email_subject'        => array('event_name'),
-		'email_text'           => array('event_name', 'event_type', 'event_course_id', 'instructor_name', 'instructor_email', 'participant_name', 'participant_email', 'participant_street', 'participant_postal', 'participant_city', 'participant_date_of_birth', 'participant_sac_member_id', 'participant_contao_member_id', 'participant_section_membership', 'participant_mobile', 'participant_emergency_phone', 'participant_emergency_phone_name', 'participant_food_habits', 'participant_notes', 'event_id', 'event_link_detail', 'event_state'),
-		'email_html'           => array('event_name', 'event_type', 'event_course_id', 'instructor_name', 'instructor_email', 'participant_name', 'participant_email', 'participant_street', 'participant_postal', 'participant_city', 'participant_date_of_birth', 'participant_sac_member_id', 'participant_contao_member_id', 'participant_section_membership', 'participant_mobile', 'participant_emergency_phone', 'participant_emergency_phone_name', 'participant_food_habits', 'participant_notes', 'event_id', 'event_link_detail', 'event_state'),
+		'email_text'           => array('event_name', 'event_type', 'event_course_id', 'instructor_name', 'instructor_email', 'participant_name', 'participant_email', 'participant_street', 'participant_postal', 'participant_city', 'participant_date_of_birth', 'participant_sac_member_id', 'participant_ahv_number', 'participant_contao_member_id', 'participant_section_membership', 'participant_mobile', 'participant_emergency_phone', 'participant_emergency_phone_name', 'participant_food_habits', 'participant_notes', 'event_id', 'event_link_detail', 'event_state'),
+		'email_html'           => array('event_name', 'event_type', 'event_course_id', 'instructor_name', 'instructor_email', 'participant_name', 'participant_email', 'participant_street', 'participant_postal', 'participant_city', 'participant_date_of_birth', 'participant_sac_member_id', 'participant_ahv_number', 'participant_contao_member_id', 'participant_section_membership', 'participant_mobile', 'participant_emergency_phone', 'participant_emergency_phone_name', 'participant_food_habits', 'participant_notes', 'event_id', 'event_link_detail', 'event_state'),
 	),
 
 	// Type
@@ -68,8 +68,8 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['sac_event_tool'] = array
 	'notify_on_new_event_story'      => array
 	(
 		// Field in tl_nc_language
-        'recipients' => array('author_email', 'instructor_email', 'webmaster_email'),
-        'email_recipient_cc' => array('author_email', 'instructor_email', 'webmaster_email'),
+		'recipients' => array('author_email', 'instructor_email', 'webmaster_email'),
+		'email_recipient_cc' => array('author_email', 'instructor_email', 'webmaster_email'),
 		'email_subject'      => array('hostname', 'story_title', 'story_text', 'story_link_backend', 'story_link_frontend', 'event_title', 'author_name', 'author_name', 'author_email', 'author_sac_member_id', 'instructor_name', 'instructor_email', 'webmaster_email'),
 		'email_text'         => array('hostname', 'story_title', 'story_text', 'story_link_backend', 'story_link_frontend', 'event_title', 'author_name', 'author_name', 'author_email', 'author_sac_member_id', 'instructor_name', 'instructor_email', 'webmaster_email'),
 	),

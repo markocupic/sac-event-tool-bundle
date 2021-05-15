@@ -25,6 +25,7 @@ $GLOBALS['TL_LANG']['tl_member']['activation'] = array('Aktivierungscode', '');
 $GLOBALS['TL_LANG']['tl_member']['activationLinkLifetime'] = array('Gültigkeitsdauer Aktivierungstoken', '');
 $GLOBALS['TL_LANG']['tl_member']['isSacMember'] = array('Dieser User ist ein SAC-Mitglied', 'Dieses Mitglied wurde in der Datenbank (CSV-File) beim täglichen Sync gefunden.');
 $GLOBALS['TL_LANG']['tl_member']['sacMemberId'] = array('Mitgliedernummer', '');
+$GLOBALS['TL_LANG']['tl_member']['ahvNumber'] = ["AHV-Nummer", 'Geben Sie hier die AHV-Nummer ein.'];
 $GLOBALS['TL_LANG']['tl_member']['emergencyPhone'] = array('Notfall-Benachrichtigungs-Telefonnummer', 'Geben Sie die Telefonnummer einer Ihnen vertrauten Person an, welche in einem Notfall kontaktiert werden kann.');
 $GLOBALS['TL_LANG']['tl_member']['emergencyPhoneName'] = array('Kontaktperson für Notfallbenachrichtigung', 'Geben Sie den Namen der Kontaktperson ein, welche im FAlle eines Notfalls benachrichtigt werden soll.');
 $GLOBALS['TL_LANG']['tl_member']['sectionId'] = array('Sektion', '');

@@ -64,7 +64,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['customizeEventRegistrat
 $strLegends = '
 {tour_report_legend:hide};{event_type_legend};
 {title_legend:hide};{date_legend:hide};{recurring_legend:hide};{details_legend:hide};
-{min_max_member_legend:hide};{registration_legend:hide};{deregistration_legend:hide};{event_registration_confirmation_legend:hide};
+{min_max_member_legend:hide};{registration_legend:hide};{deregistration_legend:hide};{sign_up_form_legend:hide};{event_registration_confirmation_legend:hide};
 {image_legend:hide};{gallery_legend:hide};{broschuere_legend:hide};
 {enclosure_legend:hide};{source_legend:hide};{expert_legend:hide}
 ';
@@ -98,8 +98,9 @@ PaletteManipulator::create()
 	->addField(array('terms', 'issues'), 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(array('customizeEventRegistrationConfirmationEmailText'), 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('askForAhvNumber'), 'sign_up_form_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('customizeEventRegistrationConfirmationEmailText'), 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
@@ -118,7 +119,8 @@ PaletteManipulator::create()
 	->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(array('customizeEventRegistrationConfirmationEmailText'), 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('askForAhvNumber'), 'sign_up_form_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('customizeEventRegistrationConfirmationEmailText'), 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('source'), 'source_legend', PaletteManipulator::POSITION_APPEND)
@@ -139,7 +141,8 @@ PaletteManipulator::create()
 	->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(array('customizeEventRegistrationConfirmationEmailText'), 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('askForAhvNumber'), 'sign_up_form_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('customizeEventRegistrationConfirmationEmailText'), 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('source'), 'source_legend', PaletteManipulator::POSITION_APPEND)
@@ -158,7 +161,8 @@ PaletteManipulator::create()
 	->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(array('customizeEventRegistrationConfirmationEmailText'), 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('askForAhvNumber'), 'sign_up_form_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(array('customizeEventRegistrationConfirmationEmailText'), 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addImage'), 'image_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addGallery'), 'gallery_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
@@ -567,6 +571,15 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['singleSRCBroschuere'] = arra
 	'inputType' => 'fileTree',
 	'eval'      => array('filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'mandatory' => false),
 	'sql'       => "binary(16) NULL",
+);
+
+// askForAhvNumber
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['askForAhvNumber'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['askForAhvNumber'],
+    'exclude'   => true,
+    'filter'    => true,
+    'inputType' => 'checkbox',
+    'sql'       => "char(1) NOT NULL default ''",
 );
 
 // Disable online registration

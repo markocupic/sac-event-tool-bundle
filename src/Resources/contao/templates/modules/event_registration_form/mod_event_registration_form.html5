@@ -81,6 +81,15 @@
                     {{br}}
                     <?php endif; ?>
 
+                    <?php if ($this->objForm->hasFormField('ahvNumber')): ?>
+                      <?= $this->objForm->getWidget('ahvNumber')->parse(); ?>
+                      <div class="alert alert-success" role="alert">
+                        <i class="fas fa-check-circle"></i>
+                        <div>Sämtliche Daten werden lediglich für interne Zwecke verwendet. Die AHV-Nummer wird ausschliesslich für die Abrechnung oder Rückforderung von Geldern von J+S verwendet. Die persönlichen Daten werden vertraulich behandelt. Eine Weitergabe an Drittorganisationen ist ausgeschlossen.</div>
+                      </div>
+                      {{br}}
+                    <?php endif; ?>
+
                     <?php if ($this->objForm->hasFormField('notes')): ?>
                       <?= $this->objForm->getWidget('notes')->parse(); ?>
                       <div class="alert alert-success" role="alert">

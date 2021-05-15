@@ -351,6 +351,13 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
             }
         }
 
+        if ($objEvent->askForAhvNumber) {
+            $objForm->addFormField('ahvNumber', [
+                'label' => 'AHV-Nummer',
+                'inputType' => 'text',
+                'eval' => ['mandatory' => true, 'maxlength' => 16, 'rgxp' => 'alnum', 'placeholder' => '756.1234.5678.97'],
+            ]);
+        }
         $objForm->addFormField('mobile', [
             'label' => 'Mobilnummer',
             'inputType' => 'text',
@@ -403,7 +410,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $objForm->addContaoHiddenFields();
 
         // Get form presets from tl_member
-        $arrFields = ['mobile', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits'];
+        $arrFields = ['mobile', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits', 'ahvNumber'];
 
         foreach ($arrFields as $field) {
             if ($objForm->hasFormField($field)) {
@@ -452,8 +459,15 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                 $objMemberModel = $memberModelAdapter->findByPk($this->objUser->id);
 
                 if (null !== $objMemberModel) {
-                    $arrData = $objForm->fetchAll();
-                    $arrData = array_merge($objMemberModel->row(), $arrData);
+                    $arrDataForm = $objForm->fetchAll();
+                    $arrData = array_merge($objMemberModel->row(), $arrDataForm);
+
+                    // Do not send ahv number if it is not required
+                    if(!isset($arrDataForm['ahvNumber']))
+                    {
+                        unset($arrData['ahvNumber']);
+                    }
+
                     $arrData['contaoMemberId'] = $objMemberModel->id;
                     $arrData['eventName'] = $this->objEvent->title;
                     $arrData['eventId'] = $this->objEvent->id;
@@ -468,8 +482,15 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                         $objMemberModel->save();
                     }
 
+                    // Save emergency phone name to user profile
                     if (empty($objMemberModel->emergencyPhoneName)) {
                         $objMemberModel->emergencyPhoneName = $arrData['emergencyPhoneName'];
+                        $objMemberModel->save();
+                    }
+
+                    // Save emergency phone name to user profile
+                    if (!empty($arrData['ahvNumber'])) {
+                        $objMemberModel->ahvNumber = $arrData['ahvNumber'];
                         $objMemberModel->save();
                     }
 
@@ -572,6 +593,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                 'participant_city' => html_entity_decode((string) $objMember->city),
                 'participant_contao_member_id' => $objMember->id,
                 'participant_sac_member_id' => $objMember->sacMemberId,
+                'participant_ahv_number' => html_entity_decode((string) $arrData['ahvNumber']),
                 'participant_section_membership' => $calendarEventsHelperAdapter->getSectionMembershipAsString($objMember),
                 'participant_mobile' => $arrData['mobile'],
                 'participant_date_of_birth' => $arrData['dateOfBirth'] > 0 ? $dateAdapter->parse('d.m.Y', $arrData['dateOfBirth']) : '---',
