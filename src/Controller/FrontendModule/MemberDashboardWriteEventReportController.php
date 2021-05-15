@@ -40,6 +40,7 @@ use Contao\System;
 use Contao\Template;
 use Contao\Validator;
 use Haste\Form\Form;
+use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Request;
@@ -262,6 +263,9 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                 // Generate forms
                 $this->template->objEventStoryTextAndYoutubeForm = $this->generateTextAndYoutubeForm($objReportModel);
                 $this->template->objEventStoryImageUploadForm = $this->generatePictureUploadForm($objReportModel, $model);
+
+                // Get the preview link
+                $this->template->previewLink = $this->getPreviewLink($objReportModel, $model);
             }
         }
 
@@ -394,7 +398,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         );
 
         // tour waypoints
-        $eval = ['rows' => 2, 'decodeEntities' => true,'placeholder' => 'z.B. Engelberg 1000m - Herrenrüti 1083 m - Galtiberg 1800 m - Einstieg 2000 m'];
+        $eval = ['rows' => 2, 'decodeEntities' => true, 'placeholder' => 'z.B. Engelberg 1000m - Herrenrüti 1083 m - Galtiberg 1800 m - Einstieg 2000 m'];
 
         if ($objEventStoryModel->doPublishInClubMagazine) {
             $eval['mandatory'] = true;
@@ -852,5 +856,41 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         }
 
         return array_values($images);
+    }
+
+    /**
+     * @param CalendarEventsStoryModel $objStory
+     * @param ModuleModel $objModule
+     * @return string
+     */
+    protected function getPreviewLink(CalendarEventsStoryModel $objStory, ModuleModel $objModule): string
+    {
+        /** @var PageModel $pageModelAdapter */
+        $pageModelAdapter = $this->get('contao.framework')->getAdapter(PageModel::class);
+
+        /** @var Config $configAdapter */
+        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+
+        /** @var Environment $environmentAdapterAdapter */
+        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+
+        /** @var Url $urlAdapter */
+        $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
+
+
+        // Generate frontend preview link
+        $previewLink = '';
+
+        if ($objModule->eventStoryJumpTo > 0) {
+            $objTarget = $pageModelAdapter->findByPk($objModule->eventStoryJumpTo);
+
+            if (null !== $objTarget) {
+                $previewLink = ampersand($objTarget->getFrontendUrl($configAdapter->get('useAutoItem') ? '/%s' : '/items/%s'));
+                $previewLink = sprintf($previewLink, $objStory->id);
+                $previewLink = $environmentAdapter->get('url').'/'.$urlAdapter->addQueryString('securityToken='.$objStory->securityToken, $previewLink);
+            }
+        }
+
+        return $previewLink;
     }
 }

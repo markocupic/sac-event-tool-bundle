@@ -1,7 +1,8 @@
 <div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
 
     <?php if ($this->headline): ?>
-    <h1 class="ce_headline"><?= $this->headline ?></h1>
+    <h1 class="ce_headline mb-2"><?= $this->headline ?></h1>
+    <date class="d-block mb-3">vom: <?= $this->eventDates ?></date>
     <?php endif; ?>
 
     <?php if($this->eventSubstitutionText != ''): ?>
@@ -57,51 +58,78 @@
         <!-- start col right -->
         <div class="col-12 col-lg-4">
             <div class="p-3 mt-4 mt-lg-0 bg-light">
-                <?php if($this->eventOrganizers): ?>
-                <div class="event-info-box icon-box-small">
-                    <h5 class="mt-0">Gruppe</h5>
-                    <p><?= $this->eventOrganizers ?></p>
+                <?php if($this->tourTypes): ?>
+                <div class="event-info-box mt-0 d-flex">
+                    <i class="fad fa-fw fa-mountain text-primary"></i>
+                    <div class="ms-2">
+                        <h5 class="mt-0"><?= $this->tourTypes ?></h5>
+                    </div>
                 </div>
                 <?php endif; ?>
 
-                <?php if($this->tourTechDifficulty): ?>
-                <div class="event-info-box icon-box-small">
-                    <h5>Schwierigkeit</h5>
-                    <p><?= $this->tourTechDifficulty ?></p>
+                <?php if($this->eventOrganizers): ?>
+                <div class="event-info-box mt-3 d-flex">
+                    <i class="fad fa-fw fa-user-friends text-primary"></i>
+                    <div class="ms-2">
+                        <h5 class="mt-0">Gruppe</h5>
+                        <div><?= $this->eventOrganizers ?></div>
+                    </div>
                 </div>
                 <?php endif; ?>
 
                 <?php if($this->tourWaypoints): ?>
-                <div class="event-info-box icon-box-small">
-                    <h5>Tourenstationen</h5>
-                    <p><?= $this->tourWaypoints ?></p>
+                <div class="event-info-box mt-3 d-flex">
+                    <i class="fad fa-fw fa-pennant text-primary"></i>
+                    <div class="ms-2">
+                        <h5 class="mt-0">Tourenstationen</h5>
+                        <div><?= $this->tourWaypoints ?></div>
+                    </div>
                 </div>
                 <?php endif; ?>
 
-                <?php if($this->doPublishInClubMagazine && $this->tourPublicTransportInfo): ?>
-                <div class="event-info-box icon-box-small">
-                    <h5>ÖV</h5>
-                    <p><?= $this->tourPublicTransportInfo ?></p>
+                <?php if($this->tourProfile || $this->tourTechDifficulty): ?>
+                <div class="event-info-box mt-3 d-flex">
+                    <i class="fad fa-dumbbell text-primary"></i>
+                    <div class="ms-2">
+                        <h5 class="mt-0">Eckdaten</h5>
+                        <div>
+                            <?php if($this->tourTechDifficulty): ?>
+                            <?= $this->tourTechDifficulty ?>{{br}}
+                            <?php endif; ?>
+                            <?php if($this->tourProfile): ?>
+                            <?= $this->tourProfile ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
                 <?php endif; ?>
 
                 <?php if($this->doPublishInClubMagazine && $this->tourHighlights): ?>
-                <div class="event-info-box icon-box-small">
-                    <h5>Highlights</h5>
-                    <p><?= $this->tourHighlights ?></p>
+                <div class="event-info-box mt-3 d-flex">
+                    <i class="fad fa-fw fa-star text-primary"></i>
+                    <div class="ms-2">
+                        <h5 class="mt-0">Highlights/Bemerkungen</h5>
+                        <div><?= $this->tourHighlights ?></div>
+                    </div>
                 </div>
                 <?php endif; ?>
 
-                <?php if($this->tourProfile): ?>
-                <div class="event-info-box icon-box-small">
-                    <h5>Eckdaten</h5>
-                    <p><?= $this->tourProfile ?></p>
+                <?php if($this->doPublishInClubMagazine && $this->tourPublicTransportInfo): ?>
+                <div class="event-info-box mt-3 d-flex">
+                    <i class="fas fa-fw fa-tram text-primary"></i>
+                    <div class="ms-2">
+                        <h5 class="mt-0">ÖV</h5>
+                        <div><?= $this->tourPublicTransportInfo ?></div>
+                    </div>
                 </div>
                 <?php endif; ?>
 
-                <div class="event-info-box icon-box-small">
-                    <h5>Mehr</h5>
-                    <p><a href="{{event_url::<?= $this->eventId ?>}}" target="_blank">Zur Tour-/Kurs-Ausschreibung</a></p>
+                <div class="event-info-box mt-3 d-flex">
+                    <i class="fad fa-fw fa-info text-primary"></i>
+                    <div class="ms-2">
+                        <h5 class="mt-0">Weiteres</h5>
+                        <div><a href="{{event_url::<?= $this->eventId ?>}}" target="_blank">Zur Tour-/Kurs-Ausschreibung</a></div>
+                    </div>
                 </div>
             </div>
         </div>

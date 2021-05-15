@@ -43,6 +43,9 @@
           <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalFotoupload"><i class="fa fa-images"></i> Foto-Upload</button>
         </div>
         <?php endif; ?>
+        <div class="me-2">
+          <a class="btn btn-primary" target="_blank" href="<?= $this->previewLink ?>"><i class="fas fa-desktop"></i> Vorschau</a>
+        </div>
 
         <?php if ($this->text != '' && $this->publishState < 2): ?>
           <?php $this->insert('write_event_report_change_publish_state_partial', $this->getData()); ?>
@@ -72,7 +75,6 @@
     {{br}}
 
     <!-- Start text -->
-    <p class="text-muted">------------------- Vorschau -------------------</p>
     <?php if (strlen((string)$this->text) > 0): ?>
       <div class="event-info-box icon-box-small">
         <h5>Bericht</h5>
