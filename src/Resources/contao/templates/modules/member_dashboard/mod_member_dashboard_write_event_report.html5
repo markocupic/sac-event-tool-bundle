@@ -33,16 +33,16 @@
     {{br}}
     <p><strong>Ver&ouml;ffentlichungs-Level:</strong> <?= $this->publishState+1 ?> - <?= $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][$this->publishState] ?></p>
 
-    <?php if ($this->publishState < 3): ?>
       <div class="event-story-form-buttons d-flex flex-row align-items-center">
         <?php if ($this->publishState < 2): ?>
-        <div class="me-2">
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalWriteTextAndYt"><i class="fa fa-pencil"></i> Bericht bearbeiten</button>
-        </div>
-        <div class="me-2">
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalFotoupload"><i class="fa fa-images"></i> Foto-Upload</button>
-        </div>
+          <div class="me-2">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalWriteTextAndYt"><i class="fa fa-pencil"></i> Bericht bearbeiten</button>
+          </div>
+          <div class="me-2">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalFotoupload"><i class="fa fa-images"></i> Foto-Upload</button>
+          </div>
         <?php endif; ?>
+
         <div class="me-2">
           <a class="btn btn-primary" target="_blank" href="<?= $this->previewLink ?>"><i class="fas fa-desktop"></i> Vorschau</a>
         </div>
@@ -52,6 +52,7 @@
         <?php endif; ?>
       </div>
 
+    <?php if ($this->publishState < 3): ?>
       <div class="form-sent-please-wait d-flex justify-content-center">
         <div class="form-sent-please-wait-content text-center mt-5 mb-2 d-none">
           <i class="fal fa-spin fa-4x fa-spinner" aria-hidden="true"></i>
