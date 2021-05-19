@@ -111,6 +111,20 @@ class TlCalendarEventsStory extends Backend
             $objArticle->id
         );
 
+        // Key data
+        $arrKeyData = [];
+
+        if (!empty($objArticle->tourTechDifficulty)) {
+            $arrKeyData[] = $objArticle->tourTechDifficulty;
+        }
+
+        if (!empty($objArticle->tourProfile)) {
+            $arrKeyData[] = $objArticle->tourProfile;
+        }
+
+        // tourTypes
+        $arrTourTypes = CalendarEventsHelper::getTourTypesAsArray($objEvent, 'title');
+
         $options = ['multiline' => true];
         $objPhpWord->replace('doPublishClubMagazine', $strDoPublishClubMagazine, $options);
         $objPhpWord->replace('checkedByInstructor', $strCheckedByInstructor, $options);
@@ -120,12 +134,12 @@ class TlCalendarEventsStory extends Backend
         $objPhpWord->replace('sacMemberId', $objArticle->sacMemberId, $options);
         $objPhpWord->replace('authorEmail', $strAuthorEmail, $options);
         $objPhpWord->replace('addedOn', date('Y-m-d', (int) $objArticle->addedOn), $options);
+        $objPhpWord->replace('tourTypes', implode(', ', $arrTourTypes), $options);
         $objPhpWord->replace('organizers', $strOrganizers, $options);
         $objPhpWord->replace('instructors', $strInstructors, $options);
         $objPhpWord->replace('eventDates', $strEventDates, $options);
         $objPhpWord->replace('tourWaypoints', $objArticle->tourWaypoints, $options);
-        $objPhpWord->replace('tourTechDifficulty', $objArticle->tourTechDifficulty, $options);
-        $objPhpWord->replace('tourProfile', $objArticle->tourProfile, $options);
+        $objPhpWord->replace('keyData', implode("\r\n", $arrKeyData), $options);
         $objPhpWord->replace('tourHighlights', $objArticle->tourHighlights, $options);
         $objPhpWord->replace('tourPublicTransportInfo', $objArticle->tourPublicTransportInfo, $options);
         // Footer
