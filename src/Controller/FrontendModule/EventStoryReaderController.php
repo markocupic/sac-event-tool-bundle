@@ -305,13 +305,13 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
         // tourTypes
         $arrTourTypes = CalendarEventsHelper::getTourTypesAsArray($objEvent, 'title');
-        if(!empty($arrTourTypes))
-        {
+
+        if (!empty($arrTourTypes)) {
             $template->tourTypes = implode(', ', $arrTourTypes);
         }
 
         // eventDates
-        $template->eventDates = CalendarEventsHelper::getEventPeriod($objEvent,'d.m.Y', false);
+        $template->eventDates = CalendarEventsHelper::getEventPeriod($objEvent, 'd.m.Y', false);
 
         // tourTechDifficulty
         $template->tourTechDifficulty = null;
@@ -332,11 +332,6 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         $template->tourProfile = null;
         $template->tourWaypoints = null;
         $template->tourHighlights = null;
-        $template->tourPublicTransportInfo = null;
-
-        if ($this->story->doPublishInClubMagazine) {
-            $template->doPublishInClubMagazine = true;
-        }
 
         if ('' !== $this->story->tourWaypoints) {
             $template->tourWaypoints = nl2br((string) $this->story->tourWaypoints);
@@ -346,14 +341,13 @@ class EventStoryReaderController extends AbstractFrontendModuleController
             $template->tourProfile = nl2br((string) $this->story->tourProfile);
         }
 
-        if ($this->story->doPublishInClubMagazine && '' !== $this->story->tourHighlights) {
+        if ('' !== $this->story->tourHighlights) {
             $template->tourHighlights = nl2br((string) $this->story->tourHighlights);
         }
 
-        if ($this->story->doPublishInClubMagazine && '' !== $this->story->tourPublicTransportInfo) {
+        if ('' !== $this->story->tourPublicTransportInfo) {
             $template->tourPublicTransportInfo = nl2br((string) $this->story->tourPublicTransportInfo);
         }
-
 
         return $template->getResponse();
     }
@@ -391,6 +385,4 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
         return null;
     }
-
-
 }
