@@ -104,14 +104,14 @@
     </div>
     <?php endif; ?>
 
-    <?php if($this->doPublishInClubMagazine && $this->tourPublicTransportInfo !== ''): ?>
+    <?php if($this->tourPublicTransportInfo !== ''): ?>
     <div class="event-info-box icon-box-small">
       <h5>ÖV</h5>
       <p><?= $this->tourPublicTransportInfo ?></p>
     </div>
     <?php endif; ?>
 
-    <?php if($this->doPublishInClubMagazine && $this->tourHighlights !== ''): ?>
+    <?php if($this->tourHighlights !== ''): ?>
     <div class="event-info-box icon-box-small">
       <h5>Highlights</h5>
       <p><?= $this->tourHighlights ?></p>

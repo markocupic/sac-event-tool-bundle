@@ -10,16 +10,10 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
 			</div>
 			<div class="modal-body">
-				<div class="alert alert-dark">
-					<i class="fas fa-check-circle"></i>
-					<div>
-						Fallst du einer Veröffentlichung deines Berichts in der Mitgliederzeitschrift zustimmst, wird deine Arbeit durch die Redaktion und die Tourenleiterin/den Tourenleiter geprüft und vielleicht im nächsten Heft publiziert. So oder so wird dein Bericht auf der Webseite nach redaktioneller Prüfung freigeschaltet.
-					</div>
-				</div>
 				<div id="editReportFormBox">
 					<?= $this->objEventStoryTextAndYoutubeForm ?>
 					<p id="ctrl_text_strLenRemaining" class="text-success">
-						Verbleibende Zeichen: {{ ctrl_text.strLenRemaining }}
+						Verbleibende Zeichen (Leerzeichen inklusive): {{ ctrl_text.strLenRemaining }}
 					</p>
 				</div>
 			</div>
@@ -62,31 +56,6 @@
   				}
 			}
 	})
-</script>
-
-<script>
-    (function ($) {
-        // Hide/Show fields if the report should be published in the club magazine
-        jQuery(document).ready(function () {
-
-            let checkBox = document.getElementById('opt_doPublishInClubMagazine_0');
-            checkBox.addEventListener('change', (event) => {
-                if(checkBox.checked)
-                {
-                    $('.publish-clubmagazine-field').removeClass('d-none');
-                }else{
-                    $('.publish-clubmagazine-field').addClass('d-none');
-                }
-            });
-
-            if(checkBox.checked)
-            {
-                $('.publish-clubmagazine-field').removeClass('d-none');
-            }else{
-                $('.publish-clubmagazine-field').addClass('d-none');
-            }
-        });
-    })(jQuery);
 </script>
 
 <script>

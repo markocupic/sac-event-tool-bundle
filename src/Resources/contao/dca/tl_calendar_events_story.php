@@ -53,7 +53,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 		),
 		'label'             => array
 		(
-			'fields'         => array('publishState', 'doPublishInClubMagazine', 'checkedByInstructor', 'title', 'authorName'),
+			'fields'         => array('publishState', 'checkedByInstructor', 'title', 'authorName'),
 			'showColumns'    => true,
 			'label_callback' => array(TlCalendarEventsStory::class, 'addIcon'),
 		),
@@ -103,18 +103,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 	// Palettes
 	'palettes'    => array
 	(
-		'__selector__' => array('doPublishInClubMagazine'),
 		'default' => '
 		{publishState_legend},publishState,checkedByInstructor;
 		{author_legend},addedOn,sacMemberId,authorName;
-		{event_legend},eventId,title,eventTitle,eventSubstitutionText,organizers,tourWaypoints,tourProfile,tourTechDifficulty,text,youtubeId,multiSRC;
-		{tourInfoBox_legend},doPublishInClubMagazine',
-	),
-
-	// Subpalettes
-	'subpalettes' => array
-	(
-		'doPublishInClubMagazine' => 'tourHighlights,tourPublicTransportInfo'
+		{event_legend},eventId,title,eventTitle,eventSubstitutionText,organizers,tourWaypoints,tourProfile,tourTechDifficulty,text,tourHighlights,tourPublicTransportInfo,youtubeId,multiSRC',
 	),
 
 	// Fields
@@ -146,14 +138,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 			'options'   => array('1', '2', '3'),
 			'eval'      => array('tl_class' => 'clr', 'submitOnChange' => true),
 			'sql'       => "char(1) NOT NULL default '1'",
-		),
-		'doPublishInClubMagazine'          => array
-		(
-			'filter'    => true,
-			'default'   => 1,
-			'inputType' => 'checkbox',
-			'eval'      => array('tl_class' => 'clr', 'submitOnChange' => true),
-			'sql'       => "char(1) NOT NULL default ''",
 		),
 		'checkedByInstructor'          => array
 		(

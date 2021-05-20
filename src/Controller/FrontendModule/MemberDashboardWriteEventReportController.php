@@ -236,10 +236,6 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                 // Get the gallery
                 $this->template->images = $this->getGalleryImages($objReportModel);
 
-                if ($objReportModel->doPublishInClubMagazine) {
-                    $this->template->doPublishInClubMagazine = true;
-                }
-
                 if ('' !== $objReportModel->tourWaypoints) {
                     $this->template->tourWaypoints = nl2br((string) $objReportModel->tourWaypoints);
                 }
@@ -252,11 +248,11 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                     $this->template->tourTechDifficulty = nl2br((string) $objReportModel->tourTechDifficulty);
                 }
 
-                if ($objReportModel->doPublishInClubMagazine && '' !== $objReportModel->tourHighlights) {
+                if ('' !== $objReportModel->tourHighlights) {
                     $this->template->tourHighlights = nl2br((string) $objReportModel->tourHighlights);
                 }
 
-                if ($objReportModel->doPublishInClubMagazine && '' !== $objReportModel->tourPublicTransportInfo) {
+                if ('' !== $objReportModel->tourPublicTransportInfo) {
                     $this->template->tourPublicTransportInfo = nl2br((string) $objReportModel->tourPublicTransportInfo);
                 }
 
@@ -372,37 +368,20 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         $url = $environmentAdapter->get('uri');
         $objForm->setFormActionFromUri($url);
 
-        // do publish report in the club magazine
-        $objForm->addFormField('doPublishInClubMagazine', [
-            'label' => ['', 'Ich stimmer einer eventuellen Veröffentlichung meines Berichts in der Mitgliederzeitschrift zu.'],
-            'inputType' => 'checkbox',
-            'value' => $objEventStoryModel->doPublishInClubMagazine,
-        ]);
-
         // text
+        $maxlength = 1800;
         $objForm->addFormField('text', [
-            'label' => 'Touren-/Lager-/Kursbericht (max. 1800 Zeichen)',
+            'label' => 'Touren-/Lager-/Kursbericht (max. '.$maxlength.' Zeichen, inkl. Leerzeichen)',
             'inputType' => 'textarea',
-            'eval' => ['mandatory' => true, 'maxlength' => 1800, 'rows' => 8, 'decodeEntities' => true],
+            'eval' => ['mandatory' => true, 'maxlength' => $maxlength, 'rows' => 8, 'decodeEntities' => true],
             'value' => html_entity_decode((string) $objEventStoryModel->text),
         ]);
 
-        // youtube id
-        $objForm->addFormField('youtubeId',
-            [
-                'label' => 'Youtube Film-Id',
-                'inputType' => 'text',
-                'eval' => ['placeholder' => 'z.B. G02hYgT3nGw'],
-                'value' => $objEventStoryModel->youtubeId,
-            ]
-        );
+
 
         // tour waypoints
-        $eval = ['rows' => 2, 'decodeEntities' => true, 'placeholder' => 'z.B. Engelberg 1000m - Herrenrüti 1083 m - Galtiberg 1800 m - Einstieg 2000 m'];
+        $eval = ['mandatory' => true, 'rows' => 2, 'decodeEntities' => true, 'placeholder' => 'z.B. Engelberg 1000m - Herrenrüti 1083 m - Galtiberg 1800 m - Einstieg 2000 m'];
 
-        if ($objEventStoryModel->doPublishInClubMagazine) {
-            $eval['mandatory'] = true;
-        }
         $objForm->addFormField(
                 'tourWaypoints',
                 [
@@ -414,11 +393,8 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             );
 
         // tour profile
-        $eval = ['rows' => 2, 'decodeEntities' => true, 'placeholder' => 'z.B. Aufst: 1500 Hm/8 h, Abst: 1500 Hm/3 h'];
+        $eval = ['mandatory' => true, 'rows' => 2, 'decodeEntities' => true, 'placeholder' => 'z.B. Aufst: 1500 Hm/8 h, Abst: 1500 Hm/3 h'];
 
-        if ($objEventStoryModel->doPublishInClubMagazine) {
-            $eval['mandatory'] = true;
-        }
         $objForm->addFormField(
                 'tourProfile',
                 [
@@ -430,11 +406,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             );
 
         // tour difficulties
-        $eval = ['rows' => 2, 'decodeEntities' => true];
-
-        if ($objEventStoryModel->doPublishInClubMagazine) {
-            $eval['mandatory'] = true;
-        }
+        $eval = ['mandatory' => true, 'rows' => 2, 'decodeEntities' => true];
 
         $objForm->addFormField('tourTechDifficulty', [
             'label' => 'Technische Schwierigkeiten',
@@ -444,7 +416,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         ]);
 
         // tour highlights (not mandatory)
-        $eval = ['class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
+        $eval = ['mandatory' => true, 'class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
 
         $objForm->addFormField('tourHighlights', [
             'label' => 'Highlights/Bemerkungen (max. 3 Sätze)',
@@ -454,17 +426,24 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         ]);
 
         // tour public transport info
-        $eval = ['class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
+        $eval = ['mandatory' => false, 'class' => 'publish-clubmagazine-field', 'rows' => 2, 'decodeEntities' => true];
 
-        if ($objEventStoryModel->doPublishInClubMagazine) {
-            $eval['mandatory'] = true;
-        }
         $objForm->addFormField('tourPublicTransportInfo', [
             'label' => 'Mögliche ÖV-Verbindung',
             'inputType' => 'textarea',
             'eval' => $eval,
             'value' => html_entity_decode((string) $objEventStoryModel->tourPublicTransportInfo),
         ]);
+
+        // youtube id
+        $objForm->addFormField('youtubeId',
+            [
+                'label' => 'Youtube Film-Id',
+                'inputType' => 'text',
+                'eval' => ['placeholder' => 'z.B. G02hYgT3nGw'],
+                'value' => $objEventStoryModel->youtubeId,
+            ]
+        );
 
         // Let's add  a submit button
         $objForm->addFormField('submit', [
@@ -496,36 +475,6 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
                     ->addError('Bitte schreibe etwas zur Tour.')
                 ;
                 $hasErrors = true;
-            }
-
-            if ($objEventStoryModel->doPublishInClubMagazine) {
-                if ('' === $objEventStoryModel->tourWaypoints) {
-                    $objForm->getWidget('tourWaypoints')
-                        ->addError('Bitte ergänze die Tourenstationen mit den Höhenangaben.')
-                    ;
-                    $hasErrors = true;
-                }
-
-                if ('' === $objEventStoryModel->tourProfile) {
-                    $objForm->getWidget('tourProfile')
-                        ->addError('Bitte ergänzen Sie das Tourenprofil und mache Angaben zu den Höhenmetern und der Zeit.')
-                    ;
-                    $hasErrors = true;
-                }
-
-                if ('' === $objEventStoryModel->tourTechDifficulty) {
-                    $objForm->getWidget('tourTechDifficulty')
-                        ->addError('Bitte mache Angaben zu den technischen Schwierigkeiten der Tour.')
-                    ;
-                    $hasErrors = true;
-                }
-
-                if ('' === $objEventStoryModel->tourPublicTransportInfo) {
-                    $objForm->getWidget('tourPublicTransportInfo')
-                        ->addError('Bitte mache Angaben zu den möglichen ÖV-Verbindungen der Tour.')
-                    ;
-                    $hasErrors = true;
-                }
             }
 
             // Reload page
@@ -858,11 +807,6 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         return array_values($images);
     }
 
-    /**
-     * @param CalendarEventsStoryModel $objStory
-     * @param ModuleModel $objModule
-     * @return string
-     */
     protected function getPreviewLink(CalendarEventsStoryModel $objStory, ModuleModel $objModule): string
     {
         /** @var PageModel $pageModelAdapter */
@@ -876,7 +820,6 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
 
         /** @var Url $urlAdapter */
         $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
-
 
         // Generate frontend preview link
         $previewLink = '';
