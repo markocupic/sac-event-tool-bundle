@@ -52,15 +52,8 @@
         <?php endif; ?>
       </div>
 
-    <?php if ($this->publishState < 3): ?>
-      <div class="form-sent-please-wait d-flex justify-content-center">
-        <div class="form-sent-please-wait-content text-center mt-5 mb-2 d-none">
-          <i class="fal fa-spin fa-4x fa-spinner" aria-hidden="true"></i>
-          {{br}}{{br}}
-          <span>Bitte warten. Deine Anfrage wird gesendet.</span>
-        </div>
-      </div>
-
+    <?php if ($this->publishState < 2): ?>
+      
       <!-- Modal box tour report form -->
       <?php $this->insert('write_event_report_create_report_form_partial', $this->getData()); ?>
 

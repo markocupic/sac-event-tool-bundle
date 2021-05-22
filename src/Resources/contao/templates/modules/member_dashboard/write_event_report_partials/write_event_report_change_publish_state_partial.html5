@@ -15,22 +15,20 @@
 				<div class="alert alert-dark">
 					<i class="fas fa-check-circle fa-w-16"></i>
 					<div>
-						Ändere hier das Veröffenlichungs-Level auf die nächsthöhere Stufe. Achtung! Führe diesen Schritt nur aus, wenn du sicher bist, dass du keine Änderungen am Bericht mehr machen willst. Du kannst diesen Schritt danach nicht mehr rückgängig machen und das Formular bleibt für weitere Eingaben gesperrt.
+						Hier kannst du deinen Bericht zur Überprüfung durch den/die Tourenleiter/in und die Redaktion freigeben. Achtung! Führe diesen Schritt nur aus, wenn du sicher bist, dass du keine Änderungen am Bericht mehr machen willst. Du kannst diesen Schritt danach nicht mehr rückgängig machen und das Formular bleibt für weitere Eingaben gesperrt.
 						{{br}}
-						Der/die Tourenleiter/in wird nach der Heraufstufung benachrichtigt und er/sie wird deinen Bericht auf inhaltliche Korrektheit überprüfen.
+						Der/die Tourenleiter/in wird benachrichtigt und er/sie wird deinen Bericht auf inhaltliche Korrektheit überprüfen.
 						{{br}}
-						Nach der Prüfung durch den/die Tourenleiter/in wird dein Bericht durch die Redaktion freigeschaltet und ist danach im Netz sichtbar.
+						Nach der Prüfung durch den/die Tourenleiter/in wird dein Bericht durch die Redaktion auf Rechtschreibung geprüft und anschliessend veröffentlicht. Danach ist dein Bericht auf der <a href="https://www.sac-pilatus.ch" target="_blank">Home Seite</a> öffentlich im Netz sichtbar.
 					</div>
 				</div>
-				<div class="me-2">Bericht zur Überprüfung freigeben:</div>
-				<div class="me-2">
-					<select class="form-control" name="publishEventStory" id="publishEventStory">
-						<option value="1"<?php if ($this->publishState < 2): ?> selected<?php endif; ?>>1 - In Bearbeitung</option>
-						<option value="2"<?php if ((int)$this->publishState === 2): ?> selected<?php endif; ?>>2 - Zur Veröffentlichung durch Redaktion freigeben</option>
-					</select>
+				<div class="mt-5">
+					<div class="d-grid gap-2">
+						<button id="publishEventStoryBtn" class="btn btn-lg btn-danger btn-block" data-publish-state="<?= $this->publishState + 1; ?>"><i class="fas fa-eye"></i> Bericht zur Veröffentlichung freigeben</button>
+						<button id="publishEventStoryBtnPending" class="d-none btn btn-lg btn-danger btn-block" disabled><i class="fal fa-spin fa-spinner" aria-hidden="true"></i> Bitte warten</button>
+					</div>
 				</div>
 			</div>
-			<!--<div id="modalFooter" class="modal-footer"></div>-->
 		</div>
 	</div>
 </div>
@@ -39,36 +37,39 @@
 
 
 
-<?php if ($this->publishState < 3): ?>
-<div class="form-sent-please-wait d-flex justify-content-center">
-	<div class="form-sent-please-wait-content text-center mt-5 mb-2 d-none">
-		<i class="fal fa-spin fa-4x fa-spinner" aria-hidden="true"></i>
-		{{br}}{{br}}
-		<span>Bitte warten. Deine Anfrage wird gesendet.</span>
-	</div>
-</div>
+<?php if ($this->publishState < 2): ?>
+
 <?php endif; ?>
 
-<?php if ($this->publishState < 3): ?>
+<?php if ($this->publishState < 2): ?>
 <script>
     (function ($) {
         jQuery(document).ready(function () {
-            $('#publishEventStory').change(function () {
+            $('#publishEventStoryBtn').click(function () {
+                let publishState = $(this).data('publish-state');
+
                 // Show spinner icon and hide form buttons
                 $('.form-sent-please-wait-content').removeClass('d-none');
-                $('.event-story-form-buttons').removeClass('d-flex').addClass('d-none');
-                var publishState = this.value;
-                var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/setPublishState', {
+                $('.event-story-form-buttons > div > .btn').removeClass('d-flex').addClass('d-none');
+            		$('#publishEventStoryBtn').addClass('d-none');
+                $('#publishEventStoryBtnPending').removeClass('d-none');
+
+                let jqxhr = $.post('ajaxMemberDashboardWriteEventReport/setPublishState', {
                     'REQUEST_TOKEN': '{{request_token}}',
                     'eventId': '<?= Contao\Input::get('eventId') ?>',
                     'publishState': publishState,
                     'moduleId': '<?= $this->id ?>'
                 }).done(function (json) {
-                    if (json.status != 'success') {
+                    if (json.status == 'success') {
                         console.log(json);
+                        window.location.reload();
+                    }
+                    else if (json.status != 'success') {
+                        console.log(json);
+                        window.location.reload();
                     }
                 }).always(function () {
-                    window.location.reload();
+                    //window.location.reload();
                 });
             });
         });

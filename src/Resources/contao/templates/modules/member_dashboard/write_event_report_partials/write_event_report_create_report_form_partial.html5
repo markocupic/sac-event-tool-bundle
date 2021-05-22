@@ -39,7 +39,6 @@
           this.ctrl_text.strLenRemaining = parseInt(document.getElementById('ctrl_text').getAttribute('maxlength')) - this.ctrl_text.len;
 					// Cut and append stringRemainig indicator
           this.cutAndAppend(document.getElementById('ctrl_text_strLenRemaining'),document.getElementById('ctrl_text').parentElement);
-          //this.cutAndAppend(document.getElementById('ctrl_submit'),document.getElementById('modalFooter'));
 
       },
 			methods:{

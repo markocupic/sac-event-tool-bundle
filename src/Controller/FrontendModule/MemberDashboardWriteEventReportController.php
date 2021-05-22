@@ -377,8 +377,6 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
             'value' => html_entity_decode((string) $objEventStoryModel->text),
         ]);
 
-
-
         // tour waypoints
         $eval = ['mandatory' => true, 'rows' => 2, 'decodeEntities' => true, 'placeholder' => 'z.B. Engelberg 1000m - Herrenrüti 1083 m - Galtiberg 1800 m - Einstieg 2000 m'];
 
@@ -446,7 +444,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         );
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submitEventReportTextFormBtn', [
             'label' => 'Änderungen speichern',
             'inputType' => 'submit',
         ]);
@@ -641,7 +639,7 @@ class MemberDashboardWriteEventReportController extends AbstractFrontendModuleCo
         ]);
 
         // Let's add  a submit button
-        $objForm->addFormField('submit', [
+        $objForm->addFormField('submitImageUploadFormBtn', [
             'label' => 'Bildupload starten',
             'inputType' => 'submit',
         ]);

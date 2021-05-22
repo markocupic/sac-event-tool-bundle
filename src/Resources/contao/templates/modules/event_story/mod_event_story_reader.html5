@@ -54,18 +54,23 @@
             <div class="p-3 mt-4 mt-lg-0 bg-light">
                 <?php if($this->tourTypes): ?>
                 <div class="event-info-box mt-0 d-flex">
-                    <i class="fad fa-fw fa-mountain text-primary"></i>
+                    <i class="fas fa-fw fa-mountain text-primary"></i>
                     <div class="ms-2">
                         <h5 class="mt-0"><?= $this->tourTypes ?></h5>
-                        <div><?= $this->eventOrganizers ?></div>
-                        <div>Leitung: <?= $this->tourInstructors ?></div>
+                        <?php if(!empty($this->eventOrganizers)): ?>
+                            <div><?= $this->eventOrganizers ?></div>
+                        <?php endif; ?>
+
+                        <?php if(!empty($this->tourInstructors)): ?>
+                            <div>Leitung: <?= $this->tourInstructors ?></div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php endif; ?>
 
                 <?php if($this->tourWaypoints): ?>
                 <div class="event-info-box mt-3 d-flex">
-                    <i class="fad fa-fw fa-pennant text-primary"></i>
+                    <i class="fas fa-fw fa-pennant text-primary"></i>
                     <div class="ms-2">
                         <h5 class="mt-0">Tourenstationen</h5>
                         <div><?= $this->tourWaypoints ?></div>
@@ -75,7 +80,7 @@
 
                 <?php if($this->tourProfile || $this->tourTechDifficulty): ?>
                 <div class="event-info-box mt-3 d-flex">
-                    <i class="fad fa-dumbbell text-primary"></i>
+                    <i class="fas fa-hiking text-primary"></i>
                     <div class="ms-2">
                         <h5 class="mt-0">Eckdaten</h5>
                         <div>
@@ -92,7 +97,7 @@
 
                 <?php if($this->tourHighlights): ?>
                 <div class="event-info-box mt-3 d-flex">
-                    <i class="fad fa-fw fa-star text-primary"></i>
+                    <i class="fas fa-fw fa-star text-primary"></i>
                     <div class="ms-2">
                         <h5 class="mt-0">Highlights/Bemerkungen</h5>
                         <div><?= $this->tourHighlights ?></div>
@@ -111,7 +116,7 @@
                 <?php endif; ?>
 
                 <div class="event-info-box mt-3 d-flex">
-                    <i class="fad fa-fw fa-info text-primary"></i>
+                    <i class="fas fa-fw fa-info text-primary"></i>
                     <div class="ms-2">
                         <h5 class="mt-0">Weiteres</h5>
                         <div><a href="{{event_url::<?= $this->eventId ?>}}" target="_blank">Zur Tour-/Kurs-Ausschreibung</a></div>
@@ -133,12 +138,12 @@
         </li>
     </ul>
     <div class="tab-content" id="pills-tabContent">
-        <div class="tab-pane fade show active" id="eventStoryQrCode" role="tabpanel" aria-labelledby="pills-home-tab">
+        <div class="tab-pane fase show active" id="eventStoryQrCode" role="tabpanel" aria-labelledby="pills-home-tab">
             <div class="event-story-reader-qrcode mt-3 mb-3">
                 <img src="<?= $this->qrCodePath ?>" style="border:1px solid red">
             </div>
         </div>
-        <div class="tab-pane fade" id="eventStoryDirectLink" role="tabpanel" aria-labelledby="pills-profile-tab">
+        <div class="tab-pane fase" id="eventStoryDirectLink" role="tabpanel" aria-labelledby="pills-profile-tab">
             <p>Direct link: <a href="<?= $this->directLink ?>"><?= $this->directLink ?></a></p>
         </div>
     </div>
