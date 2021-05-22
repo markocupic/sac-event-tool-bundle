@@ -80,7 +80,7 @@
 
                 <?php if($this->tourProfile || $this->tourTechDifficulty): ?>
                 <div class="event-info-box mt-3 d-flex">
-                    <i class="fas fa-hiking text-primary"></i>
+                    <i class="fas fa-fw fa-hiking text-primary"></i>
                     <div class="ms-2">
                         <h5 class="mt-0">Eckdaten</h5>
                         <div>
@@ -118,8 +118,7 @@
                 <div class="event-info-box mt-3 d-flex">
                     <i class="fas fa-fw fa-info text-primary"></i>
                     <div class="ms-2">
-                        <h5 class="mt-0">Weiteres</h5>
-                        <div><a href="{{event_url::<?= $this->eventId ?>}}" target="_blank">Zur Tour-/Kurs-Ausschreibung</a></div>
+                        <a href="{{event_url::<?= $this->eventId ?>}}" target="_blank">Zur Tour-/Kurs-Ausschreibung</a>
                     </div>
                 </div>
             </div>
