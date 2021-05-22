@@ -24,7 +24,7 @@
 
 <script>
 	// Vue js
-	let app = new Vue({
+	new Vue({
 			el: '#editReportFormBox',
 			data:{
 				ctrl_text: {

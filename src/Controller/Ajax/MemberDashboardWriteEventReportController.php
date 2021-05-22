@@ -301,7 +301,10 @@ class MemberDashboardWriteEventReportController extends AbstractController
         $objStory->publishState = $request->request->get('publishState');
         $objStory->save();
 
-        return new JsonResponse(['status' => 'success']);
+        return new JsonResponse([
+            'status' => 'success',
+            'publishState' => $objStory->publishState
+        ]);
     }
 
     /**

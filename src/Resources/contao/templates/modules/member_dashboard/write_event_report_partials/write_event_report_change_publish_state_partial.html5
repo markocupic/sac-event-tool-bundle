@@ -1,3 +1,5 @@
+<?php $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao-component-vue-js/vue/dist/vue.min.js|static'; ?>
+
 <div class="me-2">
 	<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#ModalChangePublishState">
 		<i class="fas fa-eye"></i> Veröffentlichen
@@ -23,56 +25,84 @@
 					</div>
 				</div>
 				<div class="mt-5">
-					<div class="d-grid gap-2">
-						<button id="publishEventStoryBtn" class="btn btn-lg btn-danger btn-block" data-publish-state="<?= $this->publishState + 1; ?>"><i class="fas fa-eye"></i> Bericht zur Veröffentlichung freigeben</button>
-						<button id="publishEventStoryBtnPending" class="d-none btn btn-lg btn-danger btn-block" disabled><i class="fal fa-spin fa-spinner" aria-hidden="true"></i> Bitte warten</button>
-					</div>
+					<form id="changePublishStateForm">
+						<div v-if="publishState < 2" class="d-grid gap-2">
+								<button id="publishEventStoryBtn" class="btn btn-lg btn-danger btn-block" v-if="!pendingRequest" v-on:click="publishArticle"><i class="fas fa-eye"></i> Bericht zur Veröffentlichung freigeben</button>
+								<button id="publishEventStoryBtnPending" class="btn btn-lg btn-danger btn-block" v-if="pendingRequest" disabled><i class="fal fa-spin fa-spinner" aria-hidden="true"></i> Bitte warten</button>
+						</div>
+						<div v-if="publishState === 2" class="alert alert-primary">
+							<i class="fas fa-grin fa-w-16"></i>
+							<div>
+								Dein Bericht wurde erfolgreich zur Überprüfung freigegeben. Die Seite wird jetzt neu geladen.
+							</div>
+						</div>
+					</form>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
-
-
-
-
-<?php if ($this->publishState < 2): ?>
-
-<?php endif; ?>
-
 <?php if ($this->publishState < 2): ?>
 <script>
-    (function ($) {
-        jQuery(document).ready(function () {
-            $('#publishEventStoryBtn').click(function () {
-                let publishState = $(this).data('publish-state');
+    // Vue js
+    new Vue({
+        el: '#changePublishStateForm',
+        data:{
+            publishState: '<?= $this->publishState; ?>',
+            pendingRequest: false
+        },
+        created: function () {
+					//
+        },
+        methods:{
+            publishArticle: function(){
 
-                // Show spinner icon and hide form buttons
-                $('.form-sent-please-wait-content').removeClass('d-none');
-                $('.event-story-form-buttons > div > .btn').removeClass('d-flex').addClass('d-none');
-            		$('#publishEventStoryBtn').addClass('d-none');
-                $('#publishEventStoryBtnPending').removeClass('d-none');
+                let self = this;
+                this.pendingRequest = true;
 
-                let jqxhr = $.post('ajaxMemberDashboardWriteEventReport/setPublishState', {
-                    'REQUEST_TOKEN': '{{request_token}}',
-                    'eventId': '<?= Contao\Input::get('eventId') ?>',
-                    'publishState': publishState,
-                    'moduleId': '<?= $this->id ?>'
-                }).done(function (json) {
-                    if (json.status == 'success') {
-                        console.log(json);
-                        window.location.reload();
+                let buttons = document.querySelectorAll('.event-story-form-buttons > div > .btn');
+
+                // Remove buttons
+                for(i = 0; i < buttons.length; ++i){
+                    buttons[i].classList.add('d-none');
+								}
+
+                // Create form
+                const formData = new FormData();
+                formData.append('REQUEST_TOKEN', '{{request_token}}');
+                formData.append('publishState', parseInt(this.publishState) + 1);
+                formData.append('moduleId', '<?= $this->id ?>');
+                formData.append('eventId', '<?= Contao\Input::get("eventId") ?>');
+
+                // Fetch
+                fetch('ajaxMemberDashboardWriteEventReport/setPublishState', {
+											method: 'POST',
+											headers: {
+													'x-requested-with': 'XMLHttpRequest'
+											},
+											body: formData,
                     }
-                    else if (json.status != 'success') {
-                        console.log(json);
+                ).then(function (res) {
+                    return res.json();
+                }).then(function (json) {
+										if(json['status'] === 'success')
+										{
+                        window.setTimeout(function(){
+                            self.publishState = parseInt(json['publishState']);
+                            window.setTimeout(function(){
+                                window.location.reload();
+                            },4000);
+                        },2000);
+                    }else{
                         window.location.reload();
-                    }
-                }).always(function () {
-                    //window.location.reload();
+										}
+                    return json;
                 });
-            });
-        });
-    })(jQuery);
+            },
+        }
+    })
 </script>
+
+
 <?php endif; ?>
