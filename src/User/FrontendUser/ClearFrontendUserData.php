@@ -142,7 +142,14 @@ class ClearFrontendUserData
             // Log
             $container = System::getContainer();
             $logger = $container->get('monolog.logger.contao');
-            $logger->log(LogLevel::INFO, sprintf('Login for member with ID:%s has been deactivated.', $objMember->id), ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, $configAdapter->get('DISABLE_MEMBER_LOGIN'))]);
+            $logger->log(
+                LogLevel::INFO,
+                sprintf('Login for member with ID:%s [%s] has been deactivated.',
+                    $objMember->id,
+                    $objMember->sacMemberId
+                ),
+                ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, $configAdapter->get('DISABLE_MEMBER_LOGIN'))]
+            );
 
             $objMember->login = '';
             $objMember->password = '';
@@ -243,7 +250,7 @@ class ClearFrontendUserData
                 $objEventsMember = $calendarEventsMemberModelAdapter->findByPk($eventsMemberId);
 
                 if (null !== $objEventsMember) {
-                    $this->anonymizeCalendarEventsMemberDataRecord($objEventsMember);
+                   $this->anonymizeCalendarEventsMemberDataRecord($objEventsMember);
                 }
             }
             // Delete avatar directory

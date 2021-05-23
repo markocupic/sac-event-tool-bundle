@@ -8,3 +8,9 @@ services:
       - '%kernel.project_dir%'
       - '@monolog.logger.contao'
 
+  # Controller: sync database
+  Markocupic\SacEventToolBundle\Controller\SacMemberDatabase\SyncMemberDatabase:
+    public: true
+    arguments:
+      - '@contao.framework'
+      - '@Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase'

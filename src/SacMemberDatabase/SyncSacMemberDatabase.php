@@ -112,6 +112,8 @@ class SyncSacMemberDatabase
         $this->projectDir = $projectDir;
         $this->logger = $logger;
 
+        $this->framework->initialize();
+
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
 
@@ -194,10 +196,16 @@ class SyncSacMemberDatabase
         $startTime = time();
         $arrMemberIDS = [];
 
-        $statement = Database::getInstance()->execute('SELECT sacMemberId FROM tl_member');
+        $stmt1 = Database::getInstance()->execute('SELECT sacMemberId FROM tl_member');
 
-        if ($statement->numRows) {
-            $arrMemberIDS = $statement->fetchEach('sacMemberId');
+        if ($stmt1->numRows) {
+            $arrMemberIDS = $stmt1->fetchEach('sacMemberId');
+        }
+
+        $stmt2 = Database::getInstance()->prepare('SELECT sacMemberId FROM tl_member WHERE isSacMember=?')->execute('');
+
+        if ($stmt2->numRows) {
+            $arrDisabledMemberIDS = $stmt2->fetchEach('sacMemberId');
         }
 
         // Valid/active members
@@ -292,8 +300,12 @@ class SyncSacMemberDatabase
             // Start transaction (big thank to cyon.ch)
             Database::getInstance()->beginTransaction();
 
-            // Set tl_member.isSacMember to false for all entries
-            Database::getInstance()->prepare('UPDATE tl_member SET isSacMember=?')->execute('');
+            // Set tl_member.isSacMember && tl_member.disable to false for all entries
+            $set = [
+                'disable' => '',
+                'isSacMember' => '',
+            ];
+            Database::getInstance()->prepare('UPDATE tl_member %s')->set($set)->execute();
 
             /** @var int $countInserts */
             $countInserts = 0;
@@ -312,7 +324,11 @@ class SyncSacMemberDatabase
 
                     // Insert new member
                     /** @var Statement $objInsertStmt */
-                    $objInsertStmt = Database::getInstance()->prepare('INSERT INTO tl_member %s')->set($arrValues)->execute();
+                    $objInsertStmt = Database::getInstance()
+                        ->prepare('INSERT INTO tl_member %s')
+                        ->set($arrValues)
+                        ->execute()
+                    ;
 
                     if ($objInsertStmt->affectedRows) {
                         // Log
@@ -337,8 +353,17 @@ class SyncSacMemberDatabase
             }
 
             // Reset sacMemberId to true, if member exists in the downloaded database dump
+            $set = [
+                'isSacMember' => '1',
+                'disable' => '',
+            ];
+
             if (!empty($arrSacMemberIds)) {
-                Database::getInstance()->execute('UPDATE tl_member SET isSacMember="1" WHERE sacMemberId IN ('.implode(',', $arrSacMemberIds).')');
+                Database::getInstance()
+                    ->prepare('UPDATE tl_member %s WHERE sacMemberId IN ('.implode(',', $arrSacMemberIds).')')
+                    ->set($set)
+                    ->execute()
+                ;
             }
 
             Database::getInstance()->commitTransaction();
@@ -357,18 +382,26 @@ class SyncSacMemberDatabase
         }
 
         // Set tl_member.disable to true if member was not found in the csv-file (is no more a valid SAC member)
-        $objDisabledMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE disable=? AND isSacMember=?')->execute('', '');
+        $objDisabledMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE isSacMember=?')->execute('');
 
         while ($objDisabledMember->next()) {
             $arrSet = [
                 'tstamp' => time(),
                 'disable' => '1',
+                'isSacMember' => '',
             ];
             Database::getInstance()->prepare('UPDATE tl_member %s WHERE id=?')->set($arrSet)->execute($objDisabledMember->id);
 
-            // Log
-            $msg = sprintf('Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. The user can not be found in the SAC main database from Bern.', $objDisabledMember->firstname, $objDisabledMember->lastname, $objDisabledMember->sacMemberId);
-            $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_DISABLE_MEMBER);
+            // Log if disable user
+            if (!\in_array($objDisabledMember->sacMemberId, $arrDisabledMemberIDS, false)) {
+                $msg = sprintf(
+                    'Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. Could not find the user in the SAC main database from Bern.',
+                    $objDisabledMember->firstname,
+                    $objDisabledMember->lastname,
+                    $objDisabledMember->sacMemberId
+                );
+                $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_DISABLE_MEMBER);
+            }
         }
 
         if ($i === \count($arrMember)) {
