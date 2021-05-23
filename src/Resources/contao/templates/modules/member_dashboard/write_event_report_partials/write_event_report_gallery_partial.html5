@@ -1,27 +1,32 @@
 <?php if (count($this->images)): ?>
 	{{br}}
+	<hr>
+
+	<?php if ($this->publishState < 2): ?>
+		<p><i class="fas fa-info-circle"></i> Bildreihenfolge kann durch Drag and Drop verändert werden.</p>
+	<?php endif; ?>
+
 	<div id="dashboardEventStoryGallery" class="<?php if ($this->publishState < 2): ?>sortable-thumbnail-container <?php endif; ?> dashboard-event-story-gallery row gx-2 gy-1">
 		<?php $i = 0; ?>
 		<?php foreach ($this->images as $arrFile): ?>
-		<div class="col-12 col-sm-6 col-lg-3 thumbnail <?php if ($this->publishState < 2): ?>sortable-item <?php endif; ?>responsive" data-item="<?= $i ?>" data-path="<?= $arrFile['path'] ?>" data-file-id="<?= $arrFile['id'] ?>" data-file-uuid="<?= \StringUtil::binToUuid($arrFile['uuid']) ?>" title="Sortierung mit Drag and Drop &auml;ndern">
-			{{image::<?= Contao\StringUtil::binToUuid($arrFile['uuid']) ?>?width=400&height=400&mode=crop}}
-			<div class="d-none"><?= $arrFile['caption'] ?></div>
-			<?php if ($this->publishState < 2): ?>
-			<div class="dashboard-event-story-thumb-buttons-container d-flex">
-				<?php if($arrFile['caption'] === '' || $arrFile['photographer'] === ''): ?>
-				<button class="btn blinking missing-caption-or-photographer-name add-caption" title="Fehlende Bildlegende oder Name des Fotografen fehlt"><i class="fal fa-exclamation-circle"></i></button>
+			<div class="col-12 col-sm-6 col-lg-3 thumbnail <?php if ($this->publishState < 2): ?>sortable-item <?php endif; ?>responsive" data-item="<?= $i ?>" data-path="<?= $arrFile['path'] ?>" data-file-id="<?= $arrFile['id'] ?>" data-file-uuid="<?= \StringUtil::binToUuid($arrFile['uuid']) ?>" title="Sortierung mit Drag and Drop &auml;ndern">
+				{{image::<?= Contao\StringUtil::binToUuid($arrFile['uuid']) ?>?width=400&height=400&mode=crop}}
+				<div class="d-none"><?= $arrFile['caption'] ?></div>
+				<?php if ($this->publishState < 2): ?>
+				<div class="dashboard-event-story-thumb-buttons-container d-flex">
+					<?php if($arrFile['caption'] === '' || $arrFile['photographer'] === ''): ?>
+					<button class="btn blinking missing-caption-or-photographer-name add-caption" title="Fehlende Bildlegende oder Name des Fotografen fehlt"><i class="fal fa-exclamation-circle"></i></button>
+					<?php endif; ?>
+					<button class="btn btn-danger rotate-image" title="Bild im GUZ 90° drehen"><i class="fal fa-history"></i></button>
+					<button class="btn btn-danger remove-image" title="Bild löschen"><i class="fal fa-trash"></i></button>
+					<button class="btn btn-danger add-caption" title="Bildunterschrift und Fotografen-Name hinzufügen"><i class="fal fa-pencil"></i></button>
+				</div>
 				<?php endif; ?>
-				<button class="btn btn-danger rotate-image" title="Bild im GUZ 90° drehen"><i class="fal fa-history"></i></button>
-				<button class="btn btn-danger remove-image" title="Bild löschen"><i class="fal fa-trash"></i></button>
-				<button class="btn btn-danger add-caption" title="Bildunterschrift und Fotografen-Name hinzufügen"><i class="fal fa-pencil"></i></button>
 			</div>
-			<?php endif; ?>
-		</div>
-		<?php $i++; ?>
+			<?php $i++; ?>
 		<?php endforeach; ?>
 	</div>
 	<!-- End gallery -->
-
 
 
 	<?php if ($this->publishState < 2): ?>
@@ -132,8 +137,8 @@
 													}).done(function (json) {
 															if (json.status != 'success') {
 																	console.log(json);
-															}else{
-																	window.location=document.URL;
+															} else {
+																	window.location = document.URL;
 															}
 													});
 											}

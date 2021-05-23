@@ -31,13 +31,14 @@
   {{br}}
   <hr>
   {{br}}
-  <p><strong>Ver&ouml;ffentlichungs-Level:</strong> <?= $this->publishState+1 ?> - <?= $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][$this->publishState] ?></p>
+  <p><strong>Veröffentlichungs-Level:</strong> <?= $this->publishState ?> - <?= $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][$this->publishState] ?></p>
 
   <div class="event-story-form-buttons d-flex flex-row align-items-center">
     <?php if ($this->publishState < 2): ?>
     <div class="me-2">
       <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalWriteTextAndYt"><i class="fa fa-pencil"></i> Bericht bearbeiten</button>
     </div>
+
     <div class="me-2">
       <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalFotoupload"><i class="fa fa-images"></i> Foto-Upload</button>
     </div>
@@ -67,14 +68,13 @@
 
   {{br}}
 
-  <!-- Start text -->
+  <!-- Start preview -->
   <?php if (strlen((string)$this->text) > 0): ?>
     <div class="event-info-box icon-box-small">
       <h5>Bericht</h5>
       <?= nl2br(html_entity_decode(htmlspecialchars_decode((string)$this->text))) ?>
     </div>
   <?php endif; ?>
-  <!-- End text -->
 
   <?php if ($this->eventOrganizers): ?>
   <div class="event-info-box icon-box-small">
@@ -123,10 +123,14 @@
 
   <?php if ($this->youtubeId): ?>
   {{br}}
+  <hr>
+  {{br}}
   <div class="ratio ratio-16x9">
     <iframe src="//www.youtube.com/embed/<?= $this->youtubeId ?>?rel=0" allowfullscreen=""></iframe>
   </div>
   <?php endif; ?>
+  <!-- End preview -->
+
 <?php endif; ?>
 <!-- end if (!$this->hasErrorMessage) -->
 
