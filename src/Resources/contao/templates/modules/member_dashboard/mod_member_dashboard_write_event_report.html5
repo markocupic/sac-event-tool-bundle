@@ -6,128 +6,128 @@
 
 
 <?php if ($this->hasInfoMessage): ?>
-  <div class="alert alert-info" role="alert">
-    <i class="fas fa-exclamation-circle fa-w-16"></i>
-      <?= $this->infoMessage ?>
-  </div>
+<div class="alert alert-info" role="alert">
+	<i class="fas fa-exclamation-circle fa-w-16"></i>
+	<?= $this->infoMessage ?>
+</div>
 <?php endif; ?>
 
 <?php if ($this->hasErrorMessage): ?>
   <?php foreach($this->errorMessages as $msg): ?>
-  <div class="alert alert-danger" role="alert">
+    <div class="alert alert-danger" role="alert">
       <?= $msg ?>
-  </div>
+    </div>
   <?php endforeach; ?>
 <?php endif; ?>
 
-<?php if(!$this->hasErrorMessage): ?>
-    <p class="mt-0 mb-0">Dein Bericht für:<p>
-<h4 class="mt-1"><span class="text-primary"><?= $this->eventName ?></span></h4>
-    <?php if($this->executionState === 'event_adapted' && $this->eventSubstitutionText !== ''): ?>
+<?php if (!$this->hasErrorMessage): ?>
+  <p class="mt-0 mb-0">Dein Bericht für:<p>
+  <h4 class="mt-1"><span class="text-primary"><?= $this->eventName ?></span></h4>
+  <?php if ($this->executionState === 'event_adapted' && $this->eventSubstitutionText !== ''): ?>
     <h4 class="mt-2" style="color: red">Ausweichtour: <?= $this->eventSubstitutionText ?></h4>
-    <?php endif; ?>
+  <?php endif; ?>
 
-    <time class="small">Datum: <?= $this->eventPeriod ?></time>
-    {{br}}
-    <hr>
-    {{br}}
-    <p><strong>Ver&ouml;ffentlichungs-Level:</strong> <?= $this->publishState+1 ?> - <?= $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][$this->publishState] ?></p>
+  <time class="small">Datum: <?= $this->eventPeriod ?></time>
+  {{br}}
+  <hr>
+  {{br}}
+  <p><strong>Ver&ouml;ffentlichungs-Level:</strong> <?= $this->publishState+1 ?> - <?= $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][$this->publishState] ?></p>
 
-      <div class="event-story-form-buttons d-flex flex-row align-items-center">
-        <?php if ($this->publishState < 2): ?>
-          <div class="me-2">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalWriteTextAndYt"><i class="fa fa-pencil"></i> Bericht bearbeiten</button>
-          </div>
-          <div class="me-2">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalFotoupload"><i class="fa fa-images"></i> Foto-Upload</button>
-          </div>
-        <?php endif; ?>
-
-        <div class="me-2">
-          <a class="btn btn-primary" target="_blank" href="<?= $this->previewLink ?>"><i class="fas fa-desktop"></i> Vorschau</a>
-        </div>
-
-        <?php if ($this->text != '' && $this->publishState < 2): ?>
-          <?php $this->insert('write_event_report_change_publish_state_partial', $this->getData()); ?>
-        <?php endif; ?>
-      </div>
-
+  <div class="event-story-form-buttons d-flex flex-row align-items-center">
     <?php if ($this->publishState < 2): ?>
-      
-      <!-- Modal box tour report form -->
-      <?php $this->insert('write_event_report_create_report_form_partial', $this->getData()); ?>
-
-      <!-- Modal box photo upload -->
-      <?php $this->insert('write_event_report_photoupload_partial', $this->getData()); ?>
-
-      <!-- Modal box photo details (cation, rotate image, photographer name -->
-      <?php $this->insert('write_event_report_image_modal_box_partial', $this->getData()); ?>
-
-    <?php endif; ?>
-    <!-- End: if ($this->publishState < 3) -->
-
-    {{br}}
-
-    <!-- Start text -->
-    <?php if (strlen((string)$this->text) > 0): ?>
-      <div class="event-info-box icon-box-small">
-        <h5>Bericht</h5>
-        <?= nl2br(html_entity_decode(htmlspecialchars_decode((string)$this->text))) ?>
-      </div>
-    <?php endif; ?>
-        <!-- End text -->
-    <?php if($this->eventOrganizers): ?>
-    <div class="event-info-box icon-box-small">
-      <h5 class="mt-lg-0">Gruppe</h5>
-      <p><?= $this->eventOrganizers ?></p>
+    <div class="me-2">
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalWriteTextAndYt"><i class="fa fa-pencil"></i> Bericht bearbeiten</button>
+    </div>
+    <div class="me-2">
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalFotoupload"><i class="fa fa-images"></i> Foto-Upload</button>
     </div>
     <?php endif; ?>
 
-    <?php if($this->tourTechDifficulty !== ''): ?>
-    <div class="event-info-box icon-box-small">
-      <h5>Schwierigkeit</h5>
-      <p><?= $this->tourTechDifficulty ?></p>
+    <div class="me-2">
+      <a class="btn btn-primary" target="_blank" href="<?= $this->previewLink ?>"><i class="fas fa-desktop"></i> Vorschau</a>
     </div>
-    <?php endif; ?>
 
-    <?php if($this->tourWaypoints !== ''): ?>
+    <?php if ($this->text != '' && $this->publishState < 2): ?>
+      <?php $this->insert('write_event_report_change_publish_state_partial', $this->getData()); ?>
+    <?php endif; ?>
+  </div>
+
+  <?php if ($this->publishState < 2): ?>
+
+    <!-- Modal box tour report form -->
+    <?php $this->insert('write_event_report_create_report_form_partial', $this->getData()); ?>
+
+    <!-- Modal box photo upload -->
+    <?php $this->insert('write_event_report_photoupload_partial', $this->getData()); ?>
+
+    <!-- Modal box photo details (cation, rotate image, photographer name -->
+    <?php $this->insert('write_event_report_image_modal_box_partial', $this->getData()); ?>
+
+  <?php endif; ?>
+
+  {{br}}
+
+  <!-- Start text -->
+  <?php if (strlen((string)$this->text) > 0): ?>
     <div class="event-info-box icon-box-small">
-      <h5>Tourenstationen</h5>
-      <p><?= $this->tourWaypoints ?></p>
+      <h5>Bericht</h5>
+      <?= nl2br(html_entity_decode(htmlspecialchars_decode((string)$this->text))) ?>
     </div>
-    <?php endif; ?>
+  <?php endif; ?>
+  <!-- End text -->
 
-    <?php if($this->tourPublicTransportInfo !== ''): ?>
-    <div class="event-info-box icon-box-small">
-      <h5>ÖV</h5>
-      <p><?= $this->tourPublicTransportInfo ?></p>
-    </div>
-    <?php endif; ?>
+  <?php if ($this->eventOrganizers): ?>
+  <div class="event-info-box icon-box-small">
+    <h5 class="mt-lg-0">Gruppe</h5>
+    <p><?= $this->eventOrganizers ?></p>
+  </div>
+  <?php endif; ?>
 
-    <?php if($this->tourHighlights !== ''): ?>
-    <div class="event-info-box icon-box-small">
-      <h5>Highlights</h5>
-      <p><?= $this->tourHighlights ?></p>
-    </div>
-    <?php endif; ?>
+  <?php if ($this->tourTechDifficulty !== ''): ?>
+  <div class="event-info-box icon-box-small">
+    <h5>Schwierigkeit</h5>
+    <p><?= $this->tourTechDifficulty ?></p>
+  </div>
+  <?php endif; ?>
 
-    <?php if($this->tourProfile !== ''): ?>
-    <div class="event-info-box icon-box-small">
-      <h5>Eckdaten</h5>
-      <p><?= $this->tourProfile ?></p>
-    </div>
-    <?php endif; ?>
+  <?php if ($this->tourWaypoints !== ''): ?>
+  <div class="event-info-box icon-box-small">
+    <h5>Tourenstationen</h5>
+    <p><?= $this->tourWaypoints ?></p>
+  </div>
+  <?php endif; ?>
 
-    <!-- Start gallery -->
-    <?php $this->insert('write_event_report_gallery_partial', $this->getData()); ?>
+  <?php if ($this->tourPublicTransportInfo !== ''): ?>
+  <div class="event-info-box icon-box-small">
+    <h5>ÖV</h5>
+    <p><?= $this->tourPublicTransportInfo ?></p>
+  </div>
+  <?php endif; ?>
 
-    <?php if ($this->youtubeId): ?>
-      {{br}}
-      <div class="ratio ratio-16x9">
-        <iframe src="//www.youtube.com/embed/<?= $this->youtubeId ?>?rel=0" allowfullscreen=""></iframe>
-      </div>
-    <?php endif; ?>
+  <?php if ($this->tourHighlights !== ''): ?>
+  <div class="event-info-box icon-box-small">
+    <h5>Highlights</h5>
+    <p><?= $this->tourHighlights ?></p>
+  </div>
+  <?php endif; ?>
+
+  <?php if ($this->tourProfile !== ''): ?>
+  <div class="event-info-box icon-box-small">
+    <h5>Eckdaten</h5>
+    <p><?= $this->tourProfile ?></p>
+  </div>
+  <?php endif; ?>
+
+  <!-- Start gallery -->
+  <?php $this->insert('write_event_report_gallery_partial', $this->getData()); ?>
+
+  <?php if ($this->youtubeId): ?>
+  {{br}}
+  <div class="ratio ratio-16x9">
+    <iframe src="//www.youtube.com/embed/<?= $this->youtubeId ?>?rel=0" allowfullscreen=""></iframe>
+  </div>
+  <?php endif; ?>
 <?php endif; ?>
-<!-- end if(!$this->hasErrorMessage) -->
+<!-- end if (!$this->hasErrorMessage) -->
 
 <?php $this->endblock(); ?>
