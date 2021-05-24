@@ -86,16 +86,18 @@ class ClearFrontendUserData
                 if (!$blnFound) {
                     $container = System::getContainer();
                     $logger = $container->get('monolog.logger.contao');
-                    $logger->log(LogLevel::INFO, sprintf(
-                        'Teilnehmer %s %s mit ID %s [%s] am Event mit ID %s [%s] konnte nicht in tl_member gefunden werden"',
+                    $message = sprintf(
+                        'Teilnehmer %s %s mit ID %s [%s] am Event mit ID %s [%s] konnte nicht in tl_member gefunden werden."',
                         $objCalendarEventsMember->firstname,
                         $objCalendarEventsMember->lastname,
                         $objCalendarEventsMember->id,
                         $objCalendarEventsMember->sacMemberId,
                         $objCalendarEventsMember->eventId,
                         $objCalendarEventsMember->eventName,
-                    ), ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, 'EVENT_MEMBER_NOT_FOUND')]);
-                    /**
+                    );
+                    $logger->log(LogLevel::INFO, $message, ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, 'EVENT_MEMBER_NOT_FOUND')]);
+                    mail('m.cupic@gmx.ch','Teilenehmer anonymisiert', $message . ' In ' . __FILE__ . ' LINE: ' . __LINE__);
+                    /*
                      * @todo Teilnehmer werden unbeabsichtig anonymisiert
                      */
                     //$this->anonymizeCalendarEventsMemberDataRecord($objEventsMember->current());
