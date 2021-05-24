@@ -14,15 +14,16 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\SacMemberDatabase;
 
+use Contao\CalendarEventsMemberModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Database;
 use Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Class SyncMemberDatabase
- * @package Markocupic\SacEventToolBundle\Controller\SacMemberDatabase
+ * Class SyncMemberDatabase.
  */
 class SyncMemberDatabase extends AbstractController
 {
@@ -38,8 +39,6 @@ class SyncMemberDatabase extends AbstractController
 
     /**
      * SyncMemberDatabase constructor.
-     * @param ContaoFramework $framework
-     * @param SyncSacMemberDatabase $syncSacMemberDatabase
      */
     public function __construct(ContaoFramework $framework, SyncSacMemberDatabase $syncSacMemberDatabase)
     {
@@ -50,7 +49,7 @@ class SyncMemberDatabase extends AbstractController
     }
 
     /**
-     * This is the frontend route for the member sync
+     * This is the frontend route for the member sync.
      *
      * @Route("/_sync_sac_member_database", name="sac_event_tool_sync_sac_member_database", defaults={"_scope" = "frontend"})
      */
@@ -58,6 +57,56 @@ class SyncMemberDatabase extends AbstractController
     {
         $this->syncSacMemberDatabase->run();
         $arrJson = ['message' => 'Successfully executed the db sync.'];
+
+        return new JsonResponse($arrJson);
+    }
+
+    /**
+     * Reconstructed anonymized entries from tl_calendar_events_membewr2
+     * 24.05.2021
+     *
+     * @Route("/_repair", name="repair", defaults={"_scope" = "frontend"})
+     */
+    public function repair(): JsonResponse
+    {
+        /**
+        $this->framework->initialize();
+        $arrUsers = [
+            11360,
+            14530,
+            14526,
+            20057,
+            18904,
+            18901,
+            21575,
+            21574,
+            21573,
+            21572,
+            21520,
+            21519,
+            21375,
+            21372,
+            20336,
+        ];
+
+        $i = 0;
+
+        foreach ($arrUsers as $id) {
+            $objEventMember = CalendarEventsMemberModel::findByPk($id);
+
+            if (null !== $objEventMember) {
+                ++$i;
+                $objTemp = Database::getInstance()
+                    ->prepare('SELECT * FROM tl_calendar_events_member2 WHERE id=?')
+                    ->limit(1)
+                    ->execute($id)
+                ;
+                $objEventMember->emergencyPhoneName = $objTemp->emergencyPhoneName;
+                $objEventMember->save();
+            }
+        }
+        **/
+        $arrJson = ['message' => 'Successfully executed '.$i.' repaira.'];
 
         return new JsonResponse($arrJson);
     }
