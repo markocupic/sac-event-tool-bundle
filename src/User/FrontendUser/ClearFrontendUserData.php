@@ -84,7 +84,21 @@ class ClearFrontendUserData
                 }
 
                 if (!$blnFound) {
-                    $this->anonymizeCalendarEventsMemberDataRecord($objEventsMember->current());
+                    $container = System::getContainer();
+                    $logger = $container->get('monolog.logger.contao');
+                    $logger->log(LogLevel::INFO, sprintf(
+                        'Teilnehmer %s %s mit ID %s [%s] am Event mit ID %s [%s] konnte nicht in tl_member gefunden werden"',
+                        $objCalendarEventsMember->firstname,
+                        $objCalendarEventsMember->lastname,
+                        $objCalendarEventsMember->id,
+                        $objCalendarEventsMember->sacMemberId,
+                        $objCalendarEventsMember->eventId,
+                        $objCalendarEventsMember->eventName,
+                    ), ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, 'EVENT_MEMBER_NOT_FOUND')]);
+                    /**
+                     * @todo Teilnehmer werden unbeabsichtig anonymisiert
+                     */
+                    //$this->anonymizeCalendarEventsMemberDataRecord($objEventsMember->current());
                 }
             }
         }
@@ -250,7 +264,7 @@ class ClearFrontendUserData
                 $objEventsMember = $calendarEventsMemberModelAdapter->findByPk($eventsMemberId);
 
                 if (null !== $objEventsMember) {
-                   $this->anonymizeCalendarEventsMemberDataRecord($objEventsMember);
+                    $this->anonymizeCalendarEventsMemberDataRecord($objEventsMember);
                 }
             }
             // Delete avatar directory
