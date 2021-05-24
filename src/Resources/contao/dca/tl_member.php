@@ -10,6 +10,7 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\BackendUser;
 use Contao\Config;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Markocupic\SacEventToolBundle\Dca\TlMember;
@@ -99,11 +100,11 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = array(
 
 // ahvNumber
 $GLOBALS['TL_DCA']['tl_member']['fields']['ahvNumber'] = array(
-    'exclude'   => true,
-    'search'    => true,
-    'inputType' => 'text',
-    'eval'      => array('mandatory' => false, 'maxlength' => 16, 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
-    'sql'       => "varchar(255) NOT NULL default ''",
+	'exclude'   => true,
+	'search'    => true,
+	'inputType' => 'text',
+	'eval'      => array('mandatory' => false, 'maxlength' => 16, 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
+	'sql'       => "varchar(255) NOT NULL default ''",
 );
 
 // sectionId
@@ -254,7 +255,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = array(
 	'sql'       => "varchar(1024) NOT NULL default ''",
 );
 
-if (TL_MODE === 'BE')
+if (TL_MODE === 'BE' && !BackendUser::getInstance()->isAdmin)
 {
 	// Fields (readonly fields)
 	$GLOBALS['TL_DCA']['tl_member']['fields']['uuid']['eval']['readonly'] = 'readonly';
