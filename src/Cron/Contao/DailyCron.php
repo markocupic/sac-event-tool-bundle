@@ -73,6 +73,6 @@ class DailyCron
     {
         /** @var ClearFrontendUserData $cron */
         $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData');
-        $cron->anonymizeOrphanedCalendarEventsMemberDataRecords();
+        $cron->anonymizeOrphanedCalendarEventsMemberDataRecords(); 
     }
 }

@@ -62,6 +62,9 @@ class ClearFrontendUserData
         /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
 
+        /** @var Config $configAdapter */
+        $configAdapter = $this->framework->getAdapter(Config::class);
+
         /** @var MemberModel $memberModelAdapter */
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
 
@@ -95,8 +98,14 @@ class ClearFrontendUserData
                         $objCalendarEventsMember->eventId,
                         $objCalendarEventsMember->eventName,
                     );
+
                     $logger->log(LogLevel::INFO, $message, ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, 'EVENT_MEMBER_NOT_FOUND')]);
-                    mail('m.cupic@gmx.ch','Teilenehmer anonymisiert', $message . ' In ' . __FILE__ . ' LINE: ' . __LINE__);
+                    // Notify admin
+                    if(!empty($configAdapter->get('adminEmail')))
+                    {
+                        mail($configAdapter->get('adminEmail'), 'Unbekannter Teilnehmer in Event ' . $objCalendarEventsMember->eventName, $message.' In '.__FILE__.' LINE: '.__LINE__);
+                    }
+
                     /*
                      * @todo Teilnehmer werden unbeabsichtig anonymisiert
                      */
