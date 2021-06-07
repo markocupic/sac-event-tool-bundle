@@ -33,7 +33,6 @@ $GLOBALS['TL_DCA']['tl_calendar_container'] = array
 			)
 		)
 	),
-
 	// List
 	'list'        => array
 	(
@@ -130,6 +129,6 @@ $GLOBALS['TL_DCA']['tl_calendar_container'] = array
 			'inputType' => 'text',
 			'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
 			'sql'       => "varchar(255) NOT NULL default ''"
-		)
+		),
 	)
 );

@@ -23,7 +23,6 @@ $GLOBALS['TL_LANG']['tl_calendar_container']['delete'] = array("SAC-Event-Jahres
 $GLOBALS['TL_LANG']['tl_calendar_container']['copy'] = array("SAC-Event-Jahrescontainer duplizieren", "SAC-Event-Jahrescontainer ID %s duplizieren");
 $GLOBALS['TL_LANG']['tl_calendar_container']['show'] = array("SAC-Event-Jahrescontainer-Details", "Details des SAC-Event-Jahrescontainer ID %s anzeigen");
 
-
 // Fields
 $GLOBALS['TL_LANG']['tl_calendar_container']['title'] = array("Titel", "Bitte geben Sie den SAC-Event-Jahrescontainer-Titel ein.");
 
