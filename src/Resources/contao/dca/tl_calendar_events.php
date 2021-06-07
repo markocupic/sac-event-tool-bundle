@@ -392,7 +392,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['leistungen'] = array(
 	'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['leistungen'],
 	'exclude'   => true,
 	'inputType' => 'textarea',
-	'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false, 'maxlength' => 300),
+	'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false, 'maxlength' => 200),
 	'sql'       => "text NULL",
 );
 

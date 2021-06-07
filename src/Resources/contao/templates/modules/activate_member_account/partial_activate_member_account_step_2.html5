@@ -14,6 +14,6 @@
 <p class="alert alert-danger" role="alert"><?= $this->errorMsg ?></p>
 <?php endif; ?>
 
-<?php if(!$this->Template->doNotShowForm): ?>
+<?php if (!$this->Template->doNotShowForm): ?>
 <?= $this->form ?>
 <?php endif; ?>

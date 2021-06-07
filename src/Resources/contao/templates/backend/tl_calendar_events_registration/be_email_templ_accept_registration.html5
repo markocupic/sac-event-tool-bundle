@@ -1,8 +1,8 @@
 Hallo <?= $this->participantFirstname ?> <?= $this->participantLastname ?>
 
 
-<?php if($this->eventType === 'course'): ?>
-Du bist für den Kurs: <?php if($this->courseId != ''): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>" definitiv angemeldet und deine Teilnahme ist bestätigt.
+<?php if ($this->eventType === 'course'): ?>
+Du bist für den Kurs: <?php if ($this->courseId != ''): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>" definitiv angemeldet und deine Teilnahme ist bestätigt.
 <?php else: ?>
 Du bist für den Event: "<?= $this->eventName ?>" definitiv angemeldet und deine Teilnahme ist bestätigt.
 <?php endif; ?>

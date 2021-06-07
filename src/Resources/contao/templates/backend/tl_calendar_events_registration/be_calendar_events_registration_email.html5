@@ -1,15 +1,15 @@
 <div class="registration-email">
     <h1 class="headline"><?= $this->headline ?></h1>
 
-    <?php if($this->form->hasFormField('subject')): ?>
+    <?php if ($this->form->hasFormField('subject')): ?>
     <?= $this->form->getWidget('subject')->parse() ?>
     <?php endif; ?>
 
-    <?php if($this->form->hasFormField('text')): ?>
+    <?php if ($this->form->hasFormField('text')): ?>
     <?= $this->form->getWidget('text')->parse() ?>
     <?php endif; ?>
 
-    <?php if($this->form->hasFormField('submit')): ?>
+    <?php if ($this->form->hasFormField('submit')): ?>
     <?= $this->form->getWidget('submit')->parse() ?>
     <?php endif; ?>
 </div>
@@ -53,7 +53,7 @@
      */
     window.addEvent('domready', function() {
         $('tl_calendar_events_member').addEvent('submit', function(){
-            if($$('input[name="subject"]').get('value') != '' && $$('textarea[name="text"]').get('value') != '')
+            if ($$('input[name="subject"]').get('value') != '' && $$('textarea[name="text"]').get('value') != '')
             {
                 document.getElementById('ctrl_submit').disabled = 1;
             }

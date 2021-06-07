@@ -4,7 +4,7 @@
 
 
     <div class="card">
-        <?php if($this->picture): ?>
+        <?php if ($this->picture): ?>
             <a href="<?= $this->jumpTo ?>">
                 <figure class="image_container"<?php if ($this->margin): ?> style="<?= $this->margin ?>"<?php endif; ?> itemscope itemtype="http://schema.org/ImageObject">
                         <?php $this->insert('picture_default', $this->picture); ?>

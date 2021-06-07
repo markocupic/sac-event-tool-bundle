@@ -34,13 +34,13 @@
                 <?= $this->objUser->postal ?> <?= $this->objUser->city ?>
             </div>
             <!-- Show personal data to logged users only -->
-            <?php if($this->objUser->phone !== ''): ?>
+            <?php if ($this->objUser->phone !== ''): ?>
             <div class="ce_user_portrait_phone">
                 <?= $this->objUser->phone ?>
             </div>
             <?php endif; ?>
 
-            <?php if($this->objUser->mobile !== ''): ?>
+            <?php if ($this->objUser->mobile !== ''): ?>
             <div class="ce_user_portrait_mobile">
                 <?= $this->objUser->mobile ?>
             </div>

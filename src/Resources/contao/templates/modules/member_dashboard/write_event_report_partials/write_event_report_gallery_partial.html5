@@ -14,7 +14,7 @@
 				<div class="d-none"><?= $arrFile['caption'] ?></div>
 				<?php if ($this->publishState < 2): ?>
 				<div class="dashboard-event-story-thumb-buttons-container d-flex">
-					<?php if($arrFile['caption'] === '' || $arrFile['photographer'] === ''): ?>
+					<?php if ($arrFile['caption'] === '' || $arrFile['photographer'] === ''): ?>
 					<button class="btn blinking missing-caption-or-photographer-name add-caption" title="Fehlende Bildlegende oder Name des Fotografen fehlt"><i class="fal fa-exclamation-circle"></i></button>
 					<?php endif; ?>
 					<button class="btn btn-danger rotate-image" title="Bild im GUZ 90° drehen"><i class="fal fa-history"></i></button>

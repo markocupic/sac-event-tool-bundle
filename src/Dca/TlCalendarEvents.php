@@ -499,17 +499,17 @@ class TlCalendarEvents extends \tl_calendar_events
                 $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE pid=?')->execute($calendarId);
 
                 while ($objEvent->next()) {
-                    $set['startTime'] = strtotime($mode, $objEvent->startTime);
-                    $set['endTime'] = strtotime($mode, $objEvent->endTime);
-                    $set['startDate'] = strtotime($mode, $objEvent->startDate);
-                    $set['endDate'] = strtotime($mode, $objEvent->endDate);
+                    $set['startTime'] = strtotime($mode, (int) $objEvent->startTime);
+                    $set['endTime'] = strtotime($mode, (int) $objEvent->endTime);
+                    $set['startDate'] = strtotime($mode, (int) $objEvent->startDate);
+                    $set['endDate'] = strtotime($mode, (int) $objEvent->endDate);
 
                     if ($objEvent->registrationStartDate > 0) {
-                        $set['registrationStartDate'] = strtotime($mode, $objEvent->registrationStartDate);
+                        $set['registrationStartDate'] = strtotime($mode, (int) $objEvent->registrationStartDate);
                     }
 
                     if ($objEvent->registrationEndDate > 0) {
-                        $set['registrationEndDate'] = strtotime($mode, $objEvent->registrationEndDate);
+                        $set['registrationEndDate'] = strtotime($mode, (int) $objEvent->registrationEndDate);
                     }
 
                     $arrRepeats = StringUtil::deserialize($objEvent->eventDates, true);
@@ -517,7 +517,7 @@ class TlCalendarEvents extends \tl_calendar_events
 
                     if (\count($arrRepeats) > 0) {
                         foreach ($arrRepeats as $repeat) {
-                            $repeat['new_repeat'] = strtotime($mode, $repeat['new_repeat']);
+                            $repeat['new_repeat'] = strtotime($mode, (int) $repeat['new_repeat']);
                             $newArrRepeats[] = $repeat;
                         }
                         $set['eventDates'] = serialize($newArrRepeats);

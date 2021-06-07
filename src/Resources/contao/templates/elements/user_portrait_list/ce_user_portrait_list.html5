@@ -1,4 +1,4 @@
-<div class="<?= $this->class ?> block<?php if(!$this->hasMultiple): ?> col-12 col-md-6 col-xl-4 mb-4<?php endif; ?>"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
+<div class="<?= $this->class ?> block<?php if (!$this->hasMultiple): ?> col-12 col-md-6 col-xl-4 mb-4<?php endif; ?>"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
 
 <?php $this->block('headline'); ?>
 <?php if ($this->headline): ?>
@@ -7,11 +7,11 @@
 <?php $this->endblock(); ?>
 
 <?php if ($this->items): ?>
-<?php if($this->hasMultiple): ?>
+<?php if ($this->hasMultiple): ?>
 <div class="row">
     <?php endif; ?>
     <?= $this->items ?>
-    <?php if($this->hasMultiple): ?>
+    <?php if ($this->hasMultiple): ?>
 </div>
 <?php endif; ?>
 

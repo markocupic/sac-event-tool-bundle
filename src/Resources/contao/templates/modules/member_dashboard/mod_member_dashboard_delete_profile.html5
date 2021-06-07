@@ -17,7 +17,7 @@
   <?php endforeach; ?>
 <?php endif; ?>
 
-<?php if(!$this->passedConfirmation): ?>
+<?php if (!$this->passedConfirmation): ?>
 <div class="alert alert-dark flex-column" role="alert">
   Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten unwiderruflich gelöscht.
   Deine Tourhistory ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.
@@ -30,7 +30,7 @@
 </div>
 <?php endif; ?>
 
-<?php if($this->passedConfirmation): ?>
+<?php if ($this->passedConfirmation): ?>
 <div class="alert alert-dark" role="alert">
   Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten unwiderruflich gelöscht.
   Deine Tourhistory ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.

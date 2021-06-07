@@ -5,7 +5,7 @@
       <th class="event-export-date">Datum</th>
       <th class="event-export-weekday">Zeit</th>
       <th class="event-export-title">Titel</th>
-      <?php if(!$this->isCourse): ?>
+      <?php if (!$this->isCourse): ?>
       <th class="event-export-tour-type">Veranstaltungsart</th>
       <?php endif; ?>
       <th class="event-export-instructors">Leiter</th>
@@ -22,11 +22,11 @@
           <td class="event-export-weeknumber" colspan="6" style="text-align:center"><strong>Woche <?= $arrEvent['week'] ?></strong></td>
         </tr>
         <?php endif; ?>
-      <tr class="event-export-row-body" data-recurringevent="<?php if($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+      <tr class="event-export-row-body" data-recurringevent="<?php if ($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
         <td class="event-export-date"><?= $arrEvent['eventDates'] ?></td>
         <td class="event-export-weekday"><?= $arrEvent['weekday'] ?></td>
         <td class="event-export-title"><?= $arrEvent['title'] ?></td>
-        <?php if(!$this->isCourse): ?>
+        <?php if (!$this->isCourse): ?>
         <td class="event-export-tour-type"><?= $arrEvent['tourType'] ?></td>
         <?php endif; ?>
         <td class="event-export-instructors"><?= $arrEvent['instructors'] ?></td>

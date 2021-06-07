@@ -38,7 +38,7 @@
                     <h5>Organisierende Gruppe</h5>
                     <div class="organizer-logo m2-4 mb-2"><?= $this->getEventData('eventOrganizerLogos') ?></div>
                     <p>
-                        <?php if($this->getEventData('eventOrganizers') !== ''): ?><?= $this->getEventData('eventOrganizers') ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
+                        <?php if ($this->getEventData('eventOrganizers') !== ''): ?><?= $this->getEventData('eventOrganizers') ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
                     </p>
                 </div>
 
@@ -66,7 +66,7 @@
                     <a href="/_download/print_workshop_details_as_pdf?eventId=<?= $this->getEventData('id') ?>" title="Details drucken" class="btn btn-block btn-outline-primary"><i class="fal fa-print"></i> Detailinfos drucken</a>
                 </div>
 
-                <?php if(!$this->getEventData('disableOnlineRegistration')): ?>
+                <?php if (!$this->getEventData('disableOnlineRegistration')): ?>
                 <div class="event-detail-buttons mt-3">
                     <a href="{{event_url::<?= $this->getEventData('id') ?>}}#eventBookingForm" title="Kurs buchen" class="btn btn-block btn-lg  btn-primary"><i class="fal fa-shopping-cart"></i> Zur Kursanmeldung</a>
                 </div>
@@ -133,8 +133,8 @@
                 <?php if ($this->getEventData('bookingEvent') != '' || $this->getEventData('generateMainInstructorContactDataFromDb')): ?>
                 <div class="booking-text event-detail event-info-box icon-box-small">
                     <h5>Anmeldung</h5>
-                    <?php if($this->getEventData('bookingEvent') != ''): ?><p><?= nl2br($this->getEventData('bookingEvent')) ?></p><?php endif; ?>
-                    <?php if($this->getEventData('generateMainInstructorContactDataFromDb')): ?><p class="m-0"><?= $this->getEventData('mainInstructorContactDataFromDb') ?></p><?php endif; ?>
+                    <?php if ($this->getEventData('bookingEvent') != ''): ?><p><?= nl2br($this->getEventData('bookingEvent')) ?></p><?php endif; ?>
+                    <?php if ($this->getEventData('generateMainInstructorContactDataFromDb')): ?><p class="m-0"><?= $this->getEventData('mainInstructorContactDataFromDb') ?></p><?php endif; ?>
                 </div>
                 <?php endif; ?>
 
@@ -166,7 +166,7 @@
 
     <!-- enclosures/downloads -->
     <?php // !Vorsicht bei Urheberrechtsverletzung wie z.B. urheberrechtlich geschützen Anhängen wie Topos, Karten, etc. ?>
-    <?php if(FE_USER_LOGGED_IN || Contao\Input::get('mode') === 'eventPreview'): ?>
+    <?php if (FE_USER_LOGGED_IN || Contao\Input::get('mode') === 'eventPreview'): ?>
     <?php if ($this->getEventData('enclosure')): ?>
     <hr>
     <div class="event-eclosures event-detail event-info-box icon-box-small">

@@ -1,4 +1,4 @@
-<?php if(!$this->isAjaxRequest): ?>
+<?php if (!$this->isAjaxRequest): ?>
 <?php $this->extend('block_unsearchable'); ?>
 
 <?php $this->block('content'); ?>
@@ -54,7 +54,7 @@
 <?php $this->endblock(); ?>
 <?php endif; ?>
 
-<?php if($this->isAjaxRequest): ?>
+<?php if ($this->isAjaxRequest): ?>
 <div class="gallery-grid equal-height block">
     <?php foreach ($this->stories as $story): ?>
     <div itemscope itemtype="http://schema.org/Article">

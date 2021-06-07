@@ -117,7 +117,7 @@
         <td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">
             <?= $arrEvent['bookingInfo'] ?>
             <!--
-            <?php if($arrEvent['bookingInfo'] != ''): ?>
+            <?php if ($arrEvent['bookingInfo'] != ''): ?>
             {{br}}
             <?= nl2br($arrEvent['bookingEvent']) ?>
             <?php endif; ?>
@@ -154,7 +154,7 @@
     <?php endif; ?>
     <?php $month = $arrEvent['month']; ?>
 
-    <?php if($arrEvent['showHeadline']): ?>
+    <?php if ($arrEvent['showHeadline']): ?>
     <tr class="event-export-row-headline">
         <td class="event-export-date" style="min-width:220px;"><?= $arrEvent['date'] ?></td>
         <td class="event-export-title" colspan="3"><?= $arrEvent['title'] ?></td>
@@ -167,14 +167,14 @@
     </tr>
     <?php endif; ?>
 
-    <?php if($arrEvent['showTeaser']): ?>
+    <?php if ($arrEvent['showTeaser']): ?>
     <tr class="event-export-row-teaser">
         <td class="event-export-date"></td>
         <td class="event-export-title" colspan="4"><?= nl2br($arrEvent['teaser']) ?></td>
     </tr>
     <?php endif; ?>
 
-    <?php if($arrEvent['showDetails']): ?>
+    <?php if ($arrEvent['showDetails']): ?>
     <!-- start details -->
     <tr class="event-export-row-details">
         <td class="event-export-profile font-italic">Profil</td>
@@ -215,7 +215,7 @@
         <td class="event-export-leistungen font-italic">Anmeldung</td>
         <td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">
             <?= $arrEvent['bookingInfo'] ?>
-            <?php if($arrEvent['bookingEvent'] != ''): ?>
+            <?php if ($arrEvent['bookingEvent'] != ''): ?>
             {{br}}
             <?= nl2br($arrEvent['bookingEvent']) ?>
             <?php endif; ?>
@@ -252,7 +252,7 @@
     <?php endif; ?>
     <?php $month = $arrEvent['month']; ?>
 
-    <?php if($arrEvent['showHeadline']): ?>
+    <?php if ($arrEvent['showHeadline']): ?>
     <tr class="event-export-row-headline">
         <td class="event-export-date" style="min-width:120px;"><?= $arrEvent['date'] ?></td>
         <td class="event-export-title" colspan="3"><?= $arrEvent['title'] ?></td>
@@ -265,14 +265,14 @@
     </tr>
     <?php endif; ?>
 
-    <?php if($arrEvent['showTeaser']): ?>
+    <?php if ($arrEvent['showTeaser']): ?>
     <tr class="event-export-row-teaser">
         <td class="event-export-date"></td>
         <td class="event-export-title" colspan="4"><?= nl2br($arrEvent['teaser']) ?></td>
     </tr>
     <?php endif; ?>
 
-    <?php if($arrEvent['showDetails']): ?>
+    <?php if ($arrEvent['showDetails']): ?>
     <!-- start details -->
     <tr class="event-export-row-details">
         <td class="event-export-profile font-italic">Profil</td>
@@ -313,7 +313,7 @@
         <td class="event-export-leistungen font-italic">Anmeldung</td>
         <td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">
             <?= $arrEvent['bookingInfo'] ?>
-            <?php if($arrEvent['bookingInfo'] != ''): ?>
+            <?php if ($arrEvent['bookingInfo'] != ''): ?>
             {{br}}
             <?= nl2br($arrEvent['bookingEvent']) ?>
             <?php endif; ?>

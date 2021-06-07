@@ -60,7 +60,7 @@
 		(function ($) {
         jQuery(document).ready(function () {
 
-            if($('#ModalWriteTextAndYt .widget.error').length)
+            if ($('#ModalWriteTextAndYt .widget.error').length)
             {
                 let modal = new bootstrap.Modal(document.getElementById('ModalWriteTextAndYt'));
                 modal.show();

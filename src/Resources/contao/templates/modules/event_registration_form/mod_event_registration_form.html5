@@ -128,11 +128,11 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
           </div>
           <div class="modal-body">
-            <?php if($this->eventRegulationExtract): ?>
+            <?php if ($this->eventRegulationExtract): ?>
               <?= $this->eventRegulationExtract ?>
               <?php endif; ?>
 
-              <?php if($this->objEventRegulationFile): ?>
+              <?php if ($this->objEventRegulationFile): ?>
               <p>Download: <a href="<?= $this->objEventRegulationFile->path ?>" download="<?= $this->objEventRegulationFile->name ?>"><?= $this->objEventRegulationFile->name ?></a></p>
               <?php endif; ?>
           </div>

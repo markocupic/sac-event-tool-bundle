@@ -5,7 +5,7 @@
     <date class="d-block mb-3">vom: <?= $this->eventDates ?></date>
     <?php endif; ?>
 
-    <?php if($this->eventSubstitutionText != ''): ?>
+    <?php if ($this->eventSubstitutionText != ''): ?>
     <h4 class="mt-0 mb-3" style="color: red"><!-- indexer::stop -->Ausweichtour:<!-- indexer::continue --> <?= $this->eventSubstitutionText ?></h4>
     <?php endif; ?>
 
@@ -13,7 +13,7 @@
         <!-- start col left -->
         <div class="col-12 col-lg-8">
             <div class="row gx-4 gy-1">
-                <?php if($this->authorName): ?>
+                <?php if ($this->authorName): ?>
                 <div class="col-auto">
                     <h5 class="m-0"><span class="text-danger"><i class="fas fa-feather"></i> Autor/in:</span> <?= $this->authorName ?></h5>
                 </div>
@@ -52,23 +52,23 @@
         <!-- start col right -->
         <div class="col-12 col-lg-4">
             <div class="p-3 mt-4 mt-lg-0 bg-light">
-                <?php if($this->tourTypes): ?>
+                <?php if ($this->tourTypes): ?>
                 <div class="event-info-box mt-0 d-flex">
                     <i class="fas fa-fw fa-mountain text-primary"></i>
                     <div class="ms-2">
                         <h5 class="mt-0"><?= $this->tourTypes ?></h5>
-                        <?php if(!empty($this->eventOrganizers)): ?>
+                        <?php if (!empty($this->eventOrganizers)): ?>
                             <div><?= $this->eventOrganizers ?></div>
                         <?php endif; ?>
 
-                        <?php if(!empty($this->tourInstructors)): ?>
+                        <?php if (!empty($this->tourInstructors)): ?>
                             <div>Leitung: <?= $this->tourInstructors ?></div>
                         <?php endif; ?>
                     </div>
                 </div>
                 <?php endif; ?>
 
-                <?php if($this->tourWaypoints): ?>
+                <?php if ($this->tourWaypoints): ?>
                 <div class="event-info-box mt-3 d-flex">
                     <i class="fas fa-fw fa-pennant text-primary"></i>
                     <div class="ms-2">
@@ -78,16 +78,16 @@
                 </div>
                 <?php endif; ?>
 
-                <?php if($this->tourProfile || $this->tourTechDifficulty): ?>
+                <?php if ($this->tourProfile || $this->tourTechDifficulty): ?>
                 <div class="event-info-box mt-3 d-flex">
                     <i class="fas fa-fw fa-hiking text-primary"></i>
                     <div class="ms-2">
                         <h5 class="mt-0">Eckdaten</h5>
                         <div>
-                            <?php if($this->tourTechDifficulty): ?>
+                            <?php if ($this->tourTechDifficulty): ?>
                             <?= $this->tourTechDifficulty ?>{{br}}
                             <?php endif; ?>
-                            <?php if($this->tourProfile): ?>
+                            <?php if ($this->tourProfile): ?>
                             <?= $this->tourProfile ?>
                             <?php endif; ?>
                         </div>
@@ -95,7 +95,7 @@
                 </div>
                 <?php endif; ?>
 
-                <?php if($this->tourHighlights): ?>
+                <?php if ($this->tourHighlights): ?>
                 <div class="event-info-box mt-3 d-flex">
                     <i class="fas fa-fw fa-star text-primary"></i>
                     <div class="ms-2">
@@ -105,7 +105,7 @@
                 </div>
                 <?php endif; ?>
 
-                <?php if($this->tourPublicTransportInfo): ?>
+                <?php if ($this->tourPublicTransportInfo): ?>
                 <div class="event-info-box mt-3 d-flex">
                     <i class="fas fa-fw fa-tram text-primary"></i>
                     <div class="ms-2">
@@ -126,7 +126,7 @@
         <!-- end col right -->
     </div>
 
-    <?php if($this->directLink): ?>
+    <?php if ($this->directLink): ?>
     <!-- QR Code & direct link -->
     <ul class="nav nav-pills mt-5 mb-3" id="pills-tab" role="tablist">
         <li class="nav-item" role="presentation">

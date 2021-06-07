@@ -28,7 +28,7 @@
                 <div class="tab-pane fade show active" id="kontakt" role="tabpanel" aria-labelledby="kontakt-tab">
                     <div class="table-responsive">
                         <table class="table">
-                            <?php if($this->huettenwart): ?>
+                            <?php if ($this->huettenwart): ?>
                             <tr>
                                 <td><strong>H&uuml;ttenwart:</strong></td>
                                 <!-- indexer::continue -->
@@ -37,14 +37,14 @@
                             </tr>
                             <?php endif; ?>
 
-                            <?php if($this->phone): ?>
+                            <?php if ($this->phone): ?>
                             <tr>
                                 <td><strong>Hüttentelefon:</strong></td>
                                 <td><?= $this->phone ?></td>
                             </tr>
                             <?php endif; ?>
 
-                            <?php if($this->email): ?>
+                            <?php if ($this->email): ?>
                             <tr>
                                 <td><strong>E-Mail:</strong></td>
                                 <td>{{email::<?= $this->email ?>}}</td>
@@ -132,8 +132,8 @@
                             <td><?= nl2br($ascent['ascentDescription']) ?></td>
                             <td><?= nl2br($ascent['ascentTime']) ?></td>
                             <td><?= nl2br($ascent['ascentDifficulty']) ?></td>
-                            <td><?php if($ascent['ascentSummer'] === 'possible'): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
-                            <td><?php if($ascent['ascentWinter'] === 'possible'): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
+                            <td><?php if ($ascent['ascentSummer'] === 'possible'): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
+                            <td><?php if ($ascent['ascentWinter'] === 'possible'): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
                             <td><?= nl2br($ascent['ascentComment']) ?></td>
                         </tr>
                     <?php endforeach; ?>
@@ -143,7 +143,7 @@
 
 
         <div class="col-xl-4">
-            <?php if($this->hasCoords): ?>
+            <?php if ($this->hasCoords): ?>
             <?php $geoLink = '//map.geo.admin.ch/embed.html?lang=de&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege&E=%s.00&N=%s.00&zoom=7&crosshair=marker'; ?>
             <div class="embed-responsive embed-responsive-4by3">
                 <iframe src="<?= sprintf($geoLink, $this->coordsCH1903X, $this->coordsCH1903Y) ?>"></iframe>

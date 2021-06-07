@@ -391,10 +391,10 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $arrData['journey'] = $calendarEventsHelperAdapter->getEventData($objEvent->current(), 'journey');
                     $arrData['minMaxMembers'] = implode('/', $minMax);
 
-                    $arrData['bookingInfo'] = !$objEvent->disableOnlineRegistration ? 'Online: Tour-/Anlassnummer '.$calendarEventsHelperAdapter->getEventData($objEvent->current(), 'eventId') : '';
+                    $arrData['bookingInfo'] = !$objEvent->disableOnlineRegistration ? 'Event-Nummer '.$calendarEventsHelperAdapter->getEventData($objEvent->current(), 'eventId') : '';
 
                     if ('course' === $objEvent->eventType) {
-                        $arrData['bookingInfo'] = !$objEvent->disableOnlineRegistration ? 'Online: Kursnummer '.$calendarEventsHelperAdapter->getEventData($objEvent->current(), 'courseId') : '';
+                        $arrData['bookingInfo'] = !$objEvent->disableOnlineRegistration ? 'Kurs-Nummer '.$calendarEventsHelperAdapter->getEventData($objEvent->current(), 'courseId') : '';
                     }
                     $arrEvent[] = $arrData;
                 }

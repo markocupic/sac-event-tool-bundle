@@ -9,8 +9,8 @@
             <!-- start row-->
             <div class="row">
                 <?php foreach($this->fields as $strField): ?>
-                <?php if($strField === 'suitableForBeginners') continue; ?>
-                <?php if($this->form->hasFormField($strField)): ?>
+                <?php if ($strField === 'suitableForBeginners') continue; ?>
+                <?php if ($this->form->hasFormField($strField)): ?>
                     <!-- start widget <?= $strField ?> -->
                     <div id="<?= $strField ?>" class="filter-board-widget col-6 col-sm-4">
                        <?= $this->form->getWidget($strField)->parse() ?>
@@ -21,7 +21,7 @@
             </div>
             <!-- end row -->
 
-            <?php if($this->form->hasFormField('suitableForBeginners')): ?>
+            <?php if ($this->form->hasFormField('suitableForBeginners')): ?>
             <div id="suitableForBeginners" class="filter-board-widget">
                 <?= $this->form->getWidget('suitableForBeginners')->parse() ?>
             </div>

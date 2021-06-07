@@ -30,10 +30,10 @@
                 <div class="organizers event-detail event-info-box icon-box-small">
                     <h5>Organisierende Gruppe</h5>
                     <p>
-                        <?php if($this->getEventData('eventOrganizers') !== ''): ?><?= $this->getEventData('eventOrganizers') ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
+                        <?php if ($this->getEventData('eventOrganizers') !== ''): ?><?= $this->getEventData('eventOrganizers') ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
                     </p>
                 </div>
-                <?php if($this->getEventData('mountainguide')): ?>
+                <?php if ($this->getEventData('mountainguide')): ?>
                 <div class="eventdate event-detail event-info-box icon-box-small">
                     <h5>Mit Bergführer</h5>
                 </div>
@@ -63,7 +63,7 @@
                 <div class="instructor event-detail event-info-box icon-box-small">
                     <h5 class="mt-0">Leitung/Betreuung</h5>
                 </div>
-                <?php if($this->getEventData('instructorContactBoxes') !== ''): ?>
+                <?php if ($this->getEventData('instructorContactBoxes') !== ''): ?>
                 <div class="row mt-3 gx-2 gy-1">
                     <?= $this->getEventData('instructorContactBoxes') ?>
                 </div>
@@ -88,8 +88,9 @@
                 <?php if ($this->getEventData('bookingEvent') != '' || $this->getEventData('generateMainInstructorContactDataFromDb')): ?>
                 <div class="booking-text event-detail event-info-box icon-box-small">
                     <h5>Anmeldung</h5>
-                    <?php if($this->getEventData('bookingEvent') != ''): ?><p><?= nl2br($this->getEventData('bookingEvent')) ?></p><?php endif; ?>
-                    <?php if($this->getEventData('generateMainInstructorContactDataFromDb')): ?><p class="m-0"><?= $this->getEventData('mainInstructorContactDataFromDb') ?></p><?php endif; ?>
+                    <p><?php if ($this->getEventData('disableOnlineRegistration')): ?>Keine <?php endif; ?>Online-Anmeldung</p>
+                    <?php if ($this->getEventData('bookingEvent') != ''): ?><p><?= nl2br($this->getEventData('bookingEvent')) ?></p><?php endif; ?>
+                    <?php if ($this->getEventData('generateMainInstructorContactDataFromDb')): ?><p><?= $this->getEventData('mainInstructorContactDataFromDb') ?></p><?php endif; ?>
                 </div>
                 <?php endif; ?>
 
@@ -210,7 +211,7 @@
 
     <!-- enclosures/downloads -->
     <?php //!Urheberrechtsverletzung bei urheberrechtlich geschützen Anhängen wie Topos, Karten, etc. ?>
-    <?php if(FE_USER_LOGGED_IN || Contao\Input::get('mode') === 'eventPreview'): ?>
+    <?php if (FE_USER_LOGGED_IN || Contao\Input::get('mode') === 'eventPreview'): ?>
         <?php if ($this->getEventData('enclosure')): ?>
         <div class="event-eclosures event-detail event-info-box icon-box-small">
             <h5>Downloads/weitere Informationen</h5>
