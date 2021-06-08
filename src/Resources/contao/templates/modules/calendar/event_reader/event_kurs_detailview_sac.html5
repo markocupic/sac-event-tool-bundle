@@ -11,11 +11,11 @@
     <h1 class="ce_headline"><?= $this->getEventData('title') ?></h1>
 
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-md-6 col-lg-3">
             {{picture::<?= $this->getEventData('eventImagePath') ?>?class=img-fluid&size=20&alt=<?= $this->getEventData('title') ?>}}
         </div>
 
-        <div class="col-lg-6 mt-3 mt-lg-0"><!--begin col left -->
+        <div class="col-md-6 col-lg-9 mt-3 mt-lg-0"><!--begin col left -->
             <div class="">
                 <?php if ($this->getEventData('teaser') != ''): ?>
                 <div class="teaser event-detail font-weight-bold">
@@ -57,26 +57,30 @@
                     </p>
                 </div>
                 <?php endif; ?>
-
-                <div class="mt-3">
-                    <a href="/_download/download_event_ical?eventId=<?= $this->getEventData('id') ?>" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary"><i class="fal fa-calendar-plus"></i> iCal download</a>
-                </div>
-
-                <div class="mt-3">
-                    <a href="/_download/print_workshop_details_as_pdf?eventId=<?= $this->getEventData('id') ?>" title="Details drucken" class="btn btn-block btn-outline-primary"><i class="fal fa-print"></i> Detailinfos drucken</a>
-                </div>
-
-                <?php if (!$this->getEventData('disableOnlineRegistration')): ?>
-                <div class="event-detail-buttons mt-3">
-                    <a href="{{event_url::<?= $this->getEventData('id') ?>}}#eventBookingForm" title="Kurs buchen" class="btn btn-block btn-lg  btn-primary"><i class="fal fa-shopping-cart"></i> Zur Kursanmeldung</a>
-                </div>
-                <?php endif; ?>
-
             </div>
-
         </div><!--end col right-->
 
 
+        <div class="col-12 mt-4">
+            <hr>
+        </div>
+        <div class="col-12">
+            <div class="d-flex flex-wrap mt-3">
+                <div class="me-2 mt-2">
+                    <a href="/_download/download_event_ical?eventId=<?= $this->getEventData('id') ?>" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary"><i class="fal fa-calendar-plus"></i> iCal</a>
+                </div>
+
+                <div class="me-2 mt-2">
+                    <a href="/_download/print_workshop_details_as_pdf?eventId=<?= $this->getEventData('id') ?>" title="Details drucken" class="btn btn-block btn-outline-primary"><i class="fal fa-print"></i> Detailinfos</a>
+                </div>
+
+                <?php if (!$this->getEventData('disableOnlineRegistration')): ?>
+                <div class="event-detail-buttons mt-2">
+                    <a href="{{event_url::<?= $this->getEventData('id') ?>}}#eventBookingForm" title="Kurs buchen" class="btn btn-block btn-primary"><i class="fal fa-shopping-cart"></i> Kursanmeldung</a>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
         <div class="col-12 mt-4">
             <hr>
         </div>
