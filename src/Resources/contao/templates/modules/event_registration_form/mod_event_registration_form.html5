@@ -1,9 +1,8 @@
 <?php $this->extend('block_unsearchable'); ?>
 <?php $this->block('content'); ?>
-  <hr>
-  <div id="eventBookingForm" class="event-detail event-info-box">
+  <div id="eventBookingForm" class="p-4 mt-3 mb-4 bg-white">
 
-      <?php if ($this->hasErrorMessage): ?>
+    <?php if ($this->hasErrorMessage): ?>
         <div class="alert alert-danger" role="alert">
           <i class="fas fa-exclamation-circle"></i>
           <div><?= $this->errorMessage ?></div>

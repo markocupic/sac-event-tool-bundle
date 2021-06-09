@@ -1,11 +1,11 @@
 <?php Markocupic\SacEventToolBundle\CalendarEventsHelper::addEventDataToTemplate($this); ?>
 
 <!-- indexer::stop -->
-<p class="back"><a href="javascript:history.go(-1)" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
+<p class="back"><a href="javascript:history.go(-1)" title="Zurück">Zur&uuml;ck</a></p>
 
 <div class="event event-detailview layout_full block<?= $this->getEventData('class') ?>">
     <?php if ($this->eventState): ?>
-    <h4 class="event-state-headline"><?= $this->getEventData('eventStateLabel') ?></h4>
+    <h4 class="event-state-headline mb-0"><?= $this->getEventData('eventStateLabel') ?></h4>
     <?php endif; ?>
 
     <h1 class="ce_headline"><?= $this->getEventData('title') ?></h1>
@@ -13,19 +13,19 @@
     <h4 class="ce_headline last-minute-tour">Last minute tour (Spontantour)</h4>
     <?php endif; ?>
 
-    <div class="row">
+    <div class="row gx-5">
         <!-- Col left -->
         <div class="col-lg-6">
-
             <?php if ($this->getEventData('teaser') != ''): ?>
-            <div class="teaser event-detail font-weight-bold">
+            <div class="teaser event-detail fs-6 mb-3 font-family-serif">
                 <?= nl2br($this->getEventData('teaser')) ?>
             </div>
-            {{br}}
             <?php endif; ?>
 
-            <div class="grey-box p-4 mb-4" style="background-color: #f2f2f2;">
-                <div class="event-detail event-info-box organizer-logo mb-4"><?= $this->getEventData('eventOrganizerLogos') ?></div>
+            <div class="p-4 mb-3 bg-white">
+                <div class="event-detail event-info-box organizer-logo mb-4">
+                    <?= $this->getEventData('eventOrganizerLogos') ?>
+                </div>
 
                 <div class="organizers event-detail event-info-box icon-box-small">
                     <h5>Organisierende Gruppe</h5>
@@ -59,9 +59,11 @@
                     <p><?= $this->getEventData('location') ?></p>
                 </div>
                 <?php endif; ?>
+            </div>
 
+            <div class="p-4 mt-3 mb-3 bg-white">
                 <div class="instructor event-detail event-info-box icon-box-small">
-                    <h5 class="mt-0">Leitung/Betreuung</h5>
+                    <h5>Leitung/Betreuung</h5>
                 </div>
                 <?php if ($this->getEventData('instructorContactBoxes') !== ''): ?>
                 <div class="row mt-3 gx-2 gy-1">
@@ -84,6 +86,9 @@
                     <p>Vom <?= $this->getEventData('registrationStartDateFormated') ?> bis zum <?= $this->getEventData('registrationEndDateFormated') ?></p>
                 </div>
                 <?php endif; ?>
+            </div>
+
+            <div class="p-4 mt-3 mb-3 bg-white">
 
                 <?php if ($this->getEventData('bookingEvent') != '' || $this->getEventData('generateMainInstructorContactDataFromDb')): ?>
                 <div class="booking-text event-detail event-info-box icon-box-small">
@@ -206,10 +211,6 @@
 
 
     <!-- Weitere Inhaltselemente -->
-    <?php if ($this->getEventData('hasDetails')): ?>
-    <?php //echo $this->getEventData('details'); ?>
-    <?php endif; ?>
-
 
     <!-- enclosures/downloads -->
     <?php //!Urheberrechtsverletzung bei urheberrechtlich geschützen Anhängen wie Topos, Karten, etc. ?>
@@ -236,6 +237,5 @@
 
 
 </div>
-{{br}}
 <!-- indexer::continue -->
 
