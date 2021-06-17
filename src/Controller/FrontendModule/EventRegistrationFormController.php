@@ -32,7 +32,6 @@ use Contao\FilesModel;
 use Contao\FrontendUser;
 use Contao\Input;
 use Contao\MemberModel;
-use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
@@ -48,6 +47,7 @@ use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Security;
 
 /**
@@ -156,8 +156,6 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         // Set adapters
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
-        /** @var Message $messageAdapter */
-        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
         /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
@@ -170,6 +168,12 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
         /** @var Input $inputAdapter */
         $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+
+        /** @var Session $session */
+        $session = System::getContainer()->get('session');
+        $flash = $session->getFlashBag();
+        $sessInfKey = 'contao.FE.info';
+        $sessErrKey = 'contao.FE.error';
 
         $this->template->objUser = $this->objUser;
         $this->template->objEvent = $this->objEvent;
@@ -187,60 +191,58 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $this->template->countAcceptedRegistrations = $countAcceptedRegistrations;
 
         if (null === $this->objEvent) {
-            $messageAdapter->addInfo(sprintf('Event mit ID: %s nicht gefunden.', $inputAdapter->get('events') ?: 'NULL'));
+            $flash->set($sessInfKey, sprintf('Event mit ID: %s nicht gefunden.', $inputAdapter->get('events') ?: 'NULL'));
         } elseif ($this->objEvent->disableOnlineRegistration) {
-            $messageAdapter->addInfo('Eine Online-Anmeldung zu diesem Event ist nicht möglich.', $scope);
+            $flash->set($sessInfKey, 'Eine Online-Anmeldung zu diesem Event ist nicht möglich.', $scope);
         } elseif (null === $this->objUser) {
-            $messageAdapter->addInfo('Bitte logge dich mit deinem Mitglieder-Konto ein, um dich für den Event anzumelden.', $scope);
+            $flash->set($sessInfKey, 'Bitte logge dich mit deinem Mitglieder-Konto ein, um dich für den Event anzumelden.', $scope);
             $this->template->showLoginForm = true;
         } elseif (null !== $this->objUser && true === $calendarEventsMemberModelAdapter->isRegistered($this->objUser->id, $this->objEvent->id)) {
-            $messageAdapter->addInfo('Du hast dich bereits für diesen Event angemeldet.', $scope);
+            $flash->set($sessInfKey, 'Du hast dich bereits für diesen Event angemeldet.', $scope);
         } elseif ('event_fully_booked' === $this->objEvent->eventState) {
-            $messageAdapter->addInfo('Dieser Anlass ist ausgebucht. Bitte erkundige dich beim Leiter, ob eine Nachmeldung möglich ist.', $scope);
+            $flash->set($sessInfKey, 'Dieser Anlass ist ausgebucht. Bitte erkundige dich beim Leiter, ob eine Nachmeldung möglich ist.', $scope);
         } elseif ('event_canceled' === $this->objEvent->eventState) {
-            $messageAdapter->addInfo('Dieser Anlass wurde abgesagt. Es ist keine Anmeldung möglich.', $scope);
+            $flash->set($sessInfKey, 'Dieser Anlass wurde abgesagt. Es ist keine Anmeldung möglich.', $scope);
         } elseif ('event_deferred' === $this->objEvent->eventState) {
-            $messageAdapter->addInfo('Dieser Anlass ist verschoben worden.', $scope);
+            $flash->set($sessInfKey, 'Dieser Anlass ist verschoben worden.', $scope);
         } elseif ($this->objEvent->setRegistrationPeriod && $this->objEvent->registrationStartDate > time()) {
-            $messageAdapter->addInfo(sprintf('Anmeldungen für <strong>"%s"</strong> sind erst ab dem %s möglich.', $this->objEvent->title, $dateAdapter->parse('d.m.Y H:i', $this->objEvent->registrationStartDate)), $scope);
+            $flash->set($sessInfKey, sprintf('Anmeldungen für <strong>"%s"</strong> sind erst ab dem %s möglich.', $this->objEvent->title, $dateAdapter->parse('d.m.Y H:i', $this->objEvent->registrationStartDate)), $scope);
         } elseif ($this->objEvent->setRegistrationPeriod && $this->objEvent->registrationEndDate < time()) {
-            $messageAdapter->addInfo(sprintf('Die Anmeldefrist für diesen Event ist am %s abgelaufen.', $dateAdapter->parse('d.m.Y \u\m H:i', $this->objEvent->registrationEndDate)), $scope);
+            $flash->set($sessInfKey, sprintf('Die Anmeldefrist für diesen Event ist am %s abgelaufen.', $dateAdapter->parse('d.m.Y \u\m H:i', $this->objEvent->registrationEndDate)), $scope);
         } elseif (!$this->objEvent->setRegistrationPeriod && $this->objEvent->startDate - 60 * 60 * 24 < time()) {
-            $messageAdapter->addInfo('Die Anmeldefrist für diesen Event ist abgelaufen. Du kannst dich bis 24 Stunden vor Event-Beginn anmelden. Nimm gegebenenfalls mit dem Leiter Kontakt auf.', $scope);
+            $flash->set($sessInfKey, 'Die Anmeldefrist für diesen Event ist abgelaufen. Du kannst dich bis 24 Stunden vor Event-Beginn anmelden. Nimm gegebenenfalls mit dem Leiter Kontakt auf.', $scope);
         } elseif ($this->objUser && true === $calendarEventsHelperAdapter->areBookingDatesOccupied($this->objEvent, $this->objUser)) {
-            $messageAdapter->addInfo('Die Anmeldung zu diesem Event ist nicht möglich, da die Event-Daten sich mit den Daten eines anderen Events überschneiden, wo deine Teilnahme bereits bestätigt ist. Bitte nimm persönlich Kontakt mit dem Touren-/Kursleiter auf, falls du der Ansicht bist, dass keine zeitliche Überschneidung vorliegt und deine Teilnahme an beiden Events möglich ist.', $scope);
+            $flash->set($sessInfKey, 'Die Anmeldung zu diesem Event ist nicht möglich, da die Event-Daten sich mit den Daten eines anderen Events überschneiden, wo deine Teilnahme bereits bestätigt ist. Bitte nimm persönlich Kontakt mit dem Touren-/Kursleiter auf, falls du der Ansicht bist, dass keine zeitliche Überschneidung vorliegt und deine Teilnahme an beiden Events möglich ist.', $scope);
         } elseif (null === $this->objInstructor) {
-            $messageAdapter->addError('Der Hauptleiter mit ID '.$this->objEvent->mainInstructor.' wurde nicht in der Datenbank gefunden. Bitte nimm persönlich Kontakt mit dem Leiter auf.', $scope);
+            $flash->set($sessErrKey, 'Der Hauptleiter mit ID '.$this->objEvent->mainInstructor.' wurde nicht in der Datenbank gefunden. Bitte nimm persönlich Kontakt mit dem Leiter auf.', $scope);
         } elseif (empty($this->objInstructor->email) || !$validatorAdapter->isEmail($this->objInstructor->email)) {
-            $messageAdapter->addError('Dem Hauptleiter mit ID '.$this->objEvent->mainInstructor.' ist keine gültige E-Mail zugewiesen. Bitte nimm persönlich mit dem Leiter Kontakt auf.', $scope);
+            $flash->set($sessErrKey, 'Dem Hauptleiter mit ID '.$this->objEvent->mainInstructor.' ist keine gültige E-Mail zugewiesen. Bitte nimm persönlich mit dem Leiter Kontakt auf.', $scope);
         } elseif (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email)) {
-            $messageAdapter->addError('Leider wurde für dieses Mitgliederkonto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlege auf auf der Internetseite des Zentralverbands deine E-Mail-Adresse.');
+            $flash->set($sessErrKey, 'Leider wurde für dieses Mitgliederkonto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlege auf auf der Internetseite des Zentralverbands deine E-Mail-Adresse.');
         } elseif (null === $this->objNotification) {
-            $messageAdapter->addError('Systemfehler: Für das Modul ist keine Benachrichtigung (terminal42/notification_center) eingestellt worden. Bitte melde den Fehler bei der Geschäftsstelle der Sektion.', $scope);
+            $flash->set($sessErrKey, 'Systemfehler: Für das Modul ist keine Benachrichtigung (terminal42/notification_center) eingestellt worden. Bitte melde den Fehler bei der Geschäftsstelle der Sektion.', $scope);
         }
 
-        // All ok! Show the registration form;
-
         // Add messages to the template
-        if ($messageAdapter->hasMessages()) {
-            if ($messageAdapter->hasError()) {
+        if ($flash->has($sessInfKey) || $flash->has($sessErrKey)) {
+            if ($flash->has($sessErrKey)) {
                 $this->template->hasErrorMessage = true;
-                $session = System::getContainer()->get('session')->getFlashBag()->get('contao.FE.error');
-                $this->template->errorMessage = $session[0];
+                $errorMessage = $flash->get($sessErrKey)[0];
+                $this->template->errorMessage = $errorMessage;
 
                 // Log
                 $logger = System::getContainer()->get('monolog.logger.contao');
-                $strText = sprintf('Event registration error: "%s"', $session[0]);
+                $strText = sprintf('Event registration error: "%s"', $errorMessage);
                 $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_EVENT_SUBSCRIPTION_ERROR'))]);
             }
 
-            if ($messageAdapter->hasInfo()) {
+            if ($flash->has($sessInfKey)) {
                 $this->template->hasInfoMessage = true;
-                $session = System::getContainer()->get('session')->getFlashBag()->get('contao.FE.info');
-                $this->template->infoMessage = $session[0];
+                $infoMessage = $flash->get($sessInfKey)[0];
+                $this->template->infoMessage = $infoMessage;
             }
         } else {
-            // Generate Form
+            // All ok! Generate the registration form;
             $this->generateForm();
 
             if (null !== $this->objForm) {

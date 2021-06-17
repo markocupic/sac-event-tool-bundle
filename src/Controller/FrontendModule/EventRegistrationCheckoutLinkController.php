@@ -63,7 +63,6 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
         $pageModelAdapter = $this->get('contao.framework')->getAdapter(PageModel::class);
         $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
 
-
         // Set the item from the auto_item parameter
         if (!isset($_GET['events']) && $configAdapter->get('useAutoItem') && isset($_GET['auto_item'])) {
             $inputAdapter->setGet('events', $inputAdapter->get('auto_item'));
@@ -71,8 +70,7 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
 
         $this->objEvent = $calendarEventsModelAdapter->findByIdOrAlias($inputAdapter->get('events'));
 
-
-        $this->objJumpTo = $pageModelAdapter->findPublishedById($model->jumpTo);
+        $this->objJumpTo = $pageModelAdapter->findPublishedById($model->eventRegCheckoutLinkPage );
 
         if ($request && $this->scopeMatcher->isFrontendRequest($request) && (!$this->objEvent || !$this->objJumpTo)) {
             return new Response(Response::HTTP_NO_CONTENT);
@@ -98,9 +96,12 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
     {
         $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
 
-        $param = '/'. ($configAdapter->get('useAutoItem') ? '' : 'events/') . $this->objEvent->alias;
+        $params = '/'.($configAdapter->get('useAutoItem') ? '' : 'events/').$this->objEvent->alias;
 
-        $template->jumpTo = $this->objJumpTo->getFrontendUrl($param);
+        $template->jumpTo = $this->objJumpTo->getFrontendUrl($params);
+
+        $template->btnLbl = $this->model->eventRegCheckoutLinkLabel;
+
         return $template->getResponse();
     }
 }

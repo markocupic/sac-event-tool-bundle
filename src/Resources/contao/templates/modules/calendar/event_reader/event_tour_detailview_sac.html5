@@ -107,7 +107,8 @@
 
                     <?php if (!$this->getEventData('disableOnlineRegistration')): ?>
                     <div class="event-detail-buttons mt-3">
-                        <a href="{{event_url::<?= $this->getEventData('id') ?>}}#eventBookingForm" title="Für Tour anmelden" class="btn btn-block btn-primary"><i class="fal fa-shopping-cart"></i> Für Tour anmelden</a>
+                        <!-- book event button -->
+                        {{insert_module::408}}
                     </div>
                     <?php endif; ?>
                 </div>

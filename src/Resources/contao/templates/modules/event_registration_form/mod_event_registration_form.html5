@@ -1,147 +1,151 @@
 <?php $this->extend('block_unsearchable'); ?>
+
 <?php $this->block('content'); ?>
-  <div id="eventBookingForm" class="p-4 mt-3 mb-4 bg-white">
 
-    <?php if ($this->hasErrorMessage): ?>
-        <div class="alert alert-danger" role="alert">
-          <i class="fas fa-exclamation-circle"></i>
-          <div><?= $this->errorMessage ?></div>
-        </div>
-      <?php endif; ?>
+<div id="eventBookingForm" class="p-4 mt-3 mb-4 bg-white">
 
-      <?php if ($this->hasInfoMessage): ?>
-        <div class="alert alert-info" role="alert">
-          <i class="fas fa-info-circle me-2"></i>
-          <div><?= $this->infoMessage ?></div>
-        </div>
-      <?php endif; ?>
+	<?php if ($this->objEvent): ?>
+	<h3 class="ce_headline">Für Event "<?= $this->objEvent->title ?>" anmelden</h3>
+	<?php endif; ?>
 
-      <?php if (!FE_USER_LOGGED_IN && $this->showLoginForm): ?>
-        <!-- Login form -->
-        <div class="mt-5 mb-4">
-          {{insert_module::406}}
-        </div>
-      <?php endif; ?>
+	<?php if ($this->hasErrorMessage): ?>
+	<div class="alert alert-danger" role="alert">
+		<i class="fas fa-exclamation-circle"></i>
+		<div><?= $this->errorMessage ?></div>
+	</div>
+	<?php endif; ?>
 
-      <?php if ($this->form): ?>
-        <h3 class="ce_headline">Für Event "<?= $this->objEvent->title ?>" anmelden</h3>
+	<?php if ($this->hasInfoMessage): ?>
+	<div class="alert alert-info" role="alert">
+		<i class="fas fa-info-circle me-2"></i>
+		<div><?= $this->infoMessage ?></div>
+	</div>
+	<?php endif; ?>
 
-        <div class="row">
-          <div class="col-lg-12">
-              <?php if ($this->bookingLimitReaches): ?>
-                <div class="alert alert-info" role="alert">
-                  <i class="fas fa-info-circle"></i>
-                  <div>Die maximale Teilnehmerzahl für diesen Event ist bereits erreicht. Wenn du dich trotzdem anmeldest, gelangst du auf die Warteliste und kannst bei Absagen evtl. nachr&uuml;cken. Du kannst selbstverst&auml;ndlich auch mit dem Leiter Kontakt aufnehmen, um Genaueres zu erfahren.</div>
-                </div>
-              <?php endif; ?>
+	<?php if (!FE_USER_LOGGED_IN && $this->showLoginForm): ?>
+	<!-- Login form -->
+	<div class="mt-5 mb-4">
+		{{insert_module::406}}
+	</div>
+	<?php endif; ?>
 
-              <?php if ($this->hasBookingError): ?>
-                <div class="alert alert-info" role="alert">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <div><?= $this->bookingErrorMsg ?></div>
-                </div>
-              <?php endif; ?>
-            <div class="hasteform_form-event-registration block">
-              <form action="<?= $this->objForm->getFormAction() ?>" method="<?= $this->objForm->getMethod() ?>" enctype="<?= $this->objForm->getEnctype() ?>">
-                <div class="formbody">
-                    <?php if ($this->objForm->hasFormField('FORM_SUBMIT')): ?>
-                        <?= $this->objForm->getWidget('FORM_SUBMIT')->parse(); ?>
-                    <?php endif; ?>
+	<?php if ($this->form): ?>
+	<div class="row">
+		<div class="col-lg-12">
+			<?php if ($this->bookingLimitReaches): ?>
+			<div class="alert alert-info" role="alert">
+				<i class="fas fa-info-circle"></i>
+				<div>Die maximale Teilnehmerzahl für diesen Event ist bereits erreicht. Wenn du dich trotzdem anmeldest, gelangst du auf die Warteliste und kannst bei Absagen evtl. nachr&uuml;cken. Du kannst selbstverst&auml;ndlich auch mit dem Leiter Kontakt aufnehmen, um Genaueres zu erfahren.</div>
+			</div>
+			<?php endif; ?>
 
-                    <?php if ($this->objForm->hasFormField('REQUEST_TOKEN')): ?>
-                        <?= $this->objForm->getWidget('REQUEST_TOKEN')->parse(); ?>
-                    <?php endif; ?>
+			<?php if ($this->hasBookingError): ?>
+			<div class="alert alert-info" role="alert">
+				<i class="fas fa-exclamation-circle"></i>
+				<div><?= $this->bookingErrorMsg ?></div>
+			</div>
+			<?php endif; ?>
+			<div class="hasteform_form-event-registration block">
+				<form action="<?= $this->objForm->getFormAction() ?>" method="<?= $this->objForm->getMethod() ?>" enctype="<?= $this->objForm->getEnctype() ?>">
+					<div class="formbody">
+						<?php if ($this->objForm->hasFormField('FORM_SUBMIT')): ?>
+						<?= $this->objForm->getWidget('FORM_SUBMIT')->parse(); ?>
+						<?php endif; ?>
 
-                    <?php if ($this->objForm->hasFormField('carInfo')): ?>
-                        <?= $this->objForm->getWidget('carInfo')->parse(); ?>
-                        {{br}}
-                    <?php endif; ?>
+						<?php if ($this->objForm->hasFormField('REQUEST_TOKEN')): ?>
+						<?= $this->objForm->getWidget('REQUEST_TOKEN')->parse(); ?>
+						<?php endif; ?>
 
-                    <?php if ($this->objForm->hasFormField('ticketInfo')): ?>
-                        <?= $this->objForm->getWidget('ticketInfo')->parse(); ?>
-                        {{br}}
-                    <?php endif; ?>
+						<?php if ($this->objForm->hasFormField('carInfo')): ?>
+						<?= $this->objForm->getWidget('carInfo')->parse(); ?>
+						{{br}}
+						<?php endif; ?>
 
-                    <?php if ($this->objForm->hasFormField('mobile')): ?>
-                        <?= $this->objForm->getWidget('mobile')->parse(); ?>
-                      <div class="alert alert-success" role="alert">
-                        <i class="fas fa-check-circle"></i>
-                        <div>Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leergelassen werden. Damit der Leiter dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine <strong>Mobilnummer</strong> zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.</div>
-                      </div>
-                      {{br}}
-                    <?php endif; ?>
+						<?php if ($this->objForm->hasFormField('ticketInfo')): ?>
+						<?= $this->objForm->getWidget('ticketInfo')->parse(); ?>
+						{{br}}
+						<?php endif; ?>
 
-                    <?php if ($this->objForm->hasFormField('emergencyPhone')): ?>
-                        <?= $this->objForm->getWidget('emergencyPhone')->parse(); ?>
-                    <?php endif; ?>
+						<?php if ($this->objForm->hasFormField('mobile')): ?>
+						<?= $this->objForm->getWidget('mobile')->parse(); ?>
+						<div class="alert alert-success" role="alert">
+							<i class="fas fa-check-circle"></i>
+							<div>Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leergelassen werden. Damit der Leiter dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine <strong>Mobilnummer</strong> zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.</div>
+						</div>
+						{{br}}
+						<?php endif; ?>
 
-                    <?php if ($this->objForm->hasFormField('emergencyPhoneName')): ?>
-                        <?= $this->objForm->getWidget('emergencyPhoneName')->parse(); ?>
-                    {{br}}
-                    <?php endif; ?>
+						<?php if ($this->objForm->hasFormField('emergencyPhone')): ?>
+						<?= $this->objForm->getWidget('emergencyPhone')->parse(); ?>
+						<?php endif; ?>
 
-                    <?php if ($this->objForm->hasFormField('ahvNumber')): ?>
-                      <?= $this->objForm->getWidget('ahvNumber')->parse(); ?>
-                      <div class="alert alert-success" role="alert">
-                        <i class="fas fa-check-circle"></i>
-                        <div>Sämtliche Daten werden lediglich für interne Zwecke verwendet. Die AHV-Nummer wird ausschliesslich für die Abrechnung oder Rückforderung von Geldern von J+S verwendet. Die persönlichen Daten werden vertraulich behandelt. Eine Weitergabe an Drittorganisationen ist ausgeschlossen.</div>
-                      </div>
-                      {{br}}
-                    <?php endif; ?>
+						<?php if ($this->objForm->hasFormField('emergencyPhoneName')): ?>
+						<?= $this->objForm->getWidget('emergencyPhoneName')->parse(); ?>
+						{{br}}
+						<?php endif; ?>
 
-                    <?php if ($this->objForm->hasFormField('notes')): ?>
-                      <?= $this->objForm->getWidget('notes')->parse(); ?>
-                      <div class="alert alert-success" role="alert">
-                        <i class="fas fa-check-circle"></i>
-                        <div>Bitte beschreibe in wenigen Worten dein Leistungsniveau und/oder beantworte, die in den Anmeldebestimmungen verlangten Angaben. (z.B. bereits absolvierte Referenztouren oder Essgewohnheiten bei Events mit &Uuml;bernachtung, etc.)</div>
-                      </div>
-                      {{br}}
-                    <?php endif; ?>
+						<?php if ($this->objForm->hasFormField('ahvNumber')): ?>
+						<?= $this->objForm->getWidget('ahvNumber')->parse(); ?>
+						<div class="alert alert-success" role="alert">
+							<i class="fas fa-check-circle"></i>
+							<div>Sämtliche Daten werden lediglich für interne Zwecke verwendet. Die AHV-Nummer wird ausschliesslich für die Abrechnung oder Rückforderung von Geldern von J+S verwendet. Die persönlichen Daten werden vertraulich behandelt. Eine Weitergabe an Drittorganisationen ist ausgeschlossen.</div>
+						</div>
+						{{br}}
+						<?php endif; ?>
 
-                    <?php if ($this->objForm->hasFormField('foodHabits')): ?>
-                        <?= $this->objForm->getWidget('foodHabits')->parse(); ?>
-                      {{br}}
-                    <?php endif; ?>
+						<?php if ($this->objForm->hasFormField('notes')): ?>
+						<?= $this->objForm->getWidget('notes')->parse(); ?>
+						<div class="alert alert-success" role="alert">
+							<i class="fas fa-check-circle"></i>
+							<div>Bitte beschreibe in wenigen Worten dein Leistungsniveau und/oder beantworte, die in den Anmeldebestimmungen verlangten Angaben. (z.B. bereits absolvierte Referenztouren oder Essgewohnheiten bei Events mit &Uuml;bernachtung, etc.)</div>
+						</div>
+						{{br}}
+						<?php endif; ?>
 
-                    <?php if ($this->objForm->hasFormField('agb')): ?>
-                        <?= $this->objForm->getWidget('agb')->parse(); ?>
-                    <?php endif; ?>
-                    {{br}}
-                    <?php if ($this->objForm->hasFormField('submit')): ?>
-                        <?= $this->objForm->getWidget('submit')->parse(); ?>
-                    <?php endif; ?>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      <?php endif; ?>
+						<?php if ($this->objForm->hasFormField('foodHabits')): ?>
+						<?= $this->objForm->getWidget('foodHabits')->parse(); ?>
+						{{br}}
+						<?php endif; ?>
+
+						<?php if ($this->objForm->hasFormField('agb')): ?>
+						<?= $this->objForm->getWidget('agb')->parse(); ?>
+						<?php endif; ?>
+						{{br}}
+						<?php if ($this->objForm->hasFormField('submit')): ?>
+						<?= $this->objForm->getWidget('submit')->parse(); ?>
+						<?php endif; ?>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<?php endif; ?>
 
 
-    <!-- AGB Modal -->
-    <div class="modal fade" id="agbModal" tabindex="-1" role="dialog" aria-labelledby="agbTitle" aria-hidden="true">
-      <div class="modal-dialog modal-fullscreen-xl-down modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="agbTitle">Kurs- und Tourenreglement</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
-          </div>
-          <div class="modal-body">
-            <?php if ($this->eventRegulationExtract): ?>
-              <?= $this->eventRegulationExtract ?>
-              <?php endif; ?>
+	<!-- AGB Modal -->
+	<div class="modal fade" id="agbModal" tabindex="-1" role="dialog" aria-labelledby="agbTitle" aria-hidden="true">
+		<div class="modal-dialog modal-fullscreen-xl-down modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="agbTitle">Kurs- und Tourenreglement</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+				</div>
+				<div class="modal-body">
+					<?php if ($this->eventRegulationExtract): ?>
+					<?= $this->eventRegulationExtract ?>
+					<?php endif; ?>
 
-              <?php if ($this->objEventRegulationFile): ?>
-              <p>Download: <a href="<?= $this->objEventRegulationFile->path ?>" download="<?= $this->objEventRegulationFile->name ?>"><?= $this->objEventRegulationFile->name ?></a></p>
-              <?php endif; ?>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schliessen</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+					<?php if ($this->objEventRegulationFile): ?>
+					<p>Download: <a href="<?= $this->objEventRegulationFile->path ?>" download="<?= $this->objEventRegulationFile->name ?>"><?= $this->objEventRegulationFile->name ?></a></p>
+					<?php endif; ?>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schliessen</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
 
 <?php $this->endblock(); ?>

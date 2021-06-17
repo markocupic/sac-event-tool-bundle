@@ -33,3 +33,7 @@ $GLOBALS['TL_LANG']['tl_module']['print_export_allowedEventTypes'] = array('Anzu
 $GLOBALS['TL_LANG']['tl_module']['eventListLimitPerRequest'] = array('Anzahl zu ladende Events pro Request', 'Legen Sie die Anzahl zu ladende Events pro Request fest. 0 für alle.');
 $GLOBALS['TL_LANG']['tl_module']['eventListPartialTpl'] = array('Event Auflistungs Kindtemplate', 'Wählen SIe das Kindtemplate (Partialtemplate) aus.');
 $GLOBALS['TL_LANG']['tl_module']['imageClass'] = array('Bild CSS Klasse', 'Geben Sie eine oder mehrere Bildklassen an. Die Klassen werden dem img tag zugeordnet.');
+$GLOBALS['TL_LANG']['tl_module']['eventRegCheckoutLinkPage'] = array('Seite mit Event-Registrierungs-Formular', 'Wählen Sie eine Seite aus..');
+$GLOBALS['TL_LANG']['tl_module']['eventRegCheckoutLinkLabel'] = array('Zum Event-Registrierungs-Formular Label', 'Schreiben Sie das Link-Label auf.');
+
+
