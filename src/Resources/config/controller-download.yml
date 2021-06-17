@@ -1,7 +1,7 @@
 services:
 
-  Markocupic\SacEventToolBundle\Controller\Download\DownloadController:
-    arguments:
-      - '@contao.framework'
-      - '@request_stack'
-    public: true
+    Markocupic\SacEventToolBundle\Controller\Download\DownloadController:
+        arguments:
+            - '@contao.framework'
+            - '@request_stack'
+        public: true

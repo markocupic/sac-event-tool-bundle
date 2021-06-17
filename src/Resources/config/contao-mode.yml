@@ -1,10 +1,10 @@
 services:
 
-  # Get the contao mode (TL_MODE)
-  Markocupic\SacEventToolBundle\ContaoMode\ContaoMode:
-    public: true
-    arguments:
-      - '@contao.framework'
-      - '@request_stack'
-      - '@contao.routing.scope_matcher'
+    # Get the contao mode (TL_MODE)
+    Markocupic\SacEventToolBundle\ContaoMode\ContaoMode:
+        public: true
+        arguments:
+            - '@contao.framework'
+            - '@request_stack'
+            - '@contao.routing.scope_matcher'
 

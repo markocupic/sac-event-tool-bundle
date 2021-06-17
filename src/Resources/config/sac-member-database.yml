@@ -1,16 +1,16 @@
 services:
 
-  # Sync member database form Bern with contao core database tl_member
-  Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase:
-    public: true
-    arguments:
-      - '@contao.framework'
-      - '%kernel.project_dir%'
-      - '@monolog.logger.contao'
+    # Sync member database form Bern with contao core database tl_member
+    Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase:
+        public: true
+        arguments:
+            - '@contao.framework'
+            - '%kernel.project_dir%'
+            - '@monolog.logger.contao'
 
-  # Controller: sync database
-  Markocupic\SacEventToolBundle\Controller\SacMemberDatabase\SyncMemberDatabase:
-    public: true
-    arguments:
-      - '@contao.framework'
-      - '@Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase'
+    # Controller: sync database
+    Markocupic\SacEventToolBundle\Controller\SacMemberDatabase\SyncMemberDatabase:
+        public: true
+        arguments:
+            - '@contao.framework'
+            - '@Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase'

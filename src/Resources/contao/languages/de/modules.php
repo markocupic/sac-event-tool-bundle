@@ -8,6 +8,9 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationCheckoutLinkController;
+
 // Backend Modules
 $GLOBALS['TL_LANG']['MOD']['sac_be_modules'] = array('SAC Module');
 $GLOBALS['TL_LANG']['MOD']['sac_course_main_types_tool'] = array('Kurs-Hauptkategorien');
@@ -32,6 +35,7 @@ $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = array('Event
 $GLOBALS['TL_LANG']['FMD']['tour_difficulty_list'] = array('Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster');
 $GLOBALS['TL_LANG']['FMD']['csv_event_member_export'] = array('SAC-Event-Teilnehmer Export');
 $GLOBALS['TL_LANG']['FMD']['event_registration_form'] = array('SAC Event Registrierungsformular');
+$GLOBALS['TL_LANG']['FMD'][EventRegistrationCheckoutLinkController::TYPE] = array('Link zur Checkout-Seite für Event-Anmeldung');
 $GLOBALS['TL_LANG']['FMD']['activate_member_account'] = array('SAC Mitgliederkonto Aktivierungsformular');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_upcoming_events'] = array('SAC Mitgliederkonto Dashboard - Meine nächsten Events');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_past_events'] = array('SAC Mitgliederkonto Dashboard - Meine absolvierten Events');

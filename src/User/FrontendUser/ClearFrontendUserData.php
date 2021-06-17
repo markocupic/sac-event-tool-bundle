@@ -101,9 +101,8 @@ class ClearFrontendUserData
 
                     $logger->log(LogLevel::INFO, $message, ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, 'EVENT_MEMBER_NOT_FOUND')]);
                     // Notify admin
-                    if(!empty($configAdapter->get('adminEmail')))
-                    {
-                        mail($configAdapter->get('adminEmail'), 'Unbekannter Teilnehmer in Event ' . $objCalendarEventsMember->eventName, $message.' In '.__FILE__.' LINE: '.__LINE__);
+                    if (!empty($configAdapter->get('adminEmail'))) {
+                        mail($configAdapter->get('adminEmail'), 'Unbekannter Teilnehmer in Event '.$objCalendarEventsMember->eventName, $message.' In '.__FILE__.' LINE: '.__LINE__);
                     }
 
                     /*

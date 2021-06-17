@@ -1,11 +1,11 @@
 services:
 
-  Markocupic\SacEventToolBundle\Controller\Feed\UpcomingEventsController:
-    arguments:
-      - '@contao.framework'
-      - '@Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory'
-      - '@database_connection'
-      - '%kernel.project_dir%'
-    public: true
+    Markocupic\SacEventToolBundle\Controller\Feed\UpcomingEventsController:
+        arguments:
+            - '@contao.framework'
+            - '@Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory'
+            - '@database_connection'
+            - '%kernel.project_dir%'
+        public: true
 
 

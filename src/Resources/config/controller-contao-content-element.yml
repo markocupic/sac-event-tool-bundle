@@ -1,33 +1,33 @@
 services:
 
-  Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController:
-    calls:
-      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
-    tags:
-      - { name: contao.content_element, category: sac_event_tool_content_elements, type: user_portrait }
-      - { name: container.service_subscriber }
-    public: true
+    Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController:
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        tags:
+            - { name: contao.content_element, category: sac_event_tool_content_elements, type: user_portrait }
+            - { name: container.service_subscriber }
+        public: true
 
-  Markocupic\SacEventToolBundle\Controller\ContentElement\CabanneSacDetailController:
-    calls:
-      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
-    tags:
-      - { name: contao.content_element, category: sac_event_tool_content_elements, type: cabanne_sac_detail }
-      - { name: container.service_subscriber }
-    public: true
+    Markocupic\SacEventToolBundle\Controller\ContentElement\CabanneSacDetailController:
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        tags:
+            - { name: contao.content_element, category: sac_event_tool_content_elements, type: cabanne_sac_detail }
+            - { name: container.service_subscriber }
+        public: true
 
-  Markocupic\SacEventToolBundle\Controller\ContentElement\CabanneSacListController:
-    calls:
-      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
-    tags:
-      - { name: contao.content_element, category: sac_event_tool_content_elements, type: cabanne_sac_list }
-      - { name: container.service_subscriber }
-    public: true
+    Markocupic\SacEventToolBundle\Controller\ContentElement\CabanneSacListController:
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        tags:
+            - { name: contao.content_element, category: sac_event_tool_content_elements, type: cabanne_sac_list }
+            - { name: container.service_subscriber }
+        public: true
 
-  Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController:
-    calls:
-      - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
-    tags:
-      - { name: contao.content_element, category: sac_event_tool_content_elements, type: user_portrait_list }
-      - { name: container.service_subscriber }
-    public: true
+    Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController:
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        tags:
+            - { name: contao.content_element, category: sac_event_tool_content_elements, type: user_portrait_list }
+            - { name: container.service_subscriber }
+        public: true

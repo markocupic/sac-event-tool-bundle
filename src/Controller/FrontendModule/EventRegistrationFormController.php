@@ -43,7 +43,6 @@ use Contao\Validator;
 use Doctrine\DBAL\Connection;
 use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
 use NotificationCenter\Model\Notification;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Request;
@@ -123,25 +122,8 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
             $inputAdapter->setGet('events', $inputAdapter->get('auto_item'));
         }
 
-        $blnShowModule = false;
-
-        // Get $this->objEvent
-        if ('' !== $inputAdapter->get('events')) {
-            $objEvent = $calendarEventsModelAdapter->findByIdOrAlias($inputAdapter->get('events'));
-
-            if (null !== $objEvent) {
-                $this->objEvent = $objEvent;
-                $blnShowModule = true;
-            }
-        }
-
-        /** @var ContaoMode $scope */
-        $scope = System::getContainer()->get('Markocupic\SacEventToolBundle\ContaoMode\ContaoMode');
-
-        if ($scope->isFrontend() && !$blnShowModule) {
-            // Return empty string
-            return new Response('', Response::HTTP_NO_CONTENT);
-        }
+        // Get $this->objEvent from GET
+        $this->objEvent = $calendarEventsModelAdapter->findByIdOrAlias($inputAdapter->get('events'));
 
         // Use terminal42/notification_center
         $this->objNotification = $notificationAdapter->findByPk($this->model->receiptEventRegistrationNotificationId);
@@ -186,6 +168,8 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
         /** @var Validator $validatorAdapter */
         $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
+        /** @var Input $inputAdapter */
+        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
 
         $this->template->objUser = $this->objUser;
         $this->template->objEvent = $this->objEvent;
@@ -202,7 +186,9 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         $countAcceptedRegistrations = $objMember->numRows;
         $this->template->countAcceptedRegistrations = $countAcceptedRegistrations;
 
-        if ($this->objEvent->disableOnlineRegistration) {
+        if (null === $this->objEvent) {
+            $messageAdapter->addInfo(sprintf('Event mit ID: %s nicht gefunden.', $inputAdapter->get('events') ?: 'NULL'));
+        } elseif ($this->objEvent->disableOnlineRegistration) {
             $messageAdapter->addInfo('Eine Online-Anmeldung zu diesem Event ist nicht möglich.', $scope);
         } elseif (null === $this->objUser) {
             $messageAdapter->addInfo('Bitte logge dich mit deinem Mitglieder-Konto ein, um dich für den Event anzumelden.', $scope);
@@ -301,11 +287,6 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
             ->prepare('SELECT * FROM tl_calendar_events_member WHERE ticketInfo=?')
             ->execute('')
         ;
-
-        while ($objDb->next()) {
-            //echo $objDb->firstname . '<br>';
-        }
-        //die();
 
         if (null === $objEvent) {
             return null;
@@ -463,8 +444,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                     $arrData = array_merge($objMemberModel->row(), $arrDataForm);
 
                     // Do not send ahv number if it is not required
-                    if(!isset($arrDataForm['ahvNumber']))
-                    {
+                    if (!isset($arrDataForm['ahvNumber'])) {
                         unset($arrData['ahvNumber']);
                     }
 
