@@ -1,0 +1,4 @@
+services:
+    Markocupic\SacEventToolBundle\Subscriber\NotifyOnEventSubscription:
+        tags:
+            - { name: kernel.event_subscriber }

@@ -27,6 +27,9 @@ services:
         public: true
 
     Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationFormController:
+        arguments:
+            - '@contao.framework'
+            - '@event_dispatcher'
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:
