@@ -219,7 +219,7 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
             $flash->set($sessInfKey, 'Bitte logge dich mit deinem Mitglieder-Konto ein, um dich für den Event anzumelden.');
             $this->template->showLoginForm = true;
         } elseif (null !== $this->memberModel && true === $calendarEventsMemberModelAdapter->isRegistered($this->memberModel->id, $this->eventModel->id)) {
-            $flash->set($sessInfKey, 'Du hast dich bereits für diesen Event angemeldet.');
+            $flash->set($sessInfKey, 'Zu diesem Event liegt bereits eine Anmeldung von dir vor.');
         } elseif ('event_fully_booked' === $this->eventModel->eventState) {
             $flash->set($sessInfKey, 'Dieser Anlass ist ausgebucht. Bitte erkundige dich beim Leiter, ob eine Nachmeldung möglich ist.');
         } elseif ('event_canceled' === $this->eventModel->eventState) {
@@ -373,18 +373,16 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         if ($objForm->validate()) {
             $blnError = false;
 
-
-
-                // Prevent duplicate entries
-                $objDb = $databaseAdapter->getInstance()
-                    ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND contaoMemberId=?')
-                    ->execute($this->eventModel->id, $this->memberModel->id)
+            // Prevent duplicate entries
+            $objDb = $databaseAdapter->getInstance()
+                ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND contaoMemberId=?')
+                ->execute($this->eventModel->id, $this->memberModel->id)
                 ;
 
-                if ($objDb->numRows) {
-                    $this->template->bookingErrorMsg = 'Für diesen Event liegt von dir bereits eine Anmeldung vor.';
-                    $blnError = true;
-                }
+            if ($objDb->numRows) {
+                $this->template->bookingErrorMsg = 'Für diesen Event liegt von dir bereits eine Anmeldung vor.';
+                $blnError = true;
+            }
 
             if (!$blnError) {
                 if (true === $calendarEventsHelperAdapter->areBookingDatesOccupied($this->eventModel, $this->memberModel)) {
