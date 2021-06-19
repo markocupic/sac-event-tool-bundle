@@ -45,6 +45,7 @@
 				<div><?= $this->bookingErrorMsg ?></div>
 			</div>
 			<?php endif; ?>
+
 			<div class="hasteform_form-event-registration block">
 				<form action="<?= $this->objForm->getFormAction() ?>" method="<?= $this->objForm->getMethod() ?>" enctype="<?= $this->objForm->getEnctype() ?>">
 					<div class="formbody">
@@ -77,6 +78,7 @@
 
 						<?php if ($this->objForm->hasFormField('emergencyPhone')): ?>
 						<?= $this->objForm->getWidget('emergencyPhone')->parse(); ?>
+						{{br}}
 						<?php endif; ?>
 
 						<?php if ($this->objForm->hasFormField('emergencyPhoneName')): ?>
@@ -109,8 +111,9 @@
 
 						<?php if ($this->objForm->hasFormField('agb')): ?>
 						<?= $this->objForm->getWidget('agb')->parse(); ?>
-						<?php endif; ?>
 						{{br}}
+						<?php endif; ?>
+
 						<?php if ($this->objForm->hasFormField('submit')): ?>
 						<?= $this->objForm->getWidget('submit')->parse(); ?>
 						<?php endif; ?>
@@ -145,6 +148,8 @@
 			</div>
 		</div>
 	</div>
+	<!-- End AGB modal -->
+
 </div>
 
 
