@@ -1,7 +1,0 @@
-<?php $this->extend('block_unsearchable'); ?>
-
-<?php $this->block('content'); ?>
-
-<?= $this->partial ?>
-
-<?php $this->endblock(); ?>

@@ -70,7 +70,7 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
 
         $this->objEvent = $calendarEventsModelAdapter->findByIdOrAlias($inputAdapter->get('events'));
 
-        $this->objJumpTo = $pageModelAdapter->findPublishedById($model->eventRegCheckoutLinkPage );
+        $this->objJumpTo = $pageModelAdapter->findPublishedById($model->eventRegCheckoutLinkPage);
 
         if ($request && $this->scopeMatcher->isFrontendRequest($request) && (!$this->objEvent || !$this->objJumpTo)) {
             return new Response(Response::HTTP_NO_CONTENT);

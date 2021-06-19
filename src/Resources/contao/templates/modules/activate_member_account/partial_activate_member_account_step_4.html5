@@ -1,6 +1,0 @@
-<!-- Step 4 -->
-<h6 class="mt-0 mb-4 form-step">Schritt <?= $this->step ?> von 4</h6>
-
-<p class="alert alert-primary" role="alert">Deine Kontoaktivierung konnte erfolgreich abgeschlossen werden. Du kannst dich jetzt mit deiner Mitgliedernummer und deinem zuvor festgelegten Passwort anmelden.</p>
-{{br}}
-<button class="btn btn-dark trigger-login-modal">Jetzt anmelden</button>
