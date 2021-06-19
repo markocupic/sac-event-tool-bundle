@@ -4,57 +4,57 @@
 
 
 <?php if ($this->hasInfoMessage): ?>
-  <div class="alert alert-info" role="alert">
-      <?= $this->infoMessage ?>
-  </div>
+<div class="alert alert-info" role="alert">
+	<?= $this->infoMessage ?>
+</div>
 <?php endif; ?>
 
 <?php if ($this->hasErrorMessage): ?>
-  <?php foreach($this->errorMessages as $msg): ?>
-  <div class="alert alert-danger" role="alert">
-      <?= $msg ?>
-  </div>
-  <?php endforeach; ?>
+<?php foreach($this->errorMessages as $msg): ?>
+<div class="alert alert-danger" role="alert">
+	<?= $msg ?>
+</div>
+<?php endforeach; ?>
 <?php endif; ?>
 
 <table class="table layout-table table-responsive table-striped">
-  <tr>
-    <th>Datum</th>
-    <th>Event-Name</th>
-    <th>Anmeldestatus</th>
-    <th></th>
-  </tr>
-  <?php foreach ($this->arrUpcomingEvents as $event): ?>
-  <?php $stateOfSubscription = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$event['eventRegistrationModel']->stateOfSubscription]; ?>
-  <tr>
-    <td><?= $event['dateSpan'] ?></td>
-    <td>
-      <?php if ($event['eventState'] === 'event_deferred'): ?>
-      <small><span style="color:red">Event verschoben!</span></small>{{br}}
-      <?php endif; ?>
-      <?php if ($event['eventState'] === 'event_canceled'): ?>
-      <small><span style="color:red">Event abgesagt!</span></small>{{br}}
-      <?php endif; ?>
-      <a href="<?= $event['eventUrl'] ?>" title="zum Event"><?= $event['eventModel']->title ?></a>
-    </td>
-    <td><span class="badge bg-primary"><?= $stateOfSubscription ?></span></td>
-    <td class="text-center">
-      <?php if ($event['eventRegistrationModel']->stateOfSubscription !== 'user-has-unsubscribed'): ?>
-      <a href="<?= $event['unregisterUrl'] ?>" role="button" title="Von Event abmelden" class="sign-out-from-event-button btn btn-sm btn-danger">
-        abmelden
-      </a>
-      <?php endif; ?>
-    </td>
-  </tr>
-  <?php endforeach; ?>
+	<tr>
+		<th>Datum</th>
+		<th>Event-Name</th>
+		<th>Anmeldestatus</th>
+		<th></th>
+	</tr>
+	<?php foreach ($this->arrUpcomingEvents as $event): ?>
+	<?php $stateOfSubscription = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$event['eventRegistrationModel']->stateOfSubscription]; ?>
+	<tr>
+		<td><?= $event['dateSpan'] ?></td>
+		<td>
+			<?php if ($event['eventState'] === 'event_deferred'): ?>
+			<small><span style="color:red">Event verschoben!</span></small>{{br}}
+			<?php endif; ?>
+			<?php if ($event['eventState'] === 'event_canceled'): ?>
+			<small><span style="color:red">Event abgesagt!</span></small>{{br}}
+			<?php endif; ?>
+			<a href="<?= $event['eventUrl'] ?>" title="zum Event"><?= $event['eventModel']->title ?></a>
+		</td>
+		<td><span class="badge bg-primary"><?= $stateOfSubscription ?></span></td>
+		<td class="text-center">
+			<?php if ($event['eventRegistrationModel']->stateOfSubscription !== 'user-has-unsubscribed'): ?>
+			<a href="<?= $event['unregisterUrl'] ?>" role="button" title="Von Event abmelden" class="sign-out-from-event-button btn btn-sm btn-danger">
+				abmelden
+			</a>
+			<?php endif; ?>
+		</td>
+	</tr>
+	<?php endforeach; ?>
 </table>
 
 <script>
-  $('.sign-out-from-event-button').click(function (e) {
-      if (!confirm('Willst du dich wirklich vom Event abmelden?')) {
-          e.preventDefault();
-      }
-  });
+    $('.sign-out-from-event-button').click(function (e) {
+        if (!confirm('Willst du dich wirklich vom Event abmelden?')) {
+            e.preventDefault();
+        }
+    });
 </script>
 
 

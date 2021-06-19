@@ -2,155 +2,156 @@
 
 <?php $this->block('content'); ?>
 
-    <!-- indexer::stop -->
-    <div class="row">
-        <div class="col-lg-6 col-xl-8 mb-4 mb-0-lg">
-            <figure class="image_container"<?php if ($this->margin): ?> style="<?= $this->margin ?>"<?php endif; ?> itemscope itemtype="http://schema.org/ImageObject">
-                <?php $this->insert('picture_default', $this->picture); ?>
-            </figure>
-        </div>
-        <div class="col-lg-6  col-xl-4">
+<!-- indexer::stop -->
+<div class="row">
+	<div class="col-lg-6 col-xl-8 mb-4 mb-0-lg">
+		<figure class="image_container"
+		<?php if ($this->margin): ?> style="<?= $this->margin ?>"<?php endif; ?> itemscope itemtype="http://schema.org/ImageObject">
+		<?php $this->insert('picture_default', $this->picture); ?>
+		</figure>
+	</div>
+	<div class="col-lg-6  col-xl-4">
 
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" id="kontakt-tab" data-bs-toggle="tab" href="#kontakt" role="tab" aria-controls="kontakt" aria-selected="true">Kontakt</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="details-tab" data-bs-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="false">Details</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="bewartung-tab" data-bs-toggle="tab" href="#bewartung" role="tab" aria-controls="bewartung" aria-selected="false">Bewartung</a>
-                </li>
-            </ul>
+		<ul class="nav nav-tabs" id="myTab" role="tablist">
+			<li class="nav-item">
+				<a class="nav-link active" id="kontakt-tab" data-bs-toggle="tab" href="#kontakt" role="tab" aria-controls="kontakt" aria-selected="true">Kontakt</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" id="details-tab" data-bs-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="false">Details</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" id="bewartung-tab" data-bs-toggle="tab" href="#bewartung" role="tab" aria-controls="bewartung" aria-selected="false">Bewartung</a>
+			</li>
+		</ul>
 
-            <div class="tab-content" id="huetteDetail">
-                <!-- Contact -->
-                <div class="tab-pane fade show active" id="kontakt" role="tabpanel" aria-labelledby="kontakt-tab">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <?php if ($this->huettenwart): ?>
-                            <tr>
-                                <td><strong>H&uuml;ttenwart:</strong></td>
-                                <!-- indexer::continue -->
-                                <td><?= nl2br($this->huettenwart) ?></td>
-                                <!-- indexer::stop -->
-                            </tr>
-                            <?php endif; ?>
+		<div class="tab-content" id="huetteDetail">
+			<!-- Contact -->
+			<div class="tab-pane fade show active" id="kontakt" role="tabpanel" aria-labelledby="kontakt-tab">
+				<div class="table-responsive">
+					<table class="table">
+						<?php if ($this->huettenwart): ?>
+						<tr>
+							<td><strong>H&uuml;ttenwart:</strong></td>
+							<!-- indexer::continue -->
+							<td><?= nl2br($this->huettenwart) ?></td>
+							<!-- indexer::stop -->
+						</tr>
+						<?php endif; ?>
 
-                            <?php if ($this->phone): ?>
-                            <tr>
-                                <td><strong>Hüttentelefon:</strong></td>
-                                <td><?= $this->phone ?></td>
-                            </tr>
-                            <?php endif; ?>
+						<?php if ($this->phone): ?>
+						<tr>
+							<td><strong>Hüttentelefon:</strong></td>
+							<td><?= $this->phone ?></td>
+						</tr>
+						<?php endif; ?>
 
-                            <?php if ($this->email): ?>
-                            <tr>
-                                <td><strong>E-Mail:</strong></td>
-                                <td>{{email::<?= $this->email ?>}}</td>
-                            </tr>
-                            <?php endif; ?>
+						<?php if ($this->email): ?>
+						<tr>
+							<td><strong>E-Mail:</strong></td>
+							<td>{{email::<?= $this->email ?>}}</td>
+						</tr>
+						<?php endif; ?>
 
-                            <?php if ($this->url !== ''): ?>
-                            <tr>
-                                <td><strong>Webseite:</strong></td>
-                                <td><a href="<?= $this->url ?>" target="_blank"><?= Contao\StringUtil::substr($this->url, 26, ' ...') ?></a></td>
-                            </tr>
-                            <?php endif; ?>
+						<?php if ($this->url !== ''): ?>
+						<tr>
+							<td><strong>Webseite:</strong></td>
+							<td><a href="<?= $this->url ?>" target="_blank"><?= Contao\StringUtil::substr($this->url, 26, ' ...') ?></a></td>
+						</tr>
+						<?php endif; ?>
 
-                            <?php if ($this->bookingMethod): ?>
-                            <tr>
-                                <td><strong>Anfrage/Buchung:</strong></td>
-                                <td><?= nl2br($this->bookingMethod) ?></td>
-                            </tr>
-                            <?php endif; ?>
-                        </table>
-                    </div>
-                </div>
+						<?php if ($this->bookingMethod): ?>
+						<tr>
+							<td><strong>Anfrage/Buchung:</strong></td>
+							<td><?= nl2br($this->bookingMethod) ?></td>
+						</tr>
+						<?php endif; ?>
+					</table>
+				</div>
+			</div>
 
-                <!--- details -->
-                <div class="tab-pane fade show" id="details" role="tabpanel" aria-labelledby="details-tab">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <tr>
-                                <td><strong>Hüttenchef:</strong></td>
-                                <!-- indexer::continue -->
-                                <td><?= nl2br($this->huettenchef) ?></td>
-                                <!-- indexer::stop -->
-                            </tr>
-                            <tr>
-                                <td><strong>Kapazität:</strong></td>
-                                <td><?= nl2br($this->capacity) ?></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Höhe:</strong></td>
-                                <td><?= $this->altitude ?> m.ü.M.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Koordinaten:</strong></td>
-                                <td><?= $this->coordsCH1903 ?> (CH1903/LV03)<br><?= $this->coordsWGS84 ?> (WGS84)</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
+			<!--- details -->
+			<div class="tab-pane fade show" id="details" role="tabpanel" aria-labelledby="details-tab">
+				<div class="table-responsive">
+					<table class="table">
+						<tr>
+							<td><strong>Hüttenchef:</strong></td>
+							<!-- indexer::continue -->
+							<td><?= nl2br($this->huettenchef) ?></td>
+							<!-- indexer::stop -->
+						</tr>
+						<tr>
+							<td><strong>Kapazität:</strong></td>
+							<td><?= nl2br($this->capacity) ?></td>
+						</tr>
+						<tr>
+							<td><strong>Höhe:</strong></td>
+							<td><?= $this->altitude ?> m.ü.M.</td>
+						</tr>
+						<tr>
+							<td><strong>Koordinaten:</strong></td>
+							<td><?= $this->coordsCH1903 ?> (CH1903/LV03)<br><?= $this->coordsWGS84 ?> (WGS84)</td>
+						</tr>
+					</table>
+				</div>
+			</div>
 
-                <!-- Bewartungszeiten -->
-                <div class="tab-pane fade show" id="bewartung" role="tabpanel" aria-labelledby="bewartung-tab">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <tr>
-                                <td><strong>Bewartung:</strong></td>
-                                <td><?= nl2br($this->openingTime) ?></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-
-        </div>
+			<!-- Bewartungszeiten -->
+			<div class="tab-pane fade show" id="bewartung" role="tabpanel" aria-labelledby="bewartung-tab">
+				<div class="table-responsive">
+					<table class="table">
+						<tr>
+							<td><strong>Bewartung:</strong></td>
+							<td><?= nl2br($this->openingTime) ?></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
 
 
-        <div class="col-12">
-            <h2 class="ce_headline">Zustiegsm&ouml;glichkeiten</h2>
-        </div>
-
-        <div class="col-xl-8 mb-4 mb-0-lg">
-            <div class="table-responsive">
-                <table class="table">
-                    <tr>
-                        <th>Beschreibung</th>
-                        <th>Zustiegszeit</th>
-                        <th>Schwierigkeit</th>
-                        <th>Sommer</th>
-                        <th>Winter</th>
-                        <th>Kommentar</th>
-                    </tr>
-
-                    <?php foreach (\StringUtil::deserialize($this->ascent, true) as $ascent): ?>
-                        <tr>
-                            <td><?= nl2br($ascent['ascentDescription']) ?></td>
-                            <td><?= nl2br($ascent['ascentTime']) ?></td>
-                            <td><?= nl2br($ascent['ascentDifficulty']) ?></td>
-                            <td><?php if ($ascent['ascentSummer'] === 'possible'): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
-                            <td><?php if ($ascent['ascentWinter'] === 'possible'): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
-                            <td><?= nl2br($ascent['ascentComment']) ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </table>
-            </div>
-        </div>
+	</div>
 
 
-        <div class="col-xl-4">
-            <?php if ($this->hasCoords): ?>
-            <?php $geoLink = '//map.geo.admin.ch/embed.html?lang=de&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege&E=%s.00&N=%s.00&zoom=7&crosshair=marker'; ?>
-            <div class="embed-responsive embed-responsive-4by3">
-                <iframe src="<?= sprintf($geoLink, $this->coordsCH1903X, $this->coordsCH1903Y) ?>"></iframe>
-            </div>
-            <?php endif; ?>
-        </div>
-    </div><!-- end row -->
+	<div class="col-12">
+		<h2 class="ce_headline">Zustiegsm&ouml;glichkeiten</h2>
+	</div>
+
+	<div class="col-xl-8 mb-4 mb-0-lg">
+		<div class="table-responsive">
+			<table class="table">
+				<tr>
+					<th>Beschreibung</th>
+					<th>Zustiegszeit</th>
+					<th>Schwierigkeit</th>
+					<th>Sommer</th>
+					<th>Winter</th>
+					<th>Kommentar</th>
+				</tr>
+
+				<?php foreach (\StringUtil::deserialize($this->ascent, true) as $ascent): ?>
+				<tr>
+					<td><?= nl2br($ascent['ascentDescription']) ?></td>
+					<td><?= nl2br($ascent['ascentTime']) ?></td>
+					<td><?= nl2br($ascent['ascentDifficulty']) ?></td>
+					<td><?php if ($ascent['ascentSummer'] === 'possible'): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
+					<td><?php if ($ascent['ascentWinter'] === 'possible'): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
+					<td><?= nl2br($ascent['ascentComment']) ?></td>
+				</tr>
+				<?php endforeach; ?>
+			</table>
+		</div>
+	</div>
+
+
+	<div class="col-xl-4">
+		<?php if ($this->hasCoords): ?>
+		<?php $geoLink = '//map.geo.admin.ch/embed.html?lang=de&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege&E=%s.00&N=%s.00&zoom=7&crosshair=marker'; ?>
+		<div class="embed-responsive embed-responsive-4by3">
+			<iframe src="<?= sprintf($geoLink, $this->coordsCH1903X, $this->coordsCH1903Y) ?>"></iframe>
+		</div>
+		<?php endif; ?>
+	</div>
+</div><!-- end row -->
 
 <!-- indexer::continue -->
 <?php $this->endblock(); ?>

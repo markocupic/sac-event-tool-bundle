@@ -2,12 +2,10 @@
 
 <?php $this->block('content'); ?>
 
-
-
-
 <div class="alert bg-light">
     <?= $this->form ?>
 </div>
+
 <script>
     //Set Datepicker
     var opt = {

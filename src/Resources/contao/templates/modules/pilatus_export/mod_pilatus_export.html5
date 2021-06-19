@@ -339,9 +339,7 @@
         <!-- end experimental --->
 
         <?php if(($strBookingPeriod = Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingPeriod($arrEvent['id'], 'd.m.', 'd.m.Y')) != ''): ?>
-        <?php $arrText[] = 'Anmeldezeitraum: <time>' . $strBookingPeriod . '
-    </time>
-    '; ?>
+        <?php $arrText[] = 'Anmeldezeitraum: <time>' . $strBookingPeriod . '</time>'; ?>
     <?php endif; ?>
 
     <?php if ($arrEvent['generateMainInstructorContactDataFromDb']): ?>

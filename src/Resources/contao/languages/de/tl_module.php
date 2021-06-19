@@ -25,8 +25,6 @@ $GLOBALS['TL_LANG']['tl_module']['eventStoryMaxImageWidth'] = array('Maximale Bi
 $GLOBALS['TL_LANG']['tl_module']['eventStoryMaxImageHeight'] = array('Maximale Bildhöhe in Pixeln', 'Legen Sie die maximale Bildhöhe fest. Grössere Bilder werden beim Upload automatisch verkleinert.');
 $GLOBALS['TL_LANG']['tl_module']['eventStoryUploadFolder'] = array('Event-Bericht Uploadverzeichnis', 'Bitte geben Sie das Upload-Verzeichnis für die Bilder an.');
 $GLOBALS['TL_LANG']['tl_module']['notifyOnEventStoryPublishedNotificationId'] = array('Benachrichtigung bei neu erstelltem Event-Bericht', '');
-$GLOBALS['TL_LANG']['tl_module']['activateMemberAccountNotificationId'] = array('Benachrichtigung bei Mitgliederkonto Aktivierung', '');
-$GLOBALS['TL_LANG']['tl_module']['jumpToWhenNotActivated'] = array('Weiterleitung zur Seite mit Kontoaktivierungsmodul', 'Legen Sie fest zu welcher Seite ein Mitglied weitergeleitet wird, wenn das Mitgliederkonto deaktiviert ist (login = false)');
 $GLOBALS['TL_LANG']['tl_module']['eventType'] = array('Event Art', 'Legen Sie fest welche Event-Arten angezeigt werden sollen.');
 $GLOBALS['TL_LANG']['tl_module']['eventFilterBoardFields'] = array('Event-Filter-Felder', 'Legen Sie hier die Felder fest, die im Filter angezeigt werden sollen.');
 $GLOBALS['TL_LANG']['tl_module']['print_export_allowedEventTypes'] = array('Anzuzeigende Event-Typen', 'Geben Sie die anzuzeigenden Event-Typen an.');

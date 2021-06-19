@@ -26,7 +26,6 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['tour_difficulty_list'] = '{title_le
 $GLOBALS['TL_DCA']['tl_module']['palettes']['csv_event_member_export'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][EventRegistrationFormController::TYPE] = '{title_legend},name,headline,type;{jumpTo_legend},jumpTo;{notification_legend},receiptEventRegistrationNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][EventRegistrationCheckoutLinkController::TYPE] = '{title_legend},name,headline,type;{jumpTo_legend},eventRegCheckoutLinkPage,eventRegCheckoutLinkLabel;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['activate_member_account'] = '{title_legend},name,headline,type;{account_legend},reg_groups;cc{notification_legend},activateMemberAccountNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_upcoming_events'] = '{title_legend},name,headline,type;{member_dashboard_upcoming_events_legend},unregisterFromEventNotificationId;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_past_events'] = '{title_legend},name,headline,type;{member_dashboard_event_type_filter_legend},eventType;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['member_dashboard_event_report_list'] = '{title_legend},name,headline,type;{events_story_legend},timeSpanForCreatingNewEventStory,eventStoryFormJumpTo;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
@@ -44,10 +43,6 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['event_story_list'] = '{title_legend
 $GLOBALS['TL_DCA']['tl_module']['palettes']['event_story_reader'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['event_list'] = '{title_legend},name,headline,type;{config_legend},cal_calendar,eventType,cal_readerModule,eventListLimitPerRequest;{template_legend:hide},eventListPartialTpl;{image_legend:hide},imgSize;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
-// Manipulate palettes
-PaletteManipulator::create()
-	->addField(array('jumpToWhenNotActivated'), 'redirect_legend', PaletteManipulator::POSITION_PREPEND)
-	->applyToPalette('login', 'tl_module');
 
 // Fields
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventType'] = array(
@@ -80,16 +75,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['receiptEventRegistrationNotificationI
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['notifyOnEventStoryPublishedNotificationId'] = array(
-	'exclude'    => true,
-	'search'     => true,
-	'inputType'  => 'select',
-	'foreignKey' => 'tl_nc_notification.title',
-	'eval'       => array('mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'),
-	'sql'        => "int(10) unsigned NOT NULL default '0'",
-	'relation'   => array('type' => 'hasOne', 'load' => 'lazy'),
-);
-
-$GLOBALS['TL_DCA']['tl_module']['fields']['activateMemberAccountNotificationId'] = array(
 	'exclude'    => true,
 	'search'     => true,
 	'inputType'  => 'select',
@@ -178,15 +163,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = ar
 	'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
 	'eval'      => array('mandatory' => false, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'),
 	'sql'       => "blob NULL"
-);
-
-$GLOBALS['TL_DCA']['tl_module']['fields']['jumpToWhenNotActivated'] = array(
-	'exclude'    => true,
-	'inputType'  => 'pageTree',
-	'foreignKey' => 'tl_page.title',
-	'eval'       => array('fieldType' => 'radio'),
-	'sql'        => "int(10) unsigned NOT NULL default '0'",
-	'relation'   => array('type' => 'hasOne', 'load' => 'eager')
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = array(

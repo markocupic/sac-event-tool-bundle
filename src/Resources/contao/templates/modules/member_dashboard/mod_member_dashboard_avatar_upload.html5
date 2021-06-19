@@ -3,36 +3,36 @@
 <?php $this->block('content'); ?>
 
 <?php if ($this->hasInfoMessage): ?>
-  <div class="alert alert-info" role="alert">
-      <?= $this->infoMessage ?>
-  </div>
+<div class="alert alert-info" role="alert">
+	<?= $this->infoMessage ?>
+</div>
 <?php endif; ?>
 
 <?php if ($this->hasErrorMessage): ?>
-  <?php foreach($this->errorMessages as $msg): ?>
-  <div class="alert alert-danger" role="alert">
-      <?= $msg ?>
-  </div>
-  <?php endforeach; ?>
+<?php foreach($this->errorMessages as $msg): ?>
+<div class="alert alert-danger" role="alert">
+	<?= $msg ?>
+</div>
+<?php endforeach; ?>
 <?php endif; ?>
 
 <div class="row">
-  <div class="col-9">
-    <div class="">
-      <?= $this->avatarForm ?>
-    </div>
-  </div>
-  <div class="col-3">
-    <figure class="member-dashboard-avatar responsive thumbnail image_container">
-      {{image::<?= getAvatar($this->objUser->id, 'FE') ?>?width=300}}
-      <?php if ($this->objUser->avatar != ''): ?>
-      <a href="{{env::request}}?do=rotate-image&fileId=<?= FilesModel::findByPath(getAvatar($this->objUser->id, 'FE'))->id ?>" class="member-dashboard-rotate-image-button" title="Bild im GUZS 90° drehen"><i class="fa fa-history turn-image"></i></a>
-      <?php endif; ?>
-    </figure>
-    <?php if ($this->objUser->avatar != ''): ?>
-    <small><a href="<?= getAvatar($this->objUser->id, 'FE') ?>" title="Avatar downloaden" download>Avatar downloaden</a></small>
-    <?php endif; ?>
-  </div>
+	<div class="col-9">
+		<div class="">
+			<?= $this->avatarForm ?>
+		</div>
+	</div>
+	<div class="col-3">
+		<figure class="member-dashboard-avatar responsive thumbnail image_container">
+			{{image::<?= getAvatar($this->objUser->id, 'FE') ?>?width=300}}
+			<?php if ($this->objUser->avatar != ''): ?>
+			<a href="{{env::request}}?do=rotate-image&fileId=<?= FilesModel::findByPath(getAvatar($this->objUser->id, 'FE'))->id ?>" class="member-dashboard-rotate-image-button" title="Bild im GUZS 90° drehen"><i class="fa fa-history turn-image"></i></a>
+			<?php endif; ?>
+		</figure>
+		<?php if ($this->objUser->avatar != ''): ?>
+		<small><a href="<?= getAvatar($this->objUser->id, 'FE') ?>" title="Avatar downloaden" download>Avatar downloaden</a></small>
+		<?php endif; ?>
+	</div>
 </div>
 
 <?php $this->endblock(); ?>

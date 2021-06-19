@@ -73,12 +73,4 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['sac_event_tool'] = array
 		'email_subject'      => array('hostname', 'story_title', 'story_text', 'story_link_backend', 'story_link_frontend', 'event_title', 'author_name', 'author_name', 'author_email', 'author_sac_member_id', 'instructor_name', 'instructor_email', 'webmaster_email'),
 		'email_text'         => array('hostname', 'story_title', 'story_text', 'story_link_backend', 'story_link_frontend', 'event_title', 'author_name', 'author_name', 'author_email', 'author_sac_member_id', 'instructor_name', 'instructor_email', 'webmaster_email'),
 	),
-
-	// Type
-	'activate_member_account'        => array
-	(
-		// Field in tl_nc_language
-		'recipients' => array('email'),
-		'email_text' => array('firstname', 'lastname', 'street', 'postal', 'city', 'phone', 'activation', 'username', 'sac_member_id', 'email'),
-	),
 );

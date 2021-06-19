@@ -4,17 +4,17 @@
 
 
 <?php if ($this->hasInfoMessage): ?>
-  <div class="alert alert-info" role="alert">
-      <?= $this->infoMessage ?>
-  </div>
+<div class="alert alert-info" role="alert">
+	<?= $this->infoMessage ?>
+</div>
 <?php endif; ?>
 
 <?php if ($this->hasErrorMessage): ?>
-  <?php foreach($this->errorMessages as $msg): ?>
-  <div class="alert alert-danger" role="alert">
-      <?= $msg ?>
-  </div>
-  <?php endforeach; ?>
+<?php foreach($this->errorMessages as $msg): ?>
+<div class="alert alert-danger" role="alert">
+	<?= $msg ?>
+</div>
+<?php endforeach; ?>
 <?php endif; ?>
 
 <?= $this->userProfileForm ?>

@@ -37,7 +37,6 @@ $GLOBALS['TL_LANG']['FMD']['tour_difficulty_list'] = array('Schwierigkeitsgrade 
 $GLOBALS['TL_LANG']['FMD']['csv_event_member_export'] = array('SAC-Event-Teilnehmer Export');
 $GLOBALS['TL_LANG']['FMD'][EventRegistrationFormController::TYPE] = array('SAC Event Registrierungsformular');
 $GLOBALS['TL_LANG']['FMD'][EventRegistrationCheckoutLinkController::TYPE] = array('Link zur Checkout-Seite für Event-Anmeldung');
-$GLOBALS['TL_LANG']['FMD']['activate_member_account'] = array('SAC Mitgliederkonto Aktivierungsformular');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_upcoming_events'] = array('SAC Mitgliederkonto Dashboard - Meine nächsten Events');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_past_events'] = array('SAC Mitgliederkonto Dashboard - Meine absolvierten Events');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_event_report_list'] = array('SAC Mitgliederkonto Dashboard - Meine Tourenberichte');

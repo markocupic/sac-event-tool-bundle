@@ -3,36 +3,37 @@
 <?php $this->block('content'); ?>
 
 <div class="row gx-2 gy-1 equal-height block">
-    <?php foreach ($this->stories as $story): ?>
-    <div class="col-6 col-sm-4 col-md-3 col-lg-3" itemscope itemtype="http://schema.org/Article">
-        <div class="card event-item">
-            <div class="p-2 d-flex align-items-center">
-                {{image::<?= getAvatar($story['authorId'], 'FE') ?>?width=32&height=32&mode=crop&class=rounded-circle}}
-                <p class="card-text small ms-2">von <?= $story['authorName'] ?></p>
-            </div>
-            <?php if ($story['singleSRC']): ?>
-            <a href="<?= $story['href'] ?>" class="event-reader-link">
-                {{image::<?= $story['singleSRC']['uuid'] ?>?width=450&height=300&mode=crop&class=card-img-top}}
-            </a>
-            <?php endif; ?>
-            <div class="card-body">
-                <p class="card-date m-0">
-                    <small><?= \Date::parse('d.m.Y', $story['addedOn']) ?></small>
-                </p>
-                <a href="<?= $story['href'] ?>" title="weiterlesen" class="event-reader-link">
-                    <h6 class="card-title mt-0"><?= $story['title'] ?></h6>
-                </a>
-                <p class="card-news-teaser"><?= \StringUtil::substr($story['text'], 80) ?></p>
-            </div>
-        </div>
-    </div>
-    <?php endforeach; ?>
+	<?php foreach ($this->stories as $story): ?>
+	<div class="col-6 col-sm-4 col-md-3 col-lg-3" itemscope itemtype="http://schema.org/Article">
+		<div class="card event-item">
+			<div class="p-2 d-flex align-items-center">
+				{{image::<?= getAvatar($story['authorId'], 'FE') ?>?width=32&height=32&mode=crop&class=rounded-circle}}
+				<p class="card-text small ms-2">von <?= $story['authorName'] ?></p>
+			</div>
+			<?php if ($story['singleSRC']): ?>
+			<a href="<?= $story['href'] ?>" class="event-reader-link">
+				{{image::<?= $story['singleSRC']['uuid'] ?>?width=450&height=300&mode=crop&class=card-img-top}}
+			</a>
+			<?php endif; ?>
+			<div class="card-body">
+				<p class="card-date m-0">
+					<small><?= \Date::parse('d.m.Y', $story['addedOn']) ?></small>
+				</p>
+				<a href="<?= $story['href'] ?>" title="weiterlesen" class="event-reader-link">
+					<h6 class="card-title mt-0"><?= $story['title'] ?></h6>
+				</a>
+				<p class="card-news-teaser"><?= \StringUtil::substr($story['text'], 80) ?></p>
+			</div>
+		</div>
+	</div>
+	<?php endforeach; ?>
 </div>
 <script>
     EventStoryList = {
         'arrAllIds': [<?= implode(',', $this->arrAllIds) ?>]
     }
 </script>
+
 <?= $this->pagination ?>
 
 <?php $this->endblock(); ?>

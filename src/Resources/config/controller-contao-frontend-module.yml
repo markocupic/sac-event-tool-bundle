@@ -40,14 +40,6 @@ services:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
         public: true
 
-    Markocupic\SacEventToolBundle\Controller\FrontendModule\ActivateMemberAccountController:
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
-        tags:
-            - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
-        public: true
-
     # Member dashboard module: show upcoming events
     Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardUpcomingEventsController:
         calls:
