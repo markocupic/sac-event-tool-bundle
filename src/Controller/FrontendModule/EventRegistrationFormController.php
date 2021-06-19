@@ -54,12 +54,12 @@ use Symfony\Component\Security\Core\Security;
 /**
  * Class EventRegistrationFormController.
  *
- * @FrontendModule("EventRegistrationFormController::TYPE", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(EventRegistrationFormController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class EventRegistrationFormController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_registration_form';
-    
+
     /**
      * @var ContaoFramework
      */
