@@ -123,7 +123,7 @@ final class NotifyOnEventSubscription implements EventSubscriberInterface
         if (null !== $objNotification) {
             // Get the event type
             $eventType = \strlen($GLOBALS['TL_LANG']['MSC'][$this->eventModel->eventType]) ? $GLOBALS['TL_LANG']['MSC'][$this->eventModel->eventType].': ' : '';
- 
+
             // Set token array
             $arrTokens = [
                 'event_name' => html_entity_decode((string) $eventType.$this->eventModel->title),
@@ -146,9 +146,9 @@ final class NotifyOnEventSubscription implements EventSubscriberInterface
                 'participant_date_of_birth' => $this->arrData['dateOfBirth'] > 0 ? $dateAdapter->parse('d.m.Y', $this->arrData['dateOfBirth']) : '---',
                 'participant_food_habits' => $this->arrData['foodHabits'],
                 'participant_notes' => html_entity_decode((string) $this->arrData['notes']),
+                'participant_state_of_subscription' => html_entity_decode((string) $this->eventMemberModel->stateOfSubscription),
                 'event_id' => $this->eventModel->id,
                 'event_link_detail' => 'https://'.$environmentAdapter->get('host').'/'.$eventsAdapter->generateEventUrl($this->eventModel),
-                'event_state' => $calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel) ? 'fully-booked' : '',
             ];
 
             $objNotification->send($arrTokens, 'de');
