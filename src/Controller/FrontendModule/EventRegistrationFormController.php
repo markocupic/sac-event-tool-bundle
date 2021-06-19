@@ -373,19 +373,8 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
         if ($objForm->validate()) {
             $blnError = false;
 
-            // Validate sacMemberId
-            $objMember = $databaseAdapter->getInstance()
-                ->prepare('SELECT * FROM tl_member WHERE id=? AND disable=?')
-                ->limit(1)
-                ->execute($this->memberModel->id, '')
-            ;
 
-            if (!$objMember->numRows) {
-                $this->template->bookingErrorMsg = sprintf('Der Benutzer mit ID "%s" wurde nicht in der Mitgliederdatenbank gefunden.', $this->memberModel->id);
-                $blnError = true;
-            }
 
-            if (!$blnError) {
                 // Prevent duplicate entries
                 $objDb = $databaseAdapter->getInstance()
                     ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND contaoMemberId=?')
@@ -396,7 +385,6 @@ class EventRegistrationFormController extends AbstractFrontendModuleController
                     $this->template->bookingErrorMsg = 'Für diesen Event liegt von dir bereits eine Anmeldung vor.';
                     $blnError = true;
                 }
-            }
 
             if (!$blnError) {
                 if (true === $calendarEventsHelperAdapter->areBookingDatesOccupied($this->eventModel, $this->memberModel)) {
