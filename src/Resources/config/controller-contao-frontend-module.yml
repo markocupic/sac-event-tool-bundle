@@ -28,13 +28,16 @@ services:
 
     Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationFormController:
         arguments:
+            - '@security.helper'
             - '@contao.framework'
+            - '@session'
             - '@event_dispatcher'
+            - '%kernel.project_dir%'
+            - '@monolog.logger.contao'
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
         public: true
 
     Markocupic\SacEventToolBundle\Controller\FrontendModule\ActivateMemberAccountController:
