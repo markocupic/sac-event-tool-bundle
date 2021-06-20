@@ -193,8 +193,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
 
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
@@ -214,13 +212,9 @@ class EventRegistrationController extends AbstractFrontendModuleController
         /** @var Input $inputAdapter */
         $inputAdapter = $this->framework->getAdapter(Input::class);
 
-
-
         $flash = $this->session->getFlashBag();
         $sessInfKey = 'contao.FE.info';
         $sessErrKey = 'contao.FE.error';
-
-
 
         if (null === $this->eventModel) {
             $flash->set($sessInfKey, sprintf('Event mit ID: %s nicht gefunden.', $inputAdapter->get('events') ?: 'NULL'));
@@ -247,7 +241,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
         } elseif (null !== $this->memberModel && (empty($this->memberModel->email) || !$validatorAdapter->isEmail($this->memberModel->email))) {
             $flash->set($sessErrKey, 'Leider wurde für dieses Mitgliederkonto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlege auf auf der Internetseite des Zentralverbands deine E-Mail-Adresse.');
         }
-
 
         $this->template = $template;
 
