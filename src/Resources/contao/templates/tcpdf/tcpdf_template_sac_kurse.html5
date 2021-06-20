@@ -1,89 +1,88 @@
 <h1 style="<?= $this->titleStyle ?>"><?= $this->title ?></h1>
 <table cellpadding="5">
 
-    <tr style="<?= $this->rowStyleB ?>">
-        <td style="width:170mm; <?= $this->cellStyleC ?>"><?= $this->teaser ?><br><br></td>
-    </tr>
+  <tr style="<?= $this->rowStyleB ?>">
+    <td style="width:170mm; <?= $this->cellStyleC ?>"><?= $this->teaser ?><br><br></td>
+  </tr>
 </table>
 
 <table cellpadding="5" style="border-collapse:collapse">
 
 
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Kursdaten</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->date ?><?php if ('' != $this->durationInfo): ?><br>Dauer: <?= $this->durationInfo ?><?php endif; ?></td>
+  </tr>
 
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Kursdaten</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->date ?><?php if ('' != $this->durationInfo): ?><br>Dauer: <?= $this->durationInfo ?><?php endif; ?></td>
-    </tr>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Kursart</td>
+    <td style="<?= $this->cellStyleB ?>"><?= strtoupper($this->courseTypeLevel0) ?><br><?= $this->courseTypeLevel1 ?></td>
+  </tr>
 
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Kursart</td>
-        <td style="<?= $this->cellStyleB ?>"><?= strtoupper($this->courseTypeLevel0) ?><br><?= $this->courseTypeLevel1 ?></td>
-    </tr>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Kursstufe</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->courseLevel ?></td>
+  </tr>
 
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Kursstufe</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->courseLevel ?></td>
-    </tr>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Organisierende Gruppe</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->organizers ?></td>
+  </tr>
 
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Organisierende Gruppe</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->organizers ?></td>
-    </tr>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Kursziele</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->terms ?></td>
+  </tr>
 
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Kursziele</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->terms ?></td>
-    </tr>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Kursinhalte</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->issues ?></td>
+  </tr>
 
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Kursinhalte</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->issues ?></td>
-    </tr>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Voraussetzungen</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->requirements ?></td>
+  </tr>
 
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Voraussetzungen</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->requirements ?></td>
-    </tr>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Kursort</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->location ?></td>
+  </tr>
 
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Kursort</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->location ?></td>
-    </tr>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Kursleitung</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->instructor ?></td>
+  </tr>
 
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Kursleitung</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->instructor ?></td>
-    </tr>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Preis/Leistungen</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->leistungen ?></td>
+  </tr>
 
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Preis/Leistungen</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->leistungen ?></td>
-    </tr>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Anmeldung</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->bookingEvent ?></td>
+  </tr>
 
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Anmeldung</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->bookingEvent ?></td>
-    </tr>
+  <?php if ('' != $this->equipment): ?>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Material</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->equipment ?></td>
+  </tr>
+  <?php endif; ?>
 
-    <?php if ('' != $this->equipment): ?>
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Material</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->equipment ?></td>
-    </tr>
-    <?php endif; ?>
+  <?php if ('' != $this->meetingPoint): ?>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Zeit und Treffpunkt</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->meetingPoint ?></td>
+  </tr>
+  <?php endif; ?>
 
-    <?php if ('' != $this->meetingPoint): ?>
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Zeit und Treffpunkt</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->meetingPoint ?></td>
-    </tr>
-    <?php endif; ?>
-
-    <?php if ('' != $this->miscellaneous): ?>
-    <tr style="<?= $this->rowStyleA ?>">
-        <td style="<?= $this->cellStyleA ?>">Weiteres</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->miscellaneous ?></td>
-    </tr>
-    <?php endif; ?>
+  <?php if ('' != $this->miscellaneous): ?>
+  <tr style="<?= $this->rowStyleA ?>">
+    <td style="<?= $this->cellStyleA ?>">Weiteres</td>
+    <td style="<?= $this->cellStyleB ?>"><?= $this->miscellaneous ?></td>
+  </tr>
+  <?php endif; ?>
 
 </table>

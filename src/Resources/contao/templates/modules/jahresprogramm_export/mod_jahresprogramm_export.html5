@@ -5,25 +5,23 @@
 <?= $this->form ?>
 
 <script>
-    //Set Datepicker
-    var opt = {
-        dateFormat: "d.m.Y",
-        locale: "de",
-    };
-    flatpickr('#ctrl_startDate', opt);
-    flatpickr('#ctrl_endDate', opt);
+  //Set Datepicker
+  var opt = {
+    dateFormat: "d.m.Y",
+    locale: "de",
+  };
+  flatpickr('#ctrl_startDate', opt);
+  flatpickr('#ctrl_endDate', opt);
 </script>
 
 <h3 class="ce_headline">Jahresprogramm</h3>
 <h4 class="ce_headline">Event-Art: <?= $this->eventTypeLabel ?></h4>
 <h4 class="ce_headline">Organisierende Gruppe: <?= $this->organizer ?></h4>
 
-
 <?php if (!$this->events): ?>
 <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
 <?php endif; ?>
 <?php if ($this->events): ?>
-
 
 <!-- Start course -->
 <?php if ('course' === $this->eventType): ?>
@@ -72,30 +70,7 @@
     <td class="event-export-requirements font-italic">Voraussetzung</td>
     <td class="event-export-requirements do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['requirements']) ?></td>
   </tr>
-  <!--
-      <tr class="event-export-row-details">
-          <td class="event-export-location font-italic">Kursort</td>
-          <td class="event-export-location do-not-show-row-when-empty" colspan="4"><?= $arrEvent['location'] ?></td>
-      </tr>
-  -->
-  <!--
-      <tr class="event-export-row-details">
-          <td class="event-export-meeting-point font-italic">Treffpunkt/Zeit</td>
-          <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['meetingPoint']) ?></td>
-      </tr>
-  -->
-  <!--
-      <tr class="event-export-row-details">
-          <td class="event-export-duration font-italic">Dauer</td>
-          <td class="event-export-duration do-not-show-row-when-empty" colspan="4"><?= $arrEvent['duration'] ?></td>
-      </tr>
-  -->
-  <!--
-      <tr class="event-export-row-details">
-          <td class="event-export-journey font-italic">Anfahrt</td>
-          <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= 'Keine Angabe' != $arrEvent['journey'] ? $arrEvent['journey'] : '' ?></td>
-      </tr>
-  -->
+
   <tr class="event-export-row-details">
     <td class="event-export-min-max-members font-italic">Teilnehmer</td>
     <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= $arrEvent['minMaxMembers'] ?></td>
@@ -105,22 +80,11 @@
     <td class="event-export-leistungen font-italic">Preis/Leistung</td>
     <td class="event-export-leistungen do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['leistungen']) ?></td>
   </tr>
-  <!--
-      <tr class="event-export-row-details">
-          <td class="event-export-equipment font-italic">Material/Ausrüstung</td>
-          <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['equipment']) ?></td>
-      </tr>
-  -->
+
   <tr class="event-export-row-details">
     <td class="event-export-leistungen font-italic">Anmeldung</td>
     <td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">
       <?= $arrEvent['bookingInfo'] ?>
-      <!--
-      <?php if ('' != $arrEvent['bookingInfo']): ?>
-      {{br}}
-      <?= nl2br($arrEvent['bookingEvent']) ?>
-      <?php endif; ?>
-      -->
     </td>
   </tr>
   <?php endforeach; ?>
@@ -218,7 +182,6 @@
   </tbody>
 </table>
 <?php endif; ?>
-
 
 <?php if ('generalEvent' === $this->eventType): ?>
 <table class="event-export-table table table-sm">
@@ -349,74 +312,70 @@
 
 
 <script>
-    $().ready(function () {
-        "use strict";
-        $('.do-not-show-row-when-empty').each(function () {
-            if ($(this).text().trim() == '') {
-                $(this).closest('tr').remove();
-            }
-        });
+  $().ready(function () {
+    "use strict";
+    $('.do-not-show-row-when-empty').each(function () {
+      if ($(this).text().trim() == '') {
+        $(this).closest('tr').remove();
+      }
     });
+  });
 </script>
 
 <script>
-    $().ready(function () {
-        "use strict";
-        /**
-         * Initialize filter board
-         */
-            // Initialize select2 for the organizer select menu
-            // https://select2.org
-        var select2Options = {
-                matcher: matchCustom,
-                placeholder: "Rolle auswaehlen"
-            };
-        var selectField = $('#ctrl_userRoles');
-        selectField.select2(select2Options);
-        // Close dropdown on deselect
-        selectField.on('select2:unselect', function () {
-            window.setTimeout(function () {
-                selectField.select2('close');
-            }, 100);
-        });
-
-        // Disable search field (important if using the plugin with mobile devices)
-        // https://select2.org/searching
-        selectField.on('select2:opening select2:closing', function (event) {
-            var $searchfield = $(this).parent().find('.select2-search__field');
-            //$searchfield.prop('disabled', true);
-        });
-
-        function matchCustom(params, data) {
-            // If there are no search terms, return all of the data
-            if ($.trim(params.term) === '') {
-                return data;
-            }
-
-            // Do not display the item if there is no 'text' property
-            if (typeof data.text === 'undefined') {
-                return null;
-            }
-
-            // `params.term` should be the term that is used for searching
-            // `data.text` is the text that is displayed for the data object
-            if (data.text.indexOf(params.term) > -1) {
-                var modifiedData = $.extend({}, data, true);
-                modifiedData.text += ' (matched)';
-
-                // You can return modified objects from here
-                // This includes matching the `children` how you want in nested data sets
-                return modifiedData;
-            }
-
-            // Return `null` if the term should not be displayed
-            return null;
-        }
-
-
+  $().ready(function () {
+    "use strict";
+    /**
+     * Initialize filter board
+     * Initialize select2 for the organizer select menu
+     * https://select2.org
+     */
+    var select2Options = {
+      matcher: matchCustom,
+      placeholder: "Rolle auswaehlen"
+    };
+    var selectField = $('#ctrl_userRoles');
+    selectField.select2(select2Options);
+    // Close dropdown on deselect
+    selectField.on('select2:unselect', function () {
+      window.setTimeout(function () {
+        selectField.select2('close');
+      }, 100);
     });
 
+    // Disable search field (important if using the plugin with mobile devices)
+    // https://select2.org/searching
+    selectField.on('select2:opening select2:closing', function (event) {
+      var $searchfield = $(this).parent().find('.select2-search__field');
+      //$searchfield.prop('disabled', true);
+    });
 
+    function matchCustom(params, data) {
+      // If there are no search terms, return all of the data
+      if ($.trim(params.term) === '') {
+        return data;
+      }
+
+      // Do not display the item if there is no 'text' property
+      if (typeof data.text === 'undefined') {
+        return null;
+      }
+
+      // `params.term` should be the term that is used for searching
+      // `data.text` is the text that is displayed for the data object
+      if (data.text.indexOf(params.term) > -1) {
+        var modifiedData = $.extend({}, data, true);
+        modifiedData.text += ' (matched)';
+
+        // You can return modified objects from here
+        // This includes matching the `children` how you want in nested data sets
+        return modifiedData;
+      }
+
+      // Return `null` if the term should not be displayed
+      return null;
+    }
+  });
 </script>
 
 

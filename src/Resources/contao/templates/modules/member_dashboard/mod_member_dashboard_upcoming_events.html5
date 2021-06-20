@@ -2,7 +2,6 @@
 
 <?php $this->block('content'); ?>
 
-
 <?php if ($this->hasInfoMessage): ?>
 <div class="alert alert-info" role="alert">
   <?= $this->infoMessage ?>
@@ -50,12 +49,11 @@
 </table>
 
 <script>
-    $('.sign-out-from-event-button').click(function (e) {
-        if (!confirm('Willst du dich wirklich vom Event abmelden?')) {
-            e.preventDefault();
-        }
-    });
+  $('.sign-out-from-event-button').click(function (e) {
+    if (!confirm('Willst du dich wirklich vom Event abmelden?')) {
+      e.preventDefault();
+    }
+  });
 </script>
-
 
 <?php $this->endblock(); ?>

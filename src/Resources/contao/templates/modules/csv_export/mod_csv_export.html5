@@ -13,12 +13,11 @@ $GLOBALS['TL_CSS'][] = 'https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12
   <?= $this->form ?>
 </div>
 <script>
-    jQuery(document).ready(function () {
-        $('#ctrl_user-roles').selectize({
-            plugins: ['remove_button']
-        });
+  jQuery(document).ready(function () {
+    $('#ctrl_user-roles').selectize({
+      plugins: ['remove_button']
     });
+  });
 </script>
-
 
 <?php $this->endblock(); ?>

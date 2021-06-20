@@ -2,7 +2,6 @@
 
 <?php $this->block('content'); ?>
 
-
 <?php if ($this->hasInfoMessage): ?>
 <div class="alert alert-info" role="alert">
   <?= $this->infoMessage ?>
@@ -44,6 +43,5 @@
   <?php endforeach; ?>
 
 </table>
-
 
 <?php $this->endblock(); ?>

@@ -41,16 +41,16 @@
 
 <?php endif; ?>
 <script>
-    (function ($) {
-        $(document).ready(function () {
-            $('.hasteform_form-clear-profile form ').submit(function (e) {
-                if (confirm("Möchtest du dein Profil endgültig und unwiderruflich löschen? Die Daten können danach nicht mehr wiederhergestellt werden.")) {
-                    return true;
-                }
-                return false;
-            });
-        });
-    })(jQuery);
+  (function ($) {
+    $(document).ready(function () {
+      $('.hasteform_form-clear-profile form ').submit(function (e) {
+        if (confirm("Möchtest du dein Profil endgültig und unwiderruflich löschen? Die Daten können danach nicht mehr wiederhergestellt werden.")) {
+          return true;
+        }
+        return false;
+      });
+    });
+  })(jQuery);
 </script>
 
 

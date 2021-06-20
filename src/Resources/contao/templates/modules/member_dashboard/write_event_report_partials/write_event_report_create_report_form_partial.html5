@@ -22,49 +22,46 @@
 </div>
 
 <script>
-    // Vue js
-    new Vue({
-        el: '#editReportFormBox',
-        data: {
-            ctrl_text: {
-                value: null,
-                len: 0,
-                strLenRemaining: 0,
-            },
-        },
-        created: function () {
-            this.ctrl_text.value = document.getElementById('ctrl_text').value;
-            this.ctrl_text.len = document.getElementById('ctrl_text').value.length;
-            this.ctrl_text.strLenRemaining = parseInt(document.getElementById('ctrl_text').getAttribute('maxlength')) - this.ctrl_text.len;
-            // Cut and append stringRemainig indicator
-            this.cutAndAppend(document.getElementById('ctrl_text_strLenRemaining'), document.getElementById('ctrl_text').parentElement);
-
-        },
-        methods: {
-            onKeyUp: function (elemId) {
-                if (elemId === 'ctrl_text') {
-                    this.ctrl_text.len = document.getElementById('ctrl_text').value.length;
-                    this.ctrl_text.strLenRemaining = parseInt(document.getElementById('ctrl_text').getAttribute('maxlength')) - this.ctrl_text.len;
-                }
-            },
-            cutAndAppend: function (elem, parentNode) {
-                childElem = elem.parentElement.removeChild(elem);
-                parentNode.appendChild(childElem);
-            }
+  // Vue js
+  new Vue({
+    el: '#editReportFormBox',
+    data: {
+      ctrl_text: {
+        value: null,
+        len: 0,
+        strLenRemaining: 0,
+      },
+    },
+    created: function () {
+      this.ctrl_text.value = document.getElementById('ctrl_text').value;
+      this.ctrl_text.len = document.getElementById('ctrl_text').value.length;
+      this.ctrl_text.strLenRemaining = parseInt(document.getElementById('ctrl_text').getAttribute('maxlength')) - this.ctrl_text.len;
+      // Cut and append stringRemainig indicator
+      this.cutAndAppend(document.getElementById('ctrl_text_strLenRemaining'), document.getElementById('ctrl_text').parentElement);
+    },
+    methods: {
+      onKeyUp: function (elemId) {
+        if (elemId === 'ctrl_text') {
+          this.ctrl_text.len = document.getElementById('ctrl_text').value.length;
+          this.ctrl_text.strLenRemaining = parseInt(document.getElementById('ctrl_text').getAttribute('maxlength')) - this.ctrl_text.len;
         }
-    })
+      },
+      cutAndAppend: function (elem, parentNode) {
+        childElem = elem.parentElement.removeChild(elem);
+        parentNode.appendChild(childElem);
+      }
+    }
+  })
 </script>
 
 <script>
-    // Open modal on error
-    (function ($) {
-        jQuery(document).ready(function () {
-
-            if ($('#ModalWriteTextAndYt .widget.error').length)
-            {
-                let modal = new bootstrap.Modal(document.getElementById('ModalWriteTextAndYt'));
-                modal.show();
-            }
-        });
-    })(jQuery);
+  // Open modal on error
+  (function ($) {
+    jQuery(document).ready(function () {
+      if ($('#ModalWriteTextAndYt .widget.error').length) {
+        let modal = new bootstrap.Modal(document.getElementById('ModalWriteTextAndYt'));
+        modal.show();
+      }
+    });
+  })(jQuery);
 </script>

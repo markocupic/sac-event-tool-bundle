@@ -46,66 +46,66 @@
 </div>
 
 <script>
-    // Vue js
-    new Vue({
-        el: '#changePublishStateForm',
-        data: {
-            publishState: 1,
-            pendingRequest: false,
-        },
-        created: function () {
-            //
-        },
-        methods: {
-            publishArticle: function () {
+  // Vue js
+  new Vue({
+    el: '#changePublishStateForm',
+    data: {
+      publishState: 1,
+      pendingRequest: false,
+    },
+    created: function () {
+      //
+    },
+    methods: {
+      publishArticle: function () {
 
-                let self = this;
-                this.pendingRequest = true;
+        let self = this;
+        this.pendingRequest = true;
 
-                const rt = this.$el.getAttribute('data-request-token');
-                const moduleId = this.$el.getAttribute('data-module-id');
-                const urlParams = new URLSearchParams(window.location.search);
+        const rt = this.$el.getAttribute('data-request-token');
+        const moduleId = this.$el.getAttribute('data-module-id');
+        const urlParams = new URLSearchParams(window.location.search);
 
-                let buttons = document.querySelectorAll('.event-story-form-buttons > div > .btn');
+        let buttons = document.querySelectorAll('.event-story-form-buttons > div > .btn');
 
-                // Remove buttons
-                for (i = 0; i < buttons.length; ++i) {
-                    buttons[i].classList.add('d-none');
-                }
-
-                // Create form
-                const formData = new FormData();
-                formData.append('REQUEST_TOKEN', rt);
-                formData.append('publishState', parseInt(this.publishState) + 1);
-                formData.append('moduleId', moduleId);
-                formData.append('eventId', urlParams.get('eventId'));
-
-                // Fetch
-                fetch('ajaxMemberDashboardWriteEventReport/setPublishState', {
-                        method: 'POST',
-                        headers: {
-                            'x-requested-with': 'XMLHttpRequest'
-                        },
-                        body: formData,
-                    }
-                ).then(function (res) {
-                    return res.json();
-                }).then(function (json) {
-                    if (json['status'] === 'success') {
-                        window.setTimeout(function () {
-                            self.publishState = parseInt(json['publishState']);
-                            window.setTimeout(function () {
-                                window.location.reload();
-                            }, 4000);
-                        }, 2000);
-                    } else {
-                        window.location.reload();
-                    }
-                    return json;
-                });
-            }
+        // Remove buttons
+        for (i = 0; i < buttons.length; ++i) {
+          buttons[i].classList.add('d-none');
         }
-    })
+
+        // Create form
+        const formData = new FormData();
+        formData.append('REQUEST_TOKEN', rt);
+        formData.append('publishState', parseInt(this.publishState) + 1);
+        formData.append('moduleId', moduleId);
+        formData.append('eventId', urlParams.get('eventId'));
+
+        // Fetch
+        fetch('ajaxMemberDashboardWriteEventReport/setPublishState', {
+          method: 'POST',
+          headers: {
+            'x-requested-with': 'XMLHttpRequest'
+          },
+          body: formData,
+        }
+        ).then(function (res) {
+          return res.json();
+        }).then(function (json) {
+          if (json['status'] === 'success') {
+            window.setTimeout(function () {
+              self.publishState = parseInt(json['publishState']);
+              window.setTimeout(function () {
+                window.location.reload();
+              }, 4000);
+            }, 2000);
+          } else {
+            window.location.reload();
+          }
+          return json;
+        });
+      }
+    }
+  })
 </script>
 
 <?php endif; ?>

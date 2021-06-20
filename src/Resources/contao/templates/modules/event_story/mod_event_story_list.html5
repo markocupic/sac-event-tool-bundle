@@ -41,17 +41,17 @@
 <?php endif; ?>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function(){
-        // Instantiate ItemWatcher class
-        new ItemWatcher('#eventStoryList<?= $this->id ?>', {
-            'params': {
-                'listModuleId': '<?= $this->id ?>',
-                'readerModuleId': '336',
-                'perPage': '<?= $this->perPage ?>',
-                'itemIds': [<?= implode(',', $this->arrAllIds) ?>]
-            }
-        });
-    }, false);
+  document.addEventListener('DOMContentLoaded', function () {
+    // Instantiate ItemWatcher class
+    new ItemWatcher('#eventStoryList<?= $this->id ?>', {
+      'params': {
+        'listModuleId': '<?= $this->id ?>',
+        'readerModuleId': '336',
+        'perPage': '<?= $this->perPage ?>',
+        'itemIds': [<?= implode(',', $this->arrAllIds) ?>],
+      }
+    });
+  }, false);
 </script>
 
 <?php if ($this->isAjaxRequest): ?>
