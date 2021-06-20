@@ -39,6 +39,7 @@ use Contao\Template;
 use Contao\UserModel;
 use Contao\Validator;
 use Haste\Form\Form;
+use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Event\EventSubscriptionEvent;
 use Psr\Log\LoggerInterface;
@@ -106,6 +107,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private $moduleModel;
 
     /**
+     * @var PageModel
+     */
+    private $pageModel;
+
+    /**
      * @var CalendarEventsModel
      */
     private $eventModel;
@@ -146,6 +152,12 @@ class EventRegistrationController extends AbstractFrontendModuleController
     {
         // Set the module object (Contao\ModuleModel)
         $this->moduleModel = $model;
+        $this->pageModel = $page;
+
+        // Do not index nor cache page
+        $this->pageModel->noSearch = true;
+        $this->pageModel->cache = false;
+        $this->pageModel->clientCache = false;
 
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
@@ -181,8 +193,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
-        $this->template = $template;
-
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->framework->getAdapter(Database::class);
 
@@ -204,15 +214,16 @@ class EventRegistrationController extends AbstractFrontendModuleController
         /** @var Input $inputAdapter */
         $inputAdapter = $this->framework->getAdapter(Input::class);
 
-        $flash = $this->session->getFlashBag();
-        $sessInfKey = 'contao.FE.info';
-        $sessErrKey = 'contao.FE.error';
-
+        $this->template = $template;
         $this->template->objUser = $this->memberModel;
         $this->template->objEvent = $this->eventModel;
 
-        // Set other template vars
-        $this->setTemplateVars();
+        // Set more template vars
+        $this->setMoreTemplateVars();
+
+        $flash = $this->session->getFlashBag();
+        $sessInfKey = 'contao.FE.info';
+        $sessErrKey = 'contao.FE.error';
 
         // Count accepted registrations
         $objMember = $databaseAdapter->getInstance()
@@ -251,12 +262,16 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $this->template->memberModel = $this->memberModel;
 
         if (null !== $this->memberModel && true === $calendarEventsMemberModelAdapter->isRegistered($this->memberModel->id, $this->eventModel->id)) {
-            $this->template->isRegistered = true;
             $this->template->regInfo = $this->parseEventRegistrationConfirmTemplate();
+
+            if ($url = $this->getRoute('confirm')) {
+                return $this->redirect($url);
+            }
         }
 
         // Add messages to the template
         elseif ($flash->has($sessInfKey) || $flash->has($sessErrKey)) {
+            // Add messages to template from session flash
             if ($flash->has($sessErrKey)) {
                 $this->template->hasErrorMessage = true;
                 $errorMessage = $flash->get($sessErrKey)[0];
@@ -267,17 +282,27 @@ class EventRegistrationController extends AbstractFrontendModuleController
                     $strText = sprintf('Event registration error: "%s"', $errorMessage);
                     $this->logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_EVENT_SUBSCRIPTION_ERROR'))]);
                 }
+
+                if ($url = $this->getRoute('info')) {
+                    return $this->redirect($url);
+                }
             }
 
             if ($flash->has($sessInfKey)) {
                 $this->template->hasInfoMessage = true;
                 $infoMessage = $flash->get($sessInfKey)[0];
                 $this->template->infoMessage = $infoMessage;
+
+                if ($url = $this->getRoute('info')) {
+                    return $this->redirect($url);
+                }
             }
         } elseif (null === $this->memberModel) {
-            $this->template->showLoginForm = true;
+            if ($url = $this->getRoute('login')) {
+                return $this->redirect($url);
+            }
         } else {
-            // All ok! Generate the registration form;
+            // All ok! Generate the registration form.
             $this->generateForm();
 
             if (null !== $this->objForm) {
@@ -289,9 +314,33 @@ class EventRegistrationController extends AbstractFrontendModuleController
             if (true === $calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel)) {
                 $this->template->bookingLimitReaches = true;
             }
+
+            if ($url = $this->getRoute('register')) {
+                return $this->redirect($url);
+            }
         }
 
+        $this->template->action = $inputAdapter->get('action');
+
         return $this->template->getResponse();
+    }
+
+    private function getRoute(string $action): ?string
+    {
+        /** @var Url $urlAdapter */
+        $urlAdapter = $this->framework->getAdapter(Url::class);
+
+        /** @var Input $inputAdapter */
+        $inputAdapter = $this->framework->getAdapter(Input::class);
+
+        /** @var Environment $environmentAdapter */
+        $environmentAdapter = $this->framework->getAdapter(Environment::class);
+
+        if ($inputAdapter->get('action') !== $action) {
+            return $urlAdapter->addQueryString('action='.$action, $environmentAdapter->get('uri'));
+        }
+
+        return null;
     }
 
     private function generateForm(): void
@@ -307,9 +356,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         /** @var CalendarEventsJourneyModel $calendarEventsJourneyModelAdapter */
         $calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
-
-        /** @var PageModel $pageModelAdapter */
-        $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
 
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
@@ -438,21 +484,15 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $event->moduleModel = $this->moduleModel;
                 $this->eventDispatcher->dispatch(new EventSubscriptionEvent($event), EventSubscriptionEvent::NAME);
 
-                if ($this->moduleModel->jumpTo) {
-                    // Redirect to jumpTo page
-                    $objPageModel = $pageModelAdapter->findByPk($this->moduleModel->jumpTo);
-
-                    if (null !== $objPageModel) {
-                        $controllerAdapter->reload();
-                    }
-                }
+                // Reload page
+                $controllerAdapter->reload();
             }
         }
 
         $this->objForm = $objForm;
     }
 
-    private function setTemplateVars(): void
+    private function setMoreTemplateVars(): void
     {
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);

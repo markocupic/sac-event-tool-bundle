@@ -5,24 +5,28 @@
 <div id="eventBookingForm" class="p-4 mt-3 mb-4 bg-white">
   <h1 class="ce_headline">Event-Registrierung</h1>
 
-  <?php if ($this->hasErrorMessage): ?>
-  <div class="alert alert-danger" role="alert">
-    <i class="fas fa-exclamation-circle"></i>
-    <div><?= $this->errorMessage ?></div>
-  </div>
+
+
+  <?php if ($this->action === 'info'): ?>
+    <?php if ($this->hasErrorMessage): ?>
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-circle"></i>
+      <div><?= $this->errorMessage ?></div>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($this->hasInfoMessage): ?>
+    <div class="alert alert-info" role="alert">
+      <i class="fas fa-info-circle me-2"></i>
+      <div><?= $this->infoMessage ?></div>
+    </div>
+    <?php endif; ?>
   <?php endif; ?>
 
-  <?php if ($this->hasInfoMessage): ?>
-  <div class="alert alert-info" role="alert">
-    <i class="fas fa-info-circle me-2"></i>
-    <div><?= $this->infoMessage ?></div>
-  </div>
-  <?php endif; ?>
 
 
 
-
-  <?php if ($this->showLoginForm): ?>
+  <?php if ($this->action === 'login'): ?>
   <h4 class="ce_headline mb-4">
     <span class="text-dark">1. Anmelden</span>
     <span class="text-black-50"> - </span>
@@ -45,7 +49,7 @@
 
 
 
-  <?php if ($this->isRegistered): ?>
+  <?php if ($this->action === 'confirm'): ?>
   <h4 class="ce_headline mb-4">
     <span class="text-black-50">1. Anmelden</span>
     <span class="text-black-50"> - </span>
@@ -59,7 +63,7 @@
 
 
 
-  <?php if ($this->form): ?>
+  <?php if ($this->action === 'register'): ?>
   <h4 class="ce_headline mb-4">
     <span class="text-black-50">1. Anmelden</span>
     <span class="text-black-50"> - </span>
@@ -67,6 +71,7 @@
     <span class="text-black-50"> - </span>
     <span class="text-black-50">3. Abschliessen</span>
   </h4>
+
   <div class="row">
     <div class="col-lg-12">
       <?php if ($this->bookingLimitReaches): ?>
