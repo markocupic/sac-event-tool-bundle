@@ -2,23 +2,23 @@
 
 <!-- Modal Box text and youtube -->
 <div id="ModalWriteTextAndYt" class="modal fade write-story-text-and-yt" tabindex="-1" role="dialog" aria-labelledby="ModalWriteTextAndYt"
-		 aria-hidden="true">
-	<div class="modal-dialog modal-xl modal-fullscreen-xl-down" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">Bericht erstellen</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
-			</div>
-			<div class="modal-body">
-				<div id="editReportFormBox">
-					<?= $this->objEventStoryTextAndYoutubeForm ?>
-					<p id="ctrl_text_strLenRemaining" class="text-success">
-						Verbleibende Zeichen (Leerzeichen inklusive): {{ ctrl_text.strLenRemaining }}
-					</p>
-				</div>
-			</div>
-		</div>
-	</div>
+     aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-fullscreen-xl-down" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Bericht erstellen</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+      </div>
+      <div class="modal-body">
+        <div id="editReportFormBox">
+          <?= $this->objEventStoryTextAndYoutubeForm ?>
+          <p id="ctrl_text_strLenRemaining" class="text-success">
+            Verbleibende Zeichen (Leerzeichen inklusive): {{ ctrl_text.strLenRemaining }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -57,7 +57,7 @@
 
 <script>
     // Open modal on error
-		(function ($) {
+    (function ($) {
         jQuery(document).ready(function () {
 
             if ($('#ModalWriteTextAndYt .widget.error').length)

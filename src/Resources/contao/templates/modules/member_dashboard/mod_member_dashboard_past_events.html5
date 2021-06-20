@@ -5,43 +5,43 @@
 
 <?php if ($this->hasInfoMessage): ?>
 <div class="alert alert-info" role="alert">
-	<?= $this->infoMessage ?>
+  <?= $this->infoMessage ?>
 </div>
 <?php endif; ?>
 
 <?php if ($this->hasErrorMessage): ?>
 <?php foreach ($this->errorMessages as $msg): ?>
 <div class="alert alert-danger" role="alert">
-	<?= $msg ?>
+  <?= $msg ?>
 </div>
 <?php endforeach; ?>
 <?php endif; ?>
 
 <table class="table layout-table table-responsive table-striped">
 
-	<?php foreach ($this->arrPastEvents as $event): ?>
-	<?php if ('course' === $event['objEvent']->eventType): ?>
-	<tr>
-		<td><?= $event['dateSpan'] ?></td>
-		<td><?= $event['objEvent']->title ?></td>
-		<td class="text-center"><a href="<?= $event['downloadCourseConfirmationLink'] ?>" title="Kursbestätigung downloaden" class="btn btn-sm btn-info"><i class="fal fa-fw fa-download"></a></td>
-	</tr>
-	<?php endif; ?>
+  <?php foreach ($this->arrPastEvents as $event): ?>
+  <?php if ('course' === $event['objEvent']->eventType): ?>
+  <tr>
+    <td><?= $event['dateSpan'] ?></td>
+    <td><?= $event['objEvent']->title ?></td>
+    <td class="text-center"><a href="<?= $event['downloadCourseConfirmationLink'] ?>" title="Kursbestätigung downloaden" class="btn btn-sm btn-info"><i class="fal fa-fw fa-download"></a></td>
+  </tr>
+  <?php endif; ?>
 
-	<?php if ('tour' === $event['objEvent']->eventType || 'lastMinuteTour' === $event['objEvent']->eventType): ?>
-	<tr>
-		<td><?= $event['dateSpan'] ?></td>
-		<td>
-			<?= $event['objEvent']->title ?><?php if ('lastMinuteTour' === $event['objEvent']->eventType): ?> <span style="color:green">(Last Minute)</span><?php endif; ?>
-			<?php if ('event_adapted' === $event['objEvent']->executionState): ?>
-			{{br}}
-			<small><span style="color:red">Ausweichtour: <?= $event['objEvent']->eventSubstitutionText ?></span></small>
-			<?php endif; ?>
-		</td>
-	</tr>
-	<?php endif; ?>
+  <?php if ('tour' === $event['objEvent']->eventType || 'lastMinuteTour' === $event['objEvent']->eventType): ?>
+  <tr>
+    <td><?= $event['dateSpan'] ?></td>
+    <td>
+      <?= $event['objEvent']->title ?><?php if ('lastMinuteTour' === $event['objEvent']->eventType): ?> <span style="color:green">(Last Minute)</span><?php endif; ?>
+      <?php if ('event_adapted' === $event['objEvent']->executionState): ?>
+      {{br}}
+      <small><span style="color:red">Ausweichtour: <?= $event['objEvent']->eventSubstitutionText ?></span></small>
+      <?php endif; ?>
+    </td>
+  </tr>
+  <?php endif; ?>
 
-	<?php endforeach; ?>
+  <?php endforeach; ?>
 
 </table>
 

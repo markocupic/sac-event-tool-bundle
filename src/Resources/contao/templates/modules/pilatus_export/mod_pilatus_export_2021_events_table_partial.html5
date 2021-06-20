@@ -1,40 +1,40 @@
 <?php if ($this->eventTable): ?>
 <table class="event-export-table table table-sm">
-	<thead>
-	<tr class="event-export-row-header">
-		<th class="event-export-date">Datum</th>
-		<th class="event-export-weekday">Zeit</th>
-		<th class="event-export-title">Titel</th>
-		<?php if (!$this->isCourse): ?>
-		<th class="event-export-tour-type">Veranstaltungsart</th>
-		<?php endif; ?>
-		<th class="event-export-instructors">Leiter</th>
-		<th class="event-export-organizers">Gruppe</th>
-		<th style="min-width:100px" class="event-export-organizers">Event-ID</th>
-	</tr>
-	</thead>
-	<tbody>
-	<?php $week = 0; ?>
-	<?php foreach ($this->eventTable as $arrEvent): ?>
-	<?php if ($week != $arrEvent['week']): ?>
-	<tr class="event-export-row-body">
-		<?php $week = $arrEvent['week']; ?>
-		<td class="event-export-weeknumber" colspan="6" style="text-align:center"><strong>Woche <?= $arrEvent['week'] ?></strong></td>
-	</tr>
-	<?php endif; ?>
-	<tr class="event-export-row-body" data-recurringevent="<?php if ($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-		<td class="event-export-date"><?= $arrEvent['eventDates'] ?></td>
-		<td class="event-export-weekday"><?= $arrEvent['weekday'] ?></td>
-		<td class="event-export-title"><?= $arrEvent['title'] ?></td>
-		<?php if (!$this->isCourse): ?>
-		<td class="event-export-tour-type"><?= $arrEvent['tourType'] ?></td>
-		<?php endif; ?>
-		<td class="event-export-instructors"><?= $arrEvent['instructors'] ?></td>
-		<td class="event-export-organizers"><?= $arrEvent['organizers'] ?></td>
-		<td class="event-export-event-id"><?= $arrEvent['eventId'] ?></td>
-	</tr>
+  <thead>
+  <tr class="event-export-row-header">
+    <th class="event-export-date">Datum</th>
+    <th class="event-export-weekday">Zeit</th>
+    <th class="event-export-title">Titel</th>
+    <?php if (!$this->isCourse): ?>
+    <th class="event-export-tour-type">Veranstaltungsart</th>
+    <?php endif; ?>
+    <th class="event-export-instructors">Leiter</th>
+    <th class="event-export-organizers">Gruppe</th>
+    <th style="min-width:100px" class="event-export-organizers">Event-ID</th>
+  </tr>
+  </thead>
+  <tbody>
+  <?php $week = 0; ?>
+  <?php foreach ($this->eventTable as $arrEvent): ?>
+  <?php if ($week != $arrEvent['week']): ?>
+  <tr class="event-export-row-body">
+    <?php $week = $arrEvent['week']; ?>
+    <td class="event-export-weeknumber" colspan="6" style="text-align:center"><strong>Woche <?= $arrEvent['week'] ?></strong></td>
+  </tr>
+  <?php endif; ?>
+  <tr class="event-export-row-body" data-recurringevent="<?php if ($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
+    <td class="event-export-date"><?= $arrEvent['eventDates'] ?></td>
+    <td class="event-export-weekday"><?= $arrEvent['weekday'] ?></td>
+    <td class="event-export-title"><?= $arrEvent['title'] ?></td>
+    <?php if (!$this->isCourse): ?>
+    <td class="event-export-tour-type"><?= $arrEvent['tourType'] ?></td>
+    <?php endif; ?>
+    <td class="event-export-instructors"><?= $arrEvent['instructors'] ?></td>
+    <td class="event-export-organizers"><?= $arrEvent['organizers'] ?></td>
+    <td class="event-export-event-id"><?= $arrEvent['eventId'] ?></td>
+  </tr>
 
-	<?php endforeach; ?>
-	</tbody>
+  <?php endforeach; ?>
+  </tbody>
 </table>
 <?php endif; ?>

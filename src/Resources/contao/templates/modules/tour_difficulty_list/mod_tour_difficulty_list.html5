@@ -3,38 +3,38 @@
 <?php $this->block('content'); ?>
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tourDifficultiesModal">
-	Schwierigkeitsgrade
+  Schwierigkeitsgrade
 </button>
 
 <!-- Tour difficulties Modal -->
 <div class="modal fade" id="tourDifficultiesModal" tabindex="-1" role="dialog" aria-labelledby="tourDifficultiesModal" aria-hidden="true">
-	<div class="modal-dialog modal-fullscreen-xl-down modal-lg" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="agbTitle">Schwierigkeitsgrade</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
-			</div>
-			<div class="modal-body">
-				<table class="table">
-					<?php foreach ($this->difficulties as $difficulty): ?>
-					<?php if ($difficulty['catStart']): ?>
-					<tr>
-						<th colspan="3"><?= $difficulty['catTitle'] ?></th>
-					</tr>
-					<?php endif; ?>
-					<tr>
-						<td><?= $difficulty['shortcut'] ?></td>
-						<td><?= $difficulty['title'] ?></td>
-						<td><?= $difficulty['description'] ?></td>
-					</tr>
-					<?php endforeach; ?>
-				</table>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schliessen</button>
-			</div>
-		</div>
-	</div>
+  <div class="modal-dialog modal-fullscreen-xl-down modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="agbTitle">Schwierigkeitsgrade</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          <?php foreach ($this->difficulties as $difficulty): ?>
+          <?php if ($difficulty['catStart']): ?>
+          <tr>
+            <th colspan="3"><?= $difficulty['catTitle'] ?></th>
+          </tr>
+          <?php endif; ?>
+          <tr>
+            <td><?= $difficulty['shortcut'] ?></td>
+            <td><?= $difficulty['title'] ?></td>
+            <td><?= $difficulty['description'] ?></td>
+          </tr>
+          <?php endforeach; ?>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schliessen</button>
+      </div>
+    </div>
+  </div>
 </div>
 <!-- indexer::continue -->
 

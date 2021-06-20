@@ -1,17 +1,17 @@
 <div class="registration-email">
-	<h1 class="headline"><?= $this->headline ?></h1>
+  <h1 class="headline"><?= $this->headline ?></h1>
 
-	<?php if ($this->form->hasFormField('subject')): ?>
-	<?= $this->form->getWidget('subject')->parse() ?>
-	<?php endif; ?>
+  <?php if ($this->form->hasFormField('subject')): ?>
+  <?= $this->form->getWidget('subject')->parse() ?>
+  <?php endif; ?>
 
-	<?php if ($this->form->hasFormField('text')): ?>
-	<?= $this->form->getWidget('text')->parse() ?>
-	<?php endif; ?>
+  <?php if ($this->form->hasFormField('text')): ?>
+  <?= $this->form->getWidget('text')->parse() ?>
+  <?php endif; ?>
 
-	<?php if ($this->form->hasFormField('submit')): ?>
-	<?= $this->form->getWidget('submit')->parse() ?>
-	<?php endif; ?>
+  <?php if ($this->form->hasFormField('submit')): ?>
+  <?= $this->form->getWidget('submit')->parse() ?>
+  <?php endif; ?>
 </div>
 
 <style type='text/css'>

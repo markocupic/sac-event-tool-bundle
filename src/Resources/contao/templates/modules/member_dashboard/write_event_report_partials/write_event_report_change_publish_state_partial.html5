@@ -3,46 +3,46 @@
 <?php if ($this->publishState < 2): ?>
 
 <div class="me-2">
-	<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#ModalChangePublishState">
-		<i class="fas fa-eye"></i> Veröffentlichen
-	</button>
+  <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#ModalChangePublishState">
+    <i class="fas fa-eye"></i> Veröffentlichen
+  </button>
 </div>
 
 <div id="ModalChangePublishState" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalChangePublishState" aria-hidden="true">
-	<div class="modal-dialog modal-xl modal-fullscreen-xl-down" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Bericht zur Überprüfung freigeben</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
-			</div>
-			<div class="modal-body">
-				<div class="alert alert-dark">
-					<i class="fas fa-check-circle fa-w-16"></i>
-					<div>
-						Hier kannst du deinen Bericht zur Überprüfung durch den/die Tourenleiter/in und die Redaktion freigeben. Achtung! Führe diesen Schritt nur aus, wenn du sicher bist, dass du keine Änderungen am Bericht mehr machen willst. Du kannst diesen Schritt danach nicht mehr rückgängig machen und das Formular bleibt für weitere Eingaben gesperrt.
-						{{br}}
-						Der/die Tourenleiter/in wird benachrichtigt und er/sie wird deinen Bericht auf inhaltliche Korrektheit überprüfen.
-						{{br}}
-						Nach der Prüfung durch den/die Tourenleiter/in wird dein Bericht durch die Redaktion auf Rechtschreibung geprüft und anschliessend veröffentlicht. Danach ist dein Bericht auf der <a href="https://www.sac-pilatus.ch" target="_blank">Home Seite</a> öffentlich im Netz sichtbar.
-					</div>
-				</div>
-				<div class="mt-5">
-					<form id="changePublishStateForm" data-request-token="{{request_token}}" data-module-id="<?= $this->id ?>">
-						<div v-if="publishState < 2" class="d-grid gap-2">
-							<button id="publishEventStoryBtn" class="btn btn-lg btn-danger btn-block" v-if="!pendingRequest" v-on:click="publishArticle"><i class="fas fa-eye" aria-hidden="true"></i> Bericht zur Veröffentlichung freigeben</button>
-							<button id="publishEventStoryBtnPending" class="btn btn-lg btn-danger btn-block" v-if="pendingRequest" disabled><i class="fas fa-spinner fa-pulse" aria-hidden="true"></i> Bitte warten</button>
-						</div>
-						<div v-if="publishState === 2" class="alert alert-primary">
-							<i class="fas fa-grin fa-w-16" aria-hidden="true"></i>
-							<div>
-								Dein Bericht wurde erfolgreich zur Überprüfung freigegeben. Die Seite wird jetzt neu geladen.
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
+  <div class="modal-dialog modal-xl modal-fullscreen-xl-down" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Bericht zur Überprüfung freigeben</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-dark">
+          <i class="fas fa-check-circle fa-w-16"></i>
+          <div>
+            Hier kannst du deinen Bericht zur Überprüfung durch den/die Tourenleiter/in und die Redaktion freigeben. Achtung! Führe diesen Schritt nur aus, wenn du sicher bist, dass du keine Änderungen am Bericht mehr machen willst. Du kannst diesen Schritt danach nicht mehr rückgängig machen und das Formular bleibt für weitere Eingaben gesperrt.
+            {{br}}
+            Der/die Tourenleiter/in wird benachrichtigt und er/sie wird deinen Bericht auf inhaltliche Korrektheit überprüfen.
+            {{br}}
+            Nach der Prüfung durch den/die Tourenleiter/in wird dein Bericht durch die Redaktion auf Rechtschreibung geprüft und anschliessend veröffentlicht. Danach ist dein Bericht auf der <a href="https://www.sac-pilatus.ch" target="_blank">Home Seite</a> öffentlich im Netz sichtbar.
+          </div>
+        </div>
+        <div class="mt-5">
+          <form id="changePublishStateForm" data-request-token="{{request_token}}" data-module-id="<?= $this->id ?>">
+            <div v-if="publishState < 2" class="d-grid gap-2">
+              <button id="publishEventStoryBtn" class="btn btn-lg btn-danger btn-block" v-if="!pendingRequest" v-on:click="publishArticle"><i class="fas fa-eye" aria-hidden="true"></i> Bericht zur Veröffentlichung freigeben</button>
+              <button id="publishEventStoryBtnPending" class="btn btn-lg btn-danger btn-block" v-if="pendingRequest" disabled><i class="fas fa-spinner fa-pulse" aria-hidden="true"></i> Bitte warten</button>
+            </div>
+            <div v-if="publishState === 2" class="alert alert-primary">
+              <i class="fas fa-grin fa-w-16" aria-hidden="true"></i>
+              <div>
+                Dein Bericht wurde erfolgreich zur Überprüfung freigegeben. Die Seite wird jetzt neu geladen.
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>

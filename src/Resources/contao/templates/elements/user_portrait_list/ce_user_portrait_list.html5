@@ -9,9 +9,9 @@
 <?php if ($this->items): ?>
 <?php if ($this->hasMultiple): ?>
 <div class="row">
-	<?php endif; ?>
-	<?= $this->items ?>
-	<?php if ($this->hasMultiple): ?>
+  <?php endif; ?>
+  <?= $this->items ?>
+  <?php if ($this->hasMultiple): ?>
 </div>
 <?php endif; ?>
 

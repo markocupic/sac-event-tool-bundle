@@ -10,7 +10,7 @@ $GLOBALS['TL_CSS'][] = 'https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12
 <?php $this->block('content'); ?>
 
 <div class="alert bg-light">
-	<?= $this->form ?>
+  <?= $this->form ?>
 </div>
 <script>
     jQuery(document).ready(function () {

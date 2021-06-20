@@ -1,7 +1,7 @@
 <div class="event-dashboard">
-	<div class="tl_submit_container">
+  <div class="tl_submit_container">
 
-		<?= $this->menu ?>
+    <?= $this->menu ?>
 
-	</div>
+  </div>
 </div>
