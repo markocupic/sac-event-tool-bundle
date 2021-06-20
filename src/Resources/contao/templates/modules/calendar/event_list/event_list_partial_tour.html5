@@ -114,31 +114,31 @@
 			'calendarIds': [<?= $this->apiParam['calendarIds'] ?>],
 			'limit': '<?= $this->apiParam['limit'] ?>',
 			'offset': '0',
-		},
-    'fields': [
-			'title',
-			'startDateDay',
-			'startDateMonth',
-			'eventType',
-			'eventTitle',
-			'eventUrl',
-			'instructors',
-			'tourTypesShortcuts',
-			'tourTechDifficulties',
-			'bookingCounter',
-			'id',
-			'eventState',
-			'eventStateLabel',
-			'eventDuration',
-			'eventPeriodLgInline',
-			'tourTypesIds',
-			'suitableForBeginners',
-    ],
-		'callbacks': {
-			'oninsert': function (vue, json) {
-				window.setTimeout(function () {
-				    $('[data-toggle="tooltip"]').tooltip();
-				}, 100);
+	},
+	'fields': [
+		'title',
+		'startDateDay',
+		'startDateMonth',
+		'eventType',
+		'eventTitle',
+		'eventUrl',
+		'instructors',
+		'tourTypesShortcuts',
+		'tourTechDifficulties',
+		'bookingCounter',
+		'id',
+		'eventState',
+		'eventStateLabel',
+		'eventDuration',
+		'eventPeriodLgInline',
+		'tourTypesIds',
+		'suitableForBeginners',
+	],
+	'callbacks': {
+		'oninsert': function (vue, json) {
+			window.setTimeout(function () {
+				$('[data-toggle="tooltip"]').tooltip();
+			}, 100);
 		}
 	}
 });
