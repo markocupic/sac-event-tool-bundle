@@ -321,6 +321,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         }
 
         $this->template->action = $inputAdapter->get('action');
+        $this->template->stepIndicator = $this->parseStepIndicatorTemplate($inputAdapter->get('action'));
 
         return $this->template->getResponse();
     }
@@ -655,5 +656,15 @@ class EventRegistrationController extends AbstractFrontendModuleController
         }
 
         return '';
+    }
+
+    private function parseStepIndicatorTemplate(string $strStep): string
+    {
+        return $this->twig->render(
+            '@MarkocupicSacEventTool/EventRegistration/event_registration_step_indicator.html.twig',
+            [
+                'step' => $strStep,
+            ]
+        );
     }
 }

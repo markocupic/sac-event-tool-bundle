@@ -19,14 +19,7 @@
 <?php endif; ?>
 
 <?php if ('login' === $this->action): ?>
-<h4 class="ce_headline mb-4">
-  <span class="text-dark">1. Anmelden</span>
-  <span class="text-black-50"> - </span>
-  <span class="text-black-50">2. Registrieren</span>
-  <span class="text-black-50"> - </span>
-  <span class="text-black-50">3. Abschliessen</span>
-</h4>
-
+<?= $this->stepIndicator ?>
 <div class="alert alert-info" role="alert">
   <i class="fas fa-info-circle"></i>
   <div>Bitte logge dich ein, um dich zu einem Event anzumelden.</div>
@@ -39,23 +32,12 @@
 <?php endif; ?>
 
 <?php if ('confirm' === $this->action): ?>
-<h4 class="ce_headline mb-4">
-  <span class="text-black-50">1. Anmelden</span>
-  <span class="text-black-50"> - </span>
-  <span class="text-black-50">2. Registrieren</span>
-  <span class="text-black-50"> - </span>
-  <span class="text-dark">3. Abschliessen</span>
-</h4>
+<?= $this->stepIndicator ?>
 <?= $this->regInfo ?>
 <?php endif; ?>
 
 <?php if ('register' === $this->action): ?>
-<h4 class="ce_headline mb-4">
-  <span class="text-black-50">1. Anmelden</span>
-  <span class="text-black-50"> - </span>
-  <span class="text-dark">2. Registrieren</span>
-  <span class="text-black-50"> - </span>
-  <span class="text-black-50">3. Abschliessen</span>
+<?= $this->stepIndicator ?>
 </h4>
 
 <div class="row">
