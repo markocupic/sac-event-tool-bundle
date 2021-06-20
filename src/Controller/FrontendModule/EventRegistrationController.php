@@ -214,23 +214,13 @@ class EventRegistrationController extends AbstractFrontendModuleController
         /** @var Input $inputAdapter */
         $inputAdapter = $this->framework->getAdapter(Input::class);
 
-        $this->template = $template;
-        $this->template->objUser = $this->memberModel;
-        $this->template->objEvent = $this->eventModel;
 
-        // Set more template vars
-        $this->setMoreTemplateVars();
 
         $flash = $this->session->getFlashBag();
         $sessInfKey = 'contao.FE.info';
         $sessErrKey = 'contao.FE.error';
 
-        // Count accepted registrations
-        $objMember = $databaseAdapter->getInstance()
-            ->prepare('SELECT COUNT(id) AS countAcceptedRegistrations FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=? AND contaoMemberId IN (SELECT id FROM tl_member WHERE disable=?)')
-            ->execute($this->eventModel->id, 'subscription-accepted', '')
-        ;
-        $this->template->countAcceptedRegistrations = $objMember->countAcceptedRegistrations;
+
 
         if (null === $this->eventModel) {
             $flash->set($sessInfKey, sprintf('Event mit ID: %s nicht gefunden.', $inputAdapter->get('events') ?: 'NULL'));
@@ -258,6 +248,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
             $flash->set($sessErrKey, 'Leider wurde für dieses Mitgliederkonto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlege auf auf der Internetseite des Zentralverbands deine E-Mail-Adresse.');
         }
 
+
+        $this->template = $template;
+
+        // Set more template vars
+        $this->setMoreTemplateVars();
         $this->template->eventModel = $this->eventModel;
         $this->template->memberModel = $this->memberModel;
 
