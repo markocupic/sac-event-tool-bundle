@@ -583,7 +583,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
     {
         /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+
+        /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
+
+        /** @var Events $eventsAdapter */
         $eventsAdapter = $this->framework->getAdapter(Events::class);
 
         $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
