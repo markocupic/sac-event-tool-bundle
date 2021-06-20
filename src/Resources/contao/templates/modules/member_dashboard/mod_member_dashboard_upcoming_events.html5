@@ -39,8 +39,8 @@
     <td><span class="badge bg-primary"><?= $stateOfSubscription ?></span></td>
     <td class="text-center">
       <?php if ('user-has-unsubscribed' !== $event['eventRegistrationModel']->stateOfSubscription): ?>
-      <a href="<?= $event['unregisterUrl'] ?>" role="button" title="Von Event abmelden" class="sign-out-from-event-button btn btn-sm btn-danger">
-        abmelden
+      <a href="<?= $event['unregisterUrl'] ?>" role="button" title="Anmeldung stornieren" class="sign-out-from-event-button btn btn-sm btn-danger">
+        stornieren
       </a>
       <?php endif; ?>
     </td>

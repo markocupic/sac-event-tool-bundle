@@ -48,6 +48,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment as TwigEnvironment;
 
 /**
@@ -83,6 +84,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
      * @var TwigEnvironment
      */
     private $twig;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
     /**
      * @var string
@@ -124,13 +130,14 @@ class EventRegistrationController extends AbstractFrontendModuleController
      */
     private $template;
 
-    public function __construct(Security $security, ContaoFramework $framework, SessionInterface $session, EventDispatcherInterface $eventDispatcher, TwigEnvironment $twig, string $projectDir, ?LoggerInterface $logger = null)
+    public function __construct(Security $security, ContaoFramework $framework, SessionInterface $session, EventDispatcherInterface $eventDispatcher, TwigEnvironment $twig, TranslatorInterface $translator, string $projectDir, ?LoggerInterface $logger = null)
     {
         $this->security = $security;
         $this->framework = $framework;
         $this->session = $session;
         $this->eventDispatcher = $eventDispatcher;
         $this->twig = $twig;
+        $this->translator = $translator;
         $this->projectDir = $projectDir;
         $this->logger = $logger;
     }
@@ -218,11 +225,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
             $flash->set($sessInfKey, sprintf('Event mit ID: %s nicht gefunden.', $inputAdapter->get('events') ?: 'NULL'));
         } elseif ($this->eventModel->disableOnlineRegistration) {
             $flash->set($sessInfKey, 'Eine Online-Anmeldung zu diesem Event ist nicht möglich.');
-        } elseif (null === $this->memberModel) {
-            $flash->set($sessInfKey, 'Bitte logge dich mit deinem Mitglieder-Konto ein, um dich für den Event anzumelden.');
-            $this->template->showLoginForm = true;
-        } elseif (null !== $this->memberModel && true === $calendarEventsMemberModelAdapter->isRegistered($this->memberModel->id, $this->eventModel->id)) {
-            $flash->set($sessInfKey, 'Zu diesem Event liegt bereits eine Anmeldung von dir vor.');
         } elseif ('event_fully_booked' === $this->eventModel->eventState) {
             $flash->set($sessInfKey, 'Dieser Anlass ist ausgebucht. Bitte erkundige dich beim Leiter, ob eine Nachmeldung möglich ist.');
         } elseif ('event_canceled' === $this->eventModel->eventState) {
@@ -241,12 +243,20 @@ class EventRegistrationController extends AbstractFrontendModuleController
             $flash->set($sessErrKey, 'Der Hauptleiter mit ID '.$this->eventModel->mainInstructor.' wurde nicht in der Datenbank gefunden. Bitte nimm persönlich Kontakt mit dem Leiter auf.');
         } elseif (empty($this->mainInstructorModel->email) || !$validatorAdapter->isEmail($this->mainInstructorModel->email)) {
             $flash->set($sessErrKey, 'Dem Hauptleiter mit ID '.$this->eventModel->mainInstructor.' ist keine gültige E-Mail zugewiesen. Bitte nimm persönlich mit dem Leiter Kontakt auf.');
-        } elseif (empty($this->memberModel->email) || !$validatorAdapter->isEmail($this->memberModel->email)) {
+        } elseif (null !== $this->memberModel && (empty($this->memberModel->email) || !$validatorAdapter->isEmail($this->memberModel->email))) {
             $flash->set($sessErrKey, 'Leider wurde für dieses Mitgliederkonto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlege auf auf der Internetseite des Zentralverbands deine E-Mail-Adresse.');
         }
 
+        $this->template->eventModel = $this->eventModel;
+        $this->template->memberModel = $this->memberModel;
+
+        if (null !== $this->memberModel && true === $calendarEventsMemberModelAdapter->isRegistered($this->memberModel->id, $this->eventModel->id)) {
+            $this->template->isRegistered = true;
+            $this->template->regInfo = $this->parseEventRegistrationConfirmTemplate();
+        }
+
         // Add messages to the template
-        if ($flash->has($sessInfKey) || $flash->has($sessErrKey)) {
+        elseif ($flash->has($sessInfKey) || $flash->has($sessErrKey)) {
             if ($flash->has($sessErrKey)) {
                 $this->template->hasErrorMessage = true;
                 $errorMessage = $flash->get($sessErrKey)[0];
@@ -264,6 +274,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $infoMessage = $flash->get($sessInfKey)[0];
                 $this->template->infoMessage = $infoMessage;
             }
+        } elseif (null === $this->memberModel) {
+            $this->template->showLoginForm = true;
         } else {
             // All ok! Generate the registration form;
             $this->generateForm();
@@ -431,7 +443,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                     $objPageModel = $pageModelAdapter->findByPk($this->moduleModel->jumpTo);
 
                     if (null !== $objPageModel) {
-                        $controllerAdapter->redirect($objPageModel->getFrontendUrl());
+                        $controllerAdapter->reload();
                     }
                 }
             }
@@ -567,7 +579,37 @@ class EventRegistrationController extends AbstractFrontendModuleController
         return false;
     }
 
-    private function parseRegistrationConfirmTemplate(): void
+    private function parseEventRegistrationConfirmTemplate(): string
     {
+        /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
+        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        $eventsAdapter = $this->framework->getAdapter(Events::class);
+
+        $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
+
+        if (null !== ($objEventsMemberModel = $calendarEventsMemberModelAdapter->findByMemberAndEvent($this->memberModel, $this->eventModel))) {
+            $arrEvent = $this->eventModel->row();
+            $arrEventsMember = $objEventsMemberModel->row();
+            $arrMember = $this->memberModel->row();
+
+            $arrEventsMember['stateOfSubscriptionTrans'] = $this->translator->trans('tl_calendar_events_member.'.$arrEventsMember['stateOfSubscription'], [], 'contao_default');
+            $arrEvent['eventUrl'] = $eventsAdapter->generateEventUrl($this->eventModel);
+
+            $arrEvent = array_map('html_entity_decode', $arrEvent);
+            $arrEventsMember = array_map('html_entity_decode', $arrEventsMember);
+            $arrMember = array_map('html_entity_decode', $arrMember);
+
+            return $this->twig->render(
+                '@MarkocupicSacEventTool/EventRegistration/event_registration_confirm.html.twig',
+                [
+                    'event_model' => $arrEvent,
+                    'event_member_model' => $arrEventsMember,
+                    'member_model' => $arrMember,
+                ]
+            );
+        }
+
+        return '';
     }
 }

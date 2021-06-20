@@ -1,0 +1,53 @@
+<div class="mt-4 alert alert-info" role="alert">
+    <i class="fas fa-check-circle me-2"></i>
+    <div>
+        Du bist für "{{ event_model.title }}" registriert.
+        <br>
+        Status: {{ event_member_model.stateOfSubscriptionTrans }}
+    </div>
+</div>
+
+<table class="table">
+    <tr>
+        <td class="fw-bold">Event</td>
+        <td>
+            <p><a href="{{ event_model.eventUrl }}" title="zum Event">"{{ event_model.title }}"</a></p>
+            <p>Event-Datum: {{ event_model.startDate|date("m.d.Y") }}</p>
+            <p><a href="_download/download_event_ical?eventId={{ event_model.id }}"><span class="badge bg-primary">ICal</span></a></p>
+        </td>
+    </tr>
+    <tr>
+        <td class="fw-bold">Name</td>
+        <td>{{ event_member_model.firstname }} {{ event_member_model.lastname }}</td>
+    </tr>
+    <tr>
+        <td class="fw-bold">Mitglieder-Nr.</td>
+        <td>{{ event_member_model.sacMemberId }}</td>
+    </tr>
+    <tr>
+        <td class="fw-bold">Strasse</td>
+        <td>{{ event_member_model.street }}</td>
+    </tr>
+    <tr>
+        <td class="fw-bold">PLZ/Ort</td>
+        <td>{{ event_member_model.postal }} {{ event_member_model.city }}</td>
+    </tr>
+    <tr>
+        <td class="fw-bold">Registriert am</td>
+        <td>{{ event_member_model.addedOn|date("m.d.Y h:m") }}</td>
+    </tr>
+
+    <tr>
+        <td class="fw-bold">Bemerkungen</td>
+        <td>{{ event_member_model.notes|nl2br }}</td>
+    </tr>
+    <tr>
+        <td class="fw-bold">Notfallangaben</td>
+        <td>{{ event_member_model.emergencyPhoneName }}, {{ event_member_model.emergencyPhone }}</td>
+    </tr>
+</table>
+
+<p class="mt-5">
+    In deinem Mitgliederprofil kannst du deine Buchungen gegebenenfalls stornieren und den Status deiner Anmeldung einsehen.
+</p>
+

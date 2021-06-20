@@ -10,7 +10,7 @@
 
 
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationCheckoutLinkController;
-use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationFormController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationController;
 
 // Backend Modules
 $GLOBALS['TL_LANG']['MOD']['sac_be_modules'] = array('SAC Module');
@@ -35,7 +35,7 @@ $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = array('Event
 // Contao 5 ready frontend modules
 $GLOBALS['TL_LANG']['FMD']['tour_difficulty_list'] = array('Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster');
 $GLOBALS['TL_LANG']['FMD']['csv_event_member_export'] = array('SAC-Event-Teilnehmer Export');
-$GLOBALS['TL_LANG']['FMD'][EventRegistrationFormController::TYPE] = array('SAC Event Registrierungsformular');
+$GLOBALS['TL_LANG']['FMD'][EventRegistrationController::TYPE] = array('SAC Event Registrierungsformular');
 $GLOBALS['TL_LANG']['FMD'][EventRegistrationCheckoutLinkController::TYPE] = array('Link zur Checkout-Seite für Event-Anmeldung');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_upcoming_events'] = array('SAC Mitgliederkonto Dashboard - Meine nächsten Events');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_past_events'] = array('SAC Mitgliederkonto Dashboard - Meine absolvierten Events');

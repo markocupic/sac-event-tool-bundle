@@ -3,10 +3,7 @@
 <?php $this->block('content'); ?>
 
 <div id="eventBookingForm" class="p-4 mt-3 mb-4 bg-white">
-
-  <?php if ($this->objEvent): ?>
-  <h3 class="ce_headline">Für Event "<?= $this->objEvent->title ?>" anmelden</h3>
-  <?php endif; ?>
+  <h1 class="ce_headline">Event-Registrierung</h1>
 
   <?php if ($this->hasErrorMessage): ?>
   <div class="alert alert-danger" role="alert">
@@ -22,14 +19,54 @@
   </div>
   <?php endif; ?>
 
-  <?php if (!FE_USER_LOGGED_IN && $this->showLoginForm): ?>
+
+
+
+  <?php if ($this->showLoginForm): ?>
+  <h4 class="ce_headline mb-4">
+    <span class="text-dark">1. Anmelden</span>
+    <span class="text-black-50"> - </span>
+    <span class="text-black-50">2. Registrieren</span>
+    <span class="text-black-50"> - </span>
+    <span class="text-black-50">3. Abschliessen</span>
+  </h4>
+
+  <div class="alert alert-info" role="alert">
+    <i class="fas fa-info-circle"></i>
+    <div>Bitte logge dich ein, um dich zu einem Event anzumelden.</div>
+  </div>
+
   <!-- Login form -->
   <div class="mt-5 mb-4">
     {{insert_module::406}}
   </div>
   <?php endif; ?>
 
+
+
+
+  <?php if ($this->isRegistered): ?>
+  <h4 class="ce_headline mb-4">
+    <span class="text-black-50">1. Anmelden</span>
+    <span class="text-black-50"> - </span>
+    <span class="text-black-50">2. Registrieren</span>
+    <span class="text-black-50"> - </span>
+    <span class="text-dark">3. Abschliessen</span>
+  </h4>
+  <?= $this->regInfo ?>
+  <?php endif; ?>
+
+
+
+
   <?php if ($this->form): ?>
+  <h4 class="ce_headline mb-4">
+    <span class="text-black-50">1. Anmelden</span>
+    <span class="text-black-50"> - </span>
+    <span class="text-dark">2. Registrieren</span>
+    <span class="text-black-50"> - </span>
+    <span class="text-black-50">3. Abschliessen</span>
+  </h4>
   <div class="row">
     <div class="col-lg-12">
       <?php if ($this->bookingLimitReaches): ?>
@@ -39,12 +76,7 @@
       </div>
       <?php endif; ?>
 
-      <?php if ($this->hasBookingError): ?>
-      <div class="alert alert-info" role="alert">
-        <i class="fas fa-exclamation-circle"></i>
-        <div><?= $this->bookingErrorMsg ?></div>
-      </div>
-      <?php endif; ?>
+      <h3 class="ce_headline text-danger mt-5 mb-4">Für "<?= $this->eventModel->title ?>" anmelden</h3>
 
       <div class="hasteform_form-event-registration block">
         <form action="<?= $this->objForm->getFormAction() ?>" method="<?= $this->objForm->getMethod() ?>" enctype="<?= $this->objForm->getEnctype() ?>">
@@ -123,6 +155,8 @@
     </div>
   </div>
   <?php endif; ?>
+
+
 
 
   <!-- AGB Modal -->

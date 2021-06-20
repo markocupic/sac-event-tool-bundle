@@ -50,6 +50,24 @@ class CalendarEventsMemberModel extends Model
 		return false;
 	}
 
+    /**
+     * @param MemberModel $objMember
+     * @param CalendarEventsModel $eventModel
+     * @return static|null
+     */
+	public static function findByMemberAndEvent(MemberModel $objMember, CalendarEventsModel $eventModel): ?self
+    {
+
+        $objDb = Database::getInstance()
+            ->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')
+            ->execute($objMember->sacMemberId, $eventModel->id);
+        if($objDb->numRows)
+        {
+            return static::findByPk($objDb->id);
+        }
+        return null;
+    }
+
 	/**
 	 * @param $memberId
 	 * @param  array $arrEventTypeFilter

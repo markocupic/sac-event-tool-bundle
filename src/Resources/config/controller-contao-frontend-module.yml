@@ -26,12 +26,14 @@ services:
             - { name: container.service_subscriber }
         public: true
 
-    Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationFormController:
+    Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationController:
         arguments:
             - '@security.helper'
             - '@contao.framework'
             - '@session'
             - '@event_dispatcher'
+            - '@twig'
+            - '@translator'
             - '%kernel.project_dir%'
             - '@monolog.logger.contao'
         calls:
