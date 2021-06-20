@@ -328,11 +328,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 			'eval'      => array('mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
 			'sql'       => "varchar(255) NOT NULL default ''",
 		),
-        'ahvNumber'               => array(
-            'inputType' => 'text',
-            'eval'      => array('mandatory' => false, 'maxlength' => 16, 'unique' => false, 'decodeEntities' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
-            'sql'       => "varchar(255) NOT NULL default ''",
-        ),
+		'ahvNumber'               => array(
+			'inputType' => 'text',
+			'eval'      => array('mandatory' => false, 'maxlength' => 16, 'unique' => false, 'decodeEntities' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
+			'sql'       => "varchar(255) NOT NULL default ''",
+		),
 		'sacMemberId'         => array(
 			'inputType'     => 'text',
 			'save_callback' => array(array(TlCalendarEventsMember::class, 'saveCallbackSacMemberId')),

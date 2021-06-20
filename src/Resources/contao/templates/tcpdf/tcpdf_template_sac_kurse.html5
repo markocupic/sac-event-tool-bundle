@@ -12,7 +12,7 @@
 
     <tr style="<?= $this->rowStyleA ?>">
         <td style="<?= $this->cellStyleA ?>">Kursdaten</td>
-        <td style="<?= $this->cellStyleB ?>"><?= $this->date ?><?php if ($this->durationInfo != ''): ?><br>Dauer: <?= $this->durationInfo ?><?php endif; ?></td>
+        <td style="<?= $this->cellStyleB ?>"><?= $this->date ?><?php if ('' != $this->durationInfo): ?><br>Dauer: <?= $this->durationInfo ?><?php endif; ?></td>
     </tr>
 
     <tr style="<?= $this->rowStyleA ?>">
@@ -65,21 +65,21 @@
         <td style="<?= $this->cellStyleB ?>"><?= $this->bookingEvent ?></td>
     </tr>
 
-    <?php if ($this->equipment != ''): ?>
+    <?php if ('' != $this->equipment): ?>
     <tr style="<?= $this->rowStyleA ?>">
         <td style="<?= $this->cellStyleA ?>">Material</td>
         <td style="<?= $this->cellStyleB ?>"><?= $this->equipment ?></td>
     </tr>
     <?php endif; ?>
 
-    <?php if ($this->meetingPoint != ''): ?>
+    <?php if ('' != $this->meetingPoint): ?>
     <tr style="<?= $this->rowStyleA ?>">
         <td style="<?= $this->cellStyleA ?>">Zeit und Treffpunkt</td>
         <td style="<?= $this->cellStyleB ?>"><?= $this->meetingPoint ?></td>
     </tr>
     <?php endif; ?>
 
-    <?php if ($this->miscellaneous != ''): ?>
+    <?php if ('' != $this->miscellaneous): ?>
     <tr style="<?= $this->rowStyleA ?>">
         <td style="<?= $this->cellStyleA ?>">Weiteres</td>
         <td style="<?= $this->cellStyleB ?>"><?= $this->miscellaneous ?></td>

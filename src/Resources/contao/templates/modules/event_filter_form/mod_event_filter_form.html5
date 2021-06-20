@@ -1,4 +1,4 @@
-<?php $GLOBALS['TL_JAVASCRIPT'][] = "bundles/markocupicsaceventtool/js/eventfilter.js|static"; ?>
+<?php $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/eventfilter.js|static'; ?>
 <?php $this->extend('block_unsearchable'); ?>
 
 <?php $this->block('content'); ?>
@@ -8,8 +8,10 @@
 		<div class="formbody">
 			<!-- start row-->
 			<div class="row">
-				<?php foreach($this->fields as $strField): ?>
-				<?php if ($strField === 'suitableForBeginners') continue; ?>
+				<?php foreach ($this->fields as $strField): ?>
+				<?php if ('suitableForBeginners' === $strField) {
+    continue;
+} ?>
 				<?php if ($this->form->hasFormField($strField)): ?>
 				<!-- start widget <?= $strField ?> -->
 				<div id="<?= $strField ?>" class="filter-board-widget col-6 col-sm-4">

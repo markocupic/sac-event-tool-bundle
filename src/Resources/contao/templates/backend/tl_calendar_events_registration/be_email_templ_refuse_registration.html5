@@ -1,8 +1,8 @@
 Hallo <?= $this->participantFirstname ?> <?= $this->participantLastname ?>
 
 
-<?php if ($this->eventType === 'course'): ?>
-Leider kann ich dir für den Kurs: <?php if ($this->courseId != ''): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>" keine Zusage erteilen.
+<?php if ('course' === $this->eventType): ?>
+Leider kann ich dir für den Kurs: <?php if ('' != $this->courseId): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>" keine Zusage erteilen.
 <?php else: ?>
 Leider kann ich dir für den Event: "<?= $this->eventName ?>" keine Zusage erteilen.
 <?php endif; ?>

@@ -23,7 +23,7 @@
 <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
 <?php endif; ?>
 <?php if ($this->events): ?>
-<?php if ($this->eventType === 'course'): ?>
+<?php if ('course' === $this->eventType): ?>
 <table class="event-export-table table table-sm">
 	<tbody>
 	<?php $courseTypeLevel0 = ''; ?>
@@ -68,7 +68,7 @@
 </table>
 <?php endif; ?>
 
-<?php if ($this->eventType === 'tour' || $this->eventType === 'lastMinuteTour'): ?>
+<?php if ('tour' === $this->eventType || 'lastMinuteTour' === $this->eventType): ?>
 <table class="event-export-table table table-sm">
 	<thead>
 	<tr class="event-export-row-head">
@@ -100,7 +100,7 @@
 </table>
 <?php endif; ?>
 
-<?php if ($this->eventType === 'generalEvent'): ?>
+<?php if ('generalEvent' === $this->eventType): ?>
 <table class="event-export-table table table-sm">
 	<thead>
 	<tr class="event-export-row-head">

@@ -1,4 +1,4 @@
-<?php $GLOBALS['TL_JAVASCRIPT'][] = "https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"; ?>
+<?php $GLOBALS['TL_JAVASCRIPT'][] = 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js'; ?>
 <?php $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao-component-vue-js/vue/dist/vue.min.js|static'; ?>
 <?php $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/eventlist_vue.js|static'; ?>
 
@@ -97,50 +97,50 @@
 
 <!-- Set up the Vuejs tour list -->
 <script>
-    new VueTourList('#tour-list', {
-        'apiParams': {
-            'organizers': [<?= $this->apiParam['organizers'] ?>],
-    'eventType': [<?= $this->apiParam['eventType'] ?>],
-    'suitableForBeginners': '<?= $this->apiParam['suitableForBeginners'] ?>',
-        'tourType': '<?= $this->apiParam['tourType'] ?>',
-        'courseType': '<?= $this->apiParam['courseType'] ?>',
-        'courseId': '<?= $this->apiParam['courseId'] ?>',
-        'year': '<?= $this->apiParam['year'] ?>',
-        'dateStart': '<?= $this->apiParam['dateStart'] ?>',
-        'textsearch': '<?= $this->apiParam['textsearch'] ?>',
-        'eventId': '<?= $this->apiParam['eventId'] ?>',
-        'arrIds': [<?= $this->apiParam['arrIds'] ?>],
-    'username': '<?= $this->apiParam['username'] ?>',
-        'calendarIds': [<?= $this->apiParam['calendarIds'] ?>],
-    'limit': '<?= $this->apiParam['limit'] ?>',
-        'offset': '0',
-    },
+	new VueTourList('#tour-list', {
+		'apiParams': {
+			'organizers': [<?= $this->apiParam['organizers'] ?>],
+			'eventType': [<?= $this->apiParam['eventType'] ?>],
+			'suitableForBeginners': '<?= $this->apiParam['suitableForBeginners'] ?>',
+			'tourType': '<?= $this->apiParam['tourType'] ?>',
+			'courseType': '<?= $this->apiParam['courseType'] ?>',
+			'courseId': '<?= $this->apiParam['courseId'] ?>',
+			'year': '<?= $this->apiParam['year'] ?>',
+			'dateStart': '<?= $this->apiParam['dateStart'] ?>',
+			'textsearch': '<?= $this->apiParam['textsearch'] ?>',
+			'eventId': '<?= $this->apiParam['eventId'] ?>',
+			'arrIds': [<?= $this->apiParam['arrIds'] ?>],
+			'username': '<?= $this->apiParam['username'] ?>',
+			'calendarIds': [<?= $this->apiParam['calendarIds'] ?>],
+			'limit': '<?= $this->apiParam['limit'] ?>',
+			'offset': '0',
+		},
     'fields': [
-        'title',
-        'startDateDay',
-        'startDateMonth',
-        'eventType',
-        'eventTitle',
-        'eventUrl',
-        'instructors',
-        'tourTypesShortcuts',
-        'tourTechDifficulties',
-        'bookingCounter',
-        'id',
-        'eventState',
-        'eventStateLabel',
-        'eventDuration',
-        'eventPeriodLgInline',
-        'tourTypesIds',
-        'suitableForBeginners',
+			'title',
+			'startDateDay',
+			'startDateMonth',
+			'eventType',
+			'eventTitle',
+			'eventUrl',
+			'instructors',
+			'tourTypesShortcuts',
+			'tourTechDifficulties',
+			'bookingCounter',
+			'id',
+			'eventState',
+			'eventStateLabel',
+			'eventDuration',
+			'eventPeriodLgInline',
+			'tourTypesIds',
+			'suitableForBeginners',
     ],
-        'callbacks': {
-        'oninsert': function (vue, json) {
-            window.setTimeout(function () {
-                $('[data-toggle="tooltip"]').tooltip();
-            }, 100);
-        }
-    }
-    });
+		'callbacks': {
+			'oninsert': function (vue, json) {
+				window.setTimeout(function () {
+				    $('[data-toggle="tooltip"]').tooltip();
+				}, 100);
+		}
+	}
+});
 </script>
 

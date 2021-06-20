@@ -50,25 +50,25 @@
         <form action="<?= $this->objForm->getFormAction() ?>" method="<?= $this->objForm->getMethod() ?>" enctype="<?= $this->objForm->getEnctype() ?>">
           <div class="formbody">
             <?php if ($this->objForm->hasFormField('FORM_SUBMIT')): ?>
-            <?= $this->objForm->getWidget('FORM_SUBMIT')->parse(); ?>
+            <?= $this->objForm->getWidget('FORM_SUBMIT')->parse() ?>
             <?php endif; ?>
 
             <?php if ($this->objForm->hasFormField('REQUEST_TOKEN')): ?>
-            <?= $this->objForm->getWidget('REQUEST_TOKEN')->parse(); ?>
+            <?= $this->objForm->getWidget('REQUEST_TOKEN')->parse() ?>
             <?php endif; ?>
 
             <?php if ($this->objForm->hasFormField('carInfo')): ?>
-            <?= $this->objForm->getWidget('carInfo')->parse(); ?>
+            <?= $this->objForm->getWidget('carInfo')->parse() ?>
             {{br}}
             <?php endif; ?>
 
             <?php if ($this->objForm->hasFormField('ticketInfo')): ?>
-            <?= $this->objForm->getWidget('ticketInfo')->parse(); ?>
+            <?= $this->objForm->getWidget('ticketInfo')->parse() ?>
             {{br}}
             <?php endif; ?>
 
             <?php if ($this->objForm->hasFormField('mobile')): ?>
-            <?= $this->objForm->getWidget('mobile')->parse(); ?>
+            <?= $this->objForm->getWidget('mobile')->parse() ?>
             <div class="alert alert-success" role="alert">
               <i class="fas fa-check-circle"></i>
               <div>Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leergelassen werden. Damit der Leiter dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine <strong>Mobilnummer</strong> zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.</div>
@@ -77,17 +77,17 @@
             <?php endif; ?>
 
             <?php if ($this->objForm->hasFormField('emergencyPhone')): ?>
-            <?= $this->objForm->getWidget('emergencyPhone')->parse(); ?>
+            <?= $this->objForm->getWidget('emergencyPhone')->parse() ?>
             {{br}}
             <?php endif; ?>
 
             <?php if ($this->objForm->hasFormField('emergencyPhoneName')): ?>
-            <?= $this->objForm->getWidget('emergencyPhoneName')->parse(); ?>
+            <?= $this->objForm->getWidget('emergencyPhoneName')->parse() ?>
             {{br}}
             <?php endif; ?>
 
             <?php if ($this->objForm->hasFormField('ahvNumber')): ?>
-            <?= $this->objForm->getWidget('ahvNumber')->parse(); ?>
+            <?= $this->objForm->getWidget('ahvNumber')->parse() ?>
             <div class="alert alert-success" role="alert">
               <i class="fas fa-check-circle"></i>
               <div>Sämtliche Daten werden lediglich für interne Zwecke verwendet. Die AHV-Nummer wird ausschliesslich für die Abrechnung oder Rückforderung von Geldern von J+S verwendet. Die persönlichen Daten werden vertraulich behandelt. Eine Weitergabe an Drittorganisationen ist ausgeschlossen.</div>
@@ -96,7 +96,7 @@
             <?php endif; ?>
 
             <?php if ($this->objForm->hasFormField('notes')): ?>
-            <?= $this->objForm->getWidget('notes')->parse(); ?>
+            <?= $this->objForm->getWidget('notes')->parse() ?>
             <div class="alert alert-success" role="alert">
               <i class="fas fa-check-circle"></i>
               <div>Bitte beschreibe in wenigen Worten dein Leistungsniveau und/oder beantworte, die in den Anmeldebestimmungen verlangten Angaben. (z.B. bereits absolvierte Referenztouren oder Essgewohnheiten bei Events mit &Uuml;bernachtung, etc.)</div>
@@ -105,17 +105,17 @@
             <?php endif; ?>
 
             <?php if ($this->objForm->hasFormField('foodHabits')): ?>
-            <?= $this->objForm->getWidget('foodHabits')->parse(); ?>
+            <?= $this->objForm->getWidget('foodHabits')->parse() ?>
             {{br}}
             <?php endif; ?>
 
             <?php if ($this->objForm->hasFormField('agb')): ?>
-            <?= $this->objForm->getWidget('agb')->parse(); ?>
+            <?= $this->objForm->getWidget('agb')->parse() ?>
             {{br}}
             <?php endif; ?>
 
             <?php if ($this->objForm->hasFormField('submit')): ?>
-            <?= $this->objForm->getWidget('submit')->parse(); ?>
+            <?= $this->objForm->getWidget('submit')->parse() ?>
             <?php endif; ?>
           </div>
         </form>

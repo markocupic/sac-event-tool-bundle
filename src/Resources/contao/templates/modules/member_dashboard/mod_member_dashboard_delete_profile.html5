@@ -10,7 +10,7 @@
 <?php endif; ?>
 
 <?php if ($this->hasErrorMessage): ?>
-<?php foreach($this->errorMessages as $msg): ?>
+<?php foreach ($this->errorMessages as $msg): ?>
 <div class="alert alert-danger" role="alert">
 	<?= $msg ?>
 </div>
@@ -37,7 +37,7 @@
 	Dieser Vorgang kann allerdings nur durchgeführt werden, wenn du keine noch hängigen Tourenbuchungen hast.
 </div>
 {{br}}
-<?= $this->deleteProfileForm; ?>
+<?= $this->deleteProfileForm ?>
 
 <?php endif; ?>
 <script>

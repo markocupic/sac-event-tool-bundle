@@ -26,7 +26,7 @@
 
 
 <!-- Start course -->
-<?php if ($this->eventType === 'course'): ?>
+<?php if ('course' === $this->eventType): ?>
 <table class="event-export-table table table-sm">
 	<tbody>
 	<?php $courseTypeLevel0 = ''; ?>
@@ -65,7 +65,7 @@
 	<!-- start details -->
 	<tr class="event-export-row-details">
 		<td class="event-export-terms font-italic">Kursziel</td>
-		<td class="event-export-terms do-not-show-row-when-empty" colspan="4"><?=  nl2br($arrEvent['terms']) ?></td>
+		<td class="event-export-terms do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['terms']) ?></td>
 	</tr>
 
 	<tr class="event-export-row-details">
@@ -93,7 +93,7 @@
 	<!--
 			<tr class="event-export-row-details">
 					<td class="event-export-journey font-italic">Anfahrt</td>
-					<td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= $arrEvent['journey'] != 'Keine Angabe' ? $arrEvent['journey'] : '' ?></td>
+					<td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= 'Keine Angabe' != $arrEvent['journey'] ? $arrEvent['journey'] : '' ?></td>
 			</tr>
 	-->
 	<tr class="event-export-row-details">
@@ -116,7 +116,7 @@
 		<td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">
 			<?= $arrEvent['bookingInfo'] ?>
 			<!--
-			<?php if ($arrEvent['bookingInfo'] != ''): ?>
+			<?php if ('' != $arrEvent['bookingInfo']): ?>
 			{{br}}
 			<?= nl2br($arrEvent['bookingEvent']) ?>
 			<?php endif; ?>
@@ -130,7 +130,7 @@
 <!-- end course -->
 
 
-<?php if ($this->eventType === 'tour' || $this->eventType === 'lastMinuteTour'): ?>
+<?php if ('tour' === $this->eventType || 'lastMinuteTour' === $this->eventType): ?>
 <table class="event-export-table table table-sm">
 
 	<tbody>
@@ -182,7 +182,7 @@
 
 	<tr class="event-export-row-details">
 		<td class="event-export-journey font-italic">Anfahrt</td>
-		<td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= $arrEvent['journey'] != 'Keine Angabe' ? $arrEvent['journey'] : '' ?></td>
+		<td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= 'Keine Angabe' != $arrEvent['journey'] ? $arrEvent['journey'] : '' ?></td>
 	</tr>
 
 	<tr class="event-export-row-details">
@@ -204,7 +204,7 @@
 		<td class="event-export-leistungen font-italic">Anmeldung</td>
 		<td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">
 			<?= $arrEvent['bookingInfo'] ?>
-			<?php if ($arrEvent['bookingEvent'] != ''): ?>
+			<?php if ('' != $arrEvent['bookingEvent']): ?>
 			{{br}}
 			<?= nl2br($arrEvent['bookingEvent']) ?>
 			<?php endif; ?>
@@ -220,7 +220,7 @@
 <?php endif; ?>
 
 
-<?php if ($this->eventType === 'generalEvent'): ?>
+<?php if ('generalEvent' === $this->eventType): ?>
 <table class="event-export-table table table-sm">
 
 	<tbody>
@@ -295,7 +295,7 @@
 		<td class="event-export-leistungen font-italic">Anmeldung</td>
 		<td class="event-export-booking-info do-not-show-row-when-empty" colspan="4">
 			<?= $arrEvent['bookingInfo'] ?>
-			<?php if ($arrEvent['bookingInfo'] != ''): ?>
+			<?php if ('' != $arrEvent['bookingInfo']): ?>
 			{{br}}
 			<?= nl2br($arrEvent['bookingEvent']) ?>
 			<?php endif; ?>

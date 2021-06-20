@@ -5,7 +5,7 @@
 <date class="d-block mb-3">vom: <?= $this->eventDates ?></date>
 <?php endif; ?>
 
-<?php if ($this->eventSubstitutionText != ''): ?>
+<?php if ('' != $this->eventSubstitutionText): ?>
 <h4 class="mt-0 mb-3" style="color: red"><!-- indexer::stop -->Ausweichtour:<!-- indexer::continue --> <?= $this->eventSubstitutionText ?></h4>
 <?php endif; ?>
 
@@ -29,7 +29,7 @@
 				<!-- indexer::stop -->
 				<?php foreach ($this->images as $image): ?>
 				<figure class="col-12 col-sm-6 col-md-4 image_container thumbnail responsive">
-					<a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement" title="<?=  $image['linkTitle']  ?>">
+					<a href="<?= $image['path'] ?>" data-lightbox="lbEventGal" class="cboxElement" title="<?= $image['linkTitle'] ?>">
 						{{image::<?= Contao\StringUtil::binToUuid($image['uuid']) ?>?width=400&height=400&mode=crop&alt=<?= $image['alt'] ?>}}
 					</a>
 					<figcaption class="figure-caption"><?= $image['strFigureCaption'] ?></figcaption>

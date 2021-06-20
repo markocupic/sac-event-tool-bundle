@@ -10,7 +10,7 @@
 <?php endif; ?>
 
 <?php if ($this->hasErrorMessage): ?>
-<?php foreach($this->errorMessages as $msg): ?>
+<?php foreach ($this->errorMessages as $msg): ?>
 <div class="alert alert-danger" role="alert">
 	<?= $msg ?>
 </div>

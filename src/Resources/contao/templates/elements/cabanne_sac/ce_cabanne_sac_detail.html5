@@ -52,7 +52,7 @@
 						</tr>
 						<?php endif; ?>
 
-						<?php if ($this->url !== ''): ?>
+						<?php if ('' !== $this->url): ?>
 						<tr>
 							<td><strong>Webseite:</strong></td>
 							<td><a href="<?= $this->url ?>" target="_blank"><?= Contao\StringUtil::substr($this->url, 26, ' ...') ?></a></td>
@@ -128,13 +128,13 @@
 					<th>Kommentar</th>
 				</tr>
 
-				<?php foreach (\StringUtil::deserialize($this->ascent, true) as $ascent): ?>
+				<?php foreach (Contao\StringUtil::deserialize($this->ascent, true) as $ascent): ?>
 				<tr>
 					<td><?= nl2br($ascent['ascentDescription']) ?></td>
 					<td><?= nl2br($ascent['ascentTime']) ?></td>
 					<td><?= nl2br($ascent['ascentDifficulty']) ?></td>
-					<td><?php if ($ascent['ascentSummer'] === 'possible'): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
-					<td><?php if ($ascent['ascentWinter'] === 'possible'): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
+					<td><?php if ('possible' === $ascent['ascentSummer']): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
+					<td><?php if ('possible' === $ascent['ascentWinter']): ?>Ja<?php else: ?>Nein<?php endif; ?></td>
 					<td><?= nl2br($ascent['ascentComment']) ?></td>
 				</tr>
 				<?php endforeach; ?>

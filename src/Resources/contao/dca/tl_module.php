@@ -10,10 +10,9 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationCheckoutLinkController;
-use Markocupic\SacEventToolBundle\Dca\TlModule;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationFormController;
+use Markocupic\SacEventToolBundle\Dca\TlModule;
 
 /**
  * Table tl_module
@@ -42,7 +41,6 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['jahresprogramm_export'] = '{title_l
 $GLOBALS['TL_DCA']['tl_module']['palettes']['event_story_list'] = '{title_legend},name,headline,type;{config_legend},jumpTo,numberOfItems,skipFirst,perPage;{template_legend:hide},eventStoryListTemplate;{image_legend:hide},imgSize;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['event_story_reader'] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['event_list'] = '{title_legend},name,headline,type;{config_legend},cal_calendar,eventType,cal_readerModule,eventListLimitPerRequest;{template_legend:hide},eventListPartialTpl;{image_legend:hide},imgSize;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
-
 
 // Fields
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventType'] = array(

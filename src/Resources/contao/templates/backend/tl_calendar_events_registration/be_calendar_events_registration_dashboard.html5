@@ -1,19 +1,19 @@
 <?php
-$onclickA = "Soll die Teilnahme dieses Teilnehmers per E-Mail abgelehnt werden?";
-$onclickB = "Soll diesem Anwärter die Teilnahme per E-Mail zugesichert werden?";
-$onclickC = "Soll dieser Anwärter per E-Mail auf die Warteliste gesetzt werden?";
+$onclickA = 'Soll die Teilnahme dieses Teilnehmers per E-Mail abgelehnt werden?';
+$onclickB = 'Soll diesem Anwärter die Teilnahme per E-Mail zugesichert werden?';
+$onclickC = 'Soll dieser Anwärter per E-Mail auf die Warteliste gesetzt werden?';
 ?>
 
 <div style="margin-left: 15px; margin-right: 15px; position: relative;">
-	<?php if ($this->stateOfSubscription === 'subscription-refused'): ?>
+	<?php if ('subscription-refused' === $this->stateOfSubscription): ?>
 	<div>Status: Dem Anw&auml;rter wurde die Teilnahme verweigert.</div>
 	<?php endif; ?>
 
-	<?php if ($this->stateOfSubscription === 'subscription-accepted'): ?>
+	<?php if ('subscription-accepted' === $this->stateOfSubscription): ?>
 	<div>Status: Dem Anw&auml;rter wurde die Teilnahme zugesagt.</div>
 	<?php endif; ?>
 
-	<?php if ($this->stateOfSubscription === 'subscription-waitlisted'): ?>
+	<?php if ('subscription-waitlisted' === $this->stateOfSubscription): ?>
 	<div>Status: Der Anw&auml;rter befindet sich auf der Warteliste.</div>
 	<?php endif; ?>
 
@@ -24,20 +24,20 @@ $onclickC = "Soll dieser Anwärter per E-Mail auf die Warteliste gesetzt werden?
 <?php if ($this->showEmailButtons): ?>
 <div class="tl_submit_container">
 
-	<?php if ($this->stateOfSubscription !== 'subscription-refused'): ?>
+	<?php if ('subscription-refused' !== $this->stateOfSubscription): ?>
 	<button type="submit" name="refuseWithEmail" id="refuseWithEmail" onclick="if (!confirm('<?= $onclickA ?>'))return false;Backend.getScrollOffset()" class="tl_submit">Ablehnen mit E-Mail</button>
 	<?php endif; ?>
 
-	<?php if ($this->stateOfSubscription !== 'subscription-accepted' && !Markocupic\SacEventToolBundle\CalendarEventsHelper::eventIsFullyBooked($this->objEvent)): ?>
+	<?php if ('subscription-accepted' !== $this->stateOfSubscription && !Markocupic\SacEventToolBundle\CalendarEventsHelper::eventIsFullyBooked($this->objEvent)): ?>
 	<button type="submit" name="acceptWithEmail" id="acceptWithEmail" onclick="if (!confirm('<?= $onclickB ?>'))return false;Backend.getScrollOffset()" class="tl_submit">Zusagen mit E-Mail</button>
 	<?php endif; ?>
 
-	<?php if ($this->stateOfSubscription !== 'subscription-waitlisted'): ?>
+	<?php if ('subscription-waitlisted' !== $this->stateOfSubscription): ?>
 	<button type="submit" name="addToWaitlist" id="addToWaitlist" onclick="if (!confirm('<?= $onclickC ?>'))return false;Backend.getScrollOffset()" class="tl_submit">Auf Warteliste mit E-Mail</button>
 	<?php endif; ?>
 </div>
 
-<?php if (Markocupic\SacEventToolBundle\CalendarEventsHelper::eventIsFullyBooked($this->objEvent) && $this->objEvent->stateOfSubscription !== 'subscription-accepted'): ?>
+<?php if (Markocupic\SacEventToolBundle\CalendarEventsHelper::eventIsFullyBooked($this->objEvent) && 'subscription-accepted' !== $this->objEvent->stateOfSubscription): ?>
 <div class="alert alert-danger">F&uuml;r diesen Anlass ist die maximale Teilnehmerzahl von <?= $this->objEvent->maxMembers ?> Personen erreicht! Es kann keine weitere Anmeldung angenommen werden.</div>
 <?php endif; ?>
 

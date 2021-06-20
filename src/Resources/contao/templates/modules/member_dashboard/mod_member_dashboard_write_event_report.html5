@@ -13,7 +13,7 @@
 <?php endif; ?>
 
 <?php if ($this->hasErrorMessage): ?>
-<?php foreach($this->errorMessages as $msg): ?>
+<?php foreach ($this->errorMessages as $msg): ?>
 <div class="alert alert-danger" role="alert">
 	<?= $msg ?>
 </div>
@@ -23,7 +23,7 @@
 <?php if (!$this->hasErrorMessage): ?>
 <p class="mt-0 mb-0">Dein Bericht für:<p>
 <h4 class="mt-1"><span class="text-primary"><?= $this->eventName ?></span></h4>
-<?php if ($this->executionState === 'event_adapted' && $this->eventSubstitutionText !== ''): ?>
+<?php if ('event_adapted' === $this->executionState && '' !== $this->eventSubstitutionText): ?>
 <h4 class="mt-2" style="color: red">Ausweichtour: <?= $this->eventSubstitutionText ?></h4>
 <?php endif; ?>
 
@@ -48,7 +48,7 @@
 		<a class="btn btn-primary" target="_blank" href="<?= $this->previewLink ?>"><i class="fas fa-desktop"></i> Vorschau</a>
 	</div>
 
-	<?php if ($this->text != '' && $this->publishState < 2): ?>
+	<?php if ('' != $this->text && $this->publishState < 2): ?>
 	<?php $this->insert('write_event_report_change_publish_state_partial', $this->getData()); ?>
 	<?php endif; ?>
 </div>
@@ -69,10 +69,10 @@
 {{br}}
 
 <!-- Start preview -->
-<?php if (strlen((string)$this->text) > 0): ?>
+<?php if (strlen((string) $this->text) > 0): ?>
 <div class="event-info-box icon-box-small">
 	<h5>Bericht</h5>
-	<?= nl2br(html_entity_decode(htmlspecialchars_decode((string)$this->text))) ?>
+	<?= nl2br(html_entity_decode(htmlspecialchars_decode((string) $this->text))) ?>
 </div>
 <?php endif; ?>
 
@@ -83,35 +83,35 @@
 </div>
 <?php endif; ?>
 
-<?php if ($this->tourTechDifficulty !== ''): ?>
+<?php if ('' !== $this->tourTechDifficulty): ?>
 <div class="event-info-box icon-box-small">
 	<h5>Schwierigkeit</h5>
 	<p><?= $this->tourTechDifficulty ?></p>
 </div>
 <?php endif; ?>
 
-<?php if ($this->tourWaypoints !== ''): ?>
+<?php if ('' !== $this->tourWaypoints): ?>
 <div class="event-info-box icon-box-small">
 	<h5>Tourenstationen</h5>
 	<p><?= $this->tourWaypoints ?></p>
 </div>
 <?php endif; ?>
 
-<?php if ($this->tourPublicTransportInfo !== ''): ?>
+<?php if ('' !== $this->tourPublicTransportInfo): ?>
 <div class="event-info-box icon-box-small">
 	<h5>ÖV</h5>
 	<p><?= $this->tourPublicTransportInfo ?></p>
 </div>
 <?php endif; ?>
 
-<?php if ($this->tourHighlights !== ''): ?>
+<?php if ('' !== $this->tourHighlights): ?>
 <div class="event-info-box icon-box-small">
 	<h5>Highlights</h5>
 	<p><?= $this->tourHighlights ?></p>
 </div>
 <?php endif; ?>
 
-<?php if ($this->tourProfile !== ''): ?>
+<?php if ('' !== $this->tourProfile): ?>
 <div class="event-info-box icon-box-small">
 	<h5>Eckdaten</h5>
 	<p><?= $this->tourProfile ?></p>
