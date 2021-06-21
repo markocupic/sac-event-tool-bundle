@@ -12,7 +12,7 @@
         <td class="fw-bold">Event</td>
         <td>
             <p><a href="{{ event_model.eventUrl }}" title="zum Event">"{{ event_model.title }}"</a></p>
-            <p>Event-Datum: {{ event_model.startDate|date("m.d.Y") }}</p>
+            <p>Event-Datum: {{ event_model.startDate|date("d.m.Y") }}</p>
             <p><a href="_download/download_event_ical?eventId={{ event_model.id }}"><span class="badge bg-primary">ICal</span></a></p>
         </td>
     </tr>
@@ -34,7 +34,7 @@
     </tr>
     <tr>
         <td class="fw-bold">Registriert am</td>
-        <td>{{ event_member_model.addedOn|date("m.d.Y h:m") }}</td>
+        <td>{{ event_member_model.addedOn|date("d.m.Y h:m") }}</td>
     </tr>
     <tr>
         <td class="fw-bold">Bemerkungen</td>
