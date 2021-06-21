@@ -27,6 +27,7 @@ use Contao\Folder;
 use Contao\Input;
 use Contao\MemberModel;
 use Contao\StringUtil;
+use Contao\UserModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\ZipBundle\Zip\Zip;
@@ -78,8 +79,12 @@ class TlCalendarEventsStory extends Backend
         $strOrganizers = implode(', ', $arrOrganizers);
 
         // Instructors
-        $arrInstructors = CalendarEventsHelper::getInstructorNamesAsArray($objEvent);
-        $strInstructors = implode(', ', $arrInstructors);
+        $mainInstructorName = CalendarEventsHelper::getMainInstructorName($objEvent);
+        $mainInstructorEmail = '';
+
+        if (null !== ($objInstructor = UserModel::findByPk($objEvent->mainInstructor))) {
+            $mainInstructorEmail = $objInstructor->email;
+        }
 
         $objMember = MemberModel::findBySacMemberId($objArticle->sacMemberId);
         $strAuthorEmail = '';
@@ -123,7 +128,6 @@ class TlCalendarEventsStory extends Backend
         $arrTourTypes = CalendarEventsHelper::getTourTypesAsArray($objEvent, 'title');
 
         $options = ['multiline' => true];
-        $objPhpWord->replace('doPublishClubMagazine', $strDoPublishClubMagazine, $options);
         $objPhpWord->replace('checkedByInstructor', $strCheckedByInstructor, $options);
         $objPhpWord->replace('title', $objArticle->title, $options);
         $objPhpWord->replace('text', $objArticle->text, $options);
@@ -133,7 +137,8 @@ class TlCalendarEventsStory extends Backend
         $objPhpWord->replace('addedOn', date('Y-m-d', (int) $objArticle->addedOn), $options);
         $objPhpWord->replace('tourTypes', implode(', ', $arrTourTypes), $options);
         $objPhpWord->replace('organizers', $strOrganizers, $options);
-        $objPhpWord->replace('instructors', $strInstructors, $options);
+        $objPhpWord->replace('mainInstructorName', $mainInstructorName, $options);
+        $objPhpWord->replace('mainInstructorEmail', $mainInstructorEmail, $options);
         $objPhpWord->replace('eventDates', $strEventDates, $options);
         $objPhpWord->replace('tourWaypoints', $objArticle->tourWaypoints, $options);
         $objPhpWord->replace('keyData', implode("\r\n", $arrKeyData), $options);

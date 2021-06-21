@@ -23,7 +23,6 @@ use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
-use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
 use Contao\EventOrganizerModel;
@@ -193,7 +192,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
-
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
 
@@ -217,29 +215,29 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $sessErrKey = 'contao.FE.error';
 
         if (null === $this->eventModel) {
-            $flash->set($sessInfKey, sprintf('Event mit ID: %s nicht gefunden.', $inputAdapter->get('events') ?: 'NULL'));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventNotFound', [$inputAdapter->get('events') ?: 'NULL'], 'event_default'));
         } elseif ($this->eventModel->disableOnlineRegistration) {
-            $flash->set($sessInfKey, 'Eine Online-Anmeldung zu diesem Event ist nicht möglich.');
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_onlineRegDisabled', [], 'event_default'));
         } elseif ('event_fully_booked' === $this->eventModel->eventState) {
-            $flash->set($sessInfKey, 'Dieser Anlass ist ausgebucht. Bitte erkundige dich beim Leiter, ob eine Nachmeldung möglich ist.');
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventFullyBooked', [], 'event_default'));
         } elseif ('event_canceled' === $this->eventModel->eventState) {
-            $flash->set($sessInfKey, 'Dieser Anlass wurde abgesagt. Es ist keine Anmeldung möglich.');
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventCanceled', [], 'event_default'));
         } elseif ('event_deferred' === $this->eventModel->eventState) {
-            $flash->set($sessInfKey, 'Dieser Anlass ist verschoben worden.');
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventDeferred', [], 'event_default'));
         } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationStartDate > time()) {
-            $flash->set($sessInfKey, sprintf('Anmeldungen für <strong>"%s"</strong> sind erst ab dem %s möglich.', $this->eventModel->title, $dateAdapter->parse('d.m.Y H:i', $this->eventModel->registrationStartDate)));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossibleOn', [$this->eventModel->title, $dateAdapter->parse('d.m.Y H:i', $this->eventModel->registrationStartDate)], 'event_default'));
         } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationEndDate < time()) {
-            $flash->set($sessInfKey, sprintf('Die Anmeldefrist für diesen Event ist am %s abgelaufen.', $dateAdapter->parse('d.m.Y \u\m H:i', $this->eventModel->registrationEndDate)));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationDeadlineExpired', [$dateAdapter->parse('d.m.Y \u\m H:i', $this->eventModel->registrationEndDate)], 'event_default'));
         } elseif (!$this->eventModel->setRegistrationPeriod && $this->eventModel->startDate - 60 * 60 * 24 < time()) {
-            $flash->set($sessInfKey, 'Die Anmeldefrist für diesen Event ist abgelaufen. Du kannst dich bis 24 Stunden vor Event-Beginn anmelden. Nimm gegebenenfalls mit dem Leiter Kontakt auf.');
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossible24BeforeEventStart', [], 'event_default'));
         } elseif ($this->memberModel && true === $calendarEventsHelperAdapter->areBookingDatesOccupied($this->eventModel, $this->memberModel)) {
-            $flash->set($sessInfKey, 'Die Anmeldung zu diesem Event ist nicht möglich, da die Event-Daten sich mit den Daten eines anderen Events überschneiden, wo deine Teilnahme bereits bestätigt ist. Bitte nimm persönlich Kontakt mit dem Touren-/Kursleiter auf, falls du der Ansicht bist, dass keine zeitliche Überschneidung vorliegt und deine Teilnahme an beiden Events möglich ist.');
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventDateOverlapError', [], 'event_default'));
         } elseif (null === $this->mainInstructorModel) {
-            $flash->set($sessErrKey, 'Der Hauptleiter mit ID '.$this->eventModel->mainInstructor.' wurde nicht in der Datenbank gefunden. Bitte nimm persönlich Kontakt mit dem Leiter auf.');
+            $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_mainInstructorNotFound', [$this->eventModel->mainInstructor], 'event_default'));
         } elseif (empty($this->mainInstructorModel->email) || !$validatorAdapter->isEmail($this->mainInstructorModel->email)) {
-            $flash->set($sessErrKey, 'Dem Hauptleiter mit ID '.$this->eventModel->mainInstructor.' ist keine gültige E-Mail zugewiesen. Bitte nimm persönlich mit dem Leiter Kontakt auf.');
+            $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_mainInstructorsEmailAddrNotFound', [$this->eventModel->mainInstructor], 'event_default'));
         } elseif (null !== $this->memberModel && (empty($this->memberModel->email) || !$validatorAdapter->isEmail($this->memberModel->email))) {
-            $flash->set($sessErrKey, 'Leider wurde für dieses Mitgliederkonto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlege auf auf der Internetseite des Zentralverbands deine E-Mail-Adresse.');
+            $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_membersEmailAddrNotFound', [], 'event_default'));
         }
 
         $this->template = $template;

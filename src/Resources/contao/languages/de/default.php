@@ -75,6 +75,20 @@ $GLOBALS['TL_LANG']['MSC']['writeTourReport'] = 'Möchten Sie den Tourenrapport 
 $GLOBALS['TL_LANG']['MSC']['goToPartcipantList'] = 'Möchten Sie zur Teilnehmerliste wechseln?';
 $GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'Möchten Sie das Vergütungsformular bearbeiten/erstellen?';
 
+// Event registration frontend module
+$GLOBALS['TL_LANG']['MSC']['evt_reg_eventNotFound'] = 'Event mit ID: %s nicht gefunden.';
+$GLOBALS['TL_LANG']['MSC']['evt_reg_onlineRegDisabled'] = 'Der Leiter hat die Online-Anmeldung zu diesem Event deaktiviert. Bitte beachte die Tourenauschreibung.';
+$GLOBALS['TL_LANG']['MSC']['evt_reg_eventFullyBooked'] = 'Dieser Anlass ist ausgebucht. Bitte erkundige dich beim Leiter, ob eine Nachmeldung möglich ist.';
+$GLOBALS['TL_LANG']['MSC']['evt_reg_eventCanceled'] = 'Dieser Anlass wurde abgesagt. Es ist keine Anmeldung möglich.';
+$GLOBALS['TL_LANG']['MSC']['evt_reg_eventDeferred'] = 'Dieser Anlass ist verschoben worden.';
+$GLOBALS['TL_LANG']['MSC']['evt_reg_registrationPossibleOn'] = 'Anmeldungen für <strong>"%s"</strong> sind erst ab dem %s möglich.';
+$GLOBALS['TL_LANG']['MSC']['evt_reg_registrationDeadlineExpired'] = 'Die Anmeldefrist für diesen Event ist am %s abgelaufen.';
+$GLOBALS['TL_LANG']['MSC']['evt_reg_registrationPossible24BeforeEventStart'] = 'Die Anmeldefrist für diesen Event ist abgelaufen. Du kannst dich bis 24 Stunden vor Event-Beginn anmelden. Nimm gegebenenfalls mit dem Leiter Kontakt auf.';
+$GLOBALS['TL_LANG']['MSC']['evt_reg_eventDateOverlapError'] = 'Die Anmeldung zu diesem Event ist nicht möglich, da die Event-Daten sich mit den Daten eines anderen Events überschneiden, wo deine Teilnahme bereits bestätigt ist. Bitte nimm persönlich Kontakt mit dem Touren-/Kursleiter auf, falls du der Ansicht bist, dass keine zeitliche Überschneidung vorliegt und deine Teilnahme an beiden Events möglich ist.';
+$GLOBALS['TL_LANG']['MSC']['evt_reg_mainInstructorNotFound'] = 'Der Hauptleiter mit ID "%s" wurde nicht in der Datenbank gefunden. Bitte nimm persönlich Kontakt mit dem Leiter auf.';
+$GLOBALS['TL_LANG']['MSC']['evt_reg_mainInstructorsEmailAddrNotFound'] = 'Dem Hauptleiter mit ID "%s" ist keine gültige E-Mail zugewiesen. Bitte nimm persönlich mit dem Leiter Kontakt auf.';
+$GLOBALS['TL_LANG']['MSC']['evt_reg_membersEmailAddrNotFound'] = 'Leider wurde für dieses Mitgliederkonto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlege auf auf der Internetseite des Zentralverbands deine E-Mail-Adresse.';
+
 // Miscelaneous
 $GLOBALS['TL_LANG']['MSC']['published'] = 'veröffentlicht';
 $GLOBALS['TL_LANG']['MSC']['unpublished'] = 'unveröffentlicht';
