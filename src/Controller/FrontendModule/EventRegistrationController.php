@@ -217,27 +217,27 @@ class EventRegistrationController extends AbstractFrontendModuleController
         if (null === $this->eventModel) {
             $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventNotFound', [$inputAdapter->get('events') ?: 'NULL'], 'event_default'));
         } elseif ($this->eventModel->disableOnlineRegistration) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_onlineRegDisabled', [], 'event_default'));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_onlineRegDisabled', [], 'contao_default'));
         } elseif ('event_fully_booked' === $this->eventModel->eventState) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventFullyBooked', [], 'event_default'));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventFullyBooked', [], 'contao_default'));
         } elseif ('event_canceled' === $this->eventModel->eventState) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventCanceled', [], 'event_default'));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventCanceled', [], 'contao_default'));
         } elseif ('event_deferred' === $this->eventModel->eventState) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventDeferred', [], 'event_default'));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventDeferred', [], 'contao_default'));
         } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationStartDate > time()) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossibleOn', [$this->eventModel->title, $dateAdapter->parse('d.m.Y H:i', $this->eventModel->registrationStartDate)], 'event_default'));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossibleOn', [$this->eventModel->title, $dateAdapter->parse('d.m.Y H:i', $this->eventModel->registrationStartDate)], 'contao_default'));
         } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationEndDate < time()) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationDeadlineExpired', [$dateAdapter->parse('d.m.Y \u\m H:i', $this->eventModel->registrationEndDate)], 'event_default'));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationDeadlineExpired', [$dateAdapter->parse('d.m.Y \u\m H:i', $this->eventModel->registrationEndDate)], 'contao_default'));
         } elseif (!$this->eventModel->setRegistrationPeriod && $this->eventModel->startDate - 60 * 60 * 24 < time()) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossible24BeforeEventStart', [], 'event_default'));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossible24BeforeEventStart', [], 'contao_default'));
         } elseif ($this->memberModel && true === $calendarEventsHelperAdapter->areBookingDatesOccupied($this->eventModel, $this->memberModel)) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventDateOverlapError', [], 'event_default'));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventDateOverlapError', [], 'contao_default'));
         } elseif (null === $this->mainInstructorModel) {
-            $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_mainInstructorNotFound', [$this->eventModel->mainInstructor], 'event_default'));
+            $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_mainInstructorNotFound', [$this->eventModel->mainInstructor], 'contao_default'));
         } elseif (empty($this->mainInstructorModel->email) || !$validatorAdapter->isEmail($this->mainInstructorModel->email)) {
-            $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_mainInstructorsEmailAddrNotFound', [$this->eventModel->mainInstructor], 'event_default'));
+            $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_mainInstructorsEmailAddrNotFound', [$this->eventModel->mainInstructor], 'contao_default'));
         } elseif (null !== $this->memberModel && (empty($this->memberModel->email) || !$validatorAdapter->isEmail($this->memberModel->email))) {
-            $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_membersEmailAddrNotFound', [], 'event_default'));
+            $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_membersEmailAddrNotFound', [], 'contao_default'));
         }
 
         $this->template = $template;
@@ -534,55 +534,55 @@ class EventRegistrationController extends AbstractFrontendModuleController
     {
         $formFields = [
             'ticketInfo' => [
-                'label' => 'Ich besitze ein/eine',
+                'label' => $this->translator->trans('FORM.evt_reg_ticketInfo', [], 'contao_default'),
                 'inputType' => 'select',
                 'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
                 'eval' => ['includeBlankOption' => false, 'mandatory' => true],
             ],
             'carInfo' => [
-                'label' => 'Ich könnte ein Auto mit ... Plätzen (inkl. Fahrer) mitnehmen',
+                'label' => $this->translator->trans('FORM.evt_reg_carInfo', [], 'contao_default'),
                 'inputType' => 'select',
                 'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
                 'eval' => ['includeBlankOption' => true, 'mandatory' => true],
             ],
             'ahvNumber' => [
-                'label' => 'AHV-Nummer',
+                'label' => $this->translator->trans('FORM.evt_reg_ahvNumber', [], 'contao_default'),
                 'inputType' => 'text',
                 'eval' => ['mandatory' => true, 'maxlength' => 16, 'rgxp' => 'alnum', 'placeholder' => '756.1234.5678.97'],
             ],
             'mobile' => [
-                'label' => 'Mobilnummer',
+                'label' => $this->translator->trans('FORM.evt_reg_mobile', [], 'contao_default'),
                 'inputType' => 'text',
                 'eval' => ['mandatory' => false, 'rgxp' => 'phone'],
             ],
             'emergencyPhone' => [
-                'label' => 'Notfalltelefonnummer/In Notfällen zu kontaktieren',
+                'label' => $this->translator->trans('FORM.evt_reg_emergencyPhone', [], 'contao_default'),
                 'inputType' => 'text',
                 'eval' => ['mandatory' => true, 'rgxp' => 'phone'],
             ],
             'emergencyPhoneName' => [
-                'label' => 'Name und Bezug der angehörigen Person, welche im Notfall zu kontaktieren ist',
+                'label' => $this->translator->trans('FORM.evt_reg_emergencyPhoneName', [], 'contao_default'),
                 'inputType' => 'text',
                 'eval' => ['mandatory' => true],
             ],
             'notes' => [
-                'label' => 'Anmerkungen/Erfahrungen/Referenztouren',
+                'label' => $this->translator->trans('FORM.evt_reg_notes', [], 'contao_default'),
                 'inputType' => 'textarea',
                 'eval' => ['mandatory' => true, 'rows' => 4],
                 'class' => '',
             ],
             'foodHabits' => [
-                'label' => 'Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)',
+                'label' => $this->translator->trans('FORM.evt_reg_foodHabits', [], 'contao_default'),
                 'inputType' => 'text',
                 'eval' => ['mandatory' => false],
             ],
             'agb' => [
-                'label' => ['', 'Ich akzeptiere <a href="#" data-bs-toggle="modal" data-bs-target="#agbModal">das Kurs- und Tourenreglement.</a>'],
+                'label' => ['', $this->translator->trans('FORM.evt_reg_agb.1', [], 'contao_default')],
                 'inputType' => 'checkbox',
                 'eval' => ['mandatory' => true],
             ],
             'submit' => [
-                'label' => 'Für Event anmelden',
+                'label' => $this->translator->trans('FORM.evt_reg_submit', [], 'contao_default'),
                 'inputType' => 'submit',
             ],
         ];

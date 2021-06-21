@@ -45,7 +45,7 @@
     <?php if ($this->bookingLimitReaches): ?>
     <div class="alert alert-info" role="alert">
       <i class="fas fa-info-circle"></i>
-      <div>Die maximale Teilnehmerzahl für diesen Event ist bereits erreicht. Wenn du dich trotzdem anmeldest, gelangst du auf die Warteliste und kannst bei Absagen evtl. nachr&uuml;cken. Du kannst selbstverst&auml;ndlich auch mit dem Leiter Kontakt aufnehmen, um Genaueres zu erfahren.</div>
+      <div><?= $this->trans('FORM.evt_reg_bookingLimitReaches') ?></div>
     </div>
     <?php endif; ?>
 
@@ -76,7 +76,7 @@
           <?= $this->objForm->getWidget('mobile')->parse() ?>
           <div class="alert alert-success" role="alert">
             <i class="fas fa-check-circle"></i>
-            <div>Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leergelassen werden. Damit der Leiter dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine <strong>Mobilnummer</strong> zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.</div>
+            <div><?= $this->trans('FORM.evt_reg_mobileExpl') ?></div>
           </div>
           {{br}}
           <?php endif; ?>
@@ -95,7 +95,7 @@
           <?= $this->objForm->getWidget('ahvNumber')->parse() ?>
           <div class="alert alert-success" role="alert">
             <i class="fas fa-check-circle"></i>
-            <div>Sämtliche Daten werden lediglich für interne Zwecke verwendet. Die AHV-Nummer wird ausschliesslich für die Abrechnung oder Rückforderung von Geldern von J+S verwendet. Die persönlichen Daten werden vertraulich behandelt. Eine Weitergabe an Drittorganisationen ist ausgeschlossen.</div>
+            <div><?= $this->trans('FORM.evt_reg_ahvExpl') ?></div>
           </div>
           {{br}}
           <?php endif; ?>
@@ -104,7 +104,7 @@
           <?= $this->objForm->getWidget('notes')->parse() ?>
           <div class="alert alert-success" role="alert">
             <i class="fas fa-check-circle"></i>
-            <div>Bitte beschreibe in wenigen Worten dein Leistungsniveau und/oder beantworte, die in den Anmeldebestimmungen verlangten Angaben. (z.B. bereits absolvierte Referenztouren oder Essgewohnheiten bei Events mit &Uuml;bernachtung, etc.)</div>
+            <div><?= $this->trans('FORM.evt_reg_notesExpl') ?></div>
           </div>
           {{br}}
           <?php endif; ?>
