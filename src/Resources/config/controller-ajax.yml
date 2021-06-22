@@ -1,5 +1,5 @@
 services:
-    Markocupic\SacEventToolBundle\Controller\Ajax\MemberDashboardWriteEventReportController:
+    Markocupic\SacEventToolBundle\Controller\Ajax\MemberDashboardWriteEventArticleController:
         arguments:
             - '@contao.framework'
             - '@contao.csrf.token_manager'

@@ -49,20 +49,20 @@
   </div>
 
   <?php if ('' != $this->text && $this->publishState < 2): ?>
-  <?php $this->insert('write_event_report_change_publish_state_partial', $this->getData()); ?>
+  <?php $this->insert('write_event_article_change_publish_state_partial', $this->getData()); ?>
   <?php endif; ?>
 </div>
 
 <?php if ($this->publishState < 2): ?>
 
 <!-- Modal box tour report form -->
-<?php $this->insert('write_event_report_create_report_form_partial', $this->getData()); ?>
+<?php $this->insert('write_event_article_create_report_form_partial', $this->getData()); ?>
 
 <!-- Modal box photo upload -->
-<?php $this->insert('write_event_report_photoupload_partial', $this->getData()); ?>
+<?php $this->insert('write_event_article_photoupload_partial', $this->getData()); ?>
 
 <!-- Modal box photo details (cation, rotate image, photographer name -->
-<?php $this->insert('write_event_report_image_modal_box_partial', $this->getData()); ?>
+<?php $this->insert('write_event_article_image_modal_box_partial', $this->getData()); ?>
 
 <?php endif; ?>
 
@@ -119,7 +119,7 @@
 <?php endif; ?>
 
 <!-- Start gallery -->
-<?php $this->insert('write_event_report_gallery_partial', $this->getData()); ?>
+<?php $this->insert('write_event_article_gallery_partial', $this->getData()); ?>
 
 <?php if ($this->youtubeId): ?>
 {{br}}

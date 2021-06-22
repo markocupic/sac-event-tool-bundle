@@ -44,7 +44,7 @@
         $(modal).attr('data-item', item);
 
         // Get caption text by xhr request
-        var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/getCaption', {
+        var jqxhr = $.post('ajaxMemberDashboardWriteEventArticle/getCaption', {
           'REQUEST_TOKEN': '{{request_token}}',
           'fileUuid': fileUuid
         }).done(function (json) {
@@ -74,7 +74,7 @@
         $(modal).modal('hide');
 
 
-        var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/setCaption', {
+        var jqxhr = $.post('ajaxMemberDashboardWriteEventArticle/setCaption', {
           'REQUEST_TOKEN': '{{request_token}}',
           'fileUuid': fileUuid,
           'caption': caption,
@@ -107,7 +107,7 @@
         if (elImage.length) {
           var uuid = $(elImage).data('file-uuid');
           if (typeof uuid !== 'undefined') {
-            var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/removeImage', {
+            var jqxhr = $.post('ajaxMemberDashboardWriteEventArticle/removeImage', {
               'REQUEST_TOKEN': '{{request_token}}',
               'eventId': '<?= Contao\Input::get('eventId') ?>',
               'uuid': uuid
@@ -130,7 +130,7 @@
         if (elImage.length) {
           var fileId = $(elImage).data('file-id');
           if (typeof fileId !== 'undefined') {
-            var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/rotateImage', {
+            var jqxhr = $.post('ajaxMemberDashboardWriteEventArticle/rotateImage', {
               'REQUEST_TOKEN': '{{request_token}}',
               //'eventId': '<?= Contao\Input::get('eventId') ?>',
               'fileId': fileId
@@ -161,7 +161,7 @@
           $(collection).each(function (index) {
             arrUuid.push($(this).data('fileUuid'));
           });
-          var jqxhr = $.post('ajaxMemberDashboardWriteEventReport/sortGallery', {
+          var jqxhr = $.post('ajaxMemberDashboardWriteEventArticle/sortGallery', {
             'REQUEST_TOKEN': '{{request_token}}',
             'eventId': '<?= Contao\Input::get('eventId') ?>',
             'uuids': JSON.stringify(arrUuid)

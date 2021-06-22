@@ -42,9 +42,9 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
- * Class MemberDashboardWriteEventReportController.
+ * Class MemberDashboardWriteEventArticleController.
  */
-class MemberDashboardWriteEventReportController extends AbstractController
+class MemberDashboardWriteEventArticleController extends AbstractController
 {
     /**
      * @var ContaoFramework
@@ -72,7 +72,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
     private $tokenName;
 
     /**
-     * MemberDashboardWriteEventReportController constructor.
+     * MemberDashboardWriteEventArticleController constructor.
      * Handles ajax requests.
      * Allow if ...
      * - user is logged in frontend user
@@ -115,12 +115,12 @@ class MemberDashboardWriteEventReportController extends AbstractController
 
         // Do allow only xhr requests
         if (!$request->isXmlHttpRequest()) {
-            throw $this->createNotFoundException('The route "/ajaxMemberDashboardWriteEventReport" is allowed to XMLHttpRequest requests only.');
+            throw $this->createNotFoundException('The route "/ajaxMemberDashboardWriteEventArticle" is allowed to XMLHttpRequest requests only.');
         }
     }
 
     /**
-     * @Route("/ajaxMemberDashboardWriteEventReport/setPublishState", name="sac_event_tool_ajax_member_dashboard_write_event_report_set_publish_state", defaults={"_scope" = "frontend"})
+     * @Route("/ajaxMemberDashboardWriteEventArticle/setPublishState", name="sac_event_tool_ajax_member_dashboard_write_event_article_set_publish_state", defaults={"_scope" = "frontend"})
      */
     public function setPublishStateAction(): JsonResponse
     {
@@ -310,7 +310,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
     }
 
     /**
-     * @Route("/ajaxMemberDashboardWriteEventReport/sortGallery", name="sac_event_tool_ajax_member_dashboard_write_event_report_sort_gallery", defaults={"_scope" = "frontend"})
+     * @Route("/ajaxMemberDashboardWriteEventArticle/sortGallery", name="sac_event_tool_ajax_member_dashboard_write_event_article_sort_gallery", defaults={"_scope" = "frontend"})
      */
     public function sortGalleryAction(): JsonResponse
     {
@@ -365,7 +365,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
 
     /**
      * @throws \Exception
-     * @Route("/ajaxMemberDashboardWriteEventReport/removeImage", name="sac_event_tool_ajax_member_dashboard_write_event_report_remove_image", defaults={"_scope" = "frontend"})
+     * @Route("/ajaxMemberDashboardWriteEventArticle/removeImage", name="sac_event_tool_ajax_member_dashboard_write_event_article_remove_image", defaults={"_scope" = "frontend"})
      */
     public function removeImageAction(): JsonResponse
     {
@@ -448,7 +448,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
     }
 
     /**
-     * @Route("/ajaxMemberDashboardWriteEventReport/rotateImage", name="sac_event_tool_ajax_member_dashboard_write_event_report_rotate_image", defaults={"_scope" = "frontend"})
+     * @Route("/ajaxMemberDashboardWriteEventArticle/rotateImage", name="sac_event_tool_ajax_member_dashboard_write_event_article_rotate_image", defaults={"_scope" = "frontend"})
      */
     public function rotateImageAction(): JsonResponse
     {
@@ -474,7 +474,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
     }
 
     /**
-     * @Route("/ajaxMemberDashboardWriteEventReport/getCaption", name="sac_event_tool_ajax_member_dashboard_write_event_report_get_caption", defaults={"_scope" = "frontend"})
+     * @Route("/ajaxMemberDashboardWriteEventArticle/getCaption", name="sac_event_tool_ajax_member_dashboard_write_event_article_get_caption", defaults={"_scope" = "frontend"})
      */
     public function getCaptionAction(): JsonResponse
     {
@@ -527,7 +527,7 @@ class MemberDashboardWriteEventReportController extends AbstractController
     }
 
     /**
-     * @Route("/ajaxMemberDashboardWriteEventReport/setCaption", name="sac_event_tool_ajax_member_dashboard_write_event_report_set_caption", defaults={"_scope" = "frontend"})
+     * @Route("/ajaxMemberDashboardWriteEventArticle/setCaption", name="sac_event_tool_ajax_member_dashboard_write_event_article_set_caption", defaults={"_scope" = "frontend"})
      */
     public function setCaptionAction(): JsonResponse
     {

@@ -81,7 +81,7 @@
         formData.append('eventId', urlParams.get('eventId'));
 
         // Fetch
-        fetch('ajaxMemberDashboardWriteEventReport/setPublishState', {
+        fetch('ajaxMemberDashboardWriteEventArticle/setPublishState', {
           method: 'POST',
           headers: {
             'x-requested-with': 'XMLHttpRequest'

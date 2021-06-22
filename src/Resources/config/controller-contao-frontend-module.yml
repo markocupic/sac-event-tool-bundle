@@ -70,12 +70,16 @@ services:
         public: true
 
     # Member dashboard module: display the forms for writing new event reports
-    Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardWriteEventReportController:
+    Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardWriteEventArticleController:
+        arguments:
+            - '@contao.framework'
+            - '@translator'
+            - '@security.helper'
+            - '%kernel.project_dir%'
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
         public: true
 
     # Member dashboard module: display the forms for editing the member profile
