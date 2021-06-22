@@ -45,6 +45,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -57,6 +58,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_write_event_article';
+
+    /**
+     * @var FrontendUser
+     */
+    protected $objUser;
+
+    /**
+     * @var Template
+     */
+    protected $template;
+
+    /**
+     * @var PageModel
+     */
+    protected $objPage;
 
     /**
      * @var ContaoFramework
@@ -78,28 +94,12 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
      */
     private $projectDir;
 
-    /**
-     * @var FrontendUser
-     */
-    protected $objUser;
-
-    /**
-     * @var Template
-     */
-    protected $template;
-
-    /**
-     * @var PageModel
-     */
-    protected $objPage;
-
     public function __construct(ContaoFramework $framework, TranslatorInterface $translator, Security $security, string $projectDir)
     {
         $this->framework = $framework;
         $this->translator = $translator;
         $this->security = $security;
         $this->projectDir = $projectDir;
-
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
@@ -125,10 +125,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
 
     public static function getSubscribedServices(): array
     {
-        $services = parent::getSubscribedServices();
-
-
-        return $services;
+        return parent::getSubscribedServices();
     }
 
     /**
@@ -170,13 +167,13 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
 
         // Handle messages
         if (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email)) {
-            $messageAdapter->addInfo('Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
+            $messageAdapter->addInfo($this->translator->trans('ERR.md_write_event_article_emailAddressNotFound', [], 'contao_default'));
         }
 
         $objEvent = $calendarEventsModelAdapter->findByPk($inputAdapter->get('eventId'));
 
         if (null === $objEvent) {
-            $messageAdapter->addError(sprintf('Event mit ID %s nicht gefunden.', $inputAdapter->get('eventId')));
+            $messageAdapter->addError($this->translator->trans('ERR.md_write_event_article_eventNotFound', [$inputAdapter->get('eventId')], 'contao_default'));
         }
 
         if (!$messageAdapter->hasError()) {
@@ -186,7 +183,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             if (null === $objReportModel) {
                 if ($objEvent->endDate + $model->timeSpanForCreatingNewEventStory * 24 * 60 * 60 < time()) {
                     // Do not allow blogging for old events
-                    $messageAdapter->addError('Für diesen Event kann kein Bericht mehr erstellt werden. Das Eventdatum liegt bereits zu lange zurück.');
+                    $messageAdapter->addError($this->translator->trans('ERR.md_write_event_article_createArticleDeadlineExpired', [], 'contao_default'));
                 }
 
                 if (!$messageAdapter->hasError()) {
@@ -203,7 +200,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
 
                     // User has not participated on the event neither as guide nor as participant and is not allowed to write a report
                     if (!$blnAllow) {
-                        $messageAdapter->addError('Du hast keine Berechtigung für diesen Event einen Bericht zu verfassen');
+                        $messageAdapter->addError($this->translator->trans('ERR.md_write_event_article_writingPermissionDenied', [], 'contao_default'));
                     }
                 }
             }
@@ -297,7 +294,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         // Check if all images are labeled with a legend and a photographer name
         if ($objReportModel && $objReportModel->publishState < 2) {
             if (!$this->validateImageUploads($objReportModel)) {
-                $messageAdapter->addInfo('Es fehlen noch eine oder mehrere Bildlegenden oder der Fotografen-Name. Bitte ergänze diese Pflichtangaben, damit der Bericht veröffentlicht werden kann.');
+                $messageAdapter->addInfo($this->translator->trans('ERR.md_write_event_article_missingImageLegend', [], 'contao_default'));
             }
         }
 
@@ -498,9 +495,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
 
             // Check mandatory fields
             if ('' === $objForm->getWidget('text')->value) {
-                $objForm->getWidget('text')
-                    ->addError('Bitte schreibe etwas zur Tour.')
-                ;
+                $objForm->getWidget('text')->addError($this->translator->trans('ERR.md_write_event_article_writeSomethingAboutTheEvent', [], 'contao_default'));
                 $hasErrors = true;
             }
 
@@ -571,7 +566,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             $arrData = $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent);
 
             if (empty($arrData)) {
-                return 'keine Angabe';
+                return $this->translator->trans('ERR.md_write_event_article_notSpecified', [], 'contao_default');
             }
 
             return implode("\r\n", $arrData);
@@ -632,7 +627,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         }
 
         if (null === $objUploadFolder) {
-            $messageAdapter->addError('Uploadverzeichnis nicht gefunden.');
+            $messageAdapter->addError($this->translator->trans('ERR.md_write_event_article_uploadDirNotFound', [], 'contao_default'));
 
             return;
         }
