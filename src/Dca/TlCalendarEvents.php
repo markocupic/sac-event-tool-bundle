@@ -867,7 +867,7 @@ class TlCalendarEvents extends \tl_calendar_events
 
         // Show all allowed fields
         foreach ($fields as $i) {
-            if (!\in_array($i, $allowedFields, true) || 'password' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] || $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['doNotShow'] || $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['hideInput']) {
+            if (!\in_array($i, $allowedFields, true) || 'password' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] || (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['doNotShow']) && $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['doNotShow']) || (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['hideInput']) && $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['hideInput'])) {
                 continue;
             }
 
@@ -879,7 +879,7 @@ class TlCalendarEvents extends \tl_calendar_events
             $value = StringUtil::deserialize($row[$i]);
 
             // Decrypt the value
-            if ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['encrypt']) {
+            if (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['encrypt']) && true === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['encrypt']) {
                 $value = Encryption::decrypt($value);
             }
 
@@ -1023,7 +1023,7 @@ class TlCalendarEvents extends \tl_calendar_events
                 $row[$i] = $value ? Date::parse(Config::get('dateFormat'), $value) : '-';
             } elseif ('time' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp']) {
                 $row[$i] = $value ? Date::parse(Config::get('timeFormat'), $value) : '-';
-            } elseif ('datim' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] || \in_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['flag'], [5, 6, 7, 8, 9, 10], false) || 'tstamp' === $i) {
+            } elseif ('datim' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] || (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['flag']) && \in_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['flag'], [5, 6, 7, 8, 9, 10], false)) || 'tstamp' === $i) {
                 $row[$i] = $value ? Date::parse(Config::get('datimFormat'), $value) : '-';
             } elseif ('checkbox' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] && !$GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['multiple']) {
                 $row[$i] = $value ? $GLOBALS['TL_LANG']['MSC']['yes'] : $GLOBALS['TL_LANG']['MSC']['no'];
@@ -1031,9 +1031,9 @@ class TlCalendarEvents extends \tl_calendar_events
                 $row[$i] = Idna::decodeEmail($value);
             } elseif ('textarea' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] && ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['allowHtml'] || $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['preserveTags'])) {
                 $row[$i] = StringUtil::specialchars($value);
-            } elseif (\is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'])) {
+            } elseif (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference']) && \is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'])) {
                 $row[$i] = isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]]) ? (\is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]]) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]][0] : $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]]) : $row[$i];
-            } elseif ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['isAssociative'] || array_is_assoc($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options'])) {
+            } elseif ((isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['isAssociative']) && $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['isAssociative']) || (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options']) && array_is_assoc($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options']))) {
                 $row[$i] = $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options'][$row[$i]];
             } else {
                 $row[$i] = $value;

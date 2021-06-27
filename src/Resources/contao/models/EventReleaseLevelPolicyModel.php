@@ -494,7 +494,7 @@ class EventReleaseLevelPolicyModel extends Model
 	 * @param $level
 	 * @return static
 	 */
-	public function findOneByPidAndLevel($pid, $level = null)
+	public static function findOneByPidAndLevel($pid, $level = null)
 	{
 		$t = static::$strTable;
 		$arrColumns = array();

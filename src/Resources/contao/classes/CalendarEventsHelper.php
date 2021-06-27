@@ -976,7 +976,7 @@ class CalendarEventsHelper
 	 * @param $objEvent
 	 * @return string
 	 */
-	public function getEventStateOfSubscriptionBadgesString($objEvent)
+	public static function getEventStateOfSubscriptionBadgesString($objEvent)
 	{
 		$strRegistrationsBadges = '';
 		$intNotConfirmed = 0;

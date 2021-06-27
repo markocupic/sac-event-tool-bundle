@@ -26,7 +26,7 @@ class EventReleaseLevelPolicyPackageModel extends Model
 	/**
 	 * @param $eventId
 	 */
-	public function findReleaseLevelPolicyPackageModelByEventId($eventId)
+	public static function findReleaseLevelPolicyPackageModelByEventId($eventId)
 	{
 		$objEvent = CalendarEventsModel::findByPk($eventId);
 
