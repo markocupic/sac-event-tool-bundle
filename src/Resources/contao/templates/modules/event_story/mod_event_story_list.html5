@@ -46,8 +46,9 @@
         'readerModuleId': '336',
         'perPage': '<?= $this->perPage ?>',
         'itemIds': [<?= implode(',', $this->arrAllIds) ?>],
-  }
-  });
+        'language': '<?= $this->language ?>',
+      }
+    });
   }, false);
 </script>
 

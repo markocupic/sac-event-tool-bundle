@@ -42,12 +42,17 @@ class EventStoryListController extends AbstractFrontendModuleController
     /**
      * @var CalendarEventsStoryModel
      */
-    protected $stories;
+    private $stories;
 
     /**
      * @var bool
      */
-    protected $isAjaxRequest;
+    private $isAjaxRequest;
+
+    /**
+     * @var PageModel
+     */
+    private $page;
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
@@ -59,7 +64,10 @@ class EventStoryListController extends AbstractFrontendModuleController
 
         /** @var Environment $environmentAdapter */
         $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+
         $this->isAjaxRequest = $environmentAdapter->get('isAjaxRequest');
+
+        $this->page = $page;
 
         $arrIDS = [];
         $arrOptions = ['order' => 'addedOn DESC'];
@@ -126,6 +134,8 @@ class EventStoryListController extends AbstractFrontendModuleController
 
         /** @var PageModel $pageModelAdapter */
         $pageModelAdapter = $this->get('contao.framework')->getAdapter(PageModel::class);
+
+        $template->language = $this->page->language;
 
         $template->isAjaxRequest = $this->isAjaxRequest;
 
