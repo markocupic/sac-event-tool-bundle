@@ -47,7 +47,7 @@ use Haste\Form;
 use League\Csv\CharsetConverter;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use MultiColumnWizard;
+use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
 
 /**
  * Class TlCalendarEvents.
