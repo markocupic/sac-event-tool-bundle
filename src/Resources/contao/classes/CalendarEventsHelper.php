@@ -212,7 +212,8 @@ class CalendarEventsHelper
 				$value = static::getTourProfileAsArray($objEvent);
 				break;
 			case 'gallery':
-				$value = static::getGallery(array(
+                $value = static::getGallery(array(
+                    'aha' => 'bla',
 					'multiSRC'   => $objEvent->multiSRC,
 					'orderSRC'   => $objEvent->orderSRC,
 					'sortBy'     => 'custom',
@@ -571,17 +572,21 @@ class CalendarEventsHelper
 	public static function getGallery(array $arrData): string
 	{
 		$arrData['type'] = 'gallery';
+		$arrData['tstamp'] = time();
 
 		if (!isset($arrData['perRow']) || $arrData['perRow'] < 1)
 		{
 			$arrData['perRow'] = 1;
 		}
 
-		$objModel = new ContentModel();
+
+        $objModel = new ContentModel();
 		$objModel->setRow($arrData);
 
-		$objGallery = new ContentGallery($objModel);
+		$objGallery = new ContentGallery($objModel, 'main');
 		$strBuffer = $objGallery->generate();
+
+		$objModel->delete();
 
 		// HOOK: add custom logic
 		if (isset($GLOBALS['TL_HOOKS']['getContentElement']) && \is_array($GLOBALS['TL_HOOKS']['getContentElement']))
