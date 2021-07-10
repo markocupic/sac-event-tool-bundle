@@ -115,7 +115,7 @@ class ItemWatcher {
         fetchList: function fetchList() {
 
           let self = this;
-          let url = '/_mc_cc_api/public-modules?id=' + self.options.params.listModuleId + '&page_e' + self.options.params.listModuleId + '=' + self.currentPage + '&_locale=' + self.options.params.language;
+          let url = '/_mc_cc_api/07d49d1bc6e9fd8bcaabead11b4f75e0/show?id=' + self.options.params.listModuleId + '&page_e' + self.options.params.listModuleId + '=' + self.currentPage + '&_locale=' + self.options.params.language;
 
           fetch(url, {
 
@@ -192,7 +192,7 @@ class ItemWatcher {
           // Use referer param to generate qrcode in EventStoryReaderController
           let referer = btoa(window.location.href);
 
-          let url = '/_mc_cc_api/public-modules?id=' + self.options.params.readerModuleId + '&items=' + self.currentItemId + '&referer=' + referer +' &_locale=' + self.options.params.language;
+          let url = '/_mc_cc_api/07d49d1bc6e9fd8bcaabead11b4f75e0/show?id=' + self.options.params.readerModuleId + '&items=' + self.currentItemId + '&referer=' + referer +' &_locale=' + self.options.params.language;
 
           fetch(url, {
               method: "GET",
