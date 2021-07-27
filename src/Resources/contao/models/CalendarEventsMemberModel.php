@@ -104,7 +104,9 @@ class CalendarEventsMemberModel extends Model
 
 				if ($objUser !== null)
 				{
-					$objJoinedEventsAsInstructor = Database::getInstance()->prepare("SELECT * FROM tl_calendar_events_instructor WHERE userId=?")->execute($objUser->id);
+					$objJoinedEventsAsInstructor = Database::getInstance()
+                        ->prepare("SELECT * FROM tl_calendar_events_instructor WHERE userId=?")
+                        ->execute($objUser->id);
 
 					if ($objJoinedEventsAsInstructor->numRows)
 					{

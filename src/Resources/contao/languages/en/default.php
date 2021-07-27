@@ -75,16 +75,16 @@ $GLOBALS['TL_LANG']['MSC']['writeTourReport'] = 'Möchten Sie den Tourenrapport 
 $GLOBALS['TL_LANG']['MSC']['goToPartcipantList'] = 'Möchten Sie zur Teilnehmerliste wechseln?';
 $GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'Möchten Sie das Vergütungsformular bearbeiten/erstellen?';
 
-// Member dasboar write event article frontend module
-$GLOBALS['TL_LANG']['ERR']['ERR.md_write_event_article_mailAddressNotFound'] = 'Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
-$GLOBALS['TL_LANG']['ERR']['ERR.md_write_event_article_eventNotFound'] = 'Event mit ID %s nicht gefunden.';
-$GLOBALS['TL_LANG']['ERR']['ERR.md_write_event_article_createArticleDeadlineExpired'] = 'Für diesen Event kann kein Bericht mehr erstellt werden. Das Eventdatum liegt bereits zu lange zurück.';
-$GLOBALS['TL_LANG']['ERR']['ERR.md_write_event_article_writingPermissionDenied'] = 'Du hast keine Berechtigung für diesen Event einen Bericht zu verfassen';
-$GLOBALS['TL_LANG']['ERR']['ERR.md_write_event_article_missingImageLegend'] = 'Es fehlen noch eine oder mehrere Bildlegenden oder der Fotografen-Name. Bitte ergänze diese Pflichtangaben, damit der Bericht veröffentlicht werden kann.';
-$GLOBALS['TL_LANG']['ERR']['ERR.md_write_event_article_uploadDirNotFound'] = 'Bild-Upload-Verzeichnis nicht gefunden';
-$GLOBALS['TL_LANG']['ERR']['ERR.md_write_event_article_notSpecified'] = 'keine Angabe';
-$GLOBALS['TL_LANG']['ERR']['ERR.md_write_event_article_writeSomethingAboutTheEvent'] = 'Bitte schreibe in einigen Sätzen etwas zum Event.';
-$GLOBALS['TL_LANG']['ERR']['ERR.md_write_event_article_uploadDirNotFound'] = '';
+// Member dashboard write event article frontend module
+$GLOBALS['TL_LANG']['ERR']['md_write_event_article_mailAddressNotFound'] = 'Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
+$GLOBALS['TL_LANG']['ERR']['md_write_event_article_eventNotFound'] = 'Event mit ID %s nicht gefunden.';
+$GLOBALS['TL_LANG']['ERR']['md_write_event_article_createArticleDeadlineExpired'] = 'Für diesen Event kann kein Bericht mehr erstellt werden. Das Eventdatum liegt bereits zu lange zurück.';
+$GLOBALS['TL_LANG']['ERR']['md_write_event_article_writingPermissionDenied'] = 'Du hast keine Berechtigung für diesen Event einen Bericht zu verfassen';
+$GLOBALS['TL_LANG']['ERR']['md_write_event_article_missingImageLegend'] = 'Es fehlen noch eine oder mehrere Bildlegenden oder der Fotografen-Name. Bitte ergänze diese Pflichtangaben, damit der Bericht veröffentlicht werden kann.';
+$GLOBALS['TL_LANG']['ERR']['md_write_event_article_uploadDirNotFound'] = 'Bild-Upload-Verzeichnis nicht gefunden';
+$GLOBALS['TL_LANG']['ERR']['md_write_event_article_notSpecified'] = 'keine Angabe';
+$GLOBALS['TL_LANG']['ERR']['md_write_event_article_writeSomethingAboutTheEvent'] = 'Bitte schreibe in einigen Sätzen etwas zum Event.';
+$GLOBALS['TL_LANG']['ERR']['md_write_event_article_uploadDirNotFound'] = '';
 
 
 

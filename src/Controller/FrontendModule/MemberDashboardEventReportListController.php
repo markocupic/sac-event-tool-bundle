@@ -138,7 +138,9 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
 
         if (null !== $this->objUser) {
             // Event Stories
-            $objEventStory = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? ORDER BY eventStartDate DESC')->execute($this->objUser->sacMemberId);
+            $objEventStory = $databaseAdapter->getInstance()
+                ->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? ORDER BY eventStartDate DESC')
+                ->execute($this->objUser->sacMemberId);
 
             while ($objEventStory->next()) {
                 $arrEventStory = $objEventStory->row();
