@@ -90,7 +90,7 @@ class UpcomingEventsController extends AbstractController
         $sacEvtConfig = $configAdapter->get('SAC-EVENT-TOOL-CONFIG');
 
         if (!isset($sacEvtConfig['SECTION_IDS'][$section])) {
-            return new Response('Section with ID '.$sectionName.' not found. Please use a valid section ID like '.implode(', ', array_keys($sacEvtConfig['SECTION_IDS'])).'.');
+            return new Response('Section with ID '.$section.' not found. Please use a valid section ID like '.implode(', ', array_keys($sacEvtConfig['SECTION_IDS'])).'.');
         }
 
         $sectionName = $sacEvtConfig['SECTION_IDS'][$section];
@@ -225,6 +225,7 @@ class UpcomingEventsController extends AbstractController
                     $qb->expr()->andX("t.eventType = 'tour'"),
                     $qb->expr()->andX("t.eventType = 'course'"),
                     $qb->expr()->andX("t.eventType = 'lastMinuteTour'"),
+                    $qb->expr()->andX("t.eventType = 'tour'"),
                 )
             )
         ;
