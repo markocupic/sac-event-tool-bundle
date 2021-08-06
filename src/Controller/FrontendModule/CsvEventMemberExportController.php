@@ -129,12 +129,6 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
             'eval' => ['rgxp' => 'date', 'mandatory' => true],
         ]);
 
-        $objForm->addFormField('endDate', [
-            'label' => 'Enddatum',
-            'inputType' => 'text',
-            'eval' => ['rgxp' => 'date', 'mandatory' => true],
-        ]);
-
         $objForm->addFormField('mountainguide', [
             'label' => ['Bergführer', 'Nur Events mit Bergführer exportieren'],
             'inputType' => 'checkbox',
