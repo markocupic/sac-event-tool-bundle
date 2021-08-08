@@ -66,7 +66,11 @@ class GetSystemMessagesListener
             $objUser = $backendUserAdapter->getInstance();
 
             if ($objUser->id > 0) {
-                $objEvent = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE (mainInstructor=? OR registrationGoesTo=?) AND startDate>? ORDER BY startDate')->execute($objUser->id, $objUser->id, time() - 3 * 30 * 24 * 3600);
+                // Dashboard: List all events where user acts as an instructor or where registration goes to the logged in user.
+                $objEvent = $databaseAdapter->getInstance()
+                    ->prepare('SELECT * FROM tl_calendar_events AS t1 WHERE (t1.registrationGoesTo=? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId=?)) AND t1.startDate>? ORDER BY t1.startDate')
+                    ->execute($objUser->id, $objUser->id, time() - 3 * 30 * 24 * 3600)
+                ;
 
                 if ($objEvent->numRows) {
                     $strBuffer .= '<h3>'.$GLOBALS['TL_LANG']['MSC']['yourUpcomingEvents'].'</h3>';

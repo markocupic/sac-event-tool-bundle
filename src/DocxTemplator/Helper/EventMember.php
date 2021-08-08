@@ -114,7 +114,7 @@ class EventMember
                         $emergencyPhone = $objMember->emergencyPhone;
                     }
 
-                    $emergencyPhoneName = $objUserModel->emergencyPhone;
+                    $emergencyPhoneName = $objUserModel->emergencyPhoneName;
 
                     if (empty($emergencyPhoneName) && null !== $objMember) {
                         $emergencyPhoneName = $objMember->emergencyPhoneName;
