@@ -30,42 +30,42 @@ class SyncSacMemberDatabase
     /**
      * Log type for new member.
      */
-    const SAC_EVT_LOG_ADD_NEW_MEMBER = 'MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER';
+    public const SAC_EVT_LOG_ADD_NEW_MEMBER = 'MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER';
 
     /**
      * Log type for member update.
      */
-    const SAC_EVT_LOG_UPDATE_MEMBER = 'MEMBER_DATABASE_SYNC_UPDATE_MEMBER';
+    public const SAC_EVT_LOG_UPDATE_MEMBER = 'MEMBER_DATABASE_SYNC_UPDATE_MEMBER';
 
     /**
      * Log type for a successful sync.
      */
-    const SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC = 'MEMBER_DATABASE_SYNC';
+    public const SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC = 'MEMBER_DATABASE_SYNC';
 
     /**
      * Log type if a member has been disabled.
      */
-    const SAC_EVT_LOG_DISABLE_MEMBER = 'DISABLE_MEMBER';
+    public const SAC_EVT_LOG_DISABLE_MEMBER = 'DISABLE_MEMBER';
 
     /**
      * Log type if there is db transaction error.
      */
-    const SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR = 'MEMBER_DATABASE_TRANSACTION_ERROR';
+    public const SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR = 'MEMBER_DATABASE_TRANSACTION_ERROR';
 
     /**
      * FTP db dump filepath.
      */
-    const FTP_DB_DUMP_FILE_PATH = 'system/tmp/Adressen_0000%s.csv';
+    public const FTP_DB_DUMP_FILE_PATH = 'system/tmp/Adressen_0000%s.csv';
 
     /**
      * End of file string.
      */
-    const FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
+    public const FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
 
     /**
      * Field delimiter.
      */
-    const FTP_DB_DUMP_FIELD_DELIMITER = '$';
+    public const FTP_DB_DUMP_FIELD_DELIMITER = '$';
     /**
      * @var ContaoFramework
      */
@@ -356,6 +356,7 @@ class SyncSacMemberDatabase
             $set = [
                 'isSacMember' => '1',
                 'disable' => '',
+                'login' => '1'
             ];
 
             if (!empty($arrSacMemberIds)) {
@@ -389,6 +390,7 @@ class SyncSacMemberDatabase
                 'tstamp' => time(),
                 'disable' => '1',
                 'isSacMember' => '',
+                'login' => ''
             ];
             Database::getInstance()->prepare('UPDATE tl_member %s WHERE id=?')->set($arrSet)->execute($objDisabledMember->id);
 
@@ -408,7 +410,8 @@ class SyncSacMemberDatabase
             $duration = time() - $startTime;
 
             // Log
-            $msg = sprintf('Finished syncing SAC member database with tl_member. Traversed %s entries. Total inserts: %s. Total updates: %s. Duration: %s s.',
+            $msg = sprintf(
+                'Finished syncing SAC member database with tl_member. Traversed %s entries. Total inserts: %s. Total updates: %s. Duration: %s s.',
                 \count($arrMember),
                 $countInserts,
                 $countUpdates,
