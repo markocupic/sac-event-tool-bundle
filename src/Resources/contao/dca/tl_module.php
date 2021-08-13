@@ -10,9 +10,9 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardWriteEventArticleController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationCheckoutLinkController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardWriteEventArticleController;
 use Markocupic\SacEventToolBundle\Dca\TlModule;
 
 /**

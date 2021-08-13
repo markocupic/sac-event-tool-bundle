@@ -14,9 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\SacMemberDatabase;
 
-use Contao\CalendarEventsMemberModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Database;
 use Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;

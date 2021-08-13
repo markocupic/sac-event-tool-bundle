@@ -36,7 +36,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class EventApiController extends AbstractController
 {
-    const CACHE_MAX_AGE = 180;
+    public const CACHE_MAX_AGE = 180;
 
     /**
      * @var ContaoFramework

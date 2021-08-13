@@ -25,6 +25,7 @@ use Contao\Folder;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\System;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Psr\Log\LogLevel;
 
 /**
@@ -168,7 +169,8 @@ class ClearFrontendUserData
             $logger = $container->get('monolog.logger.contao');
             $logger->log(
                 LogLevel::INFO,
-                sprintf('Login for member with ID:%s [%s] has been deactivated.',
+                sprintf(
+                    'Login for member with ID:%s [%s] has been deactivated.',
                     $objMember->id,
                     $objMember->sacMemberId
                 ),
@@ -240,7 +242,7 @@ class ClearFrontendUserData
                             continue;
                         }
 
-                        if ('subscription-refused' === $objEventsMember->stateOfSubscription) {
+                        if (EventSubscriptionLevel::SUBSCRIPTION_REFUSED === $objEventsMember->stateOfSubscription) {
                             continue;
                         }
 

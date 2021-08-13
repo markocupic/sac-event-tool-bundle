@@ -37,24 +37,26 @@ use Contao\MemberModel;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
+use Contao\Template;
 use Contao\TourDifficultyModel;
 use Contao\TourTypeModel;
 use Contao\UserModel;
 use Haste\Util\Url;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 
 /**
  * Class CalendarEventsHelper
  */
 class CalendarEventsHelper
 {
-	/**
-	 * @param CalendarEventsModel $objEvent
-	 * @param $strProperty
-	 * @param  null                                            $objTemplate
-	 * @return array|bool|CalendarEventsModel|int|mixed|string
-	 * @throws \Exception
-	 */
-	public static function getEventData(CalendarEventsModel $objEvent, $strProperty, $objTemplate = null)
+    /**
+     * @param CalendarEventsModel $objEvent
+     * @param string $strProperty
+     * @param Template|null $objTemplate
+     * @return array|bool|CalendarEventsModel|int|mixed|string|null
+     * @throws \Exception
+     */
+	public static function getEventData(CalendarEventsModel $objEvent, string $strProperty, ?Template $objTemplate = null)
 	{
 		// Load language files
 		Controller::loadLanguageFile('tl_calendar_events');
@@ -212,8 +214,8 @@ class CalendarEventsHelper
 				$value = static::getTourProfileAsArray($objEvent);
 				break;
 			case 'gallery':
-                $value = static::getGallery(array(
-                    'aha' => 'bla',
+				$value = static::getGallery(array(
+					'aha' => 'bla',
 					'multiSRC'   => $objEvent->multiSRC,
 					'orderSRC'   => $objEvent->orderSRC,
 					'sortBy'     => 'custom',
@@ -349,7 +351,9 @@ class CalendarEventsHelper
 		}
 
 		$objDb = Database::getInstance();
-		$objEventsMember = $objDb->prepare('SELECT COUNT(id) AS registrationCount FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
+		$objEventsMember = $objDb->prepare('SELECT COUNT(id) AS registrationCount FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')
+			->execute($objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED)
+		;
 		$registrationCount = $objEventsMember->registrationCount;
 
 		// Event canceled
@@ -399,7 +403,7 @@ class CalendarEventsHelper
 	{
 		if ($objEvent !== null)
 		{
-			$objEventsMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
+			$objEventsMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED);
 			$registrationCount = $objEventsMember->numRows;
 
 			if ($objEvent->eventState === 'event_fully_booked' || ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers))
@@ -579,8 +583,7 @@ class CalendarEventsHelper
 			$arrData['perRow'] = 1;
 		}
 
-
-        $objModel = new ContentModel();
+		$objModel = new ContentModel();
 		$objModel->setRow($arrData);
 
 		$objGallery = new ContentGallery($objModel, 'main');
@@ -944,7 +947,9 @@ class CalendarEventsHelper
 		if ($objEvent !== null)
 		{
 			$objDb = Database::getInstance();
-			$calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? && stateOfSubscription=?')->execute($objEvent->id, 'subscription-accepted');
+			$calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? && stateOfSubscription=?')
+				->execute($objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED)
+			;
 			$memberCount = $calendarEventsMember->numRows;
 
 			if ($objEvent->eventState === 'event_canceled')
@@ -996,27 +1001,27 @@ class CalendarEventsHelper
 		{
 			while ($eventsMemberModel->next())
 			{
-				if ($eventsMemberModel->stateOfSubscription === 'subscription-not-confirmed')
+				if ($eventsMemberModel->stateOfSubscription === EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED)
 				{
 					$intNotConfirmed++;
 				}
 
-				if ($eventsMemberModel->stateOfSubscription === 'subscription-accepted')
+				if ($eventsMemberModel->stateOfSubscription === EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED)
 				{
 					$intAccepted++;
 				}
 
-				if ($eventsMemberModel->stateOfSubscription === 'subscription-refused')
+				if ($eventsMemberModel->stateOfSubscription === EventSubscriptionLevel::SUBSCRIPTION_REFUSED)
 				{
 					$intRefused++;
 				}
 
-				if ($eventsMemberModel->stateOfSubscription === 'subscription-waitlisted')
+				if ($eventsMemberModel->stateOfSubscription === EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED)
 				{
 					$intWaitlisted++;
 				}
 
-				if ($eventsMemberModel->stateOfSubscription === 'user-has-unsubscribed')
+				if ($eventsMemberModel->stateOfSubscription === EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED)
 				{
 					$intUnsubscribedUser++;
 				}
@@ -1113,7 +1118,7 @@ class CalendarEventsHelper
 
 		// Get all future events of the member
 		$objMemberEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId!=? AND contaoMemberId=? AND stateOfSubscription=? AND hasParticipated=?')
-			->execute($objEvent->id, $objMember->id, 'subscription-accepted', '');
+			->execute($objEvent->id, $objMember->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED, '');
 
 		while ($objMemberEvents->next())
 		{

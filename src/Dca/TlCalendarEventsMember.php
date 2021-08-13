@@ -39,6 +39,7 @@ use Haste\Form\Form;
 use League\Csv\CharsetConverter;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use NotificationCenter\Model\Notification;
 
 /**
@@ -224,7 +225,7 @@ class TlCalendarEventsMember extends Backend
                     }
 
                     $memberState = (string) $objDb->stateOfSubscription;
-                    $memberState = \in_array($memberState, $arrSubscriptionStates, true) ? $memberState : 'subscription-state-undefined';
+                    $memberState = \in_array($memberState, $arrSubscriptionStates, true) ? $memberState : EventSubscriptionLevel::SUBSCRIPTION_STATE_UNDEFINED;
                     $strLabel = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$memberState] ?? $memberState;
                     $options['tl_calendar_events_member-'.$objDb->id] = $objDb->firstname.' '.$objDb->lastname.' ('.$strLabel.')';
                 }
@@ -514,13 +515,22 @@ class TlCalendarEventsMember extends Backend
         $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
 
         if (null !== $objEventMemberModel) {
-            $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
+            // Retrieve the event id from CURRENT_ID if we have a new entry.
+            $eventId = !empty($objEventMemberModel->eventId) ? $objEventMemberModel->eventId : CURRENT_ID;
+            $objEvent = CalendarEventsModel::findByPk($eventId);
 
             if (null !== $objEvent && $objEventMemberModel->stateOfSubscription !== $varValue) {
                 // Check if member has already booked at the same time
                 $objMember = MemberModel::findOneBySacMemberId($objEventMemberModel->sacMemberId);
 
-                if ('subscription-accepted' === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember)) {
+                // Do not allow the maximum number of participants to be exceeded.
+                if (EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED === $varValue) {
+                    if (!CalendarEventsMemberModel::canAcceptSubscription($objEventMemberModel, $objEvent)) {
+                        $varValue = EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED;
+                    }
+                }
+
+                if (EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember)) {
                     $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".';
                     $varValue = $objEventMemberModel->stateOfSubscription;
                 } elseif (Validator::isEmail($objEventMemberModel->email)) {
@@ -581,6 +591,10 @@ class TlCalendarEventsMember extends Backend
         // start session
         session_start();
 
+        if (!empty($dc->id)) {
+            $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
+        }
+
         if ('refuseWithEmail' === Input::get('call')) {
             // Show another palette
             $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['refuseWithEmail'];
@@ -618,8 +632,20 @@ class TlCalendarEventsMember extends Backend
         }
 
         if (isset($_POST['acceptWithEmail'])) {
-            // Show another palette
-            $this->redirect($this->addToUrl('call=acceptWithEmail'));
+            $blnAllow = true;
+
+            $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
+
+            if (null !== $objEventMemberModel && null !== $objEvent && !CalendarEventsMemberModel::canAcceptSubscription($objEventMemberModel, $objEvent)) {
+                $blnAllow = false;
+            }
+
+            if ($blnAllow) {
+                // Show another palette
+                $this->redirect($this->addToUrl('call=acceptWithEmail'));
+            } else {
+                $_SESSION['addError'] = 'Dem Teilnehmer kann die Teilnahme am Event nicht bestätigt werden, da die maximale Teilnehmerzahl bereits erreicht wurde.';
+            }
         }
 
         if (isset($_POST['addToWaitlist'])) {
@@ -631,9 +657,9 @@ class TlCalendarEventsMember extends Backend
             $objEventMemberModel = CalendarEventsMemberModel::findByPk(Input::get('id'));
 
             if (null !== $objEventMemberModel) {
-                $set = ['stateOfSubscription' => 'subscription-refused'];
+                $set = ['stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_REFUSED];
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
-                $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail von der Event-Teilnahme abgelehnt und muss noch darüber informiert werden.';
+                $_SESSION['addInfo'] = 'Dem Benutzer wurde ohne E-Mail die Teilnahme am Event verweigert. Er muss jedoch noch manuell darüber informiert werden.';
             }
 
             $this->reload();
@@ -643,9 +669,9 @@ class TlCalendarEventsMember extends Backend
             $objEventMemberModel = CalendarEventsMemberModel::findByPk(Input::get('id'));
 
             if (null !== $objEventMemberModel) {
-                $set = ['stateOfSubscription' => 'subscription-accepted'];
+                $set = ['stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED];
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
-                $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail zum Event zugelassen und muss noch darüber informiert werden.';
+                $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail zum Event zugelassen und muss darüber noch manuell informiert werden.';
             }
 
             $this->reload();
@@ -655,9 +681,9 @@ class TlCalendarEventsMember extends Backend
             $objEventMemberModel = CalendarEventsMemberModel::findByPk(Input::get('id'));
 
             if (null !== $objEventMemberModel) {
-                $set = ['stateOfSubscription' => 'subscription-waitlisted'];
+                $set = ['stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED];
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
-                $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail auf die Warteliste gesetzt und muss noch darüber informiert werden.';
+                $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail auf die Warteliste gesetzt und muss darüber noch manuell informiert werden.';
             }
 
             $this->reload();
@@ -771,7 +797,7 @@ class TlCalendarEventsMember extends Backend
             'acceptWithEmail' => [
                 'formId' => 'subscription-accepted-form',
                 'headline' => 'Zusage zum Event',
-                'stateOfSubscription' => 'subscription-accepted',
+                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED,
                 'sessionInfoText' => 'Dem Benutzer wurde mit einer E-Mail eine Zusage für diesen Event versandt.',
                 'emailTemplate' => 'be_email_templ_accept_registration',
                 'emailSubject' => 'Zusage für %s',
@@ -779,7 +805,7 @@ class TlCalendarEventsMember extends Backend
             'addToWaitlist' => [
                 'formId' => 'subscription-waitlisted-form',
                 'headline' => 'Auf Warteliste setzen',
-                'stateOfSubscription' => 'subscription-waitlisted',
+                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED,
                 'sessionInfoText' => 'Dem Benutzer wurde auf die Warteliste gesetzt und mit einer E-Mail darüber informiert.',
                 'emailTemplate' => 'be_email_templ_added_to_waitlist',
                 'emailSubject' => 'Auf Warteliste für %s',
@@ -787,7 +813,7 @@ class TlCalendarEventsMember extends Backend
             'refuseWithEmail' => [
                 'formId' => 'subscription-refused-form',
                 'headline' => 'Absage mitteilen',
-                'stateOfSubscription' => 'subscription-refused',
+                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_REFUSED,
                 'sessionInfoText' => 'Dem Benutzer wurde mit einer E-Mail eine Absage versandt.',
                 'emailTemplate' => 'be_email_templ_refuse_registration',
                 'emailSubject' => 'Absage für %s',
@@ -858,6 +884,8 @@ class TlCalendarEventsMember extends Backend
 
                         if ('acceptWithEmail' === Input::get('call') && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && null !== $objEvent && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember)) {
                             $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".';
+                        } elseif ('acceptWithEmail' === Input::get('call') && null !== $objEventMemberModel && null !== $objEvent && !CalendarEventsMemberModel::canAcceptSubscription($objEventMemberModel, $objEvent)) {
+                            $_SESSION['addError'] = 'Es ist ein Fehler aufgetreten. Da die maximale Teilnehmerzahl bereits erreicht ist, kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.';
                         }
                         // Send email
                         elseif (Validator::isEmail($objEventMemberModel->email)) {

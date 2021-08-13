@@ -85,7 +85,8 @@ class GetSystemMessagesListener
                         $strCSSRowClass = $objEvent->endDate > time() ? 'upcoming-event' : 'past-event';
                         $link = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s', $objEvent->id, $rt);
                         $linkMemberList = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $objEvent->id, $rt);
-                        $strBuffer .= sprintf('<tr class="hover-row %s"><td>%s</td><td>[%s] <a href="%s" style="text-decoration:underline" target="_blank" title="Event \'%s\' bearbeiten">%s</a></td><td><a href="%s" style="text-decoration:underline" target="_blank" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>',
+                        $strBuffer .= sprintf(
+                            '<tr class="hover-row %s"><td>%s</td><td>[%s] <a href="%s" style="text-decoration:underline" target="_blank" title="Event \'%s\' bearbeiten">%s</a></td><td><a href="%s" style="text-decoration:underline" target="_blank" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>',
                             $strCSSRowClass,
                             $calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($objEvent),
                             $dateAdapter->parse($configAdapter->get('dateFormat'), $objEvent->startDate),

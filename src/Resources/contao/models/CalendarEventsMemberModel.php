@@ -12,6 +12,8 @@
 
 namespace Contao;
 
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+
 /**
  * Class CalendarEventsMemberModel
  */
@@ -50,23 +52,24 @@ class CalendarEventsMemberModel extends Model
 		return false;
 	}
 
-    /**
-     * @param MemberModel $objMember
-     * @param CalendarEventsModel $eventModel
-     * @return static|null
-     */
+	/**
+	 * @param  MemberModel         $objMember
+	 * @param  CalendarEventsModel $eventModel
+	 * @return static|null
+	 */
 	public static function findByMemberAndEvent(MemberModel $objMember, CalendarEventsModel $eventModel): ?self
-    {
+	{
+		$objDb = Database::getInstance()
+			->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')
+			->execute($objMember->sacMemberId, $eventModel->id);
 
-        $objDb = Database::getInstance()
-            ->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')
-            ->execute($objMember->sacMemberId, $eventModel->id);
-        if($objDb->numRows)
-        {
-            return static::findByPk($objDb->id);
-        }
-        return null;
-    }
+		if ($objDb->numRows)
+		{
+			return static::findByPk($objDb->id);
+		}
+
+		return null;
+	}
 
 	/**
 	 * @param $memberId
@@ -105,8 +108,8 @@ class CalendarEventsMemberModel extends Model
 				if ($objUser !== null)
 				{
 					$objJoinedEventsAsInstructor = Database::getInstance()
-                        ->prepare("SELECT * FROM tl_calendar_events_instructor WHERE userId=?")
-                        ->execute($objUser->id);
+						->prepare("SELECT * FROM tl_calendar_events_instructor WHERE userId=?")
+						->execute($objUser->id);
 
 					if ($objJoinedEventsAsInstructor->numRows)
 					{
@@ -206,5 +209,28 @@ class CalendarEventsMemberModel extends Model
 	public static function findPastEventsByMemberId($memberId, $arrEventTypeFilter = array(), $blnInstructorRole = false)
 	{
 		return static::findEventsByMemberId($memberId, $arrEventTypeFilter, null, time(), $blnInstructorRole);
+	}
+
+	public static function canAcceptSubscription(self $objMember, CalendarEventsModel $objEvent): bool
+	{
+		if (null !== $objEvent && $objEvent->addMinAndMaxMembers && (int) $objEvent->maxMembers > 0)
+		{
+			if (!$objEvent->addMinAndMaxMembers || ($objEvent->addMinAndMaxMembers &&  empty($objEvent->maxMembers)))
+			{
+				return true;
+			}
+
+			$objDb = Database::getInstance()
+				->prepare('SELECT * FROM tl_calendar_events_member WHERE id != ? && eventId=? && stateOfSubscription=?')
+				->execute($objMember->id, $objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED)
+			;
+
+			if ($objDb->numRows < $objEvent->maxMembers)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

@@ -127,13 +127,16 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
 
                 // If picture
                 if (isset($size[2]) && is_numeric($size[2])) {
-                    $template->image = Controller::replaceInsertTags(sprintf('{{picture::%s?size=%s&alt=%s&class=%s}}',
-                        $objFile->path, $size[2],
+                    $template->image = Controller::replaceInsertTags(sprintf(
+                        '{{picture::%s?size=%s&alt=%s&class=%s}}',
+                        $objFile->path,
+                        $size[2],
                         $this->objUser->firstname.' '.$this->objUser->lastname,
                         $model->imageClass
                     ));
                 } else { // If image
-                    $template->image = Controller::replaceInsertTags(sprintf('{{image::%s?width=%s&height=%s&mode=%s&alt=%s&class=%s}}',
+                    $template->image = Controller::replaceInsertTags(sprintf(
+                        '{{image::%s?width=%s&height=%s&mode=%s&alt=%s&class=%s}}',
                         $objFile->path,
                         $size[0],
                         $size[1],

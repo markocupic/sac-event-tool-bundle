@@ -11,6 +11,7 @@
  */
 
 use Contao\System;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
 use Markocupic\SacEventToolBundle\Cron\Contao\DailyCron;
 use Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron;
@@ -137,11 +138,11 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EXECUTION-STATE'] = array(
 
 // Event member subscription state !Please do not change these settings because the states are hardcoded
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'] = array(
-	'subscription-not-confirmed',
-	'subscription-accepted',
-	'subscription-refused',
-	'subscription-waitlisted',
-	'user-has-unsubscribed',
+	EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED,
+	EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED,
+	EventSubscriptionLevel::SUBSCRIPTION_REFUSED,
+	EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED,
+	EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED,
 );
 
 // Backend user roles

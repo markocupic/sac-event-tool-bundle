@@ -36,6 +36,7 @@ use Contao\UserModel;
 use Markocupic\CloudconvertBundle\Services\DocxToPdfConversion;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 
@@ -184,7 +185,7 @@ class EventRapport
         if (null !== $objEvent) {
             $objEventMember = $calendarEventsMemberModelAdapter->findBy(
                 ['tl_calendar_events_member.eventId=?', 'tl_calendar_events_member.stateOfSubscription=?'],
-                [$objEvent->id, 'subscription-accepted'],
+                [$objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED],
                 ['order' => 'tl_calendar_events_member.lastname , tl_calendar_events_member.firstname']
             );
 

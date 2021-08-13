@@ -218,7 +218,8 @@ class TlCalendarEventsInstructorInvoice extends Backend
                             $objInvoice->iban = $value;
                             $objInvoice->save();
                             Message::addInfo(
-                                sprintf('Die IBAN Nummer für "%s" wurde aus der Benutzerdatenbank übernommen. Falls die IBAN nicht stimmt, muss diese zuerst unter "Profil" berichtigt werden!',
+                                sprintf(
+                                    'Die IBAN Nummer für "%s" wurde aus der Benutzerdatenbank übernommen. Falls die IBAN nicht stimmt, muss diese zuerst unter "Profil" berichtigt werden!',
                                     $objUser->name
                                 )
                             );

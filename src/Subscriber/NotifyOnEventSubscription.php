@@ -30,7 +30,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class NotifyOnEventSubscription implements EventSubscriberInterface
 {
-    const PRIORITY = 10000;
+    public const PRIORITY = 10000;
 
     /**
      * @var ContaoFramework

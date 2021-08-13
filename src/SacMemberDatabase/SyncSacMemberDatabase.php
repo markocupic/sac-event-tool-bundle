@@ -356,7 +356,7 @@ class SyncSacMemberDatabase
             $set = [
                 'isSacMember' => '1',
                 'disable' => '',
-                'login' => '1'
+                'login' => '1',
             ];
 
             if (!empty($arrSacMemberIds)) {
@@ -390,7 +390,7 @@ class SyncSacMemberDatabase
                 'tstamp' => time(),
                 'disable' => '1',
                 'isSacMember' => '',
-                'login' => ''
+                'login' => '',
             ];
             Database::getInstance()->prepare('UPDATE tl_member %s WHERE id=?')->set($arrSet)->execute($objDisabledMember->id);
 

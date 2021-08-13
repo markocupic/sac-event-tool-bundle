@@ -197,7 +197,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 		),
 		'allowMultiSignUp'     => array(
 			'inputType' => 'checkbox',
-			'eval'      => array('submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'w50'),
+			'eval'      => array('submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'long clr'),
 			'sql'       => "char(1) NOT NULL default ''",
 		),
 		'stateOfSubscription' => array(

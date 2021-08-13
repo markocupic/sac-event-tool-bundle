@@ -26,6 +26,7 @@ use Contao\Message;
 use Contao\System;
 use Markocupic\CloudconvertBundle\Services\DocxToPdfConversion;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
 use PhpOffice\PhpWord\Exception\CopyFileException;
@@ -86,7 +87,7 @@ class EventMemberList2Docx
             ],
             [
                 $objEvent->id,
-                'subscription-accepted',
+                EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED,
             ],
             [
                 'order' => 'tl_calendar_events_member.lastname, tl_calendar_events_member.firstname',

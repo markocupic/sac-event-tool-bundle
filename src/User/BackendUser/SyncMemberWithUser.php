@@ -28,7 +28,7 @@ class SyncMemberWithUser
     /**
      * Log type for sync process.
      */
-    const SAC_EVT_LOG_SYNC_MEMBER_WITH_USER = 'SYNC_MEMBER_WITH_USER';
+    public const SAC_EVT_LOG_SYNC_MEMBER_WITH_USER = 'SYNC_MEMBER_WITH_USER';
 
     /**
      * @var ContaoFramework

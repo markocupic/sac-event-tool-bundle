@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Dca;
 
-use Contao\Backend;
 use Contao\BackendUser;
 use Contao\Calendar;
 use Contao\CalendarEventsModel;
@@ -30,7 +29,6 @@ use Contao\DcaExtractor;
 use Contao\Encryption;
 use Contao\EventReleaseLevelPolicyModel;
 use Contao\EventReleaseLevelPolicyPackageModel;
-use Contao\Events;
 use Contao\EventTypeModel;
 use Contao\FilesModel;
 use Contao\Idna;
@@ -43,7 +41,6 @@ use Contao\TourDifficultyCategoryModel;
 use Contao\UserGroupModel;
 use Contao\UserModel;
 use Contao\Versions;
-use Haste\Form;
 use League\Csv\CharsetConverter;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;

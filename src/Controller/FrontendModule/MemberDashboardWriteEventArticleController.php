@@ -45,7 +45,6 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -407,27 +406,27 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         $eval = ['mandatory' => true, 'rows' => 2, 'decodeEntities' => true, 'placeholder' => 'z.B. Engelberg 1000m - Herrenrüti 1083 m - Galtiberg 1800 m - Einstieg 2000 m'];
 
         $objForm->addFormField(
-                'tourWaypoints',
-                [
-                    'label' => 'Tourenstationen mit Höhenangaben',
-                    'inputType' => 'textarea',
-                    'eval' => $eval,
-                    'value' => html_entity_decode((string) $this->getTourWaypoints($objEventStoryModel)),
-                ]
-            );
+            'tourWaypoints',
+            [
+                'label' => 'Tourenstationen mit Höhenangaben',
+                'inputType' => 'textarea',
+                'eval' => $eval,
+                'value' => html_entity_decode((string) $this->getTourWaypoints($objEventStoryModel)),
+            ]
+        );
 
         // tour profile
         $eval = ['mandatory' => true, 'rows' => 2, 'decodeEntities' => true, 'placeholder' => 'z.B. Aufst: 1500 Hm/8 h, Abst: 1500 Hm/3 h'];
 
         $objForm->addFormField(
-                'tourProfile',
-                [
-                    'label' => 'Höhenmeter und Zeitangabe pro Tag',
-                    'inputType' => 'textarea',
-                    'eval' => $eval,
-                    'value' => html_entity_decode((string) $this->getTourProfile($objEventStoryModel)),
-                ]
-            );
+            'tourProfile',
+            [
+                'label' => 'Höhenmeter und Zeitangabe pro Tag',
+                'inputType' => 'textarea',
+                'eval' => $eval,
+                'value' => html_entity_decode((string) $this->getTourProfile($objEventStoryModel)),
+            ]
+        );
 
         // tour difficulties
         $eval = ['mandatory' => true, 'rows' => 2, 'decodeEntities' => true];
@@ -460,7 +459,8 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         ]);
 
         // youtube id
-        $objForm->addFormField('youtubeId',
+        $objForm->addFormField(
+            'youtubeId',
             [
                 'label' => 'Youtube Film-Id',
                 'inputType' => 'text',
