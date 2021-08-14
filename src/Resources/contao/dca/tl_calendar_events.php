@@ -951,8 +951,8 @@ $allowEdititingOnFirstReleaseLevelOnly = array(
 	'durationInfo',
 	'tourType',
 	'tourTechDifficulty',
-	//'addMinAndMaxMembers',
-	//'maxMembers',
+	'addMinAndMaxMembers',
+	'maxMembers',
 );
 
 foreach ($allowEdititingOnFirstReleaseLevelOnly as $field)
