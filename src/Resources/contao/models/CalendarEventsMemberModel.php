@@ -213,11 +213,14 @@ class CalendarEventsMemberModel extends Model
 
 	public static function canAcceptSubscription(self $objMember, CalendarEventsModel $objEvent): bool
 	{
-		if (null !== $objEvent && $objEvent->addMinAndMaxMembers && (int) $objEvent->maxMembers > 0)
+        if (null !== $objEvent && !$objEvent->addMinAndMaxMembers) {
+            return true;
+        }
+	    elseif (null !== $objEvent && $objEvent->addMinAndMaxMembers && (int) $objEvent->maxMembers > 0)
 		{
-			if (!$objEvent->addMinAndMaxMembers || ($objEvent->addMinAndMaxMembers &&  empty($objEvent->maxMembers)))
+		    if (!$objEvent->addMinAndMaxMembers || ($objEvent->addMinAndMaxMembers && empty($objEvent->maxMembers)))
 			{
-				return true;
+			    return true;
 			}
 
 			$objDb = Database::getInstance()
