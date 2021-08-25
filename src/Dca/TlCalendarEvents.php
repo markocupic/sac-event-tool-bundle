@@ -280,7 +280,7 @@ class TlCalendarEvents extends \tl_calendar_events
                             $this->redirect($this->getReferer());
                         }
                     } else {
-                        // Protect fields with $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEdititingOnFirstReleaseLevelOnly'] === true,
+                        // Protect fields with $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEditingOnFirstReleaseLevelOnly'] === true,
                         // if the event is on the first release level
                         if (!$this->User->isAdmin) {
                             $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($objEventsModel->id);
@@ -292,7 +292,7 @@ class TlCalendarEvents extends \tl_calendar_events
                                     if (null !== $objEventReleaseLevelPolicyModel) {
                                         if ($objEventReleaseLevelPolicyModel->id !== $objEventsModel->eventReleaseLevel) {
                                             foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldname) {
-                                                if (true === $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEdititingOnFirstReleaseLevelOnly'] && '' !== $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['inputType']) {
+                                                if (true === $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEditingOnFirstReleaseLevelOnly'] && '' !== $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['inputType']) {
                                                     $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['input_field_callback'] = [self::class, 'showFieldValue'];
                                                 }
                                             }
@@ -351,7 +351,7 @@ class TlCalendarEvents extends \tl_calendar_events
                         if (null !== $objEventReleaseLevelPolicyModel) {
                             if ($objEventReleaseLevelPolicyModel->id !== $objEventsModel->eventReleaseLevel) {
                                 foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldname) {
-                                    if (true === $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEdititingOnFirstReleaseLevelOnly']) {
+                                    if (true === $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEditingOnFirstReleaseLevelOnly']) {
                                         if ('editAll' === Input::get('act')) {
                                             $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['input_field_callback'] = [self::class, 'showFieldValue'];
                                         } else {

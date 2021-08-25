@@ -936,7 +936,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReportAdditionalNotices
 );
 
 // Allow for these fields editing on first release level only
-$allowEdititingOnFirstReleaseLevelOnly = array(
+$allowEditingOnFirstReleaseLevelOnly = array(
 	'suitableForBeginners',
 	'eventType',
 	'title',
@@ -955,9 +955,9 @@ $allowEdititingOnFirstReleaseLevelOnly = array(
 	'maxMembers',
 );
 
-foreach ($allowEdititingOnFirstReleaseLevelOnly as $field)
+foreach ($allowEditingOnFirstReleaseLevelOnly as $field)
 {
-	$GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['allowEdititingOnFirstReleaseLevelOnly'] = true;
+	$GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['allowEditingOnFirstReleaseLevelOnly'] = true;
 }
 
 // DoNotCopy - Settings

@@ -160,6 +160,15 @@ services:
             - { name: container.service_subscriber }
         public: true
 
+    # Pilatus export module
+    Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExport2021Controller:
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        tags:
+            - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+            - { name: container.service_subscriber }
+        public: true
+
     # Csv Export module: Export members ans users as a csv spreadsheet
     Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvExportController:
         calls:
