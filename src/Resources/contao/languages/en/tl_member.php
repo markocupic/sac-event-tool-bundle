@@ -11,9 +11,10 @@
 // Legends
 $GLOBALS['TL_LANG']['tl_member']['section_legend'] = 'Sektions-Einstellungen';
 $GLOBALS['TL_LANG']['tl_member']['section_info_legend'] = 'Sektionsinformationen';
-$GLOBALS['TL_LANG']['tl_member']['avatar_legend'] = 'Avatar-Einstellungen';
-$GLOBALS['TL_LANG']['tl_member']['emergency_legend'] = 'Avatar-Einstellungen';
-$GLOBALS['TL_LANG']['tl_member']['food_legend'] = 'Essgewohnheiten-Einstellungen';
+$GLOBALS['TL_LANG']['tl_member']['avatar_legend'] = 'Avatar';
+$GLOBALS['TL_LANG']['tl_member']['emergency_legend'] = 'Notfallangaben';
+$GLOBALS['TL_LANG']['tl_member']['food_legend'] = 'Essgewohnheiten';
+$GLOBALS['TL_LANG']['tl_member']['education_legend'] = 'Ausbildung';
 
 // Fields
 if (TL_MODE === 'FE')
@@ -24,6 +25,8 @@ $GLOBALS['TL_LANG']['tl_member']['uuid'] = array('UUID (Zentralkommitee Bern)', 
 $GLOBALS['TL_LANG']['tl_member']['activation'] = array('Aktivierungscode', '');
 $GLOBALS['TL_LANG']['tl_member']['activationLinkLifetime'] = array('Gültigkeitsdauer Aktivierungstoken', '');
 $GLOBALS['TL_LANG']['tl_member']['isSacMember'] = array('Dieser User ist ein SAC-Mitglied', 'Dieses Mitglied wurde in der Datenbank (CSV-File) beim täglichen Sync gefunden.');
+$GLOBALS['TL_LANG']['tl_member']['hasLeadClimbingEducation'] = array('Seilschaftsführer', 'Geben Sie an, ob das Mitglied die Seilschaftsführer-Ausbildung besitzt.');
+$GLOBALS['TL_LANG']['tl_member']['dateOfLeadClimbingEducation'] = array('Datum der Seilschaftsführer-Ausbildung', 'Geben Sie an, wann das Mitglied die Seilschaftsführer-Ausbildung absolviert hat.');
 $GLOBALS['TL_LANG']['tl_member']['sacMemberId'] = array('Mitgliedernummer', '');
 $GLOBALS['TL_LANG']['tl_member']['ahvNumber'] = ["AHV-Nummer", 'Geben Sie hier die AHV-Nummer ein.'];
 $GLOBALS['TL_LANG']['tl_member']['emergencyPhone'] = array('Notfall-Benachrichtigungs-Telefonnummer', 'Geben Sie die Telefonnummer einer Ihnen vertrauten Person an, welche in einem Notfall kontaktiert werden kann.');

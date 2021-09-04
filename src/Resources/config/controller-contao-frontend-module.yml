@@ -82,6 +82,15 @@ services:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
         public: true
 
+    # Member dashboard module: display the member profile
+    Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardProfileController:
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        tags:
+            - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
+            - { name: container.service_subscriber }
+        public: true
+
     # Member dashboard module: display the forms for editing the member profile
     Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEditProfileController:
         calls:

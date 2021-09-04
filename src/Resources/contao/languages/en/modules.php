@@ -12,6 +12,7 @@
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationCheckoutLinkController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardWriteEventArticleController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardProfileController;
 
 // Backend Modules
 $GLOBALS['TL_LANG']['MOD']['sac_be_modules'] = array('SAC Module');
@@ -42,6 +43,7 @@ $GLOBALS['TL_LANG']['FMD']['member_dashboard_upcoming_events'] = array('SAC Mitg
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_past_events'] = array('SAC Mitgliederkonto Dashboard - Meine absolvierten Events');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_event_report_list'] = array('SAC Mitgliederkonto Dashboard - Meine Tourenberichte');
 $GLOBALS['TL_LANG']['FMD'][MemberDashboardWriteEventArticleController::TYPE] = array('SAC Mitgliederkonto Dashboard - Tourenbericht schreiben');
+$GLOBALS['TL_LANG']['FMD'][MemberDashboardProfileController::TYPE] = array('SAC Mitgliederkonto Dashboard - Profil');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_edit_profile'] = array('SAC Mitgliederkonto Dashboard - Profil bearbeiten');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_delete_profile'] = array('SAC Mitgliederkonto Dashboard - Profil löschen');
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_avatar_upload'] = array('SAC Mitgliederkonto Dashboard - Avatar-Upload-Formular');

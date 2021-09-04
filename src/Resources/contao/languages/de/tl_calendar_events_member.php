@@ -32,6 +32,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['contact_legend'] = "Kontaktang
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['sendEmail_legend'] = "E-Mail an Teilnehmer versenden";
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['emergency_phone_legend'] = "Notfall Kontaktangaben";
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['sac_member_id_legend'] = "SAC-Mitgliedernummer";
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['education_legend'] = 'Ausbildung';
 
 
 // Fields
@@ -48,6 +49,8 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['street'] = ["Strasse", "Geben 
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['postal'] = ["Postleitzahl", "Geben Sie hier die Postleitzahl ein."];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['city'] = ["Ort", "Geben Sie hier den Ort ein."];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['mobile'] = ["Mobilnummer", "Geben Sie die Mobilnummer ein."];
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['hasLeadClimbingEducation'] = array('Seilschaftsführer', 'Geben Sie an, ob das Mitglied die Seilschaftsführer-Ausbildung besitzt.');
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['dateOfLeadClimbingEducation'] = array('Datum der Seilschaftsführer-Ausbildung', 'Geben Sie an, wann das Mitglied die Seilschaftsführer-Ausbildung absolviert hat.');
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['emergencyPhoneName'] = ["Namen einer vertrauten Person für Notfälle", "Geben Sie den Namen einer vertrauten Person an, welche in Notfällen kontaktiert wird."];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['emergencyPhone'] = ["Notfall Telefonnummer", "Geben Sie eine Notfallnummer ein."];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['foodHabits'] = ['Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)', ''];
