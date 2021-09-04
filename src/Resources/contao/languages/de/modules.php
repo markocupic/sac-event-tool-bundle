@@ -13,6 +13,22 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationChe
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardWriteEventArticleController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardProfileController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvEventMemberExportController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardUpcomingEventsController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardPastEventsController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEventReportListController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEditProfileController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardDeleteProfileController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardAvatarController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardAvatarUploadController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvExportController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventFilterFormController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\JahresprogrammExportController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventStoryListController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventStoryReaderController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventListController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExport2021Controller;
 
 // Backend Modules
 $GLOBALS['TL_LANG']['MOD']['sac_be_modules'] = array('SAC Module');
@@ -35,24 +51,23 @@ $GLOBALS['TL_LANG']['FMD']['sac_event_tool_frontend_modules'] = array('SAC Front
 $GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'] = array('Event Reader Vorschau');
 
 // Contao 5 ready frontend modules
-$GLOBALS['TL_LANG']['FMD']['tour_difficulty_list'] = array('Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster');
-$GLOBALS['TL_LANG']['FMD']['csv_event_member_export'] = array('SAC-Event-Teilnehmer Export');
-$GLOBALS['TL_LANG']['FMD'][EventRegistrationController::TYPE] = array('SAC Event Registrierungsformular');
+$GLOBALS['TL_LANG']['FMD'][CsvEventMemberExportController::TYPE] = array('SAC-Event-Teilnehmer Export');
+$GLOBALS['TL_LANG']['FMD'][CsvExportController::TYPE] = array('SAC-Member- und Backend-User CSV-Export-Funktion');
+$GLOBALS['TL_LANG']['FMD'][EventFilterFormController::TYPE] = array('SAC-Event-Liste-Filter');
+$GLOBALS['TL_LANG']['FMD'][EventListController::TYPE] = array('SAC Event Auflistungs Modul');
 $GLOBALS['TL_LANG']['FMD'][EventRegistrationCheckoutLinkController::TYPE] = array('Link zur Checkout-Seite für Event-Anmeldung');
-$GLOBALS['TL_LANG']['FMD']['member_dashboard_upcoming_events'] = array('SAC Mitgliederkonto Dashboard - Meine nächsten Events');
-$GLOBALS['TL_LANG']['FMD']['member_dashboard_past_events'] = array('SAC Mitgliederkonto Dashboard - Meine absolvierten Events');
-$GLOBALS['TL_LANG']['FMD']['member_dashboard_event_report_list'] = array('SAC Mitgliederkonto Dashboard - Meine Tourenberichte');
-$GLOBALS['TL_LANG']['FMD'][MemberDashboardWriteEventArticleController::TYPE] = array('SAC Mitgliederkonto Dashboard - Tourenbericht schreiben');
+$GLOBALS['TL_LANG']['FMD'][EventRegistrationController::TYPE] = array('SAC Event Registrierungsformular');
+$GLOBALS['TL_LANG']['FMD'][EventStoryListController::TYPE] = array('SAC Tourenberichte Listen Modul');
+$GLOBALS['TL_LANG']['FMD'][EventStoryReaderController::TYPE] = array('SAC Tourenberichte Reader Modul');
+$GLOBALS['TL_LANG']['FMD'][JahresprogrammExportController::TYPE] = array('SAC Event-Export für Jahresprogramm');
+$GLOBALS['TL_LANG']['FMD'][MemberDashboardAvatarController::TYPE] = array('SAC Mitgliederkonto Dashboard - Mitglieder Avatar');
+$GLOBALS['TL_LANG']['FMD'][MemberDashboardAvatarUploadController::TYPE] = array('SAC Mitgliederkonto Dashboard - Avatar-Upload-Formular');
+$GLOBALS['TL_LANG']['FMD'][MemberDashboardDeleteProfileController::TYPE] = array('SAC Mitgliederkonto Dashboard - Profil löschen');
+$GLOBALS['TL_LANG']['FMD'][MemberDashboardEditProfileController::TYPE] = array('SAC Mitgliederkonto Dashboard - Profil bearbeiten');
+$GLOBALS['TL_LANG']['FMD'][MemberDashboardEventReportListController::TYPE] = array('SAC Mitgliederkonto Dashboard - Meine Tourenberichte');
+$GLOBALS['TL_LANG']['FMD'][MemberDashboardPastEventsController::TYPE] = array('SAC Mitgliederkonto Dashboard - Meine absolvierten Events');
 $GLOBALS['TL_LANG']['FMD'][MemberDashboardProfileController::TYPE] = array('SAC Mitgliederkonto Dashboard - Profil');
-$GLOBALS['TL_LANG']['FMD']['member_dashboard_edit_profile'] = array('SAC Mitgliederkonto Dashboard - Profil bearbeiten');
-$GLOBALS['TL_LANG']['FMD']['member_dashboard_delete_profile'] = array('SAC Mitgliederkonto Dashboard - Profil löschen');
-$GLOBALS['TL_LANG']['FMD']['member_dashboard_avatar_upload'] = array('SAC Mitgliederkonto Dashboard - Avatar-Upload-Formular');
-$GLOBALS['TL_LANG']['FMD']['member_dashboard_avatar'] = array('SAC Mitgliederkonto Dashboard - Mitglieder Avatar');
-$GLOBALS['TL_LANG']['FMD']['csv_export'] = array('SAC-Member- und Backend-User CSV-Export-Funktion');
-$GLOBALS['TL_LANG']['FMD']['event_filter_form'] = array('SAC-Event-Liste-Filter');
-$GLOBALS['TL_LANG']['FMD']['pilatus_export'] = array('SAC Event-Export für Monatszeitschrift');
-$GLOBALS['TL_LANG']['FMD']['pilatus_export_2021'] = array('SAC Event-Export 2021 für Monatszeitschrift');
-$GLOBALS['TL_LANG']['FMD']['jahresprogramm_export'] = array('SAC Event-Export für Jahresprogramm');
-$GLOBALS['TL_LANG']['FMD']['event_story_list'] = array('SAC Tourenberichte Listen Modul');
-$GLOBALS['TL_LANG']['FMD']['event_story_reader'] = array('SAC Tourenberichte Reader Modul');
-$GLOBALS['TL_LANG']['FMD']['event_list'] = array('SAC Event Auflistungs Modul');
+$GLOBALS['TL_LANG']['FMD'][MemberDashboardUpcomingEventsController::TYPE] = array('SAC Mitgliederkonto Dashboard - Meine nächsten Events');
+$GLOBALS['TL_LANG']['FMD'][MemberDashboardWriteEventArticleController::TYPE] = array('SAC Mitgliederkonto Dashboard - Tourenbericht schreiben');
+$GLOBALS['TL_LANG']['FMD'][PilatusExport2021Controller::TYPE] = array('SAC Event-Export 2021 für Monatszeitschrift');
+$GLOBALS['TL_LANG']['FMD'][TourDifficultyListController::TYPE] = array('Schwierigkeitsgrade Tabelle mit Erklärungen als Modalfenster');

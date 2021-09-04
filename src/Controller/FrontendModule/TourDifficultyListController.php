@@ -28,10 +28,12 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class TourDifficultyListController.
  *
- * @FrontendModule("tour_difficulty_list", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(TourDifficultyListController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class TourDifficultyListController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'tour_difficulty_list';
+
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
         return parent::__invoke($request, $model, $section, $classes, $page);

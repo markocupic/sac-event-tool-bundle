@@ -42,10 +42,11 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class CsvExportController.
  *
- * @FrontendModule("csv_export", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(CsvExportController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class CsvExportController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'csv_export';
     private const FIELD_DELIMITER = ';';
     private const FIELD_ENCLOSURE = '"';
 

@@ -21,12 +21,17 @@ use Contao\StringUtil;
 use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
+
 
 /**
  * Class EventListController.
+ * @FrontendModule(EventListController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class EventListController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'event_list';
+
     /**
      * @var ModuleModel
      */

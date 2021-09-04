@@ -43,10 +43,12 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class PilatusExport2021Controller.
  *
- * @FrontendModule("pilatus_export_2021", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(PilatusExport2021Controller::TYPE, category="sac_event_tool_frontend_modules")
  */
 class PilatusExport2021Controller extends AbstractPrintExportController
 {
+    public const TYPE = 'pilatus_export_2021';
+
     /**
      * @var ModuleModel
      */

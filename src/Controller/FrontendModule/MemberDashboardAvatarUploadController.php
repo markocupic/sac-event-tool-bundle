@@ -41,10 +41,12 @@ use Symfony\Component\Security\Core\Security;
 /**
  * Class MemberDashboardAvatarUploadController.
  *
- * @FrontendModule("member_dashboard_avatar_upload", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(MemberDashboardAvatarUploadController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardAvatarUploadController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'member_dashboard_avatar_upload';
+
     /**
      * @var string
      */

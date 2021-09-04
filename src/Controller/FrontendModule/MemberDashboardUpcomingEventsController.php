@@ -41,10 +41,12 @@ use Symfony\Component\Security\Core\Security;
 /**
  * Class MemberDashboardUpcomingEventsController.
  *
- * @FrontendModule("member_dashboard_upcoming_events", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(MemberDashboardUpcomingEventsController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'member_dashboard_upcoming_events';
+
     /**
      * @var FrontendUser
      */

@@ -35,10 +35,12 @@ use Symfony\Component\Security\Core\Security;
 /**
  * Class MemberDashboardDeleteProfileController.
  *
- * @FrontendModule("member_dashboard_delete_profile", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(MemberDashboardDeleteProfileController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardDeleteProfileController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'member_dashboard_delete_profile';
+
     /**
      * @var string
      */

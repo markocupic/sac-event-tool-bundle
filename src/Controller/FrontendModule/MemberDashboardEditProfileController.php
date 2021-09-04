@@ -35,10 +35,12 @@ use Symfony\Component\Security\Core\Security;
 /**
  * Class MemberDashboardEditProfileController.
  *
- * @FrontendModule("member_dashboard_edit_profile", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(MemberDashboardEditProfileController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardEditProfileController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'member_dashboard_edit_profile';
+
     /**
      * @var string
      */

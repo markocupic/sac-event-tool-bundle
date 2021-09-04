@@ -39,10 +39,12 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class CsvEventMemberExportController.
  *
- * @FrontendModule("csv_event_member_export", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(CsvEventMemberExportController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class CsvEventMemberExportController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'csv_event_member_export';
+
     /**
      * @var
      */

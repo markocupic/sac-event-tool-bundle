@@ -47,6 +47,7 @@ use Symfony\Component\Security\Core\Security;
  */
 class MemberDashboardPastEventsController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'member_dashboard_past_events';
     /**
      * @var FrontendUser
      */

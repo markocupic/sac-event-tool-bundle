@@ -33,10 +33,12 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class EventFilterFormController.
  *
- * @FrontendModule("event_filter_form", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(EventFilterFormController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class EventFilterFormController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'event_filter_form';
+
     /**
      * @var array
      */

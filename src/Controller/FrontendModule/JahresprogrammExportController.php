@@ -40,10 +40,11 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class JahresprogrammExportController.
  *
- * @FrontendModule("jahresprogramm_export", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(JahresprogrammExportController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class JahresprogrammExportController extends AbstractPrintExportController
 {
+    public const TYPE='jahresprogramm_export';
     /**
      * @var ModuleModel
      */

@@ -35,10 +35,12 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class EventStoryListController.
  *
- * @FrontendModule("event_story_list", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(EventStoryListController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class EventStoryListController extends AbstractFrontendModuleController
 {
+   public const TYPE = 'event_story_list';
+
     /**
      * @var CalendarEventsStoryModel
      */

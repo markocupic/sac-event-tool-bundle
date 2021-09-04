@@ -45,10 +45,12 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class EventStoryReaderController.
  *
- * @FrontendModule("event_story_reader", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(EventStoryReaderController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class EventStoryReaderController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'event_story_reader';
+
     /**
      * @var RequestStack
      */

@@ -43,10 +43,12 @@ use Symfony\Component\Security\Core\Security;
 /**
  * Class MemberDashboardEventReportListController.
  *
- * @FrontendModule("member_dashboard_event_report_list", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(MemberDashboardEventReportListController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardEventReportListController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'member_dashboard_event_report_list';
+
     /**
      * @var string
      */

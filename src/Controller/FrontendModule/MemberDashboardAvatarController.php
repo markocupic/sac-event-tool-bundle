@@ -33,10 +33,12 @@ use Symfony\Component\Security\Core\Security;
 /**
  * Class MemberDashboardAvatarController.
  *
- * @FrontendModule("member_dashboard_avatar", category="sac_event_tool_frontend_modules")
+ * @FrontendModule(MemberDashboardAvatarController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardAvatarController extends AbstractFrontendModuleController
 {
+    public const TYPE = 'member_dashboard_avatar';
+
     /**
      * @var RequestStack
      */
