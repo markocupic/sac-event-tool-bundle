@@ -147,6 +147,7 @@ final class NotifyOnEventSubscription implements EventSubscriberInterface
                 'participant_food_habits' => $this->arrData['foodHabits'],
                 'participant_notes' => html_entity_decode((string) $this->arrData['notes']),
                 'participant_state_of_subscription' => html_entity_decode((string) $this->eventMemberModel->stateOfSubscription),
+                'participant_has_lead_climbing_education' => $this->memberModel->hasLeadClimbingEducation,
                 'event_id' => $this->eventModel->id,
                 'event_link_detail' => 'https://'.$environmentAdapter->get('host').'/'.$eventsAdapter->generateEventUrl($this->eventModel),
             ];
