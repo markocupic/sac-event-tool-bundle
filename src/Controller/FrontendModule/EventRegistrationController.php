@@ -470,6 +470,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $event->eventModel = $this->eventModel;
                 $event->eventMemberModel = $objEventRegistration;
                 $event->moduleModel = $this->moduleModel;
+
+                // Use a subscriber to assign notification to the event registration
                 $this->eventDispatcher->dispatch(new EventSubscriptionEvent($event), EventSubscriptionEvent::NAME);
 
                 // Reload page
