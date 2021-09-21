@@ -147,25 +147,32 @@ class CsvExportController extends AbstractFrontendModuleController
 
                 if ('user-role-export' === $inputAdapter->post('export-type')) {
                     $strTable = 'tl_user';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'admin', 'lastLogin', 'password', 'pwChange', 'userRole'];
+                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'lastLogin', 'password', 'pwChange', 'userRole'];
                     $strGroupFieldName = 'userRole';
-                    $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
+                    $objUser = $databaseAdapter->getInstance()
+                        ->execute('SELECT * FROM tl_user ORDER BY lastname, firstname')
+                    ;
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, UserRoleModel::class, $blnKeepGroupsInOneLine);
                 }
 
                 if ('user-group-export' === $inputAdapter->post('export-type')) {
                     $strTable = 'tl_user';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'admin', 'lastLogin', 'password', 'pwChange', 'groups'];
+                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'lastLogin', 'password', 'pwChange', 'groups'];
                     $strGroupFieldName = 'groups';
-                    $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
+                    $objUser = $databaseAdapter->getInstance()
+                        ->execute('SELECT * FROM tl_user ORDER BY lastname, firstname')
+                    ;
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, UserGroupModel::class, $blnKeepGroupsInOneLine);
                 }
 
                 if ('member-group-export' === $inputAdapter->post('export-type')) {
                     $strTable = 'tl_member';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups'];
+                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'disable', 'rescissionCause', 'sacMemberId', 'login', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
-                    $objUser = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_member WHERE isSacMember=? ORDER BY lastname, firstname')->execute('1');
+                    $objUser = $databaseAdapter->getInstance()
+                        ->prepare('SELECT * FROM tl_member WHERE isSacMember=? ORDER BY lastname, firstname')
+                        ->execute('1')
+                    ;
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, MemberGroupModel::class, $blnKeepGroupsInOneLine);
                 }
             }
@@ -226,9 +233,9 @@ class CsvExportController extends AbstractFrontendModuleController
             foreach ($arrFields as $field) {
                 if ($field === $strGroupFieldName) {
                     $hasGroups = false;
-                    $arrGroups = $stringUtilAdapter->deserialize($objUser->{$field}, true);
+                    $arrGroupsUserBelongsTo = $stringUtilAdapter->deserialize($objUser->{$field}, true);
 
-                    if (\count($arrGroups) > 0) {
+                    if (\count($arrGroupsUserBelongsTo) > 0) {
                         // Write all the groups/roles in one line
                         if ($blnKeepGroupsInOneLine) {
                             $arrUser[] = implode(', ', array_filter(array_map(
@@ -236,7 +243,7 @@ class CsvExportController extends AbstractFrontendModuleController
                                     $objGroupModel = $groupModelAdapter->findByPk($id);
 
                                     if (null !== $objGroupModel) {
-                                        if ('' !== $objGroupModel->name) {
+                                        if (\strlen((string) $objGroupModel->name)) {
                                             return $objGroupModel->name;
                                         }
 
@@ -245,14 +252,14 @@ class CsvExportController extends AbstractFrontendModuleController
 
                                     return '';
                                 },
-                                $arrGroups
+                                $arrGroupsUserBelongsTo
                             )));
                         }
                         // Make a row for each group/role
                         else {
                             $hasGroups = true;
 
-                            foreach ($arrGroups as $groupId) {
+                            foreach ($arrGroupsUserBelongsTo as $groupId) {
                                 if ($blnHasUserRoleFilter && \count($arrFilterRoles) > 0) {
                                     if (!\in_array($groupId, $arrFilterRoles, false)) {
                                         continue;
@@ -261,7 +268,7 @@ class CsvExportController extends AbstractFrontendModuleController
                                 $objGroupModel = $groupModelAdapter->findByPk($groupId);
 
                                 if (null !== $objGroupModel) {
-                                    if ('' !== $objGroupModel->name) {
+                                    if (\strlen((string) $objGroupModel->name)) {
                                         $arrUser[] = $objGroupModel->name;
                                     } else {
                                         $arrUser[] = $objGroupModel->title;
