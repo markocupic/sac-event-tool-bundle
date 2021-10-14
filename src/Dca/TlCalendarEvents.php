@@ -232,7 +232,7 @@ class TlCalendarEvents extends \tl_calendar_events
 
         // Limitize filter fields
         foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $k) {
-            if ('author' === $k || 'organizers' === $k || 'tourType' === $k || 'eventReleaseLevel' === $k || 'mainInstructor' === $k || 'courseTypeLevel0' === $k || 'startTime' === $k) {
+            if ('mountainguide' === $k || 'author' === $k || 'organizers' === $k || 'tourType' === $k || 'eventReleaseLevel' === $k || 'mainInstructor' === $k || 'courseTypeLevel0' === $k || 'startTime' === $k) {
                 continue;
             }
 
