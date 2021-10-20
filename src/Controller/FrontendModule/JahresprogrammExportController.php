@@ -302,6 +302,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
             if ($this->eventType !== $objEvents->eventType) {
                 continue;
             }
+
             $arrEvents[] = (int) ($objEvents->id);
         }
 
@@ -397,6 +398,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     if ('course' === $objEvent->eventType) {
                         $arrData['bookingInfo'] = !$objEvent->disableOnlineRegistration ? 'Kurs-Nummer '.$calendarEventsHelperAdapter->getEventData($objEvent->current(), 'courseId') : '';
                     }
+
                     $arrEvent[] = $arrData;
                 }
             }

@@ -101,7 +101,7 @@ class TlCalendarEventsStory extends Backend
             },
             $arrEventDates
         );
-        $strEventDates = implode('\r\n', $arrEventDates);
+        $strEventDates = implode("\r\n", $arrEventDates);
 
         // Checked by instructor
         $strCheckedByInstructor = $objArticle->checkedByInstructor ? 'Ja' : 'Nein';

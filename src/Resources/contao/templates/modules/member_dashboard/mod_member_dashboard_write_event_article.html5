@@ -69,10 +69,15 @@
 {{br}}
 
 <!-- Start preview -->
+<?php if (strlen((string) $this->title) > 0): ?>
+<div>
+  <h3><?= $this->title ?></h3>
+</div>
+<?php endif; ?>
 <?php if (strlen((string) $this->text) > 0): ?>
 <div class="event-info-box icon-box-small">
   <h5>Bericht</h5>
-  <?= nl2br(html_entity_decode(htmlspecialchars_decode((string) $this->text))) ?>
+  <?= nl2br((string) $this->text) ?>
 </div>
 <?php endif; ?>
 
@@ -92,7 +97,7 @@
 
 <?php if ('' !== $this->tourWaypoints): ?>
 <div class="event-info-box icon-box-small">
-  <h5>Tourenstationen</h5>
+  <h5>Tourenstationen mit Höhenangaben (nur stichwortartig)</h5>
   <p><?= $this->tourWaypoints ?></p>
 </div>
 <?php endif; ?>

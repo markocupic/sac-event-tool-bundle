@@ -319,9 +319,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         $template->tourTechDifficulty = null;
         $arrTourTechDiff = $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent);
 
-        if (!empty($arrTourTechDiff)) {
-            $template->tourTechDifficulty = implode(', ', $arrTourTechDiff);
-        }
+
 
         // eventOrganizers
         $template->eventOrganizers = null;
@@ -337,6 +335,13 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
         if ('' !== $this->story->tourWaypoints) {
             $template->tourWaypoints = nl2br((string) $this->story->tourWaypoints);
+        }
+
+        if ('' !== $this->story->tourTechDifficulty) {
+            $template->tourTechDifficulty = nl2br((string) $this->story->tourTechDifficulty);
+        }elseif (!empty($arrTourTechDiff)) {
+            // Fallback
+            $template->tourTechDifficulty = implode(', ', $arrTourTechDiff);
         }
 
         if ('' !== $this->story->tourProfile) {

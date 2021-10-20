@@ -393,13 +393,21 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         $url = $environmentAdapter->get('uri');
         $objForm->setFormActionFromUri($url);
 
+        // Title
+        $objForm->addFormField('title', [
+            'label' => 'Tourname/Tourtitel',
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'decodeEntities' => true],
+            'value' => (string) $this->getTourTitle($objEventStoryModel),
+        ]);
+
         // text
         $maxlength = 1800;
         $objForm->addFormField('text', [
             'label' => 'Touren-/Lager-/Kursbericht (max. '.$maxlength.' Zeichen, inkl. Leerzeichen)',
             'inputType' => 'textarea',
             'eval' => ['mandatory' => true, 'maxlength' => $maxlength, 'rows' => 8, 'decodeEntities' => true],
-            'value' => html_entity_decode((string) $objEventStoryModel->text),
+            'value' => (string) $objEventStoryModel->text,
         ]);
 
         // tour waypoints
@@ -408,10 +416,10 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         $objForm->addFormField(
             'tourWaypoints',
             [
-                'label' => 'Tourenstationen mit Höhenangaben',
+                'label' => 'Tourenstationen mit Höhenangaben (nur stichwortartig)',
                 'inputType' => 'textarea',
                 'eval' => $eval,
-                'value' => html_entity_decode((string) $this->getTourWaypoints($objEventStoryModel)),
+                'value' => (string) $this->getTourWaypoints($objEventStoryModel),
             ]
         );
 
@@ -424,7 +432,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                 'label' => 'Höhenmeter und Zeitangabe pro Tag',
                 'inputType' => 'textarea',
                 'eval' => $eval,
-                'value' => html_entity_decode((string) $this->getTourProfile($objEventStoryModel)),
+                'value' => (string) $this->getTourProfile($objEventStoryModel),
             ]
         );
 
@@ -435,7 +443,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             'label' => 'Technische Schwierigkeiten',
             'inputType' => 'textarea',
             'eval' => $eval,
-            'value' => html_entity_decode((string) $this->getTourTechDifficulties($objEventStoryModel)),
+            'value' => (string) $this->getTourTechDifficulties($objEventStoryModel),
         ]);
 
         // tour highlights (not mandatory)
@@ -445,7 +453,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             'label' => 'Highlights/Bemerkungen (max. 3 Sätze)',
             'inputType' => 'textarea',
             'eval' => $eval,
-            'value' => html_entity_decode((string) $objEventStoryModel->tourHighlights),
+            'value' => (string) $objEventStoryModel->tourHighlights,
         ]);
 
         // tour public transport info
@@ -455,7 +463,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             'label' => 'Mögliche ÖV-Verbindung',
             'inputType' => 'textarea',
             'eval' => $eval,
-            'value' => html_entity_decode((string) $objEventStoryModel->tourPublicTransportInfo),
+            'value' => (string) $objEventStoryModel->tourPublicTransportInfo,
         ]);
 
         // youtube id
@@ -465,7 +473,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                 'label' => 'Youtube Film-Id',
                 'inputType' => 'text',
                 'eval' => ['placeholder' => 'z.B. G02hYgT3nGw'],
-                'value' => $objEventStoryModel->youtubeId,
+                'value' => (string) $objEventStoryModel->youtubeId,
             ]
         );
 
@@ -481,13 +489,14 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         // validate() also checks whether the form has been submitted
         if ($objForm->validate() && $inputAdapter->post('FORM_SUBMIT') === $objForm->getFormId()) {
             $objEventStoryModel->addedOn = time();
-            $objEventStoryModel->text = htmlspecialchars((string) $objForm->getWidget('text')->value);
+            $objEventStoryModel->title = html_entity_decode((string) $objForm->getWidget('title')->value);
+            $objEventStoryModel->text = html_entity_decode((string) $objForm->getWidget('text')->value);
             $objEventStoryModel->youtubeId = $objForm->getWidget('youtubeId')->value;
-            $objEventStoryModel->tourWaypoints = htmlspecialchars((string) $objForm->getWidget('tourWaypoints')->value);
-            $objEventStoryModel->tourProfile = htmlspecialchars((string) $objForm->getWidget('tourProfile')->value);
-            $objEventStoryModel->tourTechDifficulty = htmlspecialchars((string) $objForm->getWidget('tourTechDifficulty')->value);
-            $objEventStoryModel->tourHighlights = htmlspecialchars((string) $objForm->getWidget('tourHighlights')->value);
-            $objEventStoryModel->tourPublicTransportInfo = htmlspecialchars((string) $objForm->getWidget('tourPublicTransportInfo')->value);
+            $objEventStoryModel->tourWaypoints = html_entity_decode((string) $objForm->getWidget('tourWaypoints')->value);
+            $objEventStoryModel->tourProfile = html_entity_decode((string) $objForm->getWidget('tourProfile')->value);
+            $objEventStoryModel->tourTechDifficulty = html_entity_decode((string) $objForm->getWidget('tourTechDifficulty')->value);
+            $objEventStoryModel->tourHighlights = html_entity_decode((string) $objForm->getWidget('tourHighlights')->value);
+            $objEventStoryModel->tourPublicTransportInfo = html_entity_decode((string) $objForm->getWidget('tourPublicTransportInfo')->value);
 
             $objEventStoryModel->save();
 
@@ -531,6 +540,23 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             $arrData = $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent);
 
             return implode("\r\n", $arrData);
+        }
+
+        return '';
+    }
+
+    protected function getTourTitle(CalendarEventsStoryModel $objEventStoryModel): string
+    {
+        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+
+        if (!empty($objEventStoryModel->title)) {
+            return $objEventStoryModel->title;
+        }
+
+        $objEvent = $calendarEventsModelAdapter->findByPk($objEventStoryModel->eventId);
+
+        if (null !== $objEvent) {
+            return '' !== $objEvent->title ? $objEvent->title : '';
         }
 
         return '';

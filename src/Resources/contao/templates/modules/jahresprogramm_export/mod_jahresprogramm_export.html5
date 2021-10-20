@@ -139,10 +139,12 @@
     <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['requirements']) ?></td>
   </tr>
 
+  <!--
   <tr class="event-export-row-details">
     <td class="event-export-meeting-point font-italic">Treffpunkt/Zeit</td>
     <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['meetingPoint']) ?></td>
   </tr>
+  -->
 
   <tr class="event-export-row-details">
     <td class="event-export-journey font-italic">Anfahrt</td>
@@ -229,10 +231,12 @@
     <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['requirements']) ?></td>
   </tr>
 
+  <!--
   <tr class="event-export-row-details">
     <td class="event-export-meeting-point font-italic">Treffpunkt/Zeit</td>
     <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['meetingPoint']) ?></td>
   </tr>
+  -->
 
   <tr class="event-export-row-details">
     <td class="event-export-journey font-italic">Anfahrt</td>
