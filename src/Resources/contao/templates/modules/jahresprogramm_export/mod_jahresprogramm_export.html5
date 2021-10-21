@@ -71,10 +71,12 @@
     <td class="event-export-requirements do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['requirements']) ?></td>
   </tr>
 
+  <!--
   <tr class="event-export-row-details">
     <td class="event-export-min-max-members font-italic">Teilnehmer</td>
     <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= $arrEvent['minMaxMembers'] ?></td>
   </tr>
+  -->
 
   <tr class="event-export-row-details">
     <td class="event-export-leistungen font-italic">Preis/Leistung</td>
@@ -151,11 +153,14 @@
     <td class="event-export-journey font-italic">Anfahrt</td>
     <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= 'Keine Angabe' != $arrEvent['journey'] ? $arrEvent['journey'] : '' ?></td>
   </tr>
+  -->
+
   <!--
   <tr class="event-export-row-details">
     <td class="event-export-min-max-members font-italic">Teilnehmer</td>
     <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= $arrEvent['minMaxMembers'] ?></td>
   </tr>
+  -->
 
   <tr class="event-export-row-details">
     <td class="event-export-equipment font-italic">Ausrüstung</td>
@@ -252,7 +257,7 @@
     <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= $arrEvent['minMaxMembers'] ?></td>
   </tr>
   -->
-  
+
   <tr class="event-export-row-details">
     <td class="event-export-equipment font-italic">Ausrüstung</td>
     <td class="event-export-tour-profile do-not-show-row-when-empty" colspan="4"><?= nl2br($arrEvent['equipment']) ?></td>
