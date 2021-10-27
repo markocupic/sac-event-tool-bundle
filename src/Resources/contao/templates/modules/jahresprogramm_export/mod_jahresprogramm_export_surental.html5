@@ -50,6 +50,7 @@
     <td class="event-export-title" colspan="3"><?= $arrEvent['title'] ?> / Kursstufe <?= $arrEvent['courseLevel'] ?></td>
     <td class="event-export-organizer-title"><?= $arrEvent['organizerTitle'] ?></td>
   </tr>
+  
   <tr class="event-export-row-subheadline">
     <td class="event-export-date"><?= $arrEvent['courseTypeLevel1'] ?></td>
     <td class="event-export-instructors" colspan="3"><?= $arrEvent['instructors'] ?></td>
@@ -57,7 +58,8 @@
   </tr>
 
   <tr class="event-export-row-teaser">
-    <td class="event-export-teaser" colspan="5"><?= nl2br($arrEvent['teaser']) ?></td>
+    <td class="event-export-date">Einführungstext</td>
+    <td class="event-export-title" colspan="4"><?= nl2br($arrEvent['teaser']) ?></td>
   </tr>
 
   <!-- start details -->
@@ -107,7 +109,7 @@
   <?php endif; ?>
   <?php $month = $arrEvent['month']; ?>
 
-  <?php if ($arrEvent['showHeadline']): ?>
+  <?php //if ($arrEvent['showHeadline']): ?>
   <tr class="event-export-row-headline">
     <td class="event-export-date" style="min-width:220px;"><?= $arrEvent['date'] ?></td>
     <td class="event-export-title" colspan="3"><?= $arrEvent['title'] ?></td>
@@ -118,14 +120,14 @@
     <td class="event-export-instructors" colspan="3"><?= $arrEvent['instructors'] ?></td>
     <td class="event-export-instructors"><?= $arrEvent['eventId'] ?></td>
   </tr>
-  <?php endif; ?>
+  <?php //endif; ?>
 
-  <?php if ($arrEvent['showTeaser']): ?>
+  <?php //if ($arrEvent['showTeaser']): ?>
   <tr class="event-export-row-teaser">
-    <td class="event-export-date"></td>
+    <td class="event-export-date">Einführungstext</td>
     <td class="event-export-title" colspan="4"><?= nl2br($arrEvent['teaser']) ?></td>
   </tr>
-  <?php endif; ?>
+  <?php //endif; ?>
 
   <?php //if ($arrEvent['showDetails']): ?>
   <!-- start details -->
@@ -197,7 +199,7 @@
   <?php endif; ?>
   <?php $month = $arrEvent['month']; ?>
 
-  <?php if ($arrEvent['showHeadline']): ?>
+  <?php //if ($arrEvent['showHeadline']): ?>
   <tr class="event-export-row-headline">
     <td class="event-export-date" style="min-width:120px;"><?= $arrEvent['date'] ?></td>
     <td class="event-export-title" colspan="3"><?= $arrEvent['title'] ?></td>
@@ -208,14 +210,14 @@
     <td class="event-export-instructors" colspan="3"><?= $arrEvent['instructors'] ?></td>
     <td class="event-export-instructors"><?= $arrEvent['eventId'] ?></td>
   </tr>
-  <?php endif; ?>
+  <?php //endif; ?>
 
-  <?php if ($arrEvent['showTeaser']): ?>
+  <?php //if ($arrEvent['showTeaser']): ?>
   <tr class="event-export-row-teaser">
-    <td class="event-export-date"></td>
+    <td class="event-export-date">Einführungstext</td>
     <td class="event-export-title" colspan="4"><?= nl2br($arrEvent['teaser']) ?></td>
   </tr>
-  <?php endif; ?>
+  <?php //endif; ?>
 
   <?php //if ($arrEvent['showDetails']): ?>
   <!-- start details -->
