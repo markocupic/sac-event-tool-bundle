@@ -54,7 +54,25 @@ class TlCalendarEventsMember extends Backend
     {
         $this->import('BackendUser', 'User');
         parent::__construct();
-
+        /*
+         * $objDb = Database::getInstance()->prepare('SELECT id FROM tl_calendar_events_member ')->execute();
+         * while ($objDb->next())
+         * {
+         * $set = [
+         * 'uuid' => Uuid::uuid4()->toString()
+         * ];
+         *
+         *
+         * Database::getInstance()
+         * ->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')
+         * ->set($set)
+         * ->execute($objDb->id);
+         *
+         * echo $set['uuid']. '<br>';
+         * }
+         *
+         *
+         */
         // Set correct referer
         if ('sac_calendar_events_tool' === Input::get('do') && '' !== Input::get('ref')) {
             $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/backend_member_autocomplete.js';
@@ -541,6 +559,7 @@ class TlCalendarEventsMember extends Backend
                         $arrTokens = [
                             'participant_state_of_subscription' => html_entity_decode((string) $GLOBALS['TL_LANG']['tl_calendar_events_member'][$varValue]),
                             'event_name' => html_entity_decode((string) $objEvent->title),
+                            'participant_uuid' => $objEventMemberModel->uuid,
                             'participant_name' => html_entity_decode($objEventMemberModel->firstname.' '.$objEventMemberModel->lastname),
                             'participant_email' => $objEventMemberModel->email,
                             'event_link_detail' => 'https://'.Environment::get('host').'/'.Events::generateEventUrl($objEvent),
@@ -937,6 +956,7 @@ class TlCalendarEventsMember extends Backend
                 $arrTokens = [
                     'participantFirstname' => $objEventMemberModel->firstname,
                     'participantLastname' => $objEventMemberModel->lastname,
+                    'participant_uuid' => $objEventMemberModel->uuid,
                     'eventName' => $objEvent->title,
                     'courseId' => $objEvent->courseId,
                     'eventType' => $objEvent->eventType,

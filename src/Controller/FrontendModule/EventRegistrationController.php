@@ -44,6 +44,7 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\Event\EventSubscriptionEvent;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -428,6 +429,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $arrData['eventName'] = $this->eventModel->title;
                 $arrData['eventId'] = $this->eventModel->id;
                 $arrData['addedOn'] = time();
+                $arrData['uuid'] = Uuid::uuid4()->toString();
                 $arrData['stateOfSubscription'] = $calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel) ? EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED : EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED;
                 $arrData['bookingType'] = 'onlineForm';
                 $arrData['sectionIds'] = $this->memberModel->sectionId;

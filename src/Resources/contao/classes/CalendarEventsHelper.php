@@ -49,13 +49,13 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
  */
 class CalendarEventsHelper
 {
-    /**
-     * @param CalendarEventsModel $objEvent
-     * @param string $strProperty
-     * @param Template|null $objTemplate
-     * @return array|bool|CalendarEventsModel|int|mixed|string|null
-     * @throws \Exception
-     */
+	/**
+	 * @param  CalendarEventsModel                                  $objEvent
+	 * @param  string                                               $strProperty
+	 * @param  Template|null                                        $objTemplate
+	 * @return array|bool|CalendarEventsModel|int|mixed|string|null
+	 * @throws \Exception
+	 */
 	public static function getEventData(CalendarEventsModel $objEvent, string $strProperty, ?Template $objTemplate = null)
 	{
 		// Load language files

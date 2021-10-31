@@ -17,16 +17,10 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
-use Contao\Environment;
 use Contao\FrontendUser;
-use Contao\Input;
-use Contao\MemberModel;
-use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\System;
 use Contao\Template;
-use Haste\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -39,7 +33,7 @@ use Symfony\Component\Security\Core\Security;
  */
 class MemberDashboardProfileController extends AbstractFrontendModuleController
 {
-    const TYPE = 'member_dashboard_profile';
+    public const TYPE = 'member_dashboard_profile';
 
     /**
      * @var FrontendUser
@@ -93,13 +87,10 @@ class MemberDashboardProfileController extends AbstractFrontendModuleController
             throw new UnauthorizedHttpException('Not authorized. Please log in as frontend user.');
         }
 
-
         $this->template = $template;
 
         $this->template->user = $this->objUser;
 
-
         return $this->template->getResponse();
     }
-
 }

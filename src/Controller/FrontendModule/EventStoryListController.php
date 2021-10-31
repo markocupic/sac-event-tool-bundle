@@ -39,7 +39,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class EventStoryListController extends AbstractFrontendModuleController
 {
-   public const TYPE = 'event_story_list';
+    public const TYPE = 'event_story_list';
 
     /**
      * @var CalendarEventsStoryModel

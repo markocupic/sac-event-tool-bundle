@@ -44,7 +44,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class JahresprogrammExportController extends AbstractPrintExportController
 {
-    public const TYPE='jahresprogramm_export';
+    public const TYPE = 'jahresprogramm_export';
     /**
      * @var ModuleModel
      */
