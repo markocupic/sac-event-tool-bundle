@@ -54,25 +54,7 @@ class TlCalendarEventsMember extends Backend
     {
         $this->import('BackendUser', 'User');
         parent::__construct();
-        /*
-         * $objDb = Database::getInstance()->prepare('SELECT id FROM tl_calendar_events_member ')->execute();
-         * while ($objDb->next())
-         * {
-         * $set = [
-         * 'uuid' => Uuid::uuid4()->toString()
-         * ];
-         *
-         *
-         * Database::getInstance()
-         * ->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')
-         * ->set($set)
-         * ->execute($objDb->id);
-         *
-         * echo $set['uuid']. '<br>';
-         * }
-         *
-         *
-         */
+
         // Set correct referer
         if ('sac_calendar_events_tool' === Input::get('do') && '' !== Input::get('ref')) {
             $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/backend_member_autocomplete.js';
