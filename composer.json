@@ -19,7 +19,7 @@
     "eluceo/ical": "^0.16",
     "league/csv": "^9.6",
     "tecnickcom/tcpdf": "^6.3",
-    "ramsey/uuid": "^4.2",
+    "ramsey/uuid": "^3.8|^4.2",
     "chillerlan/php-qrcode": "^4.3",
     "markocupic/phpoffice-bundle": "^1.0",
     "markocupic/cloudconvert-bundle": "^1.0",
