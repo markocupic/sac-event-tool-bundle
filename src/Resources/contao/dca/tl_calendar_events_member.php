@@ -339,6 +339,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
             'eval'          => array('doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'),
             'sql'           => "varchar(255) NOT NULL default ''",
         ),
+        'securityToken' => array(
+            'inputType'     => 'text',
+            'sql'           => "char(36) NOT NULL default ''",
+        ),
         'hasLeadClimbingEducation'    => array(
             'exclude'   => true,
             'filter'    => true,
