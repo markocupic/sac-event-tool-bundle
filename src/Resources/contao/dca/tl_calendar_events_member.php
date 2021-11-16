@@ -11,6 +11,8 @@
  */
 
 use Contao\Config;
+use Contao\Date;
+use Contao\File;
 use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Dca\TlCalendarEventsMember;
@@ -131,7 +133,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 			'toggleStateOfParticipation' => array(
 				'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['toggleStateOfParticipation'],
 				'attributes'           => 'onclick="Backend.getScrollOffset();"',
-				'haste_ajax_operation' => array(
+                'haste_ajax_operation' => array(
 					'field'   => 'hasParticipated',
 					'options' => array(
 						array(
@@ -156,11 +158,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 	// Palettes
 	'palettes'    => array(
 		'__selector__'    => array('addEmailAttachment', 'hasLeadClimbingEducation'),
-		'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn,allowMultiSignUp;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionIds,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;',
-		'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy;',
-		'refuseWithEmail' => 'refuseWithEmail;',
-		'acceptWithEmail' => 'acceptWithEmail;',
-		'addToWaitlist'   => 'addToWaitlist;',
+		'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn,allowMultiSignUp;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionIds,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
+		'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy',
+		'refuseWithEmail' => '{refuseWithEmail_legend},refuseWithEmail',
+		'acceptWithEmail' => '{acceptWithEmail_legend},acceptWithEmail',
+		'addToWaitlist'   => '{addToWaitlist_legend},addToWaitlist',
 	),
 
 	// Subpalettes

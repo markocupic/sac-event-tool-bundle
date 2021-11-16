@@ -415,6 +415,30 @@ class CalendarEventsHelper
 		return false;
 	}
 
+    /**
+     * @param  CalendarEventsModel $objEvent
+     * @return string
+     */
+    public static function getMainInstructor(CalendarEventsModel $objEvent): ?UserModel
+    {
+
+        if ($objEvent !== null)
+        {
+            $objDb = Database::getInstance();
+            $objInstructor = $objDb->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid=? AND isMainInstructor=?')
+                ->limit(1)
+                ->execute($objEvent->id, '1')
+            ;
+
+            if ($objInstructor->numRows)
+            {
+                return UserModel::findByPk($objInstructor->userId);
+            }
+        }
+
+        return null;
+    }
+
 	/**
 	 * @param  CalendarEventsModel $objEvent
 	 * @return string
@@ -423,24 +447,15 @@ class CalendarEventsHelper
 	{
 		$strName = '';
 
-		if ($objEvent !== null)
+		$objUser = self::getMainInstructor($objEvent);
+
+		if ($objUser !== null)
 		{
-			$objDb = Database::getInstance();
-			$objInstructor = $objDb->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid=? AND isMainInstructor=?')->limit(1)->execute($objEvent->id, '1');
-
-			if ($objInstructor->numRows)
-			{
-				$objUser = UserModel::findByPk($objInstructor->userId);
-
-				if ($objUser !== null)
-				{
-					$arrName = array();
-					$arrName[] = $objUser->lastname;
-					$arrName[] = $objUser->firstname;
-					$arrName = array_filter($arrName);
-					$strName = implode(' ', $arrName);
-				}
-			}
+			$arrName = array();
+            $arrName[] = $objUser->lastname;
+            $arrName[] = $objUser->firstname;
+            $arrName = array_filter($arrName);
+            $strName = implode(' ', $arrName);
 		}
 
 		return $strName;
