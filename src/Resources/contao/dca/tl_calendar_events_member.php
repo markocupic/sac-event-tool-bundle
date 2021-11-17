@@ -233,7 +233,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 		),
 		'hasParticipated'             => array(
 			'inputType' => 'checkbox',
-			'eval'      => array('submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true),
+			'eval'      => array('doNotShow' => false, 'doNotCopy' => true),
 			'sql'       => "char(1) NOT NULL default ''",
 		),
 		'dashboard'                   => array(
