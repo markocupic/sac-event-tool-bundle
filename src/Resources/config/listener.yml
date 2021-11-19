@@ -7,6 +7,14 @@ services:
 
     # CONTAO HOOKS:
     # Contao add custom regexp hook
+    Markocupic\SacEventToolBundle\EventListener\Contao\SacEvtOnGenerateEventDashboardListener:
+        public: true
+        arguments:
+            - "@contao.framework"
+        tags:
+            - { name: contao.hook, hook: sacEvtOnGenerateEventDashboard, method: onGenerateEventDashboardListener, priority: 100 }
+
+    # Contao add custom regexp hook
     Markocupic\SacEventToolBundle\EventListener\Contao\AddCustomRegexpListener:
         public: true
         arguments:
