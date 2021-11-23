@@ -402,7 +402,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         ]);
 
         // text
-        $maxlength = 1800;
+        $maxlength = 1700;
         $objForm->addFormField('text', [
             'label' => 'Touren-/Lager-/Kursbericht (max. '.$maxlength.' Zeichen, inkl. Leerzeichen)',
             'inputType' => 'textarea',
@@ -411,7 +411,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         ]);
 
         // tour waypoints
-        $eval = ['mandatory' => true, 'rows' => 2, 'decodeEntities' => true, 'placeholder' => 'z.B. Engelberg 1000m - Herrenrüti 1083 m - Galtiberg 1800 m - Einstieg 2000 m'];
+        $eval = ['mandatory' => true, 'maxlength' => 300, 'rows' => 2, 'decodeEntities' => true, 'placeholder' => 'z.B. Engelberg 1000m - Herrenrüti 1083 m - Galtiberg 1800 m - Einstieg 2000 m'];
 
         $objForm->addFormField(
             'tourWaypoints',

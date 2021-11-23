@@ -109,12 +109,12 @@ class SacEvtOnGenerateEventDashboardListener
                 ;
 
                 $invoiceListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
-                $menu->addChild('Tourrapport und Verg&uuml;tungsformulare drucken', ['uri' => $invoiceListHref])
+                $menu->addChild('Tourrapport und Vergütungsformulare drucken', ['uri' => $invoiceListHref])
                     ->setAttribute('role', 'button')
                     ->setLinkAttribute('class', 'tl_submit')
                     ->setLinkAttribute('target', '_blank')
                     ->setLinkAttribute('accesskey', 'i')
-                    ->setLinkAttribute('title', 'Tourrapport und Verguetungsformulare drucken [ALT + i]')
+                    ->setLinkAttribute('title', 'Tourrapport und Vergütungsformulare drucken [ALT + i]')
                 ;
             }
         }

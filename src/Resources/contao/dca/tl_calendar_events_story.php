@@ -190,7 +190,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 		'text'                    => array
 		(
 			'inputType' => 'textarea',
-			'eval'      => array('doNotCopy' => true, 'mandatory' => true, 'tl_class' => 'clr'),
+			'eval'      => array('doNotCopy' => true, 'max-length' => 1700, 'mandatory' => true, 'tl_class' => 'clr'),
 			'sql'       => "mediumtext NULL",
 		),
 		'youtubeId'               => array
@@ -241,7 +241,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = array
 		'tourWaypoints'           => array
 		(
 			'inputType' => 'textarea',
-			'eval'      => array('doNotCopy' => true, 'mandatory' => false, 'tl_class' => 'clr'),
+			'eval'      => array('doNotCopy' => true, 'max-length' => 300, 'mandatory' => false, 'tl_class' => 'clr'),
 			'sql'       => "mediumtext NULL",
 		),
 		'tourProfile'             => array
