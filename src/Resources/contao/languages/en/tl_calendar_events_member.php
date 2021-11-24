@@ -25,6 +25,8 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['show'] = ["Details", "Details 
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['stateOfSubscription_legend'] = "Anmeldestatus-Einstellungen";
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['stateOfParticipation_legend'] = "Abschliessende Einstellungen zum Teilnahmestatus";
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['acceptWithEmail_legend'] = 'Zusage für Event per E-Mail';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['refuseWithEmail_legend'] = 'Event-Absage per E-Mail';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['notes_legend'] = "Anmerkungen";
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['personal_legend'] = "Personalien";
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['address_legend'] = "Adresse";
@@ -71,17 +73,21 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['eventName'] = ["Eventname", "G
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['anonymized'] = ["Eingaben anonymisiert", ""];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['bookingType'] = ["Buchungsart", "Geben Sie an über welchen Zugang der Teilnehmer gebucht hat."];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['sectionIds'] = ["Sektionszugehörigkeit", "Geben Sie hier die SAC Sektionszugehörigkeit an (readonly-Feld)."];
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['hasPaid'] = ["Teilnahmekosten beglichen", "Geben Sie an, ob dieser Teilnehmer die Teilnahmekosten beglichen hat."];
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['paymentMethod'] = ["Zahlungsart", "Geben Sie die Zahlungsart an."];
 
 // References
-$GLOBALS['TL_LANG']['tl_calendar_events_member'] [EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED] = 'Anmeldung nicht bestätigt';
-$GLOBALS['TL_LANG']['tl_calendar_events_member'] [EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED] = 'Anmeldung bestätigt';
-$GLOBALS['TL_LANG']['tl_calendar_events_member'] [EventSubscriptionLevel::SUBSCRIPTION_REFUSED] = 'Anmeldung abgelehnt';
-$GLOBALS['TL_LANG']['tl_calendar_events_member'] [EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED] = 'Auf Warteliste';
-$GLOBALS['TL_LANG']['tl_calendar_events_member'] [EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED] = 'Vom Event abgemeldet';
-$GLOBALS['TL_LANG']['tl_calendar_events_member'] [EventSubscriptionLevel::SUBSCRIPTION_STATE_UNDEFINED] = 'Anmeldestatus unbekannt';
+$GLOBALS['TL_LANG']['tl_calendar_events_member'][EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED] = 'Anmeldung nicht bestätigt';
+$GLOBALS['TL_LANG']['tl_calendar_events_member'][EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED] = 'Anmeldung bestätigt';
+$GLOBALS['TL_LANG']['tl_calendar_events_member'][EventSubscriptionLevel::SUBSCRIPTION_REFUSED] = 'Anmeldung abgelehnt';
+$GLOBALS['TL_LANG']['tl_calendar_events_member'][EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED] = 'Auf Warteliste';
+$GLOBALS['TL_LANG']['tl_calendar_events_member'][EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED] = 'Vom Event abgemeldet';
+$GLOBALS['TL_LANG']['tl_calendar_events_member'][EventSubscriptionLevel::SUBSCRIPTION_STATE_UNDEFINED] = 'Anmeldestatus unbekannt';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['manually'] = 'Manuelle Erfassung der Personalien des Event-Teilnehmers';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['onlineForm'] = 'Buchung über Online-Buchungsformular';
-
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['cashPayment'] = 'Barzahlung';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['bankTransfer'] = 'Bank-/Postüberweisung';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['twint'] = 'TWINT';
 
 
 

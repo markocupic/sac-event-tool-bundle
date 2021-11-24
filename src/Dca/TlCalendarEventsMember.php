@@ -940,6 +940,7 @@ class TlCalendarEventsMember extends Backend
                     'participantLastname' => $objEventMemberModel->lastname,
                     'participant_uuid' => $objEventMemberModel->uuid,
                     'eventName' => $objEvent->title,
+                    'eventIban' => $objEvent->addIban ? $objEvent->iban : '',
                     'courseId' => $objEvent->courseId,
                     'eventType' => $objEvent->eventType,
                     'eventUrl' => Events::generateEventUrl($objEvent, true),
@@ -968,7 +969,6 @@ class TlCalendarEventsMember extends Backend
                 } else {
                     // Build email text from template
                     $objEmailTemplate = new BackendTemplate($arrAction['emailTemplate']);
-
                     foreach ($arrTokens as $k => $v) {
                         $objEmailTemplate->{$k} = $v;
                     }

@@ -44,6 +44,16 @@
         <td class="fw-bold">Notfallangaben</td>
         <td>{{ event_member_model.emergencyPhoneName }}, {{ event_member_model.emergencyPhone }}</td>
     </tr>
+    {% if event_model.addIban %}
+        <tr>
+            <td class="fw-bold">Bezahlung/Vorauskasse</td>
+            <td>
+                <p>Bitte überweise die Kosten für deine Teilnahme auf:</p>
+                <p>IBAN: {{ event_model.iban }}</p>
+                <p>Details dazu erhältst du per E-Mail nach dem Absenden des Anmeldeformulars.</p>
+            </td>
+        </tr>
+    {% endif %}
 </table>
 
 <p class="mt-5">

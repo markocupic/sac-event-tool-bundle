@@ -157,8 +157,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 
 	// Palettes
 	'palettes'    => array(
-		'__selector__'    => array('addEmailAttachment', 'hasLeadClimbingEducation'),
-		'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn,allowMultiSignUp;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionIds,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
+		'__selector__'    => array('addEmailAttachment', 'hasLeadClimbingEducation', 'hasPaid'),
+		'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionIds,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
 		'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy',
 		'refuseWithEmail' => '{refuseWithEmail_legend},refuseWithEmail',
 		'acceptWithEmail' => '{acceptWithEmail_legend},acceptWithEmail',
@@ -169,6 +169,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 	'subpalettes' => array(
 		'addEmailAttachment'       => 'emailAttachment',
 		'hasLeadClimbingEducation' => 'dateOfLeadClimbingEducation',
+        'hasPaid' => 'paymentMethod',
 	),
 
 	// Fields
@@ -209,6 +210,21 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 			'eval'      => array('submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'long clr'),
 			'sql'       => "char(1) NOT NULL default ''",
 		),
+        'hasPaid' => array(
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'checkbox',
+            'eval'      => array('submitOnChange' => true, 'tl_class' => 'clr m12', 'mandatory' => false),
+            'sql'       => "char(1) NOT NULL default ''",
+        ),
+        'paymentMethod' => array(
+            'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
+            'exclude'   => true,
+            'inputType' => 'select',
+            'options' => array('cashPayment',  'bankTransfer', 'twint'),
+            'eval'      => array('mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'),
+            'sql'       => "varchar(32) NOT NULL default ''",
+        ),
 		'stateOfSubscription'         => array(
 			'filter'        => true,
 			'inputType'     => 'select',

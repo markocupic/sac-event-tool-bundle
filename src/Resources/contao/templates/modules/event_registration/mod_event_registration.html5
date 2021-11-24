@@ -51,6 +51,13 @@
 
     <h3 class="ce_headline text-danger mt-5 mb-4">Für "<?= $this->eventModel->title ?>" anmelden</h3>
 
+    <?php if($this->eventModel->addIban): ?>
+    <div class="alert alert-info" role="alert">
+      <i class="fas fa-info-circle"></i>
+      <div><?= $this->trans('FORM.evt_reg_ibanText',[$this->eventModel->iban]) ?></div>
+    </div>
+    <?php endif; ?>
+
     <div class="hasteform_form-event-registration block">
       <form action="<?= $this->objForm->getFormAction() ?>" method="<?= $this->objForm->getMethod() ?>" enctype="<?= $this->objForm->getEnctype() ?>">
         <div class="formbody">

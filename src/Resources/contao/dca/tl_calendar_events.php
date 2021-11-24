@@ -59,6 +59,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addGallery'] = 'multiSR
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['setRegistrationPeriod'] = 'registrationStartDate,registrationEndDate';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addMinAndMaxMembers'] = 'minMembers,maxMembers';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['customizeEventRegistrationConfirmationEmailText'] = 'customEventRegistrationConfirmationEmailText';
+$GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addIban'] = 'iban';
 
 // Reset palettes
 $strLegends = '
@@ -80,6 +81,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour_report'] = $strLegend
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'allowDeregistration';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addMinAndMaxMembers';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addGallery';
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'addIban';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'setRegistrationPeriod';
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'customizeEventRegistrationConfirmationEmailText';
 
@@ -94,7 +96,7 @@ PaletteManipulator::create()
 	->addField(array('addTime', 'startTime', 'endTime'), 'date_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('isRecurringEvent'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'addIban'), 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('terms', 'issues'), 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
@@ -115,7 +117,7 @@ PaletteManipulator::create()
 	->addField(array('eventDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('isRecurringEvent'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(array('location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'addIban'), 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
@@ -125,7 +127,7 @@ PaletteManipulator::create()
 	->addField(array('addEnclosure'), 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('source'), 'source_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('cssClass', 'noComments'), 'expert_legend', PaletteManipulator::POSITION_APPEND)
-	->applyToPalette('tour', 'tl_calendar_events')
+    ->applyToPalette('tour', 'tl_calendar_events')
 	->applyToPalette('lastMinuteTour', 'tl_calendar_events');
 
 // generalEvent
@@ -137,7 +139,7 @@ PaletteManipulator::create()
 	->addField(array('eventDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('isRecurringEvent'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(array('location', 'journey', 'generalEventDetailText', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(array('location', 'journey', 'generalEventDetailText', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'addIban'), 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
@@ -157,7 +159,7 @@ PaletteManipulator::create()
 	->addField(array('eventDates', 'durationInfo'), 'date_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('isRecurringEvent'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('recurring'), 'recurring_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(array('teaser', 'terms', 'issues', 'location', 'journey', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous'), 'details_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(array('teaser', 'terms', 'issues', 'location', 'journey', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'addIban'), 'details_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('addMinAndMaxMembers'), 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'), 'registration_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(array('allowDeregistration'), 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
@@ -514,6 +516,25 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['miscellaneous'] = array(
 	'inputType' => 'textarea',
 	'eval'      => array('tl_class' => 'clr m12', 'mandatory' => false),
 	'sql'       => "text NULL",
+);
+
+// addIban
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addIban'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['addIban'],
+    'exclude'   => true,
+    'filter'    => true,
+    'inputType' => 'checkbox',
+    'eval'      => array('submitOnChange' => true, 'tl_class' => 'clr m12', 'mandatory' => false),
+    'sql'       => "char(1) NOT NULL default ''",
+);
+
+// iban
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['iban'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['iban'],
+    'exclude'   => true,
+    'inputType' => 'text',
+    'eval'      => array('mandatory' => true, 'rgxp' => 'alnum', 'tl_class' => 'w50'),
+    'sql'       => "varchar(32) NOT NULL default ''",
 );
 
 // eventDates
