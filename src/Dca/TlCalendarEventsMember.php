@@ -484,21 +484,21 @@ class TlCalendarEventsMember extends Backend
 
                 if (null !== $objMemberModel) {
                     $set = [
-                        'contaoMemberId' => $objMemberModel->id,
+                        'contaoMemberId' => (int) $objMemberModel->id,
                     ];
                     $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
                 } else {
                     $varValue = '';
                     $set = [
                         'sacMemberId' => '',
-                        'contaoMemberId' => '',
+                        'contaoMemberId' => 0,
                     ];
                     $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
                 }
             } else {
                 $set = [
                     'sacMemberId' => '',
-                    'contaoMemberId' => '',
+                    'contaoMemberId' => 0,
                 ];
                 $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
             }
@@ -969,6 +969,7 @@ class TlCalendarEventsMember extends Backend
                 } else {
                     // Build email text from template
                     $objEmailTemplate = new BackendTemplate($arrAction['emailTemplate']);
+
                     foreach ($arrTokens as $k => $v) {
                         $objEmailTemplate->{$k} = $v;
                     }
