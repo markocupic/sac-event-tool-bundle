@@ -118,7 +118,7 @@ class SyncSacMemberDatabase
         $configAdapter = $this->framework->getAdapter(Config::class);
 
         /** @var string ftp_hostname */
-        $this->ftp_hostname = $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME');
+        $this->ftp_hostname = (string) $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME');
 
         /** @var string ftp_username */
         $this->ftp_username = (string) $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME');

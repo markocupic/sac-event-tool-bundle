@@ -1,4 +1,10 @@
 services:
+    # For test purposes only
+    Markocupic\SacEventToolBundle\Controller\TestController:
+        public: true
+        arguments:
+            - '@contao.framework'
+            - '@twig'
 
     # Add a session bag
     Markocupic\SacEventToolBundle\Session\Attribute\ArrayAttributeBag:
@@ -6,7 +12,6 @@ services:
             - '_markocupic_sac_event_tool_attributes'
         calls:
             - [ setName, [ 'markocupic_sac_event_tool_attributes' ] ]
-
 
     # Contao Backend Module "Maintenance": Delete no more used event stories media directories
     Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainModuleEventStory:

@@ -147,7 +147,7 @@ class CsvExportController extends AbstractFrontendModuleController
 
                 if ('user-role-export' === $inputAdapter->post('export-type')) {
                     $strTable = 'tl_user';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'lastLogin', 'password', 'pwChange', 'userRole'];
+                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'leiterQualifikation', 'lastLogin', 'password', 'pwChange', 'userRole'];
                     $strGroupFieldName = 'userRole';
                     $objUser = $databaseAdapter->getInstance()
                         ->execute('SELECT * FROM tl_user ORDER BY lastname, firstname')
@@ -351,7 +351,7 @@ class CsvExportController extends AbstractFrontendModuleController
             return beautifyPhoneNumber($objUser->{$field});
         }
 
-        return $objUser->{$field};
+        return (string) $objUser->{$field};
     }
 
     /**
