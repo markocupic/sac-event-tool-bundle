@@ -11,7 +11,7 @@
  */
 
 document.addEventListener("DOMContentLoaded", function (event) {
-  window.FontAwesome.dom.watch();
+  //window.FontAwesome.dom.watch();
 });
 
 
