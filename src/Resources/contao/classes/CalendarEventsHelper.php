@@ -173,7 +173,7 @@ class CalendarEventsHelper
 				$value = implode(', ', static::getInstructorNamesAsArray($objEvent, false, true));
 				break;
 			case 'journey':
-				$value = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : '';
+                $value = CalendarEventsJourneyModel::findByPk($objEvent->journey) !== null ? CalendarEventsJourneyModel::findByPk($objEvent->journey)->title : '';
 				break;
 			case 'instructorsWithQualification':
 				$value = implode(', ', static::getInstructorNamesAsArray($objEvent, true, true));

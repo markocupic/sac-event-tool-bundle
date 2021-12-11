@@ -12,7 +12,8 @@
 
   <div class="row gx-5">
     <div class="col-md-6 col-lg-3 mt-3 mb-3">
-      {{picture::<?= $this->getEventData('eventImagePath') ?>?class=img-fluid&size=20&alt=<?= $this->getEventData('title') ?>}}
+      {{picture::<?= $this->getEventData('eventImagePath') ?>?class=img-fluid&size=20&alt=<?= $this->
+      getEventData('title') ?>}}
     </div>
 
     <div class="col-md-6 col-lg-9 mt-3 mb-3"><!--begin col left -->
@@ -25,7 +26,8 @@
 
         <?php if ('' != $this->getEventData('courseId')): ?>
         <div class="courseId event-detail event-info-box icon-box-small">
-          <h5>Kurs-Nr.:&nbsp;<!-- indexer::continue --><?= $this->getEventData('courseId') ?><!-- indexer::stop --></h5>
+          <h5>Kurs-Nr.:&nbsp;<!-- indexer::continue --><?= $this->getEventData('courseId') ?>
+            <!-- indexer::stop --></h5>
         </div>
         <?php endif; ?>
 
@@ -38,7 +40,8 @@
           <h5>Organisierende Gruppe</h5>
           <div class="organizer-logo m2-4 mb-2"><?= $this->getEventData('eventOrganizerLogos') ?></div>
           <p>
-            <?php if ('' !== $this->getEventData('eventOrganizers')): ?><?= $this->getEventData('eventOrganizers') ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
+            <?php if ('' !== $this->getEventData('eventOrganizers')): ?><?= $this->
+            getEventData('eventOrganizers') ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
           </p>
         </div>
 
@@ -67,11 +70,15 @@
     <div class="col-12">
       <div class="d-flex flex-wrap">
         <div class="me-2 mt-3 mb-3">
-          <a href="/_download/download_event_ical?eventId=<?= $this->getEventData('id') ?>" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary"><i class="fal fa-calendar-plus"></i> iCal</a>
+          <a href="/_download/download_event_ical?eventId=<?= $this->getEventData('id') ?>"
+             title="Event in Kalender importieren" class="btn btn-block btn-outline-primary"><i
+                  class="fal fa-calendar-plus"></i> iCal</a>
         </div>
 
         <div class="me-2 mt-3 mb-3">
-          <a href="/_download/print_workshop_details_as_pdf?eventId=<?= $this->getEventData('id') ?>" title="Details drucken" class="btn btn-block btn-outline-primary"><i class="fal fa-print"></i> Detailinfos</a>
+          <a href="/_download/print_workshop_details_as_pdf?eventId=<?= $this->getEventData('id') ?>"
+             title="Details drucken" class="btn btn-block btn-outline-primary"><i class="fal fa-print"></i>
+            Detailinfos</a>
         </div>
 
         <?php if (!$this->getEventData('disableOnlineRegistration')): ?>
@@ -130,15 +137,19 @@
         <?php if ($this->getEventData('setRegistrationPeriod')): ?>
         <div class="booking-text event-detail event-info-box icon-box-small">
           <h5>Anmeldung möglich</h5>
-          <p>Vom <?= $this->getEventData('registrationStartDateFormated') ?> bis zum <?= $this->getEventData('registrationEndDateFormated') ?></p>
+          <p>Vom <?= $this->getEventData('registrationStartDateFormated') ?> bis zum <?= $this->
+            getEventData('registrationEndDateFormated') ?></p>
         </div>
         <?php endif; ?>
 
-        <?php if ('' != $this->getEventData('bookingEvent') || $this->getEventData('generateMainInstructorContactDataFromDb')): ?>
+        <?php if ('' != $this->getEventData('bookingEvent') ||
+        $this->getEventData('generateMainInstructorContactDataFromDb')): ?>
         <div class="booking-text event-detail event-info-box icon-box-small">
           <h5>Anmeldung</h5>
-          <?php if ('' != $this->getEventData('bookingEvent')): ?><p><?= nl2br($this->getEventData('bookingEvent')) ?></p><?php endif; ?>
-          <?php if ($this->getEventData('generateMainInstructorContactDataFromDb')): ?><p class="m-0"><?= $this->getEventData('mainInstructorContactDataFromDb') ?></p><?php endif; ?>
+          <?php if ('' != $this->getEventData('bookingEvent')): ?><p><?= nl2br($this->
+          getEventData('bookingEvent')) ?></p><?php endif; ?>
+          <?php if ($this->getEventData('generateMainInstructorContactDataFromDb')): ?><p
+                class="m-0"><?= $this->getEventData('mainInstructorContactDataFromDb') ?></p><?php endif; ?>
         </div>
         <?php endif; ?>
 
@@ -159,16 +170,19 @@
         <!-- enclosures/downloads -->
         <?php // !Vorsicht bei Urheberrechtsverletzung wie z.B. urheberrechtlich geschützen Anhängen wie Topos, Karten, etc.?>
         <?php if (FE_USER_LOGGED_IN || 'eventPreview' === Contao\Input::get('mode')): ?>
-          <?php if ($this->getEventData('enclosure')): ?>
-          <div class="event-eclosures event-detail event-info-box icon-box-small">
-            <h5>Downloads/weitere Informationen</h5>
-            <div class="enclosure">
-              <?php foreach ($this->getEventData('enclosure') as $enclosure): ?>
-              <p><img src="<?= $enclosure['icon'] ?>" width="18" height="18" alt="<?= $enclosure['mime'] ?>" class="mime_icon"> <a href="<?= $enclosure['href'] ?>" title="<?= $enclosure['title'] ?>"><?= $enclosure['link'] ?> <span class="size">(<?= $enclosure['filesize'] ?>)</span></a></p>
-              <?php endforeach; ?>
-            </div>
+        <?php if ($this->getEventData('enclosure')): ?>
+        <div class="event-eclosures event-detail event-info-box icon-box-small">
+          <h5>Downloads/weitere Informationen</h5>
+          <div class="enclosure">
+            <?php foreach ($this->getEventData('enclosure') as $enclosure): ?>
+            <p><img src="<?= $enclosure['icon'] ?>" width="18" height="18" alt="<?= $enclosure['mime'] ?>"
+                    class="mime_icon"> <a href="<?= $enclosure['href'] ?>"
+                                          title="<?= $enclosure['title'] ?>"><?= $enclosure['link'] ?> <span
+                    class="size">(<?= $enclosure['filesize'] ?>)</span></a></p>
+            <?php endforeach; ?>
           </div>
-          <?php endif; ?>
+        </div>
+        <?php endif; ?>
         <?php endif; ?>
 
       </div>
