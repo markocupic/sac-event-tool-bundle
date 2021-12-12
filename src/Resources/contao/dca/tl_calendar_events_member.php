@@ -11,8 +11,6 @@
  */
 
 use Contao\Config;
-use Contao\Date;
-use Contao\File;
 use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Dca\TlCalendarEventsMember;
@@ -133,7 +131,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 			'toggleStateOfParticipation' => array(
 				'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['toggleStateOfParticipation'],
 				'attributes'           => 'onclick="Backend.getScrollOffset();"',
-                'haste_ajax_operation' => array(
+				'haste_ajax_operation' => array(
 					'field'   => 'hasParticipated',
 					'options' => array(
 						array(
@@ -169,7 +167,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 	'subpalettes' => array(
 		'addEmailAttachment'       => 'emailAttachment',
 		'hasLeadClimbingEducation' => 'dateOfLeadClimbingEducation',
-        'hasPaid' => 'paymentMethod',
+		'hasPaid' => 'paymentMethod',
 	),
 
 	// Fields
@@ -210,21 +208,21 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 			'eval'      => array('submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'long clr'),
 			'sql'       => "char(1) NOT NULL default ''",
 		),
-        'hasPaid' => array(
-            'exclude'   => true,
-            'filter'    => true,
-            'inputType' => 'checkbox',
-            'eval'      => array('submitOnChange' => true, 'tl_class' => 'clr m12', 'mandatory' => false),
-            'sql'       => "char(1) NOT NULL default ''",
-        ),
-        'paymentMethod' => array(
-            'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
-            'exclude'   => true,
-            'inputType' => 'select',
-            'options' => array('cashPayment',  'bankTransfer', 'twint'),
-            'eval'      => array('mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'),
-            'sql'       => "varchar(32) NOT NULL default ''",
-        ),
+		'hasPaid' => array(
+			'exclude'   => true,
+			'filter'    => true,
+			'inputType' => 'checkbox',
+			'eval'      => array('submitOnChange' => true, 'tl_class' => 'clr m12', 'mandatory' => false),
+			'sql'       => "char(1) NOT NULL default ''",
+		),
+		'paymentMethod' => array(
+			'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
+			'exclude'   => true,
+			'inputType' => 'select',
+			'options' => array('cashPayment',  'bankTransfer', 'twint'),
+			'eval'      => array('mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'),
+			'sql'       => "varchar(32) NOT NULL default ''",
+		),
 		'stateOfSubscription'         => array(
 			'filter'        => true,
 			'inputType'     => 'select',
@@ -284,13 +282,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 		'notes'                       => array(
 			'exclude'   => true,
 			'inputType' => 'textarea',
-			'eval'      => array('tl_class' => 'clr', 'decodeEntities' => true, 'mandatory' => false),
+			'eval'      => array('tl_class' => 'clr', 'maxlength' => 5000, 'decodeEntities' => true, 'mandatory' => false),
 			'sql'       => "text NULL",
 		),
 		'instructorNotes'             => array(
 			'exclude'   => true,
 			'inputType' => 'textarea',
-			'eval'      => array('tl_class' => 'clr', 'decodeEntities' => true, 'mandatory' => false),
+			'eval'      => array('tl_class' => 'clr', 'maxlength' => 5000, 'decodeEntities' => true, 'mandatory' => false),
 			'sql'       => "text NULL",
 		),
 		'firstname'                   => array(
@@ -345,8 +343,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 		),
 		'emergencyPhoneName'          => array(
 			'inputType' => 'text',
-			'eval'      => array('mandatory' => true, 'maxlength' => 64, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
-			'sql'       => "varchar(64) NOT NULL default ''",
+			'eval'      => array('mandatory' => true, 'maxlength' => 250, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
+			'sql'       => "varchar(255) NOT NULL default ''",
 		),
 		'email'                       => array(
 			'inputType' => 'text',
@@ -382,8 +380,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 			'exclude'   => true,
 			'search'    => true,
 			'inputType' => 'text',
-			'eval'      => array('tl_class' => 'clr'),
-			'sql'       => "varchar(1024) NOT NULL default ''",
+			'eval'      => array('tl_class' => 'clr', 'maxlength' => 5000),
+			'sql'       => "text NULL",
 		),
 		// Send E-mail
 		'emailRecipients'             => array(

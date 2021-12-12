@@ -558,28 +558,28 @@ class EventRegistrationController extends AbstractFrontendModuleController
             'mobile' => [
                 'label' => $this->translator->trans('FORM.evt_reg_mobile', [], 'contao_default'),
                 'inputType' => 'text',
-                'eval' => ['mandatory' => false, 'rgxp' => 'phone'],
+                'eval' => ['mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone'],
             ],
             'emergencyPhone' => [
                 'label' => $this->translator->trans('FORM.evt_reg_emergencyPhone', [], 'contao_default'),
                 'inputType' => 'text',
-                'eval' => ['mandatory' => true, 'rgxp' => 'phone'],
+                'eval' => ['mandatory' => true, 'maxlength' => 64, 'rgxp' => 'phone'],
             ],
             'emergencyPhoneName' => [
                 'label' => $this->translator->trans('FORM.evt_reg_emergencyPhoneName', [], 'contao_default'),
                 'inputType' => 'text',
-                'eval' => ['mandatory' => true],
+                'eval' => ['mandatory' => true, 'maxlength' => 250],
             ],
             'notes' => [
                 'label' => $this->translator->trans('FORM.evt_reg_notes', [], 'contao_default'),
                 'inputType' => 'textarea',
-                'eval' => ['mandatory' => true, 'rows' => 4],
+                'eval' => ['mandatory' => true, 'maxlength' => 2000, 'rows' => 4],
                 'class' => '',
             ],
             'foodHabits' => [
                 'label' => $this->translator->trans('FORM.evt_reg_foodHabits', [], 'contao_default'),
                 'inputType' => 'text',
-                'eval' => ['mandatory' => false],
+                'eval' => ['mandatory' => false, 'maxlength' => 2000],
             ],
             'agb' => [
                 'label' => ['', $this->translator->trans('FORM.evt_reg_agb.1', [], 'contao_default')],
