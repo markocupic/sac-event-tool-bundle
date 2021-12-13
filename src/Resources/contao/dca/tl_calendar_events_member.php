@@ -343,7 +343,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = array(
 		),
 		'emergencyPhoneName'          => array(
 			'inputType' => 'text',
-			'eval'      => array('mandatory' => true, 'maxlength' => 250, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
+			'eval'      => array('mandatory' => true, 'maxlength' => 255, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
 			'sql'       => "varchar(255) NOT NULL default ''",
 		),
 		'email'                       => array(

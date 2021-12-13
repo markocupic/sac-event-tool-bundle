@@ -326,8 +326,8 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['emergencyPhoneName'] = array(
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
-	'eval'      => array('maxlength' => 64, 'mandatory' => false, 'decodeEntities' => true, 'tl_class' => 'clr'),
-	'sql'       => "varchar(64) NOT NULL default ''",
+	'eval'      => array('maxlength' => 255, 'mandatory' => false, 'decodeEntities' => true, 'tl_class' => 'clr'),
+	'sql'       => "varchar(255) NOT NULL default ''",
 );
 
 // mobile

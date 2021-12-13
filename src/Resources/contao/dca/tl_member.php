@@ -265,8 +265,8 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhoneName'] = array(
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
-	'eval'      => array('maxlength' => 64, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
-	'sql'       => "varchar(64) NOT NULL default ''",
+	'eval'      => array('maxlength' => 255, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'),
+	'sql'       => "varchar(255) NOT NULL default ''",
 );
 
 // foodHabits
