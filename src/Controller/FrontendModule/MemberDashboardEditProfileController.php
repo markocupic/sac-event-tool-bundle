@@ -164,17 +164,17 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         $objForm->addFormField('emergencyPhone', [
             'label' => 'Notfallnummer',
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'phone', 'mandatory' => true],
+            'eval' => ['rgxp' => 'phone', 'mandatory' => true,'maxlength' => 64],
         ]);
         $objForm->addFormField('emergencyPhoneName', [
             'label' => 'Name und Bezug des Angeh&ouml;rigen',
             'inputType' => 'text',
-            'eval' => ['mandatory' => true],
+            'eval' => ['mandatory' => true, 'maxlength' => 255],
         ]);
         $objForm->addFormField('foodHabits', [
             'label' => 'Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)',
             'inputType' => 'text',
-            'eval' => ['mandatory' => false],
+            'eval' => ['mandatory' => false, 'maxlength' => 5000],
         ]);
 
         // Let's add  a submit button

@@ -274,8 +274,8 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = array(
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'text',
-	'eval'      => array('tl_class' => 'clr'),
-	'sql'       => "varchar(1024) NOT NULL default ''",
+	'eval'      => array('tl_class' => 'clr', 'maxlength' => 5000),
+    'sql'       => "text NULL",
 );
 
 if (TL_MODE === 'BE' && !BackendUser::getInstance()->isAdmin)

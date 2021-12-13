@@ -579,7 +579,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
             'foodHabits' => [
                 'label' => $this->translator->trans('FORM.evt_reg_foodHabits', [], 'contao_default'),
                 'inputType' => 'text',
-                'eval' => ['mandatory' => false, 'maxlength' => 2000],
+                'eval' => ['mandatory' => false, 'maxlength' => 5000],
             ],
             'agb' => [
                 'label' => ['', $this->translator->trans('FORM.evt_reg_agb.1', [], 'contao_default')],
