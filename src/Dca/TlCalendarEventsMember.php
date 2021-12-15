@@ -274,8 +274,11 @@ class TlCalendarEventsMember extends Backend
                         'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
                         'reply_to' => $this->User->email,
                         'email_subject' => html_entity_decode((string) Input::post('emailSubject')),
-                        'email_text' => html_entity_decode((string) strip_tags(Input::post('emailText'))),
-                        'attachment_tokens' => '',
+                        'email_text' => html_entity_decode(strip_tags((string) Input::post('emailText'))),
+                        'attachment_tokens' => null,
+                        'recipient_cc'       => null,
+                        'recipient_bcc'      => null,
+                        'email_html' => null,
                     ];
 
                     if (Input::post('emailSendCopy')) {
@@ -872,11 +875,12 @@ class TlCalendarEventsMember extends Backend
                             'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
                             'send_to' => $objEventMemberModel->email,
                             'reply_to' => $this->User->email,
-                            // 'recipient_cc'       => '',
-                            // 'recipient_bcc'      => '',
                             'email_subject' => html_entity_decode((string) Input::post('subject')),
-                            'email_text' => html_entity_decode((string) strip_tags(Input::post('text'))),
-                            'email_html' => html_entity_decode(''),
+                            'email_text' => html_entity_decode(strip_tags((string) Input::post('text'))),
+                            'attachment_tokens' => null,
+                            'recipient_cc'       => null,
+                            'recipient_bcc'      => null,
+                            'email_html' => null,
                         ];
 
                         // Check if member has already booked at the same time
