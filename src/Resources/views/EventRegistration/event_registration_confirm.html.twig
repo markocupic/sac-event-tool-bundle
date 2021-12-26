@@ -48,8 +48,17 @@
         <tr>
             <td class="fw-bold">Bezahlung/Vorauskasse</td>
             <td>
-                <p>Bitte überweise die Kosten für deine Teilnahme auf:</p>
-                <p>IBAN: {{ event_model.iban }}</p>
+                <p>Bitte überweise die Teilnahmegebühren auf:</p>
+                <p>
+                    <span class="fw-bold">IBAN:</span>
+                    <br>
+                    {{ event_model.iban }}
+                    <br>
+                    <br>
+                    <span class="fw-bold">Begünstigter:</span>
+                    <br>
+                    {{ event_model.ibanBeneficiary|nl2br }}
+                </p>
                 <p>Details dazu erhältst du per E-Mail nach dem Absenden des Anmeldeformulars.</p>
             </td>
         </tr>

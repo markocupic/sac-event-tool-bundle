@@ -128,7 +128,8 @@ final class NotifyOnEventSubscription implements EventSubscriberInterface
             $arrTokens = [
                 'event_name' => html_entity_decode((string) $eventType.$this->eventModel->title),
                 'event_add_iban' => $this->eventModel->addIban,
-                'event_iban' => $this->eventModel->addIban ? html_entity_decode($this->eventModel->iban) : '',
+                'event_iban' => $this->eventModel->addIban ? html_entity_decode((string)$this->eventModel->iban) : '',
+                'event_ibanBeneficiary' => $this->eventModel->addIban ? html_entity_decode((string)$this->eventModel->ibanBeneficiary) : '',
                 'event_type' => html_entity_decode((string) $this->eventModel->eventType),
                 'event_course_id' => $this->eventModel->courseId,
                 'instructor_name' => $bypassRegistration ? html_entity_decode((string) $strRegistrationGoesToName) : html_entity_decode((string) $objInstructor->name),

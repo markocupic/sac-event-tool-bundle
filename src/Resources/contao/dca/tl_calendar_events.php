@@ -59,7 +59,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addGallery'] = 'multiSR
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['setRegistrationPeriod'] = 'registrationStartDate,registrationEndDate';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addMinAndMaxMembers'] = 'minMembers,maxMembers';
 $GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['customizeEventRegistrationConfirmationEmailText'] = 'customEventRegistrationConfirmationEmailText';
-$GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addIban'] = 'iban';
+$GLOBALS['TL_DCA']['tl_calendar_events']['subpalettes']['addIban'] = 'iban, ibanBeneficiary';
 
 // Reset palettes
 $strLegends = '
@@ -535,6 +535,16 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['iban'] = array(
     'inputType' => 'text',
     'eval'      => array('mandatory' => true, 'rgxp' => 'alnum', 'tl_class' => 'w50'),
     'sql'       => "varchar(32) NOT NULL default ''",
+);
+
+// ibanBeneficiary
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['ibanBeneficiary'] = array(
+    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['ibanBeneficiary'],
+    'exclude'                 => true,
+    'inputType'               => 'textarea',
+    'search'                  => true,
+    'eval'                    => array('mandatory'=>true, 'tl_class'=>'clr'),
+    'sql'                     => "text NULL"
 );
 
 // eventDates

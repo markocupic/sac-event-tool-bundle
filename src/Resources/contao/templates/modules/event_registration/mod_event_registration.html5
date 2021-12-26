@@ -54,7 +54,19 @@
     <?php if($this->eventModel->addIban): ?>
     <div class="alert alert-info" role="alert">
       <i class="fas fa-info-circle"></i>
-      <div><?= $this->trans('FORM.evt_reg_ibanText',[$this->eventModel->iban]) ?></div>
+      <div>
+        <?= $this->trans('FORM.evt_reg_ibanText',[]) ?>
+        <br>
+        <br>
+        IBAN:
+        <br>
+        <?= $this->eventModel->iban ?>
+        <br>
+        <br>
+        <?= $this->trans('FORM.evt_reg_ibanBeneficiary',[]) ?>:
+        <br>
+        <?= nl2br((string) $this->eventModel->ibanBeneficiary) ?>
+      </div>
     </div>
     <?php endif; ?>
 

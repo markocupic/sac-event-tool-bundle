@@ -53,6 +53,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['organizers'] = array("Organisierende 
 $GLOBALS['TL_LANG']['tl_calendar_events']['meetingPoint'] = array("Zeit und Treffpunkt", "Geben Sie bitte eine Zeit und einen Treffpunkt an.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['addIban'] = array("IBAN Nummer anzeigen", "Geben Sie die IBAN-Nummer an, diese wird beim Anmeldevorgang angezeigt");
 $GLOBALS['TL_LANG']['tl_calendar_events']['iban'] = array("IBAN", "Geben Sie die IBAN Nummer ein.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['ibanBeneficiary'] = array("Begünstigter (IBAN)", "Geben Sie den zur IBAN Nummer gehörenden Begünstigten an.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['addMinAndMaxMembers'] = array("Minimale und maximale Teilnehmerzahl festlegen", "Möchten Sie die Teilnehmerzahl festlegen?");
 $GLOBALS['TL_LANG']['tl_calendar_events']['minMembers'] = array("Minimale Teilnehmerzahl", "Geben Sie bitte eine Teilnehmerzahl an.");
 $GLOBALS['TL_LANG']['tl_calendar_events']['maxMembers'] = array("Maximale Teilnehmerzahl", "Geben Sie bitte eine Teilnehmerzahl an.");

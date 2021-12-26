@@ -945,6 +945,7 @@ class TlCalendarEventsMember extends Backend
                     'participant_uuid' => $objEventMemberModel->uuid,
                     'eventName' => $objEvent->title,
                     'eventIban' => $objEvent->addIban ? $objEvent->iban : '',
+                    'eventIbanBeneficiary' => $objEvent->addIban ? $objEvent->ibanBeneficiary : '',
                     'courseId' => $objEvent->courseId,
                     'eventType' => $objEvent->eventType,
                     'eventUrl' => Events::generateEventUrl($objEvent, true),
