@@ -22,7 +22,7 @@
     "ramsey/uuid": "^3.8|^4.2",
     "chillerlan/php-qrcode": "^4.3",
     "markocupic/phpoffice-bundle": "^1.0",
-    "markocupic/cloudconvert-bundle": "^2.0",
+    "markocupic/cloudconvert-bundle": "dev-master",
     "markocupic/contao-component-vue-js": "^2.6",
     "markocupic/contao-utf8-arrows-insert-tag-bundle": "^1.0",
     "markocupic/rss-feed-generator-bundle": "^1.0",
