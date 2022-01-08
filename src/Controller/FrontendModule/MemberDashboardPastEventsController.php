@@ -21,6 +21,7 @@ use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Date;
+use Contao\File;
 use Contao\Frontend;
 use Contao\FrontendUser;
 use Contao\Input;
@@ -32,7 +33,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\Template;
 use Contao\Validator;
-use Markocupic\CloudconvertBundle\Services\DocxToPdfConversion;
+use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,6 +49,9 @@ use Symfony\Component\Security\Core\Security;
 class MemberDashboardPastEventsController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_past_events';
+
+    protected ConvertFile $fileConverter;
+
     /**
      * @var FrontendUser
      */
@@ -57,6 +61,10 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
      * @var Template
      */
     protected $template;
+
+    public function __construct(ConvertFile $fileConverter){
+        $this->fileConverter = $fileConverter;
+    }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
     {
@@ -225,10 +233,12 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     ;
 
                     // Generate pdf
-                    $objConversion = new DocxToPdfConversion($destFilename, $configAdapter->get('cloudconvertApiKey'));
-                    $objConversion->sendToBrowser(true)->createUncached(false)->convert();
-
-                    exit();
+                    $this->fileConverter
+                        ->file(new File($destFilename))
+                        ->uncached(false)
+                        ->sendToBrowser(true)
+                        ->convertTo('pdf')
+                        ;
                 }
 
                 throw new \Exception('There was an error while trying to generate the course confirmation.');

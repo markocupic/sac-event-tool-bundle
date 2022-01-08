@@ -25,6 +25,7 @@ services:
         public: true
         arguments:
             - '@contao.framework'
+            - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
             - '%kernel.project_dir%'
 
     # Generate docx/pdf event rapports and event invoices from docx templates
@@ -32,6 +33,7 @@ services:
         public: true
         arguments:
             - '@contao.framework'
+            - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
             - '%kernel.project_dir%'
 
     # Generate docx/pdf event rapports, event invoices and event memberlists from docx templates

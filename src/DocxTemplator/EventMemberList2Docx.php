@@ -24,7 +24,7 @@ use Contao\File;
 use Contao\Folder;
 use Contao\Message;
 use Contao\System;
-use Markocupic\CloudconvertBundle\Services\DocxToPdfConversion;
+use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event;
@@ -37,22 +37,15 @@ use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
  */
 class EventMemberList2Docx
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
 
-    /**
-     * @var string
-     */
-    private $projectDir;
+    private ContaoFramework $framework;
+    private ConvertFile $convertFile;
+    private string $projectDir;
 
-    /**
-     * EventRapport constructor.
-     */
-    public function __construct(ContaoFramework $framework, string $projectDir)
+    public function __construct(ContaoFramework $framework, ConvertFile $convertFile, string $projectDir)
     {
         $this->framework = $framework;
+        $this->convertFile = $convertFile;
         $this->projectDir = $projectDir;
 
         // Initialize contao framework
@@ -127,8 +120,12 @@ class EventMemberList2Docx
             ;
 
             // Generate pdf
-            $objConversion = new DocxToPdfConversion($destFile, (string) $configAdapter->get('cloudconvertApiKey'));
-            $objConversion->sendToBrowser(true)->createUncached(true)->convert();
+            $this->convertFile
+                ->file(new File($destFile))
+                ->sendToBrowser(true)
+                ->uncached(true)
+                ->convertTo('pdf')
+                ;
         }
 
         if ('docx' === $outputType) {

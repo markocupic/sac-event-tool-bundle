@@ -53,6 +53,8 @@ services:
 
     # Member dashboard module: show past events
     Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardPastEventsController:
+        arguments:
+            - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:
