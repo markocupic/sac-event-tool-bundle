@@ -50,7 +50,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 {
     public const TYPE = 'member_dashboard_past_events';
 
-    protected ConvertFile $fileConverter;
+    protected ConvertFile $convertFile;
 
     /**
      * @var FrontendUser
@@ -62,8 +62,8 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
      */
     protected $template;
 
-    public function __construct(ConvertFile $fileConverter){
-        $this->fileConverter = $fileConverter;
+    public function __construct(ConvertFile $convertFile){
+        $this->convertFile = $convertFile;
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
@@ -233,7 +233,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     ;
 
                     // Generate pdf
-                    $this->fileConverter
+                    $this->convertFile
                         ->file(new File($destFilename))
                         ->uncached(false)
                         ->sendToBrowser(true)
