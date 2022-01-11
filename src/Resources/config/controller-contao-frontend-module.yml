@@ -55,6 +55,7 @@ services:
     Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardPastEventsController:
         arguments:
             - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
+            - '%kernel.project_dir%'
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:

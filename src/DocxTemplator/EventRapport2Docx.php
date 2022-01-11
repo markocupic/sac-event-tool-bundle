@@ -134,9 +134,9 @@ class EventRapport2Docx
 
                 // Generate pdf
                 $this->convertFile
-                    ->file(new File($destFilename))
+                    ->file($this->projectDir.'/'.$destFilename)
                     ->uncached(true)
-                    ->sendToBrowser(true)
+                    ->sendToBrowser(true, true)
                     ->convertTo('pdf')
                     ;
             }

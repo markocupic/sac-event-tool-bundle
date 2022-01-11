@@ -3,6 +3,7 @@ services:
     Markocupic\SacEventToolBundle\Controller\TestController:
         public: true
         arguments:
+            - '@database_connection'
             - '@contao.framework'
             - '@twig'
 

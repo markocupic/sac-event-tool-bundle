@@ -21,7 +21,6 @@ use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Date;
-use Contao\File;
 use Contao\Frontend;
 use Contao\FrontendUser;
 use Contao\Input;
@@ -50,20 +49,23 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 {
     public const TYPE = 'member_dashboard_past_events';
 
-    protected ConvertFile $convertFile;
+    private ConvertFile $convertFile;
+    private string $projectDir;
 
     /**
      * @var FrontendUser
      */
-    protected $objUser;
+    private $objUser;
 
     /**
      * @var Template
      */
-    protected $template;
+    private $template;
 
-    public function __construct(ConvertFile $convertFile){
+    public function __construct(ConvertFile $convertFile, string $projectDir){
         $this->convertFile = $convertFile;
+        $this->projectDir = $projectDir;
+
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
@@ -234,9 +236,9 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
                     // Generate pdf
                     $this->convertFile
-                        ->file(new File($destFilename))
+                        ->file($this->projectDir . '/' . $destFilename)
                         ->uncached(false)
-                        ->sendToBrowser(true)
+                        ->sendToBrowser(true, true)
                         ->convertTo('pdf')
                         ;
                 }
