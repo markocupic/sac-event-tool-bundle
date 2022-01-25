@@ -36,8 +36,7 @@ $GLOBALS['TL_DCA']['tl_user']['config']['oncreate_callback'][] = [
 ];
 
 // Manipulate palette default
-PaletteManipulator::create(
-)
+PaletteManipulator::create()
     ->addLegend(
         'admin_legend',
         'password_legend',
@@ -169,8 +168,7 @@ foreach ($arrRemove as $field) {
     );
 }
 
-PaletteManipulator::create(
-)
+PaletteManipulator::create()
     ->addLegend(
         'frontend_legend',
         'backend_legend',
@@ -287,8 +285,7 @@ foreach ($arrRemove as $field) {
         $GLOBALS['TL_DCA']['tl_user']['palettes']['login']
     );
 }
-PaletteManipulator::create(
-)
+PaletteManipulator::create()
     ->addLegend(
         'admin_legend',
         'password_legend',
@@ -396,8 +393,7 @@ foreach ($arrRemove as $field) {
         $GLOBALS['TL_DCA']['tl_user']['palettes']['login']
     );
 }
-PaletteManipulator::create(
-)
+PaletteManipulator::create()
     ->addLegend(
         'frontend_legend',
         'backend_legend',
@@ -709,8 +705,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['country'] = [
     'filter'    => true,
     'sorting'   => true,
     'inputType' => 'select',
-    'options'   => System::getCountries(
-    ),
+    'options'   => System::getCountries(),
     'eval'      => [
         'includeBlankOption' => true,
         'chosen'             => true,

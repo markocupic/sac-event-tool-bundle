@@ -255,9 +255,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         ],
         'uuid'                        => [
             'inputType' => 'text',
-            'default'   => Uuid::uuid4(
-            )->toString(
-            ),
+            'default'   => Uuid::uuid4()->toString(),
             'eval'      => [
                 'unique'    => true,
                 'doNotCopy' => true,

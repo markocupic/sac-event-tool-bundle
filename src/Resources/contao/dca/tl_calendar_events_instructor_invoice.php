@@ -143,8 +143,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
         ],
         'userPid'           => [
             'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['userPid'],
-            'default'    => BackendUser::getInstance(
-            )->id,
+            'default'    => BackendUser::getInstance()->id,
             'foreignKey' => 'tl_user.name',
             'inputType'  => 'select',
             'relation'   => [

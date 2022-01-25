@@ -17,9 +17,11 @@ use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Dca\TlContent;
 
-if ('sac_calendar_events_tool' === Input::get(
+if (
+    'sac_calendar_events_tool' === Input::get(
         'do'
-    )) {
+    )
+) {
     $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_calendar_events';
     $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = [
         TlContent::class,
@@ -229,13 +231,10 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['imgSize'] = [
         'helpwizard'         => true,
         'tl_class'           => 'w50',
     ],
-    'options_callback' => static fn(
-    ) => System::getContainer(
-    )->get(
+    'options_callback' => static fn() => System::getContainer()->get(
         'contao.image.image_sizes'
     )->getOptionsForUser(
-        BackendUser::getInstance(
-        )
+        BackendUser::getInstance()
     ),
     'sql'              => "varchar(64) NOT NULL default ''",
 ];

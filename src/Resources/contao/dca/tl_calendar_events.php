@@ -146,8 +146,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'custom
 
 // Default palettes (define it for any case, f.ex edit all mode)
 // Put here all defined fields in the dca
-PaletteManipulator::create(
-)
+PaletteManipulator::create()
     ->addField(
         ['eventType'],
         'event_type_legend',
@@ -301,8 +300,7 @@ PaletteManipulator::create(
     );
 
 // Tour and lastMinuteTour palette
-PaletteManipulator::create(
-)
+PaletteManipulator::create()
     ->addField(
         ['eventType'],
         'event_type_legend',
@@ -425,8 +423,7 @@ PaletteManipulator::create(
 // generalEvent
 // same like tour but remove Fields: 'suitableForBeginners', 'tourTechDifficulty', 'tourProfile', 'mountainguide','tourDetailText', 'requirements'
 // Add field: 'generalEventDetailText'
-PaletteManipulator::create(
-)
+PaletteManipulator::create()
     ->addField(
         ['eventType'],
         'event_type_legend',
@@ -538,8 +535,7 @@ PaletteManipulator::create(
     );
 
 // Course palette
-PaletteManipulator::create(
-)
+PaletteManipulator::create()
     ->addField(
         ['eventType'],
         'event_type_legend',
@@ -667,8 +663,7 @@ PaletteManipulator::create(
     );
 
 // Tour report palette
-PaletteManipulator::create(
-)
+PaletteManipulator::create()
     ->addField(
         [
             'executionState',
@@ -900,8 +895,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
                 'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructorId'],
                 'exclude'    => true,
                 'inputType'  => 'select',
-                'default'    => BackendUser::getInstance(
-                )->id,
+                'default'    => BackendUser::getInstance()->id,
                 'filter'     => true,
                 'reference'  => &$GLOBALS['TL_LANG']['tl_calendar_events'],
                 'relation'   => [
@@ -1286,8 +1280,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generateMainInstructorContac
     'filter'    => true,
     'sorting'   => true,
     'exclude'   => true,
-    'default'   => BackendUser::getInstance(
-    )->generateMainInstructorContactDataFromDb,
+    'default'   => BackendUser::getInstance()->generateMainInstructorContactDataFromDb,
     'inputType' => 'checkbox',
     'eval'      => ['submitOnChange' => false],
     'sql'       => "char(1) NOT NULL default ''",
@@ -1299,8 +1292,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration'] 
     'filter'    => true,
     'sorting'   => true,
     'exclude'   => true,
-    'default'   => BackendUser::getInstance(
-    )->disableOnlineRegistration,
+    'default'   => BackendUser::getInstance()->disableOnlineRegistration,
     'inputType' => 'checkbox',
     'eval'      => ['submitOnChange' => false],
     'sql'       => "char(1) NOT NULL default ''",
@@ -1611,11 +1603,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = [
     'sql'              => "int(10) unsigned NOT NULL default '0'",
 ];
 
-if (!Input::get(
+if (
+    !Input::get(
         'act'
     ) || 'select' === Input::get(
         'act'
-    )) {
+    )
+) {
     // Display the field correctly in the filter menu
     $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel']['options_callback'] = null;
 }

@@ -18,8 +18,7 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Markocupic\SacEventToolBundle\Dca\TlMember;
 
 // Manipulate palette default
-PaletteManipulator::create(
-)
+PaletteManipulator::create()
     ->addLegend(
         'food_legend',
         'contact_legend',
@@ -438,8 +437,9 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = [
     'sql'       => 'text NULL',
 ];
 
-if (TL_MODE === 'BE' && !BackendUser::getInstance(
-    )->isAdmin) {
+if (
+    TL_MODE === 'BE' && !BackendUser::getInstance()->isAdmin
+) {
     // Fields (readonly fields)
     $GLOBALS['TL_DCA']['tl_member']['fields']['uuid']['eval']['readonly'] = 'readonly';
     $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId']['eval']['readonly'] = 'readonly';

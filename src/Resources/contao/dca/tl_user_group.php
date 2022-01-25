@@ -15,8 +15,7 @@ declare(strict_types=1);
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
 // Extend default palette
-PaletteManipulator::create(
-)
+PaletteManipulator::create()
     ->addLegend(
         'allowed_event_types_legend',
         'calendars_legend',

@@ -290,8 +290,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'addedOn'                 => [
-            'default'   => time(
-            ),
+            'default'   => time(),
             'flag'      => 8,
             'sorting'   => true,
             'inputType' => 'text',
