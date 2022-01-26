@@ -8,7 +8,7 @@
   <div class="event-container row">
     <div v-for="(row, index) of rows" class="event-item event-item-tour event col-12 col-lg-6" v-bind:data-id="row.id" v-bind:data-event-type="row.tourTypesIds">
 
-      <div class="event-list-inner-box d-flex p-3 mb-3 flex-wrap">
+      <div class="event-list-inner-box d-flex p-3 mb-3">
         <!-- left col -->
         <div class="event-list-tour-col-1" v-bind:onclick="'window.location.href=\'' + row.eventUrl + '\''">
           <div class="event-list-badge-wrapper me-4 rounded-circle d-flex align-items-center justify-content-center">
