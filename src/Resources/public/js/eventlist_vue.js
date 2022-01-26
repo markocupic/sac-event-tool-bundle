@@ -158,7 +158,6 @@ class VueTourList {
             return json;
           });
 
-
         },
         // Check if callback exists
         callbackExists: function callbackExists(strCallback) {
