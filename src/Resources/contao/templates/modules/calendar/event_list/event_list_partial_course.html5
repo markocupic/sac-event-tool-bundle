@@ -4,163 +4,104 @@
 
 
 <div id="course-list">
-    <span v-if="itemsTotal > 0"
-          class="text-muted"><small>Zu deiner Suchanfrage wurden {{ itemsTotal }} Events gefunden. </small></span>
-    <span v-if="blnIsBusy === true" class="ms-2 text-success"><small>Lade events...</small></span>
-    <div class="event-container row">
+  <span v-if="itemsTotal > 0" class="text-muted"><small>Zu deiner Suchanfrage wurden {{ itemsTotal }} Events gefunden. </small></span>
+  <span v-if="blnIsBusy === true" class="ms-2 text-success"><small>Lade events...</small></span>
+  <div class="event-container row">
 
-        <div v-for="(row, index) of rows" class="col-xl-6 event-item event-item-course event layout_upcoming"
-             v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
-            <div class="row">
-                <!-- Start left col -->
-                <div class="col-sm-3 col-xl-5 d-none d-sm-block">
-                    <a v-bind:href="row.eventUrl" v-bind:title="row.title" v-html="row.eventImage"
-                       class="responsive event-title-link"></a>
-                </div>
-                <!-- Start right col -->
-                <div class="col-sm-9 col-xl-7">
-                    <div class="title">
-                        <a v-bind:href="row.eventUrl" class="event-title-link">
-                            <h4 class="headline">{{ row.title }}</h4>
-                        </a>
-                    </div>
-                    <div class="detail-item">
-                        <strong>{{ row.courseTypeLevel0Name }}: {{ row.courseTypeLevel1Name }}</strong>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fa fa-fw fa-user"></i>Leitung: {{ row.instructorsWithQualification }}
-                    </div>
-                    <div class="detail-item">
-                        <i class="fa fa-fw fa-calendar-alt"></i>
-                        <span v-html="row.eventPeriodLgInline"></span>
-                    </div>
-                    <div class="detail-item">
-                        <div v-html="row.bookingCounter" class="me-1"></div>
-                    </div>
-                    <div class="detail-item">
-                        <span class="event-state-icon" v-bind:class="row.eventState"> </span>
-                        <span v-html="row.eventStateLabel"></span>
-                    </div>
-                </div>
-            </div>
+    <div v-for="(row, index) of rows" class="col-xl-6 event-item event-item-course event layout_upcoming" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
+      <div class="row">
+        <!-- Start left col -->
+        <div class="col-sm-3 col-xl-5 d-none d-sm-block">
+          <a v-bind:href="row.eventUrl" v-bind:title="row.title" v-html="row.eventImage" class="responsive event-title-link"></a>
         </div>
+        <!-- Start right col -->
+        <div class="col-sm-9 col-xl-7">
+          <div class="title">
+            <a v-bind:href="row.eventUrl" class="event-title-link">
+              <h4 class="headline">{{ row.title }}</h4>
+            </a>
+          </div>
+          <div class="detail-item">
+            <strong>{{ row.courseTypeLevel0Name }}: {{ row.courseTypeLevel1Name }}</strong>
+          </div>
+          <div class="detail-item">
+            <i class="fa fa-fw fa-user"></i>Leitung: {{ row.instructorsWithQualification }}
+          </div>
+          <div class="detail-item">
+            <i class="fa fa-fw fa-calendar-alt"></i>
+            <span v-html="row.eventPeriodLgInline"></span>
+          </div>
+          <div class="detail-item">
+            <div v-html="row.bookingCounter" class="me-1"></div>
+          </div>
+          <div class="detail-item">
+            <span class="event-state-icon" v-bind:class="row.eventState"> </span>
+            <span v-html="row.eventStateLabel"></span>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div v-if="blnIsBusy === true">
-        <div class="d-flex mt-4 justify-content-center">
-            <div mt-3 mb-3><i class="fal fa-5x fa-circle-notch fa-spin"></i></div>
-        </div>
-        <div class="d-flex justify-content-center">
-            <div class="mt-3 mb-3">... lade Events ...</div>
-        </div>
+  <div v-if="blnIsBusy === true">
+    <div class="d-flex mt-4 justify-content-center">
+      <div mt-3 mb-3><i class="fal fa-5x fa-circle-notch fa-spin"></i></div>
     </div>
+    <div class="d-flex justify-content-center">
+      <div class="mt-3 mb-3">... lade Events ...</div>
+    </div>
+  </div>
 
-    <div v-if="blnIsBusy === false && blnAllEventsLoaded === false" v-on:click="prepareRequest()">
-        <div class="d-flex justify-content-center">
-            <button class="btn btn-lg btn-outline-primary mt-4 ps-5 pe-5">Weitere Events laden?</button>
-        </div>
+  <div v-if="blnIsBusy === false && blnAllEventsLoaded === false" v-on:click="prepareRequest()">
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-lg btn-outline-primary mt-4 ps-5 pe-5">Weitere Events laden?</button>
     </div>
+  </div>
 
-    <div v-if="blnIsBusy === false && !itemsTotal" class="alert alert-info">
-        Zu deiner Suchanfrage wurden leider keine Events gefunden.
-    </div>
+  <div v-if="blnIsBusy === false && !itemsTotal" class="alert alert-info">
+    Zu deiner Suchanfrage wurden leider keine Events gefunden.
+  </div>
 </div>
 
 <!-- Set up the Vuejs course list -->
 <script>
-    new VueTourList('#course-list', {
-        'apiParams': {
-            'organizers': [<?= $this->apiParam['organizers'] ?
-    >],
-    'eventType'
-    :
-    [<?= $this->apiParam['eventType'] ?
-    >],
-    'tourType'
-    :
-    '<?= $this->apiParam['
-    tourType
-    '] ?>',
-        'courseType'
-    :
-    '<?= $this->apiParam['
-    courseType
-    '] ?>',
-        'courseId'
-    :
-    '<?= $this->apiParam['
-    courseId
-    '] ?>',
-        'year'
-    :
-    '<?= $this->apiParam['
-    year
-    '] ?>',
-        'dateStart'
-    :
-    '<?= $this->apiParam['
-    dateStart
-    '] ?>',
-        'textsearch'
-    :
-    '<?= $this->apiParam['
-    textsearch
-    '] ?>',
-        'eventId'
-    :
-    '<?= $this->apiParam['
-    eventId
-    '] ?>',
-        'arrIds'
-    :
-    [<?= $this->apiParam['arrIds'] ?
-    >],
-    'username'
-    :
-    '<?= $this->apiParam['
-    username
-    '] ?>',
-        'calendarIds'
-    :
-    [<?= $this->apiParam['calendarIds'] ?
-    >],
-    'limit'
-    :
-    '<?= $this->apiParam['
-    limit
-    '] ?>',
-        'offset'
-    :
-    '0',
-    },
-    'fields'
-    :
-    [
-        'title',
-        'eventUrl',
-        'courseTypeLevel1',
-        'eventImage||<?= $this->pictureId ?>',
-        'courseTypeLevel0Name',
-        'courseTypeLevel1Name',
-        'instructorsWithQualification',
-        'eventPeriodLgInline',
-        'bookingCounter',
-        'eventStateLabel',
-        'eventState',
-    ],
-        'callbacks'
-    :
-    {
-        'oninsert'
-    :
-
-        function (vue, json) {
-            window.setTimeout(function () {
-                $('[data-toggle="tooltip"]').tooltip();
-            }, 100);
-        }
+  new VueTourList('#course-list', {
+    'apiParams': {
+    'organizers': [<?= $this->apiParam['organizers'] ?>],
+    'eventType': [<?= $this->apiParam['eventType'] ?>],
+    'tourType': '<?= $this->apiParam['tourType'] ?>',
+    'courseType': '<?= $this->apiParam['courseType'] ?>',
+    'courseId': '<?= $this->apiParam['courseId'] ?>',
+    'year': '<?= $this->apiParam['year'] ?>',
+    'dateStart': '<?= $this->apiParam['dateStart'] ?>',
+    'textsearch': '<?= $this->apiParam['textsearch'] ?>',
+    'eventId': '<?= $this->apiParam['eventId'] ?>',
+    'arrIds': [<?= $this->apiParam['arrIds'] ?>],
+    'username': '<?= $this->apiParam['username'] ?>',
+    'calendarIds': [<?= $this->apiParam['calendarIds'] ?>],
+    'limit': '<?= $this->apiParam['limit'] ?>',
+    'offset': '0',
+  },
+  'fields': [
+    'title',
+    'eventUrl',
+    'courseTypeLevel1',
+    'eventImage||<?= $this->pictureId ?>',
+    'courseTypeLevel0Name',
+    'courseTypeLevel1Name',
+    'instructorsWithQualification',
+    'eventPeriodLgInline',
+    'bookingCounter',
+    'eventStateLabel',
+    'eventState',
+  ],
+  'callbacks': {
+    'oninsert': function (vue, json) {
+      window.setTimeout(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+      }, 100);
     }
-    })
-    ;
+  }
+});
 </script>
 
