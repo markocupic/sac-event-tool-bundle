@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -17,6 +17,8 @@ namespace Markocupic\SacEventToolBundle\Pdf;
 use Contao\CalendarEventsModel;
 use Contao\CalendarModel;
 use Contao\Config;
+use Contao\Controller;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
@@ -28,7 +30,8 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use TCPDF_FONTS;
+use Safe\DateTime;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class PrintWorkshopsAsPdf.
@@ -38,17 +41,12 @@ class PrintWorkshopsAsPdf
     /**
      * @var
      */
-    public $pdf;
+    public WorkshopTCPDF $pdf;
 
     /**
      * @var null
      */
     protected $year;
-
-    /**
-     * @var null
-     */
-    protected $calendarId;
 
     /**
      * @var null
@@ -84,8 +82,7 @@ class PrintWorkshopsAsPdf
         $this->framework->initialize(true);
 
         // Set defaults
-        $this->year = Config::get('SAC_EVT_WORKSHOP_FLYER_YEAR');
-        $this->calendarId = Config::get('SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID');
+        $this->year = (int) date('Y');
         $this->download = false;
     }
 
@@ -100,23 +97,6 @@ class PrintWorkshopsAsPdf
             throw new \Exception(sprintf('%s is not a valid year number. Please use a valid year number f.ex. "2020" as first parameter.', Date::parse('Y', strtotime($year))));
         }
         $this->year = $year;
-
-        return $this;
-    }
-
-    /**
-     * @throws \Exception
-     *
-     * @return PrintWorkshopsAsPdf
-     */
-    public function setCalendarId(int $calendarId): self
-    {
-        $objCalendar = CalendarModel::findByPk($calendarId);
-
-        if (null === $objCalendar) {
-            throw new \Exception('Please use a valid calendar id as first parameter.');
-        }
-        $this->calendarId = $calendarId;
 
         return $this;
     }
@@ -149,12 +129,12 @@ class PrintWorkshopsAsPdf
     }
 
     /**
-     * Launch method via CronJob (Geplante Aufgaben on Plesk).
+     * Launch method via CronJob
      */
-    public function printWorkshopsAsPdf(): void
+    public function printWorkshopsAsPdf(): Response
     {
         // Get root dir
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+        $projectDir = System::getContainer()->getParameter('kernel.project_dir');
 
         $this->addToc = true;
         $this->addCover = true;
@@ -164,7 +144,6 @@ class PrintWorkshopsAsPdf
             $this->printSingleEvent = true;
             $this->addToc = false;
             $this->addCover = false;
-            $this->calendarId = $objEvent->pid;
         }
 
         // Get the font directory
@@ -175,9 +154,9 @@ class PrintWorkshopsAsPdf
         // create new PDF document
         // Extend TCPDF for special footer and header handling
         $this->pdf = new WorkshopTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-Light.ttf', 'TrueTypeUnicode', '', 96);
-        TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-Bold.ttf', 'TrueTypeUnicode', '', 96);
-        TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-LightItalic.ttf', 'TrueTypeUnicode', '', 96);
+        \TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-Light.ttf', 'TrueTypeUnicode', '', 96);
+        \TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-Bold.ttf', 'TrueTypeUnicode', '', 96);
+        \TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-LightItalic.ttf', 'TrueTypeUnicode', '', 96);
 
         //$this->pdf->setPrintHeader(false);
         $this->pdf->setPrintFooter(false);
@@ -217,9 +196,16 @@ class PrintWorkshopsAsPdf
         $objDb = Database::getInstance();
 
         if ($this->eventId) {
-            $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id=? AND published=?')->execute($this->eventId, 1);
+            $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id = ? AND published = ?')
+                ->execute($this->eventId, 1)
+            ;
         } else {
-            $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE pid=? AND published=? ORDER BY courseTypeLevel0, title, startDate')->execute($this->calendarId, 1);
+            $year = $this->year;
+            $start = (new DateTime($year . '-01-01'))->getTimestamp();
+            $stop = (new DateTime($year+1 . '-01-01'))->getTimestamp();
+            $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE eventType = ? AND startTime >= ? AND endTime < ? AND published = ? ORDER BY courseTypeLevel0, title, startDate')
+                ->execute('course', $start,$stop, 1)
+            ;
         }
 
         while ($objEvent->next()) {
@@ -257,19 +243,27 @@ class PrintWorkshopsAsPdf
 
         if (false === $this->download) {
             // Close and output PDF document
-            if (file_exists($rootDir.'/'.$fileSRC)) {
-                unlink($rootDir.'/'.$fileSRC);
+            if (file_exists($projectDir.'/'.$fileSRC)) {
+                unlink($projectDir.'/'.$fileSRC);
             }
             sleep(1);
-            $this->pdf->Output($rootDir.'/'.$fileSRC, 'F');
+            $this->pdf->Output($projectDir.'/'.$fileSRC, 'F');
+            return new ResponseException(new Response(''));
         } else {
             // Send File to Browser
             if ($this->printSingleEvent) {
                 $eventAlias = CalendarEventsModel::findByPk($this->eventId)->alias;
-                $this->pdf->Output($eventAlias.'.pdf', 'D');
+                $strPath = dirname($fileSRC) . '/' . $eventAlias.'.pdf';
+                $this->pdf->Output($projectDir . '/' . $strPath, 'F');
+                return Controller::sendFileToBrowser($strPath,true);
+
             } else {
-                $filename = basename($fileSRC);
-                $this->pdf->Output($filename, 'D');
+                // Close and output PDF document
+                if (file_exists($projectDir.'/'.$fileSRC)) {
+                    unlink($projectDir.'/'.$fileSRC);
+                }
+                $this->pdf->Output($projectDir.'/' . $fileSRC, 'F');
+                return Controller::sendFileToBrowser($fileSRC,true);
             }
         }
     }

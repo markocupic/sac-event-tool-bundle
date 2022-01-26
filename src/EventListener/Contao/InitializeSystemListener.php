@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -95,8 +95,6 @@ class InitializeSystemListener
             'SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD',
             'SAC_EVT_EVENT_DEFAULT_PREVIEW_IMAGE_SRC',
             'SAC_EVT_DEFAULT_BACKEND_PASSWORD',
-            'SAC_EVT_WORKSHOP_FLYER_YEAR',
-            'SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID',
             'SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE',
             'SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT',
         ];

@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -28,6 +28,7 @@ use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -63,7 +64,7 @@ class DownloadController extends AbstractController
      *
      * @Route("/_download/print_workshop_booklet_as_pdf", name="sac_event_tool_download_print_workshop_booklet_as_pdf", defaults={"_scope" = "frontend", "_token_check" = false})
      */
-    public function printWorkshopBookletAsPdfAction(): void
+    public function printWorkshopBookletAsPdfAction(): Response
     {
         /** @var PrintWorkshopsAsPdf $pdf */
         $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf');
@@ -71,24 +72,16 @@ class DownloadController extends AbstractController
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->framework->getAdapter(Date::class);
-
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
 
-        $year = '' !== $request->query->get('year') ? (int) $request->query->get('year') : null;
-        $calendarId = '' !== $request->query->get('calendarId') ? (int) $request->query->get('calendarId') : null;
+        $year = $request->query->get('year') ?:null;
 
         if (!empty($year)) {
             if ('current' === $year) {
-                $year = (int) $dateAdapter->parse('Y');
+                $year = date('Y');
             }
-            $pdf = $pdf->setYear($year);
-        }
-
-        if (!empty($calendarId)) {
-            $pdf = $pdf->setCalendarId($calendarId);
+            $pdf = $pdf->setYear((int)$year);
         }
 
         $pdf->setDownload(true);
@@ -98,9 +91,8 @@ class DownloadController extends AbstractController
         $logger = $container->get('monolog.logger.contao');
         $logger->log(LogLevel::INFO, 'The course booklet has been downloaded.', ['contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'))]);
 
-        $pdf->printWorkshopsAsPdf();
+        return $pdf->printWorkshopsAsPdf();
 
-        exit();
     }
 
     /**
@@ -136,7 +128,7 @@ class DownloadController extends AbstractController
      *
      * @Route("/_download/print_workshop_details_as_pdf", name="sac_event_tool_download_print_workshop_details_as_pdf", defaults={"_scope" = "frontend", "_token_check" = false})
      */
-    public function printWorkshopDetailsAsPdfAction(): void
+    public function printWorkshopDetailsAsPdfAction(): Response
     {
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
@@ -151,8 +143,7 @@ class DownloadController extends AbstractController
         }
 
         $pdf->setDownload(true);
-        $pdf->printWorkshopsAsPdf();
-        exit();
+        return $pdf->printWorkshopsAsPdf();
     }
 
     /**

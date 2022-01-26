@@ -203,16 +203,6 @@ PaletteManipulator::create()
         PaletteManipulator::POSITION_APPEND
     )
     ->addField(
-        ['SAC_EVT_WORKSHOP_FLYER_YEAR'],
-        'sacWorkshopFlyer_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID'],
-        'sacWorkshopFlyer_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
         ['SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'],
         'sacWorkshopFlyer_legend',
         PaletteManipulator::POSITION_APPEND
@@ -562,26 +552,6 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_LOG_EVENT_SUBSCRIPTION_ERRO
 
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'],
-    'inputType' => 'text',
-    'eval'      => [
-        'mandatory'      => true,
-        'decodeEntities' => false,
-        'tl_class'       => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_WORKSHOP_FLYER_CALENDAR_ID'],
-    'inputType' => 'text',
-    'eval'      => [
-        'mandatory'      => true,
-        'decodeEntities' => false,
-        'tl_class'       => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_WORKSHOP_FLYER_YEAR'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_WORKSHOP_FLYER_YEAR'],
     'inputType' => 'text',
     'eval'      => [
         'mandatory'      => true,
