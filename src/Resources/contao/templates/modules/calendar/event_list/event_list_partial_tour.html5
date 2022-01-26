@@ -14,7 +14,7 @@
           <div class="event-list-badge-wrapper me-4 rounded-circle d-flex align-items-center justify-content-center">
             <div class="d-flex flex-column">
               <span class="event-list-badge-day small text-center">
-                  <strong v-html="row.startDateDay"></strong>
+                <strong v-html="row.startDateDay"></strong>
               </span>
               <span class="event-list-badge-month text-uppercase small text-center font-weight-bolder">
                 <strong v-html="row.startDateMonth"></strong>
@@ -99,50 +99,49 @@
 
 <!-- Set up the Vuejs tour list -->
 <script>
-  new VueTourList('#tour-list', {
-    'apiParams': {
-      'organizers': [<?= $this->apiParam['organizers'] ?>],
-      'eventType': [<?= $this->apiParam['eventType'] ?>],
-      'suitableForBeginners': '<?= $this->apiParam['suitableForBeginners'] ?>',
-      'tourType': '<?= $this->apiParam['tourType'] ?>',
-      'courseType': '<?= $this->apiParam['courseType'] ?>',
-      'courseId': '<?= $this->apiParam['courseId'] ?>',
-      'year': '<?= $this->apiParam['year'] ?>',
-      'dateStart': '<?= $this->apiParam['dateStart'] ?>',
-      'textsearch': '<?= $this->apiParam['textsearch'] ?>',
-      'eventId': '<?= $this->apiParam['eventId'] ?>',
-      'arrIds': [<?= $this->apiParam['arrIds'] ?>],
-      'username': '<?= $this->apiParam['username'] ?>',
-      'calendarIds': [<?= $this->apiParam['calendarIds'] ?>],
-      'limit': '<?= $this->apiParam['limit'] ?>',
-      'offset': '0',
-  },
-  'fields': [
-    'title',
-    'startDateDay',
-    'startDateMonth',
-    'eventType',
-    'eventTitle',
-    'eventUrl',
-    'instructors',
-    'tourTypesShortcuts',
-    'tourTechDifficulties',
-    'bookingCounter',
-    'id',
-    'eventState',
-    'eventStateLabel',
-    'eventDuration',
-    'eventPeriodLgInline',
-    'tourTypesIds',
-    'suitableForBeginners',
-  ],
-  'callbacks': {
-    'oninsert': function (vue, json) {
-      window.setTimeout(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-      }, 100);
+    new VueTourList('#tour-list', {
+        'apiParams': {
+            'organizers': [<?= $this->apiParam['organizers'] ?>],
+    'eventType': [<?= $this->apiParam['eventType'] ?>],
+    'suitableForBeginners': '<?= $this->apiParam['suitableForBeginners'] ?>',
+        'tourType': '<?= $this->apiParam['tourType'] ?>',
+        'courseType': '<?= $this->apiParam['courseType'] ?>',
+        'courseId': '<?= $this->apiParam['courseId'] ?>',
+        'year': '<?= $this->apiParam['year'] ?>',
+        'dateStart': '<?= $this->apiParam['dateStart'] ?>',
+        'textsearch': '<?= $this->apiParam['textsearch'] ?>',
+        'eventId': '<?= $this->apiParam['eventId'] ?>',
+        'arrIds': [<?= $this->apiParam['arrIds'] ?>],
+    'username': '<?= $this->apiParam['username'] ?>',
+        'calendarIds': [<?= $this->apiParam['calendarIds'] ?>],
+    'limit': '<?= $this->apiParam['limit'] ?>',
+        'offset': '0',
+    },
+    'fields': [
+        'title',
+        'startDateDay',
+        'startDateMonth',
+        'eventType',
+        'eventTitle',
+        'eventUrl',
+        'instructors',
+        'tourTypesShortcuts',
+        'tourTechDifficulties',
+        'bookingCounter',
+        'id',
+        'eventState',
+        'eventStateLabel',
+        'eventDuration',
+        'eventPeriodLgInline',
+        'tourTypesIds',
+        'suitableForBeginners',
+    ],
+        'callbacks': {
+        'oninsert': function (vue, json) {
+            window.setTimeout(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            }, 100);
+        }
     }
-  }
-});
+    });
 </script>
-
