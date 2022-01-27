@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Cron\Contao;
 
-use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf;
@@ -45,21 +44,6 @@ class DailyCron
 
         // Initialize contao framework
         $this->framework->initialize();
-    }
-
-    /**
-     * Generate workshop pdf booklet.
-     */
-    public function generateWorkshopPdfBooklet(): void
-    {
-        $year = (int) date('Y');
-
-        /** @var PrintWorkshopsAsPdf $pdf */
-        $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf');
-        $pdf->setYear($year)
-            ->setDownload(false)
-            ->printWorkshopsAsPdf()
-        ;
     }
 
     /**

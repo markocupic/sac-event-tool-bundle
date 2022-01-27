@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -15,53 +15,54 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Docx;
 
 use Contao\CalendarEventsModel;
-use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
+use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
 use Contao\EventOrganizerModel;
-use Contao\Folder;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
+use PhpOffice\PhpWord\Element\Cell;
+use PhpOffice\PhpWord\Exception\Exception;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
+use Safe\DateTime;
 
-/**
- * Class ExportEvents2Docx.
- */
 class ExportEvents2Docx
 {
-    /**
-     * @var
-     */
-    public static $strTable;
-    /**
-     * @var
-     */
-    public static $dca;
+    private const TEMP_PATH = 'system/tmp';
 
-    /**
-     * @var
-     */
-    public static $arrDatarecord;
+    private ContaoFramework $framework;
 
-    /**
-     * @param $calendarId
-     * @param $year
-     * @param null $eventId
-     */
-    public static function sendToBrowser($calendarId, $year, $eventId = null): void
+    private BinaryFileDownload $binaryFileDownload;
+
+    private string $projectDir;
+
+    private ?string $strTable;
+
+    private ?array $arrDatarecord;
+
+    public function __construct(ContaoFramework $framework, BinaryFileDownload $binaryFileDownload, string $projectDir)
     {
-        // Get root dir
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+        $this->framework = $framework;
+        $this->binaryFileDownload = $binaryFileDownload;
+        $this->projectDir = $projectDir;
 
-        self::$strTable = 'tl_calendar_events';
+        $this->framework->initialize(true);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function generate(int $year, string $eventId = null): void
+    {
+        $this->strTable = 'tl_calendar_events';
         Controller::loadDataContainer('tl_calendar_events');
-        self::$dca = $GLOBALS['TL_DCA'][self::$strTable];
 
         // Creating the new document...
         // Tutorial http://phpword.readthedocs.io/en/latest/elements.html#titles
@@ -90,15 +91,18 @@ class ExportEvents2Docx
             'borderSize' => 6,
             'cellMargin' => 50,
         ];
+
         $twip = 56.6928; // 1mm = 56.6928 twip
         $widthCol_1 = round(45 * $twip);
         $widthCol_2 = round(115 * $twip);
 
-        $objEvent = CalendarEventsModel::findBy(
-            ['tl_calendar_events.pid=?', 'tl_calendar_events.published=?'],
-            [$calendarId, '1'],
-            ['order' => 'courseTypeLevel0, title, startDate']
-        );
+        $start = (new DateTime($year.'-01-01'))->getTimestamp();
+        $stop = (new DateTime($year + 1 .'-01-01'))->getTimestamp();
+
+        $objEvent = Database::getInstance()
+            ->prepare('SELECT * FROM tl_calendar_events WHERE eventType = ? AND startTime >= ? AND endTime < ? AND published = ? ORDER BY courseTypeLevel0, title, startDate')
+            ->execute('course', $start, $stop, 1)
+        ;
 
         if (null !== $objEvent) {
             while ($objEvent->next()) {
@@ -108,9 +112,11 @@ class ExportEvents2Docx
                     }
                 }
 
-                self::$arrDatarecord = $objEvent->row();
+                $eventModel = CalendarEventsModel::findByPk($objEvent->id);
 
-                // Adding an empty Section to the document...
+                $this->arrDatarecord = $objEvent->row();
+
+                // Adding an empty section to the document...
                 $section = $phpWord->addSection();
 
                 // Add page header
@@ -121,7 +127,7 @@ class ExportEvents2Docx
                 $cell = $table->addCell(4500);
                 $textrun = $cell->addTextRun();
                 $textrun->addLink(Environment::get('host').'/', htmlspecialchars('KURSPROGRAMM '.$year, ENT_COMPAT, 'UTF-8'), $fStyleMediumRed);
-                $table->addCell(4500)->addImage($rootDir.'/files/fileadmin/page_assets/kursbroschuere/logo-sac-pilatus.png', ['height' => 40, 'align' => 'right']);
+                $table->addCell(4500)->addImage($this->projectDir.'/files/fileadmin/page_assets/kursbroschuere/logo-sac-pilatus.png', ['height' => 40, 'align' => 'right']);
 
                 // Add footer
                 //$footer = $section->addFooter();
@@ -129,7 +135,7 @@ class ExportEvents2Docx
                 //$footer->addLink('https://github.com/PHPOffice/PHPWord', htmlspecialchars('PHPWord on GitHub', ENT_COMPAT, 'UTF-8'));
 
                 // Add the title
-                $title = htmlspecialchars(self::formatValue('title', $objEvent->title, $objEvent->current()));
+                $title = htmlspecialchars($this->formatValue('title', $objEvent->title, $eventModel));
                 $phpWord->addTitleStyle(1, $fStyleTitle, null);
                 $section->addTitle(htmlspecialchars($title, ENT_COMPAT, 'UTF-8'), 1);
 
@@ -161,9 +167,10 @@ class ExportEvents2Docx
                     $table->addRow();
                     $table->addCell($widthCol_1)->addText(htmlspecialchars($label.':'), 'fStyleBold', 'pStyle');
                     $objCell = $table->addCell($widthCol_2);
-                    $value = self::formatValue($fieldname, $objEvent->{$fieldname}, $objEvent->current());
+                    $value = $this->formatValue($fieldname, $objEvent->{$fieldname}, $eventModel);
+
                     // Add multiline text
-                    self::addMultilineText($objCell, $value);
+                    $this->addMultilineText($objCell, $value);
                 }
 
                 $section->addText('event-alias: '.$objEvent->alias, 'fStyleSmall', 'pStyle');
@@ -173,21 +180,23 @@ class ExportEvents2Docx
                 $section->addPageBreak();
             }
         }
+        
         // Saving the document as OOXML file...
-        $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
-        new Folder(Config::get('SAC_EVT_TEMP_PATH'));
-        $objWriter->save($rootDir.'/'.Config::get('SAC_EVT_TEMP_PATH').'/sac-jahresprogramm.docx');
-        sleep(1);
+        $path = self::TEMP_PATH.'/sac-pilatus-kursprogramm-'.date('Y').'.docx';
 
-        $fileSRC = Config::get('SAC_EVT_TEMP_PATH').'/sac-jahresprogramm.docx';
-        Controller::sendFileToBrowser($fileSRC, false);
+        $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
+        $objWriter->save($this->projectDir.'/'.$path);
+
+        $fileSRC = $this->projectDir.'/'.$path;
+        $this->binaryFileDownload->sendFileToBrowser($fileSRC, basename($fileSRC), true);
     }
 
     /**
-     * @param $objCell
-     * @param $textlines
+     * @param Cell $objCell
+     * @param string $textlines
+     * @return void
      */
-    public static function addMultilineText($objCell, $textlines): void
+    private function addMultilineText(Cell $objCell, string $textlines): void
     {
         foreach (explode("\n", $textlines) as $line) {
             $objCell->addText(htmlspecialchars($line), 'fStyle', 'pStyle');
@@ -195,13 +204,14 @@ class ExportEvents2Docx
     }
 
     /**
-     * @param $field
-     * @param string $value
-     * @param $objEvent
+     * @param string $field
+     * @param $value
+     * @param CalendarEventsModel $objEvent
+     * @return string
      */
-    public static function formatValue($field, $value, CalendarEventsModel $objEvent): string
+    private function formatValue(string $field, $value, CalendarEventsModel $objEvent): string
     {
-        $table = self::$strTable;
+        $table = $this->strTable;
 
         if ('tl_calendar_events' === $table) {
             if ('courseLevel' === $field) {
@@ -233,9 +243,7 @@ class ExportEvents2Docx
 
                 if (\is_array(StringUtil::deserialize($value)) && !empty($value)) {
                     $arrValue = array_map(
-                        static function ($v) {
-                            return UserModel::findByPk((int) $v)->name;
-                        },
+                        static fn ($v) => UserModel::findByPk((int) $v)->name,
                         StringUtil::deserialize($value)
                     );
                     $value = implode(', ', $arrValue);
@@ -245,9 +253,7 @@ class ExportEvents2Docx
             if ('instructor' === $field) {
                 $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent);
                 $arrValue = array_map(
-                    static function ($v) {
-                        return UserModel::findByPk($v)->name;
-                    },
+                    static fn ($v) => UserModel::findByPk($v)->name,
                     $arrInstructors
                 );
                 $value = implode(', ', $arrValue);
@@ -281,12 +287,10 @@ class ExportEvents2Docx
 
             // Kusdatendaten in der Form d.m.Y, d.m.Y, ...
             if ('eventDates' === $field) {
-                $objEvent = CalendarEventsModel::findByPk(self::$arrDatarecord['id']);
+                $objEvent = CalendarEventsModel::findByPk($this->arrDatarecord['id']);
                 $arr = CalendarEventsHelper::getEventTimestamps($objEvent);
                 $arr = array_map(
-                    static function ($tstamp) {
-                        return Date::parse('d.m.Y', $tstamp);
-                    },
+                    static fn ($tstamp) => Date::parse('d.m.Y', $tstamp),
                     $arr
                 );
                 $value = implode(', ', $arr);

@@ -90,11 +90,22 @@ services:
         public: true
         arguments:
             - '@contao.framework'
+            - '@Markocupic\SacEventToolBundle\Download\BinaryFileDownload'
+            - '%kernel.project_dir%'
+
+    # Export events as docx file
+    Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx:
+        public: true
+        arguments:
+            - '@contao.framework'
+            - '@Markocupic\SacEventToolBundle\Download\BinaryFileDownload'
+            - '%kernel.project_dir%'
 
     # Send ical
     Markocupic\SacEventToolBundle\Ical\SendEventIcal:
         public: true
 
-
-
+    # Send file to the browser
+    Markocupic\SacEventToolBundle\Download\BinaryFileDownload:
+        public: true
 

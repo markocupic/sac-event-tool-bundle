@@ -15,9 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Pdf;
 
 use Contao\CalendarEventsModel;
-use Contao\CalendarModel;
 use Contao\Config;
-use Contao\Controller;
 use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CourseMainTypeModel;
@@ -30,6 +28,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Safe\DateTime;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -38,47 +37,28 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PrintWorkshopsAsPdf
 {
-    /**
-     * @var
-     */
-    public WorkshopTCPDF $pdf;
+    private ContaoFramework $framework;
 
-    /**
-     * @var null
-     */
-    protected $year;
+    private BinaryFileDownload $binaryFileDownload;
 
-    /**
-     * @var null
-     */
-    protected $eventId;
+    private string $projectDir;
 
-    /**
-     * @var PrintWorkshopsAsPdf
-     */
-    protected $download = false;
+    private ?WorkshopTCPDF $pdf;
 
-    /**
-     * @var bool
-     */
-    protected $addToc = false;
+    private ?int $year;
 
-    /**
-     * @var bool
-     */
-    protected $addCover = false;
+    private ?int $eventId = null;
 
-    /**
-     * @var bool
-     */
-    protected $printSingleEvent = false;
+    private bool $download;
 
-    /**
-     * PrintWorkshopsAsPdf constructor.
-     */
-    public function __construct(ContaoFramework $framework)
+    private bool $printSingleEvent = false;
+
+    public function __construct(ContaoFramework $framework, BinaryFileDownload $binaryFileDownload, string $projectDir)
     {
         $this->framework = $framework;
+        $this->binaryFileDownload = $binaryFileDownload;
+        $this->projectDir = $projectDir;
+
         $this->framework->initialize(true);
 
         // Set defaults
@@ -89,12 +69,12 @@ class PrintWorkshopsAsPdf
     /**
      * @throws \Exception
      *
-     * @return PrintWorkshopsAsPdf
+     * @return $this
      */
     public function setYear(int $year): self
     {
         if (!checkdate(1, 1, $year)) {
-            throw new \Exception(sprintf('%s is not a valid year number. Please use a valid year number f.ex. "2020" as first parameter.', Date::parse('Y', strtotime($year))));
+            throw new \Exception(sprintf('%s is not a valid year number. Please use a valid year number f.ex. "2020" as first parameter.', Date::parse('Y', strtotime((string) $year))));
         }
         $this->year = $year;
 
@@ -104,7 +84,7 @@ class PrintWorkshopsAsPdf
     /**
      * @throws \Exception
      *
-     * @return PrintWorkshopsAsPdf
+     * @return $this
      */
     public function setEventId(int $eventId): self
     {
@@ -119,7 +99,7 @@ class PrintWorkshopsAsPdf
     }
 
     /**
-     * @return PrintWorkshopsAsPdf
+     * @return $this
      */
     public function setDownload(bool $download): self
     {
@@ -129,21 +109,18 @@ class PrintWorkshopsAsPdf
     }
 
     /**
-     * Launch method via CronJob
+     * @throws \Exception
      */
-    public function printWorkshopsAsPdf(): Response
+    public function generate(): Response
     {
-        // Get root dir
-        $projectDir = System::getContainer()->getParameter('kernel.project_dir');
-
-        $this->addToc = true;
-        $this->addCover = true;
+        $addToc = true;
+        $addCover = true;
 
         // Print single event
-        if (null !== ($objEvent = CalendarEventsModel::findByPk($this->eventId))) {
+        if (null !== CalendarEventsModel::findByPk($this->eventId)) {
             $this->printSingleEvent = true;
-            $this->addToc = false;
-            $this->addCover = false;
+            $addToc = false;
+            $addCover = false;
         }
 
         // Get the font directory
@@ -161,14 +138,14 @@ class PrintWorkshopsAsPdf
         //$this->pdf->setPrintHeader(false);
         $this->pdf->setPrintFooter(false);
 
-        // set margins
+        // Set margins
         $this->pdf->SetMargins(20, 20, 20);
         $this->pdf->SetHeaderMargin(0);
 
-        // set auto page breaks false
+        // Set auto page breaks false
         $this->pdf->SetAutoPageBreak(false, 0);
 
-        if ($this->addCover) {
+        if ($addCover) {
             // Cover (first page)
             $this->pdf->type = 'cover';
             $this->pdf->AddPage('P', 'A4');
@@ -201,10 +178,11 @@ class PrintWorkshopsAsPdf
             ;
         } else {
             $year = $this->year;
-            $start = (new DateTime($year . '-01-01'))->getTimestamp();
-            $stop = (new DateTime($year+1 . '-01-01'))->getTimestamp();
+            $start = (new DateTime($year.'-01-01'))->getTimestamp();
+            $stop = (new DateTime($year + 1 .'-01-01'))->getTimestamp();
+
             $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE eventType = ? AND startTime >= ? AND endTime < ? AND published = ? ORDER BY courseTypeLevel0, title, startDate')
-                ->execute('course', $start,$stop, 1)
+                ->execute('course', $start, $stop, 1)
             ;
         }
 
@@ -217,11 +195,11 @@ class PrintWorkshopsAsPdf
             $this->pdf->writeHTML($html);
         }
 
-        if ($this->addToc) {
+        if ($addToc) {
             $this->pdf->type = 'TOC';
             $this->pdf->addTOCPage('P', 'A4', 20);
 
-            // write the TOC title
+            // Write the TOC title
             $this->pdf->SetFont('opensanslight', 'B', 16);
             $this->pdf->SetTextColor(100, 0, 0);
             $this->pdf->MultiCell(0, 0, 'Inhaltsverzeichnis', 0, 'L', 0, 1, '', '', true, 0);
@@ -230,7 +208,7 @@ class PrintWorkshopsAsPdf
 
             $this->pdf->SetFont('opensanslight', '', 11);
 
-            // add a simple Table Of Content at first page
+            // Add a simple Table Of Content at first page
             // (check the example n. 59 for the HTML version)
             $this->pdf->addTOC(2, 'opensanslight', '.', 'INDEX', 'B', [255, 255, 255]);
 
@@ -242,38 +220,34 @@ class PrintWorkshopsAsPdf
         $fileSRC = sprintf($filenamePattern, $this->year);
 
         if (false === $this->download) {
-            // Close and output PDF document
-            if (file_exists($projectDir.'/'.$fileSRC)) {
-                unlink($projectDir.'/'.$fileSRC);
-            }
-            sleep(1);
-            $this->pdf->Output($projectDir.'/'.$fileSRC, 'F');
-            return new ResponseException(new Response(''));
-        } else {
-            // Send File to Browser
-            if ($this->printSingleEvent) {
-                $eventAlias = CalendarEventsModel::findByPk($this->eventId)->alias;
-                $strPath = dirname($fileSRC) . '/' . $eventAlias.'.pdf';
-                $this->pdf->Output($projectDir . '/' . $strPath, 'F');
-                return Controller::sendFileToBrowser($strPath,true);
+            $this->pdf->Output($this->projectDir.'/'.$fileSRC, 'F');
 
-            } else {
-                // Close and output PDF document
-                if (file_exists($projectDir.'/'.$fileSRC)) {
-                    unlink($projectDir.'/'.$fileSRC);
-                }
-                $this->pdf->Output($projectDir.'/' . $fileSRC, 'F');
-                return Controller::sendFileToBrowser($fileSRC,true);
-            }
+            throw new ResponseException(new Response(''));
         }
+
+        if ($this->printSingleEvent) {
+            $eventAlias = CalendarEventsModel::findByPk($this->eventId)->alias;
+            $strPath = \dirname($fileSRC).'/'.$eventAlias.'.pdf';
+
+            $this->pdf->setTitle(basename($fileSRC));
+
+            // Save as file
+            $this->pdf->Output($this->projectDir.'/'.$strPath, 'F');
+
+            // Send file to the browser
+            $this->binaryFileDownload->sendFileToBrowser($this->projectDir.'/'.$strPath, basename($strPath), true);
+        }
+
+        $this->pdf->setTitle(basename($fileSRC));
+
+        // Save as file
+        $this->pdf->Output($this->projectDir.'/'.$fileSRC, 'F');
+
+        // Send file to the browser
+        $this->binaryFileDownload->sendFileToBrowser($this->projectDir.'/'.$fileSRC, basename($fileSRC), true);
     }
 
-    /**
-     * @param $eventId
-     *
-     * @return mixed|string
-     */
-    public function getDateString($eventId)
+    public function getDateString(int $eventId): string
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
         $strDates = '';
@@ -306,7 +280,7 @@ class PrintWorkshopsAsPdf
     /**
      * @param string $string
      */
-    protected function nl2br($string = ''): string
+    private function nl2br($string = ''): string
     {
         if (null === $string) {
             return '';
@@ -315,14 +289,11 @@ class PrintWorkshopsAsPdf
         return nl2br($string);
     }
 
-    /**
-     * @return string
-     */
-    private function generateHtmlContent()
+    private function generateHtmlContent(): string
     {
         System::loadLanguageFile('tl_calendar_events');
         $objEvent = CalendarEventsModel::findByPk($this->pdf->Event->id);
-        $this->pdf->Bookmark(html_entity_decode((string) $objEvent->title), 0, 0, '', 'I', [0, 0, 0]);
+        $this->pdf->Bookmark(html_entity_decode($objEvent->title), 0, 0, '', 'I', [0, 0, 0]);
 
         // Create template object
         $objPartial = new FrontendTemplate('tcpdf_template_sac_kurse');
@@ -331,7 +302,7 @@ class PrintWorkshopsAsPdf
         $objPartial->title = $objEvent->title;
 
         // Dates
-        $objPartial->date = $this->getDateString($objEvent->id);
+        $objPartial->date = $this->getDateString((int) $objEvent->id);
 
         // Duration
         $objPartial->durationInfo = $objEvent->durationInfo;
@@ -343,7 +314,7 @@ class PrintWorkshopsAsPdf
         // Course level
         $objPartial->courseLevel = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel];
 
-        // organisierende Gruppen
+        // Organizers
         $arrItems = array_map(
             static function ($item) {
                 $objOrganizer = EventOrganizerModel::findByPk($item);
@@ -358,7 +329,7 @@ class PrintWorkshopsAsPdf
         );
         $objPartial->organizers = implode(', ', $arrItems);
 
-        // Teasertext
+        // Teaser text
         $objPartial->teaser = $this->nl2br($objEvent->teaser);
 
         // Event terms
@@ -373,7 +344,7 @@ class PrintWorkshopsAsPdf
         // Event location
         $objPartial->location = $this->nl2br($objEvent->location);
 
-        // Mountainguide
+        // Mountain guide
         $objPartial->mountainguide = $objEvent->mountainguide;
 
         // Instructors
@@ -392,12 +363,14 @@ class PrintWorkshopsAsPdf
             },
             $arrInstructors
         );
+
+        // Instructors
         $objPartial->instructor = implode(', ', $arrItems);
 
         // Services/Leistungen
         $objPartial->leistungen = $this->nl2br($objEvent->leistungen);
 
-        // Signin
+        // Sign in
         $objPartial->bookingEvent = str_replace('(at)', '@', html_entity_decode($this->nl2br((string) $objEvent->bookingEvent)));
 
         // Equipment
@@ -406,7 +379,7 @@ class PrintWorkshopsAsPdf
         // Meeting point
         $objPartial->meetingPoint = $this->nl2br($objEvent->meetingPoint);
 
-        // Miscelaneous
+        // Miscellaneous
         $objPartial->miscellaneous = $this->nl2br($objEvent->miscellaneous);
 
         // Styles
@@ -416,8 +389,6 @@ class PrintWorkshopsAsPdf
 
         $objPartial->cellStyleA = "font-family: 'opensansbold';  width:40mm; font-weight:bold; font-size: 9px";
         $objPartial->cellStyleB = "font-family: 'opensanslight'; width:130mm; font-size: 9px";
-        //$objPartial->cellStyleANoBorder = "color: #000000; font-family: 'opensansbold'; font-weight:bold; width:40mm; font-size: 10px";
-        //$objPartial->cellStyleBNoBorder = "color: #000000; font-family: 'opensanslight'; width:130mm; font-size: 10px";
 
         // Teaser
         $objPartial->cellStyleC = "color: #000000; font-family: 'opensansbold'; font-size: 9px";

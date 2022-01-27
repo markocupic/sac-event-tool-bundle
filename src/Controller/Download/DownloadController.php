@@ -19,11 +19,11 @@ use Contao\CalendarModel;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\Date;
 use Contao\System;
-use Markocupic\SacEventToolBundle\DocxTemplator\ExportEvents2Docx;
+use Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx;
 use Markocupic\SacEventToolBundle\Ical\SendEventIcal;
 use Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,23 +36,23 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class DownloadController extends AbstractController
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private RequestStack $requestStack;
 
-    /**
-     * DownloadController constructor.
-     */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack)
+    private PrintWorkshopsAsPdf $printWorkshopsAsPdf;
+
+    private ExportEvents2Docx $exportEvents2Docx;
+
+    private ?LoggerInterface $logger;
+
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, PrintWorkshopsAsPdf $printWorkshopsAsPdf, ExportEvents2Docx $exportEvents2Docx, ?LoggerInterface $logger)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
+        $this->printWorkshopsAsPdf = $printWorkshopsAsPdf;
+        $this->exportEvents2Docx = $exportEvents2Docx;
+        $this->logger = $logger;
 
         $this->framework->initialize();
     }
@@ -66,33 +66,31 @@ class DownloadController extends AbstractController
      */
     public function printWorkshopBookletAsPdfAction(): Response
     {
-        /** @var PrintWorkshopsAsPdf $pdf */
-        $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf');
-
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
 
-        $year = $request->query->get('year') ?:null;
+        $year = $request->query->get('year') ?: null;
 
         if (!empty($year)) {
             if ('current' === $year) {
                 $year = date('Y');
             }
-            $pdf = $pdf->setYear((int)$year);
+            $this->printWorkshopsAsPdf->setYear((int) $year);
         }
 
-        $pdf->setDownload(true);
+        $this->printWorkshopsAsPdf->setDownload(true);
 
         // Log download
-        $container = System::getContainer();
-        $logger = $container->get('monolog.logger.contao');
-        $logger->log(LogLevel::INFO, 'The course booklet has been downloaded.', ['contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'))]);
+        $this->logger->log(
+            LogLevel::INFO,
+            'The course booklet has been downloaded.',
+            ['contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'))]
+        );
 
-        return $pdf->printWorkshopsAsPdf();
-
+        return $this->printWorkshopsAsPdf->generate();
     }
 
     /**
@@ -107,19 +105,16 @@ class DownloadController extends AbstractController
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
-        /** @var ExportEvents2Docx $exportEvents2DocxAdapter */
-        $exportEvents2DocxAdapter = $this->framework->getAdapter(ExportEvents2Docx::class);
+        if ($request->query->has('year')) {
+            $year = $request->query->get('year');
 
-        /** @var CalendarModel $calendarModelAdapter */
-        $calendarModelAdapter = $this->framework->getAdapter(CalendarModel::class);
+            if($year === 'current')
+            {
+                $year = date('Y');
+            }
 
-        /** @var CalendarModel $objCalendar */
-        $objCalendar = $calendarModelAdapter->findByPk($request->query->get('calendarId'));
-
-        if ($request->query->get('year') && null !== $objCalendar) {
-            $exportEvents2DocxAdapter->generate($objCalendar, $request->query->get('year'), $request->query->get('eventId'));
+            $this->exportEvents2Docx->generate((int) $year, $request->query->get('eventId', null));
         }
-        exit();
     }
 
     /**
@@ -133,17 +128,15 @@ class DownloadController extends AbstractController
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
-        /** @var PrintWorkshopsAsPdf $pdf */
-        $pdf = System::getContainer()->get('Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf');
-
         $eventId = $request->query->get('eventId') ? (int) $request->query->get('eventId') : null;
 
         if (null !== $eventId) {
-            $pdf->setEventId($eventId);
+            $this->printWorkshopsAsPdf->setEventId($eventId);
         }
 
-        $pdf->setDownload(true);
-        return $pdf->printWorkshopsAsPdf();
+        $this->printWorkshopsAsPdf->setDownload(true);
+
+        return $this->printWorkshopsAsPdf->generate();
     }
 
     /**
@@ -178,9 +171,10 @@ class DownloadController extends AbstractController
      *
      * @Route("/_download/{slug}", name="sac_event_tool_download", defaults={"_scope" = "frontend", "_token_check" = false})
      */
-    public function defaultAction($slug = ''): void
+    public function defaultAction($slug = ''): Response
     {
-        echo sprintf('Welcome to %s::%s. You have called the Service with this route: _download/%s', self::class, __FUNCTION__, $slug);
-        exit();
+        $msg = sprintf('Welcome to %s::%s. You have called the Service with this route: _download/%s', self::class, __FUNCTION__, $slug);
+
+        return new Response($msg);
     }
 }
