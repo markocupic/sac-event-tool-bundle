@@ -88,12 +88,12 @@ class PrintWorkshopsAsPdf
      */
     public function setEventId(int $eventId): self
     {
-        $objEvent = CalendarEventsModel::findByPk($eventId);
 
-        if (null === $objEvent) {
+        if (null === CalendarEventsModel::findByPk($eventId)) {
             throw new \Exception('Please use a valid event id as first parameter.');
         }
-        $this->eventId = $objEvent->id;
+
+        $this->eventId = $eventId;
 
         return $this;
     }

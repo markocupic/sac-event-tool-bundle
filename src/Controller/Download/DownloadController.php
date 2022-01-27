@@ -128,10 +128,10 @@ class DownloadController extends AbstractController
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
-        $eventId = $request->query->get('eventId') ? (int) $request->query->get('eventId') : null;
+        $eventId = $request->query->get('eventId', null);
 
         if (null !== $eventId) {
-            $this->printWorkshopsAsPdf->setEventId($eventId);
+            $this->printWorkshopsAsPdf->setEventId((int) $eventId);
         }
 
         $this->printWorkshopsAsPdf->setDownload(true);
