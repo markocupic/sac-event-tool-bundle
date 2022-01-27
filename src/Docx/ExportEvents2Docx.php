@@ -180,9 +180,9 @@ class ExportEvents2Docx
                 $section->addPageBreak();
             }
         }
-        
+
         // Saving the document as OOXML file...
-        $path = self::TEMP_PATH.'/sac-pilatus-kursprogramm-'.date('Y').'.docx';
+        $path = self::TEMP_PATH.'/SAC_Sektion_Pilatus_Kursprogramm_'.date('Y').'.docx';
 
         $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
         $objWriter->save($this->projectDir.'/'.$path);
@@ -191,11 +191,6 @@ class ExportEvents2Docx
         $this->binaryFileDownload->sendFileToBrowser($fileSRC, basename($fileSRC), true);
     }
 
-    /**
-     * @param Cell $objCell
-     * @param string $textlines
-     * @return void
-     */
     private function addMultilineText(Cell $objCell, string $textlines): void
     {
         foreach (explode("\n", $textlines) as $line) {
@@ -204,10 +199,7 @@ class ExportEvents2Docx
     }
 
     /**
-     * @param string $field
      * @param $value
-     * @param CalendarEventsModel $objEvent
-     * @return string
      */
     private function formatValue(string $field, $value, CalendarEventsModel $objEvent): string
     {
