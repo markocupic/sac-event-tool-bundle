@@ -1,10 +1,14 @@
 <?php
 
-/**
- * SAC Event Tool Web Plugin for Contao
- * Copyright (c) 2008-2020 Marko Cupic
- * @package sac-event-tool-bundle
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
+declare(strict_types=1);
+
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -13,9 +17,9 @@
 $GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
 $GLOBALS['TL_LANG']['MSC']['yourUpcomingEvents'] = 'Deine nächsten Events';
 
-$GLOBALS['TL_LANG']['CTE']['user_portrait'] = array('SAC-User-Portrait');
-$GLOBALS['TL_LANG']['CTE']['user_portrait_list'] = array('SAC-User-Portrait-Liste');
-$GLOBALS['TL_LANG']['CTE']['sac_calendar_newsletter'] = array('SAC-Events-Elemente');
+$GLOBALS['TL_LANG']['CTE']['user_portrait'] = ['SAC-User-Portrait'];
+$GLOBALS['TL_LANG']['CTE']['user_portrait_list'] = ['SAC-User-Portrait-Liste'];
+$GLOBALS['TL_LANG']['CTE']['sac_calendar_newsletter'] = ['SAC-Events-Elemente'];
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_1'] = 'Freie Plätze!';
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_2'] = 'Anmeldefrist für Event ist abgelaufen!';
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_3'] = 'Event ausgebucht!';
@@ -28,8 +32,7 @@ $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_fully_booked'] = 'Event aus
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_canceled'] = 'Event abgesagt!';
 $GLOBALS['TL_LANG']['CTE']['calendar_events']['event_deferred'] = 'Event verschoben!';
 
-if (TL_MODE === 'FE')
-{
+if (TL_MODE === 'FE') {
     $GLOBALS['TL_LANG']['MSC']['username'] = 'SAC Mitgliedernummer';
 }
 
@@ -86,8 +89,6 @@ $GLOBALS['TL_LANG']['ERR']['md_write_event_article_notSpecified'] = 'keine Angab
 $GLOBALS['TL_LANG']['ERR']['md_write_event_article_writeSomethingAboutTheEvent'] = 'Bitte schreibe in einigen Sätzen etwas zum Event.';
 $GLOBALS['TL_LANG']['ERR']['md_write_event_article_uploadDirNotFound'] = '';
 
-
-
 // Event registration frontend module
 $GLOBALS['TL_LANG']['ERR']['evt_reg_eventNotFound'] = 'Event mit ID: %s nicht gefunden.';
 $GLOBALS['TL_LANG']['ERR']['evt_reg_onlineRegDisabled'] = 'Der Leiter hat die Online-Anmeldung zu diesem Event deaktiviert. Bitte beachte die Tourenauschreibung.';
@@ -111,7 +112,7 @@ $GLOBALS['TL_LANG']['FORM']['evt_reg_carInfo'] = 'Ich könnte ein Auto mit ... P
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ahvNumber'] = 'AHV-Nummer';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_mobile'] = 'Mobilnummer';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_emergencyPhone'] = 'Notfalltelefonnummer/In Notfällen zu kontaktieren';
-$GLOBALS['TL_LANG']['FORM']['evt_reg_emergencyPhoneName'] = 'Notfalltelefonnummer/In Notfällen zu kontaktieren';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_emergencyPhoneName'] = 'Namen einer vertrauten Person für Notfälle';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_notes'] = 'Anmerkungen/Erfahrungen/Referenztouren';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_foodHabits'] = 'Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)';
 //$GLOBALS['TL_LANG']['FORM']['evt_reg_agb'][0] = '';
@@ -129,4 +130,3 @@ $GLOBALS['TL_LANG']['MSC']['unpublished'] = 'unveröffentlicht';
 
 // Meta wizard
 $GLOBALS['TL_LANG']['MSC']['aw_photographer'] = 'Photograph';
-
