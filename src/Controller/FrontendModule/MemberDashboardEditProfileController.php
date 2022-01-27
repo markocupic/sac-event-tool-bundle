@@ -97,7 +97,8 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
     protected function addMessagesToTemplate(): void
     {
         $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
-        $session = $this->get('requestStack')->getSession();
+        $request = $this->get('request_stack')->getCurrentRequest();
+        $session = $request->getSession();
         $flashBag = $session->getFlashBag();
 
         if ($messageAdapter->hasInfo()) {
@@ -127,7 +128,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         $translator = $this->get('translator');
 
         /** @var RequestStack $requestStack */
-        $requestStack = $this->get('requestStack');
+        $requestStack = $this->get('request_stack');
 
         /** @var Request $request */
         $request = $requestStack->getCurrentRequest();
@@ -181,7 +182,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         $objForm->bindModel($objModel);
 
         if ($objForm->validate()) {
-            // The model will now contain the changes, so you can save it
+            // The model will now contain the changes, so you can save it.
             $objModel->save();
         }
 
