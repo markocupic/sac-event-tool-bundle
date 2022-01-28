@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -137,7 +137,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
      */
     private $template;
 
-    public function __construct(Security $security, ContaoFramework $framework, SessionInterface $session, EventDispatcherInterface $eventDispatcher, TwigEnvironment $twig, TranslatorInterface $translator, string $projectDir, ?LoggerInterface $logger = null)
+    public function __construct(Security $security, ContaoFramework $framework, SessionInterface $session, EventDispatcherInterface $eventDispatcher, TwigEnvironment $twig, TranslatorInterface $translator, string $projectDir, LoggerInterface $logger = null)
     {
         $this->security = $security;
         $this->framework = $framework;
@@ -149,7 +149,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $this->logger = $logger;
     }
 
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         // Set the module object (Contao\ModuleModel)
         $this->moduleModel = $model;
@@ -582,7 +582,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 'eval' => ['mandatory' => false, 'maxlength' => 5000],
             ],
             'agb' => [
-                'label' => ['', $this->translator->trans('FORM.evt_reg_agb.1', [], 'contao_default')],
+                'label' => ['', $this->translator->trans('FORM.evt_reg_agb', [], 'contao_default')],
                 'inputType' => 'checkbox',
                 'eval' => ['mandatory' => true],
             ],

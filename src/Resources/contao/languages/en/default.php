@@ -12,29 +12,30 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-// Overwrite defaults
-
-$GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
-$GLOBALS['TL_LANG']['MSC']['yourUpcomingEvents'] = 'Deine nächsten Events';
-
-$GLOBALS['TL_LANG']['CTE']['user_portrait'] = ['SAC-User-Portrait'];
-$GLOBALS['TL_LANG']['CTE']['user_portrait_list'] = ['SAC-User-Portrait-Liste'];
-$GLOBALS['TL_LANG']['CTE']['sac_calendar_newsletter'] = ['SAC-Events-Elemente'];
-$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_1'] = 'Freie Plätze!';
-$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_2'] = 'Anmeldefrist für Event ist abgelaufen!';
-$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_3'] = 'Event ausgebucht!';
-$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_4'] = 'Event abgesagt!';
-$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_5'] = 'Anmelden noch nicht möglich!';
-$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_6'] = 'Event verschoben!';
-$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_status_7'] = 'Keine Online-Anmeldung möglich!';
-
-$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_fully_booked'] = 'Event ausgebucht!';
-$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_canceled'] = 'Event abgesagt!';
-$GLOBALS['TL_LANG']['CTE']['calendar_events']['event_deferred'] = 'Event verschoben!';
-
+// Override defaults
 if (TL_MODE === 'FE') {
     $GLOBALS['TL_LANG']['MSC']['username'] = 'SAC Mitgliedernummer';
+    $GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
 }
+
+// Content elements
+$GLOBALS['TL_LANG']['CTE']['user_portrait'] = ['SAC-User-Portrait'];
+$GLOBALS['TL_LANG']['CTE']['user_portrait_list'] = ['SAC-User-Portrait-Liste'];
+
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_1'] = 'Freie Plätze!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_2'] = 'Anmeldefrist für Event ist abgelaufen!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_3'] = 'Event ausgebucht!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_4'] = 'Event abgesagt!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_5'] = 'Anmelden noch nicht möglich!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_6'] = 'Event verschoben!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_7'] = 'Keine Online-Anmeldung möglich!';
+
+// Export table vendor\markocupic\sac-export-table-custom\src\Listener\ContaoHooks\ExportTableSacEventListener.php
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_fully_booked'] = 'Event ausgebucht!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_canceled'] = 'Event abgesagt!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_deferred'] = 'Event verschoben!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['withoutMountainGuide'] = 'Ohne Bergführer';
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['withMountainGuide'] = 'Mit Bergführer';
 
 // References
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][1] = 'Einführungskurs';
@@ -69,29 +70,31 @@ $GLOBALS['TL_LANG']['MSC']['publishedEvent'] = 'Der Event mit ID %s wurde veröf
 $GLOBALS['TL_LANG']['MSC']['unpublishedEvent'] = 'Der Event mit ID %s ist nicht mehr veröffentlicht.';
 $GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck'] = 'Das Datum für den Anfang des Anmeldezeitraums musste angepasst werden. Bitte kontrollieren Sie dieses nochmals.';
 $GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck'] = 'Das Datum für das Ende des Anmeldezeitraums musste angepasst werden. Bitte kontrollieren Sie dieses nochmals.';
-$GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'] = 'Sie haben nicht die erforderlichen Berechtigungen den Datensatz mit ID %s zu bearbeiten.';
-$GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'] = 'Sie haben nicht die erforderlichen Berechtigungen den Datensatz mit ID %s zu löschen.';
-$GLOBALS['TL_LANG']['MSC']['missingPermissionsToPublishOrUnpublishEvent'] = 'Sie haben nicht die erforderlichen Berechtigungen den Datensatz mit ID %s zu veröffentlichen.';
+$GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Datensatz mit ID %s zu bearbeiten.';
+$GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Datensatz mit ID %s zu löschen.';
+$GLOBALS['TL_LANG']['MSC']['missingPermissionsToPublishOrUnpublishEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Datensatz mit ID %s zu veröffentlichen.';
 $GLOBALS['TL_LANG']['MSC']['generateInvoice'] = 'Möchten Sie das Vergütungsformular ausdrucken?';
 $GLOBALS['TL_LANG']['MSC']['generateTourRapport'] = 'Möchten Sie den Tour-Rapport ausdrucken?';
 $GLOBALS['TL_LANG']['MSC']['writeTourReport'] = 'Möchten Sie den Tourenrapport erstellen/bearbeiten?';
 $GLOBALS['TL_LANG']['MSC']['goToPartcipantList'] = 'Möchten Sie zur Teilnehmerliste wechseln?';
 $GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'Möchten Sie das Vergütungsformular bearbeiten/erstellen?';
 
-// Member dashboard write event article frontend module
-$GLOBALS['TL_LANG']['ERR']['md_write_event_article_mailAddressNotFound'] = 'Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
+// Backend member dashboard
+$GLOBALS['TL_LANG']['MSC']['bmd_yourUpcomingEvents'] = 'Deine nächsten Events';
+
+// Frontend member dashboard write event article frontend module
+$GLOBALS['TL_LANG']['ERR']['md_write_event_article_mailAddressNotFound'] = 'Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterle auf der Webseite des Zentralverbands deine E-Mail-Adresse.';
 $GLOBALS['TL_LANG']['ERR']['md_write_event_article_eventNotFound'] = 'Event mit ID %s nicht gefunden.';
 $GLOBALS['TL_LANG']['ERR']['md_write_event_article_createArticleDeadlineExpired'] = 'Für diesen Event kann kein Bericht mehr erstellt werden. Das Eventdatum liegt bereits zu lange zurück.';
-$GLOBALS['TL_LANG']['ERR']['md_write_event_article_writingPermissionDenied'] = 'Du hast keine Berechtigung für diesen Event einen Bericht zu verfassen';
+$GLOBALS['TL_LANG']['ERR']['md_write_event_article_writingPermissionDenied'] = 'Du hast keine Berechtigung für diesen Event einen Bericht zu verfassen.';
 $GLOBALS['TL_LANG']['ERR']['md_write_event_article_missingImageLegend'] = 'Es fehlen noch eine oder mehrere Bildlegenden oder der Fotografen-Name. Bitte ergänze diese Pflichtangaben, damit der Bericht veröffentlicht werden kann.';
-$GLOBALS['TL_LANG']['ERR']['md_write_event_article_uploadDirNotFound'] = 'Bild-Upload-Verzeichnis nicht gefunden';
+$GLOBALS['TL_LANG']['ERR']['md_write_event_article_uploadDirNotFound'] = 'Bild-Upload-Verzeichnis nicht gefunden.';
 $GLOBALS['TL_LANG']['ERR']['md_write_event_article_notSpecified'] = 'keine Angabe';
 $GLOBALS['TL_LANG']['ERR']['md_write_event_article_writeSomethingAboutTheEvent'] = 'Bitte schreibe in einigen Sätzen etwas zum Event.';
-$GLOBALS['TL_LANG']['ERR']['md_write_event_article_uploadDirNotFound'] = '';
 
 // Event registration frontend module
 $GLOBALS['TL_LANG']['ERR']['evt_reg_eventNotFound'] = 'Event mit ID: %s nicht gefunden.';
-$GLOBALS['TL_LANG']['ERR']['evt_reg_onlineRegDisabled'] = 'Der Leiter hat die Online-Anmeldung zu diesem Event deaktiviert. Bitte beachte die Tourenauschreibung.';
+$GLOBALS['TL_LANG']['ERR']['evt_reg_onlineRegDisabled'] = 'Der Leiter hat die Online-Anmeldung zu diesem Event deaktiviert. Bitte beachte die Tourenausschreibung.';
 $GLOBALS['TL_LANG']['ERR']['evt_reg_eventFullyBooked'] = 'Dieser Anlass ist ausgebucht. Bitte erkundige dich beim Leiter, ob eine Nachmeldung möglich ist.';
 $GLOBALS['TL_LANG']['ERR']['evt_reg_eventCanceled'] = 'Dieser Anlass wurde abgesagt. Es ist keine Anmeldung möglich.';
 $GLOBALS['TL_LANG']['ERR']['evt_reg_eventDeferred'] = 'Dieser Anlass ist verschoben worden.';
@@ -108,23 +111,22 @@ $GLOBALS['TL_LANG']['ERR']['evt_reg_bookingLimitReaches'] = 'Die maximale Teilne
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ibanText'] = 'Bitte beachte, dass es sich bei diesem Anlass um einen Event mit Bezahlung durch Vorauskasse handelt. Deine Anmeldung wird erst bestätigt, nachdem der Teilnahmebeitrag bei uns eingegangen ist. Details dazu erhältst du nach der Anmeldung per E-Mail.';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ibanBeneficiary'] = 'Begünstigter';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ticketInfo'] = 'Ich besitze ein/eine';
-$GLOBALS['TL_LANG']['FORM']['evt_reg_carInfo'] = 'Ich könnte ein Auto mit ... Plätzen (inkl. Fahrer) mitnehmen';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_carInfo'] = 'Ich könnte ein Auto mit ... Plätzen (inkl. Fahrer) stellen';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ahvNumber'] = 'AHV-Nummer';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_mobile'] = 'Mobilnummer';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_emergencyPhone'] = 'Notfalltelefonnummer/In Notfällen zu kontaktieren';
-$GLOBALS['TL_LANG']['FORM']['evt_reg_emergencyPhoneName'] = 'Name und Bezug der Ihnen anvertrauten Kontaktperson für Notfälle';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_emergencyPhoneName'] = 'Name und Bezug der dir anvertrauten Kontaktperson für Notfälle';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_notes'] = 'Anmerkungen/Erfahrungen/Referenztouren';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_foodHabits'] = 'Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)';
-//$GLOBALS['TL_LANG']['FORM']['evt_reg_agb'][0] = '';
-$GLOBALS['TL_LANG']['FORM']['evt_reg_agb'][1] = 'Ich akzeptiere <a href="#" data-bs-toggle="modal" data-bs-target="#agbModal">das Kurs- und Tourenreglement.</a>';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_agb'] = 'Ich akzeptiere <a href="#" data-bs-toggle="modal" data-bs-target="#agbModal">das Kurs- und Tourenreglement.</a>';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_submit'] = 'Für Event anmelden';
 
 // Event registration frontend module form explanations
-$GLOBALS['TL_LANG']['FORM']['evt_reg_mobileExpl'] = 'Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leergelassen werden. Damit der Leiter dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine Mobilnummer zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.';
-$GLOBALS['TL_LANG']['FORM']['evt_reg_ahvExpl'] = 'Sämtliche Daten werden lediglich für interne Zwecke verwendet. Die AHV-Nummer wird ausschliesslich für die Abrechnung oder Rückforderung von Geldern von J+S verwendet. Die persönlichen Daten werden vertraulich behandelt. Eine Weitergabe an Drittorganisationen ist ausgeschlossen.';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_mobileExpl'] = 'Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leer gelassen werden. Damit der Leiter dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine Mobilnummer zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_ahvExpl'] = 'Sämtliche Daten werden lediglich für interne Zwecke verwendet. Die AHV-Nummer wird ausschliesslich für die Abrechnung oder Rückforderung von J+S-Geldern verwendet. Deine persönlichen Daten werden vertraulich behandelt. Eine Weitergabe an Drittorganisationen ist ausgeschlossen.';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_notesExpl'] = 'Bitte beschreibe in wenigen Worten dein Leistungsniveau und/oder beantworte, die in den Anmeldebestimmungen verlangten Angaben (z.B. bereits absolvierte Referenztouren oder Essgewohnheiten bei Events mit Übernachtung, etc.).';
 
-// Miscelaneous
+// Miscellaneous
 $GLOBALS['TL_LANG']['MSC']['published'] = 'veröffentlicht';
 $GLOBALS['TL_LANG']['MSC']['unpublished'] = 'unveröffentlicht';
 
