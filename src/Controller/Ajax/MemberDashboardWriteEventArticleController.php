@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -19,10 +19,8 @@ use Contao\CalendarEventsStoryModel;
 use Contao\Config;
 use Contao\CoreBundle\Exception\InvalidRequestTokenException;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Database;
 use Contao\Environment;
 use Contao\EventOrganizerModel;
-use Contao\File;
 use Contao\FilesModel;
 use Contao\FrontendUser;
 use Contao\ModuleModel;
@@ -31,45 +29,40 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
+use Doctrine\DBAL\Connection;
 use Haste\Util\Url;
 use NotificationCenter\Model\Notification;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class MemberDashboardWriteEventArticleController.
  */
 class MemberDashboardWriteEventArticleController extends AbstractController
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
 
-    /**
-     * @var CsrfTokenManagerInterface
-     */
-    private $tokenManager;
+    private Connection $connection;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private CsrfTokenManagerInterface $tokenManager;
 
-    /**
-     * @var Security
-     */
-    private $security;
+    private RequestStack $requestStack;
 
-    /**
-     * @var string
-     */
-    private $tokenName;
+    private Security $security;
+
+    private TranslatorInterface $translator;
+
+    private string $projectDir;
+
+    private string $tokenName;
 
     /**
      * MemberDashboardWriteEventArticleController constructor.
@@ -81,49 +74,30 @@ class MemberDashboardWriteEventArticleController extends AbstractController
      *
      * @throws \Exception
      */
-    public function __construct(ContaoFramework $framework, CsrfTokenManagerInterface $tokenManager, RequestStack $requestStack, Security $security, string $tokenName)
+    public function __construct(ContaoFramework $framework, Connection $connection, CsrfTokenManagerInterface $tokenManager, RequestStack $requestStack, Security $security, TranslatorInterface $translator, string $projectDir, string $tokenName)
     {
         $this->framework = $framework;
+        $this->connection = $connection;
         $this->tokenManager = $tokenManager;
         $this->requestStack = $requestStack;
         $this->security = $security;
+        $this->translator = $translator;
+        $this->projectDir = $projectDir;
         $this->tokenName = $tokenName;
-
-        $this->framework->initialize();
-
-        /** @var FrontendUser $user */
-        $user = $this->security->getUser();
-
-        if (!$user instanceof FrontendUser) {
-            throw new \Exception('You have to be logged in as a Contao Frontend User');
-        }
-
-        /** @var FrontendUser $user */
-        $user = $this->security->getUser();
-
-        if (!$user instanceof FrontendUser) {
-            throw new \Exception('You have to be logged in as a Contao Frontend User');
-        }
-
-        /** @var Request $request */
-        $request = $this->requestStack->getCurrentRequest();
-
-        // Validate request token
-        if (!$this->tokenManager->isTokenValid(new CsrfToken($this->tokenName, $request->get('REQUEST_TOKEN')))) {
-            throw new InvalidRequestTokenException('Invalid CSRF token. Please reload the page and try again.');
-        }
-
-        // Do allow only xhr requests
-        if (!$request->isXmlHttpRequest()) {
-            throw $this->createNotFoundException('The route "/ajaxMemberDashboardWriteEventArticle" is allowed to XMLHttpRequest requests only.');
-        }
     }
 
     /**
      * @Route("/ajaxMemberDashboardWriteEventArticle/setPublishState", name="sac_event_tool_ajax_member_dashboard_write_event_article_set_publish_state", defaults={"_scope" = "frontend"})
+     * @return JsonResponse
+     * @throws \Doctrine\DBAL\Exception
      */
     public function setPublishStateAction(): JsonResponse
     {
+        $this->framework->initialize();
+        $this->checkHasLoggedInFrontendUser();
+        $this->checkIsTokenValid();
+        $this->checkIsXmlHttpRequest();
+
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
@@ -148,9 +122,6 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         /** @var ModuleModel $moduleModelAdapter */
         $moduleModelAdapter = $this->framework->getAdapter(ModuleModel::class);
 
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
-
         /** @var PageModel $pageModelAdapter */
         $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
 
@@ -166,30 +137,32 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         /** @var Validator $validatorAdapter */
         $validatorAdapter = $this->framework->getAdapter(Validator::class);
 
-        if (!$request->request->get('eventId') || !FE_USER_LOGGED_IN) {
+        if (!$request->request->get('eventId')) {
             return new JsonResponse(['status' => 'error']);
         }
 
         $objUser = $this->security->getUser();
 
-        if (!$objUser instanceof FrontendUser) {
+        $id = $this->connection->fetchOne(
+            'SELECT id FROM tl_calendar_events_story WHERE sacMemberId = ? AND eventId = ? AND publishState < ?',
+            [
+                $objUser->sacMemberId,
+                $request->request->get('eventId'),
+                3,
+            ],
+        );
+
+        if (!$id) {
             return new JsonResponse(['status' => 'error']);
         }
 
-        // Save new image order to db
-        $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? AND eventId=? AND publishState<?')->limit(1)->execute($objUser->sacMemberId, $request->request->get('eventId'), 3);
-
-        if (!$objDb->numRows) {
-            return new JsonResponse(['status' => 'error']);
-        }
-
-        $objStory = $calendarEventsStoryModelAdapter->findByPk($objDb->id);
+        $objStory = $calendarEventsStoryModelAdapter->findByPk($id);
 
         if (null === $objStory) {
             return new JsonResponse(['status' => 'error']);
         }
 
-        // Check for a valid photographer name an exiting image legends
+        // Check for a valid photographer name an existing image legends
         if (!empty($objStory->multiSRC) && !empty($stringUtilAdapter->deserialize($objStory->multiSRC, true))) {
             $arrUuids = $stringUtilAdapter->deserialize($objStory->multiSRC, true);
             $objFiles = $filesModelAdapter->findMultipleByUuids($arrUuids);
@@ -197,16 +170,14 @@ class MemberDashboardWriteEventArticleController extends AbstractController
             $blnMissingPhotographerName = false;
 
             while ($objFiles->next()) {
-                if (null !== $objFiles) {
-                    $arrMeta = $stringUtilAdapter->deserialize($objFiles->meta, true);
+                $arrMeta = $stringUtilAdapter->deserialize($objFiles->meta, true);
 
-                    if (!isset($arrMeta['de']['caption']) || '' === $arrMeta['de']['caption']) {
-                        $blnMissingLegend = true;
-                    }
+                if (!isset($arrMeta['de']['caption']) || '' === $arrMeta['de']['caption']) {
+                    $blnMissingLegend = true;
+                }
 
-                    if (!isset($arrMeta['de']['photographer']) || '' === $arrMeta['de']['photographer']) {
-                        $blnMissingPhotographerName = true;
-                    }
+                if (!isset($arrMeta['de']['photographer']) || '' === $arrMeta['de']['photographer']) {
+                    $blnMissingPhotographerName = true;
                 }
             }
 
@@ -215,16 +186,15 @@ class MemberDashboardWriteEventArticleController extends AbstractController
             }
         }
 
-        // Notify office if there is a new story
+        // Notify back office via terminal42/notification_center if there is a new story.
         if ('2' === $request->request->get('publishState') && $objStory->publishState < 2 && $request->request->get('moduleId')) {
             $objModule = $moduleModelAdapter->findByPk($request->request->get('moduleId'));
 
             if (null !== $objModule) {
-                // Use terminal42/notification_center
                 $objNotification = $notificationAdapter->findByPk($objModule->notifyOnEventStoryPublishedNotificationId);
             }
 
-            if (null !== $objNotification && null !== $objUser && $request->request->get('eventId') > 0) {
+            if (isset($objNotification) && $objNotification && $request->request->get('eventId') > 0) {
                 $objEvent = $calendarEventsModelAdapter->findByPk($request->request->get('eventId'));
                 $objInstructor = $userModelAdapter->findByPk($objEvent->mainInstructor);
                 $instructorName = '';
@@ -242,7 +212,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
                     $objTarget = $pageModelAdapter->findByPk($objModule->eventStoryJumpTo);
 
                     if (null !== $objTarget) {
-                        $previewLink = ampersand($objTarget->getFrontendUrl(Config::get('useAutoItem') ? '/%s' : '/items/%s'));
+                        $previewLink = $stringUtilAdapter->ampersand($objTarget->getFrontendUrl(Config::get('useAutoItem') ? '/%s' : '/items/%s'));
                         $previewLink = sprintf($previewLink, $objStory->id);
                         $previewLink = $environmentAdapter->get('url').'/'.$urlAdapter->addQueryString('securityToken='.$objStory->securityToken, $previewLink);
                     }
@@ -274,12 +244,14 @@ class MemberDashboardWriteEventArticleController extends AbstractController
 
                 $webmasterEmail = implode(',', $arrNotifyEmail);
 
+                $arrTokens = [];
+
                 if (null !== $objEvent) {
-                    $arrTokens = [
+                    $arrTokens = array_merge($arrTokens, [
                         'event_title' => $objEvent->title,
                         'event_id' => $objEvent->id,
-                        'instructor_name' => '' !== $instructorName ? $instructorName : 'keine Angabe',
-                        'instructor_email' => '' !== $instructorEmail ? $instructorEmail : 'keine Angabe',
+                        'instructor_name' => '' !== $instructorName ? $instructorName : $this->translator->trans('MSC.notSpecified', [], 'contao_default'),
+                        'instructor_email' => '' !== $instructorEmail ? $instructorEmail : $this->translator->trans('MSC.notSpecified', [], 'contao_default'),
                         'webmaster_email' => '' !== $webmasterEmail ? $webmasterEmail : '',
                         'author_name' => $objUser->firstname.' '.$objUser->lastname,
                         'author_email' => $objUser->email,
@@ -289,7 +261,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
                         'story_link_frontend' => $previewLink,
                         'story_title' => $objStory->title,
                         'story_text' => $objStory->text,
-                    ];
+                    ]);
                 }
 
                 // Send notification
@@ -311,17 +283,24 @@ class MemberDashboardWriteEventArticleController extends AbstractController
 
     /**
      * @Route("/ajaxMemberDashboardWriteEventArticle/sortGallery", name="sac_event_tool_ajax_member_dashboard_write_event_article_sort_gallery", defaults={"_scope" = "frontend"})
+     *
+     * @throws \Exception
      */
     public function sortGalleryAction(): JsonResponse
     {
+        $this->framework->initialize();
+        $this->checkHasLoggedInFrontendUser();
+        $this->checkIsTokenValid();
+        $this->checkIsXmlHttpRequest();
+
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
         /** @var CalendarEventsStoryModel $calendarEventsStoryModelAdapter */
         $calendarEventsStoryModelAdapter = $this->framework->getAdapter(CalendarEventsStoryModel::class);
 
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
+        /** @var StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         if (!$request->request->get('uuids') || !$request->request->get('eventId') || !FE_USER_LOGGED_IN) {
             return new JsonResponse(['status' => 'error']);
@@ -329,18 +308,19 @@ class MemberDashboardWriteEventArticleController extends AbstractController
 
         $objUser = $this->security->getUser();
 
-        if (!$objUser instanceof FrontendUser) {
+        $id = $this->connection->fetchOne(
+            'SELECT id FROM tl_calendar_events_story WHERE sacMemberId = ? AND eventId = ?',
+            [
+                $objUser->sacMemberId,
+                $request->request->get('eventId'),
+            ],
+        );
+
+        if (!$id) {
             return new JsonResponse(['status' => 'error']);
         }
 
-        // Save new image order to db
-        $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? AND eventId=?')->limit(1)->execute($objUser->sacMemberId, $request->request->get('eventId'));
-
-        if (!$objDb->numRows) {
-            return new JsonResponse(['status' => 'error']);
-        }
-
-        $objStory = $calendarEventsStoryModelAdapter->findByPk($objDb->id);
+        $objStory = $calendarEventsStoryModelAdapter->findByPk($id);
 
         if (null === $objStory) {
             return new JsonResponse(['status' => 'error']);
@@ -348,12 +328,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
 
         $arrSorting = json_decode($request->request->get('uuids'));
         $arrSorting = array_map(
-            function ($uuid) {
-                /** @var StringUtil $stringUtilAdapter */
-                $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
-                return $stringUtilAdapter->uuidToBin($uuid);
-            },
+            static fn ($uuid) => $stringUtilAdapter->uuidToBin($uuid),
             $arrSorting
         );
 
@@ -369,6 +344,11 @@ class MemberDashboardWriteEventArticleController extends AbstractController
      */
     public function removeImageAction(): JsonResponse
     {
+        $this->framework->initialize();
+        $this->checkHasLoggedInFrontendUser();
+        $this->checkIsTokenValid();
+        $this->checkIsXmlHttpRequest();
+
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
@@ -381,32 +361,34 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         /** @var FilesModel $filesModelAdapter */
         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
 
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
-
         /** @var Validator $validatorAdapter */
         $validatorAdapter = $this->framework->getAdapter(Validator::class);
 
-        if (!$request->request->get('eventId') || !$request->request->get('uuid') || !FE_USER_LOGGED_IN) {
+        if (!$request->request->get('eventId') || !$request->request->get('uuid')) {
             return new JsonResponse(['status' => 'error']);
         }
 
         $objUser = $this->security->getUser();
 
-        if (!$objUser instanceof FrontendUser) {
-            return new JsonResponse(['status' => 'error']);
-        }
-        // Save new image order to db
-        $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? && eventId=? && publishState<?')->limit(1)->execute($objUser->sacMemberId, $request->request->get('eventId'), 3);
+        $id = $this->connection->fetchOne(
+            'SELECT * FROM tl_calendar_events_story WHERE sacMemberId = ? && eventId = ? && publishState < ?',
+            [
+                $objUser->sacMemberId,
+                $request->request->get('eventId'),
+                3,
+            ]
+        );
 
-        if (!$objDb->numRows) {
+        if (!$id) {
             return new JsonResponse(['status' => 'error']);
         }
-        $objStory = $calendarEventsStoryModelAdapter->findByPk($objDb->id);
+
+        $objStory = $calendarEventsStoryModelAdapter->findByPk($id);
 
         if (null === $objStory) {
             return new JsonResponse(['status' => 'error']);
         }
+
         $multiSrc = $stringUtilAdapter->deserialize($objStory->multiSRC, true);
         $orderSrc = $stringUtilAdapter->deserialize($objStory->orderSRC, true);
 
@@ -436,22 +418,29 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         $objStory->save();
 
         // Delete image from filesystem and db
-        $objFile = $filesModelAdapter->findByUuid($uuid);
+        $filesModel = $filesModelAdapter->findByUuid($uuid);
 
-        if (null !== $objFile) {
-            $oFile = new File($objFile->path);
-            $oFile->delete();
-            $objFile->delete();
+        if (null !== $filesModel) {
+            $fs = new Filesystem();
+            $fs->remove($this->projectDir . '/' . $filesModel->path);
+
+            $filesModel->delete();
         }
 
         return new JsonResponse(['status' => 'success']);
     }
 
     /**
+     * @throws \Exception
      * @Route("/ajaxMemberDashboardWriteEventArticle/rotateImage", name="sac_event_tool_ajax_member_dashboard_write_event_article_rotate_image", defaults={"_scope" = "frontend"})
      */
     public function rotateImageAction(): JsonResponse
     {
+        $this->framework->initialize();
+        $this->checkHasLoggedInFrontendUser();
+        $this->checkIsTokenValid();
+        $this->checkIsXmlHttpRequest();
+
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
@@ -474,10 +463,16 @@ class MemberDashboardWriteEventArticleController extends AbstractController
     }
 
     /**
+     * @throws \Exception
      * @Route("/ajaxMemberDashboardWriteEventArticle/getCaption", name="sac_event_tool_ajax_member_dashboard_write_event_article_get_caption", defaults={"_scope" = "frontend"})
      */
     public function getCaptionAction(): JsonResponse
     {
+        $this->framework->initialize();
+        $this->checkHasLoggedInFrontendUser();
+        $this->checkIsTokenValid();
+        $this->checkIsXmlHttpRequest();
+
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
@@ -488,10 +483,6 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
 
         $objUser = $this->security->getUser();
-
-        if (!$objUser instanceof FrontendUser) {
-            return new JsonResponse(['status' => 'error']);
-        }
 
         if ('' !== $request->request->get('fileUuid')) {
             $objFile = $filesModelAdapter->findByUuid($request->request->get('fileUuid'));
@@ -527,10 +518,16 @@ class MemberDashboardWriteEventArticleController extends AbstractController
     }
 
     /**
+     * @throws \Exception
      * @Route("/ajaxMemberDashboardWriteEventArticle/setCaption", name="sac_event_tool_ajax_member_dashboard_write_event_article_set_caption", defaults={"_scope" = "frontend"})
      */
     public function setCaptionAction(): JsonResponse
     {
+        $this->framework->initialize();
+        $this->checkHasLoggedInFrontendUser();
+        $this->checkIsTokenValid();
+        $this->checkIsXmlHttpRequest();
+
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
@@ -572,5 +569,35 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         }
 
         return new JsonResponse(['status' => 'error']);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function checkHasLoggedInFrontendUser(): void
+    {
+        $user = $this->security->getUser();
+
+        if (!$user instanceof FrontendUser) {
+            throw new \Exception('Access denied! You have to be logged in as a Contao frontend user');
+        }
+    }
+
+    private function checkIsTokenValid(): void
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$this->tokenManager->isTokenValid(new CsrfToken($this->tokenName, $request->get('REQUEST_TOKEN')))) {
+            throw new InvalidRequestTokenException('Invalid CSRF token. Please reload the page and try again.');
+        }
+    }
+
+    private function checkIsXmlHttpRequest(): void
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$request->isXmlHttpRequest()) {
+            throw $this->createNotFoundException('The route "/ajaxMemberDashboardWriteEventArticle" is allowed to XMLHttpRequest requests only.');
+        }
     }
 }

@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -29,9 +29,6 @@ use Twig\Environment as TwigEnvironment;
  */
 class TestController extends AbstractController
 {
-    /**
-     * @var Connection
-     */
     private Connection $connection;
 
     /**
@@ -68,19 +65,18 @@ class TestController extends AbstractController
         }
 
         $table = new Table('Cars');
-        $table->addColumn("id", "integer", array("unsigned" => true, "autoincrement" => true, "notnull" => true));
-        $table->addColumn("brand", "string", array("notnull" => true));
-        $table->addColumn("type", "string", array("notnull" => true));
-        $table->addColumn("color", "string", array("notnull" => true));
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true, 'notnull' => true]);
+        $table->addColumn('brand', 'string', ['notnull' => true]);
+        $table->addColumn('type', 'string', ['notnull' => true]);
+        $table->addColumn('color', 'string', ['notnull' => true]);
 
         // Set the pk
-        $table->setPrimaryKey(array("id"));
+        $table->setPrimaryKey(['id']);
 
         // Create the table
         $schemaManager->createTable($table);
 
         return new Response('Successfully created the new table "Cars".');
-
 
         //$GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'] = 'ftpserver.sac-cas.ch';
         //$GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'] = 4250;

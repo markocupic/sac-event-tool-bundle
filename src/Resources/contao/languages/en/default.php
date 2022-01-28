@@ -22,6 +22,7 @@ if (TL_MODE === 'FE') {
 $GLOBALS['TL_LANG']['CTE']['user_portrait'] = ['SAC-User-Portrait'];
 $GLOBALS['TL_LANG']['CTE']['user_portrait_list'] = ['SAC-User-Portrait-Liste'];
 
+// Events
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_1'] = 'Freie Plätze!';
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_2'] = 'Anmeldefrist für Event ist abgelaufen!';
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_3'] = 'Event ausgebucht!';
@@ -129,6 +130,7 @@ $GLOBALS['TL_LANG']['FORM']['evt_reg_notesExpl'] = 'Bitte beschreibe in wenigen 
 // Miscellaneous
 $GLOBALS['TL_LANG']['MSC']['published'] = 'veröffentlicht';
 $GLOBALS['TL_LANG']['MSC']['unpublished'] = 'unveröffentlicht';
+$GLOBALS['TL_LANG']['MSC']['notSpecified'] = 'keine Angabe';
 
 // Meta wizard
 $GLOBALS['TL_LANG']['MSC']['aw_photographer'] = 'Photograph';

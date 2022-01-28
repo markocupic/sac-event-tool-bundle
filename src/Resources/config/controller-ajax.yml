@@ -2,18 +2,12 @@ services:
     Markocupic\SacEventToolBundle\Controller\Ajax\MemberDashboardWriteEventArticleController:
         arguments:
             - '@contao.framework'
+            - '@database_connection'
             - '@contao.csrf.token_manager'
             - '@request_stack'
             - '@security.helper'
-            - '%contao.csrf_token_name%'
-        public: true
-
-    Markocupic\SacEventToolBundle\Controller\Ajax\EventLazyLoadController:
-        arguments:
-            - '@contao.framework'
-            - '@contao.csrf.token_manager'
-            - '@request_stack'
-            - '@security.helper'
+            - '@translator'
+            - '%kernel.project_dir%'
             - '%contao.csrf_token_name%'
         public: true
 
