@@ -18,7 +18,7 @@ $GLOBALS['TL_LANG']['tl_user']['emergency_phone_legend'] = 'Notfall Einstellunge
 $GLOBALS['TL_LANG']['tl_user']['bank_account_legend'] = 'Kontoangaben';
 $GLOBALS['TL_LANG']['tl_user']['role_legend'] = 'Aufgaben/Rollen im Verein';
 $GLOBALS['TL_LANG']['tl_user']['event_tool_legend'] = 'Event-Tool Einstellungen';
-$GLOBALS['TL_LANG']['tl_user']['recission_legend'] = 'Benutzer-Deaktivierungs-Einstellungen';
+$GLOBALS['TL_LANG']['tl_user']['rescission_legend'] = 'Benutzer-Deaktivierungs-Einstellungen';
 
 // Fields
 $GLOBALS['TL_LANG']['tl_user']['uuid'] = ['UUID (Zentralkommitee Bern)', ''];

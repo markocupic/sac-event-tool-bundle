@@ -14,26 +14,9 @@ declare(strict_types=1);
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\System;
-use Markocupic\SacEventToolBundle\Dca\TlUser;
 
 // Add tl_user.sacMemberId to index
 $GLOBALS['TL_DCA']['tl_user']['config']['sql']['keys']['sacMemberId'] = 'index';
-
-// Onload callbacks
-$GLOBALS['TL_DCA']['tl_user']['config']['onload_callback'][] = [
-    TlUser::class,
-    'addReadonlyAttributeToSyncedFields',
-];
-$GLOBALS['TL_DCA']['tl_user']['config']['onload_callback'][] = [
-    TlUser::class,
-    'showReadonlyFieldsInfoMessage',
-];
-
-// Oncreate callbacks
-$GLOBALS['TL_DCA']['tl_user']['config']['oncreate_callback'][] = [
-    TlUser::class,
-    'oncreateCallback',
-];
 
 // Manipulate palette default
 PaletteManipulator::create()
@@ -73,7 +56,7 @@ PaletteManipulator::create()
         PaletteManipulator::POSITION_BEFORE
     )
     ->addLegend(
-        'recission_legend',
+        'rescission_legend',
         'event_tool_legend',
         PaletteManipulator::POSITION_BEFORE
     )
@@ -146,7 +129,7 @@ PaletteManipulator::create()
     )
     ->addField(
         ['rescissionCause'],
-        'recission_legend',
+        'rescission_legend',
         PaletteManipulator::POSITION_APPEND
     )
     ->applyToPalette(
@@ -196,7 +179,7 @@ PaletteManipulator::create()
         PaletteManipulator::POSITION_BEFORE
     )
     ->addLegend(
-        'recission_legend',
+        'rescission_legend',
         'event_tool_legend',
         PaletteManipulator::POSITION_BEFORE
     )
@@ -265,7 +248,7 @@ PaletteManipulator::create()
     )
     ->addField(
         ['rescissionCause'],
-        'recission_legend',
+        'rescission_legend',
         PaletteManipulator::POSITION_APPEND
     )
     ->applyToPalette(
@@ -319,7 +302,7 @@ PaletteManipulator::create()
         PaletteManipulator::POSITION_BEFORE
     )
     ->addLegend(
-        'recission_legend',
+        'rescission_legend',
         'event_tool_legend',
         PaletteManipulator::POSITION_BEFORE
     )
@@ -373,7 +356,7 @@ PaletteManipulator::create()
     )
     ->addField(
         ['rescissionCause'],
-        'recission_legend',
+        'rescission_legend',
         PaletteManipulator::POSITION_APPEND
     )
     ->applyToPalette(
@@ -417,7 +400,7 @@ PaletteManipulator::create()
         'emergency_phone_legend',
         PaletteManipulator::POSITION_BEFORE
     )
-    //->addLegend('recission_legend', 'event_tool_legend', PaletteManipulator::POSITION_BEFORE)
+    //->addLegend('rescission_legend', 'event_tool_legend', PaletteManipulator::POSITION_BEFORE)
     ->addField(
         [
             'firstname',
@@ -463,7 +446,7 @@ PaletteManipulator::create()
         'event_tool_legend',
         PaletteManipulator::POSITION_APPEND
     )
-    //->addField(array('rescissionCause'), 'recission_legend', PaletteManipulator::POSITION_APPEND)
+    //->addField(array('rescissionCause'), 'rescission_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette(
         'login',
         'tl_user'
@@ -850,12 +833,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['avatarSRC'] = [
         'fieldType' => 'radio',
         'mandatory' => false,
         'tl_class' => '',
-    ],
-    'load_callback' => [
-        [
-            TlUser::class,
-            'setSingleSrcFlags',
-        ],
+        'extensions' => '%contao.image.valid_extensions%',
     ],
     'sql' => 'binary(16) NULL',
 ];
@@ -867,10 +845,6 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['userRole'] = [
     'search' => true,
     'filter' => true,
     'inputType' => 'select',
-    'options_callback' => [
-        TlUser::class,
-        'optionsCallbackUserRoles',
-    ],
     'eval' => [
         'chosen' => true,
         'tl_class' => 'clr m12',

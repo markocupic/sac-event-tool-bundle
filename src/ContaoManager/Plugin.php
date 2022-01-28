@@ -75,5 +75,6 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface, ConfigPlu
         $loader->load(__DIR__.'/../Resources/config/cron.yml');
         $loader->load(__DIR__.'/../Resources/config/contao-mode.yml');
         $loader->load(__DIR__.'/../Resources/config/services.yml');
+        $loader->load(__DIR__.'/../Resources/config/data-container.yml');
     }
 }
