@@ -82,8 +82,7 @@ $GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'Möchten Sie das Vergütungsfor
 
 // Backend member dashboard
 $GLOBALS['TL_LANG']['MSC']['bmd_yourUpcomingEvents'] = 'Deine nächsten Events';
-$GLOBALS['TL_LANG']['MSC']['bmd_howToEditReadonlyProfileData'] = 'Änderungen an Name, Adresse und E-Mail müssen auf der Webseite des <href="https://www.sac-cas.ch/de/mein-sac/meinedaten/">SAC Zentralverbandes</a> gemacht werden.';
-
+$GLOBALS['TL_LANG']['MSC']['bmd_howToEditReadonlyProfileData'] = 'Änderungen an Name, Adresse und E-Mail müssen auf der Webseite des SAC Zentralverbandes (https://sac-cas.ch) gemacht werden.';
 
 // Frontend member dashboard write event article frontend module
 $GLOBALS['TL_LANG']['ERR']['md_write_event_article_mailAddressNotFound'] = 'Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterle auf der Webseite des Zentralverbands deine E-Mail-Adresse.';

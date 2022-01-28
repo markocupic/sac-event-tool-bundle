@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\BackendUser;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -26,7 +25,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception;
 use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class User
@@ -34,19 +32,17 @@ class User
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Connection $connection;
-    private Security $security;
     private TranslatorInterface $translator;
     private MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory;
 
     /**
      * Import the back end user object.
      */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Security $security, TranslatorInterface $translator, MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
-        $this->security = $security;
         $this->translator = $translator;
         $this->maintainBackendUsersHomeDirectory = $maintainBackendUsersHomeDirectory;
     }
@@ -74,41 +70,31 @@ class User
      */
     public function addReadonlyAttributeToSyncedFields(DataContainer $dc): void
     {
-        $user = $this->security->getUser();
+        if ($dc->id > 0) {
+            $stmt = $this->connection->executeQuery('SELECT * FROM tl_user WHERE id = ?', [$dc->id]);
 
-        if (!$user instanceof BackendUser) {
-            return;
-        }
+            if (false !== ($arrUser = $stmt->fetchAssociative())) {
+                if (!$arrUser['admin']) {
+                    if ((int) $arrUser['sacMemberId'] > 0) {
+                        $stmt = $this->connection->executeQuery(
+                            'SELECT * FROM tl_member WHERE sacMemberId = ?',
+                            [$arrUser['sacMemberId']],
+                        );
 
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ('login' === $request->query->get('do')) {
-            $id = $user->id;
-        } else {
-            $id = $dc->id;
-        }
-
-        if ($id > 0) {
-            if (!$user->admin) {
-                if ((int) $user->sacMemberId > 0) {
-                    $stmt = $this->connection->executeQuery(
-                        'SELECT * FROM tl_member WHERE sacMemberId = ? LIMIT 0, 1',
-                        [$user->sacMemberId],
-                    );
-
-                    if (false !== ($arrMember = $stmt->fetchAssociative())) {
-                        if (!$arrMember['disable']) {
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['gender']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['firstname']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['lastname']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['phone']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['mobile']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['street']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['postal']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['city']['eval']['readonly'] = true;
-                            $GLOBALS['TL_DCA']['tl_user']['fields']['dateOfBirth']['eval']['readonly'] = true;
+                        if (false !== ($arrMember = $stmt->fetchAssociative())) {
+                            if (!$arrMember['disable']) {
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['gender']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['firstname']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['lastname']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['phone']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['mobile']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['street']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['postal']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['city']['eval']['readonly'] = true;
+                                $GLOBALS['TL_DCA']['tl_user']['fields']['dateOfBirth']['eval']['readonly'] = true;
+                            }
                         }
                     }
                 }
@@ -137,30 +123,30 @@ class User
     }
 
     /**
-     * Show message in the user profile section of the Contao backend.
+     * Set defaults and auto-create backend users home directory when creating a new user.
      *
      * @Callback(table="tl_user", target="config.oncreate")
      */
-    public function oncreateCallback(string $strTable, int $id, array $arrSet): void
+    public function setDefaultsOnCreatingNew(string $strTable, int $id, array $arrSet): void
     {
         $configAdapter = $this->framework->getAdapter(Config::class);
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
-        $objUser = $userModelAdapter->findByPk($id);
-
-        if (null !== $objUser) {
+        if (null !== ($objUser = $userModelAdapter->findByPk($id))) {
             // Create backend users home directory
             $this->maintainBackendUsersHomeDirectory->createBackendUsersHomeDirectory($objUser);
 
             if ('extend' !== $arrSet['inherit']) {
-                $objUser->inherit = 'extend';
-                $objUser->pwChange = '1';
                 $defaultPassword = $configAdapter->get('SAC_EVT_DEFAULT_BACKEND_PASSWORD');
-                $objUser->password = password_hash($defaultPassword, PASSWORD_DEFAULT);
-                $objUser->tstamp = 0;
-                $objUser->save();
-                $controllerAdapter->reload();
+
+                $set = [
+                    'inherit' => 'extend',
+                    'pwChange' => '1',
+                    'password' => password_hash($defaultPassword, PASSWORD_DEFAULT),
+                    'tstamp' => 0,
+                ];
+
+                $this->connection->update('tl_user', $set, ['id' => $id]);
             }
         }
     }
@@ -171,7 +157,7 @@ class User
      *
      * @Callback(table="tl_user", target="fields.userRole.options")
      */
-    public function optionsCallbackUserRoles(): array
+    public function getUserRoles(): array
     {
         $options = [];
 

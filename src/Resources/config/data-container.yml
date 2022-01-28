@@ -5,6 +5,5 @@ services:
             - '@contao.framework'
             - '@request_stack'
             - '@database_connection'
-            - '@security.helper'
             - '@translator'
             - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory'
