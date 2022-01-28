@@ -19,6 +19,8 @@ services:
         public: true
         arguments:
             - '@contao.framework'
+            - '@database_connection'
+            - '@monolog.logger.contao'
             - '%kernel.project_dir%'
 
     # Generate docx/pdf event memberlists from docx templates
