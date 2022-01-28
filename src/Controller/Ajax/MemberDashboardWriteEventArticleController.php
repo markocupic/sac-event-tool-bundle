@@ -43,9 +43,6 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class MemberDashboardWriteEventArticleController.
- */
 class MemberDashboardWriteEventArticleController extends AbstractController
 {
     private ContaoFramework $framework;
@@ -157,10 +154,6 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         }
 
         $objStory = $calendarEventsStoryModelAdapter->findByPk($id);
-
-        if (null === $objStory) {
-            return new JsonResponse(['status' => 'error']);
-        }
 
         // Check for a valid photographer name an existing image legends
         if (!empty($objStory->multiSRC) && !empty($stringUtilAdapter->deserialize($objStory->multiSRC, true))) {
@@ -322,10 +315,6 @@ class MemberDashboardWriteEventArticleController extends AbstractController
 
         $objStory = $calendarEventsStoryModelAdapter->findByPk($id);
 
-        if (null === $objStory) {
-            return new JsonResponse(['status' => 'error']);
-        }
-
         $arrSorting = json_decode($request->request->get('uuids'));
         $arrSorting = array_map(
             static fn ($uuid) => $stringUtilAdapter->uuidToBin($uuid),
@@ -384,10 +373,6 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         }
 
         $objStory = $calendarEventsStoryModelAdapter->findByPk($id);
-
-        if (null === $objStory) {
-            return new JsonResponse(['status' => 'error']);
-        }
 
         $multiSrc = $stringUtilAdapter->deserialize($objStory->multiSRC, true);
         $orderSrc = $stringUtilAdapter->deserialize($objStory->orderSRC, true);
