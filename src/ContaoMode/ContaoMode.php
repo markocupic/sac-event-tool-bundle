@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -18,93 +18,73 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class ContaoMode.
- */
 class ContaoMode
 {
     private const FRONTEND_MODE = 'FE';
+
     private const BACKEND_MODE = 'BE';
 
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private RequestStack $requestStack;
 
-    /**
-     * @var ScopeMatcher
-     */
-    private $scopeMatcher;
+    private ScopeMatcher $scopeMatcher;
 
-    /**
-     * @var string
-     */
-    private $contaoMode;
+    private string $contaoMode = '';
 
-    /**
-     * ContaoMode constructor.
-     */
     public function __construct(ContaoFramework $framework, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->scopeMatcher = $scopeMatcher;
-
-        // Set the contao mode
-        if (null !== $framework) {
-            if ($this->framework->isInitialized()) {
-                $this->_setMode();
-            }
-        }
     }
 
     /**
-     * Get contao mode.
+     * @return string
+     * @throws \Exception
      */
     public function getMode(): string
     {
+        $this->_checkInitialization();
+
+        $this->_setMode();
+
         return $this->contaoMode;
     }
 
     /**
-     * Identify the Contao scope (TL_MODE) of the current request.
+     * @return bool
+     * @throws \Exception
      */
     public function isFrontend(): bool
     {
-        if (null !== $this->framework) {
-            if ($this->framework->isInitialized() && $this->requestStack->getMasterRequest() && !$this->isBackend()) {
-                return true;
-            }
+        $this->_checkInitialization();
+
+        if (null !== ($request = $this->requestStack->getCurrentRequest())) {
+            return $this->scopeMatcher->isFrontendRequest($request);
         }
 
         return false;
     }
 
     /**
-     * Identify the Contao scope (TL_MODE) of the current request.
+     * @return bool
+     * @throws \Exception
      */
     public function isBackend(): bool
     {
-        if (null !== $this->framework) {
-            if ($this->framework->isInitialized()) {
-                if (null !== $this->requestStack) {
-                    if (null !== $this->requestStack->getMasterRequest()) {
-                        return $this->scopeMatcher->isBackendRequest($this->requestStack->getMasterRequest());
-                    }
-                }
-            }
+        $this->_checkInitialization();
+
+        if (null !== ($request = $this->requestStack->getCurrentRequest())) {
+            return $this->scopeMatcher->isBackendRequest($request);
         }
 
         return false;
     }
 
     /**
-     * Set contao mode.
+     * @return void
+     * @throws \Exception
      */
     private function _setMode(): void
     {
@@ -114,6 +94,18 @@ class ContaoMode
             $this->contaoMode = static::FRONTEND_MODE;
         } else {
             $this->contaoMode = '';
+        }
+    }
+
+    /**
+     * @return void
+     * @throws \Exception
+     */
+    private function _checkInitialization(): void
+    {
+        if(!$this->framework->isInitialized())
+        {
+            throw new \Exception('The Contao framework is not initialized.');
         }
     }
 }
