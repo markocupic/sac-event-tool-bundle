@@ -16,73 +16,73 @@ declare(strict_types=1);
  * Table tl_calendar_events_instructor
  */
 $GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = [
-    'config'      => [
-        'dataContainer'     => 'Table',
-        'notCopyable'       => true,
-        'ptable'            => 'tl_calendar_events',
+    'config' => [
+        'dataContainer' => 'Table',
+        'notCopyable' => true,
+        'ptable' => 'tl_calendar_events',
         // Do not copy nor delete records, if an item has been deleted!
-        'onload_callback'   => [],
+        'onload_callback' => [],
         'onsubmit_callback' => [],
         'ondelete_callback' => [],
-        'sql'               => [
+        'sql' => [
             'keys' => [
-                'id'     => 'primary',
-                'pid'    => 'index',
+                'id' => 'primary',
+                'pid' => 'index',
                 'userId' => 'index',
             ],
         ],
     ],
     // Buttons callback
-    'edit'        => [//'buttons_callback' => array(array('tl_calendar_events_instructor', 'buttonsCallback')),
+    'edit' => [//'buttons_callback' => array(array('tl_calendar_events_instructor', 'buttonsCallback')),
     ],
 
     // List
-    'list'        => [
-        'sorting'           => [],
-        'label'             => [],
+    'list' => [
+        'sorting' => [],
+        'label' => [],
         'global_operations' => [
             'all' => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
+                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
         ],
-        'operations'        => [
-            'edit'   => [
+        'operations' => [
+            'edit' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor']['edit'],
-                'href'  => 'act=edit',
-                'icon'  => 'edit.svg',
+                'href' => 'act=edit',
+                'icon' => 'edit.svg',
             ],
             'delete' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor']['delete'],
-                'href'       => 'act=delete',
-                'icon'       => 'delete.svg',
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor']['delete'],
+                'href' => 'act=delete',
+                'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
             ],
         ],
     ],
 
     // Palettes
-    'palettes'    => [],
+    'palettes' => [],
 
     // Subpalettes
     'subpalettes' => [],
 
     // Fields
-    'fields'      => [
-        'id'               => [
+    'fields' => [
+        'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         // Parent: tl_calendar_events.id
-        'pid'              => [
+        'pid' => [
             'sql' => 'int(10) unsigned NOT NULL default 0',
         ],
-        'tstamp'           => [
+        'tstamp' => [
             'sql' => 'int(10) unsigned NOT NULL default 0',
         ],
         // Parent tl_user.id
-        'userId'           => [
+        'userId' => [
             'sql' => 'int(10) unsigned NOT NULL default 0',
         ],
         'isMainInstructor' => [

@@ -16,7 +16,6 @@ namespace Markocupic\SacEventToolBundle\Cron\Contao;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
-use Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf;
 use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 
 /**

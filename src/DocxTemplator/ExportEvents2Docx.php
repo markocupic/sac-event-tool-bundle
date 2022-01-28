@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -40,16 +40,16 @@ use PhpOffice\PhpWord\PhpWord;
 class ExportEvents2Docx
 {
     /**
-     * @var
+     * @var 
      */
     public static $strTable;
     /**
-     * @var
+     * @var 
      */
     public static $dca;
 
     /**
-     * @var
+     * @var 
      */
     public static $arrDatarecord;
 
@@ -254,9 +254,7 @@ class ExportEvents2Docx
 
                 if (\is_array(StringUtil::deserialize($value)) && !empty($value)) {
                     $arrValue = array_map(
-                        static function ($v) {
-                            return UserModel::findByPk((int) $v)->name;
-                        },
+                        static fn ($v) => UserModel::findByPk((int) $v)->name,
                         StringUtil::deserialize($value)
                     );
                     $value = implode(', ', $arrValue);
@@ -266,9 +264,7 @@ class ExportEvents2Docx
             if ('instructor' === $field) {
                 $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent);
                 $arrValue = array_map(
-                    static function ($v) {
-                        return UserModel::findByPk($v)->name;
-                    },
+                    static fn ($v) => UserModel::findByPk($v)->name,
                     $arrInstructors
                 );
                 $value = implode(', ', $arrValue);
@@ -305,9 +301,7 @@ class ExportEvents2Docx
                 $objEvent = CalendarEventsModel::findByPk(self::$arrDatarecord['id']);
                 $arr = CalendarEventsHelper::getEventTimestamps($objEvent);
                 $arr = array_map(
-                    static function ($tstamp) {
-                        return Date::parse('d.m.Y', $tstamp);
-                    },
+                    static fn ($tstamp) => Date::parse('d.m.Y', $tstamp),
                     $arr
                 );
                 $value = implode(', ', $arr);

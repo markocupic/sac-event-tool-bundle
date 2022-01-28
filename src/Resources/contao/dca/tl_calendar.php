@@ -33,8 +33,8 @@ if (
 ) {
     $GLOBALS['TL_DCA']['tl_calendar']['list']['operations']['cut'] = [
         'label' => &$GLOBALS['TL_LANG']['tl_calendar']['cut'],
-        'href'  => 'act=paste&amp;mode=cut',
-        'icon'  => 'cut.svg',
+        'href' => 'act=paste&amp;mode=cut',
+        'icon' => 'cut.svg',
     ];
 }
 
@@ -53,14 +53,15 @@ PaletteManipulator::create()
     ->applyToPalette(
         'default',
         'tl_calendar'
-    );
+    )
+;
 
 // Fields
 // pid
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['pid'] = [
     'foreignKey' => 'tl_calendar_container.title',
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => [
+    'sql' => "int(10) unsigned NOT NULL default '0'",
+    'relation' => [
         'type' => 'belongsTo',
         'load' => 'eager',
     ],
@@ -68,44 +69,44 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['pid'] = [
 
 // Allowed event types
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['allowedEventTypes'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['allowedEventTypes'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar']['allowedEventTypes'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'checkbox',
     'reference' => &$GLOBALS['TL_LANG']['MSC'],
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-    'eval'      => [
-        'multiple'           => true,
+    'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
+    'eval' => [
+        'multiple' => true,
         'includeBlankOption' => false,
-        'doNotShow'          => false,
-        'tl_class'           => 'clr m12',
-        'mandatory'          => true,
+        'doNotShow' => false,
+        'tl_class' => 'clr m12',
+        'mandatory' => true,
     ],
-    'sql'       => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 // adviceOnEventReleaseLevelChange
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventReleaseLevelChange'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventReleaseLevelChange'],
-    'exclude'   => true,
-    'filter'    => false,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventReleaseLevelChange'],
+    'exclude' => true,
+    'filter' => false,
     'inputType' => 'text',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => false,
     ],
-    'sql'       => "varchar(255) NOT NULL default ''",
+    'sql' => "varchar(255) NOT NULL default ''",
 ];
 
 // adviceOnEventPublish
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventPublish'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventPublish'],
-    'exclude'   => true,
-    'filter'    => false,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventPublish'],
+    'exclude' => true,
+    'filter' => false,
     'inputType' => 'text',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => false,
     ],
-    'sql'       => "varchar(255) NOT NULL default ''",
+    'sql' => "varchar(255) NOT NULL default ''",
 ];

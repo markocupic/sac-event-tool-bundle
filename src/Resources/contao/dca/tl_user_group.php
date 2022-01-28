@@ -37,48 +37,49 @@ PaletteManipulator::create()
     ->applyToPalette(
         'default',
         'tl_user_group'
-    );
+    )
+;
 
 // Fields
 
 // calendar_containers
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['calendar_containers'] = [
-    'label'      => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containers'],
-    'exclude'    => true,
-    'inputType'  => 'checkbox',
+    'label' => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containers'],
+    'exclude' => true,
+    'inputType' => 'checkbox',
     'foreignKey' => 'tl_calendar_container.title',
-    'eval'       => ['multiple' => true],
-    'sql'        => 'blob NULL',
+    'eval' => ['multiple' => true],
+    'sql' => 'blob NULL',
 ];
 
 // calendar_containerp
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['calendar_containerp'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containerp'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containerp'],
+    'exclude' => true,
     'inputType' => 'checkbox',
-    'options'   => [
+    'options' => [
         'create',
         'delete',
     ],
     'reference' => &$GLOBALS['TL_LANG']['MSC'],
-    'eval'      => ['multiple' => true],
-    'sql'       => 'blob NULL',
+    'eval' => ['multiple' => true],
+    'sql' => 'blob NULL',
 ];
 
 // allowedEventTypes
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['allowedEventTypes'] = [
-    'label'      => &$GLOBALS['TL_LANG']['tl_user_group']['allowedEventTypes'],
-    'exclude'    => true,
-    'inputType'  => 'checkbox',
-    'relation'   => [
+    'label' => &$GLOBALS['TL_LANG']['tl_user_group']['allowedEventTypes'],
+    'exclude' => true,
+    'inputType' => 'checkbox',
+    'relation' => [
         'type' => 'belongsTo',
         'load' => 'eager',
     ],
     'foreignKey' => 'tl_event_type.title',
-    'sql'        => 'blob NULL',
-    'eval'       => [
-        'multiple'  => true,
+    'sql' => 'blob NULL',
+    'eval' => [
+        'multiple' => true,
         'mandatory' => false,
-        'tl_class'  => 'clr',
+        'tl_class' => 'clr',
     ],
 ];

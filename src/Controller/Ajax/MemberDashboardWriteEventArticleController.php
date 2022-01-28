@@ -26,11 +26,12 @@ use Contao\FrontendUser;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Haste\Util\Url;
+use Markocupic\SacEventToolBundle\Image\RotateImage;
 use NotificationCenter\Model\Notification;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -57,6 +58,8 @@ class MemberDashboardWriteEventArticleController extends AbstractController
 
     private TranslatorInterface $translator;
 
+    private RotateImage $rotateImage;
+
     private string $projectDir;
 
     private string $tokenName;
@@ -71,7 +74,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
      *
      * @throws \Exception
      */
-    public function __construct(ContaoFramework $framework, Connection $connection, CsrfTokenManagerInterface $tokenManager, RequestStack $requestStack, Security $security, TranslatorInterface $translator, string $projectDir, string $tokenName)
+    public function __construct(ContaoFramework $framework, Connection $connection, CsrfTokenManagerInterface $tokenManager, RequestStack $requestStack, Security $security, TranslatorInterface $translator, RotateImage $rotateImage, string $projectDir, string $tokenName)
     {
         $this->framework = $framework;
         $this->connection = $connection;
@@ -79,14 +82,15 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         $this->requestStack = $requestStack;
         $this->security = $security;
         $this->translator = $translator;
+        $this->rotateImage = $rotateImage;
         $this->projectDir = $projectDir;
         $this->tokenName = $tokenName;
     }
 
     /**
      * @Route("/ajaxMemberDashboardWriteEventArticle/setPublishState", name="sac_event_tool_ajax_member_dashboard_write_event_article_set_publish_state", defaults={"_scope" = "frontend"})
-     * @return JsonResponse
-     * @throws \Doctrine\DBAL\Exception
+     *
+     * @throws Exception
      */
     public function setPublishStateAction(): JsonResponse
     {
@@ -407,7 +411,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
 
         if (null !== $filesModel) {
             $fs = new Filesystem();
-            $fs->remove($this->projectDir . '/' . $filesModel->path);
+            $fs->remove($this->projectDir.'/'.$filesModel->path);
 
             $filesModel->delete();
         }
@@ -436,9 +440,8 @@ class MemberDashboardWriteEventArticleController extends AbstractController
 
         // Get the image rotate service
         $objFiles = $filesModelAdapter->findOneById($fileId);
-        $objRotateImage = System::getContainer()->get('Markocupic\SacEventToolBundle\Image\RotateImage');
 
-        if ($objRotateImage->rotate($objFiles)) {
+        if ($this->rotateImage->rotate($objFiles)) {
             $json = ['status' => 'success'];
         } else {
             $json = ['status' => 'error'];

@@ -26,11 +26,11 @@ System::loadLanguageFile(
  * Table tl_calendar_events_member
  */
 $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
-    'config'      => [
-        'dataContainer'     => 'Table',
-        'notCopyable'       => true,
+    'config' => [
+        'dataContainer' => 'Table',
+        'notCopyable' => true,
         // Do not copy nor delete records, if an item has been deleted!
-        'onload_callback'   => [
+        'onload_callback' => [
             [
                 TlCalendarEventsMember::class,
                 'setStateOfSubscription',
@@ -63,15 +63,15 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             ],
         ],
         'ondelete_callback' => [],
-        'sql'               => [
+        'sql' => [
             'keys' => [
-                'id'            => 'primary',
+                'id' => 'primary',
                 'email,eventId' => 'index',
             ],
         ],
     ],
     // Buttons callback
-    'edit'        => [
+    'edit' => [
         'buttons_callback' => [
             [
                 TlCalendarEventsMember::class,
@@ -81,13 +81,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
     ],
 
     // List
-    'list'        => [
-        'sorting'           => [
-            'mode'        => 2,
-            'fields'      => ['stateOfSubscription, addedOn'],
-            'flag'        => 1,
+    'list' => [
+        'sorting' => [
+            'mode' => 2,
+            'fields' => ['stateOfSubscription, addedOn'],
+            'flag' => 1,
             'panelLayout' => 'filter;sort,search',
-            'filter'      => [
+            'filter' => [
                 [
                     'eventId=?',
                     Input::get(
@@ -96,670 +96,670 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 ],
             ],
         ],
-        'label'             => [
-            'fields'         => [
+        'label' => [
+            'fields' => [
                 'stateOfSubscription',
                 'firstname',
                 'lastname',
                 'street',
                 'city',
             ],
-            'showColumns'    => true,
+            'showColumns' => true,
             'label_callback' => [
                 TlCalendarEventsMember::class,
                 'addIcon',
             ],
         ],
         'global_operations' => [
-            'all'                          => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
+            'all' => [
+                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'downloadEventMemberList2Docx' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Docx'],
-                'href'       => 'act=downloadEventMemberList',
-                'class'      => 'download_registration_list',
-                'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Docx'],
+                'href' => 'act=downloadEventMemberList',
+                'class' => 'download_registration_list',
+                'icon' => 'bundles/markocupicsaceventtool/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'downloadEventMemberList2Csv'  => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Csv'],
-                'href'       => 'action=onloadCallbackExportMemberlist',
-                'class'      => 'header_icon',
-                'icon'       => 'bundles/markocupicsaceventtool/icons/excel.svg',
+            'downloadEventMemberList2Csv' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Csv'],
+                'href' => 'action=onloadCallbackExportMemberlist',
+                'class' => 'header_icon',
+                'icon' => 'bundles/markocupicsaceventtool/icons/excel.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'writeTourReport'              => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['writeTourReportButton'],
-                'href'       => '',
-                'class'      => 'writeTourRapport',
-                'icon'       => 'edit.svg',
+            'writeTourReport' => [
+                'label' => &$GLOBALS['TL_LANG']['MSC']['writeTourReportButton'],
+                'href' => '',
+                'class' => 'writeTourRapport',
+                'icon' => 'edit.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'printInstructorInvoice'       => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'],
-                'href'       => '',
-                'class'      => 'printInstructorInvoice',
-                'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
+            'printInstructorInvoice' => [
+                'label' => &$GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'],
+                'href' => '',
+                'class' => 'printInstructorInvoice',
+                'icon' => 'bundles/markocupicsaceventtool/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'sendEmail'                    => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['sendEmail'],
-                'href'       => 'act=edit&call=sendEmail',
-                'class'      => 'send_email',
-                'icon'       => 'bundles/markocupicsaceventtool/icons/enveloppe.svg',
+            'sendEmail' => [
+                'label' => &$GLOBALS['TL_LANG']['MSC']['sendEmail'],
+                'href' => 'act=edit&call=sendEmail',
+                'class' => 'send_email',
+                'icon' => 'bundles/markocupicsaceventtool/icons/enveloppe.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'backToEventSettings'          => [
-                'label'           => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
-                'href'            => 'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
+            'backToEventSettings' => [
+                'label' => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
+                'href' => 'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
                 'button_callback' => [
                     TlCalendarEventsMember::class,
                     'buttonCbBackToEventSettings',
                 ],
-                'icon'            => 'bundles/markocupicsaceventtool/icons/back.svg',
-                'attributes'      => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+                'icon' => 'bundles/markocupicsaceventtool/icons/back.svg',
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
         ],
-        'operations'        => [
+        'operations' => [
             'edit' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['edit'],
-                'href'  => 'act=edit',
-                'icon'  => 'edit.svg',
+                'href' => 'act=edit',
+                'icon' => 'edit.svg',
             ],
 
-            'delete'                     => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['delete'],
-                'href'       => 'act=delete',
-                'icon'       => 'delete.svg',
+            'delete' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['delete'],
+                'href' => 'act=delete',
+                'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
             ],
             // Regular "toggle" operation but without "icon" and with the haste specific params
             'toggleStateOfParticipation' => [
-                'label'                => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['toggleStateOfParticipation'],
-                'attributes'           => 'onclick="Backend.getScrollOffset();"',
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['toggleStateOfParticipation'],
+                'attributes' => 'onclick="Backend.getScrollOffset();"',
                 'haste_ajax_operation' => [
-                    'field'   => 'hasParticipated',
+                    'field' => 'hasParticipated',
                     'options' => [
                         [
                             'value' => '',
-                            'icon'  => Config::get(
-                                    'SAC_EVT_ASSETS_DIR'
-                                ).'/icons/has-not-participated.svg',
+                            'icon' => Config::get(
+                                'SAC_EVT_ASSETS_DIR'
+                            ).'/icons/has-not-participated.svg',
                         ],
                         [
                             'value' => '1',
-                            'icon'  => Config::get(
-                                    'SAC_EVT_ASSETS_DIR'
-                                ).'/icons/has-participated.svg',
+                            'icon' => Config::get(
+                                'SAC_EVT_ASSETS_DIR'
+                            ).'/icons/has-participated.svg',
                         ],
                     ],
                 ],
             ],
-            'show'                       => [
+            'show' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['show'],
-                'href'  => 'act=show',
-                'icon'  => 'show.svg',
+                'href' => 'act=show',
+                'icon' => 'show.svg',
             ],
         ],
     ],
 
     // Palettes
-    'palettes'    => [
-        '__selector__'    => [
+    'palettes' => [
+        '__selector__' => [
             'addEmailAttachment',
             'hasLeadClimbingEducation',
             'hasPaid',
         ],
-        'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionIds,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
-        'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy',
+        'default' => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionIds,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
+        'sendEmail' => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy',
         'refuseWithEmail' => '{refuseWithEmail_legend},refuseWithEmail',
         'acceptWithEmail' => '{acceptWithEmail_legend},acceptWithEmail',
-        'addToWaitlist'   => '{addToWaitlist_legend},addToWaitlist',
+        'addToWaitlist' => '{addToWaitlist_legend},addToWaitlist',
     ],
 
     // Subpalettes
     'subpalettes' => [
-        'addEmailAttachment'       => 'emailAttachment',
+        'addEmailAttachment' => 'emailAttachment',
         'hasLeadClimbingEducation' => 'dateOfLeadClimbingEducation',
-        'hasPaid'                  => 'paymentMethod',
+        'hasPaid' => 'paymentMethod',
     ],
 
     // Fields
-    'fields'      => [
-        'id'                          => [
+    'fields' => [
+        'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'eventId'                     => [
+        'eventId' => [
             'foreignKey' => 'tl_calendar_events.title',
-            'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'relation' => [
                 'type' => 'belongsTo',
                 'load' => 'eager',
             ],
-            'eval'       => ['readonly' => true],
+            'eval' => ['readonly' => true],
         ],
-        'contaoMemberId'              => [
+        'contaoMemberId' => [
             'foreignKey' => "tl_member.CONCAT(firstname, ' ', lastname)",
-            'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'relation' => [
                 'type' => 'belongsTo',
                 'load' => 'eager',
             ],
-            'eval'       => ['readonly' => true],
+            'eval' => ['readonly' => true],
         ],
-        'tstamp'                      => [
+        'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'uuid'                        => [
+        'uuid' => [
             'inputType' => 'text',
-            'default'   => Uuid::uuid4()->toString(),
-            'eval'      => [
-                'unique'    => true,
+            'default' => Uuid::uuid4()->toString(),
+            'eval' => [
+                'unique' => true,
                 'doNotCopy' => true,
             ],
-            'sql'       => "char(36) NOT NULL default ''",
+            'sql' => "char(36) NOT NULL default ''",
         ],
-        'addedOn'                     => [
+        'addedOn' => [
             'inputType' => 'text',
-            'flag'      => 5,
-            'sorting'   => true,
-            'eval'      => [
-                'rgxp'       => 'date',
+            'flag' => 5,
+            'sorting' => true,
+            'eval' => [
+                'rgxp' => 'date',
                 'datepicker' => true,
-                'tl_class'   => 'w50 wizard',
+                'tl_class' => 'w50 wizard',
             ],
-            'sql'       => "varchar(10) NOT NULL default ''",
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
-        'allowMultiSignUp'            => [
+        'allowMultiSignUp' => [
             'inputType' => 'checkbox',
-            'eval'      => [
+            'eval' => [
                 'submitOnChange' => true,
-                'doNotShow'      => false,
-                'doNotCopy'      => true,
-                'tl_class'       => 'long clr',
+                'doNotShow' => false,
+                'doNotCopy' => true,
+                'tl_class' => 'long clr',
             ],
-            'sql'       => "char(1) NOT NULL default ''",
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'hasPaid'                     => [
-            'exclude'   => true,
-            'filter'    => true,
+        'hasPaid' => [
+            'exclude' => true,
+            'filter' => true,
             'inputType' => 'checkbox',
-            'eval'      => [
+            'eval' => [
                 'submitOnChange' => true,
-                'tl_class'       => 'clr m12',
-                'mandatory'      => false,
+                'tl_class' => 'clr m12',
+                'mandatory' => false,
             ],
-            'sql'       => "char(1) NOT NULL default ''",
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'paymentMethod'               => [
+        'paymentMethod' => [
             'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
-            'exclude'   => true,
+            'exclude' => true,
             'inputType' => 'select',
-            'options'   => [
+            'options' => [
                 'cashPayment',
                 'bankTransfer',
                 'twint',
             ],
-            'eval'      => [
-                'mandatory'          => true,
+            'eval' => [
+                'mandatory' => true,
                 'includeBlankOption' => true,
-                'tl_class'           => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(32) NOT NULL default ''",
+            'sql' => "varchar(32) NOT NULL default ''",
         ],
-        'stateOfSubscription'         => [
-            'filter'        => true,
-            'inputType'     => 'select',
+        'stateOfSubscription' => [
+            'filter' => true,
+            'inputType' => 'select',
             'save_callback' => [
                 [
                     TlCalendarEventsMember::class,
                     'saveCallbackStateOfSubscription',
                 ],
             ],
-            'default'       => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'][0],
-            'reference'     => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
-            'options'       => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'],
-            'eval'          => [
-                'doNotShow'          => false,
-                'readonly'           => false,
+            'default' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'][0],
+            'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
+            'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'],
+            'eval' => [
+                'doNotShow' => false,
+                'readonly' => false,
                 'includeBlankOption' => false,
-                'maxlength'          => 255,
-                'tl_class'           => 'w50',
+                'maxlength' => 255,
+                'tl_class' => 'w50',
             ],
-            'sql'           => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'carInfo'                     => [
+        'carInfo' => [
             'inputType' => 'select',
-            'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
-            'eval'      => [
+            'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
+            'eval' => [
                 'includeBlankOption' => true,
-                'doNotShow'          => false,
-                'doNotCopy'          => true,
+                'doNotShow' => false,
+                'doNotCopy' => true,
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'ticketInfo'                  => [
+        'ticketInfo' => [
             'inputType' => 'select',
-            'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
-            'eval'      => [
+            'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
+            'eval' => [
                 'includeBlankOption' => true,
-                'doNotShow'          => false,
-                'doNotCopy'          => true,
+                'doNotShow' => false,
+                'doNotCopy' => true,
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'hasParticipated'             => [
+        'hasParticipated' => [
             'inputType' => 'checkbox',
-            'eval'      => [
-                'doNotShow'      => false,
+            'eval' => [
+                'doNotShow' => false,
                 'submitOnChange' => true,
-                'doNotCopy'      => true,
+                'doNotCopy' => true,
             ],
-            'sql'       => "char(1) NOT NULL default ''",
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'dashboard'                   => [
-            'inputType'            => 'text',
+        'dashboard' => [
+            'inputType' => 'text',
             'input_field_callback' => [
                 TlCalendarEventsMember::class,
                 'inputFieldCallbackDashboard',
             ],
-            'eval'                 => [
+            'eval' => [
                 'doNotShow' => true,
                 'mandatory' => false,
                 'maxlength' => 255,
-                'tl_class'  => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'                  => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'refuseWithEmail'             => [
-            'inputType'            => 'text',
-            'input_field_callback' => [
-                TlCalendarEventsMember::class,
-                'inputFieldCallbackNotifyMemberAboutSubscriptionState',
-            ],
-            'eval'                 => [
-                'doNotShow' => true,
-                'mandatory' => false,
-                'maxlength' => 255,
-                'tl_class'  => 'w50',
-            ],
-            'sql'                  => "varchar(255) NOT NULL default ''",
-        ],
-        'acceptWithEmail'             => [
-            'inputType'            => 'text',
-            'input_field_callback' => [
-                TlCalendarEventsMember::class,
-                'inputFieldCallbackNotifyMemberAboutSubscriptionState',
-            ],
-            'eval'                 => [
-                'doNotShow' => true,
-                'mandatory' => false,
-                'maxlength' => 255,
-                'tl_class'  => 'w50',
-            ],
-            'sql'                  => "varchar(255) NOT NULL default ''",
-        ],
-        'addToWaitlist'               => [
-            'inputType'            => 'text',
-            'input_field_callback' => [
-                TlCalendarEventsMember::class,
-                'inputFieldCallbackNotifyMemberAboutSubscriptionState',
-            ],
-            'eval'                 => [
-                'doNotShow' => true,
-                'mandatory' => false,
-                'maxlength' => 255,
-                'tl_class'  => 'w50',
-            ],
-            'sql'                  => "varchar(255) NOT NULL default ''",
-        ],
-        'eventName'                   => [
+        'refuseWithEmail' => [
             'inputType' => 'text',
-            'eval'      => [
+            'input_field_callback' => [
+                TlCalendarEventsMember::class,
+                'inputFieldCallbackNotifyMemberAboutSubscriptionState',
+            ],
+            'eval' => [
+                'doNotShow' => true,
+                'mandatory' => false,
+                'maxlength' => 255,
+                'tl_class' => 'w50',
+            ],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'acceptWithEmail' => [
+            'inputType' => 'text',
+            'input_field_callback' => [
+                TlCalendarEventsMember::class,
+                'inputFieldCallbackNotifyMemberAboutSubscriptionState',
+            ],
+            'eval' => [
+                'doNotShow' => true,
+                'mandatory' => false,
+                'maxlength' => 255,
+                'tl_class' => 'w50',
+            ],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'addToWaitlist' => [
+            'inputType' => 'text',
+            'input_field_callback' => [
+                TlCalendarEventsMember::class,
+                'inputFieldCallbackNotifyMemberAboutSubscriptionState',
+            ],
+            'eval' => [
+                'doNotShow' => true,
+                'mandatory' => false,
+                'maxlength' => 255,
+                'tl_class' => 'w50',
+            ],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'eventName' => [
+            'inputType' => 'text',
+            'eval' => [
                 'mandatory' => true,
                 'maxlength' => 255,
-                'tl_class'  => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'notes'                       => [
-            'exclude'   => true,
+        'notes' => [
+            'exclude' => true,
             'inputType' => 'textarea',
-            'eval'      => [
-                'tl_class'       => 'clr',
-                'maxlength'      => 5000,
+            'eval' => [
+                'tl_class' => 'clr',
+                'maxlength' => 5000,
                 'decodeEntities' => true,
-                'mandatory'      => false,
+                'mandatory' => false,
             ],
-            'sql'       => 'text NULL',
+            'sql' => 'text NULL',
         ],
-        'instructorNotes'             => [
-            'exclude'   => true,
+        'instructorNotes' => [
+            'exclude' => true,
             'inputType' => 'textarea',
-            'eval'      => [
-                'tl_class'       => 'clr',
-                'maxlength'      => 5000,
+            'eval' => [
+                'tl_class' => 'clr',
+                'maxlength' => 5000,
                 'decodeEntities' => true,
-                'mandatory'      => false,
+                'mandatory' => false,
             ],
-            'sql'       => 'text NULL',
+            'sql' => 'text NULL',
         ],
-        'firstname'                   => [
+        'firstname' => [
             'inputType' => 'text',
-            'eval'      => [
+            'eval' => [
                 'mandatory' => true,
                 'maxlength' => 255,
-                'tl_class'  => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'lastname'                    => [
+        'lastname' => [
             'inputType' => 'text',
-            'eval'      => [
+            'eval' => [
                 'mandatory' => true,
                 'maxlength' => 255,
-                'tl_class'  => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'gender'                      => [
+        'gender' => [
             'inputType' => 'select',
-            'sorting'   => true,
-            'options'   => [
+            'sorting' => true,
+            'options' => [
                 'male',
                 'female',
             ],
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
-            'eval'      => [
-                'mandatory'          => true,
+            'eval' => [
+                'mandatory' => true,
                 'includeBlankOption' => true,
-                'tl_class'           => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(32) NOT NULL default ''",
+            'sql' => "varchar(32) NOT NULL default ''",
         ],
-        'dateOfBirth'                 => [
-            'sorting'   => true,
-            'flag'      => 5,
+        'dateOfBirth' => [
+            'sorting' => true,
+            'flag' => 5,
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory'  => false,
-                'rgxp'       => 'date',
+            'eval' => [
+                'mandatory' => false,
+                'rgxp' => 'date',
                 'datepicker' => true,
-                'tl_class'   => 'w50 wizard',
+                'tl_class' => 'w50 wizard',
             ],
-            'sql'       => "varchar(11) NOT NULL default ''",
+            'sql' => "varchar(11) NOT NULL default ''",
         ],
-        'street'                      => [
+        'street' => [
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory'  => true,
-                'maxlength'  => 255,
+            'eval' => [
+                'mandatory' => true,
+                'maxlength' => 255,
                 'feEditable' => true,
                 'feViewable' => true,
-                'feGroup'    => 'address',
-                'tl_class'   => 'w50',
+                'feGroup' => 'address',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'postal'                      => [
+        'postal' => [
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory'  => true,
-                'maxlength'  => 32,
+            'eval' => [
+                'mandatory' => true,
+                'maxlength' => 32,
                 'feEditable' => true,
                 'feViewable' => true,
-                'feGroup'    => 'address',
-                'tl_class'   => 'w50',
+                'feGroup' => 'address',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(32) NOT NULL default ''",
+            'sql' => "varchar(32) NOT NULL default ''",
         ],
-        'city'                        => [
+        'city' => [
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory'  => true,
-                'maxlength'  => 255,
+            'eval' => [
+                'mandatory' => true,
+                'maxlength' => 255,
                 'feEditable' => true,
                 'feViewable' => true,
-                'feGroup'    => 'address',
-                'tl_class'   => 'w50',
+                'feGroup' => 'address',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'mobile'                      => [
+        'mobile' => [
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory'      => false,
-                'maxlength'      => 64,
-                'rgxp'           => 'phone',
+            'eval' => [
+                'mandatory' => false,
+                'maxlength' => 64,
+                'rgxp' => 'phone',
                 'decodeEntities' => true,
-                'feEditable'     => true,
-                'feViewable'     => true,
-                'feGroup'        => 'contact',
-                'tl_class'       => 'w50',
+                'feEditable' => true,
+                'feViewable' => true,
+                'feGroup' => 'contact',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(64) NOT NULL default ''",
+            'sql' => "varchar(64) NOT NULL default ''",
         ],
-        'emergencyPhone'              => [
+        'emergencyPhone' => [
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory'      => true,
-                'maxlength'      => 64,
-                'rgxp'           => 'phone',
+            'eval' => [
+                'mandatory' => true,
+                'maxlength' => 64,
+                'rgxp' => 'phone',
                 'decodeEntities' => true,
-                'feEditable'     => true,
-                'feViewable'     => true,
-                'feGroup'        => 'contact',
-                'tl_class'       => 'w50',
+                'feEditable' => true,
+                'feViewable' => true,
+                'feGroup' => 'contact',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(64) NOT NULL default ''",
+            'sql' => "varchar(64) NOT NULL default ''",
         ],
-        'emergencyPhoneName'          => [
+        'emergencyPhoneName' => [
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory'      => true,
-                'maxlength'      => 255,
+            'eval' => [
+                'mandatory' => true,
+                'maxlength' => 255,
                 'decodeEntities' => true,
-                'feEditable'     => true,
-                'feViewable'     => true,
-                'feGroup'        => 'contact',
-                'tl_class'       => 'w50',
+                'feEditable' => true,
+                'feViewable' => true,
+                'feGroup' => 'contact',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'email'                       => [
+        'email' => [
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory'      => false,
-                'maxlength'      => 255,
-                'rgxp'           => 'email',
-                'unique'         => false,
+            'eval' => [
+                'mandatory' => false,
+                'maxlength' => 255,
+                'rgxp' => 'email',
+                'unique' => false,
                 'decodeEntities' => true,
-                'feEditable'     => true,
-                'feViewable'     => true,
-                'feGroup'        => 'contact',
-                'tl_class'       => 'w50',
+                'feEditable' => true,
+                'feViewable' => true,
+                'feGroup' => 'contact',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'ahvNumber'                   => [
+        'ahvNumber' => [
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory'      => false,
-                'maxlength'      => 16,
-                'unique'         => false,
+            'eval' => [
+                'mandatory' => false,
+                'maxlength' => 16,
+                'unique' => false,
                 'decodeEntities' => true,
-                'feGroup'        => 'contact',
-                'tl_class'       => 'w50',
+                'feGroup' => 'contact',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'sacMemberId'                 => [
-            'inputType'     => 'text',
+        'sacMemberId' => [
+            'inputType' => 'text',
             'save_callback' => [
                 [
                     TlCalendarEventsMember::class,
                     'saveCallbackSacMemberId',
                 ],
             ],
-            'eval'          => [
+            'eval' => [
                 'doNotShow' => true,
                 'doNotCopy' => true,
-                'rgxp'      => 'sacMemberId',
+                'rgxp' => 'sacMemberId',
                 'maxlength' => 255,
-                'tl_class'  => 'clr',
+                'tl_class' => 'clr',
             ],
-            'sql'           => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'hasLeadClimbingEducation'    => [
-            'exclude'   => true,
-            'filter'    => true,
-            'sorting'   => true,
+        'hasLeadClimbingEducation' => [
+            'exclude' => true,
+            'filter' => true,
+            'sorting' => true,
             'inputType' => 'checkbox',
-            'eval'      => ['submitOnChange' => true],
-            'sql'       => "char(1) NOT NULL default ''",
+            'eval' => ['submitOnChange' => true],
+            'sql' => "char(1) NOT NULL default ''",
         ],
         'dateOfLeadClimbingEducation' => [
-            'exclude'   => true,
+            'exclude' => true,
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory'  => true,
-                'rgxp'       => 'date',
+            'eval' => [
+                'mandatory' => true,
+                'rgxp' => 'date',
                 'datepicker' => true,
                 'feEditable' => true,
                 'feViewable' => true,
-                'feGroup'    => 'personal',
-                'tl_class'   => 'w50 wizard',
+                'feGroup' => 'personal',
+                'tl_class' => 'w50 wizard',
             ],
-            'sql'       => "varchar(11) NOT NULL default ''",
+            'sql' => "varchar(11) NOT NULL default ''",
         ],
-        'foodHabits'                  => [
-            'exclude'   => true,
-            'search'    => true,
+        'foodHabits' => [
+            'exclude' => true,
+            'search' => true,
             'inputType' => 'text',
-            'eval'      => [
-                'tl_class'  => 'clr',
+            'eval' => [
+                'tl_class' => 'clr',
                 'maxlength' => 5000,
             ],
-            'sql'       => 'text NULL',
+            'sql' => 'text NULL',
         ],
         // Send E-mail
-        'emailRecipients'             => [
-            'options'   => [],
+        'emailRecipients' => [
+            'options' => [],
             // Set via onload callback
             'inputType' => 'checkbox',
-            'eval'      => [
-                'multiple'  => true,
+            'eval' => [
+                'multiple' => true,
                 'mandatory' => true,
                 'doNotShow' => true,
                 'doNotCopy' => true,
-                'tl_class'  => '',
+                'tl_class' => '',
             ],
-            'sql'       => 'blob NULL',
+            'sql' => 'blob NULL',
         ],
-        'emailSubject'                => [
+        'emailSubject' => [
             'inputType' => 'text',
-            'eval'      => [
+            'eval' => [
                 'mandatory' => true,
                 'maxlength' => 255,
                 'doNotShow' => true,
                 'doNotCopy' => true,
-                'tl_class'  => '',
+                'tl_class' => '',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'emailText'                   => [
+        'emailText' => [
             'inputType' => 'textarea',
-            'eval'      => [
+            'eval' => [
                 'mandatory' => true,
                 'doNotShow' => true,
                 'doNotCopy' => true,
-                'rows'      => 6,
-                'style'     => 'height:50px',
-                'tl_class'  => '',
+                'rows' => 6,
+                'style' => 'height:50px',
+                'tl_class' => '',
             ],
-            'sql'       => 'mediumtext NULL',
+            'sql' => 'mediumtext NULL',
         ],
-        'addEmailAttachment'          => [
-            'exclude'   => true,
-            'filter'    => true,
+        'addEmailAttachment' => [
+            'exclude' => true,
+            'filter' => true,
             'inputType' => 'checkbox',
-            'eval'      => ['submitOnChange' => true],
-            'sql'       => "char(1) NOT NULL default ''",
+            'eval' => ['submitOnChange' => true],
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'emailAttachment'             => [
-            'exclude'   => true,
+        'emailAttachment' => [
+            'exclude' => true,
             'inputType' => 'fileTree',
-            'eval'      => [
-                'multiple'   => true,
-                'fieldType'  => 'checkbox',
+            'eval' => [
+                'multiple' => true,
+                'fieldType' => 'checkbox',
                 'extensions' => Config::get(
                     'allowedDownload'
                 ),
-                'files'      => true,
-                'filesOnly'  => true,
-                'mandatory'  => true,
+                'files' => true,
+                'filesOnly' => true,
+                'mandatory' => true,
             ],
-            'sql'       => 'binary(16) NULL',
+            'sql' => 'binary(16) NULL',
         ],
-        'emailSendCopy'               => [
+        'emailSendCopy' => [
             'inputType' => 'checkbox',
-            'eval'      => [
+            'eval' => [
                 'doNotShow' => true,
                 'doNotCopy' => true,
             ],
-            'sql'       => "char(1) NOT NULL default ''",
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'agb'                         => [
+        'agb' => [
             'inputType' => 'checkbox',
-            'eval'      => [
+            'eval' => [
                 'doNotShow' => true,
                 'doNotCopy' => true,
             ],
-            'sql'       => "char(1) NOT NULL default ''",
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'anonymized'                  => [
+        'anonymized' => [
             'inputType' => 'checkbox',
-            'eval'      => [
+            'eval' => [
                 'doNotShow' => true,
                 'doNotCopy' => true,
             ],
-            'sql'       => "char(1) NOT NULL default ''",
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'bookingType'                 => [
-            'exclude'   => true,
+        'bookingType' => [
+            'exclude' => true,
             'inputType' => 'select',
             'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
-            'options'   => [
+            'options' => [
                 'onlineForm',
                 'manually',
             ],
-            'eval'      => [
-                'doNotShow'          => true,
+            'eval' => [
+                'doNotShow' => true,
                 'includeBlankOption' => false,
-                'doNotCopy'          => true,
+                'doNotCopy' => true,
             ],
-            'sql'       => "varchar(255) NOT NULL default 'manually'",
+            'sql' => "varchar(255) NOT NULL default 'manually'",
         ],
-        'sectionIds'                  => [
-            'sorting'          => true,
-            'exclude'          => true,
-            'inputType'        => 'select',
-            'reference'        => &$GLOBALS['TL_LANG']['tl_member']['section'],
+        'sectionIds' => [
+            'sorting' => true,
+            'exclude' => true,
+            'inputType' => 'select',
+            'reference' => &$GLOBALS['TL_LANG']['tl_member']['section'],
             'options_callback' => [
                 TlCalendarEventsMember::class,
                 'listSections',
             ],
-            'eval'             => [
-                'multiple'  => true,
-                'chosen'    => true,
+            'eval' => [
+                'multiple' => true,
+                'chosen' => true,
                 'doNotCopy' => true,
-                'readonly'  => false,
-                'tl_class'  => 'w50',
+                'readonly' => false,
+                'tl_class' => 'w50',
             ],
-            'sql'              => 'blob NULL',
+            'sql' => 'blob NULL',
         ],
     ],
 ];

@@ -40,7 +40,6 @@ class ContaoMode
     }
 
     /**
-     * @return string
      * @throws \Exception
      */
     public function getMode(): string
@@ -53,7 +52,6 @@ class ContaoMode
     }
 
     /**
-     * @return bool
      * @throws \Exception
      */
     public function isFrontend(): bool
@@ -68,7 +66,6 @@ class ContaoMode
     }
 
     /**
-     * @return bool
      * @throws \Exception
      */
     public function isBackend(): bool
@@ -83,7 +80,6 @@ class ContaoMode
     }
 
     /**
-     * @return void
      * @throws \Exception
      */
     private function _setMode(): void
@@ -98,13 +94,11 @@ class ContaoMode
     }
 
     /**
-     * @return void
      * @throws \Exception
      */
     private function _checkInitialization(): void
     {
-        if(!$this->framework->isInitialized())
-        {
+        if (!$this->framework->isInitialized()) {
             throw new \Exception('The Contao framework is not initialized.');
         }
     }

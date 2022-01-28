@@ -15,39 +15,39 @@ declare(strict_types=1);
 use Markocupic\SacEventToolBundle\Dca\TlUserRole;
 
 $GLOBALS['TL_DCA']['tl_user_role'] = [
-    'config'   => [
-        'dataContainer'    => 'Table',
+    'config' => [
+        'dataContainer' => 'Table',
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
-        'switchToEdit'     => true,
-        'sql'              => [
+        'switchToEdit' => true,
+        'sql' => [
             'keys' => [
-                'id'  => 'primary',
+                'id' => 'primary',
                 'pid' => 'index',
             ],
         ],
     ],
-    'list'     => [
-        'sorting'           => [
-            'mode'                  => 5,
-            'fields'                => [
+    'list' => [
+        'sorting' => [
+            'mode' => 5,
+            'fields' => [
                 'title',
                 'email',
             ],
-            'format'                => '%s %s',
+            'format' => '%s %s',
             //'flag'                  => 1,
-            'panelLayout'           => 'filter;search,limit',
+            'panelLayout' => 'filter;search,limit',
             'paste_button_callback' => [
                 TlUserRole::class,
                 'pasteTag',
             ],
         ],
-        'label'             => [
-            'fields'         => [
+        'label' => [
+            'fields' => [
                 'title',
                 'email',
             ],
-            'showColumns'    => true,
+            'showColumns' => true,
             'label_callback' => [
                 TlUserRole::class,
                 'checkForUsage',
@@ -55,33 +55,33 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
         ],
         'global_operations' => [
             'all' => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
+                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
         ],
-        'operations'        => [
-            'edit'   => [
+        'operations' => [
+            'edit' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_user_role']['edit'],
-                'href'  => 'act=edit',
-                'icon'  => 'edit.gif',
+                'href' => 'act=edit',
+                'icon' => 'edit.gif',
             ],
-            'copy'   => [
+            'copy' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_user_role']['copy'],
-                'href'  => 'act=copy',
-                'icon'  => 'copy.gif',
+                'href' => 'act=copy',
+                'icon' => 'copy.gif',
             ],
-            'cut'    => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_tour_type']['cut'],
-                'href'       => 'act=paste&mode=cut',
-                'icon'       => 'cut.gif',
+            'cut' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_tour_type']['cut'],
+                'href' => 'act=paste&mode=cut',
+                'icon' => 'cut.gif',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
             'delete' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_user_role']['delete'],
-                'href'       => 'act=delete',
-                'icon'       => 'delete.gif',
+                'label' => &$GLOBALS['TL_LANG']['tl_user_role']['delete'],
+                'href' => 'act=delete',
+                'icon' => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
             ],
         ],
@@ -91,147 +91,147 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
     ],
 
     'fields' => [
-        'id'                               => [
+        'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'pid'                              => [
+        'pid' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'sorting'                          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['sorting'],
-            'exclude'   => true,
-            'search'    => false,
-            'sorting'   => true,
+        'sorting' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['sorting'],
+            'exclude' => true,
+            'search' => false,
+            'sorting' => true,
             'inputType' => 'text',
-            'eval'      => [
+            'eval' => [
                 'mandatory' => true,
-                'rgxp'      => 'natural',
+                'rgxp' => 'natural',
                 'maxlength' => 10,
             ],
-            'sql'       => "int(10) unsigned NOT NULL default '0'",
-        ],
-        'tstamp'                           => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'title'                            => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['title'],
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => true,
+        'tstamp' => [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+        ],
+        'title' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['title'],
+            'exclude' => true,
+            'search' => true,
+            'sorting' => true,
             'inputType' => 'text',
-            'eval'      => [
+            'eval' => [
                 'mandatory' => true,
                 'maxlength' => 255,
-                'tl_class'  => 'clr',
+                'tl_class' => 'clr',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'belongsToExecutiveBoard'          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['belongsToExecutiveBoard'],
-            'exclude'   => true,
-            'filter'    => true,
-            'sorting'   => true,
+        'belongsToExecutiveBoard' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['belongsToExecutiveBoard'],
+            'exclude' => true,
+            'filter' => true,
+            'sorting' => true,
             'inputType' => 'checkbox',
-            'eval'      => [
+            'eval' => [
                 'mandatory' => false,
-                'tl_class'  => 'clr',
+                'tl_class' => 'clr',
             ],
-            'sql'       => "char(1) NOT NULL default ''",
+            'sql' => "char(1) NOT NULL default ''",
         ],
         'belongsToBeauftragteStammsektion' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['belongsToBeauftragteStammsektion'],
-            'exclude'   => true,
-            'filter'    => true,
-            'sorting'   => true,
+            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['belongsToBeauftragteStammsektion'],
+            'exclude' => true,
+            'filter' => true,
+            'sorting' => true,
             'inputType' => 'checkbox',
-            'eval'      => [
+            'eval' => [
                 'mandatory' => false,
-                'tl_class'  => 'clr',
+                'tl_class' => 'clr',
             ],
-            'sql'       => "char(1) NOT NULL default ''",
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'email'                            => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['email'],
-            'exclude'   => true,
-            'search'    => true,
-            'filter'    => true,
+        'email' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['email'],
+            'exclude' => true,
+            'search' => true,
+            'filter' => true,
             'inputType' => 'text',
-            'eval'      => [
-                'assignTo'       => 'tl_user.email',
-                'mandatory'      => false,
-                'maxlength'      => 255,
-                'rgxp'           => 'email',
-                'unique'         => false,
-                'decodeEntities' => true,
-                'tl_class'       => 'w50',
-            ],
-            'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'street'                           => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['street'],
-            'exclude'   => true,
-            'search'    => true,
-            'inputType' => 'text',
-            'eval'      => [
-                'assignTo'  => 'tl_user.street',
+            'eval' => [
+                'assignTo' => 'tl_user.email',
+                'mandatory' => false,
                 'maxlength' => 255,
-                'tl_class'  => 'w50',
+                'rgxp' => 'email',
+                'unique' => false,
+                'decodeEntities' => true,
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'postal'                           => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['postal'],
-            'exclude'   => true,
-            'search'    => true,
+        'street' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['street'],
+            'exclude' => true,
+            'search' => true,
             'inputType' => 'text',
-            'eval'      => [
-                'assignTo'  => 'tl_user.postal',
+            'eval' => [
+                'assignTo' => 'tl_user.street',
+                'maxlength' => 255,
+                'tl_class' => 'w50',
+            ],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'postal' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['postal'],
+            'exclude' => true,
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => [
+                'assignTo' => 'tl_user.postal',
                 'maxlength' => 32,
-                'tl_class'  => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(32) NOT NULL default ''",
+            'sql' => "varchar(32) NOT NULL default ''",
         ],
-        'city'                             => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['city'],
-            'exclude'   => true,
-            'filter'    => true,
-            'search'    => true,
-            'sorting'   => true,
+        'city' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['city'],
+            'exclude' => true,
+            'filter' => true,
+            'search' => true,
+            'sorting' => true,
             'inputType' => 'text',
-            'eval'      => [
-                'assignTo'  => 'tl_user.city',
+            'eval' => [
+                'assignTo' => 'tl_user.city',
                 'maxlength' => 255,
-                'tl_class'  => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'phone'                            => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['phone'],
-            'exclude'   => true,
-            'search'    => true,
+        'phone' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['phone'],
+            'exclude' => true,
+            'search' => true,
             'inputType' => 'text',
-            'eval'      => [
-                'assignTo'       => 'tl_user.phone',
-                'maxlength'      => 64,
-                'rgxp'           => 'phone',
+            'eval' => [
+                'assignTo' => 'tl_user.phone',
+                'maxlength' => 64,
+                'rgxp' => 'phone',
                 'decodeEntities' => true,
-                'tl_class'       => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(64) NOT NULL default ''",
+            'sql' => "varchar(64) NOT NULL default ''",
         ],
-        'mobile'                           => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_user_role']['mobile'],
-            'exclude'   => true,
-            'search'    => true,
+        'mobile' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['mobile'],
+            'exclude' => true,
+            'search' => true,
             'inputType' => 'text',
-            'eval'      => [
-                'assignTo'       => 'tl_user.mobile',
-                'maxlength'      => 64,
-                'rgxp'           => 'phone',
+            'eval' => [
+                'assignTo' => 'tl_user.mobile',
+                'maxlength' => 64,
+                'rgxp' => 'phone',
                 'decodeEntities' => true,
-                'tl_class'       => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(64) NOT NULL default ''",
+            'sql' => "varchar(64) NOT NULL default ''",
         ],
     ],
 ];

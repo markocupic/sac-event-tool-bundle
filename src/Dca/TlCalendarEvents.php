@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -420,9 +420,7 @@ class TlCalendarEvents extends \tl_calendar_events
             // Insert headline first
             Controller::loadLanguageFile('tl_calendar_events');
             $arrHeadline = array_map(
-                static function ($field) {
-                    return $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?? $field;
-                },
+                static fn ($field) => $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?? $field,
                 $arrFields
             );
             $csv->insertOne($arrHeadline);
@@ -447,9 +445,7 @@ class TlCalendarEvents extends \tl_calendar_events
                         } elseif ('eventDates' === $field) {
                             $arrTimestamps = CalendarEventsHelper::getEventTimestamps($objEvent->current());
                             $arrDates = array_map(
-                                static function ($tstamp) {
-                                    return Date::parse(Config::get('dateFormat'), $tstamp);
-                                },
+                                static fn ($tstamp) => Date::parse(Config::get('dateFormat'), $tstamp),
                                 $arrTimestamps
                             );
                             $arrRow[] = implode(',', $arrDates);

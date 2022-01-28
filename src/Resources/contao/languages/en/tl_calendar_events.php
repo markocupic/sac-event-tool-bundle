@@ -12,6 +12,18 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\Config;
+
+/*
+ * This file is part of SAC Event Tool Bundle.
+ *
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/sac-event-tool-bundle
+ */
+
 // Operations
 $GLOBALS['TL_LANG']['tl_calendar_events']['registrations'] = ['Event-Anmeldungen', 'Bearbeiten Sie die Anmeldungen des Events mit ID %s.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelNext'] = ['Freigabestufe um +1 erhöhen', 'Freigabestufe von Datensatz mit ID %s um +1 erhöhen. Der Datensatz ist dann vielleicht nicht mehr bearbeitbar.'];
@@ -101,7 +113,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'] = ['Höhen
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = ['Zeitbedarf im Abstieg in h', 'Machen Sie hier Angaben zum Zeitbedarf im Abstieg.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'] = ['<span style="color:red">Kontaktdaten standardmässig aus der Datenbank generieren (Wichtig, falls Online-Anmeldung deaktiviert ist!!!)</span>', 'Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung individualisieren.', ''];
-$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung', sprintf('Nutzen Sie dieses Feld, um eine individualisierte E-Mail-Bestätigungs für den Event zu erstellen. Fahren Sie mit der Maus über diesen Text, um mehr zu erfahren. Die Tags dienen als Platzhalter für eventspezifische Informationen. %s', '<br><br>'.str_replace('{{br}}', '<br>', \Contao\Config::get('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT')))];
+$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung', sprintf('Nutzen Sie dieses Feld, um eine individualisierte E-Mail-Bestätigungs für den Event zu erstellen. Fahren Sie mit der Maus über diesen Text, um mehr zu erfahren. Die Tags dienen als Platzhalter für eventspezifische Informationen. %s', '<br><br>'.str_replace('{{br}}', '<br>', Config::get('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT')))];
 
 // References
 // Tech difficulties main categories

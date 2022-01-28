@@ -16,114 +16,114 @@ use Markocupic\SacEventToolBundle\Dca\TlCalendarContainer;
 
 $GLOBALS['TL_DCA']['tl_calendar_container'] = [
     // Config
-    'config'      => [
-        'dataContainer'    => 'Table',
-        'ctable'           => ['tl_calendar'],
-        'switchToEdit'     => true,
+    'config' => [
+        'dataContainer' => 'Table',
+        'ctable' => ['tl_calendar'],
+        'switchToEdit' => true,
         'enableVersioning' => true,
-        'onload_callback'  => [
+        'onload_callback' => [
             [
                 TlCalendarContainer::class,
                 'checkPermission',
             ],
         ],
-        'sql'              => [
+        'sql' => [
             'keys' => [
                 'id' => 'primary',
             ],
         ],
     ],
     // List
-    'list'        => [
-        'sorting'           => [
-            'mode'            => 1,
-            'fields'          => ['title'],
-            'flag'            => 2,
-            'panelLayout'     => 'filter;search,limit',
+    'list' => [
+        'sorting' => [
+            'mode' => 1,
+            'fields' => ['title'],
+            'flag' => 2,
+            'panelLayout' => 'filter;search,limit',
             'disableGrouping' => true,
         ],
-        'label'             => [
+        'label' => [
             'fields' => ['title'],
             'format' => '%s',
         ],
         'global_operations' => [
             'all' => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
+                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
         ],
-        'operations'        => [
-            'edit'       => [
+        'operations' => [
+            'edit' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['edit'],
-                'href'  => 'table=tl_calendar',
-                'icon'  => 'edit.svg',
+                'href' => 'table=tl_calendar',
+                'icon' => 'edit.svg',
             ],
             'editheader' => [
-                'label'           => &$GLOBALS['TL_LANG']['tl_calendar_container']['editheader'],
-                'href'            => 'act=edit',
-                'icon'            => 'header.svg',
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['editheader'],
+                'href' => 'act=edit',
+                'icon' => 'header.svg',
                 'button_callback' => [
                     TlCalendarContainer::class,
                     'editHeader',
                 ],
             ],
-            'copy'       => [
-                'label'           => &$GLOBALS['TL_LANG']['tl_calendar_container']['copy'],
-                'href'            => 'act=copy',
-                'icon'            => 'copy.svg',
+            'copy' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['copy'],
+                'href' => 'act=copy',
+                'icon' => 'copy.svg',
                 'button_callback' => [
                     TlCalendarContainer::class,
                     'copyCalendarContainer',
                 ],
             ],
-            'delete'     => [
-                'label'           => &$GLOBALS['TL_LANG']['tl_calendar_container']['delete'],
-                'href'            => 'act=delete',
-                'icon'            => 'delete.svg',
-                'attributes'      => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
+            'delete' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['delete'],
+                'href' => 'act=delete',
+                'icon' => 'delete.svg',
+                'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
                 'button_callback' => [
                     TlCalendarContainer::class,
                     'deleteCalendarContainer',
                 ],
             ],
-            'show'       => [
+            'show' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['show'],
-                'href'  => 'act=show',
-                'icon'  => 'show.svg',
+                'href' => 'act=show',
+                'icon' => 'show.svg',
             ],
         ],
     ],
 
     // Palettes
-    'palettes'    => [
+    'palettes' => [
         '__selector__' => [],
-        'default'      => '{title_legend},title',
+        'default' => '{title_legend},title',
     ],
 
     // Subpalettes
     'subpalettes' => [],
 
     // Fields
-    'fields'      => [
-        'id'     => [
+    'fields' => [
+        'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'title'  => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_calendar_container']['title'],
-            'exclude'   => true,
-            'search'    => true,
+        'title' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['title'],
+            'exclude' => true,
+            'search' => true,
             'inputType' => 'text',
-            'eval'      => [
+            'eval' => [
                 'mandatory' => true,
                 'maxlength' => 255,
-                'tl_class'  => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
     ],
 ];

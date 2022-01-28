@@ -47,68 +47,68 @@ $GLOBALS['TL_DCA']['tl_content']['palettes']['cabanne_sac_detail'] = '{type_lege
 
 // Fields
 $GLOBALS['TL_DCA']['tl_content']['fields']['cabanneSac'] = [
-    'label'            => &$GLOBALS['TL_LANG']['tl_content']['cabanneSac'],
-    'exclude'          => true,
-    'search'           => true,
-    'inputType'        => 'select',
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['cabanneSac'],
+    'exclude' => true,
+    'search' => true,
+    'inputType' => 'select',
     'options_callback' => [
         TlContent::class,
         'getCabannes',
     ],
-    'eval'             => [
+    'eval' => [
         'mandatory' => true,
         'maxlength' => 200,
-        'tl_class'  => 'w50 clr',
+        'tl_class' => 'w50 clr',
     ],
-    'sql'              => "int(10) unsigned NOT NULL default '0'",
+    'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_content']['jumpTo'],
-    'exclude'   => true,
-    'search'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['jumpTo'],
+    'exclude' => true,
+    'search' => true,
     'inputType' => 'text',
-    'eval'      => [
-        'mandatory'      => true,
-        'rgxp'           => 'url',
+    'eval' => [
+        'mandatory' => true,
+        'rgxp' => 'url',
         'decodeEntities' => true,
-        'maxlength'      => 255,
-        'fieldType'      => 'radio',
-        'filesOnly'      => true,
-        'tl_class'       => 'w50 wizard',
+        'maxlength' => 255,
+        'fieldType' => 'radio',
+        'filesOnly' => true,
+        'tl_class' => 'w50 wizard',
     ],
-    'wizard'    => [
+    'wizard' => [
         [
             'tl_content',
             'pagePicker',
         ],
     ],
-    'sql'       => "varchar(255) NOT NULL default ''",
+    'sql' => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_selectMode'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_content']['userList_selectMode'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_selectMode'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'select',
     'reference' => &$GLOBALS['TL_LANG']['tl_content'],
-    'options'   => [
+    'options' => [
         'selectUserRoles',
         'selectUsers',
     ],
-    'eval'      => [
+    'eval' => [
         'submitOnChange' => true,
-        'tl_class'       => 'clr',
+        'tl_class' => 'clr',
     ],
-    'sql'       => "char(128) NOT NULL default ''",
+    'sql' => "char(128) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_replacePrivateAdressWithRoleAdress'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_content']['userList_replacePrivateAdressWithRoleAdress'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_replacePrivateAdressWithRoleAdress'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'checkbox',
-    'options'   => [
+    'options' => [
         'email',
         'phone',
         'mobile',
@@ -116,58 +116,58 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_replacePrivateAdressWithRol
         'postal',
         'city',
     ],
-    'eval'      => [
+    'eval' => [
         'submitOnChange' => false,
-        'multiple'       => true,
-        'tl_class'       => 'clr',
+        'multiple' => true,
+        'tl_class' => 'clr',
     ],
-    'sql'       => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_users'] = [
-    'label'      => &$GLOBALS['TL_LANG']['tl_content']['userList_users'],
-    'exclude'    => true,
-    'search'     => true,
-    'filter'     => true,
-    'inputType'  => 'select',
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_users'],
+    'exclude' => true,
+    'search' => true,
+    'filter' => true,
+    'inputType' => 'select',
     'foreignKey' => 'tl_user.name',
-    'relation'   => [
+    'relation' => [
         'type' => 'hasOne',
         'load' => 'lazy',
     ],
-    'eval'       => [
-        'chosen'             => true,
-        'tl_class'           => 'clr m12',
+    'eval' => [
+        'chosen' => true,
+        'tl_class' => 'clr m12',
         'includeBlankOption' => true,
-        'multiple'           => true,
-        'mandatory'          => true,
+        'multiple' => true,
+        'mandatory' => true,
     ],
-    'sql'        => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_userRoles'] = [
-    'label'            => &$GLOBALS['TL_LANG']['tl_content']['userList_userRoles'],
-    'exclude'          => true,
-    'filter'           => true,
-    'inputType'        => 'select',
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_userRoles'],
+    'exclude' => true,
+    'filter' => true,
+    'inputType' => 'select',
     'options_callback' => [
         TlContent::class,
         'optionsCallbackUserRoles',
     ],
-    'eval'             => [
+    'eval' => [
         'multiple' => true,
-        'chosen'   => true,
+        'chosen' => true,
         'tl_class' => 'clr',
     ],
-    'sql'              => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_showFieldsToGuests'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_content']['userList_showFieldsToGuests'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_showFieldsToGuests'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'checkbox',
-    'options'   => [
+    'options' => [
         'email',
         'phone',
         'mobile',
@@ -175,66 +175,66 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_showFieldsToGuests'] = [
         'postal',
         'city',
     ],
-    'eval'      => [
+    'eval' => [
         'multiple' => true,
         'tl_class' => 'clr',
     ],
-    'sql'       => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_queryType'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_content']['userList_queryType'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_queryType'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'select',
-    'options'   => [
+    'options' => [
         'AND',
         'OR',
     ],
-    'eval'      => ['tl_class' => 'clr'],
-    'sql'       => "varchar(10) NOT NULL default ''",
+    'eval' => ['tl_class' => 'clr'],
+    'sql' => "varchar(10) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_template'] = [
-    'label'            => &$GLOBALS['TL_LANG']['tl_content']['userList_template'],
-    'exclude'          => true,
-    'inputType'        => 'select',
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_template'],
+    'exclude' => true,
+    'inputType' => 'select',
     'options_callback' => [
         TlContent::class,
         'getUserListTemplates',
     ],
-    'eval'             => ['tl_class' => 'w50'],
-    'sql'              => "varchar(64) NOT NULL default ''",
+    'eval' => ['tl_class' => 'w50'],
+    'sql' => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_partial_template'] = [
-    'label'            => &$GLOBALS['TL_LANG']['tl_content']['userList_partial_template'],
-    'exclude'          => true,
-    'inputType'        => 'select',
+    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_partial_template'],
+    'exclude' => true,
+    'inputType' => 'select',
     'options_callback' => [
         TlContent::class,
         'getUserListPartialTemplates',
     ],
-    'eval'             => ['tl_class' => 'w50'],
-    'sql'              => "varchar(64) NOT NULL default ''",
+    'eval' => ['tl_class' => 'w50'],
+    'sql' => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['imgSize'] = [
-    'label'            => &$GLOBALS['TL_LANG']['tl_module']['imgSize'],
-    'exclude'          => true,
-    'inputType'        => 'imageSize',
-    'reference'        => &$GLOBALS['TL_LANG']['MSC'],
-    'eval'             => [
-        'rgxp'               => 'natural',
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['imgSize'],
+    'exclude' => true,
+    'inputType' => 'imageSize',
+    'reference' => &$GLOBALS['TL_LANG']['MSC'],
+    'eval' => [
+        'rgxp' => 'natural',
         'includeBlankOption' => true,
-        'nospace'            => true,
-        'helpwizard'         => true,
-        'tl_class'           => 'w50',
+        'nospace' => true,
+        'helpwizard' => true,
+        'tl_class' => 'w50',
     ],
-    'options_callback' => static fn() => System::getContainer()->get(
+    'options_callback' => static fn () => System::getContainer()->get(
         'contao.image.image_sizes'
     )->getOptionsForUser(
         BackendUser::getInstance()
     ),
-    'sql'              => "varchar(64) NOT NULL default ''",
+    'sql' => "varchar(64) NOT NULL default ''",
 ];

@@ -64,259 +64,259 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][TourDifficultyListController::TYPE] 
 
 // Fields
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventType'] = [
-    'exclude'   => true,
-    'search'    => true,
+    'exclude' => true,
+    'search' => true,
     'inputType' => 'select',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-    'eval'      => [
-        'mandatory'          => true,
-        'multiple'           => true,
+    'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
+    'eval' => [
+        'mandatory' => true,
+        'multiple' => true,
         'includeBlankOption' => true,
-        'chosen'             => true,
-        'tl_class'           => 'clr',
+        'chosen' => true,
+        'tl_class' => 'clr',
     ],
-    'sql'       => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['unregisterFromEventNotificationId'] = [
-    'exclude'    => true,
-    'search'     => true,
-    'inputType'  => 'select',
+    'exclude' => true,
+    'search' => true,
+    'inputType' => 'select',
     'foreignKey' => 'tl_nc_notification.title',
-    'eval'       => [
-        'mandatory'          => true,
+    'eval' => [
+        'mandatory' => true,
         'includeBlankOption' => true,
-        'chosen'             => true,
-        'tl_class'           => 'clr',
+        'chosen' => true,
+        'tl_class' => 'clr',
     ],
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => [
+    'sql' => "int(10) unsigned NOT NULL default '0'",
+    'relation' => [
         'type' => 'hasOne',
         'load' => 'lazy',
     ],
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['receiptEventRegistrationNotificationId'] = [
-    'exclude'    => true,
-    'search'     => true,
-    'inputType'  => 'select',
+    'exclude' => true,
+    'search' => true,
+    'inputType' => 'select',
     'foreignKey' => 'tl_nc_notification.title',
-    'eval'       => [
-        'mandatory'          => true,
+    'eval' => [
+        'mandatory' => true,
         'includeBlankOption' => true,
-        'chosen'             => true,
-        'tl_class'           => 'clr',
+        'chosen' => true,
+        'tl_class' => 'clr',
     ],
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => [
+    'sql' => "int(10) unsigned NOT NULL default '0'",
+    'relation' => [
         'type' => 'hasOne',
         'load' => 'lazy',
     ],
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['notifyOnEventStoryPublishedNotificationId'] = [
-    'exclude'    => true,
-    'search'     => true,
-    'inputType'  => 'select',
+    'exclude' => true,
+    'search' => true,
+    'inputType' => 'select',
     'foreignKey' => 'tl_nc_notification.title',
-    'eval'       => [
-        'mandatory'          => true,
+    'eval' => [
+        'mandatory' => true,
         'includeBlankOption' => true,
-        'chosen'             => true,
-        'tl_class'           => 'clr',
+        'chosen' => true,
+        'tl_class' => 'clr',
     ],
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => [
+    'sql' => "int(10) unsigned NOT NULL default '0'",
+    'relation' => [
         'type' => 'hasOne',
         'load' => 'lazy',
     ],
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryFormJumpTo'] = [
-    'exclude'    => true,
-    'inputType'  => 'pageTree',
+    'exclude' => true,
+    'inputType' => 'pageTree',
     'foreignKey' => 'tl_page.title',
-    'eval'       => [
+    'eval' => [
         'mandatory' => true,
         'fieldType' => 'radio',
-        'tl_class'  => 'clr',
+        'tl_class' => 'clr',
     ],
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => [
+    'sql' => "int(10) unsigned NOT NULL default '0'",
+    'relation' => [
         'type' => 'hasOne',
         'load' => 'eager',
     ],
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryJumpTo'] = [
-    'exclude'    => true,
-    'inputType'  => 'pageTree',
+    'exclude' => true,
+    'inputType' => 'pageTree',
     'foreignKey' => 'tl_page.title',
-    'eval'       => [
+    'eval' => [
         'mandatory' => true,
         'fieldType' => 'radio',
-        'tl_class'  => 'clr',
+        'tl_class' => 'clr',
     ],
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => [
+    'sql' => "int(10) unsigned NOT NULL default '0'",
+    'relation' => [
         'type' => 'hasOne',
         'load' => 'eager',
     ],
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryMaxImageWidth'] = [
-    'exclude'   => true,
+    'exclude' => true,
     'inputType' => 'text',
-    'eval'      => [
-        'rgxp'     => 'natural',
+    'eval' => [
+        'rgxp' => 'natural',
         'tl_class' => 'w50',
     ],
-    'sql'       => "smallint(5) unsigned NOT NULL default '0'",
+    'sql' => "smallint(5) unsigned NOT NULL default '0'",
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryMaxImageHeight'] = [
-    'exclude'   => true,
+    'exclude' => true,
     'inputType' => 'text',
-    'eval'      => [
-        'rgxp'     => 'natural',
+    'eval' => [
+        'rgxp' => 'natural',
         'tl_class' => 'w50',
     ],
-    'sql'       => "smallint(5) unsigned NOT NULL default '0'",
+    'sql' => "smallint(5) unsigned NOT NULL default '0'",
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryUploadFolder'] = [
-    'exclude'   => true,
+    'exclude' => true,
     'inputType' => 'fileTree',
-    'eval'      => [
+    'eval' => [
         'fieldType' => 'radio',
         'filesOnly' => false,
         'mandatory' => true,
-        'tl_class'  => 'clr',
+        'tl_class' => 'clr',
     ],
-    'sql'       => 'binary(16) NULL',
+    'sql' => 'binary(16) NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['timeSpanForCreatingNewEventStory'] = [
     'inputType' => 'select',
-    'options'   => range(
+    'options' => range(
         5,
         365
     ),
-    'eval'      => [
-        'mandatory'          => true,
+    'eval' => [
+        'mandatory' => true,
         'includeBlankOption' => false,
-        'tl_class'           => 'clr',
-        'rgxp'               => 'natural',
+        'tl_class' => 'clr',
+        'rgxp' => 'natural',
     ],
-    'sql'       => "int(10) unsigned NOT NULL default '0'",
+    'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['imageClass'] = [
-    'exclude'   => true,
+    'exclude' => true,
     'inputType' => 'text',
-    'eval'      => ['tl_class' => 'w50'],
-    'sql'       => "varchar(512) NOT NULL default ''",
+    'eval' => ['tl_class' => 'w50'],
+    'sql' => "varchar(512) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['story_limit'] = [
-    'exclude'   => true,
+    'exclude' => true,
     'inputType' => 'text',
-    'eval'      => [
-        'rgxp'     => 'natural',
+    'eval' => [
+        'rgxp' => 'natural',
         'tl_class' => 'w50',
     ],
-    'sql'       => "smallint(5) unsigned NOT NULL default '0'",
+    'sql' => "smallint(5) unsigned NOT NULL default '0'",
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['story_eventOrganizers'] = [
-    'exclude'    => true,
-    'search'     => true,
-    'filter'     => true,
-    'sorting'    => true,
-    'inputType'  => 'checkbox',
+    'exclude' => true,
+    'search' => true,
+    'filter' => true,
+    'sorting' => true,
+    'inputType' => 'checkbox',
     'foreignKey' => 'tl_event_organizer.title',
-    'relation'   => [
+    'relation' => [
         'type' => 'hasMany',
         'load' => 'lazy',
     ],
-    'eval'       => [
-        'multiple'  => true,
+    'eval' => [
+        'multiple' => true,
         'mandatory' => false,
-        'tl_class'  => 'clr m12',
+        'tl_class' => 'clr m12',
     ],
-    'sql'        => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = [
     'inputType' => 'select',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-    'eval'      => [
+    'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
+    'eval' => [
         'mandatory' => false,
-        'multiple'  => true,
-        'chosen'    => true,
-        'tl_class'  => 'clr',
+        'multiple' => true,
+        'chosen' => true,
+        'tl_class' => 'clr',
     ],
-    'sql'       => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = [
-    'inputType'        => 'checkboxWizard',
+    'inputType' => 'checkboxWizard',
     'options_callback' => [
         TlModule::class,
         'getEventFilterBoardFields',
     ],
-    'eval'             => [
-        'mandatory'    => false,
-        'multiple'     => true,
+    'eval' => [
+        'mandatory' => false,
+        'multiple' => true,
         'ooorderField' => 'orderSRC',
-        'tl_class'     => 'clr',
+        'tl_class' => 'clr',
     ],
-    'sql'              => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventListPartialTpl'] = [
-    'exclude'          => true,
-    'inputType'        => 'select',
+    'exclude' => true,
+    'inputType' => 'select',
     'options_callback' => [
         TlModule::class,
         'getEventListTemplates',
     ],
-    'eval'             => ['tl_class' => 'w50'],
-    'sql'              => "varchar(64) NOT NULL default 'event_list_partial_tour'",
+    'eval' => ['tl_class' => 'w50'],
+    'sql' => "varchar(64) NOT NULL default 'event_list_partial_tour'",
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventListLimitPerRequest'] = [
-    'exclude'   => true,
+    'exclude' => true,
     'inputType' => 'text',
-    'eval'      => [
-        'rgxp'     => 'natural',
+    'eval' => [
+        'rgxp' => 'natural',
         'tl_class' => 'w50',
     ],
-    'sql'       => 'smallint(5) unsigned NOT NULL default 0',
+    'sql' => 'smallint(5) unsigned NOT NULL default 0',
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventRegCheckoutLinkLabel'] = [
-    'exclude'   => true,
+    'exclude' => true,
     'inputType' => 'text',
-    'eval'      => [
+    'eval' => [
         'mandatory' => true,
         'maxlength' => 64,
-        'rgxp'      => 'extnd',
-        'tl_class'  => 'w50',
+        'rgxp' => 'extnd',
+        'tl_class' => 'w50',
     ],
-    'sql'       => "varchar(64) NOT NULL default ''",
+    'sql' => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventRegCheckoutLinkPage'] = [
-    'exclude'    => true,
-    'inputType'  => 'pageTree',
+    'exclude' => true,
+    'inputType' => 'pageTree',
     'foreignKey' => 'tl_page.title',
-    'eval'       => [
+    'eval' => [
         'mandatory' => true,
         'fieldType' => 'radio',
     ],
-    'sql'        => 'int(10) unsigned NOT NULL default 0',
-    'relation'   => [
+    'sql' => 'int(10) unsigned NOT NULL default 0',
+    'relation' => [
         'type' => 'hasOne',
         'load' => 'lazy',
     ],

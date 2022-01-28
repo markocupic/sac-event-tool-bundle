@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -128,8 +128,8 @@ final class NotifyOnEventSubscription implements EventSubscriberInterface
             $arrTokens = [
                 'event_name' => html_entity_decode((string) $eventType.$this->eventModel->title),
                 'event_add_iban' => $this->eventModel->addIban,
-                'event_iban' => $this->eventModel->addIban ? html_entity_decode((string)$this->eventModel->iban) : '',
-                'event_ibanBeneficiary' => $this->eventModel->addIban ? html_entity_decode((string)$this->eventModel->ibanBeneficiary) : '',
+                'event_iban' => $this->eventModel->addIban ? html_entity_decode((string) $this->eventModel->iban) : '',
+                'event_ibanBeneficiary' => $this->eventModel->addIban ? html_entity_decode((string) $this->eventModel->ibanBeneficiary) : '',
                 'event_type' => html_entity_decode((string) $this->eventModel->eventType),
                 'event_course_id' => $this->eventModel->courseId,
                 'instructor_name' => $bypassRegistration ? html_entity_decode((string) $strRegistrationGoesToName) : html_entity_decode((string) $objInstructor->name),

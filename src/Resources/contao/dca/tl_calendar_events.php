@@ -297,7 +297,8 @@ PaletteManipulator::create()
     ->applyToPalette(
         'default',
         'tl_calendar_events'
-    );
+    )
+;
 
 // Tour and lastMinuteTour palette
 PaletteManipulator::create()
@@ -418,7 +419,8 @@ PaletteManipulator::create()
     ->applyToPalette(
         'lastMinuteTour',
         'tl_calendar_events'
-    );
+    )
+;
 
 // generalEvent
 // same like tour but remove Fields: 'suitableForBeginners', 'tourTechDifficulty', 'tourProfile', 'mountainguide','tourDetailText', 'requirements'
@@ -532,7 +534,8 @@ PaletteManipulator::create()
     ->applyToPalette(
         'generalEvent',
         'tl_calendar_events'
-    );
+    )
+;
 
 // Course palette
 PaletteManipulator::create()
@@ -660,7 +663,8 @@ PaletteManipulator::create()
     ->applyToPalette(
         'course',
         'tl_calendar_events'
-    );
+    )
+;
 
 // Tour report palette
 PaletteManipulator::create()
@@ -679,41 +683,42 @@ PaletteManipulator::create()
     ->applyToPalette(
         'tour_report',
         'tl_calendar_events'
-    );
+    )
+;
 
 // Global operations
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year'] = [
-    'label'      => &$GLOBALS['TL_LANG']['MSC']['plus1year'],
-    'href'       => 'transformDates=+52weeks',
-    'class'      => 'global_op_icon_class',
+    'label' => &$GLOBALS['TL_LANG']['MSC']['plus1year'],
+    'href' => 'transformDates=+52weeks',
+    'class' => 'global_op_icon_class',
     //'class'      => 'header_icon',
-    'icon'       => 'bundles/markocupicsaceventtool/icons/calendar-plus.svg',
+    'icon' => 'bundles/markocupicsaceventtool/icons/calendar-plus.svg',
     'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'].'\'))return false;Backend.getScrollOffset()" accesskey="e"',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year'] = [
-    'label'      => &$GLOBALS['TL_LANG']['MSC']['minus1year'],
-    'href'       => 'transformDates=-52weeks',
-    'class'      => 'global_op_icon_class',
+    'label' => &$GLOBALS['TL_LANG']['MSC']['minus1year'],
+    'href' => 'transformDates=-52weeks',
+    'class' => 'global_op_icon_class',
     //'class'      => 'header_icon',
-    'icon'       => 'bundles/markocupicsaceventtool/icons/calendar-minus.svg',
+    'icon' => 'bundles/markocupicsaceventtool/icons/calendar-minus.svg',
     'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'].'\'))return false;Backend.getScrollOffset()" accesskey="e"',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
-    'label'      => &$GLOBALS['TL_LANG']['MSC']['onloadCallbackExportCalendar'],
-    'href'       => 'action=onloadCallbackExportCalendar',
+    'label' => &$GLOBALS['TL_LANG']['MSC']['onloadCallbackExportCalendar'],
+    'href' => 'action=onloadCallbackExportCalendar',
     //'class'      => 'global_op_icon_class',
-    'class'      => 'header_icon',
-    'icon'       => 'bundles/markocupicsaceventtool/icons/excel.svg',
+    'class' => 'header_icon',
+    'icon' => 'bundles/markocupicsaceventtool/icons/excel.svg',
     'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 ];
 
 // Operations
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle'] = [
-    'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events']['toggle'],
-    'icon'            => 'visible.svg',
-    'attributes'      => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['toggle'],
+    'icon' => 'visible.svg',
+    'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
     'button_callback' => [
         TlCalendarEvents::class,
         'toggleIcon',
@@ -722,14 +727,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle'] = [
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrations'],
-    'href'  => 'table=tl_calendar_events_member',
-    'icon'  => 'bundles/markocupicsaceventtool/icons/group.png',
+    'href' => 'table=tl_calendar_events_member',
+    'icon' => 'bundles/markocupicsaceventtool/icons/group.png',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelPrev'] = [
-    'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelPrev'],
-    'href'            => 'action=releaseLevelPrev',
-    'icon'            => 'bundles/markocupicsaceventtool/icons/arrow_down.png',
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelPrev'],
+    'href' => 'action=releaseLevelPrev',
+    'icon' => 'bundles/markocupicsaceventtool/icons/arrow_down.png',
     'button_callback' => [
         TlCalendarEvents::class,
         'releaseLevelPrev',
@@ -737,9 +742,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelPrev
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelNext'] = [
-    'label'           => &$GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelNext'],
-    'href'            => 'action=releaseLevelNext',
-    'icon'            => 'bundles/markocupicsaceventtool/icons/arrow_up.png',
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelNext'],
+    'href' => 'action=releaseLevelNext',
+    'icon' => 'bundles/markocupicsaceventtool/icons/arrow_up.png',
     'button_callback' => [
         TlCalendarEvents::class,
         'releaseLevelNext',
@@ -783,15 +788,15 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['maxlength'
 
 // minMembers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseId'],
-    'exclude'   => true,
-    'search'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseId'],
+    'exclude' => true,
+    'search' => true,
     'inputType' => 'text',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => false,
     ],
-    'sql'       => "varchar(255) NOT NULL default ''",
+    'sql' => "varchar(255) NOT NULL default ''",
 ];
 
 // eventToken
@@ -801,75 +806,75 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventToken'] = [
 
 // suitableForBeginners
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['suitableForBeginners'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['suitableForBeginners'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['suitableForBeginners'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'checkbox',
-    'sql'       => "char(1) NOT NULL default ''",
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // isRecurringEvent
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['isRecurringEvent'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['isRecurringEvent'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['isRecurringEvent'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'checkbox',
-    'sql'       => "char(1) NOT NULL default ''",
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // eventType
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = [
-    'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventType'],
-    'reference'        => &$GLOBALS['TL_LANG']['MSC'],
-    'exclude'          => true,
-    'filter'           => true,
-    'inputType'        => 'select',
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventType'],
+    'reference' => &$GLOBALS['TL_LANG']['MSC'],
+    'exclude' => true,
+    'filter' => true,
+    'inputType' => 'select',
     'options_callback' => [
         TlCalendarEvents::class,
         'optionsCallbackEventType',
     ],
-    'save_callback'    => [
+    'save_callback' => [
         [
             TlCalendarEvents::class,
             'saveCallbackEventType',
         ],
     ],
-    'eval'             => [
-        'submitOnChange'     => true,
+    'eval' => [
+        'submitOnChange' => true,
         'includeBlankOption' => true,
-        'doNotShow'          => false,
-        'tl_class'           => 'clr m12',
-        'mandatory'          => true,
+        'doNotShow' => false,
+        'tl_class' => 'clr m12',
+        'mandatory' => true,
     ],
-    'sql'              => "varchar(32) NOT NULL default ''",
+    'sql' => "varchar(32) NOT NULL default ''",
 ];
 
 // mountainguide
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mountainguide'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'checkbox',
-    'sql'       => "char(1) NOT NULL default ''",
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // Hauptleiter (main instructor) is set automatically (the first instructor in the list is set as "Hauptleiter"
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mainInstructor'] = [
-    'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['mainInstructor'],
-    'exclude'    => true,
-    'search'     => true,
-    'filter'     => true,
-    'sorting'    => true,
-    'inputType'  => 'radio',
-    'flag'       => 11,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['mainInstructor'],
+    'exclude' => true,
+    'search' => true,
+    'filter' => true,
+    'sorting' => true,
+    'inputType' => 'radio',
+    'flag' => 11,
     'foreignKey' => 'tl_user.name',
-    'eval'       => [
-        'mandatory'          => true,
+    'eval' => [
+        'mandatory' => true,
         'includeBlankOption' => true,
-        'tl_class'           => 'clr',
+        'tl_class' => 'clr',
     ],
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-    'relation'   => [
+    'sql' => "int(10) unsigned NOT NULL default '0'",
+    'relation' => [
         'type' => 'hasOne',
         'load' => 'eager',
     ],
@@ -877,10 +882,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mainInstructor'] = [
 
 // Instructor
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
-    'label'         => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructor'],
-    'exclude'       => true,
-    'search'        => true,
-    'inputType'     => 'multiColumnWizard',
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructor'],
+    'exclude' => true,
+    'search' => true,
+    'inputType' => 'multiColumnWizard',
     // Save instructors in a child table tl_calendar_events_instructors
     'save_callback' => [
         [
@@ -888,129 +893,129 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
             'saveCallbackSetMaininstructor',
         ],
     ],
-    'eval'          => [
-        'mandatory'    => true,
+    'eval' => [
+        'mandatory' => true,
         'columnFields' => [
             'instructorId' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructorId'],
-                'exclude'    => true,
-                'inputType'  => 'select',
-                'default'    => BackendUser::getInstance()->id,
-                'filter'     => true,
-                'reference'  => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'relation'   => [
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructorId'],
+                'exclude' => true,
+                'inputType' => 'select',
+                'default' => BackendUser::getInstance()->id,
+                'filter' => true,
+                'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+                'relation' => [
                     'type' => 'hasOne',
                     'load' => 'eager',
                 ],
                 'foreignKey' => "tl_user.CONCAT(lastname, ' ', firstname, ', ', city)",
-                'eval'       => [
-                    'style'              => 'width:350px',
-                    'mandatory'          => true,
+                'eval' => [
+                    'style' => 'width:350px',
+                    'mandatory' => true,
                     'includeBlankOption' => true,
-                    'chosen'             => true,
-                    'multiple'           => false,
+                    'chosen' => true,
+                    'multiple' => false,
                 ],
             ],
         ],
     ],
-    'sql'           => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 // Terms/Ziele
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['terms'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['terms'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['terms'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => true,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // issues
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['issues'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['issues'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['issues'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => true,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // requirements
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['requirements'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['requirements'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['requirements'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => true,
         'maxlength' => 300,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // leistungen
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['leistungen'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['leistungen'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['leistungen'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => false,
         'maxlength' => 200,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // courseLevel
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseLevel'],
-    'exclude'   => true,
-    'search'    => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseLevel'],
+    'exclude' => true,
+    'search' => true,
+    'filter' => true,
     'inputType' => 'select',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'],
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'],
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => true,
     ],
-    'sql'       => 'int(10) unsigned NULL',
+    'sql' => 'int(10) unsigned NULL',
 ];
 
 // Course Type Level_0
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0'] = [
-    'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseTypeLevel0'],
-    'exclude'          => true,
-    'search'           => true,
-    'filter'           => true,
-    'inputType'        => 'select',
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseTypeLevel0'],
+    'exclude' => true,
+    'search' => true,
+    'filter' => true,
+    'inputType' => 'select',
     'options_callback' => [
         TlCalendarEvents::class,
         'optionsCallbackCourseTypeLevel0',
     ],
-    'eval'             => [
-        'tl_class'           => 'clr m12',
-        'submitOnChange'     => true,
+    'eval' => [
+        'tl_class' => 'clr m12',
+        'submitOnChange' => true,
         'includeBlankOption' => true,
-        'multiple'           => false,
-        'mandatory'          => true,
+        'multiple' => false,
+        'mandatory' => true,
     ],
-    'sql'              => "int(10) unsigned NOT NULL default '0'",
+    'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
 // Course Type Level_1
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1'] = [
-    'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseTypeLevel1'],
-    'exclude'          => true,
-    'search'           => true,
-    'filter'           => true,
-    'inputType'        => 'select',
-    'foreignKey'       => 'tl_course_sub_type.name',
-    'relation'         => [
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseTypeLevel1'],
+    'exclude' => true,
+    'search' => true,
+    'filter' => true,
+    'inputType' => 'select',
+    'foreignKey' => 'tl_course_sub_type.name',
+    'relation' => [
         'type' => 'hasOne',
         'load' => 'lazy',
     ],
@@ -1018,211 +1023,211 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1'] = [
         TlCalendarEvents::class,
         'optionsCallbackCourseSubType',
     ],
-    'eval'             => [
-        'tl_class'  => 'clr m12',
-        'multiple'  => false,
+    'eval' => [
+        'tl_class' => 'clr m12',
+        'multiple' => false,
         'mandatory' => true,
     ],
-    'sql'              => "int(10) unsigned NOT NULL default '0'",
+    'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
 // organizers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['organizers'] = [
-    'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['organizers'],
-    'exclude'          => true,
-    'search'           => true,
-    'filter'           => true,
-    'sorting'          => true,
-    'inputType'        => 'select',
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['organizers'],
+    'exclude' => true,
+    'search' => true,
+    'filter' => true,
+    'sorting' => true,
+    'inputType' => 'select',
     'options_callback' => [
         TlCalendarEvents::class,
         'optionsCallbackGetOrganizers',
     ],
-    'eval'             => [
-        'multiple'           => true,
-        'chosen'             => true,
-        'mandatory'          => true,
+    'eval' => [
+        'multiple' => true,
+        'chosen' => true,
+        'mandatory' => true,
         'includeBlankOption' => false,
-        'tl_class'           => 'clr m12',
+        'tl_class' => 'clr m12',
     ],
-    'sql'              => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 // equipment
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['equipment'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['equipment'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['equipment'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => false,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // durationInfo
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = [
-    'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'],
-    'search'           => true,
-    'filter'           => true,
-    'exclude'          => true,
-    'inputType'        => 'select',
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'],
+    'search' => true,
+    'filter' => true,
+    'exclude' => true,
+    'inputType' => 'select',
     'options_callback' => [
         TlCalendarEvents::class,
         'optionsCallbackGetEventDuration',
     ],
-    'eval'             => [
+    'eval' => [
         'includeBlankOption' => true,
-        'tl_class'           => 'clr m12',
-        'mandatory'          => true,
+        'tl_class' => 'clr m12',
+        'mandatory' => true,
     ],
-    'sql'              => "varchar(32) NOT NULL default ''",
+    'sql' => "varchar(32) NOT NULL default ''",
 ];
 
 // Add minimum an maximum members
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addMinAndMaxMembers'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['addMinAndMaxMembers'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['addMinAndMaxMembers'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'checkbox',
-    'eval'      => ['submitOnChange' => true],
-    'sql'       => "char(1) NOT NULL default ''",
+    'eval' => ['submitOnChange' => true],
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // minMembers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['minMembers'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['minMembers'],
-    'exclude'   => true,
-    'search'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['minMembers'],
+    'exclude' => true,
+    'search' => true,
     'inputType' => 'text',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
-        'rgxp'      => 'digit',
+    'eval' => [
+        'tl_class' => 'clr m12',
+        'rgxp' => 'digit',
         'mandatory' => true,
     ],
-    'sql'       => 'int(3) unsigned NULL',
+    'sql' => 'int(3) unsigned NULL',
 ];
 
 // maxMembers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['maxMembers'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['maxMembers'],
-    'exclude'   => true,
-    'search'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['maxMembers'],
+    'exclude' => true,
+    'search' => true,
     'inputType' => 'text',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
-        'rgxp'      => 'digit',
+    'eval' => [
+        'tl_class' => 'clr m12',
+        'rgxp' => 'digit',
         'mandatory' => true,
     ],
-    'sql'       => 'int(3) unsigned NULL',
+    'sql' => 'int(3) unsigned NULL',
 ];
 
 // bookingEvent
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['bookingEvent'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['bookingEvent'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['bookingEvent'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => false,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // miscellaneous
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['miscellaneous'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['miscellaneous'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['miscellaneous'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => false,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // addIban
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addIban'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['addIban'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['addIban'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'checkbox',
-    'eval'      => [
+    'eval' => [
         'submitOnChange' => true,
-        'tl_class'       => 'clr m12',
-        'mandatory'      => false,
+        'tl_class' => 'clr m12',
+        'mandatory' => false,
     ],
-    'sql'       => "char(1) NOT NULL default ''",
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // iban
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['iban'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['iban'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['iban'],
+    'exclude' => true,
     'inputType' => 'text',
-    'eval'      => [
+    'eval' => [
         'mandatory' => true,
-        'rgxp'      => 'alnum',
-        'tl_class'  => 'w50',
+        'rgxp' => 'alnum',
+        'tl_class' => 'w50',
     ],
-    'sql'       => "varchar(32) NOT NULL default ''",
+    'sql' => "varchar(32) NOT NULL default ''",
 ];
 
 // ibanBeneficiary
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['ibanBeneficiary'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['ibanBeneficiary'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['ibanBeneficiary'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'search'    => true,
-    'eval'      => [
+    'search' => true,
+    'eval' => [
         'mandatory' => true,
-        'tl_class'  => 'clr',
+        'tl_class' => 'clr',
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // eventDates
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDates'] = [
-    'label'         => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventDates'],
-    'exclude'       => true,
-    'inputType'     => 'multiColumnWizard',
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventDates'],
+    'exclude' => true,
+    'inputType' => 'multiColumnWizard',
     'load_callback' => [
         [
             TlCalendarEvents::class,
             'loadCallbackeventDates',
         ],
     ],
-    'eval'          => [
+    'eval' => [
         'columnsCallback' => [
             TlCalendarEvents::class,
             'listFixedDates',
         ],
-        'buttons'         => [
-            'up'   => false,
+        'buttons' => [
+            'up' => false,
             'down' => false,
         ],
-        'mandatory'       => true,
+        'mandatory' => true,
     ],
-    'sql'           => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 // eventState
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventState'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventState'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'select',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-STATE'],
+    'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-STATE'],
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval'      => [
-        'submitOnChange'     => false,
+    'eval' => [
+        'submitOnChange' => false,
         'includeBlankOption' => true,
-        'doNotShow'          => false,
-        'tl_class'           => 'clr m12',
-        'mandatory'          => false,
+        'doNotShow' => false,
+        'tl_class' => 'clr m12',
+        'mandatory' => false,
     ],
     //'eval'      => array('submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false),
-    'sql'       => "varchar(32) NOT NULL default ''",
+    'sql' => "varchar(32) NOT NULL default ''",
 ];
 
 /** @todo Falls verschoben, kann hier das Verschiebedatum angegeben werden. */
@@ -1239,350 +1244,350 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
 
 // meetingPoint
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['meetingPoint'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['meetingPoint'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['meetingPoint'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
-        'tl_class'  => '',
+    'eval' => [
+        'tl_class' => '',
         'mandatory' => false,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // singleSRCBroschuere
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['singleSRCBroschuere'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['singleSRCBroschuere'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['singleSRCBroschuere'],
+    'exclude' => true,
     'inputType' => 'fileTree',
-    'eval'      => [
-        'filesOnly'  => true,
+    'eval' => [
+        'filesOnly' => true,
         'extensions' => Config::get(
             'validImageTypes'
         ),
-        'fieldType'  => 'radio',
-        'mandatory'  => false,
+        'fieldType' => 'radio',
+        'mandatory' => false,
     ],
-    'sql'       => 'binary(16) NULL',
+    'sql' => 'binary(16) NULL',
 ];
 
 // askForAhvNumber
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['askForAhvNumber'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['askForAhvNumber'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['askForAhvNumber'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'checkbox',
-    'sql'       => "char(1) NOT NULL default ''",
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // Disable online registration
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generateMainInstructorContactDataFromDb'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'],
-    'filter'    => true,
-    'sorting'   => true,
-    'exclude'   => true,
-    'default'   => BackendUser::getInstance()->generateMainInstructorContactDataFromDb,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'],
+    'filter' => true,
+    'sorting' => true,
+    'exclude' => true,
+    'default' => BackendUser::getInstance()->generateMainInstructorContactDataFromDb,
     'inputType' => 'checkbox',
-    'eval'      => ['submitOnChange' => false],
-    'sql'       => "char(1) NOT NULL default ''",
+    'eval' => ['submitOnChange' => false],
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // Disable online registration
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['disableOnlineRegistration'],
-    'filter'    => true,
-    'sorting'   => true,
-    'exclude'   => true,
-    'default'   => BackendUser::getInstance()->disableOnlineRegistration,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['disableOnlineRegistration'],
+    'filter' => true,
+    'sorting' => true,
+    'exclude' => true,
+    'default' => BackendUser::getInstance()->disableOnlineRegistration,
     'inputType' => 'checkbox',
-    'eval'      => ['submitOnChange' => false],
-    'sql'       => "char(1) NOT NULL default ''",
+    'eval' => ['submitOnChange' => false],
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // registrationGoesTo
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationGoesTo'] = [
-    'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationGoesTo'],
-    'exclude'    => true,
-    'filter'     => true,
-    'inputType'  => 'select',
-    'relation'   => [
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationGoesTo'],
+    'exclude' => true,
+    'filter' => true,
+    'inputType' => 'select',
+    'relation' => [
         'type' => 'hasOne',
         'load' => 'eager',
     ],
     'foreignKey' => 'tl_user.CONCAT(name,", ",city)',
-    'eval'       => [
-        'multiple'           => false,
-        'chosen'             => false,
+    'eval' => [
+        'multiple' => false,
+        'chosen' => false,
         'includeBlankOption' => true,
-        'tl_class'           => 'clr',
+        'tl_class' => 'clr',
     ],
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
+    'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
 // Set registration period
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['setRegistrationPeriod'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['setRegistrationPeriod'],
+    'exclude' => true,
     'inputType' => 'checkbox',
-    'eval'      => ['submitOnChange' => true],
-    'sql'       => "char(1) NOT NULL default ''",
+    'eval' => ['submitOnChange' => true],
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // Set registration start date
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationStartDate'],
-    'default'   => strtotime(
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationStartDate'],
+    'default' => strtotime(
         Date::parse(
             'Y-m-d'
         )
     ),
-    'exclude'   => true,
+    'exclude' => true,
     'inputType' => 'text',
-    'eval'      => [
-        'rgxp'       => 'date',
-        'mandatory'  => true,
+    'eval' => [
+        'rgxp' => 'date',
+        'mandatory' => true,
         'datepicker' => true,
-        'tl_class'   => 'w50 wizard',
+        'tl_class' => 'w50 wizard',
     ],
-    'sql'       => 'int(10) unsigned NULL',
+    'sql' => 'int(10) unsigned NULL',
 ];
 
 // Set registration end date
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationEndDate'],
-    'default'   => strtotime(
-            Date::parse(
-                'Y-m-d'
-            )
-        ) + (2 * 24 * 3600) - 60,
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationEndDate'],
+    'default' => strtotime(
+        Date::parse(
+            'Y-m-d'
+        )
+    ) + (2 * 24 * 3600) - 60,
+    'exclude' => true,
     'inputType' => 'text',
-    'eval'      => [
-        'rgxp'       => 'datim',
-        'mandatory'  => true,
+    'eval' => [
+        'rgxp' => 'datim',
+        'mandatory' => true,
         'datepicker' => true,
-        'tl_class'   => 'w50 wizard',
+        'tl_class' => 'w50 wizard',
     ],
-    'sql'       => 'int(10) unsigned NULL',
+    'sql' => 'int(10) unsigned NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['allowDeregistration'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['allowDeregistration'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['allowDeregistration'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'checkbox',
-    'eval'      => ['submitOnChange' => true],
-    'sql'       => "char(1) NOT NULL default ''",
+    'eval' => ['submitOnChange' => true],
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['deregistrationLimit'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['deregistrationLimit'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['deregistrationLimit'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'select',
-    'options'   => range(
+    'options' => range(
         1,
         720
     ),
-    'eval'      => [
-        'rgxp'     => 'natural',
-        'nospace'  => true,
+    'eval' => [
+        'rgxp' => 'natural',
+        'nospace' => true,
         'tl_class' => 'w50',
     ],
-    'sql'       => "int(10) unsigned NOT NULL default '0'",
+    'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
 // addGallery
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addGallery'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['addGallery'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['addGallery'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'checkbox',
-    'eval'      => ['submitOnChange' => true],
-    'sql'       => "char(1) NOT NULL default ''",
+    'eval' => ['submitOnChange' => true],
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // multiSRC
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['multiSRC'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['multiSRC'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['multiSRC'],
+    'exclude' => true,
     'inputType' => 'fileTree',
-    'eval'      => [
-        'multiple'   => true,
+    'eval' => [
+        'multiple' => true,
         'extensions' => 'jpg,jpeg,png',
-        'fieldType'  => 'checkbox',
+        'fieldType' => 'checkbox',
         'orderField' => 'orderSRC',
-        'files'      => true,
-        'filesOnly'  => true,
-        'mandatory'  => true,
+        'files' => true,
+        'filesOnly' => true,
+        'mandatory' => true,
     ],
-    'sql'       => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 // orderSRC
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['orderSRC'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['orderSRC'],
-    'sql'   => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 // tour type
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType'] = [
-    'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourType'],
-    'exclude'    => true,
-    'filter'     => true,
-    'inputType'  => 'select',
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourType'],
+    'exclude' => true,
+    'filter' => true,
+    'inputType' => 'select',
     'foreignKey' => 'tl_tour_type.title',
-    'relation'   => [
+    'relation' => [
         'type' => 'hasMany',
         'load' => 'eager',
     ],
-    'eval'       => [
-        'multiple'           => true,
-        'chosen'             => true,
-        'mandatory'          => true,
+    'eval' => [
+        'multiple' => true,
+        'chosen' => true,
+        'mandatory' => true,
         'includeBlankOption' => true,
-        'tl_class'           => 'clr m12',
+        'tl_class' => 'clr m12',
     ],
-    'sql'        => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 // tourTechDifficulty
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'],
+    'exclude' => true,
     'inputType' => 'multiColumnWizard',
-    'eval'      => [
-        'mandatory'    => true,
+    'eval' => [
+        'mandatory' => true,
         'columnFields' => [
             'tourTechDifficultyMin' => [
-                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'],
-                'exclude'          => true,
-                'inputType'        => 'select',
-                'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'],
+                'exclude' => true,
+                'inputType' => 'select',
+                'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
                 'options_callback' => [
                     TlCalendarEvents::class,
                     'optionsCallbackTourDifficulties',
                 ],
-                'relation'         => [
+                'relation' => [
                     'type' => 'hasMany',
                     'load' => 'eager',
                 ],
-                'foreignKey'       => 'tl_tour_difficulty.shortcut',
-                'eval'             => [
-                    'style'              => 'width:150px',
-                    'mandatory'          => true,
+                'foreignKey' => 'tl_tour_difficulty.shortcut',
+                'eval' => [
+                    'style' => 'width:150px',
+                    'mandatory' => true,
                     'includeBlankOption' => true,
                 ],
             ],
             'tourTechDifficultyMax' => [
-                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'],
-                'exclude'          => true,
-                'inputType'        => 'select',
-                'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'],
+                'exclude' => true,
+                'inputType' => 'select',
+                'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
                 'options_callback' => [
                     TlCalendarEvents::class,
                     'optionsCallbackTourDifficulties',
                 ],
-                'relation'         => [
+                'relation' => [
                     'type' => 'hasMany',
                     'load' => 'eager',
                 ],
-                'foreignKey'       => 'tl_tour_difficulty.shortcut',
-                'eval'             => [
-                    'style'              => 'width:150px',
-                    'mandatory'          => false,
+                'foreignKey' => 'tl_tour_difficulty.shortcut',
+                'eval' => [
+                    'style' => 'width:150px',
+                    'mandatory' => false,
                     'includeBlankOption' => true,
                 ],
             ],
         ],
     ],
-    'sql'       => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 // tourProfile
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfile'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfile'],
+    'exclude' => true,
     'inputType' => 'multiColumnWizard',
-    'eval'      => [
-        'mandatory'    => false,
+    'eval' => [
+        'mandatory' => false,
         'columnFields' => [
-            'tourProfileAscentMeters'  => [
-                'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'],
+            'tourProfileAscentMeters' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'],
                 'inputType' => 'text',
                 'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'eval'      => [
-                    'rgxp'      => 'natural',
-                    'style'     => 'width:150px',
+                'eval' => [
+                    'rgxp' => 'natural',
+                    'style' => 'width:150px',
                     'mandatory' => false,
                 ],
             ],
-            'tourProfileAscentTime'    => [
-                'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'],
+            'tourProfileAscentTime' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'],
                 'inputType' => 'text',
-                'eval'      => [
-                    'rgxp'      => 'digit',
-                    'style'     => 'width:150px',
+                'eval' => [
+                    'rgxp' => 'digit',
+                    'style' => 'width:150px',
                     'mandatory' => false,
                 ],
             ],
             'tourProfileDescentMeters' => [
-                'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'],
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'],
                 'inputType' => 'text',
                 'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'eval'      => [
-                    'rgxp'      => 'natural',
-                    'style'     => 'width:150px',
+                'eval' => [
+                    'rgxp' => 'natural',
+                    'style' => 'width:150px',
                     'mandatory' => false,
                 ],
             ],
-            'tourProfileDescentTime'   => [
-                'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'],
+            'tourProfileDescentTime' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'],
                 'inputType' => 'text',
-                'eval'      => [
-                    'rgxp'      => 'digit',
-                    'style'     => 'width:150px',
+                'eval' => [
+                    'rgxp' => 'digit',
+                    'style' => 'width:150px',
                     'mandatory' => false,
                 ],
             ],
         ],
     ],
-    'sql'       => 'blob NULL',
+    'sql' => 'blob NULL',
 ];
 
 // tourDetailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourDetailText'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourDetailText'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourDetailText'],
+    'exclude' => true,
     'inputType' => 'textarea',
     /** @todo maxlength 700 */
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => true,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // generalEventDetailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generalEventDetailText'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['generalEventDetailText'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['generalEventDetailText'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => false,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // eventReleaseLevel
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = [
-    'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventReleaseLevel'],
-    'exclude'          => true,
-    'filter'           => true,
-    'sorting'          => true,
-    'inputType'        => 'select',
-    'foreignKey'       => 'tl_event_release_level_policy.title',
-    'relation'         => [
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventReleaseLevel'],
+    'exclude' => true,
+    'filter' => true,
+    'sorting' => true,
+    'inputType' => 'select',
+    'foreignKey' => 'tl_event_release_level_policy.title',
+    'relation' => [
         'type' => 'hasOne',
         'load' => 'lazy',
     ],
@@ -1590,17 +1595,17 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = [
         TlCalendarEvents::class,
         'optionsCallbackListReleaseLevels',
     ],
-    'save_callback'    => [
+    'save_callback' => [
         [
             TlCalendarEvents::class,
             'saveCallbackEventReleaseLevel',
         ],
     ],
-    'eval'             => [
+    'eval' => [
         'mandatory' => true,
-        'tl_class'  => 'clr m12',
+        'tl_class' => 'clr m12',
     ],
-    'sql'              => "int(10) unsigned NOT NULL default '0'",
+    'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
 if (
@@ -1616,19 +1621,19 @@ if (
 
 // customizeEventRegistrationConfirmationEmailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customizeEventRegistrationConfirmationEmailText'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'],
-    'exclude'   => true,
-    'filter'    => false,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'],
+    'exclude' => true,
+    'filter' => false,
     'inputType' => 'checkbox',
-    'eval'      => ['submitOnChange' => true],
-    'sql'       => "char(1) NOT NULL default ''",
+    'eval' => ['submitOnChange' => true],
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // customEventRegistrationConfirmationEmailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfirmationEmailText'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'],
-    'exclude'   => true,
-    'default'   => str_replace(
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'],
+    'exclude' => true,
+    'default' => str_replace(
         '{{br}}',
         "\n",
         Config::get(
@@ -1636,124 +1641,124 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfi
         )
     ),
     'inputType' => 'textarea',
-    'eval'      => [
-        'tl_class'       => 'clr m12',
-        'mandatory'      => false,
-        'preserveTags'   => true,
-        'allowHtml'      => true,
+    'eval' => [
+        'tl_class' => 'clr m12',
+        'mandatory' => false,
+        'preserveTags' => true,
+        'allowHtml' => true,
         'decodeEntities' => false,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // Tour report fields:
 // This field is autofilled, if a user has filled in the event report
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = [
-    'label'   => &$GLOBALS['TL_LANG']['tl_calendar_events']['filledInEventReportForm'],
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['filledInEventReportForm'],
     'exclude' => false,
-    'eval'    => ['doNotShow' => true],
-    'sql'     => "char(1) NOT NULL default ''",
+    'eval' => ['doNotShow' => true],
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // executionState
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['executionState'],
-    'exclude'   => true,
-    'filter'    => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['executionState'],
+    'exclude' => true,
+    'filter' => true,
     'inputType' => 'select',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EXECUTION-STATE'],
+    'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EXECUTION-STATE'],
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval'      => [
+    'eval' => [
         'includeBlankOption' => true,
-        'doNotShow'          => true,
-        'tl_class'           => 'clr m12',
-        'mandatory'          => true,
+        'doNotShow' => true,
+        'tl_class' => 'clr m12',
+        'mandatory' => true,
     ],
-    'sql'       => "varchar(32) NOT NULL default ''",
+    'sql' => "varchar(32) NOT NULL default ''",
 ];
 
 // journey
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = [
-    'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['journey'],
-    'exclude'    => true,
-    'filter'     => true,
-    'inputType'  => 'select',
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['journey'],
+    'exclude' => true,
+    'filter' => true,
+    'inputType' => 'select',
     'foreignKey' => 'tl_calendar_events_journey.title',
-    'relation'   => [
+    'relation' => [
         'type' => 'hasOne',
         'load' => 'lazy',
     ],
-    'eval'       => [
-        'multiple'           => false,
-        'mandatory'          => true,
+    'eval' => [
+        'multiple' => false,
+        'mandatory' => true,
         'includeBlankOption' => true,
-        'tl_class'           => 'clr m12',
+        'tl_class' => 'clr m12',
     ],
-    'sql'        => "varchar(255) NOT NULL default ''",
+    'sql' => "varchar(255) NOT NULL default ''",
 ];
 
 // eventSubstitutionText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventSubstitutionText'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventSubstitutionText'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
+    'eval' => [
         'mandatory' => false,
-        'tl_class'  => 'clr m12',
+        'tl_class' => 'clr m12',
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // tourWeatherConditions
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourWeatherConditions'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourWeatherConditions'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
+    'eval' => [
         'mandatory' => true,
-        'tl_class'  => 'clr m12',
+        'tl_class' => 'clr m12',
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // tourAvalancheConditions
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourAvalancheConditions'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourAvalancheConditions'],
+    'exclude' => true,
     'inputType' => 'select',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'],
+    'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'],
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval'      => [
-        'multiple'           => false,
-        'mandatory'          => true,
+    'eval' => [
+        'multiple' => false,
+        'mandatory' => true,
         'includeBlankOption' => false,
-        'tl_class'           => 'clr m12',
+        'tl_class' => 'clr m12',
     ],
-    'sql'       => "varchar(255) NOT NULL default ''",
+    'sql' => "varchar(255) NOT NULL default ''",
 ];
 
 // tourSpecialIncidents
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourSpecialIncidents'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourSpecialIncidents'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => false,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // eventReportAdditionalNotices
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReportAdditionalNotices'] = [
-    'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventReportAdditionalNotices'],
-    'exclude'   => true,
+    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventReportAdditionalNotices'],
+    'exclude' => true,
     'inputType' => 'textarea',
-    'eval'      => [
-        'tl_class'  => 'clr m12',
+    'eval' => [
+        'tl_class' => 'clr m12',
         'mandatory' => false,
     ],
-    'sql'       => 'text NULL',
+    'sql' => 'text NULL',
 ];
 
 // Allow for these fields editing on first release level only

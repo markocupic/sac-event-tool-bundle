@@ -16,37 +16,37 @@ use Markocupic\SacEventToolBundle\Dca\TlTourDifficulty;
 
 $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
     'config' => [
-        'dataContainer'      => 'Table',
-        'ptable'             => 'tl_tour_difficulty_category',
-        'doNotCopyRecords'   => true,
-        'enableVersioning'   => true,
-        'switchToEdit'       => true,
+        'dataContainer' => 'Table',
+        'ptable' => 'tl_tour_difficulty_category',
+        'doNotCopyRecords' => true,
+        'enableVersioning' => true,
+        'switchToEdit' => true,
         'doNotDeleteRecords' => true,
-        'sql'                => [
+        'sql' => [
             'keys' => [
                 'id' => 'primary',
             ],
         ],
     ],
 
-    'list'     => [
-        'sorting'           => [
-            'mode'                  => 4,
-            'fields'                => ['code ASC'],
-            'flag'                  => 1,
-            'panelLayout'           => 'filter;sort,search,limit',
-            'headerFields'          => [
+    'list' => [
+        'sorting' => [
+            'mode' => 4,
+            'fields' => ['code ASC'],
+            'flag' => 1,
+            'panelLayout' => 'filter;sort,search,limit',
+            'headerFields' => [
                 'level',
                 'title',
             ],
-            'disableGrouping'       => true,
+            'disableGrouping' => true,
             'child_record_callback' => [
                 TlTourDifficulty::class,
                 'listDifficulties',
             ],
         ],
-        'label'             => [
-            'fields'      => [
+        'label' => [
+            'fields' => [
                 'title',
                 'shortcut',
             ],
@@ -54,27 +54,27 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
         ],
         'global_operations' => [
             'all' => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
+                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
         ],
-        'operations'        => [
-            'edit'   => [
+        'operations' => [
+            'edit' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['edit'],
-                'href'  => 'act=edit',
-                'icon'  => 'edit.gif',
+                'href' => 'act=edit',
+                'icon' => 'edit.gif',
             ],
-            'copy'   => [
+            'copy' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['copy'],
-                'href'  => 'act=copy',
-                'icon'  => 'copy.gif',
+                'href' => 'act=copy',
+                'icon' => 'copy.gif',
             ],
             'delete' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['delete'],
-                'href'       => 'act=delete',
-                'icon'       => 'delete.gif',
+                'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['delete'],
+                'href' => 'act=delete',
+                'icon' => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
             ],
         ],
@@ -84,67 +84,67 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
     ],
 
     'fields' => [
-        'id'          => [
+        'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'pid'         => [
+        'pid' => [
             'foreignKey' => 'tl_tour_difficulty_category.title',
-            'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'relation' => [
                 'type' => 'belongsTo',
                 'load' => 'eager',
             ],
         ],
-        'sorting'     => [
+        'sorting' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'tstamp'      => [
+        'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'shortcut'    => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['shortcut'],
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => true,
+        'shortcut' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['shortcut'],
+            'exclude' => true,
+            'search' => true,
+            'sorting' => true,
             'inputType' => 'text',
-            'eval'      => [
+            'eval' => [
                 'mandatory' => true,
                 'maxlength' => 255,
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'title'       => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['title'],
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => true,
+        'title' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['title'],
+            'exclude' => true,
+            'search' => true,
+            'sorting' => true,
             'inputType' => 'text',
-            'eval'      => [
+            'eval' => [
                 'mandatory' => true,
                 'maxlength' => 255,
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'code'        => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['code'],
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => true,
+        'code' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['code'],
+            'exclude' => true,
+            'search' => true,
+            'sorting' => true,
             'inputType' => 'text',
-            'eval'      => [
+            'eval' => [
                 'mandatory' => true,
                 'maxlength' => 255,
             ],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
         'description' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['description'],
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => true,
+            'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['description'],
+            'exclude' => true,
+            'search' => true,
+            'sorting' => true,
             'inputType' => 'textarea',
-            'eval'      => ['mandatory' => true],
-            'sql'       => 'text NULL',
+            'eval' => ['mandatory' => true],
+            'sql' => 'text NULL',
         ],
     ],
 ];

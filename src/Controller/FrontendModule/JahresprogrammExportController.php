@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -56,17 +56,17 @@ class JahresprogrammExportController extends AbstractPrintExportController
     protected $template;
 
     /**
-     * @var
+     * @var 
      */
     protected $startDate;
 
     /**
-     * @var
+     * @var 
      */
     protected $endDate;
 
     /**
-     * @var
+     * @var 
      */
     protected $organizer;
 
@@ -76,7 +76,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
     protected $eventType;
 
     /**
-     * @var
+     * @var 
      */
     protected $eventReleaseLevel;
 
@@ -95,7 +95,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
      */
     protected $specialUsers;
 
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, ?PageModel $page = null): Response
+    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         $this->model = $model;
 

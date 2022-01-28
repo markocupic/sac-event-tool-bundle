@@ -19,11 +19,11 @@ use Markocupic\SacEventToolBundle\Dca\TlEventType;
  */
 $GLOBALS['TL_DCA']['tl_event_type'] = [
     // Config
-    'config'   => [
-        'dataContainer'    => 'Table',
-        'switchToEdit'     => true,
+    'config' => [
+        'dataContainer' => 'Table',
+        'switchToEdit' => true,
         'enableVersioning' => true,
-        'sql'              => [
+        'sql' => [
             'keys' => [
                 'id' => 'primary',
             ],
@@ -31,46 +31,46 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
     ],
 
     // List
-    'list'     => [
-        'sorting'           => [
-            'mode'        => 2,
-            'fields'      => ['title'],
-            'flag'        => 1,
+    'list' => [
+        'sorting' => [
+            'mode' => 2,
+            'fields' => ['title'],
+            'flag' => 1,
             'panelLayout' => 'filter;search,limit',
         ],
-        'label'             => [
+        'label' => [
             'fields' => ['title'],
             'format' => '%s',
         ],
         'global_operations' => [
             'all' => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
+                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
         ],
-        'operations'        => [
-            'edit'   => [
+        'operations' => [
+            'edit' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_event_type']['edit'],
-                'href'  => 'act=edit',
-                'icon'  => 'edit.svg',
+                'href' => 'act=edit',
+                'icon' => 'edit.svg',
             ],
-            'copy'   => [
+            'copy' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_event_type']['copy'],
-                'href'  => 'act=paste&amp;mode=copy',
-                'icon'  => 'copy.svg',
+                'href' => 'act=paste&amp;mode=copy',
+                'icon' => 'copy.svg',
             ],
             'delete' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_event_type']['delete'],
-                'href'       => 'act=delete',
-                'icon'       => 'delete.svg',
+                'label' => &$GLOBALS['TL_LANG']['tl_event_type']['delete'],
+                'href' => 'act=delete',
+                'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
             ],
-            'show'   => [
+            'show' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_event_type']['show'],
-                'href'  => 'act=show',
-                'icon'  => 'show.svg',
+                'href' => 'act=show',
+                'icon' => 'show.svg',
             ],
         ],
     ],
@@ -81,74 +81,74 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
     ],
 
     // Fields
-    'fields'   => [
-        'id'                           => [
+    'fields' => [
+        'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'tstamp'                       => [
+        'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'alias'                        => [
-            'label'         => &$GLOBALS['TL_LANG']['tl_event_type']['alias'],
-            'inputType'     => 'text',
-            'exclude'       => true,
-            'search'        => true,
-            'flag'          => 1,
+        'alias' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_event_type']['alias'],
+            'inputType' => 'text',
+            'exclude' => true,
+            'search' => true,
+            'flag' => 1,
             'load_callback' => [
                 [
                     TlEventType::class,
                     'loadCallbackAlias',
                 ],
             ],
-            'eval'          => [
+            'eval' => [
                 'mandatory' => true,
-                'rgxp'      => 'alnum',
+                'rgxp' => 'alnum',
                 'maxlength' => 128,
-                'tl_class'  => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'           => 'varchar(128) NULL',
+            'sql' => 'varchar(128) NULL',
         ],
-        'title'                        => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_event_type']['title'],
+        'title' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_event_type']['title'],
             'inputType' => 'text',
-            'exclude'   => true,
-            'search'    => true,
-            'flag'      => 1,
-            'eval'      => [
+            'exclude' => true,
+            'search' => true,
+            'flag' => 1,
+            'eval' => [
                 'mandatory' => true,
                 'maxlength' => 128,
-                'tl_class'  => 'w50',
+                'tl_class' => 'w50',
             ],
-            'sql'       => 'varchar(128) NULL',
+            'sql' => 'varchar(128) NULL',
         ],
         'levelAccessPermissionPackage' => [
-            'label'      => &$GLOBALS['TL_LANG']['tl_event_type']['levelAccessPermissionPackage'],
-            'exclude'    => true,
-            'inputType'  => 'select',
-            'relation'   => [
+            'label' => &$GLOBALS['TL_LANG']['tl_event_type']['levelAccessPermissionPackage'],
+            'exclude' => true,
+            'inputType' => 'select',
+            'relation' => [
                 'type' => 'belongsTo',
                 'load' => 'eager',
             ],
             'foreignKey' => 'tl_event_release_level_policy_package.title',
-            'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'eval'       => [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'eval' => [
                 'includeBlankOption' => true,
-                'mandatory'          => true,
-                'tl_class'           => 'clr',
+                'mandatory' => true,
+                'tl_class' => 'clr',
             ],
         ],
-        'previewPage'                  => [
-            'label'      => &$GLOBALS['TL_LANG']['tl_event_type']['previewPage'],
-            'exclude'    => true,
-            'inputType'  => 'pageTree',
+        'previewPage' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_event_type']['previewPage'],
+            'exclude' => true,
+            'inputType' => 'pageTree',
             'foreignKey' => 'tl_page.title',
-            'eval'       => [
+            'eval' => [
                 'mandatory' => true,
                 'fieldType' => 'radio',
-                'tl_class'  => 'clr',
+                'tl_class' => 'clr',
             ],
-            'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'relation' => [
                 'type' => 'hasOne',
                 'load' => 'lazy',
             ],

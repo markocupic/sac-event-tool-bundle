@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\Download;
 
 use Contao\CalendarEventsModel;
-use Contao\CalendarModel;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -108,8 +107,7 @@ class DownloadController extends AbstractController
         if ($request->query->has('year')) {
             $year = $request->query->get('year');
 
-            if($year === 'current')
-            {
+            if ('current' === $year) {
                 $year = date('Y');
             }
 

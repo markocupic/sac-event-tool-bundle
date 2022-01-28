@@ -5,8 +5,8 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/sac-event-tool-bundle
@@ -276,8 +276,8 @@ class TlCalendarEventsMember extends Backend
                         'email_subject' => html_entity_decode((string) Input::post('emailSubject')),
                         'email_text' => html_entity_decode(strip_tags((string) Input::post('emailText'))),
                         'attachment_tokens' => null,
-                        'recipient_cc'       => null,
-                        'recipient_bcc'      => null,
+                        'recipient_cc' => null,
+                        'recipient_bcc' => null,
                         'email_html' => null,
                     ];
 
@@ -349,9 +349,7 @@ class TlCalendarEventsMember extends Backend
             Controller::loadLanguageFile('tl_calendar_events_member');
 
             $arrHeadline = array_map(
-                static function ($field) {
-                    return $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] ?? $field;
-                },
+                static fn ($field) => $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] ?? $field,
                 $arrFields
             );
             $csv->insertOne($arrHeadline);
@@ -836,9 +834,7 @@ class TlCalendarEventsMember extends Backend
         $objForm = new Form(
             $arrAction['formId'],
             'POST',
-            static function ($objHaste) {
-                return Input::post('FORM_SUBMIT') === $objHaste->getFormId();
-            }
+            static fn ($objHaste) => Input::post('FORM_SUBMIT') === $objHaste->getFormId()
         );
         // Now let's add form fields:
         $objForm->addFormField('subject', [
@@ -878,8 +874,8 @@ class TlCalendarEventsMember extends Backend
                             'email_subject' => html_entity_decode((string) Input::post('subject')),
                             'email_text' => html_entity_decode(strip_tags((string) Input::post('text'))),
                             'attachment_tokens' => null,
-                            'recipient_cc'       => null,
-                            'recipient_bcc'      => null,
+                            'recipient_cc' => null,
+                            'recipient_bcc' => null,
                             'email_html' => null,
                         ];
 
@@ -932,9 +928,7 @@ class TlCalendarEventsMember extends Backend
                 // Get event dates as a comma separated string
                 $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent);
                 $strDates = implode(', ', array_map(
-                    static function ($tstamp) {
-                        return Date::parse(Config::get('dateFormat'), $tstamp);
-                    },
+                    static fn ($tstamp) => Date::parse(Config::get('dateFormat'), $tstamp),
                     $eventDates
                 ));
 
