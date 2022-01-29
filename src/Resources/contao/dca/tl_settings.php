@@ -30,24 +30,6 @@ PaletteManipulator::create()
     )
     // Fields
     ->addField(
-        ['SAC_EVT_SECTION_NAME'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_DEFAULT_BACKEND_PASSWORD'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME',
-            'SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL',
-        ],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
         ['SAC_EVT_TEMP_PATH'],
         'sacEventTool_legend',
         PaletteManipulator::POSITION_APPEND
@@ -199,42 +181,11 @@ PaletteManipulator::create()
     )
 ;
 
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_SECTION_NAME'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_SECTION_NAME'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'w50',
-    ],
-];
-
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_DEFAULT_BACKEND_PASSWORD'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_DEFAULT_BACKEND_PASSWORD'],
     'inputType' => 'text',
     'eval' => [
         'mandatory' => true,
-        'decodeEntities' => true,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => true,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'rgxp' => 'friendly',
         'decodeEntities' => true,
         'tl_class' => 'w50',
     ],

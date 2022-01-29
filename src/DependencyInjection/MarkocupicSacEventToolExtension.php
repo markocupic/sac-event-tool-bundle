@@ -60,12 +60,14 @@ class MarkocupicSacEventToolExtension extends Extension
         $loader->load('services.yml');
         $loader->load('data-container.yml');
 
-
         // Friendly configuration
         $rootKey = $this->getAlias();
 
+        $container->setParameter($rootKey.'.section_name', $config['section_name']);
         $container->setParameter($rootKey.'.section_ids', $config['section_ids']);
         $container->setParameter($rootKey.'.member_sync_credentials', $config['member_sync_credentials']);
+        $container->setParameter($rootKey.'.event_admin_name', $config['event_admin_name']);
+        $container->setParameter($rootKey.'.event_admin_email', $config['event_admin_email']);
 
         $this->merge($container);
     }

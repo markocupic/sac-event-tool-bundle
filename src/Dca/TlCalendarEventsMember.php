@@ -47,11 +47,17 @@ use NotificationCenter\Model\Notification;
  */
 class TlCalendarEventsMember extends Backend
 {
+    private ?string $eventAdminName;
+    private ?string $eventAdminEmail;
+
     /**
      * Import the back end user object.
      */
     public function __construct()
     {
+        $this->eventAdminName = System::getContainer()->getParameter('sacevt.event_admin_name');
+        $this->eventAdminEmail = System::getContainer()->getParameter('sacevt.event_admin_email');
+
         $this->import('BackendUser', 'User');
         parent::__construct();
 
@@ -260,8 +266,8 @@ class TlCalendarEventsMember extends Backend
                 }
 
                 // Send e-mail
-                if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'))) {
-                    throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in '.__METHOD__.' LINE: '.__LINE__);
+                if (!Validator::isEmail($this->eventAdminEmail)) {
+                    throw new \Exception('Please set a valid email address in parameter sacevt.event_admin_email.');
                 }
 
                 $objEmail = Notification::findOneByType('default_email');
@@ -270,8 +276,8 @@ class TlCalendarEventsMember extends Backend
                 if (null !== $objEmail) {
                     // Set token array
                     $arrTokens = [
-                        'email_sender_name' => html_entity_decode((string) Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME')),
-                        'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
+                        'email_sender_name' => html_entity_decode((string) $this->eventAdminName),
+                        'email_sender_email' => $this->eventAdminEmail,
                         'reply_to' => $this->User->email,
                         'email_subject' => html_entity_decode((string) Input::post('emailSubject')),
                         'email_text' => html_entity_decode(strip_tags((string) Input::post('emailText'))),
@@ -429,12 +435,7 @@ class TlCalendarEventsMember extends Backend
     public function listSections(): array
     {
         Controller::loadLanguageFile('tl_member');
-        $ids = System::getContainer()->getParameter('sacevt.section_ids');
-
-        if ('' !== $ids) {
-            $arrIds = explode(',', $ids);
-        }
-
+        $arrIds = System::getContainer()->getParameter('sacevt.section_ids');
         $arrOptions = [];
 
         foreach ($arrIds as $id) {
@@ -858,8 +859,8 @@ class TlCalendarEventsMember extends Backend
                 $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
 
                 if (null !== $objEventMemberModel) {
-                    if (!Validator::isEmail(Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'))) {
-                        throw new \Exception('Please set a valid SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL Address in the Contao Backend Settings. Error in '.__METHOD__.' LINE: '.__LINE__);
+                    if (!Validator::isEmail($this->eventAdminEmail)) {
+                        throw new \Exception('Please set a valid email address in parameter sacevt.event_admin_email.');
                     }
                     $objEmail = Notification::findOneByType('default_email');
 
@@ -867,8 +868,8 @@ class TlCalendarEventsMember extends Backend
                     if (null !== $objEmail) {
                         // Set token array
                         $arrTokens = [
-                            'email_sender_name' => html_entity_decode((string) html_entity_decode((string) Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_NAME'))),
-                            'email_sender_email' => Config::get('SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL'),
+                            'email_sender_name' => html_entity_decode((string) html_entity_decode((string) $this->eventAdminName)),
+                            'email_sender_email' => $this->eventAdminEmail,
                             'send_to' => $objEventMemberModel->email,
                             'reply_to' => $this->User->email,
                             'email_subject' => html_entity_decode((string) Input::post('subject')),

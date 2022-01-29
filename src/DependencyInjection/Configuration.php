@@ -27,6 +27,8 @@ class Configuration implements ConfigurationInterface
 
         $treeBuilder->getRootNode()
             ->children()
+                // Section name
+                ->scalarNode('section_name')->info('e.g. SAC Sektion Pilatus')->cannotBeEmpty()->end()
                 // Section ids [4250,4251,4252,4253,4254]
                 ->arrayNode('section_ids')
                     ->scalarPrototype()
@@ -42,7 +44,10 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('password')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
-
+                // Event admin name
+                ->scalarNode('event_admin_name')->cannotBeEmpty()->end()
+                // Event admin email
+                ->scalarNode('event_admin_email')->cannotBeEmpty()->end()
 
             ->end()
 
