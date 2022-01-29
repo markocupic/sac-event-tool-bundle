@@ -429,7 +429,7 @@ class TlCalendarEventsMember extends Backend
     public function listSections(): array
     {
         Controller::loadLanguageFile('tl_member');
-        $ids = Config::get('SAC_EVT_SAC_SECTION_IDS');
+        $ids = System::getContainer()->getParameter('sacevt.section_ids');
 
         if ('' !== $ids) {
             $arrIds = explode(',', $ids);

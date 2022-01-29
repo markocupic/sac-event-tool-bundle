@@ -24,7 +24,6 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  */
 class MarkocupicSacEventToolExtension extends Extension
 {
-
     /**
      * {@inheritdoc}
      */
@@ -62,14 +61,14 @@ class MarkocupicSacEventToolExtension extends Extension
         $loader->load('data-container.yml');
 
 
+        // Friendly configuration
         $rootKey = $this->getAlias();
 
-        $container->setParameter($rootKey.'.test', $config['test']);
+        $container->setParameter($rootKey.'.section_ids', $config['section_ids']);
         $container->setParameter($rootKey.'.member_sync_credentials', $config['member_sync_credentials']);
 
         $this->merge($container);
     }
-
 
     public function merge(ContainerBuilder $container): void
     {

@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\SacMemberDatabase;
 
-use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
@@ -71,58 +70,32 @@ class SyncSacMemberDatabase
 
     private array $credentials;
 
+    private array $sectionIds;
+
     private string $projectDir;
 
     private ?LoggerInterface $logger;
 
-    /**
-     * @var array
-     */
-    private $section_ids = [];
+    private ?string $ftp_hostname;
 
-    /**
-     * @var string
-     */
-    private $ftp_hostname = '';
+    private ?string $ftp_username;
 
-    /**
-     * @var string
-     */
-    private $ftp_username = '';
+    private ?string $ftp_password;
 
-    /**
-     * @var string
-     */
-    private $ftp_password = '';
 
-    /**
-     * SyncSacMemberDatabase constructor.
-     *
-     * @param $projectDir
-     */
-    public function __construct(ContaoFramework $framework, array $credentials, $projectDir, LoggerInterface $logger = null)
+    public function __construct(ContaoFramework $framework, array $credentials, array $sectionIds, string $projectDir, LoggerInterface $logger = null)
     {
         $this->framework = $framework;
         $this->credentials = $credentials;
+        $this->sectionIds = $sectionIds;
         $this->projectDir = $projectDir;
         $this->logger = $logger;
 
         $this->framework->initialize();
 
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
-        /** @var string ftp_hostname */
         $this->ftp_hostname = (string) $this->credentials['hostname'];
-
-        /** @var string ftp_username */
         $this->ftp_username = (string) $this->credentials['username'];
-
-        /** @var string ftp_password */
         $this->ftp_password = (string) $this->credentials['password'];
-
-        /** @var array section_ids */
-        $this->section_ids = !empty($configAdapter->get('SAC_EVT_SAC_SECTION_IDS')) ? explode(',', $configAdapter->get('SAC_EVT_SAC_SECTION_IDS')) : [];
     }
 
     /**
@@ -142,7 +115,7 @@ class SyncSacMemberDatabase
         // Open FTP connection
         $connId = $this->openFtpConnection();
 
-        foreach ($this->section_ids as $sectionId) {
+        foreach ($this->sectionIds as $sectionId) {
             $localFile = $this->projectDir.'/'.sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId);
             $remoteFile = basename($localFile);
 
@@ -173,7 +146,7 @@ class SyncSacMemberDatabase
 
         if (!ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId) {
             $msg = sprintf('Could not establish ftp connection to %s.', $this->ftp_hostname);
-            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, self::ERROR);
+            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR);
 
             throw new \Exception($msg);
         }
@@ -197,7 +170,9 @@ class SyncSacMemberDatabase
             $arrMemberIDS = $stmt1->fetchEach('sacMemberId');
         }
 
-        $stmt2 = Database::getInstance()->prepare('SELECT sacMemberId FROM tl_member WHERE isSacMember=?')->execute('');
+        $arrDisabledMemberIDS = [];
+
+        $stmt2 = Database::getInstance()->prepare('SELECT sacMemberId FROM tl_member WHERE isSacMember = ?')->execute('');
 
         if ($stmt2->numRows) {
             $arrDisabledMemberIDS = $stmt2->fetchEach('sacMemberId');
@@ -208,72 +183,69 @@ class SyncSacMemberDatabase
 
         $arrMember = [];
 
-        foreach ($this->section_ids as $sectionId) {
+        foreach ($this->sectionIds as $sectionId) {
             $objFile = new File(sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId));
 
-            if (null !== $objFile) {
-                $arrFile = $objFile->getContentAsArray();
+            $arrFile = $objFile->getContentAsArray();
 
-                foreach ($arrFile as $line) {
-                    // End of line
-                    if (false !== strpos($line, static::FTP_DB_DUMP_END_OF_FILE_STRING)) {
-                        continue;
-                    }
-                    $arrLine = explode(static::FTP_DB_DUMP_FIELD_DELIMITER, $line);
+            foreach ($arrFile as $line) {
+                // End of line
+                if (false !== strpos($line, static::FTP_DB_DUMP_END_OF_FILE_STRING)) {
+                    continue;
+                }
+                $arrLine = explode(static::FTP_DB_DUMP_FIELD_DELIMITER, $line);
 
-                    $arrSacMemberIds[] = (int) ($arrLine[0]);
+                $arrSacMemberIds[] = (int) ($arrLine[0]);
 
-                    $set = [];
-                    $set['sacMemberId'] = (int) ($arrLine[0]);
-                    $set['username'] = (int) ($arrLine[0]);
-                    // Allow multi membership
-                    $set['sectionId'] = [(string) ltrim((string) $arrLine[1], '0')];
-                    $set['lastname'] = $arrLine[2];
-                    $set['firstname'] = $arrLine[3];
-                    $set['addressExtra'] = $arrLine[4];
-                    $set['street'] = trim((string) $arrLine[5]);
-                    $set['streetExtra'] = $arrLine[6];
-                    $set['postal'] = $arrLine[7];
-                    $set['city'] = $arrLine[8];
-                    $set['country'] = empty(strtolower((string) $arrLine[9])) ? 'ch' : strtolower((string) $arrLine[9]);
-                    $set['dateOfBirth'] = strtotime((string) $arrLine[10]);
-                    $set['phoneBusiness'] = beautifyPhoneNumber($arrLine[11]);
-                    $set['phone'] = beautifyPhoneNumber($arrLine[12]);
-                    $set['mobile'] = beautifyPhoneNumber($arrLine[14]);
-                    $set['fax'] = $arrLine[15];
-                    $set['email'] = $arrLine[16];
-                    $set['gender'] = 'weiblich' === strtolower((string) $arrLine[17]) ? 'female' : 'male';
-                    $set['profession'] = $arrLine[18];
-                    $set['language'] = 'd' === strtolower((string) $arrLine[19]) ? 'de' : strtolower((string) $arrLine[19]);
-                    $set['entryYear'] = $arrLine[20];
-                    $set['membershipType'] = $arrLine[23];
-                    $set['sectionInfo1'] = $arrLine[24];
-                    $set['sectionInfo2'] = $arrLine[25];
-                    $set['sectionInfo3'] = $arrLine[26];
-                    $set['sectionInfo4'] = $arrLine[27];
-                    $set['debit'] = $arrLine[28];
-                    $set['memberStatus'] = $arrLine[29];
-                    $arrValues['disable'] = '';
+                $set = [];
+                $set['sacMemberId'] = (int) ($arrLine[0]);
+                $set['username'] = (int) ($arrLine[0]);
+                // Allow multi membership
+                $set['sectionId'] = [ltrim((string) $arrLine[1], '0')];
+                $set['lastname'] = $arrLine[2];
+                $set['firstname'] = $arrLine[3];
+                $set['addressExtra'] = $arrLine[4];
+                $set['street'] = trim((string) $arrLine[5]);
+                $set['streetExtra'] = $arrLine[6];
+                $set['postal'] = $arrLine[7];
+                $set['city'] = $arrLine[8];
+                $set['country'] = empty(strtolower((string) $arrLine[9])) ? 'ch' : strtolower((string) $arrLine[9]);
+                $set['dateOfBirth'] = strtotime((string) $arrLine[10]);
+                $set['phoneBusiness'] = beautifyPhoneNumber($arrLine[11]);
+                $set['phone'] = beautifyPhoneNumber($arrLine[12]);
+                $set['mobile'] = beautifyPhoneNumber($arrLine[14]);
+                $set['fax'] = $arrLine[15];
+                $set['email'] = $arrLine[16];
+                $set['gender'] = 'weiblich' === strtolower((string) $arrLine[17]) ? 'female' : 'male';
+                $set['profession'] = $arrLine[18];
+                $set['language'] = 'd' === strtolower((string) $arrLine[19]) ? 'de' : strtolower((string) $arrLine[19]);
+                $set['entryYear'] = $arrLine[20];
+                $set['membershipType'] = $arrLine[23];
+                $set['sectionInfo1'] = $arrLine[24];
+                $set['sectionInfo2'] = $arrLine[25];
+                $set['sectionInfo3'] = $arrLine[26];
+                $set['sectionInfo4'] = $arrLine[27];
+                $set['debit'] = $arrLine[28];
+                $set['memberStatus'] = $arrLine[29];
 
-                    $set = array_map(
-                        static function ($value) {
-                            if (!\is_array($value)) {
-                                $value = \is_string($value) ? trim((string) $value) : $value;
+                $set = array_map(
+                    static function ($value) {
+                        if (!\is_array($value)) {
+                            $value = \is_string($value) ? trim((string) $value) : $value;
 
-                                return \is_string($value) ? utf8_encode($value) : $value;
-                            }
+                            return \is_string($value) ? utf8_encode($value) : $value;
+                        }
 
-                            return $value;
-                        },
-                        $set
-                    );
+                        return $value;
+                    },
+                    $set
+                );
 
-                    // Check if member is already in the array
-                    if (isset($arrMember[$set['sacMemberId']])) {
-                        $arrMember[$set['sacMemberId']]['sectionId'] = array_merge($arrMember[$set['sacMemberId']]['sectionId'], $set['sectionId']);
-                    } else {
-                        $arrMember[$set['sacMemberId']] = $set;
-                    }
+                // Check if member is already in the array
+                if (isset($arrMember[$set['sacMemberId']])) {
+                    $arrMember[$set['sacMemberId']]['sectionId'] = array_merge($arrMember[$set['sacMemberId']]['sectionId'], $set['sectionId']);
+                } else {
+                    $arrMember[$set['sacMemberId']] = $set;
                 }
             }
         }
@@ -302,10 +274,8 @@ class SyncSacMemberDatabase
             ];
             Database::getInstance()->prepare('UPDATE tl_member %s')->set($set)->execute();
 
-            /** @var int $countInserts */
             $countInserts = 0;
 
-            /** @var int $countUpdates */
             $countUpdates = 0;
 
             $i = 0;
@@ -318,7 +288,6 @@ class SyncSacMemberDatabase
                     $arrValues['tstamp'] = time();
 
                     // Insert new member
-                    /** @var Statement $objInsertStmt */
                     $objInsertStmt = Database::getInstance()
                         ->prepare('INSERT INTO tl_member %s')
                         ->set($arrValues)
@@ -332,12 +301,11 @@ class SyncSacMemberDatabase
                         ++$countInserts;
                     }
                 } else {
-                    // Update/sync datarecord
-                    /** @var Statement $objUpdateStmt */
-                    $objUpdateStmt = Database::getInstance()->prepare('UPDATE tl_member %s WHERE sacMemberId=?')->set($arrValues)->execute($sacMemberId);
+                    // Update/sync data record
+                    $objUpdateStmt = Database::getInstance()->prepare('UPDATE tl_member %s WHERE sacMemberId = ?')->set($arrValues)->execute($sacMemberId);
 
                     if ($objUpdateStmt->affectedRows) {
-                        Database::getInstance()->prepare('UPDATE tl_member SET tstamp=? WHERE sacMemberId=?')->execute(time(), $sacMemberId);
+                        Database::getInstance()->prepare('UPDATE tl_member SET tstamp = ? WHERE sacMemberId = ?')->execute(time(), $sacMemberId);
                         $msg = sprintf('Update SAC-member "%s %s" with SAC-User-ID: %s in tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
                         $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_UPDATE_MEMBER);
                         ++$countUpdates;
@@ -378,7 +346,7 @@ class SyncSacMemberDatabase
         }
 
         // Set tl_member.disable to true if member was not found in the csv-file (is no more a valid SAC member)
-        $objDisabledMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE isSacMember=?')->execute('');
+        $objDisabledMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE isSacMember = ?')->execute('');
 
         while ($objDisabledMember->next()) {
             $arrSet = [
@@ -387,7 +355,8 @@ class SyncSacMemberDatabase
                 'isSacMember' => '',
                 'login' => '',
             ];
-            Database::getInstance()->prepare('UPDATE tl_member %s WHERE id=?')->set($arrSet)->execute($objDisabledMember->id);
+
+            Database::getInstance()->prepare('UPDATE tl_member %s WHERE id = ?')->set($arrSet)->execute($objDisabledMember->id);
 
             // Log if disable user
             if (!\in_array($objDisabledMember->sacMemberId, $arrDisabledMemberIDS, false)) {

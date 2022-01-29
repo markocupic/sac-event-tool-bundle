@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 
 use Contao\BackendUser;
-use Contao\Config;
+use Contao\System;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Markocupic\SacEventToolBundle\Dca\TlMember;
 
@@ -248,12 +248,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = [
         'multiple' => true,
         'tl_class' => 'clr',
     ],
-    'options' => explode(
-        ',',
-        Config::get(
-            'SAC_EVT_SAC_SECTION_IDS'
-        )
-    ),
+    'options' => System::getContainer()->getParameter('sacevt.section_ids'),
     'sql' => 'blob NULL',
 ];
 

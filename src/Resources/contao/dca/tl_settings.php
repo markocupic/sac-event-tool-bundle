@@ -30,11 +30,6 @@ PaletteManipulator::create()
     )
     // Fields
     ->addField(
-        ['SAC_EVT_SAC_SECTION_IDS'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
         ['SAC_EVT_SECTION_NAME'],
         'sacEventTool_legend',
         PaletteManipulator::POSITION_APPEND
@@ -203,16 +198,6 @@ PaletteManipulator::create()
         'tl_settings'
     )
 ;
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_SAC_SECTION_IDS'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_SAC_SECTION_IDS'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'w50',
-    ],
-];
 
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_SECTION_NAME'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_SECTION_NAME'],

@@ -68,7 +68,6 @@ class InitializeSystemListener
 
         // Check for other system vars in system/localconfig.php
         $arrConfig = [
-            'SAC_EVT_SAC_SECTION_IDS',
             'SAC_EVT_SECTION_NAME',
             'SAC_EVT_ASSETS_DIR',
             'SAC_EVT_TOUREN_UND_KURS_ADMIN_EMAIL',

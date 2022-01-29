@@ -6,6 +6,7 @@ services:
         arguments:
             - '@contao.framework'
             - '%sacevt.member_sync_credentials%'
+            - '%sacevt.section_ids%'
             - '%kernel.project_dir%'
             - '@monolog.logger.contao'
 
