@@ -30,21 +30,6 @@ PaletteManipulator::create()
     )
     // Fields
     ->addField(
-        ['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
         ['SAC_EVT_SAC_SECTION_IDS'],
         'sacEventTool_legend',
         PaletteManipulator::POSITION_APPEND
@@ -218,37 +203,6 @@ PaletteManipulator::create()
         'tl_settings'
     )
 ;
-
-// Member Database Bern
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => true,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => true,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => true,
-        'tl_class' => 'w50',
-    ],
-];
 
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_SAC_SECTION_IDS'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_SAC_SECTION_IDS'],

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle;
 
 use Markocupic\SacEventToolBundle\DependencyInjection\Compiler\AddSessionBagsPass;
+use Markocupic\SacEventToolBundle\DependencyInjection\MarkocupicSacEventToolExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -25,6 +26,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class MarkocupicSacEventToolBundle extends Bundle
 {
+    public function getContainerExtension(): MarkocupicSacEventToolExtension
+    {
+        return new MarkocupicSacEventToolExtension();
+    }
+
     /**
      * {@inheritdoc}
      */

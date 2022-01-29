@@ -5,6 +5,7 @@ services:
         public: true
         arguments:
             - '@contao.framework'
+            - '%sacevt.member_sync_credentials%'
             - '%kernel.project_dir%'
             - '@monolog.logger.contao'
 

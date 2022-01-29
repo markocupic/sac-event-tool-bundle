@@ -30,13 +30,6 @@ class PreparePluginEnvironmentTest extends ContaoTestCase
         $this->assertTrue(\is_file($rootDir . '/sac_event_tool_parameters.php'));
         require_once $rootDir . '/sac_event_tool_parameters.php';
 
-        // FTP Credentials SAC Switzerland link: Daniel Fernandez Daniel.Fernandez@sac-cas.ch
-        $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME']));
-        $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME']));
-        $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD']));
-        $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_SAC_SECTION_IDS']));
-
-
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_SECTION_NAME']));
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_TEMP_PATH']));
         $this->assertTrue(!empty($GLOBALS['TL_CONFIG']['SAC_EVT_AVATAR_MALE']));

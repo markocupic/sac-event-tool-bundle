@@ -27,11 +27,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-/**
- * Class Plugin
- * Plugin for the Contao Manager.
- */
-class Plugin implements BundlePluginInterface, RoutingPluginInterface, ConfigPluginInterface
+class Plugin implements ConfigPluginInterface, BundlePluginInterface, RoutingPluginInterface
 {
     /**
      * {@inheritdoc}
@@ -59,22 +55,12 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface, ConfigPlu
     }
 
     /**
-     * @throws \Exception
+     * @param LoaderInterface $loader
+     * @param array $config
+     * @return void
      */
-    public function registerContainerConfiguration(LoaderInterface $loader, array $managerConfig): void
+    public function registerContainerConfiguration(LoaderInterface $loader, array $config): void
     {
-        $loader->load(__DIR__.'/../Resources/config/listener.yml');
-        $loader->load(__DIR__.'/../Resources/config/subscriber.yml');
-        $loader->load(__DIR__.'/../Resources/config/parameters.yml');
-        $loader->load(__DIR__.'/../Resources/config/controller-download.yml');
-        $loader->load(__DIR__.'/../Resources/config/controller-ajax.yml');
-        $loader->load(__DIR__.'/../Resources/config/controller-contao-frontend-module.yml');
-        $loader->load(__DIR__.'/../Resources/config/controller-contao-content-element.yml');
-        $loader->load(__DIR__.'/../Resources/config/controller-feed.yml');
-        $loader->load(__DIR__.'/../Resources/config/sac-member-database.yml');
-        $loader->load(__DIR__.'/../Resources/config/cron.yml');
-        $loader->load(__DIR__.'/../Resources/config/contao-mode.yml');
-        $loader->load(__DIR__.'/../Resources/config/services.yml');
-        $loader->load(__DIR__.'/../Resources/config/data-container.yml');
+        //$loader->load('@MarkocupicSacEventTool/Resources/config/config.yml');
     }
 }

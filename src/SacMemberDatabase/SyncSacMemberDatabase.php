@@ -66,20 +66,14 @@ class SyncSacMemberDatabase
      * Field delimiter.
      */
     public const FTP_DB_DUMP_FIELD_DELIMITER = '$';
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
 
-    /**
-     * string $projectDir.
-     */
-    private $projectDir;
+    private ContaoFramework $framework;
 
-    /**
-     * @var ?LoggerInterface
-     */
-    private $logger;
+    private array $credentials;
+
+    private string $projectDir;
+
+    private ?LoggerInterface $logger;
 
     /**
      * @var array
@@ -106,9 +100,10 @@ class SyncSacMemberDatabase
      *
      * @param $projectDir
      */
-    public function __construct(ContaoFramework $framework, $projectDir, LoggerInterface $logger = null)
+    public function __construct(ContaoFramework $framework, array $credentials, $projectDir, LoggerInterface $logger = null)
     {
         $this->framework = $framework;
+        $this->credentials = $credentials;
         $this->projectDir = $projectDir;
         $this->logger = $logger;
 
@@ -118,13 +113,13 @@ class SyncSacMemberDatabase
         $configAdapter = $this->framework->getAdapter(Config::class);
 
         /** @var string ftp_hostname */
-        $this->ftp_hostname = (string) $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME');
+        $this->ftp_hostname = (string) $this->credentials['hostname'];
 
         /** @var string ftp_username */
-        $this->ftp_username = (string) $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME');
+        $this->ftp_username = (string) $this->credentials['username'];
 
         /** @var string ftp_password */
-        $this->ftp_password = (string) $configAdapter->get('SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD');
+        $this->ftp_password = (string) $this->credentials['password'];
 
         /** @var array section_ids */
         $this->section_ids = !empty($configAdapter->get('SAC_EVT_SAC_SECTION_IDS')) ? explode(',', $configAdapter->get('SAC_EVT_SAC_SECTION_IDS')) : [];

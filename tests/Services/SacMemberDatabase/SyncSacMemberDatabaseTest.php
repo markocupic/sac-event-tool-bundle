@@ -62,13 +62,16 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
     protected function setUp(): void
     {
         // Get the root dir
+        $container = $this->getContainerWithContaoConfiguration();
+
+        $credentials = $container->getParameter('sacevt.member_sync_credentials');
         $this->rootDir = __DIR__.'/../../../../../../';
         $this->connection = $this->createMock(Connection::class);
         $this->framework = $this->mockContaoFramework();
         $this->arrSectionIds = explode(',', $GLOBALS['TL_CONFIG']['SAC_EVT_SAC_SECTION_IDS']);
-        $this->hostname = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'];
-        $this->username = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'];
-        $this->password = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD'];
+        $this->hostname = $credentials['hostname'];
+        $this->username = $credentials['username'];
+        $this->password = $credentials['password'];
         $this->_getFtpConnectionParams();
     }
 
@@ -175,12 +178,6 @@ class SyncSacMemberDatabaseTest extends ContaoTestCase
                 }
             }
         }
-
-        // FTP Credentials SAC Switzerland link: Daniel Fernandez Daniel.Fernandez@sac-cas.ch
-        $this->arrSectionIds = explode(',', $GLOBALS['TL_CONFIG']['SAC_EVT_SAC_SECTION_IDS']);
-        $this->hostname = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'];
-        $this->username = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'];
-        $this->password = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD'];
 
         return $container;
     }

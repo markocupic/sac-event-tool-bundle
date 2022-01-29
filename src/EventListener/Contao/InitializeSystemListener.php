@@ -68,9 +68,6 @@ class InitializeSystemListener
 
         // Check for other system vars in system/localconfig.php
         $arrConfig = [
-            'SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME',
-            'SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME',
-            'SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD',
             'SAC_EVT_SAC_SECTION_IDS',
             'SAC_EVT_SECTION_NAME',
             'SAC_EVT_ASSETS_DIR',

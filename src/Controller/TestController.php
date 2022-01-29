@@ -41,14 +41,17 @@ class TestController extends AbstractController
      */
     private $twig;
 
+    private array $credentials;
+
     /**
      * MyCustomController constructor.
      */
-    public function __construct(Connection $connection, ContaoFramework $framework, TwigEnvironment $twig)
+    public function __construct(Connection $connection, ContaoFramework $framework, TwigEnvironment $twig, array $credentials)
     {
         $this->connection = $connection;
         $this->framework = $framework;
         $this->twig = $twig;
+        $this->credentials = $credentials;
     }
 
     /**
@@ -58,32 +61,7 @@ class TestController extends AbstractController
     {
         $this->framework->initialize(true);
 
-        $schemaManager = $this->connection->getSchemaManager();
-
-        if ($schemaManager->tablesExist('Cars')) {
-            return new Response('Table already exists.');
-        }
-
-        $table = new Table('Cars');
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true, 'notnull' => true]);
-        $table->addColumn('brand', 'string', ['notnull' => true]);
-        $table->addColumn('type', 'string', ['notnull' => true]);
-        $table->addColumn('color', 'string', ['notnull' => true]);
-
-        // Set the pk
-        $table->setPrimaryKey(['id']);
-
-        // Create the table
-        $schemaManager->createTable($table);
-
-        return new Response('Successfully created the new table "Cars".');
-
-        //$GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'] = 'ftpserver.sac-cas.ch';
-        //$GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_USERNAME'] = 4250;
-        //$GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_PASSWORD'] = 'Ewawehapi255';
-        //$GLOBALS['TL_CONFIG']['SAC_EVT_SAC_SECTION_IDS'] = '4250,4251,4252,4253,4254';
-
-        $hostname = $GLOBALS['TL_CONFIG']['SAC_EVT_FTPSERVER_MEMBER_DB_BERN_HOSTNAME'];
+        $hostname = $this->credentials['hostname'];
         $connId = ftp_connect($hostname);
 
         if (false === $connId) {
