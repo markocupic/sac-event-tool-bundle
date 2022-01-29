@@ -35,6 +35,7 @@ use Contao\Validator;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\Log;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -212,7 +213,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     }
 
                     // Log
-                    $systemAdapter->log(sprintf('New event confirmation download. SAC-User-ID: %s. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__.' Line: '.__LINE__, $configAdapter->get('SAC_EVT_LOG_EVENT_CONFIRMATION_DOWNLOAD'));
+                    $systemAdapter->log(sprintf('New event confirmation download. SAC-User-ID: %s. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__.' Line: '.__LINE__, Log::DOWNLOAD_CERTIFICATE_OF_ATTENDANCE);
 
                     // Create phpWord instance
                     $filenamePattern = str_replace('%%s', '%s', $configAdapter->get('SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'));

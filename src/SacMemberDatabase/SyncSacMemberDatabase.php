@@ -18,6 +18,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Contao\File;
+use Markocupic\SacEventToolBundle\Config\Log;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -26,31 +27,6 @@ use Psr\Log\LogLevel;
  */
 class SyncSacMemberDatabase
 {
-    /**
-     * Log type for new member.
-     */
-    public const SAC_EVT_LOG_ADD_NEW_MEMBER = 'MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER';
-
-    /**
-     * Log type for member update.
-     */
-    public const SAC_EVT_LOG_UPDATE_MEMBER = 'MEMBER_DATABASE_SYNC_UPDATE_MEMBER';
-
-    /**
-     * Log type for a successful sync.
-     */
-    public const SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC = 'MEMBER_DATABASE_SYNC';
-
-    /**
-     * Log type if a member has been disabled.
-     */
-    public const SAC_EVT_LOG_DISABLE_MEMBER = 'DISABLE_MEMBER';
-
-    /**
-     * Log type if there is db transaction error.
-     */
-    public const SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR = 'MEMBER_DATABASE_TRANSACTION_ERROR';
-
     /**
      * FTP db dump filepath.
      */
@@ -82,7 +58,6 @@ class SyncSacMemberDatabase
 
     private ?string $ftp_password;
 
-
     public function __construct(ContaoFramework $framework, array $credentials, array $sectionIds, string $projectDir, LoggerInterface $logger = null)
     {
         $this->framework = $framework;
@@ -90,24 +65,31 @@ class SyncSacMemberDatabase
         $this->sectionIds = $sectionIds;
         $this->projectDir = $projectDir;
         $this->logger = $logger;
+    }
 
+    /**
+     * @return void
+     * @throws \Exception
+     */
+    public function run(): void
+    {
+        $this->prepare();
+        $this->fetchFilesFromFtp();
+        $this->syncContaoDatabase();
+    }
+
+    /**
+     * @return void
+     */
+    private function prepare(): void{
         $this->framework->initialize();
-
         $this->ftp_hostname = (string) $this->credentials['hostname'];
         $this->ftp_username = (string) $this->credentials['username'];
         $this->ftp_password = (string) $this->credentials['password'];
     }
 
     /**
-     * @throws \Exception
-     */
-    public function run(): void
-    {
-        $this->fetchFilesFromFtp();
-        $this->syncContaoDatabase();
-    }
-
-    /**
+     * @return void
      * @throws \Exception
      */
     private function fetchFilesFromFtp(): void
@@ -146,7 +128,7 @@ class SyncSacMemberDatabase
 
         if (!ftp_login($connId, $this->ftp_username, $this->ftp_password) || !$connId) {
             $msg = sprintf('Could not establish ftp connection to %s.', $this->ftp_hostname);
-            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR);
+            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_TRANSACTION_ERROR);
 
             throw new \Exception($msg);
         }
@@ -297,7 +279,7 @@ class SyncSacMemberDatabase
                     if ($objInsertStmt->affectedRows) {
                         // Log
                         $msg = sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
-                        $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_ADD_NEW_MEMBER);
+                        $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER);
                         ++$countInserts;
                     }
                 } else {
@@ -307,7 +289,7 @@ class SyncSacMemberDatabase
                     if ($objUpdateStmt->affectedRows) {
                         Database::getInstance()->prepare('UPDATE tl_member SET tstamp = ? WHERE sacMemberId = ?')->execute(time(), $sacMemberId);
                         $msg = sprintf('Update SAC-member "%s %s" with SAC-User-ID: %s in tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
-                        $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_UPDATE_MEMBER);
+                        $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_UPDATE_NEW_MEMBER);
                         ++$countUpdates;
                     }
                 }
@@ -333,7 +315,7 @@ class SyncSacMemberDatabase
             Database::getInstance()->commitTransaction();
         } catch (\Exception $e) {
             $msg = 'Error during the database sync process. Starting transaction rollback now.';
-            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_TRANSACTION_ERROR);
+            $this->log(LogLevel::CRITICAL, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_TRANSACTION_ERROR);
 
             // Transaction rollback
             Database::getInstance()->rollbackTransaction();
@@ -366,7 +348,7 @@ class SyncSacMemberDatabase
                     $objDisabledMember->lastname,
                     $objDisabledMember->sacMemberId
                 );
-                $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_DISABLE_MEMBER);
+                $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_DISABLE_MEMBER);
             }
         }
 
@@ -381,10 +363,17 @@ class SyncSacMemberDatabase
                 $countUpdates,
                 $duration
             );
-            $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_SAC_MEMBER_DATABASE_SYNC);
+            $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_SUCCESS);
         }
     }
 
+    /**
+     * @param string $strLogLevel
+     * @param string $strText
+     * @param string $strMethod
+     * @param string $strCategory
+     * @return void
+     */
     private function log(string $strLogLevel, string $strText, string $strMethod, string $strCategory): void
     {
         if (null !== $this->logger) {

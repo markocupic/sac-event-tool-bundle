@@ -32,6 +32,7 @@ use Contao\Template;
 use Contao\UserModel;
 use Contao\Validator;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Config\Log;
 use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -143,7 +144,6 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         $userModelAdapter = $this->get('contao.framework')->getAdapter(UserModel::class);
         $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
         $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
-        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
 
         $blnHasError = true;
         $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event abgemeldet werden. Bitte nimm mit dem verantwortlichen Leiter Kontakt auf.';
@@ -167,7 +167,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
                 if (EventSubscriptionLevel::SUBSCRIPTION_REFUSED === $objEventsMember->stateOfSubscription) {
                     $objEventsMember->delete();
-                    $systemAdapter->log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__.' Line: '.__LINE__, Config::get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
+                    $systemAdapter->log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__.' Line: '.__LINE__, Log::EVENT_UNSUBSCRIPTION);
 
                     return;
                 }
@@ -241,7 +241,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                     $messageAdapter->add('Du hast dich vom Event "'.$objEventsMember->eventName.'" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.', 'TL_INFO', TL_MODE);
 
                     // Log
-                    $systemAdapter->log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__.' Line: '.__LINE__, $configAdapter->get('SAC_EVT_LOG_EVENT_UNSUBSCRIPTION'));
+                    $systemAdapter->log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__.' Line: '.__LINE__, Log::EVENT_UNSUBSCRIPTION);
 
                     $objNotification->send($arrTokens, 'de');
                 }

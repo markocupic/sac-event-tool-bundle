@@ -19,6 +19,7 @@ use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\System;
+use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx;
 use Markocupic\SacEventToolBundle\Ical\SendEventIcal;
 use Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf;
@@ -68,9 +69,6 @@ class DownloadController extends AbstractController
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
         $year = $request->query->get('year') ?: null;
 
         if (!empty($year)) {
@@ -86,7 +84,7 @@ class DownloadController extends AbstractController
         $this->logger->log(
             LogLevel::INFO,
             'The course booklet has been downloaded.',
-            ['contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_COURSE_BOOKLET_DOWNLOAD'))]
+            ['contao' => new ContaoContext(__METHOD__, Log::DOWNLOAD_WORKSHOP_BOOKLET)]
         );
 
         return $this->printWorkshopsAsPdf->generate();

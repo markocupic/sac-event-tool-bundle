@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\User\BackendUser;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
+use Markocupic\SacEventToolBundle\Config\Log;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -25,10 +26,7 @@ use Psr\Log\LogLevel;
  */
 class SyncMemberWithUser
 {
-    /**
-     * Log type for sync process.
-     */
-    public const SAC_EVT_LOG_SYNC_MEMBER_WITH_USER = 'SYNC_MEMBER_WITH_USER';
+
 
     /**
      * @var ContaoFramework
@@ -82,7 +80,7 @@ class SyncMemberWithUser
                 if ($objUpdateStmt->affectedRows) {
                     // Log
                     $msg = sprintf('Synced tl_user with tl_member. Updated tl_user (%s %s [SAC Member-ID: %s]).', $objMember->firstname, $objMember->lastname, $objMember->sacMemberId);
-                    $this->log(LogLevel::INFO, $msg, __METHOD__, self::SAC_EVT_LOG_SYNC_MEMBER_WITH_USER);
+                    $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS);
                 }
             } else {
                 Database::getInstance()->prepare('UPDATE tl_user SET sacMemberId=? WHERE id=?')->execute(0, $objUser->id);

@@ -41,6 +41,7 @@ use Haste\Form\Form;
 use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Event\EventSubscriptionEvent;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -203,9 +204,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
         /** @var Validator $validatorAdapter */
         $validatorAdapter = $this->framework->getAdapter(Validator::class);
 
@@ -268,7 +266,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 // Log
                 if ($this->logger) {
                     $strText = sprintf('Event registration error: "%s"', $errorMessage);
-                    $this->logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_EVENT_SUBSCRIPTION_ERROR'))]);
+                    $this->logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION_ERROR)]);
                 }
 
                 if ($url = $this->getRoute('info')) {
@@ -345,9 +343,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         /** @var CalendarEventsJourneyModel $calendarEventsJourneyModelAdapter */
         $calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
-
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
 
         $objForm = new Form(
             'form-event-registration',
@@ -461,7 +456,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 // Log
                 if ($this->logger) {
                     $strText = sprintf('New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").', $this->memberModel->firstname, $this->memberModel->lastname, $this->memberModel->id, $this->eventModel->id, $this->eventModel->title);
-                    $this->logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, $configAdapter->get('SAC_EVT_LOG_EVENT_SUBSCRIPTION'))]);
+                    $this->logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION)]);
                 }
 
                 // Dispatch event subscription event (e.g. send notification)
