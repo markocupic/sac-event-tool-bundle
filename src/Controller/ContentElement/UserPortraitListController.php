@@ -53,8 +53,6 @@ class UserPortraitListController extends AbstractContentElementController
 
     protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
     {
-        /** @var FilesModel $filesModelAdapter */
-        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
 
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
@@ -176,12 +174,9 @@ class UserPortraitListController extends AbstractContentElementController
 
                 // Add image to template
                 if (\strlen($strAvatarSRC)) {
-                    $objModel = $filesModelAdapter->findByPath($strAvatarSRC);
-
-                    if (null !== $objModel && is_file($projectDir.'/'.$objModel->path)) {
+                    if (is_file($projectDir.'/'.$strAvatarSRC)) {
                         // Create partial object
                         $objPartial = new \stdClass();
-                        $objPartial->uuid = $objModel->uuid;
 
                         if ('' !== $model->imgSize) {
                             $size = $stringUtilAdapter->deserialize($model->imgSize);
@@ -191,11 +186,11 @@ class UserPortraitListController extends AbstractContentElementController
                             }
                         }
 
-                        $objPartial->singleSRC = $objModel->path;
+                        $objPartial->singleSRC = $strAvatarSRC;
                         $arrUser = (array) $objPartial;
                         $objTemplate->addImage = true;
 
-                        $controllerAdapter->addImageToTemplate($objTemplate, $arrUser, null, null, $objModel);
+                        $controllerAdapter->addImageToTemplate($objTemplate, $arrUser, null, null, null);
                     }
                 }
                 $strItems .= $objTemplate->parse();

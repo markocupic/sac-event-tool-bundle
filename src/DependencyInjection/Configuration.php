@@ -50,8 +50,15 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('event_admin_email')->cannotBeEmpty()->end()
                 // Temp dir e.g system/tmp
                 ->scalarNode('temp_dir')->cannotBeEmpty()->end()
+                // Avatars
+                ->arrayNode('avatar')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('female')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/avatars/avatar-default-female.png')->end()
+                        ->scalarNode('male')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/avatars/avatar-default-male.png')->end()
+                    ->end()
+                ->end()
             ->end()
-
         ;
 
         return $treeBuilder;

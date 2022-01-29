@@ -18,7 +18,6 @@ use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
 use Contao\Folder;
-use Contao\System;
 
 /**
  * Class InitializeSystemListener.
@@ -70,8 +69,6 @@ class InitializeSystemListener
         // Check for other system vars in system/localconfig.php
         $arrConfig = [
             'SAC_EVT_ASSETS_DIR',
-            'SAC_EVT_AVATAR_MALE',
-            'SAC_EVT_AVATAR_FEMALE',
             'SAC_EVT_WORKSHOP_FLYER_SRC',
             'SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC',
             'SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN',

@@ -15,8 +15,9 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\File;
+use Contao\Folder;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Table;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -60,6 +61,11 @@ class TestController extends AbstractController
     public function __invoke()
     {
         $this->framework->initialize(true);
+
+        $file = new File('system/tmp/test.txt');
+        $file->append('text');
+        $file->close();
+        $file->sendToBrowser();
 
         $hostname = $this->credentials['hostname'];
         $connId = ftp_connect($hostname);

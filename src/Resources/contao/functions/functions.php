@@ -87,10 +87,10 @@ function getAvatar($userId, $mode = 'BE')
             }
 
             if ('female' === $objUser->gender) {
-                return Config::get('SAC_EVT_AVATAR_FEMALE');
+                return System::getContainer()->getParameter('sacevt.avatar.female');
             }
 
-            return Config::get('SAC_EVT_AVATAR_MALE');
+            return System::getContainer()->getParameter('sacevt.avatar.male');
         }
 
         return '';
@@ -114,13 +114,9 @@ function getAvatar($userId, $mode = 'BE')
         }
 
         if ('female' === $objUser->gender) {
-            if (is_file($rootDir.'/'.Config::get('SAC_EVT_AVATAR_FEMALE'))) {
-                return Config::get('SAC_EVT_AVATAR_FEMALE');
-            }
+            return System::getContainer()->getParameter('sacevt.avatar.female');
         } else {
-            if (is_file($rootDir.'/'.Config::get('SAC_EVT_AVATAR_MALE'))) {
-                return Config::get('SAC_EVT_AVATAR_MALE');
-            }
+            return System::getContainer()->getParameter('sacevt.avatar.male');
         }
     }
 

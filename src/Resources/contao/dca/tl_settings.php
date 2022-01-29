@@ -28,17 +28,6 @@ PaletteManipulator::create()
         'sacTourArticle_legend',
         'global_legend'
     )
-    // Fields
-    ->addField(
-        ['SAC_EVT_AVATAR_MALE'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_AVATAR_FEMALE'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
     ->addField(
         ['SAC_EVT_BE_USER_DIRECTORY_ROOT'],
         'sacEventTool_legend',
@@ -182,26 +171,6 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_DEFAULT_BACKEND_PASSWORD'] 
     'eval' => [
         'mandatory' => true,
         'decodeEntities' => true,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_AVATAR_MALE'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_AVATAR_MALE'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_AVATAR_FEMALE'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_AVATAR_FEMALE'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
         'tl_class' => 'w50',
     ],
 ];
