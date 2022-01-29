@@ -48,10 +48,6 @@ class InitializeSystemListener
 
         // Validate directories
         $arrDirectories = [
-            //System::getContainer()->getParameter('sacevt.temp_dir'),
-            'SAC_EVT_FE_USER_DIRECTORY_ROOT',
-            'SAC_EVT_FE_USER_AVATAR_DIRECTORY',
-            'SAC_EVT_BE_USER_DIRECTORY_ROOT',
             'SAC_EVT_EVENT_STORIES_UPLOAD_PATH',
         ];
 

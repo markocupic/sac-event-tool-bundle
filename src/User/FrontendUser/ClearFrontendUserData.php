@@ -33,23 +33,21 @@ use Psr\Log\LogLevel;
  */
 class ClearFrontendUserData
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
 
-    /**
-     * @var string
-     */
-    private $projectDir;
+    private ContaoFramework $framework;
+
+    private string $projectDir;
+
+    private string $feUserAvatarDir;
 
     /**
      * ClearFrontendUserData constructor.
      */
-    public function __construct(ContaoFramework $framework, string $projectDir)
+    public function __construct(ContaoFramework $framework, string $projectDir, string $feUserAvatarDir)
     {
         $this->framework = $framework;
         $this->projectDir = $projectDir;
+        $this->feUserAvatarDir = $feUserAvatarDir;
 
         // Initialize contao framework
         $this->framework->initialize();
@@ -92,18 +90,19 @@ class ClearFrontendUserData
                     $logger = $container->get('monolog.logger.contao');
                     $message = sprintf(
                         'Teilnehmer %s %s mit ID %s [%s] am Event mit ID %s [%s] konnte nicht in tl_member gefunden werden."',
-                        $objCalendarEventsMember->firstname,
-                        $objCalendarEventsMember->lastname,
-                        $objCalendarEventsMember->id,
-                        $objCalendarEventsMember->sacMemberId,
-                        $objCalendarEventsMember->eventId,
-                        $objCalendarEventsMember->eventName,
+                        $objEventsMember->firstname,
+                        $objEventsMember->lastname,
+                        $objEventsMember->id,
+                        $objEventsMember->sacMemberId,
+                        $objEventsMember->eventId,
+                        $objEventsMember->eventName,
                     );
 
                     $logger->log(LogLevel::INFO, $message, ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, 'EVENT_MEMBER_NOT_FOUND')]);
+
                     // Notify admin
                     if (!empty($configAdapter->get('adminEmail'))) {
-                        mail($configAdapter->get('adminEmail'), 'Unbekannter Teilnehmer in Event '.$objCalendarEventsMember->eventName, $message.' In '.__FILE__.' LINE: '.__LINE__);
+                        mail($configAdapter->get('adminEmail'), 'Unbekannter Teilnehmer in Event '.$objEventsMember->eventName, $message.' In '.__FILE__.' LINE: '.__LINE__);
                     }
 
                     /*
@@ -293,10 +292,8 @@ class ClearFrontendUserData
      */
     public function deleteAvatarDirectory(int $memberId): void
     {
-        /** @var MemberModel $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
 
-        $strAvatarDir = $configAdapter->get('SAC_EVT_FE_USER_AVATAR_DIRECTORY');
+        $strAvatarDir = $this->feUserAvatarDir;
 
         if (is_dir($this->projectDir.'/'.$strAvatarDir.'/'.$memberId)) {
             $strDir = $strAvatarDir.'/'.$memberId;

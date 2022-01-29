@@ -29,21 +29,6 @@ PaletteManipulator::create()
         'global_legend'
     )
     ->addField(
-        ['SAC_EVT_BE_USER_DIRECTORY_ROOT'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_FE_USER_DIRECTORY_ROOT'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_FE_USER_AVATAR_DIRECTORY'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
         ['SAC_EVT_EVENT_STORIES_UPLOAD_PATH'],
         'sacEventTool_legend',
         PaletteManipulator::POSITION_APPEND
@@ -131,36 +116,6 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_DEFAULT_BACKEND_PASSWORD'] 
     'eval' => [
         'mandatory' => true,
         'decodeEntities' => true,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_BE_USER_DIRECTORY_ROOT'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_BE_USER_DIRECTORY_ROOT'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_FE_USER_DIRECTORY_ROOT'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_FE_USER_DIRECTORY_ROOT'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_FE_USER_AVATAR_DIRECTORY'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_FE_USER_AVATAR_DIRECTORY'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
         'tl_class' => 'w50',
     ],
 ];

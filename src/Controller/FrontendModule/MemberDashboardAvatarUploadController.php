@@ -47,31 +47,18 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 {
     public const TYPE = 'member_dashboard_avatar_upload';
 
-    /**
-     * @var string
-     */
-    protected $projectDir;
+    protected ?string $projectDir;
 
-    /**
-     * @var FrontendUser
-     */
-    protected $objUser;
+    protected ?FrontendUser $objUser;
 
-    /**
-     * @var Template
-     */
-    protected $template;
+    protected ?Template $template;
 
-    /**
-     * @var PageModel
-     */
-    protected $objPage;
+    protected ?PageModel $objPage;
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
         $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
-
         // Get logged in member object
         if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser) {
             $this->objUser = $objUser;
@@ -89,16 +76,18 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         // Rotate image by 90°
         if ('rotate-image' === $inputAdapter->get('do') && '' !== $inputAdapter->get('fileId')) {
             // Get the image rotate service
-            $objRotateImage = System::getContainer()->get('Markocupic\SacEventToolBundle\Image\RotateImage');
+            $objRotateImage = $this->get('Markocupic\SacEventToolBundle\Image\RotateImage');
+
             $objFiles = FilesModel::findOneById($inputAdapter->get('fileId'));
             $objRotateImage->rotate($objFiles);
+
             $controllerAdapter->redirect($page->getFrontendUrl());
         }
 
         $this->projectDir = $this->getParameter('kernel.project_dir');
 
         // Call the parent method
-        return parent::__invoke($request, $model, $section, $classes, $page);
+        return parent::__invoke($request, $model, $section, $classes);
     }
 
     public static function getSubscribedServices(): array
@@ -111,6 +100,13 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         return $services;
     }
 
+    /**
+     * @param Template $template
+     * @param ModuleModel $model
+     * @param Request $request
+     * @return Response|null
+     * @throws \Exception
+     */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
         // Do not allow for not authorized users
@@ -120,12 +116,12 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
         $this->template = $template;
 
-        // Set adapters
-        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
 
         $this->template->objUser = $this->objUser;
 
-        $objUploadFolder = new Folder($configAdapter->get('SAC_EVT_FE_USER_AVATAR_DIRECTORY').'/'.$this->objUser->id);
+
+
+        $objUploadFolder = new Folder($this->getUploadDir());
 
         // Check for valid avatar image and valid upload directory
         $this->checkAvatar();
@@ -146,7 +142,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     /**
      * Add messages from session to template.
      */
-    protected function addMessagesToTemplate(): void
+    private function addMessagesToTemplate(): void
     {
         $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
         $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
@@ -168,16 +164,14 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     }
 
     /**
-     * Generate the avatar upload form.
-     *
-     * @return Form
+     * @return string
+     * @throws \Exception
      */
-    protected function generateAvatarForm()
+    private function generateAvatarForm(): string
     {
         // Set adapters
         $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
         $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
-        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
         $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
         $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
         $memberModelAdapter = $this->get('contao.framework')->getAdapter(MemberModel::class);
@@ -214,7 +208,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         ]);
 
         // Create the folder if it not exists
-        $objUploadFolder = new Folder($configAdapter->get('SAC_EVT_FE_USER_AVATAR_DIRECTORY').'/'.$this->objUser->id);
+        $objUploadFolder = new Folder($this->getUploadDir());
         $dbafsAdapter->addResource($objUploadFolder->path);
 
         $objWidget = $objForm->getWidget('avatar');
@@ -265,10 +259,11 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     /**
      * @throws \Exception
      */
-    protected function checkAvatar(): void
+    private function checkAvatar(): void
     {
+        $hasError = false;
+
         // Set adapters
-        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
         $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
 
         // Check for valid avatar
@@ -293,14 +288,24 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
                 if ($hasError) {
                     $this->objUser->avatar = '';
                     $this->objUser->save();
-                    $objUploadFolder = new Folder($configAdapter->get('SAC_EVT_FE_USER_AVATAR_DIRECTORY').'/'.$this->objUser->id);
 
-                    if (null !== $objUploadFolder) {
-                        $objUploadFolder->purge();
-                        $objUploadFolder->delete();
-                    }
+                    $objUploadFolder = new Folder($this->getUploadDir());
+                    $objUploadFolder->purge();
+                    $objUploadFolder->delete();
                 }
             }
         }
     }
+
+
+    private function getUploadDir(): string
+    {
+
+        return  sprintf(
+            '%s/%s',
+            $this->getParameter('sacevt.user.frontend.avatar_dir'),
+            (string)$this->objUser->id,
+        );
+
+}
 }
