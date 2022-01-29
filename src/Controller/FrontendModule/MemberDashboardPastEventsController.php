@@ -51,6 +51,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
     private ConvertFile $convertFile;
     private string $projectDir;
+    private string $tempDir;
 
     /**
      * @var FrontendUser
@@ -62,10 +63,11 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
      */
     private $template;
 
-    public function __construct(ConvertFile $convertFile, string $projectDir)
+    public function __construct(ConvertFile $convertFile, string $projectDir, string $tempDir)
     {
         $this->convertFile = $convertFile;
         $this->projectDir = $projectDir;
+        $this->tempDir = $tempDir;
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
@@ -211,10 +213,11 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
                     // Log
                     $systemAdapter->log(sprintf('New event confirmation download. SAC-User-ID: %s. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__.' Line: '.__LINE__, $configAdapter->get('SAC_EVT_LOG_EVENT_CONFIRMATION_DOWNLOAD'));
+
                     // Create phpWord instance
                     $filenamePattern = str_replace('%%s', '%s', $configAdapter->get('SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'));
                     $filename = sprintf($filenamePattern, $objMember->sacMemberId, $objRegistration->id, 'docx');
-                    $destFilename = $configAdapter->get('SAC_EVT_TEMP_PATH').'/'.$filename;
+                    $destFilename = $this->tempDir.'/'.$filename;
                     $objPhpWord = new MsWordTemplateProcessor($configAdapter->get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'), $destFilename);
 
                     // Replace template vars

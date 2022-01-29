@@ -56,6 +56,7 @@ services:
         arguments:
             - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
             - '%kernel.project_dir%'
+            - '%sacevt.temp_dir%'
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:

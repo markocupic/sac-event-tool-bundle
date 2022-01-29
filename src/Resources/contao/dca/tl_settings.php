@@ -30,11 +30,6 @@ PaletteManipulator::create()
     )
     // Fields
     ->addField(
-        ['SAC_EVT_TEMP_PATH'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
         ['SAC_EVT_AVATAR_MALE'],
         'sacEventTool_legend',
         PaletteManipulator::POSITION_APPEND
@@ -187,16 +182,6 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_DEFAULT_BACKEND_PASSWORD'] 
     'eval' => [
         'mandatory' => true,
         'decodeEntities' => true,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_TEMP_PATH'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_TEMP_PATH'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
         'tl_class' => 'w50',
     ],
 ];

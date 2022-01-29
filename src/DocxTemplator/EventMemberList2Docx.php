@@ -39,12 +39,14 @@ class EventMemberList2Docx
 {
     private ContaoFramework $framework;
     private ConvertFile $convertFile;
+    private string $tempDir;
     private string $projectDir;
 
-    public function __construct(ContaoFramework $framework, ConvertFile $convertFile, string $projectDir)
+    public function __construct(ContaoFramework $framework, ConvertFile $convertFile, string $tempDir, string $projectDir)
     {
         $this->framework = $framework;
         $this->convertFile = $convertFile;
+        $this->tempDir = $tempDir;
         $this->projectDir = $projectDir;
 
         // Initialize contao framework
@@ -94,7 +96,7 @@ class EventMemberList2Docx
 
         // Create phpWord instance
         $filenamePattern = str_replace('%%s', '%s', $configAdapter->get('SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'));
-        $destFile = $configAdapter->get('SAC_EVT_TEMP_PATH').'/'.sprintf($filenamePattern, time(), 'docx');
+        $destFile = $this->tempDir.'/'.sprintf($filenamePattern, time(), 'docx');
         $objPhpWord = new MsWordTemplateProcessor((string) $configAdapter->get('SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'), $destFile);
 
         // Get event data
@@ -108,8 +110,8 @@ class EventMemberList2Docx
         $objEventMemberHelper->setEventMemberData($objPhpWord, $objEvent, $objEventMember);
 
         // Create temporary folder, if it not exists.
-        new Folder($configAdapter->get('SAC_EVT_TEMP_PATH'));
-        $dbafsAdapter->addResource($configAdapter->get('SAC_EVT_TEMP_PATH'));
+        new Folder($this->tempDir);
+        $dbafsAdapter->addResource($this->tempDir);
 
         if ('pdf' === $outputType) {
             // Generate Docx file from template;
@@ -143,15 +145,13 @@ class EventMemberList2Docx
      */
     protected function deleteOldTempFiles(): void
     {
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
 
         // Delete tmp files older the 1 week
-        $arrScan = scan($this->projectDir.'/'.$configAdapter->get('SAC_EVT_TEMP_PATH'));
+        $arrScan = scan($this->projectDir.'/'.$this->tempDir);
 
         foreach ($arrScan as $file) {
-            if (is_file($this->projectDir.'/'.$configAdapter->get('SAC_EVT_TEMP_PATH').'/'.$file)) {
-                $objFile = new File($configAdapter->get('SAC_EVT_TEMP_PATH').'/'.$file);
+            if (is_file($this->projectDir.'/'.$this->tempDir.'/'.$file)) {
+                $objFile = new File($this->tempDir.'/'.$file);
 
                 if (null !== $objFile) {
                     if ((int) $objFile->mtime + 60 * 60 * 24 * 7 < time()) {

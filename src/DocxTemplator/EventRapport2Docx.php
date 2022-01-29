@@ -40,15 +40,18 @@ class EventRapport2Docx
     private ContaoFramework $framework;
     private ConvertFile $convertFile;
     private string $projectDir;
+    private string $tempDir;
 
     /**
      * EventRapport constructor.
      */
-    public function __construct(ContaoFramework $framework, ConvertFile $convertFile, string $projectDir)
+    public function __construct(ContaoFramework $framework, ConvertFile $convertFile, string $projectDir, string $tempDir)
     {
         $this->framework = $framework;
         $this->convertFile = $convertFile;
         $this->projectDir = $projectDir;
+        $this->tempDir = $tempDir;
+
 
         // Initialize contao framework
         $this->framework->initialize();
@@ -61,8 +64,6 @@ class EventRapport2Docx
     public function generate(string $type, CalendarEventsInstructorInvoiceModel $objEventInvoice, string $outputType, string $templateSRC, string $strFilenamePattern): void
     {
         // Set adapters
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
         /** @var CalendarEventsModel CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         /** @var UserModel $userModelAdapter */
@@ -102,7 +103,7 @@ class EventRapport2Docx
 
         if (null !== $objEvent && null !== $objBiller) {
             $filenamePattern = str_replace('%%s', '%s', $strFilenamePattern);
-            $destFilename = $configAdapter->get('SAC_EVT_TEMP_PATH').'/'.sprintf($filenamePattern, time(), 'docx');
+            $destFilename = $this->tempDir.'/'.sprintf($filenamePattern, time(), 'docx');
             $strTemplateSrc = (string) $templateSRC;
             $objPhpWord = new MsWordTemplateProcessor($strTemplateSrc, $destFilename);
 
@@ -121,8 +122,8 @@ class EventRapport2Docx
             }
 
             // Create temporary folder, if it not exists.
-            new Folder($configAdapter->get('SAC_EVT_TEMP_PATH'));
-            $dbafsAdapter->addResource($configAdapter->get('SAC_EVT_TEMP_PATH'));
+            new Folder($this->tempDir);
+            $dbafsAdapter->addResource($this->tempDir);
 
             if ('pdf' === $outputType) {
                 // Generate Docx file from template;
@@ -157,15 +158,12 @@ class EventRapport2Docx
      */
     protected function deleteOldTempFiles(): void
     {
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
         // Delete tmp files older the 1 week
-        $arrScan = scan($this->projectDir.'/'.$configAdapter->get('SAC_EVT_TEMP_PATH'));
+        $arrScan = scan($this->projectDir.'/'.$this->tempDir);
 
         foreach ($arrScan as $file) {
-            if (is_file($this->projectDir.'/'.$configAdapter->get('SAC_EVT_TEMP_PATH').'/'.$file)) {
-                $objFile = new File($configAdapter->get('SAC_EVT_TEMP_PATH').'/'.$file);
+            if (is_file($this->projectDir.'/'.$this->tempDir.'/'.$file)) {
+                $objFile = new File($this->tempDir.'/'.$file);
 
                 if (null !== $objFile) {
                     if ((int) $objFile->mtime + 60 * 60 * 24 * 7 < time()) {

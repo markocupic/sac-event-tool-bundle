@@ -68,6 +68,7 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.member_sync_credentials', $config['member_sync_credentials']);
         $container->setParameter($rootKey.'.event_admin_name', $config['event_admin_name']);
         $container->setParameter($rootKey.'.event_admin_email', $config['event_admin_email']);
+        $container->setParameter($rootKey.'.temp_dir', $config['temp_dir']);
 
         $this->merge($container);
     }

@@ -18,6 +18,7 @@ use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
 use Contao\Folder;
+use Contao\System;
 
 /**
  * Class InitializeSystemListener.
@@ -46,12 +47,12 @@ class InitializeSystemListener
         $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
         $configAdapter = $this->framework->getAdapter(Config::class);
 
-        // Check for the this directories
+        // Validate directories
         $arrDirectories = [
+            //System::getContainer()->getParameter('sacevt.temp_dir'),
             'SAC_EVT_FE_USER_DIRECTORY_ROOT',
             'SAC_EVT_FE_USER_AVATAR_DIRECTORY',
             'SAC_EVT_BE_USER_DIRECTORY_ROOT',
-            'SAC_EVT_TEMP_PATH',
             'SAC_EVT_EVENT_STORIES_UPLOAD_PATH',
         ];
 

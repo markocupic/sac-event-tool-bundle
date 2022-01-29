@@ -48,7 +48,8 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('event_admin_name')->cannotBeEmpty()->end()
                 // Event admin email
                 ->scalarNode('event_admin_email')->cannotBeEmpty()->end()
-
+                // Temp dir e.g system/tmp
+                ->scalarNode('temp_dir')->cannotBeEmpty()->end()
             ->end()
 
         ;

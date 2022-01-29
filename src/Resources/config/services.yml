@@ -30,6 +30,7 @@ services:
         arguments:
             - '@contao.framework'
             - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
+            - '%sacevt.temp_dir%'
             - '%kernel.project_dir%'
 
     # Generate docx/pdf event rapports and event invoices from docx templates
@@ -39,6 +40,7 @@ services:
             - '@contao.framework'
             - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
             - '%kernel.project_dir%'
+            - '%sacevt.temp_dir%'
 
     # Generate docx/pdf event rapports, event invoices and event memberlists from docx templates
     Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event:

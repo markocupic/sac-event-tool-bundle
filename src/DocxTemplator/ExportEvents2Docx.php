@@ -40,16 +40,16 @@ use PhpOffice\PhpWord\PhpWord;
 class ExportEvents2Docx
 {
     /**
-     * @var 
+     * @var
      */
     public static $strTable;
     /**
-     * @var 
+     * @var
      */
     public static $dca;
 
     /**
-     * @var 
+     * @var
      */
     public static $arrDatarecord;
 
@@ -63,6 +63,9 @@ class ExportEvents2Docx
     {
         // Get root dir
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+
+        // Get the temp dir
+        $tempDir = System::getContainer()->getParameter('kernel.temp_dir');
 
         self::$strTable = 'tl_calendar_events';
         Controller::loadDataContainer('tl_calendar_events');
@@ -184,11 +187,11 @@ class ExportEvents2Docx
         }
         // Saving the document as OOXML file...
         $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
-        new Folder(Config::get('SAC_EVT_TEMP_PATH'));
-        $objWriter->save($rootDir.'/'.Config::get('SAC_EVT_TEMP_PATH').'/sac-jahresprogramm.docx');
+        new Folder($tempDir);
+        $objWriter->save($rootDir.'/'.$tempDir.'/sac-jahresprogramm.docx');
         sleep(1);
 
-        $fileSRC = Config::get('SAC_EVT_TEMP_PATH').'/sac-jahresprogramm.docx';
+        $fileSRC = $tempDir.'/sac-jahresprogramm.docx';
         Controller::sendFileToBrowser($fileSRC, false);
     }
 
