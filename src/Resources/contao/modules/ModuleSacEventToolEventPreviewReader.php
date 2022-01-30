@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle;
 use Contao\BackendTemplate;
 use Contao\Calendar;
 use Contao\CalendarEventsModel;
+use Contao\CalendarModel;
 use Contao\Config;
 use Contao\ContentModel;
 use Contao\CoreBundle\Exception\PageNotFoundException;
@@ -26,8 +27,10 @@ use Contao\Events;
 use Contao\FilesModel;
 use Contao\FrontendTemplate;
 use Contao\Input;
+use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
+use Contao\UserModel;
 use Patchwork\Utf8;
 
 /**
@@ -44,10 +47,8 @@ class ModuleSacEventToolEventPreviewReader extends Events
 
     /**
      * Display a wildcard in the back end.
-     *
-     * @return string
      */
-    public function generate()
+    public function generate(): string
     {
         if (TL_MODE === 'BE') {
             /** @var BackendTemplate|object $objTemplate */
@@ -79,7 +80,7 @@ class ModuleSacEventToolEventPreviewReader extends Events
             $objEvent = CalendarEventsModel::findByIdOrAlias(Input::get('events'));
 
             if (null !== $objEvent) {
-                if ($objEvent->eventToken === $_GET['eventToken']) {
+                if ($objEvent->eventToken === Input::get('eventToken')) {
                     $blnShow = true;
                 }
             }
@@ -93,7 +94,8 @@ class ModuleSacEventToolEventPreviewReader extends Events
     }
 
     /**
-     * Generate the module.
+     * @return void
+     * @throws \Exception
      */
     protected function compile(): void
     {
@@ -121,8 +123,8 @@ class ModuleSacEventToolEventPreviewReader extends Events
             $objPage->description = $this->prepareMetaDescription($objEvent->teaser);
         }
 
-        $intStartTime = $objEvent->startTime;
-        $intEndTime = $objEvent->endTime;
+        $intStartTime = (int) $objEvent->startTime;
+        $intEndTime = (int) $objEvent->endTime;
         $span = Calendar::calculateSpan($intStartTime, $intEndTime);
 
         // Do not show dates in the past if the event is recurring (see #923)
@@ -148,7 +150,7 @@ class ModuleSacEventToolEventPreviewReader extends Events
         if ($objEvent->addTime) {
             if ($span > 0) {
                 $strDate = Date::parse($objPage->datimFormat, $intStartTime).$GLOBALS['TL_LANG']['MSC']['cal_timeSeparator'].Date::parse($objPage->datimFormat, $intEndTime);
-            } elseif ((int) $intStartTime === (int) $intEndTime) {
+            } elseif ($intStartTime === $intEndTime) {
                 $strTime = Date::parse($objPage->timeFormat, $intStartTime);
             } else {
                 $strTime = Date::parse($objPage->timeFormat, $intStartTime).$GLOBALS['TL_LANG']['MSC']['cal_timeSeparator'].Date::parse($objPage->timeFormat, $intEndTime);
@@ -178,7 +180,8 @@ class ModuleSacEventToolEventPreviewReader extends Events
 
         $objTemplate->date = $strDate;
         $objTemplate->time = $strTime;
-        $objTemplate->datetime = $objEvent->addTime ? date('Y-m-d\TH:i:sP', $intStartTime) : date('Y-m-d', $intStartTime);
+
+        $objTemplate->datetime = $objEvent->addTime ? date('Y-m-d\TH:i:sP',$intStartTime) : date('Y-m-d', $intStartTime);
         $objTemplate->begin = $intStartTime;
         $objTemplate->end = $intEndTime;
         $objTemplate->class = '' !== $objEvent->cssClass ? ' '.$objEvent->cssClass : '';
