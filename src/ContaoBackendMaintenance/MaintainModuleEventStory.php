@@ -37,12 +37,16 @@ class MaintainModuleEventStory
 
     private string $projectDir;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, ?LoggerInterface $logger, string $projectDir)
+    private string $eventStoryAssetDir;
+
+    public function __construct(ContaoFramework $framework, Connection $connection, string $projectDir, string $eventStoryAssetDir, ?LoggerInterface $logger)
     {
         $this->framework = $framework;
         $this->connection = $connection;
-        $this->logger = $logger;
         $this->projectDir = $projectDir;
+        $this->eventStoryAssetDir = $eventStoryAssetDir;
+        $this->logger = $logger;
+
     }
 
     /**
@@ -52,11 +56,6 @@ class MaintainModuleEventStory
      */
     public function run(): void
     {
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
-        // Get the image upload path
-        $eventStoriesUploadPath = $configAdapter->get('SAC_EVT_EVENT_STORIES_UPLOAD_PATH');
 
         $fs = new Filesystem();
 
@@ -64,7 +63,7 @@ class MaintainModuleEventStory
             ->directories()
             ->depth('< 1')
             ->notName('tmp')
-            ->in($this->projectDir.'/'.$eventStoriesUploadPath)
+            ->in($this->projectDir.'/'.$this->eventStoryAssetDir)
         ;
 
         if ($finder->hasResults()) {
@@ -87,8 +86,8 @@ class MaintainModuleEventStory
         }
 
         // Purge the tmp folder
-        if (is_dir($this->projectDir.'/'.$eventStoriesUploadPath.'/tmp')) {
-            $objFolder = new Folder($eventStoriesUploadPath.'/tmp');
+        if (is_dir($this->projectDir.'/'.$this->eventStoryAssetDir.'/tmp')) {
+            $objFolder = new Folder($this->eventStoryAssetDir.'/tmp');
             $objFolder->purge();
         }
     }

@@ -17,7 +17,6 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
-use Contao\Folder;
 
 /**
  * Class InitializeSystemListener.
@@ -43,24 +42,7 @@ class InitializeSystemListener
     public function preparePluginEnvironment(): void
     {
         // Set adapters
-        $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
         $configAdapter = $this->framework->getAdapter(Config::class);
-
-        // Validate directories
-        $arrDirectories = [
-            'SAC_EVT_EVENT_STORIES_UPLOAD_PATH',
-        ];
-
-        foreach ($arrDirectories as $strDir) {
-            // Check if directory path was set in system/localconfig.php
-            if (empty($configAdapter->get($strDir))) {
-                throw new \Exception(sprintf('%s is not set in system/localconfig.php. Please log into the Contao Backend and set the missing values in the backend-settings. Error in %s on Line: %s', $strDir, __METHOD__, __LINE__));
-            }
-
-            // Create directory
-            $this->framework->createInstance(Folder::class, [$configAdapter->get($strDir)]);
-            $dbafsAdapter->addResource($configAdapter->get($strDir));
-        }
 
         // Check for other system vars in system/localconfig.php
         $arrConfig = [

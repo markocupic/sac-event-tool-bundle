@@ -56,17 +56,17 @@ class JahresprogrammExportController extends AbstractPrintExportController
     protected $template;
 
     /**
-     * @var 
+     * @var
      */
     protected $startDate;
 
     /**
-     * @var 
+     * @var
      */
     protected $endDate;
 
     /**
-     * @var 
+     * @var
      */
     protected $organizer;
 
@@ -76,7 +76,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
     protected $eventType;
 
     /**
-     * @var 
+     * @var
      */
     protected $eventReleaseLevel;
 
@@ -100,7 +100,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
         $this->model = $model;
 
         // Call the parent method
-        return parent::__invoke($request, $model, $section, $classes, $page);
+        return parent::__invoke($request, $model, $section, $classes);
     }
 
     public static function getSubscribedServices(): array

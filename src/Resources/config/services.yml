@@ -21,8 +21,9 @@ services:
         arguments:
             - '@contao.framework'
             - '@database_connection'
-            - '@monolog.logger.contao'
             - '%kernel.project_dir%'
+            - '%sacevt.event.story.asset_dir%'
+            - '@monolog.logger.contao'
 
     # Generate docx/pdf event memberlists from docx templates
     Markocupic\SacEventToolBundle\DocxTemplator\EventMemberList2Docx:

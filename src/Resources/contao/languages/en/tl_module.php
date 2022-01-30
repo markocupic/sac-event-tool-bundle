@@ -27,7 +27,6 @@ $GLOBALS['TL_LANG']['tl_module']['eventStoryJumpTo'] = ['Event-Bericht Reader', 
 $GLOBALS['TL_LANG']['tl_module']['eventStoryFormJumpTo'] = ['Seite mit Tourenbericht Erfassungsformular', 'Bitte geben Sie hier die Seite mit dem Tourenbericht-Erfassungs-Modul an.'];
 $GLOBALS['TL_LANG']['tl_module']['eventStoryMaxImageWidth'] = ['Maximale Bildbreite in Pixeln', 'Legen Sie die maximale Bildbreite fest. Grössere Bilder werden beim Upload automatisch verkleinert.'];
 $GLOBALS['TL_LANG']['tl_module']['eventStoryMaxImageHeight'] = ['Maximale Bildhöhe in Pixeln', 'Legen Sie die maximale Bildhöhe fest. Grössere Bilder werden beim Upload automatisch verkleinert.'];
-$GLOBALS['TL_LANG']['tl_module']['eventStoryUploadFolder'] = ['Event-Bericht Uploadverzeichnis', 'Bitte geben Sie das Upload-Verzeichnis für die Bilder an.'];
 $GLOBALS['TL_LANG']['tl_module']['notifyOnEventStoryPublishedNotificationId'] = ['Benachrichtigung bei neu erstelltem Event-Bericht', ''];
 $GLOBALS['TL_LANG']['tl_module']['eventType'] = ['Event Art', 'Legen Sie fest welche Event-Arten angezeigt werden sollen.'];
 $GLOBALS['TL_LANG']['tl_module']['eventFilterBoardFields'] = ['Event-Filter-Felder', 'Legen Sie hier die Felder fest, die im Filter angezeigt werden sollen.'];

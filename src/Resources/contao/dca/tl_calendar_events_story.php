@@ -246,11 +246,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
         'multiSRC' => [
             'inputType' => 'fileTree',
             'eval' => [
-                'path' => Config::get(
-                    'SAC_EVT_EVENT_STORIES_UPLOAD_PATH'
-                ).'/'.Input::get(
-                    'id'
-                ),
+                'path' => \Contao\System::getContainer()->getParameter('sacevt.event.story.asset_dir').'/'.Input::get('id'),
                 'doNotCopy' => true,
                 'isGallery' => true,
                 'extensions' => 'jpg,jpeg',

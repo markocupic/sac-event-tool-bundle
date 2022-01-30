@@ -190,7 +190,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $this->mainInstructorModel = $userModelAdapter->findByPk($this->eventModel->mainInstructor);
 
         // Call the parent method
-        return parent::__invoke($request, $model, $section, $classes, $page);
+        return parent::__invoke($request, $model, $section, $classes);
     }
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response

@@ -83,7 +83,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         }
 
         // Call the parent method
-        return parent::__invoke($request, $model, $section, $classes, $page);
+        return parent::__invoke($request, $model, $section, $classes);
     }
 
     public static function getSubscribedServices(): array

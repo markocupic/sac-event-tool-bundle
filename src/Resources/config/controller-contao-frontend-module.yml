@@ -80,6 +80,7 @@ services:
             - '@translator'
             - '@security.helper'
             - '%kernel.project_dir%'
+            - '%sacevt.event.story.asset_dir%'
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:

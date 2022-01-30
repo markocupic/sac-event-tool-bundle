@@ -55,7 +55,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     protected $model;
 
     /**
-     * @var 
+     * @var
      */
     protected $objForm;
 
@@ -132,7 +132,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
         }
 
         // Call the parent method
-        return parent::__invoke($request, $model, $section, $classes, $page);
+        return parent::__invoke($request, $model, $section, $classes);
     }
 
     public static function getSubscribedServices(): array

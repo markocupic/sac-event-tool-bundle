@@ -77,6 +77,19 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                // Backend and frontend users
+                ->arrayNode('event')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('story')
+                        ->addDefaultsIfNotSet()
+                        ->children()
+                            ->scalarNode('asset_dir')->defaultValue('files/sac_pilatus/events/tourenberichte')->end()
+                        ->end()
+                    ->end()
+                ->end()
+
+
             ->end()
         ;
 
