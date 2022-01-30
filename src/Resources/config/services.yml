@@ -62,6 +62,7 @@ services:
         arguments:
             - '@contao.framework'
             - '%kernel.project_dir%'
+            - '%sacevt.user.frontend.avatar_dir%'
 
     # Generate backend users home directory / remove old backend user home directories
     Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory:
