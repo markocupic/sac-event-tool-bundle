@@ -32,9 +32,7 @@ class Configuration implements ConfigurationInterface
                 // Section ids [4250,4251,4252,4253,4254]
                 ->arrayNode('section_ids')
                     ->scalarPrototype()
-                        ->info('Get section ids at the Zentralstelle in Bern.')
-                        ->cannotBeEmpty()
-                    ->end()
+                    ->info('Get section ids at the Zentralstelle in Bern.')->cannotBeEmpty()->end()
                 ->end()
                 // Member database sync Zentralverband Bern
                 ->arrayNode('member_sync_credentials')
@@ -72,12 +70,12 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->scalarNode('home_dir')->defaultValue('files/sac_pilatus/fe_user_home_directories')->end()
-                                ->scalarNode('avatar_dir')->defaultValue('files/sac_pilatus/fe_user_home_directories/avatars')->end()
+                            ->scalarNode('avatar_dir')->defaultValue('files/sac_pilatus/fe_user_home_directories/avatars')->end()
                             ->end()
                         ->end()
                     ->end()
                 ->end()
-                // Backend and frontend users
+                // Events
                 ->arrayNode('event')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -88,7 +86,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-
 
             ->end()
         ;
