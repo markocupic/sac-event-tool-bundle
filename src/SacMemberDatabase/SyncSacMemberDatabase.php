@@ -16,11 +16,17 @@ namespace Markocupic\SacEventToolBundle\SacMemberDatabase;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\Database;
 use Contao\File;
+use Contao\FrontendUser;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ConnectionException;
+use Doctrine\DBAL\Driver\Exception;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Safe\Exceptions\StringsException;
+use function Safe\sprintf;
+use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 
 /**
  * Class SyncSacMemberDatabase.
@@ -44,6 +50,10 @@ class SyncSacMemberDatabase
 
     private ContaoFramework $framework;
 
+    private Connection $connection;
+
+    private EncoderFactory $encoderFactory;
+
     private array $credentials;
 
     private array $sectionIds;
@@ -58,9 +68,11 @@ class SyncSacMemberDatabase
 
     private ?string $ftp_password;
 
-    public function __construct(ContaoFramework $framework, array $credentials, array $sectionIds, string $projectDir, LoggerInterface $logger = null)
+    public function __construct(ContaoFramework $framework, Connection $connection, EncoderFactory $encoderFactory, array $credentials, array $sectionIds, string $projectDir, LoggerInterface $logger = null)
     {
         $this->framework = $framework;
+        $this->connection = $connection;
+        $this->encoderFactory = $encoderFactory;
         $this->credentials = $credentials;
         $this->sectionIds = $sectionIds;
         $this->projectDir = $projectDir;
@@ -68,8 +80,10 @@ class SyncSacMemberDatabase
     }
 
     /**
-     * @return void
-     * @throws \Exception
+     * @throws ConnectionException
+     * @throws Exception
+     * @throws StringsException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function run(): void
     {
@@ -79,9 +93,65 @@ class SyncSacMemberDatabase
     }
 
     /**
-     * @return void
+     * @throws ConnectionException
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
+     * @throws StringsException
      */
-    private function prepare(): void{
+    public function setPassword(int $limit = 10): int
+    {
+        if (!$limit) {
+            return $limit;
+        }
+
+        $count = 0;
+
+        // Handle correctly LOCK TABLES with transactions: https://dev.mysql.com/doc/refman/8.0/en/lock-tables.html
+        $this->connection->executeQuery('SET autocommit=0');
+        $this->connection->executeQuery('LOCK TABLES tl_member WRITE');
+
+        $this->connection->beginTransaction();
+
+        try {
+            // Set a password if there isn't one.
+            $strUpd = sprintf(
+                'SELECT id FROM tl_member WHERE password = ? LIMIT 0,%s',
+                (string) $limit,
+            );
+
+            $stmt = $this->connection->executeQuery($strUpd, ['']);
+
+            while (false !== ($id = $stmt->fetchOne())) {
+                $password = $this->encoderFactory
+                    ->getEncoder(FrontendUser::class)
+                    ->encodePassword(uniqid(), null)
+                ;
+
+                $set = ['password' => $password];
+
+                if ($this->connection->update('tl_member', $set, ['id' => $id])) {
+                    ++$count;
+                }
+            }
+
+            $this->connection->commit();
+
+            $this->connection->executeQuery('UNLOCK TABLES');
+
+        } catch (\Exception $e) {
+            $this->connection->rollBack();
+
+            // Rollback does not release tables
+            $this->connection->executeQuery('UNLOCK TABLES');
+
+            throw $e;
+        }
+
+        return $count;
+    }
+
+    private function prepare(): void
+    {
         $this->framework->initialize();
         $this->ftp_hostname = (string) $this->credentials['hostname'];
         $this->ftp_username = (string) $this->credentials['username'];
@@ -89,7 +159,6 @@ class SyncSacMemberDatabase
     }
 
     /**
-     * @return void
      * @throws \Exception
      */
     private function fetchFilesFromFtp(): void
@@ -139,26 +208,20 @@ class SyncSacMemberDatabase
     /**
      * Sync tl_member with Navision db dump.
      *
-     * @throws \Exception
+     * @throws ConnectionException
+     * @throws Exception
+     * @throws StringsException
+     * @throws \Doctrine\DBAL\Exception
      */
     private function syncContaoDatabase(): void
     {
         $startTime = time();
-        $arrMemberIDS = [];
 
-        $stmt1 = Database::getInstance()->execute('SELECT sacMemberId FROM tl_member');
+        // All users members & non members
+        $arrMemberIDS = $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member');
 
-        if ($stmt1->numRows) {
-            $arrMemberIDS = $stmt1->fetchEach('sacMemberId');
-        }
-
-        $arrDisabledMemberIDS = [];
-
-        $stmt2 = Database::getInstance()->prepare('SELECT sacMemberId FROM tl_member WHERE isSacMember = ?')->execute('');
-
-        if ($stmt2->numRows) {
-            $arrDisabledMemberIDS = $stmt2->fetchEach('sacMemberId');
-        }
+        // Members only
+        $arrDisabledMemberIDS = $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member WHERE isSacMember = ?', ['']);
 
         // Valid/active members
         $arrSacMemberIds = [];
@@ -242,19 +305,16 @@ class SyncSacMemberDatabase
             @ini_set('memory_limit', '-1');
         }
 
+        // Handle correctly LOCK TABLES with transactions: https://dev.mysql.com/doc/refman/8.0/en/lock-tables.html
+        $this->connection->executeQuery('SET autocommit=0');
+        $this->connection->executeQuery('LOCK TABLES tl_member WRITE');
+
+        // Start transaction (big thank to cyon.ch)
+        $this->connection->beginTransaction();
+
         try {
-            // Lock table tl_member for writing
-            Database::getInstance()->lockTables(['tl_member' => 'WRITE']);
-
-            // Start transaction (big thank to cyon.ch)
-            Database::getInstance()->beginTransaction();
-
             // Set tl_member.isSacMember && tl_member.disable to false for all entries
-            $set = [
-                'disable' => '',
-                'isSacMember' => '',
-            ];
-            Database::getInstance()->prepare('UPDATE tl_member %s')->set($set)->execute();
+            $this->connection->executeStatement('UPDATE tl_member SET disable = ?, isSacMember = ?', ['', '']);
 
             $countInserts = 0;
 
@@ -270,26 +330,25 @@ class SyncSacMemberDatabase
                     $arrValues['tstamp'] = time();
 
                     // Insert new member
-                    $objInsertStmt = Database::getInstance()
-                        ->prepare('INSERT INTO tl_member %s')
-                        ->set($arrValues)
-                        ->execute()
-                    ;
-
-                    if ($objInsertStmt->affectedRows) {
+                    if ($this->connection->insert('tl_member', $arrValues)) {
                         // Log
                         $msg = sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
+
                         $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER);
                         ++$countInserts;
                     }
                 } else {
                     // Update/sync data record
-                    $objUpdateStmt = Database::getInstance()->prepare('UPDATE tl_member %s WHERE sacMemberId = ?')->set($arrValues)->execute($sacMemberId);
+                    if ($this->connection->update('tl_member', $arrValues, ['sacMemberId' => $sacMemberId])) {
+                        $set = [
+                            'tstamp' => time(),
+                        ];
 
-                    if ($objUpdateStmt->affectedRows) {
-                        Database::getInstance()->prepare('UPDATE tl_member SET tstamp = ? WHERE sacMemberId = ?')->execute(time(), $sacMemberId);
+                        $this->connection->update('tl_member', $set, ['sacMemberId' => $sacMemberId]);
+
                         $msg = sprintf('Update SAC-member "%s %s" with SAC-User-ID: %s in tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
                         $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_UPDATE_NEW_MEMBER);
+
                         ++$countUpdates;
                     }
                 }
@@ -297,57 +356,63 @@ class SyncSacMemberDatabase
                 ++$i;
             }
 
-            // Reset sacMemberId to true, if member exists in the downloaded database dump
-            $set = [
-                'isSacMember' => '1',
-                'disable' => '',
-                'login' => '1',
-            ];
-
             if (!empty($arrSacMemberIds)) {
-                Database::getInstance()
-                    ->prepare('UPDATE tl_member %s WHERE sacMemberId IN ('.implode(',', $arrSacMemberIds).')')
-                    ->set($set)
+                $qb = $this->connection->createQueryBuilder();
+                $qb->update('tl_member', 'm')
+                    ->add('where', $qb->expr()->in('m.sacMemberId', ':arr_sac_member_ids'))
+                    ->setParameter('arr_sac_member_ids', $arrSacMemberIds, Connection::PARAM_INT_ARRAY)
+
+                    // Reset sacMemberId to true, if member exists in the downloaded database dump
+                    ->set('m.isSacMember', ':isSacMember')
+                    ->set('m.disable', ':disable')
+                    ->set('m.login', ':login')
+                    ->setParameter('isSacMember', '1')
+                    ->setParameter('disable', '')
+                    ->setParameter('login', '1')
                     ->execute()
                 ;
             }
 
-            Database::getInstance()->commitTransaction();
+            $this->connection->commit();
+            $this->connection->executeQuery('UNLOCK TABLES');
         } catch (\Exception $e) {
             $msg = 'Error during the database sync process. Starting transaction rollback now.';
             $this->log(LogLevel::CRITICAL, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_TRANSACTION_ERROR);
 
             // Transaction rollback
-            Database::getInstance()->rollbackTransaction();
+            $this->connection->rollBack();
 
-            // Unlock tables
-            Database::getInstance()->unlockTables();
+            // Rollback does not release tables
+            $this->connection->executeQuery('UNLOCK TABLES');
 
             // Throw exception
             throw $e;
         }
 
         // Set tl_member.disable to true if member was not found in the csv-file (is no more a valid SAC member)
-        $objDisabledMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE isSacMember = ?')->execute('');
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember = ?', ['']);
 
-        while ($objDisabledMember->next()) {
-            $arrSet = [
+        while (false !== ($rowDisabledMember = $stmt->fetchAssociative())) {
+            $set = [
                 'tstamp' => time(),
                 'disable' => '1',
                 'isSacMember' => '',
                 'login' => '',
             ];
 
-            Database::getInstance()->prepare('UPDATE tl_member %s WHERE id = ?')->set($arrSet)->execute($objDisabledMember->id);
+            $id = $rowDisabledMember['id'];
 
-            // Log if disable user
-            if (!\in_array($objDisabledMember->sacMemberId, $arrDisabledMemberIDS, false)) {
+            $this->connection->update('tl_member', $set, ['id' => $id]);
+
+            // Log if user has been disabled
+            if (!\in_array($rowDisabledMember['sacMemberId'], $arrDisabledMemberIDS, false)) {
                 $msg = sprintf(
                     'Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. Could not find the user in the SAC main database from Bern.',
-                    $objDisabledMember->firstname,
-                    $objDisabledMember->lastname,
-                    $objDisabledMember->sacMemberId
+                    $rowDisabledMember['firstname'],
+                    $rowDisabledMember['lastname'],
+                    $rowDisabledMember['sacMemberId']
                 );
+
                 $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_DISABLE_MEMBER);
             }
         }
@@ -363,17 +428,14 @@ class SyncSacMemberDatabase
                 $countUpdates,
                 $duration
             );
+
             $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_SUCCESS);
         }
+
+        // Set password if there isn't one
+        $this->setPassword();
     }
 
-    /**
-     * @param string $strLogLevel
-     * @param string $strText
-     * @param string $strMethod
-     * @param string $strCategory
-     * @return void
-     */
     private function log(string $strLogLevel, string $strText, string $strMethod, string $strCategory): void
     {
         if (null !== $this->logger) {

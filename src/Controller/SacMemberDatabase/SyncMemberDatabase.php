@@ -53,8 +53,16 @@ class SyncMemberDatabase extends AbstractController
      */
     public function syncDatabaseAction(): JsonResponse
     {
+        // Run database sync
         $this->syncSacMemberDatabase->run();
-        $arrJson = ['message' => 'Successfully executed the db sync.'];
+
+        // Set password if there isn't one.
+        $count = $this->syncSacMemberDatabase->setPassword(200);
+
+        $arrJson = [
+            'message' => 'Successfully executed the db sync.',
+            'password updates' => (string) $count,
+        ];
 
         return new JsonResponse($arrJson);
     }
