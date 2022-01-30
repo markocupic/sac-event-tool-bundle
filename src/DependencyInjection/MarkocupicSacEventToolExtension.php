@@ -75,7 +75,11 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.user.frontend.home_dir', $config['user']['frontend']['home_dir']);
         $container->setParameter($rootKey.'.user.frontend.avatar_dir', $config['user']['frontend']['avatar_dir']);
         $container->setParameter($rootKey.'.event.story.asset_dir', $config['event']['story']['asset_dir']);
-
+        $container->setParameter($rootKey.'.event.template.tour_rapport', $config['event']['template']['tour_rapport']);
+        $container->setParameter($rootKey.'.event.template.course_confirmation', $config['event']['template']['course_confirmation']);
+        $container->setParameter($rootKey.'.event.tour_invoice_file_name_pattern', $config['event']['tour_invoice_file_name_pattern']);
+        $container->setParameter($rootKey.'.event.tour_rapport_file_name_pattern', $config['event']['tour_rapport_file_name_pattern']);
+        $container->setParameter($rootKey.'.event.course_confirmation_file_name_pattern', $config['event']['course_confirmation_file_name_pattern']);
         $this->merge($container);
     }
 

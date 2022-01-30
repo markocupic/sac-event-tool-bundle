@@ -51,24 +51,26 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
     public const TYPE = 'member_dashboard_past_events';
 
     private ConvertFile $convertFile;
+
     private string $projectDir;
+
     private string $tempDir;
 
-    /**
-     * @var FrontendUser
-     */
-    private $objUser;
+    private string $eventTemplateCourseConfirmation;
 
-    /**
-     * @var Template
-     */
-    private $template;
+    private string $eventCourseConfirmationFileNamePattern;
 
-    public function __construct(ConvertFile $convertFile, string $projectDir, string $tempDir)
+    private ?FrontendUser $objUser;
+
+    private ?Template $template;
+
+    public function __construct(ConvertFile $convertFile, string $projectDir, string $tempDir, string $eventTemplateCourseConfirmation, string $eventCourseConfirmationFileNamePattern)
     {
         $this->convertFile = $convertFile;
         $this->projectDir = $projectDir;
         $this->tempDir = $tempDir;
+        $this->eventTemplateCourseConfirmation = $eventTemplateCourseConfirmation;
+        $this->eventCourseConfirmationFileNamePattern = $eventCourseConfirmationFileNamePattern;
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
@@ -176,7 +178,6 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
         $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
         $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
-        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
 
         if (null !== $this->objUser) {
             $objRegistration = $calendarEventsMemberModelAdapter->findByPk($inputAdapter->get('id'));
@@ -216,10 +217,10 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     $systemAdapter->log(sprintf('New event confirmation download. SAC-User-ID: %s. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__.' Line: '.__LINE__, Log::DOWNLOAD_CERTIFICATE_OF_ATTENDANCE);
 
                     // Create phpWord instance
-                    $filenamePattern = str_replace('%%s', '%s', $configAdapter->get('SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'));
+                    $filenamePattern = str_replace('%%s', '%s', $this->eventCourseConfirmationFileNamePattern);
                     $filename = sprintf($filenamePattern, $objMember->sacMemberId, $objRegistration->id, 'docx');
                     $destFilename = $this->tempDir.'/'.$filename;
-                    $objPhpWord = new MsWordTemplateProcessor($configAdapter->get('SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'), $destFilename);
+                    $objPhpWord = new MsWordTemplateProcessor($this->eventTemplateCourseConfirmation, $destFilename);
 
                     // Replace template vars
                     $objPhpWord->replace('eventDates', implode(', ', $arrDates));

@@ -80,13 +80,28 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('story')
-                        ->addDefaultsIfNotSet()
-                        ->children()
-                            ->scalarNode('asset_dir')->defaultValue('files/sac_pilatus/events/tourenberichte')->end()
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('asset_dir')->defaultValue('files/sac_pilatus/events/tourenberichte')->end()
+                            ->end()
                         ->end()
+                        ->arrayNode('template')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                // Event tour rapport template
+                                ->scalarNode('tour_rapport')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/docx/event_rapport_tour.docx')->end()
+                                // Event course confirmation template
+                                ->scalarNode('course_confirmation')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/docx/course_confirmation.docx')->end()
+                            ->end()
+                        ->end()
+                        // Event tour invoice file name pattern
+                        ->scalarNode('tour_invoice_file_name_pattern')->defaultValue('SAC_Sektion_Pilatus_Verguetungsformular-%%s.%%s')->end()
+                        // Event tour rapport file name pattern
+                        ->scalarNode('tour_rapport_file_name_pattern')->defaultValue('SAC_Sektion_Pilatus_Tour-Rapport-%%s.%%s')->end()
+                        // Event course confirmation file name pattern
+                        ->scalarNode('course_confirmation_file_name_pattern')->defaultValue('SAC_Sektion_Pilatus_Kursbestaetigung-%%s-regId-%%s.%%s')->end()
                     ->end()
                 ->end()
-
             ->end()
         ;
 

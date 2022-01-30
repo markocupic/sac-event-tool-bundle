@@ -7,3 +7,15 @@ services:
             - '@database_connection'
             - '@translator'
             - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory'
+
+    Markocupic\SacEventToolBundle\DataContainer\CalendarEventsInstructorInvoice:
+        arguments:
+            - '@contao.framework'
+            - '@request_stack'
+            - '@database_connection'
+            - '@translator'
+            - '@security.helper'
+            - '@Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx'
+            - '%sacevt.event.template.tour_rapport%'
+            - '%sacevt.event.tour_invoice_file_name_pattern%'
+            - '%sacevt.event.tour_rapport_file_name_pattern%'

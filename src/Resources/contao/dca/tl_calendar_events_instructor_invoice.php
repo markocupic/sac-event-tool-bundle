@@ -22,24 +22,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
         'switchToEdit' => true,
-        'onload_callback' => [
-            [
-                TlCalendarEventsInstructorInvoice::class,
-                'checkAccesRights',
-            ],
-            [
-                TlCalendarEventsInstructorInvoice::class,
-                'routeActions',
-            ],
-            [
-                TlCalendarEventsInstructorInvoice::class,
-                'warnIfReportFormHasNotFilledIn',
-            ],
-            [
-                TlCalendarEventsInstructorInvoice::class,
-                'reviseTable',
-            ],
-        ],
         'sql' => [
             'keys' => [
                 'pid' => 'index',
@@ -48,15 +30,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
         ],
     ],
 
-    // Buttons callback
-    'edit' => [
-        'buttons_callback' => [
-            [
-                TlCalendarEventsInstructorInvoice::class,
-                'buttonsCallback',
-            ],
-        ],
-    ],
 
     'list' => [
         'sorting' => [
@@ -65,10 +38,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
             'panelLayout' => 'filter;search,limit',
             'headerFields' => ['title'],
             'disableGrouping' => true,
-            'child_record_callback' => [
-                TlCalendarEventsInstructorInvoice::class,
-                'listInvoices',
-            ],
         ],
         'label' => [
             'fields' => ['pid'],
@@ -182,12 +151,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['iban'],
             'exclude' => true,
             'inputType' => 'text',
-            'load_callback' => [
-                [
-                    TlCalendarEventsInstructorInvoice::class,
-                    'getIbanFromUser',
-                ],
-            ],
             'eval' => [
                 'mandatory' => true,
                 'maxlength' => 34,

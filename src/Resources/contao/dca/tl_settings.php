@@ -44,42 +44,12 @@ PaletteManipulator::create()
         PaletteManipulator::POSITION_APPEND
     )
     ->addField(
-        ['SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
         ['SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'],
         'sacEventTool_legend',
         PaletteManipulator::POSITION_APPEND
     )
     ->addField(
-        ['SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_EVENT_RAPPORT_TOUR_TEMPLATE_SRC'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
         ['SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_EVENT_TOUR_RAPPORT_FILE_NAME_PATTERN'],
         'sacEventTool_legend',
         PaletteManipulator::POSITION_APPEND
     )
@@ -145,26 +115,6 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_ASSETS_DIR'] = [
     ],
 ];
 
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_COURSE_CONFIRMATION_TEMPLATE_SRC'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_COURSE_CONFIRMATION_FILE_NAME_PATTERN'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'w50',
-    ],
-];
-
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'],
     'inputType' => 'text',
@@ -175,48 +125,8 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME
     ],
 ];
 
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_EVENT_TOUR_INVOICE_TEMPLATE_SRC'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_RAPPORT_TOUR_TEMPLATE_SRC'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_EVENT_RAPPORT_TOUR_TEMPLATE_SRC'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'w50',
-    ],
-];
-
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_EVENT_TOUR_INVOICE_FILE_NAME_PATTERN'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_TOUR_RAPPORT_FILE_NAME_PATTERN'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_EVENT_TOUR_RAPPORT_FILE_NAME_PATTERN'],
     'inputType' => 'text',
     'eval' => [
         'mandatory' => true,

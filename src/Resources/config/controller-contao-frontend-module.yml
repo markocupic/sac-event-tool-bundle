@@ -57,6 +57,8 @@ services:
             - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
             - '%kernel.project_dir%'
             - '%sacevt.temp_dir%'
+            - '%sacevt.event.template.course_confirmation%'
+            - '%sacevt.event.course_confirmation_file_name_pattern%'
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:

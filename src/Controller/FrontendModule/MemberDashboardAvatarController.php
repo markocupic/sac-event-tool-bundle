@@ -80,8 +80,6 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
         }
 
         $this->projectDir = $this->getParameter('kernel.project_dir');
-        $this->requestStack = $this->getParameter('kernel.project_dir');
-        $this->requestStack = $this->getParameter('kernel.project_dir');
 
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
@@ -111,10 +109,11 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
     {
         $src = getAvatar($this->objUser->id, 'FE');
 
-        if (!empty($src)) {
-            $objFile = FilesModel::findByPath($src);
 
-            if (null !== $objFile && is_file($this->projectDir.'/'.$objFile->path)) {
+
+        if (!empty($src)) {
+
+            if (is_file($this->projectDir.'/'.$src)) {
                 $size = StringUtil::deserialize($model->imgSize);
 
                 if (is_numeric($size)) {
@@ -124,14 +123,17 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
                         $size = [];
                     }
 
+
                     $size += [0, 0, 'crop'];
                 }
+
+
 
                 // If picture
                 if (isset($size[2]) && is_numeric($size[2])) {
                     $template->image = Controller::replaceInsertTags(sprintf(
                         '{{picture::%s?size=%s&alt=%s&class=%s}}',
-                        $objFile->path,
+                        $src,
                         $size[2],
                         $this->objUser->firstname.' '.$this->objUser->lastname,
                         $model->imageClass
@@ -139,7 +141,7 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
                 } else { // If image
                     $template->image = Controller::replaceInsertTags(sprintf(
                         '{{image::%s?width=%s&height=%s&mode=%s&alt=%s&class=%s}}',
-                        $objFile->path,
+                        $src,
                         $size[0],
                         $size[1],
                         $size[2],

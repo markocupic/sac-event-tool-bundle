@@ -19,27 +19,27 @@ class Log
     /**
      * MEMBER_DATABASE_SYNC: Log type for a successful sync.
      */
-    public const MEMBER_DATABASE_SYNC_SUCCESS = 'MEMBER_DATABASE_SYNC_SUCCESS';
+    public const MEMBER_DATABASE_SYNC_SUCCESS = 'MEMBER_DB_SYNC_SUCCESS';
 
     /**
      * MEMBER_DATABASE_SYNC: Log type if there has been a db transaction error.
      */
-    public const MEMBER_DATABASE_SYNC_TRANSACTION_ERROR = 'MEMBER_DATABASE_SYNC_TRANSACTION_ERROR';
+    public const MEMBER_DATABASE_SYNC_TRANSACTION_ERROR = 'MEMBER_DB_SYNC_TRANSACTION_ERROR';
 
     /**
      * MEMBER_DATABASE_SYNC: Log type when a new member has been inserted.
      */
-    public const MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER = 'MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER';
+    public const MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER = 'MEMBER_DB_SYNC_INSERT_NEW';
 
     /**
      * MEMBER_DATABASE_SYNC: Log type when a new member has been updated.
      */
-    public const MEMBER_DATABASE_SYNC_UPDATE_NEW_MEMBER = 'MEMBER_DATABASE_SYNC_UPDATE_MEMBER';
+    public const MEMBER_DATABASE_SYNC_UPDATE_NEW_MEMBER = 'MEMBER_DB_SYNC_UPDATE';
 
     /**
      * MEMBER_DATABASE_SYNC: Log type when a new member has been disabled.
      */
-    public const MEMBER_DATABASE_SYNC_DISABLE_MEMBER = 'MEMBER_DATABASE_SYNC_DISABLE_MEMBER';
+    public const MEMBER_DATABASE_SYNC_DISABLE_MEMBER = 'MEMBER_DB_SYNC_DISABLE_MEMBER';
 
     /**
      * MEMBER_WITH_USER_SYNC: Log type when tl_member has been synced with tl_user.
@@ -70,5 +70,4 @@ class Log
      * DOWNLOAD: Log type if a user has downloaded the workshop booklet.
      */
     public const DOWNLOAD_WORKSHOP_BOOKLET = 'DOWNLOAD_WORKSHOP_BOOKLET';
-
 }
