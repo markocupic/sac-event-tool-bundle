@@ -39,6 +39,7 @@ class CalendarEventsInstructorInvoice
     private TranslatorInterface $translator;
     private Security $security;
     private EventRapport2Docx $eventRapport2Docx;
+    private string $eventTemplateTourInvoice;
     private string $eventTemplateTourRapport;
     private string $eventTourInvoiceFileNamePattern;
     private string $eventTourRapportFileNamePattern;
@@ -46,7 +47,7 @@ class CalendarEventsInstructorInvoice
     /**
      * Import the back end user object.
      */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, Security $security, EventRapport2Docx $eventRapport2Docx, string $eventTemplateTourRapport, string $eventTourInvoiceFileNamePattern, string $eventTourRapportFileNamePattern)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, Security $security, EventRapport2Docx $eventRapport2Docx, string $eventTemplateTourInvoice, string $eventTemplateTourRapport, string $eventTourInvoiceFileNamePattern, string $eventTourRapportFileNamePattern)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
@@ -54,6 +55,7 @@ class CalendarEventsInstructorInvoice
         $this->translator = $translator;
         $this->security = $security;
         $this->eventRapport2Docx = $eventRapport2Docx;
+        $this->eventTemplateTourInvoice = $eventTemplateTourInvoice;
         $this->eventTemplateTourRapport = $eventTemplateTourRapport;
         $this->eventTourInvoiceFileNamePattern = $eventTourInvoiceFileNamePattern;
         $this->eventTourRapportFileNamePattern = $eventTourRapportFileNamePattern;
@@ -158,11 +160,11 @@ class CalendarEventsInstructorInvoice
             $objTemplator = $this->eventRapport2Docx;
 
             if ('generateInvoiceDocx' === $request->query->get('action')) {
-                $objTemplator->generate('invoice', $objEventInvoice, 'docx', $this->eventTemplateTourRapport,  $this->eventTourInvoiceFileNamePattern);
+                $objTemplator->generate('invoice', $objEventInvoice, 'docx', $this->eventTemplateTourInvoice,  $this->eventTourInvoiceFileNamePattern);
             }
 
             if ('generateInvoicePdf' === $request->query->get('action')) {
-                $objTemplator->generate('invoice', $objEventInvoice, 'pdf', $this->eventTemplateTourRapport,  $this->eventTourInvoiceFileNamePattern);
+                $objTemplator->generate('invoice', $objEventInvoice, 'pdf', $this->eventTemplateTourInvoice,  $this->eventTourInvoiceFileNamePattern);
             }
 
             if ('generateTourRapportDocx' === $request->query->get('action')) {

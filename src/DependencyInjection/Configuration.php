@@ -88,6 +88,8 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('template')
                             ->addDefaultsIfNotSet()
                             ->children()
+                                // Event tour invoice template
+                                ->scalarNode('tour_invoice')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/docx/event_invoice_tour.docx')->end()
                                 // Event tour rapport template
                                 ->scalarNode('tour_rapport')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/docx/event_rapport_tour.docx')->end()
                                 // Event course confirmation template

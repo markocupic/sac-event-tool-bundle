@@ -70,8 +70,7 @@ class EventMemberList2Docx
         /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
 
-        // Delete old tmp files
-        $this->deleteOldTempFiles();
+
 
         $objEventMember = $calendarEventsMemberModelAdapter->findBy(
             [
@@ -135,24 +134,5 @@ class EventMemberList2Docx
         exit();
     }
 
-    /**
-     * @throws \Exception
-     */
-    protected function deleteOldTempFiles(): void
-    {
-        // Delete tmp files older the 1 week
-        $arrScan = scan($this->projectDir.'/'.$this->tempDir);
 
-        foreach ($arrScan as $file) {
-            if (is_file($this->projectDir.'/'.$this->tempDir.'/'.$file)) {
-                $objFile = new File($this->tempDir.'/'.$file);
-
-                if (null !== $objFile) {
-                    if ((int) $objFile->mtime + 60 * 60 * 24 * 7 < time()) {
-                        $objFile->delete();
-                    }
-                }
-            }
-        }
-    }
 }
