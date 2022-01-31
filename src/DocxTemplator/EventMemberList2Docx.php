@@ -21,7 +21,6 @@ use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
 use Contao\File;
-use Contao\Folder;
 use Contao\Message;
 use Contao\System;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
@@ -59,15 +58,15 @@ class EventMemberList2Docx
      */
     public function generate(CalendarEventsModel $objEvent, string $outputType = 'docx'): void
     {
-        // Set adapters
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
+
         /** @var Message $messageAdapter */
         $messageAdapter = $this->framework->getAdapter(Message::class);
+
         /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        /** @var Dbafs $dbafsAdapter */
-        $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
+
         /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
 
@@ -109,14 +108,10 @@ class EventMemberList2Docx
         $objEventMemberHelper = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember');
         $objEventMemberHelper->setEventMemberData($objPhpWord, $objEvent, $objEventMember);
 
-        // Create temporary folder, if it not exists.
-        new Folder($this->tempDir);
-        $dbafsAdapter->addResource($this->tempDir);
-
         if ('pdf' === $outputType) {
             // Generate Docx file from template;
             $objPhpWord->generateUncached(true)
-                ->sendToBrowser(false)
+                ->sendToBrowser(false, true)
                 ->generate()
             ;
 
@@ -145,7 +140,6 @@ class EventMemberList2Docx
      */
     protected function deleteOldTempFiles(): void
     {
-
         // Delete tmp files older the 1 week
         $arrScan = scan($this->projectDir.'/'.$this->tempDir);
 

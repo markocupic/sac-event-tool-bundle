@@ -39,6 +39,7 @@ use Haste\Form\Form;
 use League\Csv\CharsetConverter;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use NotificationCenter\Model\Notification;
 
@@ -751,7 +752,7 @@ class TlCalendarEventsMember extends Backend
     public function addIcon($row, $label, DataContainer $dc, $args)
     {
         $icon = 'icons/'.$row['stateOfSubscription'].'.svg';
-        $args[0] = sprintf('<div><img src="%s/%s" alt="%s" width="16" height=16"></div>', Config::get('SAC_EVT_ASSETS_DIR'), $icon, $row['stateOfSubscription']);
+        $args[0] = sprintf('<div><img src="%s/%s" alt="%s" width="16" height=16"></div>', Bundle::ASSET_DIR, $icon, $row['stateOfSubscription']);
 
         return $args;
     }

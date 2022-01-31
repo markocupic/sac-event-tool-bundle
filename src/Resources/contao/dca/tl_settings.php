@@ -39,22 +39,12 @@ PaletteManipulator::create()
         PaletteManipulator::POSITION_APPEND
     )
     ->addField(
-        ['SAC_EVT_ASSETS_DIR'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
         ['SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'],
         'sacEventTool_legend',
         PaletteManipulator::POSITION_APPEND
     )
     ->addField(
         ['SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'],
         'sacEventTool_legend',
         PaletteManipulator::POSITION_APPEND
     )
@@ -105,16 +95,6 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_WORKSHOP_FLYER_SRC'] = [
     ],
 ];
 
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_ASSETS_DIR'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_ASSETS_DIR'],
-    'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'w50',
-    ],
-];
-
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'],
     'inputType' => 'text',
@@ -142,18 +122,6 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_WORKSHOP_FLYER_COVER_BACKGR
         'mandatory' => true,
         'decodeEntities' => false,
         'tl_class' => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_settings']['SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'],
-    'inputType' => 'textarea',
-    'eval' => [
-        'mandatory' => true,
-        'preserveTags' => true,
-        'allowHtml' => true,
-        'decodeEntities' => false,
-        'tl_class' => 'clr',
     ],
 ];
 

@@ -47,7 +47,7 @@ class Configuration implements ConfigurationInterface
                 // Event admin email
                 ->scalarNode('event_admin_email')->cannotBeEmpty()->end()
                 // Temp dir e.g system/tmp
-                ->scalarNode('temp_dir')->cannotBeEmpty()->end()
+                ->scalarNode('temp_dir')->defaultValue('system/tmp')->cannotBeEmpty()->end()
                 // Avatars
                 ->arrayNode('avatar')
                     ->addDefaultsIfNotSet()
@@ -100,6 +100,12 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('tour_rapport_file_name_pattern')->defaultValue('SAC_Sektion_Pilatus_Tour-Rapport-%%s.%%s')->end()
                         // Event course confirmation file name pattern
                         ->scalarNode('course_confirmation_file_name_pattern')->defaultValue('SAC_Sektion_Pilatus_Kursbestaetigung-%%s-regId-%%s.%%s')->end()
+                        // Default email text for accepting registrations
+                        ->scalarNode('accept_registration_email_body')
+                            ->cannotBeEmpty()
+                            ->info('Default email text for accepting registrations in the Contao backend')
+                            ->defaultValue('Hallo ##participantFirstname## ##participantLastname##{{br}}{{br}}Ich freue mich, dir mitzuteilen, dass du für den Anlass "##eventName##" vom ##eventDates## definitiv angemeldet bist.{{br}}Bitte antworte nicht auf diese E-Mail. Kontaktiere mich bei Rückfragen unter folgender E-Mail-Adresse: ##instructorEmail##.{{br}}{{br}}Liebe Grüsse{{br}}{{br}}##instructorFirstname## ##instructorLastname##{{br}}{{br}}##instructorStreet##{{br}}##instructorPostal## ##instructorCity##{{br}}##instructorPhone##{{br}}##instructorMobile##{{br}}{{br}}{{br}}--------------------------------{{br}}"##eventName##" vom ##eventDates##{{br}}##eventUrl##')
+                        ->end()
                     ->end()
                 ->end()
             ->end()

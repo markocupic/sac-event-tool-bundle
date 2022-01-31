@@ -541,7 +541,7 @@ class TlCalendarEvents extends \tl_calendar_events
             $objEventsModel->instructor = serialize([['instructorId' => $this->User->id]]);
 
             // Set customEventRegistrationConfirmationEmailText
-            $objEventsModel->customEventRegistrationConfirmationEmailText = str_replace('{{br}}', "\n", Config::get('SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'));
+            $objEventsModel->customEventRegistrationConfirmationEmailText = str_replace('{{br}}', "\n", System::getContainer()->getParameter('sacevt.event.accept_registration_email_body'));
 
             $objEventsModel->save();
         }

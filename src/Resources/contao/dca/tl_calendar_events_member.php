@@ -15,6 +15,7 @@ declare(strict_types=1);
 use Contao\Config;
 use Contao\Input;
 use Contao\System;
+use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Dca\TlCalendarEventsMember;
 use Ramsey\Uuid\Uuid;
 
@@ -185,15 +186,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                     'options' => [
                         [
                             'value' => '',
-                            'icon' => Config::get(
-                                'SAC_EVT_ASSETS_DIR'
-                            ).'/icons/has-not-participated.svg',
+                            'icon' => Bundle::ASSET_DIR.'/icons/has-not-participated.svg',
                         ],
                         [
                             'value' => '1',
-                            'icon' => Config::get(
-                                'SAC_EVT_ASSETS_DIR'
-                            ).'/icons/has-participated.svg',
+                            'icon' => Bundle::ASSET_DIR.'/icons/has-participated.svg',
                         ],
                     ],
                 ],

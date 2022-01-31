@@ -26,6 +26,7 @@ use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\Renderer\ListRenderer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\Bundle;
 
 /**
  * Class ParseBackendTemplateListener.
@@ -59,7 +60,6 @@ class ParseBackendTemplateListener
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $configAdapter = $this->framework->getAdapter(Config::class);
 
         if ('be_main' === $strTemplate) {
             // Add icon explanation legend to tl_calendar_events_member
@@ -100,7 +100,7 @@ class ParseBackendTemplateListener
                         $arrStates = $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields']['stateOfSubscription']['options'];
 
                         foreach ($arrStates as $state) {
-                            $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', $configAdapter->get('SAC_EVT_ASSETS_DIR'), $state, $GLOBALS['TL_LANG']['tl_calendar_events_member'][$state]);
+                            $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Bundle::ASSET_DIR, $state, $GLOBALS['TL_LANG']['tl_calendar_events_member'][$state]);
                         }
                         $strLegend .= '</ul>';
                         $strLegend .= '</div>';
@@ -108,8 +108,8 @@ class ParseBackendTemplateListener
                         $strLegend .= '<div class="participation-state-legend">';
                         $strLegend .= '<h3>Teilnahmestatus <span style="color:red">(Erst nach der Event-Durchf&uuml;hrung auszuf&uuml;llen!)</span></h3>';
                         $strLegend .= '<ul>';
-                        $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', $configAdapter->get('SAC_EVT_ASSETS_DIR'), 'has-not-participated', 'Hat am Event nicht/noch nicht teilgenommen');
-                        $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', $configAdapter->get('SAC_EVT_ASSETS_DIR'), 'has-participated', 'Hat am Event teilgenommen');
+                        $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Bundle::ASSET_DIR, 'has-not-participated', 'Hat am Event nicht/noch nicht teilgenommen');
+                        $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Bundle::ASSET_DIR, 'has-participated', 'Hat am Event teilgenommen');
                         $strLegend .= '</ul>';
                         $strLegend .= '</div>';
 

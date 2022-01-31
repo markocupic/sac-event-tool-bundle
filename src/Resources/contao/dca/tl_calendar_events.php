@@ -1633,13 +1633,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customizeEventRegistrationCo
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfirmationEmailText'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'],
     'exclude' => true,
-    'default' => str_replace(
-        '{{br}}',
-        "\n",
-        Config::get(
-            'SAC_EVT_ACCEPT_REGISTRATION_EMAIL_TEXT'
-        )
-    ),
     'inputType' => 'textarea',
     'eval' => [
         'tl_class' => 'clr m12',

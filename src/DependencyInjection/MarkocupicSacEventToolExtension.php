@@ -80,6 +80,9 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.event.tour_invoice_file_name_pattern', $config['event']['tour_invoice_file_name_pattern']);
         $container->setParameter($rootKey.'.event.tour_rapport_file_name_pattern', $config['event']['tour_rapport_file_name_pattern']);
         $container->setParameter($rootKey.'.event.course_confirmation_file_name_pattern', $config['event']['course_confirmation_file_name_pattern']);
+        $container->setParameter($rootKey.'.event.accept_registration_email_body', $config['event']['accept_registration_email_body']);
+
+
         $this->merge($container);
     }
 

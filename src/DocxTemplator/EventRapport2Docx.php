@@ -16,12 +16,9 @@ namespace Markocupic\SacEventToolBundle\DocxTemplator;
 
 use Contao\CalendarEventsInstructorInvoiceModel;
 use Contao\CalendarEventsModel;
-use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Dbafs;
-use Contao\File;
-use Contao\Folder;
 use Contao\Message;
 use Contao\System;
 use Contao\UserModel;
@@ -52,7 +49,6 @@ class EventRapport2Docx
         $this->projectDir = $projectDir;
         $this->tempDir = $tempDir;
 
-
         // Initialize contao framework
         $this->framework->initialize();
     }
@@ -72,8 +68,6 @@ class EventRapport2Docx
         $messageAdapter = $this->framework->getAdapter(Message::class);
         /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        /** @var Dbafs $dbafsAdapter */
-        $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
 
         /** @var Event $objEventHelper */
         $objEventHelper = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event');
@@ -83,9 +77,6 @@ class EventRapport2Docx
 
         /** @var CalendarEventsModel $objEvent */
         $objEvent = $calendarEventsModelAdapter->findByPk($objEventInvoice->pid);
-
-        // Delete old tmp files
-        $this->deleteOldTempFiles();
 
         if (!$objEventHelper->checkEventRapportHasFilledInCorrectly($objEventInvoice)) {
             $messageAdapter->addError('Bitte f&uuml;llen Sie den Touren-Rapport vollst&auml;ndig aus, bevor Sie das Verg&uuml;tungsformular herunterladen.');
@@ -104,8 +95,8 @@ class EventRapport2Docx
         if (null !== $objEvent && null !== $objBiller) {
             $filenamePattern = str_replace('%%s', '%s', $strFilenamePattern);
             $destFilename = $this->tempDir.'/'.sprintf($filenamePattern, time(), 'docx');
-            $strTemplateSrc = (string) $templateSRC;
-            $objPhpWord = new MsWordTemplateProcessor($strTemplateSrc, $destFilename);
+
+            $objPhpWord = new MsWordTemplateProcessor($templateSRC, $destFilename);
 
             // Page #1
             // Tour rapport
@@ -120,10 +111,6 @@ class EventRapport2Docx
             if ('rapport' === $type) {
                 $objEventMemberHelper->setEventMemberData($objPhpWord, $objEvent, $objEventMemberHelper->getParticipatedEventMembers($objEvent));
             }
-
-            // Create temporary folder, if it not exists.
-            new Folder($this->tempDir);
-            $dbafsAdapter->addResource($this->tempDir);
 
             if ('pdf' === $outputType) {
                 // Generate Docx file from template;
@@ -144,33 +131,12 @@ class EventRapport2Docx
             if ('docx' === $outputType) {
                 // Generate Docx file from template;
                 $objPhpWord->generateUncached(true)
-                    ->sendToBrowser(true)
+                    ->sendToBrowser(true, false)
                     ->generate()
                 ;
             }
 
-            exit();
-        }
-    }
-
-    /**
-     * @throws \Exception
-     */
-    protected function deleteOldTempFiles(): void
-    {
-        // Delete tmp files older the 1 week
-        $arrScan = scan($this->projectDir.'/'.$this->tempDir);
-
-        foreach ($arrScan as $file) {
-            if (is_file($this->projectDir.'/'.$this->tempDir.'/'.$file)) {
-                $objFile = new File($this->tempDir.'/'.$file);
-
-                if (null !== $objFile) {
-                    if ((int) $objFile->mtime + 60 * 60 * 24 * 7 < time()) {
-                        $objFile->delete();
-                    }
-                }
-            }
+            throw new \Exception(sprintf('Invalid output Type "%s"', $outputType));
         }
     }
 }
