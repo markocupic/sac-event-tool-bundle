@@ -45,7 +45,7 @@
     <?php if ($this->bookingLimitReaches): ?>
     <div class="alert alert-info" role="alert">
       <i class="fas fa-info-circle"></i>
-      <div><?= $this->trans('FORM.evt_reg_bookingLimitReaches') ?></div>
+      <div><?= $this->trans('ERR.evt_reg_bookingLimitReaches') ?></div>
     </div>
     <?php endif; ?>
 
