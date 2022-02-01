@@ -30,6 +30,7 @@ $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_4'] = 'Event abgesag
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_5'] = 'Anmelden noch nicht möglich!';
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_6'] = 'Event verschoben!';
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_7'] = 'Keine Online-Anmeldung möglich!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_8'] = 'Max. Teilnehmerzahl erreicht. Anmeldung auf Warteliste möglich.';
 
 // Export table vendor\markocupic\sac-export-table-custom\src\Listener\ContaoHooks\ExportTableSacEventListener.php
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_fully_booked'] = 'Event ausgebucht!';

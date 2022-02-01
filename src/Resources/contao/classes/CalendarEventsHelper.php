@@ -385,9 +385,14 @@ class CalendarEventsHelper
             return 'event_status_6';
         }
 
-        // Event is fully booked
-        if ('event_fully_booked' === $objEvent->eventState || ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers)) {
+        // Event is fully booked/instructor has explicitly set the "is fully booked" label in the backend
+        if ('event_fully_booked' === $objEvent->eventState) {
             return 'event_status_3'; // fa-circle red
+        }
+
+        // Max participant number reached -> waiting list still possible
+        if ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers) {
+            return 'event_status_8'; // fa-circle red
         }
 
         // Event is over or booking is no more possible
