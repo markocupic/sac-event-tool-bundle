@@ -8,13 +8,16 @@
   <h4 class="event-state-headline mb-0"><?= $this->getEventData('eventStateLabel') ?></h4>
   <?php endif; ?>
 
+  <!-- indexer::continue -->
   <h1 class="ce_headline"><?= $this->getEventData('title') ?></h1>
+  <!-- indexer::stop -->
   <?php if ('lastMinuteTour' === $this->getEventData('eventType')): ?>
   <h4 class="ce_headline last-minute-tour">Last minute tour (Spontantour)</h4>
   <?php endif; ?>
 
   <div class="row gx-5">
     <!-- Col left -->
+    <!-- indexer::continue -->
     <div class="col-lg-6">
       <?php if ('' != $this->getEventData('teaser')): ?>
       <div class="teaser event-detail fs-6 mb-3 font-family-serif">
@@ -26,6 +29,7 @@
         <div class="event-detail event-info-box organizer-logo mb-4">
           <?= $this->getEventData('eventOrganizerLogos') ?>
         </div>
+        <!-- indexer::stop -->
 
         <div class="organizers event-detail event-info-box icon-box-small">
           <h5>Organisierende Gruppe</h5>
@@ -57,12 +61,15 @@
         <?php if ('' != $this->getEventData('location')): ?>
         <div class="location event-detail event-info-box icon-box-small">
           <h5>Veranstaltungsort</h5>
+          <!-- indexer::continue -->
           <p><?= $this->getEventData('location') ?></p>
+          <!-- indexer::stop -->
         </div>
         <?php endif; ?>
       </div>
 
       <div class="p-4 mt-3 mb-3 bg-white">
+        <!-- indexer::continue -->
         <div class="instructor event-detail event-info-box icon-box-small">
           <h5>Leitung/Betreuung</h5>
         </div>
@@ -73,6 +80,7 @@
         <?php else: ?>
         Leiter wurde gel&ouml;scht.
         <?php endif; ?>
+        <!-- indexer::stop -->
 
         <?php if ('' != $this->getEventData('leistungen')): ?>
         <div class="price event-detail event-info-box icon-box-small">
@@ -131,8 +139,10 @@
 
       <?php if ('' != $this->getEventData('tourType')): ?>
       <div class="tour-type event-detail event-info-box icon-box-small">
+        <!-- indexer::continue -->
         <h5>Touren-Typ</h5>
-        <p><?= $this->getEventData('tourTypesTitles') ?></p>
+        <p><?= $this->getEventData('tourTypesTitles') ?>
+        <!-- indexer::stop -->
       </div>
       <?php endif; ?>
 
@@ -140,43 +150,50 @@
       $this->getEventData('eventType')): ?>
       <?php if ($this->getEventData('suitableForBeginners')): ?>
       <div class="suitableForBeginners event-detail event-info-box icon-box-small">
+        <!-- indexer::continue -->
         <h5>F&uuml;r Anf&auml;nger geeignet</h5>
         <p>Ideale Tour f&uuml;r Einsteiger</p>
+        <!-- indexer::stop -->
       </div>
       <?php endif; ?>
 
       <?php endif; ?>
       <?php if ('' != $this->getEventData('requirements')): ?>
+      <!-- indexer::continue -->
       <div class="requirements event-detail event-info-box icon-box-small">
         <h5>Voraussetzungen/Anforderungen</h5>
         <p class="requirements-text"><?= nl2br($this->getEventData('requirements')) ?></p>
       </div>
+      <!-- indexer::stop -->
       <?php endif; ?>
 
       <?php if ('tour' === $this->getEventData('eventType') && '' != $this->getEventData('tourDetailText')): ?>
       <div class="tour-detail-text event-detail event-info-box icon-box-small">
+        <!-- indexer::continue -->
         <h5>Route/Details</h5>
         <p>
           <?= nl2br($this->getEventData('tourDetailText')) ?>
         </p>
+        <!-- indexer::stop -->
       </div>
       <?php endif; ?>
 
       <?php if ('generalEvent' === $this->getEventData('eventType') && '' !=
       $this->getEventData('generalEventDetailText')): ?>
       <div class="general-event-detail-text event-detail event-info-box icon-box-small">
+        <!-- indexer::continue -->
         <h5>Details</h5>
         <p>
           <?= nl2br($this->getEventData('generalEventDetailText')) ?>
         </p>
+        <!-- indexer::stop -->
       </div>
       <?php endif; ?>
 
       <?php if ('tour' === $this->getEventData('eventType')): ?>
       <div class="tour-difficulties event-detail event-info-box icon-box-small">
         <h5>Schwierigkeit</h5>
-        <p><?= implode(', ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($this->
-          getEventData('model'))) ?></p>
+        <p><?= implode(', ', Markocupic\SacEventToolBundle\CalendarEventsHelper::getTourTechDifficultiesAsArray($this->getEventData('model'))) ?></p>
       </div>
       <?php endif; ?>
 

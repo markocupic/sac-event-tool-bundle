@@ -1,27 +1,30 @@
 <?php Markocupic\SacEventToolBundle\CalendarEventsHelper::addEventDataToTemplate($this); ?>
 
 <!-- indexer::stop -->
-<p class="back m-0"><a href="javascript:history.go(-1)" title="Zur&uuml;ck">Zur&uuml;ck</a></p>
+<p class="back m-0"><a href="javascript:history.go(-1)" title="Zurück">Zur&uuml;ck</a></p>
 <div class="event event-detailview layout_full block<?= $this->getEventData('class') ?>">
 
   <?php if ($this->getEventData('eventState')): ?>
   <h4 class="event-state-headline mb-0"><?= $this->getEventData('eventStateLabel') ?></h4>
   <?php endif; ?>
 
+  <!-- indexer::continue -->
   <h1 class="ce_headline"><?= $this->getEventData('title') ?></h1>
+  <!-- indexer::stop -->
 
   <div class="row gx-5">
     <div class="col-md-6 col-lg-3 mt-3 mb-3">
-      {{picture::<?= $this->getEventData('eventImagePath') ?>?class=img-fluid&size=20&alt=<?= $this->
-      getEventData('title') ?>}}
+      {{picture::<?= $this->getEventData('eventImagePath') ?>?class=img-fluid&size=20&alt=<?= $this->getEventData('title') ?>}}
     </div>
 
     <div class="col-md-6 col-lg-9 mt-3 mb-3"><!--begin col left -->
       <div class="p-4 bg-white">
         <?php if ('' != $this->getEventData('teaser')): ?>
+        <!-- indexer::continue -->
         <div class="teaser event-detail fs-6 mb-4 font-family-serif">
           <p><?= nl2br($this->getEventData('teaser')) ?></p>
         </div>
+        <!-- indexer::stop -->
         <?php endif; ?>
 
         <?php if ('' != $this->getEventData('courseId')): ?>
@@ -47,8 +50,11 @@
 
         <?php if ('' != $this->getEventData('location')): ?>
         <div class="location event-detail event-info-box icon-box-small">
+          <!-- indexer::continue -->
           <h5>Kursort</h5>
           <p><?= $this->getEventData('location') ?></p>
+          <!-- indexer::stop -->
+
         </div>
         <?php endif; ?>
 
@@ -97,22 +103,28 @@
       <div class="m-0">
         <?php if ('' != $this->getEventData('issues')): ?>
         <div class="topics event-detail event-info-box icon-box-small">
+          <!-- indexer::continue -->
           <h5>Kursinhalte</h5>
           <p><?= nl2br($this->getEventData('issues')) ?></p>
+          <!-- indexer::stop -->
         </div>
         <?php endif; ?>
 
         <?php if ('' != $this->getEventData('terms')): ?>
         <div class="terms event-detail event-info-box icon-box-small">
+          <!-- indexer::continue -->
           <h5>Kursziele</h5>
           <p><?= nl2br($this->getEventData('terms')) ?></p>
+          <!-- indexer::stop -->
         </div>
         <?php endif; ?>
 
         <?php if ('' != $this->getEventData('requirements')): ?>
         <div class="qualifications event-detail event-info-box icon-box-small">
+          <!-- indexer::continue -->
           <h5>Voraussetzungen</h5>
           <p><?= nl2br($this->getEventData('requirements')) ?></p>
+          <!-- indexer::stop -->
         </div>
         <?php endif; ?>
 
@@ -128,10 +140,12 @@
     <div class="col-md-6 mt-3 mb-3"><!--begin col right-->
       <div class="bg-white p-4" style="background-color:#eee">
         <div class="instructor event-detail event-info-box icon-box-small">
+          <!-- indexer::continue -->
           <h5>Kursleitung</h5>
           <div class="row gx-2 gy-1">
             <?= $this->getEventData('instructorContactBoxes') ?>
           </div>
+          <!-- indexer::stop -->
         </div>
 
         <?php if ($this->getEventData('setRegistrationPeriod')): ?>
