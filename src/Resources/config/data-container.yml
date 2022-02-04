@@ -28,3 +28,10 @@ services:
     Markocupic\SacEventToolBundle\DataContainer\Calendar:
         arguments:
             - '@Markocupic\SacEventToolBundle\DataContainer\Util'
+
+    Markocupic\SacEventToolBundle\DataContainer\CalendarContainer:
+        arguments:
+            - '@request_stack'
+            - '@database_connection'
+            - '@Markocupic\SacEventToolBundle\DataContainer\Util'
+            - '@security.helper'

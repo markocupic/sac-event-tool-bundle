@@ -12,8 +12,6 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Markocupic\SacEventToolBundle\Dca\TlCalendarContainer;
-
 $GLOBALS['TL_DCA']['tl_calendar_container'] = [
     // Config
     'config' => [
@@ -21,12 +19,6 @@ $GLOBALS['TL_DCA']['tl_calendar_container'] = [
         'ctable' => ['tl_calendar'],
         'switchToEdit' => true,
         'enableVersioning' => true,
-        'onload_callback' => [
-            [
-                TlCalendarContainer::class,
-                'checkPermission',
-            ],
-        ],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
@@ -64,29 +56,17 @@ $GLOBALS['TL_DCA']['tl_calendar_container'] = [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['editheader'],
                 'href' => 'act=edit',
                 'icon' => 'header.svg',
-                'button_callback' => [
-                    TlCalendarContainer::class,
-                    'editHeader',
-                ],
             ],
             'copy' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.svg',
-                'button_callback' => [
-                    TlCalendarContainer::class,
-                    'copyCalendarContainer',
-                ],
             ],
             'delete' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
-                'button_callback' => [
-                    TlCalendarContainer::class,
-                    'deleteCalendarContainer',
-                ],
             ],
             'show' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['show'],
@@ -95,17 +75,10 @@ $GLOBALS['TL_DCA']['tl_calendar_container'] = [
             ],
         ],
     ],
-
-    // Palettes
     'palettes' => [
         '__selector__' => [],
         'default' => '{title_legend},title',
     ],
-
-    // Subpalettes
-    'subpalettes' => [],
-
-    // Fields
     'fields' => [
         'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',

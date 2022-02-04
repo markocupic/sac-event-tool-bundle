@@ -243,27 +243,21 @@ PaletteManipulator::create()
 
 // Global operations
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year'] = [
-    'label' => &$GLOBALS['TL_LANG']['MSC']['plus1year'],
     'href' => 'transformDates=+52weeks',
     'class' => 'global_op_icon_class',
-    //'class'      => 'header_icon',
     'icon' => 'bundles/markocupicsaceventtool/icons/calendar-plus.svg',
     'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'].'\'))return false;Backend.getScrollOffset()" accesskey="e"',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year'] = [
-    'label' => &$GLOBALS['TL_LANG']['MSC']['minus1year'],
     'href' => 'transformDates=-52weeks',
     'class' => 'global_op_icon_class',
-    //'class'      => 'header_icon',
     'icon' => 'bundles/markocupicsaceventtool/icons/calendar-minus.svg',
     'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'].'\'))return false;Backend.getScrollOffset()" accesskey="e"',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
-    'label' => &$GLOBALS['TL_LANG']['MSC']['onloadCallbackExportCalendar'],
     'href' => 'action=onloadCallbackExportCalendar',
-    //'class'      => 'global_op_icon_class',
     'class' => 'header_icon',
     'icon' => 'bundles/markocupicsaceventtool/icons/excel.svg',
     'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
@@ -271,7 +265,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCal
 
 // Operations
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['toggle'],
     'icon' => 'visible.svg',
     'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
     'button_callback' => [
@@ -281,13 +274,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrations'],
     'href' => 'table=tl_calendar_events_member',
     'icon' => 'bundles/markocupicsaceventtool/icons/group.png',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelPrev'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelPrev'],
     'href' => 'action=releaseLevelPrev',
     'icon' => 'bundles/markocupicsaceventtool/icons/arrow_down.png',
     'button_callback' => [
@@ -297,7 +288,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelPrev
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelNext'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelNext'],
     'href' => 'action=releaseLevelNext',
     'icon' => 'bundles/markocupicsaceventtool/icons/arrow_up.png',
     'button_callback' => [
@@ -311,6 +301,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['delete']['button
     TlCalendarEvents::class,
     'deleteIcon',
 ];
+
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['copy']['button_callback'] = [
     TlCalendarEvents::class,
     'copyIcon',
@@ -321,6 +312,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['alias']['input_field_callbac
     TlCalendarEvents::class,
     'showFieldValue',
 ];
+
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['alias']['eval']['tl_class'] = 'clr';
 
 // title
@@ -343,7 +335,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['maxlength'
 
 // minMembers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseId'],
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
@@ -358,7 +349,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventToken'] = [
 
 // suitableForBeginners
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['suitableForBeginners'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['suitableForBeginners'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
@@ -367,7 +357,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['suitableForBeginners'] = [
 
 // isRecurringEvent
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['isRecurringEvent'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['isRecurringEvent'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
@@ -376,7 +365,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['isRecurringEvent'] = [
 
 // eventType
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventType'],
     'reference' => &$GLOBALS['TL_LANG']['MSC'],
     'exclude' => true,
     'filter' => true,
@@ -397,7 +385,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = [
 
 // mountainguide
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mountainguide'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
@@ -406,7 +393,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mountainguide'] = [
 
 // Hauptleiter (main instructor) is set automatically (the first instructor in the list is set as "Hauptleiter"
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mainInstructor'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['mainInstructor'],
     'exclude' => true,
     'search' => true,
     'filter' => true,
@@ -421,7 +407,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mainInstructor'] = [
 
 // Instructor
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructor'],
     'exclude' => true,
     'search' => true,
     'inputType' => 'multiColumnWizard',
@@ -453,7 +438,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
 
 // Terms/Ziele
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['terms'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['terms'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['tl_class' => 'clr m12', 'mandatory' => true],
@@ -462,7 +446,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['terms'] = [
 
 // issues
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['issues'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['issues'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['tl_class' => 'clr m12', 'mandatory' => true],
@@ -471,7 +454,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['issues'] = [
 
 // requirements
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['requirements'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['requirements'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['tl_class' => 'clr m12', 'mandatory' => true, 'maxlength' => 300],
@@ -480,7 +462,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['requirements'] = [
 
 // leistungen
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['leistungen'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['leistungen'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['tl_class' => 'clr m12', 'mandatory' => false, 'maxlength' => 200],
@@ -489,7 +470,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['leistungen'] = [
 
 // courseLevel
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseLevel'],
     'exclude' => true,
     'search' => true,
     'filter' => true,
@@ -501,7 +481,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel'] = [
 
 // Course Type Level_0
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseTypeLevel0'],
     'exclude' => true,
     'search' => true,
     'filter' => true,
@@ -516,7 +495,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0'] = [
 
 // Course Type Level_1
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['courseTypeLevel1'],
     'exclude' => true,
     'search' => true,
     'filter' => true,
@@ -533,7 +511,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1'] = [
 
 // organizers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['organizers'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['organizers'],
     'exclude' => true,
     'search' => true,
     'filter' => true,
@@ -549,7 +526,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['organizers'] = [
 
 // equipment
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['equipment'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['equipment'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
@@ -558,7 +534,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['equipment'] = [
 
 // durationInfo
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'],
     'search' => true,
     'filter' => true,
     'exclude' => true,
@@ -573,7 +548,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = [
 
 // Add minimum an maximum members
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addMinAndMaxMembers'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['addMinAndMaxMembers'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
@@ -583,7 +557,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addMinAndMaxMembers'] = [
 
 // minMembers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['minMembers'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['minMembers'],
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
@@ -593,7 +566,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['minMembers'] = [
 
 // maxMembers
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['maxMembers'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['maxMembers'],
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
@@ -603,7 +575,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['maxMembers'] = [
 
 // bookingEvent
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['bookingEvent'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['bookingEvent'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
@@ -612,7 +583,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['bookingEvent'] = [
 
 // miscellaneous
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['miscellaneous'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['miscellaneous'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
@@ -621,7 +591,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['miscellaneous'] = [
 
 // addIban
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addIban'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['addIban'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
@@ -631,7 +600,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addIban'] = [
 
 // iban
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['iban'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['iban'],
     'exclude' => true,
     'inputType' => 'text',
     'eval' => ['mandatory' => true, 'rgxp' => 'alnum', 'tl_class' => 'w50'],
@@ -640,7 +608,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['iban'] = [
 
 // ibanBeneficiary
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['ibanBeneficiary'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['ibanBeneficiary'],
     'exclude' => true,
     'inputType' => 'textarea',
     'search' => true,
@@ -650,7 +617,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['ibanBeneficiary'] = [
 
 // eventDates
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDates'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventDates'],
     'exclude' => true,
     'inputType' => 'multiColumnWizard',
     'load_callback' => [
@@ -669,7 +635,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDates'] = [
 
 // eventState
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventState'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
@@ -694,7 +659,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
 
 // meetingPoint
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['meetingPoint'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['meetingPoint'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['tl_class' => '', 'mandatory' => false],
@@ -703,7 +667,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['meetingPoint'] = [
 
 // singleSRCBroschuere
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['singleSRCBroschuere'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['singleSRCBroschuere'],
     'exclude' => true,
     'inputType' => 'fileTree',
     'eval' => ['filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'mandatory' => false],
@@ -712,7 +675,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['singleSRCBroschuere'] = [
 
 // askForAhvNumber
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['askForAhvNumber'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['askForAhvNumber'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
@@ -721,7 +683,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['askForAhvNumber'] = [
 
 // Disable online registration
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generateMainInstructorContactDataFromDb'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'],
     'filter' => true,
     'sorting' => true,
     'exclude' => true,
@@ -733,7 +694,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generateMainInstructorContac
 
 // Disable online registration
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['disableOnlineRegistration'],
     'filter' => true,
     'sorting' => true,
     'exclude' => true,
@@ -745,7 +705,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration'] 
 
 // registrationGoesTo
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationGoesTo'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationGoesTo'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
@@ -757,7 +716,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationGoesTo'] = [
 
 // Set registration period
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['setRegistrationPeriod'],
     'exclude' => true,
     'inputType' => 'checkbox',
     'eval' => ['submitOnChange' => true],
@@ -766,7 +724,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod'] = [
 
 // Set registration start date
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationStartDate'],
     'default' => strtotime(Date::parse('Y-m-d')),
     'exclude' => true,
     'inputType' => 'text',
@@ -776,7 +733,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = [
 
 // Set registration end date
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationEndDate'],
     'default' => strtotime(Date::parse('Y-m-d')) + (2 * 24 * 3600) - 60,
     'exclude' => true,
     'inputType' => 'text',
@@ -785,7 +741,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['allowDeregistration'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['allowDeregistration'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
@@ -794,7 +749,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['allowDeregistration'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['deregistrationLimit'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['deregistrationLimit'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
@@ -805,7 +759,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['deregistrationLimit'] = [
 
 // addGallery
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addGallery'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['addGallery'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
@@ -815,7 +768,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addGallery'] = [
 
 // multiSRC
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['multiSRC'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['multiSRC'],
     'exclude' => true,
     'inputType' => 'fileTree',
     'eval' => ['multiple' => true, 'extensions' => 'jpg,jpeg,png', 'fieldType' => 'checkbox', 'orderField' => 'orderSRC', 'files' => true, 'filesOnly' => true, 'mandatory' => true],
@@ -824,13 +776,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['multiSRC'] = [
 
 // orderSRC
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['orderSRC'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['orderSRC'],
     'sql' => 'blob NULL',
 ];
 
 // tour type
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourType'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
@@ -842,7 +792,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType'] = [
 
 // tourTechDifficulty
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'],
     'exclude' => true,
     'inputType' => 'multiColumnWizard',
     'eval' => [
@@ -884,7 +833,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
 
 // tourProfile
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfile'],
     'exclude' => true,
     'inputType' => 'multiColumnWizard',
     'eval' => [
@@ -919,7 +867,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = [
 
 // tourDetailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourDetailText'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourDetailText'],
     'exclude' => true,
     'inputType' => 'textarea',
     /** @todo maxlength 700 */
@@ -929,7 +876,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourDetailText'] = [
 
 // generalEventDetailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generalEventDetailText'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['generalEventDetailText'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
@@ -938,7 +884,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generalEventDetailText'] = [
 
 // eventReleaseLevel
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventReleaseLevel'],
     'exclude' => true,
     'filter' => true,
     'sorting' => true,
@@ -966,7 +911,6 @@ if (!Input::get('act') || 'select' === Input::get('act')) {
 
 // customizeEventRegistrationConfirmationEmailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customizeEventRegistrationConfirmationEmailText'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'],
     'exclude' => true,
     'filter' => false,
     'inputType' => 'checkbox',
@@ -976,7 +920,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customizeEventRegistrationCo
 
 // customEventRegistrationConfirmationEmailText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfirmationEmailText'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['tl_class' => 'clr m12', 'mandatory' => false, 'preserveTags' => true, 'allowHtml' => true, 'decodeEntities' => false],
@@ -986,7 +929,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfi
 // Tour report fields:
 // This field is autofilled, if a user has filled in the event report
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['filledInEventReportForm'],
     'exclude' => false,
     'eval' => ['doNotShow' => true],
     'sql' => "char(1) NOT NULL default ''",
@@ -994,7 +936,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = 
 
 // executionState
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['executionState'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
@@ -1006,7 +947,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
 
 // journey
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['journey'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
@@ -1018,7 +958,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = [
 
 // eventSubstitutionText
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventSubstitutionText'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['mandatory' => false, 'tl_class' => 'clr m12'],
@@ -1027,7 +966,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = [
 
 // tourWeatherConditions
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourWeatherConditions'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['mandatory' => true, 'tl_class' => 'clr m12'],
@@ -1036,7 +974,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions'] = [
 
 // tourAvalancheConditions
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourAvalancheConditions'],
     'exclude' => true,
     'inputType' => 'select',
     'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'],
@@ -1047,7 +984,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = 
 
 // tourSpecialIncidents
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourSpecialIncidents'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
@@ -1056,7 +992,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = [
 
 // eventReportAdditionalNotices
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReportAdditionalNotices'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventReportAdditionalNotices'],
     'exclude' => true,
     'inputType' => 'textarea',
     'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],

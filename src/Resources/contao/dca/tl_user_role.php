@@ -30,12 +30,8 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
     'list' => [
         'sorting' => [
             'mode' => 5,
-            'fields' => [
-                'title',
-                'email',
-            ],
+            'fields' => [                'title',                'email'            ],
             'format' => '%s %s',
-            //'flag'                  => 1,
             'panelLayout' => 'filter;search,limit',
             'paste_button_callback' => [
                 TlUserRole::class,
@@ -52,7 +48,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
         ],
         'global_operations' => [
             'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
@@ -60,23 +55,19 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_user_role']['edit'],
                 'href' => 'act=edit',
                 'icon' => 'edit.gif',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_user_role']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'cut' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tour_type']['cut'],
                 'href' => 'act=paste&mode=cut',
                 'icon' => 'cut.gif',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_user_role']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
@@ -86,7 +77,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
     'palettes' => [
         'default' => 'title,belongsToExecutiveBoard,belongsToBeauftragteStammsektion;{address_legend},street,postal,city,phone,mobile,email',
     ],
-
     'fields' => [
         'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
@@ -95,7 +85,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'sorting' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['sorting'],
             'exclude' => true,
             'search' => false,
             'sorting' => true,
@@ -107,7 +96,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'title' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['title'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -116,7 +104,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'belongsToExecutiveBoard' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['belongsToExecutiveBoard'],
             'exclude' => true,
             'filter' => true,
             'sorting' => true,
@@ -125,7 +112,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'sql' => "char(1) NOT NULL default ''",
         ],
         'belongsToBeauftragteStammsektion' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['belongsToBeauftragteStammsektion'],
             'exclude' => true,
             'filter' => true,
             'sorting' => true,
@@ -134,7 +120,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'sql' => "char(1) NOT NULL default ''",
         ],
         'email' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['email'],
             'exclude' => true,
             'search' => true,
             'filter' => true,
@@ -143,7 +128,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'street' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['street'],
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
@@ -151,7 +135,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'postal' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['postal'],
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
@@ -159,7 +142,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'sql' => "varchar(32) NOT NULL default ''",
         ],
         'city' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['city'],
             'exclude' => true,
             'filter' => true,
             'search' => true,
@@ -169,7 +151,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'phone' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['phone'],
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
@@ -177,7 +158,6 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'sql' => "varchar(64) NOT NULL default ''",
         ],
         'mobile' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_user_role']['mobile'],
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',

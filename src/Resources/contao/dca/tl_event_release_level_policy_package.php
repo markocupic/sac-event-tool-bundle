@@ -14,11 +14,7 @@ declare(strict_types=1);
 
 use Markocupic\SacEventToolBundle\Dca\TlEventReleaseLevelPolicyPackage;
 
-/*
- * Table tl_event_release_level_policy_package
- */
 $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
-    // Config
     'config' => [
         'dataContainer' => 'Table',
         'ctable' => ['tl_event_release_level_policy'],
@@ -30,8 +26,6 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
             ],
         ],
     ],
-
-    // List
     'list' => [
         'sorting' => [
             'mode' => 1,
@@ -45,7 +39,6 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
         ],
         'global_operations' => [
             'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
@@ -53,12 +46,10 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['edit'],
                 'href' => 'table=tl_event_release_level_policy',
                 'icon' => 'edit.svg',
             ],
             'editheader' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['editheader'],
                 'href' => 'table=tl_event_release_level_policy_package&amp;act=edit',
                 'icon' => 'header.svg',
                 'button_callback' => [
@@ -67,18 +58,15 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
                 ],
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['copy'],
                 'href' => 'act=paste&amp;mode=copy',
                 'icon' => 'copy.svg',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['show'],
                 'href' => 'act=show',
                 'icon' => 'show.svg',
             ],
@@ -95,7 +83,6 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'title' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy_package']['title'],
             'inputType' => 'text',
             'exclude' => true,
             'search' => true,

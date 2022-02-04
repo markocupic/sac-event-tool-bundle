@@ -26,7 +26,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             ],
         ],
     ],
-
     'list' => [
         'sorting' => [
             'mode' => 2,
@@ -40,7 +39,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
         ],
         'global_operations' => [
             'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
@@ -48,23 +46,19 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['edit'],
                 'href' => 'act=edit',
                 'icon' => 'edit.gif',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['show'],
                 'href' => 'act=show',
                 'icon' => 'show.svg',
             ],
@@ -82,7 +76,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'name' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['name'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -95,7 +88,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'canton' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['canton'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -108,7 +100,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'altitude' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['altitude'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -122,7 +113,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'huettenwart' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['huettenwart'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -131,7 +121,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "varchar(512) NOT NULL default ''",
         ],
         'phone' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['phone'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -140,7 +129,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'email' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['email'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -149,7 +137,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'bookingMethod' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['bookingMethod'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -158,7 +145,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "varchar(512) NOT NULL default ''",
         ],
         'url' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['url'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -167,14 +153,12 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'singleSRC' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['singleSRC'],
             'exclude' => true,
             'inputType' => 'fileTree',
             'eval' => ['fieldType' => 'radio', 'filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'mandatory' => true],
             'sql' => 'binary(16) NULL',
         ],
         'huettenchef' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['huettenchef'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -183,7 +167,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "varchar(512) NOT NULL default ''",
         ],
         'capacity' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['capacity'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -192,7 +175,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "varchar(512) NOT NULL default ''",
         ],
         'coordsCH1903' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['coordsCH1903'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -201,7 +183,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'coordsWGS84' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['coordsWGS84'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -210,7 +191,6 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'openingTime' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['openingTime'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,

@@ -40,7 +40,6 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty_category'] = [
         ],
         'global_operations' => [
             'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
@@ -48,12 +47,10 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty_category'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['edit'],
                 'href' => 'table=tl_tour_difficulty',
                 'icon' => 'edit.svg',
             ],
             'editheader' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['editheader'],
                 'href' => 'table=tl_tour_difficulty_category&amp;act=edit',
                 'icon' => 'header.svg',
                 'button_callback' => [
@@ -62,12 +59,10 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty_category'] = [
                 ],
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
@@ -77,7 +72,6 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty_category'] = [
     'palettes' => [
         'default' => 'title',
     ],
-
     'fields' => [
         'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
@@ -86,7 +80,6 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty_category'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'title' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty_category']['title'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,

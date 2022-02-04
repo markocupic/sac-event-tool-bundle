@@ -78,8 +78,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             ],
         ],
     ],
-
-    // List
     'list' => [
         'sorting' => [
             'mode' => 2,
@@ -98,20 +96,17 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         ],
         'global_operations' => [
             'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'downloadEventMemberList2Docx' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Docx'],
                 'href' => 'act=downloadEventMemberList',
                 'class' => 'download_registration_list',
                 'icon' => 'bundles/markocupicsaceventtool/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'downloadEventMemberList2Csv' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Csv'],
                 'href' => 'action=onloadCallbackExportMemberlist',
                 'class' => 'header_icon',
                 'icon' => 'bundles/markocupicsaceventtool/icons/excel.svg',
@@ -125,14 +120,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'printInstructorInvoice' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'],
                 'href' => '',
                 'class' => 'printInstructorInvoice',
                 'icon' => 'bundles/markocupicsaceventtool/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'sendEmail' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['sendEmail'],
                 'href' => 'act=edit&call=sendEmail',
                 'class' => 'send_email',
                 'icon' => 'bundles/markocupicsaceventtool/icons/enveloppe.svg',
@@ -151,20 +144,16 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['edit'],
                 'href' => 'act=edit',
                 'icon' => 'edit.svg',
             ],
-
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
             ],
             // Regular "toggle" operation but without "icon" and with the haste specific params
             'toggleStateOfParticipation' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['toggleStateOfParticipation'],
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
                 'haste_ajax_operation' => [
                     'field' => 'hasParticipated',
@@ -181,14 +170,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 ],
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_member']['show'],
                 'href' => 'act=show',
                 'icon' => 'show.svg',
             ],
         ],
     ],
-
-    // Palettes
     'palettes' => [
         '__selector__' => ['addEmailAttachment', 'hasLeadClimbingEducation', 'hasPaid'],
         'default' => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionIds,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
@@ -197,15 +183,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'acceptWithEmail' => '{acceptWithEmail_legend},acceptWithEmail',
         'addToWaitlist' => '{addToWaitlist_legend},addToWaitlist',
     ],
-
-    // Subpalettes
     'subpalettes' => [
         'addEmailAttachment' => 'emailAttachment',
         'hasLeadClimbingEducation' => 'dateOfLeadClimbingEducation',
         'hasPaid' => 'paymentMethod',
     ],
-
-    // Fields
     'fields' => [
         'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
@@ -440,8 +422,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'eval' => ['tl_class' => 'clr', 'maxlength' => 5000],
             'sql' => 'text NULL',
         ],
-        // Send E-mail
-        'emailRecipients' => [
+       'emailRecipients' => [
             'options' => [],
             // Set via onload callback
             'inputType' => 'checkbox',

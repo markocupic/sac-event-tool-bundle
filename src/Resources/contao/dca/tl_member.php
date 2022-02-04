@@ -33,13 +33,11 @@ PaletteManipulator::create()
     ->applyToPalette('default', 'tl_member')
 ;
 
-// Add subpalettes
+// Add palettes
 $GLOBALS['TL_DCA']['tl_member']['palettes']['__selector__'][] = 'hasLeadClimbingEducation';
 $GLOBALS['TL_DCA']['tl_member']['subpalettes']['hasLeadClimbingEducation'] = 'dateOfLeadClimbingEducation';
 
-/*
- * Table tl_member
- */
+// Customize tl_member
 $GLOBALS['TL_DCA']['tl_member']['list']['sorting']['fields'] = ['lastname ASC'];
 $GLOBALS['TL_DCA']['tl_member']['config']['ondelete_callback'][] = [
     TlMember::class,
@@ -50,7 +48,6 @@ $GLOBALS['TL_DCA']['tl_member']['config']['ondelete_callback'][] = [
 $GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index';
 
 // More fields...
-// Avatar
 $GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = [
     'exclude' => true,
     'inputType' => 'fileTree',
@@ -58,7 +55,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = [
     'sql' => 'binary(16) NULL',
 ];
 
-// Uuid from SAC central committee in Bern
 $GLOBALS['TL_DCA']['tl_member']['fields']['uuid'] = [
     'exclude' => true,
     'inputType' => 'text',
@@ -66,7 +62,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['uuid'] = [
     'sql' => "varchar(128) NOT NULL default ''",
 ];
 
-// activationLinkLifetime
 $GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = [
     'exclude' => true,
     'inputType' => 'text',
@@ -74,7 +69,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = [
     'sql' => 'int(10) unsigned NULL',
 ];
 
-// activation
 $GLOBALS['TL_DCA']['tl_member']['fields']['activation'] = [
     'exclude' => true,
     'inputType' => 'text',
@@ -82,7 +76,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['activation'] = [
     'sql' => "varchar(64) NOT NULL default ''",
 ];
 
-// activationFalseTokenCounter
 $GLOBALS['TL_DCA']['tl_member']['fields']['activationFalseTokenCounter'] = [
     'exclude' => true,
     'inputType' => 'text',
@@ -90,7 +83,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['activationFalseTokenCounter'] = [
     'sql' => 'int(10) unsigned NULL',
 ];
 
-// isSacMember
 $GLOBALS['TL_DCA']['tl_member']['fields']['isSacMember'] = [
     'exclude' => true,
     'filter' => true,
@@ -99,7 +91,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['isSacMember'] = [
     'sql' => "char(1) NOT NULL default ''",
 ];
 
-// sacMemberId
 $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = [
     'exclude' => true,
     'search' => true,
@@ -110,7 +101,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = [
     'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
-// hasLeadClimbingEducation
 $GLOBALS['TL_DCA']['tl_member']['fields']['hasLeadClimbingEducation'] = [
     'exclude' => true,
     'filter' => true,
@@ -119,7 +109,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['hasLeadClimbingEducation'] = [
     'sql' => "char(1) NOT NULL default ''",
 ];
 
-// dateOfLeadClimbingEducation
 $GLOBALS['TL_DCA']['tl_member']['fields']['dateOfLeadClimbingEducation'] = [
     'exclude' => true,
     'inputType' => 'text',
@@ -127,7 +116,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['dateOfLeadClimbingEducation'] = [
     'sql' => "varchar(11) NOT NULL default ''",
 ];
 
-// ahvNumber
 $GLOBALS['TL_DCA']['tl_member']['fields']['ahvNumber'] = [
     'exclude' => true,
     'search' => true,
@@ -136,7 +124,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['ahvNumber'] = [
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
-// sectionId
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = [
     'exclude' => true,
     'reference' => &$GLOBALS['TL_LANG']['tl_member']['section'],
@@ -147,7 +134,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = [
     'sql' => 'blob NULL',
 ];
 
-// profession
 $GLOBALS['TL_DCA']['tl_member']['fields']['profession'] = [
     'exclude' => true,
     'search' => true,
@@ -158,7 +144,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['profession'] = [
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
-// addressExtra
 $GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra'] = [
     'exclude' => true,
     'search' => true,
@@ -167,7 +152,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra'] = [
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
-// streetExtra
 $GLOBALS['TL_DCA']['tl_member']['fields']['streetExtra'] = [
     'exclude' => true,
     'search' => true,
@@ -176,7 +160,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['streetExtra'] = [
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
-// phoneBusiness
 $GLOBALS['TL_DCA']['tl_member']['fields']['phoneBusiness'] = [
     'exclude' => true,
     'search' => true,
@@ -185,7 +168,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['phoneBusiness'] = [
     'sql' => "varchar(64) NOT NULL default ''",
 ];
 
-// entryYear
 $GLOBALS['TL_DCA']['tl_member']['fields']['entryYear'] = [
     'exclude' => true,
     'filter' => true,
@@ -194,7 +176,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['entryYear'] = [
     'sql' => "varchar(5) NOT NULL default ''",
 ];
 
-// membershipType
 $GLOBALS['TL_DCA']['tl_member']['fields']['membershipType'] = [
     'exclude' => true,
     'filter' => true,
@@ -203,7 +184,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['membershipType'] = [
     'sql' => "varchar(256) NOT NULL default ''",
 ];
 
-// sectionInfo1
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo1'] = [
     'exclude' => true,
     'filter' => true,
@@ -212,7 +192,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo1'] = [
     'sql' => "varchar(256) NOT NULL default ''",
 ];
 
-// sectionInfo2
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo2'] = [
     'exclude' => true,
     'filter' => true,
@@ -221,7 +200,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo2'] = [
     'sql' => "varchar(256) NOT NULL default ''",
 ];
 
-// sectionInfo3
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo3'] = [
     'exclude' => true,
     'filter' => true,
@@ -230,7 +208,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo3'] = [
     'sql' => "varchar(256) NOT NULL default ''",
 ];
 
-// sectionInfo4
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo4'] = [
     'exclude' => true,
     'filter' => true,
@@ -239,7 +216,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo4'] = [
     'sql' => "varchar(256) NOT NULL default ''",
 ];
 
-// debit
 $GLOBALS['TL_DCA']['tl_member']['fields']['debit'] = [
     'exclude' => true,
     'filter' => true,
@@ -248,7 +224,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['debit'] = [
     'sql' => "varchar(256) NOT NULL default ''",
 ];
 
-// memberStatus
 $GLOBALS['TL_DCA']['tl_member']['fields']['memberStatus'] = [
     'exclude' => true,
     'filter' => true,
@@ -257,7 +232,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['memberStatus'] = [
     'sql' => "varchar(256) NOT NULL default ''",
 ];
 
-// emergencyPhone
 $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhone'] = [
     'exclude' => true,
     'search' => true,
@@ -266,7 +240,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhone'] = [
     'sql' => "varchar(64) NOT NULL default ''",
 ];
 
-// emergencyPhoneName
 $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhoneName'] = [
     'exclude' => true,
     'search' => true,
@@ -275,7 +248,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhoneName'] = [
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
-// foodHabits
 $GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = [
     'exclude' => true,
     'search' => true,

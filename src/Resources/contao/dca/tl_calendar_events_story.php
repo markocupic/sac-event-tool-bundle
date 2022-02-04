@@ -16,9 +16,6 @@ use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Dca\TlCalendarEventsStory;
 
-/*
- * Table tl_calendar_events_story
- */
 $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
     'config' => [
         'dataContainer' => 'Table',
@@ -46,7 +43,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
         'sorting' => [
             'mode' => 2,
             'fields' => ['eventStartDate DESC'],
-            //'flag'        => 12,
             'panelLayout' => 'filter;sort,search',
         ],
         'label' => [

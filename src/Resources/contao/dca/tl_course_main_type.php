@@ -24,7 +24,6 @@ $GLOBALS['TL_DCA']['tl_course_main_type'] = [
             ],
         ],
     ],
-
     'list' => [
         'sorting' => [
             'mode' => 2,
@@ -38,7 +37,6 @@ $GLOBALS['TL_DCA']['tl_course_main_type'] = [
         ],
         'global_operations' => [
             'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
@@ -46,17 +44,14 @@ $GLOBALS['TL_DCA']['tl_course_main_type'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_course_main_type']['edit'],
                 'href' => 'act=edit',
                 'icon' => 'edit.gif',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_news']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_course_main_type']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
@@ -66,7 +61,6 @@ $GLOBALS['TL_DCA']['tl_course_main_type'] = [
     'palettes' => [
         'default' => 'code,name',
     ],
-
     'fields' => [
         'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
@@ -77,7 +71,6 @@ $GLOBALS['TL_DCA']['tl_course_main_type'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'code' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_course_main_type']['code'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -87,7 +80,6 @@ $GLOBALS['TL_DCA']['tl_course_main_type'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'name' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_course_main_type']['name'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,

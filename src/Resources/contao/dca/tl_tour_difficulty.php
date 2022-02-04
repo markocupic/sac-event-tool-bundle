@@ -28,7 +28,6 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
             ],
         ],
     ],
-
     'list' => [
         'sorting' => [
             'mode' => 4,
@@ -51,7 +50,6 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
         ],
         'global_operations' => [
             'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
@@ -59,17 +57,14 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['edit'],
                 'href' => 'act=edit',
                 'icon' => 'edit.gif',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
@@ -79,7 +74,6 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
     'palettes' => [
         'default' => 'code,shortcut,title,description',
     ],
-
     'fields' => [
         'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
@@ -96,7 +90,6 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'shortcut' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['shortcut'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -105,7 +98,6 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'title' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['title'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -114,7 +106,6 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'code' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['code'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,
@@ -123,7 +114,6 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'description' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_tour_difficulty']['description'],
             'exclude' => true,
             'search' => true,
             'sorting' => true,

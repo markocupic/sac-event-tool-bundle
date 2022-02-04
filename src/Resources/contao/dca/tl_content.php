@@ -43,7 +43,6 @@ $GLOBALS['TL_DCA']['tl_content']['palettes']['cabanne_sac_detail'] = '{type_lege
 
 // Fields
 $GLOBALS['TL_DCA']['tl_content']['fields']['cabanneSac'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['cabanneSac'],
     'exclude' => true,
     'search' => true,
     'inputType' => 'select',
@@ -56,7 +55,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['cabanneSac'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['jumpTo'],
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
@@ -66,7 +64,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_selectMode'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_selectMode'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
@@ -77,7 +74,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_selectMode'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_replacePrivateAdressWithRoleAdress'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_replacePrivateAdressWithRoleAdress'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
@@ -87,7 +83,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_replacePrivateAdressWithRol
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_users'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_users'],
     'exclude' => true,
     'search' => true,
     'filter' => true,
@@ -99,7 +94,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_users'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_userRoles'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_userRoles'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
@@ -112,7 +106,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_userRoles'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_showFieldsToGuests'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_showFieldsToGuests'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
@@ -122,7 +115,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_showFieldsToGuests'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_queryType'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_queryType'],
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
@@ -132,7 +124,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_queryType'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_template'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_template'],
     'exclude' => true,
     'inputType' => 'select',
     'options_callback' => [
@@ -144,7 +135,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_template'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_partial_template'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_content']['userList_partial_template'],
     'exclude' => true,
     'inputType' => 'select',
     'options_callback' => [
@@ -156,7 +146,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_partial_template'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['imgSize'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['imgSize'],
     'exclude' => true,
     'inputType' => 'imageSize',
     'reference' => &$GLOBALS['TL_LANG']['MSC'],

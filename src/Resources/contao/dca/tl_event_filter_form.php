@@ -18,7 +18,6 @@ use Markocupic\SacEventToolBundle\Dca\TlEventFilterForm;
 $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
     'fields' => [
         'year' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['year'],
             'inputType' => 'select',
             'options' => range(2016, (int) Date::parse('Y') + 1),
             'eval' => [
@@ -27,12 +26,10 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
             ],
         ],
         'dateStart' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['dateStart'],
             'inputType' => 'text',
             'eval' => ['placeholder' => 'yyyy-mm-dd', 'maxlength' => 12],
         ],
         'tourType' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['tourType'],
             'inputType' => 'select',
             'options_callback' => [
                 TlEventFilterForm::class,
@@ -44,7 +41,6 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
             ],
         ],
         'courseType' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['courseType'],
             'inputType' => 'select',
             'options_callback' => [
                 TlEventFilterForm::class,
@@ -56,7 +52,6 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
             ],
         ],
         'organizers' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['organizers'],
             'inputType' => 'select',
             'options_callback' => [
                 TlEventFilterForm::class,
@@ -65,22 +60,18 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
             'eval' => ['multiple' => true],
         ],
         'textsearch' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['textsearch'],
             'inputType' => 'text',
             'eval' => ['placeholder' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['enterSearchTerms']],
         ],
         'eventId' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['eventId'],
             'inputType' => 'text',
             'eval' => ['placeholder' => Date::parse('Y').'-****'],
         ],
         'courseId' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'],
             'inputType' => 'text',
             'eval' => ['placeholder' => $GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'][0]],
         ],
         'suitableForBeginners' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['suitableForBeginners'],
             'inputType' => 'checkbox',
         ],
     ],
