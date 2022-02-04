@@ -390,14 +390,14 @@ class CalendarEventsHelper
             return 'event_status_3'; // fa-circle red
         }
 
-        // Max participant number reached -> waiting list still possible
-        if ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers) {
-            return 'event_status_8'; // fa-circle red
-        }
-
         // Event is over or booking is no more possible
         if ($objEvent->startDate <= time() || ($objEvent->setRegistrationPeriod && $objEvent->registrationEndDate < time())) {
             return 'event_status_2';
+        }
+        
+        // Max participant number reached -> waiting list still possible
+        if ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers) {
+            return 'event_status_8'; // fa-circle red
         }
 
         // Booking not possible yet
