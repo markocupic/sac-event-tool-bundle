@@ -32,10 +32,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = [
             ],
         ],
     ],
-    // Buttons callback
-    'edit' => [//'buttons_callback' => array(array('tl_calendar_events_instructor', 'buttonsCallback')),
-    ],
-
     // List
     'list' => [
         'sorting' => [],
@@ -62,14 +58,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = [
             ],
         ],
     ],
-
-    // Palettes
-    'palettes' => [],
-
-    // Subpalettes
-    'subpalettes' => [],
-
-    // Fields
     'fields' => [
         'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',

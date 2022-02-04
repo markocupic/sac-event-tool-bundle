@@ -18,7 +18,6 @@ use Contao\CalendarEventsInstructorInvoiceModel;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Dbafs;
 use Contao\Message;
 use Contao\System;
 use Contao\UserModel;

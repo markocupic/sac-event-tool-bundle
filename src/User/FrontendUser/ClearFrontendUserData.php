@@ -33,7 +33,6 @@ use Psr\Log\LogLevel;
  */
 class ClearFrontendUserData
 {
-
     private ContaoFramework $framework;
 
     private string $projectDir;
@@ -292,7 +291,6 @@ class ClearFrontendUserData
      */
     public function deleteAvatarDirectory(int $memberId): void
     {
-
         $strAvatarDir = $this->feUserAvatarDir;
 
         if (is_dir($this->projectDir.'/'.$strAvatarDir.'/'.$memberId)) {

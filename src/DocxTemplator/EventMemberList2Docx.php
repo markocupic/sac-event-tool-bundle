@@ -19,8 +19,6 @@ use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Dbafs;
-use Contao\File;
 use Contao\Message;
 use Contao\System;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
@@ -69,8 +67,6 @@ class EventMemberList2Docx
 
         /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-
-
 
         $objEventMember = $calendarEventsMemberModelAdapter->findBy(
             [
@@ -133,6 +129,4 @@ class EventMemberList2Docx
 
         exit();
     }
-
-
 }

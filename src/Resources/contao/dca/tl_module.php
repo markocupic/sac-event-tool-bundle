@@ -68,13 +68,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventType'] = [
     'search' => true,
     'inputType' => 'select',
     'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-    'eval' => [
-        'mandatory' => true,
-        'multiple' => true,
-        'includeBlankOption' => true,
-        'chosen' => true,
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['mandatory' => true, 'multiple' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql' => 'blob NULL',
 ];
 
@@ -83,17 +77,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['unregisterFromEventNotificationId'] =
     'search' => true,
     'inputType' => 'select',
     'foreignKey' => 'tl_nc_notification.title',
-    'eval' => [
-        'mandatory' => true,
-        'includeBlankOption' => true,
-        'chosen' => true,
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
-    'relation' => [
-        'type' => 'hasOne',
-        'load' => 'lazy',
-    ],
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['receiptEventRegistrationNotificationId'] = [
@@ -101,17 +87,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['receiptEventRegistrationNotificationI
     'search' => true,
     'inputType' => 'select',
     'foreignKey' => 'tl_nc_notification.title',
-    'eval' => [
-        'mandatory' => true,
-        'includeBlankOption' => true,
-        'chosen' => true,
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
-    'relation' => [
-        'type' => 'hasOne',
-        'load' => 'lazy',
-    ],
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['notifyOnEventStoryPublishedNotificationId'] = [
@@ -119,83 +97,47 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['notifyOnEventStoryPublishedNotificati
     'search' => true,
     'inputType' => 'select',
     'foreignKey' => 'tl_nc_notification.title',
-    'eval' => [
-        'mandatory' => true,
-        'includeBlankOption' => true,
-        'chosen' => true,
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
-    'relation' => [
-        'type' => 'hasOne',
-        'load' => 'lazy',
-    ],
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryFormJumpTo'] = [
     'exclude' => true,
     'inputType' => 'pageTree',
     'foreignKey' => 'tl_page.title',
-    'eval' => [
-        'mandatory' => true,
-        'fieldType' => 'radio',
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
-    'relation' => [
-        'type' => 'hasOne',
-        'load' => 'eager',
-    ],
+    'relation' => ['type' => 'hasOne', 'load' => 'eager'],
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryJumpTo'] = [
     'exclude' => true,
     'inputType' => 'pageTree',
     'foreignKey' => 'tl_page.title',
-    'eval' => [
-        'mandatory' => true,
-        'fieldType' => 'radio',
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
-    'relation' => [
-        'type' => 'hasOne',
-        'load' => 'eager',
-    ],
+    'relation' => ['type' => 'hasOne', 'load' => 'eager'],
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryMaxImageWidth'] = [
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => [
-        'rgxp' => 'natural',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['rgxp' => 'natural', 'tl_class' => 'w50'],
     'sql' => "smallint(5) unsigned NOT NULL default '0'",
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventStoryMaxImageHeight'] = [
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => [
-        'rgxp' => 'natural',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['rgxp' => 'natural', 'tl_class' => 'w50'],
     'sql' => "smallint(5) unsigned NOT NULL default '0'",
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['timeSpanForCreatingNewEventStory'] = [
     'inputType' => 'select',
-    'options' => range(
-        5,
-        365
-    ),
-    'eval' => [
-        'mandatory' => true,
-        'includeBlankOption' => false,
-        'tl_class' => 'clr',
-        'rgxp' => 'natural',
-    ],
+    'options' => range(5, 365),
+    'eval' => ['mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr', 'rgxp' => 'natural'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
@@ -209,10 +151,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['imageClass'] = [
 $GLOBALS['TL_DCA']['tl_module']['fields']['story_limit'] = [
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => [
-        'rgxp' => 'natural',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['rgxp' => 'natural', 'tl_class' => 'w50'],
     'sql' => "smallint(5) unsigned NOT NULL default '0'",
 ];
 
@@ -223,42 +162,22 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['story_eventOrganizers'] = [
     'sorting' => true,
     'inputType' => 'checkbox',
     'foreignKey' => 'tl_event_organizer.title',
-    'relation' => [
-        'type' => 'hasMany',
-        'load' => 'lazy',
-    ],
-    'eval' => [
-        'multiple' => true,
-        'mandatory' => false,
-        'tl_class' => 'clr m12',
-    ],
+    'relation' => ['type' => 'hasMany', 'load' => 'lazy'],
+    'eval' => ['multiple' => true, 'mandatory' => false, 'tl_class' => 'clr m12'],
     'sql' => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = [
     'inputType' => 'select',
     'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-    'eval' => [
-        'mandatory' => false,
-        'multiple' => true,
-        'chosen' => true,
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['mandatory' => false, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql' => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = [
     'inputType' => 'checkboxWizard',
-    'options_callback' => [
-        TlModule::class,
-        'getEventFilterBoardFields',
-    ],
-    'eval' => [
-        'mandatory' => false,
-        'multiple' => true,
-        'ooorderField' => 'orderSRC',
-        'tl_class' => 'clr',
-    ],
+    'options_callback' => [TlModule::class, 'getEventFilterBoardFields'],
+    'eval' => ['mandatory' => false, 'multiple' => true, 'ooorderField' => 'orderSRC', 'tl_class' => 'clr'],
     'sql' => 'blob NULL',
 ];
 
@@ -276,22 +195,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventListPartialTpl'] = [
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventListLimitPerRequest'] = [
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => [
-        'rgxp' => 'natural',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['rgxp' => 'natural', 'tl_class' => 'w50'],
     'sql' => 'smallint(5) unsigned NOT NULL default 0',
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventRegCheckoutLinkLabel'] = [
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'maxlength' => 64,
-        'rgxp' => 'extnd',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['mandatory' => true, 'maxlength' => 64, 'rgxp' => 'extnd', 'tl_class' => 'w50'],
     'sql' => "varchar(64) NOT NULL default ''",
 ];
 
@@ -299,13 +210,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventRegCheckoutLinkPage'] = [
     'exclude' => true,
     'inputType' => 'pageTree',
     'foreignKey' => 'tl_page.title',
-    'eval' => [
-        'mandatory' => true,
-        'fieldType' => 'radio',
-    ],
+    'eval' => ['mandatory' => true, 'fieldType' => 'radio'],
     'sql' => 'int(10) unsigned NOT NULL default 0',
-    'relation' => [
-        'type' => 'hasOne',
-        'load' => 'lazy',
-    ],
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
 ];

@@ -13,92 +13,24 @@ declare(strict_types=1);
  */
 
 use Contao\BackendUser;
-use Contao\System;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Contao\System;
 use Markocupic\SacEventToolBundle\Dca\TlMember;
 
 // Manipulate palette default
 PaletteManipulator::create()
-    ->addLegend(
-        'food_legend',
-        'contact_legend',
-        PaletteManipulator::POSITION_AFTER
-    )
-    ->addLegend(
-        'section_info_legend',
-        'contact_legend',
-        PaletteManipulator::POSITION_AFTER
-    )
-    ->addLegend(
-        'section_legend',
-        'contact_legend',
-        PaletteManipulator::POSITION_AFTER
-    )
-    ->addLegend(
-        'emergency_legend',
-        'contact_legend',
-        PaletteManipulator::POSITION_AFTER
-    )
-    ->addLegend(
-        'avatar_legend',
-        'contact_legend',
-        PaletteManipulator::POSITION_AFTER
-    )
-    ->addLegend(
-        'education_legend',
-        'contact_legend',
-        PaletteManipulator::POSITION_AFTER
-    )
-    ->addField(
-        ['avatar'],
-        'avatar_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['foodHabits'],
-        'food_legend',
-        PaletteManipulator::POSITION_AFTER
-    )
-    ->addField(
-        [
-            'isSacMember',
-            'sacMemberId',
-            'ahvNumber',
-            'uuid',
-            'sectionId',
-            'profession',
-            'addressExtra',
-            'streetExtra',
-            'phoneBusiness',
-            'entryYear',
-            'membershipType',
-            'sectionInfo1',
-            'sectionInfo2',
-            'sectionInfo3',
-            'sectionInfo4',
-            'debit',
-            'memberStatus',
-        ],
-        'section_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'emergencyPhone',
-            'emergencyPhoneName',
-        ],
-        'emergency_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['hasLeadClimbingEducation'],
-        'education_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->applyToPalette(
-        'default',
-        'tl_member'
-    )
+    ->addLegend('food_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
+    ->addLegend('section_info_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
+    ->addLegend('section_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
+    ->addLegend('emergency_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
+    ->addLegend('avatar_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
+    ->addLegend('education_legend', 'contact_legend', PaletteManipulator::POSITION_AFTER)
+    ->addField(['avatar'], 'avatar_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['foodHabits'], 'food_legend', PaletteManipulator::POSITION_AFTER)
+    ->addField(['isSacMember', 'sacMemberId', 'ahvNumber', 'uuid', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'phoneBusiness', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'], 'section_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['emergencyPhone', 'emergencyPhoneName'], 'emergency_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['hasLeadClimbingEducation'], 'education_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('default', 'tl_member')
 ;
 
 // Add subpalettes
@@ -122,12 +54,7 @@ $GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index
 $GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = [
     'exclude' => true,
     'inputType' => 'fileTree',
-    'eval' => [
-        'filesOnly' => true,
-        'fieldType' => 'radio',
-        'mandatory' => false,
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
     'sql' => 'binary(16) NULL',
 ];
 
@@ -135,10 +62,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = [
 $GLOBALS['TL_DCA']['tl_member']['fields']['uuid'] = [
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => [
-        'mandatory' => false,
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['mandatory' => false, 'tl_class' => 'w50'],
     'sql' => "varchar(128) NOT NULL default ''",
 ];
 
@@ -146,12 +70,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['uuid'] = [
 $GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = [
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => [
-        'rgxp' => 'datim',
-        'mandatory' => false,
-        'datepicker' => true,
-        'tl_class' => 'clr wizard',
-    ],
+    'eval' => ['rgxp' => 'datim', 'mandatory' => false, 'datepicker' => true, 'tl_class' => 'clr wizard'],
     'sql' => 'int(10) unsigned NULL',
 ];
 
@@ -159,10 +78,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = [
 $GLOBALS['TL_DCA']['tl_member']['fields']['activation'] = [
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => [
-        'mandatory' => false,
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['mandatory' => false, 'tl_class' => 'w50'],
     'sql' => "varchar(64) NOT NULL default ''",
 ];
 
@@ -190,13 +106,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = [
     'sorting' => true,
     'flag' => 1,
     'inputType' => 'text',
-    'eval' => [
-        'doNotCopy' => true,
-        'mandatory' => true,
-        'maxlength' => 255,
-        'tl_class' => 'w50',
-        'rgxp' => 'natural',
-    ],
+    'eval' => ['doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'rgxp' => 'natural'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
@@ -213,12 +123,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['hasLeadClimbingEducation'] = [
 $GLOBALS['TL_DCA']['tl_member']['fields']['dateOfLeadClimbingEducation'] = [
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'rgxp' => 'date',
-        'datepicker' => true,
-        'tl_class' => 'w50 wizard',
-    ],
+    'eval' => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
     'sql' => "varchar(11) NOT NULL default ''",
 ];
 
@@ -227,14 +132,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['ahvNumber'] = [
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
-    'eval' => [
-        'mandatory' => false,
-        'maxlength' => 16,
-        'decodeEntities' => true,
-        'feEditable' => true,
-        'feGroup' => 'contact',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['mandatory' => false, 'maxlength' => 16, 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
@@ -244,10 +142,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = [
     'reference' => &$GLOBALS['TL_LANG']['tl_member']['section'],
     'inputType' => 'checkbox',
     'filter' => true,
-    'eval' => [
-        'multiple' => true,
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['multiple' => true, 'tl_class' => 'clr'],
     'options' => System::getContainer()->getParameter('sacevt.section_ids'),
     'sql' => 'blob NULL',
 ];
@@ -259,13 +154,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['profession'] = [
     'sorting' => true,
     'flag' => 1,
     'inputType' => 'text',
-    'eval' => [
-        'maxlength' => 255,
-        'feEditable' => true,
-        'feViewable' => true,
-        'feGroup' => 'address',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
@@ -274,13 +163,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra'] = [
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
-    'eval' => [
-        'maxlength' => 255,
-        'feEditable' => true,
-        'feViewable' => true,
-        'feGroup' => 'address',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
@@ -289,13 +172,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['streetExtra'] = [
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
-    'eval' => [
-        'maxlength' => 255,
-        'feEditable' => true,
-        'feViewable' => true,
-        'feGroup' => 'address',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
@@ -304,15 +181,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['phoneBusiness'] = [
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
-    'eval' => [
-        'maxlength' => 64,
-        'rgxp' => 'phone',
-        'decodeEntities' => true,
-        'feEditable' => true,
-        'feViewable' => true,
-        'feGroup' => 'contact',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
     'sql' => "varchar(64) NOT NULL default ''",
 ];
 
@@ -393,15 +262,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhone'] = [
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
-    'eval' => [
-        'maxlength' => 64,
-        'rgxp' => 'phone',
-        'decodeEntities' => true,
-        'feEditable' => true,
-        'feViewable' => true,
-        'feGroup' => 'contact',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
     'sql' => "varchar(64) NOT NULL default ''",
 ];
 
@@ -410,14 +271,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhoneName'] = [
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
-    'eval' => [
-        'maxlength' => 255,
-        'decodeEntities' => true,
-        'feEditable' => true,
-        'feViewable' => true,
-        'feGroup' => 'contact',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['maxlength' => 255, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
@@ -426,16 +280,11 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = [
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
-    'eval' => [
-        'tl_class' => 'clr',
-        'maxlength' => 5000,
-    ],
+    'eval' => ['tl_class' => 'clr', 'maxlength' => 5000],
     'sql' => 'text NULL',
 ];
 
-if (
-    TL_MODE === 'BE' && !BackendUser::getInstance()->isAdmin
-) {
+if (TL_MODE === 'BE' && !BackendUser::getInstance()->isAdmin) {
     // Fields (readonly fields)
     $GLOBALS['TL_DCA']['tl_member']['fields']['uuid']['eval']['readonly'] = 'readonly';
     $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId']['eval']['readonly'] = 'readonly';

@@ -33,10 +33,7 @@ $GLOBALS['TL_DCA']['tl_course_main_type'] = [
             'panelLayout' => 'filter;sort,search,limit',
         ],
         'label' => [
-            'fields' => [
-                'code',
-                'name',
-            ],
+            'fields' => ['code', 'name'],
             'showColumns' => true,
         ],
         'global_operations' => [
@@ -85,14 +82,8 @@ $GLOBALS['TL_DCA']['tl_course_main_type'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'select',
-            'options' => range(
-                1,
-                10
-            ),
-            'eval' => [
-                'mandatory' => true,
-                'unique' => true,
-            ],
+            'options' => range(1, 10),
+            'eval' => ['mandatory' => true, 'unique' => true],
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'name' => [
@@ -101,10 +92,7 @@ $GLOBALS['TL_DCA']['tl_course_main_type'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
     ],

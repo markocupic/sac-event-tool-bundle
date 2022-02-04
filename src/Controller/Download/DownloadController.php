@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\Download;
 
 use Contao\CalendarEventsModel;
-use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\System;

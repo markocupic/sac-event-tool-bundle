@@ -12,8 +12,6 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Contao\Config;
-
 /*
  * This file is part of SAC Event Tool Bundle.
  *

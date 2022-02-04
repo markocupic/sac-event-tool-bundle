@@ -394,7 +394,7 @@ class CalendarEventsHelper
         if ($objEvent->startDate <= time() || ($objEvent->setRegistrationPeriod && $objEvent->registrationEndDate < time())) {
             return 'event_status_2';
         }
-        
+
         // Max participant number reached -> waiting list still possible
         if ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers) {
             return 'event_status_8'; // fa-circle red

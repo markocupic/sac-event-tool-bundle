@@ -26,8 +26,6 @@ use Psr\Log\LogLevel;
  */
 class SyncMemberWithUser
 {
-
-
     /**
      * @var ContaoFramework
      */

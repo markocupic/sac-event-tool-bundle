@@ -56,17 +56,17 @@ class JahresprogrammExportController extends AbstractPrintExportController
     protected $template;
 
     /**
-     * @var
+     * @var 
      */
     protected $startDate;
 
     /**
-     * @var
+     * @var 
      */
     protected $endDate;
 
     /**
-     * @var
+     * @var 
      */
     protected $organizer;
 
@@ -76,7 +76,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
     protected $eventType;
 
     /**
-     * @var
+     * @var 
      */
     protected $eventReleaseLevel;
 

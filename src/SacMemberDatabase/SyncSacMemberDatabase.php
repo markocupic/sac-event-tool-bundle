@@ -137,7 +137,6 @@ class SyncSacMemberDatabase
             $this->connection->commit();
 
             $this->connection->executeQuery('UNLOCK TABLES');
-
         } catch (\Exception $e) {
             $this->connection->rollBack();
 

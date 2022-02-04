@@ -84,13 +84,9 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
             ],
         ],
     ],
-
-    // Palettes
     'palettes' => [
         'default' => '{title_legend},title;',
     ],
-
-    // Fields
     'fields' => [
         'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
@@ -104,12 +100,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
             'exclude' => true,
             'search' => true,
             'flag' => 1,
-            'eval' => [
-                'mandatory' => true,
-                'rgxp' => 'alnum',
-                'maxlength' => 64,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => true, 'rgxp' => 'alnum', 'maxlength' => 64, 'tl_class' => 'w50'],
             'sql' => 'varchar(64) NULL',
         ],
     ],

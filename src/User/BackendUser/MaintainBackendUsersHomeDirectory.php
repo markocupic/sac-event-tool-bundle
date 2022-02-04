@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\User\BackendUser;
 
-use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Files;
@@ -56,7 +55,6 @@ class MaintainBackendUsersHomeDirectory
      */
     public function createBackendUsersHomeDirectory(UserModel $objUser): void
     {
-
         /** @var Files $filesAdapter */
         $filesAdapter = $this->framework->getAdapter(Files::class);
 
@@ -95,7 +93,6 @@ class MaintainBackendUsersHomeDirectory
      */
     public function removeUnusedBackendUsersHomeDirectories(): void
     {
-
         /** @var FilesModel $filesModelAdapter */
         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
 

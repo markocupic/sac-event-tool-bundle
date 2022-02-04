@@ -82,10 +82,7 @@ $GLOBALS['TL_DCA']['tl_course_sub_type'] = [
             'filter' => true,
             'foreignKey' => 'tl_course_main_type.name',
             'sql' => "int(10) unsigned NOT NULL default '0'",
-            'relation' => [
-                'type' => 'belongsTo',
-                'load' => 'eager',
-            ],
+            'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
         ],
         'tstamp' => [
             'label' => &$GLOBALS['TL_LANG']['tl_course_sub_type']['tstamp'],
@@ -98,10 +95,7 @@ $GLOBALS['TL_DCA']['tl_course_sub_type'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'unique' => true,
-            ],
+            'eval' => ['mandatory' => true, 'unique' => true],
             'sql' => "varchar(5) NOT NULL default ''",
         ],
         'name' => [
@@ -110,10 +104,7 @@ $GLOBALS['TL_DCA']['tl_course_sub_type'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
     ],

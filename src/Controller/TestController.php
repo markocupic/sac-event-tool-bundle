@@ -16,7 +16,6 @@ namespace Markocupic\SacEventToolBundle\Controller;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\File;
-use Contao\Folder;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

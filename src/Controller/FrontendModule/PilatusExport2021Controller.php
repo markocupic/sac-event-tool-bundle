@@ -55,7 +55,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     protected $model;
 
     /**
-     * @var
+     * @var 
      */
     protected $objForm;
 

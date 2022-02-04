@@ -104,10 +104,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'sorting' => [
@@ -116,11 +113,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'rgxp' => 'digit',
-                'mandatory' => true,
-                'maxlength' => 255,
-            ],
+            'eval' => ['rgxp' => 'digit', 'mandatory' => true, 'maxlength' => 255],
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'belongsToOrganization' => [
@@ -129,11 +122,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
             'filter' => true,
             'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SECTION_IDS'],
             'inputType' => 'select',
-            'eval' => [
-                'multiple' => true,
-                'chosen' => true,
-                'tl_class' => 'clr m12',
-            ],
+            'eval' => ['multiple' => true, 'chosen' => true, 'tl_class' => 'clr m12'],
             'sql' => 'blob NULL',
         ],
         'ignoreFilterInEventList' => [
@@ -155,60 +144,35 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationExtract'],
             'exclude' => true,
             'inputType' => 'textarea',
-            'eval' => [
-                'tl_class' => 'clr m12',
-                'rte' => 'tinyMCE',
-                'helpwizard' => true,
-                'mandatory' => true,
-            ],
+            'eval' => ['tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true],
             'sql' => 'text NULL',
         ],
         'courseRegulationExtract' => [
             'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationExtract'],
             'exclude' => true,
             'inputType' => 'textarea',
-            'eval' => [
-                'tl_class' => 'clr m12',
-                'rte' => 'tinyMCE',
-                'helpwizard' => true,
-                'mandatory' => true,
-            ],
+            'eval' => ['tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true],
             'sql' => 'text NULL',
         ],
         'tourRegulationSRC' => [
             'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['tourRegulationSRC'],
             'exclude' => true,
             'inputType' => 'fileTree',
-            'eval' => [
-                'filesOnly' => true,
-                'fieldType' => 'radio',
-                'mandatory' => false,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
             'sql' => 'binary(16) NULL',
         ],
         'courseRegulationSRC' => [
             'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationSRC'],
             'exclude' => true,
             'inputType' => 'fileTree',
-            'eval' => [
-                'filesOnly' => true,
-                'fieldType' => 'radio',
-                'mandatory' => false,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
             'sql' => 'binary(16) NULL',
         ],
         'singleSRC' => [
             'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['singleSRC'],
             'exclude' => true,
             'inputType' => 'fileTree',
-            'eval' => [
-                'filesOnly' => true,
-                'fieldType' => 'radio',
-                'mandatory' => true,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
             'load_callback' => [
                 [
                     TlEventOrganizer::class,
@@ -222,27 +186,16 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
             'exclude' => true,
             'filter' => true,
             'inputType' => 'select',
-            'relation' => [
-                'type' => 'hasOne',
-                'load' => 'eager',
-            ],
+            'relation' => ['type' => 'hasOne', 'load' => 'eager'],
             'foreignKey' => 'tl_user.name',
-            'eval' => [
-                'multiple' => true,
-                'chosen' => true,
-                'includeBlankOption' => true,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['multiple' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'],
             'sql' => 'blob NULL',
         ],
         'emergencyConcept' => [
             'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['emergencyConcept'],
             'exclude' => true,
             'inputType' => 'textarea',
-            'eval' => [
-                'tl_class' => 'clr m12',
-                'mandatory' => true,
-            ],
+            'eval' => ['tl_class' => 'clr m12', 'mandatory' => true],
             'sql' => 'text NULL',
         ],
         'addLogo' => [
@@ -256,12 +209,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
             'label' => &$GLOBALS['TL_LANG']['tl_event_organizer']['singleSRC'],
             'exclude' => true,
             'inputType' => 'fileTree',
-            'eval' => [
-                'filesOnly' => true,
-                'fieldType' => 'radio',
-                'mandatory' => true,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
             'load_callback' => [
                 [
                     TlEventOrganizer::class,

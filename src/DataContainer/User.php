@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Config;
-use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;

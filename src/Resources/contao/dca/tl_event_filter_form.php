@@ -20,12 +20,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
         'year' => [
             'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['year'],
             'inputType' => 'select',
-            'options' => range(
-                2016,
-                (int) Date::parse(
-                    'Y'
-                ) + 1
-            ),
+            'options' => range(2016, (int) Date::parse('Y') + 1),
             'eval' => [
                 'includeBlankOption' => true,
                 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['blankOptionLabel'],
@@ -34,10 +29,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
         'dateStart' => [
             'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['dateStart'],
             'inputType' => 'text',
-            'eval' => [
-                'placeholder' => 'yyyy-mm-dd',
-                'maxlength' => 12,
-            ],
+            'eval' => ['placeholder' => 'yyyy-mm-dd', 'maxlength' => 12],
         ],
         'tourType' => [
             'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['tourType'],
@@ -80,11 +72,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
         'eventId' => [
             'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['eventId'],
             'inputType' => 'text',
-            'eval' => [
-                'placeholder' => Date::parse(
-                    'Y'
-                ).'-****',
-            ],
+            'eval' => ['placeholder' => Date::parse('Y').'-****'],
         ],
         'courseId' => [
             'label' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'],

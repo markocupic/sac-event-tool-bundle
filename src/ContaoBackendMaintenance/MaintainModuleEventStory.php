@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\ContaoBackendMaintenance;
 
-use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Folder;
@@ -46,7 +45,6 @@ class MaintainModuleEventStory
         $this->projectDir = $projectDir;
         $this->eventStoryAssetDir = $eventStoryAssetDir;
         $this->logger = $logger;
-
     }
 
     /**
@@ -56,7 +54,6 @@ class MaintainModuleEventStory
      */
     public function run(): void
     {
-
         $fs = new Filesystem();
 
         $finder = (new Finder())

@@ -57,10 +57,7 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['calendar_containerp'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_user_group']['calendar_containerp'],
     'exclude' => true,
     'inputType' => 'checkbox',
-    'options' => [
-        'create',
-        'delete',
-    ],
+    'options' => ['create', 'delete'],
     'reference' => &$GLOBALS['TL_LANG']['MSC'],
     'eval' => ['multiple' => true],
     'sql' => 'blob NULL',
@@ -71,15 +68,8 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['allowedEventTypes'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_user_group']['allowedEventTypes'],
     'exclude' => true,
     'inputType' => 'checkbox',
-    'relation' => [
-        'type' => 'belongsTo',
-        'load' => 'eager',
-    ],
+    'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
     'foreignKey' => 'tl_event_type.title',
     'sql' => 'blob NULL',
-    'eval' => [
-        'multiple' => true,
-        'mandatory' => false,
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['multiple' => true, 'mandatory' => false, 'tl_class' => 'clr'],
 ];

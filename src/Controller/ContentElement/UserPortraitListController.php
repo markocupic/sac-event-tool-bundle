@@ -20,7 +20,6 @@ use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\ContentElement;
 use Contao\Database;
-use Contao\FilesModel;
 use Contao\FrontendTemplate;
 use Contao\PageModel;
 use Contao\StringUtil;
@@ -53,7 +52,6 @@ class UserPortraitListController extends AbstractContentElementController
 
     protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
     {
-
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
 

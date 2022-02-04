@@ -17,11 +17,7 @@ use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Dca\TlContent;
 
-if (
-    'sac_calendar_events_tool' === Input::get(
-        'do'
-    )
-) {
+if ('sac_calendar_events_tool' === Input::get('do')) {
     $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_calendar_events';
     $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = [
         TlContent::class,
@@ -55,11 +51,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['cabanneSac'] = [
         TlContent::class,
         'getCabannes',
     ],
-    'eval' => [
-        'mandatory' => true,
-        'maxlength' => 200,
-        'tl_class' => 'w50 clr',
-    ],
+    'eval' => ['mandatory' => true, 'maxlength' => 200, 'tl_class' => 'w50 clr'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
@@ -68,21 +60,8 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'rgxp' => 'url',
-        'decodeEntities' => true,
-        'maxlength' => 255,
-        'fieldType' => 'radio',
-        'filesOnly' => true,
-        'tl_class' => 'w50 wizard',
-    ],
-    'wizard' => [
-        [
-            'tl_content',
-            'pagePicker',
-        ],
-    ],
+    'eval' => ['mandatory' => true, 'rgxp' => 'url', 'decodeEntities' => true, 'maxlength' => 255, 'fieldType' => 'radio', 'filesOnly' => true, 'tl_class' => 'w50 wizard'],
+    'wizard' => [['tl_content', 'pagePicker']],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
@@ -92,14 +71,8 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_selectMode'] = [
     'filter' => true,
     'inputType' => 'select',
     'reference' => &$GLOBALS['TL_LANG']['tl_content'],
-    'options' => [
-        'selectUserRoles',
-        'selectUsers',
-    ],
-    'eval' => [
-        'submitOnChange' => true,
-        'tl_class' => 'clr',
-    ],
+    'options' => ['selectUserRoles', 'selectUsers'],
+    'eval' => ['submitOnChange' => true, 'tl_class' => 'clr'],
     'sql' => "char(128) NOT NULL default ''",
 ];
 
@@ -108,19 +81,8 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_replacePrivateAdressWithRol
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
-    'options' => [
-        'email',
-        'phone',
-        'mobile',
-        'street',
-        'postal',
-        'city',
-    ],
-    'eval' => [
-        'submitOnChange' => false,
-        'multiple' => true,
-        'tl_class' => 'clr',
-    ],
+    'options' => ['email', 'phone', 'mobile', 'street', 'postal', 'city'],
+    'eval' => ['submitOnChange' => false, 'multiple' => true, 'tl_class' => 'clr'],
     'sql' => 'blob NULL',
 ];
 
@@ -131,17 +93,8 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_users'] = [
     'filter' => true,
     'inputType' => 'select',
     'foreignKey' => 'tl_user.name',
-    'relation' => [
-        'type' => 'hasOne',
-        'load' => 'lazy',
-    ],
-    'eval' => [
-        'chosen' => true,
-        'tl_class' => 'clr m12',
-        'includeBlankOption' => true,
-        'multiple' => true,
-        'mandatory' => true,
-    ],
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
+    'eval' => ['chosen' => true, 'tl_class' => 'clr m12', 'includeBlankOption' => true, 'multiple' => true, 'mandatory' => true],
     'sql' => 'blob NULL',
 ];
 
@@ -154,11 +107,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_userRoles'] = [
         TlContent::class,
         'optionsCallbackUserRoles',
     ],
-    'eval' => [
-        'multiple' => true,
-        'chosen' => true,
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql' => 'blob NULL',
 ];
 
@@ -167,18 +116,8 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_showFieldsToGuests'] = [
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
-    'options' => [
-        'email',
-        'phone',
-        'mobile',
-        'street',
-        'postal',
-        'city',
-    ],
-    'eval' => [
-        'multiple' => true,
-        'tl_class' => 'clr',
-    ],
+    'options' => ['email', 'phone', 'mobile', 'street', 'postal', 'city'],
+    'eval' => ['multiple' => true, 'tl_class' => 'clr'],
     'sql' => 'blob NULL',
 ];
 
@@ -187,10 +126,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_queryType'] = [
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
-    'options' => [
-        'AND',
-        'OR',
-    ],
+    'options' => ['AND', 'OR'],
     'eval' => ['tl_class' => 'clr'],
     'sql' => "varchar(10) NOT NULL default ''",
 ];
@@ -224,17 +160,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['imgSize'] = [
     'exclude' => true,
     'inputType' => 'imageSize',
     'reference' => &$GLOBALS['TL_LANG']['MSC'],
-    'eval' => [
-        'rgxp' => 'natural',
-        'includeBlankOption' => true,
-        'nospace' => true,
-        'helpwizard' => true,
-        'tl_class' => 'w50',
-    ],
-    'options_callback' => static fn () => System::getContainer()->get(
-        'contao.image.image_sizes'
-    )->getOptionsForUser(
-        BackendUser::getInstance()
-    ),
+    'eval' => ['rgxp' => 'natural', 'includeBlankOption' => true, 'nospace' => true, 'helpwizard' => true, 'tl_class' => 'w50'],
+    'options_callback' => static fn () => System::getContainer()->get('contao.image.image_sizes')->getOptionsForUser(BackendUser::getInstance()),
     'sql' => "varchar(64) NOT NULL default ''",
 ];

@@ -94,7 +94,6 @@ class ModuleSacEventToolEventPreviewReader extends Events
     }
 
     /**
-     * @return void
      * @throws \Exception
      */
     protected function compile(): void
@@ -181,7 +180,7 @@ class ModuleSacEventToolEventPreviewReader extends Events
         $objTemplate->date = $strDate;
         $objTemplate->time = $strTime;
 
-        $objTemplate->datetime = $objEvent->addTime ? date('Y-m-d\TH:i:sP',$intStartTime) : date('Y-m-d', $intStartTime);
+        $objTemplate->datetime = $objEvent->addTime ? date('Y-m-d\TH:i:sP', $intStartTime) : date('Y-m-d', $intStartTime);
         $objTemplate->begin = $intStartTime;
         $objTemplate->end = $intEndTime;
         $objTemplate->class = '' !== $objEvent->cssClass ? ' '.$objEvent->cssClass : '';

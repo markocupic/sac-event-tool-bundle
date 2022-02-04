@@ -43,10 +43,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             ],
         ],
         'label' => [
-            'fields' => [
-                'title',
-                'email',
-            ],
+            'fields' => ['title', 'email'],
             'showColumns' => true,
             'label_callback' => [
                 TlUserRole::class,
@@ -103,11 +100,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'search' => false,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'rgxp' => 'natural',
-                'maxlength' => 10,
-            ],
+            'eval' => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 10],
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'tstamp' => [
@@ -119,11 +112,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'belongsToExecutiveBoard' => [
@@ -132,10 +121,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'filter' => true,
             'sorting' => true,
             'inputType' => 'checkbox',
-            'eval' => [
-                'mandatory' => false,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['mandatory' => false, 'tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'belongsToBeauftragteStammsektion' => [
@@ -144,10 +130,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'filter' => true,
             'sorting' => true,
             'inputType' => 'checkbox',
-            'eval' => [
-                'mandatory' => false,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['mandatory' => false, 'tl_class' => 'clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'email' => [
@@ -156,15 +139,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'search' => true,
             'filter' => true,
             'inputType' => 'text',
-            'eval' => [
-                'assignTo' => 'tl_user.email',
-                'mandatory' => false,
-                'maxlength' => 255,
-                'rgxp' => 'email',
-                'unique' => false,
-                'decodeEntities' => true,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['assignTo' => 'tl_user.email', 'mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'street' => [
@@ -172,11 +147,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
-            'eval' => [
-                'assignTo' => 'tl_user.street',
-                'maxlength' => 255,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['assignTo' => 'tl_user.street', 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'postal' => [
@@ -184,11 +155,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
-            'eval' => [
-                'assignTo' => 'tl_user.postal',
-                'maxlength' => 32,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['assignTo' => 'tl_user.postal', 'maxlength' => 32, 'tl_class' => 'w50'],
             'sql' => "varchar(32) NOT NULL default ''",
         ],
         'city' => [
@@ -198,11 +165,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'assignTo' => 'tl_user.city',
-                'maxlength' => 255,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['assignTo' => 'tl_user.city', 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'phone' => [
@@ -210,13 +173,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
-            'eval' => [
-                'assignTo' => 'tl_user.phone',
-                'maxlength' => 64,
-                'rgxp' => 'phone',
-                'decodeEntities' => true,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['assignTo' => 'tl_user.phone', 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(64) NOT NULL default ''",
         ],
         'mobile' => [
@@ -224,13 +181,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
-            'eval' => [
-                'assignTo' => 'tl_user.mobile',
-                'maxlength' => 64,
-                'rgxp' => 'phone',
-                'decodeEntities' => true,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['assignTo' => 'tl_user.mobile', 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(64) NOT NULL default ''",
         ],
     ],

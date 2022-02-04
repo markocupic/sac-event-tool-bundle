@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
-use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -101,10 +100,6 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     }
 
     /**
-     * @param Template $template
-     * @param ModuleModel $model
-     * @param Request $request
-     * @return Response|null
      * @throws \Exception
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
@@ -116,10 +111,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
         $this->template = $template;
 
-
         $this->template->objUser = $this->objUser;
-
-
 
         $objUploadFolder = new Folder($this->getUploadDir());
 
@@ -164,7 +156,6 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     }
 
     /**
-     * @return string
      * @throws \Exception
      */
     private function generateAvatarForm(): string
@@ -297,15 +288,12 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         }
     }
 
-
     private function getUploadDir(): string
     {
-
-        return  sprintf(
+        return sprintf(
             '%s/%s',
             $this->getParameter('sacevt.user.frontend.avatar_dir'),
-            (string)$this->objUser->id,
+            (string) $this->objUser->id,
         );
-
-}
+    }
 }

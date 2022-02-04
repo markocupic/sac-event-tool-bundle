@@ -61,10 +61,7 @@ PaletteManipulator::create()
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['pid'] = [
     'foreignKey' => 'tl_calendar_container.title',
     'sql' => "int(10) unsigned NOT NULL default '0'",
-    'relation' => [
-        'type' => 'belongsTo',
-        'load' => 'eager',
-    ],
+    'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
 ];
 
 // Allowed event types
@@ -75,13 +72,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['allowedEventTypes'] = [
     'inputType' => 'checkbox',
     'reference' => &$GLOBALS['TL_LANG']['MSC'],
     'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
-    'eval' => [
-        'multiple' => true,
-        'includeBlankOption' => false,
-        'doNotShow' => false,
-        'tl_class' => 'clr m12',
-        'mandatory' => true,
-    ],
+    'eval' => ['multiple' => true, 'includeBlankOption' => false, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => true],
     'sql' => 'blob NULL',
 ];
 
@@ -91,10 +82,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventReleaseLevelChange'] =
     'exclude' => true,
     'filter' => false,
     'inputType' => 'text',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
@@ -104,9 +92,6 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventPublish'] = [
     'exclude' => true,
     'filter' => false,
     'inputType' => 'text',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
     'sql' => "varchar(255) NOT NULL default ''",
 ];

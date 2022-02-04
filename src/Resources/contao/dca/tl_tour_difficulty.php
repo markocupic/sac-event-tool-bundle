@@ -35,10 +35,7 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
             'fields' => ['code ASC'],
             'flag' => 1,
             'panelLayout' => 'filter;sort,search,limit',
-            'headerFields' => [
-                'level',
-                'title',
-            ],
+            'headerFields' => ['level', 'title'],
             'disableGrouping' => true,
             'child_record_callback' => [
                 TlTourDifficulty::class,
@@ -90,10 +87,7 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
         'pid' => [
             'foreignKey' => 'tl_tour_difficulty_category.title',
             'sql' => "int(10) unsigned NOT NULL default '0'",
-            'relation' => [
-                'type' => 'belongsTo',
-                'load' => 'eager',
-            ],
+            'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
         ],
         'sorting' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
@@ -107,10 +101,7 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'title' => [
@@ -119,10 +110,7 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'code' => [
@@ -131,10 +119,7 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'description' => [

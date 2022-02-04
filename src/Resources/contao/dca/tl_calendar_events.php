@@ -147,543 +147,98 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'custom
 // Default palettes (define it for any case, f.ex edit all mode)
 // Put here all defined fields in the dca
 PaletteManipulator::create()
-    ->addField(
-        ['eventType'],
-        'event_type_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['singleSRCBroschuere'],
-        'broschuere_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'title',
-            'alias',
-            'courseId',
-            'eventState',
-            'author',
-            'instructor',
-            'mountainguide',
-            'organizers',
-            'tourType',
-            'tourTechDifficulty',
-            'teaser',
-        ],
-        'title_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'suitableForBeginners',
-            'courseLevel',
-            'courseTypeLevel0',
-            'courseTypeLevel1',
-        ],
-        'title_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'eventDates',
-            'durationInfo',
-        ],
-        'date_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'addTime',
-            'startTime',
-            'endTime',
-        ],
-        'date_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['isRecurringEvent'],
-        'recurring_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['recurring'],
-        'recurring_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'location',
-            'journey',
-            'tourDetailText',
-            'tourProfile',
-            'requirements',
-            'leistungen',
-            'equipment',
-            'meetingPoint',
-            'bookingEvent',
-            'miscellaneous',
-            'addIban',
-        ],
-        'details_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'terms',
-            'issues',
-        ],
-        'details_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addMinAndMaxMembers'],
-        'min_max_member_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'generateMainInstructorContactDataFromDb',
-            'disableOnlineRegistration',
-            'setRegistrationPeriod',
-            'registrationGoesTo',
-        ],
-        'registration_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['allowDeregistration'],
-        'deregistration_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['askForAhvNumber'],
-        'sign_up_form_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['customizeEventRegistrationConfirmationEmailText'],
-        'event_registration_confirmation_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addImage'],
-        'image_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addGallery'],
-        'gallery_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addEnclosure'],
-        'enclosure_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['source'],
-        'source_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'cssClass',
-            'noComments',
-        ],
-        'expert_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->applyToPalette(
-        'default',
-        'tl_calendar_events'
-    )
+    ->addField(['eventType'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['singleSRCBroschuere'], 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['title', 'alias', 'courseId', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'], 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['suitableForBeginners', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'], 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['eventDates', 'durationInfo'], 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addTime', 'startTime', 'endTime'], 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['isRecurringEvent'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'addIban'], 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['terms', 'issues'], 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['allowDeregistration'], 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['askForAhvNumber'], 'sign_up_form_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['customizeEventRegistrationConfirmationEmailText'], 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addImage'], 'image_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addGallery'], 'gallery_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addEnclosure'], 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['source'], 'source_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['cssClass', 'noComments'], 'expert_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('default', 'tl_calendar_events')
 ;
 
 // Tour and lastMinuteTour palette
 PaletteManipulator::create()
-    ->addField(
-        ['eventType'],
-        'event_type_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'title',
-            'alias',
-            'eventState',
-            'author',
-            'instructor',
-            'mountainguide',
-            'organizers',
-            'tourType',
-            'suitableForBeginners',
-            'tourTechDifficulty',
-            'teaser',
-        ],
-        'title_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'eventDates',
-            'durationInfo',
-        ],
-        'date_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['isRecurringEvent'],
-        'recurring_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['recurring'],
-        'recurring_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'location',
-            'journey',
-            'tourDetailText',
-            'tourProfile',
-            'requirements',
-            'leistungen',
-            'equipment',
-            'meetingPoint',
-            'bookingEvent',
-            'miscellaneous',
-            'addIban',
-        ],
-        'details_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addMinAndMaxMembers'],
-        'min_max_member_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'generateMainInstructorContactDataFromDb',
-            'disableOnlineRegistration',
-            'setRegistrationPeriod',
-            'registrationGoesTo',
-        ],
-        'registration_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['allowDeregistration'],
-        'deregistration_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['askForAhvNumber'],
-        'sign_up_form_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['customizeEventRegistrationConfirmationEmailText'],
-        'event_registration_confirmation_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addGallery'],
-        'gallery_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addEnclosure'],
-        'enclosure_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['source'],
-        'source_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'cssClass',
-            'noComments',
-        ],
-        'expert_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->applyToPalette(
-        'tour',
-        'tl_calendar_events'
-    )
-    ->applyToPalette(
-        'lastMinuteTour',
-        'tl_calendar_events'
-    )
+    ->addField(['eventType'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'suitableForBeginners', 'tourTechDifficulty', 'teaser'], 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['eventDates', 'durationInfo'], 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['isRecurringEvent'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['location', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'addIban'], 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['allowDeregistration'], 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['askForAhvNumber'], 'sign_up_form_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['customizeEventRegistrationConfirmationEmailText'], 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addGallery'], 'gallery_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addEnclosure'], 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['source'], 'source_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['cssClass', 'noComments'], 'expert_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('tour', 'tl_calendar_events')
+    ->applyToPalette('lastMinuteTour', 'tl_calendar_events')
 ;
 
 // generalEvent
 // same like tour but remove Fields: 'suitableForBeginners', 'tourTechDifficulty', 'tourProfile', 'mountainguide','tourDetailText', 'requirements'
 // Add field: 'generalEventDetailText'
 PaletteManipulator::create()
-    ->addField(
-        ['eventType'],
-        'event_type_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'title',
-            'alias',
-            'eventState',
-            'author',
-            'instructor',
-            'organizers',
-            'tourType',
-            'teaser',
-        ],
-        'title_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'eventDates',
-            'durationInfo',
-        ],
-        'date_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['isRecurringEvent'],
-        'recurring_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['recurring'],
-        'recurring_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'location',
-            'journey',
-            'generalEventDetailText',
-            'leistungen',
-            'equipment',
-            'meetingPoint',
-            'bookingEvent',
-            'miscellaneous',
-            'addIban',
-        ],
-        'details_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addMinAndMaxMembers'],
-        'min_max_member_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'generateMainInstructorContactDataFromDb',
-            'disableOnlineRegistration',
-            'setRegistrationPeriod',
-            'registrationGoesTo',
-        ],
-        'registration_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['allowDeregistration'],
-        'deregistration_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['askForAhvNumber'],
-        'sign_up_form_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['customizeEventRegistrationConfirmationEmailText'],
-        'event_registration_confirmation_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addGallery'],
-        'gallery_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addEnclosure'],
-        'enclosure_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['source'],
-        'source_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'cssClass',
-            'noComments',
-        ],
-        'expert_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->applyToPalette(
-        'generalEvent',
-        'tl_calendar_events'
-    )
+    ->addField(['eventType'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['title', 'alias', 'eventState', 'author', 'instructor', 'organizers', 'tourType', 'teaser'], 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['eventDates', 'durationInfo'], 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['isRecurringEvent'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['location', 'journey', 'generalEventDetailText', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'addIban'], 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['allowDeregistration'], 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['askForAhvNumber'], 'sign_up_form_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['customizeEventRegistrationConfirmationEmailText'], 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addGallery'], 'gallery_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addEnclosure'], 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['source'], 'source_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['cssClass', 'noComments'], 'expert_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('generalEvent', 'tl_calendar_events')
 ;
 
 // Course palette
 PaletteManipulator::create()
-    ->addField(
-        ['eventType'],
-        'event_type_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['singleSRCBroschuere'],
-        'broschuere_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'title',
-            'alias',
-            'courseId',
-            'eventState',
-            'author',
-            'instructor',
-            'mountainguide',
-            'organizers',
-            'courseLevel',
-            'courseTypeLevel0',
-            'courseTypeLevel1',
-        ],
-        'title_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'eventDates',
-            'durationInfo',
-        ],
-        'date_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['isRecurringEvent'],
-        'recurring_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['recurring'],
-        'recurring_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'teaser',
-            'terms',
-            'issues',
-            'location',
-            'journey',
-            'requirements',
-            'leistungen',
-            'equipment',
-            'meetingPoint',
-            'bookingEvent',
-            'miscellaneous',
-            'addIban',
-        ],
-        'details_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addMinAndMaxMembers'],
-        'min_max_member_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'generateMainInstructorContactDataFromDb',
-            'disableOnlineRegistration',
-            'setRegistrationPeriod',
-            'registrationGoesTo',
-        ],
-        'registration_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['allowDeregistration'],
-        'deregistration_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['askForAhvNumber'],
-        'sign_up_form_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['customizeEventRegistrationConfirmationEmailText'],
-        'event_registration_confirmation_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addImage'],
-        'image_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addGallery'],
-        'gallery_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['addEnclosure'],
-        'enclosure_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['source'],
-        'source_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        [
-            'cssClass',
-            'noComments',
-        ],
-        'expert_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->applyToPalette(
-        'course',
-        'tl_calendar_events'
-    )
+    ->addField(['eventType'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['singleSRCBroschuere'], 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['title', 'alias', 'courseId', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'], 'title_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['eventDates', 'durationInfo'], 'date_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['isRecurringEvent'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['teaser', 'terms', 'issues', 'location', 'journey', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'addIban'], 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['allowDeregistration'], 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['askForAhvNumber'], 'sign_up_form_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['customizeEventRegistrationConfirmationEmailText'], 'event_registration_confirmation_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addImage'], 'image_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addGallery'], 'gallery_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['addEnclosure'], 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['source'], 'source_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['cssClass', 'noComments'], 'expert_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('course', 'tl_calendar_events')
 ;
 
 // Tour report palette
 PaletteManipulator::create()
-    ->addField(
-        [
-            'executionState',
-            'eventSubstitutionText',
-            'tourWeatherConditions',
-            'tourAvalancheConditions',
-            'tourSpecialIncidents',
-            'eventReportAdditionalNotices',
-        ],
-        'tour_report_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->applyToPalette(
-        'tour_report',
-        'tl_calendar_events'
-    )
+    ->addField(['executionState', 'eventSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents', 'eventReportAdditionalNotices'], 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('tour_report', 'tl_calendar_events')
 ;
 
 // Global operations
@@ -792,10 +347,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId'] = [
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
@@ -839,13 +391,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = [
             'saveCallbackEventType',
         ],
     ],
-    'eval' => [
-        'submitOnChange' => true,
-        'includeBlankOption' => true,
-        'doNotShow' => false,
-        'tl_class' => 'clr m12',
-        'mandatory' => true,
-    ],
+    'eval' => ['submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => true],
     'sql' => "varchar(32) NOT NULL default ''",
 ];
 
@@ -868,16 +414,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mainInstructor'] = [
     'inputType' => 'radio',
     'flag' => 11,
     'foreignKey' => 'tl_user.name',
-    'eval' => [
-        'mandatory' => true,
-        'includeBlankOption' => true,
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
-    'relation' => [
-        'type' => 'hasOne',
-        'load' => 'eager',
-    ],
+    'relation' => ['type' => 'hasOne', 'load' => 'eager'],
 ];
 
 // Instructor
@@ -903,18 +442,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
                 'default' => BackendUser::getInstance()->id,
                 'filter' => true,
                 'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'relation' => [
-                    'type' => 'hasOne',
-                    'load' => 'eager',
-                ],
+                'relation' => ['type' => 'hasOne', 'load' => 'eager'],
                 'foreignKey' => "tl_user.CONCAT(lastname, ' ', firstname, ', ', city)",
-                'eval' => [
-                    'style' => 'width:350px',
-                    'mandatory' => true,
-                    'includeBlankOption' => true,
-                    'chosen' => true,
-                    'multiple' => false,
-                ],
+                'eval' => ['style' => 'width:350px', 'mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'multiple' => false],
             ],
         ],
     ],
@@ -926,10 +456,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['terms'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['terms'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => true,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => true],
     'sql' => 'text NULL',
 ];
 
@@ -938,10 +465,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['issues'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['issues'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => true,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => true],
     'sql' => 'text NULL',
 ];
 
@@ -950,11 +474,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['requirements'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['requirements'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => true,
-        'maxlength' => 300,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => true, 'maxlength' => 300],
     'sql' => 'text NULL',
 ];
 
@@ -963,11 +483,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['leistungen'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['leistungen'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-        'maxlength' => 200,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => false, 'maxlength' => 200],
     'sql' => 'text NULL',
 ];
 
@@ -979,10 +495,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseLevel'] = [
     'filter' => true,
     'inputType' => 'select',
     'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'],
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => true,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => true],
     'sql' => 'int(10) unsigned NULL',
 ];
 
@@ -997,13 +510,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0'] = [
         TlCalendarEvents::class,
         'optionsCallbackCourseTypeLevel0',
     ],
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'submitOnChange' => true,
-        'includeBlankOption' => true,
-        'multiple' => false,
-        'mandatory' => true,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'submitOnChange' => true, 'includeBlankOption' => true, 'multiple' => false, 'mandatory' => true],
     'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
@@ -1015,19 +522,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1'] = [
     'filter' => true,
     'inputType' => 'select',
     'foreignKey' => 'tl_course_sub_type.name',
-    'relation' => [
-        'type' => 'hasOne',
-        'load' => 'lazy',
-    ],
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
     'options_callback' => [
         TlCalendarEvents::class,
         'optionsCallbackCourseSubType',
     ],
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'multiple' => false,
-        'mandatory' => true,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'multiple' => false, 'mandatory' => true],
     'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
@@ -1043,13 +543,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['organizers'] = [
         TlCalendarEvents::class,
         'optionsCallbackGetOrganizers',
     ],
-    'eval' => [
-        'multiple' => true,
-        'chosen' => true,
-        'mandatory' => true,
-        'includeBlankOption' => false,
-        'tl_class' => 'clr m12',
-    ],
+    'eval' => ['multiple' => true, 'chosen' => true, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr m12'],
     'sql' => 'blob NULL',
 ];
 
@@ -1058,10 +552,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['equipment'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['equipment'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
     'sql' => 'text NULL',
 ];
 
@@ -1076,11 +567,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = [
         TlCalendarEvents::class,
         'optionsCallbackGetEventDuration',
     ],
-    'eval' => [
-        'includeBlankOption' => true,
-        'tl_class' => 'clr m12',
-        'mandatory' => true,
-    ],
+    'eval' => ['includeBlankOption' => true, 'tl_class' => 'clr m12', 'mandatory' => true],
     'sql' => "varchar(32) NOT NULL default ''",
 ];
 
@@ -1100,11 +587,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['minMembers'] = [
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'rgxp' => 'digit',
-        'mandatory' => true,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'rgxp' => 'digit', 'mandatory' => true],
     'sql' => 'int(3) unsigned NULL',
 ];
 
@@ -1114,11 +597,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['maxMembers'] = [
     'exclude' => true,
     'search' => true,
     'inputType' => 'text',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'rgxp' => 'digit',
-        'mandatory' => true,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'rgxp' => 'digit', 'mandatory' => true],
     'sql' => 'int(3) unsigned NULL',
 ];
 
@@ -1127,10 +606,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['bookingEvent'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['bookingEvent'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
     'sql' => 'text NULL',
 ];
 
@@ -1139,10 +615,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['miscellaneous'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['miscellaneous'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
     'sql' => 'text NULL',
 ];
 
@@ -1152,11 +625,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addIban'] = [
     'exclude' => true,
     'filter' => true,
     'inputType' => 'checkbox',
-    'eval' => [
-        'submitOnChange' => true,
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-    ],
+    'eval' => ['submitOnChange' => true, 'tl_class' => 'clr m12', 'mandatory' => false],
     'sql' => "char(1) NOT NULL default ''",
 ];
 
@@ -1165,11 +634,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['iban'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['iban'],
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => [
-        'mandatory' => true,
-        'rgxp' => 'alnum',
-        'tl_class' => 'w50',
-    ],
+    'eval' => ['mandatory' => true, 'rgxp' => 'alnum', 'tl_class' => 'w50'],
     'sql' => "varchar(32) NOT NULL default ''",
 ];
 
@@ -1179,10 +644,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['ibanBeneficiary'] = [
     'exclude' => true,
     'inputType' => 'textarea',
     'search' => true,
-    'eval' => [
-        'mandatory' => true,
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['mandatory' => true, 'tl_class' => 'clr'],
     'sql' => 'text NULL',
 ];
 
@@ -1198,14 +660,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDates'] = [
         ],
     ],
     'eval' => [
-        'columnsCallback' => [
-            TlCalendarEvents::class,
-            'listFixedDates',
-        ],
-        'buttons' => [
-            'up' => false,
-            'down' => false,
-        ],
+        'columnsCallback' => [TlCalendarEvents::class, 'listFixedDates'],
+        'buttons' => ['up' => false, 'down' => false],
         'mandatory' => true,
     ],
     'sql' => 'blob NULL',
@@ -1219,13 +675,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
     'inputType' => 'select',
     'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-STATE'],
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval' => [
-        'submitOnChange' => false,
-        'includeBlankOption' => true,
-        'doNotShow' => false,
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-    ],
+    'eval' => ['submitOnChange' => false, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false],
     //'eval'      => array('submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false),
     'sql' => "varchar(32) NOT NULL default ''",
 ];
@@ -1247,10 +697,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['meetingPoint'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['meetingPoint'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'tl_class' => '',
-        'mandatory' => false,
-    ],
+    'eval' => ['tl_class' => '', 'mandatory' => false],
     'sql' => 'text NULL',
 ];
 
@@ -1259,14 +706,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['singleSRCBroschuere'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['singleSRCBroschuere'],
     'exclude' => true,
     'inputType' => 'fileTree',
-    'eval' => [
-        'filesOnly' => true,
-        'extensions' => Config::get(
-            'validImageTypes'
-        ),
-        'fieldType' => 'radio',
-        'mandatory' => false,
-    ],
+    'eval' => ['filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'mandatory' => false],
     'sql' => 'binary(16) NULL',
 ];
 
@@ -1309,17 +749,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationGoesTo'] = [
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
-    'relation' => [
-        'type' => 'hasOne',
-        'load' => 'eager',
-    ],
+    'relation' => ['type' => 'hasOne', 'load' => 'eager'],
     'foreignKey' => 'tl_user.CONCAT(name,", ",city)',
-    'eval' => [
-        'multiple' => false,
-        'chosen' => false,
-        'includeBlankOption' => true,
-        'tl_class' => 'clr',
-    ],
+    'eval' => ['multiple' => false, 'chosen' => false, 'includeBlankOption' => true, 'tl_class' => 'clr'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
@@ -1335,38 +767,20 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod'] = [
 // Set registration start date
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationStartDate'],
-    'default' => strtotime(
-        Date::parse(
-            'Y-m-d'
-        )
-    ),
+    'default' => strtotime(Date::parse('Y-m-d')),
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => [
-        'rgxp' => 'date',
-        'mandatory' => true,
-        'datepicker' => true,
-        'tl_class' => 'w50 wizard',
-    ],
+    'eval' => ['rgxp' => 'date', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
     'sql' => 'int(10) unsigned NULL',
 ];
 
 // Set registration end date
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['registrationEndDate'],
-    'default' => strtotime(
-        Date::parse(
-            'Y-m-d'
-        )
-    ) + (2 * 24 * 3600) - 60,
+    'default' => strtotime(Date::parse('Y-m-d')) + (2 * 24 * 3600) - 60,
     'exclude' => true,
     'inputType' => 'text',
-    'eval' => [
-        'rgxp' => 'datim',
-        'mandatory' => true,
-        'datepicker' => true,
-        'tl_class' => 'w50 wizard',
-    ],
+    'eval' => ['rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
     'sql' => 'int(10) unsigned NULL',
 ];
 
@@ -1384,15 +798,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['deregistrationLimit'] = [
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
-    'options' => range(
-        1,
-        720
-    ),
-    'eval' => [
-        'rgxp' => 'natural',
-        'nospace' => true,
-        'tl_class' => 'w50',
-    ],
+    'options' => range(1, 720),
+    'eval' => ['rgxp' => 'natural', 'nospace' => true, 'tl_class' => 'w50'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
@@ -1411,15 +818,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['multiSRC'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['multiSRC'],
     'exclude' => true,
     'inputType' => 'fileTree',
-    'eval' => [
-        'multiple' => true,
-        'extensions' => 'jpg,jpeg,png',
-        'fieldType' => 'checkbox',
-        'orderField' => 'orderSRC',
-        'files' => true,
-        'filesOnly' => true,
-        'mandatory' => true,
-    ],
+    'eval' => ['multiple' => true, 'extensions' => 'jpg,jpeg,png', 'fieldType' => 'checkbox', 'orderField' => 'orderSRC', 'files' => true, 'filesOnly' => true, 'mandatory' => true],
     'sql' => 'blob NULL',
 ];
 
@@ -1436,17 +835,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType'] = [
     'filter' => true,
     'inputType' => 'select',
     'foreignKey' => 'tl_tour_type.title',
-    'relation' => [
-        'type' => 'hasMany',
-        'load' => 'eager',
-    ],
-    'eval' => [
-        'multiple' => true,
-        'chosen' => true,
-        'mandatory' => true,
-        'includeBlankOption' => true,
-        'tl_class' => 'clr m12',
-    ],
+    'relation' => ['type' => 'hasMany', 'load' => 'eager'],
+    'eval' => ['multiple' => true, 'chosen' => true, 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr m12'],
     'sql' => 'blob NULL',
 ];
 
@@ -1472,11 +862,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
                     'load' => 'eager',
                 ],
                 'foreignKey' => 'tl_tour_difficulty.shortcut',
-                'eval' => [
-                    'style' => 'width:150px',
-                    'mandatory' => true,
-                    'includeBlankOption' => true,
-                ],
+                'eval' => ['style' => 'width:150px', 'mandatory' => true, 'includeBlankOption' => true],
             ],
             'tourTechDifficultyMax' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'],
@@ -1487,16 +873,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
                     TlCalendarEvents::class,
                     'optionsCallbackTourDifficulties',
                 ],
-                'relation' => [
-                    'type' => 'hasMany',
-                    'load' => 'eager',
-                ],
+                'relation' => ['type' => 'hasMany', 'load' => 'eager'],
                 'foreignKey' => 'tl_tour_difficulty.shortcut',
-                'eval' => [
-                    'style' => 'width:150px',
-                    'mandatory' => false,
-                    'includeBlankOption' => true,
-                ],
+                'eval' => ['style' => 'width:150px', 'mandatory' => false, 'includeBlankOption' => true],
             ],
         ],
     ],
@@ -1515,39 +894,23 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'],
                 'inputType' => 'text',
                 'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'eval' => [
-                    'rgxp' => 'natural',
-                    'style' => 'width:150px',
-                    'mandatory' => false,
-                ],
+                'eval' => ['rgxp' => 'natural', 'style' => 'width:150px', 'mandatory' => false],
             ],
             'tourProfileAscentTime' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'],
                 'inputType' => 'text',
-                'eval' => [
-                    'rgxp' => 'digit',
-                    'style' => 'width:150px',
-                    'mandatory' => false,
-                ],
+                'eval' => ['rgxp' => 'digit', 'style' => 'width:150px', 'mandatory' => false],
             ],
             'tourProfileDescentMeters' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'],
                 'inputType' => 'text',
                 'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'eval' => [
-                    'rgxp' => 'natural',
-                    'style' => 'width:150px',
-                    'mandatory' => false,
-                ],
+                'eval' => ['rgxp' => 'natural', 'style' => 'width:150px', 'mandatory' => false],
             ],
             'tourProfileDescentTime' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'],
                 'inputType' => 'text',
-                'eval' => [
-                    'rgxp' => 'digit',
-                    'style' => 'width:150px',
-                    'mandatory' => false,
-                ],
+                'eval' => ['rgxp' => 'digit', 'style' => 'width:150px', 'mandatory' => false],
             ],
         ],
     ],
@@ -1560,10 +923,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourDetailText'] = [
     'exclude' => true,
     'inputType' => 'textarea',
     /** @todo maxlength 700 */
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => true,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => true],
     'sql' => 'text NULL',
 ];
 
@@ -1572,10 +932,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generalEventDetailText'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['generalEventDetailText'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
     'sql' => 'text NULL',
 ];
 
@@ -1587,10 +944,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = [
     'sorting' => true,
     'inputType' => 'select',
     'foreignKey' => 'tl_event_release_level_policy.title',
-    'relation' => [
-        'type' => 'hasOne',
-        'load' => 'lazy',
-    ],
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
     'options_callback' => [
         TlCalendarEvents::class,
         'optionsCallbackListReleaseLevels',
@@ -1601,20 +955,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = [
             'saveCallbackEventReleaseLevel',
         ],
     ],
-    'eval' => [
-        'mandatory' => true,
-        'tl_class' => 'clr m12',
-    ],
+    'eval' => ['mandatory' => true, 'tl_class' => 'clr m12'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
 
-if (
-    !Input::get(
-        'act'
-    ) || 'select' === Input::get(
-        'act'
-    )
-) {
+if (!Input::get('act') || 'select' === Input::get('act')) {
     // Display the field correctly in the filter menu
     $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel']['options_callback'] = null;
 }
@@ -1634,13 +979,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfi
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-        'preserveTags' => true,
-        'allowHtml' => true,
-        'decodeEntities' => false,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => false, 'preserveTags' => true, 'allowHtml' => true, 'decodeEntities' => false],
     'sql' => 'text NULL',
 ];
 
@@ -1661,12 +1000,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
     'inputType' => 'select',
     'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EXECUTION-STATE'],
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval' => [
-        'includeBlankOption' => true,
-        'doNotShow' => true,
-        'tl_class' => 'clr m12',
-        'mandatory' => true,
-    ],
+    'eval' => ['includeBlankOption' => true, 'doNotShow' => true, 'tl_class' => 'clr m12', 'mandatory' => true],
     'sql' => "varchar(32) NOT NULL default ''",
 ];
 
@@ -1677,16 +1011,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = [
     'filter' => true,
     'inputType' => 'select',
     'foreignKey' => 'tl_calendar_events_journey.title',
-    'relation' => [
-        'type' => 'hasOne',
-        'load' => 'lazy',
-    ],
-    'eval' => [
-        'multiple' => false,
-        'mandatory' => true,
-        'includeBlankOption' => true,
-        'tl_class' => 'clr m12',
-    ],
+    'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
+    'eval' => ['multiple' => false, 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr m12'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
@@ -1695,10 +1021,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventSubstitutionText'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'mandatory' => false,
-        'tl_class' => 'clr m12',
-    ],
+    'eval' => ['mandatory' => false, 'tl_class' => 'clr m12'],
     'sql' => 'text NULL',
 ];
 
@@ -1707,10 +1030,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourWeatherConditions'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'mandatory' => true,
-        'tl_class' => 'clr m12',
-    ],
+    'eval' => ['mandatory' => true, 'tl_class' => 'clr m12'],
     'sql' => 'text NULL',
 ];
 
@@ -1721,12 +1041,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourAvalancheConditions'] = 
     'inputType' => 'select',
     'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'],
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval' => [
-        'multiple' => false,
-        'mandatory' => true,
-        'includeBlankOption' => false,
-        'tl_class' => 'clr m12',
-    ],
+    'eval' => ['multiple' => false, 'mandatory' => true, 'includeBlankOption' => false, 'tl_class' => 'clr m12'],
     'sql' => "varchar(255) NOT NULL default ''",
 ];
 
@@ -1735,10 +1050,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourSpecialIncidents'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
     'sql' => 'text NULL',
 ];
 
@@ -1747,10 +1059,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReportAdditionalNotices
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventReportAdditionalNotices'],
     'exclude' => true,
     'inputType' => 'textarea',
-    'eval' => [
-        'tl_class' => 'clr m12',
-        'mandatory' => false,
-    ],
+    'eval' => ['tl_class' => 'clr m12', 'mandatory' => false],
     'sql' => 'text NULL',
 ];
 

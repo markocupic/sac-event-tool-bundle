@@ -38,10 +38,7 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = [
             ],
         ],
         'label' => [
-            'fields' => [
-                'shortcut',
-                'title',
-            ],
+            'fields' => ['shortcut', 'title'],
             'format' => '%s %s',
         ],
         'global_operations' => [
@@ -80,7 +77,6 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = [
     'palettes' => [
         'default' => 'shortcut,title,description',
     ],
-
     'fields' => [
         'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
@@ -100,10 +96,7 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = [
             'search' => true,
             'sorting' => false,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'shortcut' => [
@@ -112,10 +105,7 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = [
             'search' => true,
             'sorting' => false,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'description' => [

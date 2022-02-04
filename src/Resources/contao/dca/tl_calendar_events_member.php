@@ -19,9 +19,7 @@ use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Dca\TlCalendarEventsMember;
 use Ramsey\Uuid\Uuid;
 
-System::loadLanguageFile(
-    'tl_member'
-);
+System::loadLanguageFile('tl_member');
 
 /*
  * Table tl_calendar_events_member
@@ -88,23 +86,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'fields' => ['stateOfSubscription, addedOn'],
             'flag' => 1,
             'panelLayout' => 'filter;sort,search',
-            'filter' => [
-                [
-                    'eventId=?',
-                    Input::get(
-                        'id'
-                    ),
-                ],
-            ],
+            'filter' => [['eventId=?', Input::get('id')]],
         ],
         'label' => [
-            'fields' => [
-                'stateOfSubscription',
-                'firstname',
-                'lastname',
-                'street',
-                'city',
-            ],
+            'fields' => ['stateOfSubscription', 'firstname', 'lastname', 'street', 'city'],
             'showColumns' => true,
             'label_callback' => [
                 TlCalendarEventsMember::class,
@@ -205,11 +190,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 
     // Palettes
     'palettes' => [
-        '__selector__' => [
-            'addEmailAttachment',
-            'hasLeadClimbingEducation',
-            'hasPaid',
-        ],
+        '__selector__' => ['addEmailAttachment', 'hasLeadClimbingEducation', 'hasPaid'],
         'default' => '{stateOfSubscription_legend},dashboard,stateOfSubscription,addedOn,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionIds,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
         'sendEmail' => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy',
         'refuseWithEmail' => '{refuseWithEmail_legend},refuseWithEmail',
@@ -232,19 +213,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'eventId' => [
             'foreignKey' => 'tl_calendar_events.title',
             'sql' => "int(10) unsigned NOT NULL default '0'",
-            'relation' => [
-                'type' => 'belongsTo',
-                'load' => 'eager',
-            ],
+            'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
             'eval' => ['readonly' => true],
         ],
         'contaoMemberId' => [
             'foreignKey' => "tl_member.CONCAT(firstname, ' ', lastname)",
             'sql' => "int(10) unsigned NOT NULL default '0'",
-            'relation' => [
-                'type' => 'belongsTo',
-                'load' => 'eager',
-            ],
+            'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
             'eval' => ['readonly' => true],
         ],
         'tstamp' => [
@@ -253,58 +228,34 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'uuid' => [
             'inputType' => 'text',
             'default' => Uuid::uuid4()->toString(),
-            'eval' => [
-                'unique' => true,
-                'doNotCopy' => true,
-            ],
+            'eval' => ['unique' => true, 'doNotCopy' => true],
             'sql' => "char(36) NOT NULL default ''",
         ],
         'addedOn' => [
             'inputType' => 'text',
             'flag' => 5,
             'sorting' => true,
-            'eval' => [
-                'rgxp' => 'date',
-                'datepicker' => true,
-                'tl_class' => 'w50 wizard',
-            ],
+            'eval' => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(10) NOT NULL default ''",
         ],
         'allowMultiSignUp' => [
             'inputType' => 'checkbox',
-            'eval' => [
-                'submitOnChange' => true,
-                'doNotShow' => false,
-                'doNotCopy' => true,
-                'tl_class' => 'long clr',
-            ],
+            'eval' => ['submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'long clr'],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'hasPaid' => [
             'exclude' => true,
             'filter' => true,
             'inputType' => 'checkbox',
-            'eval' => [
-                'submitOnChange' => true,
-                'tl_class' => 'clr m12',
-                'mandatory' => false,
-            ],
+            'eval' => ['submitOnChange' => true, 'tl_class' => 'clr m12', 'mandatory' => false],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'paymentMethod' => [
             'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
             'exclude' => true,
             'inputType' => 'select',
-            'options' => [
-                'cashPayment',
-                'bankTransfer',
-                'twint',
-            ],
-            'eval' => [
-                'mandatory' => true,
-                'includeBlankOption' => true,
-                'tl_class' => 'w50',
-            ],
+            'options' => ['cashPayment', 'bankTransfer', 'twint'],
+            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(32) NOT NULL default ''",
         ],
         'stateOfSubscription' => [
@@ -319,42 +270,24 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'default' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'][0],
             'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
             'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'],
-            'eval' => [
-                'doNotShow' => false,
-                'readonly' => false,
-                'includeBlankOption' => false,
-                'maxlength' => 255,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['doNotShow' => false, 'readonly' => false, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'carInfo' => [
             'inputType' => 'select',
             'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
-            'eval' => [
-                'includeBlankOption' => true,
-                'doNotShow' => false,
-                'doNotCopy' => true,
-            ],
+            'eval' => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'ticketInfo' => [
             'inputType' => 'select',
             'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
-            'eval' => [
-                'includeBlankOption' => true,
-                'doNotShow' => false,
-                'doNotCopy' => true,
-            ],
+            'eval' => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'hasParticipated' => [
             'inputType' => 'checkbox',
-            'eval' => [
-                'doNotShow' => false,
-                'submitOnChange' => true,
-                'doNotCopy' => true,
-            ],
+            'eval' => ['doNotShow' => false, 'submitOnChange' => true, 'doNotCopy' => true],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'dashboard' => [
@@ -363,12 +296,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 TlCalendarEventsMember::class,
                 'inputFieldCallbackDashboard',
             ],
-            'eval' => [
-                'doNotShow' => true,
-                'mandatory' => false,
-                'maxlength' => 255,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'refuseWithEmail' => [
@@ -377,12 +305,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 TlCalendarEventsMember::class,
                 'inputFieldCallbackNotifyMemberAboutSubscriptionState',
             ],
-            'eval' => [
-                'doNotShow' => true,
-                'mandatory' => false,
-                'maxlength' => 255,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'acceptWithEmail' => [
@@ -391,12 +314,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 TlCalendarEventsMember::class,
                 'inputFieldCallbackNotifyMemberAboutSubscriptionState',
             ],
-            'eval' => [
-                'doNotShow' => true,
-                'mandatory' => false,
-                'maxlength' => 255,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'addToWaitlist' => [
@@ -405,192 +323,89 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 TlCalendarEventsMember::class,
                 'inputFieldCallbackNotifyMemberAboutSubscriptionState',
             ],
-            'eval' => [
-                'doNotShow' => true,
-                'mandatory' => false,
-                'maxlength' => 255,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'eventName' => [
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'notes' => [
             'exclude' => true,
             'inputType' => 'textarea',
-            'eval' => [
-                'tl_class' => 'clr',
-                'maxlength' => 5000,
-                'decodeEntities' => true,
-                'mandatory' => false,
-            ],
+            'eval' => ['tl_class' => 'clr', 'maxlength' => 5000, 'decodeEntities' => true, 'mandatory' => false],
             'sql' => 'text NULL',
         ],
         'instructorNotes' => [
             'exclude' => true,
             'inputType' => 'textarea',
-            'eval' => [
-                'tl_class' => 'clr',
-                'maxlength' => 5000,
-                'decodeEntities' => true,
-                'mandatory' => false,
-            ],
+            'eval' => ['tl_class' => 'clr', 'maxlength' => 5000, 'decodeEntities' => true, 'mandatory' => false],
             'sql' => 'text NULL',
         ],
         'firstname' => [
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'lastname' => [
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'gender' => [
             'inputType' => 'select',
             'sorting' => true,
-            'options' => [
-                'male',
-                'female',
-            ],
+            'options' => ['male', 'female'],
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
-            'eval' => [
-                'mandatory' => true,
-                'includeBlankOption' => true,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(32) NOT NULL default ''",
         ],
         'dateOfBirth' => [
             'sorting' => true,
             'flag' => 5,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => false,
-                'rgxp' => 'date',
-                'datepicker' => true,
-                'tl_class' => 'w50 wizard',
-            ],
+            'eval' => ['mandatory' => false, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(11) NOT NULL default ''",
         ],
         'street' => [
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'feEditable' => true,
-                'feViewable' => true,
-                'feGroup' => 'address',
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'postal' => [
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 32,
-                'feEditable' => true,
-                'feViewable' => true,
-                'feGroup' => 'address',
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 32, 'tl_class' => 'w50'],
             'sql' => "varchar(32) NOT NULL default ''",
         ],
         'city' => [
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'feEditable' => true,
-                'feViewable' => true,
-                'feGroup' => 'address',
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'mobile' => [
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => false,
-                'maxlength' => 64,
-                'rgxp' => 'phone',
-                'decodeEntities' => true,
-                'feEditable' => true,
-                'feViewable' => true,
-                'feGroup' => 'contact',
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(64) NOT NULL default ''",
         ],
         'emergencyPhone' => [
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 64,
-                'rgxp' => 'phone',
-                'decodeEntities' => true,
-                'feEditable' => true,
-                'feViewable' => true,
-                'feGroup' => 'contact',
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(64) NOT NULL default ''",
         ],
         'emergencyPhoneName' => [
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'decodeEntities' => true,
-                'feEditable' => true,
-                'feViewable' => true,
-                'feGroup' => 'contact',
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'email' => [
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => false,
-                'maxlength' => 255,
-                'rgxp' => 'email',
-                'unique' => false,
-                'decodeEntities' => true,
-                'feEditable' => true,
-                'feViewable' => true,
-                'feGroup' => 'contact',
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'ahvNumber' => [
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => false,
-                'maxlength' => 16,
-                'unique' => false,
-                'decodeEntities' => true,
-                'feGroup' => 'contact',
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => false, 'maxlength' => 16, 'unique' => false, 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'sacMemberId' => [
@@ -601,13 +416,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                     'saveCallbackSacMemberId',
                 ],
             ],
-            'eval' => [
-                'doNotShow' => true,
-                'doNotCopy' => true,
-                'rgxp' => 'sacMemberId',
-                'maxlength' => 255,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'hasLeadClimbingEducation' => [
@@ -621,25 +430,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'dateOfLeadClimbingEducation' => [
             'exclude' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'rgxp' => 'date',
-                'datepicker' => true,
-                'feEditable' => true,
-                'feViewable' => true,
-                'feGroup' => 'personal',
-                'tl_class' => 'w50 wizard',
-            ],
+            'eval' => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql' => "varchar(11) NOT NULL default ''",
         ],
         'foodHabits' => [
             'exclude' => true,
             'search' => true,
             'inputType' => 'text',
-            'eval' => [
-                'tl_class' => 'clr',
-                'maxlength' => 5000,
-            ],
+            'eval' => ['tl_class' => 'clr', 'maxlength' => 5000],
             'sql' => 'text NULL',
         ],
         // Send E-mail
@@ -647,36 +445,17 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'options' => [],
             // Set via onload callback
             'inputType' => 'checkbox',
-            'eval' => [
-                'multiple' => true,
-                'mandatory' => true,
-                'doNotShow' => true,
-                'doNotCopy' => true,
-                'tl_class' => '',
-            ],
+            'eval' => ['multiple' => true, 'mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''],
             'sql' => 'blob NULL',
         ],
         'emailSubject' => [
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'doNotShow' => true,
-                'doNotCopy' => true,
-                'tl_class' => '',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'emailText' => [
             'inputType' => 'textarea',
-            'eval' => [
-                'mandatory' => true,
-                'doNotShow' => true,
-                'doNotCopy' => true,
-                'rows' => 6,
-                'style' => 'height:50px',
-                'tl_class' => '',
-            ],
+            'eval' => ['mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'rows' => 6, 'style' => 'height:50px', 'tl_class' => ''],
             'sql' => 'mediumtext NULL',
         ],
         'addEmailAttachment' => [
@@ -689,55 +468,30 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'emailAttachment' => [
             'exclude' => true,
             'inputType' => 'fileTree',
-            'eval' => [
-                'multiple' => true,
-                'fieldType' => 'checkbox',
-                'extensions' => Config::get(
-                    'allowedDownload'
-                ),
-                'files' => true,
-                'filesOnly' => true,
-                'mandatory' => true,
-            ],
+            'eval' => ['multiple' => true, 'fieldType' => 'checkbox', 'extensions' => Config::get('allowedDownload'), 'files' => true, 'filesOnly' => true, 'mandatory' => true],
             'sql' => 'binary(16) NULL',
         ],
         'emailSendCopy' => [
             'inputType' => 'checkbox',
-            'eval' => [
-                'doNotShow' => true,
-                'doNotCopy' => true,
-            ],
+            'eval' => ['doNotShow' => true, 'doNotCopy' => true],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'agb' => [
             'inputType' => 'checkbox',
-            'eval' => [
-                'doNotShow' => true,
-                'doNotCopy' => true,
-            ],
+            'eval' => ['doNotShow' => true, 'doNotCopy' => true],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'anonymized' => [
             'inputType' => 'checkbox',
-            'eval' => [
-                'doNotShow' => true,
-                'doNotCopy' => true,
-            ],
+            'eval' => ['doNotShow' => true, 'doNotCopy' => true],
             'sql' => "char(1) NOT NULL default ''",
         ],
         'bookingType' => [
             'exclude' => true,
             'inputType' => 'select',
             'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
-            'options' => [
-                'onlineForm',
-                'manually',
-            ],
-            'eval' => [
-                'doNotShow' => true,
-                'includeBlankOption' => false,
-                'doNotCopy' => true,
-            ],
+            'options' => ['onlineForm', 'manually'],
+            'eval' => ['doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true],
             'sql' => "varchar(255) NOT NULL default 'manually'",
         ],
         'sectionIds' => [
@@ -749,13 +503,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 TlCalendarEventsMember::class,
                 'listSections',
             ],
-            'eval' => [
-                'multiple' => true,
-                'chosen' => true,
-                'doNotCopy' => true,
-                'readonly' => false,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['multiple' => true, 'chosen' => true, 'doNotCopy' => true, 'readonly' => false, 'tl_class' => 'w50'],
             'sql' => 'blob NULL',
         ],
     ],

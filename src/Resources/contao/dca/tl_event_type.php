@@ -29,8 +29,6 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
             ],
         ],
     ],
-
-    // List
     'list' => [
         'sorting' => [
             'mode' => 2,
@@ -74,13 +72,9 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
             ],
         ],
     ],
-
-    // Palettes
     'palettes' => [
         'default' => '{title_legend},alias,title;{release_level_legend},levelAccessPermissionPackage;{preview_page_legend},previewPage;',
     ],
-
-    // Fields
     'fields' => [
         'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
@@ -100,12 +94,7 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
                     'loadCallbackAlias',
                 ],
             ],
-            'eval' => [
-                'mandatory' => true,
-                'rgxp' => 'alnum',
-                'maxlength' => 128,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => true, 'rgxp' => 'alnum', 'maxlength' => 128, 'tl_class' => 'w50'],
             'sql' => 'varchar(128) NULL',
         ],
         'title' => [
@@ -114,44 +103,26 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
             'exclude' => true,
             'search' => true,
             'flag' => 1,
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 128,
-                'tl_class' => 'w50',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 128, 'tl_class' => 'w50'],
             'sql' => 'varchar(128) NULL',
         ],
         'levelAccessPermissionPackage' => [
             'label' => &$GLOBALS['TL_LANG']['tl_event_type']['levelAccessPermissionPackage'],
             'exclude' => true,
             'inputType' => 'select',
-            'relation' => [
-                'type' => 'belongsTo',
-                'load' => 'eager',
-            ],
+            'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
             'foreignKey' => 'tl_event_release_level_policy_package.title',
             'sql' => "int(10) unsigned NOT NULL default '0'",
-            'eval' => [
-                'includeBlankOption' => true,
-                'mandatory' => true,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'clr'],
         ],
         'previewPage' => [
             'label' => &$GLOBALS['TL_LANG']['tl_event_type']['previewPage'],
             'exclude' => true,
             'inputType' => 'pageTree',
             'foreignKey' => 'tl_page.title',
-            'eval' => [
-                'mandatory' => true,
-                'fieldType' => 'radio',
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
             'sql' => "int(10) unsigned NOT NULL default '0'",
-            'relation' => [
-                'type' => 'hasOne',
-                'load' => 'lazy',
-            ],
+            'relation' => ['type' => 'hasOne', 'load' => 'lazy'],
         ],
     ],
 ];

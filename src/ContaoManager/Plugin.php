@@ -54,11 +54,6 @@ class Plugin implements ConfigPluginInterface, BundlePluginInterface, RoutingPlu
         ;
     }
 
-    /**
-     * @param LoaderInterface $loader
-     * @param array $config
-     * @return void
-     */
     public function registerContainerConfiguration(LoaderInterface $loader, array $config): void
     {
         //$loader->load('@MarkocupicSacEventTool/Resources/config/config.yml');

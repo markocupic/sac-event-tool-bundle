@@ -127,12 +127,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'textarea',
-            'eval' => [
-                'rgxp' => '',
-                'mandatory' => true,
-                'maxlength' => 512,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['rgxp' => '', 'mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'],
             'sql' => "varchar(512) NOT NULL default ''",
         ],
         'phone' => [
@@ -141,12 +136,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'rgxp' => 'phone',
-                'mandatory' => false,
-                'maxlength' => 255,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['rgxp' => 'phone', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'email' => [
@@ -155,12 +145,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'rgxp' => 'email',
-                'mandatory' => false,
-                'maxlength' => 255,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['rgxp' => 'email', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'bookingMethod' => [
@@ -169,11 +154,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'textarea',
-            'eval' => [
-                'mandatory' => false,
-                'maxlength' => 512,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['mandatory' => false, 'maxlength' => 512, 'tl_class' => 'clr'],
             'sql' => "varchar(512) NOT NULL default ''",
         ],
         'url' => [
@@ -182,26 +163,14 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'rgxp' => 'url',
-                'mandatory' => false,
-                'maxlength' => 255,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['rgxp' => 'url', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'singleSRC' => [
             'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['singleSRC'],
             'exclude' => true,
             'inputType' => 'fileTree',
-            'eval' => [
-                'fieldType' => 'radio',
-                'filesOnly' => true,
-                'extensions' => Config::get(
-                    'validImageTypes'
-                ),
-                'mandatory' => true,
-            ],
+            'eval' => ['fieldType' => 'radio', 'filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'mandatory' => true],
             'sql' => 'binary(16) NULL',
         ],
         'huettenchef' => [
@@ -210,11 +179,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'textarea',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 512,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'],
             'sql' => "varchar(512) NOT NULL default ''",
         ],
         'capacity' => [
@@ -223,11 +188,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'textarea',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 512,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'],
             'sql' => "varchar(512) NOT NULL default ''",
         ],
         'coordsCH1903' => [
@@ -236,11 +197,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'coordsWGS84' => [
@@ -249,11 +206,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'openingTime' => [
@@ -262,11 +215,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'textarea',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 512,
-                'tl_class' => 'clr',
-            ],
+            'eval' => ['mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'],
             'sql' => "varchar(512) NOT NULL default ''",
         ],
         'ascent' => [
@@ -279,59 +228,41 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
                         'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentDescription'],
                         'exclude' => true,
                         'inputType' => 'textarea',
-                        'eval' => [
-                            'style' => 'width:150px',
-                        ],
+                        'eval' => ['style' => 'width:150px'],
                     ],
                     'ascentTime' => [
                         'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentTime'],
                         'exclude' => true,
                         'inputType' => 'text',
-                        'eval' => [
-                            'style' => 'width:80px',
-                        ],
+                        'eval' => ['style' => 'width:80px'],
                     ],
                     'ascentDifficulty' => [
                         'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentDifficulty'],
                         'exclude' => true,
                         'inputType' => 'textarea',
-                        'eval' => [
-                            'style' => 'width:80px',
-                        ],
+                        'eval' => ['style' => 'width:80px'],
                     ],
                     'ascentSummer' => [
                         'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentSummer'],
                         'exclude' => true,
                         'inputType' => 'select',
-                        'options' => [
-                            'possible',
-                            'not-possible',
-                        ],
+                        'options' => ['possible', 'not-possible'],
                         'reference' => &$GLOBALS['TL_LANG']['tl_cabanne_sac'],
-                        'eval' => [
-                            'style' => 'width:50px',
-                        ],
+                        'eval' => ['style' => 'width:50px'],
                     ],
                     'ascentWinter' => [
                         'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentWinter'],
                         'exclude' => true,
                         'inputType' => 'select',
-                        'options' => [
-                            'possible',
-                            'not-possible',
-                        ],
+                        'options' => ['possible', 'not-possible'],
                         'reference' => &$GLOBALS['TL_LANG']['tl_cabanne_sac'],
-                        'eval' => [
-                            'style' => 'width:50px',
-                        ],
+                        'eval' => ['style' => 'width:50px'],
                     ],
                     'ascentComment' => [
                         'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentComment'],
                         'exclude' => true,
                         'inputType' => 'textarea',
-                        'eval' => [
-                            'style' => 'width:150px',
-                        ],
+                        'eval' => ['style' => 'width:150px'],
                     ],
                 ],
             ],

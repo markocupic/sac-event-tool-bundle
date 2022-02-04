@@ -16,7 +16,6 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\CalendarEventsInstructorInvoiceModel;
 use Contao\CalendarEventsModel;
-use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
@@ -26,7 +25,10 @@ use Contao\Message;
 use Contao\System;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx;
+use PhpOffice\PhpWord\Exception\CopyFileException;
+use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -59,7 +61,6 @@ class CalendarEventsInstructorInvoice
         $this->eventTemplateTourRapport = $eventTemplateTourRapport;
         $this->eventTourInvoiceFileNamePattern = $eventTourInvoiceFileNamePattern;
         $this->eventTourRapportFileNamePattern = $eventTourRapportFileNamePattern;
-
     }
 
     /**
@@ -111,8 +112,7 @@ class CalendarEventsInstructorInvoice
 
         $request = $this->requestStack->getCurrentRequest();
 
-
-        if (defined('CURRENT_ID') && CURRENT_ID !== '') {
+        if (\defined('CURRENT_ID') && CURRENT_ID !== '') {
             if ('generateInvoiceDocx' === $request->query->get('action') || 'generateInvoicePdf' === $request->query->get('action') || 'generateTourRapportDocx' === $request->query->get('action') || 'generateTourRapportPdf' === $request->query->get('action')) {
                 $objInvoice = CalendarEventsInstructorInvoiceModel::findByPk($request->query->get('id'));
 
@@ -140,11 +140,9 @@ class CalendarEventsInstructorInvoice
         }
     }
 
-
     /**
-     * @return void
-     * @throws \PhpOffice\PhpWord\Exception\CopyFileException
-     * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
+     * @throws CopyFileException
+     * @throws CreateTemporaryFileException
      * @Callback(table="tl_calendar_events_instructor_invoice", target="config.onload", priority=80)
      */
     public function routeActions(): void
@@ -160,11 +158,11 @@ class CalendarEventsInstructorInvoice
             $objTemplator = $this->eventRapport2Docx;
 
             if ('generateInvoiceDocx' === $request->query->get('action')) {
-                $objTemplator->generate('invoice', $objEventInvoice, 'docx', $this->eventTemplateTourInvoice,  $this->eventTourInvoiceFileNamePattern);
+                $objTemplator->generate('invoice', $objEventInvoice, 'docx', $this->eventTemplateTourInvoice, $this->eventTourInvoiceFileNamePattern);
             }
 
             if ('generateInvoicePdf' === $request->query->get('action')) {
-                $objTemplator->generate('invoice', $objEventInvoice, 'pdf', $this->eventTemplateTourInvoice,  $this->eventTourInvoiceFileNamePattern);
+                $objTemplator->generate('invoice', $objEventInvoice, 'pdf', $this->eventTemplateTourInvoice, $this->eventTourInvoiceFileNamePattern);
             }
 
             if ('generateTourRapportDocx' === $request->query->get('action')) {
@@ -184,7 +182,7 @@ class CalendarEventsInstructorInvoice
      */
     public function warnIfReportFormHasNotFilledIn(): void
     {
-        if (defined('CURRENT_ID') && CURRENT_ID !== '') {
+        if (\defined('CURRENT_ID') && CURRENT_ID !== '') {
             $objEvent = CalendarEventsModel::findByPk(CURRENT_ID);
 
             if (null !== $objEvent) {
@@ -196,10 +194,8 @@ class CalendarEventsInstructorInvoice
         }
     }
 
-
     /**
-     * @return void
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @Callback(table="tl_calendar_events_instructor_invoice", target="config.onload", priority=60)
      */
     public function reviseTable(): void
@@ -233,11 +229,9 @@ class CalendarEventsInstructorInvoice
         return $arrButtons;
     }
 
-
-
     /**
      * @param $value
-     * @param DataContainer $dc
+     *
      * @return mixed|null
      * @Callback(table="tl_calendar_events_instructor_invoice", target="fields.iban.load")
      */

@@ -19,7 +19,6 @@ use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
-use Contao\FilesModel;
 use Contao\FrontendUser;
 use Contao\ModuleModel;
 use Contao\PageModel;
@@ -109,10 +108,7 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
     {
         $src = getAvatar($this->objUser->id, 'FE');
 
-
-
         if (!empty($src)) {
-
             if (is_file($this->projectDir.'/'.$src)) {
                 $size = StringUtil::deserialize($model->imgSize);
 
@@ -123,11 +119,8 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
                         $size = [];
                     }
 
-
                     $size += [0, 0, 'crop'];
                 }
-
-
 
                 // If picture
                 if (isset($size[2]) && is_numeric($size[2])) {

@@ -12,7 +12,6 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Contao\Config;
 use Contao\FilesModel;
 use Contao\MemberModel;
 use Contao\Picture;
@@ -115,9 +114,9 @@ function getAvatar($userId, $mode = 'BE')
 
         if ('female' === $objUser->gender) {
             return System::getContainer()->getParameter('sacevt.avatar.female');
-        } else {
-            return System::getContainer()->getParameter('sacevt.avatar.male');
         }
+
+        return System::getContainer()->getParameter('sacevt.avatar.male');
     }
 
     return '';

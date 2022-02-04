@@ -228,13 +228,10 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                         ;
 
                         $objReportModel = $calendarEventsStoryModelAdapter->findByPk($insertId);
-
                     }
-
                 }
 
-                if(!isset($objReportModel))
-                {
+                if (!isset($objReportModel)) {
                     throw new \Exception('Event report model not found.');
                 }
 
@@ -353,10 +350,6 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         $messageAdapter->reset();
     }
 
-    /**
-     * @param CalendarEventsStoryModel $objEventStoryModel
-     * @return string
-     */
     protected function generateTextAndYoutubeForm(CalendarEventsStoryModel $objEventStoryModel): string
     {
         // Set adapters
@@ -386,7 +379,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             'label' => 'Tourname/Tourtitel',
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'decodeEntities' => true],
-            'value' =>  $this->getTourTitle($objEventStoryModel),
+            'value' => $this->getTourTitle($objEventStoryModel),
         ]);
 
         // text
@@ -407,7 +400,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                 'label' => 'Tourenstationen mit Höhenangaben (nur stichwortartig)',
                 'inputType' => 'textarea',
                 'eval' => $eval,
-                'value' =>  $this->getTourWaypoints($objEventStoryModel),
+                'value' => $this->getTourWaypoints($objEventStoryModel),
             ]
         );
 
@@ -420,7 +413,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                 'label' => 'Höhenmeter und Zeitangabe pro Tag',
                 'inputType' => 'textarea',
                 'eval' => $eval,
-                'value' =>  $this->getTourProfile($objEventStoryModel),
+                'value' => $this->getTourProfile($objEventStoryModel),
             ]
         );
 
@@ -431,7 +424,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             'label' => 'Technische Schwierigkeiten',
             'inputType' => 'textarea',
             'eval' => $eval,
-            'value' =>  $this->getTourTechDifficulties($objEventStoryModel),
+            'value' => $this->getTourTechDifficulties($objEventStoryModel),
         ]);
 
         // tour highlights (not mandatory)
@@ -590,9 +583,6 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
     }
 
     /**
-     * @param CalendarEventsStoryModel $objEventStoryModel
-     * @param ModuleModel $moduleModel
-     * @return string
      * @throws \Exception
      */
     protected function generatePictureUploadForm(CalendarEventsStoryModel $objEventStoryModel, ModuleModel $moduleModel): string
@@ -629,12 +619,9 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         $objUploadFolder = new Folder($this->eventStoryAssetDir.'/'.$objEventStoryModel->id);
         $dbafsAdapter->addResource($objUploadFolder->path);
 
-        if(!is_dir($this->projectDir . '/' . $this->eventStoryAssetDir.'/'.$objEventStoryModel->id))
-        {
+        if (!is_dir($this->projectDir.'/'.$this->eventStoryAssetDir.'/'.$objEventStoryModel->id)) {
             throw new \Exception($this->translator->trans('ERR.md_write_event_article_uploadDirNotFound', [], 'contao_default'));
         }
-
-
 
         $objForm = new Form(
             'form-eventstory-picture-upload',
