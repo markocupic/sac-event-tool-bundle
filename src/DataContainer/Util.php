@@ -12,22 +12,29 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Dca;
+namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\Input;
-use Contao\System;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-class TlCalendar extends \tl_calendar
+class Util
 {
-    /**
-     * Import the back end user object.
-     */
-    public function __construct()
+    private RequestStack $requestStack;
+
+    public function __construct(RequestStack $requestStack)
     {
+        $this->requestStack = $requestStack;
+    }
+
+
+    public function setCorrectReferer(): void
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
         // Set correct referer
-        if ('sac_calendar_events_tool' === Input::get('do') && '' !== Input::get('ref')) {
-            $objSession = System::getContainer()->get('session');
-            $ref = Input::get('ref');
+        if ('sac_calendar_events_tool' === $request->query->get('do') && '' !== $request->query->get('ref')) {
+            $objSession = $request->getSession();
+
+            $ref = $request->query->get('ref');
             $session = $objSession->get('referer');
 
             if (isset($session[$ref]['tl_calendar_container'])) {
@@ -50,19 +57,6 @@ class TlCalendar extends \tl_calendar
                 $objSession->set('referer', $session);
             }
         }
-
-        parent::__construct();
     }
 
-    /**
-     * List items.
-     *
-     * @param array $arrRow
-     *
-     * @return string
-     */
-    public function listCalendars($arrRow)
-    {
-        return $arrRow['title'];
-    }
 }

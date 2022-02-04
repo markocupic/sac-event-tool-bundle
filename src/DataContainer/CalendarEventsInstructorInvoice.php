@@ -38,6 +38,7 @@ class CalendarEventsInstructorInvoice
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Connection $connection;
+    private Util $util;
     private TranslatorInterface $translator;
     private Security $security;
     private EventRapport2Docx $eventRapport2Docx;
@@ -49,11 +50,12 @@ class CalendarEventsInstructorInvoice
     /**
      * Import the back end user object.
      */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, Security $security, EventRapport2Docx $eventRapport2Docx, string $eventTemplateTourInvoice, string $eventTemplateTourRapport, string $eventTourInvoiceFileNamePattern, string $eventTourRapportFileNamePattern)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, EventRapport2Docx $eventRapport2Docx, string $eventTemplateTourInvoice, string $eventTemplateTourRapport, string $eventTourInvoiceFileNamePattern, string $eventTourRapportFileNamePattern)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
+        $this->util = $util;
         $this->translator = $translator;
         $this->security = $security;
         $this->eventRapport2Docx = $eventRapport2Docx;
@@ -70,35 +72,7 @@ class CalendarEventsInstructorInvoice
      */
     public function setCorrectReferer(): void
     {
-        $request = $this->requestStack->getCurrentRequest();
-
-        // Set correct referer
-        if ('sac_calendar_events_tool' === $request->query->get('do') && '' !== $request->query->get('ref')) {
-            $objSession = $request->getSession();
-
-            $ref = $request->query->get('ref');
-            $session = $objSession->get('referer');
-
-            if (isset($session[$ref]['tl_calendar_container'])) {
-                $session[$ref]['tl_calendar_container'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar_container']);
-                $objSession->set('referer', $session);
-            }
-
-            if (isset($session[$ref]['tl_calendar'])) {
-                $session[$ref]['tl_calendar'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar']);
-                $objSession->set('referer', $session);
-            }
-
-            if (isset($session[$ref]['tl_calendar_events'])) {
-                $session[$ref]['tl_calendar_events'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar_events']);
-                $objSession->set('referer', $session);
-            }
-
-            if (isset($session[$ref]['tl_calendar_events_instructor_invoice'])) {
-                $session[$ref]['tl_calendar_events_instructor_invoice'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar_events_instructor_invoice']);
-                $objSession->set('referer', $session);
-            }
-        }
+       $this->util->setCorrectReferer();
     }
 
     /**

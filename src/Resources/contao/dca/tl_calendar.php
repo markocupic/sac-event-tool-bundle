@@ -21,16 +21,10 @@ $GLOBALS['TL_DCA']['tl_calendar']['config']['ptable'] = 'tl_calendar_container';
 
 // List
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['mode'] = 4;
-$GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['child_record_callback'] = [
-    TlCalendar::class,
-    'listCalendars',
-];
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['headerFields'] = ['title'];
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['disableGrouping'] = true;
 
-if (
-    BackendUser::getInstance()->isAdmin
-) {
+if (    BackendUser::getInstance()->isAdmin) {
     $GLOBALS['TL_DCA']['tl_calendar']['list']['operations']['cut'] = [
         'label' => &$GLOBALS['TL_LANG']['tl_calendar']['cut'],
         'href' => 'act=paste&amp;mode=cut',
