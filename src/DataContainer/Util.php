@@ -25,38 +25,35 @@ class Util
         $this->requestStack = $requestStack;
     }
 
-
+    /**
+     * Set the correct referer
+     *
+     * @return void
+     */
     public function setCorrectReferer(): void
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        // Set correct referer
         if ('sac_calendar_events_tool' === $request->query->get('do') && '' !== $request->query->get('ref')) {
-            $objSession = $request->getSession();
 
+            $objSession = $request->getSession();
             $ref = $request->query->get('ref');
             $session = $objSession->get('referer');
 
-            if (isset($session[$ref]['tl_calendar_container'])) {
-                $session[$ref]['tl_calendar_container'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar_container']);
-                $objSession->set('referer', $session);
-            }
+            $arrTables = [
+                'tl_calendar_container',
+                'tl_calendar',
+                'tl_calendar_events',
+                'tl_calendar_events_instructor_invoice',
+            ];
 
-            if (isset($session[$ref]['tl_calendar'])) {
-                $session[$ref]['tl_calendar'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar']);
-                $objSession->set('referer', $session);
-            }
-
-            if (isset($session[$ref]['tl_calendar_events'])) {
-                $session[$ref]['tl_calendar_events'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar_events']);
-                $objSession->set('referer', $session);
-            }
-
-            if (isset($session[$ref]['tl_calendar_events_instructor_invoice'])) {
-                $session[$ref]['tl_calendar_events_instructor_invoice'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar_events_instructor_invoice']);
-                $objSession->set('referer', $session);
+            foreach ($arrTables as $table)
+            {
+                if (isset($session[$ref][$table])) {
+                    $session[$ref][$table] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref][$table]);
+                    $objSession->set('referer', $session);
+                }
             }
         }
     }
-
 }
