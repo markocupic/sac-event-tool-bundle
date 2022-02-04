@@ -163,7 +163,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = [
     3 => 'Psychologe FSP',
     4 => 'Scheesportlehrer',
     5 => 'Dr. med.',
-    6 => 'J%S Leiter',
+    6 => 'J+S Leiter',
     7 => 'Wanderleiter',
     8 => 'IGKA Instruktor',
 ];
