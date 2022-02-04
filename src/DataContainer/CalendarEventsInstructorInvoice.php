@@ -72,7 +72,7 @@ class CalendarEventsInstructorInvoice
      */
     public function setCorrectReferer(): void
     {
-       $this->util->setCorrectReferer();
+        $this->util->setCorrectReferer();
     }
 
     /**
@@ -107,7 +107,7 @@ class CalendarEventsInstructorInvoice
                 }
 
                 if (!$blnAllow) {
-                    Message::addError('Sie besitzen nicht die nötigen Rechte, um diese Seite zu sehen.', 'BE');
+                    Message::addError('Sie besitzen nicht die nötigen Rechte, um diese Seite zu sehen.');
                     Controller::redirect(System::getReferer());
                 }
             }
