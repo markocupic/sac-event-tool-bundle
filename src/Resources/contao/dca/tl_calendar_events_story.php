@@ -22,16 +22,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
         'enableVersioning' => true,
         'notCopyable' => true,
         'closed' => true,
-        'onload_callback' => [
-            [
-                TlCalendarEventsStory::class,
-                'setPalettes',
-            ],
-            [
-                TlCalendarEventsStory::class,
-                'deleteUnfinishedAndOldEntries',
-            ],
-        ],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
@@ -53,10 +43,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
                 'authorName',
             ],
             'showColumns' => true,
-            'label_callback' => [
-                TlCalendarEventsStory::class,
-                'addIcon',
-            ],
         ],
         'global_operations' => [
             'all' => [

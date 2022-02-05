@@ -30,6 +30,16 @@ services:
             - '%sacevt.event.tour_invoice_file_name_pattern%'
             - '%sacevt.event.tour_rapport_file_name_pattern%'
 
+    Markocupic\SacEventToolBundle\DataContainer\CalendarEventsStory:
+        arguments:
+            - '@security.helper'
+            - '@database_connection'
+            - '@request_stack'
+            - '@Markocupic\SacEventToolBundle\Download\BinaryFileDownload'
+            - '%kernel.project_dir%'
+            - '%sacevt.temp_dir%'
+            - '%sacevt.locale%'
+
     Markocupic\SacEventToolBundle\DataContainer\Content:
         arguments:
             - '@database_connection'

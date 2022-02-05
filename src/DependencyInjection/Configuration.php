@@ -27,6 +27,8 @@ class Configuration implements ConfigurationInterface
 
         $treeBuilder->getRootNode()
             ->children()
+                // Language
+                ->scalarNode('locale')->info('Set the default language.')->defaultValue('de')->cannotBeEmpty()->end()
                 // Section name
                 ->scalarNode('section_name')->info('e.g. SAC Sektion Pilatus')->cannotBeEmpty()->end()
                 // Section ids [4250,4251,4252,4253,4254]

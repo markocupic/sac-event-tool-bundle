@@ -12,46 +12,164 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Dca;
+namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Backend;
 use Contao\CalendarEventsModel;
 use Contao\CalendarEventsStoryModel;
 use Contao\Config;
-use Contao\Database;
+use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 use Contao\Environment;
 use Contao\Files;
 use Contao\FilesModel;
 use Contao\Folder;
-use Contao\Input;
 use Contao\MemberModel;
 use Contao\StringUtil;
 use Contao\UserModel;
+use Doctrine\DBAL\Connection;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\ZipBundle\Zip\Zip;
+use PhpOffice\PhpWord\Exception\CopyFileException;
+use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Security;
 
-/**
- * Class TlCalendarEventsStory.
- */
-class TlCalendarEventsStory extends Backend
+class CalendarEventsStory
 {
-    /**
-     * Import the back end user object.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
+    private Security $security;
+    private Connection $connection;
+    private RequestStack $requestStack;
+    private BinaryFileDownload $binaryFileDownload;
+    private string $projectDir;
+    private string $tempDir;
+    private string $locale;
 
-        if ('exportArticle' === Input::get('action') && Input::get('id') && null !== CalendarEventsStoryModel::findByPk(Input::get('id'))) {
-            $objArticle = CalendarEventsStoryModel::findByPk(Input::get('id'));
-            $this->exportArticle($objArticle);
+    public function __construct(Security $security, Connection $connection, RequestStack $requestStack, BinaryFileDownload $binaryFileDownload, string $projectDir, string $tempDir, string $locale)
+    {
+        $this->security = $security;
+        $this->connection = $connection;
+        $this->requestStack = $requestStack;
+        $this->binaryFileDownload = $binaryFileDownload;
+        $this->projectDir = $projectDir;
+        $this->tempDir = $tempDir;
+        $this->locale = $locale;
+    }
+
+    /**
+     * @Callback(table="tl_calendar_events_story", target="config.onload")
+     *
+     * @throws \Exception
+     */
+    public function route(): void
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        $id = $request->query->get('id');
+
+        if ($id && 'exportArticle' === $request->query->get('action')) {
+            if (null !== ($objArticle = CalendarEventsStoryModel::findByPk($id))) {
+                $this->exportArticle($objArticle);
+            }
         }
     }
 
-    public function exportArticle(CalendarEventsStoryModel $objArticle): void
+    /**
+     * @Callback(table="tl_calendar_events_story", target="config.onload")
+     */
+    public function setPalettes(): void
+    {
+        $user = $this->security->getUser();
+
+        // Overwrite readonly attribute for admins
+        if ($user->admin) {
+            $fields = ['sacMemberId', 'eventId', 'authorName'];
+
+            foreach ($fields as $field) {
+                $GLOBALS['TL_DCA']['tl_calendar_events_story']['fields'][$field]['eval']['readonly'] = false;
+            }
+        }
+    }
+
+    /**
+     * @Callback(table="tl_calendar_events_story", target="config.onload")
+     *
+     * @throws \Exception
+     */
+    public function deleteUnfinishedAndOldEntries(): void
+    {
+        // Delete old and unpublished stories
+        $limit = time() - 60 * 60 * 24 * 30;
+
+        $this->connection->executeStatement(
+            'tl_calendar_events_story WHERE tstamp < ? AND publishState < ?',
+            [$limit, 3],
+        );
+
+        // Delete unfinished stories older the 14 days
+        $limit = time() - 60 * 60 * 24 * 14;
+
+        $this->connection->executeStatement(
+            'DELETE FROM tl_calendar_events_story WHERE tstamp < ? AND text = ? AND youtubeId = ? AND multiSRC = ?',
+            [$limit, '', '', null]
+        );
+
+        // Keep stories up to date, if events are renamed f.ex.
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_calendar_events_story', []);
+
+        while (false !== ($arrStory = $stmt->fetchAssociative())) {
+            $objStoryModel = CalendarEventsStoryModel::findByPk($arrStory['id']);
+            $objEvent = $objStoryModel->getRelated('eventId');
+
+            if (null !== $objEvent) {
+                $objStoryModel->eventTitle = $objEvent->title;
+                $objStoryModel->substitutionEvent = 'event_adapted' === $objEvent->executionState && '' !== $objEvent->eventSubstitutionText ? $objEvent->eventSubstitutionText : '';
+                $objStoryModel->eventStartDate = $objEvent->startDate;
+                $objStoryModel->eventEndDate = $objEvent->endDate;
+                $objStoryModel->organizers = $objEvent->organizers;
+
+                $aDates = [];
+                $arrDates = StringUtil::deserialize($objEvent->eventDates, true);
+
+                foreach ($arrDates as $arrDate) {
+                    $aDates[] = $arrDate['new_repeat'];
+                }
+                
+                $objStoryModel->eventDates = serialize($aDates);
+                $objStoryModel->save();
+            }
+        }
+    }
+
+    /**
+     * Add an image to each record.
+     *
+     * @Callback(table="tl_calendar_events_story", target="list.label.label")
+     *
+     * @param array $row
+     */
+    public function addIcon($row, string $label, DataContainer $dc, array $args): array
+    {
+        $image = 'member';
+        $disabled = false;
+
+        if ('3' !== $row['publishState']) {
+            $image .= '_';
+            $disabled = true;
+        }
+
+        $args[0] = sprintf('<div class="list_icon_new" style="background-image:url(\'%ssystem/themes/%s/icons/%s.svg\')" data-icon="%s.svg" data-icon-disabled="%s.svg">&nbsp;</div>', TL_ASSETS_URL, Backend::getTheme(), $image, $disabled ? $image : rtrim($image, '_'), rtrim($image, '_').'_');
+
+        return $args;
+    }
+
+    /**
+     * @throws CopyFileException
+     * @throws CreateTemporaryFileException
+     */
+    private function exportArticle(CalendarEventsStoryModel $objArticle): void
     {
         $objEvent = CalendarEventsModel::findByPk($objArticle->eventId);
 
@@ -61,9 +179,10 @@ class TlCalendarEventsStory extends Backend
 
         $templSrc = Config::get('SAC_EVT_TOUR_ARTICLE_EXPORT_TEMPLATE_SRC');
 
-        if (!is_file(TL_ROOT.'/'.$templSrc)) {
+        if (!is_file($this->projectDir.'/'.$templSrc)) {
             throw new \Exception('Template file not found.');
         }
+
         // target dir & file
         $targetDir = sprintf('system/tmp/article_%s_%s', $objArticle->id, time());
         $imageDir = sprintf('%s/images', $targetDir);
@@ -142,6 +261,7 @@ class TlCalendarEventsStory extends Backend
         $objPhpWord->replace('keyData', implode("\r\n", $arrKeyData), $options);
         $objPhpWord->replace('tourHighlights', $objArticle->tourHighlights, $options);
         $objPhpWord->replace('tourPublicTransportInfo', $objArticle->tourPublicTransportInfo, $options);
+
         // Footer
         $objPhpWord->replace('eventId', $objEvent->id);
         $objPhpWord->replace('articleId', $objArticle->id);
@@ -156,16 +276,21 @@ class TlCalendarEventsStory extends Backend
                 $i = 0;
 
                 while ($objFiles->next()) {
-                    if (!is_file(TL_ROOT.'/'.$objFiles->path)) {
+                    if (!is_file($this->projectDir.'/'.$objFiles->path)) {
                         continue;
                     }
+
                     ++$i;
+
                     Files::getInstance()->copy($objFiles->path, $imageDir.'/'.$objFiles->name);
+
                     $options = ['multiline' => false];
+
                     $objPhpWord->createClone('i');
                     $objPhpWord->addToClone('i', 'i', $i, $options);
                     $objPhpWord->addToClone('i', 'fileName', $objFiles->name, $options);
-                    $arrMeta = $this->getMeta($objFiles->current(), 'de');
+
+                    $arrMeta = $this->getMeta($objFiles->current(), $this->locale);
                     $objPhpWord->addToClone('i', 'photographerName', $arrMeta['photographer'], $options);
                     $objPhpWord->addToClone('i', 'imageCaption', $arrMeta['caption'], $options);
                 }
@@ -173,8 +298,9 @@ class TlCalendarEventsStory extends Backend
         }
 
         $zipSrc = sprintf(
-            '%s/system/tmp/article_%s_%s.zip',
-            TL_ROOT,
+            '%s/%s/article_%s_%s.zip',
+            $this->projectDir,
+            $this->tempDir,
             $objArticle->id,
             time()
         );
@@ -188,122 +314,26 @@ class TlCalendarEventsStory extends Backend
         // Zip archive
         (new Zip())
             ->ignoreDotFiles(false)
-            ->stripSourcePath(TL_ROOT.'/'.$targetDir)
-            ->addDirRecursive(TL_ROOT.'/'.$targetDir)
+            ->stripSourcePath($this->projectDir.'/'.$targetDir)
+            ->addDirRecursive($this->projectDir.'/'.$targetDir)
             ->run($zipSrc)
         ;
 
-        // Send zip archive to browser
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename="'.basename($zipSrc).'"');
-        header('Content-Length: '.filesize($zipSrc));
-        readfile($zipSrc);
-        exit();
+        $this->binaryFileDownload->sendFileToBrowser($zipSrc, basename($zipSrc));
     }
 
-    public function getMeta(FilesModel $objFile, string $lang = 'de'): array
+    private function getMeta(FilesModel $objFile, string $lang = 'en'): array
     {
-        if (null !== $objFile) {
-            $arrMeta = StringUtil::deserialize($objFile->meta, true);
+        $arrMeta = StringUtil::deserialize($objFile->meta, true);
 
-            if (!isset($arrMeta[$lang]['caption'])) {
-                $arrMeta[$lang]['caption'] = '';
-            }
-
-            if (!isset($arrMeta[$lang]['photographer'])) {
-                $arrMeta[$lang]['photographer'] = '';
-            }
-
-            return $arrMeta[$lang];
-        }
-    }
-
-    /**
-     * Onload Callback
-     * setPalette.
-     */
-    public function setPalettes(): void
-    {
-        // Overwrite readonly attribute for admins
-        if ($this->User->admin) {
-            $fields = ['sacMemberId', 'eventId', 'authorName'];
-
-            foreach ($fields as $field) {
-                $GLOBALS['TL_DCA']['tl_calendar_events_story']['fields'][$field]['eval']['readonly'] = false;
-            }
-        }
-    }
-
-    /**
-     * OnLoad Callback
-     * deleteUnfinishedAndOldEntries.
-     */
-    public function deleteUnfinishedAndOldEntries(): void
-    {
-        // Delete old and unpublished stories
-        $limit = time() - 60 * 60 * 24 * 30;
-        Database::getInstance()
-            ->prepare('DELETE FROM tl_calendar_events_story WHERE tstamp<? AND publishState<?')
-            ->execute($limit, 3)
-        ;
-
-        // Delete unfinished stories older the 14 days
-        $limit = time() - 60 * 60 * 24 * 14;
-        Database::getInstance()
-            ->prepare('DELETE FROM tl_calendar_events_story WHERE tstamp<? AND text=? AND youtubeId=? AND multiSRC=?')
-            ->execute($limit, '', '', null)
-        ;
-
-        // Keep stories up to date, if events are renamed f.ex.
-        $objStory = Database::getInstance()
-            ->prepare('SELECT * FROM tl_calendar_events_story')
-            ->execute()
-        ;
-
-        while ($objStory->next()) {
-            $objStoryModel = CalendarEventsStoryModel::findByPk($objStory->id);
-            $objEvent = $objStoryModel->getRelated('eventId');
-
-            if (null !== $objEvent) {
-                $objStoryModel->eventTitle = $objEvent->title;
-                $objStoryModel->substitutionEvent = 'event_adapted' === $objEvent->executionState && '' !== $objEvent->eventSubstitutionText ? $objEvent->eventSubstitutionText : '';
-                $objStoryModel->eventStartDate = $objEvent->startDate;
-                $objStoryModel->eventEndDate = $objEvent->endDate;
-                $objStoryModel->organizers = $objEvent->organizers;
-
-                $aDates = [];
-                $arrDates = StringUtil::deserialize($objEvent->eventDates, true);
-
-                foreach ($arrDates as $arrDate) {
-                    $aDates[] = $arrDate['new_repeat'];
-                }
-                $objStoryModel->eventDates = serialize($aDates);
-                $objStoryModel->save();
-            }
-        }
-    }
-
-    /**
-     * Add an image to each record.
-     *
-     * @param array  $row
-     * @param string $label
-     * @param array  $args
-     *
-     * @return array
-     */
-    public function addIcon($row, $label, DataContainer $dc, $args)
-    {
-        $image = 'member';
-        $disabled = false;
-
-        if ('3' !== $row['publishState']) {
-            $image .= '_';
-            $disabled = true;
+        if (!isset($arrMeta[$lang]['caption'])) {
+            $arrMeta[$lang]['caption'] = '';
         }
 
-        $args[0] = sprintf('<div class="list_icon_new" style="background-image:url(\'%ssystem/themes/%s/icons/%s.svg\')" data-icon="%s.svg" data-icon-disabled="%s.svg">&nbsp;</div>', TL_ASSETS_URL, Backend::getTheme(), $image, $disabled ? $image : rtrim($image, '_'), rtrim($image, '_').'_');
+        if (!isset($arrMeta[$lang]['photographer'])) {
+            $arrMeta[$lang]['photographer'] = '';
+        }
 
-        return $args;
+        return $arrMeta[$lang];
     }
 }
