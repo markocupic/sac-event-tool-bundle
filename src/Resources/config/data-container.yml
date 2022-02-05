@@ -9,7 +9,13 @@ services:
             - '@request_stack'
             - '@database_connection'
             - '@translator'
+            - '@Contao\CoreBundle\Intl\Countries'
             - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory'
+
+    Markocupic\SacEventToolBundle\DataContainer\EventFilterForm:
+        public: true
+        arguments:
+            - '@database_connection'
 
     Markocupic\SacEventToolBundle\DataContainer\CalendarEventsInstructorInvoice:
         arguments:

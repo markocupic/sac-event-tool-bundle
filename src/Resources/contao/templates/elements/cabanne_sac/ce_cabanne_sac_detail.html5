@@ -29,11 +29,11 @@
       <div class="tab-pane fade show active" id="kontakt" role="tabpanel" aria-labelledby="kontakt-tab">
         <div class="table-responsive">
           <table class="table">
-            <?php if ($this->huettenwart): ?>
+            <?php if ($this->hutWarden): ?>
             <tr>
               <td><strong>H&uuml;ttenwart:</strong></td>
               <!-- indexer::continue -->
-              <td><?= nl2br($this->huettenwart) ?></td>
+              <td><?= nl2br($this->hutWarden) ?></td>
               <!-- indexer::stop -->
             </tr>
             <?php endif; ?>

@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Intl\Countries;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 use Contao\Message;
@@ -32,18 +33,28 @@ class User
     private RequestStack $requestStack;
     private Connection $connection;
     private TranslatorInterface $translator;
+    private Countries $countries;
     private MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory;
 
-    /**
-     * Import the back end user object.
-     */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, Countries $countries, MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
         $this->translator = $translator;
+        $this->countries = $countries;
         $this->maintainBackendUsersHomeDirectory = $maintainBackendUsersHomeDirectory;
+    }
+
+
+    /**
+     *
+     * @Callback(table="tl_user", target="fields.country.options")
+     */
+    public function getCountries(): array
+    {
+        $arrCountries = $this->countries->getCountries();
+        return array_combine(array_map('strtolower', array_keys($arrCountries)), $arrCountries);
     }
 
     /**

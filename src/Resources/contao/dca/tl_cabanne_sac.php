@@ -65,7 +65,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
         ],
     ],
     'palettes' => [
-        'default' => '{contact_legend},name,canton,altitude,huettenwart,phone,email,url,bookingMethod;{image_legend},singleSRC;{details_legend},huettenchef,capacity,coordsCH1903,coordsWGS84,openingTime;{ascent_legend},ascent',
+        'default' => '{contact_legend},name,canton,altitude,hutWarden,phone,email,url,bookingMethod;{image_legend},singleSRC;{details_legend},huettenchef,capacity,coordsCH1903,coordsWGS84,openingTime;{ascent_legend},ascent',
     ],
 
     'fields' => [
@@ -112,7 +112,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             ],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'huettenwart' => [
+        'hutWarden' => [
             'exclude' => true,
             'search' => true,
             'sorting' => true,

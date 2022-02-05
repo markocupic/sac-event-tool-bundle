@@ -12,8 +12,6 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Markocupic\SacEventToolBundle\Dca\TlEventReleaseLevelPolicy;
-
 $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
     'config' => [
         'dataContainer' => 'Table',
@@ -103,12 +101,6 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
             'sql' => "char(1) NOT NULL default ''",
         ],
         'allowSwitchingToNextLevel' => [
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'checkbox',
-            'sql' => "char(1) NOT NULL default ''",
-        ],
-        'allowWriteAccessToAuthor' => [
             'exclude' => true,
             'filter' => true,
             'inputType' => 'checkbox',

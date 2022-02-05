@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Markocupic\SacEventToolBundle\Dca\TlEventOrganizer;
+use Contao\Config;
 
 $GLOBALS['TL_DCA']['tl_event_organizer'] = [
     'config' => [
@@ -150,18 +150,6 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
             'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
             'sql' => 'binary(16) NULL',
         ],
-        'singleSRC' => [
-            'exclude' => true,
-            'inputType' => 'fileTree',
-            'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
-            'load_callback' => [
-                [
-                    TlEventOrganizer::class,
-                    'setSingleSrcFlags',
-                ],
-            ],
-            'sql' => 'binary(16) NULL',
-        ],
         'notifyWebmasterOnNewEventStory' => [
             'exclude' => true,
             'filter' => true,
@@ -186,13 +174,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
         'singleSRC' => [
             'exclude' => true,
             'inputType' => 'fileTree',
-            'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
-            'load_callback' => [
-                [
-                    TlEventOrganizer::class,
-                    'setSingleSrcFlags',
-                ],
-            ],
+            'eval' => ['filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
             'sql' => 'binary(16) NULL',
         ],
         'annualProgramShowHeadline' => [

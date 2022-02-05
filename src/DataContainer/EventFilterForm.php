@@ -12,38 +12,25 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Dca;
+namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\Backend;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
-use Contao\Database;
-use Contao\TourTypeModel;
+use Doctrine\DBAL\Connection;
 
-/**
- * Class TlEventFilterForm.
- */
-class TlEventFilterForm extends Backend
+class EventFilterForm
 {
-    /**
-     * @return array
-     */
-    public function getTourTypes()
+    private Connection $connection;
+
+    public function __construct(Connection $connection)
     {
-        $arrOptions = [];
-        $objTourType = TourTypeModel::findAll();
-
-        while ($objTourType->next()) {
-            $arrOptions[$objTourType->id] = $objTourType->title;
-        }
-
-        return $arrOptions;
+        $this->connection = $connection;
     }
 
     /**
-     * @return array
+     * @Callback(table="tl_event_filter_form" target="fields.courseType.options")
      */
-    public function getCourseTypes()
+    public function getCourseTypes(): array
     {
         $opt = [];
         $mainTypes = CourseMainTypeModel::findAll();
@@ -61,18 +48,19 @@ class TlEventFilterForm extends Backend
     }
 
     /**
+     * @Callback(table="tl_event_filter_form" target="fields.organizers.options")
+     *
      * @return array
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function getOrganizers()
+    public function getOrganizers(): array
     {
         $arrOptions = [];
-        $objOrganizer = Database::getInstance()
-            ->prepare('SELECT * FROM tl_event_organizer WHERE hideInEventFilter=? ORDER BY sorting')
-            ->execute('')
-        ;
 
-        while ($objOrganizer->next()) {
-            $arrOptions[$objOrganizer->id] = $objOrganizer->title;
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_event_organizer WHERE hideInEventFilter = ? ORDER BY sorting', ['']);
+        while (false !== ($arrOrganizer = $stmt->fetchAssociative())) {
+            $arrOptions[$arrOrganizer['id']] = $arrOrganizer['title'];
         }
 
         return $arrOptions;

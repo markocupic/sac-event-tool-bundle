@@ -12,18 +12,15 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Contao\Date;
-use Markocupic\SacEventToolBundle\Dca\TlEventFilterForm;
+use Contao\System;
+use Markocupic\SacEventToolBundle\DataContainer\EventFilterForm;
 
 $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
     'fields' => [
         'year' => [
             'inputType' => 'select',
-            'options' => range(2016, (int) Date::parse('Y') + 1),
-            'eval' => [
-                'includeBlankOption' => true,
-                'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['blankOptionLabel'],
-            ],
+            'options' => range(2016, (int) date('Y') + 1),
+            'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['blankOptionLabel']],
         ],
         'dateStart' => [
             'inputType' => 'text',
@@ -31,32 +28,20 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
         ],
         'tourType' => [
             'inputType' => 'select',
-            'options_callback' => [
-                TlEventFilterForm::class,
-                'getTourTypes',
-            ],
-            'eval' => [
-                'includeBlankOption' => true,
-                'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll'],
-            ],
+            'relation' => ['type' => 'hasOne', 'load' => 'eager'],
+            'foreignKey' => 'tl_tour_type.title',
+            'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
         ],
         'courseType' => [
             'inputType' => 'select',
-            'options_callback' => [
-                TlEventFilterForm::class,
-                'getCourseTypes',
-            ],
-            'eval' => [
-                'includeBlankOption' => true,
-                'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll'],
-            ],
+            // codefog/contao-haste doesn't support options callback via annotations
+            'options' => System::getContainer()->get(EventFilterForm::class)->getCourseTypes(),
+            'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
         ],
         'organizers' => [
             'inputType' => 'select',
-            'options_callback' => [
-                TlEventFilterForm::class,
-                'getOrganizers',
-            ],
+            // codefog/contao-haste doesn't support options callback via annotations
+            'options' => System::getContainer()->get(EventFilterForm::class)->getOrganizers(),
             'eval' => ['multiple' => true],
         ],
         'textsearch' => [
@@ -65,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
         ],
         'eventId' => [
             'inputType' => 'text',
-            'eval' => ['placeholder' => Date::parse('Y').'-****'],
+            'eval' => ['placeholder' => date('Y').'-****'],
         ],
         'courseId' => [
             'inputType' => 'text',
