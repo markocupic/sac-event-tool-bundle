@@ -12,25 +12,20 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Dca;
+namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\Backend;
+use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 
-/**
- * Class TlEventType.
- */
-class TlEventType extends Backend
+class EventType
 {
     /**
-     * @param $strValue
-     *
-     * @return mixed
+     * @Callback(table="tl_event_type", target="fields.alias.load")
      */
-    public function loadCallbackAlias($strValue, DataContainer $dc)
+    public function loadCallbackAlias(?string $strValue, DataContainer $dc): ?string
     {
         // Prevent renaming the alias if it was set
-        if ('' !== $strValue) {
+        if ($strValue) {
             $GLOBALS['TL_DCA']['tl_event_type']['fields']['alias']['eval']['readonly'] = true;
         }
 

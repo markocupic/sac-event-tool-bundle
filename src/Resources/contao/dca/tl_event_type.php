@@ -78,12 +78,6 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
             'exclude' => true,
             'search' => true,
             'flag' => 1,
-            'load_callback' => [
-                [
-                    TlEventType::class,
-                    'loadCallbackAlias',
-                ],
-            ],
             'eval' => ['mandatory' => true, 'rgxp' => 'alnum', 'maxlength' => 128, 'tl_class' => 'w50'],
             'sql' => 'varchar(128) NULL',
         ],
