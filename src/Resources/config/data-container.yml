@@ -2,6 +2,7 @@ services:
     Markocupic\SacEventToolBundle\DataContainer\Util:
         arguments:
             - '@request_stack'
+            - '@translator'
 
     Markocupic\SacEventToolBundle\DataContainer\User:
         arguments:

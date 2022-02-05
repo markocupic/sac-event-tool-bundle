@@ -14,10 +14,8 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\Backend;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
-use Contao\Image;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
@@ -32,25 +30,6 @@ class UserRole
     {
         $this->connection = $connection;
         $this->translator = $translator;
-    }
-
-    /**
-     * Return the paste button.
-     *
-     * @Callback(table="tl_user_role", target="list.sorting.paste_button")
-     *
-     * @param array|bool $arrClipboard
-     */
-    public function pasteButton(DataContainer $dc, array $row, string $table, bool $cr, $arrClipboard = false): string
-    {
-        $imagePasteAfter = Image::getHtml('pasteafter.gif', $this->translator->trans('DCA.pasteafter.1', [$row['id']], 'contao_default'));
-        $imagePasteInto = Image::getHtml('pasteinto.gif', $this->translator->trans('DCA.pasteinto.1', [$row['id']], 'contao_default'));
-
-        if (0 === (int) $row['id']) {
-            return $cr ? Image::getHtml('pasteinto_.gif').' ' : '<a href="'.Backend::addToUrl('act='.$arrClipboard['mode'].'&mode=2&pid='.$row['id'].'&id='.$arrClipboard['id']).'" title="'.StringUtil::specialchars($this->translator->trans('DCA.pasteinto.1', [$row['id']], 'contao_default')).'" onclick="Backend.getScrollOffset();">'.$imagePasteInto.'</a> ';
-        }
-
-        return ('cut' === $arrClipboard['mode'] && (int) $arrClipboard['id'] === (int) $row['id']) || $cr ? Image::getHtml('pasteafter_.gif').' ' : '<a href="'.Backend::addToUrl('act='.$arrClipboard['mode'].'&mode=1&pid='.$row['id'].'&id='.$arrClipboard['id']).'" title="'.StringUtil::specialchars($this->translator->trans('DCA.pasteafter.1', [$row['id']], 'contao_default')).'" onclick="Backend.getScrollOffset();">'.$imagePasteAfter.'</a> ';
     }
 
     /**

@@ -18,6 +18,10 @@ if (TL_MODE === 'FE') {
     $GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
 }
 
+// DCA
+// tl_user_role
+$GLOBALS['TL_LANG']['MSC']['roleCurrentlyVacant'] = 'Benutzer-Rolle im Moment vakant';
+
 // Content elements
 $GLOBALS['TL_LANG']['CTE']['user_portrait'] = ['SAC-User-Portrait'];
 $GLOBALS['TL_LANG']['CTE']['user_portrait_list'] = ['SAC-User-Portrait-Liste'];

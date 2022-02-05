@@ -30,21 +30,13 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
     'list' => [
         'sorting' => [
             'mode' => 5,
-            'fields' => [                'title',                'email'            ],
+            'fields' => ['title', 'email'],
             'format' => '%s %s',
             'panelLayout' => 'filter;search,limit',
-            'paste_button_callback' => [
-                TlUserRole::class,
-                'pasteTag',
-            ],
         ],
         'label' => [
             'fields' => ['title', 'email'],
             'showColumns' => true,
-            'label_callback' => [
-                TlUserRole::class,
-                'checkForUsage',
-            ],
         ],
         'global_operations' => [
             'all' => [

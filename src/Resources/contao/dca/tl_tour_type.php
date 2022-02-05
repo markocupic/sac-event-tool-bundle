@@ -32,10 +32,6 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = [
             'fields' => ['sorting'],
             'flag' => 1,
             'panelLayout' => 'filter;search,limit',
-            'paste_button_callback' => [
-                TlTourType::class,
-                'pasteTag',
-            ],
         ],
         'label' => [
             'fields' => ['shortcut', 'title'],
