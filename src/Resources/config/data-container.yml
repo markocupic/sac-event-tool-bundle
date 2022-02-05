@@ -36,6 +36,10 @@ services:
             - '@Markocupic\SacEventToolBundle\DataContainer\Util'
             - '@security.helper'
 
+    Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevelPolicy:
+        arguments:
+            - '@translator'
+
     Markocupic\SacEventToolBundle\DataContainer\EventReleaseLevelPolicyPackage:
         arguments:
             - '@security.helper'

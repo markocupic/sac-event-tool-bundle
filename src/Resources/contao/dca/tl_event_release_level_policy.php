@@ -34,10 +34,6 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
             'panelLayout' => 'filter;search,limit',
             'headerFields' => ['level', 'title'],
             'disableGrouping' => true,
-            'child_record_callback' => [
-                TlEventReleaseLevelPolicy::class,
-                'listReleaseLevels',
-            ],
         ],
         'label' => [
             'fields' => ['level', 'title'],
@@ -53,15 +49,15 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
         'operations' => [
             'edit' => [
                 'href' => 'act=edit',
-                'icon' => 'edit.gif',
+                'icon' => 'edit.svg',
             ],
             'copy' => [
                 'href' => 'act=copy',
-                'icon' => 'copy.gif',
+                'icon' => 'copy.svg',
             ],
             'delete' => [
                 'href' => 'act=delete',
-                'icon' => 'delete.gif',
+                'icon' => 'delete.svg',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
             ],
         ],
