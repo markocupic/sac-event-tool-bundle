@@ -52,10 +52,6 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
             'editheader' => [
                 'href' => 'table=tl_event_release_level_policy_package&amp;act=edit',
                 'icon' => 'header.svg',
-                'button_callback' => [
-                    TlEventReleaseLevelPolicyPackage::class,
-                    'editHeader',
-                ],
             ],
             'copy' => [
                 'href' => 'act=paste&amp;mode=copy',
