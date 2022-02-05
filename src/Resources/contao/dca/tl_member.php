@@ -39,10 +39,6 @@ $GLOBALS['TL_DCA']['tl_member']['subpalettes']['hasLeadClimbingEducation'] = 'da
 
 // Customize tl_member
 $GLOBALS['TL_DCA']['tl_member']['list']['sorting']['fields'] = ['lastname ASC'];
-$GLOBALS['TL_DCA']['tl_member']['config']['ondelete_callback'][] = [
-    TlMember::class,
-    'ondeleteCallback',
-];
 
 // Add tl_member.sacMemberId to index
 $GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index';

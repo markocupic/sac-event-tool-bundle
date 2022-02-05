@@ -21,6 +21,8 @@ if (TL_MODE === 'FE') {
 // DCA
 // tl_user_role
 $GLOBALS['TL_LANG']['MSC']['roleCurrentlyVacant'] = 'Benutzer-Rolle im Moment vakant';
+// tl_member
+$GLOBALS['TL_LANG']['ERR']['clearMemberProfile'] = 'Das Mitglied mit ID %d kann nicht gelöscht werden, weil es bei einem oder mehreren Events noch auf der Buchungsliste steht.';
 
 // Content elements
 $GLOBALS['TL_LANG']['CTE']['user_portrait'] = ['SAC-User-Portrait'];

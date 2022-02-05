@@ -41,6 +41,11 @@ services:
             - '@database_connection'
             - '@translator'
 
+    Markocupic\SacEventToolBundle\DataContainer\Member:
+        arguments:
+            - '@translator'
+            - '@Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData'
+
     Markocupic\SacEventToolBundle\DataContainer\Module: ~
 
     Markocupic\SacEventToolBundle\DataContainer\TourDifficulty: ~
