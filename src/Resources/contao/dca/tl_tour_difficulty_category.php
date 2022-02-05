@@ -53,10 +53,6 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty_category'] = [
             'editheader' => [
                 'href' => 'table=tl_tour_difficulty_category&amp;act=edit',
                 'icon' => 'header.svg',
-                'button_callback' => [
-                    TlTourDifficultyCategory::class,
-                    'editHeader',
-                ],
             ],
             'copy' => [
                 'href' => 'act=copy',

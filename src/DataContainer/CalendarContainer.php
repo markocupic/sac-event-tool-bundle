@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\Backend;
 use Contao\BackendUser;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
@@ -193,7 +194,7 @@ class CalendarContainer
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
-        return $user->canEditFieldsOf('tl_calendar_container') ? '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
+        return $user->canEditFieldsOf('tl_calendar_container') ? '<a href="'.Backend::addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
     }
 
     /**
@@ -206,7 +207,7 @@ class CalendarContainer
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
-        return $user->hasAccess('create', 'calendar_containerp') ? '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
+        return $user->hasAccess('create', 'calendar_containerp') ? '<a href="'.Backend::addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
     }
 
     /**
@@ -219,6 +220,6 @@ class CalendarContainer
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
-        return $user->hasAccess('delete', 'calendar_containerp') ? '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
+        return $user->hasAccess('delete', 'calendar_containerp') ? '<a href="'.Backend::addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
     }
 }
