@@ -14,9 +14,11 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Exception;
 
 class EventFilterForm
 {
@@ -28,7 +30,7 @@ class EventFilterForm
     }
 
     /**
-     * @Callback(table="tl_event_filter_form" target="fields.courseType.options")
+     * @Callback(table="tl_event_filter_form", target="fields.courseType.options")
      */
     public function getCourseTypes(): array
     {
@@ -48,10 +50,9 @@ class EventFilterForm
     }
 
     /**
-     * @Callback(table="tl_event_filter_form" target="fields.organizers.options")
+     * @Callback(table="tl_event_filter_form", target="fields.organizers.options")
      *
-     * @return array
-     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
     public function getOrganizers(): array
@@ -59,6 +60,7 @@ class EventFilterForm
         $arrOptions = [];
 
         $stmt = $this->connection->executeQuery('SELECT * FROM tl_event_organizer WHERE hideInEventFilter = ? ORDER BY sorting', ['']);
+
         while (false !== ($arrOrganizer = $stmt->fetchAssociative())) {
             $arrOptions[$arrOrganizer['id']] = $arrOrganizer['title'];
         }

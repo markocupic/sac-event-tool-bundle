@@ -12,30 +12,37 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Dca;
+namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\Controller;
+use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\Database;
 use Contao\DataContainer;
+use Doctrine\DBAL\Connection;
 
-/**
- * Class TlContent.
- */
-class TlContent extends \tl_content
+class Content
 {
+    private Connection $connection;
+
+    public function __construct(Connection $connection)
+    {
+        $this->connection = $connection;
+    }
+
     /**
-     * @param $dc
+     * @Callback(table="tl_content", target="config.onload")
      */
     public function setPalette(DataContainer $dc): void
     {
         if ($dc->id > 0) {
             $objDb = Database::getInstance()
-                ->prepare('SELECT * FROM tl_content WHERE id=?')
+                ->prepare('SELECT * FROM tl_content WHERE id = ?')
                 ->limit(1)
                 ->execute($dc->id)
             ;
 
             if ($objDb->numRows) {
-                // Set palette for contednt element "user_portrait_list"
+                // Set palette for content element "user_portrait_list"
                 if ('user_portrait_list' === $objDb->type) {
                     if ('selectUsers' === $objDb->userList_selectMode) {
                         $GLOBALS['TL_DCA'][$dc->table]['palettes'] = str_replace(',userList_userRoles', '', $GLOBALS['TL_DCA'][$dc->table]['palettes']);
@@ -49,36 +56,20 @@ class TlContent extends \tl_content
     }
 
     /**
-     * @return array
+     * Get all user roles.
+     *
+     * @Callback(table="tl_content", target="fields.userList_userRoles.options")
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function getCabannes()
+    public function optionsCallbackUserRoles(): array
     {
         $options = [];
-        $objDb = Database::getInstance()
-            ->prepare('SELECT * FROM tl_cabanne_sac')
-            ->execute()
-        ;
 
-        while ($objDb->next()) {
-            $options[$objDb->id] = $objDb->name;
-        }
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_user_role ORDER BY sorting ASC', []);
 
-        return $options;
-    }
-
-    /**
-     * @return array
-     */
-    public function optionsCallbackUserRoles()
-    {
-        $options = [];
-        $objDb = Database::getInstance()
-            ->prepare('SELECT * FROM tl_user_role ORDER BY sorting ASC')
-            ->execute()
-        ;
-
-        while ($objDb->next()) {
-            $options[$objDb->id] = $objDb->title;
+        while (false !== ($arrUserRole = $stmt->fetchAssociative())) {
+            $options[$arrUserRole['id']] = $arrUserRole['title'];
         }
 
         return $options;
@@ -87,20 +78,20 @@ class TlContent extends \tl_content
     /**
      * Return all user portrait list templates as array.
      *
-     * @return array
+     * @Callback(table="tl_content", target="fields.userList_template.options")
      */
-    public function getUserListTemplates()
+    public function getUserListTemplates(): array
     {
-        return $this->getTemplateGroup('ce_user_portrait_list');
+        return Controller::getTemplateGroup('ce_user_portrait_list');
     }
 
     /**
      * Return all user portrait list partial templates as array.
      *
-     * @return array
+     * @Callback(table="tl_content", target="fields.userList_partial_template.options")
      */
-    public function getUserListPartialTemplates()
+    public function getUserListPartialTemplates(): array
     {
-        return $this->getTemplateGroup('user_portrait_list_partial_');
+        return Controller::getTemplateGroup('user_portrait_list_partial_');
     }
 }

@@ -23,17 +23,13 @@ if ('sac_calendar_events_tool' === Input::get('do')) {
         TlContent::class,
         'checkPermission',
     ];
+
+
     $GLOBALS['TL_DCA']['tl_content']['list']['operations']['toggle']['button_callback'] = [
         TlContent::class,
         'toggleIcon',
     ];
 }
-
-// Callbacks
-$GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = [
-    TlContent::class,
-    'setPalette',
-];
 
 // Palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes']['user_portrait_list'] = 'name,type,headline;{config_legend},userList_selectMode,userList_queryType,userList_users,userList_userRoles,userList_replacePrivateAdressWithRoleAdress,userList_showFieldsToGuests;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{template_legend},userList_template,userList_partial_template;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
@@ -46,10 +42,8 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['cabanneSac'] = [
     'exclude' => true,
     'search' => true,
     'inputType' => 'select',
-    'options_callback' => [
-        TlContent::class,
-        'getCabannes',
-    ],
+    'foreignKey' => 'tl_cabanne_sac.name',
+    'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
     'eval' => ['mandatory' => true, 'maxlength' => 200, 'tl_class' => 'w50 clr'],
     'sql' => "int(10) unsigned NOT NULL default '0'",
 ];
@@ -97,10 +91,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_userRoles'] = [
     'exclude' => true,
     'filter' => true,
     'inputType' => 'select',
-    'options_callback' => [
-        TlContent::class,
-        'optionsCallbackUserRoles',
-    ],
     'eval' => ['multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
     'sql' => 'blob NULL',
 ];
@@ -126,10 +116,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_queryType'] = [
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_template'] = [
     'exclude' => true,
     'inputType' => 'select',
-    'options_callback' => [
-        TlContent::class,
-        'getUserListTemplates',
-    ],
     'eval' => ['tl_class' => 'w50'],
     'sql' => "varchar(64) NOT NULL default ''",
 ];
@@ -137,10 +123,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['userList_template'] = [
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_partial_template'] = [
     'exclude' => true,
     'inputType' => 'select',
-    'options_callback' => [
-        TlContent::class,
-        'getUserListPartialTemplates',
-    ],
     'eval' => ['tl_class' => 'w50'],
     'sql' => "varchar(64) NOT NULL default ''",
 ];

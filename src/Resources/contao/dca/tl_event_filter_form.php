@@ -34,14 +34,10 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
         ],
         'courseType' => [
             'inputType' => 'select',
-            // codefog/contao-haste doesn't support options callback via annotations
-            'options' => System::getContainer()->get(EventFilterForm::class)->getCourseTypes(),
             'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
         ],
         'organizers' => [
             'inputType' => 'select',
-            // codefog/contao-haste doesn't support options callback via annotations
-            'options' => System::getContainer()->get(EventFilterForm::class)->getOrganizers(),
             'eval' => ['multiple' => true],
         ],
         'textsearch' => [

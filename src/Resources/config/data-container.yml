@@ -13,7 +13,6 @@ services:
             - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory'
 
     Markocupic\SacEventToolBundle\DataContainer\EventFilterForm:
-        public: true
         arguments:
             - '@database_connection'
 
@@ -30,6 +29,10 @@ services:
             - '%sacevt.event.template.tour_rapport%'
             - '%sacevt.event.tour_invoice_file_name_pattern%'
             - '%sacevt.event.tour_rapport_file_name_pattern%'
+
+    Markocupic\SacEventToolBundle\DataContainer\Content:
+        arguments:
+            - '@database_connection'
 
     Markocupic\SacEventToolBundle\DataContainer\Calendar:
         arguments:
@@ -69,3 +72,6 @@ services:
     Markocupic\SacEventToolBundle\DataContainer\TourDifficultyCategory:
         arguments:
             - '@security.helper'
+
+
+
