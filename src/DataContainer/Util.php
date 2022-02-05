@@ -24,12 +24,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class Util
 {
     private RequestStack $requestStack;
-    private TranslatorInterface $translator;
 
-    public function __construct(RequestStack $requestStack, TranslatorInterface $translator)
+    public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
-        $this->translator = $translator;
     }
 
     /**
@@ -60,18 +58,4 @@ class Util
         }
     }
 
-    /**
-     * Return the paste button.
-     */
-    public function pasteButtonCallback(DataContainer $dc, array $row, string $table, bool $cr, array $arrClipboard, ?array $arrChildren = null, ?string $prevLabel = null, ?string $nextlabel = null): string
-    {
-        $imagePasteAfter = Image::getHtml('pasteafter.gif', $this->translator->trans('DCA.pasteafter.1', [$row['id']], 'contao_default'));
-        $imagePasteInto = Image::getHtml('pasteinto.gif', $this->translator->trans('DCA.pasteinto.1', [$row['id']], 'contao_default'));
-
-        if (0 === (int) $row['id']) {
-            return $cr ? Image::getHtml('pasteinto_.gif').' ' : '<a href="'.Backend::addToUrl('act='.$arrClipboard['mode'].'&mode=2&pid='.$row['id'].'&id='.$arrClipboard['id']).'" title="'.StringUtil::specialchars($this->translator->trans('DCA.pasteinto.1', [$row['id']], 'contao_default')).'" onclick="Backend.getScrollOffset();">'.$imagePasteInto.'</a> ';
-        }
-
-        return ('cut' === $arrClipboard['mode'] && (int) $arrClipboard['id'] === (int) $row['id']) || $cr ? Image::getHtml('pasteafter_.gif').' ' : '<a href="'.Backend::addToUrl('act='.$arrClipboard['mode'].'&mode=1&pid='.$row['id'].'&id='.$arrClipboard['id']).'" title="'.StringUtil::specialchars($this->translator->trans('DCA.pasteafter.1', [$row['id']], 'contao_default')).'" onclick="Backend.getScrollOffset();">'.$imagePasteAfter.'</a> ';
-    }
 }

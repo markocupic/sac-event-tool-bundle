@@ -12,23 +12,20 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Dca;
+namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\Backend;
+use Contao\CoreBundle\ServiceAnnotation\Callback;
 
-/**
- * Class TlTourDifficulty.
- */
-class TlTourDifficulty extends Backend
+
+class TourDifficulty
 {
     /**
-     * List a style sheet.
      *
      * @param array $row
      *
-     * @return string
+     * @Callback(table="tl_tour_difficulty", target="list.sorting.child_record")
      */
-    public function listDifficulties($row)
+    public function listDifficulties(array $row): string
     {
         return '<div class="tl_content_left"><span class="level">'.$row['title'].'</span> '.$row['shortcut']."</div>\n";
     }

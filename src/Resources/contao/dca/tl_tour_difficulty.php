@@ -36,10 +36,6 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
             'panelLayout' => 'filter;sort,search,limit',
             'headerFields' => ['level', 'title'],
             'disableGrouping' => true,
-            'child_record_callback' => [
-                TlTourDifficulty::class,
-                'listDifficulties',
-            ],
         ],
         'label' => [
             'fields' => [

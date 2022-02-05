@@ -12,22 +12,22 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Dca;
+namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Controller;
+use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\System;
 
-/**
- * Class TlModule.
- */
-class TlModule extends \tl_module
+class Module
 {
+
     /**
-     * @return array
+     * @Callback(table="tl_module", target="fields.eventFilterBoardFields.options")
      */
     public function getEventFilterBoardFields()
     {
         $opt = [];
+
         Controller::loadDataContainer('tl_event_filter_form');
         System::loadLanguageFile('tl_event_filter_form');
 
@@ -39,12 +39,12 @@ class TlModule extends \tl_module
     }
 
     /**
-     * Return all calendar templates as array.
+     * Return all templates as array.
      *
-     * @return array
+     * @Callback(table="tl_module", target="fields.eventListPartialTpl.options")
      */
     public function getEventListTemplates()
     {
-        return $this->getTemplateGroup('event_list_partial_');
+        return Controller::getTemplateGroup('event_list_partial_');
     }
 }

@@ -176,7 +176,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = [
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = [
     'inputType' => 'checkboxWizard',
-    'options_callback' => [TlModule::class, 'getEventFilterBoardFields'],
     'eval' => ['mandatory' => false, 'multiple' => true, 'ooorderField' => 'orderSRC', 'tl_class' => 'clr'],
     'sql' => 'blob NULL',
 ];
@@ -184,10 +183,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = [
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventListPartialTpl'] = [
     'exclude' => true,
     'inputType' => 'select',
-    'options_callback' => [
-        TlModule::class,
-        'getEventListTemplates',
-    ],
     'eval' => ['tl_class' => 'w50'],
     'sql' => "varchar(64) NOT NULL default 'event_list_partial_tour'",
 ];

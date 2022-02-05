@@ -41,6 +41,10 @@ services:
             - '@database_connection'
             - '@translator'
 
+    Markocupic\SacEventToolBundle\DataContainer\Module: ~
+
+    Markocupic\SacEventToolBundle\DataContainer\TourDifficulty: ~
+
     Markocupic\SacEventToolBundle\DataContainer\TourDifficultyCategory:
         arguments:
             - '@security.helper'
