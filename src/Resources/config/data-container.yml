@@ -35,3 +35,8 @@ services:
             - '@database_connection'
             - '@Markocupic\SacEventToolBundle\DataContainer\Util'
             - '@security.helper'
+
+    Markocupic\SacEventToolBundle\DataContainer\UserRole:
+        arguments:
+            - '@database_connection'
+            - '@translator'
