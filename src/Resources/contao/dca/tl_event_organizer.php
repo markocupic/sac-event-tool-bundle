@@ -108,7 +108,6 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
         'belongsToOrganization' => [
             'exclude' => true,
             'filter' => true,
-            'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SECTION_IDS'],
             'inputType' => 'select',
             'eval' => ['multiple' => true, 'chosen' => true, 'tl_class' => 'clr m12'],
             'sql' => 'blob NULL',

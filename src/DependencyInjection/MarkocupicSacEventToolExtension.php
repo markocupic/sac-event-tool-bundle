@@ -65,7 +65,6 @@ class MarkocupicSacEventToolExtension extends Extension
 
         $container->setParameter($rootKey.'.locale', $config['locale']);
         $container->setParameter($rootKey.'.section_name', $config['section_name']);
-        $container->setParameter($rootKey.'.section_ids', $config['section_ids']);
         $container->setParameter($rootKey.'.member_sync_credentials', $config['member_sync_credentials']);
         $container->setParameter($rootKey.'.event_admin_name', $config['event_admin_name']);
         $container->setParameter($rootKey.'.event_admin_email', $config['event_admin_email']);

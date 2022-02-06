@@ -56,8 +56,6 @@ class SyncSacMemberDatabase
 
     private array $credentials;
 
-    private array $sectionIds;
-
     private string $projectDir;
 
     private string $locale;
@@ -70,13 +68,12 @@ class SyncSacMemberDatabase
 
     private ?string $ftp_password;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, EncoderFactory $encoderFactory, array $credentials, array $sectionIds, string $projectDir, string $locale, ?LoggerInterface $logger = null)
+    public function __construct(ContaoFramework $framework, Connection $connection, EncoderFactory $encoderFactory, array $credentials, string $projectDir, string $locale, LoggerInterface $logger = null)
     {
         $this->framework = $framework;
         $this->connection = $connection;
         $this->encoderFactory = $encoderFactory;
         $this->credentials = $credentials;
-        $this->sectionIds = $sectionIds;
         $this->projectDir = $projectDir;
         $this->locale = $locale;
         $this->logger = $logger;
@@ -168,23 +165,28 @@ class SyncSacMemberDatabase
         // Open FTP connection
         $connId = $this->openFtpConnection();
 
-        foreach ($this->sectionIds as $sectionId) {
-            $localFile = $this->projectDir.'/'.sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId);
-            $remoteFile = basename($localFile);
+        $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section',[]);
 
-            // Delete old file
-            if (is_file($localFile)) {
-                unlink($localFile);
+
+            foreach ($arrSectionIds as $sectionId) {
+                $localFile = $this->projectDir.'/'.sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId);
+                $remoteFile = basename($localFile);
+
+                // Delete old file
+                if (is_file($localFile)) {
+                    unlink($localFile);
+                }
+
+                // Fetch file
+                if (!ftp_get($connId, $localFile, $remoteFile, FTP_BINARY)) {
+                    $msg = sprintf('Could not find db dump "%s" at "%s".', $remoteFile, $this->ftp_hostname);
+                    $this->log(LogLevel::CRITICAL, $msg, __METHOD__, ContaoContext::ERROR);
+
+                    throw new \Exception($msg);
+                }
             }
 
-            // Fetch file
-            if (!ftp_get($connId, $localFile, $remoteFile, FTP_BINARY)) {
-                $msg = sprintf('Could not find db dump "%s" at "%s".', $remoteFile, $this->ftp_hostname);
-                $this->log(LogLevel::CRITICAL, $msg, __METHOD__, ContaoContext::ERROR);
 
-                throw new \Exception($msg);
-            }
-        }
         ftp_close($connId);
     }
 
@@ -230,7 +232,10 @@ class SyncSacMemberDatabase
 
         $arrMember = [];
 
-        foreach ($this->sectionIds as $sectionId) {
+        $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section',[]);
+
+
+        foreach ($arrSectionIds as $sectionId) {
             $objFile = new File(sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId));
 
             $arrFile = $objFile->getContentAsArray();

@@ -80,11 +80,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'tl_class' => 'clr',
-            ],
+            'eval' => [                'mandatory' => true,                'maxlength' => 255,                'tl_class' => 'clr',            ],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'canton' => [
@@ -92,11 +88,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'tl_class' => 'clr',
-            ],
+            'eval' => [                'mandatory' => true,                'maxlength' => 255,                'tl_class' => 'clr',            ],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'altitude' => [
@@ -104,12 +96,7 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
             'search' => true,
             'sorting' => true,
             'inputType' => 'text',
-            'eval' => [
-                'rgxp' => 'natural',
-                'mandatory' => true,
-                'maxlength' => 255,
-                'tl_class' => 'clr',
-            ],
+            'eval' => [                'rgxp' => 'natural',                'mandatory' => true,                'maxlength' => 255,                'tl_class' => 'clr',            ],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'hutWarden' => [

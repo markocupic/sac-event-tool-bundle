@@ -19,6 +19,7 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardWrite
 
 // Backend Modules
 $GLOBALS['TL_LANG']['MOD']['sac_be_modules'] = ['SAC Module'];
+$GLOBALS['TL_LANG']['MOD']['sac_section_tool'] = ['SAC Sektionen und OG'];
 $GLOBALS['TL_LANG']['MOD']['sac_course_main_types_tool'] = ['Kurs-Hauptkategorien'];
 $GLOBALS['TL_LANG']['MOD']['sac_course_sub_types_tool'] = ['Kurs-Unterkategorien'];
 $GLOBALS['TL_LANG']['MOD']['sac_calendar_events_tool'] = ['SAC Event-Tool'];

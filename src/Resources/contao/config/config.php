@@ -40,6 +40,9 @@ if ($contaoMode->isBackend()) {
 
 $GLOBALS['BE_MOD']['content']['calendar']['tables'] = ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'];
 $GLOBALS['BE_MOD']['sac_be_modules'] = [
+    'sac_section_tool' => [
+        'tables' => ['tl_sac_section'],
+    ],
     'sac_calendar_events_tool' => [
         'tables' => ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'],
         'table' => ['TableWizard', 'importTable'],
@@ -100,18 +103,6 @@ $GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = [
 // Delete unused event-story folders
 $GLOBALS['TL_PURGE']['custom']['sac_event_story'] = [
     'callback' => ['Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainModuleEventStory', 'run'],
-];
-
-// Do not index a page if one of the following parameters is set
-//$GLOBALS['TL_NOINDEX_KEYS'][] = 'xhrAction';
-
-// SAC Sections
-$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SECTION_IDS'] = [
-    4250 => 'SAC Pilatus',
-    4251 => 'SAC PILATUS SURENTAL',
-    4252 => 'SAC PILATUS NAPF',
-    4253 => 'SAC PILATUS HOCHDORF',
-    4254 => 'SAC PILATUS RIGI',
 ];
 
 // TL_CONFIG

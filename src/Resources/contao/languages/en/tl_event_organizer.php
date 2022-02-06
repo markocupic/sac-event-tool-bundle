@@ -46,4 +46,4 @@ $GLOBALS['TL_LANG']['tl_event_organizer']['courseRegulationSRC'] = ['Kursregleme
 $GLOBALS['TL_LANG']['tl_event_organizer']['annualProgramShowHeadline'] = ['Zeige die Headline', ''];
 $GLOBALS['TL_LANG']['tl_event_organizer']['annualProgramShowTeaser'] = ['Zeige den Teasertext', ''];
 $GLOBALS['TL_LANG']['tl_event_organizer']['annualProgramShowDetails'] = ['Zeige die Details', ''];
-$GLOBALS['TL_LANG']['tl_event_organizer']['belongsToOrganization'] = ['Teil von OG', 'Geben Sie an, welcher OG die Untergruppe angehört.de'];
+$GLOBALS['TL_LANG']['tl_event_organizer']['belongsToOrganization'] = ['Teil von Sektion/OG', 'Geben Sie an, welcher OG die Untergruppe angehört.de'];

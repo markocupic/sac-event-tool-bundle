@@ -437,12 +437,13 @@ class TlCalendarEventsMember extends Backend
 
     public function listSections(): array
     {
-        Controller::loadLanguageFile('tl_member');
-        $arrIds = System::getContainer()->getParameter('sacevt.section_ids');
         $arrOptions = [];
 
-        foreach ($arrIds as $id) {
-            $arrOptions[$id] = $GLOBALS['TL_LANG']['tl_member']['section'][$id] ?: $id;
+        $objDb = Database::getInstance()->execute('SELECT * FROM tl_sac_section');
+
+        while($objDb->next())
+        {
+            $arrOptions[$objDb->sectionId] = $objDb->name;
         }
 
         return $arrOptions;

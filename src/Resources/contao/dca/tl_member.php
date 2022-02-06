@@ -15,7 +15,6 @@ declare(strict_types=1);
 use Contao\BackendUser;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\System;
-use Markocupic\SacEventToolBundle\Dca\TlMember;
 
 // Manipulate palette default
 PaletteManipulator::create()
@@ -126,7 +125,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = [
     'inputType' => 'checkbox',
     'filter' => true,
     'eval' => ['multiple' => true, 'tl_class' => 'clr'],
-    'options' => System::getContainer()->getParameter('sacevt.section_ids'),
     'sql' => 'blob NULL',
 ];
 

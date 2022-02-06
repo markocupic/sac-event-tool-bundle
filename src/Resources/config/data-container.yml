@@ -16,6 +16,10 @@ services:
         arguments:
             - '@database_connection'
 
+    Markocupic\SacEventToolBundle\DataContainer\EventOrganizer:
+        arguments:
+            - '@database_connection'
+
     Markocupic\SacEventToolBundle\DataContainer\CalendarEventsInstructorInvoice:
         arguments:
             - '@contao.framework'
@@ -72,6 +76,7 @@ services:
 
     Markocupic\SacEventToolBundle\DataContainer\Member:
         arguments:
+            - '@database_connection'
             - '@translator'
             - '@Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData'
 

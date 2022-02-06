@@ -36,7 +36,6 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class UpcomingEventsController extends AbstractController
 {
-
     private ContaoFramework $framework;
 
     private FeedFactory $feedFactory;
@@ -71,17 +70,16 @@ class UpcomingEventsController extends AbstractController
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $eventsAdapter = $this->framework->getAdapter(Events::class);
-        $configAdapter = $this->framework->getAdapter(Config::class);
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        $sacEvtConfig = $configAdapter->get('SAC-EVENT-TOOL-CONFIG');
+        $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section',[]);
 
-        if (!isset($sacEvtConfig['SECTION_IDS'][$section])) {
-            return new Response('Section with ID '.$section.' not found. Please use a valid section ID like '.implode(', ', array_keys($sacEvtConfig['SECTION_IDS'])).'.');
+        if (!in_array($section, $arrSectionIds, false)) {
+            return new Response('Section with ID '.$section.' not found. Please use a valid section ID like '.implode(', ', $arrSectionIds).'.');
         }
 
-        $sectionName = $sacEvtConfig['SECTION_IDS'][$section];
+        $sectionName = $this->connection->fetchOne('SELECT name FROM tl_sac_section WHERE sectionId = ?',[$section]);
 
         $filePath = 'share/rss_feed_'.str_replace(' ', '_', strtolower($sectionName)).'.xml';
 

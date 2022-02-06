@@ -16,18 +16,22 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Controller;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\Database;
 use Contao\DataContainer;
 use Contao\Message;
+use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Member
 {
+    private Connection $connection;
     private TranslatorInterface $translator;
     private ClearFrontendUserData $clearFrontendUserData;
 
-    public function __construct(TranslatorInterface $translator, ClearFrontendUserData $clearFrontendUserData)
+    public function __construct(Connection $connection, TranslatorInterface $translator, ClearFrontendUserData $clearFrontendUserData)
     {
+        $this->connection = $connection;
         $this->translator = $translator;
         $this->clearFrontendUserData = $clearFrontendUserData;
     }
@@ -53,5 +57,24 @@ class Member
 
             Controller::redirect('contao?do=member');
         }
+    }
+
+     /**
+      * @Callback(table="tl_member", target="fields.sectionId.options")
+      *
+      * @throws \Doctrine\DBAL\Exception
+      */
+    public function listSections(): array
+    {
+        $arrOptions = [];
+
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_sac_section',[]);
+
+        while(false !== ($arrSection = $stmt->fetchAssociative()))
+        {
+            $arrOptions[$arrSection['sectionId']] = $arrSection['name'];
+        }
+
+        return $arrOptions;
     }
 }

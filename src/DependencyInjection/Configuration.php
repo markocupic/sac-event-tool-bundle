@@ -31,11 +31,6 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('locale')->info('Set the default language.')->defaultValue('en')->cannotBeEmpty()->end()
                 // Section name
                 ->scalarNode('section_name')->info('e.g. SAC Sektion Pilatus')->cannotBeEmpty()->end()
-                // Section ids [4250,4251,4252,4253,4254]
-                ->arrayNode('section_ids')
-                    ->scalarPrototype()
-                    ->info('Get section ids at the Zentralstelle in Bern.')->cannotBeEmpty()->end()
-                ->end()
                 // Member database sync Zentralverband Bern
                 ->arrayNode('member_sync_credentials')
                     ->children()

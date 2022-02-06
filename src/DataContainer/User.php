@@ -46,14 +46,32 @@ class User
         $this->maintainBackendUsersHomeDirectory = $maintainBackendUsersHomeDirectory;
     }
 
+    /**
+     * @Callback(table="tl_user", target="fields.sectionId.options")
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function listSections(): array
+    {
+        $arrOptions = [];
+
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_sac_section',[]);
+
+        while(false !== ($arrSection = $stmt->fetchAssociative()))
+        {
+            $arrOptions[$arrSection['sectionId']] = $arrSection['name'];
+        }
+
+        return $arrOptions;
+    }
 
     /**
-     *
      * @Callback(table="tl_user", target="fields.country.options")
      */
     public function getCountries(): array
     {
         $arrCountries = $this->countries->getCountries();
+
         return array_combine(array_map('strtolower', array_keys($arrCountries)), $arrCountries);
     }
 

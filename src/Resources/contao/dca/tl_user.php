@@ -198,7 +198,6 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['sectionId'] = [
     'reference' => &$GLOBALS['TL_LANG']['tl_user']['section'],
     'inputType' => 'checkboxWizard',
     'eval' => ['multiple' => true, 'tl_class' => true],
-    'options' => System::getContainer()->getParameter('sacevt.section_ids'),
     'sql' => 'blob NULL',
 ];
 
