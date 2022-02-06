@@ -47,26 +47,29 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 {
     public const TYPE = 'member_dashboard_upcoming_events';
 
-    /**
-     * @var FrontendUser
-     */
-    protected $objUser;
+    private ContaoFramework $framework;
+    private Security $security;
+    private string $locale;
 
-    /**
-     * @var Template
-     */
-    protected $template;
+    private ?FrontendUser $user = null;
+    private ?Template $template = null;
+
+    public function __construct(ContaoFramework $framework, Security $security, string $locale)
+    {
+        $this->framework = $framework;
+        $this->security = $security;
+        $this->locale = $locale;
+    }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         // Return empty string, if user is not logged in as a frontend user
 
         // Set adapters
-        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
-        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+        $inputAdapter = $this->framework->getAdapter(Input::class);
 
-        if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser) {
-            $this->objUser = $objUser;
+        if (($objUser = $this->security->getUser()) instanceof FrontendUser) {
+            $this->user = $objUser;
         }
 
         if (null !== $page) {
@@ -78,41 +81,32 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         // Sign out from Event
         if ('unregisterUserFromEvent' === $inputAdapter->get('do')) {
             $this->unregisterUserFromEvent($inputAdapter->get('registrationId'), $model->unregisterFromEventNotificationId);
-            $controllerAdapter->redirect($page->getFrontendUrl());
+            $this->redirect($page->getFrontendUrl());
         }
 
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
-
-        $services['contao.framework'] = ContaoFramework::class;
-        $services['security.helper'] = Security::class;
-
-        return $services;
-    }
-
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
+
         // Do not allow for not authorized users
-        if (null === $this->objUser) {
+        if (null === $this->user) {
             throw new UnauthorizedHttpException('Not authorized. Please log in as frontend user.');
         }
 
         $this->template = $template;
 
         // Set adapters
-        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
-        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
-        $calendarEventsMemberModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsMemberModel::class);
-        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $messageAdapter = $this->framework->getAdapter(Message::class);
+        $validatorAdapter = $this->framework->getAdapter(Validator::class);
+        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         // Handle messages
-        if (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email)) {
-            $messageAdapter->addInfo('Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
+        if (empty($this->user->email) || !$validatorAdapter->isEmail($this->user->email)) {
+            $messageAdapter->addInfo('Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
         }
 
         // Add messages to template
@@ -122,7 +116,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
         // Upcoming events
-        $this->template->arrUpcomingEvents = $calendarEventsMemberModelAdapter->findUpcomingEventsByMemberId($this->objUser->id);
+        $this->template->arrUpcomingEvents = $calendarEventsMemberModelAdapter->findUpcomingEventsByMemberId($this->user->id);
 
         return $this->template->getResponse();
     }
@@ -134,15 +128,15 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
     protected function unregisterUserFromEvent($registrationId, $notificationId): void
     {
         // Set adapters
-        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
-        $notificationAdapter = $this->get('contao.framework')->getAdapter(Notification::class);
-        $calendarEventsMemberModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsMemberModel::class);
-        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
-        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
-        $eventsAdapter = $this->get('contao.framework')->getAdapter(Events::class);
-        $userModelAdapter = $this->get('contao.framework')->getAdapter(UserModel::class);
-        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
-        $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
+        $messageAdapter = $this->framework->getAdapter(Message::class);
+        $notificationAdapter = $this->framework->getAdapter(Notification::class);
+        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+        $validatorAdapter = $this->framework->getAdapter(Validator::class);
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        $eventsAdapter = $this->framework->getAdapter(Events::class);
+        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+        $environmentAdapter = $this->framework->getAdapter(Environment::class);
+        $systemAdapter = $this->framework->getAdapter(System::class);
 
         $blnHasError = true;
         $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event abgemeldet werden. Bitte nimm mit dem verantwortlichen Leiter Kontakt auf.';
@@ -150,7 +144,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         $objEventsMember = $calendarEventsMemberModelAdapter->findByPk($registrationId);
 
         if (null === $objEventsMember) {
-            $messageAdapter->add($errorMsg, 'TL_ERROR', TL_MODE);
+            $messageAdapter->addError($errorMsg);
 
             return;
         }
@@ -158,7 +152,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         // Use terminal42/notification_center
         $objNotification = $notificationAdapter->findByPk($notificationId);
 
-        if (null !== $objNotification && null !== $objEventsMember) {
+        if (null !== $objNotification) {
             $objEvent = $objEventsMember->getRelated('eventId');
 
             if (null !== $objEvent) {
@@ -173,24 +167,20 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
                 if (EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED === $objEventsMember->stateOfSubscription) {
                     $errorMsg = 'Abmeldung fehlgeschlagen! Du hast dich vom Event "'.$objEvent->title.'" bereits abgemeldet.';
-                    $blnHasError = true;
                 } elseif (EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED === $objEventsMember->stateOfSubscription || EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED === $objEventsMember->stateOfSubscription) {
                     // allow unregistering if member is not confirmed on the event
                     // allow unregistering if member is waitlisted on the event
                     $blnHasError = false;
                 } elseif (!$objEvent->allowDeregistration) {
                     $errorMsg = $objEvent->allowDeregistration.'Du kannst dich vom Event "'.$objEvent->title.'" nicht abmelden. Die Anmeldung ist definitiv. Nimm Kontakt mit dem Event-Organisator auf.';
-                    $blnHasError = true;
                 } elseif ($objEvent->startDate < time()) {
                     $errorMsg = 'Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden, da der Event bereits vorbei ist.';
-                    $blnHasError = true;
                 } elseif ($objEvent->allowDeregistration && ($objEvent->startDate < (time() + $objEvent->deregistrationLimit * 25 * 3600))) {
                     $errorMsg = 'Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden, da die Abmeldefrist von '.$objEvent->deregistrationLimit.' Tag(en) abgelaufen ist. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
+                } elseif (empty($this->user->email) || !$validatorAdapter->isEmail($this->user->email)) {
+                    $errorMsg = 'Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
                     $blnHasError = true;
-                } elseif (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email)) {
-                    $errorMsg = 'Leider wurde f&uuml;r dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschr&auml;nkt zur Verf&uuml;gung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
-                    $blnHasError = true;
-                } elseif ($objEventsMember->sacMemberId !== $this->objUser->sacMemberId) {
+                } elseif ($objEventsMember->sacMemberId !== $this->user->sacMemberId) {
                     $errorMsg = 'Du hast nicht die nötigen Benutzerrechte um dich vom Event "'.$objEvent->title.'" abzumelden.';
                     $blnHasError = true;
                 } elseif (null !== $objInstructor) {
@@ -237,18 +227,18 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                         }
                     }
 
-                    $messageAdapter->add('Du hast dich vom Event "'.$objEventsMember->eventName.'" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.', 'TL_INFO', TL_MODE);
+                    $messageAdapter->addInfo('Du hast dich vom Event "'.$objEventsMember->eventName.'" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.');
 
                     // Log
                     $systemAdapter->log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__.' Line: '.__LINE__, Log::EVENT_UNSUBSCRIPTION);
 
-                    $objNotification->send($arrTokens, 'de');
+                    $objNotification->send($arrTokens, $this->locale);
                 }
             }
         }
 
         if ($blnHasError) {
-            $messageAdapter->add($errorMsg, 'TL_ERROR', TL_MODE);
+            $messageAdapter->addError($errorMsg);
         }
     }
 
@@ -257,8 +247,8 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
      */
     protected function addMessagesToTemplate(): void
     {
-        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
-        $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
+        $messageAdapter = $this->framework->getAdapter(Message::class);
+        $systemAdapter = $this->framework->getAdapter(System::class);
 
         if ($messageAdapter->hasInfo()) {
             $this->template->hasInfoMessage = true;

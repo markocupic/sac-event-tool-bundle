@@ -44,8 +44,10 @@ services:
 
     # Member dashboard module: show upcoming events
     Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardUpcomingEventsController:
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        arguments:
+            - '@contao.framework'
+            - '@security.helper'
+            - '%sacevt.locale%'
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
             - { name: container.service_subscriber }
