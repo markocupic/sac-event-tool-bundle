@@ -41,9 +41,13 @@
 </div>
 
 <script>
-  $(document).ready(function () {
-    EventFilter.initialize();
-  });
+    $(document).ready(function () {
+        let options = {
+            'locale': '<?= $this->locale ?>',
+        }
+
+        EventFilter.initialize(options);
+    });
 </script>
 
 <?php $this->endblock(); ?>

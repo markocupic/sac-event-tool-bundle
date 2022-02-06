@@ -50,7 +50,6 @@ services:
             - '%sacevt.locale%'
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
         public: true
 
     # Member dashboard module: show past events
@@ -85,6 +84,7 @@ services:
             - '@security.helper'
             - '%kernel.project_dir%'
             - '%sacevt.event.story.asset_dir%'
+            - '%sacevt.locale%'
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:
@@ -141,11 +141,12 @@ services:
 
     # Event filter form module
     Markocupic\SacEventToolBundle\Controller\FrontendModule\EventFilterFormController:
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        arguments:
+            - '@contao.framework'
+            - '@translator'
+            - '%sacevt.locale%'
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
         public: true
 
     # Jahresprpgramm export module
@@ -168,14 +169,13 @@ services:
 
     # Event story reader module
     Markocupic\SacEventToolBundle\Controller\FrontendModule\EventStoryReaderController:
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         arguments:
+            - '@contao.framework'
             - '@request_stack'
             - '%kernel.project_dir%'
+            - '%sacevt.locale%'
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
         public: true
 
     # Pilatus export module

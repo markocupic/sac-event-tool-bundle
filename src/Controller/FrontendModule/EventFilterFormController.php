@@ -29,6 +29,7 @@ use Haste\Form\Form;
 use Haste\Util\Url;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class EventFilterFormController.
@@ -39,15 +40,22 @@ class EventFilterFormController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_filter_form';
 
-    /**
-     * @var array
-     */
-    protected $arrAllowedFields;
+    private ContaoFramework $framework;
 
-    /**
-     * @var PageModel
-     */
-    protected $objPage;
+    private TranslatorInterface $translator;
+
+    private string $locale;
+
+    private ?array $arrAllowedFields = null;
+
+    private ?PageModel $objPage = null;
+
+    public function __construct(ContaoFramework $framework, TranslatorInterface $translator, string $locale)
+    {
+        $this->framework = $framework;
+        $this->translator = $translator;
+        $this->locale = $locale;
+    }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
@@ -57,35 +65,26 @@ class EventFilterFormController extends AbstractFrontendModuleController
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
-
-        $services['contao.framework'] = ContaoFramework::class;
-
-        return $services;
-    }
-
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
         // Set adapters
         /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         /** @var Environment $environmentAdapter */
-        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+        $environmentAdapter = $this->framework->getAdapter(Environment::class);
 
         /** @var Input $inputAdapter */
-        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+        $inputAdapter = $this->framework->getAdapter(Input::class);
 
         /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         /** @var Url $urlAdapter */
-        $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
+        $urlAdapter = $this->framework->getAdapter(Url::class);
 
         /** @var Date $dateAdapter */
-        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
+        $dateAdapter = $this->framework->getAdapter(Date::class);
 
         $this->arrAllowedFields = $stringUtilAdapter->deserialize($model->eventFilterBoardFields, true);
 
@@ -107,7 +106,12 @@ class EventFilterFormController extends AbstractFrontendModuleController
         }
 
         $template->fields = $this->arrAllowedFields;
-        $this->generateForm($template);
+
+        // Get the form
+        $template->form = $this->generateForm();
+
+        // Datepicker
+        $template->locale = $this->locale;
 
         return $template->getResponse();
     }
@@ -115,22 +119,20 @@ class EventFilterFormController extends AbstractFrontendModuleController
     /**
      * Generate filter form.
      */
-    protected function generateForm(Template $template): void
+    protected function generateForm(): Form
     {
         // Set adapters
         /** @var Input $inputAdapter */
-        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+        $inputAdapter = $this->framework->getAdapter(Input::class);
 
         /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         $controllerAdapter->loadLanguageFile('tl_event_filter_form');
 
-        /** @var Translator $translator */
-        $translator = $this->get('translator');
 
         // Generate form
         $objForm = new Form(
@@ -138,7 +140,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
             'GET',
             function () {
                 /** @var Input $inputAdapter */
-                $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+                $inputAdapter = $this->framework->getAdapter(Input::class);
 
                 return 'eventFilter' === $inputAdapter->get('eventFilter');
             }
@@ -167,7 +169,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
         // Let's add  a submit button
         $objForm->addFormField('submit', [
-            'label' => $translator->trans('tl_event_filter_form.submitBtn', [], 'contao_default'),
+            'label' => $this->translator->trans('tl_event_filter_form.submitBtn', [], 'contao_default'),
             'inputType' => 'submit',
         ]);
 
@@ -206,6 +208,6 @@ class EventFilterFormController extends AbstractFrontendModuleController
             $objForm->getWidget('suitableForBeginners')->template = 'form_bs_switch';
         }
 
-        $template->form = $objForm;
+        return $objForm;
     }
 }

@@ -50,6 +50,7 @@ class TlCalendarEventsMember extends Backend
 {
     private ?string $eventAdminName;
     private ?string $eventAdminEmail;
+    private ?string $locale;
 
     /**
      * Import the back end user object.
@@ -58,6 +59,7 @@ class TlCalendarEventsMember extends Backend
     {
         $this->eventAdminName = System::getContainer()->getParameter('sacevt.event_admin_name');
         $this->eventAdminEmail = System::getContainer()->getParameter('sacevt.event_admin_email');
+        $this->locale = System::getContainer()->getParameter('sacevt.locale');
 
         $this->import('BackendUser', 'User');
         parent::__construct();
@@ -323,7 +325,7 @@ class TlCalendarEventsMember extends Backend
 
                     if (\count($arrRecipients) > 0) {
                         $arrTokens['send_to'] = implode(',', $arrRecipients);
-                        $objEmail->send($arrTokens, 'de');
+                        $objEmail->send($arrTokens, $this->locale);
                     }
                 }
             }
@@ -549,7 +551,7 @@ class TlCalendarEventsMember extends Backend
                             'participant_email' => $objEventMemberModel->email,
                             'event_link_detail' => 'https://'.Environment::get('host').'/'.Events::generateEventUrl($objEvent),
                         ];
-                        $objNotification->send($arrTokens, 'de');
+                        $objNotification->send($arrTokens, $this->locale);
                     }
                 }
             }
@@ -892,7 +894,7 @@ class TlCalendarEventsMember extends Backend
                         }
                         // Send email
                         elseif (Validator::isEmail($objEventMemberModel->email)) {
-                            $objEmail->send($arrTokens, 'de');
+                            $objEmail->send($arrTokens, $this->locale);
                             $set = ['stateOfSubscription' => $arrAction['stateOfSubscription']];
                             $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
                             $_SESSION['addInfo'] = $arrAction['sessionInfoText'];

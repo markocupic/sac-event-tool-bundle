@@ -10,6 +10,7 @@ services:
             - '@Markocupic\SacEventToolBundle\Image\RotateImage'
             - '%kernel.project_dir%'
             - '%contao.csrf_token_name%'
+            - '%sacevt.locale%'
         public: true
 
     Markocupic\SacEventToolBundle\Controller\Api\EventApiController:

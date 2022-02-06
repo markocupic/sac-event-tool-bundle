@@ -23,35 +23,22 @@ use Contao\UserModel;
 use NotificationCenter\Model\Notification;
 use Psr\Log\LogLevel;
 
-/**
- * Class ReplaceDefaultPassword.
- */
 class ReplaceDefaultPassword
 {
-    /**
-     * @var 
-     */
-    protected $defaultPassword;
 
-    /**
-     * @var int
-     */
-    protected $emailSendLimit = 20;
+    private ContaoFramework $framework;
 
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private string $locale;
 
-    /**
-     * ReplaceDefaultPassword constructor.
-     */
-    public function __construct(ContaoFramework $framework)
+    private ?string $defaultPassword = null;
+
+    private int $emailSendLimit = 20;
+
+
+    public function __construct(ContaoFramework $framework, string $locale)
     {
         $this->framework = $framework;
-
-        // Initialize contao framework
-        $this->framework->initialize();
+        $this->locale = $locale;
     }
 
     /**
@@ -59,6 +46,9 @@ class ReplaceDefaultPassword
      */
     public function replaceDefaultPasswordAndSendNew(): void
     {
+        // Initialize contao framework
+        $this->framework->initialize();
+
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
 
@@ -100,7 +90,7 @@ class ReplaceDefaultPassword
                         'send_to' => $objUserModel->email,
                     ];
 
-                    $objEmail->send($arrTokens, 'de');
+                    $objEmail->send($arrTokens, $this->locale);
 
                     // System log
                     $strText = sprintf('The default password for backend user %s has been replaced and sent by e-mail.', $objUserModel->name);
@@ -151,7 +141,7 @@ class ReplaceDefaultPassword
     private function generateEmailText($objMember, $pw)
     {
         $text = 'Hallo %s
-        
+
 Dein bisheriges Default Passwort "%s" für den Backend-Zugang ist aus Gründen der Sicherheit ab sofort nicht mehr gültig. Mit dieser Nachricht erhältst du ein neues Passwort. Bitte logge dich mit deiner 6-stelligen Mitgliedernummer und dem Passwort auf https://www.sac-pilatus.ch/contao ein und ändere dein Passwort durch ein eigenes sicheres Passwort.
 
 Benutzername: Deine 6-stellige Mitgliedernummer

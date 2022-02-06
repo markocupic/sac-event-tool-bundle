@@ -104,7 +104,7 @@ class CalendarEventsStory
         $limit = time() - 60 * 60 * 24 * 30;
 
         $this->connection->executeStatement(
-            'tl_calendar_events_story WHERE tstamp < ? AND publishState < ?',
+            'DELETE FROM tl_calendar_events_story WHERE tstamp < ? AND publishState < ?',
             [$limit, 3],
         );
 
@@ -136,7 +136,7 @@ class CalendarEventsStory
                 foreach ($arrDates as $arrDate) {
                     $aDates[] = $arrDate['new_repeat'];
                 }
-                
+
                 $objStoryModel->eventDates = serialize($aDates);
                 $objStoryModel->save();
             }

@@ -6,6 +6,7 @@ services:
             - '@Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory'
             - '@database_connection'
             - '%kernel.project_dir%'
+            - '%sacevt.locale%'
         public: true
 
 

@@ -1,4 +1,6 @@
 services:
     Markocupic\SacEventToolBundle\Subscriber\NotifyOnEventSubscription:
+        arguments:
+            - '%sacevt.locale%'
         tags:
             - { name: kernel.event_subscriber }

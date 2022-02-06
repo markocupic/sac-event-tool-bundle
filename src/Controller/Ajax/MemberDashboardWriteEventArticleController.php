@@ -64,6 +64,8 @@ class MemberDashboardWriteEventArticleController extends AbstractController
 
     private string $tokenName;
 
+    private string $locale;
+
     /**
      * MemberDashboardWriteEventArticleController constructor.
      * Handles ajax requests.
@@ -74,7 +76,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
      *
      * @throws \Exception
      */
-    public function __construct(ContaoFramework $framework, Connection $connection, CsrfTokenManagerInterface $tokenManager, RequestStack $requestStack, Security $security, TranslatorInterface $translator, RotateImage $rotateImage, string $projectDir, string $tokenName)
+    public function __construct(ContaoFramework $framework, Connection $connection, CsrfTokenManagerInterface $tokenManager, RequestStack $requestStack, Security $security, TranslatorInterface $translator, RotateImage $rotateImage, string $projectDir, string $tokenName, string $locale)
     {
         $this->framework = $framework;
         $this->connection = $connection;
@@ -85,6 +87,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         $this->rotateImage = $rotateImage;
         $this->projectDir = $projectDir;
         $this->tokenName = $tokenName;
+        $this->locale = $locale;
     }
 
     /**
@@ -169,11 +172,11 @@ class MemberDashboardWriteEventArticleController extends AbstractController
             while ($objFiles->next()) {
                 $arrMeta = $stringUtilAdapter->deserialize($objFiles->meta, true);
 
-                if (!isset($arrMeta['de']['caption']) || '' === $arrMeta['de']['caption']) {
+                if (!isset($arrMeta[$this->locale]['caption']) || '' === $arrMeta[$this->locale]['caption']) {
                     $blnMissingLegend = true;
                 }
 
-                if (!isset($arrMeta['de']['photographer']) || '' === $arrMeta['de']['photographer']) {
+                if (!isset($arrMeta[$this->locale]['photographer']) || '' === $arrMeta[$this->locale]['photographer']) {
                     $blnMissingPhotographerName = true;
                 }
             }
@@ -262,7 +265,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
                 }
 
                 // Send notification
-                $objNotification->send($arrTokens, 'de');
+                $objNotification->send($arrTokens, $this->locale);
             }
         }
 
@@ -478,16 +481,16 @@ class MemberDashboardWriteEventArticleController extends AbstractController
             if (null !== $objFile) {
                 $arrMeta = $stringUtilAdapter->deserialize($objFile->meta, true);
 
-                if (!isset($arrMeta['de']['caption'])) {
+                if (!isset($arrMeta[$this->locale]['caption'])) {
                     $caption = '';
                 } else {
-                    $caption = $arrMeta['de']['caption'];
+                    $caption = $arrMeta[$this->locale]['caption'];
                 }
 
-                if (!isset($arrMeta['de']['photographer'])) {
+                if (!isset($arrMeta[$this->locale]['photographer'])) {
                     $photographer = $objUser->firstname.' '.$objUser->lastname;
                 } else {
-                    $photographer = $arrMeta['de']['photographer'];
+                    $photographer = $arrMeta[$this->locale]['photographer'];
 
                     if ('' === $photographer) {
                         $photographer = $objUser->firstname.' '.$objUser->lastname;
@@ -537,8 +540,8 @@ class MemberDashboardWriteEventArticleController extends AbstractController
             if (null !== $objFile) {
                 $arrMeta = $stringUtilAdapter->deserialize($objFile->meta, true);
 
-                if (!isset($arrMeta['de'])) {
-                    $arrMeta['de'] = [
+                if (!isset($arrMeta[$this->locale])) {
+                    $arrMeta[$this->locale] = [
                         'title' => '',
                         'alt' => '',
                         'link' => '',
@@ -546,8 +549,8 @@ class MemberDashboardWriteEventArticleController extends AbstractController
                         'photographer' => '',
                     ];
                 }
-                $arrMeta['de']['caption'] = $request->request->get('caption');
-                $arrMeta['de']['photographer'] = $request->request->get('photographer') ?: $objUser->firstname.' '.$objUser->lastname;
+                $arrMeta[$this->locale]['caption'] = $request->request->get('caption');
+                $arrMeta[$this->locale]['photographer'] = $request->request->get('photographer') ?: $objUser->firstname.' '.$objUser->lastname;
 
                 $objFile->meta = serialize($arrMeta);
                 $objFile->save();

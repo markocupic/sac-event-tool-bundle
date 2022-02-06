@@ -10,6 +10,7 @@ services:
             - '%sacevt.member_sync_credentials%'
             - '%sacevt.section_ids%'
             - '%kernel.project_dir%'
+            - '%sacevt.locale%'
             - '@monolog.logger.contao'
 
     # Controller: sync database

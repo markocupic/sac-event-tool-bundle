@@ -36,38 +36,24 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class UpcomingEventsController extends AbstractController
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
 
-    /**
-     * @var FeedFactory
-     */
-    private $feedFactory;
+    private ContaoFramework $framework;
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private FeedFactory $feedFactory;
 
-    /**
-     * @var string
-     */
-    private $projectDir;
+    private Connection $connection;
 
-    /**
-     * UpcomingEventsController constructor.
-     */
-    public function __construct(ContaoFramework $framework, FeedFactory $feedFactory, Connection $connection, string $projectDir)
+    private string $projectDir;
+
+    private string $locale;
+
+    public function __construct(ContaoFramework $framework, FeedFactory $feedFactory, Connection $connection, string $projectDir, string $locale)
     {
         $this->framework = $framework;
         $this->feedFactory = $feedFactory;
         $this->connection = $connection;
         $this->projectDir = $projectDir;
-
-        // Initialize Contao framework
-        $this->framework->initialize();
+        $this->locale = $locale;
     }
 
     /**
@@ -77,6 +63,9 @@ class UpcomingEventsController extends AbstractController
      */
     public function printLatestEvents(int $section = 4250, int $limit = 100): Response
     {
+        // Initialize Contao framework
+        $this->framework->initialize();
+
         $limit = $limit < 1 ? 0 : $limit;
 
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
@@ -132,7 +121,7 @@ class UpcomingEventsController extends AbstractController
         );
 
         $rss->addChannelField(
-            new Item('language', 'de')
+            new Item('language', $this->locale)
         );
 
         $rss->addChannelField(

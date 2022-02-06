@@ -60,6 +60,8 @@ class SyncSacMemberDatabase
 
     private string $projectDir;
 
+    private string $locale;
+
     private ?LoggerInterface $logger;
 
     private ?string $ftp_hostname;
@@ -68,7 +70,7 @@ class SyncSacMemberDatabase
 
     private ?string $ftp_password;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, EncoderFactory $encoderFactory, array $credentials, array $sectionIds, string $projectDir, LoggerInterface $logger = null)
+    public function __construct(ContaoFramework $framework, Connection $connection, EncoderFactory $encoderFactory, array $credentials, array $sectionIds, string $projectDir, string $locale, ?LoggerInterface $logger = null)
     {
         $this->framework = $framework;
         $this->connection = $connection;
@@ -76,6 +78,7 @@ class SyncSacMemberDatabase
         $this->credentials = $credentials;
         $this->sectionIds = $sectionIds;
         $this->projectDir = $projectDir;
+        $this->locale = $locale;
         $this->logger = $logger;
     }
 
@@ -262,7 +265,7 @@ class SyncSacMemberDatabase
                 $set['email'] = $arrLine[16];
                 $set['gender'] = 'weiblich' === strtolower((string) $arrLine[17]) ? 'female' : 'male';
                 $set['profession'] = $arrLine[18];
-                $set['language'] = 'd' === strtolower((string) $arrLine[19]) ? 'de' : strtolower((string) $arrLine[19]);
+                $set['language'] = 'd' === strtolower((string) $arrLine[19]) ? $this->locale : strtolower((string) $arrLine[19]);
                 $set['entryYear'] = $arrLine[20];
                 $set['membershipType'] = $arrLine[23];
                 $set['sectionInfo1'] = $arrLine[24];

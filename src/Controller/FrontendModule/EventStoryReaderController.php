@@ -33,7 +33,6 @@ use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\Template;
 use Contao\Validator;
 use Haste\Util\Url;
@@ -51,48 +50,42 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_story_reader';
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private ContaoFramework $framework;
 
-    /**
-     * @var string
-     */
-    private $projectDir;
+    private RequestStack $requestStack;
 
-    /**
-     * @var CalendarEventsStoryModel
-     */
-    private $story;
+    private string $projectDir;
 
-    /**
-     * @var bool
-     */
-    private $isPreviewMode = false;
+    private string $locale;
+
+    private ?CalendarEventsStoryModel $story = null;
+
+    private bool $isPreviewMode = false;
 
     /**
      * EventStoryReaderController constructor.
      */
-    public function __construct(RequestStack $requestStack, string $projectDir)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, string $projectDir, string $locale)
     {
+        $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->projectDir = $projectDir;
+        $this->locale = $locale;
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         /** @var CalendarEventsStoryModel $calendarEventsStoryModelAdapter */
-        $calendarEventsStoryModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsStoryModel::class);
+        $calendarEventsStoryModelAdapter = $this->framework->getAdapter(CalendarEventsStoryModel::class);
 
         /** @var Config $configAdapter */
-        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+        $configAdapter = $this->framework->getAdapter(Config::class);
 
         /** @var Environment $environmentAdapter */
-        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+        $environmentAdapter = $this->framework->getAdapter(Environment::class);
 
         /** @var Input $inputAdapter */
-        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+        $inputAdapter = $this->framework->getAdapter(Input::class);
 
         // Set the item from the auto_item parameter
         if (!isset($_GET['items']) && $configAdapter->get('useAutoItem') && isset($_GET['auto_item'])) {
@@ -117,7 +110,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
             $arrValues = ['3', $inputAdapter->get('items')];
         }
 
-        $this->story = $calendarEventsStoryModelAdapter->findBy($arrColumns, $arrValues);
+        $this->story = $calendarEventsStoryModelAdapter->findOneBy($arrColumns, $arrValues);
 
         if (null === $this->story) {
             throw new PageNotFoundException('Page not found: '.$environmentAdapter->get('uri'));
@@ -127,14 +120,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
 
-        $services['contao.framework'] = ContaoFramework::class;
-
-        return $services;
-    }
 
     /**
      * @throws \Exception
@@ -142,28 +128,25 @@ class EventStoryReaderController extends AbstractFrontendModuleController
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
         /** @var MemberModel $memberModelModelAdapter */
-        $memberModelModelAdapter = $this->get('contao.framework')->getAdapter(MemberModel::class);
+        $memberModelModelAdapter = $this->framework->getAdapter(MemberModel::class);
 
         /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         /** @var Validator $validatorAdapter */
-        $validatorAdapter = $this->get('contao.framework')->getAdapter(Validator::class);
+        $validatorAdapter = $this->framework->getAdapter(Validator::class);
 
         /** @var FilesModel $filesModelAdapter */
-        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
+        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
 
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
-        $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
+        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
-        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
 
         /** @var Url $urlAdapter */
-        $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
-
-        // Get root dir
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+        $urlAdapter = $this->framework->getAdapter(Url::class);
 
         // Set data
         $template->setData($this->story->row());
@@ -207,8 +190,8 @@ class EventStoryReaderController extends AbstractFrontendModuleController
                 $objFiles = $filesModelAdapter->findByUuid($uuid);
 
                 if (null !== $objFiles) {
-                    if (is_file($rootDir.'/'.$objFiles->path)) {
-                        /** @var File $objFile */
+                    if (is_file($this->projectDir.'/'.$objFiles->path)) {
+
                         $objFile = new File($objFiles->path);
 
                         if ($objFile->isImage) {
@@ -218,11 +201,11 @@ class EventStoryReaderController extends AbstractFrontendModuleController
                             $caption = '';
                             $photographer = '';
 
-                            if (isset($arrMeta['de'])) {
-                                $title = $arrMeta['de']['title'];
-                                $alt = $arrMeta['de']['alt'];
-                                $caption = $arrMeta['de']['caption'];
-                                $photographer = $arrMeta['de']['photographer'];
+                            if (isset($arrMeta[$this->locale])) {
+                                $title = $arrMeta[$this->locale]['title'];
+                                $alt = $arrMeta[$this->locale]['alt'];
+                                $caption = $arrMeta[$this->locale]['caption'];
+                                $photographer = $arrMeta[$this->locale]['photographer'];
                             }
 
                             $arrFigureCaption = [];
@@ -374,9 +357,6 @@ class EventStoryReaderController extends AbstractFrontendModuleController
             'cachefile' => $filepath,
         ];
 
-        if (!$blnCache && isset($opt['cachefile'])) {
-            unset($opt['cachefile']);
-        }
 
         $options = new QROptions($opt);
 

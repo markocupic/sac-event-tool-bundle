@@ -32,6 +32,8 @@ final class NotifyOnEventSubscription implements EventSubscriberInterface
 {
     public const PRIORITY = 10000;
 
+    private string $locale;
+
     /**
      * @var ContaoFramework
      */
@@ -61,6 +63,11 @@ final class NotifyOnEventSubscription implements EventSubscriberInterface
      * @var ModuleModel
      */
     private $moduleModel;
+
+    public function __construct(string $locale)
+    {
+        $this->locale = $locale;
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -155,7 +162,7 @@ final class NotifyOnEventSubscription implements EventSubscriberInterface
                 'event_link_detail' => 'https://'.$environmentAdapter->get('host').'/'.$eventsAdapter->generateEventUrl($this->eventModel),
             ];
 
-            $objNotification->send($arrTokens, 'de');
+            $objNotification->send($arrTokens, $this->locale);
         }
     }
 

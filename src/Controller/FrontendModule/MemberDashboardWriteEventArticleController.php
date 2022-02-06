@@ -74,13 +74,16 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
 
     private string $eventStoryAssetDir;
 
-    public function __construct(ContaoFramework $framework, TranslatorInterface $translator, Security $security, string $projectDir, string $eventStoryAssetDir)
+    private string $locale;
+
+    public function __construct(ContaoFramework $framework, TranslatorInterface $translator, Security $security, string $projectDir, string $eventStoryAssetDir, string $locale)
     {
         $this->framework = $framework;
         $this->translator = $translator;
         $this->security = $security;
         $this->projectDir = $projectDir;
         $this->eventStoryAssetDir = $eventStoryAssetDir;
+        $this->locale = $locale;
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
@@ -307,11 +310,11 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             while ($objFiles->next()) {
                 $arrMeta = $stringUtilAdapter->deserialize($objFiles->meta, true);
 
-                if (!isset($arrMeta['de']['caption']) || '' === $arrMeta['de']['caption']) {
+                if (!isset($arrMeta[$this->locale]['caption']) || '' === $arrMeta[$this->locale]['caption']) {
                     $blnMissingLegend = true;
                 }
 
-                if (!isset($arrMeta['de']['photographer']) || '' === $arrMeta['de']['photographer']) {
+                if (!isset($arrMeta[$this->locale]['photographer']) || '' === $arrMeta[$this->locale]['photographer']) {
                     $blnMissingPhotographerName = true;
                 }
             }
@@ -776,9 +779,9 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                                 'singleSRC' => $objFiles->path,
                                 'title' => $stringUtilAdapter->specialchars($objFile->basename),
                                 'filesModel' => $objFiles->current(),
-                                'caption' => $arrMeta['de']['caption'] ?? '',
-                                'photographer' => $arrMeta['de']['photographer'] ?? '',
-                                'alt' => $arrMeta['de']['alt'] ?? '',
+                                'caption' => $arrMeta[$this->locale]['caption'] ?? '',
+                                'photographer' => $arrMeta[$this->locale]['photographer'] ?? '',
+                                'alt' => $arrMeta[$this->locale]['alt'] ?? '',
                             ];
                         }
                     }

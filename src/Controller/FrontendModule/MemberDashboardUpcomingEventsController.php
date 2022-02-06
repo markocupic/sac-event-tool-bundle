@@ -48,10 +48,13 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
     public const TYPE = 'member_dashboard_upcoming_events';
 
     private ContaoFramework $framework;
+
     private Security $security;
+
     private string $locale;
 
     private ?FrontendUser $user = null;
+
     private ?Template $template = null;
 
     public function __construct(ContaoFramework $framework, Security $security, string $locale)
@@ -90,7 +93,6 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
-
         // Do not allow for not authorized users
         if (null === $this->user) {
             throw new UnauthorizedHttpException('Not authorized. Please log in as frontend user.');
