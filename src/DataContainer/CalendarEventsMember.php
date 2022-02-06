@@ -47,6 +47,8 @@ use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Contao\CoreBundle\ServiceAnnotation\Callback;
+
 
 class CalendarEventsMember extends Backend
 {
@@ -212,7 +214,7 @@ class CalendarEventsMember extends Backend
                         $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCopyable'] = true;
 
                         Message::addError($this->translator->trans('ERR.accessDenied', [], 'contao_default'));
-                        $this->redirect('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$objEvent->id);
+                        Controller::redirect('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$objEvent->id);
                     }
                 }
             }
@@ -257,7 +259,7 @@ class CalendarEventsMember extends Backend
             }
 
             // Then get event participants
-            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY stateOfSubscription, firstname')->execute(Input::get('eventId'));
+            $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY stateOfSubscription, firstname')->execute(Input::get('eventId'));
 
             while ($objDb->next()) {
                 if (Validator::isEmail($objDb->email)) {
@@ -443,11 +445,11 @@ class CalendarEventsMember extends Backend
         $reload = false;
 
         // Delete orphaned records
-        $objStmt = $this->Database->prepare('SELECT id FROM tl_calendar_events_member AS em WHERE em.sacMemberId > ? AND em.tstamp > ? AND NOT EXISTS (SELECT * FROM tl_member AS m WHERE em.sacMemberId = m.sacMemberId)')->execute(0, 0);
+        $objStmt = Database::getInstance()->prepare('SELECT id FROM tl_calendar_events_member AS em WHERE em.sacMemberId > ? AND em.tstamp > ? AND NOT EXISTS (SELECT * FROM tl_member AS m WHERE em.sacMemberId = m.sacMemberId)')->execute(0, 0);
 
         if ($objStmt->numRows) {
             $arrIDS = $objStmt->fetchEach('id');
-            $objStmt2 = $this->Database->execute('DELETE FROM tl_calendar_events_member WHERE id IN('.implode(',', $arrIDS).')');
+            $objStmt2 = Database::getInstance()->execute('DELETE FROM tl_calendar_events_member WHERE id IN('.implode(',', $arrIDS).')');
 
             if ($objStmt2->affectedRows > 0) {
                 $reload = true;
@@ -455,11 +457,11 @@ class CalendarEventsMember extends Backend
         }
 
         // Delete event members without sacMemberId that are not related to an event
-        $objStmt = $this->Database->prepare('SELECT id FROM tl_calendar_events_member AS em WHERE (em.sacMemberId < ? OR em.sacMemberId = ?) AND tstamp > ? AND NOT EXISTS (SELECT * FROM tl_calendar_events AS e WHERE em.eventId = e.id)')->execute(1, '', 0);
+        $objStmt = Database::getInstance()->prepare('SELECT id FROM tl_calendar_events_member AS em WHERE (em.sacMemberId < ? OR em.sacMemberId = ?) AND tstamp > ? AND NOT EXISTS (SELECT * FROM tl_calendar_events AS e WHERE em.eventId = e.id)')->execute(1, '', 0);
 
         if ($objStmt->numRows) {
             $arrIDS = $objStmt->fetchEach('id');
-            $objStmt2 = $this->Database->execute('DELETE FROM tl_calendar_events_member WHERE id IN('.implode(',', $arrIDS).')');
+            $objStmt2 = Database::getInstance()->execute('DELETE FROM tl_calendar_events_member WHERE id IN('.implode(',', $arrIDS).')');
 
             if ($objStmt2->affectedRows > 0) {
                 $reload = true;
@@ -467,7 +469,7 @@ class CalendarEventsMember extends Backend
         }
 
         if ($reload) {
-            $this->reload();
+            Controller::reload();
         }
     }
 
@@ -496,7 +498,7 @@ class CalendarEventsMember extends Backend
      */
     public function setContaoMemberIdFromSacMemberId(DataContainer $dc): void
     {
-        $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE tl_calendar_events_member.contaoMemberId < ? AND tl_calendar_events_member.sacMemberId > ? AND tl_calendar_events_member.sacMemberId IN (SELECT sacMemberId FROM tl_member)')->execute(1, 0);
+        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE tl_calendar_events_member.contaoMemberId < ? AND tl_calendar_events_member.sacMemberId > ? AND tl_calendar_events_member.sacMemberId IN (SELECT sacMemberId FROM tl_member)')->execute(1, 0);
 
         while ($objDb->next()) {
             $objMemberModel = MemberModel::findOneBySacMemberId($objDb->sacMemberId);
@@ -513,7 +515,7 @@ class CalendarEventsMember extends Backend
                     'city' => $objMemberModel->city,
                     'mobile' => $objMemberModel->mobile,
                 ];
-                $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($objDb->id);
+                Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($objDb->id);
             }
         }
     }
@@ -538,21 +540,21 @@ class CalendarEventsMember extends Backend
                     $set = [
                         'contaoMemberId' => (int) $objMemberModel->id,
                     ];
-                    $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
+                    Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
                 } else {
                     $varValue = '';
                     $set = [
                         'sacMemberId' => '',
                         'contaoMemberId' => 0,
                     ];
-                    $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
+                    Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
                 }
             } else {
                 $set = [
                     'sacMemberId' => '',
                     'contaoMemberId' => 0,
                 ];
-                $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
+                Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
             }
         }
 
@@ -596,7 +598,7 @@ class CalendarEventsMember extends Backend
                     if (null !== $objNotification) {
                         $arrTokens = [
                             'participant_state_of_subscription' => html_entity_decode((string) $GLOBALS['TL_LANG']['tl_calendar_events_member'][$varValue]),
-                            'event_name' => html_entity_decode((string) $objEvent->title),
+                            'event_name' => html_entity_decode($objEvent->title),
                             'participant_uuid' => $objEventMemberModel->uuid,
                             'participant_name' => html_entity_decode($objEventMemberModel->firstname.' '.$objEventMemberModel->lastname),
                             'participant_email' => $objEventMemberModel->email,
@@ -626,7 +628,7 @@ class CalendarEventsMember extends Backend
                     'addedOn' => time(),
                 ];
 
-                $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
+                Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
             }
 
             $eventId = $objEventMemberModel->eventId > 0 ? $objEventMemberModel->eventId : CURRENT_ID;
@@ -639,7 +641,7 @@ class CalendarEventsMember extends Backend
                     'eventName' => $objEventModel->title,
                     'eventId' => $eventId,
                 ];
-                $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
+                Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
             }
         }
     }
@@ -697,7 +699,7 @@ class CalendarEventsMember extends Backend
 
         if (isset($_POST['refuseWithEmail'])) {
             // Show another palette
-            $this->redirect($this->addToUrl('call=refuseWithEmail'));
+            Controller::redirect(Backend::addToUrl('call=refuseWithEmail'));
         }
 
         if (isset($_POST['acceptWithEmail'])) {
@@ -711,7 +713,7 @@ class CalendarEventsMember extends Backend
 
             if ($blnAllow) {
                 // Show another palette
-                $this->redirect($this->addToUrl('call=acceptWithEmail'));
+                Controller::redirect(Backend::addToUrl('call=acceptWithEmail'));
             } else {
                 $_SESSION['addError'] = 'Dem Teilnehmer kann die Teilnahme am Event nicht bestätigt werden, da die maximale Teilnehmerzahl bereits erreicht wurde.';
             }
@@ -719,7 +721,7 @@ class CalendarEventsMember extends Backend
 
         if (isset($_POST['addToWaitlist'])) {
             // Show another palette
-            $this->redirect($this->addToUrl('call=addToWaitlist'));
+            Controller::redirect(Backend::addToUrl('call=addToWaitlist'));
         }
 
         if (isset($_POST['refuseWithoutEmail'])) {
@@ -727,11 +729,11 @@ class CalendarEventsMember extends Backend
 
             if (null !== $objEventMemberModel) {
                 $set = ['stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_REFUSED];
-                $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
+                Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
                 $_SESSION['addInfo'] = 'Dem Benutzer wurde ohne E-Mail die Teilnahme am Event verweigert. Er muss jedoch noch manuell darüber informiert werden.';
             }
 
-            $this->reload();
+            Controller::reload();
         }
 
         if (isset($_POST['acceptWithoutEmail'])) {
@@ -739,11 +741,11 @@ class CalendarEventsMember extends Backend
 
             if (null !== $objEventMemberModel) {
                 $set = ['stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED];
-                $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
+                Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
                 $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail zum Event zugelassen und muss darüber noch manuell informiert werden.';
             }
 
-            $this->reload();
+            Controller::reload();
         }
 
         if (isset($_POST['addToWaitlist'])) {
@@ -751,11 +753,11 @@ class CalendarEventsMember extends Backend
 
             if (null !== $objEventMemberModel) {
                 $set = ['stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED];
-                $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
+                Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
                 $_SESSION['addInfo'] = 'Der Benutzer wurde ohne E-Mail auf die Warteliste gesetzt und muss darüber noch manuell informiert werden.';
             }
 
-            $this->reload();
+            Controller::reload();
         }
     }
 
@@ -898,7 +900,7 @@ class CalendarEventsMember extends Backend
 
         if (empty(Input::get('call')) || !\is_array($arrActions[Input::get('call')]) || empty($arrActions[Input::get('call')])) {
             $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten.';
-            $this->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.Input::get('id').'&act=edit&rt='.Input::get('rt'));
+            Controller::redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.Input::get('id').'&act=edit&rt='.Input::get('rt'));
         }
 
         // Set action array
@@ -941,7 +943,7 @@ class CalendarEventsMember extends Backend
                     if (null !== $objEmail) {
                         // Set token array
                         $arrTokens = [
-                            'email_sender_name' => html_entity_decode((string) html_entity_decode((string) $this->eventAdminName)),
+                            'email_sender_name' => html_entity_decode(html_entity_decode((string) $this->eventAdminName)),
                             'email_sender_email' => $this->eventAdminEmail,
                             'send_to' => $objEventMemberModel->email,
                             'reply_to' => $user->email,
@@ -965,14 +967,14 @@ class CalendarEventsMember extends Backend
                         elseif (Validator::isEmail($objEventMemberModel->email)) {
                             $objEmail->send($arrTokens, $this->locale);
                             $set = ['stateOfSubscription' => $arrAction['stateOfSubscription']];
-                            $this->Database->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
+                            Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
                             $_SESSION['addInfo'] = $arrAction['sessionInfoText'];
                         } else {
                             $_SESSION['addInfo'] = 'Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.';
                         }
                     }
                 }
-                $this->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.Input::get('id').'&act=edit&rt='.Input::get('rt'));
+                Controller::redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.Input::get('id').'&act=edit&rt='.Input::get('rt'));
             } else {
                 // Add value to ffields
                 if ('' !== Input::post('subject')) {

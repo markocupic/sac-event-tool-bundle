@@ -28,57 +28,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
     'config' => [
         'dataContainer' => 'Table',
         'notCopyable' => true,
-        // Do not copy nor delete records, if an item has been deleted!
-        'onload_callback' => [
-            [
-                TlCalendarEventsMember::class,
-                'test',
-            ],
-            [
-                TlCalendarEventsMember::class,
-                'setStateOfSubscription',
-            ],
-            [
-                TlCalendarEventsMember::class,
-                'onloadCallback',
-            ],
-            [
-                TlCalendarEventsMember::class,
-                'reviseTable',
-            ],
-            [
-                TlCalendarEventsMember::class,
-                'setContaoMemberIdFromSacMemberId',
-            ],
-            [
-                TlCalendarEventsMember::class,
-                'setGlobalOperations',
-            ],
-            [
-                TlCalendarEventsMember::class,
-                'onloadCallbackExportMemberlist',
-            ],
-        ],
-        'onsubmit_callback' => [
-            [
-                TlCalendarEventsMember::class,
-                'onsubmitCallback',
-            ],
-        ],
-        'ondelete_callback' => [],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
                 'email,eventId' => 'index',
-            ],
-        ],
-    ],
-    // Buttons callback
-    'edit' => [
-        'buttons_callback' => [
-            [
-                TlCalendarEventsMember::class,
-                'buttonsCallback',
             ],
         ],
     ],
@@ -93,10 +46,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'label' => [
             'fields' => ['stateOfSubscription', 'firstname', 'lastname', 'street', 'city'],
             'showColumns' => true,
-            'label_callback' => [
-                TlCalendarEventsMember::class,
-                'addIcon',
-            ],
         ],
         'global_operations' => [
             'all' => [
@@ -107,13 +56,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'downloadEventMemberList2Docx' => [
                 'href' => 'act=downloadEventMemberList',
                 'class' => 'download_registration_list',
-                'icon' => Bundle::ASSET_DIR .'/icons/docx.png',
+                'icon' => Bundle::ASSET_DIR.'/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'downloadEventMemberList2Csv' => [
                 'href' => 'action=onloadCallbackExportMemberlist',
                 'class' => 'header_icon',
-                'icon' => Bundle::ASSET_DIR .'/icons/excel.svg',
+                'icon' => Bundle::ASSET_DIR.'/icons/excel.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'writeTourReport' => [
@@ -126,23 +75,19 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'printInstructorInvoice' => [
                 'href' => '',
                 'class' => 'printInstructorInvoice',
-                'icon' => Bundle::ASSET_DIR . '/icons/docx.png',
+                'icon' => Bundle::ASSET_DIR.'/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'sendEmail' => [
                 'href' => 'act=edit&call=sendEmail',
                 'class' => 'send_email',
-                'icon' => Bundle::ASSET_DIR .'/icons/enveloppe.svg',
+                'icon' => Bundle::ASSET_DIR.'/icons/enveloppe.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'backToEventSettings' => [
                 'label' => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
                 'href' => 'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
-                'button_callback' => [
-                    TlCalendarEventsMember::class,
-                    'buttonCbBackToEventSettings',
-                ],
-                'icon' => Bundle::ASSET_DIR .'/icons/back.svg',
+                'icon' => Bundle::ASSET_DIR.'/icons/back.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
         ],
@@ -247,12 +192,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'stateOfSubscription' => [
             'filter' => true,
             'inputType' => 'select',
-            'save_callback' => [
-                [
-                    TlCalendarEventsMember::class,
-                    'saveCallbackStateOfSubscription',
-                ],
-            ],
             'default' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'][0],
             'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
             'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'],
@@ -278,37 +217,21 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         ],
         'dashboard' => [
             'inputType' => 'text',
-            'input_field_callback' => [
-                TlCalendarEventsMember::class,
-                'inputFieldCallbackDashboard',
-            ],
             'eval' => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'refuseWithEmail' => [
             'inputType' => 'text',
-            'input_field_callback' => [
-                TlCalendarEventsMember::class,
-                'inputFieldCallbackNotifyMemberAboutSubscriptionState',
-            ],
             'eval' => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'acceptWithEmail' => [
             'inputType' => 'text',
-            'input_field_callback' => [
-                TlCalendarEventsMember::class,
-                'inputFieldCallbackNotifyMemberAboutSubscriptionState',
-            ],
             'eval' => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'addToWaitlist' => [
             'inputType' => 'text',
-            'input_field_callback' => [
-                TlCalendarEventsMember::class,
-                'inputFieldCallbackNotifyMemberAboutSubscriptionState',
-            ],
             'eval' => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
@@ -396,12 +319,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         ],
         'sacMemberId' => [
             'inputType' => 'text',
-            'save_callback' => [
-                [
-                    TlCalendarEventsMember::class,
-                    'saveCallbackSacMemberId',
-                ],
-            ],
             'eval' => ['doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
@@ -484,10 +401,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'exclude' => true,
             'inputType' => 'select',
             'reference' => &$GLOBALS['TL_LANG']['tl_member']['section'],
-            'options_callback' => [
-                TlCalendarEventsMember::class,
-                'listSections',
-            ],
             'eval' => ['multiple' => true, 'chosen' => true, 'doNotCopy' => true, 'readonly' => false, 'tl_class' => 'w50'],
             'sql' => 'blob NULL',
         ],
