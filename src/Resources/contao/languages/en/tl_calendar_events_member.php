@@ -17,10 +17,11 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 // Global operations
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Csv'] = 'Teilnehmerliste Excel';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Docx'] = 'Teilnehmerliste Word';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['sendEmail'] = 'E-Mail';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['new'] = ['Teilnehmer hinzufügen', 'Fügen Sie hier manuell einen neuen Teilnehmer hinzu.'];
 
 // Operations
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['toggleStateOfParticipation'] = ['Status der Teilnahme aendern', 'Ändern Sie hier den Teilnahmestatus des Teilnehmers mit ID %s.'];
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['new'] = ['Neuen Teilnehmer hinzufügen', 'Fügen Sie hier manuell einen neuen Teilnehmer hinzu.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['edit'] = ['Bearbeiten', 'Bearbeiten Sie die Teilnahme-Optionen des Teilnehmers mit ID %s.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['delete'] = ['Löschen', 'Löschen Sie die Anmeldung des Teilnehmers mit ID %s.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['show'] = ['Details', 'Details des Teilnehmers mit ID %s anzeigen.'];

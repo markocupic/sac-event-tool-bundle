@@ -32,6 +32,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'onload_callback' => [
             [
                 TlCalendarEventsMember::class,
+                'test',
+            ],
+            [
+                TlCalendarEventsMember::class,
                 'setStateOfSubscription',
             ],
             [
@@ -103,13 +107,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'downloadEventMemberList2Docx' => [
                 'href' => 'act=downloadEventMemberList',
                 'class' => 'download_registration_list',
-                'icon' => 'bundles/markocupicsaceventtool/icons/docx.png',
+                'icon' => Bundle::ASSET_DIR .'/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'downloadEventMemberList2Csv' => [
                 'href' => 'action=onloadCallbackExportMemberlist',
                 'class' => 'header_icon',
-                'icon' => 'bundles/markocupicsaceventtool/icons/excel.svg',
+                'icon' => Bundle::ASSET_DIR .'/icons/excel.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'writeTourReport' => [
@@ -122,13 +126,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'printInstructorInvoice' => [
                 'href' => '',
                 'class' => 'printInstructorInvoice',
-                'icon' => 'bundles/markocupicsaceventtool/icons/docx.png',
+                'icon' => Bundle::ASSET_DIR . '/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'sendEmail' => [
                 'href' => 'act=edit&call=sendEmail',
                 'class' => 'send_email',
-                'icon' => 'bundles/markocupicsaceventtool/icons/enveloppe.svg',
+                'icon' => Bundle::ASSET_DIR .'/icons/enveloppe.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'backToEventSettings' => [
@@ -138,7 +142,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                     TlCalendarEventsMember::class,
                     'buttonCbBackToEventSettings',
                 ],
-                'icon' => 'bundles/markocupicsaceventtool/icons/back.svg',
+                'icon' => Bundle::ASSET_DIR .'/icons/back.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
         ],
@@ -422,7 +426,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'eval' => ['tl_class' => 'clr', 'maxlength' => 5000],
             'sql' => 'text NULL',
         ],
-       'emailRecipients' => [
+        'emailRecipients' => [
             'options' => [],
             // Set via onload callback
             'inputType' => 'checkbox',

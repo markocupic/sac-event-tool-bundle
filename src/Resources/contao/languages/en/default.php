@@ -25,6 +25,8 @@ $GLOBALS['TL_LANG']['MSC']['roleCurrentlyVacant'] = 'Benutzer-Rolle im Moment va
 $GLOBALS['TL_LANG']['ERR']['clearMemberProfile'] = 'Das Mitglied mit ID %d kann nicht gelöscht werden, weil es bei einem oder mehreren Events noch auf der Buchungsliste steht.';
 // tl_event_release_level_policy
 $GLOBALS['TL_LANG']['MSC']['level'] = 'Stufe';
+// tl_calendar_events_member
+$GLOBALS['TL_LANG']['ERR']['accessDenied'] = 'Zutritt verweigert.';
 
 // Content elements
 $GLOBALS['TL_LANG']['CTE']['user_portrait'] = ['SAC-User-Portrait'];

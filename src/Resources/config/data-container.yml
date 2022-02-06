@@ -34,6 +34,18 @@ services:
             - '%sacevt.event.tour_invoice_file_name_pattern%'
             - '%sacevt.event.tour_rapport_file_name_pattern%'
 
+    Markocupic\SacEventToolBundle\DataContainer\CalendarEventsMember:
+        arguments:
+            - '@contao.framework'
+            - '@request_stack'
+            - '@database_connection'
+            - '@Markocupic\SacEventToolBundle\DataContainer\Util'
+            - '@translator'
+            - '@security.helper'
+            - '%sacevt.event_admin_name%'
+            - '%sacevt.event_admin_email%'
+            - '%sacevt.locale%'
+
     Markocupic\SacEventToolBundle\DataContainer\CalendarEventsStory:
         arguments:
             - '@security.helper'
