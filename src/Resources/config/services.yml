@@ -35,6 +35,11 @@ services:
             - '%sacevt.temp_dir%'
             - '%kernel.project_dir%'
 
+    # Generate csv event registration list
+    Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList:
+        arguments:
+            - '@database_connection'
+
     # Generate docx/pdf event rapports and event invoices from docx templates
     Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx:
         public: true

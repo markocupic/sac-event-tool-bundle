@@ -16,7 +16,6 @@ use Contao\Config;
 use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\Bundle;
-use Markocupic\SacEventToolBundle\Dca\TlCalendarEventsMember;
 use Ramsey\Uuid\Uuid;
 
 System::loadLanguageFile('tl_member');
@@ -54,19 +53,18 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'downloadEventMemberList2Docx' => [
-                'href' => 'act=downloadEventMemberList',
+                'href' => 'action=downloadEventMemberListDocx',
                 'class' => 'download_registration_list',
                 'icon' => Bundle::ASSET_DIR.'/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'downloadEventMemberList2Csv' => [
-                'href' => 'action=onloadCallbackExportMemberlist',
+                'href' => 'action=downloadEventMemberListCsv',
                 'class' => 'header_icon',
                 'icon' => Bundle::ASSET_DIR.'/icons/excel.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'writeTourReport' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['writeTourReportButton'],
                 'href' => '',
                 'class' => 'writeTourRapport',
                 'icon' => 'edit.svg',
@@ -79,7 +77,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'sendEmail' => [
-                'href' => 'act=edit&call=sendEmail',
+                'href' => 'act=edit&action=sendEmail',
                 'class' => 'send_email',
                 'icon' => Bundle::ASSET_DIR.'/icons/enveloppe.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
@@ -346,8 +344,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'emailRecipients' => [
             'options' => [],
             // Set via onload callback
-            'inputType' => 'checkbox',
-            'eval' => ['multiple' => true, 'mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''],
+            'inputType' => 'select',
+            'eval' => ['multiple' => true, 'mandatory' => true, 'chosen' => true, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''],
             'sql' => 'blob NULL',
         ],
         'emailSubject' => [

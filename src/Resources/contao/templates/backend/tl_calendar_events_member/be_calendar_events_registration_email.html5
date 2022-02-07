@@ -55,12 +55,11 @@
      * Prevent multiple clicks
      * Disable Submit Button Upon Form Submission
      */
-    window.addEvent('domready', function () {
-        $('tl_calendar_events_member').addEvent('submit', function () {
-            if ($$('input[name="subject"]').get('value') != '' && $$('textarea[name="text"]').get('value') != '') {
+    window.addEventListener('DOMContentLoaded', (event) => {
+        document.getElementById('tl_calendar_events_member').addEventListener('submit', () => {
+            if (document.getElementById('ctrl_subject').value != '' && document.getElementById('ctrl_text').value != '') {
                 document.getElementById('ctrl_submit').disabled = 1;
             }
         });
     });
-
 </script>

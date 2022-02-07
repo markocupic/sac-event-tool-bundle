@@ -15,6 +15,8 @@ declare(strict_types=1);
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 
 // Global operations
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['writeTourReport'] = 'Tourenrapport bearbeiten';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['printInstructorInvoice'] = 'Vergütungsformular und Rapport drucken';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Csv'] = 'Teilnehmerliste Excel';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Docx'] = 'Teilnehmerliste Word';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['sendEmail'] = 'E-Mail';

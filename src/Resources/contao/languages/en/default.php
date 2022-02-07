@@ -27,6 +27,7 @@ $GLOBALS['TL_LANG']['ERR']['clearMemberProfile'] = 'Das Mitglied mit ID %d kann 
 $GLOBALS['TL_LANG']['MSC']['level'] = 'Stufe';
 // tl_calendar_events_member
 $GLOBALS['TL_LANG']['ERR']['accessDenied'] = 'Zutritt verweigert.';
+$GLOBALS['TL_LANG']['MSC']['messageSuccessfullySent'] = 'Die Nachricht wurde erfolgreich versandt.';
 
 // Content elements
 $GLOBALS['TL_LANG']['CTE']['user_portrait'] = ['SAC-User-Portrait'];

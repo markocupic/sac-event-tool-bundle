@@ -84,7 +84,7 @@ class EventMemberList2Docx
 
         if (null === $objEventMember) {
             // Send error message if there are no members assigned to the event
-            $messageAdapter->addError('Bitte &uuml;berpr&uuml;fe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, deren Teilname best&auml;tigt ist.');
+            $messageAdapter->addError('Bitte überprüfe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, deren Teilname best&auml;tigt ist.');
             $controllerAdapter->redirect(System::getReferer());
         }
 
