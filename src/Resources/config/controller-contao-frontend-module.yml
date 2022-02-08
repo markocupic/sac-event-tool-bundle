@@ -132,11 +132,14 @@ services:
 
     # Member dashboard module: display the avatar and the avatar upload form
     Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardAvatarUploadController:
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        arguments:
+            - '@contao.framework'
+            - '@security.helper'
+            - '@Markocupic\SacEventToolBundle\Image\RotateImage'
+            - '%kernel.project_dir%'
+            - '%sacevt.user.frontend.avatar_dir%'
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
         public: true
 
     # Event filter form module

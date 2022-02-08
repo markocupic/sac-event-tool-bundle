@@ -32,6 +32,7 @@ use Contao\PageModel;
 use Contao\System;
 use Contao\Template;
 use Haste\Form\Form;
+use Markocupic\SacEventToolBundle\Image\RotateImage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -46,20 +47,32 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 {
     public const TYPE = 'member_dashboard_avatar_upload';
 
-    protected ?string $projectDir;
+    private ContaoFramework $framework;
+    private Security $security;
+    private RotateImage $rotateImage;
+    private string $projectDir;
+    private string $avatarDir;
+    private ?FrontendUser $objUser;
+    private ?Template $template;
 
-    protected ?FrontendUser $objUser;
+    public function __construct(ContaoFramework $framework, Security $security, RotateImage $rotateImage,string $projectDir, string $avatarDir)
+    {
+        $this->framework = $framework;
+        $this->security = $security;
+        $this->rotateImage = $rotateImage;
+        $this->projectDir = $projectDir;
+        $this->avatarDir = $avatarDir;
 
-    protected ?Template $template;
 
-    protected ?PageModel $objPage;
+    }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
-        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $inputAdapter = $this->framework->getAdapter(Input::class);
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+
         // Get logged in member object
-        if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser) {
+        if (($objUser = $this->security->getUser()) instanceof FrontendUser) {
             $this->objUser = $objUser;
         }
 
@@ -67,37 +80,22 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             // Neither cache nor search page
             $page->noSearch = 1;
             $page->cache = 0;
-
-            // Set the page object
-            $this->objPage = $page;
         }
 
         // Rotate image by 90°
         if ('rotate-image' === $inputAdapter->get('do') && '' !== $inputAdapter->get('fileId')) {
-            // Get the image rotate service
-            $objRotateImage = $this->get('Markocupic\SacEventToolBundle\Image\RotateImage');
 
             $objFiles = FilesModel::findOneById($inputAdapter->get('fileId'));
-            $objRotateImage->rotate($objFiles);
+            $this->rotateImage->rotate($objFiles);
 
             $controllerAdapter->redirect($page->getFrontendUrl());
         }
-
-        $this->projectDir = $this->getParameter('kernel.project_dir');
 
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
 
-        $services['contao.framework'] = ContaoFramework::class;
-        $services['security.helper'] = Security::class;
-
-        return $services;
-    }
 
     /**
      * @throws \Exception
@@ -136,8 +134,8 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
      */
     private function addMessagesToTemplate(): void
     {
-        $systemAdapter = $this->get('contao.framework')->getAdapter(System::class);
-        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
+        $systemAdapter = $this->framework->getAdapter(System::class);
+        $messageAdapter = $this->framework->getAdapter(Message::class);
 
         if ($messageAdapter->hasInfo()) {
             $this->template->hasInfoMessage = true;
@@ -161,18 +159,18 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     private function generateAvatarForm(): string
     {
         // Set adapters
-        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
-        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
-        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
-        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
-        $memberModelAdapter = $this->get('contao.framework')->getAdapter(MemberModel::class);
-        $dbafsAdapter = $this->get('contao.framework')->getAdapter(Dbafs::class);
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+        $inputAdapter = $this->framework->getAdapter(Input::class);
+        $environmentAdapter = $this->framework->getAdapter(Environment::class);
+        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
+        $dbafsAdapter = $this->framework->getAdapter(Dbafs::class);
 
         $objForm = new Form(
             'form-avatar-upload',
             'POST',
             function ($objHaste) {
-                $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+                $inputAdapter = $this->framework->getAdapter(Input::class);
 
                 return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
             }
@@ -222,13 +220,20 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         // Standardize name
         if ('form-avatar-upload' === $inputAdapter->post('FORM_SUBMIT') && !empty($_FILES['avatar']['tmp_name'])) {
             $objUploadFolder->purge();
-            $objFile = new File($_FILES['avatar']['name']);
-            $_FILES['avatar']['name'] = 'avatar-'.$this->objUser->id.'.'.strtolower($objFile->extension);
 
-            // Move uploaded file so we can save the avatar uuid in tl_member.avatar
-            move_uploaded_file($_FILES['avatar']['tmp_name'], TL_ROOT.'/'.$objUploadFolder->path.'/'.$_FILES['avatar']['name']);
-            $dbafsAdapter->addResource($objUploadFolder->path.'/'.$_FILES['avatar']['name']);
-            $fileModel = $filesModelAdapter->findByPath($objUploadFolder->path.'/'.$_FILES['avatar']['name']);
+            $objFile = new File($_FILES['avatar']['name']);
+
+            // Rename upload to avatar-<user-id>.jpg
+            $strAvatarFileName = 'avatar-'.$this->objUser->id.'.'.strtolower($objFile->extension);
+
+            // Move uploaded file, so we can save the avatar uuid in tl_member.avatar
+            move_uploaded_file($_FILES['avatar']['tmp_name'], $this->projectDir.'/'.$objUploadFolder->path.'/'.$strAvatarFileName);
+
+            // Add file to DBAFS
+            $dbafsAdapter->addResource($objUploadFolder->path.'/'.$strAvatarFileName);
+
+            $fileModel = $filesModelAdapter->findByPath($objUploadFolder->path.'/'.$strAvatarFileName);
+
             $oMember = $memberModelAdapter->findByPk($this->objUser->id);
 
             if (null !== $oMember) {
@@ -255,11 +260,11 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         $hasError = false;
 
         // Set adapters
-        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
+        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
 
         // Check for valid avatar
         if (null !== $this->objUser) {
-            if ('' !== $this->objUser->avatar) {
+            if ($this->objUser->avatar) {
                 $objFile = $filesModelAdapter->findByUuid($this->objUser->avatar);
 
                 if (null === $objFile) {
@@ -279,7 +284,6 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
                 if ($hasError) {
                     $this->objUser->avatar = '';
                     $this->objUser->save();
-
                     $objUploadFolder = new Folder($this->getUploadDir());
                     $objUploadFolder->purge();
                     $objUploadFolder->delete();
@@ -292,8 +296,8 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     {
         return sprintf(
             '%s/%s',
-            $this->getParameter('sacevt.user.frontend.avatar_dir'),
-            (string) $this->objUser->id,
+            $this->avatarDir,
+            $this->objUser->id,
         );
     }
 }
