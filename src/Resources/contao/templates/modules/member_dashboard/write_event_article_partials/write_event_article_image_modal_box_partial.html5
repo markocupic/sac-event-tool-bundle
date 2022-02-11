@@ -18,7 +18,7 @@
           </div>
           {{br}}
           <div class="col-12">
-            <label for="imagePhotographerInput">Fotograf/Bildeigent&uuml;mer</label>
+            <label for="imagePhotographerInput">Fotograf/Bildeigentümer</label>
             <input class="form-control" id="imagePhotographerInput" name="image-photographer" type="text" placeholder="">
           </div>
         </div>

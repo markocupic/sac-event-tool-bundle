@@ -1,7 +1,7 @@
 <?php Markocupic\SacEventToolBundle\CalendarEventsHelper::addEventDataToTemplate($this); ?>
 
 <!-- indexer::stop -->
-<p class="back m-0"><a href="javascript:history.go(-1)" title="Zurück">Zur&uuml;ck</a></p>
+<p class="back m-0"><a href="javascript:history.go(-1)" title="Zurück">Zurück</a></p>
 <div class="event event-detailview layout_full block<?= $this->getEventData('class') ?>">
 
   <?php if ($this->getEventData('eventState')): ?>
@@ -44,7 +44,7 @@
           <div class="organizer-logo m2-4 mb-2"><?= $this->getEventData('eventOrganizerLogos') ?></div>
           <p>
             <?php if ('' !== $this->getEventData('eventOrganizers')): ?><?= $this->
-            getEventData('eventOrganizers') ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
+            getEventData('eventOrganizers') ?><?php else: ?>Keine Gruppe ausgewählt<?php endif; ?>
           </p>
         </div>
 
@@ -130,7 +130,7 @@
 
         <?php if ('' != $this->getEventData('equipment')): ?>
         <div class="equipment event-detail event-info-box icon-box-small">
-          <h5>Ben&ouml;tigtes Material</h5>
+          <h5>Benötigtes Material</h5>
           <p><?= nl2br($this->getEventData('equipment')) ?></p>
         </div>
         <?php endif; ?>

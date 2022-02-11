@@ -34,7 +34,7 @@
         </div>
       </div>
       <div class="mt-3 filter-board-widget">
-        <a class="small reset-form" href="#">Filter zur&uuml;cksetzen</a>
+        <a class="small reset-form" href="#">Filter zurücksetzen</a>
       </div>
     </div><!-- end formbody -->
   </form>

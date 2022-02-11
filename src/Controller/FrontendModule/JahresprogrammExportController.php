@@ -56,17 +56,17 @@ class JahresprogrammExportController extends AbstractPrintExportController
     protected $template;
 
     /**
-     * @var 
+     * @var
      */
     protected $startDate;
 
     /**
-     * @var 
+     * @var
      */
     protected $endDate;
 
     /**
-     * @var 
+     * @var
      */
     protected $organizer;
 
@@ -76,7 +76,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
     protected $eventType;
 
     /**
-     * @var 
+     * @var
      */
     protected $eventReleaseLevel;
 
@@ -210,7 +210,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
             $arrUserRoles[$objUserRoles->id] = $objUserRoles->title;
         }
         $objForm->addFormField('userRoles', [
-            'label' => 'Neben den Event-Leitern zus&auml;tzliche Funktion&auml;re anzeigen',
+            'label' => 'Neben den Event-Leitern zusätzliche Funktionäre anzeigen',
             'inputType' => 'select',
             'options' => $arrUserRoles,
             'eval' => ['multiple' => true, 'mandatory' => false],

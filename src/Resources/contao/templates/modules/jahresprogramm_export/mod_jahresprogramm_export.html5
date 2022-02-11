@@ -292,7 +292,7 @@
 
 
 <?php if ($this->specialUsers): ?>
-<h3>Funktion&auml;re (Ausgabe anhand gew&auml;hlter Benutzerrolle)</h3>
+<h3>Funktionäre (Ausgabe anhand gewählter Benutzerrolle)</h3>
 <table class="event-export-table table table-sm">
   <tbody>
   <?php foreach ($this->specialUsers as $arrSpecialUser): ?>

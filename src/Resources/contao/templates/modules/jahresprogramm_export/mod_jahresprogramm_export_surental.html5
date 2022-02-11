@@ -304,7 +304,7 @@
 
 
 <?php if ($this->specialUsers): ?>
-<h3>Verantwortliche (Ausgabe anhand gew&auml;hlter Benutzerrolle)</h3>
+<h3>Verantwortliche (Ausgabe anhand gewählter Benutzerrolle)</h3>
 <table class="event-export-table table table-sm">
   <tbody>
   <?php foreach ($this->specialUsers as $arrSpecialUser): ?>

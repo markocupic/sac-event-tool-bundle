@@ -882,7 +882,7 @@ class CalendarEventsHelper
 
                 if ($memberCount < $objEvent->maxMembers) {
                     // Free places
-                    return sprintf($strBadge, 'success', sprintf('noch %s freie Pl&auml;tze', $objEvent->maxMembers - $memberCount), $memberCount.'/'.$objEvent->maxMembers);
+                    return sprintf($strBadge, 'success', sprintf('noch %s freie Plätze', $objEvent->maxMembers - $memberCount), $memberCount.'/'.$objEvent->maxMembers);
                 }
             } else {
                 // There is no booking limit. Show registered members

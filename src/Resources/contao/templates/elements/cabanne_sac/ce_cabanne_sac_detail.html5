@@ -31,7 +31,7 @@
           <table class="table">
             <?php if ($this->hutWarden): ?>
             <tr>
-              <td><strong>H&uuml;ttenwart:</strong></td>
+              <td><strong>Hüttenwart:</strong></td>
               <!-- indexer::continue -->
               <td><?= nl2br($this->hutWarden) ?></td>
               <!-- indexer::stop -->
@@ -113,7 +113,7 @@
 
 
   <div class="col-12">
-    <h2 class="ce_headline">Zustiegsm&ouml;glichkeiten</h2>
+    <h2 class="ce_headline">Zustiegsmöglichkeiten</h2>
   </div>
 
   <div class="col-xl-8 mb-4 mb-0-lg">

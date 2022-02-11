@@ -9,7 +9,7 @@
 <div id="dashboardEventStoryGallery" class="<?php if ($this->publishState < 2): ?>sortable-thumbnail-container <?php endif; ?> dashboard-event-story-gallery row gx-2 gy-1">
   <?php $i = 0; ?>
   <?php foreach ($this->images as $arrFile): ?>
-  <div class="col-12 col-sm-6 col-lg-3 thumbnail <?php if ($this->publishState < 2): ?>sortable-item <?php endif; ?>responsive" data-item="<?= $i ?>" data-path="<?= $arrFile['path'] ?>" data-file-id="<?= $arrFile['id'] ?>" data-file-uuid="<?= Contao\StringUtil::binToUuid($arrFile['uuid']) ?>" title="Sortierung mit Drag and Drop &auml;ndern">
+  <div class="col-12 col-sm-6 col-lg-3 thumbnail <?php if ($this->publishState < 2): ?>sortable-item <?php endif; ?>responsive" data-item="<?= $i ?>" data-path="<?= $arrFile['path'] ?>" data-file-id="<?= $arrFile['id'] ?>" data-file-uuid="<?= Contao\StringUtil::binToUuid($arrFile['uuid']) ?>" title="Sortierung mit Drag and Drop ändern">
     {{image::<?= Contao\StringUtil::binToUuid($arrFile['uuid']) ?>?width=400&height=400&mode=crop}}
     <div class="d-none"><?= $arrFile['caption'] ?></div>
     <?php if ($this->publishState < 2): ?>

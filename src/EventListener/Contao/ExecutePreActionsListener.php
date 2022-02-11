@@ -90,7 +90,7 @@ class ExecutePreActionsListener
 
                 $html = '<div>';
                 $html .= '<h1>Mitglied gefunden</h1>';
-                $html .= sprintf('<div>Sollen die Daten von %s %s &uuml;bernommen werden?</div>', $objMemberModel->firstname, $objMemberModel->lastname);
+                $html .= sprintf('<div>Sollen die Daten von %s %s übernommen werden?</div>', $objMemberModel->firstname, $objMemberModel->lastname);
                 $html .= '<button class="tl_button">Ja</button> <button class="tl_button">nein</button>';
                 $json['html'] = $html;
             }

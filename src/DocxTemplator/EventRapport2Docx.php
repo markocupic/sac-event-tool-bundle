@@ -78,13 +78,13 @@ class EventRapport2Docx
         $objEvent = $calendarEventsModelAdapter->findByPk($objEventInvoice->pid);
 
         if (!$objEventHelper->checkEventRapportHasFilledInCorrectly($objEventInvoice)) {
-            $messageAdapter->addError('Bitte f&uuml;llen Sie den Touren-Rapport vollst&auml;ndig aus, bevor Sie das Verg&uuml;tungsformular herunterladen.');
+            $messageAdapter->addError('Bitte füllen Sie den Touren-Rapport vollständig aus, bevor Sie das Vergütungsformular herunterladen.');
             $controllerAdapter->redirect(System::getReferer());
         }
 
         if (null === $objEventMemberHelper->getParticipatedEventMembers($objEvent)) {
             // Send error message if there are no members assigned to the event
-            $messageAdapter->addError('Bitte &uuml;berpr&uuml;fe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, die am Event teilgenommen haben.');
+            $messageAdapter->addError('Bitte überprüfe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, die am Event teilgenommen haben.');
             $controllerAdapter->redirect(System::getReferer());
         }
 

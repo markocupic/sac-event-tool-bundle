@@ -1,7 +1,7 @@
 <?php Markocupic\SacEventToolBundle\CalendarEventsHelper::addEventDataToTemplate($this); ?>
 
 <!-- indexer::stop -->
-<p class="back"><a href="javascript:history.go(-1)" title="Zurück">Zur&uuml;ck</a></p>
+<p class="back"><a href="javascript:history.go(-1)" title="Zurück">Zurück</a></p>
 
 <div class="event event-detailview layout_full block<?= $this->getEventData('class') ?>">
   <?php if ($this->eventState): ?>
@@ -35,7 +35,7 @@
           <h5>Organisierende Gruppe</h5>
           <p>
             <?php if ('' !== $this->getEventData('eventOrganizers')): ?><?= $this->
-            getEventData('eventOrganizers') ?><?php else: ?>Keine Gruppe ausgew&auml;hlt<?php endif; ?>
+            getEventData('eventOrganizers') ?><?php else: ?>Keine Gruppe ausgewählt<?php endif; ?>
           </p>
         </div>
         <?php if ($this->getEventData('mountainguide')): ?>
@@ -78,7 +78,7 @@
           <?= $this->getEventData('instructorContactBoxes') ?>
         </div>
         <?php else: ?>
-        Leiter wurde gel&ouml;scht.
+        Leiter wurde gelöscht.
         <?php endif; ?>
         <!-- indexer::stop -->
 
@@ -151,8 +151,8 @@
       <?php if ($this->getEventData('suitableForBeginners')): ?>
       <div class="suitableForBeginners event-detail event-info-box icon-box-small">
         <!-- indexer::continue -->
-        <h5>F&uuml;r Anf&auml;nger geeignet</h5>
-        <p>Ideale Tour f&uuml;r Einsteiger</p>
+        <h5>Für Anfänger geeignet</h5>
+        <p>Ideale Tour für Einsteiger</p>
         <!-- indexer::stop -->
       </div>
       <?php endif; ?>
@@ -216,7 +216,7 @@
 
       <?php if ('' != $this->getEventData('equipment')): ?>
       <div class="equipment event-detail event-info-box icon-box-small">
-        <h5>Ben&ouml;tigtes Material</h5>
+        <h5>Benötigtes Material</h5>
         <p><?= nl2br($this->getEventData('equipment')) ?></p>
       </div>
       <?php endif; ?>
