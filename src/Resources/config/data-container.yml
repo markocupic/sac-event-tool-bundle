@@ -36,7 +36,6 @@ services:
 
     Markocupic\SacEventToolBundle\DataContainer\CalendarEventsMember:
         arguments:
-            - '@contao.framework'
             - '@request_stack'
             - '@database_connection'
             - '@Markocupic\SacEventToolBundle\DataContainer\Util'

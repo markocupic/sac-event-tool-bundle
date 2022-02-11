@@ -21,9 +21,7 @@ use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\Date;
 use Contao\Email;
@@ -31,7 +29,6 @@ use Contao\Environment;
 use Contao\EventReleaseLevelPolicyModel;
 use Contao\Events;
 use Contao\FilesModel;
-use Contao\Input;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\StringUtil;
@@ -39,6 +36,7 @@ use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\Bundle;
@@ -55,7 +53,6 @@ class CalendarEventsMember
     private const SESSION_FLASH_ERROR = 'sacevt.be.tl_calendar_events_member.error';
     private const SESSION_FLASH_INFO = 'sacevt.be.tl_calendar_events_member.info';
 
-    private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Connection $connection;
     private Util $util;
@@ -68,9 +65,8 @@ class CalendarEventsMember
     private string $eventAdminEmail;
     private string $locale;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, ExportEventRegistrationList $registrationListExporterCsv, EventMemberList2Docx $registrationListExporterDocx, string $projectDir, string $eventAdminName, string $eventAdminEmail, string $locale)
+    public function __construct(RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, ExportEventRegistrationList $registrationListExporterCsv, EventMemberList2Docx $registrationListExporterDocx, string $projectDir, string $eventAdminName, string $eventAdminEmail, string $locale)
     {
-        $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
         $this->util = $util;
@@ -112,6 +108,8 @@ class CalendarEventsMember
      * Show or hide the "send email" button in the global operations section.
      *
      * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
+     *
+     * @throws Exception
      */
     public function showSendEmailButton(DataContainer $dc): void
     {
@@ -137,6 +135,9 @@ class CalendarEventsMember
      * Send emails to event members.
      *
      * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
+     *
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws Exception
      */
     public function sendEmailAction(DataContainer $dc): void
     {
@@ -245,8 +246,8 @@ class CalendarEventsMember
             $objEmail->fromName = html_entity_decode($this->eventAdminName);
             $objEmail->from = $this->eventAdminEmail;
             $objEmail->replyTo($user->email);
-            $objEmail->subject = html_entity_decode((string) Input::post('emailSubject'));
-            $objEmail->text = html_entity_decode((string) Input::post('emailText'));
+            $objEmail->subject = html_entity_decode((string) $request->request->get('emailSubject'));
+            $objEmail->text = html_entity_decode((string) $request->request->get('emailText'));
 
             if ($request->request->get('emailSendCopy')) {
                 $objEmail->sendBcc($user->email);
@@ -281,6 +282,8 @@ class CalendarEventsMember
      * Check permissions.
      *
      * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
+     *
+     * @throws \Exception
      */
     public function checkPermissions(DataContainer $dc): void
     {
@@ -352,6 +355,13 @@ class CalendarEventsMember
      * Export registration list as a DOCX or CSV file.
      *
      * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
+     *
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \League\Csv\CannotInsertRecord
+     * @throws \League\Csv\InvalidArgument
+     * @throws \PhpOffice\PhpWord\Exception\CopyFileException
+     * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
      */
     public function exportMemberList(DataContainer $dc): void
     {
@@ -374,6 +384,8 @@ class CalendarEventsMember
      * Delete orphaned records.
      *
      * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
+     *
+     * @throws Exception
      */
     public function reviseTable(): void
     {
@@ -391,7 +403,12 @@ class CalendarEventsMember
         }
 
         // Delete event members without sacMemberId that are not related to an event
-        $ids = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar_events_member AS m WHERE (m.sacMemberId < ? OR m.sacMemberId = ?) AND tstamp > ? AND NOT EXISTS (SELECT * FROM tl_calendar_events AS e WHERE m.eventId = e.id)', [1, '', 0]);
+        $ids = $this->connection
+            ->fetchFirstColumn(
+                'SELECT id FROM tl_calendar_events_member AS m WHERE (m.sacMemberId < ? OR m.sacMemberId = ?) AND tstamp > ? AND NOT EXISTS (SELECT * FROM tl_calendar_events AS e WHERE m.eventId = e.id)',
+                [1, '', 0]
+            )
+        ;
 
         if (!empty($ids)) {
             $rowsAffected = $this->connection->executeStatement('DELETE FROM tl_calendar_events_member WHERE id IN('.implode(',', $ids).')', []);
@@ -410,6 +427,8 @@ class CalendarEventsMember
      * List SAC sections.
      *
      * @Callback(table="tl_calendar_events_member", target="fields.sectionIds.options")
+     *
+     * @throws Exception
      */
     public function listSections(): array
     {
@@ -419,79 +438,7 @@ class CalendarEventsMember
     }
 
     /**
-     * @todo: Do we need this method? Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
-     *
-     * This method is used when an instructor signs in a member manually.
-     */
-    public function setContaoMemberIdFromSacMemberId(DataContainer $dc): void
-    {
-        $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE tl_calendar_events_member.contaoMemberId < ? AND tl_calendar_events_member.sacMemberId > ? AND tl_calendar_events_member.sacMemberId IN (SELECT sacMemberId FROM tl_member)')->execute(1, 0);
-
-        while ($objDb->next()) {
-            $objMemberModel = MemberModel::findOneBySacMemberId($objDb->sacMemberId);
-
-            if (null !== $objMemberModel) {
-                $set = [
-                    'contaoMemberId' => $objMemberModel->id,
-                    'gender' => $objMemberModel->gender,
-                    'firstname' => $objMemberModel->firstname,
-                    'lastname' => $objMemberModel->lastname,
-                    'street' => $objMemberModel->street,
-                    'email' => $objMemberModel->email,
-                    'postal' => $objMemberModel->postal,
-                    'city' => $objMemberModel->city,
-                    'mobile' => $objMemberModel->mobile,
-                ];
-                Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($objDb->id);
-            }
-        }
-    }
-
-    /**
-     * Set correct sac member and contao member id.
-     *
-     * @todo: Do we need this method? Callback(table="tl_calendar_events_member", target="fields.sacMemberId.save")
-     *
-     * @param $varValue
-     */
-    public function setCorrectSacAndContaoMemberId($varValue, DataContainer $dc)
-    {
-        // Set correct contaoMemberId if there is a sacMemberId
-        $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
-
-        if (null !== $objEventMemberModel) {
-            if ('' !== $varValue) {
-                $objMemberModel = MemberModel::findOneBySacMemberId($varValue);
-
-                if (null !== $objMemberModel) {
-                    $set = [
-                        'contaoMemberId' => (int) $objMemberModel->id,
-                    ];
-                    Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
-                } else {
-                    $varValue = '';
-                    $set = [
-                        'sacMemberId' => '',
-                        'contaoMemberId' => 0,
-                    ];
-                    Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
-                }
-            } else {
-                $set = [
-                    'sacMemberId' => '',
-                    'contaoMemberId' => 0,
-                ];
-                Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute($dc->id);
-            }
-        }
-
-        return $varValue;
-    }
-
-    /**
      * @Callback(table="tl_calendar_events_member", target="fields.stateOfSubscription.save")
-     *
-     * @param $varValue
      *
      * @return mixed|string|null
      */
@@ -534,6 +481,7 @@ class CalendarEventsMember
                             'participant_email' => $objEventMemberModel->email,
                             'event_link_detail' => 'https://'.Environment::get('host').'/'.Events::generateEventUrl($objEvent),
                         ];
+
                         $objNotification->send($arrTokens, $this->locale);
                     }
                 }
@@ -547,6 +495,8 @@ class CalendarEventsMember
      * Add more data to the registration, when user adds a new registration manually.
      *
      * @Callback(table="tl_calendar_events_member", target="config.onsubmit")
+     *
+     * @throws Exception
      */
     public function onsubmitCallback(DataContainer $dc): void
     {
@@ -563,6 +513,12 @@ class CalendarEventsMember
 
         $arrReg = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events_member WHERE id = ?', [$dc->id]);
 
+        // Set the SAC member id e.g: 185155
+        if ($arrReg) {
+            $set['sacMemberId'] = $arrReg['sacMemberId'];
+        }
+
+        // Set the Contao member id
         if (!empty($arrReg['sacMemberId'])) {
             $id = $this->connection->fetchOne('SELECT id FROM tl_member WHERE sacMemberId = ?', [$arrReg['sacMemberId']]);
 
@@ -573,6 +529,7 @@ class CalendarEventsMember
 
         $eventId = $arrReg['eventId'] > 0 ? $arrReg['eventId'] : CURRENT_ID;
 
+        // Add correct event id and event title
         $arrEvent = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events WHERE id = ?', [$eventId]);
 
         if ($arrEvent) {
@@ -586,6 +543,8 @@ class CalendarEventsMember
 
     /**
      * @Callback(table="tl_calendar_events_member", target="config.onload")
+     *
+     * @throws \Exception
      */
     public function setStateOfSubscription(DataContainer $dc): void
     {
@@ -605,21 +564,21 @@ class CalendarEventsMember
             throw new \Exception(sprintf('Registration with ID %s not found.', $dc->id));
         }
 
-        if ('refuseWithEmail' === Input::get('action')) {
+        if ('refuseWithEmail' === $request->query->get('action')) {
             // Show another palette
             $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['refuseWithEmail'];
 
             return;
         }
 
-        if ('acceptWithEmail' === Input::get('action')) {
+        if ('acceptWithEmail' === $request->query->get('action')) {
             // Show another palette
             $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['acceptWithEmail'];
 
             return;
         }
 
-        if ('addToWaitlist' === Input::get('action')) {
+        if ('addToWaitlist' === $request->query->get('action')) {
             // Show another palette
             $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['addToWaitlist'];
 
@@ -647,7 +606,7 @@ class CalendarEventsMember
 
             $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
 
-            if (null !== $objEventMemberModel && null !== $objEvent && !CalendarEventsMemberModel::canAcceptSubscription($objEventMemberModel, $objEvent)) {
+            if (null !== $objEvent && !CalendarEventsMemberModel::canAcceptSubscription($objEventMemberModel, $objEvent)) {
                 $blnAllow = false;
             }
 
@@ -663,42 +622,6 @@ class CalendarEventsMember
             // Show another palette
             Controller::redirect(Backend::addToUrl('action=addToWaitlist'));
         }
-
-        if (isset($_POST['refuseWithoutEmail'])) {
-            $objEventMemberModel = CalendarEventsMemberModel::findByPk(Input::get('id'));
-
-            if (null !== $objEventMemberModel) {
-                $set = ['stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_REFUSED];
-                Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
-                $flashBag->set(self::SESSION_FLASH_INFO, 'Dem Benutzer wurde ohne E-Mail die Teilnahme am Event verweigert. Er muss jedoch noch manuell darüber informiert werden.');
-            }
-
-            Controller::reload();
-        }
-
-        if (isset($_POST['acceptWithoutEmail'])) {
-            $objEventMemberModel = CalendarEventsMemberModel::findByPk(Input::get('id'));
-
-            if (null !== $objEventMemberModel) {
-                $set = ['stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED];
-                Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
-                $flashBag->set(self::SESSION_FLASH_INFO, 'Der Benutzer wurde ohne E-Mail zum Event zugelassen und muss darüber noch manuell informiert werden.');
-            }
-
-            Controller::reload();
-        }
-
-        if (isset($_POST['addToWaitlist'])) {
-            $objEventMemberModel = CalendarEventsMemberModel::findByPk(Input::get('id'));
-
-            if (null !== $objEventMemberModel) {
-                $set = ['stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED];
-                Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
-                $flashBag->set(self::SESSION_FLASH_INFO, 'Der Benutzer wurde ohne E-Mail auf die Warteliste gesetzt und muss darüber noch manuell informiert werden.');
-            }
-
-            Controller::reload();
-        }
     }
 
     /**
@@ -706,6 +629,8 @@ class CalendarEventsMember
      */
     public function setGlobalOperations(DataContainer $dc): void
     {
+        $request = $this->requestStack->getCurrentRequest();
+
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
@@ -724,9 +649,9 @@ class CalendarEventsMember
         $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
 
         // Get the backend module name
-        $module = Input::get('do');
+        $module = $request->query->get('do');
 
-        $eventId = Input::get('id');
+        $eventId = $request->query->get('id');
         $objEvent = CalendarEventsModel::findByPk($eventId);
 
         if (null !== $objEvent) {
@@ -737,7 +662,7 @@ class CalendarEventsMember
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'] = $url;
                     $blnAllowTourReportButton = true;
 
-                    $url = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, Input::get('id'), REQUEST_TOKEN, $refererId);
+                    $url = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, $request->query->get('id'), REQUEST_TOKEN, $refererId);
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'] = $url;
                     $blnAllowInstructorInvoiceButton = true;
                 }
@@ -804,6 +729,8 @@ class CalendarEventsMember
      */
     public function inputFieldCallbackNotifyMemberAboutSubscriptionState(DataContainer $dc): string
     {
+        $request = $this->requestStack->getCurrentRequest();
+
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
@@ -838,19 +765,19 @@ class CalendarEventsMember
             ],
         ];
 
-        if (empty(Input::get('action')) || !\is_array($arrActions[Input::get('action')]) || empty($arrActions[Input::get('action')])) {
+        if (!$request->query->has('action') || !\is_array($arrActions[$request->query->get('action')]) || empty($arrActions[$request->query->get('action')])) {
             $flashBag->set(self::SESSION_FLASH_INFO, 'Es ist ein Fehler aufgetreten.');
-            Controller::redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.Input::get('id').'&act=edit&rt='.Input::get('rt'));
+            Controller::redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$request->query->get('id').'&act=edit&rt='.$request->query->get('rt'));
         }
 
         // Set action array
-        $arrAction = $arrActions[Input::get('action')];
+        $arrAction = $arrActions[$request->query->get('action')];
 
         // Generate form fields
         $objForm = new Form(
             $arrAction['formId'],
             'POST',
-            static fn ($objHaste) => Input::post('FORM_SUBMIT') === $objHaste->getFormId()
+            static fn ($objHaste) => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId()
         );
 
         // Now let's add form fields:
@@ -872,8 +799,8 @@ class CalendarEventsMember
         ]);
 
         // Send notification
-        if ('tl_calendar_events_member' === Input::post('FORM_SUBMIT')) {
-            if ('' !== Input::post('subject') && '' !== Input::post('text')) {
+        if ('tl_calendar_events_member' === $request->request->get('FORM_SUBMIT')) {
+            if ('' !== $request->request->get('subject') && '' !== $request->request->get('text')) {
                 $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
 
                 if (null !== $objEventMemberModel) {
@@ -890,8 +817,8 @@ class CalendarEventsMember
                             'email_sender_email' => $this->eventAdminEmail,
                             'send_to' => $objEventMemberModel->email,
                             'reply_to' => $user->email,
-                            'email_subject' => html_entity_decode((string) Input::post('subject')),
-                            'email_text' => html_entity_decode(strip_tags((string) Input::post('text'))),
+                            'email_subject' => html_entity_decode((string) $request->request->get('subject')),
+                            'email_text' => html_entity_decode(strip_tags((string) $request->request->get('text'))),
                             'attachment_tokens' => null,
                             'recipient_cc' => null,
                             'recipient_bcc' => null,
@@ -902,30 +829,32 @@ class CalendarEventsMember
                         $objMember = MemberModel::findOneBySacMemberId($objEventMemberModel->sacMemberId);
                         $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
 
-                        if ('acceptWithEmail' === Input::get('action') && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && null !== $objEvent && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember)) {
+                        if ('acceptWithEmail' === $request->query->get('action') && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && null !== $objEvent && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember)) {
                             $flashBag->set(self::SESSION_FLASH_ERROR, 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
-                        } elseif ('acceptWithEmail' === Input::get('action') && null !== $objEventMemberModel && null !== $objEvent && !CalendarEventsMemberModel::canAcceptSubscription($objEventMemberModel, $objEvent)) {
+                        } elseif ('acceptWithEmail' === $request->query->get('action') && null !== $objEvent && !CalendarEventsMemberModel::canAcceptSubscription($objEventMemberModel, $objEvent)) {
                             $flashBag->set(self::SESSION_FLASH_ERROR, 'Es ist ein Fehler aufgetreten. Da die maximale Teilnehmerzahl bereits erreicht ist, kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.');
                         } // Send email
                         elseif (Validator::isEmail($objEventMemberModel->email)) {
                             $objEmail->send($arrTokens, $this->locale);
+
                             $set = ['stateOfSubscription' => $arrAction['stateOfSubscription']];
-                            Database::getInstance()->prepare('UPDATE tl_calendar_events_member %s WHERE id=?')->set($set)->execute(Input::get('id'));
+                            $this->connection->update('tl_calendar_events_member', $set, ['id' => $dc->id]);
+
                             $flashBag->set(self::SESSION_FLASH_INFO, $arrAction['sessionInfoText']);
                         } else {
                             $flashBag->set(self::SESSION_FLASH_INFO, 'Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.');
                         }
                     }
                 }
-                Controller::redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.Input::get('id').'&act=edit&rt='.Input::get('rt'));
+                Controller::redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$request->query->get('id').'&act=edit&rt='.$request->query->get('rt'));
             } else {
                 // Add value to ffields
-                if ('' !== Input::post('subject')) {
-                    $objForm->getWidget('subject')->value = Input::post('subject');
+                if ('' !== $request->request->get('subject')) {
+                    $objForm->getWidget('subject')->value = $request->request->get('subject');
                 }
 
-                if ('' !== Input::post('text')) {
-                    $objForm->getWidget('text')->value = strip_tags(Input::post('text'));
+                if ('' !== $request->request->get('text')) {
+                    $objForm->getWidget('text')->value = strip_tags($request->request->get('text'));
                 }
 
                 // Generate template
@@ -973,9 +902,9 @@ class CalendarEventsMember
                     'instructorEmail' => $user->email,
                 ];
 
-                if ('acceptWithEmail' === Input::get('action') && $objEvent->customizeEventRegistrationConfirmationEmailText && '' !== $objEvent->customEventRegistrationConfirmationEmailText) {
+                if ('acceptWithEmail' === $request->query->get('action') && $objEvent->customizeEventRegistrationConfirmationEmailText && '' !== $objEvent->customEventRegistrationConfirmationEmailText) {
                     // Only for acceptWithEmail!!!
-                    // Replace tags for custom notification set in the events settings (tags can be used case insensitive!)
+                    // Replace tags for custom notification set in the events settings (tags can be used case-insensitive!)
                     $emailBodyText = $objEvent->customEventRegistrationConfirmationEmailText;
 
                     foreach ($arrTokens as $k => $v) {
@@ -1014,21 +943,15 @@ class CalendarEventsMember
 
     /**
      * @Callback(table="tl_calendar_events_member", target="list.global_operations.backToEventSettings.button")
-     *
-     * @param $href
-     * @param $label
-     * @param $title
-     * @param $class
-     * @param $attributes
-     * @param $table
-     *
-     * @return string
      */
-    public function buttonCbBackToEventSettings(?string $href, string $label, string $title, string $class, string $attributes, string $table)
+    public function buttonCbBackToEventSettings(?string $href, string $label, string $title, string $class, string $attributes, string $table): string
     {
+        $request = $this->requestStack->getCurrentRequest();
+
         $href = StringUtil::ampersand('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s');
-        $eventId = Input::get('id');
-        $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
+        $eventId = $request->query->get('id');
+        $refererId = $request->get('_contao_referer_id');
+
         $href = sprintf($href, $eventId, REQUEST_TOKEN, $refererId);
 
         return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $href, $class, $title, $attributes, $label);
@@ -1036,19 +959,17 @@ class CalendarEventsMember
 
     /**
      * @Callback(table="tl_calendar_events_member", target="edit.buttons")
-     *
-     * @param $arrButtons
-     *
-     * @return mixed
      */
-    public function buttonsCallback(array $arrButtons, DataContainer $dc)
+    public function buttonsCallback(array $arrButtons, DataContainer $dc): array
     {
+        $request = $this->requestStack->getCurrentRequest();
+
         // Remove all buttons
-        if ('refuseWithEmail' === Input::get('action') || 'acceptWithEmail' === Input::get('action') || 'addToWaitlist' === Input::get('action')) {
+        if ('refuseWithEmail' === $request->query->get('action') || 'acceptWithEmail' === $request->query->get('action') || 'addToWaitlist' === $request->query->get('action')) {
             $arrButtons = [];
         }
 
-        if ('sendEmail' === Input::get('action')) {
+        if ('sendEmail' === $request->query->get('action')) {
             $arrButtons['saveNclose'] = '<button type="submit" name="saveNclose" id="saveNclose" class="tl_submit" accesskey="c">E-Mail absenden</button>';
             unset($arrButtons['save']);
         }

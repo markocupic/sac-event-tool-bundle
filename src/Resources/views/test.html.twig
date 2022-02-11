@@ -1,7 +1,110 @@
 {% block body %}
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <h1>FTP status</h1>
+    <script>
+        async function initialize()
+        {
+            return JSON.parse('{{ data | raw }}');
 
-    <p>{{ message }}</p>
+        }
+
+        async function getImage(event) {
+            let image = '';
+            await fetch('/_imagetest/' + event.singleSRC)
+                .then(response => response.json())
+                .then(data => {
+                         event.image = data.image;
+                })
+                .catch(console.error);
+            return image;
+        }
+
+    </script>
+
+    <h1 class="text-4xl font-bold">alpine.js Test</h1>
+
+    <div x-data="{ data: [] }" x-init="data = await initialize()">
+        <template x-for="(event, index) in data.events">
+            <div class="flex">
+                <div class="w-1/3">
+                <template x-if="event.picture">
+                    <div x-html="atob(event.picture)"></div>
+                </template>
+                </div>
+                <div class="w-2/3">
+                    <h2 class="text-2xl font-bold underline" x-text="event.title"></h2>
+                </div>
+            </div>
+        </template>
+
+
+        <script>
+            function imageViewer() {
+                return {
+                    urlStack: [],
+
+                    fileChosen(event) {
+                        let uploader = event.target;
+                        this.showPreviewImage(uploader);
+                    },
+
+                    showPreviewImage(uploader) {
+
+                        let i;
+
+                        console.log(uploader.length);
+
+                        for(i=0; i < uploader.files.length; i++)
+                        {
+                            const file = uploader.files[i];
+
+                            const reader = new FileReader();
+
+                            reader.addEventListener("load",  () => {
+                                // convert image file to base64 string
+                                this.urlStack.push(reader.result);
+                            }, false);
+
+                            if (file) {
+                                reader.readAsDataURL(file);
+                            }
+                        }
+                    }
+                }
+            }
+
+        </script>
+
+        <div x-data="imageViewer()">
+            <div class="mb-2 flex">
+                <!-- Show the image -->
+                <template x-if="urlStack.length">
+                    <template x-for="url in urlStack">
+                    <img :src="url"
+                         class="me-2 object-cover rounded border border-gray-200"
+                         style="width: 100px; height: 100px;"
+                    >
+                    </template>
+                </template>
+
+                <!-- Show the gray box when image is not available -->
+                <template x-if="!urlStack.length">
+                    <div
+                        class="border rounded border-gray-200 bg-gray-100"
+                        style="width: 100px; height: 100px;"
+                    ></div>
+                </template>
+
+                <!-- Image file selector -->
+                <input class="mt-2" type="file" multiple=true accept="image/*" @change="fileChosen">
+
+            </div>
+        </div>
+
+
+    </div>
+
+
 
 {% endblock %}

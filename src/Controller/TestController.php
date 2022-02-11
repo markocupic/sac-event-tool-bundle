@@ -14,19 +14,16 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller;
 
+use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\File;
+use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment as TwigEnvironment;
 
-/**
- * Class MyCustomController.
- *
- * @Route("/test", name="markocupic_sac_evt_test", defaults={"_scope" = "frontend", "_token_check" = true})
- */
 class TestController extends AbstractController
 {
     private Connection $connection;
@@ -55,31 +52,59 @@ class TestController extends AbstractController
     }
 
     /**
-     * Generate the response.
+     * Class MyCustomController.
+     *
+     * @Route("/test", name="markocupic_sac_evt_test", defaults={"_scope" = "frontend", "_token_check" = true})
      */
-    public function __invoke()
+    public function testAction()
     {
         $this->framework->initialize(true);
 
-        $file = new File('system/tmp/test.txt');
-        $file->append('text');
-        $file->close();
-        $file->sendToBrowser();
+        $arrEvents = [];
 
-        $hostname = $this->credentials['hostname'];
-        $connId = ftp_connect($hostname);
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_calendar_events WHERE startDate > ? LIMIT 0,20', [time()]);
 
-        if (false === $connId) {
-            $message = sprintf('FTP server %s is not online.', $hostname);
-        } else {
-            $message = sprintf('FTP server %s is online.', $hostname);
+        while (false !== ($arrEvent = $stmt->fetchAssociative())) {
+            $picture = null;
+            $uuid = $arrEvent['singleSRC'] ? StringUtil::binToUuid($arrEvent['singleSRC']) : null;
+
+            if ($uuid) {
+                $it = sprintf('{{picture::%s?size=%s}}', $uuid, '22');
+                $picture = Controller::replaceInsertTags($it);
+            }
+
+            $arrEvents[] = [
+                'id' => $arrEvent['id'],
+                'title' => $arrEvent['title'],
+                'singleSRC' => $arrEvent['singleSRC'] ? StringUtil::binToUuid($arrEvent['singleSRC']) : null,
+                'picture' => base64_encode($picture),
+            ];
         }
 
         return new Response($this->twig->render(
             '@MarkocupicSacEventTool/test.html.twig',
             [
-                'message' => $message,
+                'data' => \Safe\json_encode([
+                    'events' => $arrEvents,
+                ]),
             ]
         ));
+    }
+
+    /**
+     * Class MyCustomController.
+     *
+     * @Route("/_imagetest/{uuid}", name="markocupic_sac_evt_imagetest", defaults={"_scope" = "frontend", "_token_check" = true})
+     */
+    public function imageAction($uuid): JsonResponse
+    {
+        $this->framework->initialize(true);
+        $it = sprintf('{{picture::%s?size=%s}}', $uuid, '22');
+
+        $json = [
+            'image' => Controller::replaceInsertTags($it),
+        ];
+
+        return new JsonResponse($json);
     }
 }
