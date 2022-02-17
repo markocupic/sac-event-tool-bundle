@@ -29,16 +29,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class User
 {
+    public const TABLE = 'tl_user';
+
     private ContaoFramework $framework;
+    private Util $util;
     private RequestStack $requestStack;
     private Connection $connection;
     private TranslatorInterface $translator;
     private Countries $countries;
     private MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, Countries $countries, MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory)
+    public function __construct(ContaoFramework $framework, Util $util, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, Countries $countries, MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory)
     {
         $this->framework = $framework;
+        $this->util = $util;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
         $this->translator = $translator;
@@ -55,10 +59,9 @@ class User
     {
         $arrOptions = [];
 
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_sac_section',[]);
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_sac_section', []);
 
-        while(false !== ($arrSection = $stmt->fetchAssociative()))
-        {
+        while (false !== ($arrSection = $stmt->fetchAssociative())) {
             $arrOptions[$arrSection['sectionId']] = $arrSection['name'];
         }
 
@@ -148,6 +151,17 @@ class User
         $messageAdapter->addInfo(
             $this->translator->trans('MSC.bmd_howToEditReadonlyProfileData', [], 'contao_default')
         );
+    }
+
+    /**
+     * Display the section name instead of the section id
+     * 4250,4252 becomes SAC PILATUS, SAC PILATUS NAPF.
+     *
+     * @Callback(table="tl_user", target="config.onshow")
+     */
+    public function decryptSectionIds(array $data, array $row, DataContainer $dc): array
+    {
+        return $this->util->decryptSectionIds($data, $row, $dc, self::TABLE);
     }
 
     /**

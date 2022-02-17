@@ -48,11 +48,11 @@ window.addEvent('domready', function () {
 
               // Autofill form inputs
               $('btnAcceptAutocomplete').addEvent('click', function (event) {
-                var fields = ['gender', 'name', 'username', 'firstname', 'lastname', 'street', 'postal', 'city', 'mobile', 'phone', 'email', 'dateOfBirth', 'foodHabits', 'emergencyPhone', 'emergencyPhoneName', 'sectionIds'];
+                var fields = ['gender', 'name', 'username', 'firstname', 'lastname', 'street', 'postal', 'city', 'mobile', 'phone', 'email', 'dateOfBirth', 'foodHabits', 'emergencyPhone', 'emergencyPhoneName', 'sectionId'];
                 fields.each(function (field) {
                   if ($('ctrl_' + field)) {
                     // Special handling for arrays
-                    if (field === 'sectionIds') {
+                    if (field === 'sectionId') {
                       let arrSections = json[field];
                       let options = document.querySelectorAll('select#ctrl_' + field + ' option');
                       let i;

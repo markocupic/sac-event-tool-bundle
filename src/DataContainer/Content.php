@@ -19,6 +19,7 @@ use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\Database;
 use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Exception;
 
 class Content
 {
@@ -59,7 +60,8 @@ class Content
      * Get all user roles.
      *
      * @Callback(table="tl_content", target="fields.userList_userRoles.options")
-     * @throws \Doctrine\DBAL\Driver\Exception
+     *
+     * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
     public function optionsCallbackUserRoles(): array

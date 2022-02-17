@@ -12,45 +12,42 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Contao\System;
-use Markocupic\SacEventToolBundle\DataContainer\EventFilterForm;
-
 $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
     'fields' => [
-        'year' => [
+        'year'                 => [
             'inputType' => 'select',
-            'options' => range(2016, (int) date('Y') + 1),
-            'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['blankOptionLabel']],
+            'options'   => range(2016, (int)date('Y') + 1),
+            'eval'      => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['blankOptionLabel']],
         ],
-        'dateStart' => [
+        'dateStart'            => [
             'inputType' => 'text',
-            'eval' => ['placeholder' => 'yyyy-mm-dd', 'maxlength' => 12],
+            'eval'      => ['placeholder' => 'yyyy-mm-dd', 'maxlength' => 12],
         ],
-        'tourType' => [
-            'inputType' => 'select',
-            'relation' => ['type' => 'hasOne', 'load' => 'eager'],
+        'tourType'             => [
+            'inputType'  => 'select',
+            'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
             'foreignKey' => 'tl_tour_type.title',
-            'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
+            'eval'       => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
         ],
-        'courseType' => [
+        'courseType'           => [
             'inputType' => 'select',
-            'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
+            'eval'      => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
         ],
-        'organizers' => [
+        'organizers'           => [
             'inputType' => 'select',
-            'eval' => ['multiple' => true],
+            'eval'      => ['multiple' => true],
         ],
-        'textsearch' => [
+        'textsearch'           => [
             'inputType' => 'text',
-            'eval' => ['placeholder' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['enterSearchTerms']],
+            'eval'      => ['placeholder' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['enterSearchTerms']],
         ],
-        'eventId' => [
+        'eventId'              => [
             'inputType' => 'text',
-            'eval' => ['placeholder' => date('Y').'-****'],
+            'eval'      => ['placeholder' => date('Y').'-****'],
         ],
-        'courseId' => [
+        'courseId'             => [
             'inputType' => 'text',
-            'eval' => ['placeholder' => $GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'][0]],
+            'eval'      => ['placeholder' => $GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'][0]],
         ],
         'suitableForBeginners' => [
             'inputType' => 'checkbox',

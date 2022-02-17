@@ -25,7 +25,6 @@ use Psr\Log\LogLevel;
 
 class ReplaceDefaultPassword
 {
-
     private ContaoFramework $framework;
 
     private string $locale;
@@ -33,7 +32,6 @@ class ReplaceDefaultPassword
     private ?string $defaultPassword = null;
 
     private int $emailSendLimit = 20;
-
 
     public function __construct(ContaoFramework $framework, string $locale)
     {

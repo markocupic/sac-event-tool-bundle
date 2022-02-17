@@ -55,15 +55,13 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     private ?FrontendUser $objUser;
     private ?Template $template;
 
-    public function __construct(ContaoFramework $framework, Security $security, RotateImage $rotateImage,string $projectDir, string $avatarDir)
+    public function __construct(ContaoFramework $framework, Security $security, RotateImage $rotateImage, string $projectDir, string $avatarDir)
     {
         $this->framework = $framework;
         $this->security = $security;
         $this->rotateImage = $rotateImage;
         $this->projectDir = $projectDir;
         $this->avatarDir = $avatarDir;
-
-
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
@@ -84,7 +82,6 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
         // Rotate image by 90°
         if ('rotate-image' === $inputAdapter->get('do') && '' !== $inputAdapter->get('fileId')) {
-
             $objFiles = FilesModel::findOneById($inputAdapter->get('fileId'));
             $this->rotateImage->rotate($objFiles);
 
@@ -94,8 +91,6 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }
-
-
 
     /**
      * @throws \Exception

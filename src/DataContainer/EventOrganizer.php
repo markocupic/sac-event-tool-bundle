@@ -15,18 +15,13 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\CoreBundle\ServiceAnnotation\Callback;
-use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
-use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Security;
 
 class EventOrganizer
 {
     private Connection $connection;
 
-
-    public function __construct( Connection $connection)
+    public function __construct(Connection $connection)
     {
         $this->connection = $connection;
     }
@@ -38,10 +33,9 @@ class EventOrganizer
     {
         $arrOptions = [];
 
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_sac_section',[]);
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_sac_section', []);
 
-        while (false !== ($arrSection = $stmt->fetchAssociative()))
-        {
+        while (false !== ($arrSection = $stmt->fetchAssociative())) {
             $arrOptions[$arrSection['sectionId']] = $arrSection['name'];
         }
 

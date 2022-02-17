@@ -165,27 +165,25 @@ class SyncSacMemberDatabase
         // Open FTP connection
         $connId = $this->openFtpConnection();
 
-        $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section',[]);
+        $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
 
+        foreach ($arrSectionIds as $sectionId) {
+            $localFile = $this->projectDir.'/'.sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId);
+            $remoteFile = basename($localFile);
 
-            foreach ($arrSectionIds as $sectionId) {
-                $localFile = $this->projectDir.'/'.sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId);
-                $remoteFile = basename($localFile);
-
-                // Delete old file
-                if (is_file($localFile)) {
-                    unlink($localFile);
-                }
-
-                // Fetch file
-                if (!ftp_get($connId, $localFile, $remoteFile, FTP_BINARY)) {
-                    $msg = sprintf('Could not find db dump "%s" at "%s".', $remoteFile, $this->ftp_hostname);
-                    $this->log(LogLevel::CRITICAL, $msg, __METHOD__, ContaoContext::ERROR);
-
-                    throw new \Exception($msg);
-                }
+            // Delete old file
+            if (is_file($localFile)) {
+                unlink($localFile);
             }
 
+            // Fetch file
+            if (!ftp_get($connId, $localFile, $remoteFile, FTP_BINARY)) {
+                $msg = sprintf('Could not find db dump "%s" at "%s".', $remoteFile, $this->ftp_hostname);
+                $this->log(LogLevel::CRITICAL, $msg, __METHOD__, ContaoContext::ERROR);
+
+                throw new \Exception($msg);
+            }
+        }
 
         ftp_close($connId);
     }
@@ -232,8 +230,7 @@ class SyncSacMemberDatabase
 
         $arrMember = [];
 
-        $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section',[]);
-
+        $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
 
         foreach ($arrSectionIds as $sectionId) {
             $objFile = new File(sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId));

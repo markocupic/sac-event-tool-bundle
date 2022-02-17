@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\Feed;
 
 use Contao\CalendarEventsModel;
-use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Environment;
 use Contao\Events;
@@ -73,13 +72,13 @@ class UpcomingEventsController extends AbstractController
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section',[]);
+        $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
 
-        if (!in_array($section, $arrSectionIds, false)) {
+        if (!\in_array($section, $arrSectionIds, false)) {
             return new Response('Section with ID '.$section.' not found. Please use a valid section ID like '.implode(', ', $arrSectionIds).'.');
         }
 
-        $sectionName = $this->connection->fetchOne('SELECT name FROM tl_sac_section WHERE sectionId = ?',[$section]);
+        $sectionName = $this->connection->fetchOne('SELECT name FROM tl_sac_section WHERE sectionId = ?', [$section]);
 
         $filePath = 'share/rss_feed_'.str_replace(' ', '_', strtolower($sectionName)).'.xml';
 

@@ -20,7 +20,6 @@ use Contao\System;
 
 class Module
 {
-
     /**
      * @Callback(table="tl_module", target="fields.eventFilterBoardFields.options")
      */

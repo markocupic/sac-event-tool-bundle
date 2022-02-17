@@ -38,18 +38,23 @@ use Contao\Validator;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Haste\Form\Form;
+use League\Csv\CannotInsertRecord;
+use League\Csv\InvalidArgument;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventMemberList2Docx;
 use NotificationCenter\Model\Notification;
+use PhpOffice\PhpWord\Exception\CopyFileException;
+use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CalendarEventsMember
 {
+    public const TABLE = 'tl_calendar_events_member';
     private const SESSION_FLASH_ERROR = 'sacevt.be.tl_calendar_events_member.error';
     private const SESSION_FLASH_INFO = 'sacevt.be.tl_calendar_events_member.info';
 
@@ -358,10 +363,10 @@ class CalendarEventsMember
      *
      * @throws Exception
      * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws \League\Csv\CannotInsertRecord
-     * @throws \League\Csv\InvalidArgument
-     * @throws \PhpOffice\PhpWord\Exception\CopyFileException
-     * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
+     * @throws CannotInsertRecord
+     * @throws InvalidArgument
+     * @throws CopyFileException
+     * @throws CreateTemporaryFileException
      */
     public function exportMemberList(DataContainer $dc): void
     {
@@ -426,7 +431,7 @@ class CalendarEventsMember
     /**
      * List SAC sections.
      *
-     * @Callback(table="tl_calendar_events_member", target="fields.sectionIds.options")
+     * @Callback(table="tl_calendar_events_member", target="fields.sectionId.options")
      *
      * @throws Exception
      */
@@ -676,6 +681,17 @@ class CalendarEventsMember
         if (!$blnAllowInstructorInvoiceButton) {
             unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']);
         }
+    }
+
+    /**
+     * Display the section name instead of the section id
+     * 4250,4252 becomes SAC PILATUS, SAC PILATUS NAPF.
+     *
+     * @Callback(table="tl_calendar_events_member", target="config.onshow")
+     */
+    public function decryptSectionIds(array $data, array $row, DataContainer $dc): array
+    {
+        return $this->util->decryptSectionIds($data, $row, $dc, self::TABLE);
     }
 
     /**

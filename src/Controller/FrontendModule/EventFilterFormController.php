@@ -133,7 +133,6 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
         $controllerAdapter->loadLanguageFile('tl_event_filter_form');
 
-
         // Generate form
         $objForm = new Form(
             'event-filter-board-form',

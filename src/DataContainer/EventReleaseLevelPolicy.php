@@ -26,13 +26,11 @@ class EventReleaseLevelPolicy
         $this->translator = $translator;
     }
 
-
-
     /**
      * @Callback(table="tl_event_release_level_policy", target="list.sorting.child_record")
      */
     public function listCalendars(array $arrRow): string
     {
-        return '<div class="tl_content_left"><span class="level">' . $this->translator->trans('MSC.level', [], 'contao_default') . ': '.$arrRow['level'].'</span> '.$arrRow['title']."</div>\n";
+        return '<div class="tl_content_left"><span class="level">'.$this->translator->trans('MSC.level', [], 'contao_default').': '.$arrRow['level'].'</span> '.$arrRow['title']."</div>\n";
     }
 }

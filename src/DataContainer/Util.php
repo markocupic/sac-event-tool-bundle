@@ -14,20 +14,20 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\Backend;
 use Contao\DataContainer;
-use Contao\Image;
 use Contao\StringUtil;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Util
 {
     private RequestStack $requestStack;
+    private Connection $connection;
 
-    public function __construct(RequestStack $requestStack)
+    public function __construct(RequestStack $requestStack, Connection $connection)
     {
         $this->requestStack = $requestStack;
+        $this->connection = $connection;
     }
 
     /**
@@ -58,4 +58,34 @@ class Util
         }
     }
 
+    /**
+     * Display the section name instead of the section id
+     * 4250,4252 becomes SAC PILATUS, SAC PILATUS NAPF.
+     */
+    public function decryptSectionIds(array $data, array $row, DataContainer $dc, string $strTable): array
+    {
+        if (isset($data[$strTable]) && \is_array($data[$strTable])) {
+            foreach (array_keys($data[$strTable]) as $k) {
+                if (isset($data[$strTable][$k]) && \is_array($data[$strTable][$k])) {
+                    foreach ($data[$strTable][0] as $kk => $vv) {
+                        if (false !== strpos($kk, '<small>sectionId</small>')) {
+                            if ('' !== $vv) {
+                                $arrSectionNames = [];
+                                $arrSections = StringUtil::trimsplit(',', $vv);
+
+                                foreach ($arrSections as $id) {
+                                    $name = $this->connection->fetchOne('SELECT name FROM tl_sac_section WHERE sectionId = ?', [$id]);
+                                    $arrSectionNames[] = $name ?: $id;
+                                }
+
+                                $data[$strTable][$k][$kk] = implode(', ', $arrSectionNames);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $data;
+    }
 }

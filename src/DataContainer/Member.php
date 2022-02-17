@@ -16,22 +16,26 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Controller;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
-use Contao\Database;
 use Contao\DataContainer;
 use Contao\Message;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Member
 {
+    public const TABLE = 'tl_member';
+
     private Connection $connection;
+    private Util $util;
     private TranslatorInterface $translator;
     private ClearFrontendUserData $clearFrontendUserData;
 
-    public function __construct(Connection $connection, TranslatorInterface $translator, ClearFrontendUserData $clearFrontendUserData)
+    public function __construct(Connection $connection, Util $util, TranslatorInterface $translator, ClearFrontendUserData $clearFrontendUserData)
     {
         $this->connection = $connection;
+        $this->util = $util;
         $this->translator = $translator;
         $this->clearFrontendUserData = $clearFrontendUserData;
     }
@@ -59,22 +63,26 @@ class Member
         }
     }
 
-     /**
-      * @Callback(table="tl_member", target="fields.sectionId.options")
-      *
-      * @throws \Doctrine\DBAL\Exception
-      */
+    /**
+     * @Callback(table="tl_member", target="fields.sectionId.options")
+     *
+     * @throws Exception
+     */
     public function listSections(): array
     {
-        $arrOptions = [];
+        return $this->connection
+            ->fetchAllKeyValue('SELECT sectionId, name FROM tl_sac_section')
+            ;
+    }
 
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_sac_section',[]);
-
-        while(false !== ($arrSection = $stmt->fetchAssociative()))
-        {
-            $arrOptions[$arrSection['sectionId']] = $arrSection['name'];
-        }
-
-        return $arrOptions;
+    /**
+     * Display the section name instead of the section id
+     * 4250,4252 becomes SAC PILATUS, SAC PILATUS NAPF.
+     *
+     * @Callback(table="tl_member", target="config.onshow")
+     */
+    public function decryptSectionIds(array $data, array $row, DataContainer $dc): array
+    {
+        return $this->util->decryptSectionIds($data, $row, $dc, self::TABLE);
     }
 }

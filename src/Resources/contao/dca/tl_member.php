@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 use Contao\BackendUser;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
-use Contao\System;
 
 // Manipulate palette default
 PaletteManipulator::create()
@@ -29,8 +28,7 @@ PaletteManipulator::create()
     ->addField(['isSacMember', 'sacMemberId', 'ahvNumber', 'uuid', 'sectionId', 'profession', 'addressExtra', 'streetExtra', 'phoneBusiness', 'entryYear', 'membershipType', 'sectionInfo1', 'sectionInfo2', 'sectionInfo3', 'sectionInfo4', 'debit', 'memberStatus'], 'section_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['emergencyPhone', 'emergencyPhoneName'], 'emergency_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['hasLeadClimbingEducation'], 'education_legend', PaletteManipulator::POSITION_APPEND)
-    ->applyToPalette('default', 'tl_member')
-;
+    ->applyToPalette('default', 'tl_member');
 
 // Add palettes
 $GLOBALS['TL_DCA']['tl_member']['palettes']['__selector__'][] = 'hasLeadClimbingEducation';
@@ -44,210 +42,209 @@ $GLOBALS['TL_DCA']['tl_member']['config']['sql']['keys']['sacMemberId'] = 'index
 
 // More fields...
 $GLOBALS['TL_DCA']['tl_member']['fields']['avatar'] = [
-    'exclude' => true,
+    'exclude'   => true,
     'inputType' => 'fileTree',
-    'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
-    'sql' => 'binary(16) NULL',
+    'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
+    'sql'       => 'binary(16) NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['uuid'] = [
-    'exclude' => true,
+    'exclude'   => true,
     'inputType' => 'text',
-    'eval' => ['mandatory' => false, 'tl_class' => 'w50'],
-    'sql' => "varchar(128) NOT NULL default ''",
+    'eval'      => ['mandatory' => false, 'tl_class' => 'w50'],
+    'sql'       => "varchar(128) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = [
-    'exclude' => true,
+    'exclude'   => true,
     'inputType' => 'text',
-    'eval' => ['rgxp' => 'datim', 'mandatory' => false, 'datepicker' => true, 'tl_class' => 'clr wizard'],
-    'sql' => 'int(10) unsigned NULL',
+    'eval'      => ['rgxp' => 'datim', 'mandatory' => false, 'datepicker' => true, 'tl_class' => 'clr wizard'],
+    'sql'       => 'int(10) unsigned NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['activation'] = [
-    'exclude' => true,
+    'exclude'   => true,
     'inputType' => 'text',
-    'eval' => ['mandatory' => false, 'tl_class' => 'w50'],
-    'sql' => "varchar(64) NOT NULL default ''",
+    'eval'      => ['mandatory' => false, 'tl_class' => 'w50'],
+    'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['activationFalseTokenCounter'] = [
-    'exclude' => true,
+    'exclude'   => true,
     'inputType' => 'text',
-    'eval' => ['rgxp' => 'natural'],
-    'sql' => 'int(10) unsigned NULL',
+    'eval'      => ['rgxp' => 'natural'],
+    'sql'       => 'int(10) unsigned NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['isSacMember'] = [
-    'exclude' => true,
-    'filter' => true,
+    'exclude'   => true,
+    'filter'    => true,
     'inputType' => 'checkbox',
-    'eval' => ['submitOnChange' => false],
-    'sql' => "char(1) NOT NULL default ''",
+    'eval'      => ['submitOnChange' => false],
+    'sql'       => "char(1) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = [
-    'exclude' => true,
-    'search' => true,
-    'sorting' => true,
-    'flag' => 1,
+    'exclude'   => true,
+    'search'    => true,
+    'sorting'   => true,
+    'flag'      => 1,
     'inputType' => 'text',
-    'eval' => ['doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'rgxp' => 'natural'],
-    'sql' => "int(10) unsigned NOT NULL default '0'",
+    'eval'      => ['doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'rgxp' => 'natural'],
+    'sql'       => "int(10) unsigned NOT NULL default '0'",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['hasLeadClimbingEducation'] = [
-    'exclude' => true,
-    'filter' => true,
+    'exclude'   => true,
+    'filter'    => true,
     'inputType' => 'checkbox',
-    'eval' => ['submitOnChange' => true],
-    'sql' => "char(1) NOT NULL default ''",
+    'eval'      => ['submitOnChange' => true],
+    'sql'       => "char(1) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['dateOfLeadClimbingEducation'] = [
-    'exclude' => true,
+    'exclude'   => true,
     'inputType' => 'text',
-    'eval' => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-    'sql' => "varchar(11) NOT NULL default ''",
+    'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+    'sql'       => "varchar(11) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['ahvNumber'] = [
-    'exclude' => true,
-    'search' => true,
+    'exclude'   => true,
+    'search'    => true,
     'inputType' => 'text',
-    'eval' => ['mandatory' => false, 'maxlength' => 16, 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
-    'sql' => "varchar(255) NOT NULL default ''",
+    'eval'      => ['mandatory' => false, 'maxlength' => 16, 'decodeEntities' => true, 'feEditable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+    'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = [
-    'exclude' => true,
-    'reference' => &$GLOBALS['TL_LANG']['tl_member']['section'],
+    'exclude'   => true,
     'inputType' => 'checkbox',
-    'filter' => true,
-    'eval' => ['multiple' => true, 'tl_class' => 'clr'],
-    'sql' => 'blob NULL',
+    'filter'    => true,
+    'eval'      => ['multiple' => true, 'tl_class' => 'clr'],
+    'sql'       => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['profession'] = [
-    'exclude' => true,
-    'search' => true,
-    'sorting' => true,
-    'flag' => 1,
+    'exclude'   => true,
+    'search'    => true,
+    'sorting'   => true,
+    'flag'      => 1,
     'inputType' => 'text',
-    'eval' => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
-    'sql' => "varchar(255) NOT NULL default ''",
+    'eval'      => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
+    'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['addressExtra'] = [
-    'exclude' => true,
-    'search' => true,
+    'exclude'   => true,
+    'search'    => true,
     'inputType' => 'text',
-    'eval' => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
-    'sql' => "varchar(255) NOT NULL default ''",
+    'eval'      => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
+    'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['streetExtra'] = [
-    'exclude' => true,
-    'search' => true,
+    'exclude'   => true,
+    'search'    => true,
     'inputType' => 'text',
-    'eval' => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
-    'sql' => "varchar(255) NOT NULL default ''",
+    'eval'      => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
+    'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['phoneBusiness'] = [
-    'exclude' => true,
-    'search' => true,
+    'exclude'   => true,
+    'search'    => true,
     'inputType' => 'text',
-    'eval' => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
-    'sql' => "varchar(64) NOT NULL default ''",
+    'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+    'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['entryYear'] = [
-    'exclude' => true,
-    'filter' => true,
+    'exclude'   => true,
+    'filter'    => true,
     'inputType' => 'text',
-    'eval' => ['tl_class' => 'w50'],
-    'sql' => "varchar(5) NOT NULL default ''",
+    'eval'      => ['tl_class' => 'w50'],
+    'sql'       => "varchar(5) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['membershipType'] = [
-    'exclude' => true,
-    'filter' => true,
+    'exclude'   => true,
+    'filter'    => true,
     'inputType' => 'text',
-    'eval' => ['tl_class' => 'w50'],
-    'sql' => "varchar(256) NOT NULL default ''",
+    'eval'      => ['tl_class' => 'w50'],
+    'sql'       => "varchar(256) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo1'] = [
-    'exclude' => true,
-    'filter' => true,
+    'exclude'   => true,
+    'filter'    => true,
     'inputType' => 'text',
-    'eval' => ['tl_class' => 'w50'],
-    'sql' => "varchar(256) NOT NULL default ''",
+    'eval'      => ['tl_class' => 'w50'],
+    'sql'       => "varchar(256) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo2'] = [
-    'exclude' => true,
-    'filter' => true,
+    'exclude'   => true,
+    'filter'    => true,
     'inputType' => 'text',
-    'eval' => ['tl_class' => 'w50'],
-    'sql' => "varchar(256) NOT NULL default ''",
+    'eval'      => ['tl_class' => 'w50'],
+    'sql'       => "varchar(256) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo3'] = [
-    'exclude' => true,
-    'filter' => true,
+    'exclude'   => true,
+    'filter'    => true,
     'inputType' => 'text',
-    'eval' => ['tl_class' => 'w50'],
-    'sql' => "varchar(256) NOT NULL default ''",
+    'eval'      => ['tl_class' => 'w50'],
+    'sql'       => "varchar(256) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionInfo4'] = [
-    'exclude' => true,
-    'filter' => true,
+    'exclude'   => true,
+    'filter'    => true,
     'inputType' => 'text',
-    'eval' => ['tl_class' => 'w50'],
-    'sql' => "varchar(256) NOT NULL default ''",
+    'eval'      => ['tl_class' => 'w50'],
+    'sql'       => "varchar(256) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['debit'] = [
-    'exclude' => true,
-    'filter' => true,
+    'exclude'   => true,
+    'filter'    => true,
     'inputType' => 'text',
-    'eval' => ['tl_class' => 'w50'],
-    'sql' => "varchar(256) NOT NULL default ''",
+    'eval'      => ['tl_class' => 'w50'],
+    'sql'       => "varchar(256) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['memberStatus'] = [
-    'exclude' => true,
-    'filter' => true,
+    'exclude'   => true,
+    'filter'    => true,
     'inputType' => 'text',
-    'eval' => ['tl_class' => 'w50'],
-    'sql' => "varchar(256) NOT NULL default ''",
+    'eval'      => ['tl_class' => 'w50'],
+    'sql'       => "varchar(256) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhone'] = [
-    'exclude' => true,
-    'search' => true,
+    'exclude'   => true,
+    'search'    => true,
     'inputType' => 'text',
-    'eval' => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
-    'sql' => "varchar(64) NOT NULL default ''",
+    'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+    'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['emergencyPhoneName'] = [
-    'exclude' => true,
-    'search' => true,
+    'exclude'   => true,
+    'search'    => true,
     'inputType' => 'text',
-    'eval' => ['maxlength' => 255, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
-    'sql' => "varchar(255) NOT NULL default ''",
+    'eval'      => ['maxlength' => 255, 'decodeEntities' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+    'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = [
-    'exclude' => true,
-    'search' => true,
+    'exclude'   => true,
+    'search'    => true,
     'inputType' => 'text',
-    'eval' => ['tl_class' => 'clr', 'maxlength' => 5000],
-    'sql' => 'text NULL',
+    'eval'      => ['tl_class' => 'clr', 'maxlength' => 5000],
+    'sql'       => 'text NULL',
 ];
 
 if (TL_MODE === 'BE' && !BackendUser::getInstance()->isAdmin) {

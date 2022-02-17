@@ -15,50 +15,50 @@ declare(strict_types=1);
 use Contao\Config;
 
 $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
-    'config' => [
-        'dataContainer' => 'Table',
+    'config'   => [
+        'dataContainer'    => 'Table',
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
-        'switchToEdit' => true,
-        'sql' => [
+        'switchToEdit'     => true,
+        'sql'              => [
             'keys' => [
                 'id' => 'primary',
             ],
         ],
     ],
-    'list' => [
-        'sorting' => [
-            'mode' => 2,
-            'fields' => ['name ASC'],
-            'flag' => 1,
+    'list'     => [
+        'sorting'           => [
+            'mode'        => 2,
+            'fields'      => ['name ASC'],
+            'flag'        => 1,
             'panelLayout' => 'filter;sort,search,limit',
         ],
-        'label' => [
-            'fields' => ['name'],
+        'label'             => [
+            'fields'      => ['name'],
             'showColumns' => true,
         ],
         'global_operations' => [
             'all' => [
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
+                'href'       => 'act=select',
+                'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
         ],
-        'operations' => [
-            'edit' => [
+        'operations'        => [
+            'edit'   => [
                 'href' => 'act=edit',
                 'icon' => 'edit.gif',
             ],
-            'copy' => [
+            'copy'   => [
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'href' => 'act=delete',
-                'icon' => 'delete.gif',
+                'href'       => 'act=delete',
+                'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
             ],
-            'show' => [
+            'show'   => [
                 'href' => 'act=show',
                 'icon' => 'show.svg',
             ],
@@ -69,171 +69,171 @@ $GLOBALS['TL_DCA']['tl_cabanne_sac'] = [
     ],
 
     'fields' => [
-        'id' => [
+        'id'            => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'tstamp' => [
+        'tstamp'        => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'name' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'name'          => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => [                'mandatory' => true,                'maxlength' => 255,                'tl_class' => 'clr',            ],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'canton' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'canton'        => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => [                'mandatory' => true,                'maxlength' => 255,                'tl_class' => 'clr',            ],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'altitude' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'altitude'      => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => [                'rgxp' => 'natural',                'mandatory' => true,                'maxlength' => 255,                'tl_class' => 'clr',            ],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['rgxp' => 'natural', 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'hutWarden' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'hutWarden'     => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'textarea',
-            'eval' => ['rgxp' => '', 'mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'],
-            'sql' => "varchar(512) NOT NULL default ''",
+            'eval'      => ['rgxp' => '', 'mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'],
+            'sql'       => "varchar(512) NOT NULL default ''",
         ],
-        'phone' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'phone'         => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'phone', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['rgxp' => 'phone', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'email' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'email'         => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'email', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['rgxp' => 'email', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'bookingMethod' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'textarea',
-            'eval' => ['mandatory' => false, 'maxlength' => 512, 'tl_class' => 'clr'],
-            'sql' => "varchar(512) NOT NULL default ''",
+            'eval'      => ['mandatory' => false, 'maxlength' => 512, 'tl_class' => 'clr'],
+            'sql'       => "varchar(512) NOT NULL default ''",
         ],
-        'url' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'url'           => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'url', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['rgxp' => 'url', 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'singleSRC' => [
-            'exclude' => true,
+        'singleSRC'     => [
+            'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval' => ['fieldType' => 'radio', 'filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'mandatory' => true],
-            'sql' => 'binary(16) NULL',
+            'eval'      => ['fieldType' => 'radio', 'filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'mandatory' => true],
+            'sql'       => 'binary(16) NULL',
         ],
-        'huettenchef' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'huettenchef'   => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'textarea',
-            'eval' => ['mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'],
-            'sql' => "varchar(512) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'],
+            'sql'       => "varchar(512) NOT NULL default ''",
         ],
-        'capacity' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'capacity'      => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'textarea',
-            'eval' => ['mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'],
-            'sql' => "varchar(512) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'],
+            'sql'       => "varchar(512) NOT NULL default ''",
         ],
-        'coordsCH1903' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'coordsCH1903'  => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'coordsWGS84' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'coordsWGS84'   => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'openingTime' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'openingTime'   => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'textarea',
-            'eval' => ['mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'],
-            'sql' => "varchar(512) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 512, 'tl_class' => 'clr'],
+            'sql'       => "varchar(512) NOT NULL default ''",
         ],
-        'ascent' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascent'],
-            'exclude' => true,
+        'ascent'        => [
+            'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascent'],
+            'exclude'   => true,
             'inputType' => 'multiColumnWizard',
-            'eval' => [
+            'eval'      => [
                 'columnFields' => [
                     'ascentDescription' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentDescription'],
-                        'exclude' => true,
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentDescription'],
+                        'exclude'   => true,
                         'inputType' => 'textarea',
-                        'eval' => ['style' => 'width:150px'],
+                        'eval'      => ['style' => 'width:150px'],
                     ],
-                    'ascentTime' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentTime'],
-                        'exclude' => true,
+                    'ascentTime'        => [
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentTime'],
+                        'exclude'   => true,
                         'inputType' => 'text',
-                        'eval' => ['style' => 'width:80px'],
+                        'eval'      => ['style' => 'width:80px'],
                     ],
-                    'ascentDifficulty' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentDifficulty'],
-                        'exclude' => true,
+                    'ascentDifficulty'  => [
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentDifficulty'],
+                        'exclude'   => true,
                         'inputType' => 'textarea',
-                        'eval' => ['style' => 'width:80px'],
+                        'eval'      => ['style' => 'width:80px'],
                     ],
-                    'ascentSummer' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentSummer'],
-                        'exclude' => true,
+                    'ascentSummer'      => [
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentSummer'],
+                        'exclude'   => true,
                         'inputType' => 'select',
-                        'options' => ['possible', 'not-possible'],
+                        'options'   => ['possible', 'not-possible'],
                         'reference' => &$GLOBALS['TL_LANG']['tl_cabanne_sac'],
-                        'eval' => ['style' => 'width:50px'],
+                        'eval'      => ['style' => 'width:50px'],
                     ],
-                    'ascentWinter' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentWinter'],
-                        'exclude' => true,
+                    'ascentWinter'      => [
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentWinter'],
+                        'exclude'   => true,
                         'inputType' => 'select',
-                        'options' => ['possible', 'not-possible'],
+                        'options'   => ['possible', 'not-possible'],
                         'reference' => &$GLOBALS['TL_LANG']['tl_cabanne_sac'],
-                        'eval' => ['style' => 'width:50px'],
+                        'eval'      => ['style' => 'width:50px'],
                     ],
-                    'ascentComment' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentComment'],
-                        'exclude' => true,
+                    'ascentComment'     => [
+                        'label'     => &$GLOBALS['TL_LANG']['tl_cabanne_sac']['ascentComment'],
+                        'exclude'   => true,
                         'inputType' => 'textarea',
-                        'eval' => ['style' => 'width:150px'],
+                        'eval'      => ['style' => 'width:150px'],
                     ],
                 ],
             ],
-            'sql' => 'blob NULL',
+            'sql'       => 'blob NULL',
         ],
     ],
 ];

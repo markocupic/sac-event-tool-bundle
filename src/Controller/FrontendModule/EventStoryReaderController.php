@@ -120,8 +120,6 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-
-
     /**
      * @throws \Exception
      */
@@ -191,7 +189,6 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
                 if (null !== $objFiles) {
                     if (is_file($this->projectDir.'/'.$objFiles->path)) {
-
                         $objFile = new File($objFiles->path);
 
                         if ($objFile->isImage) {
@@ -356,7 +353,6 @@ class EventStoryReaderController extends AbstractFrontendModuleController
             'eccLevel' => QRCode::ECC_L,
             'cachefile' => $filepath,
         ];
-
 
         $options = new QROptions($opt);
 

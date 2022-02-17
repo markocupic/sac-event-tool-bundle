@@ -427,7 +427,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $arrData['uuid'] = Uuid::uuid4()->toString();
                 $arrData['stateOfSubscription'] = $calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel) ? EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED : EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED;
                 $arrData['bookingType'] = 'onlineForm';
-                $arrData['sectionIds'] = $this->memberModel->sectionId;
+                $arrData['sectionId'] = $this->memberModel->sectionId;
 
                 // Save emergency phone number to user profile
                 if (empty($this->memberModel->emergencyPhone)) {

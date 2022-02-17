@@ -48,10 +48,3 @@ $GLOBALS['TL_LANG']['tl_member']['debit'] = ['Debit', ''];
 $GLOBALS['TL_LANG']['tl_member']['memberStatus'] = ['Mitgliederstatus', ''];
 $GLOBALS['TL_LANG']['tl_member']['disable'] = ['Inaktives SAC-Mitglied (ausgetreten)', ''];
 $GLOBALS['TL_LANG']['tl_member']['foodHabits'] = ['Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)', ''];
-
-// References
-$GLOBALS['TL_LANG']['tl_member']['section']['4250'] = 'SAC PILATUS';
-$GLOBALS['TL_LANG']['tl_member']['section']['4251'] = 'SAC PILATUS SURENTAL';
-$GLOBALS['TL_LANG']['tl_member']['section']['4252'] = 'SAC PILATUS NAPF';
-$GLOBALS['TL_LANG']['tl_member']['section']['4253'] = 'SAC PILATUS HOCHDORF';
-$GLOBALS['TL_LANG']['tl_member']['section']['4254'] = 'SAC PILATUS RIGI';

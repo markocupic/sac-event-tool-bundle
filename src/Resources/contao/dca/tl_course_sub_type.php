@@ -13,28 +13,28 @@ declare(strict_types=1);
  */
 
 $GLOBALS['TL_DCA']['tl_course_sub_type'] = [
-    'config' => [
-        'dataContainer' => 'Table',
+    'config'   => [
+        'dataContainer'    => 'Table',
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
-        'switchToEdit' => true,
-        'ptable' => 'tl_course_main_type',
-        'sql' => [
+        'switchToEdit'     => true,
+        'ptable'           => 'tl_course_main_type',
+        'sql'              => [
             'keys' => [
-                'id' => 'primary',
+                'id'  => 'primary',
                 'pid' => 'index',
             ],
         ],
     ],
-    'list' => [
-        'sorting' => [
-            'mode' => 2,
-            'fields' => ['code ASC'],
-            'flag' => 1,
+    'list'     => [
+        'sorting'           => [
+            'mode'        => 2,
+            'fields'      => ['code ASC'],
+            'flag'        => 1,
             'panelLayout' => 'filter;sort,search,limit',
         ],
-        'label' => [
-            'fields' => [
+        'label'             => [
+            'fields'      => [
                 'code',
                 'pid:tl_course_main_type.name',
                 'name',
@@ -43,23 +43,23 @@ $GLOBALS['TL_DCA']['tl_course_sub_type'] = [
         ],
         'global_operations' => [
             'all' => [
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
+                'href'       => 'act=select',
+                'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
         ],
-        'operations' => [
-            'edit' => [
+        'operations'        => [
+            'edit'   => [
                 'href' => 'act=edit',
                 'icon' => 'edit.gif',
             ],
-            'copy' => [
+            'copy'   => [
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'href' => 'act=delete',
-                'icon' => 'delete.gif',
+                'href'       => 'act=delete',
+                'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
             ],
         ],
@@ -67,37 +67,37 @@ $GLOBALS['TL_DCA']['tl_course_sub_type'] = [
     'palettes' => [
         'default' => 'pid,code,name,',
     ],
-    'fields' => [
-        'id' => [
+    'fields'   => [
+        'id'     => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'pid' => [
-            'inputType' => 'select',
-            'sorting' => true,
-            'filter' => true,
+        'pid'    => [
+            'inputType'  => 'select',
+            'sorting'    => true,
+            'filter'     => true,
             'foreignKey' => 'tl_course_main_type.name',
-            'sql' => "int(10) unsigned NOT NULL default '0'",
-            'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
+            'sql'        => "int(10) unsigned NOT NULL default '0'",
+            'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
         ],
         'tstamp' => [
             'flag' => 6,
-            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'sql'  => "int(10) unsigned NOT NULL default '0'",
         ],
-        'code' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'code'   => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'unique' => true],
-            'sql' => "varchar(5) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'unique' => true],
+            'sql'       => "varchar(5) NOT NULL default ''",
         ],
-        'name' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'name'   => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
     ],
 ];

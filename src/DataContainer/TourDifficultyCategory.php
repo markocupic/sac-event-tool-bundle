@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\Backend;
 use Contao\BackendUser;
+use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\Image;
 use Contao\StringUtil;
 use Symfony\Component\Security\Core\Security;

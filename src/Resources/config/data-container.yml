@@ -2,10 +2,12 @@ services:
     Markocupic\SacEventToolBundle\DataContainer\Util:
         arguments:
             - '@request_stack'
+            - '@database_connection'
 
     Markocupic\SacEventToolBundle\DataContainer\User:
         arguments:
             - '@contao.framework'
+            - '@Markocupic\SacEventToolBundle\DataContainer\Util'
             - '@request_stack'
             - '@database_connection'
             - '@translator'
@@ -91,6 +93,7 @@ services:
     Markocupic\SacEventToolBundle\DataContainer\Member:
         arguments:
             - '@database_connection'
+            - '@Markocupic\SacEventToolBundle\DataContainer\Util'
             - '@translator'
             - '@Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData'
 

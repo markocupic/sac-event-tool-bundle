@@ -18,6 +18,7 @@ use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
+use function Safe\json_encode;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -84,7 +85,7 @@ class TestController extends AbstractController
         return new Response($this->twig->render(
             '@MarkocupicSacEventTool/test.html.twig',
             [
-                'data' => \Safe\json_encode([
+                'data' => json_encode([
                     'events' => $arrEvents,
                 ]),
             ]

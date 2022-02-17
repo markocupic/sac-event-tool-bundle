@@ -16,13 +16,9 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\CoreBundle\ServiceAnnotation\Callback;
 
-
 class TourDifficulty
 {
     /**
-     *
-     * @param array $row
-     *
      * @Callback(table="tl_tour_difficulty", target="list.sorting.child_record")
      */
     public function listDifficulties(array $row): string
