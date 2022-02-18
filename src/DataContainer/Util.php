@@ -67,18 +67,11 @@ class Util
         if (isset($data[$strTable]) && \is_array($data[$strTable])) {
             foreach (array_keys($data[$strTable]) as $k) {
                 if (isset($data[$strTable][$k]) && \is_array($data[$strTable][$k])) {
-                    foreach ($data[$strTable][0] as $kk => $vv) {
+                    foreach (array_keys($data[$strTable][0]) as $kk) {
                         if (false !== strpos($kk, '<small>sectionId</small>')) {
-                            if ('' !== $vv) {
-                                $arrSectionNames = [];
-                                $arrSections = StringUtil::trimsplit(',', $vv);
-
-                                foreach ($arrSections as $id) {
-                                    $name = $this->connection->fetchOne('SELECT name FROM tl_sac_section WHERE sectionId = ?', [$id]);
-                                    $arrSectionNames[] = $name ?: $id;
-                                }
-
-                                $data[$strTable][$k][$kk] = implode(', ', $arrSectionNames);
+                            if (isset($row['sectionId'])) {
+                                $arrSections = StringUtil::deserialize($row['sectionId'], true);
+                                $data[$strTable][$k][$kk] = implode(', ', $arrSections);
                             }
                         }
                     }
