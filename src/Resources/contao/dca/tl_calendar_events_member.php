@@ -136,14 +136,17 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'hasPaid'                  => 'paymentMethod',
     ],
     'fields'      => [
-        'id'                          => [
+        'id'     => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'eventId'                     => [
-            'foreignKey' => 'tl_calendar_events.title',
-            'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
-            'eval'       => ['doNotShow' => true, 'readonly' => true],
+        'tstamp' => [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+        ],
+        'uuid'   => [
+            'inputType' => 'text',
+            'default'   => Uuid::uuid4()->toString(),
+            'eval'      => ['unique' => true, 'doNotCopy' => true],
+            'sql'       => "char(36) NOT NULL default ''",
         ],
         'contaoMemberId'              => [
             'foreignKey' => "tl_member.CONCAT(firstname, ' ', lastname)",
@@ -151,14 +154,16 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
             'eval'       => ['readonly' => true],
         ],
-        'tstamp'                      => [
-            'sql' => "int(10) unsigned NOT NULL default '0'",
+        'eventId'                     => [
+            'foreignKey' => 'tl_calendar_events.title',
+            'sql'        => "int(10) unsigned NOT NULL default '0'",
+            'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
+            'eval'       => ['doNotShow' => true, 'readonly' => true],
         ],
-        'uuid'                        => [
+        'eventName'                   => [
             'inputType' => 'text',
-            'default'   => Uuid::uuid4()->toString(),
-            'eval'      => ['unique' => true, 'doNotCopy' => true],
-            'sql'       => "char(36) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'addedOn'                     => [
             'inputType' => 'text',
@@ -166,26 +171,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'sorting'   => true,
             'eval'      => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql'       => "varchar(10) NOT NULL default ''",
-        ],
-        'allowMultiSignUp'            => [
-            'inputType' => 'checkbox',
-            'eval'      => ['submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'long clr'],
-            'sql'       => "char(1) NOT NULL default ''",
-        ],
-        'hasPaid'                     => [
-            'exclude'   => true,
-            'filter'    => true,
-            'inputType' => 'checkbox',
-            'eval'      => ['submitOnChange' => true, 'tl_class' => 'clr m12', 'mandatory' => false],
-            'sql'       => "char(1) NOT NULL default ''",
-        ],
-        'paymentMethod'               => [
-            'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
-            'exclude'   => true,
-            'inputType' => 'select',
-            'options'   => ['cashPayment', 'bankTransfer', 'twint'],
-            'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(32) NOT NULL default ''",
         ],
         'stateOfSubscription'         => [
             'filter'    => true,
@@ -196,59 +181,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'eval'      => ['doNotShow' => false, 'readonly' => false, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'carInfo'                     => [
+        'gender'                      => [
             'inputType' => 'select',
-            'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
-            'eval'      => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
-            'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'ticketInfo'                  => [
-            'inputType' => 'select',
-            'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
-            'eval'      => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
-            'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'hasParticipated'             => [
-            'inputType' => 'checkbox',
-            'eval'      => ['doNotShow' => false, 'submitOnChange' => true, 'doNotCopy' => true],
-            'sql'       => "char(1) NOT NULL default ''",
-        ],
-        'dashboard'                   => [
-            'inputType' => 'text',
-            'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'refuseWithEmail'             => [
-            'inputType' => 'text',
-            'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'acceptWithEmail'             => [
-            'inputType' => 'text',
-            'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'addToWaitlist'               => [
-            'inputType' => 'text',
-            'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'eventName'                   => [
-            'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'notes'                       => [
-            'exclude'   => true,
-            'inputType' => 'textarea',
-            'eval'      => ['tl_class' => 'clr', 'maxlength' => 5000, 'decodeEntities' => true, 'mandatory' => false],
-            'sql'       => 'text NULL',
-        ],
-        'instructorNotes'             => [
-            'exclude'   => true,
-            'inputType' => 'textarea',
-            'eval'      => ['tl_class' => 'clr', 'maxlength' => 5000, 'decodeEntities' => true, 'mandatory' => false],
-            'sql'       => 'text NULL',
+            'sorting'   => true,
+            'options'   => ['male', 'female'],
+            'reference' => &$GLOBALS['TL_LANG']['MSC'],
+            'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+            'sql'       => "varchar(32) NOT NULL default ''",
         ],
         'firstname'                   => [
             'inputType' => 'text',
@@ -259,14 +198,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'inputType' => 'text',
             'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'gender'                      => [
-            'inputType' => 'select',
-            'sorting'   => true,
-            'options'   => ['male', 'female'],
-            'reference' => &$GLOBALS['TL_LANG']['MSC'],
-            'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(32) NOT NULL default ''",
         ],
         'dateOfBirth'                 => [
             'sorting'   => true,
@@ -290,10 +221,33 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
+        'email'                       => [
+            'inputType' => 'text',
+            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ],
         'mobile'                      => [
             'inputType' => 'text',
             'eval'      => ['mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(64) NOT NULL default ''",
+        ],
+        'sectionId'                   => [
+            'sorting'   => true,
+            'exclude'   => true,
+            'inputType' => 'select',
+            'eval'      => ['multiple' => true, 'chosen' => true, 'doNotCopy' => true, 'readonly' => false, 'tl_class' => 'w50'],
+            'sql'       => 'blob NULL',
+        ],
+        'sacMemberId'                 => [
+            'inputType' => 'text',
+            'eval'      => ['doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'],
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ],
+        'notes'                       => [
+            'exclude'   => true,
+            'inputType' => 'textarea',
+            'eval'      => ['tl_class' => 'clr', 'maxlength' => 5000, 'decodeEntities' => true, 'mandatory' => false],
+            'sql'       => 'text NULL',
         ],
         'emergencyPhone'              => [
             'inputType' => 'text',
@@ -305,20 +259,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'eval'      => ['mandatory' => true, 'maxlength' => 255, 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'email'                       => [
-            'inputType' => 'text',
-            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'ahvNumber'                   => [
-            'inputType' => 'text',
-            'eval'      => ['mandatory' => false, 'maxlength' => 16, 'unique' => false, 'decodeEntities' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
-        ],
-        'sacMemberId'                 => [
-            'inputType' => 'text',
-            'eval'      => ['doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+        'instructorNotes'             => [
+            'exclude'   => true,
+            'inputType' => 'textarea',
+            'eval'      => ['tl_class' => 'clr', 'maxlength' => 5000, 'decodeEntities' => true, 'mandatory' => false],
+            'sql'       => 'text NULL',
         ],
         'hasLeadClimbingEducation'    => [
             'exclude'   => true,
@@ -334,12 +279,82 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
             'sql'       => "varchar(11) NOT NULL default ''",
         ],
+        'agb'                         => [
+            'inputType' => 'checkbox',
+            'eval'      => ['doNotShow' => true, 'doNotCopy' => true],
+            'sql'       => "char(1) NOT NULL default ''",
+        ],
+        'ahvNumber'                   => [
+            'inputType' => 'text',
+            'eval'      => ['mandatory' => false, 'maxlength' => 16, 'unique' => false, 'decodeEntities' => true, 'tl_class' => 'w50'],
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ],
         'foodHabits'                  => [
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
             'eval'      => ['tl_class' => 'clr', 'maxlength' => 5000],
             'sql'       => 'text NULL',
+        ],
+        'ticketInfo'                  => [
+            'inputType' => 'select',
+            'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
+            'eval'      => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ],
+        'carInfo'                     => [
+            'inputType' => 'select',
+            'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
+            'eval'      => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ],
+        'hasParticipated'             => [
+            'inputType' => 'checkbox',
+            'eval'      => ['doNotShow' => false, 'submitOnChange' => true, 'doNotCopy' => true],
+            'sql'       => "char(1) NOT NULL default ''",
+        ],
+        'hasPaid'                     => [
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'checkbox',
+            'eval'      => ['submitOnChange' => true, 'tl_class' => 'clr m12', 'mandatory' => false],
+            'sql'       => "char(1) NOT NULL default ''",
+        ],
+        'paymentMethod'               => [
+            'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
+            'exclude'   => true,
+            'inputType' => 'select',
+            'options'   => ['cashPayment', 'bankTransfer', 'twint'],
+            'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+            'sql'       => "varchar(32) NOT NULL default ''",
+        ],
+        'bookingType'                 => [
+            'exclude'   => true,
+            'inputType' => 'select',
+            'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
+            'options'   => ['onlineForm', 'manually'],
+            'eval'      => ['doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true],
+            'sql'       => "varchar(255) NOT NULL default 'manually'",
+        ],
+        'allowMultiSignUp'            => [
+            'inputType' => 'checkbox',
+            'eval'      => ['submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'long clr'],
+            'sql'       => "char(1) NOT NULL default ''",
+        ],
+        'acceptWithEmail'             => [
+            'inputType' => 'text',
+            'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ],
+        'refuseWithEmail'             => [
+            'inputType' => 'text',
+            'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ],
+        'addToWaitlist'               => [
+            'inputType' => 'text',
+            'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'emailRecipients'             => [
             'options'   => [],
@@ -376,30 +391,15 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'eval'      => ['doNotShow' => true, 'doNotCopy' => true],
             'sql'       => "char(1) NOT NULL default ''",
         ],
-        'agb'                         => [
-            'inputType' => 'checkbox',
-            'eval'      => ['doNotShow' => true, 'doNotCopy' => true],
-            'sql'       => "char(1) NOT NULL default ''",
-        ],
         'anonymized'                  => [
             'inputType' => 'checkbox',
             'eval'      => ['doNotShow' => true, 'doNotCopy' => true],
             'sql'       => "char(1) NOT NULL default ''",
         ],
-        'bookingType'                 => [
-            'exclude'   => true,
-            'inputType' => 'select',
-            'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
-            'options'   => ['onlineForm', 'manually'],
-            'eval'      => ['doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true],
-            'sql'       => "varchar(255) NOT NULL default 'manually'",
-        ],
-        'sectionId'                   => [
-            'sorting'   => true,
-            'exclude'   => true,
-            'inputType' => 'select',
-            'eval'      => ['multiple' => true, 'chosen' => true, 'doNotCopy' => true, 'readonly' => false, 'tl_class' => 'w50'],
-            'sql'       => 'blob NULL',
+        'dashboard'                   => [
+            'inputType' => 'text',
+            'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
     ],
 ];
