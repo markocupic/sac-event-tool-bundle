@@ -71,7 +71,15 @@ class Util
                         if (false !== strpos($kk, '<small>sectionId</small>')) {
                             if (isset($row['sectionId'])) {
                                 $arrSections = StringUtil::deserialize($row['sectionId'], true);
-                                $data[$strTable][$k][$kk] = implode(', ', $arrSections);
+                                $arrSectionNames = [];
+
+                                foreach($arrSections as $id)
+                                {
+                                    $result = $this->connection->fetchOne('SELECT name FROM tl_sac_section WHERE sectionId = ?', [$id]);
+                                    $arrSectionNames[] = $result ?: $id;
+                                }
+
+                                $data[$strTable][$k][$kk] = implode(', ', $arrSectionNames);
                             }
                         }
                     }
