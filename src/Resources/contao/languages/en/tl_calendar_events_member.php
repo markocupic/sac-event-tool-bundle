@@ -43,6 +43,8 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['sac_member_id_legend'] = 'SAC-
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['education_legend'] = 'Ausbildung';
 
 // Fields
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['uuid'] = ['Registrierungs-UUID', 'Geben Sie hier die Registrierungs-UUID ein.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['eventId'] = ['Event-ID', 'Geben Sie hier die Event-ID ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['hasParticipated'] = ['Hat am Event teilgenommen', 'Geben Sie hier abschliessend an, ob der Teilnehmer auch tatsächlich am Event teilgenommen hat. (Erst nach Eventende einstellen!)'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['stateOfSubscription'] = ['Anmeldestatus', 'Geben Sie hier den Anmeldestatus ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['addedOn'] = ['Anmeldedatum', 'Geben Sie hier das Anmeldedatum ein.'];

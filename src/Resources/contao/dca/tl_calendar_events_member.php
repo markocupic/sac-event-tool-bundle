@@ -143,7 +143,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'foreignKey' => 'tl_calendar_events.title',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
             'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
-            'eval'       => ['readonly' => true],
+            'eval'       => ['doNotShow' => true, 'readonly' => true],
         ],
         'contaoMemberId'              => [
             'foreignKey' => "tl_member.CONCAT(firstname, ' ', lastname)",
@@ -368,7 +368,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'emailAttachment'             => [
             'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval'      => ['multiple' => true, 'fieldType' => 'checkbox', 'extensions' => Config::get('allowedDownload'), 'files' => true, 'filesOnly' => true, 'mandatory' => true],
+            'eval'      => ['doNotShow' => true, 'multiple' => true, 'fieldType' => 'checkbox', 'extensions' => Config::get('allowedDownload'), 'files' => true, 'filesOnly' => true, 'mandatory' => true],
             'sql'       => 'binary(16) NULL',
         ],
         'emailSendCopy'               => [
