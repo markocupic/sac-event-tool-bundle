@@ -362,7 +362,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'checkbox',
-            'eval'      => ['submitOnChange' => true],
+            'eval'      => ['doNotShow' => true, 'submitOnChange' => true],
             'sql'       => "char(1) NOT NULL default ''",
         ],
         'emailAttachment'             => [
