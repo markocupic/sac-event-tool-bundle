@@ -877,16 +877,16 @@ class CalendarEventsHelper
             if ($objEvent->addMinAndMaxMembers && $objEvent->maxMembers > 0) {
                 if ($memberCount >= $objEvent->maxMembers) {
                     // Event fully booked
-                    return sprintf($strBadge, 'danger', 'ausgebucht', $memberCount.'/'.$objEvent->maxMembers);
+                    return sprintf($strBadge, 'dark', 'ausgebucht', $memberCount.'/'.$objEvent->maxMembers);
                 }
 
                 if ($memberCount < $objEvent->maxMembers) {
                     // Free places
-                    return sprintf($strBadge, 'success', sprintf('noch %s freie Plätze', $objEvent->maxMembers - $memberCount), $memberCount.'/'.$objEvent->maxMembers);
+                    return sprintf($strBadge, 'dark', sprintf('noch %s freie Plätze', $objEvent->maxMembers - $memberCount), $memberCount.'/'.$objEvent->maxMembers);
                 }
             } else {
                 // There is no booking limit. Show registered members
-                return sprintf($strBadge, 'success', $memberCount.' Anmeldungen', $memberCount.'/?');
+                return sprintf($strBadge, 'dark', $memberCount.' Anmeldungen', $memberCount.'/?');
             }
         }
 
