@@ -119,9 +119,9 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['ahvNumber'] = [
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['sectionId'] = [
     'exclude'   => true,
-    'inputType' => 'checkbox',
+    'inputType' => 'select',
     'filter'    => true,
-    'eval'      => ['multiple' => true, 'tl_class' => 'clr'],
+    'eval'      => ['multiple' => true, 'chosen' => true, 'doNotCopy' => true, 'tl_class' => 'clr'],
     'sql'       => 'blob NULL',
 ];
 

@@ -190,9 +190,8 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['sectionId'] = [
     'filter'    => true,
     'exclude'   => true,
     'sorting'   => true,
-    'reference' => &$GLOBALS['TL_LANG']['tl_user']['section'],
-    'inputType' => 'checkboxWizard',
-    'eval'      => ['multiple' => true, 'tl_class' => true],
+    'inputType' => 'select',
+    'eval'      => ['multiple' => true, 'chosen' => true, 'doNotCopy' => true, 'tl_class' => 'clr'],
     'sql'       => 'blob NULL',
 ];
 
