@@ -82,9 +82,9 @@ class EventRapport2Docx
             $controllerAdapter->redirect(System::getReferer());
         }
 
-        if (null === $objEventMemberHelper->getParticipatedEventMembers($objEvent)) {
+        if ($objEvent->eventState !== 'event_canceled' && null === $objEventMemberHelper->getParticipatedEventMembers($objEvent)) {
             // Send error message if there are no members assigned to the event
-            $messageAdapter->addError('Bitte überprüfe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, die am Event teilgenommen haben.');
+            $messageAdapter->addError('Bitte überprüfe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, die am Event teilgenommen haben. Falls du den Event abgesagt hast, musst du dies unter Event Status beim Event selber vermerken.');
             $controllerAdapter->redirect(System::getReferer());
         }
 

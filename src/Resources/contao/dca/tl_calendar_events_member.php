@@ -136,13 +136,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'hasPaid'                  => 'paymentMethod',
     ],
     'fields'      => [
-        'id'     => [
+        'id'                          => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'tstamp' => [
+        'tstamp'                      => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'uuid'   => [
+        'uuid'                        => [
             'inputType' => 'text',
             'default'   => Uuid::uuid4()->toString(),
             'eval'      => ['unique' => true, 'doNotCopy' => true],
