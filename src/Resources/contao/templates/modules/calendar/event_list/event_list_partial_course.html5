@@ -16,16 +16,19 @@
         </div>
         <!-- Start right col -->
         <div class="col-sm-9 col-xl-7">
-          <div class="title">
+          <div class="title d-flex align-items-start lh-1">
+            <span class="event-state-icon pt-1" data-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:title="row.eventStateLabel" v-bind:class="row.eventState"> </span>
             <a v-bind:href="row.eventUrl" class="event-title-link">
-              <h4 class="headline">{{ row.title }}</h4>
+              <h4 class="d-flex headline">
+                {{ row.title }}
+              </h4>
             </a>
           </div>
           <div class="detail-item">
             <strong>{{ row.courseTypeLevel0Name }}: {{ row.courseTypeLevel1Name }}</strong>
           </div>
           <div class="detail-item">
-            <i class="fa fa-fw fa-user"></i>Leitung: {{ row.instructorsWithQualification }}
+            <i class="fa fa-fw fa-user"></i> <span>Leitung: {{ row.instructorsWithQualification }}</span>
           </div>
           <div class="detail-item">
             <i class="fa fa-fw fa-calendar-alt"></i>
@@ -33,10 +36,6 @@
           </div>
           <div class="detail-item">
             <div v-html="row.bookingCounter" class="me-1"></div>
-          </div>
-          <div class="detail-item">
-            <span class="event-state-icon" v-bind:class="row.eventState"> </span>
-            <span v-html="row.eventStateLabel"></span>
           </div>
         </div>
       </div>
