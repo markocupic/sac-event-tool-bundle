@@ -64,8 +64,8 @@ class SacEvtOnGenerateEventDashboardListener
         $module = $inputAdapter->get('do');
 
         // Go to event button
-        $eventListHref = sprintf('contao/main.php?do=%s&id=%s&table=tl_calendar_events&act=%s&rt=%s&ref=%s', $module, $objEvent->id, 'edit', $requestToken, $refererId);
-        $menu->addChild('Event', ['uri' => $eventListHref])
+        $href = sprintf('contao/main.php?do=%s&id=%s&table=tl_calendar_events&act=%s&rt=%s&ref=%s', $module, $objEvent->id, 'edit', $requestToken, $refererId);
+        $menu->addChild('Event', ['uri' => $href])
             ->setLinkAttribute('role', 'button')
             ->setLinkAttribute('class', 'tl_submit')
             ->setLinkAttribute('target', '_blank')
@@ -74,8 +74,8 @@ class SacEvtOnGenerateEventDashboardListener
         ;
 
         // Go to event list button
-        $eventListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, $requestToken, $refererId);
-        $menu->addChild('Eventliste', ['uri' => $eventListHref])
+        $href = sprintf('contao/main.php?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, $requestToken, $refererId);
+        $menu->addChild('Eventliste', ['uri' => $href])
             ->setLinkAttribute('role', 'button')
             ->setLinkAttribute('class', 'tl_submit')
             ->setLinkAttribute('target', '_blank')
@@ -84,8 +84,8 @@ class SacEvtOnGenerateEventDashboardListener
         ;
 
         // Go to event preview button
-        if (($previewHref = $calendarEventsHelperAdapter->generateEventPreviewUrl($objEvent)) !== '') {
-            $menu->addChild('Vorschau', ['uri' => $previewHref])
+        if (($href = $calendarEventsHelperAdapter->generateEventPreviewUrl($objEvent)) !== '') {
+            $menu->addChild('Vorschau', ['uri' => $href])
                 ->setLinkAttribute('role', 'button')
                 ->setLinkAttribute('class', 'tl_submit')
                 ->setLinkAttribute('target', '_blank')
@@ -96,8 +96,8 @@ class SacEvtOnGenerateEventDashboardListener
 
         // Go to event participant list button
         if ($eventReleaseLevelPolicyModelAdapter->hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id) {
-            $participantListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
-            $menu->addChild('Teilnehmerliste', ['uri' => $participantListHref])
+            $href = sprintf('contao/main.php?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
+            $menu->addChild('Teilnehmerliste', ['uri' => $href])
                 ->setAttribute('role', 'button')
                 ->setLinkAttribute('class', 'tl_submit')
                 ->setLinkAttribute('target', '_blank')
@@ -109,8 +109,8 @@ class SacEvtOnGenerateEventDashboardListener
         // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und Vergütungsformular drucken" button
         if ($eventReleaseLevelPolicyModelAdapter->hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id) {
             if ('tour' === $objEvent->eventType || 'lastMinuteTour' === $objEvent->eventType) {
-                $writeTourReportHref = $controllerAdapter->addToUrl('call=writeTourReport&rt='.$requestToken, true);
-                $menu->addChild('Tourrapport erfassen', ['uri' => $writeTourReportHref])
+                $href = $controllerAdapter->addToUrl('call=writeTourReport&rt='.$requestToken, true);
+                $menu->addChild('Tourrapport erfassen', ['uri' => $href])
                     ->setLinkAttribute('role', 'button')
                     ->setLinkAttribute('class', 'tl_submit')
                     ->setLinkAttribute('target', '_blank')
@@ -118,8 +118,8 @@ class SacEvtOnGenerateEventDashboardListener
                     ->setLinkAttribute('title', 'Tourrapport anzeigen [ALT + r]')
                 ;
 
-                $invoiceListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
-                $menu->addChild('Tourrapport und Vergütungsformulare drucken', ['uri' => $invoiceListHref])
+                $href = sprintf('contao/main.php?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
+                $menu->addChild('Tourrapport und Vergütungsformulare drucken', ['uri' => $href])
                     ->setAttribute('role', 'button')
                     ->setLinkAttribute('class', 'tl_submit')
                     ->setLinkAttribute('target', '_blank')
