@@ -63,6 +63,16 @@ class SacEvtOnGenerateEventDashboardListener
         // Get the backend module name
         $module = $inputAdapter->get('do');
 
+        // Go to event button
+        $eventListHref = sprintf('contao/main.php?do=%s&id=%s&table=tl_calendar_events&act=%s&rt=%s&ref=%s', $module, $objEvent->id, 'edit', $requestToken, $refererId);
+        $menu->addChild('Event', ['uri' => $eventListHref])
+            ->setLinkAttribute('role', 'button')
+            ->setLinkAttribute('class', 'tl_submit')
+            ->setLinkAttribute('target', '_blank')
+            //->setLinkAttribute('accesskey', 'm')
+            ->setLinkAttribute('title', 'Event bearbeiten')
+        ;
+
         // Go to event list button
         $eventListHref = sprintf('contao/main.php?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, $requestToken, $refererId);
         $menu->addChild('Eventliste', ['uri' => $eventListHref])

@@ -159,7 +159,7 @@ class ParseBackendTemplateListener
         $factory = new MenuFactory();
         $menu = $factory->createItem('Event Dashboard');
 
-        // HOOK: Use hooks to generate the mini dashboard. Like this other plugins are able to add items as well.
+        // HOOK: Use hooks to generate the mini dashboard. Soother plugins are able to add items as well.
         if (isset($GLOBALS['TL_HOOKS']['sacEvtOnGenerateEventDashboard']) && \is_array($GLOBALS['TL_HOOKS']['sacEvtOnGenerateEventDashboard'])) {
             foreach ($GLOBALS['TL_HOOKS']['sacEvtOnGenerateEventDashboard'] as $callback) {
                 System::importStatic($callback[0])->{$callback[1]}($menu, $objEvent);
