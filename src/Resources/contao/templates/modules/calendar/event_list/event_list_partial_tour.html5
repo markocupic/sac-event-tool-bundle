@@ -10,7 +10,7 @@
 
       <div class="event-list-inner-box d-flex p-3 mb-3">
         <!-- left col -->
-        <div class="event-list-tour-col-1" v-bind:onclick="'window.location.href=\'' + row.eventUrl + '\''">
+        <div class="event-list-tour-col-1" v-bind:onclick="'window.open(\'' + row.eventUrl + '\')'">
           <div class="event-list-badge-wrapper me-4 rounded-circle d-flex align-items-center justify-content-center">
             <div class="d-flex flex-column">
               <span class="event-list-badge-day small text-center">
@@ -45,7 +45,7 @@
             <span data-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:title="row.eventStateLabel">
               <i class="event-state-icon fa-fw" v-bind:class="row.eventState"></i>
             </span>
-            <a v-bind:href="row.eventUrl" class="event-title-link font-weight-bold"><strong>{{ row.eventTitle }}</strong></a>
+            <a v-bind:href="row.eventUrl" target="_blank" class="event-title-link font-weight-bold"><strong>{{ row.eventTitle }}</strong></a>
           </div>
           <!-- end row state icon -->
 

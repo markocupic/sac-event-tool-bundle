@@ -12,13 +12,13 @@
       <div class="row">
         <!-- Start left col -->
         <div class="col-sm-3 col-xl-5 d-none d-sm-block">
-          <a v-bind:href="row.eventUrl" v-bind:title="row.title" v-html="row.eventImage" class="responsive event-title-link"></a>
+          <a v-bind:href="row.eventUrl" target="_blank" v-bind:title="row.title" v-html="row.eventImage" class="responsive event-title-link"></a>
         </div>
         <!-- Start right col -->
         <div class="col-sm-9 col-xl-7">
           <div class="title d-flex align-items-start lh-1">
             <span class="event-state-icon pt-1" data-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:title="row.eventStateLabel" v-bind:class="row.eventState"> </span>
-            <a v-bind:href="row.eventUrl" class="event-title-link">
+            <a v-bind:href="row.eventUrl" target="_blank" class="event-title-link">
               <h4 class="d-flex headline">
                 {{ row.title }}
               </h4>
