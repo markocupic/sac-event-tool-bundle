@@ -32,7 +32,6 @@ use Contao\FilesModel;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
@@ -650,12 +649,6 @@ class CalendarEventsMember
         $blnAllowTourReportButton = false;
         $blnAllowInstructorInvoiceButton = false;
 
-        // Get the refererId
-        $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
-
-        // Get the backend module name
-        $module = $request->query->get('do');
-
         $eventId = $request->query->get('id');
         $objEvent = CalendarEventsModel::findByPk($eventId);
 
@@ -663,12 +656,14 @@ class CalendarEventsMember
             // Check if backend user is allowed
             if (EventReleaseLevelPolicyModel::hasWritePermission($user->id, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
                 if ('tour' === $objEvent->eventType || 'lastMinuteTour' === $objEvent->eventType) {
-                    $url = sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&action=writeTourReport&rt=%s&ref=%s', $eventId, REQUEST_TOKEN, $refererId);
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'] = $url;
+                    $href = $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'];
+                    $href = sprintf($href, $eventId);
+                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'] = $href;
                     $blnAllowTourReportButton = true;
 
-                    $url = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, $request->query->get('id'), REQUEST_TOKEN, $refererId);
-                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'] = $url;
+                    $href = $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'];
+                    $href = sprintf($href, $eventId);
+                    $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']['href'] = $href;
                     $blnAllowInstructorInvoiceButton = true;
                 }
             }

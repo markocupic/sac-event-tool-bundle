@@ -73,8 +73,7 @@ class Util
                                 $arrSections = StringUtil::deserialize($row['sectionId'], true);
                                 $arrSectionNames = [];
 
-                                foreach($arrSections as $id)
-                                {
+                                foreach ($arrSections as $id) {
                                     $result = $this->connection->fetchOne('SELECT name FROM tl_sac_section WHERE sectionId = ?', [$id]);
                                     $arrSectionNames[] = $result ?: $id;
                                 }

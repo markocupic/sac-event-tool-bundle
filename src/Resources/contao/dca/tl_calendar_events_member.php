@@ -65,13 +65,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'writeTourReport'              => [
-                'href'       => '',
+                'href'       => 'table=tl_calendar_events&amp;&act=edit&amp;call=writeTourReport&amp;id=%d',
                 'class'      => 'writeTourRapport',
                 'icon'       => 'edit.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'printInstructorInvoice'       => [
-                'href'       => '',
+                'href'       => 'table=tl_calendar_events_instructor_invoice&amp;id=%d',
                 'class'      => 'printInstructorInvoice',
                 'icon'       => Bundle::ASSET_DIR.'/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
