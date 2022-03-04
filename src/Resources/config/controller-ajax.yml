@@ -11,6 +11,8 @@ services:
             - '%kernel.project_dir%'
             - '%contao.csrf_token_name%'
             - '%sacevt.locale%'
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         public: true
 
     Markocupic\SacEventToolBundle\Controller\Api\EventApiController:
@@ -18,4 +20,6 @@ services:
             - '@contao.framework'
             - '@request_stack'
             - '@database_connection'
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         public: true

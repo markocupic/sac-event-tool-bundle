@@ -63,7 +63,6 @@ class EventApiController extends AbstractController
         $this->requestStack = $requestStack;
         $this->connection = $connection;
 
-        $this->framework->initialize();
     }
 
     /**
@@ -74,7 +73,9 @@ class EventApiController extends AbstractController
      */
     public function getEventList(): JsonResponse
     {
-        System::getContainer()->get('contao.framework')->initialize();
+        $this->framework->initialize();
+
+        //System::getContainer()->get('contao.framework')->initialize();
 
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
@@ -192,7 +193,8 @@ class EventApiController extends AbstractController
                     ->from('tl_user', 'u')
                     ->where($qbSt->expr()->like('u.name', $qbSt->expr()->literal('%'.$strNeedle.'%')))
                 ;
-                $arrInst = $qbSt->execute()->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+                $arrInst = $qbSt->execute()->fetchFirstColumn();
 
                 // Check if instructor is the instructor in this event
                 foreach ($arrInst as $instrId) {
@@ -309,7 +311,7 @@ class EventApiController extends AbstractController
         $query = $qb->getSQL();
 
         /** @var array $arrIds */
-        $arrIds = $qb->execute()->fetchAll(\PDO::FETCH_COLUMN, 0);
+        $arrIds = $qb->execute()->fetchFirstColumn();
 
         $endTime = microtime(true);
         $queryTime = $endTime - $startTime;
@@ -405,6 +407,8 @@ class EventApiController extends AbstractController
      */
     public function getEventById(): JsonResponse
     {
+        $this->framework->initialize();
+
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
 
