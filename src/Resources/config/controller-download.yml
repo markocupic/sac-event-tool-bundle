@@ -1,6 +1,8 @@
 services:
 
     Markocupic\SacEventToolBundle\Controller\Download\DownloadController:
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         arguments:
             - '@contao.framework'
             - '@request_stack'

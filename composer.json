@@ -11,7 +11,7 @@
   ],
   "require": {
     "ext-pdo": "*",
-    "contao/core-bundle": "^4.12",
+    "contao/core-bundle": "^4.13",
     "terminal42/notification_center": "^1.6",
     "markocupic/notification-center-default-email-bundle": "^1.0",
     "menatwork/contao-multicolumnwizard-bundle": "^3.4",
@@ -21,7 +21,7 @@
     "tecnickcom/tcpdf": "^6.3",
     "ramsey/uuid": "^3.8|^4.2",
     "chillerlan/php-qrcode": "^4.3",
-    "markocupic/phpoffice-bundle": "^1.1",
+    "markocupic/phpoffice-bundle": "^1.2",
     "markocupic/cloudconvert-bundle": "^2.0",
     "markocupic/contao-component-vue-js": "^2.6",
     "markocupic/contao-utf8-arrows-insert-tag-bundle": "^1.0",
