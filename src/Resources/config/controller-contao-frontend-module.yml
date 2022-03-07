@@ -48,6 +48,8 @@ services:
             - '@contao.framework'
             - '@security.helper'
             - '%sacevt.locale%'
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
         public: true
