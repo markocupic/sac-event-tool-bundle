@@ -614,8 +614,8 @@ class CalendarEvents
     }
 
     /**
-     * Do not allow non-admins deleting records
-     * if there are child records (event registrations) in tl_calendar_events_member.
+     * Do not allow to non-admins to delete a record
+     * if it contains child records (event registrations) in tl_calendar_events_member.
      *
      * @Callback(table="tl_calendar_events", target="config.ondelete", priority=100)
      */
@@ -639,21 +639,7 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=100)
-     */
-    public function adjustImageSize(DataContainer $dc): void
-    {
-        // Return if there is no active record (override all)
-        if (!$dc->activeRecord) {
-            return;
-        }
-
-        $set['size'] = serialize(['', '', 11]);
-        $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
-    }
-
-    /**
-     * Adjust enddate.
+     * Adjust end date.
      *
      * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=90)
      */
@@ -676,7 +662,9 @@ class CalendarEvents
             $objDate = new Date($v['new_repeat']);
             $aNew[$objDate->timestamp] = $objDate->timestamp;
         }
+
         ksort($aNew);
+
         $arrDates = [];
 
         foreach ($aNew as $v) {
@@ -717,7 +705,10 @@ class CalendarEvents
         $eventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($dc->activeRecord->id);
 
         if (null !== $eventReleaseLevelModel) {
-            $set = ['eventReleaseLevel' => $eventReleaseLevelModel->id];
+            $set = [
+                'eventReleaseLevel' => $eventReleaseLevelModel->id
+            ];
+
             $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
         }
     }
@@ -844,6 +835,7 @@ class CalendarEvents
 
                     if (null !== $objEventReleaseLevel) {
                         $objEventReleaseLevelPackage = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($objEvent->id);
+
                         // Adjust event release level when changing eventType...
                         if ($objEventReleaseLevel->pid !== $objEventReleaseLevelPackage->id) {
                             $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);

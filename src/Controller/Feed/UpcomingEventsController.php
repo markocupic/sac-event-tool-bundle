@@ -20,7 +20,7 @@ use Contao\Environment;
 use Contao\Events;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ForwardCompatibility\Result;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory;
 use Markocupic\RssFeedGeneratorBundle\Item\Item;
@@ -191,7 +191,7 @@ class UpcomingEventsController extends AbstractController
             ->where($qb->expr()->like('t.belongsToOrganization', $qb->expr()->literal('%'.$section.'%')))
         ;
 
-        $arrOrgIds = $qb->execute()->fetchAll(\PDO::FETCH_COLUMN, 0);
+        $arrOrgIds = $qb->executeQuery()->fetchFirstColumn();
 
         if (!\is_array($arrOrgIds) || empty($arrOrgIds)) {
             return null;
@@ -226,6 +226,6 @@ class UpcomingEventsController extends AbstractController
         $qb->orderBy('t.startDate', 'ASC');
         $qb->setMaxResults($limit);
 
-        return $qb->execute();
+        return $qb->executeQuery();
     }
 }

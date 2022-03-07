@@ -134,9 +134,9 @@ class ExecutePreActionsListener
                         ->setParameter('id', $objUser->id)
                         ->setMaxResults(1)
                     ;
-                    $result = $qb->execute();
+                    $stmt = $qb->executeQuery();
 
-                    if (false !== ($user = $result->fetch())) {
+                    if (false !== ($user = $stmt->fetchAssociative())) {
                         $arrSession = $stringUtilAdapter->deserialize($user['session'], true);
 
                         if (!isset($arrSession['editAllHelper'][$strKey])) {
@@ -169,9 +169,10 @@ class ExecutePreActionsListener
                         ->setParameter('id', $objUser->id)
                         ->setMaxResults(1)
                     ;
-                    $result = $qb->execute();
 
-                    if (false !== ($user = $result->fetch())) {
+                    $stmt = $qb->executeQuery();
+
+                    if (false !== ($user = $stmt->fetchAssociative())) {
                         $arrSession = $stringUtilAdapter->deserialize($user['session'], true);
                         $arrSession['editAllHelper'][$strKey] = $request->request->get('checkedItems');
                         $json['sessionData'] = $arrSession['editAllHelper'];
@@ -185,7 +186,7 @@ class ExecutePreActionsListener
                             ->setParameter('id', $objUser->id)
                             ->setParameter('session', serialize($arrSession))
                         ;
-                        $result = $qb->execute();
+                        $result = $qb->executeStatement();
                         $json['affectedRows'] = $result;
                         $json['status'] = 'success';
                     }

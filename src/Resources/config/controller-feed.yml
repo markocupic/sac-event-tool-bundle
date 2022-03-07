@@ -1,6 +1,8 @@
 services:
 
     Markocupic\SacEventToolBundle\Controller\Feed\UpcomingEventsController:
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         arguments:
             - '@contao.framework'
             - '@Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory'
