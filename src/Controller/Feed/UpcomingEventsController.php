@@ -20,7 +20,7 @@ use Contao\Environment;
 use Contao\Events;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ForwardCompatibility\Result;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory;
 use Markocupic\RssFeedGeneratorBundle\Item\Item;
@@ -149,36 +149,35 @@ class UpcomingEventsController extends AbstractController
             new Item('generator', $stringUtilAdapter->specialchars(self::class))
         );
 
-        $results = $this->getEvents($section, $limit);
+        $stmt = $this->getEvents($section, $limit);
 
-        if (null !== $results) {
-            while (false !== ($arrEvent = $results->fetch())) {
-                $eventsModel = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
+        while (false !== ($arrEvent = $stmt->fetchAssociative())) {
+            $eventsModel = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
 
-                $arrEvent = array_map(
-                    static fn ($varValue) => str_replace(['&quot;', '&#40;', '&#41;', '[-]', '&shy;', '[nbsp]', '&nbsp;'], ['"', '(', ')', '', '', ' ', ' '], $varValue),
-                    $arrEvent
-                );
-                $rss->addChannelItemField(
-                    new ItemGroup('item', [
-                        new Item('title', strip_tags($stringUtilAdapter->stripInsertTags($arrEvent['title'])), ['cdata' => true]),
-                        new Item('link', $stringUtilAdapter->specialchars($eventsAdapter->generateEventUrl($eventsModel, true))),
-                        new Item('description', strip_tags(preg_replace('/[\n\r]+/', ' ', $arrEvent['teaser'])), ['cdata' => true]),
-                        new Item('pubDate', date('r', (int) $eventsModel->startDate)),
-                        new Item('author', implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel))),
-                        //new Item('author',$calendarEventsHelperAdapter->getMainInstructorName($eventsModel)),
-                        new Item('guid', $stringUtilAdapter->specialchars($eventsAdapter->generateEventUrl($eventsModel, true))),
-                        new Item('tourdb:startdate', date('Y-m-d', (int) $eventsModel->startDate)),
-                        new Item('tourdb:enddate', date('Y-m-d', (int) $eventsModel->endDate)),
-                        //new Item('tourdb:eventtype',$arrEvent['eventType']),
-                        //new Item('tourdb:organizers',implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($eventsModel))),
-                        //new Item('tourdb:instructors',implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel))),
-                        //new Item('tourdb:tourtype',implode(', ', $calendarEventsHelperAdapter->getTourTypesAsArray($eventsModel, 'title'))),
-                        //new Item('tourdb:difficulty',implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($eventsModel))),
-                    ])
-                );
-            }
+            $arrEvent = array_map(
+                static fn ($varValue) => str_replace(['&quot;', '&#40;', '&#41;', '[-]', '&shy;', '[nbsp]', '&nbsp;'], ['"', '(', ')', '', '', ' ', ' '], $varValue),
+                $arrEvent
+            );
+            $rss->addChannelItemField(
+                new ItemGroup('item', [
+                    new Item('title', strip_tags($stringUtilAdapter->stripInsertTags($arrEvent['title'])), ['cdata' => true]),
+                    new Item('link', $stringUtilAdapter->specialchars($eventsAdapter->generateEventUrl($eventsModel, true))),
+                    new Item('description', strip_tags(preg_replace('/[\n\r]+/', ' ', $arrEvent['teaser'])), ['cdata' => true]),
+                    new Item('pubDate', date('r', (int) $eventsModel->startDate)),
+                    new Item('author', implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel))),
+                    //new Item('author',$calendarEventsHelperAdapter->getMainInstructorName($eventsModel)),
+                    new Item('guid', $stringUtilAdapter->specialchars($eventsAdapter->generateEventUrl($eventsModel, true))),
+                    new Item('tourdb:startdate', date('Y-m-d', (int) $eventsModel->startDate)),
+                    new Item('tourdb:enddate', date('Y-m-d', (int) $eventsModel->endDate)),
+                    //new Item('tourdb:eventtype',$arrEvent['eventType']),
+                    //new Item('tourdb:organizers',implode(', ', CalendarEventsHelper::getEventOrganizersAsArray($eventsModel))),
+                    //new Item('tourdb:instructors',implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($eventsModel))),
+                    //new Item('tourdb:tourtype',implode(', ', $calendarEventsHelperAdapter->getTourTypesAsArray($eventsModel, 'title'))),
+                    //new Item('tourdb:difficulty',implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($eventsModel))),
+                ])
+            );
         }
+
 
         return $rss->render($this->projectDir.'/web/'.$filePath);
     }
@@ -191,7 +190,7 @@ class UpcomingEventsController extends AbstractController
             ->where($qb->expr()->like('t.belongsToOrganization', $qb->expr()->literal('%'.$section.'%')))
         ;
 
-        $arrOrgIds = $qb->execute()->fetchAll(\PDO::FETCH_COLUMN, 0);
+        $arrOrgIds = $qb->fetchFirstColumn();
 
         if (!\is_array($arrOrgIds) || empty($arrOrgIds)) {
             return null;
@@ -205,10 +204,10 @@ class UpcomingEventsController extends AbstractController
             ->andWhere('t.startDate > :startDate')
             ->andWhere(
                 $qb->expr()->or(
-                    $qb->expr()->andX("t.eventType = 'tour'"),
-                    $qb->expr()->andX("t.eventType = 'course'"),
-                    $qb->expr()->andX("t.eventType = 'lastMinuteTour'"),
-                    $qb->expr()->andX("t.eventType = 'tour'"),
+                    $qb->expr()->and("t.eventType = 'tour'"),
+                    $qb->expr()->and("t.eventType = 'course'"),
+                    $qb->expr()->and("t.eventType = 'lastMinuteTour'"),
+                    $qb->expr()->and("t.eventType = 'tour'"),
                 )
             )
         ;
@@ -226,6 +225,6 @@ class UpcomingEventsController extends AbstractController
         $qb->orderBy('t.startDate', 'ASC');
         $qb->setMaxResults($limit);
 
-        return $qb->execute();
+        return $qb->executeQuery();
     }
 }
