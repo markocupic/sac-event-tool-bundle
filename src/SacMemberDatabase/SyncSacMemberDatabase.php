@@ -373,7 +373,7 @@ class SyncSacMemberDatabase
                     ->setParameter('isSacMember', '1')
                     ->setParameter('disable', '')
                     ->setParameter('login', '1')
-                    ->executeStatement()
+                    ->execute()
                 ;
             }
 

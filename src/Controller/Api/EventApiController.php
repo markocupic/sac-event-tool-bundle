@@ -18,6 +18,7 @@ use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\StringUtil;
+use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
@@ -61,6 +62,7 @@ class EventApiController extends AbstractController
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
+
     }
 
     /**
@@ -163,8 +165,7 @@ class EventApiController extends AbstractController
                 ->where('t.userId = :instructorId')
                 ->setParameter('instructorId', $userId)
             ;
-
-            $arrEvents = $qb2->executeQuery()->fetchFirstColumn();
+            $arrEvents = $qb2->execute()->fetchFirstColumn();
 
             $qb->andWhere($qb->expr()->in('t.id', ':arrEvents'));
             $qb->setParameter('arrEvents', $arrEvents, Connection::PARAM_INT_ARRAY);
@@ -193,7 +194,7 @@ class EventApiController extends AbstractController
                     ->where($qbSt->expr()->like('u.name', $qbSt->expr()->literal('%'.$strNeedle.'%')))
                 ;
 
-                $arrInst = $qbSt->executeQuery()->fetchFirstColumn();
+                $arrInst = $qbSt->execute()->fetchFirstColumn();
 
                 // Check if instructor is the instructor in this event
                 foreach ($arrInst as $instrId) {
@@ -220,7 +221,7 @@ class EventApiController extends AbstractController
                 ->setParameter('true', '1')
             ;
 
-            $arrIgnoredOrganizer = $qbEvtOrg->executeQuery()->fetchFirstColumn();
+            $arrIgnoredOrganizer = $qbEvtOrg->execute()->fetchFirstColumn();
 
             $orxOrg = $qb->expr()->orX();
 
@@ -311,7 +312,7 @@ class EventApiController extends AbstractController
         $query = $qb->getSQL();
 
         /** @var array $arrIds */
-        $arrIds = $qb->executeQuery()->fetchFirstColumn();
+        $arrIds = $qb->execute()->fetchFirstColumn();
 
         $endTime = microtime(true);
         $queryTime = $endTime - $startTime;
@@ -356,9 +357,10 @@ class EventApiController extends AbstractController
                 $qb->setMaxResults($param['limit']);
             }
 
-            $stmt = $qb->executeQuery();
+            /** @var PDOStatement $results */
+            $results = $qb->execute();
 
-            while (false !== ($arrEvent = $stmt->fetchAssociative())) {
+            while (false !== ($arrEvent = $results->fetchAssociative())) {
                 ++$arrJSON['meta']['countItems'];
                 $oData = null;
 

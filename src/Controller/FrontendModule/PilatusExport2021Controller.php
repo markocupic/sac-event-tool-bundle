@@ -55,7 +55,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     protected $model;
 
     /**
-     * @var
+     * @var 
      */
     protected $objForm;
 
@@ -419,11 +419,11 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             ->addOrderBy('t.startDate', 'ASC')
         ;
 
-        /** @var PDOStatement $stmt */
-        $stmt = $qb->executeQuery();
+        /** @var PDOStatement $results */
+        $results = $qb->execute();
 
-        while (false !== ($row = $stmt->fetchAssociative())) {
-            $objEvent = $calendarEventsModelAdapter->findByPk($row['id']);
+        while (false !== ($oEvent = $results->fetch(\PDO::FETCH_OBJ))) {
+            $objEvent = $calendarEventsModelAdapter->findByPk($oEvent->id);
 
             if (null === $objEvent) {
                 continue;
@@ -622,10 +622,11 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             ->addOrderBy('t1.startDate', 'ASC')
         ;
 
-        $stmt = $qb->executeQuery();
+        /** @var PDOStatement $results */
+        $results = $qb->execute();
 
-        while (false !== ($row = $stmt->fetchAssociative())) {
-            $eventModel = $calendarEventsModelAdapter->findByPk($row['id']);
+        while (false !== ($objEvent = $results->fetch(\PDO::FETCH_OBJ))) {
+            $eventModel = $calendarEventsModelAdapter->findByPk($objEvent->id);
 
             if (null === $eventModel) {
                 continue;
@@ -693,9 +694,9 @@ class PilatusExport2021Controller extends AbstractPrintExportController
         ;
 
         /** @var PDOStatement $resultsOrganizers */
-        $resultsOrganizers = $qbOrganizers->executeQuery();
+        $resultsOrganizers = $qbOrganizers->execute();
 
-        while (false !== ($arrOrganizer = $resultsOrganizers->fetchAssociative())) {
+        while (false !== ($objOrganizer = $resultsOrganizers->fetch(\PDO::FETCH_OBJ))) {
             $arrOrganizerEvents = [];
 
             /** @var QueryBuilder $qb */
@@ -714,10 +715,10 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             ;
 
             /** @var PDOStatement $resultsEvents */
-            $resultsEvents = $qbEvents->executeQuery();
+            $resultsEvents = $qbEvents->execute();
 
-            while (false !== ($arrEvent = $resultsEvents->fetchAssociative())) {
-                $eventModel = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
+            while (false !== ($objEvent = $resultsEvents->fetch(\PDO::FETCH_OBJ))) {
+                $eventModel = $calendarEventsModelAdapter->findByPk($objEvent->id);
 
                 if (null === $eventModel) {
                     continue;
@@ -725,7 +726,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
 
                 $arrOrganizers = $stringUtilAdapter->deserialize($eventModel->organizers, true);
 
-                if (!\in_array($arrOrganizer['id'], $arrOrganizers, false)) {
+                if (!\in_array($objOrganizer->id, $arrOrganizers, false)) {
                     continue;
                 }
 
@@ -754,8 +755,8 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             }
 
             $arrOrganizerContainer[] = [
-                'id' => $arrOrganizer['id'],
-                'title' => $arrOrganizer['title'],
+                'id' => $objOrganizer->id,
+                'title' => $objOrganizer->title,
                 'events' => $arrOrganizerEvents,
             ];
         }

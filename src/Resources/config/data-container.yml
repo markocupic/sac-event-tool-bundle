@@ -4,15 +4,6 @@ services:
             - '@request_stack'
             - '@database_connection'
 
-    Markocupic\SacEventToolBundle\DataContainer\CalendarEvents:
-        arguments:
-            - '@Markocupic\SacEventToolBundle\DataContainer\Util'
-            - '@contao.framework'
-            - '@request_stack'
-            - '@security.helper'
-            - '@database_connection'
-        public: true
-
     Markocupic\SacEventToolBundle\DataContainer\User:
         arguments:
             - '@contao.framework'

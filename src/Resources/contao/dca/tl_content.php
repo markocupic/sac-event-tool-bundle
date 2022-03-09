@@ -15,9 +15,19 @@ declare(strict_types=1);
 use Contao\BackendUser;
 use Contao\Input;
 use Contao\System;
+use Markocupic\SacEventToolBundle\Dca\TlContent;
 
 if ('sac_calendar_events_tool' === Input::get('do')) {
     $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_calendar_events';
+    $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = [
+        TlContent::class,
+        'checkPermission',
+    ];
+
+    $GLOBALS['TL_DCA']['tl_content']['list']['operations']['toggle']['button_callback'] = [
+        TlContent::class,
+        'toggleIcon',
+    ];
 }
 
 // Palettes

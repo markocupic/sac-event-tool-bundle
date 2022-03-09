@@ -253,11 +253,12 @@ class CalendarEventsHelper
 
             case 'gallery':
                 $value = static::getGallery([
+                    'aha' => 'bla',
                     'multiSRC' => $objEvent->multiSRC,
                     'orderSRC' => $objEvent->orderSRC,
                     'sortBy' => 'custom',
                     'perRow' => 4,
-                    'size' => $arrProperty[1] ?? serialize([400, 400, 'center_center', 'proportional']),
+                    'size' => serialize([400, 400, 'center_center', 'proportional']),
                     'fullsize' => true,
                     'galleryTpl' => 'gallery_bootstrap_col-4',
                 ]);

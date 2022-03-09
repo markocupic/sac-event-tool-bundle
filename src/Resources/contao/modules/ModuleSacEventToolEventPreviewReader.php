@@ -31,7 +31,6 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
-use Patchwork\Utf8;
 
 /**
  * Class ModuleSacEventToolEventPreviewReader.
@@ -54,7 +53,7 @@ class ModuleSacEventToolEventPreviewReader extends Events
             /** @var BackendTemplate|object $objTemplate */
             $objTemplate = new BackendTemplate('be_wildcard');
 
-            $objTemplate->wildcard = '### '.Utf8::strtoupper($GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'][0]).' ###';
+            $objTemplate->wildcard = '### '.$GLOBALS['TL_LANG']['FMD']['eventToolCalendarEventPreviewReader'][0].' ###';
             $objTemplate->title = $this->headline;
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
