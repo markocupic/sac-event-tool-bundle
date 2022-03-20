@@ -273,17 +273,34 @@ class ItemWatcher {
                  * @private
                  */
                 _initLightbox: function _initLightbox() {
-                    jQuery(function ($) {
-                        $('a[data-lightbox]').map(function () {
-                            $(this).colorbox({
-                                // Put custom options here
-                                loop: false,
-                                rel: $(this).attr('data-lightbox'),
-                                maxWidth: '95%',
-                                maxHeight: '95%'
+                    // GLightbox support
+                    if('undefined' !== typeof GLightbox)
+                    {
+                        (function(){
+                            'use strict';
+                            document.querySelectorAll('a[data-lightbox]').forEach((element) => {
+                                if (!!element.dataset.lightbox) {
+                                    element.setAttribute('data-gallery', element.dataset.lightbox);
+                                }
+                            });
+                            GLightbox({
+                                selector: 'a[data-lightbox]'
+                            });
+                        })();
+                    } else{
+                        // Colorbox support
+                        jQuery(function ($) {
+                            $('a[data-lightbox]').map(function () {
+                                $(this).colorbox({
+                                    // Put custom options here
+                                    loop: false,
+                                    rel: $(this).attr('data-lightbox'),
+                                    maxWidth: '95%',
+                                    maxHeight: '95%'
+                                });
                             });
                         });
-                    });
+                    }
                 },
 
                 /**
