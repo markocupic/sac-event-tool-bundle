@@ -11,7 +11,7 @@
     <div v-for="(row, index) of rows" class="col-xl-6 event-item event-item-course event layout_upcoming" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
       <div class="row">
         <!-- Start left col -->
-        <div class="col-sm-3 col-xl-5 d-none d-sm-block">
+        <div class="col-sm-3 col-xl-5 d-none d-sm-block image-zoom-in">
           <a v-bind:href="row.eventUrl" target="_blank" v-bind:title="row.title" v-html="row.eventImage" class="responsive event-title-link"></a>
         </div>
         <!-- Start right col -->

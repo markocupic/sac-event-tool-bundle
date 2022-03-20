@@ -66,9 +66,11 @@
         <p class="card-text fw-bold small ms-2">von <?= $story['authorName'] ?></p>
       </div>
       <?php if ($story['singleSRC']): ?>
-      <a href="<?= $story['href'] ?>" class="item-reader-link">
-        {{image::<?= $story['singleSRC']['uuid'] ?>?width=450&height=300&mode=crop&class=card-img-top}}
-      </a>
+      <div class="image-zoom-in">
+        <a href="<?= $story['href'] ?>" class="item-reader-link">
+          {{image::<?= $story['singleSRC']['uuid'] ?>?width=450&height=300&mode=crop&class=card-img-top}}
+        </a>
+      </div>
       <?php endif; ?>
       <div class="card-body">
         <p class="card-date m-0">
