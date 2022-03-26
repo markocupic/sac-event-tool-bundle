@@ -124,7 +124,9 @@
           <?php if (!$this->getEventData('disableOnlineRegistration')): ?>
           <div class="event-detail-buttons mt-3">
             <!-- book event button -->
+            <!-- indexer::continue -->
             {{insert_module::408}}
+            <!-- indexer::stop -->
           </div>
           <?php endif; ?>
         </div>
