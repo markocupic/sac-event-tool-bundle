@@ -1124,7 +1124,7 @@ class CalendarEventsHelper
      *
      * @return mixed|string|array<string>|null
      */
-    public function exportRegistrationListHook($field, $value, $strTable, $dataRecord, $dca)
+    public static function exportRegistrationListHook($field, $value, $strTable, $dataRecord, $dca)
     {
         if ('tl_calendar_events_member' === $strTable) {
             if ('dateOfBirth' === $field || 'addedOn' === $field) {
@@ -1158,7 +1158,7 @@ class CalendarEventsHelper
      * @param string $strInsertTag
      * @param false  $allowDuplicate
      */
-    public function getEventOrganizersLogoAsHtml(CalendarEventsModel $objEvent, $strInsertTag = '{{image::%s}}', $allowDuplicate = false): array
+    public static function getEventOrganizersLogoAsHtml(CalendarEventsModel $objEvent, $strInsertTag = '{{image::%s}}', $allowDuplicate = false): array
     {
         $arrHtml = [];
         $arrUuids = [];
