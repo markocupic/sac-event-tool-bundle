@@ -4,7 +4,7 @@
 <p class="back"><a href="javascript:history.go(-1)" title="Zurück">Zurück</a></p>
 
 <div class="event event-detailview layout_full block<?= $this->getEventData('class') ?>">
-  <?php if ($this->eventState): ?>
+  <?php if ($this->getEventData('eventState')): ?>
   <h4 class="event-state-headline mb-0"><?= $this->getEventData('eventStateLabel') ?></h4>
   <?php endif; ?>
 
