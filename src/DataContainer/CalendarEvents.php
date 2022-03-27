@@ -12,8 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Dca;
+namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\Backend;
 use Contao\BackendUser;
 use Contao\Calendar;
 use Contao\CalendarEventsModel;
@@ -21,7 +22,9 @@ use Contao\CalendarModel;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
-use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\CoreBundle\Framework\Adapter;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Date;
@@ -33,75 +36,88 @@ use Contao\EventTypeModel;
 use Contao\FilesModel;
 use Contao\Idna;
 use Contao\Image;
-use Contao\Input;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\TourDifficultyCategoryModel;
 use Contao\UserGroupModel;
 use Contao\UserModel;
-use Contao\Versions;
+use Doctrine\DBAL\Connection;
 use League\Csv\CharsetConverter;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Security;
 
-/**
- * Class TlCalendarEvents.
- */
-class TlCalendarEvents extends \tl_calendar_events
+class CalendarEvents extends Backend
 {
-    /**
-     * Import the back end user object.
-     */
-    public function __construct()
+    private ContaoFramework $framework;
+    private RequestStack $requestStack;
+    private Connection $connection;
+    private Util $util;
+    private Security $security;
+
+    private Adapter $backend;
+    private Adapter $calendarModel;
+    private Adapter $calendarEventsModel;
+    private Adapter $config;
+    private Adapter $controller;
+    private Adapter $date;
+    private Adapter $filesModel;
+    private Adapter $message;
+    private Adapter $stringUtil;
+    private Adapter $system;
+
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, Security $security)
     {
-        // Set correct referer
-        if ('sac_calendar_events_tool' === Input::get('do') && '' !== Input::get('ref')) {
-            $objSession = static::getContainer()->get('session');
-            $ref = Input::get('ref');
-            $session = $objSession->get('referer');
+        $this->framework = $framework;
+        $this->requestStack = $requestStack;
+        $this->connection = $connection;
+        $this->util = $util;
+        $this->security = $security;
 
-            if (isset($session[$ref]['tl_calendar_container'])) {
-                $session[$ref]['tl_calendar_container'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar_container']);
-                $objSession->set('referer', $session);
-            }
-
-            if (isset($session[$ref]['tl_calendar'])) {
-                $session[$ref]['tl_calendar'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar']);
-                $objSession->set('referer', $session);
-            }
-
-            if (isset($session[$ref]['tl_calendar_events'])) {
-                $session[$ref]['tl_calendar_events'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar_events']);
-                $objSession->set('referer', $session);
-            }
-
-            if (isset($session[$ref]['tl_calendar_events_instructor_invoice'])) {
-                $session[$ref]['tl_calendar_events_instructor_invoice'] = str_replace('do=calendar', 'do=sac_calendar_events_tool', $session[$ref]['tl_calendar_events_instructor_invoice']);
-                $objSession->set('referer', $session);
-            }
-        }
-
-        $this->import('BackendUser', 'User');
-
-        return parent::__construct();
+        $this->backend = $this->framework->getAdapter(Backend::class);
+        $this->calendarModel = $this->framework->getAdapter(CalendarModel::class);
+        $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
+        $this->config = $this->framework->getAdapter(Config::class);
+        $this->controller = $this->framework->getAdapter(Controller::class);
+        $this->date = $this->framework->getAdapter(Date::class);
+        $this->filesModel = $this->framework->getAdapter(FilesModel::class);
+        $this->message = $this->framework->getAdapter(Message::class);
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
+        $this->system = $this->framework->getAdapter(System::class);
     }
 
     /**
-     * Manipulate palette when creating a new datarecord.
+     * Set correct referer.
+     *
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=100)
+     */
+    public function setCorrectReferer(): void
+    {
+        $this->util->setCorrectReferer();
+    }
+
+    /**
+     * Set palette on creating new.
+     *
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=90)
      */
     public function setPaletteWhenCreatingNew(DataContainer $dc): void
     {
-        if ('edit' === Input::get('act')) {
-            $objCalendarEventsModel = CalendarEventsModel::findByPk($dc->id);
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ('edit' === $request->query->get('act')) {
+            $objCalendarEventsModel = $this->calendarEventsModel->findByPk($dc->id);
 
             if (null !== $objCalendarEventsModel) {
                 if (0 === (int) $objCalendarEventsModel->tstamp && empty($objCalendarEventsModel->eventType)) {
                     $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = 'eventType';
                 }
             }
-            /** @todo Den Teilnehmern weiterhin ermöglichen, sich anzumelden, auch wenn das Enddatum abgelaufen ist */
+
+            /** @todo Continue allowing members to register even after registration deadline has expired */
+
             // If event has been deferred
             if ('event_deferred' === $objCalendarEventsModel->eventState) {
                 PaletteManipulator::create()
@@ -116,15 +132,17 @@ class TlCalendarEvents extends \tl_calendar_events
     }
 
     /**
-     * Display differentfilters for each event types.
+     * Adjust filters depending on event type.
+     *
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=80)
      */
     public function setFilterSearchAndSortingBoard(DataContainer $dc): void
     {
-        if (CURRENT_ID > 0) {
-            $objCalendar = CalendarModel::findByPk(CURRENT_ID);
+        if (\defined('CURRENT_ID') && CURRENT_ID > 0) {
+            $objCalendar = $this->calendarModel->findByPk(CURRENT_ID);
 
             if (null !== $objCalendar) {
-                $arrAllowedEventTypes = StringUtil::deserialize($objCalendar->allowedEventTypes, true);
+                $arrAllowedEventTypes = $this->stringUtil->deserialize($objCalendar->allowedEventTypes, true);
 
                 if (!\in_array('tour', $arrAllowedEventTypes, true) && !\in_array('lastMinuteTour', $arrAllowedEventTypes, true)) {
                     $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType']['filter'] = false;
@@ -150,43 +168,49 @@ class TlCalendarEvents extends \tl_calendar_events
     }
 
     /**
-     * onload_callback onloadCallbackDeleteInvalidEvents.
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=80)
      */
     public function onloadCallbackDeleteInvalidEvents(DataContainer $dc): void
     {
-        $this->Database->prepare('DELETE FROM tl_calendar_events WHERE tstamp<? AND tstamp>? AND title=?')->execute(time() - 24 * 60 * 60, 0, '');
+        $this->connection->executeStatement(
+            'DELETE FROM tl_calendar_events WHERE tstamp < ? AND tstamp > ? AND title = ?',
+            [time() - 86400, 0, ''],
+        );
     }
 
     /**
-     * onload_callback onloadCallback.
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=70)
      */
     public function onloadCallback(DataContainer $dc): void
     {
+        $request = $this->requestStack->getCurrentRequest();
+
+        $user = $this->security->getUser();
+
         // Minimize header fields for default users
-        if (!$this->User->isAdmin) {
+        if (!$user->isAdmin) {
             $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['headerFields'] = ['title'];
         }
 
         // Minimize operations for default users
-        if (!$this->User->isAdmin) {
+        if (!$user->isAdmin) {
             unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['show']);
         }
 
         // Do not allow some specific global operations to default users
-        if (!$this->User->isAdmin) {
+        if (!$user->isAdmin) {
             unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year'], $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year']);
         }
 
         // Special treatment for tl_calendar_events.eventReleaseLevel
         // Do not allow multi edit on tl_calendar_events.eventReleaseLevel, if user does not habe write permissions on all levels
-        if ('editAll' === Input::get('act') || 'overrideAll' === Input::get('act')) {
+        if ('editAll' === $request->query->get('act') || 'overrideAll' === $request->query->get('act')) {
             $allow = true;
-            $objSession = System::getContainer()->get('session');
-            $session = $objSession->get('CURRENT');
+            $session = $request->getSession()->get('CURRENT');
             $arrIDS = $session['IDS'];
 
             foreach ($arrIDS as $eventId) {
-                $objEvent = CalendarEventsModel::findByPk($eventId);
+                $objEvent = $this->calendarEventsModel->findByPk($eventId);
 
                 if (null !== $objEvent) {
                     $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($eventId);
@@ -197,8 +221,8 @@ class TlCalendarEvents extends \tl_calendar_events
                         if (null !== $objReleaseLevelModel) {
                             while ($objReleaseLevelModel->next()) {
                                 $allow = false;
-                                $arrGroupsUserBelongsTo = StringUtil::deserialize($this->User->groups, true);
-                                $arrGroups = StringUtil::deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
+                                $arrGroupsUserBelongsTo = $this->stringUtil->deserialize($user->groups, true);
+                                $arrGroups = $this->stringUtil->deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
 
                                 foreach ($arrGroups as $k => $v) {
                                     if (\in_array($v['group'], $arrGroupsUserBelongsTo, false)) {
@@ -214,7 +238,7 @@ class TlCalendarEvents extends \tl_calendar_events
                 }
             }
 
-            if ($this->User->isAdmin || true === $allow) {
+            if ($user->isAdmin || true === $allow) {
                 PaletteManipulator::create()
                     ->addField(['eventReleaseLevel'], 'title_legend', PaletteManipulator::POSITION_APPEND)
                     ->applyToPalette('default', 'tl_calendar_events')
@@ -222,8 +246,8 @@ class TlCalendarEvents extends \tl_calendar_events
             }
         }
 
-        // Skip here if user is admin
-        if ($this->User->isAdmin) {
+        // Skip here if the user is an admin
+        if ($user->isAdmin) {
             return;
         }
 
@@ -240,49 +264,49 @@ class TlCalendarEvents extends \tl_calendar_events
         }
 
         // Prevent unauthorized publishing
-        if (Input::get('tid')) {
-            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->execute(Input::get('tid'));
+        if ($request->query->has('tid')) {
+            $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE id = ?')->execute($request->query->get('tid'));
 
             if ($objDb->next()) {
-                if (!EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objDb->id)) {
-                    Message::addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToPublishOrUnpublishEvent'], $objDb->id));
-                    $this->redirect($this->getReferer());
+                if (!EventReleaseLevelPolicyModel::hasWritePermission($user->id, $objDb->id)) {
+                    $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToPublishOrUnpublishEvent'], $objDb->id));
+                    $this->controller->redirect($this->system->getReferer());
                 }
             }
         }
 
         // Prevent unauthorized deletion
-        if ('delete' === Input::get('act')) {
-            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($dc->id);
+        if ('delete' === $request->query->get('act')) {
+            $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE id = ?')->limit(1)->execute($dc->id);
 
             if ($objDb->numRows) {
-                if (!EventReleaseLevelPolicyModel::canDeleteEvent($this->User->id, $objDb->id)) {
-                    Message::addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'], $objDb->id));
-                    $this->redirect($this->getReferer());
+                if (!EventReleaseLevelPolicyModel::canDeleteEvent($user->id, $objDb->id)) {
+                    $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'], $objDb->id));
+                    $this->controller->redirect($this->system->getReferer());
                 }
             }
         }
 
         // Prevent unauthorized editing
-        if ('edit' === Input::get('act')) {
-            $objEventsModel = CalendarEventsModel::findOneById(Input::get('id'));
+        if ('edit' === $request->query->get('act')) {
+            $objEventsModel = $this->calendarEventsModel->findOneById($request->query->get('id'));
 
             if (null !== $objEventsModel) {
                 if (null !== EventReleaseLevelPolicyModel::findByPk($objEventsModel->eventReleaseLevel)) {
-                    if (!EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objEventsModel->id) && $this->User->id !== $objEventsModel->registrationGoesTo) {
+                    if (!EventReleaseLevelPolicyModel::hasWritePermission($user->id, $objEventsModel->id) && $user->id !== $objEventsModel->registrationGoesTo) {
                         // User has no write access to the datarecord, that's why we display field values without a form input
                         foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $field) {
                             $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['input_field_callback'] = [self::class, 'showFieldValue'];
                         }
 
-                        if ('tl_calendar_events' === Input::post('FORM_SUBMIT')) {
-                            Message::addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'], $objEventsModel->id));
-                            $this->redirect($this->getReferer());
+                        if ('tl_calendar_events' === $request->request->get('FORM_SUBMIT')) {
+                            $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'], $objEventsModel->id));
+                            $this->controller->redirect($this->system->getReferer());
                         }
                     } else {
                         // Protect fields with $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEditingOnFirstReleaseLevelOnly'] === true,
                         // if the event is on the first release level
-                        if (!$this->User->isAdmin) {
+                        if (!$user->isAdmin) {
                             $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($objEventsModel->id);
 
                             if (null !== $objEventReleaseLevelPolicyPackageModel) {
@@ -307,27 +331,28 @@ class TlCalendarEvents extends \tl_calendar_events
         }
 
         // Allow select mode only, if an eventReleaseLevel filter is set
-        if ('select' === Input::get('act')) {
+        if ('select' === $request->query->get('act')) {
             /** @var AttributeBagInterface $objSessionBag */
-            $objSessionBag = System::getContainer()->get('session')->getBag('contao_backend');
+            $objSessionBag = $request->getSession()->getBag('contao_backend');
+
             $session = $objSessionBag->all();
+
             $filter = 4 === (int) $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['mode'] ? 'tl_calendar_events_'.CURRENT_ID : 'tl_calendar_events';
 
             if (!isset($session['filter'][$filter]['eventReleaseLevel'])) {
-                Message::addInfo('"Mehrere bearbeiten" nur möglich, wenn ein Freigabestufen-Filter gesetzt wurde."');
-                $this->redirect($this->getReferer());
-
-                return;
+                $this->message->addInfo('"Mehrere bearbeiten" nur möglich, wenn ein Freigabestufen-Filter gesetzt wurde."');
+                $this->controller->redirect($this->system->getReferer());
             }
         }
 
-        // Only list record where the logged in user has write permissions
-        if ('select' === Input::get('act') || 'editAll' === Input::get('act')) {
+        // Only list record if the logged in user has write permissions
+        if ('select' === $request->query->get('act') || 'editAll' === $request->query->get('act')) {
             $arrIDS = [0];
-            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE pid=?')->execute(CURRENT_ID);
+
+            $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE pid = ?')->execute(CURRENT_ID);
 
             while ($objDb->next()) {
-                if (EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $objDb->id)) {
+                if (EventReleaseLevelPolicyModel::hasWritePermission($user->id, $objDb->id)) {
                     $arrIDS[] = $objDb->id;
                 }
             }
@@ -336,23 +361,27 @@ class TlCalendarEvents extends \tl_calendar_events
 
         // Do not allow editing write protected fields in editAll mode
         // Use input_field_callback to only display the field values without the form input field
-        if ('editAll' === Input::get('act') || 'overrideAll' === Input::get('act')) {
-            $objSession = System::getContainer()->get('session');
-            $session = $objSession->get('CURRENT');
+        if ('editAll' === $request->query->get('act') || 'overrideAll' === $request->query->get('act')) {
+
+            $session = $request->getSession()->get('CURRENT');
             $arrIDS = $session['IDS'];
 
             if (!empty($arrIDS) && \is_array($arrIDS)) {
-                $objEventsModel = CalendarEventsModel::findByPk($arrIDS[1]);
+                $objEventsModel = $this->calendarEventsModel->findByPk($arrIDS[1]);
 
                 if (null !== $objEventsModel) {
                     if ($objEventsModel->eventReleaseLevel > 0) {
                         $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEventsModel->id);
 
                         if (null !== $objEventReleaseLevelPolicyModel) {
+
                             if ($objEventReleaseLevelPolicyModel->id !== $objEventsModel->eventReleaseLevel) {
+
                                 foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldname) {
+
                                     if (true === $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEditingOnFirstReleaseLevelOnly']) {
-                                        if ('editAll' === Input::get('act')) {
+
+                                        if ('editAll' === $request->query->get('act')) {
                                             $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['input_field_callback'] = [self::class, 'showFieldValue'];
                                         } else {
                                             unset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]);
@@ -368,24 +397,27 @@ class TlCalendarEvents extends \tl_calendar_events
     }
 
     /**
-     * onload_callback onloadCallbackSetPalettes
      * Set palette for course, tour, tour_report, etc.
+     *
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=60)
      */
     public function onloadCallbackSetPalettes(DataContainer $dc): void
     {
-        if ('editAll' === Input::get('act') || 'overrideAll' === Input::get('act')) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$dc || 'editAll' === $request->query->get('act') || 'overrideAll' === $request->query->get('act')) {
             return;
         }
 
         if ($dc->id > 0) {
-            if ('writeTourReport' === Input::get('call')) {
+            if ('writeTourReport' === $request->query->get('call')) {
                 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour_report'];
 
                 return;
             }
 
             // Set palette for tour and course
-            $objCalendarEventsModel = CalendarEventsModel::findByPk($dc->id);
+            $objCalendarEventsModel = $this->calendarEventsModel->findByPk($dc->id);
 
             if (null !== $objCalendarEventsModel) {
                 if (isset($GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][$objCalendarEventsModel->eventType])) {
@@ -396,12 +428,15 @@ class TlCalendarEvents extends \tl_calendar_events
     }
 
     /**
-     * onload_callback onloadCallbackExportCalendar
      * CSV-export of all events of a calendar.
+     *
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=50)
      */
     public function onloadCallbackExportCalendar(DataContainer $dc): void
     {
-        if ('onloadCallbackExportCalendar' === Input::get('action') && Input::get('id') > 0) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ('onloadCallbackExportCalendar' === $request->query->get('action') && $request->query->get('id') > 0) {
             // Create empty document
             $csv = Writer::createFromString('');
 
@@ -409,6 +444,7 @@ class TlCalendarEvents extends \tl_calendar_events
             $encoder = (new CharsetConverter())
                 ->outputEncoding('iso-8859-15')
             ;
+
             $csv->addFormatter($encoder);
 
             // Set delimiter
@@ -418,16 +454,18 @@ class TlCalendarEvents extends \tl_calendar_events
             $arrFields = ['id', 'title', 'eventDates', 'organizers', 'mainInstructor', 'instructor', 'eventType', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel'];
 
             // Insert headline first
-            Controller::loadLanguageFile('tl_calendar_events');
+            $this->controller->loadLanguageFile('tl_calendar_events');
+
             $arrHeadline = array_map(
                 static fn ($field) => $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?? $field,
                 $arrFields
             );
+
             $csv->insertOne($arrHeadline);
 
-            $objEvent = CalendarEventsModel::findBy(
-                ['tl_calendar_events.pid=?'],
-                [Input::get('id')],
+            $objEvent = $this->calendarEventsModel->findBy(
+                ['tl_calendar_events.pid = ?'],
+                [$request->query->get('id')],
                 ['order' => 'tl_calendar_events.startDate ASC']
             );
 
@@ -445,7 +483,7 @@ class TlCalendarEvents extends \tl_calendar_events
                         } elseif ('eventDates' === $field) {
                             $arrTimestamps = CalendarEventsHelper::getEventTimestamps($objEvent->current());
                             $arrDates = array_map(
-                                static fn ($tstamp) => Date::parse(Config::get('dateFormat'), $tstamp),
+                                static fn ($tstamp) => $this->date->parse($this->config->get('dateFormat'), $tstamp),
                                 $arrTimestamps
                             );
                             $arrRow[] = implode(',', $arrDates);
@@ -465,31 +503,36 @@ class TlCalendarEvents extends \tl_calendar_events
                             $arrRow[] = $objEvent->{$field};
                         }
                     }
+
                     $csv->insertOne($arrRow);
                 }
             }
 
-            $objCalendar = CalendarModel::findByPk(Input::get('id'));
+            $objCalendar = $this->calendarModel->findByPk($request->query->get('id'));
             $csv->output($objCalendar->title.'.csv');
             exit;
         }
     }
 
     /**
-     * onload_callback onloadCallbackShiftEventDates
      * Shift all event dates of a certain calendar by +/- 1 year
      * https://somehost/contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=21&transformDate=+52weeks&rt=hUFF18TV1YCLddb-Cyb48dRH8y_9iI-BgM-Nc1rB8o8&ref=2sjHl6mB.
+     *
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=40)
      */
     public function onloadCallbackShiftEventDates(DataContainer $dc): void
     {
-        if (Input::get('transformDates')) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ($request->query->get('transformDates')) {
+
             // $mode may be "+52weeks" or "+1year"
-            $mode = Input::get('transformDates');
+            $mode = $request->query->get('transformDates');
 
             if (false !== strtotime($mode)) {
-                $calendarId = Input::get('id');
+                $calendarId = $request->query->get('id');
 
-                $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE pid=?')->execute($calendarId);
+                $objEvent = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE pid = ?')->execute($calendarId);
 
                 while ($objEvent->next()) {
                     $set['startTime'] = strtotime($mode, (int) $objEvent->startTime);
@@ -505,7 +548,7 @@ class TlCalendarEvents extends \tl_calendar_events
                         $set['registrationEndDate'] = strtotime($mode, (int) $objEvent->registrationEndDate);
                     }
 
-                    $arrRepeats = StringUtil::deserialize($objEvent->eventDates, true);
+                    $arrRepeats = $this->stringUtil->deserialize($objEvent->eventDates, true);
                     $newArrRepeats = [];
 
                     if (\count($arrRepeats) > 0) {
@@ -515,52 +558,59 @@ class TlCalendarEvents extends \tl_calendar_events
                         }
                         $set['eventDates'] = serialize($newArrRepeats);
                     }
-                    $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
+
+                    Database::getInstance()->prepare('UPDATE tl_calendar_events %s WHERE id = ?')->set($set)->execute($objEvent->id);
                 }
             }
+
             // Redirect
-            $this->redirect($this->getReferer());
+            $this->controller->redirect($this->system->getReferer());
         }
     }
 
     /**
-     * oncreate_callback oncreateCallback.
+     * @Callback(table="tl_calendar_events", target="config.oncreate", priority=100)
      */
-    public function oncreateCallback($strTable, $insertId, $set, DataContainer $dc): void
+    public function oncreateNew($strTable, $insertId, $set, DataContainer $dc): void
     {
+        $user = $this->security->getUser();
+
         // Set source, add author, set first release level and & set customEventRegistrationConfirmationEmailText on creating new events
-        $objEventsModel = CalendarEventsModel::findByPk($insertId);
+        $objEventsModel = $this->calendarEventsModel->findByPk($insertId);
 
         if (null !== $objEventsModel) {
             // Set source always to "default"
             $objEventsModel->source = 'default';
 
             // Set logged in User as author
-            $objEventsModel->author = $this->User->id;
-            $objEventsModel->mainInstructor = $this->User->id;
-            $objEventsModel->instructor = serialize([['instructorId' => $this->User->id]]);
+            $objEventsModel->author = $user->id;
+            $objEventsModel->mainInstructor = $user->id;
+            $objEventsModel->instructor = serialize([['instructorId' => $user->id]]);
 
             // Set customEventRegistrationConfirmationEmailText
-            $objEventsModel->customEventRegistrationConfirmationEmailText = str_replace('{{br}}', "\n", System::getContainer()->getParameter('sacevt.event.accept_registration_email_body'));
+            $objEventsModel->customEventRegistrationConfirmationEmailText = str_replace('{{br}}', "\n", $this->system->getContainer()->getParameter('sacevt.event.accept_registration_email_body'));
 
             $objEventsModel->save();
         }
     }
 
     /**
-     * oncopy_callback oncopyCallback.
+     * @Callback(table="tl_calendar_events", target="config.oncopy", priority=100)
      *
      * @param $insertId
      */
-    public function oncopyCallback($insertId, DataContainer $dc): void
+    public function oncopy($insertId, DataContainer $dc): void
     {
+        $user = $this->security->getUser();
+
         // Add author and set first release level on creating new events
-        $objEventsModel = CalendarEventsModel::findByPk($insertId);
+        $objEventsModel = $this->calendarEventsModel->findByPk($insertId);
 
         if (null !== $objEventsModel) {
-            // Set logged in User as author
-            $objEventsModel->author = $this->User->id;
-            $objEventsModel->eventToken = $this->generateEventToken($insertId);
+
+            // Set logged in user as author
+            $objEventsModel->author = $user->id;
+            $objEventsModel->eventToken = $this->generateEventToken((int) $insertId);
             $objEventsModel->save();
 
             // Set eventReleaseLevel
@@ -578,26 +628,30 @@ class TlCalendarEvents extends \tl_calendar_events
     /**
      * ondelete_callback ondeleteCallback
      * Do not allow to non-admins deleting records if there are child records (event registrations) in tl_calendar_events_member.
+     *
+     * @Callback(table="tl_calendar_events", target="config.ondelete", priority=100)
      */
     public function ondeleteCallback(DataContainer $dc): void
     {
+        $user = $this->security->getUser();
+
         // Return if there is no ID
         if (!$dc->activeRecord) {
             return;
         }
 
-        if (!$this->User->admin) {
-            $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=?')->execute($dc->activeRecord->id);
+        if (!$user->admin) {
+            $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId = ?')->execute($dc->activeRecord->id);
 
             if ($objDb->numRows) {
-                Message::addError(sprintf($GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'], $dc->activeRecord->id));
-                $this->redirect($this->getReferer());
+                $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'], $dc->activeRecord->id));
+                $this->controller->redirect($this->system->getReferer());
             }
         }
     }
 
     /**
-     * onsubmit_callback adjustImageSize().
+     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=100)
      */
     public function adjustImageSize(DataContainer $dc): void
     {
@@ -607,11 +661,16 @@ class TlCalendarEvents extends \tl_calendar_events
         }
 
         $arrSet['size'] = serialize(['', '', 11]);
-        $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($dc->activeRecord->id);
+
+        Database::getInstance()
+            ->prepare('UPDATE tl_calendar_events %s WHERE id = ?')
+            ->set($arrSet)
+            ->execute($dc->activeRecord->id)
+        ;
     }
 
     /**
-     * onsubmit_callback adjustEndDate().
+     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=90)
      */
     public function adjustEndDate(DataContainer $dc): void
     {
@@ -620,7 +679,7 @@ class TlCalendarEvents extends \tl_calendar_events
             return;
         }
 
-        $arrDates = StringUtil::deserialize($dc->activeRecord->eventDates);
+        $arrDates = $this->stringUtil->deserialize($dc->activeRecord->eventDates);
 
         if (!\is_array($arrDates) || empty($arrDates)) {
             return;
@@ -632,11 +691,13 @@ class TlCalendarEvents extends \tl_calendar_events
             $objDate = new Date($v['new_repeat']);
             $aNew[$objDate->timestamp] = $objDate->timestamp;
         }
+
         ksort($aNew);
+
         $arrDates = [];
 
         foreach ($aNew as $v) {
-            // Save as timestamp
+            // Save as a timestamp
             $arrDates[] = ['new_repeat' => $v];
         }
         $arrSet = [];
@@ -648,11 +709,16 @@ class TlCalendarEvents extends \tl_calendar_events
         $arrSet['endDate'] = $endTime;
         $arrSet['startDate'] = $startTime;
         $arrSet['startTime'] = $startTime;
-        $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($dc->activeRecord->id);
+
+        Database::getInstance()
+            ->prepare('UPDATE tl_calendar_events %s WHERE id = ?')
+            ->set($arrSet)
+            ->execute($dc->activeRecord->id)
+        ;
     }
 
     /**
-     * onsubmit_callback adjustEventReleaseLevel().
+     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=80)
      */
     public function adjustEventReleaseLevel(DataContainer $dc): void
     {
@@ -670,12 +736,17 @@ class TlCalendarEvents extends \tl_calendar_events
 
         if (null !== $eventReleaseLevelModel) {
             $set = ['eventReleaseLevel' => $eventReleaseLevelModel->id];
-            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
+
+            Database::getInstance()
+                ->prepare('UPDATE tl_calendar_events %s WHERE id = ?')
+                ->set($set)
+                ->execute($dc->activeRecord->id)
+            ;
         }
     }
 
     /**
-     * onsubmit_callback setEventToken().
+     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=70)
      */
     public function setEventToken(DataContainer $dc): void
     {
@@ -684,21 +755,24 @@ class TlCalendarEvents extends \tl_calendar_events
             return;
         }
 
-        $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
+        $objEvent = $this->calendarEventsModel->findByPk($dc->activeRecord->id);
 
         if (null !== $objEvent) {
             if (false === strpos($objEvent->eventToken, '-'.$dc->activeRecord->id)) {
-                $objEvent->eventToken = $this->generateEventToken($dc->activeRecord->id);
+                $objEvent->eventToken = $this->generateEventToken((int) $dc->activeRecord->id);
                 $objEvent->save();
             }
         }
 
-        $strToken = $this->generateEventToken($dc->activeRecord->id);
-        $this->Database->prepare('UPDATE tl_calendar_events SET eventToken=? WHERE id=? AND eventToken=?')->execute($strToken, $dc->activeRecord->id, '');
+        $strToken = $this->generateEventToken((int) $dc->activeRecord->id);
+        Database::getInstance()
+            ->prepare('UPDATE tl_calendar_events SET eventToken = ? WHERE id = ? AND eventToken = ?')
+            ->execute($strToken, $dc->activeRecord->id, '')
+        ;
     }
 
     /**
-     * onsubmit_callback adjustDurationInfo().
+     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=60)
      */
     public function adjustDurationInfo(DataContainer $dc): void
     {
@@ -707,7 +781,7 @@ class TlCalendarEvents extends \tl_calendar_events
             return;
         }
 
-        $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
+        $objEvent = $this->calendarEventsModel->findByPk($dc->activeRecord->id);
 
         if (null !== $objEvent) {
             $arrTimestamps = CalendarEventsHelper::getEventTimestamps($objEvent);
@@ -724,8 +798,13 @@ class TlCalendarEvents extends \tl_calendar_events
                         if ($duration !== $countTimestamps) {
                             $arrSet = [];
                             $arrSet['durationInfo'] = '';
-                            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($objEvent->id);
-                            Message::addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein. Setzen SIe für jeden Event-Tag eine Datumszeile!', $objEvent->title, $objEvent->id), TL_MODE);
+
+                            Database::getInstance()
+                                ->prepare('UPDATE tl_calendar_events %s WHERE id = ?')
+                                ->set($arrSet)->execute($objEvent->id)
+                            ;
+
+                            $this->message->addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein. Setzen SIe für jeden Event-Tag eine Datumszeile!', $objEvent->title, $objEvent->id), TL_MODE);
                         }
                     }
                 }
@@ -734,7 +813,7 @@ class TlCalendarEvents extends \tl_calendar_events
     }
 
     /**
-     * onsubmit_callback adjustRegistrationPeriod().
+     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=50)
      */
     public function adjustRegistrationPeriod(DataContainer $dc): void
     {
@@ -743,7 +822,11 @@ class TlCalendarEvents extends \tl_calendar_events
             return;
         }
 
-        $objDb = $this->Database->prepare('SELECT * FROM tl_calendar_events WHERE id=?')->limit(1)->execute($dc->activeRecord->id);
+        $objDb = Database::getInstance()
+            ->prepare('SELECT * FROM tl_calendar_events WHERE id = ?')
+            ->limit(1)
+            ->execute($dc->activeRecord->id)
+        ;
 
         if ($objDb->numRows > 0) {
             if ($objDb->setRegistrationPeriod) {
@@ -752,28 +835,33 @@ class TlCalendarEvents extends \tl_calendar_events
 
                 if ($regEndDate > $objDb->startDate) {
                     $regEndDate = $objDb->startDate;
-                    Message::addInfo($GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck'], TL_MODE);
+                    $this->message->addInfo($GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck'], TL_MODE);
                 }
 
                 if ($regStartDate > $regEndDate) {
                     $regStartDate = $regEndDate - 86400;
-                    Message::addInfo($GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck'], TL_MODE);
+                    $this->message->addInfo($GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck'], TL_MODE);
                 }
                 $arrSet['registrationStartDate'] = $regStartDate;
                 $arrSet['registrationEndDate'] = $regEndDate;
-                $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($objDb->id);
+
+                Database::getInstance()
+                    ->prepare('UPDATE tl_calendar_events %s WHERE id = ?')
+                    ->set($arrSet)->execute($objDb->id)
+                ;
             }
         }
     }
 
     /**
-     * onsubmit_callback onsubmitCallback
-     * Set alias.
+     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=40)
      */
-    public function onsubmitCallback(DataContainer $dc): void
+    public function setAlias(DataContainer $dc): void
     {
+        $request = $this->requestStack->getCurrentRequest();
+
         // Set correct eventReleaseLevel
-        $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
+        $objEvent = $this->calendarEventsModel->findByPk($dc->activeRecord->id);
 
         if (null !== $objEvent) {
             if ('' !== $objEvent->eventType) {
@@ -788,39 +876,55 @@ class TlCalendarEvents extends \tl_calendar_events
 
                             if (null !== $oEventReleaseLevelModel) {
                                 $set = ['eventReleaseLevel' => $oEventReleaseLevelModel->id];
-                                $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
+
+                                Database::getInstance()
+                                    ->prepare('UPDATE tl_calendar_events %s WHERE id = ?')
+                                    ->set($set)->execute($objEvent->id)
+                                ;
                             }
                         }
                     }
                 } else {
                     // Add eventReleaseLevel when creating a new event...
                     $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
+
                     $set = ['eventReleaseLevel' => $oEventReleaseLevelModel->id];
-                    $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
+
+                    Database::getInstance()
+                        ->prepare('UPDATE tl_calendar_events %s WHERE id = ?')
+                        ->set($set)
+                        ->execute($objEvent->id)
+                    ;
                 }
             }
         }
         // End set correct eventReleaseLevel
 
         // Set filledInEventReportForm, now the invoice form can be printed in tl_calendar_events_instructor_invoice
-        if ('writeTourReport' === Input::get('call')) {
+        if ('writeTourReport' === $request->query->get('call')) {
+
             $set = ['filledInEventReportForm' => '1'];
-            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
+
+            Database::getInstance()
+                ->prepare('UPDATE tl_calendar_events %s WHERE id = ?')
+                ->set($set)
+                ->execute($dc->activeRecord->id)
+            ;
         }
 
         $set = ['alias' => 'event-'.$dc->id];
-        $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->activeRecord->id);
+
+        Database::getInstance()
+            ->prepare('UPDATE tl_calendar_events %s WHERE id = ?')
+            ->set($set)
+            ->execute($dc->activeRecord->id)
+        ;
     }
 
     /**
-     * input_field_callback showFieldValue.
-     *
-     * @param $dc
-     * @param $field
-     *
-     * @return string
+     * @Callback(table="tl_calendar_events", target="fields.alias.input_field", priority=100)
      */
-    public function showFieldValue(DataContainer $dc)
+    public function showFieldValue(DataContainer $dc): string
     {
         $field = $dc->field;
 
@@ -831,7 +935,8 @@ class TlCalendarEvents extends \tl_calendar_events
         }
         $intId = $dc->activeRecord->id;
 
-        $objRow = $this->Database->prepare('SELECT '.$field.' FROM tl_calendar_events WHERE id=?')
+        $objRow = Database::getInstance()
+            ->prepare('SELECT '.$field.' FROM tl_calendar_events WHERE id = ?')
             ->limit(1)
             ->execute($intId)
         ;
@@ -869,7 +974,7 @@ class TlCalendarEvents extends \tl_calendar_events
                 continue;
             }
 
-            $value = StringUtil::deserialize($row[$i]);
+            $value = $this->stringUtil->deserialize($row[$i]);
 
             // Decrypt the value
             if (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['encrypt']) && true === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['encrypt']) {
@@ -889,7 +994,7 @@ class TlCalendarEvents extends \tl_calendar_events
                     $arrDate = [];
 
                     foreach ($value as $arrTstamp) {
-                        $arrDate[] = Date::parse('D, d.m.Y', $arrTstamp['new_repeat']);
+                        $arrDate[] = $this->date->parse('D, d.m.Y', $arrTstamp['new_repeat']);
                     }
                     $row[$i] = implode('<br>', $arrDate);
                 }
@@ -939,12 +1044,20 @@ class TlCalendarEvents extends \tl_calendar_events
                     $strDiff = '';
 
                     if (\strlen((string) $difficulty['tourTechDifficultyMin']) && \strlen($difficulty['tourTechDifficultyMax'])) {
-                        $objDiff = $this->Database->prepare('SELECT * FROM tl_tour_difficulty WHERE id=?')->limit(1)->execute((int) ($difficulty['tourTechDifficultyMin']));
+                        $objDiff = Database::getInstance()
+                            ->prepare('SELECT * FROM tl_tour_difficulty WHERE id = ?')
+                            ->limit(1)
+                            ->execute((int) ($difficulty['tourTechDifficultyMin']))
+                        ;
 
                         if ($objDiff->numRows) {
                             $strDiff = $objDiff->shortcut;
                         }
-                        $objDiff = $this->Database->prepare('SELECT * FROM tl_tour_difficulty WHERE id=?')->limit(1)->execute((int) ($difficulty['tourTechDifficultyMax']));
+                        $objDiff = Database::getInstance()
+                            ->prepare('SELECT * FROM tl_tour_difficulty WHERE id = ?')
+                            ->limit(1)
+                            ->execute((int) $difficulty['tourTechDifficultyMax'])
+                        ;
 
                         if ($objDiff->numRows) {
                             $max = $objDiff->shortcut;
@@ -953,11 +1066,17 @@ class TlCalendarEvents extends \tl_calendar_events
 
                         $arrDiff[] = $strDiff;
                     } elseif (\strlen((string) $difficulty['tourTechDifficultyMin'])) {
-                        $objDiff = $this->Database->prepare('SELECT * FROM tl_tour_difficulty WHERE id=?')->limit(1)->execute((int) ($difficulty['tourTechDifficultyMin']));
+
+                        $objDiff = Database::getInstance()
+                            ->prepare('SELECT * FROM tl_tour_difficulty WHERE id = ?')
+                            ->limit(1)
+                            ->execute((int) $difficulty['tourTechDifficultyMin'])
+                        ;
 
                         if ($objDiff->numRows) {
                             $strDiff = $objDiff->shortcut;
                         }
+
                         $arrDiff[] = $strDiff;
                     }
                 }
@@ -970,7 +1089,8 @@ class TlCalendarEvents extends \tl_calendar_events
                 $chunks = explode('.', $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['foreignKey'], 2);
 
                 foreach ((array) $value as $v) {
-                    $objKey = $this->Database->prepare('SELECT '.$chunks[1].' AS value FROM '.$chunks[0].' WHERE id=?')
+                    $objKey = Database::getInstance()
+                        ->prepare('SELECT '.$chunks[1].' AS value FROM '.$chunks[0].' WHERE id = ?')
                         ->limit(1)
                         ->execute($v)
                     ;
@@ -984,8 +1104,8 @@ class TlCalendarEvents extends \tl_calendar_events
             } elseif ('fileTree' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] || \in_array($i, $arrOrder, true)) {
                 if (\is_array($value)) {
                     foreach ($value as $kk => $vv) {
-                        if (($objFile = FilesModel::findByUuid($vv)) instanceof FilesModel) {
-                            $value[$kk] = $objFile->path.' ('.StringUtil::binToUuid($vv).')';
+                        if (($objFile = $this->filesModel->findByUuid($vv)) instanceof FilesModel) {
+                            $value[$kk] = $objFile->path.' ('.$this->stringUtil->binToUuid($vv).')';
                         } else {
                             $value[$kk] = '';
                         }
@@ -993,8 +1113,8 @@ class TlCalendarEvents extends \tl_calendar_events
 
                     $row[$i] = implode('<br>', $value);
                 } else {
-                    if (($objFile = FilesModel::findByUuid($value)) instanceof FilesModel) {
-                        $row[$i] = $objFile->path.' ('.StringUtil::binToUuid($value).')';
+                    if (($objFile = $this->filesModel->findByUuid($value)) instanceof FilesModel) {
+                        $row[$i] = $objFile->path.' ('.$this->stringUtil->binToUuid($value).')';
                     } else {
                         $row[$i] = '';
                     }
@@ -1013,17 +1133,17 @@ class TlCalendarEvents extends \tl_calendar_events
                     $row[$i] = implode('<br>', $value);
                 }
             } elseif ('date' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp']) {
-                $row[$i] = $value ? Date::parse(Config::get('dateFormat'), $value) : '-';
+                $row[$i] = $value ? $this->date->parse($this->config->get('dateFormat'), $value) : '-';
             } elseif ('time' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp']) {
-                $row[$i] = $value ? Date::parse(Config::get('timeFormat'), $value) : '-';
+                $row[$i] = $value ? $this->date->parse($this->config->get('timeFormat'), $value) : '-';
             } elseif ('datim' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] || (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['flag']) && \in_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['flag'], [5, 6, 7, 8, 9, 10], false)) || 'tstamp' === $i) {
-                $row[$i] = $value ? Date::parse(Config::get('datimFormat'), $value) : '-';
+                $row[$i] = $value ? $this->date->parse($this->config->get('datimFormat'), $value) : '-';
             } elseif ('checkbox' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] && !$GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['multiple']) {
                 $row[$i] = $value ? $GLOBALS['TL_LANG']['MSC']['yes'] : $GLOBALS['TL_LANG']['MSC']['no'];
             } elseif ('email' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp']) {
                 $row[$i] = Idna::decodeEmail($value);
             } elseif ('textarea' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] && ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['allowHtml'] || $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['preserveTags'])) {
-                $row[$i] = StringUtil::specialchars($value);
+                $row[$i] = $this->stringUtil->specialchars($value);
             } elseif (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference']) && \is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'])) {
                 $row[$i] = isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]]) ? (\is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]]) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]][0] : $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]]) : $row[$i];
             } elseif ((isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['isAssociative']) && $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['isAssociative']) || (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options']) && array_is_assoc($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options']))) {
@@ -1063,14 +1183,12 @@ class TlCalendarEvents extends \tl_calendar_events
     }
 
     /**
-     * @param $arrValues
-     *
-     * @return array|string|null
+     * @Callback(table="tl_calendar_events", target="fields.eventDates.load", priority=100)
      */
-    public function loadCallbackeventDates($arrValues, DataContainer $dc)
+    public function loadCallbackEventDates(?string $arrValues, DataContainer $dc): array
     {
         if ('' !== $arrValues) {
-            $arrValues = StringUtil::deserialize($arrValues, true);
+            $arrValues = $this->stringUtil->deserialize($arrValues, true);
 
             if (isset($arrValues[0])) {
                 if ($arrValues[0]['new_repeat'] <= 0) {
@@ -1086,14 +1204,13 @@ class TlCalendarEvents extends \tl_calendar_events
     /**
      * buttons_callback buttonsCallback.
      *
-     * @param $arrButtons
-     * @param $dc
-     *
-     * @return mixed
+     * @Callback(table="tl_calendar_events", target="edit.buttons", priority=100)
      */
     public function buttonsCallback($arrButtons, $dc)
     {
-        if ('writeTourReport' === Input::get('call')) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ('writeTourReport' === $request->query->get('call')) {
             unset($arrButtons['saveNcreate'], $arrButtons['saveNduplicate'], $arrButtons['saveNedit']);
         }
 
@@ -1101,15 +1218,16 @@ class TlCalendarEvents extends \tl_calendar_events
     }
 
     /**
-     * @return array
+     * @Callback(table="tl_calendar_events", target="fields.durationInfo.options", priority=100)
      */
-    public function optionsCallbackGetEventDuration()
+    public function optionsCallbackGetEventDuration(): array
     {
         if (!empty($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo']) && \is_array($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'])) {
             $opt = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'];
         } else {
             $opt = [];
         }
+
         $arrOpt = [];
 
         foreach (array_keys($opt) as $k) {
@@ -1120,12 +1238,15 @@ class TlCalendarEvents extends \tl_calendar_events
     }
 
     /**
-     * @return array
+     * @Callback(table="tl_calendar_events", target="fields.organizers.options", priority=100)
      */
-    public function optionsCallbackGetOrganizers()
+    public function optionsCallbackGetOrganizers(): array
     {
         $arrOptions = [];
-        $objOrganizer = Database::getInstance()->prepare('SELECT * FROM tl_event_organizer ORDER BY sorting')->execute();
+        $objOrganizer = Database::getInstance()
+            ->prepare('SELECT * FROM tl_event_organizer ORDER BY sorting')
+            ->execute()
+        ;
 
         while ($objOrganizer->next()) {
             $arrOptions[$objOrganizer->id] = $objOrganizer->title;
@@ -1135,12 +1256,14 @@ class TlCalendarEvents extends \tl_calendar_events
     }
 
     /**
-     * @return array
+     * @Callback(table="tl_calendar_events", target="fields.courseTypeLevel0.options", priority=100)
      */
-    public function optionsCallbackCourseTypeLevel0()
+    public function optionsCallbackCourseTypeLevel0(): array
     {
         $arrOpt = [];
-        $objDatabase = Database::getInstance()->execute('SELECT * FROM tl_course_main_type ORDER BY code');
+        $objDatabase = Database::getInstance()
+            ->execute('SELECT * FROM tl_course_main_type ORDER BY code')
+        ;
 
         while ($objDatabase->next()) {
             $arrOpt[$objDatabase->id] = $objDatabase->name;
@@ -1149,15 +1272,12 @@ class TlCalendarEvents extends \tl_calendar_events
         return $arrOpt;
     }
 
-    /**
-     * options_callback optionsCallbackTourDifficulties().
-     *
-     * @return array
-     */
-    public function optionsCallbackTourDifficulties(MultiColumnWizard $dc)
+    public function getTourDifficulties(): array
     {
         $options = [];
-        $objDb = $this->Database->execute('SELECT * FROM tl_tour_difficulty ORDER BY pid ASC, code ASC');
+        $objDb = Database::getInstance()
+            ->execute('SELECT * FROM tl_tour_difficulty ORDER BY pid ASC, code ASC')
+        ;
 
         while ($objDb->next()) {
             $objDiffCat = TourDifficultyCategoryModel::findByPk($objDb->pid);
@@ -1177,29 +1297,33 @@ class TlCalendarEvents extends \tl_calendar_events
     }
 
     /**
-     * @return array
+     * @Callback(table="tl_calendar_events", target="fields.eventType.options", priority=100)
      */
-    public function optionsCallbackEventType(DataContainer $dc)
+    public function getEventTypes(?DataContainer $dc): array
     {
-        $arrEventTypes = [];
+        $options = [];
+        $user = $this->security->getUser();
+
+        if (!$dc) {
+            return $options;
+        }
 
         if (!$dc->id && CURRENT_ID > 0) {
-            $objCalendar = CalendarModel::findByPk(CURRENT_ID);
+            $objCalendar = $this->calendarModel->findByPk(CURRENT_ID);
         } elseif ($dc->id > 0) {
-            $objCalendar = CalendarEventsModel::findByPk($dc->id)->getRelated('pid');
+            $objCalendar = $this->calendarEventsModel->findByPk($dc->id)->getRelated('pid');
         }
 
         $arrAllowedEventTypes = [];
-        $objUser = BackendUser::getInstance();
 
-        if (null !== $objUser) {
-            $arrGroups = StringUtil::deserialize($objUser->groups, true);
+        if (null !== $objCalendar && null !== $user) {
+            $arrGroups = $this->stringUtil->deserialize($user->groups, true);
 
             foreach ($arrGroups as $group) {
                 $objGroup = UserGroupModel::findByPk($group);
 
-                if (!empty($objGroup->allowedEventTypes) && \is_array($objGroup->allowedEventTypes)) {
-                    $arrAllowedEvtTypes = StringUtil::deserialize($objGroup->allowedEventTypes, true);
+                if (null !== $objGroup && !empty($objGroup->allowedEventTypes) && \is_array($objGroup->allowedEventTypes)) {
+                    $arrAllowedEvtTypes = $this->stringUtil->deserialize($objGroup->allowedEventTypes, true);
 
                     foreach ($arrAllowedEvtTypes as $eventType) {
                         if (!\in_array($eventType, $arrAllowedEventTypes, false)) {
@@ -1211,43 +1335,44 @@ class TlCalendarEvents extends \tl_calendar_events
         }
 
         if (null !== $objCalendar) {
-            $arrEventTypes = StringUtil::deserialize($objCalendar->allowedEventTypes, true);
-        }
-
-        return $arrEventTypes;
-    }
-
-    /**
-     * options_callback optionsCallbackCourseSubType().
-     *
-     * @return array
-     */
-    public function optionsCallbackCourseSubType()
-    {
-        $options = [];
-
-        if ('edit' === Input::get('act')) {
-            $objEvent = CalendarEventsModel::findByPk(Input::get('id'));
-            $sql = "SELECT * FROM tl_course_sub_type WHERE pid='".$objEvent->courseTypeLevel0."' ORDER BY pid, code";
-        } else {
-            $sql = 'SELECT * FROM tl_course_sub_type ORDER BY pid, code';
-        }
-
-        $objType = $this->Database->execute($sql);
-
-        while ($objType->next()) {
-            $options[$objType->id] = $objType->code.' '.$objType->name;
+            $options = $this->stringUtil->deserialize($objCalendar->allowedEventTypes, true);
         }
 
         return $options;
     }
 
     /**
-     * options_callback optionsCallbackListReleaseLevels.
-     *
-     * @return array
+     * @Callback(table="tl_calendar_events", target="fields.courseTypeLevel1.options", priority=100)
      */
-    public function optionsCallbackListReleaseLevels(DataContainer $dc)
+    public function getCourseSubType(?DataContainer $dc): array
+    {
+        $options = [];
+
+        if (!$dc) {
+            return $options;
+        }
+
+        $eventId = $this->connection
+            ->fetchOne('SELECT courseTypeLevel0 FROM tl_calendar_events WHERE id = ?', [$dc->id])
+        ;
+
+        if ($eventId) {
+            $stmt = $this->connection
+                ->executeQuery('SELECT * FROM tl_course_sub_type WHERE pid = ? ORDER BY pid, code', [$eventId])
+            ;
+
+            while (false !== ($row = $stmt->fetchAssociative())) {
+                $options[$row['id']] = $row['code'].' '.$row['name'];
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * @Callback(table="tl_calendar_events", target="fields.eventReleaseLevel.options", priority=100)
+     */
+    public function getReleaseLevels(DataContainer $dc): array
     {
         $options = [];
 
@@ -1256,13 +1381,13 @@ class TlCalendarEvents extends \tl_calendar_events
 
         if (null !== $objUser) {
             if (!$objUser->admin) {
-                $arrGroups = StringUtil::deserialize($objUser->groups, true);
+                $arrGroups = $this->stringUtil->deserialize($objUser->groups, true);
 
                 foreach ($arrGroups as $group) {
                     $objGroup = UserGroupModel::findByPk($group);
 
                     if (null !== $objGroup) {
-                        $arrEventTypes = StringUtil::deserialize($objGroup->allowedEventTypes, true);
+                        $arrEventTypes = $this->stringUtil->deserialize($objGroup->allowedEventTypes, true);
 
                         foreach ($arrEventTypes as $eventType) {
                             if (!\in_array($eventType, $arrAllowedEventTypes, false)) {
@@ -1279,7 +1404,10 @@ class TlCalendarEvents extends \tl_calendar_events
                         $objEventReleasePackage = EventReleaseLevelPolicyPackageModel::findByPk($objEventType->levelAccessPermissionPackage);
 
                         if (null !== $objEventReleasePackage) {
-                            $objEventReleaseLevels = $this->Database->prepare('SELECT * FROM tl_event_release_level_policy WHERE pid=? ORDER BY level ASC')->execute($objEventReleasePackage->id);
+                            $objEventReleaseLevels = Database::getInstance()
+                                ->prepare('SELECT * FROM tl_event_release_level_policy WHERE pid = ? ORDER BY level ASC')
+                                ->execute($objEventReleasePackage->id)
+                            ;
 
                             while ($objEventReleaseLevels->next()) {
                                 $options[EventReleaseLevelPolicyModel::findByPk($objEventReleaseLevels->id)->getRelated('pid')->title][$objEventReleaseLevels->id] = $objEventReleaseLevels->title;
@@ -1288,7 +1416,10 @@ class TlCalendarEvents extends \tl_calendar_events
                     }
                 }
             } else {
-                $objEventReleaseLevels = $this->Database->prepare('SELECT * FROM tl_event_release_level_policy ORDER BY pid,level ASC')->execute();
+                $objEventReleaseLevels = Database::getInstance()
+                    ->prepare('SELECT * FROM tl_event_release_level_policy ORDER BY pid,level ASC')
+                    ->execute()
+                ;
 
                 while ($objEventReleaseLevels->next()) {
                     $options[EventReleaseLevelPolicyModel::findByPk($objEventReleaseLevels->id)->getRelated('pid')->title][$objEventReleaseLevels->id] = $objEventReleaseLevels->title;
@@ -1306,50 +1437,36 @@ class TlCalendarEvents extends \tl_calendar_events
      */
     public function listFixedDates()
     {
-        $columnFields = null;
-
-        $columnFields = [
+        return [
             'new_repeat' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['kurstage'],
+                'label' => null,
                 'exclude' => true,
                 'inputType' => 'text',
                 'default' => time(),
-                'eval' => ['rgxp' => 'date', 'datepicker' => true, 'doNotCopy' => false, 'style' => 'width:100px', 'tl_class' => 'wizard'],
+                'eval' => ['rgxp' => 'date', 'datepicker' => true, 'doNotCopy' => false, 'style' => 'width:100px', 'tl_class' => 'hidelabel wizard'],
             ],
         ];
-
-        return $columnFields;
     }
 
-    /**
-     * @param $eventId
-     *
-     * @return string
-     */
-    public function generateEventToken($eventId)
+    private function generateEventToken(int $eventId): string
     {
         return md5((string) random_int(100000000, 999999999)).'-'.$eventId;
     }
 
     /**
-     * childrecord_callback listEvents()
-     * Add the type of input field.
-     *
-     * @param array $arrRow
-     *
-     * @return string
+     * @Callback(table="tl_calendar_events", target="list.sorting.child_record", priority=100)
      */
-    public function listEvents($arrRow)
+    public function childRecordCallback(array $arrRow): string
     {
         $span = Calendar::calculateSpan($arrRow['startTime'], $arrRow['endTime']);
-        $objEvent = CalendarEventsModel::findByPk($arrRow['id']);
+        $objEvent = $this->calendarEventsModel->findByPk($arrRow['id']);
 
         if ($span > 0) {
-            $date = Date::parse(Config::get(($arrRow['addTime'] ? 'datimFormat' : 'dateFormat')), $arrRow['startTime']).' – '.Date::parse(Config::get(($arrRow['addTime'] ? 'datimFormat' : 'dateFormat')), $arrRow['endTime']);
+            $date = $this->date->parse($this->config->get(($arrRow['addTime'] ? 'datimFormat' : 'dateFormat')), $arrRow['startTime']).' – '.$this->date->parse($this->config->get(($arrRow['addTime'] ? 'datimFormat' : 'dateFormat')), $arrRow['endTime']);
         } elseif ((int) $arrRow['startTime'] === (int) $arrRow['endTime']) {
-            $date = Date::parse(Config::get('dateFormat'), $arrRow['startTime']).($arrRow['addTime'] ? ' '.Date::parse(Config::get('timeFormat'), $arrRow['startTime']) : '');
+            $date = $this->date->parse($this->config->get('dateFormat'), $arrRow['startTime']).($arrRow['addTime'] ? ' '.$this->date->parse($this->config->get('timeFormat'), $arrRow['startTime']) : '');
         } else {
-            $date = Date::parse(Config::get('dateFormat'), $arrRow['startTime']).($arrRow['addTime'] ? ' '.Date::parse(Config::get('timeFormat'), $arrRow['startTime']).' – '.Date::parse(Config::get('timeFormat'), $arrRow['endTime']) : '');
+            $date = $this->date->parse($this->config->get('dateFormat'), $arrRow['startTime']).($arrRow['addTime'] ? ' '.$this->date->parse($this->config->get('timeFormat'), $arrRow['startTime']).' – '.$this->date->parse($this->config->get('timeFormat'), $arrRow['endTime']) : '');
         }
 
         // Add icon
@@ -1385,121 +1502,29 @@ class TlCalendarEvents extends \tl_calendar_events
     }
 
     /**
-     * button_callback toggleIcon()
-     * Return the "toggle visibility" button.
-     *
-     * @param array  $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     *
-     * @return string
-     */
-    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-    {
-        if (\strlen((string) Input::get('tid'))) {
-            $this->toggleVisibility(Input::get('tid'), ('1' === Input::get('state')), (@func_get_arg(12) ?: null));
-            $this->redirect($this->getReferer());
-        }
-
-        // Check permissions AFTER checking the tid, so hacking attempts are logged
-        if (!$this->User->hasAccess('tl_calendar_events::published', 'alexf')) {
-            return '';
-        }
-
-        $href .= '&amp;tid='.$row['id'].'&amp;state='.($row['published'] ? '' : 1);
-
-        if (!$row['published']) {
-            $icon = 'invisible.svg';
-        }
-
-        return '<a href="'.$this->addToUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label, 'data-state="'.($row['published'] ? 1 : 0).'"').'</a> ';
-    }
-
-    /**
-     * Publish/unpublish event.
-     *
-     * @param int           $intId
-     * @param bool          $blnVisible
-     * @param DataContainer $dc
-     *
-     * @throws AccessDeniedException
-     */
-    public function toggleVisibility($intId, $blnVisible, DataContainer $dc = null): void
-    {
-        // Set the ID and action
-        Input::setGet('id', $intId);
-        Input::setGet('act', 'toggle');
-
-        if ($dc) {
-            $dc->id = $intId; // see #8043
-        }
-
-        $this->checkPermission();
-
-        // Check the field access
-        if (!$this->User->hasAccess('tl_calendar_events::published', 'alexf')) {
-            throw new AccessDeniedException('Not enough permissions to publish/unpublish event ID '.$intId.'.');
-        }
-
-        $objVersions = new Versions('tl_calendar_events', $intId);
-        $objVersions->initialize();
-
-        // Trigger the save_callback
-        if (\is_array($GLOBALS['TL_DCA']['tl_calendar_events']['fields']['published']['save_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_calendar_events']['fields']['published']['save_callback'] as $callback) {
-                if (\is_array($callback)) {
-                    $this->import($callback[0]);
-                    $blnVisible = $this->{$callback[0]}->{$callback[1]}($blnVisible, ($dc ?: $this));
-                } elseif (\is_callable($callback)) {
-                    $blnVisible = $callback($blnVisible, ($dc ?: $this));
-                }
-            }
-        }
-
-        // Update the database
-        $this->Database
-            ->prepare('UPDATE tl_calendar_events SET tstamp='.time().", published='".($blnVisible ? '1' : '')."' WHERE id=?")
-            ->execute($intId)
-        ;
-
-        $objVersions->create();
-
-        // Update the RSS feed (for some reason it does not work without sleep(1))
-        sleep(1);
-        $this->import('Calendar');
-        $this->Calendar->generateFeedsByCalendar(CURRENT_ID);
-    }
-
-    /**
      * Push event to next release level.
      *
-     * @param $row
-     * @param $href
-     * @param $label
-     * @param $title
-     * @param $icon
-     * @param $attributes
-     *
-     * @return string
+     * @Callback(table="tl_calendar_events", target="list.operations.releaseLevelNext.button", priority=100)
      */
-    public function releaseLevelNext($row, $href, $label, $title, $icon, $attributes)
+    public function releaseLevelNext(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
     {
+        $request = $this->requestStack->getCurrentRequest();
+        $user = $this->security->getUser();
+
         $strDirection = 'up';
 
-        $canSendToNextReleaseLevel = false;
+        $canPushToNextReleaseLevel = false;
         $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
         $nextReleaseLevel = null;
 
         if (null !== $objReleaseLevelModel) {
             $nextReleaseLevel = $objReleaseLevelModel->level + 1;
         }
+
         // Save to database
-        if ('releaseLevelNext' === Input::get('action') && (int) Input::get('eventId') === (int) $row['id']) {
-            if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id'], 'up') && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel)) {
-                $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
+        if ('releaseLevelNext' === $request->query->get('action') && (int) $request->query->get('eventId') === (int) $row['id']) {
+            if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($user->id, $row['id'], 'up') && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel)) {
+                $objEvent = $this->calendarEventsModel->findByPk($request->query->get('eventId'));
 
                 if (null !== $objEvent) {
                     $objReleaseLevelModel = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
@@ -1512,43 +1537,44 @@ class TlCalendarEvents extends \tl_calendar_events
                         // HOOK: changeEventReleaseLevel, f.ex inform tourenchef via email
                         if (isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) && \is_array($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'])) {
                             foreach ($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] as $callback) {
-                                System::importStatic($callback[0])->{$callback[1]}($objEvent, $strDirection);
+                                $this->system->importStatic($callback[0])->{$callback[1]}($objEvent, $strDirection);
                             }
                         }
                     }
                 }
             }
-            $this->redirect($this->getReferer());
+
+            $this->controller->redirect($this->system->getReferer());
         }
 
-        if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id'], $strDirection) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel)) {
-            $canSendToNextReleaseLevel = true;
+        if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($user->id, $row['id'], $strDirection) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel)) {
+            $canPushToNextReleaseLevel = true;
         }
 
-        if (false === $canSendToNextReleaseLevel) {
+        if (false === $canPushToNextReleaseLevel) {
             return '';
         }
 
-        return '<a href="'.$this->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 
     /**
-     * save_callback for tl_calendar_events.instructor
      * Update main instructor (first instructor in the list is the main instructor).
      *
-     * @param $varValue
+     * @param mixed $varValue
      *
      * @return mixed
+     * @Callback(table="tl_calendar_events", target="fields.instructor.save", priority=100)
      */
     public function saveCallbackSetMaininstructor($varValue, DataContainer $dc)
     {
         if (isset($dc) && $dc->id > 0) {
-            $arrInstructors = StringUtil::deserialize($varValue, true);
+            $arrInstructors = $this->stringUtil->deserialize($varValue, true);
 
             // Use a child table to store instructors
             // Delete instructor
-            $this->Database
-                ->prepare('DELETE FROM tl_calendar_events_instructor WHERE pid=?')
+            Database::getInstance()
+                ->prepare('DELETE FROM tl_calendar_events_instructor WHERE pid = ?')
                 ->execute($dc->id)
             ;
 
@@ -1562,10 +1588,12 @@ class TlCalendarEvents extends \tl_calendar_events
                     'tstamp' => time(),
                     'isMainInstructor' => $i < 1 ? '1' : '',
                 ];
-                $this->Database->prepare('INSERT INTO tl_calendar_events_instructor %s')
+
+                Database::getInstance()->prepare('INSERT INTO tl_calendar_events_instructor %s')
                     ->set($set)
                     ->execute()
                 ;
+
                 ++$i;
             }
             // End child insert
@@ -1574,9 +1602,11 @@ class TlCalendarEvents extends \tl_calendar_events
                 $intInstructor = $arrInstructors[0]['instructorId'];
 
                 if (null !== UserModel::findByPk($intInstructor)) {
+
                     $set = ['mainInstructor' => $intInstructor];
-                    $this->Database
-                        ->prepare('UPDATE tl_calendar_events %s WHERE id=?')
+
+                    Database::getInstance()
+                        ->prepare('UPDATE tl_calendar_events %s WHERE id = ?')
                         ->set($set)
                         ->execute($dc->id)
                     ;
@@ -1586,30 +1616,36 @@ class TlCalendarEvents extends \tl_calendar_events
             }
 
             $set = ['mainInstructor' => 0];
-            $this->Database->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($dc->id);
+
+            Database::getInstance()
+                ->prepare('UPDATE tl_calendar_events %s WHERE id = ?')
+                ->set($set)
+                ->execute($dc->id)
+            ;
         }
 
         return $varValue;
     }
 
     /**
-     * save_callback saveCallbackEventReleaseLevel()
      * Publish or unpublish events if eventReleaseLevel has reached the highest/last level.
      *
-     * @param $newEventReleaseLevelId
+     * @param $targetEventReleaseLevelId
      * @param DataContainer $dc
      * @param null          $eventId
      *
      * @return mixed
+     *
+     * @Callback(table="tl_calendar_events", target="fields.eventReleaseLevel.save", priority=100)
      */
-    public function saveCallbackEventReleaseLevel($newEventReleaseLevelId, DataContainer $dc = null, $eventId = null)
+    public function saveCallbackEventReleaseLevel($targetEventReleaseLevelId, DataContainer $dc = null, $eventId = null)
     {
         $hasError = false;
         // Get event id
-        if ($dc->activeRecord->id > 0) {
-            $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
+        if ($dc && $dc->activeRecord->id > 0) {
+            $objEvent = $this->calendarEventsModel->findByPk($dc->activeRecord->id);
         } elseif ($eventId > 0) {
-            $objEvent = CalendarEventsModel::findByPk($eventId);
+            $objEvent = $this->calendarEventsModel->findByPk($eventId);
         }
 
         if (null !== $objEvent) {
@@ -1617,20 +1653,20 @@ class TlCalendarEvents extends \tl_calendar_events
 
             if (null !== $lastEventReleaseModel) {
                 // Display message in the backend if event is published or unpublished now
-                if ((int) $lastEventReleaseModel->id === (int) $newEventReleaseLevelId) {
+                if ((int) $lastEventReleaseModel->id === (int) $targetEventReleaseLevelId) {
                     if (!$objEvent->published) {
-                        Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
+                        $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
                     }
                     $objEvent->published = '1';
 
                     // HOOK: publishEvent, f.ex advice tourenchef by email
                     if (isset($GLOBALS['TL_HOOKS']['publishEvent']) && \is_array($GLOBALS['TL_HOOKS']['publishEvent'])) {
                         foreach ($GLOBALS['TL_HOOKS']['publishEvent'] as $callback) {
-                            System::importStatic($callback[0])->{$callback[1]}($objEvent);
+                            $this->system->importStatic($callback[0])->{$callback[1]}($objEvent);
                         }
                     }
                 } else {
-                    $eventReleaseModel = EventReleaseLevelPolicyModel::findByPk($newEventReleaseLevelId);
+                    $eventReleaseModel = EventReleaseLevelPolicyModel::findByPk($targetEventReleaseLevelId);
                     $firstEventReleaseModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
 
                     if (null !== $eventReleaseModel) {
@@ -1638,80 +1674,48 @@ class TlCalendarEvents extends \tl_calendar_events
                             $hasError = true;
 
                             if ($objEvent->eventReleaseLevel > 0) {
-                                $newEventReleaseLevelId = $objEvent->eventReleaseLevel;
-                                Message::addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" konnte nicht auf "%s" geändert werden, weil diese Freigabestufe zum Event-Typ ungültig ist. ', $objEvent->title, $objEvent->id, $eventReleaseModel->title));
+                                $targetEventReleaseLevelId = $objEvent->eventReleaseLevel;
+                                $this->message->addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" konnte nicht auf "%s" geändert werden, weil diese Freigabestufe zum Event-Typ ungültig ist. ', $objEvent->title, $objEvent->id, $eventReleaseModel->title));
                             } else {
-                                $newEventReleaseLevelId = $firstEventReleaseModel->id;
-                                Message::addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" musste auf "%s" korrigiert werden, weil eine zum Event-Typ ungültige Freigabestufe gewählt wurde. ', $objEvent->title, $objEvent->id, $firstEventReleaseModel->title));
+                                $targetEventReleaseLevelId = $firstEventReleaseModel->id;
+                                $this->message->addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" musste auf "%s" korrigiert werden, weil eine zum Event-Typ ungültige Freigabestufe gewählt wurde. ', $objEvent->title, $objEvent->id, $firstEventReleaseModel->title));
                             }
                         }
                     }
 
                     if ($objEvent->published) {
-                        Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
+                        $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
                     }
                     $objEvent->published = '';
                 }
+
                 $objEvent->save();
 
                 if (!$hasError) {
                     // Display message in the backend
-                    Message::addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'], $objEvent->id, EventReleaseLevelPolicyModel::findByPk($newEventReleaseLevelId)->level));
+                    $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'], $objEvent->id, EventReleaseLevelPolicyModel::findByPk($targetEventReleaseLevelId)->level));
                 }
             }
         }
 
-        return $newEventReleaseLevelId;
+        return $targetEventReleaseLevelId;
     }
 
     /**
-     * @param $strDuration
-     * @param null $eventId
-     *
-     * @return string
-     */
-    public function onSubmitCallbackDurationInfo($strDuration, DataContainer $dc = null, $eventId = null)
-    {
-        // Get event id
-        if ($dc->activeRecord->id > 0) {
-            $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
-        } elseif ($eventId > 0) {
-            $objEvent = CalendarEventsModel::findByPk($eventId);
-        }
-
-        if (false !== CalendarEventsHelper::getEventTimestamps($objEvent)) {
-            $countTimestamps = \count(CalendarEventsHelper::getEventTimestamps($objEvent));
-
-            $arrDuration = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$strDuration];
-
-            if (!empty($arrDuration) && \is_array($arrDuration)) {
-                $duration = $arrDuration['dateRows'];
-
-                if ($duration !== $countTimestamps) {
-                    Message::addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein.', $objEvent->title, $objEvent->id));
-
-                    return '';
-                }
-            }
-        }
-
-        return $strDuration;
-    }
-
-    /**
-     * @param $strEventType
-     * @param null $eventId
+     * @param int|null $eventId
      *
      * @return mixed
+     *
+     * @Callback(table="tl_calendar_events", target="fields.eventType.save", priority=100)
      */
-    public function saveCallbackEventType($strEventType, DataContainer $dc = null, $eventId = null)
+    public function saveCallbackEventType(string $strEventType, ?DataContainer $dc, $eventId = null)
     {
         if ('' !== $strEventType) {
             // Get event id
             if ($dc->activeRecord->id > 0) {
-                $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->id);
+                $objEvent = $this->calendarEventsModel->findByPk($dc->activeRecord->id);
             } elseif ($eventId > 0) {
-                $objEvent = CalendarEventsModel::findByPk($eventId);
+                $objEvent = $this->calendarEventsModel->findByPk($eventId);
             }
             // !important, because if eventType is not saved, then no eventReleaseLevel can be assigned
             $objEvent->eventType = $strEventType;
@@ -1735,20 +1739,16 @@ class TlCalendarEvents extends \tl_calendar_events
     /**
      * Downgrade event to the previous release level.
      *
-     * @param $row
-     * @param $href
-     * @param $label
-     * @param $title
-     * @param $icon
-     * @param $attributes
-     *
-     * @return string
+     * @Callback(table="tl_calendar_events", target="list.operations.releaseLevelPrev.button", priority=100)
      */
-    public function releaseLevelPrev($row, $href, $label, $title, $icon, $attributes)
+    public function releaseLevelPrev(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
     {
+        $request = $this->requestStack->getCurrentRequest();
+        $user = $this->security->getUser();
+
         $strDirection = 'down';
 
-        $canSendToNextReleaseLevel = false;
+        $canPushToNextReleaseLevel = false;
         $prevReleaseLevel = null;
         $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
 
@@ -1757,9 +1757,9 @@ class TlCalendarEvents extends \tl_calendar_events
         }
 
         // Save to database
-        if ('releaseLevelPrev' === Input::get('action') && (int) Input::get('eventId') === (int) $row['id']) {
-            if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id'], 'down') && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
-                $objEvent = CalendarEventsModel::findByPk(Input::get('eventId'));
+        if ('releaseLevelPrev' === $request->query->get('action') && (int) $request->query->get('eventId') === (int) $row['id']) {
+            if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($user->id, $row['id'], 'down') && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
+                $objEvent = $this->calendarEventsModel->findByPk($request->query->get('eventId'));
 
                 if (null !== $objEvent) {
                     $objReleaseLevelModel = EventReleaseLevelPolicyModel::findPrevLevel($objEvent->eventReleaseLevel);
@@ -1772,67 +1772,56 @@ class TlCalendarEvents extends \tl_calendar_events
                         // HOOK: changeEventReleaseLevel, f.ex inform tourenchef via email
                         if (isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) && \is_array($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'])) {
                             foreach ($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] as $callback) {
-                                System::importStatic($callback[0])->{$callback[1]}($objEvent, $strDirection);
+                                $this->system->importStatic($callback[0])->{$callback[1]}($objEvent, $strDirection);
                             }
                         }
                     }
                 }
             }
-            $this->redirect($this->getReferer());
+
+            $this->controller->redirect($this->system->getReferer());
         }
 
-        if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($this->User->id, $row['id'], $strDirection) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
-            $canSendToNextReleaseLevel = true;
+        if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($user->id, $row['id'], $strDirection) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
+            $canPushToNextReleaseLevel = true;
         }
 
-        if (false === $canSendToNextReleaseLevel) {
+        if (false === $canPushToNextReleaseLevel) {
             return '';
         }
 
-        return '<a href="'.$this->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 
     /**
-     * Return the delete icon.
-     *
-     * @param array  $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     *
-     * @return string
+     * @Callback(table="tl_calendar_events", target="list.operations.delete.button", priority=100)
      */
-    public function deleteIcon($row, $href, $label, $title, $icon, $attributes)
+    public function deleteIcon(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
     {
-        $blnAllow = EventReleaseLevelPolicyModel::canDeleteEvent($this->User->id, $row['id']);
+        $user = $this->security->getUser();
+
+        $blnAllow = EventReleaseLevelPolicyModel::canDeleteEvent($user->id, $row['id']);
 
         if (!$blnAllow) {
             return '';
         }
 
-        return '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 
     /**
-     * @param $row
-     * @param $href
-     * @param $label
-     * @param $title
-     * @param $icon
-     * @param $attributes
-     *
-     * @return string
+     * @Callback(table="tl_calendar_events", target="list.operations.copy.button", priority=100)
      */
-    public function copyIcon($row, $href, $label, $title, $icon, $attributes)
+    public function copyIcon(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
     {
-        $blnAllow = EventReleaseLevelPolicyModel::hasWritePermission($this->User->id, $row['id']);
+        $user = $this->security->getUser();
+
+        $blnAllow = EventReleaseLevelPolicyModel::hasWritePermission($user->id, $row['id']);
 
         if (!$blnAllow) {
             return '';
         }
 
-        return '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 }

@@ -50,6 +50,15 @@ services:
             - '%sacevt.event_admin_email%'
             - '%sacevt.locale%'
 
+    Markocupic\SacEventToolBundle\DataContainer\CalendarEvents:
+        public: true
+        arguments:
+            - '@contao.framework'
+            - '@request_stack'
+            - '@database_connection'
+            - '@Markocupic\SacEventToolBundle\DataContainer\Util'
+            - '@security.helper'
+
     Markocupic\SacEventToolBundle\DataContainer\CalendarEventsStory:
         arguments:
             - '@security.helper'

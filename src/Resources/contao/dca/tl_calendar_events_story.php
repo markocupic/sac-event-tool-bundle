@@ -72,7 +72,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
                 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['exportArticle'],
                 'href'  => 'action=exportArticle',
                 'icon'  => 'bundles/markocupicsaceventtool/icons/docx.png',
-                //'button_callback' => array(TlCalendarEventsStory::class, 'exportArticle'),
             ],
         ],
     ],
