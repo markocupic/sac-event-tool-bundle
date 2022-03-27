@@ -886,7 +886,7 @@ class CalendarEventsHelper
                 }
             } else {
                 // There is no booking limit. Show registered members
-                return sprintf($strBadge, 'dark', $memberCount.' Anmeldungen', $memberCount.'/?');
+                return sprintf($strBadge, 'dark', $memberCount.' bestätigte Plätze', $memberCount.'/?');
             }
         }
 
