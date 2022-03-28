@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 use Contao\Config;
+use Contao\DataContainer;
 use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\Bundle;
@@ -36,8 +37,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
     ],
     'list'        => [
         'sorting'           => [
-            'mode'        => 2,
-            'fields'      => ['stateOfSubscription'],
+            'mode'        => DataContainer::SORT_INITIAL_LETTER_DESC,
+            'fields'      => ['stateOfSubscription', 'addedOn', 'lastname', 'firstname'],
             'flag'        => 1,
             'panelLayout' => 'filter;sort,search',
             'filter'      => [['eventId=?', Input::get('id')]],
@@ -174,6 +175,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         ],
         'stateOfSubscription'         => [
             'filter'    => true,
+            'sorting'   => true,
             'inputType' => 'select',
             'default'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'][0],
             'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
