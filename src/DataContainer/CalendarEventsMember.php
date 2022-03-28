@@ -508,8 +508,10 @@ class CalendarEventsMember
             return;
         }
 
+        $addedOn = $this->connection->fetchOne('SELECT addedOn FROM tl_calendar_events_member WHERE id = ?', [$dc->id]);
+
         $set = [
-            'addedOn' => time(),
+            'addedOn' => false === $addedOn || '' === $addedOn ? time() : $addedOn,
             'tstamp' => time(),
             'sacMemberId' => '',
             'contaoMemberId' => 0,
