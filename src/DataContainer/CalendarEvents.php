@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\ArrayUtil;
 use Contao\Backend;
 use Contao\BackendUser;
 use Contao\Calendar;
@@ -316,7 +317,7 @@ class CalendarEvents extends Backend
                                     if (null !== $objEventReleaseLevelPolicyModel) {
                                         if ($objEventReleaseLevelPolicyModel->id !== $objEventsModel->eventReleaseLevel) {
                                             foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldname) {
-                                                if (true === $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEditingOnFirstReleaseLevelOnly'] && '' !== $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['inputType']) {
+                                                if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEditingOnFirstReleaseLevelOnly'] ?? false) && isset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['inputType'])) {
                                                     $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['input_field_callback'] = [self::class, 'showFieldValue'];
                                                 }
                                             }
@@ -483,7 +484,7 @@ class CalendarEvents extends Backend
                         } elseif ('eventDates' === $field) {
                             $arrTimestamps = CalendarEventsHelper::getEventTimestamps($objEvent->current());
                             $arrDates = array_map(
-                                static fn ($tstamp) => $this->date->parse($this->config->get('dateFormat'), $tstamp),
+                                static fn ($tstamp) => Date::parse(Config::get('dateFormat'), $tstamp),
                                 $arrTimestamps
                             );
                             $arrRow[] = implode(',', $arrDates);
@@ -1132,21 +1133,21 @@ class CalendarEvents extends Backend
 
                     $row[$i] = implode('<br>', $value);
                 }
-            } elseif ('date' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp']) {
+            } elseif ('date' === ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] ?? false)) {
                 $row[$i] = $value ? $this->date->parse($this->config->get('dateFormat'), $value) : '-';
-            } elseif ('time' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp']) {
+            } elseif ('time' === ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] ?? false)) {
                 $row[$i] = $value ? $this->date->parse($this->config->get('timeFormat'), $value) : '-';
-            } elseif ('datim' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] || (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['flag']) && \in_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['flag'], [5, 6, 7, 8, 9, 10], false)) || 'tstamp' === $i) {
+            } elseif ('datim' === ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] ?? false) || (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['flag']) && \in_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['flag'], [5, 6, 7, 8, 9, 10], false)) || 'tstamp' === $i) {
                 $row[$i] = $value ? $this->date->parse($this->config->get('datimFormat'), $value) : '-';
-            } elseif ('checkbox' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] && !$GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['multiple']) {
+            } elseif ('checkbox' === ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] ?? false) && true !== ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['multiple'] ?? false)) {
                 $row[$i] = $value ? $GLOBALS['TL_LANG']['MSC']['yes'] : $GLOBALS['TL_LANG']['MSC']['no'];
-            } elseif ('email' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp']) {
+            } elseif ('email' === ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] ?? false)) {
                 $row[$i] = Idna::decodeEmail($value);
-            } elseif ('textarea' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] && ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['allowHtml'] || $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['preserveTags'])) {
+            } elseif ('textarea' === ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] ?? false) && (true === ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['allowHtml'] ?? false) || true === ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['preserveTags'] ?? false))) {
                 $row[$i] = $this->stringUtil->specialchars($value);
             } elseif (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference']) && \is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'])) {
                 $row[$i] = isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]]) ? (\is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]]) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]][0] : $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]]) : $row[$i];
-            } elseif ((isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['isAssociative']) && $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['isAssociative']) || (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options']) && array_is_assoc($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options']))) {
+            } elseif (true === ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['isAssociative'] ?? false) || (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options']) && ArrayUtil::isAssoc($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options']))) {
                 $row[$i] = $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options'][$row[$i]];
             } else {
                 $row[$i] = $value;
@@ -1157,9 +1158,8 @@ class CalendarEvents extends Backend
                 $label = \is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label']) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'][0] : $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'];
                 $help = \is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label']) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'][1] : $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'];
             } else {
-                echo $i.' ';
-                $label = \is_array($GLOBALS['TL_LANG']['MSC'][$i]) ? $GLOBALS['TL_LANG']['MSC'][$i][0] : $GLOBALS['TL_LANG']['MSC'][$i];
-                $help = \is_array($GLOBALS['TL_LANG']['MSC'][$i]) ? $GLOBALS['TL_LANG']['MSC'][$i][1] : $GLOBALS['TL_LANG']['MSC'][$i];
+                $label = (isset($GLOBALS['TL_LANG']['MSC'][$i]) && \is_array($GLOBALS['TL_LANG']['MSC'][$i])) ? $GLOBALS['TL_LANG']['MSC'][$i][0] : $GLOBALS['TL_LANG']['MSC'][$i];
+                $help = (isset($GLOBALS['TL_LANG']['MSC'][$i]) && \is_array($GLOBALS['TL_LANG']['MSC'][$i])) ? $GLOBALS['TL_LANG']['MSC'][$i][1] : $GLOBALS['TL_LANG']['MSC'][$i];
             }
 
             if (empty($label)) {
