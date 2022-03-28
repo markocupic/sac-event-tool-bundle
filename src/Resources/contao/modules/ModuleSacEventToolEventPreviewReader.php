@@ -254,6 +254,19 @@ class ModuleSacEventToolEventPreviewReader extends Events
             $this->addEnclosuresToTemplate($objTemplate, $objEvent->row());
         }
 
+        // schema.org information
+        $objTemplate->getSchemaOrgData = static function () use ($objTemplate, $objEvent): array
+        {
+            $jsonLd = Events::getSchemaOrgData($objEvent);
+
+            if ($objTemplate->addImage && $objTemplate->figure)
+            {
+                $jsonLd['image'] = $objTemplate->figure->getSchemaOrgData();
+            }
+
+            return $jsonLd;
+        };
+
         $this->Template->event = $objTemplate->parse();
 
         $bundles = System::getContainer()->getParameter('kernel.bundles');
