@@ -22,6 +22,11 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+// Global operations
+$GLOBALS['TL_LANG']['tl_calendar_events']['plus1year'] = ['+ 1 Jahr', 'Ändere bei allen Events die Datumsangaben um + 1 Jahr.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['minus1year'] = ['- 1 Jahr', 'Ändere bei allen Events die Datumsangaben um - 1 Jahr.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['onloadCallbackExportCalendar'] = ['Excel Export', 'Exportiere die Events im Excel-/CSV-Format.'];
+
 // Operations
 $GLOBALS['TL_LANG']['tl_calendar_events']['registrations'] = ['Event-Anmeldungen', 'Bearbeiten Sie die Anmeldungen des Events mit ID %s.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelNext'] = ['Freigabestufe um +1 erhöhen', 'Freigabestufe von Datensatz mit ID %s um +1 erhöhen. Der Datensatz ist dann vielleicht nicht mehr bearbeitbar.'];
