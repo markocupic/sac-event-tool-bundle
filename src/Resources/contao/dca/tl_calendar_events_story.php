@@ -99,7 +99,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
             'filter'    => true,
             'default'   => 1,
             'exclude'   => true,
-            'reference' => $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'],
             'inputType' => 'select',
             'options'   => ['1', '2', '3'],
             'eval'      => ['tl_class' => 'clr', 'submitOnChange' => true],
