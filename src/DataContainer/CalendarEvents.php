@@ -1500,7 +1500,7 @@ class CalendarEvents
                         $objEvent->eventReleaseLevel = $objReleaseLevelModel->id;
                         $objEvent->save();
 
-                        $this->handleEventReleaseLevelAndPublishUnpublish((int) $objEvent->id, $objEvent->eventReleaseLevel);
+                        $this->handleEventReleaseLevelAndPublishUnpublish((int) $objEvent->id, (int) $objEvent->eventReleaseLevel);
 
                         // HOOK: changeEventReleaseLevel, f.ex inform tourenchef via email
                         if (isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) && \is_array($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'])) {
@@ -1588,7 +1588,7 @@ class CalendarEvents
      */
     public function saveCallbackEventReleaseLevel(int $targetEventReleaseLevelId, DataContainer $dc): int
     {
-        return $this->handleEventReleaseLevelAndPublishUnpublish((int) $dc->activeRecord->id, $targetEventReleaseLevelId);
+        return $this->handleEventReleaseLevelAndPublishUnpublish((int) $dc->activeRecord->id, (int) $targetEventReleaseLevelId);
     }
 
     /**
@@ -1660,7 +1660,7 @@ class CalendarEvents
                         $objEvent->eventReleaseLevel = $objReleaseLevelModel->id;
                         $objEvent->save();
 
-                        $this->handleEventReleaseLevelAndPublishUnpublish((int) $objEvent->id, $objEvent->eventReleaseLevel);
+                        $this->handleEventReleaseLevelAndPublishUnpublish((int) $objEvent->id, (int) $objEvent->eventReleaseLevel);
 
                         // HOOK: changeEventReleaseLevel, f.ex inform tourenchef via email
                         if (isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) && \is_array($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'])) {
