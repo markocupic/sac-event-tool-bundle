@@ -20,8 +20,8 @@ use Contao\Environment;
 use Contao\Events;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory;
 use Markocupic\RssFeedGeneratorBundle\Item\Item;
 use Markocupic\RssFeedGeneratorBundle\Item\ItemGroup;
@@ -177,7 +177,6 @@ class UpcomingEventsController extends AbstractController
                 ])
             );
         }
-
 
         return $rss->render($this->projectDir.'/web/'.$filePath);
     }

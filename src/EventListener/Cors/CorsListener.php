@@ -4,8 +4,6 @@
  * SAC Event Tool Web Plugin for Contao
  * Copyright (c) 2008-2020 Marko Cupic.
  *
- * @author Marko Cupic m.cupic@gmx.ch, 2017-2020
- *
  * @see https://github.com/markocupic/sac-event-tool-bundle
  */
 
@@ -23,7 +21,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\EventListener\Cors;
 
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**

@@ -302,7 +302,7 @@ class SyncSacMemberDatabase
         @ini_set('max_execution_time', '0');
         // Consider the suhosin.memory_limit
         if (\extension_loaded('suhosin')) {
-            if (($limit = ini_get('suhosin.memory_limit')) !== '') {
+            if (($limit = \ini_get('suhosin.memory_limit')) !== '') {
                 @ini_set('memory_limit', (string) $limit);
             }
         } else {

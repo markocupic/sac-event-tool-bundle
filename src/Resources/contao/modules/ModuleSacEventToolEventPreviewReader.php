@@ -255,12 +255,10 @@ class ModuleSacEventToolEventPreviewReader extends Events
         }
 
         // schema.org information
-        $objTemplate->getSchemaOrgData = static function () use ($objTemplate, $objEvent): array
-        {
+        $objTemplate->getSchemaOrgData = static function () use ($objTemplate, $objEvent): array {
             $jsonLd = Events::getSchemaOrgData($objEvent);
 
-            if ($objTemplate->addImage && $objTemplate->figure)
-            {
+            if ($objTemplate->addImage && $objTemplate->figure) {
                 $jsonLd['image'] = $objTemplate->figure->getSchemaOrgData();
             }
 

@@ -21,8 +21,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Configures the sac event tool bundle.
- *
- * @author Marko Cupic <https://github.com/markocupic>
  */
 class MarkocupicSacEventToolBundle extends Bundle
 {

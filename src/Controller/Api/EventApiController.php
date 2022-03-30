@@ -18,7 +18,6 @@ use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
@@ -62,7 +61,6 @@ class EventApiController extends AbstractController
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
-
     }
 
     /**

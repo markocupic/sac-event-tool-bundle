@@ -44,13 +44,15 @@ use Contao\UserGroupModel;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use League\Csv\CannotInsertRecord;
 use League\Csv\CharsetConverter;
+use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 
-class CalendarEvents extends Backend
+class CalendarEvents
 {
     private ContaoFramework $framework;
     private RequestStack $requestStack;
@@ -177,7 +179,9 @@ class CalendarEvents extends Backend
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=80)
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=70)
+     *
+     * @throws Exception
      */
     public function onloadCallbackDeleteInvalidEvents(DataContainer $dc): void
     {
@@ -188,7 +192,9 @@ class CalendarEvents extends Backend
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=70)
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=60)
+     *
+     * @throws Exception
      */
     public function onloadCallback(DataContainer $dc): void
     {
@@ -338,7 +344,6 @@ class CalendarEvents extends Backend
 
         // Allow select mode only, if an eventReleaseLevel filter is set
         if ('select' === $request->query->get('act')) {
-            /** @var AttributeBagInterface $objSessionBag */
             $objSessionBag = $request->getSession()->getBag('contao_backend');
 
             $session = $objSessionBag->all();
@@ -401,7 +406,7 @@ class CalendarEvents extends Backend
     /**
      * Set palette for course, tour, tour_report, etc.
      *
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=60)
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=50)
      */
     public function onloadCallbackSetPalettes(DataContainer $dc): void
     {
@@ -432,7 +437,10 @@ class CalendarEvents extends Backend
     /**
      * CSV-export of all events of a calendar.
      *
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=50)
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=40)
+     *
+     * @throws CannotInsertRecord
+     * @throws InvalidArgument
      */
     public function onloadCallbackExportCalendar(DataContainer $dc): void
     {
@@ -520,7 +528,9 @@ class CalendarEvents extends Backend
      * Shift all event dates of a certain calendar by +/- 1 year
      * https://somehost/contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=21&transformDate=+52weeks&rt=hUFF18TV1YCLddb-Cyb48dRH8y_9iI-BgM-Nc1rB8o8&ref=2sjHl6mB.
      *
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=40)
+     * @Callback(table="tl_calendar_events", target="config.onload", priority=30)
+     *
+     * @throws Exception
      */
     public function onloadCallbackShiftEventDates(DataContainer $dc): void
     {
@@ -573,7 +583,7 @@ class CalendarEvents extends Backend
     /**
      * @Callback(table="tl_calendar_events", target="config.oncreate", priority=100)
      */
-    public function oncreateNew($strTable, $insertId, $set, DataContainer $dc): void
+    public function onCreate(string $strTable, int $insertId, array $set, DataContainer $dc): void
     {
         $user = $this->security->getUser();
 
@@ -599,9 +609,9 @@ class CalendarEvents extends Backend
     /**
      * @Callback(table="tl_calendar_events", target="config.oncopy", priority=100)
      *
-     * @param $insertId
+     * @throws \Exception
      */
-    public function oncopy($insertId, DataContainer $dc): void
+    public function onCopy(int $insertId, DataContainer $dc): void
     {
         $user = $this->security->getUser();
 
@@ -611,7 +621,7 @@ class CalendarEvents extends Backend
         if (null !== $objEventsModel) {
             // Set logged-in user as author
             $objEventsModel->author = $user->id;
-            $objEventsModel->eventToken = $this->generateEventToken((int) $insertId);
+            $objEventsModel->eventToken = $this->generateEventToken($insertId);
             $objEventsModel->save();
 
             // Set eventReleaseLevel
@@ -627,12 +637,13 @@ class CalendarEvents extends Backend
     }
 
     /**
-     * ondelete_callback ondeleteCallback
      * Do not allow to non-admins deleting records if there are child records (event registrations) in tl_calendar_events_member.
      *
      * @Callback(table="tl_calendar_events", target="config.ondelete", priority=100)
+     *
+     * @throws Exception
      */
-    public function ondeleteCallback(DataContainer $dc): void
+    public function onDelete(DataContainer $dc): void
     {
         $user = $this->security->getUser();
 
@@ -653,6 +664,8 @@ class CalendarEvents extends Backend
 
     /**
      * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=90)
+     *
+     * @throws Exception
      */
     public function adjustEndDate(DataContainer $dc): void
     {
@@ -697,6 +710,8 @@ class CalendarEvents extends Backend
 
     /**
      * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=80)
+     *
+     * @throws Exception
      */
     public function adjustEventReleaseLevel(DataContainer $dc): void
     {
@@ -721,6 +736,9 @@ class CalendarEvents extends Backend
 
     /**
      * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=70)
+     *
+     * @throws Exception
+     * @throws \Exception
      */
     public function setEventToken(DataContainer $dc): void
     {
@@ -747,6 +765,8 @@ class CalendarEvents extends Backend
 
     /**
      * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=60)
+     *
+     * @throws Exception
      */
     public function adjustDurationInfo(DataContainer $dc): void
     {
@@ -786,6 +806,8 @@ class CalendarEvents extends Backend
 
     /**
      * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=50)
+     *
+     * @throws Exception
      */
     public function adjustRegistrationPeriod(DataContainer $dc): void
     {
@@ -823,6 +845,8 @@ class CalendarEvents extends Backend
 
     /**
      * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=40)
+     *
+     * @throws Exception
      */
     public function setAlias(DataContainer $dc): void
     {
@@ -881,6 +905,8 @@ class CalendarEvents extends Backend
 
     /**
      * @Callback(table="tl_calendar_events", target="fields.alias.input_field", priority=100)
+     *
+     * @throws Exception
      */
     public function showFieldValue(DataContainer $dc): string
     {
@@ -1126,28 +1152,26 @@ class CalendarEvents extends Backend
     /**
      * @Callback(table="tl_calendar_events", target="fields.eventDates.load", priority=100)
      */
-    public function loadCallbackEventDates(?string $arrValues, DataContainer $dc): array
+    public function loadCallbackEventDates(?string $varValue, DataContainer $dc): array
     {
-        if ('' !== $arrValues) {
-            $arrValues = $this->stringUtil->deserialize($arrValues, true);
+        $arrValues = $this->stringUtil->deserialize($varValue, true);
 
-            if (isset($arrValues[0])) {
-                if ($arrValues[0]['new_repeat'] <= 0) {
-                    // Replace invalid date with empty string
-                    $arrValues = '';
-                }
+        if (isset($arrValues[0])) {
+            if ($arrValues[0]['new_repeat'] <= 0) {
+                // Replace invalid date with empty array
+                $arrValues = [];
             }
+        } else {
+            $arrValues = [];
         }
 
         return $arrValues;
     }
 
     /**
-     * buttons_callback buttonsCallback.
-     *
      * @Callback(table="tl_calendar_events", target="edit.buttons", priority=100)
      */
-    public function buttonsCallback($arrButtons, $dc)
+    public function editButtons($arrButtons, $dc)
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -1179,25 +1203,34 @@ class CalendarEvents extends Backend
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="fields.organizers.options", priority=100)
+     * @Callback(table="tl_calendar_events", target="fields.organizers.options", priority=90)
+     *
+     * @throws Exception
      */
     public function optionsCallbackGetOrganizers(): array
     {
         return $this->connection
             ->fetchAllKeyValue('SELECT id,title FROM tl_event_organizer ORDER BY sorting')
-            ;
+        ;
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="fields.courseTypeLevel0.options", priority=100)
+     * @Callback(table="tl_calendar_events", target="fields.courseTypeLevel0.options", priority=80)
+     *
+     * @throws Exception
      */
     public function optionsCallbackCourseTypeLevel0(): array
     {
         return $this->connection
             ->fetchAllKeyValue('SELECT id,name FROM tl_course_main_type ORDER BY code')
-            ;
+        ;
     }
 
+    /**
+     * Options callback for Multi Column Wizard field tl_calendar_events.tourTechDifficulty.
+     *
+     * @throws Exception
+     */
     public function getTourDifficulties(): array
     {
         $options = [];
@@ -1221,7 +1254,9 @@ class CalendarEvents extends Backend
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="fields.eventType.options", priority=100)
+     * @Callback(table="tl_calendar_events", target="fields.eventType.options", priority=70)
+     *
+     * @throws \Exception
      */
     public function getEventTypes(?DataContainer $dc): array
     {
@@ -1266,15 +1301,13 @@ class CalendarEvents extends Backend
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="fields.courseTypeLevel1.options", priority=100)
+     * @Callback(table="tl_calendar_events", target="fields.courseTypeLevel1.options", priority=60)
+     *
+     * @throws Exception
      */
-    public function getCourseSubType(?DataContainer $dc): array
+    public function getCourseSubType(DataContainer $dc): array
     {
         $options = [];
-
-        if (!$dc) {
-            return $options;
-        }
 
         $eventId = $this->connection
             ->fetchOne('SELECT courseTypeLevel0 FROM tl_calendar_events WHERE id = ?', [$dc->id])
@@ -1294,7 +1327,10 @@ class CalendarEvents extends Backend
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="fields.eventReleaseLevel.options", priority=100)
+     * @Callback(table="tl_calendar_events", target="fields.eventReleaseLevel.options", priority=50)
+     *
+     * @throws Exception
+     * @throws \Exception
      */
     public function getReleaseLevels(DataContainer $dc): array
     {
@@ -1330,12 +1366,11 @@ class CalendarEvents extends Backend
                         if (null !== $objEventReleasePackage) {
                             $stmt = $this->connection->executeQuery('SELECT * FROM tl_event_release_level_policy WHERE pid = ? ORDER BY level', [$objEventReleasePackage->id]);
 
-                            // Get the referring method, because nested filter wont't work in the filter panel
+                            // Get the referring method, because nested filter won't work in the filter panel
                             $trace = debug_backtrace();
                             $referringMethod = $trace[2]['function'];
 
                             while (false !== ($rowEventReleaseLevels = $stmt->fetchAssociative())) {
-
                                 if ('panel' === $referringMethod) {
                                     // Nested options won't work in the filter panel
                                     $options[$rowEventReleaseLevels['id']] = $rowEventReleaseLevels['title'];
@@ -1349,7 +1384,7 @@ class CalendarEvents extends Backend
             } else {
                 $stmt = $this->connection->executeQuery('SELECT * FROM tl_event_release_level_policy ORDER BY pid,level');
 
-                // Get the referring method, because nested filter wont't work in the filter panel
+                // Get the referring method, because nested filter won't work in the filter panel
                 $trace = debug_backtrace();
                 $referringMethod = $trace[2]['function'];
 
@@ -1368,7 +1403,7 @@ class CalendarEvents extends Backend
     }
 
     /**
-     * multicolumnwizard columnsCallback listFixedDates().
+     * Multi Column Wizard columnsCallback listFixedDates().
      */
     public function listFixedDates(): array
     {
@@ -1435,6 +1470,8 @@ class CalendarEvents extends Backend
      * Push event to next release level.
      *
      * @Callback(table="tl_calendar_events", target="list.operations.releaseLevelNext.button", priority=100)
+     *
+     * @throws \Exception
      */
     public function releaseLevelNext(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
     {
@@ -1462,7 +1499,8 @@ class CalendarEvents extends Backend
                     if (null !== $objReleaseLevelModel) {
                         $objEvent->eventReleaseLevel = $objReleaseLevelModel->id;
                         $objEvent->save();
-                        $this->saveCallbackEventReleaseLevel($objEvent->eventReleaseLevel, null, $objEvent->id);
+
+                        $this->handleEventReleaseLevelAndPublishUnpublish((int) $objEvent->id, $objEvent->eventReleaseLevel);
 
                         // HOOK: changeEventReleaseLevel, f.ex inform tourenchef via email
                         if (isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) && \is_array($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'])) {
@@ -1489,17 +1527,13 @@ class CalendarEvents extends Backend
     }
 
     /**
-     * Update main instructor (first instructor in the list is the main instructor).
-     *
-     * @param $varValue
+     * Update main instructor (the first instructor in the list is the main instructor).
      *
      * @throws Exception
      *
-     * @return mixed
-     *
      * @Callback(table="tl_calendar_events", target="fields.instructor.save", priority=100)
      */
-    public function saveCallbackSetMaininstructor($varValue, DataContainer $dc)
+    public function saveCallbackSetMaininstructor(?string $varValue, DataContainer $dc): ?string
     {
         if ($dc->id > 0) {
             $arrInstructors = $this->stringUtil->deserialize($varValue, true);
@@ -1550,17 +1584,156 @@ class CalendarEvents extends Backend
      *
      * @throws \Exception
      *
-     * @Callback(table="tl_calendar_events", target="fields.eventReleaseLevel.save", priority=100)
+     * @Callback(table="tl_calendar_events", target="fields.eventReleaseLevel.save", priority=90)
      */
-    public function saveCallbackEventReleaseLevel(int $targetEventReleaseLevelId, ?DataContainer $dc, int $intId = null): int
+    public function saveCallbackEventReleaseLevel(int $targetEventReleaseLevelId, DataContainer $dc): int
+    {
+        return $this->handleEventReleaseLevelAndPublishUnpublish((int) $dc->activeRecord->id, $targetEventReleaseLevelId);
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @Callback(table="tl_calendar_events", target="fields.eventType.save", priority=80)
+     */
+    public function saveCallbackEventType(string $strEventType, DataContainer $dc, int $intId = null): string
+    {
+        if ('' !== $strEventType) {
+            if ($dc->activeRecord->id > 0) {
+                $objEvent = $this->calendarEventsModel->findByPk($dc->activeRecord->id);
+            } else {
+                $objEvent = $this->calendarEventsModel->findByPk($intId);
+            }
+
+            if (null === $objEvent) {
+                throw new \Exception('Event not found.');
+            }
+
+            // !important, because if the eventType is not saved, no eventReleaseLevel can be assigned
+            $objEvent->eventType = $strEventType;
+            $objEvent->save();
+
+            if (null === EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel)) {
+                $objEventReleaseModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
+
+                if (null !== $objEventReleaseModel) {
+                    $objEvent->eventReleaseLevel = $objEventReleaseModel->id;
+                    $objEvent->save();
+                }
+            }
+        }
+
+        return $strEventType;
+    }
+
+    /**
+     * Downgrade event to the previous release level.
+     *
+     * @Callback(table="tl_calendar_events", target="list.operations.releaseLevelPrev.button", priority=90)
+     *
+     * @throws \Exception
+     */
+    public function releaseLevelPrev(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        $user = $this->security->getUser();
+
+        $strDirection = 'down';
+
+        $canPushToNextReleaseLevel = false;
+        $prevReleaseLevel = null;
+        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
+
+        if (null !== $objReleaseLevelModel) {
+            $prevReleaseLevel = $objReleaseLevelModel->level - 1;
+        }
+
+        // Save to database
+        if ('releaseLevelPrev' === $request->query->get('action') && (int) $request->query->get('eventId') === (int) $row['id']) {
+            if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($user->id, $row['id'], 'down') && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
+                $objEvent = $this->calendarEventsModel->findByPk($request->query->get('eventId'));
+
+                if (null !== $objEvent) {
+                    $objReleaseLevelModel = EventReleaseLevelPolicyModel::findPrevLevel($objEvent->eventReleaseLevel);
+
+                    if (null !== $objReleaseLevelModel) {
+                        $objEvent->eventReleaseLevel = $objReleaseLevelModel->id;
+                        $objEvent->save();
+
+                        $this->handleEventReleaseLevelAndPublishUnpublish((int) $objEvent->id, $objEvent->eventReleaseLevel);
+
+                        // HOOK: changeEventReleaseLevel, f.ex inform tourenchef via email
+                        if (isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) && \is_array($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'])) {
+                            foreach ($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] as $callback) {
+                                $this->system->importStatic($callback[0])->{$callback[1]}($objEvent, $strDirection);
+                            }
+                        }
+                    }
+                }
+            }
+
+            $this->controller->redirect($this->system->getReferer());
+        }
+
+        if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($user->id, $row['id'], $strDirection) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
+            $canPushToNextReleaseLevel = true;
+        }
+
+        if (false === $canPushToNextReleaseLevel) {
+            return '';
+        }
+
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+    }
+
+    /**
+     * @Callback(table="tl_calendar_events", target="list.operations.delete.button", priority=80)
+     */
+    public function deleteIcon(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    {
+        $user = $this->security->getUser();
+
+        $blnAllow = EventReleaseLevelPolicyModel::canDeleteEvent($user->id, $row['id']);
+
+        if (!$blnAllow) {
+            return '';
+        }
+
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+    }
+
+    /**
+     * @Callback(table="tl_calendar_events", target="list.operations.copy.button", priority=70)
+     */
+    public function copyIcon(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    {
+        $user = $this->security->getUser();
+
+        $blnAllow = EventReleaseLevelPolicyModel::hasWritePermission($user->id, $row['id']);
+
+        if (!$blnAllow) {
+            return '';
+        }
+
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function generateEventToken(int $eventId): string
+    {
+        return md5((string) random_int(100000000, 999999999)).'-'.$eventId;
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function handleEventReleaseLevelAndPublishUnpublish(int $eventId, int $targetEventReleaseLevelId): int
     {
         $hasError = false;
 
-        if ($dc->activeRecord->id > 0) {
-            $objEvent = $this->calendarEventsModel->findByPk($dc->activeRecord->id);
-        } else {
-            $objEvent = $this->calendarEventsModel->findByPk($intId);
-        }
+        $objEvent = $this->calendarEventsModel->findByPk($eventId);
 
         if (null === $objEvent) {
             throw new \Exception('Event not found.');
@@ -1615,134 +1788,5 @@ class CalendarEvents extends Backend
         }
 
         return $targetEventReleaseLevelId;
-    }
-
-    /**
-     * @throws \Exception
-     *
-     * @Callback(table="tl_calendar_events", target="fields.eventType.save", priority=100)
-     */
-    public function saveCallbackEventType(string $strEventType, DataContainer $dc, int $intId = null): string
-    {
-        if ('' !== $strEventType) {
-            if ($dc->activeRecord->id > 0) {
-                $objEvent = $this->calendarEventsModel->findByPk($dc->activeRecord->id);
-            } else {
-                $objEvent = $this->calendarEventsModel->findByPk($intId);
-            }
-
-            if (null === $objEvent) {
-                throw new \Exception('Event not found.');
-            }
-
-            // !important, because if the eventType is not saved, no eventReleaseLevel can be assigned
-            $objEvent->eventType = $strEventType;
-            $objEvent->save();
-
-            if (null === EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel)) {
-                $objEventReleaseModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
-
-                if (null !== $objEventReleaseModel) {
-                    $objEvent->eventReleaseLevel = $objEventReleaseModel->id;
-                    $objEvent->save();
-                }
-            }
-        }
-
-        return $strEventType;
-    }
-
-    /**
-     * Downgrade event to the previous release level.
-     *
-     * @Callback(table="tl_calendar_events", target="list.operations.releaseLevelPrev.button", priority=100)
-     */
-    public function releaseLevelPrev(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        $user = $this->security->getUser();
-
-        $strDirection = 'down';
-
-        $canPushToNextReleaseLevel = false;
-        $prevReleaseLevel = null;
-        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
-
-        if (null !== $objReleaseLevelModel) {
-            $prevReleaseLevel = $objReleaseLevelModel->level - 1;
-        }
-
-        // Save to database
-        if ('releaseLevelPrev' === $request->query->get('action') && (int) $request->query->get('eventId') === (int) $row['id']) {
-            if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($user->id, $row['id'], 'down') && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
-                $objEvent = $this->calendarEventsModel->findByPk($request->query->get('eventId'));
-
-                if (null !== $objEvent) {
-                    $objReleaseLevelModel = EventReleaseLevelPolicyModel::findPrevLevel($objEvent->eventReleaseLevel);
-
-                    if (null !== $objReleaseLevelModel) {
-                        $objEvent->eventReleaseLevel = $objReleaseLevelModel->id;
-                        $objEvent->save();
-                        $this->saveCallbackEventReleaseLevel($objEvent->eventReleaseLevel, null, $objEvent->id);
-
-                        // HOOK: changeEventReleaseLevel, f.ex inform tourenchef via email
-                        if (isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) && \is_array($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'])) {
-                            foreach ($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] as $callback) {
-                                $this->system->importStatic($callback[0])->{$callback[1]}($objEvent, $strDirection);
-                            }
-                        }
-                    }
-                }
-            }
-
-            $this->controller->redirect($this->system->getReferer());
-        }
-
-        if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($user->id, $row['id'], $strDirection) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
-            $canPushToNextReleaseLevel = true;
-        }
-
-        if (false === $canPushToNextReleaseLevel) {
-            return '';
-        }
-
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
-    }
-
-    /**
-     * @Callback(table="tl_calendar_events", target="list.operations.delete.button", priority=100)
-     */
-    public function deleteIcon(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
-    {
-        $user = $this->security->getUser();
-
-        $blnAllow = EventReleaseLevelPolicyModel::canDeleteEvent($user->id, $row['id']);
-
-        if (!$blnAllow) {
-            return '';
-        }
-
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
-    }
-
-    /**
-     * @Callback(table="tl_calendar_events", target="list.operations.copy.button", priority=100)
-     */
-    public function copyIcon(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
-    {
-        $user = $this->security->getUser();
-
-        $blnAllow = EventReleaseLevelPolicyModel::hasWritePermission($user->id, $row['id']);
-
-        if (!$blnAllow) {
-            return '';
-        }
-
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
-    }
-
-    private function generateEventToken(int $eventId): string
-    {
-        return md5((string) random_int(100000000, 999999999)).'-'.$eventId;
     }
 }
