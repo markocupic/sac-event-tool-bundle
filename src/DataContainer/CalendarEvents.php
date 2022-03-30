@@ -645,20 +645,16 @@ class CalendarEvents
      */
     public function onDelete(DataContainer $dc): void
     {
-        $user = $this->security->getUser();
-
         // Return if there is no ID
         if (!$dc->activeRecord) {
             return;
         }
 
-        if (!$user->admin) {
-            $registrationId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$dc->activeRecord->id]);
+        $registrationId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$dc->activeRecord->id]);
 
-            if ($registrationId) {
-                $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'], $dc->activeRecord->id));
-                $this->controller->redirect($this->system->getReferer());
-            }
+        if ($registrationId) {
+            $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['deleteEventMembersBeforeDeleteEvent'], $dc->activeRecord->id));
+            $this->controller->redirect($this->system->getReferer());
         }
     }
 
