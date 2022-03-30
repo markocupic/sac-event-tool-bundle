@@ -253,7 +253,6 @@ class CalendarEventsHelper
 
             case 'gallery':
                 $value = static::getGallery([
-                    'aha' => 'bla',
                     'multiSRC' => $objEvent->multiSRC,
                     'orderSRC' => $objEvent->orderSRC,
                     'sortBy' => 'custom',
