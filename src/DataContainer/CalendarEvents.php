@@ -26,6 +26,7 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\Database;
 use Contao\DataContainer;
 use Contao\Date;
 use Contao\DcaExtractor;
@@ -1053,7 +1054,10 @@ class CalendarEvents
                 $chunks = explode('.', $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['foreignKey'], 2);
 
                 foreach ((array) $value as $v) {
-                    $keyValue = $this->connection->fetchOne('SELECT '.$this->connection->quoteIdentifier($chunks[1]).' AS value FROM '.$chunks[0].' WHERE id = ?', [$v]);
+                    // Use \Contao\Database::quoteIdentifier instead of Doctrine\DBAL\Connection::quoteIdentifier
+                    // because only Contao can handle chained foreign keys like this:
+                    // 'foreignKey' => "tl_user.CONCAT(lastname, ' ', firstname, ', ', city)",
+                    $keyValue = $this->connection->fetchOne('SELECT '.Database::quoteIdentifier($chunks[1]).' AS value FROM '.$chunks[0].' WHERE id = ?', [$v]);
 
                     if ($keyValue) {
                         $temp[] = $keyValue;
