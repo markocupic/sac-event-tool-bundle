@@ -13,49 +13,49 @@ declare(strict_types=1);
  */
 
 $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
-    'config' => [
-        'dataContainer' => 'Table',
-        'ptable' => 'tl_event_release_level_policy_package',
+    'config'   => [
+        'dataContainer'    => 'Table',
+        'ptable'           => 'tl_event_release_level_policy_package',
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
-        'switchToEdit' => true,
-        'sql' => [
+        'switchToEdit'     => true,
+        'sql'              => [
             'keys' => [
                 'id' => 'primary',
             ],
         ],
     ],
-    'list' => [
-        'sorting' => [
-            'mode' => 4,
-            'fields' => ['level'],
-            'panelLayout' => 'filter;search,limit',
-            'headerFields' => ['level', 'title'],
+    'list'     => [
+        'sorting'           => [
+            'mode'            => 4,
+            'fields'          => ['level'],
+            'panelLayout'     => 'filter;search,limit',
+            'headerFields'    => ['level', 'title'],
             'disableGrouping' => true,
         ],
-        'label' => [
-            'fields' => ['level', 'title'],
+        'label'             => [
+            'fields'      => ['level', 'title'],
             'showColumns' => true,
         ],
         'global_operations' => [
             'all' => [
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
+                'href'       => 'act=select',
+                'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
         ],
-        'operations' => [
-            'edit' => [
+        'operations'        => [
+            'edit'   => [
                 'href' => 'act=edit',
                 'icon' => 'edit.svg',
             ],
-            'copy' => [
+            'copy'   => [
                 'href' => 'act=copy',
                 'icon' => 'copy.svg',
             ],
             'delete' => [
-                'href' => 'act=delete',
-                'icon' => 'delete.svg',
+                'href'       => 'act=delete',
+                'icon'       => 'delete.svg',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
             ],
         ],
@@ -63,93 +63,93 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
     'palettes' => [
         'default' => 'level,title,description,allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowSwitchingToPrevLevel,allowSwitchingToNextLevel,groupReleaseLevelRights',
     ],
-    'fields' => [
-        'id' => [
+    'fields'   => [
+        'id'                            => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'pid' => [
+        'pid'                           => [
             'foreignKey' => 'tl_event_release_level_policy_package.title',
-            'sql' => "int(10) unsigned NOT NULL default '0'",
-            'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
+            'sql'        => "int(10) unsigned NOT NULL default '0'",
+            'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
         ],
-        'tstamp' => [
+        'tstamp'                        => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'level' => [
-            'exclude' => true,
+        'level'                         => [
+            'exclude'   => true,
             'inputType' => 'select',
-            'options' => range(1, 10),
-            'eval' => ['mandatory' => true, 'tl_class' => 'clr'],
-            'sql' => "smallint(2) unsigned NOT NULL default '0'",
+            'options'   => range(1, 10),
+            'eval'      => ['mandatory' => true, 'tl_class' => 'clr'],
+            'sql'       => "smallint(2) unsigned NOT NULL default '0'",
         ],
-        'title' => [
-            'exclude' => true,
+        'title'                         => [
+            'exclude'   => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'description' => [
-            'exclude' => true,
+        'description'                   => [
+            'exclude'   => true,
             'inputType' => 'textarea',
-            'eval' => ['mandatory' => true, 'tl_class' => 'clr'],
-            'sql' => 'text NULL',
+            'eval'      => ['mandatory' => true, 'tl_class' => 'clr'],
+            'sql'       => 'text NULL',
         ],
-        'allowSwitchingToPrevLevel' => [
-            'exclude' => true,
-            'filter' => true,
+        'allowSwitchingToPrevLevel'     => [
+            'exclude'   => true,
+            'filter'    => true,
             'inputType' => 'checkbox',
-            'sql' => "char(1) NOT NULL default ''",
+            'sql'       => "char(1) NOT NULL default ''",
         ],
-        'allowSwitchingToNextLevel' => [
-            'exclude' => true,
-            'filter' => true,
+        'allowSwitchingToNextLevel'     => [
+            'exclude'   => true,
+            'filter'    => true,
             'inputType' => 'checkbox',
-            'sql' => "char(1) NOT NULL default ''",
+            'sql'       => "char(1) NOT NULL default ''",
         ],
-        'allowWriteAccessToAuthor' => [
-            'exclude' => true,
-            'filter' => true,
+        'allowWriteAccessToAuthor'      => [
+            'exclude'   => true,
+            'filter'    => true,
             'inputType' => 'checkbox',
-            'sql' => "char(1) NOT NULL default ''",
+            'sql'       => "char(1) NOT NULL default ''",
         ],
         'allowWriteAccessToInstructors' => [
-            'exclude' => true,
-            'filter' => true,
+            'exclude'   => true,
+            'filter'    => true,
             'inputType' => 'checkbox',
-            'sql' => "char(1) NOT NULL default ''",
+            'sql'       => "char(1) NOT NULL default ''",
         ],
-        'groupReleaseLevelRights' => [
-            'exclude' => true,
+        'groupReleaseLevelRights'       => [
+            'exclude'   => true,
             'inputType' => 'multiColumnWizard',
-            'eval' => [
-                'mandatory' => false,
+            'eval'      => [
+                'mandatory'    => false,
                 'columnFields' => [
-                    'group' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['group'],
-                        'exclude' => true,
-                        'inputType' => 'select',
-                        'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
-                        'relation' => ['type' => 'hasMany', 'load' => 'eager'],
+                    'group'              => [
+                        'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['group'],
+                        'exclude'    => true,
+                        'inputType'  => 'select',
+                        'reference'  => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
+                        'relation'   => ['type' => 'hasMany', 'load' => 'eager'],
                         'foreignKey' => 'tl_user_group.name',
-                        'eval' => ['style' => 'width:250px', 'mandatory' => true, 'includeBlankOption' => true],
+                        'eval'       => ['style' => 'width:250px', 'mandatory' => true, 'includeBlankOption' => true],
                     ],
                     'releaseLevelRights' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['releaseLevelRights'],
-                        'exclude' => true,
+                        'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['releaseLevelRights'],
+                        'exclude'   => true,
                         'inputType' => 'select',
                         'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
-                        'options' => ['up', 'down', 'upAndDown'],
-                        'eval' => ['style' => 'width:250px', 'mandatory' => true, 'includeBlankOption' => true],
+                        'options'   => ['up', 'down', 'upAndDown'],
+                        'eval'      => ['style' => 'width:250px', 'mandatory' => true, 'includeBlankOption' => true],
                     ],
-                    'writeAccess' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['writeAccess'],
-                        'exclude' => true,
+                    'writeAccess'        => [
+                        'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['writeAccess'],
+                        'exclude'   => true,
                         'inputType' => 'checkbox',
-                        'eval' => ['style' => 'width:100px'],
+                        'eval'      => ['style' => 'width:100px'],
                     ],
                 ],
             ],
-            'sql' => 'blob NULL',
+            'sql'       => 'blob NULL',
         ],
     ],
 ];

@@ -13,47 +13,47 @@ declare(strict_types=1);
  */
 
 $GLOBALS['TL_DCA']['tl_course_main_type'] = [
-    'config' => [
-        'dataContainer' => 'Table',
+    'config'   => [
+        'dataContainer'    => 'Table',
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
-        'switchToEdit' => true,
-        'sql' => [
+        'switchToEdit'     => true,
+        'sql'              => [
             'keys' => [
                 'id' => 'primary',
             ],
         ],
     ],
-    'list' => [
-        'sorting' => [
-            'mode' => 2,
-            'fields' => ['code ASC'],
-            'flag' => 1,
+    'list'     => [
+        'sorting'           => [
+            'mode'        => 2,
+            'fields'      => ['code ASC'],
+            'flag'        => 1,
             'panelLayout' => 'filter;sort,search,limit',
         ],
-        'label' => [
-            'fields' => ['code', 'name'],
+        'label'             => [
+            'fields'      => ['code', 'name'],
             'showColumns' => true,
         ],
         'global_operations' => [
             'all' => [
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
+                'href'       => 'act=select',
+                'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
         ],
-        'operations' => [
-            'edit' => [
+        'operations'        => [
+            'edit'   => [
                 'href' => 'act=edit',
                 'icon' => 'edit.gif',
             ],
-            'copy' => [
+            'copy'   => [
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'href' => 'act=delete',
-                'icon' => 'delete.gif',
+                'href'       => 'act=delete',
+                'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
             ],
         ],
@@ -61,31 +61,31 @@ $GLOBALS['TL_DCA']['tl_course_main_type'] = [
     'palettes' => [
         'default' => 'code,name',
     ],
-    'fields' => [
-        'id' => [
+    'fields'   => [
+        'id'     => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         'tstamp' => [
             'label' => &$GLOBALS['TL_LANG']['tl_course_main_type']['tstamp'],
-            'flag' => 6,
-            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'flag'  => 6,
+            'sql'   => "int(10) unsigned NOT NULL default '0'",
         ],
-        'code' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'code'   => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'select',
-            'options' => range(1, 10),
-            'eval' => ['mandatory' => true, 'unique' => true],
-            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'options'   => range(1, 10),
+            'eval'      => ['mandatory' => true, 'unique' => true],
+            'sql'       => "int(10) unsigned NOT NULL default '0'",
         ],
-        'name' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'name'   => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
     ],
 ];

@@ -19,31 +19,30 @@ PaletteManipulator::create()
     ->addLegend('allowed_event_types_legend', 'calendars_legend', PaletteManipulator::POSITION_AFTER)
     ->addField(['calendar_containers', 'calendar_containerp'], 'calendars_legend', PaletteManipulator::POSITION_PREPEND)
     ->addField(['allowedEventTypes'], 'allowed_event_types_legend', PaletteManipulator::POSITION_PREPEND)
-    ->applyToPalette('default', 'tl_user_group')
-;
+    ->applyToPalette('default', 'tl_user_group');
 
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['calendar_containers'] = [
-    'exclude' => true,
-    'inputType' => 'checkbox',
+    'exclude'    => true,
+    'inputType'  => 'checkbox',
     'foreignKey' => 'tl_calendar_container.title',
-    'eval' => ['multiple' => true],
-    'sql' => 'blob NULL',
+    'eval'       => ['multiple' => true],
+    'sql'        => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['calendar_containerp'] = [
-    'exclude' => true,
+    'exclude'   => true,
     'inputType' => 'checkbox',
-    'options' => ['create', 'delete'],
+    'options'   => ['create', 'delete'],
     'reference' => &$GLOBALS['TL_LANG']['MSC'],
-    'eval' => ['multiple' => true],
-    'sql' => 'blob NULL',
+    'eval'      => ['multiple' => true],
+    'sql'       => 'blob NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['allowedEventTypes'] = [
-    'exclude' => true,
-    'inputType' => 'checkbox',
-    'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
+    'exclude'    => true,
+    'inputType'  => 'checkbox',
+    'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
     'foreignKey' => 'tl_event_type.title',
-    'sql' => 'blob NULL',
-    'eval' => ['multiple' => true, 'mandatory' => false, 'tl_class' => 'clr'],
+    'sql'        => 'blob NULL',
+    'eval'       => ['multiple' => true, 'mandatory' => false, 'tl_class' => 'clr'],
 ];

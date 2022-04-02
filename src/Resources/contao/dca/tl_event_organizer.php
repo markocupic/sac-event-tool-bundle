@@ -15,184 +15,184 @@ declare(strict_types=1);
 use Contao\Config;
 
 $GLOBALS['TL_DCA']['tl_event_organizer'] = [
-    'config' => [
-        'dataContainer' => 'Table',
+    'config'      => [
+        'dataContainer'    => 'Table',
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
-        'switchToEdit' => true,
-        'sql' => [
+        'switchToEdit'     => true,
+        'sql'              => [
             'keys' => [
                 'id' => 'primary',
             ],
         ],
     ],
-    'list' => [
-        'sorting' => [
-            'mode' => 2,
-            'fields' => ['sorting ASC'],
-            'flag' => 1,
+    'list'        => [
+        'sorting'           => [
+            'mode'        => 2,
+            'fields'      => ['sorting ASC'],
+            'flag'        => 1,
             'panelLayout' => 'filter;sort,search,limit',
         ],
-        'label' => [
-            'fields' => ['title'],
+        'label'             => [
+            'fields'      => ['title'],
             'showColumns' => true,
         ],
         'global_operations' => [
             'all' => [
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
+                'href'       => 'act=select',
+                'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
         ],
-        'operations' => [
-            'edit' => [
+        'operations'        => [
+            'edit'   => [
                 'href' => 'act=edit',
                 'icon' => 'edit.gif',
             ],
-            'copy' => [
+            'copy'   => [
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'href' => 'act=delete',
-                'icon' => 'delete.gif',
+                'href'       => 'act=delete',
+                'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
             ],
-            'show' => [
+            'show'   => [
                 'href' => 'act=show',
                 'icon' => 'show.svg',
             ],
         ],
     ],
-    'palettes' => [
+    'palettes'    => [
         '__selector__' => ['addLogo'],
-        'default' => '{title_legend},title,titlePrint,belongsToOrganization,sorting;{eventList_legend},ignoreFilterInEventList,hideInEventFilter;{event_regulation_legend},tourRegulationExtract,tourRegulationSRC,courseRegulationExtract,courseRegulationSRC;{event_story_legend},notifyWebmasterOnNewEventStory;{emergency_concept_legend},emergencyConcept;{logo_legend},addLogo;{annual_program_legend},annualProgramShowHeadline,annualProgramShowTeaser,annualProgramShowDetails',
+        'default'      => '{title_legend},title,titlePrint,belongsToOrganization,sorting;{eventList_legend},ignoreFilterInEventList,hideInEventFilter;{event_regulation_legend},tourRegulationExtract,tourRegulationSRC,courseRegulationExtract,courseRegulationSRC;{event_story_legend},notifyWebmasterOnNewEventStory;{emergency_concept_legend},emergencyConcept;{logo_legend},addLogo;{annual_program_legend},annualProgramShowHeadline,annualProgramShowTeaser,annualProgramShowDetails',
     ],
     'subpalettes' => [
         'addLogo' => 'singleSRC',
     ],
-    'fields' => [
-        'id' => [
+    'fields'      => [
+        'id'                             => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'tstamp' => [
+        'tstamp'                         => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'title' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'title'                          => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => [
+            'eval'      => [
                 'mandatory' => true,
                 'maxlength' => 255,
             ],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'titlePrint' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'titlePrint'                     => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'sorting' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'sorting'                        => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'digit', 'mandatory' => true, 'maxlength' => 255],
-            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'eval'      => ['rgxp' => 'digit', 'mandatory' => true, 'maxlength' => 255],
+            'sql'       => "int(10) unsigned NOT NULL default '0'",
         ],
-        'belongsToOrganization' => [
-            'exclude' => true,
-            'filter' => true,
+        'belongsToOrganization'          => [
+            'exclude'   => true,
+            'filter'    => true,
             'inputType' => 'select',
-            'eval' => ['multiple' => true, 'chosen' => true, 'tl_class' => 'clr m12'],
-            'sql' => 'blob NULL',
+            'eval'      => ['multiple' => true, 'chosen' => true, 'tl_class' => 'clr m12'],
+            'sql'       => 'blob NULL',
         ],
-        'ignoreFilterInEventList' => [
-            'exclude' => true,
-            'filter' => true,
+        'ignoreFilterInEventList'        => [
+            'exclude'   => true,
+            'filter'    => true,
             'inputType' => 'checkbox',
-            'eval' => ['tl_class' => 'clr m12'],
-            'sql' => "char(1) NOT NULL default ''",
+            'eval'      => ['tl_class' => 'clr m12'],
+            'sql'       => "char(1) NOT NULL default ''",
         ],
-        'hideInEventFilter' => [
-            'exclude' => true,
+        'hideInEventFilter'              => [
+            'exclude'   => true,
             'inputType' => 'checkbox',
-            'eval' => ['tl_class' => 'clr m12'],
-            'sql' => "char(1) NOT NULL default ''",
+            'eval'      => ['tl_class' => 'clr m12'],
+            'sql'       => "char(1) NOT NULL default ''",
         ],
-        'tourRegulationExtract' => [
-            'exclude' => true,
+        'tourRegulationExtract'          => [
+            'exclude'   => true,
             'inputType' => 'textarea',
-            'eval' => ['tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true],
-            'sql' => 'text NULL',
+            'eval'      => ['tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true],
+            'sql'       => 'text NULL',
         ],
-        'courseRegulationExtract' => [
-            'exclude' => true,
+        'courseRegulationExtract'        => [
+            'exclude'   => true,
             'inputType' => 'textarea',
-            'eval' => ['tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true],
-            'sql' => 'text NULL',
+            'eval'      => ['tl_class' => 'clr m12', 'rte' => 'tinyMCE', 'helpwizard' => true, 'mandatory' => true],
+            'sql'       => 'text NULL',
         ],
-        'tourRegulationSRC' => [
-            'exclude' => true,
+        'tourRegulationSRC'              => [
+            'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
-            'sql' => 'binary(16) NULL',
+            'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
+            'sql'       => 'binary(16) NULL',
         ],
-        'courseRegulationSRC' => [
-            'exclude' => true,
+        'courseRegulationSRC'            => [
+            'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval' => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
-            'sql' => 'binary(16) NULL',
+            'eval'      => ['filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => 'clr'],
+            'sql'       => 'binary(16) NULL',
         ],
         'notifyWebmasterOnNewEventStory' => [
-            'exclude' => true,
-            'filter' => true,
-            'inputType' => 'select',
-            'relation' => ['type' => 'hasOne', 'load' => 'eager'],
+            'exclude'    => true,
+            'filter'     => true,
+            'inputType'  => 'select',
+            'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
             'foreignKey' => 'tl_user.name',
-            'eval' => ['multiple' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'],
-            'sql' => 'blob NULL',
+            'eval'       => ['multiple' => true, 'chosen' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'],
+            'sql'        => 'blob NULL',
         ],
-        'emergencyConcept' => [
-            'exclude' => true,
+        'emergencyConcept'               => [
+            'exclude'   => true,
             'inputType' => 'textarea',
-            'eval' => ['tl_class' => 'clr m12', 'mandatory' => true],
-            'sql' => 'text NULL',
+            'eval'      => ['tl_class' => 'clr m12', 'mandatory' => true],
+            'sql'       => 'text NULL',
         ],
-        'addLogo' => [
-            'exclude' => true,
+        'addLogo'                        => [
+            'exclude'   => true,
             'inputType' => 'checkbox',
-            'eval' => ['submitOnChange' => true],
-            'sql' => "char(1) NOT NULL default ''",
+            'eval'      => ['submitOnChange' => true],
+            'sql'       => "char(1) NOT NULL default ''",
         ],
-        'singleSRC' => [
-            'exclude' => true,
+        'singleSRC'                      => [
+            'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval' => ['filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
-            'sql' => 'binary(16) NULL',
+            'eval'      => ['filesOnly' => true, 'extensions' => Config::get('validImageTypes'), 'fieldType' => 'radio', 'mandatory' => true, 'tl_class' => 'clr'],
+            'sql'       => 'binary(16) NULL',
         ],
-        'annualProgramShowHeadline' => [
-            'exclude' => true,
+        'annualProgramShowHeadline'      => [
+            'exclude'   => true,
             'inputType' => 'checkbox',
-            'eval' => ['tl_class' => 'w50'],
-            'sql' => "char(1) NOT NULL default ''",
+            'eval'      => ['tl_class' => 'w50'],
+            'sql'       => "char(1) NOT NULL default ''",
         ],
-        'annualProgramShowTeaser' => [
-            'exclude' => true,
+        'annualProgramShowTeaser'        => [
+            'exclude'   => true,
             'inputType' => 'checkbox',
-            'eval' => ['tl_class' => 'w50'],
-            'sql' => "char(1) NOT NULL default ''",
+            'eval'      => ['tl_class' => 'w50'],
+            'sql'       => "char(1) NOT NULL default ''",
         ],
-        'annualProgramShowDetails' => [
-            'exclude' => true,
+        'annualProgramShowDetails'       => [
+            'exclude'   => true,
             'inputType' => 'checkbox',
-            'eval' => ['tl_class' => 'w50'],
-            'sql' => "char(1) NOT NULL default ''",
+            'eval'      => ['tl_class' => 'w50'],
+            'sql'       => "char(1) NOT NULL default ''",
         ],
     ],
 ];
