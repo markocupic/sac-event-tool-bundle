@@ -14,47 +14,47 @@ declare(strict_types=1);
 
 $GLOBALS['TL_DCA']['tl_calendar_events_journey'] = [
     'config' => [
-        'dataContainer'    => 'Table',
+        'dataContainer' => 'Table',
         'enableVersioning' => true,
-        'switchToEdit'     => true,
-        'sql'              => [
+        'switchToEdit' => true,
+        'sql' => [
             'keys' => [
                 'id' => 'primary',
             ],
         ],
     ],
 
-    'list'     => [
-        'sorting'           => [
-            'mode'        => 1,
-            'fields'      => ['title ASC'],
-            'flag'        => 1,
+    'list' => [
+        'sorting' => [
+            'mode' => 1,
+            'fields' => ['title ASC'],
+            'flag' => 1,
             'panelLayout' => 'filter;sort,search,limit',
         ],
-        'label'             => [
-            'fields'      => ['title'],
+        'label' => [
+            'fields' => ['title'],
             'showColumns' => true,
         ],
         'global_operations' => [
             'all' => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
+                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
         ],
-        'operations'        => [
-            'edit'   => [
+        'operations' => [
+            'edit' => [
                 'href' => 'act=edit',
                 'icon' => 'edit.svg',
             ],
-            'copy'   => [
+            'copy' => [
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'href'       => 'act=delete',
-                'icon'       => 'delete.gif',
+                'href' => 'act=delete',
+                'icon' => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
             ],
         ],
@@ -62,30 +62,30 @@ $GLOBALS['TL_DCA']['tl_calendar_events_journey'] = [
     'palettes' => [
         'default' => 'title,alias',
     ],
-    'fields'   => [
-        'id'     => [
+    'fields' => [
+        'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'title'  => [
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => true,
-            'filter'    => true,
+        'title' => [
+            'exclude' => true,
+            'search' => true,
+            'sorting' => true,
+            'filter' => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['mandatory' => true],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'alias'  => [
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => true,
-            'filter'    => true,
+        'alias' => [
+            'exclude' => true,
+            'search' => true,
+            'sorting' => true,
+            'filter' => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['mandatory' => true],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
     ],
 ];

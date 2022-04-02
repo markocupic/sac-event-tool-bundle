@@ -20,52 +20,52 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
         'dataContainer' => 'Table',
     ],
     'fields' => [
-        'year'                 => [
+        'year' => [
             'inputType' => 'select',
-            'options'   => range(2016, (int)date('Y') + 1),
-            'eval'      => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['blankOptionLabel']],
-            'sql'       => "varchar(10) NOT NULL default ''",
+            'options' => range(2016, (int) date('Y') + 1),
+            'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['blankOptionLabel']],
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
-        'dateStart'            => [
+        'dateStart' => [
             'inputType' => 'text',
-            'eval'      => ['placeholder' => 'yyyy-mm-dd', 'maxlength' => 12],
-            'sql'       => "varchar(10) NOT NULL default ''",
+            'eval' => ['placeholder' => 'yyyy-mm-dd', 'maxlength' => 12],
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
-        'tourType'             => [
-            'inputType'  => 'select',
-            'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
+        'tourType' => [
+            'inputType' => 'select',
+            'relation' => ['type' => 'hasOne', 'load' => 'eager'],
             'foreignKey' => 'tl_tour_type.title',
-            'eval'       => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
-            'sql'        => "varchar(10) NOT NULL default ''",
+            'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
-        'courseType'           => [
+        'courseType' => [
             'inputType' => 'select',
-            'eval'      => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
-            'sql'       => "varchar(10) NOT NULL default ''",
+            'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['showAll']],
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
-        'organizers'           => [
+        'organizers' => [
             'inputType' => 'select',
-            'eval'      => ['multiple' => true],
-            'sql'       => "varchar(10) NOT NULL default ''",
+            'eval' => ['multiple' => true],
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
-        'textsearch'           => [
+        'textsearch' => [
             'inputType' => 'text',
-            'eval'      => ['placeholder' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['enterSearchTerms']],
-            'sql'       => "varchar(10) NOT NULL default ''",
+            'eval' => ['placeholder' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['enterSearchTerms']],
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
-        'eventId'              => [
+        'eventId' => [
             'inputType' => 'text',
-            'eval'      => ['placeholder' => date('Y').'-****'],
-            'sql'       => "varchar(10) NOT NULL default ''",
+            'eval' => ['placeholder' => date('Y').'-****'],
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
-        'courseId'             => [
+        'courseId' => [
             'inputType' => 'text',
-            'eval'      => ['placeholder' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'][0]],
-            'sql'       => "varchar(10) NOT NULL default ''",
+            'eval' => ['placeholder' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'][0]],
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
         'suitableForBeginners' => [
             'inputType' => 'checkbox',
-            'sql'       => "varchar(10) NOT NULL default ''",
+            'sql' => "varchar(10) NOT NULL default ''",
         ],
     ],
 ];

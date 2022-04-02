@@ -1584,7 +1584,7 @@ class CalendarEvents
      */
     public function saveCallbackEventReleaseLevel(int $targetEventReleaseLevelId, DataContainer $dc): int
     {
-        return $this->handleEventReleaseLevelAndPublishUnpublish((int) $dc->activeRecord->id, (int) $targetEventReleaseLevelId);
+        return $this->handleEventReleaseLevelAndPublishUnpublish((int) $dc->activeRecord->id, $targetEventReleaseLevelId);
     }
 
     /**
@@ -1739,11 +1739,14 @@ class CalendarEvents
 
         if (null !== $lastEventReleaseModel) {
             // Display a message in the backend if the event has been published or unpublished.
-            if ($lastEventReleaseModel->id === $targetEventReleaseLevelId) {
+            // @todo For some reason this the comparison operator will not work without type casting the id.
+            if ((int) $lastEventReleaseModel->id === $targetEventReleaseLevelId) {
                 if (!$objEvent->published) {
                     $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
                 }
+
                 $objEvent->published = '1';
+                $objEvent->save();
 
                 // HOOK: publishEvent, f.ex advice tourenchef by email
                 if (isset($GLOBALS['TL_HOOKS']['publishEvent']) && \is_array($GLOBALS['TL_HOOKS']['publishEvent'])) {
@@ -1756,7 +1759,7 @@ class CalendarEvents
                 $firstEventReleaseModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
 
                 if (null !== $eventReleaseModel) {
-                    if ($eventReleaseModel->pid !== $firstEventReleaseModel->pid) {
+                    if ((int) $eventReleaseModel->pid !== (int) $firstEventReleaseModel->pid) {
                         $hasError = true;
 
                         if ($objEvent->eventReleaseLevel > 0) {
@@ -1772,10 +1775,10 @@ class CalendarEvents
                 if ($objEvent->published) {
                     $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
                 }
-                $objEvent->published = '';
-            }
 
-            $objEvent->save();
+                $objEvent->published = '';
+                $objEvent->save();
+            }
 
             if (!$hasError) {
                 // Display a message in the backend.
