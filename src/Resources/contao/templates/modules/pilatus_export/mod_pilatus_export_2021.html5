@@ -339,7 +339,7 @@
     <?php endif; ?>
     <!-- end experimental --->
 
-    <?php if (($strBookingPeriod = Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingPeriod($arrEvent['id'], 'd.m.', 'd.m.Y')) != ''): ?>
+    <?php if (($strBookingPeriod = Markocupic\SacEventToolBundle\CalendarEventsHelper::getBookingPeriod((int) $arrEvent['id'], 'd.m.', 'd.m.Y')) != ''): ?>
     <?php $arrText[] = 'Anmeldezeitraum: <time>'.$strBookingPeriod.'
   </time>
   '; ?>

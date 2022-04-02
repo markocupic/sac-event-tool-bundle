@@ -18,6 +18,7 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 
 /**
  * Class CalendarEventsMemberModel.
+ * @method static findByEventId(int|string $id)
  */
 class CalendarEventsMemberModel extends Model
 {

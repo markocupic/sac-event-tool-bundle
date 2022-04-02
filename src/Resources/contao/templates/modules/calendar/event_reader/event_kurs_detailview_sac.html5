@@ -151,8 +151,8 @@
         <?php if ($this->getEventData('setRegistrationPeriod')): ?>
         <div class="booking-text event-detail event-info-box icon-box-small">
           <h5>Anmeldung möglich</h5>
-          <p>Vom <?= $this->getEventData('registrationStartDateFormated') ?> bis zum <?= $this->
-            getEventData('registrationEndDateFormated') ?></p>
+          <p>Vom <?= $this->getEventData('registrationStartDateFormatted') ?> bis zum <?= $this->
+            getEventData('registrationEndDateFormatted') ?></p>
         </div>
         <?php endif; ?>
 
