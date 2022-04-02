@@ -22,7 +22,6 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\ContentElement;
 use Contao\FilesModel;
 use Contao\PageModel;
-use Contao\System;
 use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,41 +33,37 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CabanneSacDetailController extends AbstractContentElementController
 {
-    /**
-     * @var CabanneSacModel
-     */
-    protected $objCabanne;
+    private ContaoFramework $framework;
+    private string $projectDir;
+    private ?CabanneSacModel $objCabanne;
+
+    public function __construct(ContaoFramework $framework, string $projectDir)
+    {
+        $this->framework = $framework;
+        $this->projectDir = $projectDir;
+    }
 
     public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
     {
         /** @var CabanneSacModel $cabanneSacModelAdapter */
-        $cabanneSacModelAdapter = $this->get('contao.framework')->getAdapter(CabanneSacModel::class);
+        $cabanneSacModelAdapter =$this->framework->getAdapter(CabanneSacModel::class);
 
         // Add data to template
         if (null === ($this->objCabanne = $cabanneSacModelAdapter->findByPk($model->cabanneSac))) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 
-        return parent::__invoke($request, $model, $section, $classes, $pageModel);
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
-        $services['contao.framework'] = ContaoFramework::class;
-
-        return $services;
+        return parent::__invoke($request, $model, $section, $classes);
     }
 
     protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
     {
         /** @var FilesModel $filesModelAdapter */
-        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
+        $filesModelAdapter =$this->framework->getAdapter(FilesModel::class);
 
         /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $controllerAdapter =$this->framework->getAdapter(Controller::class);
 
-        $projectDir = System::getContainer()->getParameter('kernel.project_dir');
 
         // Add data to template
         $skip = ['id', 'tstamp'];
@@ -80,7 +75,7 @@ class CabanneSacDetailController extends AbstractContentElementController
         }
         $objFiles = $filesModelAdapter->findByUuid($this->objCabanne->singleSRC);
 
-        if (null !== $objFiles && is_file($projectDir.'/'.$objFiles->path)) {
+        if (null !== $objFiles && is_file($this->projectDir.'/'.$objFiles->path)) {
             $model->singleSRC = $objFiles->path;
             $controllerAdapter->addImageToTemplate($template, $model->row(), null, 'cabanneDetail', $objFiles);
         }

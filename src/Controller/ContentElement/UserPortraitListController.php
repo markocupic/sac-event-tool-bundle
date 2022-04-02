@@ -19,14 +19,13 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\ContentElement;
-use Contao\Database;
 use Contao\FrontendTemplate;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\Template;
 use Contao\UserModel;
 use Contao\UserRoleModel;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -37,37 +36,43 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class UserPortraitListController extends AbstractContentElementController
 {
+    private ContaoFramework $framework;
+    private Connection $connection;
+    private string $projectDir;
+
+    public function __construct(ContaoFramework $framework, Connection $connection, string $projectDir)
+    {
+        $this->framework = $framework;
+        $this->connection = $connection;
+        $this->projectDir = $projectDir;
+    }
+
     public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
     {
-        return parent::__invoke($request, $model, $section, $classes, $pageModel);
+        return parent::__invoke($request, $model, $section, $classes);
     }
 
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
-        $services['contao.framework'] = ContaoFramework::class;
-
-        return $services;
-    }
-
+    /**
+     * @param Template $template
+     * @param ContentModel $model
+     * @param Request $request
+     * @return Response|null
+     * @throws \Doctrine\DBAL\Exception
+     */
     protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
     {
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
 
         /** @var UserModel $userModelAdapter */
-        $userModelAdapter = $this->get('contao.framework')->getAdapter(UserModel::class);
+        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
         /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         /** @var Controller $stringUtilAdapter */
-        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         /** @var UserRoleModel $userRoleModelAdapter */
-        $userRoleModelAdapter = $this->get('contao.framework')->getAdapter(UserRoleModel::class);
-
-        $projectDir = System::getContainer()->getParameter('kernel.project_dir');
+        $userRoleModelAdapter = $this->framework->getAdapter(UserRoleModel::class);
 
         // Get template
         if ('' !== $model->userList_template) {
@@ -81,22 +86,22 @@ class UserPortraitListController extends AbstractContentElementController
             $queryType = $model->userList_queryType;
 
             if (\count($arrSelectedRoles) > 0) {
-                $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_user  WHERE disable=? AND hideInFrontendListings =? ORDER BY lastname ASC, firstname ASC')->execute('', '');
+                $stmt = $this->connection->executeQuery('SELECT * FROM tl_user  WHERE disable = ? AND hideInFrontendListings = ? ORDER BY lastname ASC, firstname ASC', ['', '']);
 
                 if ('OR' === $queryType) {
-                    while ($objDb->next()) {
-                        $arrUserRole = $stringUtilAdapter->deserialize($objDb->userRole, true);
+                    while (false !== ($arrUser = $stmt->fetchAssociative())) {
+                        $arrUserRole = $stringUtilAdapter->deserialize($arrUser['userRole'], true);
 
                         if (\count(array_intersect($arrUserRole, $arrSelectedRoles)) > 0) {
-                            $arrIDS[] = $objDb->id;
+                            $arrIDS[] = $arrUser['id'];
                         }
                     }
                 } elseif ('AND' === $queryType) {
-                    while ($objDb->next()) {
-                        $arrUserRole = $stringUtilAdapter->deserialize($objDb->userRole, true);
+                    while (false !== ($arrUser = $stmt->fetchAssociative())) {
+                        $arrUserRole = $stringUtilAdapter->deserialize($arrUser['userRole'], true);
 
                         if (\count(array_intersect($arrUserRole, $arrSelectedRoles)) === \count($arrSelectedRoles)) {
-                            $arrIDS[] = $objDb->id;
+                            $arrIDS[] = $arrUser['id'];
                         }
                     }
                 }
@@ -116,18 +121,17 @@ class UserPortraitListController extends AbstractContentElementController
 
         $objUser = $userModelAdapter->findMultipleByIds($arrIDS);
 
+        $itemCount = 0;
+
         if (null !== $objUser) {
-            $itemCount = 0;
             $strItems = '';
 
             while ($objUser->next()) {
                 ++$itemCount;
 
                 // Get partial template
-                if ('' !== $model->userList_partial_template) {
-                    $strTemplatePartial = $model->userList_partial_template;
-                }
-                /** @var FrontendTemplate $objTemplate */
+                $strTemplatePartial = $model->userList_partial_template;
+
                 $objTemplate = new FrontendTemplate($strTemplatePartial);
                 $objTemplate->setData($objUser->row());
                 $objTemplate->jumpTo = $model->jumpTo;
@@ -164,6 +168,7 @@ class UserPortraitListController extends AbstractContentElementController
                         }
                     }
                 }
+
                 $objTemplate->roleEmails = $arrRoleEmails;
                 $objTemplate->roles = $arrRoles;
 
@@ -172,7 +177,8 @@ class UserPortraitListController extends AbstractContentElementController
 
                 // Add image to template
                 if (\strlen($strAvatarSRC)) {
-                    if (is_file($projectDir.'/'.$strAvatarSRC)) {
+                    if (is_file($this->projectDir.'/'.$strAvatarSRC)) {
+
                         // Create partial object
                         $objPartial = new \stdClass();
 
@@ -188,7 +194,7 @@ class UserPortraitListController extends AbstractContentElementController
                         $arrUser = (array) $objPartial;
                         $objTemplate->addImage = true;
 
-                        $controllerAdapter->addImageToTemplate($objTemplate, $arrUser, null, null, null);
+                        $controllerAdapter->addImageToTemplate($objTemplate, $arrUser);
                     }
                 }
                 $strItems .= $objTemplate->parse();
@@ -196,7 +202,7 @@ class UserPortraitListController extends AbstractContentElementController
             $template->items = $strItems;
         }
 
-        $template->hasMultiple = $itemCount > 1 ? true : false;
+        $template->hasMultiple = $itemCount > 1;
         $template->itemCount = $itemCount;
 
         return $template->getResponse();

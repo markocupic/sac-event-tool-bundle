@@ -142,8 +142,13 @@
         <div class="instructor event-detail event-info-box icon-box-small">
           <!-- indexer::continue -->
           <h5>Kursleitung</h5>
+
           <div class="row gx-2 gy-1">
-            <?= $this->getEventData('instructorContactBoxes') ?>
+          <?php if ('' !== ($userProfile = $this->getEventData('instructorContactBoxes||' . $this->userPortraitJumpTo))): ?>
+            <?= $this->getEventData('instructorContactBoxes||' . $this->userPortraitJumpTo) ?>
+          <?php else: ?>
+            Leiter wurde gelöscht.
+          <?php endif; ?>
           </div>
           <!-- indexer::stop -->
         </div>

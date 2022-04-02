@@ -34,8 +34,11 @@
         <div class="organizers event-detail event-info-box icon-box-small">
           <h5>Organisierende Gruppe</h5>
           <p>
-            <?php if ('' !== $this->getEventData('eventOrganizers')): ?><?= $this->
-            getEventData('eventOrganizers') ?><?php else: ?>Keine Gruppe ausgewählt<?php endif; ?>
+            <?php if ('' !== $this->getEventData('eventOrganizers')): ?>
+            <?= $this->getEventData('eventOrganizers') ?>
+            <?php else: ?>
+            Keine Gruppe ausgewählt
+            <?php endif; ?>
           </p>
         </div>
         <?php if ($this->getEventData('mountainguide')): ?>
@@ -73,9 +76,9 @@
         <div class="instructor event-detail event-info-box icon-box-small">
           <h5>Leitung/Betreuung</h5>
         </div>
-        <?php if ('' !== $this->getEventData('instructorContactBoxes')): ?>
+        <?php if ('' !== ($userProfile = $this->getEventData('instructorContactBoxes||' . $this->userPortraitJumpTo))): ?>
         <div class="row mt-3 gx-2 gy-1">
-          <?= $this->getEventData('instructorContactBoxes') ?>
+          <?= $userProfile ?>
         </div>
         <?php else: ?>
         Leiter wurde gelöscht.

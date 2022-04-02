@@ -19,11 +19,10 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\ContentElement;
-use Contao\Database;
 use Contao\FilesModel;
 use Contao\PageModel;
-use Contao\System;
 use Contao\Template;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -34,39 +33,37 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CabanneSacListController extends AbstractContentElementController
 {
-    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
+    private ContaoFramework $framework;
+    private Connection $connection;
+    private string $projectDir;
+
+    public function __construct(ContaoFramework $framework, Connection $connection, string $projectDir)
     {
-        return parent::__invoke($request, $model, $section, $classes, $pageModel);
+        $this->framework = $framework;
+        $this->connection = $connection;
+        $this->projectDir = $projectDir;
     }
 
-    public static function getSubscribedServices(): array
+    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
     {
-        $services = parent::getSubscribedServices();
-        $services['contao.framework'] = ContaoFramework::class;
-
-        return $services;
+        return parent::__invoke($request, $model, $section, $classes);
     }
 
     protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
     {
         /** @var FilesModel $filesModelAdapter */
-        $filesModelAdapter = $this->get('contao.framework')->getAdapter(FilesModel::class);
-
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
 
         /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
-
-        $projectDir = System::getContainer()->getParameter('kernel.project_dir');
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         // Add data to template
-        $objDb = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_cabanne_sac WHERE id=?')->execute($model->cabanneSac);
+        $row = $this->connection->fetchAssociative('SELECT * FROM tl_cabanne_sac WHERE id = ?',[$model->cabanneSac]);
 
-        if ($objDb->numRows) {
+        if ($row) {
             $skip = ['id', 'tstamp', 'singleSRC'];
 
-            foreach ($objDb->fetchAssoc() as $k => $v) {
+            foreach ($row as $k => $v) {
                 if (!\in_array($k, $skip, true)) {
                     $template->$k = $v;
                 }
@@ -75,7 +72,7 @@ class CabanneSacListController extends AbstractContentElementController
 
         $objFiles = $filesModelAdapter->findByUuid($model->singleSRC);
 
-        if (null !== $objFiles && is_file($projectDir.'/'.$objFiles->path)) {
+        if (null !== $objFiles && is_file($this->projectDir.'/'.$objFiles->path)) {
             $model->singleSRC = $objFiles->path;
             $controllerAdapter->addImageToTemplate($template, $model->row(), null, 'cabanne_sac_list', $objFiles);
         }

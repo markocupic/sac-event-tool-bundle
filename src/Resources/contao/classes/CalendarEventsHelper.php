@@ -48,14 +48,10 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 
 class CalendarEventsHelper
 {
-
-
     /**
-     * @param CalendarEventsModel $objEvent
-     * @param string $strProperty
-     * @param Template|null $objTemplate
-     * @return array|bool|CalendarEventsModel|int|mixed|string|null
      * @throws \Exception
+     *
+     * @return array|bool|CalendarEventsModel|int|mixed|string|null
      */
     public static function getEventData(CalendarEventsModel $objEvent, string $strProperty, Template $objTemplate = null)
     {
@@ -64,10 +60,10 @@ class CalendarEventsHelper
         Controller::loadLanguageFile('default');
         $value = '';
 
-        // eventImage||5
-        $arrProperty = explode('||', $strProperty);
+        // Add arguments separated by two pipes -> eventImage||5
+        $arrArgs = explode('||', $strProperty);
 
-        switch ($arrProperty[0]) {
+        switch ($arrArgs[0]) {
             case 'model':
                 $value = $objEvent;
                 break;
@@ -213,8 +209,8 @@ class CalendarEventsHelper
                 break;
 
             case 'eventImage':
-                if (isset($arrProperty[1])) {
-                    $pictureSize = $arrProperty[1];
+                if (isset($arrArgs[1])) {
+                    $pictureSize = $arrArgs[1];
                     $src = static::getEventImagePath($objEvent);
                     $parser = System::getContainer()->get('contao.insert_tag.parser');
                     $value = $parser->replace(sprintf('{{picture::%s?size=%s}}', $src, $pictureSize));
@@ -242,7 +238,7 @@ class CalendarEventsHelper
                 break;
 
             case 'instructorContactBoxes':
-                $value = static::generateInstructorContactBoxes($objEvent);
+                $value = static::generateInstructorContactBoxes($objEvent, (int) $arrArgs[1]);
                 break;
 
             case 'arrTourProfile':
@@ -264,10 +260,10 @@ class CalendarEventsHelper
             default:
                 $arrEvent = $objEvent->row();
 
-                if (null !== $objTemplate && isset($objTemplate->{$strProperty})) {
-                    $value = $objTemplate->{$strProperty};
-                } elseif (isset($arrEvent[$strProperty])) {
-                    $value = $arrEvent[$strProperty];
+                if (null !== $objTemplate && isset($objTemplate->{$arrArgs[0]})) {
+                    $value = $objTemplate->{$arrArgs[0]};
+                } elseif (isset($arrEvent[$arrArgs[0]])) {
+                    $value = $arrEvent[$$arrArgs[0]];
                 } else {
                     $value = '';
                 }
@@ -292,8 +288,7 @@ class CalendarEventsHelper
         }
     }
 
-
-    public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent): string
+    public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent, int $jumpTo): string
     {
         $strHtml = '';
 
@@ -310,7 +305,7 @@ class CalendarEventsHelper
                 $parser = System::getContainer()->get('contao.insert_tag.parser');
 
                 $strHtml .= '<div class="image_container portrait">';
-                $strHtml .= sprintf('<a href="%s?username=%s" title="Leiter Portrait ansehen">', $parser->replace('{{link_url::leiter-portrait}}'), UserModel::findByPk($userId)->username);
+                $strHtml .= sprintf('<a href="%s?username=%s" title="Leiter Portrait ansehen">', $parser->replace('{{link_url::'.$jumpTo.'}}'), UserModel::findByPk($userId)->username);
                 $strHtml .= sprintf('<figure class="avatar-large">%s</figure>', $objPictureTpl->parse());
                 $strHtml .= '</a></div>';
                 // End image
@@ -359,10 +354,11 @@ class CalendarEventsHelper
      */
     public static function getEventState(CalendarEventsModel $objEvent): string
     {
-        $objDb = Database::getInstance();
-        $objEventsMember = $objDb->prepare('SELECT COUNT(id) AS registrationCount FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')
+        $objEventsMember = Database::getInstance()
+            ->prepare('SELECT COUNT(id) AS registrationCount FROM tl_calendar_events_member WHERE eventId = ? AND stateOfSubscription = ?')
             ->execute($objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED)
         ;
+
         $registrationCount = $objEventsMember->registrationCount;
 
         // Event canceled
@@ -405,7 +401,11 @@ class CalendarEventsHelper
 
     public static function eventIsFullyBooked(CalendarEventsModel $objEvent): bool
     {
-        $objEventsMember = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')->execute($objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED);
+        $objEventsMember = Database::getInstance()
+            ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId = ? AND stateOfSubscription = ?')
+            ->execute($objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED)
+        ;
+
         $registrationCount = $objEventsMember->numRows;
 
         if ('event_fully_booked' === $objEvent->eventState || ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers)) {
@@ -417,8 +417,8 @@ class CalendarEventsHelper
 
     public static function getMainInstructor(CalendarEventsModel $objEvent): ?UserModel
     {
-        $objDb = Database::getInstance();
-        $objInstructor = $objDb->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid=? AND isMainInstructor=?')
+        $objInstructor = Database::getInstance()
+            ->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid = ? AND isMainInstructor = ?')
             ->limit(1)
             ->execute($objEvent->id, '1')
         ;
@@ -471,8 +471,10 @@ class CalendarEventsHelper
         $arrInstructors = [];
 
         // Get all instructors from an event, list mainInstructor first
-        $objDb = Database::getInstance();
-        $objInstructor = $objDb->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid=? ORDER BY isMainInstructor DESC')->execute($objEvent->id);
+        $objInstructor = Database::getInstance()
+            ->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid = ? ORDER BY isMainInstructor DESC')
+            ->execute($objEvent->id)
+        ;
 
         while ($objInstructor->next()) {
             $objUser = UserModel::findByPk($objInstructor->userId);
@@ -647,7 +649,7 @@ class CalendarEventsHelper
     {
         $arrRepeats = [];
 
-        $arrDates = StringUtil::deserialize($objEvent->eventDates,true);
+        $arrDates = StringUtil::deserialize($objEvent->eventDates, true);
 
         foreach ($arrDates as $v) {
             $arrRepeats[] = $v['new_repeat'];
@@ -773,10 +775,11 @@ class CalendarEventsHelper
     {
         $strBadge = '<span class="badge badge-pill bg-%s" data-toggle="tooltip" data-placement="top" title="%s">%s</span>';
 
-        $objDb = Database::getInstance();
-        $calendarEventsMember = $objDb->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? && stateOfSubscription=?')
+        $calendarEventsMember = Database::getInstance()
+            ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId = ? && stateOfSubscription = ?')
             ->execute($objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED)
         ;
+
         $memberCount = $calendarEventsMember->numRows;
 
         if ('event_canceled' === $objEvent->eventState) {
@@ -896,7 +899,8 @@ class CalendarEventsHelper
         }
 
         // Get all future events of the member
-        $objMemberEvents = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId!=? AND contaoMemberId=? AND stateOfSubscription=? AND hasParticipated=?')
+        $objMemberEvents = Database::getInstance()
+            ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId != ? AND contaoMemberId = ? AND stateOfSubscription = ? AND hasParticipated = ?')
             ->execute($objEvent->id, $objMember->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED, '')
         ;
 
@@ -1000,7 +1004,6 @@ class CalendarEventsHelper
 
         return $arrProfile;
     }
-
 
     public static function getEventOrganizersLogoAsHtml(CalendarEventsModel $objEvent, string $strInsertTag = '{{image::%s}}', bool $allowDuplicate = false): array
     {

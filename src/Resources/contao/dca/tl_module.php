@@ -12,6 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvEventMemberExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventFilterFormController;
@@ -61,7 +62,15 @@ $GLOBALS['TL_DCA']['tl_module']['palettes'][MemberDashboardWriteEventArticleCont
 $GLOBALS['TL_DCA']['tl_module']['palettes'][PilatusExport2021Controller::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes'][TourDifficultyListController::TYPE] = '{title_legend},name,headline,type;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
+// Add fields to tl_module
+PaletteManipulator::create()
+    ->addLegend('jumpTo_legend', 'title_legend', PaletteManipulator::POSITION_AFTER)
+    ->addField('userPortraitJumpTo', 'jumpTo_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('eventreader', 'tl_module');
+
 // Fields
+$GLOBALS['TL_DCA']['tl_module']['fields']['userPortraitJumpTo'] = $GLOBALS['TL_DCA']['tl_module']['fields']['jumpTo'];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventType'] = [
     'exclude'   => true,
     'search'    => true,
