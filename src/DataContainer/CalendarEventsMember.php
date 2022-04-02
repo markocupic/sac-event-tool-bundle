@@ -567,7 +567,7 @@ class CalendarEventsMember
         $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
 
         if (null === $objEventMemberModel) {
-            throw new \Exception(sprintf('Registration with ID %s not found.', $dc->id));
+            throw new \Exception(sprintf('Registration with ID %s not found. While calling. %s', $dc->id, $request->getRequestUri()));
         }
 
         if ('refuseWithEmail' === $request->query->get('action')) {
