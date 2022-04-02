@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\BackendUser;
+use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
@@ -82,13 +83,16 @@ class GetSystemMessagesListener
                     $rt = $container->get('contao.csrf.token_manager')->getToken($container->getParameter('contao.csrf_token_name'))->getValue();
 
                     while ($objEvent->next()) {
+                        $eventModel = CalendarEventsModel::findByPk($objEvent->id);
+
                         $strCSSRowClass = $objEvent->endDate > time() ? 'upcoming-event' : 'past-event';
                         $link = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s', $objEvent->id, $rt);
                         $linkMemberList = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $objEvent->id, $rt);
+
                         $strBuffer .= sprintf(
                             '<tr class="hover-row %s"><td>%s</td><td>[%s] <a href="%s" style="text-decoration:underline" target="_blank" title="Event \'%s\' bearbeiten">%s</a></td><td><a href="%s" style="text-decoration:underline" target="_blank" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>',
                             $strCSSRowClass,
-                            $calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($objEvent),
+                            $calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($eventModel),
                             $dateAdapter->parse($configAdapter->get('dateFormat'), $objEvent->startDate),
                             $link,
                             $objEvent->title,

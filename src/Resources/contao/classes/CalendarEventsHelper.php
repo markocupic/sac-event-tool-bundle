@@ -46,15 +46,16 @@ use Contao\UserModel;
 use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 
-/**
- * Class CalendarEventsHelper.
- */
 class CalendarEventsHelper
 {
+
+
     /**
-     * @throws \Exception
-     *
+     * @param CalendarEventsModel $objEvent
+     * @param string $strProperty
+     * @param Template|null $objTemplate
      * @return array|bool|CalendarEventsModel|int|mixed|string|null
+     * @throws \Exception
      */
     public static function getEventData(CalendarEventsModel $objEvent, string $strProperty, Template $objTemplate = null)
     {
@@ -276,8 +277,6 @@ class CalendarEventsHelper
     }
 
     /**
-     * Usage in event detail reader&listing template.
-     *
      * @throws \Exception
      */
     public static function addEventDataToTemplate(FrontendTemplate $objTemplate): void
@@ -293,9 +292,7 @@ class CalendarEventsHelper
         }
     }
 
-    /**
-     * Usage in static::addEventDataToTemplate()/event detail reader template.
-     */
+
     public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent): string
     {
         $strHtml = '';
@@ -362,7 +359,6 @@ class CalendarEventsHelper
      */
     public static function getEventState(CalendarEventsModel $objEvent): string
     {
-
         $objDb = Database::getInstance();
         $objEventsMember = $objDb->prepare('SELECT COUNT(id) AS registrationCount FROM tl_calendar_events_member WHERE eventId=? AND stateOfSubscription=?')
             ->execute($objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED)
@@ -418,7 +414,6 @@ class CalendarEventsHelper
 
         return false;
     }
-
 
     public static function getMainInstructor(CalendarEventsModel $objEvent): ?UserModel
     {
@@ -533,7 +528,6 @@ class CalendarEventsHelper
         return $strQuali;
     }
 
-
     public static function getGallery(array $arrData): string
     {
         $arrData['type'] = 'gallery';
@@ -583,7 +577,6 @@ class CalendarEventsHelper
      */
     public static function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = '', bool $blnAppendEventDuration = true, bool $blnTooltip = true, bool $blnInline = false): string
     {
-
         if (empty($dateFormat)) {
             $dateFormat = Config::get('dateFormat');
         }
@@ -650,18 +643,11 @@ class CalendarEventsHelper
         return Date::parse($dateFormatStart, $objEvent->registrationStartDate).' - '.Date::parse($dateFormatEnd, $objEvent->registrationEndDate);
     }
 
-    /**
-     * @return array|bool
-     */
-    public static function getEventTimestamps(CalendarEventsModel $objEvent)
+    public static function getEventTimestamps(CalendarEventsModel $objEvent): array
     {
         $arrRepeats = [];
 
-        $arrDates = StringUtil::deserialize($objEvent->eventDates);
-
-        if (!\is_array($arrDates) || empty($arrDates)) {
-            return false;
-        }
+        $arrDates = StringUtil::deserialize($objEvent->eventDates,true);
 
         foreach ($arrDates as $v) {
             $arrRepeats[] = $v['new_repeat'];
@@ -672,7 +658,6 @@ class CalendarEventsHelper
 
     public static function getStartDate(CalendarEventsModel $objEvent): int
     {
-
         $arrDates = StringUtil::deserialize($objEvent->eventDates);
 
         if (!\is_array($arrDates) || empty($arrDates)) {
@@ -684,7 +669,6 @@ class CalendarEventsHelper
 
     public static function getEndDate(CalendarEventsModel $objEvent): int
     {
-
         $arrDates = StringUtil::deserialize($objEvent->eventDates);
 
         if (!\is_array($arrDates) || empty($arrDates)) {
@@ -699,8 +683,6 @@ class CalendarEventsHelper
      */
     public static function getEventDuration(CalendarEventsModel $objEvent): string
     {
-
-
         $arrDates = StringUtil::deserialize($objEvent->eventDates);
 
         if ('' !== $objEvent->durationInfo) {
@@ -714,7 +696,6 @@ class CalendarEventsHelper
         return '';
     }
 
-
     public static function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false): array
     {
         $arrReturn = [];
@@ -722,7 +703,6 @@ class CalendarEventsHelper
         $arrValues = StringUtil::deserialize($objEvent->tourTechDifficulty, true);
 
         if (!empty($arrValues)) {
-
             foreach ($arrValues as $difficulty) {
                 $strDiff = '';
                 $strDiffTitle = '';
@@ -765,7 +745,6 @@ class CalendarEventsHelper
         return $arrReturn;
     }
 
-
     public static function getTourTypesAsArray(CalendarEventsModel $objEvent, string $field = 'shortcut', bool $tooltip = false): array
     {
         $arrReturn = [];
@@ -790,9 +769,6 @@ class CalendarEventsHelper
         return $arrReturn;
     }
 
-    /**
-     * Return a bootstrap badge with some booking count information.
-     */
     public static function getBookingCounter(CalendarEventsModel $objEvent): string
     {
         $strBadge = '<span class="badge badge-pill bg-%s" data-toggle="tooltip" data-placement="top" title="%s">%s</span>';
@@ -816,14 +792,12 @@ class CalendarEventsHelper
 
             // Free places
             return sprintf($strBadge, 'dark', sprintf('noch %s freie Plätze', $objEvent->maxMembers - $memberCount), $memberCount.'/'.$objEvent->maxMembers);
-        } else {
-            // There is no booking limit. Show registered members
-            return sprintf($strBadge, 'dark', $memberCount.' bestätigte Plätze', $memberCount.'/?');
         }
+        // There is no booking limit. Show registered members
+        return sprintf($strBadge, 'dark', $memberCount.' bestätigte Plätze', $memberCount.'/?');
 
         return '';
     }
-
 
     public static function getEventStateOfSubscriptionBadgesString(CalendarEventsModel $objEvent): string
     {
@@ -886,7 +860,6 @@ class CalendarEventsHelper
         return $strRegistrationsBadges;
     }
 
-
     public static function getEventOrganizersAsArray(CalendarEventsModel $objEvent, string $field = 'title'): array
     {
         $arrReturn = [];
@@ -907,12 +880,10 @@ class CalendarEventsHelper
     }
 
     /**
-     * Check if event dates are not already occupied by another booked event.
+     * Test if the member has already made another booking at the same time.
      */
     public static function areBookingDatesOccupied(CalendarEventsModel $objEvent, MemberModel $objMember): bool
     {
-
-
         $arrEventDates = [];
         $arrEventRepeats = StringUtil::deserialize($objEvent->eventDates, true);
 
@@ -951,7 +922,6 @@ class CalendarEventsHelper
         return false;
     }
 
-
     public static function generateEventPreviewUrl(CalendarEventsModel $objEvent): string
     {
         $strUrl = '';
@@ -988,6 +958,7 @@ class CalendarEventsHelper
                 if (empty($profile['tourProfileAscentMeters']) && empty($profile['tourProfileAscentTime']) && empty($profile['tourProfileDescentMeters']) && empty($profile['tourProfileDescentTime'])) {
                     continue;
                 }
+
                 ++$m;
 
                 $arrAsc = [];
@@ -1030,45 +1001,6 @@ class CalendarEventsHelper
         return $arrProfile;
     }
 
-    /**
-     * @param $field
-     * @param $value
-     * @param $strTable
-     * @param $dataRecord
-     * @param $dca
-     *
-     * @return mixed|string|array<string>|null
-     */
-    public static function exportRegistrationListHook($field, $value, $strTable, $dataRecord, $dca)
-    {
-        if ('tl_calendar_events_member' === $strTable) {
-            if ('dateOfBirth' === $field || 'addedOn' === $field) {
-                if ((int) $value) {
-                    $value = Date::parse('Y-m-d', $value);
-                }
-            }
-
-            if ('phone' === $field) {
-                $value = str_replace(' ', '', (string) $value);
-
-                if (10 === \strlen((string) $value)) {
-                    // Format phone numbers to "0xx xxx xx xx"
-                    $value = preg_replace('/^0(\d{2})(\d{3})(\d{2})(\d{2})/', '0${1} ${2} ${3} ${4}', $value, -1);
-                }
-            }
-
-            if ('stateOfSubscription' === $field) {
-                Controller::loadLanguageFile('tl_calendar_events_member');
-
-                if (\strlen($value) && isset($GLOBALS['TL_LANG']['tl_calendar_events_member'][$value])) {
-                    $value = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$value];
-                }
-            }
-        }
-
-        return $value;
-    }
-
 
     public static function getEventOrganizersLogoAsHtml(CalendarEventsModel $objEvent, string $strInsertTag = '{{image::%s}}', bool $allowDuplicate = false): array
     {
@@ -1082,7 +1014,6 @@ class CalendarEventsHelper
 
             if (null !== $objOrganizer) {
                 if ($objOrganizer->addLogo && '' !== $objOrganizer->singleSRC) {
-
                     if (\in_array($objOrganizer->singleSRC, $arrUuids, false) && !$allowDuplicate) {
                         continue;
                     }
@@ -1101,7 +1032,6 @@ class CalendarEventsHelper
 
         return $arrHtml;
     }
-
 
     public static function getEventQrCode(CalendarEventsModel $objEvent, array $arrOptions = [], bool $blnAbsoluteUrl = true, bool $blnCache = true): ?string
     {
