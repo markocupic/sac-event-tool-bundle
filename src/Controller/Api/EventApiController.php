@@ -21,8 +21,7 @@ use Contao\StringUtil;
 use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\PDOStatement;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -37,20 +36,9 @@ class EventApiController extends AbstractController
 {
     public const CACHE_MAX_AGE = 180;
 
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private ContaoFramework $framework;
+    private RequestStack $requestStack;
+    private Connection $connection;
 
     /**
      * EventApiController constructor.
@@ -68,12 +56,13 @@ class EventApiController extends AbstractController
      * This controller is used for the vje.js event list module.
      *
      * @Route("/eventApi/events", name="sac_event_tool_api_event_api_get_events", defaults={"_scope" = "frontend", "_token_check" = false})
+     *
+     * @throws Exception
+     * @throws \Exception
      */
     public function getEventList(): JsonResponse
     {
         $this->framework->initialize();
-
-        //System::getContainer()->get('contao.framework')->initialize();
 
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
@@ -117,7 +106,6 @@ class EventApiController extends AbstractController
         // Ignore date range, ff certain query params were set
         $blnIgnoreDate = false;
 
-        /** @var QueryBuilder $qb */
         $qb = $this->connection->createQueryBuilder();
         $qb->select('id')
             ->from('tl_calendar_events', 't')
@@ -163,15 +151,15 @@ class EventApiController extends AbstractController
                 ->where('t.userId = :instructorId')
                 ->setParameter('instructorId', $userId)
             ;
-            $arrEvents = $qb2->execute()->fetchFirstColumn();
+            $arrEvents = $qb2->fetchFirstColumn();
 
             $qb->andWhere($qb->expr()->in('t.id', ':arrEvents'));
             $qb->setParameter('arrEvents', $arrEvents, Connection::PARAM_INT_ARRAY);
         }
 
-        // Searchterm (search for expression in tl_calendar_events.title and tl_calendar_events.teaser
+        // Search term (search for expression in tl_calendar_events.title and tl_calendar_events.teaser
         if (!empty($param['textsearch'])) {
-            $orxSearchTerm = $qb->expr()->orX();
+            $arrOrExpr = [];
 
             // Support multiple search expressions
             foreach (explode(' ', $param['textsearch']) as $strNeedle) {
@@ -182,8 +170,8 @@ class EventApiController extends AbstractController
                 $strNeedle = trim($strNeedle);
 
                 // Search expression in title & teaser
-                $orxSearchTerm->add($qb->expr()->like('t.title', $qb->expr()->literal('%'.$strNeedle.'%')));
-                $orxSearchTerm->add($qb->expr()->like('t.teaser', $qb->expr()->literal('%'.$strNeedle.'%')));
+                $arrOrExpr[] = $qb->expr()->like('t.title', $qb->expr()->literal('%'.$strNeedle.'%'));
+                $arrOrExpr[] = $qb->expr()->like('t.teaser', $qb->expr()->literal('%'.$strNeedle.'%'));
 
                 // Check if search expression is the name of an instructor
                 $qbSt = $this->connection->createQueryBuilder();
@@ -192,22 +180,25 @@ class EventApiController extends AbstractController
                     ->where($qbSt->expr()->like('u.name', $qbSt->expr()->literal('%'.$strNeedle.'%')))
                 ;
 
-                $arrInst = $qbSt->execute()->fetchFirstColumn();
+                $arrInst = $qbSt->fetchFirstColumn();
 
                 // Check if instructor is the instructor in this event
                 foreach ($arrInst as $instrId) {
-                    $orxSearchTerm->add($qb->expr()->in(
+                    $arrOrExpr[] = $qb->expr()->in(
                         't.id',
                         $this->connection->createQueryBuilder()
                             ->select('pid')
                             ->from('tl_calendar_events_instructor', 't2')
-                            ->where('t2.userId = :qbStInstructorid'.$instrId)
+                            ->where('t2.userId = :qbStInstructorId'.$instrId)
                             ->getSQL()
-                    ));
-                    $qb->setParameter('qbStInstructorid'.$instrId, $instrId);
+                    );
+                    $qb->setParameter('qbStInstructorId'.$instrId, $instrId);
                 }
             }
-            $qb->andWhere($orxSearchTerm);
+
+            if (!empty($arrOrExpr)) {
+                $qb->andWhere($qb->expr()->or(...$arrOrExpr));
+            }
         }
 
         // Filter by organizers
@@ -219,23 +210,27 @@ class EventApiController extends AbstractController
                 ->setParameter('true', '1')
             ;
 
-            $arrIgnoredOrganizer = $qbEvtOrg->execute()->fetchFirstColumn();
+            $arrIgnoredOrganizer = $qbEvtOrg->fetchFirstColumn();
 
-            $orxOrg = $qb->expr()->orX();
+            $arrOrExpr = [];
 
             // Show event if it has an organizer with the flag ignoreFilterInEventList=true
-            if (!empty($arrIgnoredOrganizer) && \is_array($arrIgnoredOrganizer)) {
+            if (!empty($arrIgnoredOrganizer)) {
                 foreach ($arrIgnoredOrganizer as $orgId) {
-                    $orxOrg->add($qb->expr()->like('t.organizers', $qb->expr()->literal('%:"'.$orgId.'";%')));
+                    $arrOrExpr[] = $qb->expr()->like('t.organizers', $qb->expr()->literal('%:"'.$orgId.'";%'));
                 }
             }
+
             // Show event if its organizer is in the search param
             foreach ($param['organizers'] as $orgId) {
                 if (!\in_array($orgId, $arrIgnoredOrganizer, false)) {
-                    $orxOrg->add($qb->expr()->like('t.organizers', $qb->expr()->literal('%:"'.$orgId.'";%')));
+                    $arrOrExpr[] = $qb->expr()->like('t.organizers', $qb->expr()->literal('%:"'.$orgId.'";%'));
                 }
             }
-            $qb->andWhere($orxOrg);
+
+            if (!empty($arrOrExpr)) {
+                $qb->andWhere($qb->expr()->or(...$arrOrExpr));
+            }
         }
 
         // Filter by tour type
@@ -264,11 +259,7 @@ class EventApiController extends AbstractController
             $strId = preg_replace('/\s/', '', $param['eventId']);
             $arrChunk = explode('-', $strId);
 
-            if (isset($arrChunk[1])) {
-                $eventId = $arrChunk[1];
-            } else {
-                $eventId = $strId;
-            }
+            $eventId = $arrChunk[1] ?? $strId;
 
             $qb->andWhere('t.id = :eventId');
             $qb->setParameter('eventId', $eventId);
@@ -281,7 +272,7 @@ class EventApiController extends AbstractController
                 $qb->andWhere($qb->expr()->gte('t.endDate', ':dateStart'));
                 $qb->setParameter('dateStart', $dateStart);
             }
-            // Filterboard: year filter
+            // event filter: year filter
             elseif ((int) $param['year'] > 2000) {
                 $year = (int) $param['year'];
                 $intStart = strtotime('01-01-'.$year);
@@ -297,7 +288,7 @@ class EventApiController extends AbstractController
                 $qb->setParameter('intNow', $intNow);
             }
 
-            // Filterboard: dateEnd filter
+            // event filter: dateEnd filter
             if (!empty($param['dateEnd']) && (false !== ($dateEnd = strtotime($param['dateEnd'])))) {
                 $qb->andWhere($qb->expr()->lte('t.endDate', ':dateEnd'));
                 $qb->setParameter('dateEnd', $dateEnd);
@@ -310,7 +301,7 @@ class EventApiController extends AbstractController
         $query = $qb->getSQL();
 
         /** @var array $arrIds */
-        $arrIds = $qb->execute()->fetchFirstColumn();
+        $arrIds = $qb->fetchFirstColumn();
 
         $endTime = microtime(true);
         $queryTime = $endTime - $startTime;
@@ -336,7 +327,6 @@ class EventApiController extends AbstractController
         }
 
         if (!empty($arrIds)) {
-            /** @var QueryBuilder $qb */
             $qb = $this->connection->createQueryBuilder();
             $qb->select('*')
                 ->from('tl_calendar_events', 't')
@@ -355,8 +345,7 @@ class EventApiController extends AbstractController
                 $qb->setMaxResults($param['limit']);
             }
 
-            /** @var PDOStatement $results */
-            $results = $qb->execute();
+            $results = $qb->executeQuery();
 
             while (false !== ($arrEvent = $results->fetchAssociative())) {
                 ++$arrJSON['meta']['countItems'];
@@ -467,7 +456,7 @@ class EventApiController extends AbstractController
         // Transform bin uuids
         $varValue = $validatorAdapter->isBinaryUuid($varValue) ? $stringUtilAdapter->binToUuid($varValue) : $varValue;
 
-        // Deserialize arrays and convert binuuids
+        // Deserialize arrays and convert binary uuids
         $tmp = $stringUtilAdapter->deserialize($varValue);
 
         if (!empty($tmp) && \is_array($tmp)) {
@@ -491,12 +480,8 @@ class EventApiController extends AbstractController
 
     /**
      * array_map for deep arrays.
-     *
-     * @param $fn
-     *
-     * @return array
      */
-    private function arrayMapRecursive(&$arr, $fn)
+    private function arrayMapRecursive(array &$arr, callable $fn): array
     {
         return array_map(
             fn ($item) => \is_array($item) ? $this->arrayMapRecursive($item, $fn) : $fn($item),
