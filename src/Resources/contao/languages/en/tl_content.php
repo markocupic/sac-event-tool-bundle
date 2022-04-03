@@ -27,7 +27,6 @@ $GLOBALS['TL_LANG']['tl_content']['userList_queryType'] = ['Abfragetyp (UND/ODER
 $GLOBALS['TL_LANG']['tl_content']['userList_showFieldsToGuests'] = ['Zeige Felder unangemeldeten Gästen', 'Zeige diese Felder unangemeldeten Gästen'];
 $GLOBALS['TL_LANG']['tl_content']['imgSize'] = ['Bildgrösse', 'Wählen Sie eine Bildgrösse aus.'];
 $GLOBALS['TL_LANG']['tl_content']['jumpTo'] = ['Weiterleitungsseite', 'Wählen Sie eine Weiterleitungsseite aus.'];
-$GLOBALS['TL_LANG']['tl_content']['cabanneSac'] = ['SAC Hütte', 'Wählen Sie eine SAC Hütte aus.'];
 
 // References
 $GLOBALS['TL_LANG']['tl_content']['selectUserRoles'] = 'Anhand Benutzer-Rollen';

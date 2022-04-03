@@ -15,22 +15,3 @@ services:
         tags:
             - { name: contao.content_element, category: sac_event_tool_content_elements, type: user_portrait_list }
         public: true
-
-    Markocupic\SacEventToolBundle\Controller\ContentElement\CabanneSacDetailController:
-        arguments:
-            - '@contao.framework'
-            - '%kernel.project_dir%'
-        tags:
-            - { name: contao.content_element, category: sac_event_tool_content_elements, type: cabanne_sac_detail }
-        public: true
-
-    Markocupic\SacEventToolBundle\Controller\ContentElement\CabanneSacListController:
-        arguments:
-            - '@contao.framework'
-            - '@database_connection'
-            - '%kernel.project_dir%'
-        tags:
-            - { name: contao.content_element, category: sac_event_tool_content_elements, type: cabanne_sac_list }
-            - { name: container.service_subscriber }
-        public: true
-

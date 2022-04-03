@@ -81,9 +81,6 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
     'sac_event_journey_tool' => [
         'tables' => ['tl_calendar_events_journey'],
     ],
-    'sac_cabanne_tool' => [
-        'tables' => ['tl_cabanne_sac'],
-    ],
     'sac_user_role_tool' => [
         'tables' => ['tl_user_role'],
     ],

@@ -23,19 +23,6 @@ if ('sac_calendar_events_tool' === Input::get('do')) {
 // Palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes']['user_portrait_list'] = 'name,type,headline;{config_legend},userList_selectMode,userList_queryType,userList_users,userList_userRoles,userList_replacePrivateAdressWithRoleAdress,userList_showFieldsToGuests;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{template_legend},userList_template,userList_partial_template;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['user_portrait'] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
-$GLOBALS['TL_DCA']['tl_content']['palettes']['cabanne_sac_list'] = '{type_legend},type,headline,cabanneSac;{image_legend},singleSRC,size,imagemargin,fullsize,overwriteMeta;{link_legend},jumpTo;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
-$GLOBALS['TL_DCA']['tl_content']['palettes']['cabanne_sac_detail'] = '{type_legend},type,headline,cabanneSac;{image_legend},singleSRC,size,imagemargin,fullsize,overwriteMeta;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
-
-// Fields
-$GLOBALS['TL_DCA']['tl_content']['fields']['cabanneSac'] = [
-    'exclude'    => true,
-    'search'     => true,
-    'inputType'  => 'select',
-    'foreignKey' => 'tl_cabanne_sac.name',
-    'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
-    'eval'       => ['mandatory' => true, 'maxlength' => 200, 'tl_class' => 'w50 clr'],
-    'sql'        => "int(10) unsigned NOT NULL default '0'",
-];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
     'exclude'   => true,
