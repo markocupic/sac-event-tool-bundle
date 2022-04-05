@@ -263,7 +263,7 @@ class CalendarEventsHelper
                 if (null !== $objTemplate && isset($objTemplate->{$arrArgs[0]})) {
                     $value = $objTemplate->{$arrArgs[0]};
                 } elseif (isset($arrEvent[$arrArgs[0]])) {
-                    $value = $arrEvent[$$arrArgs[0]];
+                    $value = $arrEvent[$arrArgs[0]];
                 } else {
                     $value = '';
                 }
@@ -735,7 +735,7 @@ class CalendarEventsHelper
 
                 if ('' !== $strDiff) {
                     if ($tooltip) {
-                        $html = '<span class="badge badge-pill bg-danger" data-toggle="tooltip" data-placement="top" title="Techn. Schwierigkeit: %s">%s</span>';
+                        $html = '<span class="badge badge-pill bg-primary" data-toggle="tooltip" data-placement="top" title="Techn. Schwierigkeit: %s">%s</span>';
                         $arrReturn[] = sprintf($html, $strDiffTitle, $strDiff);
                     } else {
                         $arrReturn[] = $strDiff;
