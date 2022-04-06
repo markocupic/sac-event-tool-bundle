@@ -69,8 +69,6 @@ PaletteManipulator::create()
     ->applyToPalette('eventreader', 'tl_module');
 
 // Fields
-$GLOBALS['TL_DCA']['tl_module']['fields']['userPortraitJumpTo'] = $GLOBALS['TL_DCA']['tl_module']['fields']['jumpTo'];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventType'] = [
     'exclude'   => true,
     'search'    => true,

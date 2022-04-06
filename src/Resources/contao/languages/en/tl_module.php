@@ -15,11 +15,9 @@ declare(strict_types=1);
 // Legends
 $GLOBALS['TL_LANG']['tl_module']['member_dashboard_upcoming_events_legend'] = 'Member Dashboard: Zukünftige Events';
 $GLOBALS['TL_LANG']['tl_module']['member_dashboard_event_type_filter_legend'] = 'Member Dashboard: Event-Filter-Einstellungen';
-$GLOBALS['TL_LANG']['tl_module']['jumpTo_legend'] = 'Weiterleitungs-Einstellungen';
 $GLOBALS['TL_LANG']['tl_module']['events_story_legend'] = 'Touren- und Kursberichte-Einstellungen';
 
 // Fields
-$GLOBALS['TL_LANG']['tl_module']['userPortraitJumpTo'] = ['Seite mit User Portrait Inhaltselement.','Wählen Sie aus dem Seitenbaum eine Seite, welche das User-Portrait-Inhaltselement enthält.'];
 $GLOBALS['TL_LANG']['tl_module']['unregisterFromEventNotificationId'] = ['Notification Center: Benachrichtigungs-ID bei Eventabsage eines Mitglieds', 'Geben Sie eine Benachrichtigung aus dem Notification Center ein.'];
 $GLOBALS['TL_LANG']['tl_module']['timeSpanForCreatingNewEventStory'] = ['Frist in Tagen wie lange nach Event-Ende noch Berichte eröffnet werden können', 'Geben Sie in Tagen an, wie lange nach Event-Ende es möglich sein soll, Berichte zu einem Event schreiben zu können.'];
 $GLOBALS['TL_LANG']['tl_module']['story_limit'] = ['Gesamtzahl der Beiträge', 'Hier können Sie die Gesamtzahl der Beiträge begrenzen. Geben Sie 0 ein, um alle anzuzeigen.'];

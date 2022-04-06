@@ -291,6 +291,8 @@ class CalendarEventsHelper
     public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent, int $jumpTo): string
     {
         $strHtml = '';
+        $objCalendar = $objEvent->getRelated('pid');
+        $userPortraitJumpTo = $objCalendar->userPortraitJumpTo;
 
         $arrInstructors = static::getInstructorsAsArray($objEvent);
 
@@ -305,7 +307,7 @@ class CalendarEventsHelper
                 $parser = System::getContainer()->get('contao.insert_tag.parser');
 
                 $strHtml .= '<div class="image_container portrait">';
-                $strHtml .= sprintf('<a href="%s?username=%s" title="Leiter Portrait ansehen">', $parser->replace('{{link_url::'.$jumpTo.'}}'), UserModel::findByPk($userId)->username);
+                $strHtml .= sprintf('<a href="%s?username=%s" title="Leiter Portrait ansehen">', $parser->replace('{{link_url::'.$userPortraitJumpTo.'}}'), UserModel::findByPk($userId)->username);
                 $strHtml .= sprintf('<figure class="avatar-large">%s</figure>', $objPictureTpl->parse());
                 $strHtml .= '</a></div>';
                 // End image
@@ -320,7 +322,7 @@ class CalendarEventsHelper
 
                 if (!$objUser->hideInFrontendListings) {
                     $parser = System::getContainer()->get('contao.insert_tag.parser');
-                    $strHtml .= sprintf('<a href="%s?username=%s" title="Leiter Portrait ansehen">', $parser->replace('{{link_url::leiter-portrait}}'), $objUser->username);
+                    $strHtml .= sprintf('<a href="%s?username=%s" title="Leiter Portrait ansehen">', $parser->replace('{{link_url::'.$userPortraitJumpTo.'}}'), $objUser->username);
                 }
 
                 $strHtml .= sprintf('%s %s%s', $objUser->lastname, $objUser->firstname, $strQuali);

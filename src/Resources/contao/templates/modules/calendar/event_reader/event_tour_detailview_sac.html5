@@ -76,7 +76,7 @@
         <div class="instructor event-detail event-info-box icon-box-small">
           <h5>Leitung/Betreuung</h5>
         </div>
-        <?php if ('' !== ($userProfile = $this->getEventData('instructorContactBoxes||' . $this->userPortraitJumpTo))): ?>
+        <?php if ('' !== ($userProfile = $this->getEventData('instructorContactBoxes'))): ?>
         <div class="row mt-3 gx-2 gy-1">
           <?= $userProfile ?>
         </div>

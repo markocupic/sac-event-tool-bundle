@@ -144,8 +144,8 @@
           <h5>Kursleitung</h5>
 
           <div class="row gx-2 gy-1">
-          <?php if ('' !== ($userProfile = $this->getEventData('instructorContactBoxes||' . $this->userPortraitJumpTo))): ?>
-            <?= $this->getEventData('instructorContactBoxes||' . $this->userPortraitJumpTo) ?>
+          <?php if ('' !== ($userProfile = $this->getEventData('instructorContactBoxes'))): ?>
+            <?= $this->getEventData('instructorContactBoxes') ?>
           <?php else: ?>
             Leiter wurde gelöscht.
           <?php endif; ?>

@@ -14,11 +14,13 @@ declare(strict_types=1);
 
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar']['event_type_legend'] = 'Event Typen Einstellungen';
+$GLOBALS['TL_LANG']['tl_calendar']['event_reader_legend'] = 'Event Detailseite Einstellungen';
 
 // Fields
 $GLOBALS['TL_LANG']['tl_calendar']['allowedEventTypes'] = ['Erlaubte Event Typen', 'Wählen Sie die Event Typen, die im Kalender ausgewählt werden dürfen, aus.'];
 $GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventReleaseLevelChange'] = ['Benachrichtigen bei Freigabestufen-Änderung', 'Geben Sie eine Kommaseparierte Liste mit E-Mail-Adressen an.'];
 $GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventPublish'] = ['Benachrichtigen bei Event-Veröffentlichung', 'Geben Sie eine Kommaseparierte Liste mit E-Mail-Adressen an.'];
+$GLOBALS['TL_LANG']['tl_calendar']['userPortraitJumpTo'] = ['Seite mit User Portrait Inhaltselement.','Wählen Sie aus dem Seitenbaum eine Seite, welche das User-Portrait-Inhaltselement enthält.'];
 
 // References
 $GLOBALS['TL_LANG']['tl_calendar']['course'] = 'SAC-Kurskalender';

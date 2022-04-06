@@ -33,30 +33,19 @@ if (BackendUser::getInstance()->isAdmin) {
 
 // Palettes
 PaletteManipulator::create()
-    ->addLegend(
-        'event_type_legend',
-        'protected_legend',
-        PaletteManipulator::POSITION_BEFORE
-    )
-    ->addField(
-        ['allowedEventTypes,adviceOnEventReleaseLevelChange,adviceOnEventPublish'],
-        'event_type_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->applyToPalette(
-        'default',
-        'tl_calendar'
-    );
+    ->addLegend('event_type_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
+    ->addLegend('event_reader_legend', 'protected_legend', PaletteManipulator::POSITION_BEFORE)
+    ->addField(['allowedEventTypes,adviceOnEventReleaseLevelChange,adviceOnEventPublish'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['userPortraitJumpTo'], 'event_reader_legend', PaletteManipulator::POSITION_APPEND)
+    ->applyToPalette('default', 'tl_calendar');
 
 // Fields
-// pid
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['pid'] = [
     'foreignKey' => 'tl_calendar_container.title',
     'sql'        => "int(10) unsigned NOT NULL default '0'",
     'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 ];
 
-// Allowed event types
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['allowedEventTypes'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['allowedEventTypes'],
     'exclude'   => true,
@@ -68,7 +57,6 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['allowedEventTypes'] = [
     'sql'       => 'blob NULL',
 ];
 
-// adviceOnEventReleaseLevelChange
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventReleaseLevelChange'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventReleaseLevelChange'],
     'exclude'   => true,
@@ -78,7 +66,6 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventReleaseLevelChange'] =
     'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
-// adviceOnEventPublish
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventPublish'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventPublish'],
     'exclude'   => true,
@@ -86,4 +73,13 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['adviceOnEventPublish'] = [
     'inputType' => 'text',
     'eval'      => ['tl_class' => 'clr m12', 'mandatory' => false],
     'sql'       => "varchar(255) NOT NULL default ''",
+];
+
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['userPortraitJumpTo'] = [
+    'exclude'    => true,
+    'inputType'  => 'pageTree',
+    'foreignKey' => 'tl_page.title',
+    'eval'       => ['fieldType' => 'radio'],
+    'sql'        => "int(10) unsigned NOT NULL default 0",
+    'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
