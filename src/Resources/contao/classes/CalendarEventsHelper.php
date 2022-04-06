@@ -740,7 +740,7 @@ class CalendarEventsHelper
                         $html = '<span class="badge badge-pill bg-primary" data-toggle="tooltip" data-placement="top" title="Techn. Schwierigkeit: %s">%s</span>';
                         $arrReturn[] = sprintf($html, $strDiffTitle, $strDiff);
                     } else {
-                        $arrReturn[] = $strDiff;
+                        $arrReturn[] = $strDiff.' ('.$strDiffTitle.')'
                     }
                 }
             }
