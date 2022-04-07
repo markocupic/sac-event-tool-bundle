@@ -21,6 +21,7 @@
     "tecnickcom/tcpdf": "^6.3",
     "ramsey/uuid": "^3.8|^4.2",
     "chillerlan/php-qrcode": "^4.3",
+    "terminal42/contao-fineuploader": "^3.2",
     "markocupic/phpoffice-bundle": "^1.2",
     "markocupic/cloudconvert-bundle": "^2.0",
     "markocupic/contao-component-vue-js": "^2.6",
