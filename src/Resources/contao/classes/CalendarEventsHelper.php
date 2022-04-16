@@ -288,6 +288,9 @@ class CalendarEventsHelper
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent): string
     {
         $strHtml = '';
@@ -592,7 +595,7 @@ class CalendarEventsHelper
         }
 
         $eventDuration = \count(self::getEventTimestamps($objEvent));
-        $span = (int) Calendar::calculateSpan(self::getStartDate($objEvent), self::getEndDate($objEvent)) + 1;
+        $span = Calendar::calculateSpan(self::getStartDate($objEvent), self::getEndDate($objEvent)) + 1;
 
         if (1 === $eventDuration) {
             return Date::parse($dateFormat, self::getStartDate($objEvent)).($blnAppendEventDuration ? ' ('.self::getEventDuration($objEvent).')' : '');
@@ -740,7 +743,7 @@ class CalendarEventsHelper
                         $html = '<span class="badge badge-pill bg-primary" data-toggle="tooltip" data-placement="top" title="Techn. Schwierigkeit: %s">%s</span>';
                         $arrReturn[] = sprintf($html, $strDiffTitle, $strDiff);
                     } else {
-                        $arrReturn[] = $strDiff;
+                        $arrReturn[] = $strDiff.' ('.$strDiffTitle.')';
                     }
                 }
             }
