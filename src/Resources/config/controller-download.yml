@@ -6,7 +6,7 @@ services:
         arguments:
             - '@contao.framework'
             - '@request_stack'
-            - '@Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf'
+            - '@Markocupic\SacEventToolBundle\Pdf\WorkshopBookletGenerator'
             - '@Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx'
             - '@monolog.logger.contao'
 

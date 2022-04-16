@@ -21,7 +21,7 @@ use Contao\System;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx;
 use Markocupic\SacEventToolBundle\Ical\SendEventIcal;
-use Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf;
+use Markocupic\SacEventToolBundle\Pdf\WorkshopBookletGenerator;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,17 +36,17 @@ class DownloadController extends AbstractController
 
     private RequestStack $requestStack;
 
-    private PrintWorkshopsAsPdf $printWorkshopsAsPdf;
+    private WorkshopBookletGenerator $workshopBookletGenerator;
 
     private ExportEvents2Docx $exportEvents2Docx;
 
     private ?LoggerInterface $logger;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, PrintWorkshopsAsPdf $printWorkshopsAsPdf, ExportEvents2Docx $exportEvents2Docx, ?LoggerInterface $logger)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, WorkshopBookletGenerator $workshopBookletGenerator, ExportEvents2Docx $exportEvents2Docx, ?LoggerInterface $logger)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
-        $this->printWorkshopsAsPdf = $printWorkshopsAsPdf;
+        $this->workshopBookletGenerator = $workshopBookletGenerator;
         $this->exportEvents2Docx = $exportEvents2Docx;
         $this->logger = $logger;
 
@@ -71,10 +71,10 @@ class DownloadController extends AbstractController
             if ('current' === $year) {
                 $year = date('Y');
             }
-            $this->printWorkshopsAsPdf->setYear((int) $year);
+            $this->workshopBookletGenerator->setYear((int) $year);
         }
 
-        $this->printWorkshopsAsPdf->setDownload(true);
+        $this->workshopBookletGenerator->setDownload(true);
 
         // Log download
         $this->logger->log(
@@ -83,7 +83,7 @@ class DownloadController extends AbstractController
             ['contao' => new ContaoContext(__METHOD__, Log::DOWNLOAD_WORKSHOP_BOOKLET)]
         );
 
-        return $this->printWorkshopsAsPdf->generate();
+        return $this->workshopBookletGenerator->generate();
     }
 
     /**
@@ -123,12 +123,12 @@ class DownloadController extends AbstractController
         $eventId = $request->query->get('eventId', null);
 
         if (null !== $eventId) {
-            $this->printWorkshopsAsPdf->setEventId((int) $eventId);
+            $this->workshopBookletGenerator->setEventId((int) $eventId);
         }
 
-        $this->printWorkshopsAsPdf->setDownload(true);
+        $this->workshopBookletGenerator->setDownload(true);
 
-        return $this->printWorkshopsAsPdf->generate();
+        return $this->workshopBookletGenerator->generate();
     }
 
     /**

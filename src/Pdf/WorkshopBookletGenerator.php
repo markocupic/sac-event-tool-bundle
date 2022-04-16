@@ -19,21 +19,23 @@ use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
-use Contao\Database;
 use Contao\Date;
 use Contao\EventOrganizerModel;
 use Contao\FrontendTemplate;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Safe\DateTime;
 use Symfony\Component\HttpFoundation\Response;
 
-class PrintWorkshopsAsPdf
+class WorkshopBookletGenerator
 {
     private ContaoFramework $framework;
+    private Connection $connection;
     private BinaryFileDownload $binaryFileDownload;
     private string $projectDir;
     private string $tempDir;
@@ -45,9 +47,10 @@ class PrintWorkshopsAsPdf
     private bool $download = false;
     private bool $printSingleEvent = false;
 
-    public function __construct(ContaoFramework $framework, BinaryFileDownload $binaryFileDownload, string $projectDir, string $tempDir, string $bookletFilenamePattern)
+    public function __construct(ContaoFramework $framework, Connection $connection, BinaryFileDownload $binaryFileDownload, string $projectDir, string $tempDir, string $bookletFilenamePattern)
     {
         $this->framework = $framework;
+        $this->connection = $connection;
         $this->binaryFileDownload = $binaryFileDownload;
         $this->projectDir = $projectDir;
         $this->tempDir = $tempDir;
@@ -101,7 +104,7 @@ class PrintWorkshopsAsPdf
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function generate(): Response
     {
@@ -116,11 +119,10 @@ class PrintWorkshopsAsPdf
         }
 
         // Get the font directory
-        $container = System::getContainer();
-        $bundleSRC = $container->get('kernel')->locateResource('@MarkocupicSacEventToolBundle');
+        $bundleSRC = System::getContainer()->get('kernel')->locateResource('@MarkocupicSacEventToolBundle');
         $fontDirectory = $bundleSRC.'Pdf/fonts/opensans';
 
-        // create new PDF document
+        // Create new PDF document
         // Extend TCPDF for special footer and header handling
         $this->pdf = new WorkshopTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
         \TCPDF_FONTS::addTTFfont($fontDirectory.'/OpenSans-Light.ttf', 'TrueTypeUnicode', '', 96);
@@ -135,7 +137,7 @@ class PrintWorkshopsAsPdf
         $this->pdf->SetHeaderMargin(0);
 
         // Set auto page breaks false
-        $this->pdf->SetAutoPageBreak(false, 0);
+        $this->pdf->SetAutoPageBreak(false);
 
         if ($addCover) {
             // Cover (first page)
@@ -145,43 +147,41 @@ class PrintWorkshopsAsPdf
             $this->pdf->SetY(60);
             $this->pdf->SetFont('opensans', 'B', 30);
             $this->pdf->SetTextColor(255, 255, 255);
-            $this->pdf->MultiCell(0, 0, 'SAC Sektion Pilatus', 0, 'R', 0, 1, '', '', true, 0);
+            $this->pdf->MultiCell(0, 0, 'SAC Sektion Pilatus', 0, 'R', 0, 1, '', '', true);
 
             $this->pdf->SetY(120);
             $this->pdf->SetFont('opensans', 'B', 45);
             $this->pdf->SetTextColor(255, 255, 255);
-            $this->pdf->MultiCell(0, 0, 'Kursprogramm '.$this->year, 0, 'R', 0, 1, '', '', true, 0);
+            $this->pdf->MultiCell(0, 0, 'Kursprogramm '.$this->year, 0, 'R', 0, 1, '', '', true);
 
             $this->pdf->Ln();
             $this->pdf->SetY(270);
             $this->pdf->SetFont('opensanslight', '', 8);
             $this->pdf->SetTextColor(0, 0, 0);
-            $this->pdf->MultiCell(0, 0, 'Ausgabe vom '.Date::parse('d.m.Y H:i', time()), 0, 'R', 0, 1, '', '', true, 0);
+            $this->pdf->MultiCell(0, 0, 'Ausgabe vom '.Date::parse('d.m.Y H:i', time()), 0, 'R', 0, 1, '', '', true);
         }
 
         // Event items
         $this->pdf->SetFont('opensanslight', '', 12);
         $this->pdf->SetTextColor(0, 0, 0);
-        $objDb = Database::getInstance();
 
         if ($this->eventId) {
-            $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE id = ? AND published = ?')
-                ->execute($this->eventId, 1)
-            ;
+            $stmt = $this->connection->executeQuery('SELECT * FROM tl_calendar_events WHERE id = ? AND published = ?', [$this->eventId, 1]);
         } else {
             $year = $this->year;
             $start = (new DateTime($year.'-01-01'))->getTimestamp();
             $stop = (new DateTime($year + 1 .'-01-01'))->getTimestamp();
 
-            $objEvent = $objDb->prepare('SELECT * FROM tl_calendar_events WHERE eventType = ? AND startTime >= ? AND endTime < ? AND published = ? ORDER BY courseTypeLevel0, title, startDate')
-                ->execute('course', $start, $stop, 1)
-            ;
+            $stmt = $this->connection->executeQuery(
+                'SELECT * FROM tl_calendar_events WHERE eventType = ? AND startTime >= ? AND endTime < ? AND published = ? ORDER BY courseTypeLevel0, title, startDate',
+                ['course', $start, $stop, '1']
+            );
         }
 
-        while ($objEvent->next()) {
+        while (false !== ($row = $stmt->fetchAssociative())) {
             // Create a page for each event
             $this->pdf->type = 'eventPage';
-            $this->pdf->objEvent = CalendarEventsModel::findByPk($objEvent->id);
+            $this->pdf->objEvent = CalendarEventsModel::findByPk($row['id']);
             $this->pdf->AddPage('P', 'A4');
             $html = $this->generateHtmlContent();
             $this->pdf->writeHTML($html);
@@ -194,7 +194,7 @@ class PrintWorkshopsAsPdf
             // Write the TOC title
             $this->pdf->SetFont('opensanslight', 'B', 16);
             $this->pdf->SetTextColor(100, 0, 0);
-            $this->pdf->MultiCell(0, 0, 'Inhaltsverzeichnis', 0, 'L', 0, 1, '', '', true, 0);
+            $this->pdf->MultiCell(0, 0, 'Inhaltsverzeichnis', 0, 'L', 0, 1, '', '', true);
             $this->pdf->SetTextColor(0, 0, 0);
             $this->pdf->Ln();
 
@@ -248,32 +248,27 @@ class PrintWorkshopsAsPdf
         if (null !== $objEvent) {
             $arr = CalendarEventsHelper::getEventTimestamps($objEvent);
 
-            if (false !== $arr) {
-                if (\count($arr) > 1) {
-                    $arrValue = [];
+            if (!empty($arr)) {
+                $arrValue = [];
 
-                    foreach ($arr as $k => $v) {
-                        if ($k === \count($arr) - 1) {
-                            $arrValue[] = 'und '.Date::parse('d.m.Y', $v);
-                        } else {
-                            $arrValue[] = Date::parse('d.m.', $v);
-                        }
+                foreach ($arr as $k => $v) {
+                    if ($k === \count($arr) - 1) {
+                        $arrValue[] = 'und '.Date::parse('d.m.Y', $v);
+                    } else {
+                        $arrValue[] = Date::parse('d.m.', $v);
                     }
-                    $strDates = implode(', ', $arrValue);
-                    $strDates = str_replace(', und ', ' und ', $strDates);
-                } else {
-                    $strDates = Date::parse('d.m.Y', $arr[0]);
                 }
+                $strDates = implode(', ', $arrValue);
+                $strDates = str_replace(', und ', ' und ', $strDates);
+            } else {
+                $strDates = Date::parse('d.m.Y', $arr[0]);
             }
         }
 
         return $strDates;
     }
 
-    /**
-     * @param string $string
-     */
-    private function nl2br($string = ''): string
+    private function nl2br(?string $string = ''): string
     {
         if (null === $string) {
             return '';

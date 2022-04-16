@@ -96,7 +96,7 @@ class WorkshopTCPDF extends \TCPDF
         }
 
         // logo
-        $this->Image($rootDir.'/files/fileadmin/page_assets/kursbroschuere/logo-sac-2000.png', 150, 5, 50, '', '', '', '', false, 300, '', false, false, 0);
+        $this->Image($rootDir.'/vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/logo_sac.png', 150, 5, 50, '', '', '', '', false, 300, '', false, false, 0);
 
         // Stripe bottom
         if ('eventPage' === $this->type) {

@@ -101,10 +101,11 @@ services:
             - '%kernel.project_dir%'
 
     # Generate worhshop booklet
-    Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf:
+    Markocupic\SacEventToolBundle\Pdf\WorkshopBookletGenerator:
         public: true
         arguments:
             - '@contao.framework'
+            - '@database_connection'
             - '@Markocupic\SacEventToolBundle\Download\BinaryFileDownload'
             - '%kernel.project_dir%'
             - '%sacevt.temp_dir%'

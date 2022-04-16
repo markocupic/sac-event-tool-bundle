@@ -1,2 +1,2 @@
-These fonts are used for the workshop booklet generator:
-Markocupic\SacEventToolBundle\Pdf\PrintWorkshopsAsPdf
+These fonts are used for the workshop booklet generator service:
+Markocupic\SacEventToolBundle\Pdf\WorkshopBookletGenerator
