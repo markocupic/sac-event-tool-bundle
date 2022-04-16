@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Intl\Countries;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
@@ -167,11 +166,11 @@ class User
     /**
      * Set defaults and auto-create backend users home directory when creating a new user.
      *
+     * @throws \Doctrine\DBAL\Exception
      * @Callback(table="tl_user", target="config.oncreate")
      */
     public function setDefaultsOnCreatingNew(string $strTable, int $id, array $arrSet): void
     {
-        $configAdapter = $this->framework->getAdapter(Config::class);
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
         if (null !== ($objUser = $userModelAdapter->findByPk($id))) {
@@ -179,12 +178,12 @@ class User
             $this->maintainBackendUsersHomeDirectory->createBackendUsersHomeDirectory($objUser);
 
             if ('extend' !== $arrSet['inherit']) {
-                $defaultPassword = $configAdapter->get('SAC_EVT_DEFAULT_BACKEND_PASSWORD');
+                $randomPassword = sha1((string) random_int(0, getrandmax()));
 
                 $set = [
                     'inherit' => 'extend',
                     'pwChange' => '1',
-                    'password' => password_hash($defaultPassword, PASSWORD_DEFAULT),
+                    'password' => password_hash($randomPassword, PASSWORD_DEFAULT),
                     'tstamp' => 0,
                 ];
 

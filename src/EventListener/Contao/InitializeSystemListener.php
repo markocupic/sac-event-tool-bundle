@@ -44,7 +44,6 @@ class InitializeSystemListener
         $arrConfig = [
             'SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN',
             'SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC',
-            'SAC_EVT_DEFAULT_BACKEND_PASSWORD',
         ];
 
         foreach ($arrConfig as $strConfig) {

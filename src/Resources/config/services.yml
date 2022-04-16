@@ -79,13 +79,6 @@ services:
             - '%kernel.project_dir%'
             - '%sacevt.user.backend.home_dir%'
 
-    # Cron: Replace default password and send email to user with new pw
-    Markocupic\SacEventToolBundle\User\BackendUser\ReplaceDefaultPassword:
-        public: true
-        arguments:
-            - '@contao.framework'
-            - '%sacevt.locale%'
-
     # Cron: Sync tl_member with tl_user
     Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser:
         public: true

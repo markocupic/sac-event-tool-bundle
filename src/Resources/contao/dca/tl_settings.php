@@ -49,15 +49,6 @@ PaletteManipulator::create()
         'tl_settings'
     );
 
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_DEFAULT_BACKEND_PASSWORD'] = [
-    'inputType' => 'text',
-    'eval'      => [
-        'mandatory'      => true,
-        'decodeEntities' => true,
-        'tl_class'       => 'w50',
-    ],
-];
-
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'] = [
     'inputType' => 'text',
     'eval'      => [

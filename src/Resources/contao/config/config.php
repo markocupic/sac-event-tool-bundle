@@ -17,7 +17,6 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
 use Markocupic\SacEventToolBundle\Cron\Contao\DailyCron;
 use Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron;
-use Markocupic\SacEventToolBundle\Cron\Contao\MonthlyCron;
 
 $projectDir = System::getContainer()->getParameter('kernel.project_dir');
 
@@ -295,7 +294,6 @@ $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Markocupic\SacEventToolBundle\Ev
 $GLOBALS['TL_HOOKS']['parseTemplate'][] = ['Markocupic\SacEventToolBundle\EventListener\Contao\ParseTemplateListener', 'onParseTemplate'];
 
 /* Cron jobs */
-$GLOBALS['TL_CRON']['monthly']['replaceDefaultPassword'] = [MonthlyCron::class, 'replaceDefaultPasswordAndSendNew'];
 $GLOBALS['TL_CRON']['hourly']['syncSacMemberDatabase'] = [HourlyCron::class, 'syncSacMemberDatabase'];
 $GLOBALS['TL_CRON']['hourly']['syncMemberWithUser'] = [HourlyCron::class, 'syncMemberWithUser'];
 $GLOBALS['TL_CRON']['daily']['anonymizeOrphanedCalendarEventsMemberDataRecords'] = [DailyCron::class, 'anonymizeOrphanedCalendarEventsMemberDataRecords'];
