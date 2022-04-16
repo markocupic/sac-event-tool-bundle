@@ -203,8 +203,6 @@ services:
             - '@Markocupic\SacEventToolBundle\Download\BinaryFileDownload'
             - '%sacevt.temp_dir%'
             - '%kernel.project_dir%'
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
         public: true

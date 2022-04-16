@@ -18,7 +18,6 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
-use Doctrine\DBAL\Result;
 use Contao\Date;
 use Contao\Environment;
 use Contao\File;
@@ -29,8 +28,10 @@ use Contao\Template;
 use Contao\UserGroupModel;
 use Contao\UserRoleModel;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
 use Haste\Form\Form;
 use League\Csv\Exception;
+use League\Csv\InvalidArgument;
 use League\Csv\Reader;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
@@ -68,13 +69,9 @@ class CsvExportController extends AbstractFrontendModuleController
     }
 
     /**
-     * @param Template $template
-     * @param ModuleModel $model
-     * @param Request $request
-     * @return Response|null
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
-     * @throws \League\Csv\InvalidArgument
+     * @throws InvalidArgument
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
@@ -84,10 +81,9 @@ class CsvExportController extends AbstractFrontendModuleController
     }
 
     /**
-     * @return Form
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
-     * @throws \League\Csv\InvalidArgument
+     * @throws InvalidArgument
      */
     private function getForm(): Form
     {
@@ -99,9 +95,7 @@ class CsvExportController extends AbstractFrontendModuleController
         $objForm = new Form(
             'form-user-export',
             'POST',
-            function ($objHaste) use ($request) {
-                return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
-            }
+            static fn ($objHaste) => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId()
         );
 
         $arrUserRoles = [];
@@ -167,9 +161,9 @@ class CsvExportController extends AbstractFrontendModuleController
 
                 if ('member-group-export' === $request->request->get('export-type')) {
                     $strTable = 'tl_member';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'disable', 'rescissionCause', 'sacMemberId', 'login', 'lastLogin', 'groups'];
+                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'rescissionCause', 'sacMemberId', 'login', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
-                    $result = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember=? ORDER BY lastname, firstname',['1']);
+                    $result = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember=? ORDER BY lastname, firstname', ['1']);
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, MemberGroupModel::class, $blnKeepGroupsInOneLine);
                 }
             }
@@ -179,21 +173,15 @@ class CsvExportController extends AbstractFrontendModuleController
     }
 
     /**
-     * @param string $type
-     * @param string $strTable
-     * @param array $arrFields
-     * @param string $strGroupFieldName
-     * @param Result $result
      * @param $GroupModel
-     * @param bool $blnKeepGroupsInOneLine
-     * @return void
+     *
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
-     * @throws \League\Csv\InvalidArgument
+     * @throws InvalidArgument
      */
     private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $result, $GroupModel, bool $blnKeepGroupsInOneLine = false): void
     {
-       $request = $this->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
 
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
@@ -236,7 +224,6 @@ class CsvExportController extends AbstractFrontendModuleController
             $hasGroups = false;
 
             foreach ($arrFields as $field) {
-
                 if ($field === $strGroupFieldName) {
                     $arrGroupsUserBelongsTo = $stringUtilAdapter->deserialize($rowUser[$field], true);
 
@@ -342,11 +329,8 @@ class CsvExportController extends AbstractFrontendModuleController
     }
 
     /**
-     * @param array $arrData
-     * @param string $filename
-     * @return void
      * @throws Exception
-     * @throws \League\Csv\InvalidArgument
+     * @throws InvalidArgument
      */
     private function sendToBrowser(array $arrData, string $filename): void
     {
@@ -372,7 +356,7 @@ class CsvExportController extends AbstractFrontendModuleController
         $csv->insertAll($arrFinal);
 
         // Save data to temporary file
-        $objFile = new File($this->tempDir . '/' . $filename);
+        $objFile = new File($this->tempDir.'/'.$filename);
         $objFile->write($csv->toString());
         $objFile->close();
 
