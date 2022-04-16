@@ -28,9 +28,6 @@ use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 
-/**
- * Class EventRapport2Docx.
- */
 class EventRapport2Docx
 {
     private ContaoFramework $framework;

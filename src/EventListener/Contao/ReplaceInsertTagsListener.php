@@ -20,9 +20,6 @@ use Contao\FrontendUser;
 use Contao\MemberModel;
 use Contao\PageModel;
 
-/**
- * Class ReplaceInsertTagsListener.
- */
 class ReplaceInsertTagsListener
 {
     /**

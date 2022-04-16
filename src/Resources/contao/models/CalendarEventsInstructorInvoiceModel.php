@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace Contao;
 
 /**
- * Class CalendarEventsInstructorInvoiceModel.
- *
  * @method findByPk($invoiceId)
  */
 class CalendarEventsInstructorInvoiceModel extends Model

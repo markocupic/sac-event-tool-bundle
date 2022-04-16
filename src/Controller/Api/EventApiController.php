@@ -29,9 +29,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * Class EventApiController.
- */
 class EventApiController extends AbstractController
 {
     public const CACHE_MAX_AGE = 180;

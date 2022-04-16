@@ -53,8 +53,6 @@ class TestController extends AbstractController
     }
 
     /**
-     * Class MyCustomController.
-     *
      * @Route("/test", name="markocupic_sac_evt_test", defaults={"_scope" = "frontend", "_token_check" = true})
      */
     public function testAction()
@@ -93,8 +91,6 @@ class TestController extends AbstractController
     }
 
     /**
-     * Class MyCustomController.
-     *
      * @Route("/_imagetest/{uuid}", name="markocupic_sac_evt_imagetest", defaults={"_scope" = "frontend", "_token_check" = true})
      */
     public function imageAction($uuid): JsonResponse

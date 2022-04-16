@@ -24,35 +24,24 @@ use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Template;
-use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Security;
 
 /**
- * Class EventRegistrationCheckoutLinkController.
- *
  * @FrontendModule(EventRegistrationCheckoutLinkController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_registration_checkout_link';
 
-    private $scopeMatcher;
+    private ContaoFramework $framework;
+    private ScopeMatcher $scopeMatcher;
+    private ?PageModel $objJumpTo = null;
+    private ?CalendarEventsModel $objEvent = null;
 
-    /**
-     * @var PageModel
-     */
-    private $objJumpTo;
-
-    /**
-     * @var CalendarEventsModel
-     */
-    private $objEvent;
-
-    public function __construct(ScopeMatcher $scopeMatcher)
+    public function __construct(ContaoFramework $framework, ScopeMatcher $scopeMatcher)
     {
+        $this->framework = $framework;
         $this->scopeMatcher = $scopeMatcher;
     }
 
@@ -73,7 +62,7 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
         $this->objJumpTo = $pageModelAdapter->findPublishedById($model->eventRegCheckoutLinkPage);
 
         if ($request && $this->scopeMatcher->isFrontendRequest($request) && (!$this->objEvent || !$this->objJumpTo)) {
-            return new Response(Response::HTTP_NO_CONTENT);
+            return new Response('', Response::HTTP_NO_CONTENT);
         }
 
         // Call the parent method
@@ -85,9 +74,6 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
         $services = parent::getSubscribedServices();
 
         $services['contao.framework'] = ContaoFramework::class;
-        $services['database_connection'] = Connection::class;
-        $services['security.helper'] = Security::class;
-        $services['request_stack'] = RequestStack::class;
 
         return $services;
     }
@@ -100,7 +86,7 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
 
         $template->jumpTo = $this->objJumpTo->getFrontendUrl($params);
 
-        $template->btnLbl = $this->model->eventRegCheckoutLinkLabel;
+        $template->btnLbl = $model->eventRegCheckoutLinkLabel;
 
         return $template->getResponse();
     }

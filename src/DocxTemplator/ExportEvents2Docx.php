@@ -33,9 +33,6 @@ use PhpOffice\PhpWord\Exception\Exception;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 
-/**
- * Class ExportEvents2Docx.
- */
 class ExportEvents2Docx
 {
     /**

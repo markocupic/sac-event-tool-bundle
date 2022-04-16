@@ -19,9 +19,6 @@ use Contao\Database;
 use Contao\MemberModel;
 use Contao\Widget;
 
-/**
- * Class AddCustomRegexpListener.
- */
 class AddCustomRegexpListener
 {
     /**

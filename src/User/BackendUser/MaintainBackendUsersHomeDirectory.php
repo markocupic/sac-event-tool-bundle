@@ -24,9 +24,6 @@ use Contao\System;
 use Contao\UserModel;
 use Psr\Log\LogLevel;
 
-/**
- * Class MaintainBackendUsersHomeDirectory.
- */
 class MaintainBackendUsersHomeDirectory
 {
     private ContaoFramework $framework;

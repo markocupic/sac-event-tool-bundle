@@ -26,8 +26,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class TourDifficultyListController.
- *
  * @FrontendModule(TourDifficultyListController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class TourDifficultyListController extends AbstractFrontendModuleController

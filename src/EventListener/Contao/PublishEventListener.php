@@ -21,9 +21,6 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Email;
 use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
 
-/**
- * Class PublishEventListener.
- */
 class PublishEventListener
 {
     /**

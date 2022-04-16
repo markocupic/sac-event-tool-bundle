@@ -24,9 +24,6 @@ use Contao\System;
 use Knp\Menu\MenuItem;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
-/**
- * Class SacEvtOnGenerateEventDashboardListener.
- */
 class SacEvtOnGenerateEventDashboardListener
 {
     /**

@@ -50,8 +50,6 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class MemberDashboardWriteEventArticleController.
- *
  * @FrontendModule(MemberDashboardWriteEventArticleController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleController

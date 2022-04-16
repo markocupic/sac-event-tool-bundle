@@ -19,9 +19,6 @@ use Contao\Input;
 use Contao\UserModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class ImportUserListener.
- */
 class ImportUserListener
 {
     /**

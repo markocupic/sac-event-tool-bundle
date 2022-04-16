@@ -19,9 +19,6 @@ use Contao\System;
 use Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase;
 use Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser;
 
-/**
- * Class HourlyCron.
- */
 class HourlyCron
 {
     /**

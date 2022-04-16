@@ -24,9 +24,6 @@ use Contao\UserModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
-/**
- * Class EventMember.
- */
 class EventMember
 {
     /**

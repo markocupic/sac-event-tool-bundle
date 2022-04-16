@@ -32,8 +32,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class EventFilterFormController.
- *
  * @FrontendModule(EventFilterFormController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class EventFilterFormController extends AbstractFrontendModuleController

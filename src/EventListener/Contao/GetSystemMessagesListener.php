@@ -24,9 +24,6 @@ use Contao\System;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
 
-/**
- * Class GetSystemMessagesListener.
- */
 class GetSystemMessagesListener
 {
     /**

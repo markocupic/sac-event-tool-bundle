@@ -28,9 +28,6 @@ use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Psr\Log\LogLevel;
 
-/**
- * Class ClearFrontendUserData.
- */
 class ClearFrontendUserData
 {
     private ContaoFramework $framework;

@@ -38,8 +38,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class JahresprogrammExportController.
- *
  * @FrontendModule(JahresprogrammExportController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class JahresprogrammExportController extends AbstractPrintExportController

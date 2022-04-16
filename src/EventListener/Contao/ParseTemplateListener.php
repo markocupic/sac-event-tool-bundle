@@ -23,9 +23,6 @@ use Contao\PageModel;
 use Contao\System;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class ParseTemplateListener.
- */
 class ParseTemplateListener
 {
     /**

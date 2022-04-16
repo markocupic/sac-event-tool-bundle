@@ -33,8 +33,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class EventStoryListController.
- *
  * @FrontendModule(EventStoryListController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class EventStoryListController extends AbstractFrontendModuleController

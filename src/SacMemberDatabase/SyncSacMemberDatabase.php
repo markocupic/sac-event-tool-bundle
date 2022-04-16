@@ -28,9 +28,6 @@ use Safe\Exceptions\StringsException;
 use function Safe\sprintf;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 
-/**
- * Class SyncSacMemberDatabase.
- */
 class SyncSacMemberDatabase
 {
     /**

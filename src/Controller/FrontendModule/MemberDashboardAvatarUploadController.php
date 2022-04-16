@@ -39,8 +39,6 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * Class MemberDashboardAvatarUploadController.
- *
  * @FrontendModule(MemberDashboardAvatarUploadController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardAvatarUploadController extends AbstractFrontendModuleController

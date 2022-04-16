@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Pdf;
 
 use Contao\CalendarEventsModel;
-use Contao\Config;
 use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CourseMainTypeModel;
@@ -32,38 +31,32 @@ use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Safe\DateTime;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class PrintWorkshopsAsPdf.
- */
 class PrintWorkshopsAsPdf
 {
     private ContaoFramework $framework;
-
     private BinaryFileDownload $binaryFileDownload;
-
     private string $projectDir;
+    private string $tempDir;
+    private string $bookletFilenamePattern;
 
     private ?WorkshopTCPDF $pdf;
-
     private ?int $year;
-
     private ?int $eventId = null;
-
-    private bool $download;
-
+    private bool $download = false;
     private bool $printSingleEvent = false;
 
-    public function __construct(ContaoFramework $framework, BinaryFileDownload $binaryFileDownload, string $projectDir)
+    public function __construct(ContaoFramework $framework, BinaryFileDownload $binaryFileDownload, string $projectDir, string $tempDir, string $bookletFilenamePattern)
     {
         $this->framework = $framework;
         $this->binaryFileDownload = $binaryFileDownload;
         $this->projectDir = $projectDir;
+        $this->tempDir = $tempDir;
+        $this->bookletFilenamePattern = $bookletFilenamePattern;
 
         $this->framework->initialize(true);
 
         // Set defaults
         $this->year = (int) date('Y');
-        $this->download = false;
     }
 
     /**
@@ -188,7 +181,7 @@ class PrintWorkshopsAsPdf
         while ($objEvent->next()) {
             // Create a page for each event
             $this->pdf->type = 'eventPage';
-            $this->pdf->Event = $objEvent;
+            $this->pdf->objEvent = CalendarEventsModel::findByPk($objEvent->id);
             $this->pdf->AddPage('P', 'A4');
             $html = $this->generateHtmlContent();
             $this->pdf->writeHTML($html);
@@ -215,35 +208,36 @@ class PrintWorkshopsAsPdf
             $this->pdf->endTOCPage();
         }
 
-        $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_WORKSHOP_FLYER_SRC'));
-        $fileSRC = sprintf($filenamePattern, $this->year);
+        // Kursprogramm_%s.pdf
+        $filename = sprintf($this->bookletFilenamePattern, $this->year);
+        $path = $this->projectDir.'/'.$this->tempDir.'/'.$filename;
 
         if (false === $this->download) {
-            $this->pdf->Output($this->projectDir.'/'.$fileSRC, 'F');
+            $this->pdf->Output($path, 'F');
 
             throw new ResponseException(new Response(''));
         }
 
         if ($this->printSingleEvent) {
             $eventAlias = CalendarEventsModel::findByPk($this->eventId)->alias;
-            $strPath = \dirname($fileSRC).'/'.$eventAlias.'.pdf';
+            $path = \dirname($path).'/'.$eventAlias.'.pdf';
 
-            $this->pdf->setTitle(basename($fileSRC));
+            $this->pdf->setTitle(basename($path));
 
             // Save as file
-            $this->pdf->Output($this->projectDir.'/'.$strPath, 'F');
+            $this->pdf->Output($path, 'F');
 
             // Send file to the browser
-            $this->binaryFileDownload->sendFileToBrowser($this->projectDir.'/'.$strPath, basename($strPath), true);
+            $this->binaryFileDownload->sendFileToBrowser($path, basename($path), true);
         }
 
-        $this->pdf->setTitle(basename($fileSRC));
+        $this->pdf->setTitle(basename($path));
 
         // Save as file
-        $this->pdf->Output($this->projectDir.'/'.$fileSRC, 'F');
+        $this->pdf->Output($path, 'F');
 
         // Send file to the browser
-        $this->binaryFileDownload->sendFileToBrowser($this->projectDir.'/'.$fileSRC, basename($fileSRC), true);
+        $this->binaryFileDownload->sendFileToBrowser($path, basename($path), true);
     }
 
     public function getDateString(int $eventId): string
@@ -291,7 +285,7 @@ class PrintWorkshopsAsPdf
     private function generateHtmlContent(): string
     {
         System::loadLanguageFile('tl_calendar_events');
-        $objEvent = CalendarEventsModel::findByPk($this->pdf->Event->id);
+        $objEvent = CalendarEventsModel::findByPk($this->pdf->objEvent->id);
         $this->pdf->Bookmark(html_entity_decode($objEvent->title), 0, 0, '', 'I', [0, 0, 0]);
 
         // Create template object

@@ -24,8 +24,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class EventListController.
- *
  * @FrontendModule(EventListController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class EventListController extends AbstractFrontendModuleController

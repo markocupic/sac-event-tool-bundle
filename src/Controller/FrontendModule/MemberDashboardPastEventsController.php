@@ -41,8 +41,6 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * Class MemberDashboardPastEventsController.
- *
  * @FrontendModule("member_dashboard_past_events", category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardPastEventsController extends AbstractFrontendModuleController

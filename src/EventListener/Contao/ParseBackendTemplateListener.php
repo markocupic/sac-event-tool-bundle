@@ -27,9 +27,6 @@ use Knp\Menu\Renderer\ListRenderer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 
-/**
- * Class ParseBackendTemplateListener.
- */
 class ParseBackendTemplateListener
 {
     /**

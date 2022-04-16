@@ -23,9 +23,6 @@ namespace Markocupic\SacEventToolBundle\EventListener\Cors;
 
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
-/**
- * Class CorsListener.
- */
 class CorsListener
 {
     public function onKernelResponse(ResponseEvent $event): void

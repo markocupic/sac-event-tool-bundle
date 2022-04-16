@@ -20,9 +20,6 @@ use Contao\User;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory;
 
-/**
- * Class PostLoginListener.
- */
 class PostLoginListener
 {
     /**

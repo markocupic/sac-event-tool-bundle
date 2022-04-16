@@ -25,8 +25,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class UserPortraitController.
- *
  * @ContentElement("user_portrait", category="sac_event_tool_content_elements", template="ce_user_portrait")
  */
 class UserPortraitController extends AbstractContentElementController

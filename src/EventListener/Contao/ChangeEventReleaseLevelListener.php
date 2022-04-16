@@ -22,9 +22,6 @@ use Contao\Email;
 use Contao\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
 
-/**
- * Class ChangeEventReleaseLevelListener.
- */
 class ChangeEventReleaseLevelListener
 {
     /**

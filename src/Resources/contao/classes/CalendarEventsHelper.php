@@ -238,7 +238,7 @@ class CalendarEventsHelper
                 break;
 
             case 'instructorContactBoxes':
-                $value = static::generateInstructorContactBoxes($objEvent, (int) $arrArgs[1]);
+                $value = static::generateInstructorContactBoxes($objEvent);
                 break;
 
             case 'arrTourProfile':
@@ -288,7 +288,7 @@ class CalendarEventsHelper
         }
     }
 
-    public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent, int $jumpTo): string
+    public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent): string
     {
         $strHtml = '';
         $objCalendar = $objEvent->getRelated('pid');
@@ -573,7 +573,7 @@ class CalendarEventsHelper
             }
         }
 
-        return Config::get('SAC_EVT_EVENT_DEFAULT_PREVIEW_IMAGE_SRC');
+        return System::getContainer()->getParameter('sacevt.event.course.fallback_image');
     }
 
     /**

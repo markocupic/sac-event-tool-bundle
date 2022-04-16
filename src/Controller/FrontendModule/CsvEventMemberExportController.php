@@ -37,8 +37,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class CsvEventMemberExportController.
- *
  * @FrontendModule(CsvEventMemberExportController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class CsvEventMemberExportController extends AbstractFrontendModuleController

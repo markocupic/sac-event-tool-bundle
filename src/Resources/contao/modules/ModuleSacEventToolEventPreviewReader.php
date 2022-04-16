@@ -32,9 +32,6 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 
-/**
- * Class ModuleSacEventToolEventPreviewReader.
- */
 class ModuleSacEventToolEventPreviewReader extends Events
 {
     /**

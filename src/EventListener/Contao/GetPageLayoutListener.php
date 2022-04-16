@@ -23,9 +23,6 @@ use Contao\PageRegular;
 use Contao\StringUtil;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-/**
- * Class GetPageLayoutListener.
- */
 class GetPageLayoutListener
 {
     /**

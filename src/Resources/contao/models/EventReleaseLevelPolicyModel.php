@@ -17,8 +17,6 @@ namespace Contao;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 /**
- * Class EventReleaseLevelPolicyModel.
- *
  * @method static findByPid(int|mixed|null $id)
  */
 class EventReleaseLevelPolicyModel extends Model

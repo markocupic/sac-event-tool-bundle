@@ -33,8 +33,6 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class MemberDashboardEditProfileController.
- *
  * @FrontendModule(MemberDashboardEditProfileController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardEditProfileController extends AbstractFrontendModuleController

@@ -21,9 +21,6 @@ use Markocupic\SacEventToolBundle\Config\Log;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
-/**
- * Class SyncMemberWithUser.
- */
 class SyncMemberWithUser
 {
     /**

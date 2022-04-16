@@ -41,8 +41,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class PilatusExport2021Controller.
- *
  * @FrontendModule(PilatusExport2021Controller::TYPE, category="sac_event_tool_frontend_modules")
  */
 class PilatusExport2021Controller extends AbstractPrintExportController

@@ -21,9 +21,6 @@ use Contao\Events;
 use Eluceo\iCal\Component\Calendar;
 use Eluceo\iCal\Component\Event;
 
-/**
- * Class SendEventIcal.
- */
 class SendEventIcal
 {
     public function sendIcsFile(CalendarEventsModel $objEvent): void

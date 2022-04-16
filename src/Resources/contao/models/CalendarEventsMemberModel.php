@@ -16,9 +16,6 @@ namespace Contao;
 
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 
-/**
- * Class CalendarEventsMemberModel.
- */
 class CalendarEventsMemberModel extends Model
 {
     /**

@@ -20,9 +20,6 @@ use Contao\FilesModel;
 use Contao\Folder;
 use Contao\Message;
 
-/**
- * Class RotateImage.
- */
 class RotateImage
 {
     /**

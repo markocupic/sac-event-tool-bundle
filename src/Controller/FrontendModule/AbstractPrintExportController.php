@@ -18,9 +18,6 @@ use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\EventReleaseLevelPolicyModel;
 
-/**
- * Class AbstractModuleSacEventToolPrintExport.
- */
 abstract class AbstractPrintExportController extends AbstractFrontendModuleController
 {
     public function hasValidReleaseLevel(CalendarEventsModel $objEvent, int $minLevel = null): bool

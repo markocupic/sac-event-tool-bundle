@@ -14,9 +14,6 @@ declare(strict_types=1);
 
 namespace Contao;
 
-/**
- * Class CourseSubTypeModel.
- */
 class CourseSubTypeModel extends Model
 {
     /**

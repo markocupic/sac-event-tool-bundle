@@ -26,9 +26,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class ExecutePreActionsListener.
- */
 class ExecutePreActionsListener
 {
     /**

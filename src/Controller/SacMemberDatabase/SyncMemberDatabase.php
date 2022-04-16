@@ -20,9 +20,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * Class SyncMemberDatabase.
- */
 class SyncMemberDatabase extends AbstractController
 {
     /**

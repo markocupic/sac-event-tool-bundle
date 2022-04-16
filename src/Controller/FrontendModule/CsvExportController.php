@@ -40,8 +40,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class CsvExportController.
- *
  * @FrontendModule(CsvExportController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class CsvExportController extends AbstractFrontendModuleController

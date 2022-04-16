@@ -26,12 +26,11 @@ use Contao\Template;
 use Contao\UserModel;
 use Contao\UserRoleModel;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class UserPortraitListController.
- *
  * @ContentElement("user_portrait_list", category="sac_event_tool_content_elements", template="ce_user_portrait_list")
  */
 class UserPortraitListController extends AbstractContentElementController
@@ -53,15 +52,10 @@ class UserPortraitListController extends AbstractContentElementController
     }
 
     /**
-     * @param Template $template
-     * @param ContentModel $model
-     * @param Request $request
-     * @return Response|null
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
     {
-
         /** @var UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
@@ -178,7 +172,6 @@ class UserPortraitListController extends AbstractContentElementController
                 // Add image to template
                 if (\strlen($strAvatarSRC)) {
                     if (is_file($this->projectDir.'/'.$strAvatarSRC)) {
-
                         // Create partial object
                         $objPartial = new \stdClass();
 

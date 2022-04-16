@@ -55,8 +55,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment as TwigEnvironment;
 
 /**
- * Class EventRegistrationController.
- *
  * @FrontendModule(EventRegistrationController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class EventRegistrationController extends AbstractFrontendModuleController

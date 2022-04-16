@@ -42,8 +42,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class EventStoryReaderController.
- *
  * @FrontendModule(EventStoryReaderController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class EventStoryReaderController extends AbstractFrontendModuleController

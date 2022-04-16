@@ -29,16 +29,6 @@ PaletteManipulator::create()
         'global_legend'
     )
     ->addField(
-        ['SAC_EVT_EVENT_DEFAULT_PREVIEW_IMAGE_SRC'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_WORKSHOP_FLYER_SRC'],
-        'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
         ['SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'],
         'sacEventTool_legend',
         PaletteManipulator::POSITION_APPEND
@@ -46,11 +36,6 @@ PaletteManipulator::create()
     ->addField(
         ['SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'],
         'sacEventTool_legend',
-        PaletteManipulator::POSITION_APPEND
-    )
-    ->addField(
-        ['SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'],
-        'sacWorkshopFlyer_legend',
         PaletteManipulator::POSITION_APPEND
     )
     ->addField(
@@ -73,24 +58,6 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_DEFAULT_BACKEND_PASSWORD'] 
     ],
 ];
 
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_DEFAULT_PREVIEW_IMAGE_SRC'] = [
-    'inputType' => 'text',
-    'eval'      => [
-        'mandatory'      => true,
-        'decodeEntities' => false,
-        'tl_class'       => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_WORKSHOP_FLYER_SRC'] = [
-    'inputType' => 'text',
-    'eval'      => [
-        'mandatory'      => true,
-        'decodeEntities' => false,
-        'tl_class'       => 'w50',
-    ],
-];
-
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'] = [
     'inputType' => 'text',
     'eval'      => [
@@ -101,15 +68,6 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME
 ];
 
 $GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'] = [
-    'inputType' => 'text',
-    'eval'      => [
-        'mandatory'      => true,
-        'decodeEntities' => false,
-        'tl_class'       => 'w50',
-    ],
-];
-
-$GLOBALS['TL_DCA']['tl_settings']['fields']['SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE'] = [
     'inputType' => 'text',
     'eval'      => [
         'mandatory'      => true,

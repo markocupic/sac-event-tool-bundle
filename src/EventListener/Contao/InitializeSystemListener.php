@@ -17,9 +17,6 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 
-/**
- * Class InitializeSystemListener.
- */
 class InitializeSystemListener
 {
     /**
@@ -45,12 +42,9 @@ class InitializeSystemListener
 
         // Check for other system vars in system/localconfig.php
         $arrConfig = [
-            'SAC_EVT_WORKSHOP_FLYER_SRC',
             'SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN',
             'SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC',
-            'SAC_EVT_EVENT_DEFAULT_PREVIEW_IMAGE_SRC',
             'SAC_EVT_DEFAULT_BACKEND_PASSWORD',
-            'SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE',
         ];
 
         foreach ($arrConfig as $strConfig) {

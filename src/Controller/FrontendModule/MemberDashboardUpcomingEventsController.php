@@ -39,8 +39,6 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * Class MemberDashboardUpcomingEventsController.
- *
  * @FrontendModule(MemberDashboardUpcomingEventsController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleController

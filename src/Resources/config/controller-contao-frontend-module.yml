@@ -18,6 +18,7 @@ services:
 
     Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationCheckoutLinkController:
         arguments:
+            - '@contao.framework'
             - '@contao.routing.scope_matcher'
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]

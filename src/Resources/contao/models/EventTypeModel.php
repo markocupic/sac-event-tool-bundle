@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Contao;
 
 /**
- * Class EventTypeModel.
  * @method static findByAlias(mixed|null $eventType)
  */
 class EventTypeModel extends Model

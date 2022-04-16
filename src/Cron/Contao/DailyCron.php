@@ -18,9 +18,6 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
 use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 
-/**
- * Class DailyCron.
- */
 class DailyCron
 {
     /**

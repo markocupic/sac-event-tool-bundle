@@ -107,6 +107,8 @@ services:
             - '@contao.framework'
             - '@Markocupic\SacEventToolBundle\Download\BinaryFileDownload'
             - '%kernel.project_dir%'
+            - '%sacevt.temp_dir%'
+            - '%sacevt.event.course.booklet_filename_pattern%'
 
     # Export events as docx file
     Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx:

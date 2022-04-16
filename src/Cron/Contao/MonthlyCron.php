@@ -18,9 +18,6 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\System;
 use Markocupic\SacEventToolBundle\User\BackendUser\ReplaceDefaultPassword;
 
-/**
- * Class MonthlyCron.
- */
 class MonthlyCron
 {
     /**

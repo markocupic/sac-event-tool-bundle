@@ -30,9 +30,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * Class DownloadController.
- */
 class DownloadController extends AbstractController
 {
     private ContaoFramework $framework;

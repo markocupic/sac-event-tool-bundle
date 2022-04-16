@@ -14,33 +14,16 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Pdf;
 
-use Contao\Config;
+use Contao\CalendarEventsModel;
 use Contao\FilesModel;
 use Contao\System;
 
-/**
- * Class WorkshopTCPDF.
- */
 class WorkshopTCPDF extends \TCPDF
 {
-    /**
-     * @var Event db-object
-     */
-    public $Event;
-
-    /**
-     * @var page type
-     */
-    public $type;
-    /**
-     * @var null
-     */
-    public $backgroundImage;
-
-    /**
-     * @var null
-     */
-    public $backgroundImageBottom;
+    public ?CalendarEventsModel $objEvent = null;
+    public ?string $type = null;
+    public ?string $backgroundImage = null;
+    public ?string $backgroundImageBottom = null;
 
     // Page header
     public function Header(): void
@@ -50,25 +33,25 @@ class WorkshopTCPDF extends \TCPDF
 
         // Set background-image
         if ('cover' === $this->type) {
-            $this->backgroundImage = Config::get('SAC_EVT_WORKSHOP_FLYER_COVER_BACKGROUND_IMAGE');
+            $this->backgroundImage = System::getContainer()->getParameter('sacevt.event.course.booklet_cover_image');
         } elseif ('TOC' === $this->type) {
-            $this->backgroundImage = 'files/fileadmin/page_assets/kursbroschuere/toc.jpg';
-            $this->backgroundImageBottom = 'files/fileadmin/page_assets/kursbroschuere/background.png';
+            $this->backgroundImage = 'vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/toc.jpg';
+            $this->backgroundImageBottom = 'vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/background.png';
         } elseif ('eventPage' === $this->type) {
             // default
-            $this->backgroundImage = 'files/fileadmin/page_assets/kursbroschuere/hochtour.jpg';
-            $this->backgroundImageBottom = 'files/fileadmin/page_assets/kursbroschuere/background.png';
+            $this->backgroundImage = 'vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/fallback.jpg';
+            $this->backgroundImageBottom = 'vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/background.png';
 
             // set background image
-            if ('' !== $this->Event->singleSRCBroschuere) {
-                $objImage = FilesModel::findByUuid($this->Event->singleSRCBroschuere);
+            if ('' !== $this->objEvent->singleSRCBroschuere) {
+                $objImage = FilesModel::findByUuid($this->objEvent->singleSRCBroschuere);
 
                 if (null !== $objImage) {
                     $this->backgroundImage = $objImage->path;
                 }
             }
         } else {
-            $this->backgroundImage = $objImage->path;
+            $this->backgroundImage = 'vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/fallback.jpg';
         }
 
         // set the starting point for the page content
@@ -122,7 +105,7 @@ class WorkshopTCPDF extends \TCPDF
             $this->setY(275);
             $this->setFillColorArray([255, 255, 255]); // white
             $this->setTextColor(55, 55, 55);
-            $date = date('Y', (int) $this->Event->startDate);
+            $date = date('Y', (int) $this->objEvent->startDate);
             $this->Cell(210, 10, 'SAC Sektion Pilatus Ausbildung '.$date, 0, 1, 'C', 1, '', 0);
         }
 
@@ -137,7 +120,7 @@ class WorkshopTCPDF extends \TCPDF
                 'bgcolor' => [255, 255, 255],
             ];
             // QR-CODE - Im Moment deaktiviert
-            $this->write2DBarcode('http://sac-kurse.kletterkader.com/kurse-detail/' . $this->Event->id, 'QRCODE,H', 175, 267, 25, 25, $style, 'N');
+            $this->write2DBarcode('http://sac-kurse.kletterkader.com/kurse-detail/' . $this->objEvent->id, 'QRCODE,H', 175, 267, 25, 25, $style, 'N');
             */
         }
 

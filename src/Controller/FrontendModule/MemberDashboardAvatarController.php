@@ -30,8 +30,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * Class MemberDashboardAvatarController.
- *
  * @FrontendModule(MemberDashboardAvatarController::TYPE, category="sac_event_tool_frontend_modules")
  */
 class MemberDashboardAvatarController extends AbstractFrontendModuleController

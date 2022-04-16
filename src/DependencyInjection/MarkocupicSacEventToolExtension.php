@@ -19,9 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-/**
- * Class MarkocupicSacEventToolExtension.
- */
 class MarkocupicSacEventToolExtension extends Extension
 {
     /**
@@ -74,6 +71,9 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.user.backend.home_dir', $config['user']['backend']['home_dir']);
         $container->setParameter($rootKey.'.user.frontend.home_dir', $config['user']['frontend']['home_dir']);
         $container->setParameter($rootKey.'.user.frontend.avatar_dir', $config['user']['frontend']['avatar_dir']);
+        $container->setParameter($rootKey.'.event.course.booklet_cover_image', $config['event']['course']['booklet_cover_image']);
+        $container->setParameter($rootKey.'.event.course.booklet_filename_pattern', $config['event']['course']['booklet_filename_pattern']);
+        $container->setParameter($rootKey.'.event.course.fallback_image', $config['event']['course']['fallback_image']);
         $container->setParameter($rootKey.'.event.story.asset_dir', $config['event']['story']['asset_dir']);
         $container->setParameter($rootKey.'.event.template.tour_invoice', $config['event']['template']['tour_invoice']);
         $container->setParameter($rootKey.'.event.template.tour_rapport', $config['event']['template']['tour_rapport']);
