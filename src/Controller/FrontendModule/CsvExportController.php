@@ -14,30 +14,30 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
-use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
-use Contao\CoreBundle\Translation\Translator;
-use Contao\Database;
-use Contao\Database\Result;
+use Doctrine\DBAL\Result;
 use Contao\Date;
 use Contao\Environment;
-use Contao\Input;
+use Contao\File;
 use Contao\MemberGroupModel;
 use Contao\ModuleModel;
 use Contao\StringUtil;
 use Contao\Template;
 use Contao\UserGroupModel;
-use Contao\UserModel;
 use Contao\UserRoleModel;
+use Doctrine\DBAL\Connection;
 use Haste\Form\Form;
 use League\Csv\Exception;
 use League\Csv\Reader;
 use League\Csv\Writer;
+use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @FrontendModule(CsvExportController::TYPE, category="sac_event_tool_frontend_modules")
@@ -48,62 +48,68 @@ class CsvExportController extends AbstractFrontendModuleController
     private const FIELD_DELIMITER = ';';
     private const FIELD_ENCLOSURE = '"';
 
-    /**
-     * @var 
-     */
-    protected $objForm;
+    private ContaoFramework $framework;
+    private RequestStack $requestStack;
+    private Connection $connection;
+    private TranslatorInterface $translator;
+    private BinaryFileDownload $binaryFileDownload;
+    private string $tempDir;
+    private string $projectDir;
 
-    public static function getSubscribedServices(): array
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, BinaryFileDownload $binaryFileDownload, string $tempDir, string $projectDir)
     {
-        $services = parent::getSubscribedServices();
-
-        $services['contao.framework'] = ContaoFramework::class;
-
-        return $services;
+        $this->framework = $framework;
+        $this->requestStack = $requestStack;
+        $this->connection = $connection;
+        $this->translator = $translator;
+        $this->binaryFileDownload = $binaryFileDownload;
+        $this->tempDir = $tempDir;
+        $this->projectDir = $projectDir;
     }
 
     /**
+     * @param Template $template
+     * @param ModuleModel $model
+     * @param Request $request
+     * @return Response|null
      * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \League\Csv\InvalidArgument
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
-        $this->generateForm();
-        $template->form = $this->objForm;
+        $template->form = $this->getForm()->generate();
 
         return $template->getResponse();
     }
 
     /**
+     * @return Form
      * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \League\Csv\InvalidArgument
      */
-    private function generateForm(): void
+    private function getForm(): Form
     {
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
-
-        /** @var Input $inputAdapter */
-        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+        $request = $this->requestStack->getCurrentRequest();
 
         /** @var Environment $environmentAdapter */
-        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
+        $environmentAdapter = $this->framework->getAdapter(Environment::class);
 
-        /** @var Form $objForm */
         $objForm = new Form(
             'form-user-export',
             'POST',
-            function ($objHaste) {
-                /** @var Input $inputAdapter */
-                $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
-
-                return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
+            function ($objHaste) use ($request) {
+                return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
             }
         );
 
         $arrUserRoles = [];
-        $objUserRole = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user_role ORDER BY sorting');
 
-        while ($objUserRole->next()) {
-            $arrUserRoles[$objUserRole->id] = $objUserRole->title;
+        $result = $this->connection->executeQuery('SELECT * FROM tl_user_role ORDER BY sorting');
+
+        while (false !== ($rowUserRole = $result->fetchAssociative())) {
+            $arrUserRoles[$rowUserRole['id']] = $rowUserRole['title'];
         }
 
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
@@ -138,68 +144,65 @@ class CsvExportController extends AbstractFrontendModuleController
         ]);
 
         if ($objForm->validate()) {
-            if ('form-user-export' === $inputAdapter->post('FORM_SUBMIT')) {
-                $blnKeepGroupsInOneLine = $inputAdapter->post('keep-groups-in-one-line') ? true : false;
+            if ('form-user-export' === $request->request->get('FORM_SUBMIT')) {
+                $blnKeepGroupsInOneLine = $request->request->has('keep-groups-in-one-line');
 
-                $exportType = $inputAdapter->post('export-type');
+                $exportType = $request->request->get('export-type');
 
-                if ('user-role-export' === $inputAdapter->post('export-type')) {
+                if ('user-role-export' === $request->request->get('export-type')) {
                     $strTable = 'tl_user';
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'leiterQualifikation', 'lastLogin', 'password', 'pwChange', 'userRole'];
                     $strGroupFieldName = 'userRole';
-                    $objUser = $databaseAdapter->getInstance()
-                        ->execute('SELECT * FROM tl_user ORDER BY lastname, firstname')
-                    ;
-                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, UserRoleModel::class, $blnKeepGroupsInOneLine);
+                    $result = $this->connection->executeQuery('SELECT * FROM tl_user ORDER BY lastname, firstname');
+                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, UserRoleModel::class, $blnKeepGroupsInOneLine);
                 }
 
-                if ('user-group-export' === $inputAdapter->post('export-type')) {
+                if ('user-group-export' === $request->request->get('export-type')) {
                     $strTable = 'tl_user';
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'lastLogin', 'password', 'pwChange', 'groups'];
                     $strGroupFieldName = 'groups';
-                    $objUser = $databaseAdapter->getInstance()
-                        ->execute('SELECT * FROM tl_user ORDER BY lastname, firstname')
-                    ;
-                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, UserGroupModel::class, $blnKeepGroupsInOneLine);
+                    $result = $this->connection->executeQuery('SELECT * FROM tl_user ORDER BY lastname, firstname');
+                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, UserGroupModel::class, $blnKeepGroupsInOneLine);
                 }
 
-                if ('member-group-export' === $inputAdapter->post('export-type')) {
+                if ('member-group-export' === $request->request->get('export-type')) {
                     $strTable = 'tl_member';
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'disable', 'rescissionCause', 'sacMemberId', 'login', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
-                    $objUser = $databaseAdapter->getInstance()
-                        ->prepare('SELECT * FROM tl_member WHERE isSacMember=? ORDER BY lastname, firstname')
-                        ->execute('1')
-                    ;
-                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $objUser, MemberGroupModel::class, $blnKeepGroupsInOneLine);
+                    $result = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember=? ORDER BY lastname, firstname',['1']);
+                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, MemberGroupModel::class, $blnKeepGroupsInOneLine);
                 }
             }
         }
 
-        $this->objForm = $objForm->generate();
+        return $objForm;
     }
 
     /**
+     * @param string $type
+     * @param string $strTable
+     * @param array $arrFields
+     * @param string $strGroupFieldName
+     * @param Result $result
      * @param $GroupModel
-     *
+     * @param bool $blnKeepGroupsInOneLine
+     * @return void
      * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \League\Csv\InvalidArgument
      */
-    private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $objUser, $GroupModel, bool $blnKeepGroupsInOneLine = false): void
+    private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $result, $GroupModel, bool $blnKeepGroupsInOneLine = false): void
     {
-        /** @var Input $inputAdapter */
-        $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
+       $request = $this->requestStack->getCurrentRequest();
 
         /** @var Date $dateAdapter */
-        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
+        $dateAdapter = $this->framework->getAdapter(Date::class);
 
         /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        /**
-         * @var $groupModelAdapter
-         *                         $groupModelAdapter can be instance of Contao\UserRoleModel or Contao\MemberGroupModel or Contao\UserGroupModel
-         */
-        $groupModelAdapter = $this->get('contao.framework')->getAdapter($GroupModel);
+        /** @var UserRoleModel|MemberGroupModel|UserGroupModel $groupModelAdapter */
+        $groupModelAdapter = $this->framework->getAdapter($GroupModel);
 
         $filename = $type.'_'.$dateAdapter->parse('Y-m-d_H-i-s').'.csv';
         $arrData = [];
@@ -210,16 +213,18 @@ class CsvExportController extends AbstractFrontendModuleController
         // Filter by user role
         $blnHasUserRoleFilter = false;
 
-        if (!empty($inputAdapter->post('user-roles') && \is_array($inputAdapter->post('user-roles')))) {
-            $arrFilterRoles = $inputAdapter->post('user-roles');
+        $arrFilterRoles = [];
+
+        if ($request->request->has('user-roles') && \is_array($request->request->get('user-roles'))) {
+            $arrFilterRoles = $request->request->get('user-roles');
             $blnHasUserRoleFilter = true;
         }
 
         // Write rows
-        while ($objUser->next()) {
+        while (false !== ($rowUser = $result->fetchAssociative())) {
             // Filter by user role
             if ($blnHasUserRoleFilter) {
-                $arrUserRoles = $stringUtilAdapter->deserialize($objUser->userRole, true);
+                $arrUserRoles = $stringUtilAdapter->deserialize($rowUser['userRole'], true);
 
                 if (\count(array_intersect($arrFilterRoles, $arrUserRoles)) < 1) {
                     continue;
@@ -228,13 +233,15 @@ class CsvExportController extends AbstractFrontendModuleController
 
             $arrUser = [];
 
-            foreach ($arrFields as $field) {
-                if ($field === $strGroupFieldName) {
-                    $hasGroups = false;
-                    $arrGroupsUserBelongsTo = $stringUtilAdapter->deserialize($objUser->{$field}, true);
+            $hasGroups = false;
 
-                    if (\count($arrGroupsUserBelongsTo) > 0) {
-                        // Write all the groups/roles in one line
+            foreach ($arrFields as $field) {
+
+                if ($field === $strGroupFieldName) {
+                    $arrGroupsUserBelongsTo = $stringUtilAdapter->deserialize($rowUser[$field], true);
+
+                    if (!empty($arrGroupsUserBelongsTo)) {
+                        // Write all groups/roles in one line
                         if ($blnKeepGroupsInOneLine) {
                             $arrUser[] = implode(', ', array_filter(array_map(
                                 static function ($id) use ($groupModelAdapter) {
@@ -252,9 +259,8 @@ class CsvExportController extends AbstractFrontendModuleController
                                 },
                                 $arrGroupsUserBelongsTo
                             )));
-                        }
-                        // Make a row for each group/role
-                        else {
+                        } else {
+                            // Make a row for each group/role
                             $hasGroups = true;
 
                             foreach ($arrGroupsUserBelongsTo as $groupId) {
@@ -263,6 +269,7 @@ class CsvExportController extends AbstractFrontendModuleController
                                         continue;
                                     }
                                 }
+
                                 $objGroupModel = $groupModelAdapter->findByPk($groupId);
 
                                 if (null !== $objGroupModel) {
@@ -274,7 +281,9 @@ class CsvExportController extends AbstractFrontendModuleController
                                 } else {
                                     $arrUser[] = 'Unbekannte Gruppe/Rolle mit ID:'.$groupId;
                                 }
+
                                 $arrData[] = $arrUser;
+
                                 array_pop($arrUser);
                             }
                         }
@@ -282,85 +291,69 @@ class CsvExportController extends AbstractFrontendModuleController
                         $arrUser[] = '';
                     }
                 } else {
-                    $arrUser[] = $this->getField($field, $objUser);
+                    $arrUser[] = $this->getField($field, $rowUser);
                 }
             }
 
             if (!$hasGroups) {
                 $arrData[] = $arrUser;
-            } else {
-                $hasGroups = false;
             }
         }
 
-        // Print to screen
-        $this->printCsv($arrData, $filename);
+        // Downlaod data as CSV spreadsheet
+        $this->sendToBrowser($arrData, $filename);
     }
 
     private function getHeadline(array $arrFields, string $strTable): array
     {
         /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         $controllerAdapter->loadLanguageFile($strTable);
-
-        /** @var Translator $translator */
-        $translator = $this->get('translator');
 
         // Write headline
         $arrHeadline = [];
 
         foreach ($arrFields as $field) {
-            $fieldname = $translator->trans(sprintf('%s.%s.0', $strTable, $field), [], 'contao_default') ?: $field;
+            $fieldname = $this->translator->trans(sprintf('%s.%s.0', $strTable, $field), [], 'contao_default') ?: $field;
             $arrHeadline[] = $fieldname;
         }
 
         return $arrHeadline;
     }
 
-    private function getField(string $field, Result $objUser): string
+    private function getField(string $field, array $arrUser): string
     {
-        /** @var Config $configAdapter */
-        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
+        $dateAdapter = $this->framework->getAdapter(Date::class);
 
         if ('password' === $field) {
-            $defaultPassword = $configAdapter->get('SAC_EVT_DEFAULT_BACKEND_PASSWORD');
-
-            if (password_verify($defaultPassword, $objUser->password)) {
-                // Activate pwchange (=side efect) ;-)
-                $objUserModel = UserModel::findByPk($objUser->id);
-
-                if ($objUserModel->sacMemberId > 1) {
-                    $objUserModel->pwChange = '1';
-                    $objUserModel->save();
-                }
-
-                return $defaultPassword;
-            }
-
             return '#######';
         }
 
         if ('lastLogin' === $field) {
-            return Date::parse('Y-m-d', $objUser->lastLogin);
+            return $dateAdapter->parse('Y-m-d', $arrUser['lastLogin']);
         }
 
         if ('phone' === $field || 'mobile' === $field) {
-            return beautifyPhoneNumber($objUser->{$field});
+            return beautifyPhoneNumber($arrUser[$field]);
         }
 
-        return (string) $objUser->{$field};
+        return (string) $arrUser[$field];
     }
 
     /**
+     * @param array $arrData
+     * @param string $filename
+     * @return void
      * @throws Exception
+     * @throws \League\Csv\InvalidArgument
      */
-    private function printCsv(array $arrData, string $filename): string
+    private function sendToBrowser(array $arrData, string $filename): void
     {
         /** @var Writer $writerAdapter */
-        $writerAdapter = $this->get('contao.framework')->getAdapter(Writer::class);
+        $writerAdapter = $this->framework->getAdapter(Writer::class);
 
-        // Convert special chars
+        // Decode html entities and special chars
         $arrFinal = [];
 
         foreach ($arrData as $arrRow) {
@@ -371,24 +364,18 @@ class CsvExportController extends AbstractFrontendModuleController
             $arrFinal[] = $arrLine;
         }
 
-        // Send file to browser
-        header('Content-Encoding: UTF-8');
-        header('Content-type: text/csv; charset=UTF-8');
-        header('Content-Disposition: attachment; filename="'.$filename);
-
-        // Load the CSV document from a string
-        $csv = $writerAdapter->createFromString('');
+        // Load the CSV document from an empty string
+        $csv = $writerAdapter->createFromString();
         $csv->setOutputBOM(Reader::BOM_UTF8);
-
         $csv->setDelimiter(static::FIELD_DELIMITER);
         $csv->setEnclosure(static::FIELD_ENCLOSURE);
-
-        // Insert all the records
         $csv->insertAll($arrFinal);
 
-        // Returns the CSV document as a string
-        echo $csv;
+        // Save data to temporary file
+        $objFile = new File($this->tempDir . '/' . $filename);
+        $objFile->write($csv->toString());
+        $objFile->close();
 
-        exit;
+        $this->binaryFileDownload->sendFileToBrowser($this->projectDir.'/'.$objFile->path);
     }
 }

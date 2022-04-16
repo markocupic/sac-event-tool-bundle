@@ -22,6 +22,7 @@ use Symfony\Component\String\UnicodeString;
 
 class BinaryFileDownload
 {
+
     public function sendFileToBrowser(string $filePath, string $filename = '', bool $inline = false): void
     {
         $response = new BinaryFileResponse($filePath);

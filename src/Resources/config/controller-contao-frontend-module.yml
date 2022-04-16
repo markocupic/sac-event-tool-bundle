@@ -193,16 +193,23 @@ services:
             - { name: container.service_subscriber }
         public: true
 
-    # Csv Export module: Export members ans users as a csv spreadsheet
+    # Csv Export module: Export members and users as a csv spreadsheet
     Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvExportController:
+        arguments:
+            - '@contao.framework'
+            - '@request_stack'
+            - '@database_connection'
+            - '@translator'
+            - '@Markocupic\SacEventToolBundle\Download\BinaryFileDownload'
+            - '%sacevt.temp_dir%'
+            - '%kernel.project_dir%'
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
         public: true
 
-        # Event Auflistungs Modul
+    # Event Auflistungs Modul
     Markocupic\SacEventToolBundle\Controller\FrontendModule\EventListController:
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
