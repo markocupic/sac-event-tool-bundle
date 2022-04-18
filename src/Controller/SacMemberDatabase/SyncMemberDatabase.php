@@ -54,7 +54,7 @@ class SyncMemberDatabase extends AbstractController
         $this->syncSacMemberDatabase->run();
 
         // Set password if there isn't one.
-        $count = $this->syncSacMemberDatabase->setPassword(200);
+        $count = 0;
 
         $arrJson = [
             'message' => 'Successfully executed the db sync.',

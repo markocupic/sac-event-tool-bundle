@@ -19,8 +19,8 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\File;
 use Contao\FrontendUser;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ConnectionException;
-use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Exception;
+use FTP\Connection as FtpConnection;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -46,24 +46,16 @@ class SyncSacMemberDatabase
     public const FTP_DB_DUMP_FIELD_DELIMITER = '$';
 
     private ContaoFramework $framework;
-
     private Connection $connection;
-
     private EncoderFactory $encoderFactory;
-
     private array $credentials;
-
     private string $projectDir;
-
     private string $locale;
-
     private ?LoggerInterface $logger;
 
-    private ?string $ftp_hostname;
-
-    private ?string $ftp_username;
-
-    private ?string $ftp_password;
+    private ?string $ftp_hostname = null;
+    private ?string $ftp_username = null;
+    private ?string $ftp_password = null;
 
     public function __construct(ContaoFramework $framework, Connection $connection, EncoderFactory $encoderFactory, array $credentials, string $projectDir, string $locale, LoggerInterface $logger = null)
     {
@@ -77,10 +69,8 @@ class SyncSacMemberDatabase
     }
 
     /**
-     * @throws ConnectionException
-     * @throws Exception
      * @throws StringsException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function run(): void
     {
@@ -90,12 +80,10 @@ class SyncSacMemberDatabase
     }
 
     /**
-     * @throws ConnectionException
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
      * @throws StringsException
+     * @throws Exception
      */
-    public function setPassword(int $limit = 10): int
+    public function setPassword(int $limit = 20): int
     {
         if (!$limit) {
             return $limit;
@@ -103,13 +91,10 @@ class SyncSacMemberDatabase
 
         $count = 0;
 
-        // Handle correctly LOCK TABLES with transactions: https://dev.mysql.com/doc/refman/8.0/en/lock-tables.html
-        $this->connection->executeQuery('SET autocommit=0');
-        $this->connection->executeQuery('LOCK TABLES tl_member WRITE');
-
-        $this->connection->beginTransaction();
-
         try {
+            $this->connection->executeStatement('LOCK TABLES tl_member WRITE;');
+            $this->connection->beginTransaction();
+
             // Set a password if there isn't one.
             $strUpd = sprintf(
                 'SELECT id FROM tl_member WHERE password = ? LIMIT 0,%s',
@@ -132,13 +117,10 @@ class SyncSacMemberDatabase
             }
 
             $this->connection->commit();
-
-            $this->connection->executeQuery('UNLOCK TABLES');
+            $this->connection->executeStatement('UNLOCK TABLES;');
         } catch (\Exception $e) {
             $this->connection->rollBack();
-
-            // Rollback does not release tables
-            $this->connection->executeQuery('UNLOCK TABLES');
+            $this->connection->executeStatement('UNLOCK TABLES;');
 
             throw $e;
         }
@@ -148,14 +130,15 @@ class SyncSacMemberDatabase
 
     private function prepare(): void
     {
-        $this->framework->initialize();
+        $this->framework->initialize(false);
         $this->ftp_hostname = (string) $this->credentials['hostname'];
         $this->ftp_username = (string) $this->credentials['username'];
         $this->ftp_password = (string) $this->credentials['password'];
     }
 
     /**
-     * @throws \Exception
+     * @throws StringsException
+     * @throws Exception
      */
     private function fetchFilesFromFtp(): void
     {
@@ -186,11 +169,9 @@ class SyncSacMemberDatabase
     }
 
     /**
-     * @throws \Exception
-     *
-     * @return resource
+     * @throws StringsException
      */
-    private function openFtpConnection()
+    private function openFtpConnection(): FtpConnection
     {
         $connId = ftp_connect($this->ftp_hostname);
 
@@ -207,114 +188,109 @@ class SyncSacMemberDatabase
     /**
      * Sync tl_member with Navision db dump.
      *
-     * @throws ConnectionException
-     * @throws Exception
      * @throws StringsException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     private function syncContaoDatabase(): void
     {
         $startTime = time();
 
-        // All users members & non members
-        $arrMemberIDS = $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member');
-
-        // Members only
-        $arrDisabledMemberIDS = $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member WHERE isSacMember = ?', ['']);
-
-        // Valid/active members
-        $arrSacMemberIds = [];
-
-        $arrMember = [];
-
-        $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
-
-        foreach ($arrSectionIds as $sectionId) {
-            $objFile = new File(sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId));
-
-            $arrFile = $objFile->getContentAsArray();
-
-            foreach ($arrFile as $line) {
-                // End of line
-                if (false !== strpos($line, static::FTP_DB_DUMP_END_OF_FILE_STRING)) {
-                    continue;
-                }
-                $arrLine = explode(static::FTP_DB_DUMP_FIELD_DELIMITER, $line);
-
-                $arrSacMemberIds[] = (int) ($arrLine[0]);
-
-                $set = [];
-                $set['sacMemberId'] = (int) ($arrLine[0]);
-                $set['username'] = (int) ($arrLine[0]);
-                // Allow multi membership
-                $set['sectionId'] = [ltrim((string) $arrLine[1], '0')];
-                $set['lastname'] = $arrLine[2];
-                $set['firstname'] = $arrLine[3];
-                $set['addressExtra'] = $arrLine[4];
-                $set['street'] = trim((string) $arrLine[5]);
-                $set['streetExtra'] = $arrLine[6];
-                $set['postal'] = $arrLine[7];
-                $set['city'] = $arrLine[8];
-                $set['country'] = empty(strtolower((string) $arrLine[9])) ? 'ch' : strtolower((string) $arrLine[9]);
-                $set['dateOfBirth'] = strtotime((string) $arrLine[10]);
-                $set['phoneBusiness'] = beautifyPhoneNumber($arrLine[11]);
-                $set['phone'] = beautifyPhoneNumber($arrLine[12]);
-                $set['mobile'] = beautifyPhoneNumber($arrLine[14]);
-                $set['fax'] = $arrLine[15];
-                $set['email'] = $arrLine[16];
-                $set['gender'] = 'weiblich' === strtolower((string) $arrLine[17]) ? 'female' : 'male';
-                $set['profession'] = $arrLine[18];
-                $set['language'] = 'd' === strtolower((string) $arrLine[19]) ? $this->locale : strtolower((string) $arrLine[19]);
-                $set['entryYear'] = $arrLine[20];
-                $set['membershipType'] = $arrLine[23];
-                $set['sectionInfo1'] = $arrLine[24];
-                $set['sectionInfo2'] = $arrLine[25];
-                $set['sectionInfo3'] = $arrLine[26];
-                $set['sectionInfo4'] = $arrLine[27];
-                $set['debit'] = $arrLine[28];
-                $set['memberStatus'] = $arrLine[29];
-
-                $set = array_map(
-                    static function ($value) {
-                        if (!\is_array($value)) {
-                            $value = \is_string($value) ? trim((string) $value) : $value;
-
-                            return \is_string($value) ? utf8_encode($value) : $value;
-                        }
-
-                        return $value;
-                    },
-                    $set
-                );
-
-                // Check if member is already in the array
-                if (isset($arrMember[$set['sacMemberId']])) {
-                    $arrMember[$set['sacMemberId']]['sectionId'] = array_merge($arrMember[$set['sacMemberId']]['sectionId'], $set['sectionId']);
-                } else {
-                    $arrMember[$set['sacMemberId']] = $set;
-                }
-            }
-        }
-
-        @ini_set('max_execution_time', '0');
-        // Consider the suhosin.memory_limit
-        if (\extension_loaded('suhosin')) {
-            if (($limit = \ini_get('suhosin.memory_limit')) !== '') {
-                @ini_set('memory_limit', (string) $limit);
-            }
-        } else {
-            @ini_set('memory_limit', '-1');
-        }
-
-        // Handle correctly LOCK TABLES with transactions: https://dev.mysql.com/doc/refman/8.0/en/lock-tables.html
-        $this->connection->executeQuery('SET autocommit=0');
-        $this->connection->executeQuery('LOCK TABLES tl_member WRITE');
-
-        // Start transaction (big thank to cyon.ch)
-        $this->connection->beginTransaction();
-
         try {
-            // Set tl_member.isSacMember && tl_member.disable to false for all entries
+            $this->connection->executeStatement('LOCK TABLES tl_member WRITE, tl_sac_section WRITE;');
+            $this->connection->beginTransaction();
+
+            // All users members & nonmembers
+            $arrMemberIDS = $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member');
+
+            // Members only
+            $arrDisabledMemberIDS = $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member WHERE isSacMember = ?', ['']);
+
+            // Valid/active members
+            $arrSacMemberIds = [];
+
+            $arrMember = [];
+
+            $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
+
+            foreach ($arrSectionIds as $sectionId) {
+                $objFile = new File(sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId));
+
+                $arrFile = $objFile->getContentAsArray();
+
+                foreach ($arrFile as $line) {
+                    // End of line
+                    if (str_contains($line, static::FTP_DB_DUMP_END_OF_FILE_STRING)) {
+                        continue;
+                    }
+                    $arrLine = explode(static::FTP_DB_DUMP_FIELD_DELIMITER, $line);
+
+                    $arrSacMemberIds[] = (int) ($arrLine[0]);
+
+                    $set = [];
+                    $set['sacMemberId'] = (int) ($arrLine[0]);
+                    $set['username'] = (int) ($arrLine[0]);
+                    // Allow multi membership
+                    $set['sectionId'] = [ltrim((string) $arrLine[1], '0')];
+                    $set['lastname'] = $arrLine[2];
+                    $set['firstname'] = $arrLine[3];
+                    $set['addressExtra'] = $arrLine[4];
+                    $set['street'] = trim((string) $arrLine[5]);
+                    $set['streetExtra'] = $arrLine[6];
+                    $set['postal'] = $arrLine[7];
+                    $set['city'] = $arrLine[8];
+                    $set['country'] = empty(strtolower((string) $arrLine[9])) ? 'ch' : strtolower((string) $arrLine[9]);
+                    $set['dateOfBirth'] = strtotime((string) $arrLine[10]);
+                    $set['phoneBusiness'] = beautifyPhoneNumber($arrLine[11]);
+                    $set['phone'] = beautifyPhoneNumber($arrLine[12]);
+                    $set['mobile'] = beautifyPhoneNumber($arrLine[14]);
+                    $set['fax'] = $arrLine[15];
+                    $set['email'] = $arrLine[16];
+                    $set['gender'] = 'weiblich' === strtolower((string) $arrLine[17]) ? 'female' : 'male';
+                    $set['profession'] = $arrLine[18];
+                    $set['language'] = 'd' === strtolower((string) $arrLine[19]) ? $this->locale : strtolower((string) $arrLine[19]);
+                    $set['entryYear'] = $arrLine[20];
+                    $set['membershipType'] = $arrLine[23];
+                    $set['sectionInfo1'] = $arrLine[24];
+                    $set['sectionInfo2'] = $arrLine[25];
+                    $set['sectionInfo3'] = $arrLine[26];
+                    $set['sectionInfo4'] = $arrLine[27];
+                    $set['debit'] = $arrLine[28];
+                    $set['memberStatus'] = $arrLine[29];
+
+                    $set = array_map(
+                        static function ($value) {
+                            if (!\is_array($value)) {
+                                $value = \is_string($value) ? trim((string) $value) : $value;
+
+                                return \is_string($value) ? utf8_encode($value) : $value;
+                            }
+
+                            return $value;
+                        },
+                        $set
+                    );
+
+                    // Check if member is already in the array
+                    if (isset($arrMember[$set['sacMemberId']])) {
+                        $arrMember[$set['sacMemberId']]['sectionId'] = array_merge($arrMember[$set['sacMemberId']]['sectionId'], $set['sectionId']);
+                    } else {
+                        $arrMember[$set['sacMemberId']] = $set;
+                    }
+                }
+            }
+
+            @ini_set('max_execution_time', 0);
+
+            // Consider the suhosin.memory_limit (see #7035)
+            if (\extension_loaded('suhosin')) {
+                if (($limit = \ini_get('suhosin.memory_limit')) !== '') {
+                    @ini_set('memory_limit', $limit);
+                }
+            } else {
+                @ini_set('memory_limit', -1);
+            }
+
+            // Set tl_member.isSacMember and tl_member.disable to '' for all records
             $this->connection->executeStatement('UPDATE tl_member SET disable = ?, isSacMember = ?', ['', '']);
 
             $countInserts = 0;
@@ -375,16 +351,14 @@ class SyncSacMemberDatabase
             }
 
             $this->connection->commit();
-            $this->connection->executeQuery('UNLOCK TABLES');
+            $this->connection->executeStatement('UNLOCK TABLES;');
         } catch (\Exception $e) {
             $msg = 'Error during the database sync process. Starting transaction rollback now.';
             $this->log(LogLevel::CRITICAL, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_TRANSACTION_ERROR);
 
             // Transaction rollback
             $this->connection->rollBack();
-
-            // Rollback does not release tables
-            $this->connection->executeQuery('UNLOCK TABLES');
+            $this->connection->executeStatement('UNLOCK TABLES;');
 
             // Throw exception
             throw $e;
