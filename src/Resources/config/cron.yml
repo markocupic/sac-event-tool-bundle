@@ -5,14 +5,12 @@ services:
         public: true
         arguments:
             - '@contao.framework'
-            - '%kernel.project_dir%'
 
     # Contao Cron Controller
     Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron:
         public: true
         arguments:
             - '@contao.framework'
-            - '%kernel.project_dir%'
 
 
 

@@ -29,9 +29,9 @@ services:
 
     Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationController:
         arguments:
-            - '@security.helper'
             - '@contao.framework'
-            - '@session'
+            - '@request_stack'
+            - '@security.helper'
             - '@event_dispatcher'
             - '@twig'
             - '@translator'

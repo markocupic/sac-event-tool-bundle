@@ -21,45 +21,26 @@ use Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser;
 
 class HourlyCron
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
 
-    /**
-     * @var string
-     */
-    private $projectDir;
-
-    /**
-     * HourlyCron constructor.
-     */
-    public function __construct(ContaoFramework $framework, string $projectDir)
+    public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
-        $this->projectDir = $projectDir;
-
-        // Initialize contao framework
-        $this->framework->initialize();
     }
 
     /**
      * Sync SAC member database.
-     */
-    public function syncSacMemberDatabase(): void
-    {
-        /** @var SyncSacMemberDatabase $cron */
-        $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase');
-        $cron->run();
-    }
-
-    /**
      * Sync tl_member with tl_user.
      */
-    public function syncMemberWithUser(): void
+    public function hourlyCron(): void
     {
-        /** @var SyncMemberWithUser $cron */
-        $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser');
+        // Initialize contao framework
+        $this->framework->initialize();
+
+        $cron = System::getContainer()->get(SyncSacMemberDatabase::class);
+        $cron->run();
+
+        $cron = System::getContainer()->get(SyncMemberWithUser::class);
         $cron->syncMemberWithUser();
     }
 }

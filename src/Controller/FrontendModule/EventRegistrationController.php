@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUndefinedFieldInspection */
 
 declare(strict_types=1);
 
@@ -20,6 +20,7 @@ use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
@@ -48,8 +49,8 @@ use Psr\Log\LogLevel;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment as TwigEnvironment;
@@ -60,160 +61,120 @@ use Twig\Environment as TwigEnvironment;
 class EventRegistrationController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_registration';
+    private ContaoFramework $framework;
+    private RequestStack $requestStack;
+    private Security $security;
+    private EventDispatcherInterface $eventDispatcher;
+    private TwigEnvironment $twig;
+    private TranslatorInterface $translator;
+    private string $projectDir;
+    private ?LoggerInterface $logger;
 
-    /**
-     * @var Security
-     */
-    private $security;
+    // Adapters
+    private Adapter $calendarEventsHelperAdapter;
+    private Adapter $calendarEventsJourneyModelAdapter;
+    private Adapter $calendarEventsMemberModelAdapter;
+    private Adapter $calendarEventsModelAdapter;
+    private Adapter $configAdapter;
+    private Adapter $controllerAdapter;
+    private Adapter $dateAdapter;
+    private Adapter $environmentAdapter;
+    private Adapter $eventOrganizerModelAdapter;
+    private Adapter $eventsAdapter;
+    private Adapter $filesModelAdapter;
+    private Adapter $inputAdapter;
+    private Adapter $stringUtilAdapter;
+    private Adapter $urlAdapter;
+    private Adapter $userModelAdapter;
+    private Adapter $validatorAdapter;
 
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    // Class properties that are initialized after class instantiation
+    private ?ModuleModel $moduleModel = null;
+    private ?CalendarEventsModel $eventModel = null;
+    private ?MemberModel $memberModel = null;
+    private ?UserModel $mainInstructorModel = null;
+    private ?Form $objForm = null;
+    private ?Template $template = null;
 
-    /**
-     * @var SessionInterface
-     */
-    private $session;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var TwigEnvironment
-     */
-    private $twig;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var string
-     */
-    private $projectDir;
-
-    /**
-     * @var LoggerInterface|null
-     */
-    private $logger;
-
-    /**
-     * @var ModuleModel
-     */
-    private $moduleModel;
-
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var CalendarEventsModel
-     */
-    private $eventModel;
-
-    /**
-     * @var FrontendUser
-     */
-    private $memberModel;
-
-    /**
-     * @var UserModel
-     */
-    private $mainInstructorModel;
-
-    /**
-     * @var Form
-     */
-    private $objForm;
-
-    /**
-     * @var Template
-     */
-    private $template;
-
-    public function __construct(Security $security, ContaoFramework $framework, SessionInterface $session, EventDispatcherInterface $eventDispatcher, TwigEnvironment $twig, TranslatorInterface $translator, string $projectDir, LoggerInterface $logger = null)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Security $security, EventDispatcherInterface $eventDispatcher, TwigEnvironment $twig, TranslatorInterface $translator, string $projectDir, LoggerInterface $logger = null)
     {
-        $this->security = $security;
         $this->framework = $framework;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
+        $this->security = $security;
         $this->eventDispatcher = $eventDispatcher;
         $this->twig = $twig;
         $this->translator = $translator;
         $this->projectDir = $projectDir;
         $this->logger = $logger;
+
+        // Adapters
+        $this->calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
+        $this->calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+        $this->calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+        $this->configAdapter = $this->framework->getAdapter(Config::class);
+        $this->controllerAdapter = $this->framework->getAdapter(Controller::class);
+        $this->dateAdapter = $this->framework->getAdapter(Date::class);
+        $this->environmentAdapter = $this->framework->getAdapter(Environment::class);
+        $this->eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
+        $this->eventsAdapter = $this->framework->getAdapter(Events::class);
+        $this->filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+        $this->inputAdapter = $this->framework->getAdapter(Input::class);
+        $this->stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+        $this->urlAdapter = $this->framework->getAdapter(Url::class);
+        $this->userModelAdapter = $this->framework->getAdapter(UserModel::class);
+        $this->validatorAdapter = $this->framework->getAdapter(Validator::class);
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         // Set the module object (Contao\ModuleModel)
         $this->moduleModel = $model;
-        $this->pageModel = $page;
 
         // Do not index nor cache page
-        $this->pageModel->noSearch = true;
-        $this->pageModel->cache = false;
-        $this->pageModel->clientCache = false;
-
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
-        /** @var CalendarEventsModel $calendarEventsModelAdapter */
-        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-
-        /** @var UserModel $userModelAdapter */
-        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-
-        /** @var Input $inputAdapter */
-        $inputAdapter = $this->framework->getAdapter(Input::class);
+        $page->noSearch = true;
+        $page->cache = false;
+        $page->clientCache = false;
 
         if (($objUser = $this->security->getUser()) instanceof FrontendUser) {
-            /** @var MemberModel objUser */
             $this->memberModel = MemberModel::findByPk($objUser->id);
         }
 
         // Set the item from the auto_item parameter
-        if (!isset($_GET['events']) && $configAdapter->get('useAutoItem') && isset($_GET['auto_item'])) {
-            $inputAdapter->setGet('events', $inputAdapter->get('auto_item'));
+        if (!isset($_GET['events']) && $this->configAdapter->get('useAutoItem') && isset($_GET['auto_item'])) {
+            $this->inputAdapter->setGet('events', $this->inputAdapter->get('auto_item'));
         }
 
         // Get $this->eventModel from GET
-        $this->eventModel = $calendarEventsModelAdapter->findByIdOrAlias($inputAdapter->get('events'));
+        $this->eventModel = $this->calendarEventsModelAdapter->findByIdOrAlias($this->inputAdapter->get('events'));
 
         // Get instructor object from UserModel
-        $this->mainInstructorModel = $userModelAdapter->findByPk($this->eventModel->mainInstructor);
+        $this->mainInstructorModel = $this->userModelAdapter->findByPk($this->eventModel->mainInstructor);
 
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }
 
+    /**
+     * @param Template $template
+     * @param ModuleModel $model
+     * @param Request $request
+     * @return Response|null
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $request = $this->requestStack->getCurrentRequest();
+        $session = $request->getSession();
 
-        /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->framework->getAdapter(Date::class);
-
-        /** @var Validator $validatorAdapter */
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-
-        /** @var Input $inputAdapter */
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-
-        $flash = $this->session->getFlashBag();
+        $flash = $session->getFlashBag();
         $sessInfKey = 'contao.FE.info';
         $sessErrKey = 'contao.FE.error';
 
         if (null === $this->eventModel) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventNotFound', [$inputAdapter->get('events') ?: 'NULL'], 'event_default'));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventNotFound', [$this->inputAdapter->get('events') ?? 'NULL'], 'contao_default'));
         } elseif ($this->eventModel->disableOnlineRegistration) {
             $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_onlineRegDisabled', [], 'contao_default'));
         } elseif ('event_fully_booked' === $this->eventModel->eventState) {
@@ -223,30 +184,33 @@ class EventRegistrationController extends AbstractFrontendModuleController
         } elseif ('event_deferred' === $this->eventModel->eventState) {
             $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventDeferred', [], 'contao_default'));
         } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationStartDate > time()) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossibleOn', [$this->eventModel->title, $dateAdapter->parse('d.m.Y H:i', $this->eventModel->registrationStartDate)], 'contao_default'));
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossibleOn', [$this->eventModel->title, $this->dateAdapter->parse('d.m.Y H:i', $this->eventModel->registrationStartDate)], 'contao_default'));
         } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationEndDate < time()) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationDeadlineExpired', [$dateAdapter->parse('d.m.Y \u\m H:i', $this->eventModel->registrationEndDate)], 'contao_default'));
+            $strDate = $this->dateAdapter->parse('d.m.Y', $this->eventModel->registrationEndDate);
+            $strTime = $this->dateAdapter->parse('H:i', $this->eventModel->registrationEndDate);
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationDeadlineExpired', [$strDate, $strTime], 'contao_default'));
         } elseif (!$this->eventModel->setRegistrationPeriod && $this->eventModel->startDate - 60 * 60 * 24 < time()) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossible24BeforeEventStart', [], 'contao_default'));
-        } elseif ($this->memberModel && true === $calendarEventsHelperAdapter->areBookingDatesOccupied($this->eventModel, $this->memberModel)) {
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossible24HoursBeforeEventStart', [], 'contao_default'));
+        } elseif ($this->memberModel && true === $this->calendarEventsHelperAdapter->areBookingDatesOccupied($this->eventModel, $this->memberModel)) {
             $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventDateOverlapError', [], 'contao_default'));
         } elseif (null === $this->mainInstructorModel) {
             $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_mainInstructorNotFound', [$this->eventModel->mainInstructor], 'contao_default'));
-        } elseif (empty($this->mainInstructorModel->email) || !$validatorAdapter->isEmail($this->mainInstructorModel->email)) {
+        } elseif (empty($this->mainInstructorModel->email) || !$this->validatorAdapter->isEmail($this->mainInstructorModel->email)) {
             $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_mainInstructorsEmailAddrNotFound', [$this->eventModel->mainInstructor], 'contao_default'));
-        } elseif (null !== $this->memberModel && (empty($this->memberModel->email) || !$validatorAdapter->isEmail($this->memberModel->email))) {
+        } elseif (null !== $this->memberModel && (empty($this->memberModel->email) || !$this->validatorAdapter->isEmail($this->memberModel->email))) {
             $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_membersEmailAddrNotFound', [], 'contao_default'));
         }
 
         $this->template = $template;
-
-        // Set more template vars
-        $this->setMoreTemplateVars();
         $this->template->eventModel = $this->eventModel;
         $this->template->memberModel = $this->memberModel;
         $this->template->moduleModel = $this->moduleModel;
 
-        if (null !== $this->memberModel && true === $calendarEventsMemberModelAdapter->isRegistered($this->memberModel->id, $this->eventModel->id)) {
+        // Set more template vars
+        $this->setMoreTemplateVars();
+
+
+        if (null !== $this->memberModel && true === $this->calendarEventsMemberModelAdapter->isRegistered($this->memberModel->id, $this->eventModel->id)) {
             $this->template->regInfo = $this->parseEventRegistrationConfirmTemplate();
 
             if ($url = $this->getRoute('confirm')) {
@@ -296,7 +260,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
             }
 
             // Check if event is already fully booked
-            if (true === $calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel)) {
+            if (true === $this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel)) {
                 $this->template->bookingLimitReaches = true;
             }
 
@@ -305,25 +269,18 @@ class EventRegistrationController extends AbstractFrontendModuleController
             }
         }
 
-        $this->template->action = $inputAdapter->get('action');
-        $this->template->stepIndicator = $this->parseStepIndicatorTemplate($inputAdapter->get('action'));
+        $this->template->action = $request->query->get('action');
+        $this->template->stepIndicator = $this->parseStepIndicatorTemplate($request->query->get('action'));
 
         return $this->template->getResponse();
     }
 
     private function getRoute(string $action): ?string
     {
-        /** @var Url $urlAdapter */
-        $urlAdapter = $this->framework->getAdapter(Url::class);
+        $request = $this->requestStack->getCurrentRequest();
 
-        /** @var Input $inputAdapter */
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-
-        /** @var Environment $environmentAdapter */
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-
-        if ($inputAdapter->get('action') !== $action) {
-            return $urlAdapter->addQueryString('action='.$action, $environmentAdapter->get('uri'));
+        if ($request->query->get('action') !== $action) {
+            return $this->urlAdapter->addQueryString('action='.$action, $this->environmentAdapter->get('uri'));
         }
 
         return null;
@@ -331,32 +288,17 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     private function generateForm(): void
     {
-        /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-
-        /** @var Environment $environmentAdapter */
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-
-        /** @var CalendarEventsJourneyModel $calendarEventsJourneyModelAdapter */
-        $calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
+        $request = $this->requestStack->getCurrentRequest();
 
         $objForm = new Form(
             'form-event-registration',
             'POST',
-            function ($objHaste) {
-                /** @var Input $inputAdapter */
-                $inputAdapter = $this->framework->getAdapter(Input::class);
-
-                return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
-            }
+            fn ($objHaste) => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId(),
         );
 
-        $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
+        $objForm->setFormActionFromUri($this->environmentAdapter->get('uri'));
 
-        if (null !== ($objJourney = $calendarEventsJourneyModelAdapter->findByPk($this->eventModel->journey))) {
+        if (null !== ($objJourney = $this->calendarEventsJourneyModelAdapter->findByPk($this->eventModel->journey))) {
             if ('public-transport' === $objJourney->alias) {
                 $objForm->addFormField('ticketInfo', $this->getFormFieldDca('ticketInfo'));
             }
@@ -371,11 +313,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
         }
 
         $objForm->addFormField('mobile', $this->getFormFieldDca('mobile'));
-
         $objForm->addFormField('emergencyPhone', $this->getFormFieldDca('emergencyPhone'));
-
         $objForm->addFormField('emergencyPhoneName', $this->getFormFieldDca('emergencyPhoneName'));
-
         $objForm->addFormField('notes', $this->getFormFieldDca('notes'));
 
         // Only show this field if it is a multi day event
@@ -384,8 +323,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
         }
 
         $objForm->addFormField('agb', $this->getFormFieldDca('agb'));
-
-        // Let's add  a submit button
         $objForm->addFormField('submit', $this->getFormFieldDca('submit'));
 
         // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields.
@@ -424,7 +361,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $arrData['eventId'] = $this->eventModel->id;
                 $arrData['addedOn'] = time();
                 $arrData['uuid'] = Uuid::uuid4()->toString();
-                $arrData['stateOfSubscription'] = $calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel) ? EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED : EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED;
+                $arrData['stateOfSubscription'] = $this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel) ? EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED : EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED;
                 $arrData['bookingType'] = 'onlineForm';
                 $arrData['sectionId'] = $this->memberModel->sectionId;
 
@@ -454,11 +391,19 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
                 // Log
                 if ($this->logger) {
-                    $strText = sprintf('New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").', $this->memberModel->firstname, $this->memberModel->lastname, $this->memberModel->id, $this->eventModel->id, $this->eventModel->title);
+                    $strText = sprintf(
+                        'New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").',
+                        $this->memberModel->firstname,
+                        $this->memberModel->lastname,
+                        $this->memberModel->id,
+                        $this->eventModel->id,
+                        $this->eventModel->title
+                    );
+
                     $this->logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION)]);
                 }
 
-                // Dispatch event subscription event (e.g. send notification)
+                // Dispatch event registration event (e.g. send notification)
                 $event = new \stdClass();
                 $event->framework = $this->framework;
                 $event->arrData = $arrData;
@@ -467,11 +412,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $event->eventMemberModel = $objEventRegistration;
                 $event->moduleModel = $this->moduleModel;
 
-                // Use a subscriber to assign notification to the event registration
+                // Use an event subscriber to notify member
                 $this->eventDispatcher->dispatch(new EventRegistrationEvent($event), EventRegistrationEvent::NAME);
 
                 // Reload page
-                $controllerAdapter->reload();
+                $this->controllerAdapter->reload();
             }
         }
 
@@ -480,23 +425,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     private function setMoreTemplateVars(): void
     {
-        /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
-        /** @var EventOrganizerModel $eventOrganizerModelAdapter */
-        $eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
-
-        /** @var Validator $validatorAdapter */
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-
-        /** @var FilesModel $filesModelAdapter */
-        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
-
         if ('tour' === $this->eventModel->eventType || 'last-minute-tour' === $this->eventModel->eventType || 'course' === $this->eventModel->eventType) {
-            $arrOrganizers = $stringUtilAdapter->deserialize($this->eventModel->organizers, true);
+            $arrOrganizers = $this->stringUtilAdapter->deserialize($this->eventModel->organizers, true);
 
             if (isset($arrOrganizers[0])) {
-                $objOrganizer = $eventOrganizerModelAdapter->findByPk($arrOrganizers[0]);
+                $objOrganizer = $this->eventOrganizerModelAdapter->findByPk($arrOrganizers[0]);
 
                 if (null !== $objOrganizer) {
                     $prefix = '';
@@ -511,8 +444,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
                     if ('' !== $prefix) {
                         if ('' !== $objOrganizer->{$prefix.'RegulationSRC'}) {
-                            if ($validatorAdapter->isBinaryUuid($objOrganizer->{$prefix.'RegulationSRC'})) {
-                                $objFile = $filesModelAdapter->findByUuid($objOrganizer->{$prefix.'RegulationSRC'});
+                            if ($this->validatorAdapter->isBinaryUuid($objOrganizer->{$prefix.'RegulationSRC'})) {
+                                $objFile = $this->filesModelAdapter->findByUuid($objOrganizer->{$prefix.'RegulationSRC'});
 
                                 if (null !== $objFile && is_file($this->projectDir.'/'.$objFile->path)) {
                                     $this->template->objEventRegulationFile = $objFile;
@@ -591,12 +524,9 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     private function isMultiDayEvent(): bool
     {
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-
-        $durationInDays = \count($calendarEventsHelperAdapter->getEventTimestamps($this->eventModel));
-        $startDate = $calendarEventsHelperAdapter->getStartDate($this->eventModel);
-        $endDate = $calendarEventsHelperAdapter->getEndDate($this->eventModel);
+        $durationInDays = \count($this->calendarEventsHelperAdapter->getEventTimestamps($this->eventModel));
+        $startDate = $this->calendarEventsHelperAdapter->getStartDate($this->eventModel);
+        $endDate = $this->calendarEventsHelperAdapter->getEndDate($this->eventModel);
 
         if ($durationInDays > 1 && $startDate + ($durationInDays - 1) * 86400 === $endDate) {
             return true;
@@ -605,26 +535,23 @@ class EventRegistrationController extends AbstractFrontendModuleController
         return false;
     }
 
+    /**
+     * @return string
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
     private function parseEventRegistrationConfirmTemplate(): string
     {
-        /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+        $this->controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
-        /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-
-        /** @var Events $eventsAdapter */
-        $eventsAdapter = $this->framework->getAdapter(Events::class);
-
-        $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
-
-        if (null !== ($objEventsMemberModel = $calendarEventsMemberModelAdapter->findByMemberAndEvent($this->memberModel, $this->eventModel))) {
+        if (null !== ($objEventsMemberModel = $this->calendarEventsMemberModelAdapter->findByMemberAndEvent($this->memberModel, $this->eventModel))) {
             $arrEvent = $this->eventModel->row();
             $arrEventsMember = $objEventsMemberModel->row();
             $arrMember = $this->memberModel->row();
 
             $arrEventsMember['stateOfSubscriptionTrans'] = $this->translator->trans('tl_calendar_events_member.'.$arrEventsMember['stateOfSubscription'], [], 'contao_default');
-            $arrEvent['eventUrl'] = $eventsAdapter->generateEventUrl($this->eventModel);
+            $arrEvent['eventUrl'] = $this->eventsAdapter->generateEventUrl($this->eventModel);
 
             $arrEvent = array_map('html_entity_decode', $arrEvent);
             $arrEventsMember = array_map('html_entity_decode', $arrEventsMember);
@@ -643,6 +570,13 @@ class EventRegistrationController extends AbstractFrontendModuleController
         return '';
     }
 
+    /**
+     * @param string $strStep
+     * @return string
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
     private function parseStepIndicatorTemplate(string $strStep): string
     {
         return $this->twig->render(

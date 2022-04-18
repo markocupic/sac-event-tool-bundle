@@ -20,35 +20,22 @@ use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 
 class DailyCron
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
 
-    /**
-     * @var string
-     */
-    private $projectDir;
-
-    /**
-     * DailyCron constructor.
-     */
-    public function __construct(ContaoFramework $framework, string $projectDir)
+    public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
-        $this->projectDir = $projectDir;
-
-        // Initialize contao framework
-        $this->framework->initialize();
     }
 
     /**
-     * Anonymize orphaned calendar events member datarecords.
+     * Anonymize orphaned event registration datarecords (tl_calendar_events_member).
      */
-    public function anonymizeOrphanedCalendarEventsMemberDataRecords(): void
+    public function dailyCron(): void
     {
-        /** @var ClearFrontendUserData $cron */
-        $cron = System::getContainer()->get('Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData');
+        // Initialize contao framework
+        $this->framework->initialize();
+
+        $cron = System::getContainer()->get(ClearFrontendUserData::class);
         $cron->anonymizeOrphanedCalendarEventsMemberDataRecords();
     }
 }
