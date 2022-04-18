@@ -595,7 +595,8 @@ class CalendarEventsHelper
         }
 
         $eventDuration = \count(self::getEventTimestamps($objEvent));
-        $span = Calendar::calculateSpan(self::getStartDate($objEvent), self::getEndDate($objEvent)) + 1;
+        // Typecast is required here, this although PhpCodeSniffer claims the opposite.
+        $span = (int) Calendar::calculateSpan(self::getStartDate($objEvent), self::getEndDate($objEvent)) + 1;
 
         if (1 === $eventDuration) {
             return Date::parse($dateFormat, self::getStartDate($objEvent)).($blnAppendEventDuration ? ' ('.self::getEventDuration($objEvent).')' : '');
