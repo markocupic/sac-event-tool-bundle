@@ -27,7 +27,7 @@
 
         <!-- Login form -->
         <div class="mt-5 mb-4">
-            {{ replace_contao_insert_tag('{{insert_module::' ~ moduleModel.eventRegLoginModule ~ '}}')|raw }}
+            {{ '{{insert_module::' ~ moduleModel.eventRegLoginModule ~ '}}' }}
         </div>
     {% endif %}
 
