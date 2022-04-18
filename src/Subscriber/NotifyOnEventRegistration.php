@@ -24,45 +24,21 @@ use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Markocupic\SacEventToolBundle\Event\EventSubscriptionEvent;
+use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
 use NotificationCenter\Model\Notification;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class NotifyOnEventSubscription implements EventSubscriberInterface
+final class NotifyOnEventRegistration implements EventSubscriberInterface
 {
     public const PRIORITY = 10000;
 
     private string $locale;
-
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
-
-    /**
-     * @var array
-     */
-    private $arrData;
-
-    /**
-     * @var MemberModel
-     */
-    private $memberModel;
-
-    /**
-     * @var CalendarEventsModel
-     */
-    private $eventModel;
-
-    /**
-     * @var CalendarEventsMemberModel
-     */
-    private $eventMemberModel;
-
-    /**
-     * @var ModuleModel
-     */
-    private $moduleModel;
+    private array $arrData = [];
+    private ?ContaoFramework $framework = null;
+    private ?MemberModel $memberModel = null;
+    private ?CalendarEventsModel $eventModel = null;
+    private ?CalendarEventsMemberModel $eventMemberModel = null;
+    private ?ModuleModel $moduleModel = null;
 
     public function __construct(string $locale)
     {
@@ -72,11 +48,11 @@ final class NotifyOnEventSubscription implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EventSubscriptionEvent::NAME => ['notifyUserOnEventSubscription', self::PRIORITY],
+            EventRegistrationEvent::NAME => ['notifyUserOnEventRegistration', self::PRIORITY],
         ];
     }
 
-    public function notifyUserOnEventSubscription(EventSubscriptionEvent $event): void
+    public function notifyUserOnEventRegistration(EventRegistrationEvent $event): void
     {
         $this->initialize($event);
 
@@ -108,10 +84,10 @@ final class NotifyOnEventSubscription implements EventSubscriberInterface
         /** @var UserModel $objInstructor */
         $objInstructor = $userModelAdapter->findByPk($this->eventModel->mainInstructor);
 
-        if ($this->eventModel->registrationGoesTo) {
-            $strRegistrationGoesToName = '';
-            $strRegistrationGoesToEmail = '';
+        $strRegistrationGoesToName = '';
+        $strRegistrationGoesToEmail = '';
 
+        if ($this->eventModel->registrationGoesTo) {
             $objUser = $userModelAdapter->findByPk($this->eventModel->registrationGoesTo);
 
             if (null !== $objUser) {
@@ -133,29 +109,29 @@ final class NotifyOnEventSubscription implements EventSubscriberInterface
 
             // Set token array
             $arrTokens = [
-                'event_name' => html_entity_decode((string) $eventType.$this->eventModel->title),
+                'event_name' => html_entity_decode($eventType.$this->eventModel->title),
                 'event_add_iban' => $this->eventModel->addIban,
                 'event_iban' => $this->eventModel->addIban ? html_entity_decode((string) $this->eventModel->iban) : '',
                 'event_ibanBeneficiary' => $this->eventModel->addIban ? html_entity_decode((string) $this->eventModel->ibanBeneficiary) : '',
                 'event_type' => html_entity_decode((string) $this->eventModel->eventType),
                 'event_course_id' => $this->eventModel->courseId,
-                'instructor_name' => $bypassRegistration ? html_entity_decode((string) $strRegistrationGoesToName) : html_entity_decode((string) $objInstructor->name),
-                'instructor_email' => $bypassRegistration ? html_entity_decode((string) $strRegistrationGoesToEmail) : html_entity_decode((string) $objInstructor->email),
+                'instructor_name' => $bypassRegistration ? html_entity_decode((string) $strRegistrationGoesToName) : html_entity_decode($objInstructor->name),
+                'instructor_email' => $bypassRegistration ? html_entity_decode((string) $strRegistrationGoesToEmail) : html_entity_decode($objInstructor->email),
                 'participant_name' => html_entity_decode($this->memberModel->firstname.' '.$this->memberModel->lastname),
                 'participant_email' => $this->memberModel->email !== $this->arrData['email'] ? $this->arrData['email'] : $this->memberModel->email,
                 'participant_emergency_phone' => $this->arrData['emergencyPhone'],
-                'participant_emergency_phone_name' => html_entity_decode((string) $this->arrData['emergencyPhoneName']),
-                'participant_street' => html_entity_decode((string) $this->memberModel->street),
+                'participant_emergency_phone_name' => html_entity_decode((string) ($this->arrData['emergencyPhoneName'] ?? '')),
+                'participant_street' => html_entity_decode($this->memberModel->street),
                 'participant_postal' => $this->memberModel->postal,
-                'participant_city' => html_entity_decode((string) $this->memberModel->city),
+                'participant_city' => html_entity_decode($this->memberModel->city),
                 'participant_contao_member_id' => $this->memberModel->id,
                 'participant_sac_member_id' => $this->memberModel->sacMemberId,
-                'participant_ahv_number' => html_entity_decode((string) $this->arrData['ahvNumber']),
+                'participant_ahv_number' => html_entity_decode((string) ($this->arrData['ahvNumber'] ?? '')),
                 'participant_section_membership' => $calendarEventsHelperAdapter->getSectionMembershipAsString($this->memberModel),
                 'participant_mobile' => $this->arrData['mobile'],
-                'participant_date_of_birth' => $this->arrData['dateOfBirth'] > 0 ? $dateAdapter->parse('d.m.Y', $this->arrData['dateOfBirth']) : '---',
-                'participant_food_habits' => $this->arrData['foodHabits'],
-                'participant_notes' => html_entity_decode((string) $this->arrData['notes']),
+                'participant_date_of_birth' => ($this->arrData['dateOfBirth'] ?? 0) > 0 ? $dateAdapter->parse('d.m.Y', $this->arrData['dateOfBirth']) : '---',
+                'participant_food_habits' => $this->arrData['foodHabits'] ?? '',
+                'participant_notes' => html_entity_decode((string) ($this->arrData['notes'] ?? '')),
                 'participant_state_of_subscription' => html_entity_decode((string) $this->eventMemberModel->stateOfSubscription),
                 'participant_has_lead_climbing_education' => $this->memberModel->hasLeadClimbingEducation,
                 'event_id' => $this->eventModel->id,
@@ -166,7 +142,7 @@ final class NotifyOnEventSubscription implements EventSubscriberInterface
         }
     }
 
-    private function initialize(EventSubscriptionEvent $event): void
+    private function initialize(EventRegistrationEvent $event): void
     {
         $this->framework = $event->framework;
         $this->arrData = $event->arrData;

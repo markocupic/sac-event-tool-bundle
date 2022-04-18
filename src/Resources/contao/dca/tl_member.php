@@ -247,7 +247,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['foodHabits'] = [
     'sql'       => 'text NULL',
 ];
 
-if (TL_MODE === 'BE' && !BackendUser::getInstance()->isAdmin) {
+if (TL_MODE === 'BE' && !BackendUser::getInstance()->admin) {
     // Fields (readonly fields)
     $GLOBALS['TL_DCA']['tl_member']['fields']['uuid']['eval']['readonly'] = 'readonly';
     $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId']['eval']['readonly'] = 'readonly';

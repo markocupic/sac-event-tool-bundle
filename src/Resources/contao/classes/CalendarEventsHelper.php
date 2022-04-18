@@ -1086,7 +1086,7 @@ class CalendarEventsHelper
         $sections = StringUtil::deserialize($objMember->sectionId, true);
 
         foreach ($sections as $id) {
-            $arrSections[] = $GLOBALS['TL_LANG']['tl_member']['section'][$id] ?: $id;
+            $arrSections[] = $GLOBALS['TL_LANG']['tl_member']['section'][$id] ?? $id;
         }
 
         return implode(', ', $arrSections);

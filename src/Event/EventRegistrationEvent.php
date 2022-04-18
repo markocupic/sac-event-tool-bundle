@@ -23,12 +23,10 @@ class EventRegistrationEvent extends Event
     public function __construct(\stdClass $event)
     {
         $this->framework = $event->framework;
-        $this->session = $event->session;
-        $this->tagStorage = $event->tagStorage;
-        $this->fileStorage = $event->fileStorage;
-        $this->input = $event->input;
-        $this->message = $event->message;
-        $this->skeletonPath = $event->skeletonPath;
-        $this->projectDir = $event->projectDir;
+        $this->arrData = $event->arrData;
+        $this->memberModel = $event->memberModel;
+        $this->eventModel = $event->eventModel;
+        $this->eventMemberModel = $event->eventMemberModel;
+        $this->moduleModel = $event->moduleModel;
     }
 }

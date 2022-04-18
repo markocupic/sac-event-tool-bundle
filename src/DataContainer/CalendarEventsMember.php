@@ -296,7 +296,7 @@ class CalendarEventsMember
         $request = $this->requestStack->getCurrentRequest();
 
         // Allow full access only to admins, owners and allowed groups
-        if ($user->isAdmin) {
+        if ($user->admin) {
             return;
         }
 

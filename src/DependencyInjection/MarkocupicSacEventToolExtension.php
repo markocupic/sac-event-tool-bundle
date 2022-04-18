@@ -46,16 +46,17 @@ class MarkocupicSacEventToolExtension extends Extension
         $loader->load('listener.yml');
         $loader->load('subscriber.yml');
         $loader->load('parameters.yml');
-        $loader->load('controller-download.yml');
-        $loader->load('controller-ajax.yml');
-        $loader->load('controller-contao-frontend-module.yml');
-        $loader->load('controller-contao-content-element.yml');
-        $loader->load('controller-feed.yml');
-        $loader->load('sac-member-database.yml');
+        $loader->load('controller_download.yml');
+        $loader->load('controller_ajax.yml');
+        $loader->load('controller_contao_frontend_module.yml');
+        $loader->load('controller_contao_content_element.yml');
+        $loader->load('controller_feed.yml');
+        $loader->load('sac_member_database.yml');
         $loader->load('cron.yml');
-        $loader->load('contao-mode.yml');
+        $loader->load('contao_mode.yml');
         $loader->load('services.yml');
-        $loader->load('data-container.yml');
+        $loader->load('data_container.yml');
+        $loader->load('twig_extension.yml');
 
         // Friendly configuration
         $rootKey = $this->getAlias();

@@ -23,7 +23,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['mode'] = 4;
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['headerFields'] = ['title'];
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['disableGrouping'] = true;
 
-if (BackendUser::getInstance()->isAdmin) {
+if (BackendUser::getInstance()->admin) {
     $GLOBALS['TL_DCA']['tl_calendar']['list']['operations']['cut'] = [
         'label' => &$GLOBALS['TL_LANG']['tl_calendar']['cut'],
         'href'  => 'act=paste&amp;mode=cut',

@@ -42,7 +42,7 @@ use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\Config\Log;
-use Markocupic\SacEventToolBundle\Event\EventSubscriptionEvent;
+use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Ramsey\Uuid\Uuid;
@@ -244,6 +244,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $this->setMoreTemplateVars();
         $this->template->eventModel = $this->eventModel;
         $this->template->memberModel = $this->memberModel;
+        $this->template->moduleModel = $this->moduleModel;
 
         if (null !== $this->memberModel && true === $calendarEventsMemberModelAdapter->isRegistered($this->memberModel->id, $this->eventModel->id)) {
             $this->template->regInfo = $this->parseEventRegistrationConfirmTemplate();
@@ -467,7 +468,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $event->moduleModel = $this->moduleModel;
 
                 // Use a subscriber to assign notification to the event registration
-                $this->eventDispatcher->dispatch(new EventSubscriptionEvent($event), EventSubscriptionEvent::NAME);
+                $this->eventDispatcher->dispatch(new EventRegistrationEvent($event), EventRegistrationEvent::NAME);
 
                 // Reload page
                 $controllerAdapter->reload();

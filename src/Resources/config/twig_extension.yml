@@ -1,0 +1,9 @@
+services:
+
+    # Twig extension
+    Markocupic\SacEventToolBundle\Twig\ReplaceContaoInsertTagExtension:
+        arguments:
+            - '@contao.insert_tag.parser'
+        tags:
+            - { name: "twig.extension" }
+

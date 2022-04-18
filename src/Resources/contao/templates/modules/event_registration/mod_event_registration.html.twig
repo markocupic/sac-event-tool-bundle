@@ -1,0 +1,175 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+
+    {% if 'info' == action %}
+        {% if hasErrorMessage is defined %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>{{ errorMessage }}</div>
+            </div>
+        {% endif %}
+
+        {% if hasInfoMessage is defined %}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                <div>{{ infoMessage }}</div>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {% if 'login' == action %}
+        {{ stepIndicator|raw }}
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle"></i>
+            <div>Bitte logge dich ein, um dich zu einem Event anzumelden.</div>
+        </div>
+
+        <!-- Login form -->
+        <div class="mt-5 mb-4">
+            {{ replace_contao_insert_tag('{{insert_module::' ~ moduleModel.eventRegLoginModule ~ '}}')|raw }}
+        </div>
+    {% endif %}
+
+    {% if 'confirm' == action %}
+        {{ stepIndicator|raw }}
+        {{ regInfo|raw }}
+    {% endif %}
+
+    {% if 'register' == action %}
+        {{ stepIndicator|raw }}
+
+        <div class="row">
+            <div class="col-lg-12">
+                {% if bookingLimitReaches is defined and bookingLimitReaches is same as(true) %}
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle"></i>
+                        <div>{{ 'ERR.evt_reg_bookingLimitReaches'|trans({}, 'contao_default') }}</div>
+                    </div>
+                {% endif %}
+
+                <h3 class="ce_headline text-danger mt-5 mb-4">Für "{{ eventModel.title }}" anmelden</h3>
+
+                {% if eventModel.addIban %}
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            {{ 'FORM.evt_reg_ibanText'|trans({}, 'contao_default') }}
+                            <br>
+                            <br>
+                            IBAN:
+                            <br>
+                            {{ eventModel.iban }}
+                            <br>
+                            <br>
+                            {{ 'FORM.evt_reg_ibanBeneficiary'|trans({}, 'contao_default') }}:
+                            <br>
+                            {{ eventModel.ibanBeneficiary|nl2br }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="hasteform_form-event-registration block">
+                    <form action="{{ objForm.getFormAction() }}" method="{{ objForm.getMethod() }}" enctype="{{ objForm.getEnctype() }}">
+                        <div class="formbody">
+                            {% if objForm.hasFormField('FORM_SUBMIT') %}
+                                {{ objForm.getWidget('FORM_SUBMIT').parse()|raw }}
+                            {% endif %}
+
+                            {% if objForm.hasFormField('REQUEST_TOKEN') %}
+                                {{ objForm.getWidget('REQUEST_TOKEN').parse()|raw }}
+                            {% endif %}
+
+                            {% if objForm.hasFormField('carInfo') %}
+                                {{ objForm.getWidget('carInfo').parse()|raw }}
+                                <br>
+                            {% endif %}
+
+                            {% if objForm.hasFormField('ticketInfo') %}
+                                {{ objForm.getWidget('ticketInfo').parse()|raw }}
+                                <br>
+                            {% endif %}
+
+                            {% if objForm.hasFormField('mobile') %}
+                                {{ objForm.getWidget('mobile').parse()|raw }}
+                                <div class="alert alert-success" role="alert">
+                                    <i class="fas fa-check-circle"></i>
+                                    <div>{{ 'FORM.evt_reg_mobileExpl'|trans({}, 'contao_default') }}</div>
+                                </div>
+                                <br>
+                            {% endif %}
+
+                            {% if objForm.hasFormField('emergencyPhone') %}
+                                {{ objForm.getWidget('emergencyPhone').parse()|raw }}
+                                <br>
+                            {% endif %}
+
+                            {% if objForm.hasFormField('emergencyPhoneName') %}
+                                {{ objForm.getWidget('emergencyPhoneName').parse()|raw }}
+                                <br>
+                            {% endif %}
+
+                            {% if objForm.hasFormField('ahvNumber') %}
+                                {{ objForm.getWidget('ahvNumber').parse()|raw }}
+                                <div class="alert alert-success" role="alert">
+                                    <i class="fas fa-check-circle"></i>
+                                    <div>{{ 'FORM.evt_reg_ahvExpl'|trans({}, 'contao_default') }}</div>
+                                </div>
+                                <br>
+                            {% endif %}
+
+                            {% if objForm.hasFormField('notes') %}
+                                {{ objForm.getWidget('notes').parse()|raw }}
+                                <div class="alert alert-success" role="alert">
+                                    <i class="fas fa-check-circle"></i>
+                                    <div>{{ 'FORM.evt_reg_notesExpl'|trans({}, 'contao_default') }}</div>
+                                </div>
+                                <br>
+                            {% endif %}
+
+                            {% if objForm.hasFormField('foodHabits') %}
+                                {{ objForm.getWidget('foodHabits').parse()|raw }}
+                                <br>
+                            {% endif %}
+
+                            {% if objForm.hasFormField('agb') %}
+                                {{ objForm.getWidget('agb').parse()|raw }}
+                                <br>
+                            {% endif %}
+
+                            {% if objForm.hasFormField('submit') %}
+                                {{ objForm.getWidget('submit').parse()|raw }}
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- AGB Modal -->
+        <div class="modal fade" id="agbModal" tabindex="-1" role="dialog" aria-labelledby="agbTitle" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen-xl-down modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="agbTitle">Kurs- und Tourenreglement</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% if eventRegulationExtract is defined %}
+                            {{ eventRegulationExtract|raw }}
+                        {% endif %}
+
+                        {% if objEventRegulationFile is defined %}
+                            <p>Download: <a href="{{ objEventRegulationFile.path }}" download="{{ objEventRegulationFile.name }}">{{ objEventRegulationFile.name }}</a></p>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schliessen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End AGB modal -->
+    {% endif %}
+
+{% endblock %}

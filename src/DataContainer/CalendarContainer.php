@@ -66,7 +66,7 @@ class CalendarContainer
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
-        if ($user->isAdmin) {
+        if ($user->admin) {
             return;
         }
 
