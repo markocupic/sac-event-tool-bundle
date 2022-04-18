@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpUndefinedFieldInspection */
+<?php
+
+/** @noinspection PhpUndefinedFieldInspection */
 
 declare(strict_types=1);
 
@@ -54,6 +56,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment as TwigEnvironment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  * @FrontendModule(EventRegistrationController::TYPE, category="sac_event_tool_frontend_modules")
@@ -156,13 +161,9 @@ class EventRegistrationController extends AbstractFrontendModuleController
     }
 
     /**
-     * @param Template $template
-     * @param ModuleModel $model
-     * @param Request $request
-     * @return Response|null
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
     {
@@ -208,7 +209,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         // Set more template vars
         $this->setMoreTemplateVars();
-
 
         if (null !== $this->memberModel && true === $this->calendarEventsMemberModelAdapter->isRegistered($this->memberModel->id, $this->eventModel->id)) {
             $this->template->regInfo = $this->parseEventRegistrationConfirmTemplate();
@@ -293,7 +293,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $objForm = new Form(
             'form-event-registration',
             'POST',
-            fn ($objHaste) => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId(),
+            static fn ($objHaste) => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId(),
         );
 
         $objForm->setFormActionFromUri($this->environmentAdapter->get('uri'));
@@ -536,10 +536,9 @@ class EventRegistrationController extends AbstractFrontendModuleController
     }
 
     /**
-     * @return string
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     private function parseEventRegistrationConfirmTemplate(): string
     {
@@ -571,11 +570,9 @@ class EventRegistrationController extends AbstractFrontendModuleController
     }
 
     /**
-     * @param string $strStep
-     * @return string
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     private function parseStepIndicatorTemplate(string $strStep): string
     {
