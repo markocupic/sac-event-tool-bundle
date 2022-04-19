@@ -93,20 +93,21 @@ class DownloadController extends AbstractController
      *
      * @Route("/_download/print_workshop_details_as_docx", name="sac_event_tool_download_print_workshop_details_as_docx", defaults={"_scope" = "frontend", "_token_check" = false})
      */
-    public function printWorkshopDetailsAsDocxAction(): void
+    public function printWorkshopDetailsAsDocxAction(): Response
     {
-        /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
-        if ($request->query->has('year')) {
+        if (!$request->query->has('year')) {
+            $year = 'current';
+        } else {
             $year = $request->query->get('year');
-
-            if ('current' === $year) {
-                $year = date('Y');
-            }
-
-            $this->exportEvents2Docx->generate((int) $year, $request->query->get('eventId', null));
         }
+
+        if ('current' === $year) {
+            $year = date('Y');
+        }
+
+        return $this->exportEvents2Docx->generate((int) $year, $request->query->get('eventId', null));
     }
 
     /**
@@ -136,7 +137,7 @@ class DownloadController extends AbstractController
      *
      * @Route("/_download/download_event_ical", name="sac_event_tool_download_download_event_ical", defaults={"_scope" = "frontend", "_token_check" = false})
      */
-    public function downloadEventIcalAction(): void
+    public function downloadEventIcalAction(): Response
     {
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
@@ -154,7 +155,8 @@ class DownloadController extends AbstractController
                 $ical->sendIcsFile($objEvent);
             }
         }
-        exit();
+
+        return new Response('Ical download failed. Please select add an event id to the eventId GET parameter.',Response::HTTP_BAD_REQUEST);
     }
 
     /**
