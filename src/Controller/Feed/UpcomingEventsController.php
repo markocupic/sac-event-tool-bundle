@@ -152,9 +152,10 @@ class UpcomingEventsController extends AbstractController
             $eventsModel = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
 
             $arrEvent = array_map(
-                static fn ($varValue) => str_replace(['&quot;', '&#40;', '&#41;', '[-]', '&shy;', '[nbsp]', '&nbsp;'], ['"', '(', ')', '', '', ' ', ' '], $varValue),
+                static fn ($varValue) => str_replace(['&quot;', '&#40;', '&#41;', '[-]', '&shy;', '[nbsp]', '&nbsp;'], ['"', '(', ')', '', '', ' ', ' '], (string) $varValue),
                 $arrEvent
             );
+
             $rss->addChannelItemField(
                 new ItemGroup('item', [
                     new Item('title', strip_tags($stringUtilAdapter->stripInsertTags($arrEvent['title'])), ['cdata' => true]),
