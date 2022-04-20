@@ -19,35 +19,24 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\File;
 use Contao\FrontendUser;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Exception as DbalException;
 use FTP\Connection as FtpConnection;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Safe\Exceptions\StringsException;
 use function Safe\sprintf;
-use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 
 class SyncSacMemberDatabase
 {
-    /**
-     * FTP db dump filepath.
-     */
     public const FTP_DB_DUMP_FILE_PATH = 'system/tmp/Adressen_0000%s.csv';
-
-    /**
-     * End of file string.
-     */
     public const FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
-
-    /**
-     * Field delimiter.
-     */
     public const FTP_DB_DUMP_FIELD_DELIMITER = '$';
 
     private ContaoFramework $framework;
     private Connection $connection;
-    private EncoderFactory $encoderFactory;
+    private PasswordHasherFactory $passwordHasher;
     private array $credentials;
     private string $projectDir;
     private string $locale;
@@ -57,11 +46,11 @@ class SyncSacMemberDatabase
     private ?string $ftp_username = null;
     private ?string $ftp_password = null;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, EncoderFactory $encoderFactory, array $credentials, string $projectDir, string $locale, LoggerInterface $logger = null)
+    public function __construct(ContaoFramework $framework, Connection $connection, PasswordHasherFactory $passwordHasher, array $credentials, string $projectDir, string $locale, LoggerInterface $logger = null)
     {
         $this->framework = $framework;
         $this->connection = $connection;
-        $this->encoderFactory = $encoderFactory;
+        $this->passwordHasher = $passwordHasher;
         $this->credentials = $credentials;
         $this->projectDir = $projectDir;
         $this->locale = $locale;
@@ -70,7 +59,7 @@ class SyncSacMemberDatabase
 
     /**
      * @throws StringsException
-     * @throws Exception
+     * @throws DbalException
      */
     public function run(): void
     {
@@ -81,7 +70,7 @@ class SyncSacMemberDatabase
 
     /**
      * @throws StringsException
-     * @throws Exception
+     * @throws DbalException
      */
     public function setPassword(int $limit = 20): int
     {
@@ -97,16 +86,16 @@ class SyncSacMemberDatabase
 
             // Set a password if there isn't one.
             $strUpd = sprintf(
-                'SELECT id FROM tl_member WHERE password = ? LIMIT 0,%s',
-                (string) $limit,
+                'SELECT id FROM tl_member WHERE password = ? LIMIT 0,%d',
+                $limit,
             );
 
-            $stmt = $this->connection->executeQuery($strUpd, ['']);
+            $result = $this->connection->executeQuery($strUpd, ['']);
 
-            while (false !== ($id = $stmt->fetchOne())) {
-                $password = $this->encoderFactory
-                    ->getEncoder(FrontendUser::class)
-                    ->encodePassword(uniqid(), null)
+            while (false !== ($id = $result->fetchOne())) {
+                $password = $this->passwordHasher
+                    ->getPasswordHasher(FrontendUser::class)
+                    ->hash(uniqid())
                 ;
 
                 $set = ['password' => $password];
@@ -138,7 +127,8 @@ class SyncSacMemberDatabase
 
     /**
      * @throws StringsException
-     * @throws Exception
+     * @throws DbalException
+     * @throws \Exception
      */
     private function fetchFilesFromFtp(): void
     {
@@ -170,6 +160,7 @@ class SyncSacMemberDatabase
 
     /**
      * @throws StringsException
+     * @throws \Exception
      */
     private function openFtpConnection(): FtpConnection
     {
@@ -189,7 +180,7 @@ class SyncSacMemberDatabase
      * Sync tl_member with Navision db dump.
      *
      * @throws StringsException
-     * @throws Exception
+     * @throws DbalException
      */
     private function syncContaoDatabase(): void
     {
@@ -230,24 +221,24 @@ class SyncSacMemberDatabase
                     $set['sacMemberId'] = (int) ($arrLine[0]);
                     $set['username'] = (int) ($arrLine[0]);
                     // Allow multi membership
-                    $set['sectionId'] = [ltrim((string) $arrLine[1], '0')];
+                    $set['sectionId'] = [ltrim($arrLine[1], '0')];
                     $set['lastname'] = $arrLine[2];
                     $set['firstname'] = $arrLine[3];
                     $set['addressExtra'] = $arrLine[4];
-                    $set['street'] = trim((string) $arrLine[5]);
+                    $set['street'] = trim($arrLine[5]);
                     $set['streetExtra'] = $arrLine[6];
                     $set['postal'] = $arrLine[7];
                     $set['city'] = $arrLine[8];
-                    $set['country'] = empty(strtolower((string) $arrLine[9])) ? 'ch' : strtolower((string) $arrLine[9]);
-                    $set['dateOfBirth'] = strtotime((string) $arrLine[10]);
+                    $set['country'] = empty(strtolower($arrLine[9])) ? 'ch' : strtolower($arrLine[9]);
+                    $set['dateOfBirth'] = strtotime($arrLine[10]);
                     $set['phoneBusiness'] = beautifyPhoneNumber($arrLine[11]);
                     $set['phone'] = beautifyPhoneNumber($arrLine[12]);
                     $set['mobile'] = beautifyPhoneNumber($arrLine[14]);
                     $set['fax'] = $arrLine[15];
                     $set['email'] = $arrLine[16];
-                    $set['gender'] = 'weiblich' === strtolower((string) $arrLine[17]) ? 'female' : 'male';
+                    $set['gender'] = 'weiblich' === strtolower($arrLine[17]) ? 'female' : 'male';
                     $set['profession'] = $arrLine[18];
-                    $set['language'] = 'd' === strtolower((string) $arrLine[19]) ? $this->locale : strtolower((string) $arrLine[19]);
+                    $set['language'] = 'd' === strtolower($arrLine[19]) ? $this->locale : strtolower($arrLine[19]);
                     $set['entryYear'] = $arrLine[20];
                     $set['membershipType'] = $arrLine[23];
                     $set['sectionInfo1'] = $arrLine[24];
@@ -346,7 +337,7 @@ class SyncSacMemberDatabase
                     ->setParameter('isSacMember', '1')
                     ->setParameter('disable', '')
                     ->setParameter('login', '1')
-                    ->execute()
+                    ->executeStatement()
                 ;
             }
 

@@ -22,19 +22,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SyncMemberDatabase extends AbstractController
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
+    private SyncSacMemberDatabase $syncSacMemberDatabase;
 
-    /**
-     * @var SyncSacMemberDatabase
-     */
-    private $syncSacMemberDatabase;
-
-    /**
-     * SyncMemberDatabase constructor.
-     */
     public function __construct(ContaoFramework $framework, SyncSacMemberDatabase $syncSacMemberDatabase)
     {
         $this->framework = $framework;

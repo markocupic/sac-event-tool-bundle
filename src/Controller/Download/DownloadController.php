@@ -156,7 +156,7 @@ class DownloadController extends AbstractController
             }
         }
 
-        return new Response('Ical download failed. Please select add an event id to the eventId GET parameter.',Response::HTTP_BAD_REQUEST);
+        return new Response('Ical download failed. Please select add an event id to the eventId GET parameter.', Response::HTTP_BAD_REQUEST);
     }
 
     /**

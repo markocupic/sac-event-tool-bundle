@@ -6,7 +6,7 @@ services:
         arguments:
             - '@contao.framework'
             - '@database_connection'
-            - '@security.encoder_factory'
+            - '@security.password_hasher_factory'
             - '%sacevt.member_sync_credentials%'
             - '%kernel.project_dir%'
             - '%sacevt.locale%'
