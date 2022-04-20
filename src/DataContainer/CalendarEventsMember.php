@@ -556,6 +556,18 @@ class CalendarEventsMember
     {
         $request = $this->requestStack->getCurrentRequest();
 
+        if ('select' === $request->query->get('act')) {
+            return;
+        }
+
+        if ('editAll' === $request->query->get('act')) {
+            return;
+        }
+
+        if ('overrideAll' === $request->query->get('act')) {
+            return;
+        }
+
         if (!$dc->id || !$request->query->has('act')) {
             return;
         }

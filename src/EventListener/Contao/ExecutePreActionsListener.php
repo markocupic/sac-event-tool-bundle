@@ -17,54 +17,55 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 use Contao\BackendTemplate;
 use Contao\BackendUser;
 use Contao\Config;
+use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\Input;
 use Contao\MemberModel;
 use Contao\StringUtil;
+use Contao\Validator;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Exception;
+use Safe\Exceptions\JsonException;
+use function Safe\json_encode;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class ExecutePreActionsListener
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
+    private Connection $connection;
+    private RequestStack $requestStack;
 
-    /**
-     * @var Connection
-     */
-    private $connection;
+    // Adapters
+    private Adapter $backendUserAdapter;
+    private Adapter $configAdapter;
+    private Adapter $dateAdapter;
+    private Adapter $memberModelAdapter;
+    private Adapter $stringUtilAdapter;
+    private Adapter $validatorAdapter;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * ExecutePreActionsListener constructor.
-     */
     public function __construct(ContaoFramework $framework, Connection $connection, RequestStack $requestStack)
     {
         $this->framework = $framework;
         $this->connection = $connection;
         $this->requestStack = $requestStack;
+
+        // Adapters
+        $this->backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
+        $this->configAdapter = $this->framework->getAdapter(Config::class);
+        $this->dateAdapter = $this->framework->getAdapter(Date::class);
+        $this->memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
+        $this->stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+        $this->validatorAdapter = $this->framework->getAdapter(Validator::class);
     }
 
     /**
-     * @param string $strAction
+     * @throws Exception
+     * @throws JsonException
      */
-    public function onExecutePreActions($strAction = ''): void
+    public function onExecutePreActions(string $strAction = ''): void
     {
-        // Set adapters
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-        $dateAdapter = $this->framework->getAdapter(Date::class);
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-        $configAdapter = $this->framework->getAdapter(Config::class);
-        $backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
-
         // Get current request
         $request = $this->requestStack->getCurrentRequest();
 
@@ -72,18 +73,19 @@ class ExecutePreActionsListener
         if ('autocompleterLoadMemberDataFromSacMemberId' === $strAction) {
             // Output
             $json = ['status' => 'error'];
-            $objMemberModel = $memberModelAdapter->findOneBySacMemberId(Input::post('sacMemberId'));
+            $objMemberModel = $this->memberModelAdapter->findOneBySacMemberId(Input::post('sacMemberId'));
 
             if (null !== $objMemberModel) {
                 $json = $objMemberModel->row();
                 $json['name'] = $json['firstname'].' '.$json['lastname'];
                 $json['username'] = str_replace(' ', '', strtolower($json['name']));
-                $json['dateOfBirth'] = $dateAdapter->parse($configAdapter->get('dateFormat'), $json['dateOfBirth']);
+                $json['dateOfBirth'] = $this->dateAdapter->parse($this->configAdapter->get('dateFormat'), $json['dateOfBirth']);
                 $json['status'] = 'success';
+
                 // Bin to hex otherwise there will be a json error
-                $json['avatar'] = '' !== $json['avatar'] ? $stringUtilAdapter->binToUuid($json['avatar']) : '';
+                $json['avatar'] = $this->validatorAdapter->isBinaryUuid($json['avatar']) ? $this->stringUtilAdapter->binToUuid($json['avatar']) : '';
                 $json['password'] = '';
-                $json['sectionId'] = $stringUtilAdapter->deserialize($objMemberModel->sectionId, true);
+                $json['sectionId'] = $this->stringUtilAdapter->deserialize($objMemberModel->sectionId, true);
 
                 $html = '<div>';
                 $html .= '<h1>Mitglied gefunden</h1>';
@@ -104,8 +106,7 @@ class ExecutePreActionsListener
                 $json['status'] = 'error';
                 $json['subaction'] = $request->request->get('subaction');
 
-                if (($objUser = $backendUserAdapter->getInstance()) !== null) {
-                    /** @var BackendTemplate $objTemplate */
+                if (null !== $this->backendUserAdapter->getInstance()) {
                     $objTemplate = new BackendTemplate('be_edit_all_navbar_helper');
                     $json['navbar'] = $objTemplate->parse();
                     $json['status'] = 'success';
@@ -122,8 +123,7 @@ class ExecutePreActionsListener
                 $strTable = $request->query->get('table');
                 $strKey = '' !== $strTable ? $strTable : '';
 
-                if (($objUser = $backendUserAdapter->getInstance()) !== null) {
-                    /** @var QueryBuilder $qb */
+                if (($objUser = $this->backendUserAdapter->getInstance()) !== null) {
                     $qb = $this->connection->createQueryBuilder();
                     $qb->select('session')
                         ->from('tl_user', 't')
@@ -131,10 +131,10 @@ class ExecutePreActionsListener
                         ->setParameter('id', $objUser->id)
                         ->setMaxResults(1)
                     ;
-                    $result = $qb->execute();
+                    $result = $qb->executeQuery();
 
-                    if (false !== ($user = $result->fetch())) {
-                        $arrSession = $stringUtilAdapter->deserialize($user['session'], true);
+                    if (false !== ($user = $result->fetchAssociative())) {
+                        $arrSession = $this->stringUtilAdapter->deserialize($user['session'], true);
 
                         if (!isset($arrSession['editAllHelper'][$strKey])) {
                             $arrChecked = [];
@@ -157,8 +157,7 @@ class ExecutePreActionsListener
                 $strTable = $request->query->get('table');
                 $strKey = '' !== $strTable ? $strTable : '';
 
-                if (($objUser = $backendUserAdapter->getInstance()) !== null) {
-                    /** @var QueryBuilder $qb */
+                if (($objUser = $this->backendUserAdapter->getInstance()) !== null) {
                     $qb = $this->connection->createQueryBuilder();
                     $qb->select('session')
                         ->from('tl_user', 't')
@@ -166,15 +165,14 @@ class ExecutePreActionsListener
                         ->setParameter('id', $objUser->id)
                         ->setMaxResults(1)
                     ;
-                    $result = $qb->execute();
+                    $result = $qb->executeQuery();
 
-                    if (false !== ($user = $result->fetch())) {
-                        $arrSession = $stringUtilAdapter->deserialize($user['session'], true);
+                    if (false !== ($user = $result->fetchAssociative())) {
+                        $arrSession = $this->stringUtilAdapter->deserialize($user['session'], true);
                         $arrSession['editAllHelper'][$strKey] = $request->request->get('checkedItems');
                         $json['sessionData'] = $arrSession['editAllHelper'];
 
                         // Update session
-                        /** @var QueryBuilder $qb */
                         $qb = $this->connection->createQueryBuilder();
                         $qb->update('tl_user', 't')
                             ->set('t.session', ':session')
@@ -182,7 +180,7 @@ class ExecutePreActionsListener
                             ->setParameter('id', $objUser->id)
                             ->setParameter('session', serialize($arrSession))
                         ;
-                        $result = $qb->execute();
+                        $result = $qb->executeStatement();
                         $json['affectedRows'] = $result;
                         $json['status'] = 'success';
                     }
@@ -195,16 +193,13 @@ class ExecutePreActionsListener
     }
 
     /**
-     * @param $json
-     * @param int $status
+     * @throws JsonException
      */
-    private function _jsonSend($json, $status = 200): void
+    private function _jsonSend(array $json): void
     {
         // !!! Do not use new JsonResponse($json) because session data will be overwritten
-        // Send json data to the browser
         header('Content-Type: application/json');
-        header('Status: '.$status);
-        // return the encoded json
+        header('Status: '.Response::HTTP_OK);
         echo json_encode($json);
         exit();
     }
