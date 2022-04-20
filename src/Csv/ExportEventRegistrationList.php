@@ -18,66 +18,94 @@ use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Exception\ResponseException;
+use Contao\CoreBundle\Framework\Adapter;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Exception;
 use League\Csv\CannotInsertRecord;
-use League\Csv\CharsetConverter;
 use League\Csv\InvalidArgument;
+use League\Csv\Reader;
 use League\Csv\Writer;
 use Symfony\Component\HttpFoundation\Response;
 
 class ExportEventRegistrationList
 {
-    private const OUTPUT_ENCODING = 'iso-8859-15';
-
     private const DELIMITER = ';';
+    private const FIELDS = [
+        'id',
+        'stateOfSubscription',
+        'addedOn',
+        'carInfo',
+        'ticketInfo',
+        'notes',
+        'instructorNotes',
+        'bookingType',
+        'sacMemberId',
+        'ahvNumber',
+        'firstname',
+        'lastname',
+        'gender',
+        'dateOfBirth',
+        'foodHabits',
+        'street',
+        'postal',
+        'city',
+        'mobile',
+        'email',
+        'emergencyPhone',
+        'emergencyPhoneName',
+        'hasParticipated',
+    ];
 
+    private ContaoFramework $framework;
     private Connection $connection;
+    private string $eventMemberListFileNamePattern;
 
-    private array $fields = ['id', 'stateOfSubscription', 'addedOn', 'carInfo', 'ticketInfo', 'notes', 'instructorNotes', 'bookingType', 'sacMemberId', 'ahvNumber', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'foodHabits', 'street', 'postal', 'city', 'mobile', 'email', 'emergencyPhone', 'emergencyPhoneName', 'hasParticipated'];
+    // Adapters
+    private Adapter $configAdapter;
+    private Adapter $controllerAdapter;
 
-    public function __construct(Connection $connection)
+    public function __construct(ContaoFramework $framework, Connection $connection, string $eventMemberListFileNamePattern)
     {
+        $this->framework = $framework;
         $this->connection = $connection;
+        $this->eventMemberListFileNamePattern = $eventMemberListFileNamePattern;
+
+        // Adapters
+        $this->configAdapter = $this->framework->getAdapter(Config::class);
+        $this->controllerAdapter = $this->framework->getAdapter(Controller::class);
     }
 
     /**
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
      * @throws CannotInsertRecord
      * @throws InvalidArgument
+     * @throws Exception
      */
     public function generate(CalendarEventsModel $event): void
     {
         // Create empty document
-        $csv = Writer::createFromString('');
+        $csv = Writer::createFromString();
 
-        $encoder = (new CharsetConverter())
-            ->outputEncoding(self::OUTPUT_ENCODING)
-        ;
-
-        $csv->addFormatter($encoder);
-
+        $csv->setOutputBOM(Reader::BOM_UTF8);
         $csv->setDelimiter(self::DELIMITER);
 
-        $arrFields = $this->fields;
-
-        Controller::loadLanguageFile('tl_calendar_events_member');
+        // Load translation
+        $this->controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
         // Insert headline
         $arrHeadline = array_map(
             static fn ($field) => $GLOBALS['TL_LANG']['tl_calendar_events_member'][$field][0] ?? $field,
-            $arrFields
+            self::FIELDS
         );
 
         $csv->insertOne($arrHeadline);
 
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId = ? ORDER BY lastname, firstname', [$event->id]);
+        $result = $this->connection->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId = ? ORDER BY lastname, firstname', [$event->id]);
 
-        while (false !== ($arrRegistration = $stmt->fetchAssociative())) {
+        while (false !== ($arrRegistration = $result->fetchAssociative())) {
             $arrRow = [];
 
-            foreach ($arrFields as $field) {
+            foreach (self::FIELDS as $field) {
                 $value = html_entity_decode((string) $arrRegistration[$field]);
 
                 if ('stateOfSubscription' === $field) {
@@ -85,9 +113,9 @@ class ExportEventRegistrationList
                 } elseif ('gender' === $field) {
                     $arrRow[] = '' !== $GLOBALS['TL_LANG']['MSC'][$value] ? $GLOBALS['TL_LANG']['MSC'][$value] : $value;
                 } elseif ('addedOn' === $field) {
-                    $arrRow[] = date(Config::get('datimFormat'), (int) $value);
+                    $arrRow[] = date($this->configAdapter->get('datimFormat'), (int) $value);
                 } elseif ('dateOfBirth' === $field) {
-                    $arrRow[] = date(Config::get('dateFormat'), (int) $value);
+                    $arrRow[] = date($this->configAdapter->get('dateFormat'), (int) $value);
                 } else {
                     $arrRow[] = $value;
                 }
@@ -96,11 +124,11 @@ class ExportEventRegistrationList
             $csv->insertOne($arrRow);
         }
 
-        // Sanitize filename
+        // Sanitize event title
         $eventTitle = preg_replace('/[^a-zA-Z0-9_-]+/', '_', strtolower($event->title));
 
-        $filenamePattern = str_replace('%%s', '%s', Config::get('SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'));
-        $filename = sprintf($filenamePattern, $eventTitle, 'csv');
+        // Generate the file name
+        $filename = sprintf($this->eventMemberListFileNamePattern, $eventTitle, 'csv');
 
         // Output
         $csv->output($filename);

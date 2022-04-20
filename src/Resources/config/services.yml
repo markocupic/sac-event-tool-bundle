@@ -31,14 +31,20 @@ services:
         public: true
         arguments:
             - '@contao.framework'
+            - '@Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event'
+            - '@Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember'
             - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
             - '%sacevt.temp_dir%'
             - '%kernel.project_dir%'
+            - '%sacevt.event.template.member_list%'
+            - '%sacevt.event.member_list_file_name_pattern%'
 
     # Generate csv event registration list
     Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList:
         arguments:
+            - '@contao.framework'
             - '@database_connection'
+            - '%sacevt.event.member_list_file_name_pattern%'
 
     # Generate docx/pdf event rapports and event invoices from docx templates
     Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx:

@@ -93,20 +93,24 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('template')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                // Event tour invoice template
+                                // Event member list docx template
+                                ->scalarNode('member_list')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/docx/event_memberlist.docx')->end()
+                                // Event tour invoice docx template
                                 ->scalarNode('tour_invoice')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/docx/event_invoice_tour.docx')->end()
-                                // Event tour rapport template
+                                // Event tour rapport docx template
                                 ->scalarNode('tour_rapport')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/docx/event_rapport_tour.docx')->end()
-                                // Event course confirmation template
+                                // Event course confirmation docx template
                                 ->scalarNode('course_confirmation')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/docx/course_confirmation.docx')->end()
                             ->end()
                         ->end()
+                        // Member list file name pattern
+                        ->scalarNode('member_list_file_name_pattern')->defaultValue('SAC_Event_Teilnehmerliste_%%s.%%s')->end()
                         // Event tour invoice file name pattern
-                        ->scalarNode('tour_invoice_file_name_pattern')->defaultValue('SAC_Sektion_Pilatus_Verguetungsformular-%%s.%%s')->end()
+                        ->scalarNode('tour_invoice_file_name_pattern')->defaultValue('SAC_Event_Verguetungsformular_%%s.%%s')->end()
                         // Event tour rapport file name pattern
-                        ->scalarNode('tour_rapport_file_name_pattern')->defaultValue('SAC_Sektion_Pilatus_Tour-Rapport-%%s.%%s')->end()
+                        ->scalarNode('tour_rapport_file_name_pattern')->defaultValue('SAC_Event_Tour-Rapport_%%s.%%s')->end()
                         // Event course confirmation file name pattern
-                        ->scalarNode('course_confirmation_file_name_pattern')->defaultValue('SAC_Sektion_Pilatus_Kursbestaetigung-%%s-regId-%%s.%%s')->end()
+                        ->scalarNode('course_confirmation_file_name_pattern')->defaultValue('SAC_Event_Kursbestaetigung_%%s_regId_%%s.%%s')->end()
                         // Default email text for accepting registrations
                         ->scalarNode('accept_registration_email_body')
                             ->cannotBeEmpty()

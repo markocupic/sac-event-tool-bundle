@@ -80,14 +80,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: import_user_listener, method: onImportUser }
 
-    # Contao initialize system hook (Prepare the SAC Event Tool plugin environment)
-    Markocupic\SacEventToolBundle\EventListener\Contao\InitializeSystemListener:
-        public: true
-        arguments:
-            - "@contao.framework"
-        tags:
-            - { name: kernel.event_listener, event: initialize_system_listener, method: onInitializeSystem }
-
     # Contao parse template hook (Check if frontend login is allowed, if not replace the default error message and redirect to account activation page)
     Markocupic\SacEventToolBundle\EventListener\Contao\ParseTemplateListener:
         public: true

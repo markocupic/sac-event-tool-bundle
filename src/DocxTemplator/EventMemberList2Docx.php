@@ -16,8 +16,8 @@ namespace Markocupic\SacEventToolBundle\DocxTemplator;
 
 use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
-use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Message;
 use Contao\System;
@@ -32,16 +32,34 @@ use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 class EventMemberList2Docx
 {
     private ContaoFramework $framework;
+    private Event $eventHelper;
+    private EventMember $eventMemberHelper;
     private ConvertFile $convertFile;
     private string $tempDir;
     private string $projectDir;
+    private string $eventMemberListTemplate;
+    private string $eventMemberListFileNamePattern;
 
-    public function __construct(ContaoFramework $framework, ConvertFile $convertFile, string $tempDir, string $projectDir)
+    // Adapters
+    private Adapter $calendarEventsMemberModelAdapter;
+    private Adapter $controllerAdapter;
+    private Adapter $messageAdapter;
+
+    public function __construct(ContaoFramework $framework, Event $eventHelper, EventMember $eventMemberHelper, ConvertFile $convertFile, string $tempDir, string $projectDir, string $eventMemberListTemplate, string $eventMemberListFileNamePattern)
     {
         $this->framework = $framework;
+        $this->eventHelper = $eventHelper;
+        $this->eventMemberHelper = $eventMemberHelper;
         $this->convertFile = $convertFile;
         $this->tempDir = $tempDir;
         $this->projectDir = $projectDir;
+        $this->eventMemberListTemplate = $eventMemberListTemplate;
+        $this->eventMemberListFileNamePattern = $eventMemberListFileNamePattern;
+
+        // Adapters
+        $this->calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+        $this->controllerAdapter = $this->framework->getAdapter(Controller::class);
+        $this->messageAdapter = $this->framework->getAdapter(Message::class);
 
         // Initialize contao framework
         $this->framework->initialize();
@@ -53,22 +71,10 @@ class EventMemberList2Docx
      */
     public function generate(CalendarEventsModel $objEvent, string $outputType = 'docx'): void
     {
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
-        /** @var Message $messageAdapter */
-        $messageAdapter = $this->framework->getAdapter(Message::class);
-
-        /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-
-        /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-
-        $objEventMember = $calendarEventsMemberModelAdapter->findBy(
+        $objEventMember = $this->calendarEventsMemberModelAdapter->findBy(
             [
-                'tl_calendar_events_member.eventId=?',
-                'tl_calendar_events_member.stateOfSubscription=?',
+                'tl_calendar_events_member.eventId = ?',
+                'tl_calendar_events_member.stateOfSubscription = ?',
             ],
             [
                 $objEvent->id,
@@ -81,24 +87,19 @@ class EventMemberList2Docx
 
         if (null === $objEventMember) {
             // Send error message if there are no members assigned to the event
-            $messageAdapter->addError('Bitte überprüfe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, deren Teilname bestätigt ist.');
-            $controllerAdapter->redirect(System::getReferer());
+            $this->messageAdapter->addError('Bitte überprüfe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, deren Teilname bestätigt ist.');
+            $this->controllerAdapter->redirect(System::getReferer());
         }
 
         // Create phpWord instance
-        $filenamePattern = str_replace('%%s', '%s', $configAdapter->get('SAC_EVT_EVENT_MEMBER_LIST_FILE_NAME_PATTERN'));
-        $destFile = $this->tempDir.'/'.sprintf($filenamePattern, time(), 'docx');
-        $objPhpWord = new MsWordTemplateProcessor((string) $configAdapter->get('SAC_EVT_EVENT_MEMBER_LIST_TEMPLATE_SRC'), $destFile);
+        $targetFilePath = $this->tempDir.'/'.sprintf($this->eventMemberListFileNamePattern, time(), 'docx');
+        $objPhpWord = new MsWordTemplateProcessor($this->eventMemberListTemplate, $targetFilePath);
 
         // Get event data
-        /** @var Event $objEventHelper */
-        $objEventHelper = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event');
-        $objEventHelper->setEventData($objPhpWord, $objEvent);
+        $this->eventHelper->setEventData($objPhpWord, $objEvent);
 
         // Member list
-        /** @var EventMember $objEventMemberHelper */
-        $objEventMemberHelper = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember');
-        $objEventMemberHelper->setEventMemberData($objPhpWord, $objEvent, $objEventMember);
+        $this->eventMemberHelper->setEventMemberData($objPhpWord, $objEvent, $objEventMember);
 
         if ('pdf' === $outputType) {
             // Generate Docx file from template;
@@ -109,7 +110,7 @@ class EventMemberList2Docx
 
             // Generate pdf
             $this->convertFile
-                ->file($this->projectDir.'/'.$destFile)
+                ->file($this->projectDir.'/'.$targetFilePath)
                 ->sendToBrowser(true, true)
                 ->uncached(true)
                 ->convertTo('pdf')
@@ -124,6 +125,6 @@ class EventMemberList2Docx
             ;
         }
 
-        exit();
+        throw new \Exception('No output type defined. The output type must be "docx" or "pdf".');
     }
 }

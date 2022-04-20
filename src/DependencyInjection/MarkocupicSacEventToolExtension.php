@@ -75,9 +75,11 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.event.course.booklet_filename_pattern', $config['event']['course']['booklet_filename_pattern']);
         $container->setParameter($rootKey.'.event.course.fallback_image', $config['event']['course']['fallback_image']);
         $container->setParameter($rootKey.'.event.story.asset_dir', $config['event']['story']['asset_dir']);
+        $container->setParameter($rootKey.'.event.template.member_list', $config['event']['template']['member_list']);
         $container->setParameter($rootKey.'.event.template.tour_invoice', $config['event']['template']['tour_invoice']);
         $container->setParameter($rootKey.'.event.template.tour_rapport', $config['event']['template']['tour_rapport']);
         $container->setParameter($rootKey.'.event.template.course_confirmation', $config['event']['template']['course_confirmation']);
+        $container->setParameter($rootKey.'.event.member_list_file_name_pattern', $config['event']['member_list_file_name_pattern']);
         $container->setParameter($rootKey.'.event.tour_invoice_file_name_pattern', $config['event']['tour_invoice_file_name_pattern']);
         $container->setParameter($rootKey.'.event.tour_rapport_file_name_pattern', $config['event']['tour_rapport_file_name_pattern']);
         $container->setParameter($rootKey.'.event.course_confirmation_file_name_pattern', $config['event']['course_confirmation_file_name_pattern']);

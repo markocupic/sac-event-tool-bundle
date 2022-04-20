@@ -267,9 +267,6 @@ if (!isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) || !is_array($GLOBAL
 }
 $GLOBALS['TL_HOOKS']['changeEventReleaseLevel'][] = ['Markocupic\SacEventToolBundle\EventListener\Contao\ChangeEventReleaseLevelListener', 'onChangeEventReleaseLevel'];
 
-/* Route prepare plugin environment */
-$GLOBALS['TL_HOOKS']['initializeSystem'][] = ['Markocupic\SacEventToolBundle\EventListener\Contao\InitializeSystemListener', 'preparePluginEnvironment'];
-
 /* Handle Ajax calls from the backend */
 $GLOBALS['TL_HOOKS']['executePreActions'][] = ['Markocupic\SacEventToolBundle\EventListener\Contao\ExecutePreActionsListener', 'onExecutePreActions'];
 
