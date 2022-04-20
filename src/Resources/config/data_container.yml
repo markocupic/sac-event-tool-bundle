@@ -67,6 +67,7 @@ services:
             - '@Markocupic\SacEventToolBundle\Download\BinaryFileDownload'
             - '%kernel.project_dir%'
             - '%sacevt.temp_dir%'
+            - '%sacevt.event.story.template.export%'
             - '%sacevt.locale%'
 
     Markocupic\SacEventToolBundle\DataContainer\Content:

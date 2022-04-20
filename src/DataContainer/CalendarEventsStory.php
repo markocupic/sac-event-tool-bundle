@@ -17,7 +17,6 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 use Contao\Backend;
 use Contao\CalendarEventsModel;
 use Contao\CalendarEventsStoryModel;
-use Contao\Config;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 use Contao\Environment;
@@ -45,9 +44,10 @@ class CalendarEventsStory
     private BinaryFileDownload $binaryFileDownload;
     private string $projectDir;
     private string $tempDir;
+    private string $eventStoryExportTemplate;
     private string $locale;
 
-    public function __construct(Security $security, Connection $connection, RequestStack $requestStack, BinaryFileDownload $binaryFileDownload, string $projectDir, string $tempDir, string $locale)
+    public function __construct(Security $security, Connection $connection, RequestStack $requestStack, BinaryFileDownload $binaryFileDownload, string $projectDir, string $tempDir, string $eventStoryExportTemplate, string $locale)
     {
         $this->security = $security;
         $this->connection = $connection;
@@ -55,6 +55,7 @@ class CalendarEventsStory
         $this->binaryFileDownload = $binaryFileDownload;
         $this->projectDir = $projectDir;
         $this->tempDir = $tempDir;
+        $this->eventStoryExportTemplate = $eventStoryExportTemplate;
         $this->locale = $locale;
     }
 
@@ -177,9 +178,7 @@ class CalendarEventsStory
             throw new \Exception('Event not found.');
         }
 
-        $templSrc = Config::get('SAC_EVT_TOUR_ARTICLE_EXPORT_TEMPLATE_SRC');
-
-        if (!is_file($this->projectDir.'/'.$templSrc)) {
+        if (!is_file($this->projectDir.'/'.$this->eventStoryExportTemplate)) {
             throw new \Exception('Template file not found.');
         }
 
@@ -191,7 +190,7 @@ class CalendarEventsStory
         new Folder($imageDir);
 
         $targetFile = sprintf('%s/event_article_%s.docx', $targetDir, $objArticle->id);
-        $objPhpWord = new MsWordTemplateProcessor($templSrc, $targetFile);
+        $objPhpWord = new MsWordTemplateProcessor($this->eventStoryExportTemplate, $targetFile);
 
         // Organizers
         $arrOrganizers = CalendarEventsHelper::getEventOrganizersAsArray($objEvent);
