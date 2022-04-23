@@ -12,6 +12,8 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+
 // Override defaults
 if (TL_MODE === 'FE') {
     $GLOBALS['TL_LANG']['MSC']['username'] = 'SAC Mitgliedernummer';
@@ -134,6 +136,14 @@ $GLOBALS['TL_LANG']['FORM']['evt_reg_notes'] = 'Anmerkungen/Erfahrungen/Referenz
 $GLOBALS['TL_LANG']['FORM']['evt_reg_foodHabits'] = 'Essgewohnheiten (Vegetarier, Laktoseintoleranz, etc.)';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_agb'] = 'Ich akzeptiere <a href="#" data-bs-toggle="modal" data-bs-target="#agbModal">das Kurs- und Tourenreglement.</a>';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_submit'] = 'Für Event anmelden';
+
+// Booking states/Subscription states
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED] = 'Anmeldeanfrage unbeantwortet';
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED] = 'Anmeldung bestätigt';
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_REJECTED] = 'Anmeldeanfrage abgelehnt';
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED] = 'Auf Warteliste';
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED] = 'Anmeldung storniert';
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_STATE_UNDEFINED] = 'Anmelde-Status unbekannt';
 
 // Event registration frontend module form explanations
 $GLOBALS['TL_LANG']['FORM']['evt_reg_mobileExpl'] = 'Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leer gelassen werden. Damit der Leiter dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine Mobilnummer zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.';

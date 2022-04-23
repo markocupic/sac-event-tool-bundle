@@ -178,7 +178,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'sorting'   => true,
             'inputType' => 'select',
             'default'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'][0],
-            'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
+            'reference' => &$GLOBALS['TL_LANG']['MSC'],
             'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'],
             'eval'      => ['doNotShow' => false, 'readonly' => false, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",

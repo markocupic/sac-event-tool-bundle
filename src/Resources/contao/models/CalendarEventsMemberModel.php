@@ -137,9 +137,7 @@ class CalendarEventsMemberModel extends Model
                     if ($objJoinedEvents->numRows) {
                         // If member had the role of a participant
                         $objEventModel = CalendarEventsModel::findByPk($objEvents->id);
-                        $arr['id'] = $objEvents->id;
-                        $arr['title'] = $objEvents->title;
-                        $arr['eventType'] = $objEvents->eventType;
+                        $arr = $objEventModel->row();
                         $arr['dateSpan'] = $objEvents->startDate !== $objEvents->endDate ? Date::parse('d.m.', $objEvents->startDate).' - '.Date::parse('d.m.Y', $objEvents->endDate) : Date::parse('d.m.Y', $objEvents->startDate);
                         $arr['registrationId'] = $objJoinedEvents->id;
                         $arr['role'] = 'member';
@@ -156,9 +154,7 @@ class CalendarEventsMemberModel extends Model
                         // If member had the role of an instructor
                         if ($blnInstructorRole && $blnHasEventsAsInstructor) {
                             $objEventModel = CalendarEventsModel::findByPk($objEvents->id);
-                            $arr['id'] = $objEvents->id;
-                            $arr['title'] = $objEvents->title;
-                            $arr['eventType'] = $objEvents->eventType;
+                            $arr = $objEventModel->row();
                             $arr['dateSpan'] = $objEvents->startDate !== $objEvents->endDate ? Date::parse('d.m.', $objEvents->startDate).' - '.Date::parse('d.m.Y', $objEvents->endDate) : Date::parse('d.m.Y', $objEvents->startDate);
                             $arr['registrationId'] = null;
                             $arr['role'] = 'instructor';

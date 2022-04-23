@@ -146,14 +146,17 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
             while ($objEventStory->next()) {
                 $arrEventStory = $objEventStory->row();
 
+                // Defaults
+                $arrEventStory['date'] = $dateAdapter->parse($configAdapter->get('dateFormat'), $objEventStory->eventStartDate);
+                $arrEventStory['canEditStory'] = false;
+                $arrEventStory['storyLink'] = '';
+
                 // Check if story is still editable
                 if ($objEventStory->eventEndDate + $model->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time()) {
                     if ('1' === $objEventStory->publishState) {
                         $arrEventStory['canEditStory'] = true;
                     }
                 }
-
-                $arrEventStory['date'] = $dateAdapter->parse($configAdapter->get('dateFormat'), $objEventStory->eventStartDate);
 
                 // Check if event still exists
                 if (($objEvent = $calendarEventsModelAdapter->findByPk($objEventStory->eventId)) !== null) {

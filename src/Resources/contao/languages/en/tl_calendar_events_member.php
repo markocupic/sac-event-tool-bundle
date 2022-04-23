@@ -12,8 +12,6 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
-
 // Global operations
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['writeTourReport'] = 'Tourenrapport bearbeiten';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['printInstructorInvoice'] = 'Vergütungsformular und Rapport drucken';
@@ -84,12 +82,6 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['hasPaid'] = ['Teilnahmekosten 
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['paymentMethod'] = ['Zahlungsart', 'Geben Sie die Zahlungsart an.'];
 
 // References
-$GLOBALS['TL_LANG']['tl_calendar_events_member'][EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED] = 'Anmeldung nicht bestätigt';
-$GLOBALS['TL_LANG']['tl_calendar_events_member'][EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED] = 'Anmeldung bestätigt';
-$GLOBALS['TL_LANG']['tl_calendar_events_member'][EventSubscriptionLevel::SUBSCRIPTION_REFUSED] = 'Anmeldung abgelehnt';
-$GLOBALS['TL_LANG']['tl_calendar_events_member'][EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED] = 'Auf Warteliste';
-$GLOBALS['TL_LANG']['tl_calendar_events_member'][EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED] = 'Vom Event abgemeldet';
-$GLOBALS['TL_LANG']['tl_calendar_events_member'][EventSubscriptionLevel::SUBSCRIPTION_STATE_UNDEFINED] = 'Anmeldestatus unbekannt';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['manually'] = 'Manuelle Erfassung der Personalien des Event-Teilnehmers';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['onlineForm'] = 'Buchung über Online-Buchungsformular';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['cashPayment'] = 'Barzahlung';

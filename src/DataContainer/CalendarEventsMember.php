@@ -207,7 +207,7 @@ class CalendarEventsMember
 
                 $regState = (string) $arrReg['stateOfSubscription'];
                 $regState = \in_array($regState, $arrSubscriptionStates, true) ? $regState : EventSubscriptionLevel::SUBSCRIPTION_STATE_UNDEFINED;
-                $strLabel = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$regState] ?? $regState;
+                $strLabel = $GLOBALS['TL_LANG']['MSC'][$regState] ?? $regState;
 
                 $options['tl_calendar_events_member-'.$arrReg['id']] = $arrReg['firstname'].' '.$arrReg['lastname'].' ('.$strLabel.')';
             }
@@ -478,7 +478,7 @@ class CalendarEventsMember
 
                     if (null !== $objNotification) {
                         $arrTokens = [
-                            'participant_state_of_subscription' => html_entity_decode((string) $GLOBALS['TL_LANG']['tl_calendar_events_member'][$varValue]),
+                            'participant_state_of_subscription' => html_entity_decode((string) $GLOBALS['TL_LANG']['MSC'][$varValue]),
                             'event_name' => html_entity_decode($objEvent->title),
                             'participant_uuid' => $objEventMemberModel->uuid,
                             'participant_name' => html_entity_decode($objEventMemberModel->firstname.' '.$objEventMemberModel->lastname),
@@ -783,7 +783,7 @@ class CalendarEventsMember
             'refuseWithEmail' => [
                 'formId' => 'subscription-refused-form',
                 'headline' => 'Absage mitteilen',
-                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_REFUSED,
+                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_REJECTED,
                 'sessionInfoText' => 'Dem Benutzer wurde mit einer E-Mail eine Absage versandt.',
                 'emailTemplate' => 'be_email_templ_refuse_registration',
                 'emailSubject' => 'Absage für %s',

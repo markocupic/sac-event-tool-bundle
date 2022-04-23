@@ -5,7 +5,7 @@ $onclickC = 'Soll dieser Anwärter per E-Mail auf die Warteliste gesetzt werden?
 ?>
 
 <div style="margin-left: 15px; margin-right: 15px; position: relative;">
-  <?php if (Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel::SUBSCRIPTION_REFUSED === $this->stateOfSubscription): ?>
+  <?php if (Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel::SUBSCRIPTION_REJECTED === $this->stateOfSubscription): ?>
   <div>Status: Dem Anwärter wurde die Teilnahme verweigert.</div>
   <?php endif; ?>
 
@@ -24,7 +24,7 @@ $onclickC = 'Soll dieser Anwärter per E-Mail auf die Warteliste gesetzt werden?
 <?php if ($this->showEmailButtons): ?>
 <div class="tl_submit_container">
 
-  <?php if (Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel::SUBSCRIPTION_REFUSED !== $this->stateOfSubscription): ?>
+  <?php if (Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel::SUBSCRIPTION_REJECTED !== $this->stateOfSubscription): ?>
   <button type="submit" name="refuseWithEmail" id="refuseWithEmail" onclick="if (!confirm('<?= $onclickA ?>'))return false;Backend.getScrollOffset()" class="tl_submit">Ablehnen mit E-Mail</button>
   <?php endif; ?>
 

@@ -109,9 +109,9 @@ class ExportEventRegistrationList
                 $value = html_entity_decode((string) $arrRegistration[$field]);
 
                 if ('stateOfSubscription' === $field) {
-                    $arrRow[] = '' !== $GLOBALS['TL_LANG']['tl_calendar_events_member'][$value] ? $GLOBALS['TL_LANG']['tl_calendar_events_member'][$value] : $value;
+                    $arrRow[] = $GLOBALS['TL_LANG']['MSC'][$value] ?? $value;
                 } elseif ('gender' === $field) {
-                    $arrRow[] = '' !== $GLOBALS['TL_LANG']['MSC'][$value] ? $GLOBALS['TL_LANG']['MSC'][$value] : $value;
+                    $arrRow[] = $GLOBALS['TL_LANG']['MSC'][$value] ?? $value;
                 } elseif ('addedOn' === $field) {
                     $arrRow[] = date($this->configAdapter->get('datimFormat'), (int) $value);
                 } elseif ('dateOfBirth' === $field) {

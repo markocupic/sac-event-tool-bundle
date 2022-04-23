@@ -18,7 +18,7 @@ class EventSubscriptionLevel
 {
     public const SUBSCRIPTION_NOT_CONFIRMED = 'subscription-not-confirmed';
     public const SUBSCRIPTION_ACCEPTED = 'subscription-accepted';
-    public const SUBSCRIPTION_REFUSED = 'subscription-refused';
+    public const SUBSCRIPTION_REJECTED = 'subscription-refused';
     public const SUBSCRIPTION_WAITLISTED = 'subscription-waitlisted';
     public const USER_HAS_UNSUBSCRIBED = 'user-has-unsubscribed';
     public const SUBSCRIPTION_STATE_UNDEFINED = 'subscription-state-undefined';

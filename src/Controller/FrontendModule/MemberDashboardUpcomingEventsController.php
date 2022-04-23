@@ -158,7 +158,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
             if (null !== $objEvent) {
                 $objInstructor = $objEvent->getRelated('mainInstructor');
 
-                if (EventSubscriptionLevel::SUBSCRIPTION_REFUSED === $objEventsMember->stateOfSubscription) {
+                if (EventSubscriptionLevel::SUBSCRIPTION_REJECTED === $objEventsMember->stateOfSubscription) {
                     $objEventsMember->delete();
                     $systemAdapter->log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__.' Line: '.__LINE__, Log::EVENT_UNSUBSCRIPTION);
 
@@ -202,7 +202,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                     $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
                     $arrTokens = [
-                        'state_of_subscription' => $GLOBALS['TL_LANG']['tl_calendar_events_member'][$objEventsMember->stateOfSubscription],
+                        'state_of_subscription' => $GLOBALS['TL_LANG']['MSC'][$objEventsMember->stateOfSubscription],
                         'event_course_id' => $objEvent->courseId,
                         'event_name' => $objEvent->title,
                         'event_type' => $objEvent->eventType,

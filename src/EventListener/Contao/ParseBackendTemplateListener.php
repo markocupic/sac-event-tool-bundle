@@ -96,7 +96,7 @@ class ParseBackendTemplateListener
                         $arrStates = $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields']['stateOfSubscription']['options'];
 
                         foreach ($arrStates as $state) {
-                            $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Bundle::ASSET_DIR, $state, $GLOBALS['TL_LANG']['tl_calendar_events_member'][$state]);
+                            $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Bundle::ASSET_DIR, $state, $GLOBALS['TL_LANG']['MSC'][$state]);
                         }
                         $strLegend .= '</ul>';
                         $strLegend .= '</div>';

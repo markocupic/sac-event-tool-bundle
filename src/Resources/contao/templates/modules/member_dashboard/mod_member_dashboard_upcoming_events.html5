@@ -24,7 +24,7 @@
     <th></th>
   </tr>
   <?php foreach ($this->arrUpcomingEvents as $event): ?>
-  <?php $stateOfSubscription = $GLOBALS['TL_LANG']['tl_calendar_events_member'][$event['eventRegistrationModel']->stateOfSubscription]; ?>
+  <?php $stateOfSubscription = $GLOBALS['TL_LANG']['MSC'][$event['eventRegistrationModel']->stateOfSubscription]; ?>
   <tr>
     <td><?= $event['dateSpan'] ?></td>
     <td>

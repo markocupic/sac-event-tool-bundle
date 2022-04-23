@@ -549,7 +549,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
             $arrEventsMember = $objEventsMemberModel->row();
             $arrMember = $this->memberModel->row();
 
-            $arrEventsMember['stateOfSubscriptionTrans'] = $this->translator->trans('tl_calendar_events_member.'.$arrEventsMember['stateOfSubscription'], [], 'contao_default');
+            $arrEventsMember['stateOfSubscriptionTrans'] = $this->translator->trans('MSC.'.$arrEventsMember['stateOfSubscription'], [], 'contao_default');
             $arrEvent['eventUrl'] = $this->eventsAdapter->generateEventUrl($this->eventModel);
 
             $arrEvent = array_map('html_entity_decode', $arrEvent);

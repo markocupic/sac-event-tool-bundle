@@ -829,7 +829,7 @@ class CalendarEventsHelper
                     ++$intAccepted;
                 }
 
-                if (EventSubscriptionLevel::SUBSCRIPTION_REFUSED === $eventsMemberModel->stateOfSubscription) {
+                if (EventSubscriptionLevel::SUBSCRIPTION_REJECTED === $eventsMemberModel->stateOfSubscription) {
                     ++$intRefused;
                 }
 
@@ -846,7 +846,7 @@ class CalendarEventsHelper
             $href = sprintf("'contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s'", $objEvent->id, REQUEST_TOKEN, $refererId);
 
             if ($intNotConfirmed > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge not-confirmed blink" title="%s unbestätigte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge not-confirmed blink" title="%s unbeantwortete Anmeldeanfragen" role="button" onclick="window.location.href=%s">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
             }
 
             if ($intAccepted > 0) {
@@ -862,7 +862,7 @@ class CalendarEventsHelper
             }
 
             if ($intUnsubscribedUser > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge unsubscribed-user" title="%s Abgemeldete Teilnehmer" role="button" onclick="window.location.href=%s">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge unsubscribed-user" title="%s stornierte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
             }
         }
 

@@ -249,7 +249,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                 return $date->parse($config->get('dateFormat'), $objEventMember->$field);
             }
         } elseif ('stateOfSubscription' === $field) {
-            return $GLOBALS['TL_LANG']['tl_calendar_events_member'][$objEventMember->$field] ?? $objEventMember->$field;
+            return $GLOBALS['TL_LANG']['MSC'][$objEventMember->$field] ?? $objEventMember->$field;
         } elseif ('startDate' === $field) {
             $objEvent = $calendarEventsModel->findByPk($objEventMember->eventId);
 
