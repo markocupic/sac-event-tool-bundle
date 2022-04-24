@@ -39,48 +39,48 @@ if ($contaoMode->isBackend()) {
 
 $GLOBALS['BE_MOD']['content']['calendar']['tables'] = ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'];
 $GLOBALS['BE_MOD']['sac_be_modules'] = [
-    'sac_section_tool' => [
+    'sac_section_tool'                 => [
         'tables' => ['tl_sac_section'],
     ],
-    'sac_calendar_events_tool' => [
+    'sac_calendar_events_tool'         => [
         'tables' => ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'],
-        'table' => ['TableWizard', 'importTable'],
-        'list' => ['ListWizard', 'importList'],
+        'table'  => ['TableWizard', 'importTable'],
+        'list'   => ['ListWizard', 'importList'],
     ],
     'sac_calendar_events_stories_tool' => [
         'tables' => ['tl_calendar_events_story'],
     ],
-    'sac_course_main_types_tool' => [
+    'sac_course_main_types_tool'       => [
         'tables' => ['tl_course_main_type'],
     ],
-    'sac_course_sub_types_tool' => [
+    'sac_course_sub_types_tool'        => [
         'tables' => ['tl_course_sub_type'],
     ],
-    'sac_event_type_tool' => [
+    'sac_event_type_tool'              => [
         'tables' => ['tl_event_type'],
     ],
-    'sac_tour_difficulty_tool' => [
+    'sac_tour_difficulty_tool'         => [
         'tables' => ['tl_tour_difficulty_category', 'tl_tour_difficulty'],
-        'table' => ['TableWizard', 'importTable'],
-        'list' => ['ListWizard', 'importList'],
+        'table'  => ['TableWizard', 'importTable'],
+        'list'   => ['ListWizard', 'importList'],
     ],
-    'sac_tour_type_tool' => [
+    'sac_tour_type_tool'               => [
         'tables' => ['tl_tour_type'],
     ],
-    'sac_event_release_tool' => [
+    'sac_event_release_tool'           => [
         'tables' => ['tl_event_release_level_policy_package', 'tl_event_release_level_policy'],
-        'table' => ['TableWizard', 'importTable'],
-        'list' => ['ListWizard', 'importList'],
+        'table'  => ['TableWizard', 'importTable'],
+        'list'   => ['ListWizard', 'importList'],
     ],
-    'sac_event_organizer_tool' => [
+    'sac_event_organizer_tool'         => [
         'tables' => ['tl_event_organizer'],
-        'table' => ['TableWizard', 'importTable'],
-        'list' => ['ListWizard', 'importList'],
+        'table'  => ['TableWizard', 'importTable'],
+        'list'   => ['ListWizard', 'importList'],
     ],
-    'sac_event_journey_tool' => [
+    'sac_event_journey_tool'           => [
         'tables' => ['tl_calendar_events_journey'],
     ],
-    'sac_user_role_tool' => [
+    'sac_user_role_tool'               => [
         'tables' => ['tl_user_role'],
     ],
 ];
@@ -163,15 +163,15 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'] = [
 
 // TL_CONFIG
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = [
-    1 => '1',
-    2 => '2',
-    3 => '3',
-    4 => '4',
-    5 => '5',
-    6 => '1 - 2',
-    7 => '1 - 3',
-    8 => '1 - 4',
-    9 => '1 - 5',
+    1  => '1',
+    2  => '2',
+    3  => '3',
+    4  => '4',
+    5  => '5',
+    6  => '1 - 2',
+    7  => '1 - 3',
+    8  => '1 - 4',
+    9  => '1 - 5',
     10 => '2 - 3',
     11 => '2 - 4',
     12 => '2 - 5',
@@ -181,50 +181,50 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = [
 ];
 
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'] = [
-    'ca. 1 h' => ['dateRows' => 1],
-    'ca. 2 h' => ['dateRows' => 1],
-    'ca. 3 h' => ['dateRows' => 1],
-    'ca. 4 h' => ['dateRows' => 1],
-    'ca. 5 h' => ['dateRows' => 1],
-    'ca. 6 h' => ['dateRows' => 1],
-    'ca. 7 h' => ['dateRows' => 1],
-    'ca. 8 h' => ['dateRows' => 1],
-    'ca. 9 h' => ['dateRows' => 1],
-    '1/2 Tag' => ['dateRows' => 1],
-    '1 Tag' => ['dateRows' => 1],
-    '1 1/2 Tage' => ['dateRows' => 2],
-    '2 Tage' => ['dateRows' => 2],
-    '2 1/2 Tage' => ['dateRows' => 3],
-    '3 Tage' => ['dateRows' => 3],
-    '3 1/2 Tage' => ['dateRows' => 4],
-    '4 Tage' => ['dateRows' => 4],
-    '4 1/2 Tage' => ['dateRows' => 5],
-    '5 Tage' => ['dateRows' => 5],
-    '5 1/2 Tage' => ['dateRows' => 6],
-    '6 Tage' => ['dateRows' => 6],
-    '6 1/2 Tage' => ['dateRows' => 7],
-    '7 Tage' => ['dateRows' => 7],
-    '7 1/2 Tage' => ['dateRows' => 8],
-    '8 Tage' => ['dateRows' => 8],
-    '8 1/2 Tage' => ['dateRows' => 9],
-    '9 Tage' => ['dateRows' => 9],
-    '9 1/2 Tage' => ['dateRows' => 10],
-    '10 Tage' => ['dateRows' => 10],
-    '10 1/2 Tage' => ['dateRows' => 11],
-    '11 Tage' => ['dateRows' => 11],
-    '11 1/2 Tage' => ['dateRows' => 12],
-    '12 Tage' => ['dateRows' => 12],
-    '12 1/2 Tage' => ['dateRows' => 13],
-    '13 Tage' => ['dateRows' => 13],
-    '13 1/2 Tage' => ['dateRows' => 14],
-    '14 Tage' => ['dateRows' => 14],
-    '1 Abend' => ['dateRows' => 1],
-    '2 Abende' => ['dateRows' => 2],
-    '3 Abende' => ['dateRows' => 3],
-    '4 Abende' => ['dateRows' => 4],
-    '5 Abende' => ['dateRows' => 5],
-    '6 Abende' => ['dateRows' => 6],
-    '7 Abende' => ['dateRows' => 7],
+    'ca. 1 h'           => ['dateRows' => 1],
+    'ca. 2 h'           => ['dateRows' => 1],
+    'ca. 3 h'           => ['dateRows' => 1],
+    'ca. 4 h'           => ['dateRows' => 1],
+    'ca. 5 h'           => ['dateRows' => 1],
+    'ca. 6 h'           => ['dateRows' => 1],
+    'ca. 7 h'           => ['dateRows' => 1],
+    'ca. 8 h'           => ['dateRows' => 1],
+    'ca. 9 h'           => ['dateRows' => 1],
+    '1/2 Tag'           => ['dateRows' => 1],
+    '1 Tag'             => ['dateRows' => 1],
+    '1 1/2 Tage'        => ['dateRows' => 2],
+    '2 Tage'            => ['dateRows' => 2],
+    '2 1/2 Tage'        => ['dateRows' => 3],
+    '3 Tage'            => ['dateRows' => 3],
+    '3 1/2 Tage'        => ['dateRows' => 4],
+    '4 Tage'            => ['dateRows' => 4],
+    '4 1/2 Tage'        => ['dateRows' => 5],
+    '5 Tage'            => ['dateRows' => 5],
+    '5 1/2 Tage'        => ['dateRows' => 6],
+    '6 Tage'            => ['dateRows' => 6],
+    '6 1/2 Tage'        => ['dateRows' => 7],
+    '7 Tage'            => ['dateRows' => 7],
+    '7 1/2 Tage'        => ['dateRows' => 8],
+    '8 Tage'            => ['dateRows' => 8],
+    '8 1/2 Tage'        => ['dateRows' => 9],
+    '9 Tage'            => ['dateRows' => 9],
+    '9 1/2 Tage'        => ['dateRows' => 10],
+    '10 Tage'           => ['dateRows' => 10],
+    '10 1/2 Tage'       => ['dateRows' => 11],
+    '11 Tage'           => ['dateRows' => 11],
+    '11 1/2 Tage'       => ['dateRows' => 12],
+    '12 Tage'           => ['dateRows' => 12],
+    '12 1/2 Tage'       => ['dateRows' => 13],
+    '13 Tage'           => ['dateRows' => 13],
+    '13 1/2 Tage'       => ['dateRows' => 14],
+    '14 Tage'           => ['dateRows' => 14],
+    '1 Abend'           => ['dateRows' => 1],
+    '2 Abende'          => ['dateRows' => 2],
+    '3 Abende'          => ['dateRows' => 3],
+    '4 Abende'          => ['dateRows' => 4],
+    '5 Abende'          => ['dateRows' => 5],
+    '6 Abende'          => ['dateRows' => 6],
+    '7 Abende'          => ['dateRows' => 7],
     '1 Abend und 1 Tag' => ['dateRows' => 2],
 ];
 
