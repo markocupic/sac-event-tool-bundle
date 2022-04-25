@@ -32,7 +32,7 @@
     <td><?= $event['dateSpan'] ?></td>
     <td>
       <?= $event['objEvent']->title ?><?php if ('lastMinuteTour' === $event['objEvent']->eventType): ?> <span style="color:green">(Last Minute)</span><?php endif; ?>
-      <?php if ('event_adapted' === $event['objEvent']->executionState): ?>
+      <?php if (\Markocupic\SacEventToolBundle\Config\EventExecutionState::STATE_ADAPTED === $event['objEvent']->executionState): ?>
       {{br}}
       <small><span style="color:red">Ausweichtour: <?= $event['objEvent']->eventSubstitutionText ?></span></small>
       <?php endif; ?>

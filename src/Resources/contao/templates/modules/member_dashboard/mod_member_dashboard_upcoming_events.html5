@@ -28,10 +28,10 @@
   <tr>
     <td><?= $event['dateSpan'] ?></td>
     <td>
-      <?php if ('event_deferred' === $event['eventState']): ?>
+      <?php if (\Markocupic\SacEventToolBundle\Config\EventState::STATE_DEFERRED === $event['eventState']): ?>
       <small><span style="color:red">Event verschoben!</span></small>{{br}}
       <?php endif; ?>
-      <?php if ('event_canceled' === $event['eventState']): ?>
+      <?php if (\Markocupic\SacEventToolBundle\Config\EventState::STATE_CANCELED === $event['eventState']): ?>
       <small><span style="color:red">Event abgesagt!</span></small>{{br}}
       <?php endif; ?>
       <a href="<?= $event['eventUrl'] ?>" title="zum Event"><?= $event['eventModel']->title ?></a>

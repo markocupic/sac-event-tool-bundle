@@ -23,6 +23,7 @@ use Contao\System;
 use Contao\UserModel;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
+use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
 use PhpOffice\PhpWord\Exception\CopyFileException;
@@ -79,7 +80,7 @@ class EventRapport2Docx
             $controllerAdapter->redirect(System::getReferer());
         }
 
-        if ('event_canceled' !== $objEvent->eventState && null === $objEventMemberHelper->getParticipatedEventMembers($objEvent)) {
+        if (EventState::STATE_CANCELED !== $objEvent->eventState && null === $objEventMemberHelper->getParticipatedEventMembers($objEvent)) {
             // Send error message if there are no members assigned to the event
             $messageAdapter->addError('Bitte überprüfe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, die am Event teilgenommen haben. Falls du den Event abgesagt hast, musst du dies unter Event Status beim Event selber vermerken.');
             $controllerAdapter->redirect(System::getReferer());

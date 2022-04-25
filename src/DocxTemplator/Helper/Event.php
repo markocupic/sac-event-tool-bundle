@@ -27,6 +27,8 @@ use Contao\System;
 use Contao\UserModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventExecutionState;
+use Markocupic\SacEventToolBundle\Config\EventState;
 
 class Event
 {
@@ -172,8 +174,8 @@ class Event
 
         $transport = null !== $calendarEventsJourneyModel->findByPk($objEvent->journey) ? $calendarEventsJourneyModel->findByPk($objEvent->journey)->title : 'keine Angabe';
         $objPhpWord->replace('eventTransport', $this->prepareString($transport));
-        $objPhpWord->replace('eventCanceled', 'event_canceled' === $objEvent->eventState || 'event_canceled' === $objEvent->executionState ? 'Ja' : 'Nein');
-        $objPhpWord->replace('eventHasExecuted', 'event_executed_like_predicted' === $objEvent->executionState ? 'Ja' : 'Nein');
+        $objPhpWord->replace('eventCanceled', EventState::STATE_CANCELED === $objEvent->eventState || EventExecutionState::STATE_CANCELED === $objEvent->executionState ? 'Ja' : 'Nein');
+        $objPhpWord->replace('eventHasExecuted', EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED === $objEvent->executionState ? 'Ja' : 'Nein');
         $substitutionText = '' !== $objEvent->eventSubstitutionText ? $objEvent->eventSubstitutionText : '---';
         $objPhpWord->replace('eventSubstitutionText', $this->prepareString($substitutionText));
         $objPhpWord->replace('eventDuration', $this->prepareString($objEventInvoice->eventDuration));

@@ -29,6 +29,7 @@ use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\ZipBundle\Zip\Zip;
 use PhpOffice\PhpWord\Exception\CopyFileException;
@@ -126,7 +127,7 @@ class CalendarEventsStory
 
             if (null !== $objEvent) {
                 $objStoryModel->eventTitle = $objEvent->title;
-                $objStoryModel->substitutionEvent = 'event_adapted' === $objEvent->executionState && '' !== $objEvent->eventSubstitutionText ? $objEvent->eventSubstitutionText : '';
+                $objStoryModel->substitutionEvent = EventExecutionState::STATE_ADAPTED === $objEvent->executionState && '' !== $objEvent->eventSubstitutionText ? $objEvent->eventSubstitutionText : '';
                 $objStoryModel->eventStartDate = $objEvent->startDate;
                 $objStoryModel->eventEndDate = $objEvent->endDate;
                 $objStoryModel->organizers = $objEvent->organizers;

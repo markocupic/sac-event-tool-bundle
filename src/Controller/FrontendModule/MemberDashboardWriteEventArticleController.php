@@ -42,6 +42,7 @@ use Contao\Validator;
 use Haste\Form\Form;
 use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -199,7 +200,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                     $set = [
                         'title' => $objEvent->title,
                         'eventTitle' => $objEvent->title,
-                        'eventSubstitutionText' => 'event_adapted' === $objEvent->executionState && '' !== $objEvent->eventSubstitutionText ? $objEvent->eventSubstitutionText : '',
+                        'eventSubstitutionText' => EventExecutionState::STATE_ADAPTED === $objEvent->executionState && '' !== $objEvent->eventSubstitutionText ? $objEvent->eventSubstitutionText : '',
                         'eventStartDate' => $objEvent->startDate,
                         'eventEndDate' => $objEvent->endDate,
                         'organizers' => $objEvent->organizers,

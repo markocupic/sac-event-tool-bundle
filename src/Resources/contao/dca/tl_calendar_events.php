@@ -18,6 +18,8 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\Date;
 use Contao\Input;
 use Contao\System;
+use Markocupic\SacEventToolBundle\Config\EventExecutionState;
+use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\DataContainer\CalendarEvents;
 
 // Keys
@@ -485,10 +487,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'select',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-STATE'],
+    'options'   => [EventState::STATE_FULLY_BOOKED, EventState::STATE_DEFERRED, EventState::STATE_CANCELED],
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
     'eval'      => ['submitOnChange' => false, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false],
-    //'eval'      => array('submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false),
     'sql'       => "varchar(32) NOT NULL default ''",
 ];
 
@@ -770,7 +771,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'select',
-    'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EXECUTION-STATE'],
+    'options'   => [EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED, EventExecutionState::STATE_DEFERRED, EventExecutionState::STATE_ADAPTED, EventExecutionState::STATE_CANCELED],
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
     'eval'      => ['includeBlankOption' => true, 'doNotShow' => true, 'tl_class' => 'clr m12', 'mandatory' => true],
     'sql'       => "varchar(32) NOT NULL default ''",

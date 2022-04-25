@@ -43,6 +43,7 @@ use Contao\Validator;
 use Haste\Form\Form;
 use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
@@ -178,11 +179,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
             $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventNotFound', [$this->inputAdapter->get('events') ?? 'NULL'], 'contao_default'));
         } elseif ($this->eventModel->disableOnlineRegistration) {
             $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_onlineRegDisabled', [], 'contao_default'));
-        } elseif ('event_fully_booked' === $this->eventModel->eventState) {
+        } elseif (EventState::STATE_FULLY_BOOKED === $this->eventModel->eventState) {
             $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventFullyBooked', [], 'contao_default'));
-        } elseif ('event_canceled' === $this->eventModel->eventState) {
+        } elseif (EventState::STATE_CANCELED === $this->eventModel->eventState) {
             $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventCanceled', [], 'contao_default'));
-        } elseif ('event_deferred' === $this->eventModel->eventState) {
+        } elseif (EventState::STATE_DEFERRED === $this->eventModel->eventState) {
             $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventDeferred', [], 'contao_default'));
         } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationStartDate > time()) {
             $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossibleOn', [$this->eventModel->title, $this->dateAdapter->parse('d.m.Y H:i', $this->eventModel->registrationStartDate)], 'contao_default'));

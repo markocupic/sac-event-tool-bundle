@@ -44,6 +44,7 @@ use Contao\TourDifficultyModel;
 use Contao\TourTypeModel;
 use Contao\UserModel;
 use Haste\Util\Url;
+use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 
 class CalendarEventsHelper
@@ -367,17 +368,17 @@ class CalendarEventsHelper
         $registrationCount = $objEventsMember->registrationCount;
 
         // Event canceled
-        if ('event_canceled' === $objEvent->eventState) {
+        if (EventState::STATE_CANCELED === $objEvent->eventState) {
             return 'event_status_4';
         }
 
         // Event deferred
-        if ('event_deferred' === $objEvent->eventState) {
+        if (EventState::STATE_DEFERRED === $objEvent->eventState) {
             return 'event_status_6';
         }
 
         // Event is fully booked/instructor has explicitly set the "is fully booked" label in the backend
-        if ('event_fully_booked' === $objEvent->eventState) {
+        if (EventState::STATE_FULLY_BOOKED === $objEvent->eventState) {
             return 'event_status_3';
         }
 
@@ -413,7 +414,7 @@ class CalendarEventsHelper
 
         $registrationCount = $objEventsMember->numRows;
 
-        if ('event_fully_booked' === $objEvent->eventState || ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers)) {
+        if (EventState::STATE_FULLY_BOOKED === $objEvent->eventState || ($objEvent->maxMembers > 0 && $registrationCount >= $objEvent->maxMembers)) {
             return true;
         }
 
@@ -788,7 +789,7 @@ class CalendarEventsHelper
 
         $memberCount = $calendarEventsMember->numRows;
 
-        if ('event_canceled' === $objEvent->eventState) {
+        if (EventState::STATE_CANCELED === $objEvent->eventState) {
             // Event canceled
             return '';
         }

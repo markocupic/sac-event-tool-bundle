@@ -12,6 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 
 // Override defaults
@@ -45,10 +46,10 @@ $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_6'] = 'Event verscho
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_7'] = 'Keine Online-Anmeldung möglich!';
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_8'] = 'Max. Teilnehmerzahl erreicht. Anmeldung auf Warteliste möglich.';
 
-// Export table vendor\markocupic\sac-export-table-custom\src\Listener\ContaoHooks\ExportTableSacEventListener.php
-$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_fully_booked'] = 'Event ausgebucht!';
-$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_canceled'] = 'Event abgesagt!';
-$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_deferred'] = 'Event verschoben!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events'][EventState::STATE_FULLY_BOOKED] = 'Event ausgebucht!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events'][EventState::STATE_CANCELED] = 'Event abgesagt!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events'][EventState::STATE_DEFERRED] = 'Event verschoben!';
+
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['withoutMountainGuide'] = 'Ohne Bergführer';
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['withMountainGuide'] = 'Mit Bergführer';
 

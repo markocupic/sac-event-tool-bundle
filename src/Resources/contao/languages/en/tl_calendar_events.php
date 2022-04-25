@@ -12,15 +12,8 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-/*
- * This file is part of SAC Event Tool Bundle.
- *
- * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
- * @license GPL-3.0-or-later
- * For the full copyright and license information,
- * please view the LICENSE file that was distributed with this source code.
- * @link https://github.com/markocupic/sac-event-tool-bundle
- */
+use Markocupic\SacEventToolBundle\Config\EventExecutionState;
+use Markocupic\SacEventToolBundle\Config\EventState;
 
 // Global operations
 $GLOBALS['TL_LANG']['tl_calendar_events']['plus1year'] = ['+ 1 Jahr', 'Ändere bei allen Events die Datumsangaben um + 1 Jahr.'];
@@ -130,11 +123,17 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['viaFerrata'] = ['Klettersteig'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['snowShoeTour'] = ['Schneeschuhtour'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['endurance'] = ['Konditionelle Anforderungen'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['iceClimbing'] = ['Eisklettern'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['event_fully_booked'] = ['Event ausgebucht'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['event_canceled'] = ['Event abgesagt'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['event_deferred'] = ['Event verschoben'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['event_executed_like_predicted'] = ['Event wie ausgeschrieben durchgeführt.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['event_adapted'] = ['Ausweichtour-/event'];
+$GLOBALS['TL_LANG']['tl_calendar_events'][EventState::STATE_FULLY_BOOKED] = ['Event ausgebucht'];
+$GLOBALS['TL_LANG']['tl_calendar_events'][EventState::STATE_CANCELED] = ['Event abgesagt'];
+$GLOBALS['TL_LANG']['tl_calendar_events'][EventState::STATE_DEFERRED] = ['Event verschoben'];
+
+// Use these states for the report
+$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED] = ['Event wie ausgeschrieben durchgeführt.'];
+$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_ADAPTED] = ['Ausweichtour-/event'];
+// These states are already transated by EventState::STATE_CANCELED and EventState::STATE_DEFERRED
+//$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_CANCELED] = ['Event abgesagt'];
+//$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_DEFERRED] = ['Event verschoben'];
+
 $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_0'] = ['Keine Lawinengefahr'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_1'] = ['Geringe Lawinengefahr'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_2'] = ['Mässige Lawinengefahr'];

@@ -50,6 +50,7 @@ use League\Csv\CharsetConverter;
 use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventState;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 
@@ -131,7 +132,7 @@ class CalendarEvents
             /** @todo Continue allowing members to register even after registration deadline has expired */
 
             // If event has been deferred
-            if ('event_deferred' === $objCalendarEventsModel->eventState) {
+            if (EventState::STATE_DEFERRED === $objCalendarEventsModel->eventState) {
                 PaletteManipulator::create()
                     ->applyToPalette('default', 'tl_calendar_events')
                     ->applyToPalette('tour', 'tl_calendar_events')
