@@ -251,7 +251,7 @@ class CalendarEventsStory
         $objPhpWord->replace('authorName', $objArticle->authorName, $options);
         $objPhpWord->replace('sacMemberId', $objArticle->sacMemberId, $options);
         $objPhpWord->replace('authorEmail', $strAuthorEmail, $options);
-        $objPhpWord->replace('addedOn', date('Y-m-d', (int) $objArticle->addedOn), $options);
+        $objPhpWord->replace('dateAdded', date('Y-m-d', (int) $objArticle->dateAdded), $options);
         $objPhpWord->replace('tourTypes', implode(', ', $arrTourTypes), $options);
         $objPhpWord->replace('organizers', $strOrganizers, $options);
         $objPhpWord->replace('mainInstructorName', $mainInstructorName, $options);

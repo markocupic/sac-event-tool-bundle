@@ -27,7 +27,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][2] = 'Vom Aut
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][3] = 'Bericht veröffentlicht und kann vom Autor nicht mehr bearbeitet werden.';
 
 // Fields
-$GLOBALS['TL_LANG']['tl_calendar_events_story']['addedOn'] = ['Erstellungsdatum', 'Geben Sie das Erstellungsdatum en.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_story']['dateAdded'] = ['Erstellungsdatum', 'Geben Sie das Erstellungsdatum en.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishState'] = ['Veröffentlichungs-Level', 'Geben Sie den Veröffenlichungslevel ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['checkedByInstructor'] = ['Durch Tourenleiter geprüft', 'Geben Sie an, ob der Bericht durch den verantwortlichen Tourenleiter geprüft wurde.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_story']['sacMemberId'] = ['SAC-Mitgliedernummer des Autors', ''];

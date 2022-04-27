@@ -78,7 +78,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
     'palettes' => [
         'default' => '
 		{publishState_legend},publishState,checkedByInstructor;
-		{author_legend},addedOn,sacMemberId,authorName;
+		{author_legend},dateAdded,sacMemberId,authorName;
 		{event_legend},eventId,title,eventTitle,eventSubstitutionText,organizers,tourWaypoints,tourProfile,tourTechDifficulty,text,tourHighlights,tourPublicTransportInfo,youtubeId,multiSRC',
     ],
     'fields'   => [
@@ -193,13 +193,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
         'securityToken'           => [
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'addedOn'                 => [
+        'dateAdded'               => [
             'default'   => time(),
             'flag'      => 8,
             'sorting'   => true,
             'inputType' => 'text',
             'eval'      => ['rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => false, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql'       => 'int(10) unsigned NULL',
+            'sql'       => 'int(10) unsigned NOT NULL default 0',
         ],
         'tourWaypoints'           => [
             'inputType' => 'textarea',

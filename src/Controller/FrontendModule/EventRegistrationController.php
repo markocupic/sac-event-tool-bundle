@@ -360,7 +360,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $arrData['contaoMemberId'] = $this->memberModel->id;
                 $arrData['eventName'] = $this->eventModel->title;
                 $arrData['eventId'] = $this->eventModel->id;
-                $arrData['addedOn'] = time();
+                $arrData['dateAdded'] = time();
                 $arrData['uuid'] = Uuid::uuid4()->toString();
                 $arrData['stateOfSubscription'] = $this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel) ? EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED : EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED;
                 $arrData['bookingType'] = 'onlineForm';

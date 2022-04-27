@@ -34,7 +34,7 @@ class ExportEventRegistrationList
     private const FIELDS = [
         'id',
         'stateOfSubscription',
-        'addedOn',
+        'dateAdded',
         'carInfo',
         'ticketInfo',
         'notes',
@@ -112,7 +112,7 @@ class ExportEventRegistrationList
                     $arrRow[] = $GLOBALS['TL_LANG']['MSC'][$value] ?? $value;
                 } elseif ('gender' === $field) {
                     $arrRow[] = $GLOBALS['TL_LANG']['MSC'][$value] ?? $value;
-                } elseif ('addedOn' === $field) {
+                } elseif ('dateAdded' === $field) {
                     $arrRow[] = date($this->configAdapter->get('datimFormat'), (int) $value);
                 } elseif ('dateOfBirth' === $field) {
                     $arrRow[] = date($this->configAdapter->get('dateFormat'), (int) $value);

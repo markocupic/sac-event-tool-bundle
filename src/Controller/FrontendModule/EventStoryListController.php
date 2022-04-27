@@ -70,7 +70,7 @@ class EventStoryListController extends AbstractFrontendModuleController
         $this->page = $page;
 
         $arrIDS = [];
-        $arrOptions = ['order' => 'addedOn DESC'];
+        $arrOptions = ['order' => 'dateAdded DESC'];
 
         /** @var CalendarEventsStoryModel $objStories */
         $objStories = $calendarEventsStoryModelAdapter->findBy(

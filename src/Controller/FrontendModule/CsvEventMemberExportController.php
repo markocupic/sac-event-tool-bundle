@@ -146,7 +146,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
             if ('form-event-member-export' === $request->get('FORM_SUBMIT')) {
                 $eventType = $request->get('event-type');
-                $arrFields = ['id', 'eventId', 'eventName', 'startDate', 'endDate', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'addedOn'];
+                $arrFields = ['id', 'eventId', 'eventName', 'startDate', 'endDate', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'dateAdded'];
                 $startDate = strtotime($request->get('startDate'));
                 $endDate = strtotime($request->get('endDate'));
                 $this->getHeadline($arrFields);
@@ -240,8 +240,8 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
             return '#######';
         }
 
-        if ('addedOn' === $field) {
-            return $date->parse('Y-m-d', $objEventMember->addedOn);
+        if ('dateAdded' === $field) {
+            return $date->parse('Y-m-d', $objEventMember->dateAdded);
         }
 
         if ('dateOfBirth' === $field) {

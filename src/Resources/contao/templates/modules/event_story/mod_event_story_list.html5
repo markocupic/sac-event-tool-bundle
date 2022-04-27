@@ -74,7 +74,7 @@
       <?php endif; ?>
       <div class="card-body">
         <p class="card-date m-0">
-          <small><?= Contao\Date::parse('d.m.Y', $story['addedOn']) ?></small>
+          <small><?= Contao\Date::parse('d.m.Y', $story['dateAdded']) ?></small>
         </p>
         <a href="<?= $story['href'] ?>" title="weiterlesen" class="text-decoration-none item-reader-link">
           <h6 class="card-title mt-0"><?= $story['title'] ?></h6>

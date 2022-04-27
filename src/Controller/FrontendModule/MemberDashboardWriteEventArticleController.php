@@ -209,7 +209,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                         'sacMemberId' => $this->objUser->sacMemberId,
                         'eventId' => $inputAdapter->get('eventId'),
                         'tstamp' => time(),
-                        'addedOn' => time(),
+                        'dateAdded' => time(),
                     ];
                     $objInsertStmt = $databaseAdapter->getInstance()
                         ->prepare('INSERT INTO tl_calendar_events_story %s')
@@ -471,7 +471,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate() && $inputAdapter->post('FORM_SUBMIT') === $objForm->getFormId()) {
-            $objEventStoryModel->addedOn = time();
+            $objEventStoryModel->dateAdded = time();
             $objEventStoryModel->title = html_entity_decode((string) $objForm->getWidget('title')->value);
             $objEventStoryModel->text = html_entity_decode((string) $objForm->getWidget('text')->value);
             $objEventStoryModel->youtubeId = $objForm->getWidget('youtubeId')->value;
