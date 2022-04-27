@@ -21,9 +21,10 @@ use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\Framework\Adapter;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
-use Contao\Date;
 use Contao\Email;
 use Contao\Environment;
 use Contao\EventReleaseLevelPolicyModel;
@@ -54,9 +55,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CalendarEventsMember
 {
     public const TABLE = 'tl_calendar_events_member';
-    private const SESSION_FLASH_ERROR = 'sacevt.be.tl_calendar_events_member.error';
-    private const SESSION_FLASH_INFO = 'sacevt.be.tl_calendar_events_member.info';
 
+    private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Connection $connection;
     private Util $util;
@@ -69,8 +69,26 @@ class CalendarEventsMember
     private string $eventAdminEmail;
     private string $locale;
 
-    public function __construct(RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, ExportEventRegistrationList $registrationListExporterCsv, EventMemberList2Docx $registrationListExporterDocx, string $projectDir, string $eventAdminName, string $eventAdminEmail, string $locale)
+    // Adapters
+    private Adapter $backend;
+    private Adapter $calendarEvents;
+    private Adapter $calendarEventsHelper;
+    private Adapter $calendarEventsMember;
+    private Adapter $controller;
+    private Adapter $environment;
+    private Adapter $eventReleaseLevelPolicy;
+    private Adapter $events;
+    private Adapter $files;
+    private Adapter $member;
+    private Adapter $message;
+    private Adapter $notification;
+    private Adapter $stringUtil;
+    private Adapter $user;
+    private Adapter $validator;
+
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, ExportEventRegistrationList $registrationListExporterCsv, EventMemberList2Docx $registrationListExporterDocx, string $projectDir, string $eventAdminName, string $eventAdminEmail, string $locale)
     {
+        $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
         $this->util = $util;
@@ -82,6 +100,23 @@ class CalendarEventsMember
         $this->eventAdminName = $eventAdminName;
         $this->eventAdminEmail = $eventAdminEmail;
         $this->locale = $locale;
+
+        // Adapters
+        $this->backend = $this->framework->getAdapter(Backend::class);
+        $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
+        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
+        $this->controller = $this->framework->getAdapter(Controller::class);
+        $this->environment = $this->framework->getAdapter(Environment::class);
+        $this->eventReleaseLevelPolicy = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
+        $this->events = $this->framework->getAdapter(Events::class);
+        $this->files = $this->framework->getAdapter(FilesModel::class);
+        $this->member = $this->framework->getAdapter(MemberModel::class);
+        $this->message = $this->framework->getAdapter(Message::class);
+        $this->notification = $this->framework->getAdapter(Notification::class);
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
+        $this->user = $this->framework->getAdapter(UserModel::class);
+        $this->validator = $this->framework->getAdapter(Validator::class);
     }
 
     /**
@@ -159,7 +194,7 @@ class CalendarEventsMember
 
         $eventId = $request->query->get('eventId');
 
-        if (null === ($objEvent = CalendarEventsModel::findByPk($eventId))) {
+        if (null === ($objEvent = $this->calendarEvents->findByPk($eventId))) {
             return;
         }
 
@@ -180,14 +215,14 @@ class CalendarEventsMember
 
         $options = [];
 
-        $arrGuideIDS = CalendarEventsHelper::getInstructorsAsArray($objEvent, false);
+        $arrGuideIDS = $this->calendarEventsHelper->getInstructorsAsArray($objEvent, false);
 
         foreach ($arrGuideIDS as $userId) {
-            $objInstructor = UserModel::findByPk($userId);
+            $objInstructor = $this->user->findByPk($userId);
 
             if (null !== $objInstructor) {
                 if ('' !== $objInstructor->email) {
-                    if (Validator::isEmail($objInstructor->email)) {
+                    if ($this->validator->isEmail($objInstructor->email)) {
                         $options['tl_user-'.$objInstructor->id] = $objInstructor->firstname.' '.$objInstructor->lastname.' (Leiter)';
                     }
                 }
@@ -198,7 +233,7 @@ class CalendarEventsMember
         $stmt = $this->connection->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId = ? ORDER BY stateOfSubscription, firstname', [$eventId]);
 
         while (false !== ($arrReg = $stmt->fetchAssociative())) {
-            if (Validator::isEmail($arrReg['email'])) {
+            if ($this->validator->isEmail($arrReg['email'])) {
                 $arrSubscriptionStates = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'];
 
                 if (empty($arrSubscriptionStates) || !\is_array($arrSubscriptionStates)) {
@@ -221,28 +256,28 @@ class CalendarEventsMember
             $arrRecipients = [];
 
             foreach ($request->request->get('emailRecipients') as $key) {
-                if (false !== strpos($key, 'tl_user-')) {
+                if (str_contains($key, 'tl_user-')) {
                     $id = str_replace('tl_user-', '', $key);
-                    $objInstructor = UserModel::findByPk($id);
+                    $objInstructor = $this->user->findByPk($id);
 
                     if (null !== $objInstructor) {
-                        if (Validator::isEmail($objInstructor->email)) {
+                        if ($this->validator->isEmail($objInstructor->email)) {
                             $arrRecipients[] = $objInstructor->email;
                         }
                     }
-                } elseif (false !== strpos($key, 'tl_calendar_events_member-')) {
+                } elseif (str_contains($key, 'tl_calendar_events_member-')) {
                     $id = str_replace('tl_calendar_events_member-', '', $key);
-                    $objEventMember = CalendarEventsMemberModel::findByPk($id);
+                    $objEventMember = $this->calendarEventsMember->findByPk($id);
 
                     if (null !== $objEventMember) {
-                        if (Validator::isEmail($objEventMember->email)) {
+                        if ($this->validator->isEmail($objEventMember->email)) {
                             $arrRecipients[] = $objEventMember->email;
                         }
                     }
                 }
             }
 
-            if (!Validator::isEmail($this->eventAdminEmail)) {
+            if (!$this->validator->isEmail($this->eventAdminEmail)) {
                 throw new \Exception('Please set a valid email address in parameter %sacevt.event_admin_email%.');
             }
 
@@ -264,7 +299,7 @@ class CalendarEventsMember
 
                     if (!empty($uuids) && \is_array($uuids)) {
                         foreach ($uuids as $uuid) {
-                            $objFile = FilesModel::findByUuid($uuid);
+                            $objFile = $this->files->findByUuid($uuid);
 
                             if (null !== $objFile) {
                                 if (is_file($this->projectDir.'/'.$objFile->path)) {
@@ -300,17 +335,17 @@ class CalendarEventsMember
             return;
         }
 
-        if (EventReleaseLevelPolicyModel::hasWritePermission($user->id, CURRENT_ID)) {
+        if ($this->eventReleaseLevelPolicy->hasWritePermission($user->id, CURRENT_ID)) {
             // User is allowed to edit table
             return;
         }
 
         if (!$request->query->get('act') && $request->query->get('id')) {
-            $objEvent = CalendarEventsModel::findByPk($request->query->get('id'));
+            $objEvent = $this->calendarEvents->findByPk($request->query->get('id'));
 
             if (null !== $objEvent) {
-                $arrAuthors = StringUtil::deserialize($objEvent->author, true);
-                $arrRegistrationGoesTo = StringUtil::deserialize($objEvent->registrationGoesTo, true);
+                $arrAuthors = $this->stringUtil->deserialize($objEvent->author, true);
+                $arrRegistrationGoesTo = $this->stringUtil->deserialize($objEvent->registrationGoesTo, true);
 
                 if (!\in_array($user->id, $arrAuthors, false) && !\in_array($user->id, $arrRegistrationGoesTo, true)) {
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['closed'] = true;
@@ -328,18 +363,18 @@ class CalendarEventsMember
             $id = \strlen((string) $request->query->get('id')) ? $request->query->get('id') : CURRENT_ID;
 
             if ('select' === $request->query->get('act')) {
-                $objEvent = CalendarEventsModel::findByPk($id);
+                $objEvent = $this->calendarEvents->findByPk($id);
             } else {
                 /** @var CalendarEventsMemberModel $objEvent */
-                if (null !== ($objMember = CalendarEventsMemberModel::findByPk($id))) {
+                if (null !== ($objMember = $this->calendarEventsMember->findByPk($id))) {
                     /** @var CalendarEventsModel $objEvent */
                     $objEvent = $objMember->getRelated('eventId');
                 }
             }
 
             if (null !== $objEvent) {
-                $arrAuthors = StringUtil::deserialize($objEvent->author, true);
-                $arrRegistrationGoesTo = StringUtil::deserialize($objEvent->registrationGoesTo, true);
+                $arrAuthors = $this->stringUtil->deserialize($objEvent->author, true);
+                $arrRegistrationGoesTo = $this->stringUtil->deserialize($objEvent->registrationGoesTo, true);
 
                 if (!\in_array($user->id, $arrAuthors, false) && !\in_array($user->id, $arrRegistrationGoesTo, true)) {
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['closed'] = true;
@@ -348,8 +383,8 @@ class CalendarEventsMember
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notDeletable'] = true;
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCopyable'] = true;
 
-                    Message::addError($this->translator->trans('ERR.accessDenied', [], 'contao_default'));
-                    Controller::redirect('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$objEvent->id);
+                    $this->message->addError($this->translator->trans('ERR.accessDenied', [], 'contao_default'));
+                    $this->controller->redirect('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$objEvent->id);
                 }
             }
         }
@@ -371,7 +406,7 @@ class CalendarEventsMember
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ($request->query->has('id') && null !== ($objEvent = CalendarEventsModel::findByPk($request->query->get('id')))) {
+        if ($request->query->has('id') && null !== ($objEvent = $this->calendarEvents->findByPk($request->query->get('id')))) {
             // Download the registration list as a docx file
             if ('downloadEventMemberListDocx' === $request->query->get('action')) {
                 $this->registrationListExporterDocx->generate($objEvent, 'docx');
@@ -423,7 +458,7 @@ class CalendarEventsMember
         }
 
         if ($reload) {
-            Controller::reload();
+            $this->controller->reload();
         }
     }
 
@@ -448,33 +483,30 @@ class CalendarEventsMember
      */
     public function saveCallbackStateOfSubscription($varValue, DataContainer $dc)
     {
-        $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
+        $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
 
         if (null !== $objEventMemberModel) {
             // Retrieve the event id from CURRENT_ID if we have a new entry.
             $eventId = !empty($objEventMemberModel->eventId) ? $objEventMemberModel->eventId : CURRENT_ID;
-            $objEvent = CalendarEventsModel::findByPk($eventId);
+            $objEvent = $this->calendarEvents->findByPk($eventId);
 
             if (null !== $objEvent && $objEventMemberModel->stateOfSubscription !== $varValue) {
                 // Check if member has already booked at the same time
-                $objMember = MemberModel::findOneBySacMemberId($objEventMemberModel->sacMemberId);
+                $objMember = $this->member->findOneBySacMemberId($objEventMemberModel->sacMemberId);
 
                 // Do not allow the maximum number of participants to be exceeded.
                 if (EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED === $varValue) {
-                    if (!CalendarEventsMemberModel::canAcceptSubscription($objEventMemberModel, $objEvent)) {
+                    if (!$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
                         $varValue = EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED;
                     }
                 }
 
-                if (EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember)) {
-                    $session = $this->requestStack->getCurrentRequest()->getSession();
-                    $flashBag = $session->getFlashBag();
-
-                    $flashBag->set(self::SESSION_FLASH_ERROR, 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
+                if (EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && $this->calendarEventsHelper->areBookingDatesOccupied($objEvent, $objMember)) {
+                    $this->message->addError('Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
                     $varValue = $objEventMemberModel->stateOfSubscription;
-                } elseif (Validator::isEmail($objEventMemberModel->email)) {
+                } elseif ($this->validator->isEmail($objEventMemberModel->email)) {
                     // Use terminal42/notification_center
-                    $objNotification = Notification::findOneByType('onchange_state_of_subscription');
+                    $objNotification = $this->notification->findOneByType('onchange_state_of_subscription');
 
                     if (null !== $objNotification) {
                         $arrTokens = [
@@ -483,7 +515,7 @@ class CalendarEventsMember
                             'participant_uuid' => $objEventMemberModel->uuid,
                             'participant_name' => html_entity_decode($objEventMemberModel->firstname.' '.$objEventMemberModel->lastname),
                             'participant_email' => $objEventMemberModel->email,
-                            'event_link_detail' => 'https://'.Environment::get('host').'/'.Events::generateEventUrl($objEvent),
+                            'event_link_detail' => 'https://'.$this->environment->get('host').'/'.$this->events->generateEventUrl($objEvent),
                         ];
 
                         $objNotification->send($arrTokens, $this->locale);
@@ -576,7 +608,7 @@ class CalendarEventsMember
             return;
         }
 
-        $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
+        $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
 
         if (null === $objEventMemberModel) {
             throw new \Exception(sprintf('Registration with ID %s not found. While calling. %s', $dc->id, $request->getRequestUri()));
@@ -603,46 +635,38 @@ class CalendarEventsMember
             return;
         }
 
-        $session = $request->getSession();
-        $flashBag = $session->getFlashBag();
-
-        if ($flashBag->has(self::SESSION_FLASH_ERROR)) {
-            Message::addError($flashBag->get(self::SESSION_FLASH_ERROR)[0]);
-        }
-
-        if ($flashBag->has(self::SESSION_FLASH_INFO)) {
-            Message::addInfo($flashBag->get(self::SESSION_FLASH_INFO)[0]);
-        }
-
         if (isset($_POST['refuseWithEmail'])) {
             // Show another palette
-            Controller::redirect(Backend::addToUrl('action=refuseWithEmail'));
+            $this->controller->redirect($this->backend->addToUrl('action=refuseWithEmail'));
         }
 
         if (isset($_POST['acceptWithEmail'])) {
             $blnAllow = true;
 
-            $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
+            $objEvent = $this->calendarEvents->findByPk($objEventMemberModel->eventId);
 
-            if (null !== $objEvent && !CalendarEventsMemberModel::canAcceptSubscription($objEventMemberModel, $objEvent)) {
+            if (null !== $objEvent && !$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
                 $blnAllow = false;
             }
 
             if ($blnAllow) {
                 // Show another palette
-                Controller::redirect(Backend::addToUrl('action=acceptWithEmail'));
+                $this->controller->redirect($this->backend->addToUrl('action=acceptWithEmail'));
             } else {
-                $flashBag->set(self::SESSION_FLASH_ERROR, 'Dem Teilnehmer kann die Teilnahme am Event nicht bestätigt werden, da die maximale Teilnehmerzahl bereits erreicht wurde.');
+                $this->message->addError('Dem Teilnehmer kann die Teilnahme am Event nicht bestätigt werden, da die maximale Teilnehmerzahl bereits erreicht wurde.');
             }
         }
 
         if (isset($_POST['addToWaitlist'])) {
             // Show another palette
-            Controller::redirect(Backend::addToUrl('action=addToWaitlist'));
+            $this->controller->redirect($this->backend->addToUrl('action=addToWaitlist'));
         }
     }
 
     /**
+     * Generate href for $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']
+     * Generate href for $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice'].
+     *
      * @Callback(table="tl_calendar_events_member", target="config.onload")
      */
     public function setGlobalOperations(DataContainer $dc): void
@@ -657,18 +681,15 @@ class CalendarEventsMember
             unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['all']);
         }
 
-        // Generate href for $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']
-        // Generate href for  $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice']
-
         $blnAllowTourReportButton = false;
         $blnAllowInstructorInvoiceButton = false;
 
         $eventId = $request->query->get('id');
-        $objEvent = CalendarEventsModel::findByPk($eventId);
+        $objEvent = $this->calendarEvents->findByPk($eventId);
 
         if (null !== $objEvent) {
             // Check if backend user is allowed
-            if (EventReleaseLevelPolicyModel::hasWritePermission($user->id, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
+            if ($this->eventReleaseLevelPolicy->hasWritePermission($user->id, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
                 if ('tour' === $objEvent->eventType || 'lastMinuteTour' === $objEvent->eventType) {
                     $href = $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'];
                     $href = sprintf($href, $eventId);
@@ -721,19 +742,19 @@ class CalendarEventsMember
      */
     public function parseDashboard(DataContainer $dc): string
     {
-        $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
+        $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
 
         if (null !== $objEventMemberModel) {
             $objTemplate = new BackendTemplate('be_calendar_events_registration_dashboard');
             $objTemplate->objRegistration = $objEventMemberModel;
             $objTemplate->stateOfSubscription = $objEventMemberModel->stateOfSubscription;
-            $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
+            $objEvent = $this->calendarEvents->findByPk($objEventMemberModel->eventId);
 
             if (null !== $objEvent) {
                 $objTemplate->objEvent = $objEvent;
 
                 if (!$objEventMemberModel->hasParticipated && '' !== $objEventMemberModel->email) {
-                    if (Validator::isEmail($objEventMemberModel->email)) {
+                    if ($this->validator->isEmail($objEventMemberModel->email)) {
                         $objTemplate->showEmailButtons = true;
                     }
                 }
@@ -758,9 +779,6 @@ class CalendarEventsMember
 
         /** @var BackendUser $user */
         $user = $this->security->getUser();
-
-        $session = $this->requestStack->getCurrentRequest()->getSession();
-        $flashBag = $session->getFlashBag();
 
         // Build action array first
         $arrActions = [
@@ -791,8 +809,8 @@ class CalendarEventsMember
         ];
 
         if (!$request->query->has('action') || !\is_array($arrActions[$request->query->get('action')]) || empty($arrActions[$request->query->get('action')])) {
-            $flashBag->set(self::SESSION_FLASH_INFO, 'Es ist ein Fehler aufgetreten.');
-            Controller::redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$request->query->get('id').'&act=edit&rt='.$request->query->get('rt'));
+            $this->message->addInfo('Es ist ein Fehler aufgetreten.');
+            $this->controller->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$request->query->get('id').'&act=edit&rt='.$request->query->get('rt'));
         }
 
         // Set action array
@@ -826,13 +844,13 @@ class CalendarEventsMember
         // Send notification
         if ('tl_calendar_events_member' === $request->request->get('FORM_SUBMIT')) {
             if ('' !== $request->request->get('subject') && '' !== $request->request->get('text')) {
-                $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
+                $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
 
                 if (null !== $objEventMemberModel) {
-                    if (!Validator::isEmail($this->eventAdminEmail)) {
+                    if (!$this->validator->isEmail($this->eventAdminEmail)) {
                         throw new \Exception('Please set a valid email address in parameter sacevt.event_admin_email.');
                     }
-                    $objEmail = Notification::findOneByType('default_email');
+                    $objEmail = $this->notification->findOneByType('default_email');
 
                     // Use terminal42/notification_center
                     if (null !== $objEmail) {
@@ -851,27 +869,27 @@ class CalendarEventsMember
                         ];
 
                         // Check if member has already booked at the same time
-                        $objMember = MemberModel::findOneBySacMemberId($objEventMemberModel->sacMemberId);
-                        $objEvent = CalendarEventsModel::findByPk($objEventMemberModel->eventId);
+                        $objMember = $this->member->findOneBySacMemberId($objEventMemberModel->sacMemberId);
+                        $objEvent = $this->calendarEvents->findByPk($objEventMemberModel->eventId);
 
-                        if ('acceptWithEmail' === $request->query->get('action') && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && null !== $objEvent && CalendarEventsHelper::areBookingDatesOccupied($objEvent, $objMember)) {
-                            $flashBag->set(self::SESSION_FLASH_ERROR, 'Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
-                        } elseif ('acceptWithEmail' === $request->query->get('action') && null !== $objEvent && !CalendarEventsMemberModel::canAcceptSubscription($objEventMemberModel, $objEvent)) {
-                            $flashBag->set(self::SESSION_FLASH_ERROR, 'Es ist ein Fehler aufgetreten. Da die maximale Teilnehmerzahl bereits erreicht ist, kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.');
+                        if ('acceptWithEmail' === $request->query->get('action') && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && null !== $objEvent && $this->calendarEventsHelper->areBookingDatesOccupied($objEvent, $objMember)) {
+                            $this->message->addError('Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
+                        } elseif ('acceptWithEmail' === $request->query->get('action') && null !== $objEvent && !$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
+                            $this->message->addError('Es ist ein Fehler aufgetreten. Da die maximale Teilnehmerzahl bereits erreicht ist, kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.');
                         } // Send email
-                        elseif (Validator::isEmail($objEventMemberModel->email)) {
+                        elseif ($this->validator->isEmail($objEventMemberModel->email)) {
                             $objEmail->send($arrTokens, $this->locale);
 
                             $set = ['stateOfSubscription' => $arrAction['stateOfSubscription']];
                             $this->connection->update('tl_calendar_events_member', $set, ['id' => $dc->id]);
 
-                            $flashBag->set(self::SESSION_FLASH_INFO, $arrAction['sessionInfoText']);
+                            $this->message->addInfo($arrAction['sessionInfoText']);
                         } else {
-                            $flashBag->set(self::SESSION_FLASH_INFO, 'Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.');
+                            $this->message->addInfo('Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.');
                         }
                     }
                 }
-                Controller::redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$request->query->get('id').'&act=edit&rt='.$request->query->get('rt'));
+                $this->controller->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$request->query->get('id').'&act=edit&rt='.$request->query->get('rt'));
             } else {
                 // Add value to ffields
                 if ('' !== $request->request->get('subject')) {
@@ -891,16 +909,16 @@ class CalendarEventsMember
             }
         } else { // Prefill form
             // Get the registration object
-            $objEventMemberModel = CalendarEventsMemberModel::findByPk($dc->id);
+            $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
 
             if (null !== $objEventMemberModel) {
                 /** @var CalendarEventsModel $objEvent */
                 $objEvent = $objEventMemberModel->getRelated('eventId');
 
                 // Get event dates as a comma separated string
-                $eventDates = CalendarEventsHelper::getEventTimestamps($objEvent);
+                $eventDates = $this->calendarEventsHelper->getEventTimestamps($objEvent);
                 $strDates = implode(', ', array_map(
-                    static fn ($tstamp) => Date::parse(Config::get('dateFormat'), $tstamp),
+                    static fn ($tstamp) => date(Config::get('dateFormat'), (int) $tstamp),
                     $eventDates
                 ));
 
@@ -914,7 +932,7 @@ class CalendarEventsMember
                     'eventIbanBeneficiary' => $objEvent->addIban ? $objEvent->ibanBeneficiary : '',
                     'courseId' => $objEvent->courseId,
                     'eventType' => $objEvent->eventType,
-                    'eventUrl' => Events::generateEventUrl($objEvent, true),
+                    'eventUrl' => $this->events->generateEventUrl($objEvent, true),
                     'eventDates' => $strDates,
                     'instructorName' => $user->name,
                     'instructorFirstname' => $user->firstname,
@@ -973,7 +991,7 @@ class CalendarEventsMember
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        $href = StringUtil::ampersand('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s');
+        $href = $this->stringUtil->ampersand('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s');
         $eventId = $request->query->get('id');
         $refererId = $request->get('_contao_referer_id');
 
