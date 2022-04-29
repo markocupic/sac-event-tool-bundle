@@ -53,7 +53,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     protected ?int $endDate = null;
     protected ?int $eventReleaseLevel = null;
     protected string $dateFormat = 'j.';
-    protected bool $showQrCode = false;
+    //protected bool $showQrCode = false;
     protected ?array $htmlCourseTable = null;
     protected ?array $htmlTourTable = null;
     protected array $events = [];
@@ -258,13 +258,13 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             'options' => [1 => 'FS1', 2 => 'FS2', 3 => 'FS3', 4 => 'FS4'],
             'eval' => ['mandatory' => false, 'includeBlankOption' => true],
         ]);
-
+        /**
         $objForm->addFormField('showQrCode', [
             'label' => ['', 'QR Code anzeigen?'],
             'inputType' => 'checkbox',
             'eval' => ['mandatory' => false],
         ]);
-
+**/
         // Let's add a submit button
         $objForm->addFormField('submit', [
             'label' => 'Export starten',
@@ -310,12 +310,12 @@ class PilatusExport2021Controller extends AbstractPrintExportController
                     $objForm->getWidget('timeRangeEnd')->addError($strError);
                 }
             }
-
+            /**
             // Generate QR code
             if ($request->request->get('showQrCode')) {
                 $this->showQrCode = true;
             }
-
+            **/
             if ($this->startDate && $this->endDate) {
                 $this->eventReleaseLevel = (int) $request->request->get('eventReleaseLevel') > 0 ? (int) $request->request->get('eventReleaseLevel') : null;
                 $this->htmlCourseTable = $this->generateEventTable(['course']);
@@ -714,9 +714,10 @@ class PilatusExport2021Controller extends AbstractPrintExportController
         $arrRow = $objEvent->row();
         $arrRow['url'] = $environmentAdapter->get('url').'/'.$eventsAdapter->generateEventUrl($objEvent);
 
+        /**
         if ($this->showQrCode) {
-            $arrRow['qrCode'] = $calendarEventsHelperAdapter->getEventQrCode($objEvent, ['scale' => 4]);
-        }
+            //$arrRow['qrCode'] = $calendarEventsHelperAdapter->getEventQrCode($objEvent, ['scale' => 4]);
+        }*/
         $arrRow['eventState'] = '' !== $objEvent->eventState ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
         $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate);
         $arrRow['eventDates'] = $this->getEventPeriod($objEvent, $this->dateFormat);
