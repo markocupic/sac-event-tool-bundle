@@ -186,11 +186,13 @@ services:
 
     # Pilatus export module
     Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExport2021Controller:
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        arguments:
+            - '@contao.framework'
+            - '@request_stack'
+            - '@database_connection'
+            - '@contao.insert_tag.parser'
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
         public: true
 
     # Csv Export module: Export members and users as a csv spreadsheet

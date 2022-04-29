@@ -16,8 +16,10 @@
     flatpickr('#ctrl_timeRangeEnd', opt);
 </script>
 
+<!---
 <button class="btn btn-info enable-fe-editing" data-label-enable="Frontend Editing aktivieren" data-label-disable="Frontend Editing deaktivieren">Frontend Editing aktivieren</button>
 <button class="btn btn-danger toggle-recurring-events" data-label-hide="Wiederkehrende Events ausblenden" data-label-show="Wiederkehrende Events einblenden">Wiederkehrende Events ausblenden</button>
+-->
 
 <!-- course table -->
 <h3 class="ce_headline">Quartalsprogramm Kurse</h3>
@@ -29,13 +31,7 @@
 <?= $this->htmlCourseTable ?>
 <?php endif; ?>
 
-<?php if (!$this->events['courses']): ?>
-<!-- courses -->
-<!--<h3 class="ce_headline">Monatsprogramm Kurse</h3>-->
-<!--<p>Zu dieser Anfrage wurden keine Events gefunden!</p>-->
-<?php endif; ?>
-
-<?php if ($this->events['courses']): ?>
+<?php if (isset($this->events['courses']) && is_array($this->events['courses'])): ?>
 <table class="event-export-table event-export-table-courses table table-sm">
   <tbody>
   <?php foreach ($this->events['courses'] as $arrEvent): ?>
@@ -156,45 +152,6 @@
   </tbody>
 </table>
 
-
-<!-- The Course Modal for frontend editing-->
-<div class="modal" id="editCourseModal">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title" data-event="title"></h4>
-        <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
-      </div>
-      <!-- Modal body -->
-      <div class="modal-body">
-        <form method="post" action="{{env::request}}">
-          <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
-          <input type="hidden" name="FORM_SUBMIT" value="update-record">
-          <input type="hidden" name="EVENT_TYPE" value="course">
-          <input type="hidden" name="id" data-event="id" value="">
-          <?php foreach ($this->courseFeEditableFields as $field): ?>
-          <?php if ('title' === $field) {
-    continue;
-} ?>
-          <!-- <?= $field ?> -->
-          <div class="form-group">
-            <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?></label>
-            <textarea class="form-control" rows="3" data-event="<?= $field ?>" name="<?= $field ?>"></textarea>
-          </div>
-          <?php endforeach; ?>
-          <button type="button" class="btn btn-primary send-form">Änderungen Speichern</button>
-        </form>
-      </div>
-      <!-- Modal footer -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Schliessen</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- End Course modal -->
-
 <?php endif; ?>
 
 
@@ -210,7 +167,7 @@
 <!-- tours grouped by organizers -->
 <?php $arrTypes = ['tours', 'generalEvents']; ?>
 <?php foreach ($arrTypes as $type): ?>
-<?php if ($this->events[$type]): ?>
+<?php if (isset($this->events[$type])): ?>
 <?php if ('tours' === $type): ?>
 <h3 class="ce_headline">Monatsprogramm Touren</h3>
 <?php endif; ?>
@@ -238,7 +195,7 @@
   <?php foreach ($arrOrganizer['events'] as $arrEvent): ?>
   <?php if ('generalEvent' === $arrEvent['eventType']): ?>
   <tr class="event-export-row-body" data-recurringevent="<?php if ($arrEvent['isRecurringEvent']): ?>true<?php else: ?>false<?php endif; ?>">
-    <td class="event-export-headline" colspan="2" style="color:red"><strong><?= Contao\EventTypeModel::findByAlias($arrEvent['eventType'])->title ?></strong></td>
+    <td class="event-export-headline" colspan="2" style="color:red"><strong><?= \Contao\EventTypeModel::findByAlias($arrEvent['eventType'])->title ?></strong></td>
   </tr>
   <?php endif; ?>
   <?php if ('' != $arrEvent['headline']): ?>
@@ -331,7 +288,7 @@
     <td class="event-export-bookingEvent">Anmeldung</td>
     <?php $arrText = []; ?>
     <?php if (!$arrEvent['disableOnlineRegistration']): ?>
-    <?php $arrText[] = sprintf('Mit Event-Nummer: %s-%s', Contao\Date::parse('Y', $arrEvent['startDate']), $arrEvent['id'], $arrEvent['bookingEvent']); ?>
+    <?php $arrText[] = sprintf('Mit Event-Nummer: %s-%s', \Contao\Date::parse('Y', $arrEvent['startDate']), $arrEvent['id'], $arrEvent['bookingEvent']); ?>
     <?php endif; ?>
     <?php if ('' != $arrEvent['bookingEvent']): ?>
     <!-- experimental: Redaktion muss diese Einträge prüfen und evtl. doppelt vorhandene Inhalte manuell löschen -->
@@ -378,41 +335,5 @@
 <?php endif; ?>
 <?php endforeach; ?>
 
-<!-- The Tour Modal for frontend editing-->
-<div class="modal" id="editTourModal">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title" data-event="title"></h4>
-        <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
-      </div>
-      <!-- Modal body -->
-      <div class="modal-body">
-        <form method="post" action="{{env::request}}">
-          <input type="hidden" name="REQUEST_TOKEN" value="{{REQUEST_TOKEN}}">
-          <input type="hidden" name="FORM_SUBMIT" value="update-record">
-          <input type="hidden" name="EVENT_TYPE" value="course">
-          <input type="hidden" name="id" data-event="id" value="">
-          <?php foreach ($this->tourFeEditableFields as $field): ?>
-          <?php if ('title' === $field) {
-        continue;
-    } ?>
-          <!-- <?= $field ?> -->
-          <div class="form-group">
-            <label for="ctrl_<?= $field ?>_<?= $arrEvent['id'] ?>"><?= $GLOBALS['TL_LANG']['tl_calendar_events'][$field][0] ?></label>
-            <textarea class="form-control" rows="3" data-event="<?= $field ?>" name="<?= $field ?>"></textarea>
-          </div>
-          <?php endforeach; ?>
-          <button type="button" class="btn btn-primary send-form">Änderungen Speichern</button>
-        </form>
-      </div>
-      <!-- Modal footer -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Schliessen</button>
-      </div>
-    </div>
-  </div>
-</div><!-- End Course modal -->
 
 <?php $this->endblock(); ?>
