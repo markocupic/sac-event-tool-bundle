@@ -42,7 +42,7 @@ class MarkocupicSacEventToolExtension extends Extension
             $container,
             new FileLocator(__DIR__.'/../Resources/config')
         );
-
+        $loader->load('security.yml');
         $loader->load('listener.yml');
         $loader->load('subscriber.yml');
         $loader->load('parameters.yml');

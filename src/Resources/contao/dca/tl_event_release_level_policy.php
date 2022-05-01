@@ -61,64 +61,76 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
         ],
     ],
     'palettes' => [
-        'default' => 'level,title,description,allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowSwitchingToPrevLevel,allowSwitchingToNextLevel,groupReleaseLevelRights',
+        'default' => 'level,title,description,allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowDeleteAccessToAuthor,allowDeleteAccessToInstructors,allowSwitchingToPrevLevel,allowSwitchingToNextLevel,groupReleaseLevelRights',
     ],
     'fields'   => [
-        'id'                            => [
+        'id'                             => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'pid'                           => [
+        'pid'                            => [
             'foreignKey' => 'tl_event_release_level_policy_package.title',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
             'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
         ],
-        'tstamp'                        => [
+        'tstamp'                         => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'level'                         => [
+        'level'                          => [
             'exclude'   => true,
             'inputType' => 'select',
             'options'   => range(1, 10),
             'eval'      => ['mandatory' => true, 'tl_class' => 'clr'],
             'sql'       => "smallint(2) unsigned NOT NULL default '0'",
         ],
-        'title'                         => [
+        'title'                          => [
             'exclude'   => true,
             'inputType' => 'text',
             'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'description'                   => [
+        'description'                    => [
             'exclude'   => true,
             'inputType' => 'textarea',
             'eval'      => ['mandatory' => true, 'tl_class' => 'clr'],
             'sql'       => 'text NULL',
         ],
-        'allowSwitchingToPrevLevel'     => [
+        'allowSwitchingToPrevLevel'      => [
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'checkbox',
             'sql'       => "char(1) NOT NULL default ''",
         ],
-        'allowSwitchingToNextLevel'     => [
+        'allowSwitchingToNextLevel'      => [
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'checkbox',
             'sql'       => "char(1) NOT NULL default ''",
         ],
-        'allowWriteAccessToAuthor'      => [
+        'allowWriteAccessToAuthor'       => [
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'checkbox',
             'sql'       => "char(1) NOT NULL default ''",
         ],
-        'allowWriteAccessToInstructors' => [
+        'allowWriteAccessToInstructors'  => [
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'checkbox',
             'sql'       => "char(1) NOT NULL default ''",
         ],
-        'groupReleaseLevelRights'       => [
+        'allowDeleteAccessToAuthor'      => [
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'checkbox',
+            'sql'       => "char(1) NOT NULL default ''",
+        ],
+        'allowDeleteAccessToInstructors' => [
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'checkbox',
+            'sql'       => "char(1) NOT NULL default '1'",
+        ],
+        'groupReleaseLevelRights'        => [
             'exclude'   => true,
             'inputType' => 'multiColumnWizard',
             'eval'      => [
@@ -141,8 +153,14 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
                         'options'   => ['up', 'down', 'upAndDown'],
                         'eval'      => ['style' => 'width:250px', 'mandatory' => true, 'includeBlankOption' => true],
                     ],
-                    'writeAccess'        => [
-                        'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['writeAccess'],
+                    'canWrite'           => [
+                        'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canWrite'],
+                        'exclude'   => true,
+                        'inputType' => 'checkbox',
+                        'eval'      => ['style' => 'width:100px'],
+                    ],
+                    'canDelete'          => [
+                        'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canDelete'],
                         'exclude'   => true,
                         'inputType' => 'checkbox',
                         'eval'      => ['style' => 'width:100px'],

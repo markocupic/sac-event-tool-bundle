@@ -20,13 +20,13 @@ use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
-use Contao\EventReleaseLevelPolicyModel;
 use Contao\Message;
 use Contao\System;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx;
+use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -100,7 +100,7 @@ class CalendarEventsInstructorInvoice
             }
 
             if (isset($objEvent)) {
-                $blnAllow = EventReleaseLevelPolicyModel::hasWritePermission($user->id, $objEvent->id);
+                $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id);
 
                 if ($objEvent->registrationGoesTo === $user->id) {
                     $blnAllow = true;

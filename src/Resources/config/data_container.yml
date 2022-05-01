@@ -59,6 +59,7 @@ services:
             - '@database_connection'
             - '@Markocupic\SacEventToolBundle\DataContainer\Util'
             - '@security.helper'
+            - '@security.authorization_checker'
 
     Markocupic\SacEventToolBundle\DataContainer\CalendarEventsStory:
         arguments:

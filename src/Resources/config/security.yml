@@ -1,0 +1,7 @@
+services:
+    # Voter
+    Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter:
+        arguments:
+            - "@contao.framework"
+        public: true
+        tags: { name: security.voter }

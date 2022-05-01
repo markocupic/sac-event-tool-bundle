@@ -18,25 +18,22 @@ use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\EventReleaseLevelPolicyModel;
 use Contao\Input;
 use Contao\System;
 use Knp\Menu\MenuItem;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
+use Symfony\Component\Security\Core\Security;
 
 class SacEvtOnGenerateEventDashboardListener
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
+    private Security $security;
 
-    /**
-     * SacEvtOnGenerateEventDashboardListener constructor.
-     */
-    public function __construct(ContaoFramework $framework)
+    public function __construct(ContaoFramework $framework, Security $security)
     {
         $this->framework = $framework;
+        $this->security = $security;
     }
 
     public function onGenerateEventDashboardListener(MenuItem $menu, CalendarEventsModel $objEvent): void
@@ -44,7 +41,6 @@ class SacEvtOnGenerateEventDashboardListener
         // Set adapters
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-        $eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
         $backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
 
@@ -92,7 +88,7 @@ class SacEvtOnGenerateEventDashboardListener
         }
 
         // Go to event participant list button
-        if ($eventReleaseLevelPolicyModelAdapter->hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id) {
+        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id) {
             $href = sprintf('contao/main.php?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
             $menu->addChild('Teilnehmerliste', ['uri' => $href])
                 ->setAttribute('role', 'button')
@@ -104,7 +100,7 @@ class SacEvtOnGenerateEventDashboardListener
         }
 
         // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und Vergütungsformular drucken" button
-        if ($eventReleaseLevelPolicyModelAdapter->hasWritePermission($objUser->id, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id) {
+        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id) {
             if ('tour' === $objEvent->eventType || 'lastMinuteTour' === $objEvent->eventType) {
                 $href = $controllerAdapter->addToUrl('call=writeTourReport&rt='.$requestToken, true);
                 $menu->addChild('Tourrapport erfassen', ['uri' => $href])

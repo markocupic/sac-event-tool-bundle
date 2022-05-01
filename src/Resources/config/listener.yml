@@ -10,7 +10,8 @@ services:
     Markocupic\SacEventToolBundle\EventListener\Contao\SacEvtOnGenerateEventDashboardListener:
         public: true
         arguments:
-            - "@contao.framework"
+            - '@contao.framework'
+            - '@security.helper'
         tags:
             - { name: contao.hook, hook: sacEvtOnGenerateEventDashboard, method: onGenerateEventDashboardListener, priority: 100 }
 
@@ -18,7 +19,7 @@ services:
     Markocupic\SacEventToolBundle\EventListener\Contao\AddCustomRegexpListener:
         public: true
         arguments:
-            - "@contao.framework"
+            - '@contao.framework'
         tags:
             - { name: kernel.event_listener, event: contao.add_custom_regexp, method: onAddCustomRegexp }
 
@@ -26,7 +27,7 @@ services:
     Markocupic\SacEventToolBundle\EventListener\Contao\ChangeEventReleaseLevelListener:
         public: true
         arguments:
-            - "@contao.framework"
+            - '@contao.framework'
             - '@Markocupic\SacEventToolBundle\ContaoMode\ContaoMode'
         tags:
             - { name: kernel.event_listener, event: contao.change_event_release_level, method: onChangeEventReleaseLevel }
@@ -35,7 +36,7 @@ services:
     Markocupic\SacEventToolBundle\EventListener\Contao\PublishEventListener:
         public: true
         arguments:
-            - "@contao.framework"
+            - '@contao.framework'
             - '@Markocupic\SacEventToolBundle\ContaoMode\ContaoMode'
         tags:
             - { name: kernel.event_listener, event: contao.publish_event, method: onPublishEvent }
@@ -45,8 +46,8 @@ services:
         public: true
         class: Markocupic\SacEventToolBundle\EventListener\Contao\GetPageLayoutListener
         arguments:
-            - "@contao.framework"
-            - "@kernel"
+            - '@contao.framework'
+            - '@kernel'
             - '%kernel.project_dir%'
         tags:
             - { name: kernel.event_listener, event: contao.get_page_layout, method: purgeScriptCacheInDebugMode }
@@ -55,7 +56,7 @@ services:
     Markocupic\SacEventToolBundle\EventListener\Contao\GetSystemMessagesListener:
         public: true
         arguments:
-            - "@contao.framework"
+            - '@contao.framework'
             - '@Markocupic\SacEventToolBundle\ContaoMode\ContaoMode'
 
         tags:
@@ -65,8 +66,8 @@ services:
     Markocupic\SacEventToolBundle\EventListener\Contao\ExecutePreActionsListener:
         public: true
         arguments:
-            - "@contao.framework"
-            - "@database_connection"
+            - '@contao.framework'
+            - '@database_connection'
             - '@request_stack'
         tags:
             - { name: kernel.event_listener, event: execute_pre_actions_listener, method: onExecutePreActions }
@@ -75,7 +76,7 @@ services:
     Markocupic\SacEventToolBundle\EventListener\Contao\ImportUserListener:
         public: true
         arguments:
-            - "@contao.framework"
+            - '@contao.framework'
             - '@request_stack'
         tags:
             - { name: kernel.event_listener, event: import_user_listener, method: onImportUser }
@@ -84,7 +85,7 @@ services:
     Markocupic\SacEventToolBundle\EventListener\Contao\ParseTemplateListener:
         public: true
         arguments:
-            - "@contao.framework"
+            - '@contao.framework'
             - '@request_stack'
             - '@contao.routing.scope_matcher'
         tags:
@@ -103,7 +104,7 @@ services:
     Markocupic\SacEventToolBundle\EventListener\Contao\ParseBackendTemplateListener:
         public: true
         arguments:
-            - "@contao.framework"
+            - '@contao.framework'
         tags:
             - { name: kernel.event_listener, event: parse_backend_template_listener, method: onParseBackendTemplate }
 
@@ -111,7 +112,7 @@ services:
     Markocupic\SacEventToolBundle\EventListener\Contao\ReplaceInsertTagsListener:
         public: true
         arguments:
-            - "@contao.framework"
+            - '@contao.framework'
         tags:
             - { name: kernel.event_listener, event: replace_insert_tags_listener, method: onReplaceInsertTags }
 

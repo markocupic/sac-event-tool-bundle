@@ -45,6 +45,7 @@ use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventMemberList2Docx;
+use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use NotificationCenter\Model\Notification;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
@@ -689,7 +690,7 @@ class CalendarEventsMember
 
         if (null !== $objEvent) {
             // Check if backend user is allowed
-            if ($this->eventReleaseLevelPolicy->hasWritePermission($user->id, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
+            if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
                 if ('tour' === $objEvent->eventType || 'lastMinuteTour' === $objEvent->eventType) {
                     $href = $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'];
                     $href = sprintf($href, $eventId);

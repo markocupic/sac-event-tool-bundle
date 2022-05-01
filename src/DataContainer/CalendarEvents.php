@@ -51,7 +51,9 @@ use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventState;
+use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;
 
 class CalendarEvents
@@ -61,6 +63,7 @@ class CalendarEvents
     private Connection $connection;
     private Util $util;
     private Security $security;
+    private AuthorizationCheckerInterface $authorizationChecker;
 
     private Adapter $arrayUtil;
     private Adapter $backend;
@@ -77,13 +80,14 @@ class CalendarEvents
     private Adapter $system;
     private Adapter $userModel;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, Security $security)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, Security $security, AuthorizationCheckerInterface $authorizationChecker)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
         $this->util = $util;
         $this->security = $security;
+        $this->authorizationChecker = $authorizationChecker;
 
         $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);
         $this->backend = $this->framework->getAdapter(Backend::class);
@@ -263,6 +267,18 @@ class CalendarEvents
             }
         }
 
+        // Prevent unauthorized deletion
+        if ('delete' === $request->query->get('act')) {
+            $eventId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events WHERE id = ?', [$dc->id]);
+
+            if ($eventId) {
+                if (false === $this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $eventId)) {
+                    $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'], $eventId));
+                    $this->controller->redirect($this->system->getReferer());
+                }
+            }
+        }
+
         // Skip here if the user is an admin
         if ($user->admin) {
             return;
@@ -285,7 +301,7 @@ class CalendarEvents
             $tid = $request->query->get('tid');
             $eventId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events WHERE id = ?', [$tid]);
 
-            if ($eventId && !EventReleaseLevelPolicyModel::hasWritePermission($user->id, $eventId)) {
+            if ($eventId && false === $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $eventId)) {
                 $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToPublishOrUnpublishEvent'], $eventId));
                 $this->controller->redirect($this->system->getReferer());
             }
@@ -296,7 +312,7 @@ class CalendarEvents
             $eventId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events WHERE id = ?', [$dc->id]);
 
             if ($eventId) {
-                if (!EventReleaseLevelPolicyModel::canDeleteEvent($user->id, $eventId)) {
+                if (false === $this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $eventId)) {
                     $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'], $eventId));
                     $this->controller->redirect($this->system->getReferer());
                 }
@@ -309,7 +325,7 @@ class CalendarEvents
 
             if (null !== $objEventsModel) {
                 if (null !== EventReleaseLevelPolicyModel::findByPk($objEventsModel->eventReleaseLevel)) {
-                    if (!EventReleaseLevelPolicyModel::hasWritePermission($user->id, $objEventsModel->id) && $user->id !== $objEventsModel->registrationGoesTo) {
+                    if (false === $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEventsModel->id) && $user->id !== $objEventsModel->registrationGoesTo) {
                         // User has no write access to the datarecord, that's why we display field values without a form input
                         foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $field) {
                             $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['input_field_callback'] = [self::class, 'showFieldValue'];
@@ -365,7 +381,7 @@ class CalendarEvents
             $ids = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar_events WHERE pid = ?', [CURRENT_ID]);
 
             foreach ($ids as $id) {
-                if (EventReleaseLevelPolicyModel::hasWritePermission($user->id, $id)) {
+                if (true === $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $id)) {
                     $arrIDS[] = $id;
                 }
             }
@@ -1477,7 +1493,6 @@ class CalendarEvents
     public function releaseLevelNext(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
     {
         $request = $this->requestStack->getCurrentRequest();
-        $user = $this->security->getUser();
 
         $strDirection = 'up';
 
@@ -1491,7 +1506,7 @@ class CalendarEvents
 
         // Save to database
         if ('releaseLevelNext' === $request->query->get('action') && (int) $request->query->get('eventId') === (int) $row['id']) {
-            if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($user->id, $row['id'], 'up') && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel)) {
+            if (true === $this->security->isGranted(CalendarEventsVoter::CAN_UPGRADE_EVENT_RELEASE_LEVEL, $row['id']) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel)) {
                 $objEvent = $this->calendarEventsModel->findByPk($request->query->get('eventId'));
 
                 if (null !== $objEvent) {
@@ -1516,7 +1531,7 @@ class CalendarEvents
             $this->controller->redirect($this->system->getReferer());
         }
 
-        if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($user->id, $row['id'], $strDirection) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel)) {
+        if (true === $this->security->isGranted(CalendarEventsVoter::CAN_UPGRADE_EVENT_RELEASE_LEVEL, $row['id']) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel)) {
             $canPushToNextReleaseLevel = true;
         }
 
@@ -1637,7 +1652,6 @@ class CalendarEvents
     public function releaseLevelPrev(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
     {
         $request = $this->requestStack->getCurrentRequest();
-        $user = $this->security->getUser();
 
         $strDirection = 'down';
 
@@ -1651,7 +1665,7 @@ class CalendarEvents
 
         // Save to database
         if ('releaseLevelPrev' === $request->query->get('action') && (int) $request->query->get('eventId') === (int) $row['id']) {
-            if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($user->id, $row['id'], 'down') && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
+            if (true === $this->security->isGranted(CalendarEventsVoter::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $row['id']) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
                 $objEvent = $this->calendarEventsModel->findByPk($request->query->get('eventId'));
 
                 if (null !== $objEvent) {
@@ -1676,7 +1690,7 @@ class CalendarEvents
             $this->controller->redirect($this->system->getReferer());
         }
 
-        if (true === EventReleaseLevelPolicyModel::allowSwitchingEventReleaseLevel($user->id, $row['id'], $strDirection) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
+        if (true === $this->security->isGranted(CalendarEventsVoter::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $row['id']) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
             $canPushToNextReleaseLevel = true;
         }
 
@@ -1692,9 +1706,7 @@ class CalendarEvents
      */
     public function deleteIcon(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
     {
-        $user = $this->security->getUser();
-
-        $blnAllow = EventReleaseLevelPolicyModel::canDeleteEvent($user->id, $row['id']);
+        $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $row['id']);
 
         if (!$blnAllow) {
             return '';
@@ -1708,9 +1720,7 @@ class CalendarEvents
      */
     public function copyIcon(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
     {
-        $user = $this->security->getUser();
-
-        $blnAllow = EventReleaseLevelPolicyModel::hasWritePermission($user->id, $row['id']);
+        $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $row['id']);
 
         if (!$blnAllow) {
             return '';
