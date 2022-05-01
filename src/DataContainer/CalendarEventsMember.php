@@ -336,7 +336,7 @@ class CalendarEventsMember
             return;
         }
 
-        if ($this->eventReleaseLevelPolicy->hasWritePermission($user->id, CURRENT_ID)) {
+        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, CURRENT_ID)) {
             // User is allowed to edit table
             return;
         }
