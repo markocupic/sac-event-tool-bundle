@@ -55,7 +55,16 @@ class CalendarEventsVoter extends Voter
 
     protected function supports($attribute, $subject): bool
     {
-        return \in_array($attribute, [self::CAN_WRITE_EVENT, self::CAN_DELETE_EVENT, self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL], true);
+        return \in_array(
+            $attribute,
+            [
+                self::CAN_WRITE_EVENT,
+                self::CAN_DELETE_EVENT,
+                self::CAN_UPGRADE_EVENT_RELEASE_LEVEL,
+                self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL,
+            ],
+            true
+        );
     }
 
     /**
@@ -82,10 +91,10 @@ class CalendarEventsVoter extends Voter
             case self::CAN_DELETE_EVENT:
                 return $this->canDeleteEvent();
 
-            case self::CAN_WRITE_EVENT:
+                case self::CAN_WRITE_EVENT:
                 return $this->canWriteEvent();
 
-            case self::CAN_UPGRADE_EVENT_RELEASE_LEVEL:
+                case self::CAN_UPGRADE_EVENT_RELEASE_LEVEL:
             case self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL:
                 return $this->canSwitchReleaseLevel($attribute);
         }

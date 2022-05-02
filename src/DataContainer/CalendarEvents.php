@@ -30,7 +30,6 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\Date;
 use Contao\DcaExtractor;
-use Contao\Encryption;
 use Contao\EventReleaseLevelPolicyModel;
 use Contao\EventReleaseLevelPolicyPackageModel;
 use Contao\EventTypeModel;
@@ -41,6 +40,7 @@ use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\TourDifficultyCategoryModel;
+use Contao\User;
 use Contao\UserGroupModel;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
@@ -53,6 +53,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;
 
@@ -63,7 +64,7 @@ class CalendarEvents
     private Connection $connection;
     private Util $util;
     private Security $security;
-    private AuthorizationCheckerInterface $authorizationChecker;
+    private PasswordHasherFactoryInterface $passwordHasherFactory;
 
     private Adapter $arrayUtil;
     private Adapter $backend;
@@ -80,14 +81,14 @@ class CalendarEvents
     private Adapter $system;
     private Adapter $userModel;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, Security $security, AuthorizationCheckerInterface $authorizationChecker)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, Security $security, PasswordHasherFactoryInterface $passwordHasherFactory)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
         $this->util = $util;
         $this->security = $security;
-        $this->authorizationChecker = $authorizationChecker;
+        $this->passwordHasherFactory = $passwordHasherFactory;
 
         $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);
         $this->backend = $this->framework->getAdapter(Backend::class);
@@ -970,9 +971,12 @@ class CalendarEvents
 
             $value = $this->stringUtil->deserialize($row[$i]);
 
-            /// Decrypt the value
+            // Decrypt the value
             if ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['encrypt'] ?? null) {
-                $value = Encryption::decrypt($value);
+                $passwordHasher = $this->passwordHasherFactory
+                    ->getPasswordHasher(User::class)
+                ;
+                $value = $passwordHasher->hash($value);
             }
 
             // Default value
