@@ -582,8 +582,6 @@ class CalendarEventsMember
 
     /**
      * @Callback(table="tl_calendar_events_member", target="config.onload")
-     *
-     * @throws \Exception
      */
     public function setStateOfSubscription(DataContainer $dc): void
     {
@@ -612,7 +610,7 @@ class CalendarEventsMember
         $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
 
         if (null === $objEventMemberModel) {
-            throw new \Exception(sprintf('Registration with ID %s not found. While calling. %s', $dc->id, $request->getRequestUri()));
+            return;
         }
 
         if ('refuseWithEmail' === $request->query->get('action')) {
