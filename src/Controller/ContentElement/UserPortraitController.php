@@ -25,10 +25,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @ContentElement("user_portrait", category="sac_event_tool_content_elements", template="ce_user_portrait")
+ * @ContentElement(UserPortraitController::TYPE, category="sac_event_tool_content_elements", template="ce_user_portrait")
  */
 class UserPortraitController extends AbstractContentElementController
 {
+    public const TYPE = 'user_portrait';
+
     private ContaoFramework $framework;
 
     public function __construct(ContaoFramework $framework)

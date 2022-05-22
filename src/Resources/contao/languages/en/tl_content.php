@@ -12,8 +12,6 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-//$GLOBALS['TL_DCA']['tl_content']['palettes']['user_portrait_list'] = 'name,type,headline;{config_legend},userList_userRoles,userList_queryType;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
-
 // Legends
 $GLOBALS['TL_LANG']['tl_content']['jumpTo_legend'] = 'Weiterleitungs-Einstellungen';
 $GLOBALS['TL_LANG']['tl_content']['config_legend'] = 'Element-Einstellungen';

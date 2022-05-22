@@ -31,10 +31,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @ContentElement("user_portrait_list", category="sac_event_tool_content_elements", template="ce_user_portrait_list")
+ * @ContentElement(UserPortraitListController::TYPE, category="sac_event_tool_content_elements", template="ce_user_portrait_list")
  */
 class UserPortraitListController extends AbstractContentElementController
 {
+    public const TYPE = 'user_portrait_list';
+
     private ContaoFramework $framework;
     private Connection $connection;
     private string $projectDir;

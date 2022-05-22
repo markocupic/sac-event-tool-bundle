@@ -14,6 +14,12 @@ declare(strict_types=1);
 
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
+
+// Content elements
+$GLOBALS['TL_LANG']['CTE'][UserPortraitController::TYPE] = ['SAC-User-Portrait'];
+$GLOBALS['TL_LANG']['CTE'][UserPortraitListController::TYPE] = ['SAC-User-Portrait-Liste'];
 
 // Override defaults
 if (TL_MODE === 'FE') {
@@ -31,10 +37,6 @@ $GLOBALS['TL_LANG']['MSC']['level'] = 'Stufe';
 // tl_calendar_events_member
 $GLOBALS['TL_LANG']['ERR']['accessDenied'] = 'Zutritt verweigert.';
 $GLOBALS['TL_LANG']['MSC']['messageSuccessfullySent'] = 'Die Nachricht wurde erfolgreich versandt.';
-
-// Content elements
-$GLOBALS['TL_LANG']['CTE']['user_portrait'] = ['SAC-User-Portrait'];
-$GLOBALS['TL_LANG']['CTE']['user_portrait_list'] = ['SAC-User-Portrait-Liste'];
 
 // Events
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_1'] = 'Freie Plätze!';

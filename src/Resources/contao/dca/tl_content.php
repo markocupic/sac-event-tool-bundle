@@ -15,14 +15,16 @@ declare(strict_types=1);
 use Contao\BackendUser;
 use Contao\Input;
 use Contao\System;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
 
 if ('sac_calendar_events_tool' === Input::get('do')) {
     $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_calendar_events';
 }
 
 // Palettes
-$GLOBALS['TL_DCA']['tl_content']['palettes']['user_portrait_list'] = 'name,type,headline;{config_legend},userList_selectMode,userList_queryType,userList_users,userList_userRoles,userList_replacePrivateAdressWithRoleAdress,userList_showFieldsToGuests;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{template_legend},userList_template,userList_partial_template;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
-$GLOBALS['TL_DCA']['tl_content']['palettes']['user_portrait'] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes'][UserPortraitListController::TYPE] = 'name,type,headline;{config_legend},userList_selectMode,userList_queryType,userList_users,userList_userRoles,userList_replacePrivateAdressWithRoleAdress,userList_showFieldsToGuests;{image_legend:hide},imgSize;{jumpTo_legend},jumpTo;{template_legend},userList_template,userList_partial_template;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes'][UserPortraitController::TYPE] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
     'exclude'   => true,

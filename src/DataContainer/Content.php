@@ -15,11 +15,13 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Controller;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\Database;
 use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception;
+use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
 
 class Content
 {
@@ -30,26 +32,32 @@ class Content
         $this->connection = $connection;
     }
 
+
     /**
+     *
      * @Callback(table="tl_content", target="config.onload")
+     *
+     * @param DataContainer $dc
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
      */
     public function setPalette(DataContainer $dc): void
     {
         if ($dc->id > 0) {
-            $objDb = Database::getInstance()
-                ->prepare('SELECT * FROM tl_content WHERE id = ?')
-                ->limit(1)
-                ->execute($dc->id)
-            ;
+            $arrRow = $this->connection->fetchAssociative('SELECT * FROM tl_content WHERE id = ?', [$dc->id]);
 
-            if ($objDb->numRows) {
+            if ($arrRow) {
                 // Set palette for content element "user_portrait_list"
-                if ('user_portrait_list' === $objDb->type) {
-                    if ('selectUsers' === $objDb->userList_selectMode) {
-                        $GLOBALS['TL_DCA'][$dc->table]['palettes'] = str_replace(',userList_userRoles', '', $GLOBALS['TL_DCA'][$dc->table]['palettes']);
-                        $GLOBALS['TL_DCA'][$dc->table]['palettes'] = str_replace(',userList_queryType', '', $GLOBALS['TL_DCA'][$dc->table]['palettes']);
+                if ('user_portrait_list' === $arrRow['type']) {
+                    if ('selectUsers' === $arrRow['userList_selectMode']) {
+                        PaletteManipulator::create()
+                            ->removeField('userList_userRoles')
+                            ->removeField('userList_queryType')
+                            ->applyToPalette(UserPortraitListController::TYPE,$dc->table);
                     } else {
-                        $GLOBALS['TL_DCA'][$dc->table]['palettes'] = str_replace(',userList_users', '', $GLOBALS['TL_DCA'][$dc->table]['palettes']);
+                        PaletteManipulator::create()
+                            ->removeField('userList_users')
+                            ->applyToPalette(UserPortraitListController::TYPE,$dc->table);
                     }
                 }
             }
