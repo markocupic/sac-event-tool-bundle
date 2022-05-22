@@ -54,7 +54,6 @@ use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;
 
 class CalendarEvents
