@@ -122,7 +122,7 @@
                                 {{ objForm.getWidget('notes').parse()|raw }}
                                 <div class="alert alert-success" role="alert">
                                     <i class="fas fa-check-circle"></i>
-                                    <div>{{ 'FORM.evt_reg_notesExpl'|trans({}, 'contao_default') }}</div>
+                                    <div>{{ 'FORM.evt_reg_notesExpl'|trans({}, 'contao_default')|raw }}</div>
                                 </div>
                                 <br>
                             {% endif %}
