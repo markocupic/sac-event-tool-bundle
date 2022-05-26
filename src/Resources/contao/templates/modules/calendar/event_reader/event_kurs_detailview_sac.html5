@@ -57,7 +57,7 @@
         </div>
         <?php endif; ?>
 
-        <?php if ('' != $this->getEventData('hasCoords')): ?>
+        <?php if ($this->getEventData('hasCoords')): ?>
         <div class="location event-detail event-info-box icon-box-small">
           <h5>Karte</h5>
           <!-- indexer::continue -->

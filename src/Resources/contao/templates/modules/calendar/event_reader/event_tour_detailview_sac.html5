@@ -70,9 +70,9 @@
         </div>
         <?php endif; ?>
 
-        <?php if ('' != $this->getEventData('hasCoords')): ?>
+        <?php if ($this->getEventData('hasCoords')): ?>
         <div class="location event-detail event-info-box icon-box-small">
-          <h5>Karte mit Ziel</h5>
+          <h5>Karte</h5>
           <!-- indexer::continue -->
           <div class="embed-responsive embed-responsive-4by3">
             <iframe src="{{ <?= $this->getEventData('geoLink') ?>|format(<?= $this->getEventData('coordsCH1903')[0] ?>,<?= $this->getEventData('coordsCH1903')[1] ?>) }}" width="400" height="300" allow="geolocation"></iframe>
