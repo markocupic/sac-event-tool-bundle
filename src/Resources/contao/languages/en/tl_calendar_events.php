@@ -82,6 +82,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['allowDeregistration'] = ['Angemeldete
 $GLOBALS['TL_LANG']['tl_calendar_events']['deregistrationLimit'] = ['Abmeldefrist in Tagen', 'Definieren Sie den Zeitraum in Tagen, bis zu dem sich ein bereits angemeldeter Teilnehmer wieder online vom Event abmelden kann.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['addGallery'] = ['Dem Event eine Bildergalerie hinzufügen'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['multiSRC'] = ['Bilder auswählen', 'Treffen Sie eine Auswahl von Bildern. Evtl. mässen Sie Ihre Bilder zuerst über die Dateiverwaltung auf den Webserver laden.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['coordsCH1903'] = ['Ziel-Koordinaten CH1903 für Kartenansicht', 'Bitte geben Sie die Koordinaten des Zieles im Format 2600000/1200000 (CH1903+) oder 600000/200000 (CH1903) ein. Die Koordinaten können auf https://map.geo.admin.ch und einem Klick mit der rechten Maustaste auf das Ziel herausgelesen und kopiert werden.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['journey'] = ['Anreise mit', 'Geben Sie an, wie zum Event angereist wird.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['setRegistrationPeriod'] = ['Anmeldezeitraum definieren', 'Definieren Sie hier den Zeitraum, indem sich Teilnehmer für den Event mit dem Anmeldeformular anmelden können.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['disableOnlineRegistration'] = ['Online-Anmeldung deaktivieren', 'Wenn Sie diese Einstellung wählen, wird das Online-Anmeldeformular deaktiviert.'];
