@@ -81,7 +81,7 @@
           <?= $userProfile ?>
         </div>
         <?php else: ?>
-        Leiter wurde gelöscht.
+        Leiter/in wurde gelöscht.
         <?php endif; ?>
         <!-- indexer::stop -->
 
