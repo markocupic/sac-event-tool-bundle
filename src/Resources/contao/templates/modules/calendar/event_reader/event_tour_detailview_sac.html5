@@ -43,7 +43,7 @@
         </div>
         <?php if ($this->getEventData('mountainguide')): ?>
         <div class="eventdate event-detail event-info-box icon-box-small">
-          <h5>Mit Bergführer</h5>
+          <h5>Mit Bergführer/in</h5>
         </div>
         <?php endif; ?>
 
@@ -214,7 +214,7 @@
 
       <?php if ('' != $this->getEventData('journey') && 'not-specified' != $this->getEventData('journey')): ?>
       <div class="journey event-detail event-info-box icon-box-small">
-        <h5>Anreise mit:</h5>
+        <h5>Anreise mit</h5>
         <p><?= $this->getEventData('journey') ?></p>
       </div>
       <?php endif; ?>
