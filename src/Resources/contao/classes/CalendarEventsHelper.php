@@ -251,7 +251,7 @@ class CalendarEventsHelper
                 break;
             
             case 'hasCoords':
-                $value = [] !== static::getCoordsCH1903AsArray($objEvent) ? true : false;
+                $value = !empty(static::getCoordsCH1903AsArray($objEvent)) ? true : false;
                 break;
 
             case 'coordsCH1903':
@@ -1110,14 +1110,14 @@ class CalendarEventsHelper
     {
         $arrCoord = [];
 
-        // coordsCH1903+
+        // coordsCH1903 (format "2600000, 1200000" (CH1903+) or "600000, 200000" (CH1903))
         if (!empty($objMember->coordsCH1903)) {
-            if (false !== strpos($objMember->coordsCH1903, '/')) {
-                $arrCoord = explode('/', $objMember->coordsCH1903);
+            if (false !== strpos($objMember->coordsCH1903, ',')) {
+                $arrCoord = explode(',', $objMember->coordsCH1903);
 
                 if (\is_array($arrCoord) && 2 === \count($arrCoord)) {
                     $arrCoord = preg_replace("/\s+/", "", $arrCoord);  # strip all whitespaces
-                    $arrCoord = preg_replace("/[\']/", "", $arrCoord);  # strip '
+                    $arrCoord = preg_replace("/[\'\"]/", "", $arrCoord);  # strip ' and "
                     return $arrCoord;
                 }
             }
