@@ -2,13 +2,13 @@ Hallo <?= $this->participantFirstname ?> <?= $this->participantLastname ?>
 
 
 <?php if ('course' === $this->eventType): ?>
-Du bist für den Kurs: <?php if ('' != $this->courseId): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>" definitiv angemeldet und deine Teilnahme ist bestätigt.
+Du bist für den Kurs <?php if ('' != $this->courseId): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>" definitiv angemeldet und deine Teilnahme ist bestätigt.
 <?php else: ?>
-Du bist für den Event: "<?= $this->eventName ?>" definitiv angemeldet und deine Teilnahme ist bestätigt.
+Du bist für den Event "<?= $this->eventName ?>" definitiv angemeldet und deine Teilnahme ist bestätigt.
 <?php endif; ?>
 
-
-Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte: <?= $this->instructorEmail ?>.
+Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte: 
+<?= $this->instructorEmail ?>
 
 Freundliche Grüsse
 
@@ -20,10 +20,4 @@ Freundliche Grüsse
 <?= $this->eventName ?>
 
 <?= $this->eventUrl ?>
-
-
-
-
-
-
 

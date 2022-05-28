@@ -2,12 +2,13 @@ Hallo <?= $this->participantFirstname ?> <?= $this->participantLastname ?>
 
 
 <?php if ('course' === $this->eventType): ?>
-Leider kann ich dir für den Kurs: <?php if ('' != $this->courseId): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>"  im Moment noch keine Zusage erteilen. Du wirst auf die Warteliste gesetzt und sollte ein Platz frei werden, wieder kontaktiert.
+Leider kann ich dir für den Kurs <?php if ('' != $this->courseId): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>" im Moment noch keine Zusage erteilen. Du wirst auf die Warteliste gesetzt und sollte ein Platz frei werden, wieder kontaktiert.
 <?php else: ?>
-Leider kann ich dir für den Event: "<?= $this->eventName ?>" im Moment noch keine Zusage erteilen. Du wirst auf die Warteliste gesetzt und sollte ein Platz frei werden, wieder kontaktiert.
+Leider kann ich dir für den Event "<?= $this->eventName ?>" im Moment noch keine Zusage erteilen. Du wirst auf die Warteliste gesetzt und sollte ein Platz frei werden, wieder kontaktiert.
 <?php endif; ?>
 
-Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte: <?= $this->instructorEmail ?>.
+Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte: 
+<?= $this->instructorEmail ?>
 
 Freundliche Grüsse
 
