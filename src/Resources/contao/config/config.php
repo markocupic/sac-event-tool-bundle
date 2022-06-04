@@ -130,14 +130,14 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL']
 
 // Guide qualifications
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = [
-    1 => 'Tourenleiter SAC',
-    2 => 'Bergführer IVBV',
-    3 => 'Psychologe FSP',
-    4 => 'Scheesportlehrer',
+    1 => 'Tourenleiter/in SAC',
+    2 => 'Bergführer/in IVBV',
+    3 => 'Psychologe/in FSP',
+    4 => 'Scheesportlehrer/in',
     5 => 'Dr. med.',
-    6 => 'J+S Leiter',
-    7 => 'Wanderleiter',
-    8 => 'IGKA Instruktor',
+    6 => 'J+S Leiter/in',
+    7 => 'Wanderleiter/in',
+    8 => 'IGKA Instruktor/in',
 ];
 
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'] = [

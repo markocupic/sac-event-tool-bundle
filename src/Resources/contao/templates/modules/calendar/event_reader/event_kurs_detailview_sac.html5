@@ -157,7 +157,7 @@
             <?php if ('' !== ($userProfile = $this->getEventData('instructorContactBoxes'))): ?>
             <?= $this->getEventData('instructorContactBoxes') ?>
             <?php else: ?>
-            Leiter wurde gelöscht.
+            Leiter/in wurde gelöscht.
             <?php endif; ?>
           </div>
           <!-- indexer::stop -->
