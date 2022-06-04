@@ -246,6 +246,22 @@ class CalendarEventsHelper
                 $value = static::getTourProfileAsArray($objEvent);
                 break;
 
+            case 'geoLink':
+                $value = $objEvent->geoLink;
+                break;
+
+            case 'hasCoords':
+                $value = !empty(static::getCoordsCH1903AsArray($objEvent)) ? true : false;
+                break;
+
+            case 'coordsCH1903':
+                $value = static::getCoordsCH1903AsArray($objEvent);
+                break;
+
+            case 'geoLinkUrl':
+                $value = static::getGeoLinkUrl($objEvent);
+                break;
+
             case 'gallery':
                 $value = static::getGallery([
                     'multiSRC' => $objEvent->multiSRC,
@@ -1092,5 +1108,39 @@ class CalendarEventsHelper
         }
 
         return implode(', ', $arrSections);
+    }
+
+    public static function getCoordsCH1903AsArray(CalendarEventsModel $objEvent): array
+    {
+        // coordsCH1903 (format "2600000, 1200000" (CH1903+) or "600000, 200000" (CH1903))
+        if (!empty($objEvent->coordsCH1903)) {
+            $arrCoord = explode(',', $objEvent->coordsCH1903);
+
+            if (2 === \count($arrCoord)) {
+                return array_map(
+                    static function ($strCoord) {
+                        $strCoord = html_entity_decode($strCoord);
+                        // Remove whitespaces and other inavlid characters
+                        return preg_replace('/[^0-9.]/', '', $strCoord);
+                    },
+                    $arrCoord
+                );
+            }
+        }
+
+        return [];
+    }
+
+    public static function getGeoLinkUrl(CalendarEventsModel $objEvent): ?string
+    {
+        $arrCoord = self::getCoordsCH1903AsArray($objEvent);
+
+        if (!empty($arrCoord)) {
+            $strGeoLink = System::getContainer()->getParameter('sacevt.event.geo_link');
+
+            return sprintf($strGeoLink, $arrCoord[0], $arrCoord[1]);
+        }
+
+        return null;
     }
 }

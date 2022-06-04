@@ -17,7 +17,6 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
-use Contao\Database;
 use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception;
@@ -32,13 +31,9 @@ class Content
         $this->connection = $connection;
     }
 
-
     /**
-     *
      * @Callback(table="tl_content", target="config.onload")
      *
-     * @param DataContainer $dc
-     * @return void
      * @throws \Doctrine\DBAL\Exception
      */
     public function setPalette(DataContainer $dc): void
@@ -53,11 +48,13 @@ class Content
                         PaletteManipulator::create()
                             ->removeField('userList_userRoles')
                             ->removeField('userList_queryType')
-                            ->applyToPalette(UserPortraitListController::TYPE,$dc->table);
+                            ->applyToPalette(UserPortraitListController::TYPE, $dc->table)
+                        ;
                     } else {
                         PaletteManipulator::create()
                             ->removeField('userList_users')
-                            ->applyToPalette(UserPortraitListController::TYPE,$dc->table);
+                            ->applyToPalette(UserPortraitListController::TYPE, $dc->table)
+                        ;
                     }
                 }
             }

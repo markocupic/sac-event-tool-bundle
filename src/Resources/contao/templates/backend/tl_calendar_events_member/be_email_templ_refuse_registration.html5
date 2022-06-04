@@ -2,11 +2,14 @@ Hallo <?= $this->participantFirstname ?> <?= $this->participantLastname ?>
 
 
 <?php if ('course' === $this->eventType): ?>
-Leider kann ich dir für den Kurs: <?php if ('' != $this->courseId): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>" keine Zusage erteilen.
+Leider kann ich dir für den Kurs <?php if ('' != $this->courseId): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>" keine Zusage erteilen und deine Anmeldeanfrage ist abgelehnt.
 <?php else: ?>
-Leider kann ich dir für den Event: "<?= $this->eventName ?>" keine Zusage erteilen.
+Leider kann ich dir für den Event "<?= $this->eventName ?>" keine Zusage erteilen und deine Anmeldeanfrage ist abgelehnt.
 <?php endif; ?>
-Ich danke dir für dein Verständnis. Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte: <?= $this->instructorEmail ?>.
+Ich danke dir für dein Verständnis. 
+
+Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte: 
+<?= $this->instructorEmail ?>
 
 Freundliche Grüsse
 

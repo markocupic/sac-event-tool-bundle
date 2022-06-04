@@ -54,7 +54,17 @@
           <h5>Kursort</h5>
           <p><?= $this->getEventData('location') ?></p>
           <!-- indexer::stop -->
+        </div>
+        <?php endif; ?>
 
+        <?php if ($this->getEventData('hasCoords')): ?>
+        <div class="location event-detail event-info-box icon-box-small">
+          <h5>Karte</h5>
+          <!-- indexer::continue -->
+          <div class="embed-responsive embed-responsive-4by3">
+            <iframe src="<?= $this->getEventData('geoLinkUrl') ?>" allow="geolocation"></iframe>
+          </div>
+          <!-- indexer::stop -->
         </div>
         <?php endif; ?>
 
@@ -144,11 +154,11 @@
           <h5>Kursleitung</h5>
 
           <div class="row gx-2 gy-1">
-          <?php if ('' !== ($userProfile = $this->getEventData('instructorContactBoxes'))): ?>
+            <?php if ('' !== ($userProfile = $this->getEventData('instructorContactBoxes'))): ?>
             <?= $this->getEventData('instructorContactBoxes') ?>
-          <?php else: ?>
+            <?php else: ?>
             Leiter/in wurde gelöscht.
-          <?php endif; ?>
+            <?php endif; ?>
           </div>
           <!-- indexer::stop -->
         </div>
@@ -232,7 +242,7 @@
 $schemaOrg = $this->getSchemaOrgData();
 
 if ($this->hasDetails()) {
-  $schemaOrg['description'] = $this->rawHtmlToPlainText($this->details);
+$schemaOrg['description'] = $this->rawHtmlToPlainText($this->details);
 }
 
 $this->addSchemaOrg($schemaOrg);
