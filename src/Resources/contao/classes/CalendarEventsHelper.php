@@ -249,7 +249,7 @@ class CalendarEventsHelper
             case 'geoLink':
                 $value = $objEvent->geoLink;
                 break;
-            
+
             case 'hasCoords':
                 $value = !empty(static::getCoordsCH1903AsArray($objEvent)) ? true : false;
                 break;
@@ -1106,14 +1106,14 @@ class CalendarEventsHelper
         return implode(', ', $arrSections);
     }
 
-    public static function getCoordsCH1903AsArray(MemberModel $objMember): array
+    public static function getCoordsCH1903AsArray(CalendarEventsModel $objEvent): array
     {
         $arrCoord = [];
 
         // coordsCH1903 (format "2600000, 1200000" (CH1903+) or "600000, 200000" (CH1903))
-        if (!empty($objMember->coordsCH1903)) {
-            if (false !== strpos($objMember->coordsCH1903, ',')) {
-                $arrCoord = explode(',', $objMember->coordsCH1903);
+        if (!empty($objEvent->coordsCH1903)) {
+            if (false !== strpos($objEvent->coordsCH1903, ',')) {
+                $arrCoord = explode(',', $objEvent->coordsCH1903);
 
                 if (\is_array($arrCoord) && 2 === \count($arrCoord)) {
                     $arrCoord = preg_replace("/\s+/", "", $arrCoord);  # strip all whitespaces
