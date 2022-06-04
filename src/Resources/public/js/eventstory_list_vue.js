@@ -135,7 +135,7 @@ class ItemWatcher {
                         // see: vendor\markocupic\contao-theme-sac-pilatus\src\Resources\contao\files\theme-sac-pilatus\js\theme.js
                         $(window).trigger('vueupdate');
 
-                        let cssSelectorStr = elId + ' .pagination .link,.pagination .first,.pagination .last,.pagination .previous,.pagination .next';
+                        let cssSelectorStr = elId + ' .pagination .link, ' + elId + '.pagination .first, ' + elId + '.pagination .last, ' + elId + '.pagination .previous, ' + elId + '.pagination .next';
                         $(cssSelectorStr).off("click");
                         $(cssSelectorStr).click(function (e) {
                             e.stopPropagation();
@@ -274,9 +274,8 @@ class ItemWatcher {
                  */
                 _initLightbox: function _initLightbox() {
                     // GLightbox support
-                    if('undefined' !== typeof GLightbox)
-                    {
-                        (function(){
+                    if ('undefined' !== typeof GLightbox) {
+                        (function () {
                             'use strict';
                             document.querySelectorAll('a[data-lightbox]').forEach((element) => {
                                 if (!!element.dataset.lightbox) {
@@ -287,7 +286,7 @@ class ItemWatcher {
                                 selector: 'a[data-lightbox]'
                             });
                         })();
-                    } else{
+                    } else {
                         // Colorbox support
                         jQuery(function ($) {
                             $('a[data-lightbox]').map(function () {
