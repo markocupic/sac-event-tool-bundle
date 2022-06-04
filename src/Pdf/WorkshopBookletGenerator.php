@@ -40,7 +40,6 @@ class WorkshopBookletGenerator
     private string $projectDir;
     private string $tempDir;
     private string $bookletFilenamePattern;
-
     private ?WorkshopTCPDF $pdf;
     private ?int $year;
     private ?int $eventId = null;

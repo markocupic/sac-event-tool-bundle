@@ -36,15 +36,10 @@ use Safe\DateTime;
 class ExportEvents2Docx
 {
     private const TEMP_PATH = 'system/tmp';
-
     private ContaoFramework $framework;
-
     private BinaryFileDownload $binaryFileDownload;
-
     private string $projectDir;
-
     private ?string $strTable;
-
     private ?array $arrDatarecord;
 
     public function __construct(ContaoFramework $framework, BinaryFileDownload $binaryFileDownload, string $projectDir)

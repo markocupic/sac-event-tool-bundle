@@ -43,55 +43,17 @@ use Symfony\Component\HttpFoundation\Response;
 class JahresprogrammExportController extends AbstractPrintExportController
 {
     public const TYPE = 'jahresprogramm_export';
-    /**
-     * @var ModuleModel
-     */
-    protected $model;
 
-    /**
-     * @var Template
-     */
-    protected $template;
-
-    /**
-     * @var
-     */
-    protected $startDate;
-
-    /**
-     * @var
-     */
-    protected $endDate;
-
-    /**
-     * @var
-     */
-    protected $organizer;
-
-    /**
-     * @var null
-     */
-    protected $eventType;
-
-    /**
-     * @var
-     */
-    protected $eventReleaseLevel;
-
-    /**
-     * @var null
-     */
-    protected $events;
-
-    /**
-     * @var null
-     */
-    protected $instructors;
-
-    /**
-     * @var null
-     */
-    protected $specialUsers;
+    protected ?ModuleModel $model = null;
+    protected ?Template $template = null;
+    protected ?int $startDate = null;
+    protected ?int $endDate = null;
+    protected ?int $organizer = null;
+    protected ?string $eventType = null;
+    protected ?int $eventReleaseLevel;
+    protected ?array$events = null;
+    protected ?array$instructors = null;
+    protected ?array $specialUsers = null;
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
@@ -226,8 +188,8 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 $this->startDate = strtotime($request->request->get('startDate'));
                 $this->endDate = strtotime($request->request->get('endDate'));
                 $this->eventType = $request->request->get('eventType');
-                $this->organizer = $request->request->get('organizer') > 0 ? $request->request->get('organizer') : null;
-                $this->eventReleaseLevel = $request->request->get('eventReleaseLevel') > 0 ? $request->request->get('eventReleaseLevel') : null;
+                $this->organizer = $request->request->get('organizer') > 0 ? (int) $request->request->get('organizer') : null;
+                $this->eventReleaseLevel = $request->request->get('eventReleaseLevel') > 0 ? (int) $request->request->get('eventReleaseLevel') : null;
 
                 // Get events and instructors (fill $this->events and $this->instructors)
                 $this->getEventsAndInstructors();
@@ -278,7 +240,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
         /** @var EventOrganizerModel $eventOrganizerModelAdapter */
         $eventOrganizerModelAdapter = $this->get('contao.framework')->getAdapter(EventOrganizerModel::class);
 
-        $arrEvents = [];
+        $events = [];
         $objEvents = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=?')->execute($this->startDate, $this->endDate);
 
         while ($objEvents->next()) {
@@ -300,19 +262,19 @@ class JahresprogrammExportController extends AbstractPrintExportController
             if ($this->eventType !== $objEvents->eventType) {
                 continue;
             }
-            $arrEvents[] = (int) ($objEvents->id);
+            $events[] = (int) ($objEvents->id);
         }
 
         $arrInstructors = [];
 
-        if (\count($arrEvents) > 0) {
-            $arrEvent = [];
+        if (\count($events) > 0) {
+            $arrEvents = [];
 
             // Let's use different queries for each event type
             if ('course' === $this->eventType) {
-                $objEvent = CalendarEventsModel::findMultipleByIds($arrEvents, ['order' => 'tl_calendar_events.courseTypeLevel0, tl_calendar_events.courseTypeLevel1, tl_calendar_events.startDate, tl_calendar_events.endDate, tl_calendar_events.courseId']);
+                $objEvent = CalendarEventsModel::findMultipleByIds($events, ['order' => 'tl_calendar_events.courseTypeLevel0, tl_calendar_events.courseTypeLevel1, tl_calendar_events.startDate, tl_calendar_events.endDate, tl_calendar_events.courseId']);
             } else {
-                $objEvent = CalendarEventsModel::findMultipleByIds($arrEvents, ['order' => 'tl_calendar_events.startDate, tl_calendar_events.endDate']);
+                $objEvent = CalendarEventsModel::findMultipleByIds($events, ['order' => 'tl_calendar_events.startDate, tl_calendar_events.endDate']);
             }
 
             if (null !== $objEvent) {
@@ -395,11 +357,11 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     if ('course' === $objEvent->eventType) {
                         $arrData['bookingInfo'] = 'Kurs-Nummer '.$calendarEventsHelperAdapter->getEventData($objEvent->current(), 'courseId');
                     }
-                    $arrEvent[] = $arrData;
+                    $arrEvents[] = $arrData;
                 }
             }
 
-            $this->events = $arrEvent;
+            $this->events = $arrEvents;
 
             $arrInstructors = array_unique($arrInstructors);
             $aInstructors = [];
