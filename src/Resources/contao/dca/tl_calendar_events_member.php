@@ -361,8 +361,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         'emailRecipients'             => [
             'options'   => [],
             // Set via onload callback
-            'inputType' => 'select',
-            'eval'      => ['multiple' => true, 'mandatory' => true, 'chosen' => true, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''],
+            'inputType' => 'checkbox',
+            'eval'      => ['multiple' => true, 'mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''],
             'sql'       => 'blob NULL',
         ],
         'emailSubject'                => [
