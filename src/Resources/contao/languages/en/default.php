@@ -96,6 +96,7 @@ $GLOBALS['TL_LANG']['MSC']['generateTourRapport'] = 'Möchten Sie den Tour-Rappo
 $GLOBALS['TL_LANG']['MSC']['writeTourReport'] = 'Möchten Sie den Tourenrapport erstellen/bearbeiten?';
 $GLOBALS['TL_LANG']['MSC']['goToPartcipantList'] = 'Möchten Sie zur Teilnehmerliste wechseln?';
 $GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'Möchten Sie das Vergütungsformular bearbeiten/erstellen?';
+$GLOBALS['TL_LANG']['MSC']['emailSentToEventMembers'] = 'Der/die Teilnehmer wurden erfolgreich per E-Mail benachrichtigt.';
 
 // Backend member dashboard
 $GLOBALS['TL_LANG']['MSC']['bmd_yourUpcomingEvents'] = 'Deine nächsten Events';

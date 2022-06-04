@@ -314,6 +314,17 @@ class CalendarEventsMember
 
             if ($objEmail->sendTo($arrRecipients)) {
                 unset($_POST['addEmailAttachment'], $_POST['emailAttachment']);
+
+                // Show a message in the backend
+                $msg = $this->translator->trans('MSC.emailSentToEventMembers', [], 'contao_default');
+                $this->message->addInfo($msg);
+
+                // Redirect user to the event member list
+                $strUrl = 'contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s';
+                $eventId = $request->query->get('eventId');
+                $rt = $request->query->get('rt');
+                $href = sprintf($strUrl, $eventId, $rt);
+                $this->controller->redirect($href);
             }
         }
     }
