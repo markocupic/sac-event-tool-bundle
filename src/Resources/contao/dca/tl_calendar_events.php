@@ -401,13 +401,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['durationInfo'] = [
     'sql'       => "varchar(32) NOT NULL default ''",
 ];
 
-// Add minimum an maximum members
+// Add minimum and maximum members (set up to "true" by default, when creating a new event)
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addMinAndMaxMembers'] = [
     'exclude'   => true,
     'filter'    => true,
     'inputType' => 'checkbox',
     'eval'      => ['submitOnChange' => true],
-    'sql'       => "char(1) NOT NULL default ''",
+    'sql'       => "char(1) NOT NULL default '1'",
 ];
 
 // minMembers
