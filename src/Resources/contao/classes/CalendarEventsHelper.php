@@ -1114,17 +1114,14 @@ class CalendarEventsHelper
     {
         // coordsCH1903 (format "2600000, 1200000" (CH1903+) or "600000, 200000" (CH1903))
         if (!empty($objEvent->coordsCH1903)) {
-            $arrCoord = explode(',', $objEvent->coordsCH1903);
+            $strCoord = html_entity_decode($objEvent->coordsCH1903);
+
+            // Remove invalid characters (whitespaces, quotes, ...)
+            $strCoord = preg_replace('/[^0-9.,]/', '', $strCoord);
+            $arrCoord = explode(',', $strCoord);
 
             if (2 === \count($arrCoord)) {
-                return array_map(
-                    static function ($strCoord) {
-                        $strCoord = html_entity_decode($strCoord);
-                        // Remove whitespaces and other inavlid characters
-                        return preg_replace('/[^0-9.]/', '', $strCoord);
-                    },
-                    $arrCoord
-                );
+                return $arrCoord;
             }
         }
 
