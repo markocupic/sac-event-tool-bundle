@@ -51,8 +51,8 @@ class JahresprogrammExportController extends AbstractPrintExportController
     protected int|null $organizer = null;
     protected string|null $eventType = null;
     protected int|null $eventReleaseLevel;
-    protected |nullarray$events = null;
-    protected |nullarray$instructors = null;
+    protected array|null $events = null;
+    protected array|null $instructors = null;
     protected array|null $specialUsers = null;
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
