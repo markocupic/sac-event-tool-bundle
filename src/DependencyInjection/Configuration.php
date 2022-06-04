@@ -123,6 +123,12 @@ class Configuration implements ConfigurationInterface
                             ->info('Default email text for accepting registrations in the Contao backend')
                             ->defaultValue('Hallo ##participantFirstname## ##participantLastname##{{br}}{{br}}Ich freue mich, dir mitzuteilen, dass du für den Anlass "##eventName##" vom ##eventDates## definitiv angemeldet bist.{{br}}Bitte antworte nicht auf diese E-Mail. Kontaktiere mich bei Rückfragen unter folgender E-Mail-Adresse: ##instructorEmail##.{{br}}{{br}}Liebe Grüsse{{br}}{{br}}##instructorFirstname## ##instructorLastname##{{br}}{{br}}##instructorStreet##{{br}}##instructorPostal## ##instructorCity##{{br}}##instructorPhone##{{br}}##instructorMobile##{{br}}{{br}}{{br}}--------------------------------{{br}}"##eventName##" vom ##eventDates##{{br}}##eventUrl##')
                         ->end()
+                        // Coordinates
+                        ->scalarNode('geo_link')
+                            ->cannotBeEmpty()
+                            // The coord "%s" placeholders have to be escaped by an additional percent sign => &&s
+                            ->defaultValue('https://map.geo.admin.ch/embed.html?lang=de&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege,ch.swisstopo-karto.skitouren,ch.astra.wanderland-sperrungen_umleitungen&E=%%s&N=%%s&zoom=6&crosshair=marker')
+                        ->end()
                     ->end()
                 ->end()
             ->end()
