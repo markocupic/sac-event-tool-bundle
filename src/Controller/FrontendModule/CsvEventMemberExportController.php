@@ -44,7 +44,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     public const TYPE = 'csv_event_member_export';
 
     /**
-     * @var 
+     * @var
      */
     protected $objForm;
 
@@ -59,7 +59,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     protected $strEnclosure = '"';
 
     /**
-     * @var 
+     * @var
      */
     protected $defaultPassword;
 

@@ -36,16 +36,16 @@ use PhpOffice\PhpWord\PhpWord;
 class ExportEvents2Docx
 {
     /**
-     * @var 
+     * @var
      */
     public static $strTable;
     /**
-     * @var 
+     * @var
      */
     public static $dca;
 
     /**
-     * @var 
+     * @var
      */
     public static $arrDatarecord;
 
