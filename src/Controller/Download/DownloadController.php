@@ -19,6 +19,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\Log;
+use Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx;
 use Markocupic\SacEventToolBundle\Ical\SendEventIcal;
 use Markocupic\SacEventToolBundle\Pdf\WorkshopBookletGenerator;
 use Psr\Log\LoggerInterface;
@@ -34,13 +35,15 @@ class DownloadController extends AbstractController
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private WorkshopBookletGenerator $workshopBookletGenerator;
+    private ExportEvents2Docx $exportEvents2Docx;
     private ?LoggerInterface $logger;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, WorkshopBookletGenerator $workshopBookletGenerator, ?LoggerInterface $logger)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, WorkshopBookletGenerator $workshopBookletGenerator, ExportEvents2Docx $exportEvents2Docx, ?LoggerInterface $logger)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->workshopBookletGenerator = $workshopBookletGenerator;
+        $this->exportEvents2Docx = $exportEvents2Docx;
         $this->logger = $logger;
 
         $this->framework->initialize();
@@ -81,8 +84,8 @@ class DownloadController extends AbstractController
 
     /**
      * Download events as docx file
-     * /_download/print_workshop_details_as_docx?calendarId=6&year=2017
-     * /_download/print_workshop_details_as_docx?calendarId=6&year=2017&eventId=89.
+     * /_download/print_workshop_details_as_docx?&year=2017
+     * /_download/print_workshop_details_as_docx?&year=2017&eventId=89.
      *
      * @Route("/_download/print_workshop_details_as_docx", name="sac_event_tool_download_print_workshop_details_as_docx", defaults={"_scope" = "frontend", "_token_check" = false})
      */
