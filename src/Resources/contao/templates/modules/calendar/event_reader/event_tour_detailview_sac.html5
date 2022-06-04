@@ -75,7 +75,7 @@
           <h5>Karte</h5>
           <!-- indexer::continue -->
           <div class="embed-responsive embed-responsive-4by3">
-            <iframe src="{{ <?= $this->getEventData('geoLink') ?>|format(<?= $this->getEventData('coordsCH1903')[0] ?>,<?= $this->getEventData('coordsCH1903')[1] ?>) }}" width="400" height="300" allow="geolocation"></iframe>
+            <iframe src="<?= $this->getEventData('geoLinkUrl') ?>" allow="geolocation"></iframe>
           </div>
           <!-- indexer::stop -->
         </div>
@@ -158,7 +158,7 @@
         <!-- indexer::continue -->
         <h5>Touren-Typ</h5>
         <p><?= $this->getEventData('tourTypesTitles') ?>
-        <!-- indexer::stop -->
+          <!-- indexer::stop -->
       </div>
       <?php endif; ?>
 
@@ -292,7 +292,7 @@
 $schemaOrg = $this->getSchemaOrgData();
 
 if ($this->hasDetails()) {
-  $schemaOrg['description'] = $this->rawHtmlToPlainText($this->details);
+$schemaOrg['description'] = $this->rawHtmlToPlainText($this->details);
 }
 
 $this->addSchemaOrg($schemaOrg);

@@ -258,6 +258,10 @@ class CalendarEventsHelper
                 $value = static::getCoordsCH1903AsArray($objEvent);
                 break;
 
+            case 'geoLinkUrl':
+                $value = static::getGeoLinkUrl($objEvent);
+                break;
+
             case 'gallery':
                 $value = static::getGallery([
                     'multiSRC' => $objEvent->multiSRC,
@@ -1108,21 +1112,35 @@ class CalendarEventsHelper
 
     public static function getCoordsCH1903AsArray(CalendarEventsModel $objEvent): array
     {
-        $arrCoord = [];
-
         // coordsCH1903 (format "2600000, 1200000" (CH1903+) or "600000, 200000" (CH1903))
         if (!empty($objEvent->coordsCH1903)) {
-            if (false !== strpos($objEvent->coordsCH1903, ',')) {
-                $arrCoord = explode(',', $objEvent->coordsCH1903);
+            $arrCoord = explode(',', $objEvent->coordsCH1903);
 
-                if (\is_array($arrCoord) && 2 === \count($arrCoord)) {
-                    $arrCoord = preg_replace("/\s+/", "", $arrCoord);  # strip all whitespaces
-                    $arrCoord = preg_replace("/[\'\"]/", "", $arrCoord);  # strip ' and "
-                    return $arrCoord;
-                }
+            if (2 === \count($arrCoord)) {
+                return array_map(
+                    static function ($strCoord) {
+                        $strCoord = html_entity_decode($strCoord);
+                        // Remove whitespaces and other inavlid characters
+                        return preg_replace('/[^0-9.]/', '', $strCoord);
+                    },
+                    $arrCoord
+                );
             }
         }
 
-        return $arrCoord;
+        return [];
+    }
+
+    public static function getGeoLinkUrl(CalendarEventsModel $objEvent): ?string
+    {
+        $arrCoord = self::getCoordsCH1903AsArray($objEvent);
+
+        if (!empty($arrCoord)) {
+            $strGeoLink = System::getContainer()->getParameter('sacevt.event.geo_link');
+
+            return sprintf($strGeoLink, $arrCoord[0], $arrCoord[1]);
+        }
+
+        return null;
     }
 }
