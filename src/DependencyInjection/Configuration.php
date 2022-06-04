@@ -126,7 +126,7 @@ class Configuration implements ConfigurationInterface
                         // Coordinates
                         ->scalarNode('geo_link')
                             ->cannotBeEmpty()
-                            // The coord "%s" placeholders have to be escaped by an additional percent sign => &&s
+                            // The coord "%s" placeholders have to be escaped by an additional percent char => %%s
                             ->defaultValue('https://map.geo.admin.ch/embed.html?lang=de&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege,ch.swisstopo-karto.skitouren,ch.astra.wanderland-sperrungen_umleitungen&E=%%s&N=%%s&zoom=6&crosshair=marker')
                         ->end()
                     ->end()
