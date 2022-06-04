@@ -36,8 +36,8 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
 
     private ContaoFramework $framework;
     private ScopeMatcher $scopeMatcher;
-    private ?PageModel $objJumpTo = null;
-    private ?CalendarEventsModel $objEvent = null;
+    private PageModel|null $objJumpTo = null;
+    private CalendarEventsModel|null $objEvent = null;
 
     public function __construct(ContaoFramework $framework, ScopeMatcher $scopeMatcher)
     {
@@ -78,7 +78,7 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
         return $services;
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
 

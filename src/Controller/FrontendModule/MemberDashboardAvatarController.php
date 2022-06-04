@@ -102,7 +102,7 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
         return null !== $this->requestStack->getCurrentRequest() ? $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()) : false;
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         $src = getAvatar($this->objUser->id, 'FE');
 

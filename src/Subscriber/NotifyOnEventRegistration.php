@@ -34,11 +34,11 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
 
     private string $locale;
     private array $arrData = [];
-    private ?ContaoFramework $framework = null;
-    private ?MemberModel $memberModel = null;
-    private ?CalendarEventsModel $eventModel = null;
-    private ?CalendarEventsMemberModel $eventMemberModel = null;
-    private ?ModuleModel $moduleModel = null;
+    private ContaoFramework|null $framework = null;
+    private MemberModel|null $memberModel = null;
+    private CalendarEventsModel|null $eventModel = null;
+    private CalendarEventsMemberModel|null $eventMemberModel = null;
+    private ModuleModel|null $moduleModel = null;
 
     public function __construct(string $locale)
     {

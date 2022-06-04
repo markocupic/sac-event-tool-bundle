@@ -73,7 +73,7 @@ class CsvExportController extends AbstractFrontendModuleController
      * @throws \Doctrine\DBAL\Exception
      * @throws InvalidArgument
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         $template->form = $this->getForm()->generate();
 

@@ -82,7 +82,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     /**
      * @throws Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         $this->generateForm();
         $template->form = $this->objForm;

@@ -74,7 +74,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private TwigEnvironment $twig;
     private TranslatorInterface $translator;
     private string $projectDir;
-    private ?LoggerInterface $logger;
+    private LoggerInterface|null $logger;
 
     // Adapters
     private Adapter $calendarEventsHelperAdapter;
@@ -95,12 +95,12 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private Adapter $validatorAdapter;
 
     // Class properties that are initialized after class instantiation
-    private ?ModuleModel $moduleModel = null;
-    private ?CalendarEventsModel $eventModel = null;
-    private ?MemberModel $memberModel = null;
-    private ?UserModel $mainInstructorModel = null;
-    private ?Form $objForm = null;
-    private ?Template $template = null;
+    private ModuleModel|null $moduleModel = null;
+    private CalendarEventsModel|null $eventModel = null;
+    private MemberModel|null $memberModel = null;
+    private UserModel|null $mainInstructorModel = null;
+    private Form|null $objForm = null;
+    private Template|null $template = null;
 
     public function __construct(ContaoFramework $framework, RequestStack $requestStack, Security $security, EventDispatcherInterface $eventDispatcher, TwigEnvironment $twig, TranslatorInterface $translator, string $projectDir, LoggerInterface $logger = null)
     {
@@ -166,7 +166,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         $request = $this->requestStack->getCurrentRequest();
         $session = $request->getSession();
@@ -276,7 +276,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         return $this->template->getResponse();
     }
 
-    private function getRoute(string $action): ?string
+    private function getRoute(string $action): string|null
     {
         $request = $this->requestStack->getCurrentRequest();
 

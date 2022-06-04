@@ -179,7 +179,7 @@ class UpcomingEventsController extends AbstractController
         return $rss->render($this->projectDir.'/web/'.$filePath);
     }
 
-    private function getEvents(int $section, int $limit): ?Result
+    private function getEvents(int $section, int $limit): Result|null
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select('id')

@@ -20,10 +20,10 @@ use Contao\System;
 
 class WorkshopTCPDF extends \TCPDF
 {
-    public ?CalendarEventsModel $objEvent = null;
-    public ?string $type = null;
-    public ?string $backgroundImage = null;
-    public ?string $backgroundImageBottom = null;
+    public CalendarEventsModel|null $objEvent = null;
+    public string|null $type = null;
+    public string|null $backgroundImage = null;
+    public string|null $backgroundImageBottom = null;
 
     // Page header
     public function Header(): void

@@ -84,7 +84,7 @@ class PreviewUrlCreateListener
     /**
      * @param int|string $id
      */
-    private function getEventModel($id): ?CalendarEventsModel
+    private function getEventModel($id): CalendarEventsModel|null
     {
         /** @var CalendarEventsModel $adapter */
         $adapter = $this->framework->getAdapter(CalendarEventsModel::class);

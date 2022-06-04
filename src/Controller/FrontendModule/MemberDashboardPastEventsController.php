@@ -57,9 +57,9 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 
     private string $eventCourseConfirmationFileNamePattern;
 
-    private ?FrontendUser $objUser;
+    private FrontendUser|null $objUser;
 
-    private ?Template $template;
+    private Template|null $template;
 
     public function __construct(ConvertFile $convertFile, string $projectDir, string $tempDir, string $eventTemplateCourseConfirmation, string $eventCourseConfirmationFileNamePattern)
     {
@@ -107,7 +107,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         return $services;
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         // Do not allow for not authorized users
         if (null === $this->objUser) {

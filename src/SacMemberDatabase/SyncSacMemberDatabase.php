@@ -25,8 +25,8 @@ use Markocupic\SacEventToolBundle\Config\Log;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Safe\Exceptions\StringsException;
-use function Safe\sprintf;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
+use function Safe\sprintf;
 
 class SyncSacMemberDatabase
 {
@@ -40,11 +40,11 @@ class SyncSacMemberDatabase
     private array $credentials;
     private string $projectDir;
     private string $locale;
-    private ?LoggerInterface $logger;
+    private LoggerInterface|null $logger;
 
-    private ?string $ftp_hostname = null;
-    private ?string $ftp_username = null;
-    private ?string $ftp_password = null;
+    private string|null $ftp_hostname = null;
+    private string|null $ftp_username = null;
+    private string|null $ftp_password = null;
 
     public function __construct(ContaoFramework $framework, Connection $connection, PasswordHasherFactory $passwordHasher, array $credentials, string $projectDir, string $locale, LoggerInterface $logger = null)
     {
@@ -274,7 +274,7 @@ class SyncSacMemberDatabase
 
             // Consider the suhosin.memory_limit (see #7035)
             if (\extension_loaded('suhosin')) {
-                if (($limit = ini_get('suhosin.memory_limit')) !== '') {
+                if (($limit = \ini_get('suhosin.memory_limit')) !== '') {
                     @ini_set('memory_limit', $limit);
                 }
             } else {

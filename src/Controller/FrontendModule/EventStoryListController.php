@@ -109,7 +109,7 @@ class EventStoryListController extends AbstractFrontendModuleController
         return $services;
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         // Get project dir
         $projectDir = $this->getParameter('kernel.project_dir');

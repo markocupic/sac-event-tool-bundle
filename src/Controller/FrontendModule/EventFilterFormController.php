@@ -44,9 +44,9 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
     private string $locale;
 
-    private ?array $arrAllowedFields = null;
+    private array|null $arrAllowedFields = null;
 
-    private ?PageModel $objPage = null;
+    private PageModel|null $objPage = null;
 
     public function __construct(ContaoFramework $framework, TranslatorInterface $translator, string $locale)
     {
@@ -63,7 +63,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         // Set adapters
         /** @var Controller $controllerAdapter */

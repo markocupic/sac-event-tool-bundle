@@ -437,7 +437,7 @@ class CalendarEventsHelper
         return false;
     }
 
-    public static function getMainInstructor(CalendarEventsModel $objEvent): ?UserModel
+    public static function getMainInstructor(CalendarEventsModel $objEvent): UserModel|null
     {
         $objInstructor = Database::getInstance()
             ->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid = ? AND isMainInstructor = ?')
@@ -1059,7 +1059,7 @@ class CalendarEventsHelper
         return $arrHtml;
     }
 
-    public static function getEventQrCode(CalendarEventsModel $objEvent, array $arrOptions = [], bool $blnAbsoluteUrl = true, bool $blnCache = true): ?string
+    public static function getEventQrCode(CalendarEventsModel $objEvent, array $arrOptions = [], bool $blnAbsoluteUrl = true, bool $blnCache = true): string|null
     {
         // Generate QR code folder
         $objFolder = new Folder('system/qrcodes');
@@ -1128,7 +1128,7 @@ class CalendarEventsHelper
         return [];
     }
 
-    public static function getGeoLinkUrl(CalendarEventsModel $objEvent): ?string
+    public static function getGeoLinkUrl(CalendarEventsModel $objEvent): string|null
     {
         $arrCoord = self::getCoordsCH1903AsArray($objEvent);
 

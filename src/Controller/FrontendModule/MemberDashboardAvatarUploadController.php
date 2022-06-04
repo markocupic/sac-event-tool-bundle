@@ -50,8 +50,8 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     private RotateImage $rotateImage;
     private string $projectDir;
     private string $avatarDir;
-    private ?FrontendUser $objUser;
-    private ?Template $template;
+    private FrontendUser|null $objUser;
+    private Template|null $template;
 
     public function __construct(ContaoFramework $framework, Security $security, RotateImage $rotateImage, string $projectDir, string $avatarDir)
     {
@@ -93,7 +93,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         // Do not allow for not authorized users
         if (null === $this->objUser) {

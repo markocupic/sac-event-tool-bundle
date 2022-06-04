@@ -36,9 +36,9 @@ class DownloadController extends AbstractController
     private RequestStack $requestStack;
     private WorkshopBookletGenerator $workshopBookletGenerator;
     private ExportEvents2Docx $exportEvents2Docx;
-    private ?LoggerInterface $logger;
+    private LoggerInterface|null $logger;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, WorkshopBookletGenerator $workshopBookletGenerator, ExportEvents2Docx $exportEvents2Docx, ?LoggerInterface $logger)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, WorkshopBookletGenerator $workshopBookletGenerator, ExportEvents2Docx $exportEvents2Docx, LoggerInterface|null $logger)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;

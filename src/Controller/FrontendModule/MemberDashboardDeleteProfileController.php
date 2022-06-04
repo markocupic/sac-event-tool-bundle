@@ -91,7 +91,7 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
         return $services;
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         // Do not allow for not authorized users
         if (null === $this->objUser) {

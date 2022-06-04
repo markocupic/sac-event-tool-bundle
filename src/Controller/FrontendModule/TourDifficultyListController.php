@@ -46,7 +46,7 @@ class TourDifficultyListController extends AbstractFrontendModuleController
         return $services;
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         $arrDifficulty = [];
         $pid = 0;

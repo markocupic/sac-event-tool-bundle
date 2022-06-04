@@ -997,7 +997,7 @@ class CalendarEventsMember
     /**
      * @Callback(table="tl_calendar_events_member", target="list.global_operations.backToEventSettings.button")
      */
-    public function buttonCbBackToEventSettings(?string $href, string $label, string $title, string $class, string $attributes, string $table): string
+    public function buttonCbBackToEventSettings(string|null $href, string $label, string $title, string $class, string $attributes, string $table): string
     {
         $request = $this->requestStack->getCurrentRequest();
 

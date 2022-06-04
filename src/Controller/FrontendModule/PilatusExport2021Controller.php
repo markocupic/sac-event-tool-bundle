@@ -47,15 +47,15 @@ class PilatusExport2021Controller extends AbstractPrintExportController
 {
     public const TYPE = 'pilatus_export_2021';
 
-    protected ?ModuleModel $model = null;
-    protected ?Form $objForm = null;
-    protected ?int $startDate = null;
-    protected ?int $endDate = null;
-    protected ?int $eventReleaseLevel = null;
+    protected ModuleModel|null $model = null;
+    protected Form|null $objForm = null;
+    protected int|null $startDate = null;
+    protected int|null $endDate = null;
+    protected int|null $eventReleaseLevel = null;
     protected string $dateFormat = 'j.';
     //protected bool $showQrCode = false;
-    protected ?array $htmlCourseTable = null;
-    protected ?array $htmlTourTable = null;
+    protected array|null $htmlCourseTable = null;
+    protected array|null $htmlTourTable = null;
     protected array $events = [];
 
     /**
@@ -101,7 +101,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
@@ -329,7 +329,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     /**
      * @throws \Exception
      */
-    protected function generateEventTable(array $arrAllowedEventType): ?array
+    protected function generateEventTable(array $arrAllowedEventType): array|null
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);

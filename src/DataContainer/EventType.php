@@ -22,7 +22,7 @@ class EventType
     /**
      * @Callback(table="tl_event_type", target="fields.alias.load")
      */
-    public function loadCallbackAlias(?string $strValue, DataContainer $dc): ?string
+    public function loadCallbackAlias(string|null $strValue, DataContainer $dc): string|null
     {
         // Prevent renaming the alias if it was set
         if ($strValue) {

@@ -51,9 +51,9 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
     private string $locale;
 
-    private ?FrontendUser $user = null;
+    private FrontendUser|null $user = null;
 
-    private ?Template $template = null;
+    private Template|null $template = null;
 
     public function __construct(ContaoFramework $framework, Security $security, string $locale)
     {
@@ -89,7 +89,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         // Do not allow for not authorized users
         if (null === $this->user) {

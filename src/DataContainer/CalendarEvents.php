@@ -1172,7 +1172,7 @@ class CalendarEvents
     /**
      * @Callback(table="tl_calendar_events", target="fields.eventDates.load", priority=100)
      */
-    public function loadCallbackEventDates(?string $varValue, DataContainer $dc): array
+    public function loadCallbackEventDates(string|null $varValue, DataContainer $dc): array
     {
         $arrValues = $this->stringUtil->deserialize($varValue, true);
 
@@ -1278,7 +1278,7 @@ class CalendarEvents
      *
      * @throws \Exception
      */
-    public function getEventTypes(?DataContainer $dc): array
+    public function getEventTypes(DataContainer|null $dc): array
     {
         $options = [];
         $user = $this->security->getUser();
@@ -1493,7 +1493,7 @@ class CalendarEvents
      *
      * @throws \Exception
      */
-    public function releaseLevelNext(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    public function releaseLevelNext(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -1552,7 +1552,7 @@ class CalendarEvents
      *
      * @Callback(table="tl_calendar_events", target="fields.instructor.save", priority=100)
      */
-    public function saveCallbackSetMaininstructor(?string $varValue, DataContainer $dc): ?string
+    public function saveCallbackSetMaininstructor(string|null $varValue, DataContainer $dc): string|null
     {
         if ($dc->id > 0) {
             $arrInstructors = $this->stringUtil->deserialize($varValue, true);
@@ -1652,7 +1652,7 @@ class CalendarEvents
      *
      * @throws \Exception
      */
-    public function releaseLevelPrev(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    public function releaseLevelPrev(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -1707,7 +1707,7 @@ class CalendarEvents
     /**
      * @Callback(table="tl_calendar_events", target="list.operations.delete.button", priority=80)
      */
-    public function deleteIcon(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    public function deleteIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $row['id']);
 
@@ -1721,7 +1721,7 @@ class CalendarEvents
     /**
      * @Callback(table="tl_calendar_events", target="list.operations.copy.button", priority=70)
      */
-    public function copyIcon(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    public function copyIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $row['id']);
 

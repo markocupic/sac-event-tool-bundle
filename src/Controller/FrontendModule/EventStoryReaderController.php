@@ -56,7 +56,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
     private string $locale;
 
-    private ?CalendarEventsStoryModel $story = null;
+    private CalendarEventsStoryModel|null $story = null;
 
     private bool $isPreviewMode = false;
 
@@ -121,7 +121,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         /** @var MemberModel $memberModelModelAdapter */
         $memberModelModelAdapter = $this->framework->getAdapter(MemberModel::class);
@@ -332,7 +332,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         return $template->getResponse();
     }
 
-    private function getQrCodeFromUrl(string $url): ?string
+    private function getQrCodeFromUrl(string $url): string|null
     {
         // Generate QR code folder
         $objFolder = new Folder('system/eventstoryqrcodes');

@@ -40,9 +40,9 @@ class WorkshopBookletGenerator
     private string $projectDir;
     private string $tempDir;
     private string $bookletFilenamePattern;
-    private ?WorkshopTCPDF $pdf;
-    private ?int $year;
-    private ?int $eventId = null;
+    private WorkshopTCPDF|null $pdf;
+    private int|null $year;
+    private int|null $eventId = null;
     private bool $download = false;
     private bool $printSingleEvent = false;
 
@@ -267,7 +267,7 @@ class WorkshopBookletGenerator
         return $strDates;
     }
 
-    private function nl2br(?string $string = ''): string
+    private function nl2br(string|null $string = ''): string
     {
         if (null === $string) {
             return '';

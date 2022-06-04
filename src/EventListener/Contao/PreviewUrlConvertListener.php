@@ -60,7 +60,7 @@ class PreviewUrlConvertListener
         $event->setUrl($request->getSchemeAndHttpHost().'/'.$eventsAdapter->generateEventUrl($eventModel));
     }
 
-    private function getEventModel(Request $request): ?CalendarEventsModel
+    private function getEventModel(Request $request): CalendarEventsModel|null
     {
         //#1: if (!$request->query->has('calendar')) {
         if (!$request->query->has('sac_calendar_events_tool')) {

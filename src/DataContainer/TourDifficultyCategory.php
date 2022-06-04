@@ -35,7 +35,7 @@ class TourDifficultyCategory
      *
      * @Callback(table="tl_tour_difficulty_category", target="operations.editheader.button")
      */
-    public function editHeaderButton(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    public function editHeaderButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         /** @var BackendUser $user */
         $user = $this->security->getUser();

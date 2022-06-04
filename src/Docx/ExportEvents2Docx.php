@@ -39,8 +39,8 @@ class ExportEvents2Docx
     private ContaoFramework $framework;
     private BinaryFileDownload $binaryFileDownload;
     private string $projectDir;
-    private ?string $strTable;
-    private ?array $arrDatarecord;
+    private string|null $strTable;
+    private array|null $arrDatarecord;
 
     public function __construct(ContaoFramework $framework, BinaryFileDownload $binaryFileDownload, string $projectDir)
     {

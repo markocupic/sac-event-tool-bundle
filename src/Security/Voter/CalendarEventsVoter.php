@@ -39,8 +39,8 @@ class CalendarEventsVoter extends Voter
     private Adapter $eventReleaseLevelPolicy;
     private Adapter $stringUtil;
 
-    private ?CalendarEventsModel $event = null;
-    private ?BackendUser $user = null;
+    private CalendarEventsModel|null $event = null;
+    private BackendUser|null $user = null;
 
     public function __construct(ContaoFramework $framework)
     {

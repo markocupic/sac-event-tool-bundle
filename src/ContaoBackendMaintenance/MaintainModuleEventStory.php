@@ -38,7 +38,7 @@ class MaintainModuleEventStory
 
     private string $eventStoryAssetDir;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, string $projectDir, string $eventStoryAssetDir, ?LoggerInterface $logger)
+    public function __construct(ContaoFramework $framework, Connection $connection, string $projectDir, string $eventStoryAssetDir, LoggerInterface|null $logger)
     {
         $this->framework = $framework;
         $this->connection = $connection;

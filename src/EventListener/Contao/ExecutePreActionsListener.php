@@ -27,9 +27,9 @@ use Contao\Validator;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Safe\Exceptions\JsonException;
-use function Safe\json_encode;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use function Safe\json_encode;
 
 class ExecutePreActionsListener
 {

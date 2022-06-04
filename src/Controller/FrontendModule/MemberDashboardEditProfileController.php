@@ -39,9 +39,9 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
 {
     public const TYPE = 'member_dashboard_edit_profile';
 
-    private ?FrontendUser $objUser;
+    private FrontendUser|null $objUser;
 
-    private ?Template $template;
+    private Template|null $template;
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
@@ -69,7 +69,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         return $services;
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         // Do not allow for not authorized users
         if (!$this->objUser instanceof FrontendUser) {

@@ -189,7 +189,7 @@ class CalendarContainer
      *
      * @Callback(table="tl_calendar_container", target="operations.editheader.button")
      */
-    public function editHeaderButton(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    public function editHeaderButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         /** @var BackendUser $user */
         $user = $this->security->getUser();
@@ -202,7 +202,7 @@ class CalendarContainer
      *
      * @Callback(table="tl_calendar_container", target="operations.copy.button")
      */
-    public function copyButton(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    public function copyButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         /** @var BackendUser $user */
         $user = $this->security->getUser();
@@ -215,7 +215,7 @@ class CalendarContainer
      *
      * @Callback(table="tl_calendar_container", target="operations.delete.button")
      */
-    public function deleteButton(array $row, ?string $href, string $label, string $title, ?string $icon, string $attributes): string
+    public function deleteButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         /** @var BackendUser $user */
         $user = $this->security->getUser();

@@ -48,7 +48,7 @@ class EventMember
         $this->framework->initialize();
     }
 
-    public function setEventMemberData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, ?Collection $objEventMember): void
+    public function setEventMemberData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, Collection|null $objEventMember): void
     {
         // Set adapters
         /** @var UserModel $userModelAdapter */
@@ -209,7 +209,7 @@ class EventMember
     /**
      * @param $objEvent
      */
-    public function getParticipatedEventMembers($objEvent): ?Collection
+    public function getParticipatedEventMembers($objEvent): Collection|null
     {
         /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);

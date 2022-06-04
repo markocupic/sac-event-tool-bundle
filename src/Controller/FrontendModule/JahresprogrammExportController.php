@@ -44,16 +44,16 @@ class JahresprogrammExportController extends AbstractPrintExportController
 {
     public const TYPE = 'jahresprogramm_export';
 
-    protected ?ModuleModel $model = null;
-    protected ?Template $template = null;
-    protected ?int $startDate = null;
-    protected ?int $endDate = null;
-    protected ?int $organizer = null;
-    protected ?string $eventType = null;
-    protected ?int $eventReleaseLevel;
-    protected ?array$events = null;
-    protected ?array$instructors = null;
-    protected ?array $specialUsers = null;
+    protected ModuleModel|null $model = null;
+    protected Template|null $template = null;
+    protected int|null $startDate = null;
+    protected int|null $endDate = null;
+    protected int|null $organizer = null;
+    protected string|null $eventType = null;
+    protected int|null $eventReleaseLevel;
+    protected |nullarray$events = null;
+    protected |nullarray$instructors = null;
+    protected array|null $specialUsers = null;
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
@@ -76,7 +76,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         $this->template = $template;
 

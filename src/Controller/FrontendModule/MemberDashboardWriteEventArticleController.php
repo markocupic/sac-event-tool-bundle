@@ -57,11 +57,11 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
 {
     public const TYPE = 'member_dashboard_write_event_article';
 
-    protected ?FrontendUser $objUser;
+    protected FrontendUser|null $objUser;
 
-    protected ?Template $template;
+    protected Template|null $template;
 
-    protected ?PageModel $objPage;
+    protected PageModel|null $objPage;
 
     private ContaoFramework $framework;
 
@@ -114,7 +114,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         // Do not allow for not authorized users
         if (null === $this->objUser) {

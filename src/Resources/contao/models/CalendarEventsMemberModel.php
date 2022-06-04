@@ -54,7 +54,7 @@ class CalendarEventsMemberModel extends Model
     /**
      * @return static|null
      */
-    public static function findByMemberAndEvent(MemberModel $objMember, CalendarEventsModel $eventModel): ?self
+    public static function findByMemberAndEvent(MemberModel $objMember, CalendarEventsModel $eventModel): self|null
     {
         $objDb = Database::getInstance()
             ->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')
