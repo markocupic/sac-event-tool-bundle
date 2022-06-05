@@ -148,7 +148,7 @@ class DownloadController extends AbstractController
             if (null !== $objEvent) {
                 /** @var SendEventIcal $ical */
                 $ical = System::getContainer()->get('Markocupic\SacEventToolBundle\Ical\SendEventIcal');
-                $ical->sendIcsFile($objEvent);
+                $ical->sendEventIcalToBrowser($objEvent);
             }
         }
 

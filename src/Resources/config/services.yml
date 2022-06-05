@@ -118,9 +118,12 @@ services:
             - '@Markocupic\SacEventToolBundle\Download\BinaryFileDownload'
             - '%kernel.project_dir%'
 
-    # Send ical
+    # Send ical to the browser
     Markocupic\SacEventToolBundle\Ical\SendEventIcal:
         public: true
+        arguments:
+            - '@contao.framework'
+            - '@Contao\CoreBundle\InsertTag\InsertTagParser'
 
     # Send file to the browser
     Markocupic\SacEventToolBundle\Download\BinaryFileDownload:
