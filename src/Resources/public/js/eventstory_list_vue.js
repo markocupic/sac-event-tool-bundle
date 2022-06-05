@@ -135,7 +135,7 @@ class ItemWatcher {
                         // see: vendor\markocupic\contao-theme-sac-pilatus\src\Resources\contao\files\theme-sac-pilatus\js\theme.js
                         $(window).trigger('vueupdate');
 
-                        let cssSelectorStr = elId + ' .pagination .link, ' + elId + '.pagination .first, ' + elId + '.pagination .last, ' + elId + '.pagination .previous, ' + elId + '.pagination .next';
+                        let cssSelectorStr = elId + ' .pagination .link, ' + elId + ' .pagination .first, ' + elId + ' .pagination .last, ' + elId + ' .pagination .previous, ' + elId + ' .pagination .next';
                         $(cssSelectorStr).off("click");
                         $(cssSelectorStr).click(function (e) {
                             e.stopPropagation();
