@@ -22,11 +22,12 @@ use Contao\Environment;
 use Contao\Events;
 use Eluceo\iCal\Domain\Entity\Calendar;
 use Eluceo\iCal\Domain\Entity\Event;
-use Eluceo\iCal\Domain\ValueObject\DateTime;
+use Eluceo\iCal\Domain\ValueObject\Date;
 use Eluceo\iCal\Domain\ValueObject\Location;
-use Eluceo\iCal\Domain\ValueObject\TimeSpan;
+use Eluceo\iCal\Domain\ValueObject\SingleDay;
 use Eluceo\iCal\Domain\ValueObject\Uri;
 use Eluceo\iCal\Presentation\Factory\CalendarFactory;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 class SendEventIcal
 {
@@ -48,21 +49,11 @@ class SendEventIcal
     }
 
     /**
-     * @param CalendarEventsModel $objEvent
-     * @return void
      * @throws \Exception
      */
     public function sendEventIcalToBrowser(CalendarEventsModel $objEvent): void
     {
-        // start- & end-date
-        if ($objEvent->startTime === $objEvent->startDate && $objEvent->endTime === $objEvent->endDate) {
-            $dateFormat = 'd.m.Y';
-        } else {
-            $dateFormat = 'd.m.Y H:i:s';
-        }
-
-        $objStartDate = new DateTime(new \DateTime(date($dateFormat, (int) $objEvent->startTime)), false);
-        $objEndDate = new DateTime(new \DateTime(date($dateFormat, (int) $objEvent->endTime)), false);
+        $dateFormat = 'd.m.Y';
 
         // summary
         $summary = strip_tags(html_entity_decode((string) $objEvent->title));
@@ -74,16 +65,24 @@ class SendEventIcal
 
         // Get url
         $url = $this->environment->get('url').'/'.$this->events->generateEventUrl($objEvent);
-        $vEvent = new Event();
 
-        $vEvent
-            ->setSummary($summary)
-            ->setLocation(new Location($location))
-            ->setUrl(new Uri($url))
-            ->setOccurrence(new TimeSpan($objStartDate, $objEndDate))
-        ;
+        $arrEvents = [];
+        $arrEventTstamps = CalendarEventsHelper::getEventTimestamps($objEvent);
 
-        $vCalendar = new Calendar([$vEvent]);
+        foreach ($arrEventTstamps as $timestamp) {
+            $occurence = new SingleDay(new Date(new \DateTime(date($dateFormat, (int) $timestamp)), true));
+
+            $vEvent = new Event();
+            $vEvent
+                ->setSummary($summary)
+                ->setLocation(new Location($location))
+                ->setUrl(new Uri($url))
+                ->setOccurrence($occurence)
+                     ;
+            $arrEvents[] = $vEvent;
+        }
+
+        $vCalendar = new Calendar([...$arrEvents]);
         $componentFactory = new CalendarFactory();
         $calendarComponent = $componentFactory->createCalendar($vCalendar);
 
