@@ -62,7 +62,7 @@
           <h5>Karte</h5>
           <!-- indexer::continue -->
           <div class="embed-responsive embed-responsive-4by3">
-            <iframe src="<?= $this->getEventData('geoLinkUrl') ?>" allow="geolocation"></iframe>
+            <iframe src="<?= $this->getEventData('geoLinkUrl') ?>" width="100%" height="100%" allow="geolocation"></iframe>
           </div>
           <!-- indexer::stop -->
         </div>
