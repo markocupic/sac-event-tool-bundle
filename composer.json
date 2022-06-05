@@ -31,7 +31,7 @@
     "markocupic/zip-bundle": "^1.0"
   },
   "require-dev": {
-    "contao/easy-coding-standard": "^4.0",
+    "contao/easy-coding-standard": "^5.0",
     "contao/manager-bundle": "^4.13",
     "contao/manager-plugin": "^2.3.1",
     "contao/test-case": "^4.6",
