@@ -211,9 +211,9 @@ class Event
             }
         }
 
-        $objPhpWord->replace('carTaxes', $this->prepareString(ceil($carTaxes, 2)));
+        $objPhpWord->replace('carTaxes', $this->prepareString(ceil($carTaxes)));
         $totalCosts = $objEventInvoice->sleepingTaxes + $objEventInvoice->miscTaxes + $objEventInvoice->railwTaxes + $objEventInvoice->cabelCarTaxes + $objEventInvoice->phoneTaxes + $carTaxes;
-        $objPhpWord->replace('totalCosts', $this->prepareString(ceil($totalCosts, 2)));
+        $objPhpWord->replace('totalCosts', $this->prepareString(ceil($totalCosts)));
 
         // Notice
         $notice = empty($objEventInvoice->notice) ? '---' : $objEventInvoice->notice;
