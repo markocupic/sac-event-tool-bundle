@@ -211,7 +211,7 @@ class Event
             }
         }
 
-        $objPhpWord->replace('carTaxes', $this->prepareString(ceil($carTaxes)));
+        $objPhpWord->replace('carTaxes', $this->prepareString(round($carTaxes, 2)));
         $totalCosts = $objEventInvoice->sleepingTaxes + $objEventInvoice->miscTaxes + $objEventInvoice->railwTaxes + $objEventInvoice->cabelCarTaxes + $objEventInvoice->phoneTaxes + $carTaxes;
         $objPhpWord->replace('totalCosts', $this->prepareString(ceil($totalCosts)));
 
