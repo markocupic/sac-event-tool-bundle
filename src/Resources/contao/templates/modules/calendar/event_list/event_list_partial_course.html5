@@ -16,10 +16,10 @@
         </div>
         <!-- Start right col -->
         <div class="col-sm-9 col-xl-7">
-          <div class="title d-flex align-items-start lh-1">
-            <span class="event-state-icon pt-1" data-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:title="row.eventStateLabel" v-bind:class="row.eventState"> </span>
-            <a v-bind:href="row.eventUrl" target="_blank" class="event-title-link">
-              <h4 class="d-flex headline">
+          <div class="title d-flex align-items-start mb-2">
+            <span class="event-state-icon lh-base pt-1" data-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:title="row.eventStateLabel" v-bind:class="row.eventState"> </span>
+            <a v-bind:href="row.eventUrl" target="_blank" class="event-title-link lh-base">
+              <h4 class="d-flex headline m-0 p-0 lh-base">
                 {{ row.title }}
               </h4>
             </a>

@@ -21,8 +21,8 @@
       <div class="p-4 bg-white">
         <?php if ('' != $this->getEventData('teaser')): ?>
         <!-- indexer::continue -->
-        <div class="teaser event-detail fs-6 mb-4 font-family-serif">
-          <p><?= nl2br($this->getEventData('teaser')) ?></p>
+        <div class="teaser event-detail mb-4">
+          <p><strong><?= nl2br($this->getEventData('teaser')) ?></strong></p>
         </div>
         <!-- indexer::stop -->
         <?php endif; ?>

@@ -13,10 +13,10 @@
         <div class="event-list-tour-col-1" v-bind:onclick="'window.open(\'' + row.eventUrl + '\')'">
           <div class="event-list-badge-wrapper me-4 rounded-circle d-flex align-items-center justify-content-center">
             <div class="d-flex flex-column">
-              <span class="event-list-badge-day small text-center">
+              <span class="event-list-badge-day text-center">
                 <strong v-html="row.startDateDay"></strong>
               </span>
-              <span class="event-list-badge-month text-uppercase small text-center font-weight-bolder">
+              <span class="event-list-badge-month text-uppercase text-center font-weight-bolder">
                 <strong v-html="row.startDateMonth"></strong>
               </span>
             </div>

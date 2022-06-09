@@ -20,8 +20,8 @@
     <!-- indexer::continue -->
     <div class="col-lg-6">
       <?php if ('' != $this->getEventData('teaser')): ?>
-      <div class="teaser event-detail fs-6 mb-3 font-family-serif">
-        <?= nl2br($this->getEventData('teaser')) ?>
+      <div class="teaser event-detail mb-3">
+        <p><strong><?= nl2br($this->getEventData('teaser')) ?></strong></p>
       </div>
       <?php endif; ?>
 
