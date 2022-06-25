@@ -70,9 +70,9 @@
 
       <?php if ($this->tourWaypoints): ?>
       <div class="event-info-box mt-3 d-flex">
-        <i class="fas fa-fw fa-pennant text-primary"></i>
+        <i class="pt-1 fas fa-fw fa-pennant text-primary"></i>
         <div class="ms-2">
-          <h5 class="mt-0">Tourenstationen</h5>
+          <h5 class="mt-0 lh-1">Tourenstationen</h5>
           <div><?= $this->tourWaypoints ?></div>
         </div>
       </div>
@@ -80,9 +80,9 @@
 
       <?php if ($this->tourProfile || $this->tourTechDifficulty): ?>
       <div class="event-info-box mt-3 d-flex">
-        <i class="fas fa-fw fa-hiking text-primary"></i>
+        <i class="pt-1 fas fa-fw fa-hiking text-primary"></i>
         <div class="ms-2">
-          <h5 class="mt-0">Eckdaten</h5>
+          <h5 class="mt-0 lh-1">Eckdaten</h5>
           <div>
             <?php if ($this->tourTechDifficulty): ?>
             <?= $this->tourTechDifficulty ?>{{br}}
@@ -97,9 +97,9 @@
 
       <?php if ($this->tourHighlights): ?>
       <div class="event-info-box mt-3 d-flex">
-        <i class="fas fa-fw fa-star text-primary"></i>
+        <i class="pt-1 fas fa-fw fa-star text-primary"></i>
         <div class="ms-2">
-          <h5 class="mt-0">Highlights/Bemerkungen</h5>
+          <h5 class="mt-0 lh-1">Highlights/Bemerkungen</h5>
           <div><?= $this->tourHighlights ?></div>
         </div>
       </div>
@@ -107,17 +107,17 @@
 
       <?php if ($this->tourPublicTransportInfo): ?>
       <div class="event-info-box mt-3 d-flex">
-        <i class="fas fa-fw fa-tram text-primary"></i>
+        <i class="pt-1 fas fa-fw fa-tram text-primary"></i>
         <div class="ms-2">
-          <h5 class="mt-0">ÖV</h5>
+          <h5 class="mt-0 lh-1">ÖV</h5>
           <div><?= $this->tourPublicTransportInfo ?></div>
         </div>
       </div>
       <?php endif; ?>
 
       <div class="event-info-box mt-3 d-flex">
-        <i class="fas fa-fw fa-info text-primary"></i>
-        <div class="ms-2">
+        <i class="pt-1 fas fa-fw fa-info text-primary"></i>
+        <div class="ms-2 lh-1">
           <a href="{{event_url::<?= $this->eventId ?>}}" target="_blank">Zur Tour-/Kurs-Ausschreibung</a>
         </div>
       </div>
