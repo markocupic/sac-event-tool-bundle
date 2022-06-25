@@ -2,7 +2,7 @@
 
 <?php $this->block('content'); ?>
 
-<p>
+<p class="mt-4 mt-md-0">
     <strong class="text-danger"><?= $this->user->firstname ?>[nbsp]<?= $this->user->lastname ?></strong>
     {{br}}
     <?= $this->user->street ?>
