@@ -54,9 +54,9 @@
     <div class="p-3 mt-4 mt-lg-0 bg-light">
       <?php if ($this->tourTypes): ?>
       <div class="event-info-box mt-0 d-flex">
-        <i class="fas fa-fw fa-mountain text-primary"></i>
+        <i class="pt-1 fas fa-fw fa-mountain text-primary"></i>
         <div class="ms-2">
-          <h5 class="mt-0"><?= $this->tourTypes ?></h5>
+          <h5 class="mt-0 lh-1"><?= $this->tourTypes ?></h5>
           <?php if (!empty($this->eventOrganizers)): ?>
           <div><?= $this->eventOrganizers ?></div>
           <?php endif; ?>
