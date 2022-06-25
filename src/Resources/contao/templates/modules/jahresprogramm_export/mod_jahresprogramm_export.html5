@@ -6,7 +6,7 @@
 
 <script>
   //Set Datepicker
-  var opt = {
+  let opt = {
     dateFormat: "d.m.Y",
     locale: "de",
   };
@@ -33,14 +33,14 @@
   <?php foreach ($this->events as $arrEvent): ?>
   <?php if ($courseTypeLevel0 != $arrEvent['courseTypeLevel0']): ?>
   <tr class="event-export-row-body">
-    <td class="event-export-course-type-level-0" colspan="5" style="text-align:center"><strong><?= strtoupper($arrEvent['courseTypeLevel0']) ?><strong></td>
+    <td class="event-export-course-type-level-0" colspan="5" style="text-align:center"><strong><?= strtoupper($arrEvent['courseTypeLevel0']) ?></strong></td>
   </tr>
   <?php endif; ?>
   <?php $courseTypeLevel0 = $arrEvent['courseTypeLevel0']; ?>
 
   <?php if ($courseTypeLevel1 != $arrEvent['courseTypeLevel1']): ?>
   <tr class="event-export-row-body">
-    <td class="event-export-course-type-level-1" colspan="5" style="text-align:center"><strong><?= $arrEvent['courseTypeLevel1'] ?><strong></td>
+    <td class="event-export-course-type-level-1" colspan="5" style="text-align:center"><strong><?= $arrEvent['courseTypeLevel1'] ?></strong></td>
   </tr>
   <?php endif; ?>
   <?php $courseTypeLevel1 = $arrEvent['courseTypeLevel1']; ?>
@@ -104,7 +104,7 @@
   <?php foreach ($this->events as $arrEvent): ?>
   <?php if ($month != $arrEvent['month']): ?>
   <tr class="event-export-row-month">
-    <td class="event-export-month" colspan="5"><strong><?= strtoupper($arrEvent['month']) ?><strong></td>
+    <td class="event-export-month" colspan="5"><strong><?= strtoupper($arrEvent['month']) ?></strong></td>
   </tr>
   <?php endif; ?>
   <?php $month = $arrEvent['month']; ?>
@@ -200,7 +200,7 @@
   <?php $arrEvent['tourType'] = 'VK'; ?>
   <?php if ($month != $arrEvent['month']): ?>
   <tr class="event-export-row-month">
-    <td class="event-export-month" colspan="5"><strong><?= strtoupper($arrEvent['month']) ?><strong></td>
+    <td class="event-export-month" colspan="5"><strong><?= strtoupper($arrEvent['month']) ?></strong></td>
   </tr>
   <?php endif; ?>
   <?php $month = $arrEvent['month']; ?>
@@ -297,7 +297,7 @@
   <tbody>
   <?php foreach ($this->specialUsers as $arrSpecialUser): ?>
   <tr class="event-export-row-body">
-    <th class="event-export-instuctors-headline" colspan="2"><strong><?= $arrSpecialUser['title'] ?><strong></th>
+    <th class="event-export-instuctors-headline" colspan="2"><strong><?= $arrSpecialUser['title'] ?></strong></th>
   </tr>
   <?php foreach ($arrSpecialUser['users'] as $arrUser): ?>
   <tr class="event-export-row-header">
@@ -329,7 +329,7 @@
   $().ready(function () {
     "use strict";
     $('.do-not-show-row-when-empty').each(function () {
-      if ($(this).text().trim() == '') {
+      if ($(this).text().trim() === '') {
         $(this).closest('tr').remove();
       }
     });
@@ -344,12 +344,12 @@
      * Initialize select2 for the organizer select menu
      * https://select2.org
      */
-    var select2Options = {
+    let select2Options = {
       matcher: matchCustom,
       placeholder: "Rolle auswaehlen"
     };
-    var selectField = $('#ctrl_userRoles');
-    selectField.select2(select2Options);
+      let selectField = $('#ctrl_userRoles');
+      selectField.select2(select2Options);
     // Close dropdown on deselect
     selectField.on('select2:unselect', function () {
       window.setTimeout(function () {
@@ -357,15 +357,8 @@
       }, 100);
     });
 
-    // Disable search field (important if using the plugin with mobile devices)
-    // https://select2.org/searching
-    selectField.on('select2:opening select2:closing', function (event) {
-      var $searchfield = $(this).parent().find('.select2-search__field');
-      //$searchfield.prop('disabled', true);
-    });
-
     function matchCustom(params, data) {
-      // If there are no search terms, return all of the data
+      // If there are no search terms, return all
       if ($.trim(params.term) === '') {
         return data;
       }
@@ -378,8 +371,8 @@
       // `params.term` should be the term that is used for searching
       // `data.text` is the text that is displayed for the data object
       if (data.text.indexOf(params.term) > -1) {
-        var modifiedData = $.extend({}, data, true);
-        modifiedData.text += ' (matched)';
+          let modifiedData = $.extend({}, data, true);
+          modifiedData.text += ' (matched)';
 
         // You can return modified objects from here
         // This includes matching the `children` how you want in nested data sets
