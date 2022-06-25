@@ -46,7 +46,7 @@
   <?php $courseTypeLevel1 = $arrEvent['courseTypeLevel1']; ?>
 
   <tr class="event-export-row-headline">
-    <td class="event-export-date" style="min-width:220px;"><?= $arrEvent['date'] ?></td>
+    <td class="event-export-date" style="min-width:220px;"<?= $arrEvent['date'] ?></td>
     <td class="event-export-title" colspan="3"><?= $arrEvent['title'] ?> / Kursstufe <?= $arrEvent['courseLevel'] ?></td>
     <td class="event-export-organizer-title"><?= $arrEvent['organizerTitle'] ?></td>
   </tr>
@@ -116,7 +116,7 @@
     <td class="event-export-tour-difficulty" style="min-width:150px;"><?= $arrEvent['difficulty'] ?></td>
   </tr>
   <tr class="event-export-row-subheadline">
-    <td class="event-export-date"><?= $arrEvent['tourType'] ?></td>
+    <td class="event-export-date"><?= $arrEvent['tourType'] ?><?php if($arrEvent['journey'] === 'ÖV'): ?>, ÖV-Tour<?php endif; ?></td>
     <td class="event-export-instructors" colspan="3"><?= $arrEvent['instructors'] ?></td>
     <td class="event-export-instructors"><?= $arrEvent['eventId'] ?></td>
   </tr>

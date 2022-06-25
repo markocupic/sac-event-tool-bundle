@@ -337,6 +337,9 @@ class PilatusExport2021Controller extends AbstractPrintExportController
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
 
+        /** @var CalendarEventsJourneyModel $calendarEventsHelperJourneyModelAdapter */
+        $calendarEventsHelperJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
+
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
@@ -387,6 +390,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, false));
             $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent, 'titlePrint'));
             $arrRow['eventId'] = date('Y', (int) $objEvent->startDate).'-'.$objEvent->id;
+            $arrRow['journey'] = null !== $calendarEventsHelperJourneyModelAdapter->findByPk($objEvent->journey) ? $calendarEventsHelperJourneyModelAdapter->findByPk($objEvent->journey)->title : null;
 
             if ('course' === $objEvent->eventType) {
                 $arrRow['eventId'] = $objEvent->courseId;
