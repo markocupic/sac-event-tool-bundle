@@ -511,7 +511,7 @@ class CalendarEvents
                         } elseif ('eventDates' === $field) {
                             $arrTimestamps = CalendarEventsHelper::getEventTimestamps($objEvent->current());
                             $arrDates = array_map(
-                                static fn ($tstamp) => $this->date->parse($this->config->get('dateFormat'), $tstamp),
+                                static fn ($tstamp) => Date::parse(Config::get('dateFormat'), $tstamp),
                                 $arrTimestamps
                             );
                             $arrRow[] = implode(',', $arrDates);
