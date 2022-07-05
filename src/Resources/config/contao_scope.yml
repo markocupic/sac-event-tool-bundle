@@ -1,7 +1,7 @@
 services:
 
     # Get the contao mode (TL_MODE)
-    Markocupic\SacEventToolBundle\ContaoMode\ContaoMode:
+    Markocupic\SacEventToolBundle\ContaoScope\ContaoScope:
         public: true
         arguments:
             - '@contao.framework'

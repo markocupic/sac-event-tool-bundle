@@ -20,7 +20,7 @@ use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Email;
 use Contao\EventReleaseLevelPolicyModel;
-use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
+use Markocupic\SacEventToolBundle\ContaoScope\ContaoScope;
 
 class ChangeEventReleaseLevelListener
 {
@@ -30,17 +30,17 @@ class ChangeEventReleaseLevelListener
     private $framework;
 
     /**
-     * @var ContaoMode
+     * @var ContaoScope
      */
-    private $contaoMode;
+    private $contaoScope;
 
     /**
      * ChangeEventReleaseLevelListener constructor.
      */
-    public function __construct(ContaoFramework $framework, ContaoMode $contaoMode)
+    public function __construct(ContaoFramework $framework, ContaoScope $contaoScope)
     {
         $this->framework = $framework;
-        $this->contaoMode = $contaoMode;
+        $this->contaoScope = $contaoScope;
     }
 
     /**
@@ -48,7 +48,7 @@ class ChangeEventReleaseLevelListener
      */
     public function onChangeEventReleaseLevel(CalendarEventsModel $objEvent, string $strDirection): void
     {
-        if ($this->contaoMode->isBackend()) {
+        if ($this->contaoScope->isBackend()) {
             $eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
             $backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
             $configAdapter = $this->framework->getAdapter(Config::class);

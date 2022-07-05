@@ -22,7 +22,7 @@ use Contao\Database;
 use Contao\Date;
 use Contao\System;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
+use Markocupic\SacEventToolBundle\ContaoScope\ContaoScope;
 
 class GetSystemMessagesListener
 {
@@ -32,17 +32,17 @@ class GetSystemMessagesListener
     private $framework;
 
     /**
-     * @var ContaoMode;
+     * @var ContaoScope;
      */
-    private $contaoMode;
+    private $contaoScope;
 
     /**
      * GetSystemMessagesListener constructor.
      */
-    public function __construct(ContaoFramework $framework, ContaoMode $contaoMode)
+    public function __construct(ContaoFramework $framework, ContaoScope $contaoScope)
     {
         $this->framework = $framework;
-        $this->contaoMode = $contaoMode;
+        $this->contaoScope = $contaoScope;
     }
 
     /**
@@ -54,7 +54,7 @@ class GetSystemMessagesListener
     {
         $strBuffer = '';
 
-        if ($this->contaoMode->isBackend()) {
+        if ($this->contaoScope->isBackend()) {
             $backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
             $databaseAdapter = $this->framework->getAdapter(Database::class);
             $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);

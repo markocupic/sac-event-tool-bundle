@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
-use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
+use Markocupic\SacEventToolBundle\ContaoScope\ContaoScope;
 use Markocupic\SacEventToolBundle\Cron\Contao\DailyCron;
 use Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron;
 
 $projectDir = System::getContainer()->getParameter('kernel.project_dir');
 
-/** @var ContaoMode $contaoMode */
-$contaoMode = System::getContainer()->get('Markocupic\SacEventToolBundle\ContaoMode\ContaoMode');
+/** @var ContaoScope $contaoScope */
+$contaoScope = System::getContainer()->get('Markocupic\SacEventToolBundle\ContaoScope\ContaoScope');
 
 // Add notification center configs
 require_once $projectDir.'/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/config/notification_center_config.php';
@@ -29,7 +29,7 @@ require_once $projectDir.'/vendor/markocupic/sac-event-tool-bundle/src/Resources
 // include custom functions
 require_once $projectDir.'/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/functions/functions.php';
 
-if ($contaoMode->isBackend()) {
+if ($contaoScope->isBackend()) {
     // Add Backend CSS
     $GLOBALS['TL_CSS'][] = 'bundles/markocupicsaceventtool/css/be_stylesheet.css|static';
 

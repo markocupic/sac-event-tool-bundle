@@ -28,7 +28,7 @@ services:
         public: true
         arguments:
             - '@contao.framework'
-            - '@Markocupic\SacEventToolBundle\ContaoMode\ContaoMode'
+            - '@Markocupic\SacEventToolBundle\ContaoScope\ContaoScope'
         tags:
             - { name: kernel.event_listener, event: contao.change_event_release_level, method: onChangeEventReleaseLevel }
 
@@ -37,7 +37,7 @@ services:
         public: true
         arguments:
             - '@contao.framework'
-            - '@Markocupic\SacEventToolBundle\ContaoMode\ContaoMode'
+            - '@Markocupic\SacEventToolBundle\ContaoScope\ContaoScope'
         tags:
             - { name: kernel.event_listener, event: contao.publish_event, method: onPublishEvent }
 
@@ -57,7 +57,7 @@ services:
         public: true
         arguments:
             - '@contao.framework'
-            - '@Markocupic\SacEventToolBundle\ContaoMode\ContaoMode'
+            - '@Markocupic\SacEventToolBundle\ContaoScope\ContaoScope'
 
         tags:
             - { name: kernel.event_listener, event: get_system_messages_listener, method: listUntreatedEventSubscriptions }
