@@ -42,6 +42,7 @@ class MarkocupicSacEventToolExtension extends Extension
             $container,
             new FileLocator(__DIR__.'/../Resources/config')
         );
+
         $loader->load('security.yml');
         $loader->load('listener.yml');
         $loader->load('subscriber.yml');
@@ -56,6 +57,7 @@ class MarkocupicSacEventToolExtension extends Extension
         $loader->load('contao_scope.yml');
         $loader->load('services.yml');
         $loader->load('data_container.yml');
+        $loader->load('twig.yml');
 
         // Friendly configuration
         $rootKey = $this->getAlias();

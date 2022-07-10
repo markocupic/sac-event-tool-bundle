@@ -1,0 +1,10 @@
+services:
+
+    # Twig extensions
+    Markocupic\SacEventToolBundle\Twig\TwigHelper:
+        arguments:
+            - '@contao.framework'
+        tags:
+            - { name: twig.extension }
+
+

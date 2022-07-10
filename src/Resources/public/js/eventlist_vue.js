@@ -45,6 +45,7 @@ class VueTourList {
         // Instantiate vue.js application
         new Vue({
             el: elId,
+            delimiters: ["<%", "%>"],
             created: function created() {
                 let self = this;
 
