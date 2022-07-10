@@ -17,57 +17,57 @@ declare(strict_types=1);
  */
 $GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = [
     'config' => [
-        'dataContainer'     => 'Table',
-        'notCopyable'       => true,
-        'ptable'            => 'tl_calendar_events',
+        'dataContainer' => 'Table',
+        'notCopyable' => true,
+        'ptable' => 'tl_calendar_events',
         // Do not copy nor delete records, if an item has been deleted!
-        'onload_callback'   => [],
+        'onload_callback' => [],
         'onsubmit_callback' => [],
         'ondelete_callback' => [],
-        'sql'               => [
+        'sql' => [
             'keys' => [
-                'id'     => 'primary',
-                'pid'    => 'index',
+                'id' => 'primary',
+                'pid' => 'index',
                 'userId' => 'index',
             ],
         ],
     ],
     // List
-    'list'   => [
-        'sorting'           => [],
-        'label'             => [],
+    'list' => [
+        'sorting' => [],
+        'label' => [],
         'global_operations' => [
             'all' => [
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
         ],
-        'operations'        => [
-            'edit'   => [
+        'operations' => [
+            'edit' => [
                 'href' => 'act=edit',
                 'icon' => 'edit.svg',
             ],
             'delete' => [
-                'href'       => 'act=delete',
-                'icon'       => 'delete.svg',
+                'href' => 'act=delete',
+                'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
             ],
         ],
     ],
     'fields' => [
-        'id'               => [
+        'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         // Parent: tl_calendar_events.id
-        'pid'              => [
+        'pid' => [
             'sql' => 'int(10) unsigned NOT NULL default 0',
         ],
-        'tstamp'           => [
+        'tstamp' => [
             'sql' => 'int(10) unsigned NOT NULL default 0',
         ],
         // Parent tl_user.id
-        'userId'           => [
+        'userId' => [
             'sql' => 'int(10) unsigned NOT NULL default 0',
         ],
         'isMainInstructor' => [

@@ -10,7 +10,7 @@
 
       <div class="event-list-inner-box d-flex p-3 mb-3">
         <!-- left col -->
-        <div class="event-list-tour-col-1" v-bind:onclick="'window.open(\'' + row.eventUrl + '\')'">
+        <div class="event-list-tour-col-1" data-has-event-href="true" v-bind:data-href="row.eventUrl">
           <div class="event-list-badge-wrapper me-4 rounded-circle d-flex align-items-center justify-content-center">
             <div class="d-flex flex-column">
               <span class="event-list-badge-day text-center lh-1">
@@ -45,7 +45,7 @@
             <span data-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:title="row.eventStateLabel">
               <i class="event-state-icon fa-fw" v-bind:class="row.eventState"></i>
             </span>
-            <a v-bind:href="row.eventUrl" target="_blank" class="event-title-link font-weight-bold"><strong>{{ row.eventTitle }}</strong></a>
+            <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link font-weight-bold"><strong>{{ row.eventTitle }}</strong></a>
           </div>
           <!-- end row state icon -->
 
@@ -97,51 +97,104 @@
 </div>
 
 
-<!-- Set up the Vuejs tour list -->
+<!-- Set up the vue.js tour list -->
 <script>
-    new VueTourList('#tour-list', {
-        'apiParams': {
-            'organizers': [<?= $this->apiParam['organizers'] ?>],
+  new VueTourList('#tour-list', {
+  'apiParams': {
+    'organizers': [<?= $this->apiParam['organizers'] ?>],
     'eventType': [<?= $this->apiParam['eventType'] ?>],
     'suitableForBeginners': '<?= $this->apiParam['suitableForBeginners'] ?>',
-        'tourType': '<?= $this->apiParam['tourType'] ?>',
-        'courseType': '<?= $this->apiParam['courseType'] ?>',
-        'courseId': '<?= $this->apiParam['courseId'] ?>',
-        'year': '<?= $this->apiParam['year'] ?>',
-        'dateStart': '<?= $this->apiParam['dateStart'] ?>',
-        'textsearch': '<?= $this->apiParam['textsearch'] ?>',
-        'eventId': '<?= $this->apiParam['eventId'] ?>',
-        'arrIds': [<?= $this->apiParam['arrIds'] ?>],
+    'tourType': '<?= $this->apiParam['tourType'] ?>',
+    'courseType': '<?= $this->apiParam['courseType'] ?>',
+    'courseId': '<?= $this->apiParam['courseId'] ?>',
+    'year': '<?= $this->apiParam['year'] ?>',
+    'dateStart': '<?= $this->apiParam['dateStart'] ?>',
+    'textsearch': '<?= $this->apiParam['textsearch'] ?>',
+    'eventId': '<?= $this->apiParam['eventId'] ?>',
+    'arrIds': [<?= $this->apiParam['arrIds'] ?>],
     'username': '<?= $this->apiParam['username'] ?>',
-        'calendarIds': [<?= $this->apiParam['calendarIds'] ?>],
+    'calendarIds': [<?= $this->apiParam['calendarIds'] ?>],
     'limit': '<?= $this->apiParam['limit'] ?>',
-        'offset': '0',
-    },
-    'fields': [
-        'title',
-        'startDateDay',
-        'startDateMonth',
-        'eventType',
-        'eventTitle',
-        'eventUrl',
-        'instructors',
-        'tourTypesShortcuts',
-        'tourTechDifficulties',
-        'bookingCounter',
-        'id',
-        'eventState',
-        'eventStateLabel',
-        'eventDuration',
-        'eventPeriodLgInline',
-        'tourTypesIds',
-        'suitableForBeginners',
-    ],
-        'callbacks': {
-        'oninsert': function (vue, json) {
-            window.setTimeout(function () {
-                $('[data-toggle="tooltip"]').tooltip();
-            }, 100);
-        }
-    }
-    });
+    'offset': '0',
+  },
+  'fields': [
+    'title',
+    'startDateDay',
+    'startDateMonth',
+    'eventType',
+    'eventTitle',
+    'eventUrl',
+    'instructors',
+    'tourTypesShortcuts',
+    'tourTechDifficulties',
+    'bookingCounter',
+    'id',
+    'eventState',
+    'eventStateLabel',
+    'eventDuration',
+    'eventPeriodLgInline',
+    'tourTypesIds',
+    'suitableForBeginners',
+  ],
+  'callbacks': {
+    'oninsert': function (vue, json) {
+      window.setTimeout(function () {
+          jQuery('[data-toggle="tooltip"]').tooltip();
+      }, 200);
+
+      window.setTimeout(function () {
+
+        // Cache the event list object in the localStorage
+        // before redirecting to the detail page
+        let buttons = document.querySelectorAll('[data-has-event-href="true"]');
+        buttons.forEach((button) => {
+          button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            let link = button.getAttribute('data-href');
+
+            let eventBox = button.closest('.event-item');
+            let eventId = eventBox.dataset.id;
+
+            let url = new URL(window.location.href);
+            let urlParams = new URLSearchParams(url.search);
+            let href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+
+            if (urlParams.has('itemId'))
+            {
+                urlParams.set('itemId', eventId);
+            } else {
+                urlParams.append('itemId', eventId);
+            }
+
+            // Current URL: https://my-website.com/page_a.html?event=200
+            const nextURL = href + '?' + urlParams.toString();
+            const nextTitle = document.title; // keep the same title
+
+            // This will create a new entry in the browser's history, without reloading
+            window.history.replaceState({}, nextTitle, nextURL);
+
+            let vueInstance = {
+              'rows': vue.rows,
+              'arrEventIds': vue.arrEventIds,
+              'itemsTotal': vue.itemsTotal,
+              'loadedItems': vue.loadedItems,
+              'blnAllEventsLoaded': vue.blnAllEventsLoaded,
+              'expiry': Date.now() + 5 * 60 * 1000,
+            }
+
+            localStorage.setItem(btoa(nextURL), JSON.stringify(vueInstance));
+
+            // Redirect to detail page
+            window.location.href = link;
+
+          });
+        });
+      }, 200);
+
+      }
+  },
+});
+
+
 </script>

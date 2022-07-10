@@ -13,37 +13,37 @@ declare(strict_types=1);
  */
 
 $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
-    'config'   => [
-        'dataContainer'    => 'Table',
-        'ctable'           => ['tl_event_release_level_policy'],
-        'switchToEdit'     => true,
+    'config' => [
+        'dataContainer' => 'Table',
+        'ctable' => ['tl_event_release_level_policy'],
+        'switchToEdit' => true,
         'enableVersioning' => true,
-        'sql'              => [
+        'sql' => [
             'keys' => [
                 'id' => 'primary',
             ],
         ],
     ],
-    'list'     => [
-        'sorting'           => [
-            'mode'        => 1,
-            'fields'      => ['title'],
-            'flag'        => 1,
+    'list' => [
+        'sorting' => [
+            'mode' => 1,
+            'fields' => ['title'],
+            'flag' => 1,
             'panelLayout' => 'filter;search,limit',
         ],
-        'label'             => [
+        'label' => [
             'fields' => ['title'],
             'format' => '%s',
         ],
         'global_operations' => [
             'all' => [
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
         ],
-        'operations'        => [
-            'edit'       => [
+        'operations' => [
+            'edit' => [
                 'href' => 'table=tl_event_release_level_policy',
                 'icon' => 'edit.svg',
             ],
@@ -51,16 +51,16 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
                 'href' => 'table=tl_event_release_level_policy_package&amp;act=edit',
                 'icon' => 'header.svg',
             ],
-            'copy'       => [
+            'copy' => [
                 'href' => 'act=paste&amp;mode=copy',
                 'icon' => 'copy.svg',
             ],
-            'delete'     => [
-                'href'       => 'act=delete',
-                'icon'       => 'delete.svg',
+            'delete' => [
+                'href' => 'act=delete',
+                'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
             ],
-            'show'       => [
+            'show' => [
                 'href' => 'act=show',
                 'icon' => 'show.svg',
             ],
@@ -69,20 +69,20 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
     'palettes' => [
         'default' => '{title_legend},title;',
     ],
-    'fields'   => [
-        'id'     => [
+    'fields' => [
+        'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'title'  => [
+        'title' => [
             'inputType' => 'text',
-            'exclude'   => true,
-            'search'    => true,
-            'flag'      => 1,
-            'eval'      => ['mandatory' => true, 'rgxp' => 'alnum', 'maxlength' => 64, 'tl_class' => 'w50'],
-            'sql'       => 'varchar(64) NULL',
+            'exclude' => true,
+            'search' => true,
+            'flag' => 1,
+            'eval' => ['mandatory' => true, 'rgxp' => 'alnum', 'maxlength' => 64, 'tl_class' => 'w50'],
+            'sql' => 'varchar(64) NULL',
         ],
     ],
 ];

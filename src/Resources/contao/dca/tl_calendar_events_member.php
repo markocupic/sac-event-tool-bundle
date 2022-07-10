@@ -25,383 +25,383 @@ System::loadLanguageFile('tl_member');
  * Table tl_calendar_events_member
  */
 $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
-    'config'      => [
+    'config' => [
         'dataContainer' => 'Table',
-        'notCopyable'   => true,
-        'sql'           => [
+        'notCopyable' => true,
+        'sql' => [
             'keys' => [
-                'id'            => 'primary',
+                'id' => 'primary',
                 'email,eventId' => 'index',
             ],
         ],
     ],
-    'list'        => [
-        'sorting'           => [
-            'mode'        => DataContainer::SORT_INITIAL_LETTER_DESC,
-            'fields'      => ['stateOfSubscription', 'dateAdded', 'lastname', 'firstname'],
-            'flag'        => 1,
+    'list' => [
+        'sorting' => [
+            'mode' => DataContainer::SORT_INITIAL_LETTER_DESC,
+            'fields' => ['stateOfSubscription', 'dateAdded', 'lastname', 'firstname'],
+            'flag' => 1,
             'panelLayout' => 'filter;sort,search',
-            'filter'      => [['eventId=?', Input::get('id')]],
+            'filter' => [['eventId=?', Input::get('id')]],
         ],
-        'label'             => [
-            'fields'      => ['stateOfSubscription', 'firstname', 'lastname', 'street', 'city'],
+        'label' => [
+            'fields' => ['stateOfSubscription', 'firstname', 'lastname', 'street', 'city'],
             'showColumns' => true,
         ],
         'global_operations' => [
-            'all'                          => [
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
+            'all' => [
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
             'downloadEventMemberList2Docx' => [
-                'href'       => 'action=downloadEventMemberListDocx',
-                'class'      => 'download_registration_list',
-                'icon'       => Bundle::ASSET_DIR.'/icons/docx.png',
+                'href' => 'action=downloadEventMemberListDocx',
+                'class' => 'download_registration_list',
+                'icon' => Bundle::ASSET_DIR.'/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'downloadEventMemberList2Csv'  => [
-                'href'       => 'action=downloadEventMemberListCsv',
-                'class'      => 'header_icon',
-                'icon'       => Bundle::ASSET_DIR.'/icons/excel.svg',
+            'downloadEventMemberList2Csv' => [
+                'href' => 'action=downloadEventMemberListCsv',
+                'class' => 'header_icon',
+                'icon' => Bundle::ASSET_DIR.'/icons/excel.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'writeTourReport'              => [
-                'href'       => 'table=tl_calendar_events&amp;&act=edit&amp;call=writeTourReport&amp;id=%d',
-                'class'      => 'writeTourRapport',
-                'icon'       => 'edit.svg',
+            'writeTourReport' => [
+                'href' => 'table=tl_calendar_events&amp;&act=edit&amp;call=writeTourReport&amp;id=%d',
+                'class' => 'writeTourRapport',
+                'icon' => 'edit.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'printInstructorInvoice'       => [
-                'href'       => 'table=tl_calendar_events_instructor_invoice&amp;id=%d',
-                'class'      => 'printInstructorInvoice',
-                'icon'       => Bundle::ASSET_DIR.'/icons/docx.png',
+            'printInstructorInvoice' => [
+                'href' => 'table=tl_calendar_events_instructor_invoice&amp;id=%d',
+                'class' => 'printInstructorInvoice',
+                'icon' => Bundle::ASSET_DIR.'/icons/docx.png',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'sendEmail'                    => [
-                'href'       => 'act=edit&action=sendEmail',
-                'class'      => 'send_email',
-                'icon'       => Bundle::ASSET_DIR.'/icons/enveloppe.svg',
+            'sendEmail' => [
+                'href' => 'act=edit&action=sendEmail',
+                'class' => 'send_email',
+                'icon' => Bundle::ASSET_DIR.'/icons/enveloppe.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
-            'backToEventSettings'          => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
-                'href'       => 'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
-                'icon'       => Bundle::ASSET_DIR.'/icons/back.svg',
+            'backToEventSettings' => [
+                'label' => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
+                'href' => 'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
+                'icon' => Bundle::ASSET_DIR.'/icons/back.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
             ],
         ],
-        'operations'        => [
-            'edit'                       => [
+        'operations' => [
+            'edit' => [
                 'href' => 'act=edit',
                 'icon' => 'edit.svg',
             ],
-            'delete'                     => [
-                'href'       => 'act=delete',
-                'icon'       => 'delete.svg',
+            'delete' => [
+                'href' => 'act=delete',
+                'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
             ],
             // Regular "toggle" operation but without "icon" and with the haste specific params
             'toggleStateOfParticipation' => [
-                'attributes'           => 'onclick="Backend.getScrollOffset();"',
+                'attributes' => 'onclick="Backend.getScrollOffset();"',
                 'haste_ajax_operation' => [
-                    'field'   => 'hasParticipated',
+                    'field' => 'hasParticipated',
                     'options' => [
                         [
                             'value' => '',
-                            'icon'  => Bundle::ASSET_DIR.'/icons/has-not-participated.svg',
+                            'icon' => Bundle::ASSET_DIR.'/icons/has-not-participated.svg',
                         ],
                         [
                             'value' => '1',
-                            'icon'  => Bundle::ASSET_DIR.'/icons/has-participated.svg',
+                            'icon' => Bundle::ASSET_DIR.'/icons/has-participated.svg',
                         ],
                     ],
                 ],
             ],
-            'show'                       => [
+            'show' => [
                 'href' => 'act=show',
                 'icon' => 'show.svg',
             ],
         ],
     ],
-    'palettes'    => [
-        '__selector__'    => ['addEmailAttachment', 'hasLeadClimbingEducation', 'hasPaid'],
-        'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,dateAdded,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionId,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
-        'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy',
+    'palettes' => [
+        '__selector__' => ['addEmailAttachment', 'hasLeadClimbingEducation', 'hasPaid'],
+        'default' => '{stateOfSubscription_legend},dashboard,stateOfSubscription,dateAdded,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionId,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
+        'sendEmail' => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy',
         'refuseWithEmail' => '{refuseWithEmail_legend},refuseWithEmail',
         'acceptWithEmail' => '{acceptWithEmail_legend},acceptWithEmail',
-        'addToWaitlist'   => '{addToWaitlist_legend},addToWaitlist',
+        'addToWaitlist' => '{addToWaitlist_legend},addToWaitlist',
     ],
     'subpalettes' => [
-        'addEmailAttachment'       => 'emailAttachment',
+        'addEmailAttachment' => 'emailAttachment',
         'hasLeadClimbingEducation' => 'dateOfLeadClimbingEducation',
-        'hasPaid'                  => 'paymentMethod',
+        'hasPaid' => 'paymentMethod',
     ],
-    'fields'      => [
-        'id'                          => [
+    'fields' => [
+        'id' => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'tstamp'                      => [
+        'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'uuid'                        => [
+        'uuid' => [
             'inputType' => 'text',
-            'default'   => Uuid::uuid4()->toString(),
-            'eval'      => ['unique' => true, 'doNotCopy' => true],
-            'sql'       => "char(36) NOT NULL default ''",
+            'default' => Uuid::uuid4()->toString(),
+            'eval' => ['unique' => true, 'doNotCopy' => true],
+            'sql' => "char(36) NOT NULL default ''",
         ],
-        'contaoMemberId'              => [
+        'contaoMemberId' => [
             'foreignKey' => "tl_member.CONCAT(firstname, ' ', lastname)",
-            'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
-            'eval'       => ['readonly' => true],
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
+            'eval' => ['readonly' => true],
         ],
-        'eventId'                     => [
+        'eventId' => [
             'foreignKey' => 'tl_calendar_events.title',
-            'sql'        => "int(10) unsigned NOT NULL default '0'",
-            'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
-            'eval'       => ['doNotShow' => true, 'readonly' => true],
+            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
+            'eval' => ['doNotShow' => true, 'readonly' => true],
         ],
-        'eventName'                   => [
+        'eventName' => [
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'dateAdded'                   => [
+        'dateAdded' => [
             'inputType' => 'text',
-            'flag'      => 5,
-            'sorting'   => true,
-            'eval'      => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql'       => 'int(10) unsigned NOT NULL default 0',
+            'flag' => 5,
+            'sorting' => true,
+            'eval' => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+            'sql' => 'int(10) unsigned NOT NULL default 0',
         ],
-        'stateOfSubscription'         => [
-            'filter'    => true,
-            'sorting'   => true,
+        'stateOfSubscription' => [
+            'filter' => true,
+            'sorting' => true,
             'inputType' => 'select',
-            'default'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'][0],
+            'default' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'][0],
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
-            'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'],
-            'eval'      => ['doNotShow' => false, 'readonly' => false, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'],
+            'eval' => ['doNotShow' => false, 'readonly' => false, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'gender'                      => [
+        'gender' => [
             'inputType' => 'select',
-            'sorting'   => true,
-            'options'   => ['male', 'female'],
+            'sorting' => true,
+            'options' => ['male', 'female'],
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
-            'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(32) NOT NULL default ''",
+            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+            'sql' => "varchar(32) NOT NULL default ''",
         ],
-        'firstname'                   => [
+        'firstname' => [
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'lastname'                    => [
+        'lastname' => [
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'dateOfBirth'                 => [
-            'sorting'   => true,
-            'flag'      => 5,
+        'dateOfBirth' => [
+            'sorting' => true,
+            'flag' => 5,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => false, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql'       => "varchar(11) NOT NULL default ''",
+            'eval' => ['mandatory' => false, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+            'sql' => "varchar(11) NOT NULL default ''",
         ],
-        'street'                      => [
+        'street' => [
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'postal'                      => [
+        'postal' => [
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 32, 'tl_class' => 'w50'],
-            'sql'       => "varchar(32) NOT NULL default ''",
+            'eval' => ['mandatory' => true, 'maxlength' => 32, 'tl_class' => 'w50'],
+            'sql' => "varchar(32) NOT NULL default ''",
         ],
-        'city'                        => [
+        'city' => [
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'email'                       => [
+        'email' => [
             'inputType' => 'text',
-            'eval'      => ['mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'mobile'                      => [
+        'mobile' => [
             'inputType' => 'text',
-            'eval'      => ['mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(64) NOT NULL default ''",
+            'eval' => ['mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
+            'sql' => "varchar(64) NOT NULL default ''",
         ],
-        'sectionId'                   => [
-            'sorting'   => true,
-            'exclude'   => true,
+        'sectionId' => [
+            'sorting' => true,
+            'exclude' => true,
             'inputType' => 'select',
-            'eval'      => ['multiple' => true, 'chosen' => true, 'doNotCopy' => true, 'readonly' => false, 'tl_class' => 'w50'],
-            'sql'       => 'blob NULL',
+            'eval' => ['multiple' => true, 'chosen' => true, 'doNotCopy' => true, 'readonly' => false, 'tl_class' => 'w50'],
+            'sql' => 'blob NULL',
         ],
-        'sacMemberId'                 => [
+        'sacMemberId' => [
             'inputType' => 'text',
-            'eval'      => ['doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'notes'                       => [
-            'exclude'   => true,
+        'notes' => [
+            'exclude' => true,
             'inputType' => 'textarea',
-            'eval'      => ['tl_class' => 'clr', 'maxlength' => 5000, 'decodeEntities' => true, 'mandatory' => false],
-            'sql'       => 'text NULL',
+            'eval' => ['tl_class' => 'clr', 'maxlength' => 5000, 'decodeEntities' => true, 'mandatory' => false],
+            'sql' => 'text NULL',
         ],
-        'emergencyPhone'              => [
+        'emergencyPhone' => [
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(64) NOT NULL default ''",
+            'eval' => ['mandatory' => true, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
+            'sql' => "varchar(64) NOT NULL default ''",
         ],
-        'emergencyPhoneName'          => [
+        'emergencyPhoneName' => [
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'decodeEntities' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'decodeEntities' => true, 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'instructorNotes'             => [
-            'exclude'   => true,
+        'instructorNotes' => [
+            'exclude' => true,
             'inputType' => 'textarea',
-            'eval'      => ['tl_class' => 'clr', 'maxlength' => 5000, 'decodeEntities' => true, 'mandatory' => false],
-            'sql'       => 'text NULL',
+            'eval' => ['tl_class' => 'clr', 'maxlength' => 5000, 'decodeEntities' => true, 'mandatory' => false],
+            'sql' => 'text NULL',
         ],
-        'hasLeadClimbingEducation'    => [
-            'exclude'   => true,
-            'filter'    => true,
-            'sorting'   => true,
+        'hasLeadClimbingEducation' => [
+            'exclude' => true,
+            'filter' => true,
+            'sorting' => true,
             'inputType' => 'checkbox',
-            'eval'      => ['submitOnChange' => true],
-            'sql'       => "char(1) NOT NULL default ''",
+            'eval' => ['submitOnChange' => true],
+            'sql' => "char(1) NOT NULL default ''",
         ],
         'dateOfLeadClimbingEducation' => [
-            'exclude'   => true,
+            'exclude' => true,
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql'       => "varchar(11) NOT NULL default ''",
+            'eval' => ['mandatory' => true, 'rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+            'sql' => "varchar(11) NOT NULL default ''",
         ],
-        'agb'                         => [
+        'agb' => [
             'inputType' => 'checkbox',
-            'eval'      => ['doNotShow' => true, 'doNotCopy' => true],
-            'sql'       => "char(1) NOT NULL default ''",
+            'eval' => ['doNotShow' => true, 'doNotCopy' => true],
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'ahvNumber'                   => [
+        'ahvNumber' => [
             'inputType' => 'text',
-            'eval'      => ['mandatory' => false, 'maxlength' => 16, 'unique' => false, 'decodeEntities' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['mandatory' => false, 'maxlength' => 16, 'unique' => false, 'decodeEntities' => true, 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'foodHabits'                  => [
-            'exclude'   => true,
-            'search'    => true,
+        'foodHabits' => [
+            'exclude' => true,
+            'search' => true,
             'inputType' => 'text',
-            'eval'      => ['tl_class' => 'clr', 'maxlength' => 5000],
-            'sql'       => 'text NULL',
+            'eval' => ['tl_class' => 'clr', 'maxlength' => 5000],
+            'sql' => 'text NULL',
         ],
-        'ticketInfo'                  => [
+        'ticketInfo' => [
             'inputType' => 'select',
-            'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
-            'eval'      => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
+            'eval' => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'carInfo'                     => [
+        'carInfo' => [
             'inputType' => 'select',
-            'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
-            'eval'      => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
+            'eval' => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'hasParticipated'             => [
+        'hasParticipated' => [
             'inputType' => 'checkbox',
-            'eval'      => ['doNotShow' => false, 'submitOnChange' => true, 'doNotCopy' => true],
-            'sql'       => "char(1) NOT NULL default ''",
+            'eval' => ['doNotShow' => false, 'submitOnChange' => true, 'doNotCopy' => true],
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'hasPaid'                     => [
-            'exclude'   => true,
-            'filter'    => true,
+        'hasPaid' => [
+            'exclude' => true,
+            'filter' => true,
             'inputType' => 'checkbox',
-            'eval'      => ['submitOnChange' => true, 'tl_class' => 'clr m12', 'mandatory' => false],
-            'sql'       => "char(1) NOT NULL default ''",
+            'eval' => ['submitOnChange' => true, 'tl_class' => 'clr m12', 'mandatory' => false],
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'paymentMethod'               => [
+        'paymentMethod' => [
             'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
-            'exclude'   => true,
+            'exclude' => true,
             'inputType' => 'select',
-            'options'   => ['cashPayment', 'bankTransfer', 'twint'],
-            'eval'      => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(32) NOT NULL default ''",
+            'options' => ['cashPayment', 'bankTransfer', 'twint'],
+            'eval' => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'w50'],
+            'sql' => "varchar(32) NOT NULL default ''",
         ],
-        'bookingType'                 => [
-            'exclude'   => true,
+        'bookingType' => [
+            'exclude' => true,
             'inputType' => 'select',
             'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
-            'options'   => ['onlineForm', 'manually'],
-            'eval'      => ['doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true],
-            'sql'       => "varchar(255) NOT NULL default 'manually'",
+            'options' => ['onlineForm', 'manually'],
+            'eval' => ['doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true],
+            'sql' => "varchar(255) NOT NULL default 'manually'",
         ],
-        'allowMultiSignUp'            => [
+        'allowMultiSignUp' => [
             'inputType' => 'checkbox',
-            'eval'      => ['submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'long clr'],
-            'sql'       => "char(1) NOT NULL default ''",
+            'eval' => ['submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'long clr'],
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'acceptWithEmail'             => [
+        'acceptWithEmail' => [
             'inputType' => 'text',
-            'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'refuseWithEmail'             => [
+        'refuseWithEmail' => [
             'inputType' => 'text',
-            'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'addToWaitlist'               => [
+        'addToWaitlist' => [
             'inputType' => 'text',
-            'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'emailRecipients'             => [
-            'options'   => [],
+        'emailRecipients' => [
+            'options' => [],
             // Set via onload callback
             'inputType' => 'checkbox',
-            'eval'      => ['multiple' => true, 'mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''],
-            'sql'       => 'blob NULL',
+            'eval' => ['multiple' => true, 'mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''],
+            'sql' => 'blob NULL',
         ],
-        'emailSubject'                => [
+        'emailSubject' => [
             'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['mandatory' => true, 'maxlength' => 255, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'emailText'                   => [
+        'emailText' => [
             'inputType' => 'textarea',
-            'eval'      => ['mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'rows' => 6, 'style' => 'height:50px', 'tl_class' => ''],
-            'sql'       => 'mediumtext NULL',
+            'eval' => ['mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'rows' => 6, 'style' => 'height:50px', 'tl_class' => ''],
+            'sql' => 'mediumtext NULL',
         ],
-        'addEmailAttachment'          => [
-            'exclude'   => true,
-            'filter'    => true,
+        'addEmailAttachment' => [
+            'exclude' => true,
+            'filter' => true,
             'inputType' => 'checkbox',
-            'eval'      => ['doNotShow' => true, 'submitOnChange' => true],
-            'sql'       => "char(1) NOT NULL default ''",
+            'eval' => ['doNotShow' => true, 'submitOnChange' => true],
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'emailAttachment'             => [
-            'exclude'   => true,
+        'emailAttachment' => [
+            'exclude' => true,
             'inputType' => 'fileTree',
-            'eval'      => ['doNotShow' => true, 'multiple' => true, 'fieldType' => 'checkbox', 'extensions' => Config::get('allowedDownload'), 'files' => true, 'filesOnly' => true, 'mandatory' => true],
-            'sql'       => 'binary(16) NULL',
+            'eval' => ['doNotShow' => true, 'multiple' => true, 'fieldType' => 'checkbox', 'extensions' => Config::get('allowedDownload'), 'files' => true, 'filesOnly' => true, 'mandatory' => true],
+            'sql' => 'binary(16) NULL',
         ],
-        'emailSendCopy'               => [
+        'emailSendCopy' => [
             'inputType' => 'checkbox',
-            'eval'      => ['doNotShow' => true, 'doNotCopy' => true],
-            'sql'       => "char(1) NOT NULL default ''",
+            'eval' => ['doNotShow' => true, 'doNotCopy' => true],
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'anonymized'                  => [
+        'anonymized' => [
             'inputType' => 'checkbox',
-            'eval'      => ['doNotShow' => true, 'doNotCopy' => true],
-            'sql'       => "char(1) NOT NULL default ''",
+            'eval' => ['doNotShow' => true, 'doNotCopy' => true],
+            'sql' => "char(1) NOT NULL default ''",
         ],
-        'dashboard'                   => [
+        'dashboard' => [
             'inputType' => 'text',
-            'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''",
+            'eval' => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql' => "varchar(255) NOT NULL default ''",
         ],
     ],
 ];
