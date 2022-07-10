@@ -31,7 +31,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class EventApiController extends AbstractController
 {
-https://github.com/jonasmueller1/sac-pilatus-website/issues/17    public const CACHE_MAX_AGE = 300;
+    public const CACHE_MAX_AGE = 300;
 
     private ContaoFramework $framework;
     private RequestStack $requestStack;
