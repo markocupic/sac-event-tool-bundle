@@ -13,30 +13,30 @@ declare(strict_types=1);
  */
 
 $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
-    'config' => [
-        'dataContainer' => 'Table',
-        'ptable' => 'tl_tour_difficulty_category',
-        'doNotCopyRecords' => true,
-        'enableVersioning' => true,
-        'switchToEdit' => true,
+    'config'   => [
+        'dataContainer'      => 'Table',
+        'ptable'             => 'tl_tour_difficulty_category',
+        'doNotCopyRecords'   => true,
+        'enableVersioning'   => true,
+        'switchToEdit'       => true,
         'doNotDeleteRecords' => true,
-        'sql' => [
+        'sql'                => [
             'keys' => [
                 'id' => 'primary',
             ],
         ],
     ],
-    'list' => [
-        'sorting' => [
-            'mode' => 4,
-            'fields' => ['code ASC'],
-            'flag' => 1,
-            'panelLayout' => 'filter;sort,search,limit',
-            'headerFields' => ['level', 'title'],
+    'list'     => [
+        'sorting'           => [
+            'mode'            => 4,
+            'fields'          => ['code ASC'],
+            'flag'            => 1,
+            'panelLayout'     => 'filter;sort,search,limit',
+            'headerFields'    => ['level', 'title'],
             'disableGrouping' => true,
         ],
-        'label' => [
-            'fields' => [
+        'label'             => [
+            'fields'      => [
                 'title',
                 'shortcut',
             ],
@@ -44,23 +44,23 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
         ],
         'global_operations' => [
             'all' => [
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
+                'href'       => 'act=select',
+                'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
         ],
-        'operations' => [
-            'edit' => [
+        'operations'        => [
+            'edit'   => [
                 'href' => 'act=edit',
                 'icon' => 'edit.gif',
             ],
-            'copy' => [
+            'copy'   => [
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'href' => 'act=delete',
-                'icon' => 'delete.gif',
+                'href'       => 'act=delete',
+                'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
             ],
         ],
@@ -68,52 +68,52 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
     'palettes' => [
         'default' => 'code,shortcut,title,description',
     ],
-    'fields' => [
-        'id' => [
+    'fields'   => [
+        'id'          => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'pid' => [
+        'pid'         => [
             'foreignKey' => 'tl_tour_difficulty_category.title',
-            'sql' => "int(10) unsigned NOT NULL default '0'",
-            'relation' => ['type' => 'belongsTo', 'load' => 'eager'],
+            'sql'        => "int(10) unsigned NOT NULL default '0'",
+            'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
         ],
-        'sorting' => [
-            'sql' => "int(10) unsigned NOT NULL default '0'",
-        ],
-        'tstamp' => [
+        'sorting'     => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'shortcut' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
-            'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255],
-            'sql' => "varchar(255) NOT NULL default ''",
+        'tstamp'      => [
+            'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'title' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'shortcut'    => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'code' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+        'title'       => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'sql'       => "varchar(255) NOT NULL default ''",
+        ],
+        'code'        => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
+            'inputType' => 'text',
+            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'description' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => true,
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => true,
             'inputType' => 'textarea',
-            'eval' => ['mandatory' => true],
-            'sql' => 'text NULL',
+            'eval'      => ['mandatory' => true],
+            'sql'       => 'text NULL',
         ],
     ],
 ];

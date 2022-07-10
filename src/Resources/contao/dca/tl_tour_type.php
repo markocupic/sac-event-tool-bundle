@@ -13,52 +13,52 @@ declare(strict_types=1);
  */
 
 $GLOBALS['TL_DCA']['tl_tour_type'] = [
-    'config' => [
-        'dataContainer' => 'Table',
+    'config'   => [
+        'dataContainer'    => 'Table',
         'doNotCopyRecords' => true,
         'enableVersioning' => true,
-        'switchToEdit' => true,
-        'sql' => [
+        'switchToEdit'     => true,
+        'sql'              => [
             'keys' => [
                 'id' => 'primary',
             ],
         ],
     ],
-    'list' => [
-        'sorting' => [
-            'mode' => 5,
-            'fields' => ['sorting'],
-            'flag' => 1,
+    'list'     => [
+        'sorting'           => [
+            'mode'        => 5,
+            'fields'      => ['sorting'],
+            'flag'        => 1,
             'panelLayout' => 'filter;search,limit',
         ],
-        'label' => [
+        'label'             => [
             'fields' => ['shortcut', 'title'],
             'format' => '%s %s',
         ],
         'global_operations' => [
             'all' => [
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
+                'href'       => 'act=select',
+                'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
         ],
-        'operations' => [
-            'edit' => [
+        'operations'        => [
+            'edit'   => [
                 'href' => 'act=edit',
                 'icon' => 'edit.gif',
             ],
-            'copy' => [
+            'copy'   => [
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
-            'cut' => [
-                'href' => 'act=paste&mode=cut',
-                'icon' => 'cut.gif',
+            'cut'    => [
+                'href'       => 'act=paste&mode=cut',
+                'icon'       => 'cut.gif',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
             ],
             'delete' => [
-                'href' => 'act=delete',
-                'icon' => 'delete.gif',
+                'href'       => 'act=delete',
+                'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
             ],
         ],
@@ -66,42 +66,42 @@ $GLOBALS['TL_DCA']['tl_tour_type'] = [
     'palettes' => [
         'default' => 'shortcut,title,description',
     ],
-    'fields' => [
-        'id' => [
+    'fields'   => [
+        'id'          => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'tstamp' => [
+        'tstamp'      => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'pid' => [
+        'pid'         => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'sorting' => [
+        'sorting'     => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'title' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => false,
+        'title'       => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => false,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'shortcut' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => false,
+        'shortcut'    => [
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => false,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 255],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval'      => ['mandatory' => true, 'maxlength' => 255],
+            'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'description' => [
-            'exclude' => true,
-            'search' => true,
-            'sorting' => false,
+            'exclude'   => true,
+            'search'    => true,
+            'sorting'   => false,
             'inputType' => 'textarea',
-            'eval' => ['mandatory' => false],
-            'sql' => 'text NULL',
+            'eval'      => ['mandatory' => false],
+            'sql'       => 'text NULL',
         ],
     ],
 ];
