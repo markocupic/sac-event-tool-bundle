@@ -157,6 +157,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
         ],
         'eventId'                     => [
             'foreignKey' => 'tl_calendar_events.title',
+            'default'    => Input::get('id'),
             'sql'        => "int(10) unsigned NOT NULL default '0'",
             'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
             'eval'       => ['doNotShow' => true, 'readonly' => true],
@@ -171,7 +172,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'flag'      => 5,
             'sorting'   => true,
             'eval'      => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-            'sql'       => 'int(10) unsigned NOT NULL default 0',
+            'sql'       => 'int(10) unsigned NOT NULL default '.time(),
         ],
         'stateOfSubscription'         => [
             'filter'    => true,
