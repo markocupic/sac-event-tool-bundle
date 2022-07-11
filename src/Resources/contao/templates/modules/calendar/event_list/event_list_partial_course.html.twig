@@ -1,4 +1,3 @@
-{% do addJavascriptResource('https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js') %}
 {% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.min.js|static') %}
 {% do addJavascriptResource('bundles/markocupicsaceventtool/js/eventlist_vue.js|static') %}
 
@@ -16,7 +15,7 @@
                 <!-- Start right col -->
                 <div class="col-sm-9 col-xl-7">
                     <div class="title d-flex align-items-start mb-2">
-                        <span class="event-state-icon lh-base pt-1" data-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:title="row.eventStateLabel" v-bind:class="row.eventState"> </span>
+                        <span class="event-state-icon lh-base pt-1" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:title="row.eventStateLabel" v-bind:class="row.eventState"> </span>
                         <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link lh-base">
                             <h4 class="d-flex headline m-0 p-0 lh-base">
                                 <% row.title %>
@@ -61,7 +60,7 @@
     </div>
 </div>
 
-<!-- Set up the Vuejs course list -->
+<!-- Set up the vue.js course list -->
 <script>
     new VueTourList('#course-list', {
         'apiParams': {
@@ -96,8 +95,11 @@
         'callbacks': {
             'oninsert': function (vue, json) {
                 window.setTimeout(function () {
-                    jQuery('[data-toggle="tooltip"]').tooltip();
-                }, 100);
+                    let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+                    let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                        return new bootstrap.Tooltip(tooltipTriggerEl)
+                    })
+                }, 200);
 
                 window.setTimeout(function () {
 

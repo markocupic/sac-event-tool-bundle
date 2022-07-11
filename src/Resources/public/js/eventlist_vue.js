@@ -16,7 +16,7 @@ class VueTourList {
         const defaults = {
             'apiParams': {
                 'organizers': [],
-                'eventType': ["tour", "generalEvent", "lastMinuteTour"],
+                'eventType': ["tour", "generalEvent", "lastMinuteTour", "course"],
                 'suitableForBeginners': '',
                 'tourType': '',
                 'courseType': '',
@@ -39,8 +39,10 @@ class VueTourList {
             }
         };
 
-        // Use lodash to merge options and defaults
-        let params = _.merge(defaults, opt);
+        // Merge options and defaults
+        let params = {...defaults, ...opt}
+
+        console.log(params);
 
         // Instantiate vue.js application
         new Vue({
