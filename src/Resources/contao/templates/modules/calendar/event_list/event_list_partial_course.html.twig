@@ -1,6 +1,6 @@
-{{ addJsToHead('https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js') }}
-{{ addJsToHead('assets/contao-component-vue-js/vue/dist/vue.min.js|static') }}
-{{ addJsToHead('bundles/markocupicsaceventtool/js/eventlist_vue.js|static') }}
+{% do addJavascriptResource('https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js') %}
+{% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.min.js|static') %}
+{% do addJavascriptResource('bundles/markocupicsaceventtool/js/eventlist_vue.js|static') %}
 
 <div id="course-list">
     <span v-if="itemsTotal > 0" class="text-muted"><small>Zu deiner Suchanfrage wurden <% itemsTotal %> Events gefunden. </small></span>

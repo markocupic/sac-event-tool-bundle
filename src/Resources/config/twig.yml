@@ -1,10 +1,6 @@
 services:
 
     # Twig extensions
-    Markocupic\SacEventToolBundle\Twig\TwigHelper:
-        arguments:
-            - '@contao.framework'
+    Markocupic\SacEventToolBundle\Twig\TwigAssetManager:
         tags:
             - { name: twig.extension }
-
-

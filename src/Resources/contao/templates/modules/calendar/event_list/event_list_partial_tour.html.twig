@@ -1,6 +1,6 @@
-{{ addJsToHead('https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js') }}
-{{ addJsToHead('assets/contao-component-vue-js/vue/dist/vue.min.js|static') }}
-{{ addJsToHead('bundles/markocupicsaceventtool/js/eventlist_vue.js|static') }}
+{% do addJavascriptResource('https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js') %}
+{% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.min.js|static') %}
+{% do addJavascriptResource('bundles/markocupicsaceventtool/js/eventlist_vue.js|static') %}
 
 <div id="tour-list">
     <span v-if="itemsTotal > 0" class="text-muted"><small>Zu deiner Suchanfrage wurden <% itemsTotal %> Events gefunden. </small></span>
@@ -52,11 +52,11 @@
                     <!-- start row icons -->
                     <div class="d-flex">
                         <div class="me-2" v-if="row.bookingCounter" v-html="row.bookingCounter"></div>
-                            <div class="me-2" v-if="row.suitableForBeginners">
+                        <div class="me-2" v-if="row.suitableForBeginners">
                                 <span class="badge badge-pill bg-warning" data-toggle="tooltip" data-placement="top" title="Für Einsteiger geeignet">
                                     <i class="event-for-beginners"></i>
                                 </span>
-                            </div>
+                        </div>
                         <div class="me-2" v-if="row.tourTechDifficulties" v-html="row.tourTechDifficulties"></div>
                         <div class="me-2" v-if="row.tourTypesShortcuts" v-html="row.tourTypesShortcuts"></div>
                     </div>
