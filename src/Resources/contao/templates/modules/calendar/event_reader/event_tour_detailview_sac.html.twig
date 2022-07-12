@@ -37,6 +37,7 @@
                         <p>Keine Gruppe ausgewählt</p>
                     {% endif %}
                 </div>
+
                 {% if getEventData.invoke('mountainguide') %}
                     <div class="eventdate event-detail event-info-box icon-box-small">
                         <h5>Mit Bergführer/in</h5>
@@ -74,6 +75,7 @@
                         <!-- indexer::stop -->
                     </div>
                 {% endif %}
+
             </div>
 
             <div class="mt-3 mb-3 p-3 bg-white">
@@ -121,6 +123,7 @@
                         {% if getEventData.invoke('generateMainInstructorContactDataFromDb') %}
                             <p class="mt-3">{{ getEventData.invoke('mainInstructorContactDataFromDb')|raw }}</p>
                         {% endif %}
+
                     </div>
                 {% endif %}
 
@@ -238,16 +241,13 @@
                     <p>{{ getEventData.invoke('meetingPoint')|nl2br }}></p>
                 </div>
             {% endif %}
+
         </div>
         <!-- End col right -->
-
     </div>
 
-
-    <!-- Weitere Inhaltselemente -->
-
     <!-- enclosures/downloads -->
-    {# !Urheberrechtsverletzung bei urheberrechtlich geschützen Anhängen wie Topos, Karten, etc. #}
+    {# !Urheberrechtsverletzung bei urheberrechtlich geschützten Anhängen wie Topos, Karten, etc. #}
     {% if hasLoggedInFrontendUser or 'eventPreview' == app.request.query.get('modee') %}
         {% if getEventData.invoke('enclosure') %}
             <div class="event-eclosures event-detail event-info-box icon-box-small">
