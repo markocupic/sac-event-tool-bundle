@@ -272,9 +272,6 @@ $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = ['Markocupic\SacEventToolBundle
 /* Replace insert tags */
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Markocupic\SacEventToolBundle\EventListener\Contao\ReplaceInsertTagsListener', 'onReplaceInsertTags'];
 
-/* Parse template (Check if frontend login is allowed, if not replace the default error message and redirect to account activation page) */
-$GLOBALS['TL_HOOKS']['parseTemplate'][] = ['Markocupic\SacEventToolBundle\EventListener\Contao\ParseTemplateListener', 'onParseTemplate'];
-
 /* Cron jobs */
 $GLOBALS['TL_CRON']['daily']['SAC_EVT_DAILY'] = [DailyCron::class, 'dailyCron'];
 $GLOBALS['TL_CRON']['hourly']['SAC_EVT_HOURLY'] = [HourlyCron::class, 'hourlyCron'];

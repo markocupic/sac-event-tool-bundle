@@ -4,3 +4,5 @@ services:
     Markocupic\SacEventToolBundle\Twig\TwigAssetManager:
         tags:
             - { name: twig.extension }
+
+

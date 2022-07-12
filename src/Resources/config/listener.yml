@@ -81,17 +81,16 @@ services:
         tags:
             - { name: kernel.event_listener, event: import_user_listener, method: onImportUser }
 
-    # Contao parse template hook (Check if frontend login is allowed, if not replace the default error message and redirect to account activation page)
-    Markocupic\SacEventToolBundle\EventListener\Contao\ParseTemplateListener:
-        public: true
+    # Augment event template with more data
+    Markocupic\SacEventToolBundle\EventListener\Contao\EventParseTemplateListener:
         arguments:
             - '@contao.framework'
-            - '@request_stack'
-            - '@contao.routing.scope_matcher'
+            - '@security.helper'
+            - '@Markocupic\SacEventToolBundle\ContaoScope\ContaoScope'
         tags:
-            - { name: kernel.event_listener, event: parse_template_listener, method: onParseTemplate }
+            - { name: contao.hook, hook: parseTemplate, method: onParseTemplate, priority: 0 }
 
-    # Contao post login hook (Create backend user home directories if they does not exist & remove no more used directories)
+    # Contao post login hook (Create backend user home directories if they do not exist & remove no more used directories)
     Markocupic\SacEventToolBundle\EventListener\Contao\PostLoginListener:
         public: true
         arguments:
