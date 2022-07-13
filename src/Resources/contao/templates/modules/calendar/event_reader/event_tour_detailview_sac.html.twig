@@ -66,10 +66,10 @@
                 {% endif %}
 
                 {% if getEventData.invoke('hasCoords') %}
-                    <div class="location event-detail event-info-box icon-box-small">
+                    <div class="geo-location event-detail event-info-box icon-box-small">
                         <h5>Karte</h5>
                         <!-- indexer::continue -->
-                        <div class="embed-responsive embed-responsive-4by3">
+                        <div class="event-info-box-inner">
                             <iframe src="{{ getEventData.invoke('geoLinkUrl') }}" width="100%" height="100%" allow="geolocation"></iframe>
                         </div>
                         <!-- indexer::stop -->
