@@ -1,0 +1,60 @@
+{% do addJavascriptResource('bundles/markocupicsaceventtool/js/eventfilter.js|static') %}
+
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+
+    <div class="filter-board {{ form.getFormId() }} block" id="{{ form.getFormId() }}">
+        <form action="{{ form.getFormAction() }}" enctype="{{ form.getEnctype() }}" method="{{ form.getMethod() }}">
+            {# start formbody #}
+            <div class="formbody">
+                {# start row #}
+                <div class="row">
+                    {% for field in fields %}
+                        {% if field != 'suitableForBeginners' %}
+                            {% if form.hasFormField(field) %}
+                                <!-- start widget {{ field }} -->
+                                <div class="filter-board-widget col-6 col-sm-4" id="{{ field }}">
+                                    {{ form.getWidget(field).parse()|raw }}
+                                </div>
+                                <!-- end widget {{ field }} -->
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {# end row #}
+
+                {% if form.hasFormField('suitableForBeginners') %}
+                    <div class="filter-board-widget" id="suitableForBeginners">
+                        {{ form.getWidget('suitableForBeginners').parse()|raw }}
+                    </div>
+                {% endif %}
+
+                <div class="filter-board-widget" id="submit">
+                    <div class="widget widget-submit">
+                        <button class="submit" id="ctrl_submit" name type="submit">Filter anwenden</button>
+                    </div>
+                </div>
+                <div class="mt-3 filter-board-widget">
+                    <a class="small reset-form" href="#">Filter zurücksetzen</a>
+                </div>
+            </div>
+            {# end formbody #}
+        </form>
+    </div>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let options = {
+                'locale': '{{ locale }}',
+            }
+
+            EventFilter.initialize(options);
+        });
+
+    </script>
+
+{% endblock %}
+
+
