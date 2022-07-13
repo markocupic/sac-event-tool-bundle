@@ -185,6 +185,10 @@ class CalendarEventsHelper
                 $value = static::getBookingCounter($objEvent);
                 break;
 
+            case 'tourTechDifficultiesAsArray':
+                $value = static::getTourTechDifficultiesAsArray($objEvent, false);
+                break;
+
             case 'tourTechDifficulties':
                 $value = implode(' ', static::getTourTechDifficultiesAsArray($objEvent, true));
                 break;

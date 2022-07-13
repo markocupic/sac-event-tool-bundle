@@ -12,25 +12,19 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\ContaoMode;
+namespace Markocupic\SacEventToolBundle\ContaoScope;
 
+use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ContaoMode
+class ContaoScope
 {
-    private const FRONTEND_MODE = 'FE';
-
-    private const BACKEND_MODE = 'BE';
-
     private ContaoFramework $framework;
-
     private RequestStack $requestStack;
-
     private ScopeMatcher $scopeMatcher;
-
-    private string $contaoMode = '';
+    private string $contaoScope = '';
 
     public function __construct(ContaoFramework $framework, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
     {
@@ -42,13 +36,13 @@ class ContaoMode
     /**
      * @throws \Exception
      */
-    public function getMode(): string
+    public function getScope(): string
     {
-        $this->_checkInitialization();
+        $this->assertHasInitialized();
 
         $this->_setMode();
 
-        return $this->contaoMode;
+        return $this->contaoScope;
     }
 
     /**
@@ -56,7 +50,7 @@ class ContaoMode
      */
     public function isFrontend(): bool
     {
-        $this->_checkInitialization();
+        $this->assertHasInitialized();
 
         if (null !== ($request = $this->requestStack->getCurrentRequest())) {
             return $this->scopeMatcher->isFrontendRequest($request);
@@ -70,7 +64,7 @@ class ContaoMode
      */
     public function isBackend(): bool
     {
-        $this->_checkInitialization();
+        $this->assertHasInitialized();
 
         if (null !== ($request = $this->requestStack->getCurrentRequest())) {
             return $this->scopeMatcher->isBackendRequest($request);
@@ -85,21 +79,21 @@ class ContaoMode
     private function _setMode(): void
     {
         if ($this->isBackend()) {
-            $this->contaoMode = static::BACKEND_MODE;
+            $this->contaoScope = ContaoCoreBundle::SCOPE_BACKEND;
         } elseif ($this->isFrontend()) {
-            $this->contaoMode = static::FRONTEND_MODE;
+            $this->contaoScope = ContaoCoreBundle::SCOPE_FRONTEND;
         } else {
-            $this->contaoMode = '';
+            $this->contaoScope = '';
         }
     }
 
     /**
      * @throws \Exception
      */
-    private function _checkInitialization(): void
+    private function assertHasInitialized(): void
     {
         if (!$this->framework->isInitialized()) {
-            throw new \Exception('The Contao framework is not initialized.');
+            throw new \Exception('The Contao framework has not been initialized.');
         }
     }
 }

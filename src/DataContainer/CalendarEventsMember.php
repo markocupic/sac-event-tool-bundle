@@ -27,7 +27,6 @@ use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 use Contao\Email;
 use Contao\Environment;
-use Contao\EventReleaseLevelPolicyModel;
 use Contao\Events;
 use Contao\FilesModel;
 use Contao\MemberModel;
@@ -77,7 +76,6 @@ class CalendarEventsMember
     private Adapter $calendarEventsMember;
     private Adapter $controller;
     private Adapter $environment;
-    private Adapter $eventReleaseLevelPolicy;
     private Adapter $events;
     private Adapter $files;
     private Adapter $member;
@@ -109,7 +107,6 @@ class CalendarEventsMember
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->environment = $this->framework->getAdapter(Environment::class);
-        $this->eventReleaseLevelPolicy = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
         $this->events = $this->framework->getAdapter(Events::class);
         $this->files = $this->framework->getAdapter(FilesModel::class);
         $this->member = $this->framework->getAdapter(MemberModel::class);
@@ -176,8 +173,8 @@ class CalendarEventsMember
      *
      * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
      *
-     * @throws \Doctrine\DBAL\Driver\Exception
-     * @throws Exception
+     * @throws \Doctrine\Dbal\Exception
+     * @throws \Exception
      */
     public function sendEmailAction(DataContainer $dc): void
     {
@@ -385,16 +382,17 @@ class CalendarEventsMember
             }
 
             if (null !== $objEvent) {
+                // Allow write-access to authors, tour guides and registration admins (tl_calendar_events.registrationGoesTo)
                 $arrAuthors = $this->stringUtil->deserialize($objEvent->author, true);
                 $arrRegistrationGoesTo = $this->stringUtil->deserialize($objEvent->registrationGoesTo, true);
+                $arrInstructor = CalendarEventsHelper::getInstructorsAsArray($objEvent);
 
-                if (!\in_array($user->id, $arrAuthors, false) && !\in_array($user->id, $arrRegistrationGoesTo, true)) {
+                if (!\in_array($user->id, $arrAuthors, false) && !\in_array($user->id, $arrRegistrationGoesTo, true) && !\in_array($user->id, $arrInstructor, true)) {
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['closed'] = true;
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCreatable'] = true;
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notEditable'] = true;
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notDeletable'] = true;
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCopyable'] = true;
-
                     $this->message->addError($this->translator->trans('ERR.accessDenied', [], 'contao_default'));
                     $this->controller->redirect('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$objEvent->id);
                 }
@@ -408,7 +406,6 @@ class CalendarEventsMember
      * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
      *
      * @throws Exception
-     * @throws \Doctrine\DBAL\Driver\Exception
      * @throws CannotInsertRecord
      * @throws InvalidArgument
      * @throws CopyFileException
@@ -493,7 +490,7 @@ class CalendarEventsMember
      *
      * @return mixed|string|null
      */
-    public function saveCallbackStateOfSubscription($varValue, DataContainer $dc)
+    public function saveCallbackStateOfSubscription($varValue, DataContainer $dc): mixed
     {
         $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
 
@@ -542,6 +539,25 @@ class CalendarEventsMember
     /**
      * Add more data to the registration, when user adds a new registration manually.
      *
+     * @Callback(table="tl_calendar_events_member", target="config.oncreate")
+     *
+     * @throws Exception
+     */
+    public function oncreateCallback(string $strTable, int $insertId, array $arrFields, DataContainer $dc): void
+    {
+        if (!$dc->id) {
+            return;
+        }
+
+        if (empty($arrFields['dateAdded'])) {
+            $set = ['dateAdded' => time()];
+            $this->connection->update('tl_calendar_events_member', $set, ['id' => $insertId]);
+        }
+    }
+
+    /**
+     * Add more data to the registration, when user adds a new registration manually.
+     *
      * @Callback(table="tl_calendar_events_member", target="config.onsubmit")
      *
      * @throws Exception
@@ -552,21 +568,13 @@ class CalendarEventsMember
             return;
         }
 
-        $dateAdded = $this->connection->fetchOne('SELECT dateAdded FROM tl_calendar_events_member WHERE id = ?', [$dc->id]);
-
-        $set = [
-            'dateAdded' => false === $dateAdded || '' === $dateAdded ? time() : $dateAdded,
-            'tstamp' => time(),
-            'sacMemberId' => '',
-            'contaoMemberId' => 0,
-        ];
-
         $arrReg = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events_member WHERE id = ?', [$dc->id]);
 
-        // Set the SAC member id e.g: 185155
-        if ($arrReg) {
-            $set['sacMemberId'] = $arrReg['sacMemberId'];
-        }
+        $set = [
+            'dateAdded' => empty($arrReg['dateAdded']) ? time() : $arrReg['dateAdded'],
+            'tstamp' => time(),
+            'contaoMemberId' => 0,
+        ];
 
         // Set the Contao member id
         if (!empty($arrReg['sacMemberId'])) {
@@ -577,10 +585,8 @@ class CalendarEventsMember
             }
         }
 
-        $eventId = $arrReg['eventId'] > 0 ? $arrReg['eventId'] : CURRENT_ID;
-
         // Add correct event id and event title
-        $arrEvent = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events WHERE id = ?', [$eventId]);
+        $arrEvent = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events WHERE id = ?', [$arrReg['eventId']]);
 
         if ($arrEvent) {
             // Set correct event title and eventId

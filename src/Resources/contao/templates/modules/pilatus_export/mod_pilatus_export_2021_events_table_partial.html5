@@ -27,7 +27,7 @@
     <td class="event-export-weekday"><?= $arrEvent['weekday'] ?></td>
     <td class="event-export-title"><?= $arrEvent['title'] ?></td>
     <?php if (!$this->isCourse): ?>
-    <td class="event-export-tour-type"><?= $arrEvent['tourType'] ?><?php if ($arrEvent['journey'] === 'ÖV'): ?>, ÖV-Tour<?php endif; ?></td>
+    <td class="event-export-tour-type"><?= $arrEvent['tourType'] ?><?php if ($arrEvent['journey'] === 'ÖV'): ?>, ÖV<?php endif; ?></td>
     <?php endif; ?>
     <td class="event-export-instructors"><?= $arrEvent['instructors'] ?></td>
     <td class="event-export-organizers"><?= $arrEvent['organizers'] ?></td>

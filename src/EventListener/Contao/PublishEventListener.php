@@ -19,7 +19,7 @@ use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Email;
-use Markocupic\SacEventToolBundle\ContaoMode\ContaoMode;
+use Markocupic\SacEventToolBundle\ContaoScope\ContaoScope;
 
 class PublishEventListener
 {
@@ -29,17 +29,17 @@ class PublishEventListener
     private $framework;
 
     /**
-     * @var ContaoMode;
+     * @var ContaoScope;
      */
-    private $contaoMode;
+    private $contaoScope;
 
     /**
      * PublishEventListener constructor.
      */
-    public function __construct(ContaoFramework $framework, ContaoMode $contaoMode)
+    public function __construct(ContaoFramework $framework, ContaoScope $contaoScope)
     {
         $this->framework = $framework;
-        $this->contaoMode = $contaoMode;
+        $this->contaoScope = $contaoScope;
     }
 
     /**
@@ -47,7 +47,7 @@ class PublishEventListener
      */
     public function onPublishEvent(CalendarEventsModel $objEvent): void
     {
-        if ($this->contaoMode->isBackend()) {
+        if ($this->contaoScope->isBackend()) {
             $backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
             $configAdapter = $this->framework->getAdapter(Config::class);
             $objCalendar = $objEvent->getRelated('pid');

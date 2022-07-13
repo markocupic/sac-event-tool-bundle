@@ -28,28 +28,14 @@ use function Safe\json_encode;
 class TestController extends AbstractController
 {
     private Connection $connection;
+    private ContaoFramework $framework;
+    private TwigEnvironment $twig;
 
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
-
-    /**
-     * @var TwigEnvironment
-     */
-    private $twig;
-
-    private array $credentials;
-
-    /**
-     * MyCustomController constructor.
-     */
-    public function __construct(Connection $connection, ContaoFramework $framework, TwigEnvironment $twig, array $credentials)
+    public function __construct(Connection $connection, ContaoFramework $framework, TwigEnvironment $twig)
     {
         $this->connection = $connection;
         $this->framework = $framework;
         $this->twig = $twig;
-        $this->credentials = $credentials;
     }
 
     /**
