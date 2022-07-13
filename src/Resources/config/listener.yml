@@ -21,7 +21,7 @@ services:
         arguments:
             - '@contao.framework'
         tags:
-            - { name: kernel.event_listener, event: contao.add_custom_regexp, method: onAddCustomRegexp }
+            - { name: contao.hook, hook: addCustomRegexp, method: onAddCustomRegexp }
 
     # Contao change event release level hook
     Markocupic\SacEventToolBundle\EventListener\Contao\ChangeEventReleaseLevelListener:
@@ -30,7 +30,7 @@ services:
             - '@contao.framework'
             - '@Markocupic\SacEventToolBundle\ContaoScope\ContaoScope'
         tags:
-            - { name: kernel.event_listener, event: contao.change_event_release_level, method: onChangeEventReleaseLevel }
+            - { name: contao.hook, hook: changeEventReleaseLevel, method: onChangeEventReleaseLevel }
 
     # Contao publish event hook
     Markocupic\SacEventToolBundle\EventListener\Contao\PublishEventListener:
@@ -39,7 +39,7 @@ services:
             - '@contao.framework'
             - '@Markocupic\SacEventToolBundle\ContaoScope\ContaoScope'
         tags:
-            - { name: kernel.event_listener, event: contao.publish_event, method: onPublishEvent }
+            - { name: contao.hook, hook: publishEvent, method: onPublishEvent, priority: 0 }
 
     # Contao get page layout hook (purge script cache in debug mode only frontend)
     Markocupic\SacEventToolBundle\EventListener\Contao\GetPageLayoutListener:
@@ -50,7 +50,7 @@ services:
             - '@kernel'
             - '%kernel.project_dir%'
         tags:
-            - { name: kernel.event_listener, event: contao.get_page_layout, method: purgeScriptCacheInDebugMode }
+            - { name: contao.hook, hook: getPageLayout, method: purgeScriptCacheInDebugMode, priority: 0 }
 
     # Contao get system messages hook (list untreated event subscriptions when logging in into the backend)
     Markocupic\SacEventToolBundle\EventListener\Contao\GetSystemMessagesListener:
@@ -58,9 +58,8 @@ services:
         arguments:
             - '@contao.framework'
             - '@Markocupic\SacEventToolBundle\ContaoScope\ContaoScope'
-
         tags:
-            - { name: kernel.event_listener, event: get_system_messages_listener, method: listUntreatedEventSubscriptions }
+            - { name: contao.hook, hook: getSystemMessages, method: listUntreatedEventSubscriptions }
 
     # Contao execute pre actions hook
     Markocupic\SacEventToolBundle\EventListener\Contao\ExecutePreActionsListener:
@@ -70,7 +69,7 @@ services:
             - '@database_connection'
             - '@request_stack'
         tags:
-            - { name: kernel.event_listener, event: execute_pre_actions_listener, method: onExecutePreActions }
+            - { name: contao.hook, hook: executePreActions, method: onExecutePreActions }
 
     # Contao import user hook (Allow users to login into the backend with their sacMemberId)
     Markocupic\SacEventToolBundle\EventListener\Contao\ImportUserListener:
@@ -79,7 +78,7 @@ services:
             - '@contao.framework'
             - '@request_stack'
         tags:
-            - { name: kernel.event_listener, event: import_user_listener, method: onImportUser }
+            - { name: contao.hook, hook: importUser, method: onImportUser }
 
     # Augment event template with more data
     Markocupic\SacEventToolBundle\EventListener\Contao\EventParseTemplateListener:
@@ -97,7 +96,7 @@ services:
             - '@contao.framework'
             - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory'
         tags:
-            - { name: kernel.event_listener, event: post_login_listener, method: onPostLogin }
+            - { name: contao.hook, hook: postLogin, method: onPostLogin }
 
     # Contao parse backend template hook (manipulate backend templates)
     Markocupic\SacEventToolBundle\EventListener\Contao\ParseBackendTemplateListener:
@@ -105,7 +104,7 @@ services:
         arguments:
             - '@contao.framework'
         tags:
-            - { name: kernel.event_listener, event: parse_backend_template_listener, method: onParseBackendTemplate }
+            - { name: contao.hook, hook: parseBackendTemplate, method: onParseBackendTemplate }
 
     # Contao replace insert tags hook (Use custom inserttags)
     Markocupic\SacEventToolBundle\EventListener\Contao\ReplaceInsertTagsListener:
@@ -113,7 +112,7 @@ services:
         arguments:
             - '@contao.framework'
         tags:
-            - { name: kernel.event_listener, event: replace_insert_tags_listener, method: onReplaceInsertTags }
+            - { name: contao.hook, hook: replaceInsertTags, method: onReplaceInsertTags }
 
     Markocupic\SacEventToolBundle\EventListener\Contao\PreviewUrlCreateListener:
         arguments:
