@@ -1,0 +1,5 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+    {% include '@Contao_MarkocupicSacEventToolBundle/' ~ eventListPartialTpl ~ '.html.twig' with arrPartialOpt %}
+{% endblock %}

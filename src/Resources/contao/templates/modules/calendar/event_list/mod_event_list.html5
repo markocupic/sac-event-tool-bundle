@@ -1,7 +1,0 @@
-<?php $this->extend('block_unsearchable'); ?>
-
-<?php $this->block('content'); ?>
-
-<?php $this->insert($this->eventListPartialTpl, $this->arrPartialOpt); ?>
-
-<?php $this->endblock(); ?>
