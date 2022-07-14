@@ -49,20 +49,12 @@ class EventStoryReaderController extends AbstractFrontendModuleController
     public const TYPE = 'event_story_reader';
 
     private ContaoFramework $framework;
-
     private RequestStack $requestStack;
-
     private string $projectDir;
-
     private string $locale;
-
     private CalendarEventsStoryModel|null $story = null;
-
     private bool $isPreviewMode = false;
 
-    /**
-     * EventStoryReaderController constructor.
-     */
     public function __construct(ContaoFramework $framework, RequestStack $requestStack, string $projectDir, string $locale)
     {
         $this->framework = $framework;
@@ -149,6 +141,9 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
         // Set title as headline
         $template->headline = $this->story->title;
+
+        // Twig callable
+        $template->binToUuid = static fn (string $uuid): string => StringUtil::binToUuid($uuid);
 
         // Fallback if author is no more findable in tl_member
         $objAuthor = $memberModelModelAdapter->findOneBySacMemberId($this->story->sacMemberId);
@@ -272,7 +267,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
         $template->images = \count($images) ? $images : null;
 
-        // Add youtube movie
+        // Add YouTube movie
         $template->youtubeId = '' !== $this->story->youtubeId ? $this->story->youtubeId : null;
 
         // tourTechDifficulty
