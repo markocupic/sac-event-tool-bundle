@@ -139,6 +139,9 @@ class EventStoryListController extends AbstractFrontendModuleController
 
         $template->isAjaxRequest = $this->isAjaxRequest;
 
+        // Twig callable
+        $template->getAvatar = static fn (int $userId, string $scope): string => getAvatar($userId, $scope);
+
         $objPageModel = null;
 
         if ($model->jumpTo) {
