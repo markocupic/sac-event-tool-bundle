@@ -139,7 +139,7 @@ class CsvExportController extends AbstractFrontendModuleController
 
         if ($objForm->validate()) {
             if ('form-user-export' === $request->request->get('FORM_SUBMIT')) {
-                $blnKeepGroupsInOneLine = $request->request->has('keep-groups-in-one-line');
+                $blnKeepGroupsInOneLine = ($request->request->has('keep-groups-in-one-line') && $request->request->get('keep-groups-in-one-line')) ? true : false;
 
                 $exportType = $request->request->get('export-type');
 
@@ -179,7 +179,7 @@ class CsvExportController extends AbstractFrontendModuleController
      * @throws \Doctrine\DBAL\Exception
      * @throws InvalidArgument
      */
-    private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $result, $GroupModel, bool $blnKeepGroupsInOneLine = false): void
+    private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $result, string $GroupModelClassName, bool $blnKeepGroupsInOneLine = false): void
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -190,7 +190,7 @@ class CsvExportController extends AbstractFrontendModuleController
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         /** @var UserRoleModel|MemberGroupModel|UserGroupModel $groupModelAdapter */
-        $groupModelAdapter = $this->framework->getAdapter($GroupModel);
+        $groupModelAdapter = $this->framework->getAdapter($GroupModelClassName);
 
         $filename = $type.'_'.$dateAdapter->parse('Y-m-d_H-i-s').'.csv';
         $arrData = [];
