@@ -139,7 +139,7 @@ class CsvExportController extends AbstractFrontendModuleController
 
         if ($objForm->validate()) {
             if ('form-user-export' === $request->request->get('FORM_SUBMIT')) {
-                $blnKeepGroupsInOneLine = ($request->request->has('keep-groups-in-one-line') && $request->request->get('keep-groups-in-one-line')) ? true : false;
+                $blnKeepGroupsInOneLine = $request->request->has('keep-groups-in-one-line') && $request->request->get('keep-groups-in-one-line');
 
                 $exportType = $request->request->get('export-type');
 
