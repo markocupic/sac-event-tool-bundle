@@ -20,7 +20,7 @@
 
 <div class="alert flex-column bg-light">
   <?= $this->newEventBlogForm ?>
-  <p class="small">*Tourenberichte können bis maximal <?= $this->timeSpanForCreatingNewEventBlog ?> Tage nach Tourende verfasst werden.</p>
+  <p class="small">*Tourenberichte können bis maximal <?= $this->eventBlogTimeSpanForCreatingNew ?> Tage nach Tourende verfasst werden.</p>
 </div>
 
 <table class="table layout-table table-responsive table-striped">

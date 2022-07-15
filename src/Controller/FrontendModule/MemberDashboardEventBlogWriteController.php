@@ -164,14 +164,14 @@ class MemberDashboardEventBlogWriteController extends AbstractFrontendModuleCont
             $objReportModel = CalendarEventsBlogModel::findOneBySacMemberIdAndEventId($this->objUser->sacMemberId, $objEvent->id);
 
             if (null === $objReportModel) {
-                if ($objEvent->endDate + $model->timeSpanForCreatingNewEventBlog * 24 * 60 * 60 < time()) {
+                if ($objEvent->endDate + $model->eventBlogTimeSpanForCreatingNew * 24 * 60 * 60 < time()) {
                     // Do not allow blogging for old events
                     $messageAdapter->addError($this->translator->trans('ERR.md_write_event_blog_createBlogDeadlineExpired', [], 'contao_default'));
                 }
 
                 if (!$messageAdapter->hasError()) {
                     $blnAllow = false;
-                    $intStartDateMin = $model->timeSpanForCreatingNewEventBlog > 0 ? time() - $model->timeSpanForCreatingNewEventBlog * 24 * 3600 : time();
+                    $intStartDateMin = $model->eventBlogTimeSpanForCreatingNew > 0 ? time() - $model->eventBlogTimeSpanForCreatingNew * 24 * 3600 : time();
                     $arrAllowedEvents = $calendarEventsMemberModelAdapter->findEventsByMemberId($this->objUser->id, [], $intStartDateMin, time(), true);
 
                     foreach ($arrAllowedEvents as $allowedEvent) {

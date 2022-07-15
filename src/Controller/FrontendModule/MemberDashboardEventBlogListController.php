@@ -110,7 +110,7 @@ class MemberDashboardEventBlogListController extends AbstractFrontendModuleContr
         }
 
         // Get the time span for creating a new event blog
-        $this->template->timeSpanForCreatingNewEventBlog = $model->timeSpanForCreatingNewEventBlog;
+        $this->template->eventBlogTimeSpanForCreatingNew = $model->eventBlogTimeSpanForCreatingNew;
 
         // Add messages to template
         $this->addMessagesToTemplate();
@@ -152,7 +152,7 @@ class MemberDashboardEventBlogListController extends AbstractFrontendModuleContr
                 $arrEventBlog['blogLink'] = '';
 
                 // Check if the event blog is still editable
-                if ($objEventBlog->eventEndDate + $model->timeSpanForCreatingNewEventBlog * 24 * 60 * 60 > time()) {
+                if ($objEventBlog->eventEndDate + $model->eventBlogTimeSpanForCreatingNew * 24 * 60 * 60 > time()) {
                     if ('1' === $objEventBlog->publishState) {
                         $arrEventBlog['canEditBlog'] = true;
                     }
@@ -198,7 +198,7 @@ class MemberDashboardEventBlogListController extends AbstractFrontendModuleContr
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         $arrOptions = [];
-        $intStartDateMin = $model->timeSpanForCreatingNewEventBlog > 0 ? time() - $model->timeSpanForCreatingNewEventBlog * 24 * 3600 : time();
+        $intStartDateMin = $model->eventBlogTimeSpanForCreatingNew > 0 ? time() - $model->eventBlogTimeSpanForCreatingNew * 24 * 3600 : time();
         $arrEvents = $calendarEventsMemberModelAdapter->findEventsByMemberId($this->objUser->id, [], $intStartDateMin, time(), true);
 
         if (!empty($arrEvents) && \is_array($arrEvents)) {

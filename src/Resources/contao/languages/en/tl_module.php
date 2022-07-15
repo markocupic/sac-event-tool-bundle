@@ -20,7 +20,7 @@ $GLOBALS['TL_LANG']['tl_module']['eventRegloginModule_legend'] = 'Login-Module-E
 
 // Fields
 $GLOBALS['TL_LANG']['tl_module']['unregisterFromEventNotificationId'] = ['Notification Center: Benachrichtigungs-ID bei Eventabsage eines Mitglieds', 'Geben Sie eine Benachrichtigung aus dem Notification Center ein.'];
-$GLOBALS['TL_LANG']['tl_module']['timeSpanForCreatingNewEventBlog'] = ['Frist in Tagen wie lange nach Event-Ende noch Berichte eröffnet werden können', 'Geben Sie in Tagen an, wie lange nach Event-Ende es möglich sein soll, Berichte zu einem Event schreiben zu können.'];
+$GLOBALS['TL_LANG']['tl_module']['eventBlogTimeSpanForCreatingNew'] = ['Frist in Tagen wie lange nach Event-Ende noch Berichte eröffnet werden können', 'Geben Sie in Tagen an, wie lange nach Event-Ende es möglich sein soll, Berichte zu einem Event schreiben zu können.'];
 $GLOBALS['TL_LANG']['tl_module']['eventBlogLimit'] = ['Gesamtzahl der Beiträge', 'Hier können Sie die Gesamtzahl der Beiträge begrenzen. Geben Sie 0 ein, um alle anzuzeigen.'];
 $GLOBALS['TL_LANG']['tl_module']['eventBlogOrganizers'] = ['Veranstalter\\Ortsgruppen einschänken', 'Wählen Sie hier die Event-Veranstalter aus, deren Berichte angezeigt werden sollen.'];
 $GLOBALS['TL_LANG']['tl_module']['eventBlogJumpTo'] = ['Event-Bericht Reader', 'Bitte geben Sie hier die Seite mit dem Event-Reader Modul an.'];
