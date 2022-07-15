@@ -15,7 +15,7 @@ declare(strict_types=1);
 use Contao\Input;
 use Contao\System;
 
-$GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
+$GLOBALS['TL_DCA']['tl_calendar_events_blog'] = [
     'config'   => [
         'dataContainer'    => 'Table',
         'enableVersioning' => true,
@@ -52,25 +52,25 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
             ],
         ],
         'operations'        => [
-            'edit'          => [
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['edit'],
+            'edit'       => [
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_blog']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.svg',
             ],
-            'delete'        => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['delete'],
+            'delete'     => [
+                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_blog']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
             ],
-            'show'          => [
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['show'],
+            'show'       => [
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_blog']['show'],
                 'href'  => 'act=show',
                 'icon'  => 'show.svg',
             ],
-            'exportArticle' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['exportArticle'],
-                'href'  => 'action=exportArticle',
+            'exportBlog' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_blog']['exportBlog'],
+                'href'  => 'action=exportBlog',
                 'icon'  => 'bundles/markocupicsaceventtool/icons/docx.png',
             ],
         ],
@@ -86,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
         'eventId'                 => [
-            'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['eventId'],
+            'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events_blog']['eventId'],
             'foreignKey' => 'tl_calendar_events.title',
             'sql'        => "int(10) unsigned NOT NULL default '0'",
             'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
@@ -99,7 +99,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
             'filter'    => true,
             'default'   => 1,
             'exclude'   => true,
-            'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_blog']['publishStateRef'],
             'inputType' => 'select',
             'options'   => ['1', '2', '3'],
             'eval'      => ['tl_class' => 'clr', 'submitOnChange' => true],
@@ -163,7 +163,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_story'] = [
         'multiSRC'                => [
             'inputType' => 'fileTree',
             'eval'      => [
-                'path'       => System::getContainer()->getParameter('sacevt.event.story.asset_dir').'/'.Input::get('id'),
+                'path'       => System::getContainer()->getParameter('sacevt.event.blog.asset_dir').'/'.Input::get('id'),
                 'doNotCopy'  => true,
                 'isGallery'  => true,
                 'extensions' => 'jpg,jpeg',

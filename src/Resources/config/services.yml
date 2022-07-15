@@ -19,14 +19,14 @@ services:
         calls:
             - [ setName, [ 'markocupic_sac_event_tool_attributes' ] ]
 
-    # Contao Backend Module "Maintenance": Delete no more used event stories media directories
-    Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainModuleEventStory:
+    # Contao Backend Module "Maintenance": Delete no more used event blog media directories
+    Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainModuleEventBlog:
         public: true
         arguments:
             - '@contao.framework'
             - '@database_connection'
             - '%kernel.project_dir%'
-            - '%sacevt.event.story.asset_dir%'
+            - '%sacevt.event.blog.asset_dir%'
             - '@monolog.logger.contao'
 
     # Generate docx/pdf event memberlists from docx templates

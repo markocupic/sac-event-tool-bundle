@@ -3,7 +3,7 @@
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -14,14 +14,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
     //window.FontAwesome.dom.watch();
 });
 
-
-class ItemWatcher {
+class EventBlogList {
     constructor(elId, opt) {
 
         // Defaults
         const defaults = {
             'params': {
                 'listModuleId': null,
+                'apiKey': null,
                 'readerModuleId': null,
                 'itemIds': [],
                 'perPage': 4,
@@ -29,8 +29,8 @@ class ItemWatcher {
             },
         };
 
-        // Use lodash to merge options and defaults
-        let options = _.merge(defaults, opt);
+        // merge options and defaults
+        let options = {...defaults, ...opt}
 
         // Instantiate vue.js application
         new Vue({
@@ -45,12 +45,12 @@ class ItemWatcher {
                 currentItemId: null,
             },
 
-            created: function created() {
+            created: async function created() {
                 let self = this;
 
                 self.itemIds = self.options.params.itemIds;
 
-                let page = self.getUrlParam('page_e' + self.options.params.listModuleId, null);
+                let page = await self.getUrlParam('page_e' + self.options.params.listModuleId, null);
                 self.currentPage = page === null ? 1 : parseInt(page);
 
                 document.onkeydown = (function (e) {
@@ -68,12 +68,11 @@ class ItemWatcher {
                     }
                 }, 1000);
 
-
-                // Open event story with id 120
-                // https://www.sac-pilatus.ch/home.html?showEventStory=120
-                let eventStoryId = null;
-                if (false !== (eventStoryId = self.getUrlParam('showEventStory', false))) {
-                    self.currentItemId = eventStoryId;
+                // Open event blog with id 120
+                // https://www.sac-pilatus.ch/home.html?show_event_blog=120
+                let eventBlogId = null;
+                if (false !== (eventBlogId = await self.getUrlParam('show_event_blog', false))) {
+                    self.currentItemId = eventBlogId;
 
                     // Adjust current page
                     self.currentItemIndex = self.getCurrentItemIndex();
@@ -83,13 +82,35 @@ class ItemWatcher {
                     self.fetchReaderContent();
                     self.fetchReaderContent();
                 }
+
+                // Set self.currentPage if user goes back/forward in the browser history
+                window.onpopstate = async function (event) {
+                    self.currentPage = await self.getUrlParam('page_e' + self.options.params.listModuleId, 1);
+                };
+
             },
 
             watch: {
-                currentPage: function (val) {
+                currentPage: async function (val) {
                     let self = this;
+
+                    // Add the current page to the url without reloading the page
+                    let nextURL = await (function () {
+                        if (self.currentPage < 2) {
+                            return self.removeUrlParam('page_e' + self.options.params.listModuleId);
+                        } else {
+                            return self.setUrlParam('page_e' + self.options.params.listModuleId, self.currentPage);
+                        }
+                    })();
+
+                    if (nextURL !== window.location.href) {
+                        window.history.pushState({}, document.title, nextURL);
+                    }
+
+                    // Fetch items from server
                     self.fetchList();
                 },
+
                 currentItemId: function (val) {
                     let self = this;
 
@@ -109,13 +130,17 @@ class ItemWatcher {
             methods: {
 
                 /**
-                 * Fetch list content
+                 * Fetch items from server
                  * Use markocupic/contao-content-api
                  */
                 fetchList: function fetchList() {
 
                     let self = this;
-                    let url = '/_mc_cc_api/07d49d1bc6e9fd8bcaabead11b4f75e0/show?id=' + self.options.params.listModuleId + '&page_e' + self.options.params.listModuleId + '=' + self.currentPage + '&_locale=' + self.options.params.language;
+
+                    let url = window.location.protocol + '//' + window.location.hostname + '/_mc_cc_api/' + self.options.params.apiKey + '/show?id=' + self.options.params.listModuleId
+                        + '&page_e' + self.options.params.listModuleId + '=' + self.currentPage
+                        + '&_locale=' + self.options.params.language
+                    ;
 
                     fetch(url, {
 
@@ -189,10 +214,14 @@ class ItemWatcher {
                 fetchReaderContent: function fetchReaderContent() {
                     let self = this;
 
-                    // Use referer param to generate qrcode in EventStoryReaderController
+                    // Use referer param to generate qrcode in EventBlogReaderController
                     let referer = btoa(window.location.href);
 
-                    let url = '/_mc_cc_api/07d49d1bc6e9fd8bcaabead11b4f75e0/show?id=' + self.options.params.readerModuleId + '&items=' + self.currentItemId + '&referer=' + referer + ' &_locale=' + self.options.params.language;
+                    let url = '/_mc_cc_api/' + self.options.params.apiKey + '/show?id=' + self.options.params.readerModuleId
+                        + '&items=' + self.currentItemId
+                        + '&referer=' + referer
+                        + '&_locale=' + self.options.params.language
+                    ;
 
                     fetch(url, {
                             method: "GET",
@@ -303,35 +332,82 @@ class ItemWatcher {
                 },
 
                 /**
-                 * Get url param
+                 * Get an url parameter from the search query string
                  * @param parameter
                  * @param defaultvalue
-                 * @returns {*}
-                 * @private
+                 * @returns {Promise<string>}
                  */
                 getUrlParam: function getUrlParam(parameter, defaultvalue) {
-                    let self = this;
-                    var urlparameter = defaultvalue;
-                    if (window.location.href.indexOf(parameter) > -1) {
-                        urlparameter = self._getUrlVars()[parameter];
-                    }
-                    return urlparameter;
-                },
 
-                /**
-                 * Helper method for self.getUrlParam
-                 * @private
-                 */
-                _getUrlVars: function _getUrlVars() {
-                    var vars = {};
-                    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
-                        vars[key] = value;
+                    return new Promise(resolve => {
+                        let params = new URLSearchParams(document.location.search);
+                        if (params.has(parameter)) {
+                            resolve(params.get(parameter));
+                        } else {
+                            resolve(defaultvalue);
+                        }
                     });
-                    return vars;
                 },
 
                 /**
-                 * Check key press
+                 * Set an url parameter and return the new url
+                 * @param parameter
+                 * @param value
+                 * @param href
+                 * @returns {Promise<string>}
+                 */
+                setUrlParam: function setUrlParam(parameter, value, href = null) {
+
+                    return new Promise(resolve => {
+                        if (null === href) {
+                            href = window.location.href;
+                        }
+
+                        let url = new URL(href);
+                        let urlParams = new URLSearchParams(url.search);
+
+                        if (urlParams.has(parameter)) {
+                            urlParams.set(parameter, value);
+                        } else {
+                            urlParams.append(parameter, value);
+                        }
+
+                        href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+
+                        resolve(href + (urlParams.toString() ? '?' + urlParams.toString() : ''));
+                    });
+
+                },
+
+                /**
+                 * Remove an url parameter and return the new url
+                 * @param parameter
+                 * @param href
+                 * @returns {Promise<string>}
+                 */
+                removeUrlParam: async function removeUrlParam(parameter, href = null) {
+
+                    return new Promise(resolve => {
+                        if (null === href) {
+                            href = window.location.href;
+                        }
+
+                        let url = new URL(href);
+                        let urlParams = new URLSearchParams(url.search);
+
+                        if (urlParams.has(parameter)) {
+                            urlParams.delete(parameter)
+                        }
+
+                        href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+
+                        resolve(href + (urlParams.toString() ? '?' + urlParams.toString() : ''));
+                    });
+
+                },
+
+                /**
+                 *
                  * @param e
                  * @private
                  */

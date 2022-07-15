@@ -6,7 +6,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
       </div>
       <div class="modal-body">
-        <?= $this->objEventStoryImageUploadForm ?>
+        <?= $this->objEventBlogImageUploadForm ?>
       </div>
     </div>
   </div>

@@ -14,14 +14,14 @@ declare(strict_types=1);
 
 namespace Contao;
 
-class CalendarEventsStoryModel extends Model
+class CalendarEventsBlogModel extends Model
 {
     /**
      * Table name.
      *
      * @var string
      */
-    protected static $strTable = 'tl_calendar_events_story';
+    protected static $strTable = 'tl_calendar_events_blog';
 
     /**
      * @param $sacMemberId
@@ -31,6 +31,6 @@ class CalendarEventsStoryModel extends Model
      */
     public static function findOneBySacMemberIdAndEventId($sacMemberId, $eventId)
     {
-        return self::findOneBy(['tl_calendar_events_story.sacMemberId=? AND tl_calendar_events_story.eventId=?'], [$sacMemberId, $eventId]);
+        return self::findOneBy(['tl_calendar_events_blog.sacMemberId=? AND tl_calendar_events_blog.eventId=?'], [$sacMemberId, $eventId]);
     }
 }

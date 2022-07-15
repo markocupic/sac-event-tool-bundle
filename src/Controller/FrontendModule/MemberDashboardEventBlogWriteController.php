@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Contao\CalendarEventsBlogModel;
 use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
-use Contao\CalendarEventsStoryModel;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
@@ -51,11 +51,11 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @FrontendModule(MemberDashboardWriteEventArticleController::TYPE, category="sac_event_tool_frontend_modules")
+ * @FrontendModule(MemberDashboardEventBlogWriteController::TYPE, category="sac_event_tool_frontend_modules")
  */
-class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleController
+class MemberDashboardEventBlogWriteController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'member_dashboard_write_event_article';
+    public const TYPE = 'member_dashboard_write_event_blog';
 
     protected FrontendUser|null $objUser;
 
@@ -71,17 +71,17 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
 
     private string $projectDir;
 
-    private string $eventStoryAssetDir;
+    private string $eventBlogAssetDir;
 
     private string $locale;
 
-    public function __construct(ContaoFramework $framework, TranslatorInterface $translator, Security $security, string $projectDir, string $eventStoryAssetDir, string $locale)
+    public function __construct(ContaoFramework $framework, TranslatorInterface $translator, Security $security, string $projectDir, string $eventBlogAssetDir, string $locale)
     {
         $this->framework = $framework;
         $this->translator = $translator;
         $this->security = $security;
         $this->projectDir = $projectDir;
-        $this->eventStoryAssetDir = $eventStoryAssetDir;
+        $this->eventBlogAssetDir = $eventBlogAssetDir;
         $this->locale = $locale;
     }
 
@@ -132,8 +132,8 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-        /** @var $calendarEventsStoryModelAdapter */
-        $calendarEventsStoryModelAdapter = $this->framework->getAdapter(CalendarEventsStoryModel::class);
+        /** @var $calendarEventsBlogModelAdapter */
+        $calendarEventsBlogModelAdapter = $this->framework->getAdapter(CalendarEventsBlogModel::class);
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         /** @var Database $databaseAdapter */
@@ -146,32 +146,32 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         // Load language file
-        $controllerAdapter->loadLanguageFile('tl_calendar_events_story');
+        $controllerAdapter->loadLanguageFile('tl_calendar_events_blog');
 
         // Handle messages
         if (empty($this->objUser->email) || !$validatorAdapter->isEmail($this->objUser->email)) {
-            $messageAdapter->addInfo($this->translator->trans('ERR.md_write_event_article_emailAddressNotFound', [], 'contao_default'));
+            $messageAdapter->addInfo($this->translator->trans('ERR.md_write_event_blog_emailAddressNotFound', [], 'contao_default'));
         }
 
         $objEvent = $calendarEventsModelAdapter->findByPk($inputAdapter->get('eventId'));
 
         if (null === $objEvent) {
-            $messageAdapter->addError($this->translator->trans('ERR.md_write_event_article_eventNotFound', [$inputAdapter->get('eventId')], 'contao_default'));
+            $messageAdapter->addError($this->translator->trans('ERR.md_write_event_blog_eventNotFound', [$inputAdapter->get('eventId')], 'contao_default'));
         }
 
         if (!$messageAdapter->hasError()) {
             // Check if report already exists
-            $objReportModel = CalendarEventsStoryModel::findOneBySacMemberIdAndEventId($this->objUser->sacMemberId, $objEvent->id);
+            $objReportModel = CalendarEventsBlogModel::findOneBySacMemberIdAndEventId($this->objUser->sacMemberId, $objEvent->id);
 
             if (null === $objReportModel) {
-                if ($objEvent->endDate + $model->timeSpanForCreatingNewEventStory * 24 * 60 * 60 < time()) {
+                if ($objEvent->endDate + $model->timeSpanForCreatingNewEventBlog * 24 * 60 * 60 < time()) {
                     // Do not allow blogging for old events
-                    $messageAdapter->addError($this->translator->trans('ERR.md_write_event_article_createArticleDeadlineExpired', [], 'contao_default'));
+                    $messageAdapter->addError($this->translator->trans('ERR.md_write_event_blog_createBlogDeadlineExpired', [], 'contao_default'));
                 }
 
                 if (!$messageAdapter->hasError()) {
                     $blnAllow = false;
-                    $intStartDateMin = $model->timeSpanForCreatingNewEventStory > 0 ? time() - $model->timeSpanForCreatingNewEventStory * 24 * 3600 : time();
+                    $intStartDateMin = $model->timeSpanForCreatingNewEventBlog > 0 ? time() - $model->timeSpanForCreatingNewEventBlog * 24 * 3600 : time();
                     $arrAllowedEvents = $calendarEventsMemberModelAdapter->findEventsByMemberId($this->objUser->id, [], $intStartDateMin, time(), true);
 
                     foreach ($arrAllowedEvents as $allowedEvent) {
@@ -182,7 +182,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
 
                     // User has not participated on the event neither as guide nor as participant and is not allowed to write a report
                     if (!$blnAllow) {
-                        $messageAdapter->addError($this->translator->trans('ERR.md_write_event_article_writingPermissionDenied', [], 'contao_default'));
+                        $messageAdapter->addError($this->translator->trans('ERR.md_write_event_blog_writingPermissionDenied', [], 'contao_default'));
                     }
                 }
             }
@@ -212,7 +212,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                         'dateAdded' => time(),
                     ];
                     $objInsertStmt = $databaseAdapter->getInstance()
-                        ->prepare('INSERT INTO tl_calendar_events_story %s')
+                        ->prepare('INSERT INTO tl_calendar_events_blog %s')
                         ->set($set)
                         ->execute()
                     ;
@@ -224,12 +224,12 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                         $set = [];
                         $set['securityToken'] = md5((string) random_int(100000000, 999999999)).$insertId;
                         $databaseAdapter->getInstance()
-                            ->prepare('UPDATE tl_calendar_events_story %s WHERE id=?')
+                            ->prepare('UPDATE tl_calendar_events_blog %s WHERE id=?')
                             ->set($set)
                             ->execute($insertId)
                         ;
 
-                        $objReportModel = $calendarEventsStoryModelAdapter->findByPk($insertId);
+                        $objReportModel = $calendarEventsBlogModelAdapter->findByPk($insertId);
                     }
                 }
 
@@ -270,8 +270,8 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                 }
 
                 // Generate forms
-                $this->template->objEventStoryTextAndYoutubeForm = $this->generateTextAndYoutubeForm($objReportModel);
-                $this->template->objEventStoryImageUploadForm = $this->generatePictureUploadForm($objReportModel, $model);
+                $this->template->objEventBlogTextAndYoutubeForm = $this->generateTextAndYoutubeForm($objReportModel);
+                $this->template->objEventBlogImageUploadForm = $this->generatePictureUploadForm($objReportModel, $model);
 
                 // Get the preview link
                 $this->template->previewLink = $this->getPreviewLink($objReportModel, $model);
@@ -281,7 +281,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         // Check if all images are labeled with a legend and a photographer name
         if (isset($objReportModel) && $objReportModel->publishState < 2) {
             if (!$this->validateImageUploads($objReportModel)) {
-                $messageAdapter->addInfo($this->translator->trans('ERR.md_write_event_article_missingImageLegend', [], 'contao_default'));
+                $messageAdapter->addInfo($this->translator->trans('ERR.md_write_event_blog_missingImageLegend', [], 'contao_default'));
             }
         }
 
@@ -291,7 +291,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         return $this->template->getResponse();
     }
 
-    protected function validateImageUploads(CalendarEventsStoryModel $objReportModel): bool
+    protected function validateImageUploads(CalendarEventsBlogModel $objReportModel): bool
     {
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
@@ -352,7 +352,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         $messageAdapter->reset();
     }
 
-    protected function generateTextAndYoutubeForm(CalendarEventsStoryModel $objEventStoryModel): string
+    protected function generateTextAndYoutubeForm(CalendarEventsBlogModel $objEventBlogModel): string
     {
         // Set adapters
         /** @var Environment $environmentAdapter */
@@ -363,7 +363,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         $inputAdapter = $this->framework->getAdapter(Input::class);
 
         $objForm = new Form(
-            'form-eventstory-text-and-youtube',
+            'form-event-blog-text-and-youtube',
             'POST',
             function ($objHaste) {
                 /** @var Input $inputAdapter */
@@ -381,7 +381,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             'label' => 'Tourname/Tourtitel',
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'decodeEntities' => true],
-            'value' => $this->getTourTitle($objEventStoryModel),
+            'value' => $this->getTourTitle($objEventBlogModel),
         ]);
 
         // text
@@ -390,7 +390,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             'label' => 'Touren-/Lager-/Kursbericht (max. '.$maxlength.' Zeichen, inkl. Leerzeichen)',
             'inputType' => 'textarea',
             'eval' => ['mandatory' => true, 'maxlength' => $maxlength, 'rows' => 8, 'decodeEntities' => true],
-            'value' => (string) $objEventStoryModel->text,
+            'value' => (string) $objEventBlogModel->text,
         ]);
 
         // tour waypoints
@@ -402,7 +402,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                 'label' => 'Tourenstationen mit Höhenangaben (nur stichwortartig)',
                 'inputType' => 'textarea',
                 'eval' => $eval,
-                'value' => $this->getTourWaypoints($objEventStoryModel),
+                'value' => $this->getTourWaypoints($objEventBlogModel),
             ]
         );
 
@@ -415,7 +415,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                 'label' => 'Höhenmeter und Zeitangabe pro Tag',
                 'inputType' => 'textarea',
                 'eval' => $eval,
-                'value' => $this->getTourProfile($objEventStoryModel),
+                'value' => $this->getTourProfile($objEventBlogModel),
             ]
         );
 
@@ -426,7 +426,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             'label' => 'Technische Schwierigkeiten',
             'inputType' => 'textarea',
             'eval' => $eval,
-            'value' => $this->getTourTechDifficulties($objEventStoryModel),
+            'value' => $this->getTourTechDifficulties($objEventBlogModel),
         ]);
 
         // tour highlights (not mandatory)
@@ -436,7 +436,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             'label' => 'Highlights/Bemerkungen (max. 3 Sätze)',
             'inputType' => 'textarea',
             'eval' => $eval,
-            'value' => (string) $objEventStoryModel->tourHighlights,
+            'value' => (string) $objEventBlogModel->tourHighlights,
         ]);
 
         // tour public transport info
@@ -446,7 +446,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
             'label' => 'Mögliche ÖV-Verbindung',
             'inputType' => 'textarea',
             'eval' => $eval,
-            'value' => (string) $objEventStoryModel->tourPublicTransportInfo,
+            'value' => (string) $objEventBlogModel->tourPublicTransportInfo,
         ]);
 
         // youtube id
@@ -456,7 +456,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                 'label' => 'Youtube Film-Id',
                 'inputType' => 'text',
                 'eval' => ['placeholder' => 'z.B. G02hYgT3nGw'],
-                'value' => (string) $objEventStoryModel->youtubeId,
+                'value' => (string) $objEventBlogModel->youtubeId,
             ]
         );
 
@@ -467,27 +467,27 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         ]);
 
         // Bind model
-        $objForm->bindModel($objEventStoryModel);
+        $objForm->bindModel($objEventBlogModel);
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate() && $inputAdapter->post('FORM_SUBMIT') === $objForm->getFormId()) {
-            $objEventStoryModel->dateAdded = time();
-            $objEventStoryModel->title = html_entity_decode((string) $objForm->getWidget('title')->value);
-            $objEventStoryModel->text = html_entity_decode((string) $objForm->getWidget('text')->value);
-            $objEventStoryModel->youtubeId = $objForm->getWidget('youtubeId')->value;
-            $objEventStoryModel->tourWaypoints = html_entity_decode((string) $objForm->getWidget('tourWaypoints')->value);
-            $objEventStoryModel->tourProfile = html_entity_decode((string) $objForm->getWidget('tourProfile')->value);
-            $objEventStoryModel->tourTechDifficulty = html_entity_decode((string) $objForm->getWidget('tourTechDifficulty')->value);
-            $objEventStoryModel->tourHighlights = html_entity_decode((string) $objForm->getWidget('tourHighlights')->value);
-            $objEventStoryModel->tourPublicTransportInfo = html_entity_decode((string) $objForm->getWidget('tourPublicTransportInfo')->value);
+            $objEventBlogModel->dateAdded = time();
+            $objEventBlogModel->title = html_entity_decode((string) $objForm->getWidget('title')->value);
+            $objEventBlogModel->text = html_entity_decode((string) $objForm->getWidget('text')->value);
+            $objEventBlogModel->youtubeId = $objForm->getWidget('youtubeId')->value;
+            $objEventBlogModel->tourWaypoints = html_entity_decode((string) $objForm->getWidget('tourWaypoints')->value);
+            $objEventBlogModel->tourProfile = html_entity_decode((string) $objForm->getWidget('tourProfile')->value);
+            $objEventBlogModel->tourTechDifficulty = html_entity_decode((string) $objForm->getWidget('tourTechDifficulty')->value);
+            $objEventBlogModel->tourHighlights = html_entity_decode((string) $objForm->getWidget('tourHighlights')->value);
+            $objEventBlogModel->tourPublicTransportInfo = html_entity_decode((string) $objForm->getWidget('tourPublicTransportInfo')->value);
 
-            $objEventStoryModel->save();
+            $objEventBlogModel->save();
 
             $hasErrors = false;
 
             // Check mandatory fields
             if ('' === $objForm->getWidget('text')->value) {
-                $objForm->getWidget('text')->addError($this->translator->trans('ERR.md_write_event_article_writeSomethingAboutTheEvent', [], 'contao_default'));
+                $objForm->getWidget('text')->addError($this->translator->trans('ERR.md_write_event_blog_writeSomethingAboutTheEvent', [], 'contao_default'));
                 $hasErrors = true;
             }
 
@@ -509,15 +509,15 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         $objForm->getWidget('text')->addAttribute('v-on:keyup', 'onKeyUp("ctrl_text")');
     }
 
-    protected function getTourProfile(CalendarEventsStoryModel $objEventStoryModel): string
+    protected function getTourProfile(CalendarEventsBlogModel $objEventBlogModel): string
     {
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        if (!empty($objEventStoryModel->tourProfile)) {
-            return $objEventStoryModel->tourProfile;
+        if (!empty($objEventBlogModel->tourProfile)) {
+            return $objEventBlogModel->tourProfile;
         }
-        $objEvent = $calendarEventsModelAdapter->findByPk($objEventStoryModel->eventId);
+        $objEvent = $calendarEventsModelAdapter->findByPk($objEventBlogModel->eventId);
 
         if (null !== $objEvent) {
             $arrData = $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent);
@@ -528,15 +528,15 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         return '';
     }
 
-    protected function getTourTitle(CalendarEventsStoryModel $objEventStoryModel): string
+    protected function getTourTitle(CalendarEventsBlogModel $objEventBlogModel): string
     {
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        if (!empty($objEventStoryModel->title)) {
-            return $objEventStoryModel->title;
+        if (!empty($objEventBlogModel->title)) {
+            return $objEventBlogModel->title;
         }
 
-        $objEvent = $calendarEventsModelAdapter->findByPk($objEventStoryModel->eventId);
+        $objEvent = $calendarEventsModelAdapter->findByPk($objEventBlogModel->eventId);
 
         if (null !== $objEvent) {
             return '' !== $objEvent->title ? $objEvent->title : '';
@@ -545,14 +545,14 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         return '';
     }
 
-    protected function getTourWaypoints(CalendarEventsStoryModel $objEventStoryModel): string
+    protected function getTourWaypoints(CalendarEventsBlogModel $objEventBlogModel): string
     {
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        if (!empty($objEventStoryModel->tourWaypoints)) {
-            return $objEventStoryModel->tourWaypoints;
+        if (!empty($objEventBlogModel->tourWaypoints)) {
+            return $objEventBlogModel->tourWaypoints;
         }
-        $objEvent = $calendarEventsModelAdapter->findByPk($objEventStoryModel->eventId);
+        $objEvent = $calendarEventsModelAdapter->findByPk($objEventBlogModel->eventId);
 
         if (null !== $objEvent) {
             return !empty($objEvent->tourDetailText) ? $objEvent->tourDetailText : '';
@@ -561,21 +561,21 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         return '';
     }
 
-    protected function getTourTechDifficulties(CalendarEventsStoryModel $objEventStoryModel): string
+    protected function getTourTechDifficulties(CalendarEventsBlogModel $objEventBlogModel): string
     {
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        if (!empty($objEventStoryModel->tourTechDifficulty)) {
-            return $objEventStoryModel->tourTechDifficulty;
+        if (!empty($objEventBlogModel->tourTechDifficulty)) {
+            return $objEventBlogModel->tourTechDifficulty;
         }
-        $objEvent = $calendarEventsModelAdapter->findByPk($objEventStoryModel->eventId);
+        $objEvent = $calendarEventsModelAdapter->findByPk($objEventBlogModel->eventId);
 
         if (null !== $objEvent) {
             $arrData = $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent);
 
             if (empty($arrData)) {
-                return $this->translator->trans('ERR.md_write_event_article_notSpecified', [], 'contao_default');
+                return $this->translator->trans('ERR.md_write_event_blog_notSpecified', [], 'contao_default');
             }
 
             return implode("\r\n", $arrData);
@@ -587,7 +587,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
     /**
      * @throws \Exception
      */
-    protected function generatePictureUploadForm(CalendarEventsStoryModel $objEventStoryModel, ModuleModel $moduleModel): string
+    protected function generatePictureUploadForm(CalendarEventsBlogModel $objEventBlogModel, ModuleModel $moduleModel): string
     {
         // Set adapters
         /** @var Environment $environmentAdapter */
@@ -610,23 +610,23 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         $configAdapter = $this->framework->getAdapter(Config::class);
 
         // Set max image widht and height
-        if ((int) $moduleModel->eventStoryMaxImageWidth > 0) {
-            $configAdapter->set('imageWidth', (int) $moduleModel->eventStoryMaxImageWidth);
+        if ((int) $moduleModel->eventBlogMaxImageWidth > 0) {
+            $configAdapter->set('imageWidth', (int) $moduleModel->eventBlogMaxImageWidth);
         }
 
-        if ((int) $moduleModel->eventStoryMaxImageHeight > 0) {
-            $configAdapter->set('imageHeight', (int) $moduleModel->eventStoryMaxImageHeight);
+        if ((int) $moduleModel->eventBlogMaxImageHeight > 0) {
+            $configAdapter->set('imageHeight', (int) $moduleModel->eventBlogMaxImageHeight);
         }
 
-        $objUploadFolder = new Folder($this->eventStoryAssetDir.'/'.$objEventStoryModel->id);
+        $objUploadFolder = new Folder($this->eventBlogAssetDir.'/'.$objEventBlogModel->id);
         $dbafsAdapter->addResource($objUploadFolder->path);
 
-        if (!is_dir($this->projectDir.'/'.$this->eventStoryAssetDir.'/'.$objEventStoryModel->id)) {
-            throw new \Exception($this->translator->trans('ERR.md_write_event_article_uploadDirNotFound', [], 'contao_default'));
+        if (!is_dir($this->projectDir.'/'.$this->eventBlogAssetDir.'/'.$objEventBlogModel->id)) {
+            throw new \Exception($this->translator->trans('ERR.md_write_event_blog_uploadDirNotFound', [], 'contao_default'));
         }
 
         $objForm = new Form(
-            'form-eventstory-picture-upload',
+            'form-event-blog-picture-upload',
             'POST',
             function ($objHaste) {
                 /** @var Input $inputAdapter */
@@ -681,7 +681,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
 
                             if ($objFile->isImage) {
                                 // Rename file
-                                $newFilename = sprintf('event-story-%s-img-%s.%s', $objEventStoryModel->id, $objModel->id, strtolower($objFile->extension));
+                                $newFilename = sprintf('event-blog-%s-img-%s.%s', $objEventBlogModel->id, $objModel->id, strtolower($objFile->extension));
                                 $newPath = $objUploadFolder->path.'/'.$newFilename;
                                 $filesAdapter->getInstance()->rename($objFile->path, $newPath);
                                 $objModel->path = $newPath;
@@ -712,14 +712,14 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
                                             $oFileModel->save();
                                         }
 
-                                        // Save gallery data to tl_calendar_events_story
-                                        $multiSRC = $stringUtilAdapter->deserialize($objEventStoryModel->multiSRC, true);
+                                        // Save gallery data to tl_calendar_events_blog
+                                        $multiSRC = $stringUtilAdapter->deserialize($objEventBlogModel->multiSRC, true);
                                         $multiSRC[] = $oFileModel->uuid;
-                                        $objEventStoryModel->multiSRC = serialize($multiSRC);
-                                        $orderSRC = $stringUtilAdapter->deserialize($objEventStoryModel->multiSRC, true);
+                                        $objEventBlogModel->multiSRC = serialize($multiSRC);
+                                        $orderSRC = $stringUtilAdapter->deserialize($objEventBlogModel->multiSRC, true);
                                         $orderSRC[] = $oFileModel->uuid;
-                                        $objEventStoryModel->orderSRC = serialize($orderSRC);
-                                        $objEventStoryModel->save();
+                                        $objEventBlogModel->orderSRC = serialize($orderSRC);
+                                        $objEventBlogModel->save();
                                     }
 
                                     // Log
@@ -747,7 +747,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
     /**
      * @throws \Exception
      */
-    protected function getGalleryImages(CalendarEventsStoryModel $objStory): array
+    protected function getGalleryImages(CalendarEventsBlogModel $objBlog): array
     {
         // Set adapters
         /** @var Validator $validatorAdapter */
@@ -758,7 +758,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
 
         $images = [];
-        $arrMultiSRC = $stringUtilAdapter->deserialize($objStory->multiSRC, true);
+        $arrMultiSRC = $stringUtilAdapter->deserialize($objBlog->multiSRC, true);
 
         foreach ($arrMultiSRC as $uuid) {
             if ($validatorAdapter->isUuid($uuid)) {
@@ -789,8 +789,8 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         }
 
         // Custom image sorting
-        if ('' !== $objStory->orderSRC) {
-            $tmp = $stringUtilAdapter->deserialize($objStory->orderSRC);
+        if ('' !== $objBlog->orderSRC) {
+            $tmp = $stringUtilAdapter->deserialize($objBlog->orderSRC);
 
             if (!empty($tmp) && \is_array($tmp)) {
                 // Remove all values
@@ -822,7 +822,7 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         return array_values($images);
     }
 
-    protected function getPreviewLink(CalendarEventsStoryModel $objStory, ModuleModel $objModule): string
+    protected function getPreviewLink(CalendarEventsBlogModel $objBlog, ModuleModel $objModule): string
     {
         /** @var PageModel $pageModelAdapter */
         $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
@@ -842,13 +842,13 @@ class MemberDashboardWriteEventArticleController extends AbstractFrontendModuleC
         // Generate frontend preview link
         $previewLink = '';
 
-        if ($objModule->eventStoryJumpTo > 0) {
-            $objTarget = $pageModelAdapter->findByPk($objModule->eventStoryJumpTo);
+        if ($objModule->eventBlogJumpTo > 0) {
+            $objTarget = $pageModelAdapter->findByPk($objModule->eventBlogJumpTo);
 
             if (null !== $objTarget) {
                 $previewLink = $stringUtilAdapter->ampersand($objTarget->getFrontendUrl($configAdapter->get('useAutoItem') ? '/%s' : '/items/%s'));
-                $previewLink = sprintf($previewLink, $objStory->id);
-                $previewLink = $environmentAdapter->get('url').'/'.$urlAdapter->addQueryString('securityToken='.$objStory->securityToken, $previewLink);
+                $previewLink = sprintf($previewLink, $objBlog->id);
+                $previewLink = $environmentAdapter->get('url').'/'.$urlAdapter->addQueryString('securityToken='.$objBlog->securityToken, $previewLink);
             }
         }
 

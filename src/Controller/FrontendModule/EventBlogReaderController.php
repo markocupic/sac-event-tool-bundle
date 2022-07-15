@@ -16,8 +16,8 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use Contao\CalendarEventsBlogModel;
 use Contao\CalendarEventsModel;
-use Contao\CalendarEventsStoryModel;
 use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Exception\PageNotFoundException;
@@ -42,17 +42,17 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @FrontendModule(EventStoryReaderController::TYPE, category="sac_event_tool_frontend_modules")
+ * @FrontendModule(EventBlogReaderController::TYPE, category="sac_event_tool_frontend_modules")
  */
-class EventStoryReaderController extends AbstractFrontendModuleController
+class EventBlogReaderController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'event_story_reader';
+    public const TYPE = 'event_blog_reader';
 
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private string $projectDir;
     private string $locale;
-    private CalendarEventsStoryModel|null $story = null;
+    private CalendarEventsBlogModel|null $blog = null;
     private bool $isPreviewMode = false;
 
     public function __construct(ContaoFramework $framework, RequestStack $requestStack, string $projectDir, string $locale)
@@ -65,8 +65,8 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        /** @var CalendarEventsStoryModel $calendarEventsStoryModelAdapter */
-        $calendarEventsStoryModelAdapter = $this->framework->getAdapter(CalendarEventsStoryModel::class);
+        /** @var CalendarEventsBlogModel $calendarEventsBlogModelAdapter */
+        $calendarEventsBlogModelAdapter = $this->framework->getAdapter(CalendarEventsBlogModel::class);
 
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
@@ -92,17 +92,17 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         }
 
         if (!empty($inputAdapter->get('securityToken'))) {
-            $arrColumns = ['tl_calendar_events_story.securityToken=?', 'tl_calendar_events_story.id=?'];
+            $arrColumns = ['tl_calendar_events_blog.securityToken=?', 'tl_calendar_events_blog.id=?'];
             $arrValues = [$inputAdapter->get('securityToken'), $inputAdapter->get('items')];
             $this->isPreviewMode = true;
         } else {
-            $arrColumns = ['tl_calendar_events_story.publishState=?', 'tl_calendar_events_story.id=?'];
+            $arrColumns = ['tl_calendar_events_blog.publishState=?', 'tl_calendar_events_blog.id=?'];
             $arrValues = ['3', $inputAdapter->get('items')];
         }
 
-        $this->story = $calendarEventsStoryModelAdapter->findOneBy($arrColumns, $arrValues);
+        $this->blog = $calendarEventsBlogModelAdapter->findOneBy($arrColumns, $arrValues);
 
-        if (null === $this->story) {
+        if (null === $this->blog) {
             throw new PageNotFoundException('Page not found: '.$environmentAdapter->get('uri'));
         }
 
@@ -137,20 +137,23 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         $urlAdapter = $this->framework->getAdapter(Url::class);
 
         // Set data
-        $template->setData($this->story->row());
+        $template->setData($this->blog->row());
+
+        $template->class = $template->class ?? '';
+        $template->cssID = $template->cssID ?? '';
 
         // Set title as headline
-        $template->headline = $this->story->title;
+        $template->headline = $this->blog->title;
 
         // Twig callable
         $template->binToUuid = static fn (string $uuid): string => StringUtil::binToUuid($uuid);
 
         // Fallback if author is no more findable in tl_member
-        $objAuthor = $memberModelModelAdapter->findOneBySacMemberId($this->story->sacMemberId);
-        $template->authorName = null !== $objAuthor ? $objAuthor->firstname.' '.$objAuthor->lastname : $this->story->authorName;
+        $objAuthor = $memberModelModelAdapter->findOneBySacMemberId($this->blog->sacMemberId);
+        $template->authorName = null !== $objAuthor ? $objAuthor->firstname.' '.$objAuthor->lastname : $this->blog->authorName;
 
         // !!! $objEvent can be NULL, if the related event no more exists
-        $objEvent = $calendarEventsModelAdapter->findByPk($this->story->eventId);
+        $objEvent = $calendarEventsModelAdapter->findByPk($this->blog->eventId);
         $template->objEvent = $objEvent;
 
         // Add qrcode, if it is not preview mode
@@ -159,9 +162,9 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         if (!$this->isPreviewMode) {
             if ($request->query->has('referer')) {
                 $url = base64_decode($request->query->get('referer', ''), true);
-                $url = $urlAdapter->addQueryString('showEventStory='.$this->story->id, $url);
+                $url = $urlAdapter->addQueryString('show_event_blog='.$this->blog->id, $url);
             } else {
-                $url = $urlAdapter->addQueryString('showEventStory='.$this->story->id);
+                $url = $urlAdapter->addQueryString('show_event_blog='.$this->blog->id);
             }
 
             if ('' !== $url) {
@@ -174,7 +177,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
 
         // Add gallery
         $images = [];
-        $arrMultiSRC = $stringUtilAdapter->deserialize($this->story->multiSRC, true);
+        $arrMultiSRC = $stringUtilAdapter->deserialize($this->blog->multiSRC, true);
 
         foreach ($arrMultiSRC as $uuid) {
             if ($validatorAdapter->isUuid($uuid)) {
@@ -234,8 +237,8 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         }
 
         // Custom image sorting
-        if ('' !== $this->story->orderSRC) {
-            $tmp = $stringUtilAdapter->deserialize($this->story->orderSRC);
+        if ('' !== $this->blog->orderSRC) {
+            $tmp = $stringUtilAdapter->deserialize($this->blog->orderSRC);
 
             if (!empty($tmp) && \is_array($tmp)) {
                 // Remove all values
@@ -268,7 +271,7 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         $template->images = \count($images) ? $images : null;
 
         // Add YouTube movie
-        $template->youtubeId = '' !== $this->story->youtubeId ? $this->story->youtubeId : null;
+        $template->youtubeId = '' !== $this->blog->youtubeId ? $this->blog->youtubeId : null;
 
         // tourTechDifficulty
         $template->tourInstructors = null;
@@ -308,20 +311,20 @@ class EventStoryReaderController extends AbstractFrontendModuleController
         $template->tourWaypoints = null;
         $template->tourHighlights = null;
 
-        if ('' !== $this->story->tourWaypoints) {
-            $template->tourWaypoints = nl2br((string) $this->story->tourWaypoints);
+        if ('' !== $this->blog->tourWaypoints) {
+            $template->tourWaypoints = nl2br((string) $this->blog->tourWaypoints);
         }
 
-        if ('' !== $this->story->tourProfile) {
-            $template->tourProfile = nl2br((string) $this->story->tourProfile);
+        if ('' !== $this->blog->tourProfile) {
+            $template->tourProfile = nl2br((string) $this->blog->tourProfile);
         }
 
-        if ('' !== $this->story->tourHighlights) {
-            $template->tourHighlights = nl2br((string) $this->story->tourHighlights);
+        if ('' !== $this->blog->tourHighlights) {
+            $template->tourHighlights = nl2br((string) $this->blog->tourHighlights);
         }
 
-        if ('' !== $this->story->tourPublicTransportInfo) {
-            $template->tourPublicTransportInfo = nl2br((string) $this->story->tourPublicTransportInfo);
+        if ('' !== $this->blog->tourPublicTransportInfo) {
+            $template->tourPublicTransportInfo = nl2br((string) $this->blog->tourPublicTransportInfo);
         }
 
         return $template->getResponse();
@@ -330,13 +333,13 @@ class EventStoryReaderController extends AbstractFrontendModuleController
     private function getQrCodeFromUrl(string $url): string|null
     {
         // Generate QR code folder
-        $objFolder = new Folder('system/eventstoryqrcodes');
+        $objFolder = new Folder('system/eventblogqrcodes');
 
         // Symlink
         SymlinkUtil::symlink($objFolder->path, 'web/'.$objFolder->path, $this->projectDir);
 
         // Generate path
-        $filepath = sprintf($objFolder->path.'/'.'eventStoryQRcode_%s.png', md5($url));
+        $filepath = sprintf($objFolder->path.'/'.'eventBlogQRcode_%s.png', md5($url));
 
         // Defaults
         $opt = [

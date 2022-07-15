@@ -41,11 +41,11 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * @FrontendModule(MemberDashboardEventReportListController::TYPE, category="sac_event_tool_frontend_modules")
+ * @FrontendModule(MemberDashboardEventBlogListController::TYPE, category="sac_event_tool_frontend_modules")
  */
-class MemberDashboardEventReportListController extends AbstractFrontendModuleController
+class MemberDashboardEventBlogListController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'member_dashboard_event_report_list';
+    public const TYPE = 'member_dashboard_event_blog_list';
 
     /**
      * @var string
@@ -109,21 +109,21 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
             $messageAdapter->addInfo('Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.');
         }
 
-        // Get time span for creating new event story
-        $this->template->timeSpanForCreatingNewEventStory = $model->timeSpanForCreatingNewEventStory;
+        // Get the time span for creating a new event blog
+        $this->template->timeSpanForCreatingNewEventBlog = $model->timeSpanForCreatingNewEventBlog;
 
         // Add messages to template
         $this->addMessagesToTemplate();
-        $objForm = $this->generateCreateNewEventStoryForm($model);
-        $this->template->newEventStoryForm = $objForm->generate();
+        $objForm = $this->generateCreateNewEventBlogForm($model);
+        $this->template->newEventBlogForm = $objForm->generate();
 
         // Get event report list
-        $this->template->arrEventStories = $this->getEventStories($model);
+        $this->template->arrEventBlogs = $this->getEventBlogs($model);
 
         return $this->template->getResponse();
     }
 
-    protected function getEventStories(ModuleModel $model): array
+    protected function getEventBlogs(ModuleModel $model): array
     {
         // Set adapters
         $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
@@ -134,48 +134,48 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
         $pageModelAdapter = $this->get('contao.framework')->getAdapter(PageModel::class);
         $urlAdapter = $this->get('contao.framework')->getAdapter(Url::class);
 
-        $arrEventStories = [];
+        $arrEventBlogs = [];
 
         if (null !== $this->objUser) {
-            // Event Stories
-            $objEventStory = $databaseAdapter->getInstance()
-                ->prepare('SELECT * FROM tl_calendar_events_story WHERE sacMemberId=? ORDER BY eventStartDate DESC')
+            // Event blogs
+            $objEventBlog = $databaseAdapter->getInstance()
+                ->prepare('SELECT * FROM tl_calendar_events_blog WHERE sacMemberId=? ORDER BY eventStartDate DESC')
                 ->execute($this->objUser->sacMemberId)
             ;
 
-            while ($objEventStory->next()) {
-                $arrEventStory = $objEventStory->row();
+            while ($objEventBlog->next()) {
+                $arrEventBlog = $objEventBlog->row();
 
                 // Defaults
-                $arrEventStory['date'] = $dateAdapter->parse($configAdapter->get('dateFormat'), $objEventStory->eventStartDate);
-                $arrEventStory['canEditStory'] = false;
-                $arrEventStory['storyLink'] = '';
+                $arrEventBlog['date'] = $dateAdapter->parse($configAdapter->get('dateFormat'), $objEventBlog->eventStartDate);
+                $arrEventBlog['canEditBlog'] = false;
+                $arrEventBlog['blogLink'] = '';
 
-                // Check if story is still editable
-                if ($objEventStory->eventEndDate + $model->timeSpanForCreatingNewEventStory * 24 * 60 * 60 > time()) {
-                    if ('1' === $objEventStory->publishState) {
-                        $arrEventStory['canEditStory'] = true;
+                // Check if the event blog is still editable
+                if ($objEventBlog->eventEndDate + $model->timeSpanForCreatingNewEventBlog * 24 * 60 * 60 > time()) {
+                    if ('1' === $objEventBlog->publishState) {
+                        $arrEventBlog['canEditBlog'] = true;
                     }
                 }
 
                 // Check if event still exists
-                if (($objEvent = $calendarEventsModelAdapter->findByPk($objEventStory->eventId)) !== null) {
+                if (($objEvent = $calendarEventsModelAdapter->findByPk($objEventBlog->eventId)) !== null) {
                     // Overwrite date if event still exists in tl_calendar_events
-                    $arrEventStory['date'] = $calendarEventsHelperAdapter->getEventPeriod($objEvent, $configAdapter->get('dateFormat'), false);
-                    $objPage = $pageModelAdapter->findByPk($model->eventStoryFormJumpTo);
+                    $arrEventBlog['date'] = $calendarEventsHelperAdapter->getEventPeriod($objEvent, $configAdapter->get('dateFormat'), false);
+                    $objPage = $pageModelAdapter->findByPk($model->eventBlogFormJumpTo);
 
                     if (null !== $objPage) {
-                        $arrEventStory['storyLink'] = $urlAdapter->addQueryString('eventId='.$objEventStory->eventId, $objPage->getFrontendUrl());
+                        $arrEventBlog['blogLink'] = $urlAdapter->addQueryString('eventId='.$objEventBlog->eventId, $objPage->getFrontendUrl());
                     }
                 }
-                $arrEventStories[] = $arrEventStory;
+                $arrEventBlogs[] = $arrEventBlog;
             }
         }
 
-        return $arrEventStories;
+        return $arrEventBlogs;
     }
 
-    protected function generateCreateNewEventStoryForm(ModuleModel $model): Form
+    protected function generateCreateNewEventBlogForm(ModuleModel $model): Form
     {
         // Set adapters
         $calendarEventsMemberModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsMemberModel::class);
@@ -186,7 +186,7 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
         $pageModelAdapter = $this->get('contao.framework')->getAdapter(PageModel::class);
 
         $objForm = new Form(
-            'form-create-new-event-story',
+            'form-create-new-event-blog',
             'POST',
             function ($objHaste) {
                 $inputAdapter = $this->get('contao.framework')->getAdapter(Input::class);
@@ -198,7 +198,7 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
         $arrOptions = [];
-        $intStartDateMin = $model->timeSpanForCreatingNewEventStory > 0 ? time() - $model->timeSpanForCreatingNewEventStory * 24 * 3600 : time();
+        $intStartDateMin = $model->timeSpanForCreatingNewEventBlog > 0 ? time() - $model->timeSpanForCreatingNewEventBlog * 24 * 3600 : time();
         $arrEvents = $calendarEventsMemberModelAdapter->findEventsByMemberId($this->objUser->id, [], $intStartDateMin, time(), true);
 
         if (!empty($arrEvents) && \is_array($arrEvents)) {
@@ -226,10 +226,10 @@ class MemberDashboardEventReportListController extends AbstractFrontendModuleCon
 
         if ($objForm->validate()) {
             // Redirect to the page with the event report form
-            if ('form-create-new-event-story' === $inputAdapter->post('FORM_SUBMIT')) {
+            if ('form-create-new-event-blog' === $inputAdapter->post('FORM_SUBMIT')) {
                 $href = '';
                 $objWidget = $objForm->getWidget('event');
-                $objPage = $pageModelAdapter->findByPk($model->eventStoryFormJumpTo);
+                $objPage = $pageModelAdapter->findByPk($model->eventBlogFormJumpTo);
 
                 if (null !== $objPage) {
                     $href = $urlAdapter->addQueryString('eventId='.$objWidget->value, $objPage->getFrontendUrl());

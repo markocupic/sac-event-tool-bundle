@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
-use Contao\CalendarEventsStoryModel;
+use Contao\CalendarEventsBlogModel;
 use Contao\Config;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Exception\PageNotFoundException;
@@ -23,6 +23,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Environment;
 use Contao\FilesModel;
 use Contao\MemberModel;
+use Contao\Model\Collection;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Pagination;
@@ -33,16 +34,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @FrontendModule(EventStoryListController::TYPE, category="sac_event_tool_frontend_modules")
+ * @FrontendModule(EventBlogListController::TYPE, category="sac_event_tool_frontend_modules")
  */
-class EventStoryListController extends AbstractFrontendModuleController
+class EventBlogListController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'event_story_list';
+    public const TYPE = 'event_blog_list';
 
     /**
-     * @var CalendarEventsStoryModel
+     * @var Collection
      */
-    private $stories;
+    private $blogs;
 
     /**
      * @var bool
@@ -56,8 +57,8 @@ class EventStoryListController extends AbstractFrontendModuleController
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        /** @var CalendarEventsStoryModel $calendarEventsStoryModelAdapter */
-        $calendarEventsStoryModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsStoryModel::class);
+        /** @var CalendarEventsBlogModel $calendarEventsBlogModelAdapter */
+        $calendarEventsBlogModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsBlogModel::class);
 
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
@@ -72,26 +73,26 @@ class EventStoryListController extends AbstractFrontendModuleController
         $arrIDS = [];
         $arrOptions = ['order' => 'dateAdded DESC'];
 
-        /** @var CalendarEventsStoryModel $objStories */
-        $objStories = $calendarEventsStoryModelAdapter->findBy(
-            ['tl_calendar_events_story.publishState=?'],
+        /** @var CalendarEventsBlogModel $objBlogs */
+        $objBlogs = $calendarEventsBlogModelAdapter->findBy(
+            ['tl_calendar_events_blog.publishState=?'],
             ['3'],
             $arrOptions
         );
 
-        if (null !== $objStories) {
-            while ($objStories->next()) {
-                $arrOrganizers = $stringUtilAdapter->deserialize($objStories->organizers, true);
+        if (null !== $objBlogs) {
+            while ($objBlogs->next()) {
+                $arrOrganizers = $stringUtilAdapter->deserialize($objBlogs->organizers, true);
 
-                if (\count(array_intersect($arrOrganizers, $stringUtilAdapter->deserialize($model->story_eventOrganizers, true))) > 0) {
-                    $arrIDS[] = $objStories->id;
+                if (\count(array_intersect($arrOrganizers, $stringUtilAdapter->deserialize($model->eventBlogOrganizers, true))) > 0) {
+                    $arrIDS[] = $objBlogs->id;
                 }
             }
         }
 
-        $this->stories = $calendarEventsStoryModelAdapter->findMultipleByIds($arrIDS, $arrOptions);
+        $this->blogs = $calendarEventsBlogModelAdapter->findMultipleByIds($arrIDS, $arrOptions);
 
-        if (null === $this->stories) {
+        if (null === $this->blogs) {
             // Return empty string
             return new Response('', Response::HTTP_NO_CONTENT);
         }
@@ -148,21 +149,21 @@ class EventStoryListController extends AbstractFrontendModuleController
             $objPageModel = $pageModelAdapter->findByPk($model->jumpTo);
         }
 
-        $arrAllStories = [];
+        $arrBlogsAll = [];
         $arrAllIds = [];
 
-        while ($this->stories->next()) {
-            $arrStory = $this->stories->row();
-            $arrAllIds[] = $arrStory['id'];
-            $objMember = $memberModelModelAdapter->findOneBySacMemberId($arrStory['sacMemberId']);
-            $arrStory['authorId'] = $objMember->id;
-            $arrStory['authorName'] = null !== $objMember ? $objMember->firstname.' '.$objMember->lastname : $arrStory['authorName'];
-            $arrStory['href'] = null !== $objPageModel ? ampersand($objPageModel->getFrontendUrl(($configAdapter->get('useAutoItem') ? '/' : '/items/').$this->stories->id)) : null;
+        while ($this->blogs->next()) {
+            $arrBlog = $this->blogs->row();
+            $arrAllIds[] = $arrBlog['id'];
+            $objMember = $memberModelModelAdapter->findOneBySacMemberId($arrBlog['sacMemberId']);
+            $arrBlog['authorId'] = $objMember->id;
+            $arrBlog['authorName'] = null !== $objMember ? $objMember->firstname.' '.$objMember->lastname : $arrBlog['authorName'];
+            $arrBlog['href'] = null !== $objPageModel ? ampersand($objPageModel->getFrontendUrl(($configAdapter->get('useAutoItem') ? '/' : '/items/').$this->blogs->id)) : null;
 
-            $multiSRC = $stringUtilAdapter->deserialize($arrStory['multiSRC'], true);
+            $multiSRC = $stringUtilAdapter->deserialize($arrBlog['multiSRC'], true);
 
             // Add a random image to the list
-            $arrStory['singleSRC'] = null;
+            $arrBlog['singleSRC'] = null;
 
             if (!empty($multiSRC) && \is_array($multiSRC)) {
                 $k = array_rand($multiSRC);
@@ -173,7 +174,7 @@ class EventStoryListController extends AbstractFrontendModuleController
 
                     if (null !== $objFiles) {
                         if (is_file($projectDir.'/'.$objFiles->path)) {
-                            $arrStory['singleSRC'] = [
+                            $arrBlog['singleSRC'] = [
                                 'id' => $objFiles->id,
                                 'path' => $objFiles->path,
                                 'uuid' => $stringUtilAdapter->binToUuid($objFiles->uuid),
@@ -187,17 +188,17 @@ class EventStoryListController extends AbstractFrontendModuleController
                 }
             }
 
-            $arrAllStories[] = $arrStory;
+            $arrBlogsAll[] = $arrBlog;
         }
         $template->arrAllIds = $arrAllIds;
 
-        $total = \count($arrAllStories);
+        $total = \count($arrBlogsAll);
         $limit = $total;
         $offset = 0;
 
         // Overall limit
-        if ($model->story_limit > 0) {
-            $total = min($model->story_limit, $total);
+        if ($model->eventBlogLimit > 0) {
+            $total = min($model->eventBlogLimit, $total);
             $limit = $total;
         }
 
@@ -220,15 +221,15 @@ class EventStoryListController extends AbstractFrontendModuleController
             $template->pagination = $objPagination->generate("\n  ");
         }
 
-        $arrStories = [];
+        $arrBlogs = [];
 
         for ($i = $offset; $i < $limit; ++$i) {
-            if (!isset($arrAllStories[$i]) || !\is_array($arrAllStories[$i])) {
+            if (!isset($arrBlogsAll[$i]) || !\is_array($arrBlogsAll[$i])) {
                 continue;
             }
-            $arrStories[] = $arrAllStories[$i];
+            $arrBlogs[] = $arrBlogsAll[$i];
         }
-        $template->stories = $arrStories;
+        $template->blogs = $arrBlogs;
 
         return $template->getResponse();
     }

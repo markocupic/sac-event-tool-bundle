@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Backend;
+use Contao\CalendarEventsBlogModel;
 use Contao\CalendarEventsModel;
-use Contao\CalendarEventsStoryModel;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 use Contao\Environment;
@@ -37,7 +37,7 @@ use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 
-class CalendarEventsStory
+class CalendarEventsBlog
 {
     private Security $security;
     private Connection $connection;
@@ -45,10 +45,10 @@ class CalendarEventsStory
     private BinaryFileDownload $binaryFileDownload;
     private string $projectDir;
     private string $tempDir;
-    private string $eventStoryExportTemplate;
+    private string $eventBlogExportTemplate;
     private string $locale;
 
-    public function __construct(Security $security, Connection $connection, RequestStack $requestStack, BinaryFileDownload $binaryFileDownload, string $projectDir, string $tempDir, string $eventStoryExportTemplate, string $locale)
+    public function __construct(Security $security, Connection $connection, RequestStack $requestStack, BinaryFileDownload $binaryFileDownload, string $projectDir, string $tempDir, string $eventBlogExportTemplate, string $locale)
     {
         $this->security = $security;
         $this->connection = $connection;
@@ -56,12 +56,12 @@ class CalendarEventsStory
         $this->binaryFileDownload = $binaryFileDownload;
         $this->projectDir = $projectDir;
         $this->tempDir = $tempDir;
-        $this->eventStoryExportTemplate = $eventStoryExportTemplate;
+        $this->eventBlogExportTemplate = $eventBlogExportTemplate;
         $this->locale = $locale;
     }
 
     /**
-     * @Callback(table="tl_calendar_events_story", target="config.onload")
+     * @Callback(table="tl_calendar_events_blog", target="config.onload")
      *
      * @throws \Exception
      */
@@ -71,15 +71,15 @@ class CalendarEventsStory
 
         $id = $request->query->get('id');
 
-        if ($id && 'exportArticle' === $request->query->get('action')) {
-            if (null !== ($objArticle = CalendarEventsStoryModel::findByPk($id))) {
-                $this->exportArticle($objArticle);
+        if ($id && 'exportBlog' === $request->query->get('action')) {
+            if (null !== ($objBlog = CalendarEventsBlogModel::findByPk($id))) {
+                $this->exportBlog($objBlog);
             }
         }
     }
 
     /**
-     * @Callback(table="tl_calendar_events_story", target="config.onload")
+     * @Callback(table="tl_calendar_events_blog", target="config.onload")
      */
     public function setPalettes(): void
     {
@@ -90,47 +90,47 @@ class CalendarEventsStory
             $fields = ['sacMemberId', 'eventId', 'authorName'];
 
             foreach ($fields as $field) {
-                $GLOBALS['TL_DCA']['tl_calendar_events_story']['fields'][$field]['eval']['readonly'] = false;
+                $GLOBALS['TL_DCA']['tl_calendar_events_blog']['fields'][$field]['eval']['readonly'] = false;
             }
         }
     }
 
     /**
-     * @Callback(table="tl_calendar_events_story", target="config.onload")
+     * @Callback(table="tl_calendar_events_blog", target="config.onload")
      *
      * @throws \Exception
      */
     public function deleteUnfinishedAndOldEntries(): void
     {
-        // Delete old and unpublished stories
+        // Delete old and unpublished blogs
         $limit = time() - 60 * 60 * 24 * 30;
 
         $this->connection->executeStatement(
-            'DELETE FROM tl_calendar_events_story WHERE tstamp < ? AND publishState < ?',
+            'DELETE FROM tl_calendar_events_blog WHERE tstamp < ? AND publishState < ?',
             [$limit, 3],
         );
 
-        // Delete unfinished stories older the 14 days
+        // Delete unfinished blogs older the 14 days
         $limit = time() - 60 * 60 * 24 * 14;
 
         $this->connection->executeStatement(
-            'DELETE FROM tl_calendar_events_story WHERE tstamp < ? AND text = ? AND youtubeId = ? AND multiSRC = ?',
+            'DELETE FROM tl_calendar_events_blog WHERE tstamp < ? AND text = ? AND youtubeId = ? AND multiSRC = ?',
             [$limit, '', '', null]
         );
 
-        // Keep stories up to date, if events are renamed f.ex.
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_calendar_events_story', []);
+        // Keep blogs up to date, if events are renamed f.ex.
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_calendar_events_blog', []);
 
-        while (false !== ($arrStory = $stmt->fetchAssociative())) {
-            $objStoryModel = CalendarEventsStoryModel::findByPk($arrStory['id']);
-            $objEvent = $objStoryModel->getRelated('eventId');
+        while (false !== ($arrBlog = $stmt->fetchAssociative())) {
+            $objBlogModel = CalendarEventsBlogModel::findByPk($arrBlog['id']);
+            $objEvent = $objBlogModel->getRelated('eventId');
 
             if (null !== $objEvent) {
-                $objStoryModel->eventTitle = $objEvent->title;
-                $objStoryModel->substitutionEvent = EventExecutionState::STATE_ADAPTED === $objEvent->executionState && '' !== $objEvent->eventSubstitutionText ? $objEvent->eventSubstitutionText : '';
-                $objStoryModel->eventStartDate = $objEvent->startDate;
-                $objStoryModel->eventEndDate = $objEvent->endDate;
-                $objStoryModel->organizers = $objEvent->organizers;
+                $objBlogModel->eventTitle = $objEvent->title;
+                $objBlogModel->substitutionEvent = EventExecutionState::STATE_ADAPTED === $objEvent->executionState && '' !== $objEvent->eventSubstitutionText ? $objEvent->eventSubstitutionText : '';
+                $objBlogModel->eventStartDate = $objEvent->startDate;
+                $objBlogModel->eventEndDate = $objEvent->endDate;
+                $objBlogModel->organizers = $objEvent->organizers;
 
                 $aDates = [];
                 $arrDates = StringUtil::deserialize($objEvent->eventDates, true);
@@ -139,8 +139,8 @@ class CalendarEventsStory
                     $aDates[] = $arrDate['new_repeat'];
                 }
 
-                $objStoryModel->eventDates = serialize($aDates);
-                $objStoryModel->save();
+                $objBlogModel->eventDates = serialize($aDates);
+                $objBlogModel->save();
             }
         }
     }
@@ -148,7 +148,7 @@ class CalendarEventsStory
     /**
      * Add an image to each record.
      *
-     * @Callback(table="tl_calendar_events_story", target="list.label.label")
+     * @Callback(table="tl_calendar_events_blog", target="list.label.label")
      *
      * @param array $row
      */
@@ -171,27 +171,27 @@ class CalendarEventsStory
      * @throws CopyFileException
      * @throws CreateTemporaryFileException
      */
-    private function exportArticle(CalendarEventsStoryModel $objArticle): void
+    private function exportBlog(CalendarEventsBlogModel $objBlog): void
     {
-        $objEvent = CalendarEventsModel::findByPk($objArticle->eventId);
+        $objEvent = CalendarEventsModel::findByPk($objBlog->eventId);
 
         if (null === $objEvent) {
             throw new \Exception('Event not found.');
         }
 
-        if (!is_file($this->projectDir.'/'.$this->eventStoryExportTemplate)) {
+        if (!is_file($this->projectDir.'/'.$this->eventBlogExportTemplate)) {
             throw new \Exception('Template file not found.');
         }
 
         // target dir & file
-        $targetDir = sprintf('system/tmp/article_%s_%s', $objArticle->id, time());
+        $targetDir = sprintf('system/tmp/blog_%s_%s', $objBlog->id, time());
         $imageDir = sprintf('%s/images', $targetDir);
 
         // Create folder
         new Folder($imageDir);
 
-        $targetFile = sprintf('%s/event_article_%s.docx', $targetDir, $objArticle->id);
-        $objPhpWord = new MsWordTemplateProcessor($this->eventStoryExportTemplate, $targetFile);
+        $targetFile = sprintf('%s/event_blog_%s.docx', $targetDir, $objBlog->id);
+        $objPhpWord = new MsWordTemplateProcessor($this->eventBlogExportTemplate, $targetFile);
 
         // Organizers
         $arrOrganizers = CalendarEventsHelper::getEventOrganizersAsArray($objEvent);
@@ -205,7 +205,7 @@ class CalendarEventsStory
             $mainInstructorEmail = $objInstructor->email;
         }
 
-        $objMember = MemberModel::findBySacMemberId($objArticle->sacMemberId);
+        $objMember = MemberModel::findBySacMemberId($objBlog->sacMemberId);
         $strAuthorEmail = '';
 
         if (null !== $objMember) {
@@ -221,24 +221,24 @@ class CalendarEventsStory
         $strEventDates = implode("\r\n", $arrEventDates);
 
         // Checked by instructor
-        $strCheckedByInstructor = $objArticle->checkedByInstructor ? 'Ja' : 'Nein';
+        $strCheckedByInstructor = $objBlog->checkedByInstructor ? 'Ja' : 'Nein';
 
         // Backend url
         $strUrlBackend = sprintf(
-            '%s/contao?do=sac_calendar_event_stories_tool&act=edit&id=%s',
+            '%s/contao?do=sac_calendar_events_blog_tool&act=edit&id=%s',
             Environment::get('url'),
-            $objArticle->id
+            $objBlog->id
         );
 
         // Key data
         $arrKeyData = [];
 
-        if (!empty($objArticle->tourTechDifficulty)) {
-            $arrKeyData[] = $objArticle->tourTechDifficulty;
+        if (!empty($objBlog->tourTechDifficulty)) {
+            $arrKeyData[] = $objBlog->tourTechDifficulty;
         }
 
-        if (!empty($objArticle->tourProfile)) {
-            $arrKeyData[] = $objArticle->tourProfile;
+        if (!empty($objBlog->tourProfile)) {
+            $arrKeyData[] = $objBlog->tourProfile;
         }
 
         // tourTypes
@@ -246,30 +246,30 @@ class CalendarEventsStory
 
         $options = ['multiline' => true];
         $objPhpWord->replace('checkedByInstructor', $strCheckedByInstructor, $options);
-        $objPhpWord->replace('title', $objArticle->title, $options);
-        $objPhpWord->replace('text', $objArticle->text, $options);
-        $objPhpWord->replace('authorName', $objArticle->authorName, $options);
-        $objPhpWord->replace('sacMemberId', $objArticle->sacMemberId, $options);
+        $objPhpWord->replace('title', $objBlog->title, $options);
+        $objPhpWord->replace('text', $objBlog->text, $options);
+        $objPhpWord->replace('authorName', $objBlog->authorName, $options);
+        $objPhpWord->replace('sacMemberId', $objBlog->sacMemberId, $options);
         $objPhpWord->replace('authorEmail', $strAuthorEmail, $options);
-        $objPhpWord->replace('dateAdded', date('Y-m-d', (int) $objArticle->dateAdded), $options);
+        $objPhpWord->replace('dateAdded', date('Y-m-d', (int) $objBlog->dateAdded), $options);
         $objPhpWord->replace('tourTypes', implode(', ', $arrTourTypes), $options);
         $objPhpWord->replace('organizers', $strOrganizers, $options);
         $objPhpWord->replace('mainInstructorName', $mainInstructorName, $options);
         $objPhpWord->replace('mainInstructorEmail', $mainInstructorEmail, $options);
         $objPhpWord->replace('eventDates', $strEventDates, $options);
-        $objPhpWord->replace('tourWaypoints', $objArticle->tourWaypoints, $options);
+        $objPhpWord->replace('tourWaypoints', $objBlog->tourWaypoints, $options);
         $objPhpWord->replace('keyData', implode("\r\n", $arrKeyData), $options);
-        $objPhpWord->replace('tourHighlights', $objArticle->tourHighlights, $options);
-        $objPhpWord->replace('tourPublicTransportInfo', $objArticle->tourPublicTransportInfo, $options);
+        $objPhpWord->replace('tourHighlights', $objBlog->tourHighlights, $options);
+        $objPhpWord->replace('tourPublicTransportInfo', $objBlog->tourPublicTransportInfo, $options);
 
         // Footer
         $objPhpWord->replace('eventId', $objEvent->id);
-        $objPhpWord->replace('articleId', $objArticle->id);
+        $objPhpWord->replace('blogId', $objBlog->id);
         $objPhpWord->replace('urlBackend', htmlentities($strUrlBackend));
 
         // Images
-        if (!empty($objArticle->multiSRC)) {
-            $arrImages = StringUtil::deserialize($objArticle->multiSRC, true);
+        if (!empty($objBlog->multiSRC)) {
+            $arrImages = StringUtil::deserialize($objBlog->multiSRC, true);
 
             if (!empty($arrImages)) {
                 $objFiles = FilesModel::findMultipleByUuids($arrImages);
@@ -298,10 +298,10 @@ class CalendarEventsStory
         }
 
         $zipSrc = sprintf(
-            '%s/%s/article_%s_%s.zip',
+            '%s/%s/blog_%s_%s.zip',
             $this->projectDir,
             $this->tempDir,
-            $objArticle->id,
+            $objBlog->id,
             time()
         );
 

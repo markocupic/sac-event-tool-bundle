@@ -12,5 +12,5 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-$GLOBALS['TL_LANG']['tl_maintenance_jobs']['sac_event_story']['0'] = 'Tourenberichte Module bereinigen';
-$GLOBALS['TL_LANG']['tl_maintenance_jobs']['sac_event_story']['1'] = 'Löscht Bildupload-Verzeichnisse, die keinem Bericht zugeordnet werden können.';
+$GLOBALS['TL_LANG']['tl_maintenance_jobs']['sac_event_blog']['0'] = 'Tourenberichte Module bereinigen';
+$GLOBALS['TL_LANG']['tl_maintenance_jobs']['sac_event_blog']['1'] = 'Löscht Bildupload-Verzeichnisse, die keinem Bericht zugeordnet werden können.';

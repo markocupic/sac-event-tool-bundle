@@ -29,7 +29,7 @@
                         <!-- indexer::stop -->
                         {% for image in images %}
                             <figure class="col-12 col-sm-6 col-md-4 image_container thumbnail responsive">
-                                <a href="{{ image.path }}" data-lightbox="lbEventGal" class="cboxElement" title="{{ image.liinkTitle }}">
+                                <a href="{{ image.path }}" data-lightbox="lbEventGal" class="cboxElement" title="{{ image.linkTitle }}">
                                     {{ '{{image::' ~ binToUuid.invoke(image.uuid) ~ '?width=400&height=400&mode=crop&alt=' ~ image.alt ~ '}}' }}
                                 </a>
                                 <figcaption class="figure-caption">{{ image.strFigureCaption }}</figcaption>
@@ -127,23 +127,23 @@
         <!-- end col right -->
     </div>
 
-    {% if directLink %}
+    {% if directLink is defined %}
         <!-- QR Code & direct link -->
         <ul class="nav nav-pills mt-5 mb-3" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#eventStoryQrCode" type="button" role="tab" aria-controls="pills-home" aria-selected="true">QR Code</button>
+                <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#eventBlogQrCode" type="button" role="tab" aria-controls="pills-home" aria-selected="true">QR Code</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#eventStoryDirectLink" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Direkt-Link</button>
+                <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#eventBlogDirectLink" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Direkt-Link</button>
             </li>
         </ul>
         <div class="tab-content" id="pills-tabContent">
-            <div class="tab-pane fase show active" id="eventStoryQrCode" role="tabpanel" aria-labelledby="pills-home-tab">
-                <div class="event-story-reader-qrcode mt-3 mb-3">
+            <div class="tab-pane fase show active" id="eventBlogQrCode" role="tabpanel" aria-labelledby="pills-home-tab">
+                <div class="event-blog-reader-qrcode mt-3 mb-3">
                     <img src="{{ qrCodePath }}" style="border:1px solid red">
                 </div>
             </div>
-            <div class="tab-pane fase" id="eventStoryDirectLink" role="tabpanel" aria-labelledby="pills-profile-tab">
+            <div class="tab-pane fase" id="eventBlogDirectLink" role="tabpanel" aria-labelledby="pills-profile-tab">
                 <p>Direct link: <a href="{{ directLink }}">{{ directLink }}</a></p>
             </div>
         </div>

@@ -2,23 +2,22 @@
 {% if not isAjaxRequest %}
 
     {% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.min.js|static') %}
-    {% do addJavascriptResource('https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js') %}
-    {% do addJavascriptResource('bundles/markocupicsaceventtool/js/eventstory_list_vue.min.js|static') %}
+    {% do addJavascriptResource('bundles/markocupicsaceventtool/js/event_blog_list_vue.js') %}
 
     <div class="{{ class }} block" {{ cssID }}{% if style is defined %} style="{{ style }}"{% endif %}>
 
         <!-- headline start -->{% if headline is defined %}<{{ hl }}>{{ headline }}</{{ hl }}>{% endif %}<!-- headline end -->
 
-        <div id="eventStoryList{{ id }}">
+        <div id="eventBlogList{{ id }}">
 
             <div class=" list-container" v-html="listContent"></div>
 
             <!-- start modal -->
-            <div class="modal" class="event-story-reader-modal" tabindex="-1" role="dialog" aria-labelledby="eventStoryReaderModalTitle{{ id }}" aria-hidden="true">
+            <div class="modal" class="event-blog-reader-modal" tabindex="-1" role="dialog" aria-labelledby="eventBlogReaderModalTitle{{ id }}" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-fullscreen-xl-down" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="eventStoryReaderModalTitle{{ id }}">Tourenberichte</h5>
+                            <h5 class="modal-title" id="eventBlogReaderModalTitle{{ id }}">Tourenberichte</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
                         </div>
 
@@ -46,9 +45,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Instantiate ItemWatcher class
-            new ItemWatcher('#eventStoryList{{ id }}', {
+            new EventBlogList('#eventBlogList{{ id }}', {
                 'params': {
                     'listModuleId': '{{ id }}',
+                    'apiKey': '07d49d1bc6e9fd8bcaabead11b4f75e0',
                     'readerModuleId': '336',
                     'perPage': '{{ perPage }}',
                     'itemIds': [{{ arrAllIds|join(',') }}],
@@ -62,35 +62,35 @@
 
 {% if isAjaxRequest %}
     <div class="gallery-grid equal-height block">
-        {% for story in stories %}
+        {% for blog in blogs %}
             <div itemscope itemtype="http://schema.org/Article">
                 <div class="card event-item">
 
                     <div class="p-2 d-flex align-items-center">
-                        {{ '{{image::' ~ getAvatar.invoke(story.authorId, 'FE') ~ '?width=32&height=32&mode=crop&class=rounded-circle}}' }}
-                        <p class="card-text fw-bold small m-0 ms-2">von {{ story.authorName }}</p>
+                        {{ '{{image::' ~ getAvatar.invoke(blog.authorId, 'FE') ~ '?width=32&height=32&mode=crop&class=rounded-circle}}' }}
+                        <p class="card-text fw-bold small m-0 ms-2">von {{ blog.authorName }}</p>
                     </div>
 
-                    {% if story.singleSRC %}
+                    {% if blog.singleSRC %}
                         <div class="image-zoom-in">
-                            <a href="{{ story.href }}" class="item-reader-link">
-                                {{ '{{image::' ~ story.singleSRC.uuid ~ '?width=450&height=300&mode=crop&class=card-img-top}}' }}
+                            <a href="{{ blog.href }}" class="item-reader-link">
+                                {{ '{{image::' ~ blog.singleSRC.uuid ~ '?width=450&height=300&mode=crop&class=card-img-top}}' }}
                             </a>
                         </div>
                     {% endif %}
 
                     <div class="card-body">
                         <p class="card-date m-0">
-                            <time datetime="{{ story.dateAdded|date('Y-m-d\TH:i:sP') }}">
-                                <small>{{ story.dateAdded|date('d.m.Y') }}</small>
+                            <time datetime="{{ blog.dateAdded|date('Y-m-d\TH:i:sP') }}">
+                                <small>{{ blog.dateAdded|date('d.m.Y') }}</small>
                             </time>
                         </p>
 
-                        <a href="{{ story.href }}" title="weiterlesen" class="text-decoration-none item-reader-link">
-                            <h6 class="card-title mt-0">{{ story.title }}</h6>
+                        <a href="{{ blog.href }}" title="weiterlesen" class="text-decoration-none item-reader-link">
+                            <h6 class="card-title mt-0">{{ blog.title }}</h6>
                         </a>
 
-                        <p class="card-news-teaser">{{ story.text|raw[0:80] }}</p>
+                        <p class="card-news-teaser">{{ blog.text|raw[0:80] }}</p>
                     </div>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 <?php $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao-component-vue-js/vue/dist/vue.min.js|static'; ?>
 
 <!-- Modal Box text and youtube -->
-<div id="ModalWriteTextAndYt" class="modal fade write-story-text-and-yt" tabindex="-1" role="dialog" aria-labelledby="ModalWriteTextAndYt"
+<div id="ModalWriteTextAndYt" class="modal fade write-event-blog-text-and-yt" tabindex="-1" role="dialog" aria-labelledby="ModalWriteTextAndYt"
      aria-hidden="true">
   <div class="modal-dialog modal-xl modal-fullscreen-xl-down" role="document">
     <div class="modal-content">
@@ -11,7 +11,7 @@
       </div>
       <div class="modal-body">
         <div id="editReportFormBox">
-          <?= $this->objEventStoryTextAndYoutubeForm ?>
+          <?= $this->objEventBlogTextAndYoutubeForm ?>
           <p id="ctrl_text_strLenRemaining" class="text-success">
             Verbleibende Zeichen (Leerzeichen inklusive): {{ ctrl_text.strLenRemaining }}
           </p>

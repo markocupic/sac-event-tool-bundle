@@ -31,9 +31,10 @@
 {{br}}
 <hr>
 {{br}}
-<p><strong>Veröffentlichungs-Level:</strong> <?= $this->publishState ?> - <?= $GLOBALS['TL_LANG']['tl_calendar_events_story']['publishStateRef'][$this->publishState] ?></p>
 
-<div class="event-story-form-buttons d-flex flex-row align-items-center">
+<p><strong>Veröffentlichungs-Level:</strong> <?= $this->publishState ?> - <?= $GLOBALS['TL_LANG']['tl_calendar_events_blog']['publishStateRef'][$this->publishState] ?></p>
+
+<div class="event-blog-form-buttons d-flex flex-row align-items-center">
   <?php if ($this->publishState < 2): ?>
   <div class="me-2">
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalWriteTextAndYt"><i class="fa fa-pencil"></i> Bericht bearbeiten</button>
@@ -49,20 +50,20 @@
   </div>
 
   <?php if ('' != $this->text && $this->publishState < 2): ?>
-  <?php $this->insert('write_event_article_change_publish_state_partial', $this->getData()); ?>
+  <?php $this->insert('write_event_blog_change_publish_state_partial', $this->getData()); ?>
   <?php endif; ?>
 </div>
 
 <?php if ($this->publishState < 2): ?>
 
 <!-- Modal box tour report form -->
-<?php $this->insert('write_event_article_create_report_form_partial', $this->getData()); ?>
+<?php $this->insert('write_event_blog_create_report_form_partial', $this->getData()); ?>
 
 <!-- Modal box photo upload -->
-<?php $this->insert('write_event_article_photoupload_partial', $this->getData()); ?>
+<?php $this->insert('write_event_blog_photoupload_partial', $this->getData()); ?>
 
 <!-- Modal box photo details (cation, rotate image, photographer name -->
-<?php $this->insert('write_event_article_image_modal_box_partial', $this->getData()); ?>
+<?php $this->insert('write_event_blog_image_modal_box_partial', $this->getData()); ?>
 
 <?php endif; ?>
 
@@ -124,7 +125,7 @@
 <?php endif; ?>
 
 <!-- Start gallery -->
-<?php $this->insert('write_event_article_gallery_partial', $this->getData()); ?>
+<?php $this->insert('write_event_blog_gallery_partial', $this->getData()); ?>
 
 <?php if ($this->youtubeId): ?>
 {{br}}

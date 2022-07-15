@@ -26,7 +26,7 @@ use Psr\Log\LogLevel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
-class MaintainModuleEventStory
+class MaintainModuleEventBlog
 {
     private ContaoFramework $framework;
 
@@ -36,19 +36,19 @@ class MaintainModuleEventStory
 
     private string $projectDir;
 
-    private string $eventStoryAssetDir;
+    private string $eventBlogAssetDir;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, string $projectDir, string $eventStoryAssetDir, LoggerInterface|null $logger)
+    public function __construct(ContaoFramework $framework, Connection $connection, string $projectDir, string $eventBlogAssetDir, LoggerInterface|null $logger)
     {
         $this->framework = $framework;
         $this->connection = $connection;
         $this->projectDir = $projectDir;
-        $this->eventStoryAssetDir = $eventStoryAssetDir;
+        $this->eventBlogAssetDir = $eventBlogAssetDir;
         $this->logger = $logger;
     }
 
     /**
-     * Remove image upload folders that aren't assigned to an event story.
+     * Remove image upload folders that aren't assigned to an event blog entry.
      *
      * @throws Exception
      */
@@ -60,7 +60,7 @@ class MaintainModuleEventStory
             ->directories()
             ->depth('< 1')
             ->notName('tmp')
-            ->in($this->projectDir.'/'.$this->eventStoryAssetDir)
+            ->in($this->projectDir.'/'.$this->eventBlogAssetDir)
         ;
 
         if ($finder->hasResults()) {
@@ -68,9 +68,9 @@ class MaintainModuleEventStory
                 $path = $objFolder->getRealPath();
                 $basename = $objFolder->getBasename();
 
-                if (!$this->connection->fetchOne('SELECT id FROM tl_calendar_events_story WHERE id = ?', [(int) $basename])) {
+                if (!$this->connection->fetchOne('SELECT id FROM tl_calendar_events_blog WHERE id = ?', [(int) $basename])) {
                     // Log
-                    $strText = sprintf('Successfully deleted orphaned event story media folder "%s".', $path);
+                    $strText = sprintf('Successfully deleted orphaned event blog media folder "%s".', $path);
                     $this->logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
 
                     // Display the confirmation message in the Contao backend maintenance module.
@@ -83,8 +83,8 @@ class MaintainModuleEventStory
         }
 
         // Purge the tmp folder
-        if (is_dir($this->projectDir.'/'.$this->eventStoryAssetDir.'/tmp')) {
-            $objFolder = new Folder($this->eventStoryAssetDir.'/tmp');
+        if (is_dir($this->projectDir.'/'.$this->eventBlogAssetDir.'/tmp')) {
+            $objFolder = new Folder($this->eventBlogAssetDir.'/tmp');
             $objFolder->purge();
         }
     }

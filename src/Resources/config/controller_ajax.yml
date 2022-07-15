@@ -1,5 +1,5 @@
 services:
-    Markocupic\SacEventToolBundle\Controller\Ajax\MemberDashboardWriteEventArticleController:
+    Markocupic\SacEventToolBundle\Controller\Ajax\MemberDashboardWriteEventBlogController:
         arguments:
             - '@contao.framework'
             - '@database_connection'

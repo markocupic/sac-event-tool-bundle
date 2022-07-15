@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\Ajax;
 
+use Contao\CalendarEventsBlogModel;
 use Contao\CalendarEventsModel;
-use Contao\CalendarEventsStoryModel;
 use Contao\Config;
 use Contao\CoreBundle\Exception\InvalidRequestTokenException;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -44,7 +44,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MemberDashboardWriteEventArticleController extends AbstractController
+class MemberDashboardWriteEventBlogController extends AbstractController
 {
     private ContaoFramework $framework;
 
@@ -67,10 +67,9 @@ class MemberDashboardWriteEventArticleController extends AbstractController
     private string $locale;
 
     /**
-     * MemberDashboardWriteEventArticleController constructor.
      * Handles ajax requests.
      * Allow if ...
-     * - user is logged in frontend user
+     * - user is a logged in frontend user
      * - is XmlHttpRequest
      * - csrf token is valid.
      *
@@ -91,7 +90,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
     }
 
     /**
-     * @Route("/ajaxMemberDashboardWriteEventArticle/setPublishState", name="sac_event_tool_ajax_member_dashboard_write_event_article_set_publish_state", defaults={"_scope" = "frontend"})
+     * @Route("/ajaxMemberDashboardWriteEventBlog/setPublishState", name="sac_event_tool_ajax_member_dashboard_write_event_blog_set_publish_state", defaults={"_scope" = "frontend"})
      *
      * @throws Exception
      */
@@ -111,8 +110,8 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        /** @var CalendarEventsStoryModel $calendarEventsStoryModelAdapter */
-        $calendarEventsStoryModelAdapter = $this->framework->getAdapter(CalendarEventsStoryModel::class);
+        /** @var CalendarEventsBlogModel $calendarEventsBlogModelAdapter */
+        $calendarEventsBlogModelAdapter = $this->framework->getAdapter(CalendarEventsBlogModel::class);
 
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
@@ -148,7 +147,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         $objUser = $this->security->getUser();
 
         $id = $this->connection->fetchOne(
-            'SELECT id FROM tl_calendar_events_story WHERE sacMemberId = ? AND eventId = ? AND publishState < ?',
+            'SELECT id FROM tl_calendar_events_blog WHERE sacMemberId = ? AND eventId = ? AND publishState < ?',
             [
                 $objUser->sacMemberId,
                 $request->request->get('eventId'),
@@ -160,11 +159,11 @@ class MemberDashboardWriteEventArticleController extends AbstractController
             return new JsonResponse(['status' => 'error']);
         }
 
-        $objStory = $calendarEventsStoryModelAdapter->findByPk($id);
+        $objBlog = $calendarEventsBlogModelAdapter->findByPk($id);
 
         // Check for a valid photographer name an existing image legends
-        if (!empty($objStory->multiSRC) && !empty($stringUtilAdapter->deserialize($objStory->multiSRC, true))) {
-            $arrUuids = $stringUtilAdapter->deserialize($objStory->multiSRC, true);
+        if (!empty($objBlog->multiSRC) && !empty($stringUtilAdapter->deserialize($objBlog->multiSRC, true))) {
+            $arrUuids = $stringUtilAdapter->deserialize($objBlog->multiSRC, true);
             $objFiles = $filesModelAdapter->findMultipleByUuids($arrUuids);
             $blnMissingLegend = false;
             $blnMissingPhotographerName = false;
@@ -186,12 +185,12 @@ class MemberDashboardWriteEventArticleController extends AbstractController
             }
         }
 
-        // Notify back office via terminal42/notification_center if there is a new story.
-        if ('2' === $request->request->get('publishState') && $objStory->publishState < 2 && $request->request->get('moduleId')) {
+        // Notify back office via terminal42/notification_center if there is a new blog entry.
+        if ('2' === $request->request->get('publishState') && $objBlog->publishState < 2 && $request->request->get('moduleId')) {
             $objModule = $moduleModelAdapter->findByPk($request->request->get('moduleId'));
 
             if (null !== $objModule) {
-                $objNotification = $notificationAdapter->findByPk($objModule->notifyOnEventStoryPublishedNotificationId);
+                $objNotification = $notificationAdapter->findByPk($objModule->eventBlogOnPublishNotification);
             }
 
             if (isset($objNotification) && $objNotification && $request->request->get('eventId') > 0) {
@@ -208,13 +207,13 @@ class MemberDashboardWriteEventArticleController extends AbstractController
                 // Generate frontend preview link
                 $previewLink = '';
 
-                if ($objModule->eventStoryJumpTo > 0) {
-                    $objTarget = $pageModelAdapter->findByPk($objModule->eventStoryJumpTo);
+                if ($objModule->eventBlogJumpTo > 0) {
+                    $objTarget = $pageModelAdapter->findByPk($objModule->eventBlogJumpTo);
 
                     if (null !== $objTarget) {
                         $previewLink = $stringUtilAdapter->ampersand($objTarget->getFrontendUrl(Config::get('useAutoItem') ? '/%s' : '/items/%s'));
-                        $previewLink = sprintf($previewLink, $objStory->id);
-                        $previewLink = $environmentAdapter->get('url').'/'.$urlAdapter->addQueryString('securityToken='.$objStory->securityToken, $previewLink);
+                        $previewLink = sprintf($previewLink, $objBlog->id);
+                        $previewLink = $environmentAdapter->get('url').'/'.$urlAdapter->addQueryString('securityToken='.$objBlog->securityToken, $previewLink);
                     }
                 }
 
@@ -226,7 +225,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
                     $objEventOrganizer = $eventOrganizerModelAdapter->findByPk($orgId);
 
                     if (null !== $objEventOrganizer) {
-                        $arrUsers = $stringUtilAdapter->deserialize($objEventOrganizer->notifyWebmasterOnNewEventStory, true);
+                        $arrUsers = $stringUtilAdapter->deserialize($objEventOrganizer->notifyWebmasterOnNewEventBlog, true);
 
                         foreach ($arrUsers as $userId) {
                             $objWebmaster = $userModelAdapter->findByPk($userId);
@@ -257,10 +256,10 @@ class MemberDashboardWriteEventArticleController extends AbstractController
                         'author_email' => $objUser->email,
                         'author_sac_member_id' => $objUser->sacMemberId,
                         'hostname' => $environmentAdapter->get('host'),
-                        'story_link_backend' => $environmentAdapter->get('url').'/contao?do=sac_calendar_events_stories_tool&act=edit&id='.$objStory->id,
-                        'story_link_frontend' => $previewLink,
-                        'story_title' => $objStory->title,
-                        'story_text' => $objStory->text,
+                        'blog_link_backend' => $environmentAdapter->get('url').'/contao?do=sac_calendar_events_blog_tool&act=edit&id='.$objBlog->id,
+                        'blog_link_frontend' => $previewLink,
+                        'blog_title' => $objBlog->title,
+                        'blog_text' => $objBlog->text,
                     ]);
                 }
 
@@ -270,19 +269,19 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         }
 
         // Save publish state
-        $objStory->publishState = $request->request->get('publishState');
-        $objStory->save();
+        $objBlog->publishState = $request->request->get('publishState');
+        $objBlog->save();
 
         $json = [
             'status' => 'success',
-            'publishState' => $objStory->publishState,
+            'publishState' => $objBlog->publishState,
         ];
 
         return new JsonResponse($json);
     }
 
     /**
-     * @Route("/ajaxMemberDashboardWriteEventArticle/sortGallery", name="sac_event_tool_ajax_member_dashboard_write_event_article_sort_gallery", defaults={"_scope" = "frontend"})
+     * @Route("/ajaxMemberDashboardWriteEventBlog/sortGallery", name="sac_event_tool_ajax_member_dashboard_write_event_blog_sort_gallery", defaults={"_scope" = "frontend"})
      *
      * @throws \Exception
      */
@@ -296,8 +295,8 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
-        /** @var CalendarEventsStoryModel $calendarEventsStoryModelAdapter */
-        $calendarEventsStoryModelAdapter = $this->framework->getAdapter(CalendarEventsStoryModel::class);
+        /** @var CalendarEventsBlogModel $calendarEventsBlogModelAdapter */
+        $calendarEventsBlogModelAdapter = $this->framework->getAdapter(CalendarEventsBlogModel::class);
 
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
@@ -309,7 +308,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         $objUser = $this->security->getUser();
 
         $id = $this->connection->fetchOne(
-            'SELECT id FROM tl_calendar_events_story WHERE sacMemberId = ? AND eventId = ?',
+            'SELECT id FROM tl_calendar_events_blog WHERE sacMemberId = ? AND eventId = ?',
             [
                 $objUser->sacMemberId,
                 $request->request->get('eventId'),
@@ -320,7 +319,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
             return new JsonResponse(['status' => 'error']);
         }
 
-        $objStory = $calendarEventsStoryModelAdapter->findByPk($id);
+        $objBlog = $calendarEventsBlogModelAdapter->findByPk($id);
 
         $arrSorting = json_decode($request->request->get('uuids'));
         $arrSorting = array_map(
@@ -328,15 +327,15 @@ class MemberDashboardWriteEventArticleController extends AbstractController
             $arrSorting
         );
 
-        $objStory->orderSRC = serialize($arrSorting);
-        $objStory->save();
+        $objBlog->orderSRC = serialize($arrSorting);
+        $objBlog->save();
 
         return new JsonResponse(['status' => 'success']);
     }
 
     /**
      * @throws \Exception
-     * @Route("/ajaxMemberDashboardWriteEventArticle/removeImage", name="sac_event_tool_ajax_member_dashboard_write_event_article_remove_image", defaults={"_scope" = "frontend"})
+     * @Route("/ajaxMemberDashboardWriteEventBlog/removeImage", name="sac_event_tool_ajax_member_dashboard_write_event_blog_remove_image", defaults={"_scope" = "frontend"})
      */
     public function removeImageAction(): JsonResponse
     {
@@ -348,8 +347,8 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
-        /** @var CalendarEventsStoryModel $calendarEventsStoryModelAdapter */
-        $calendarEventsStoryModelAdapter = $this->framework->getAdapter(CalendarEventsStoryModel::class);
+        /** @var CalendarEventsBlogModel $calendarEventsBlogModelAdapter */
+        $calendarEventsBlogModelAdapter = $this->framework->getAdapter(CalendarEventsBlogModel::class);
 
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
@@ -367,7 +366,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         $objUser = $this->security->getUser();
 
         $id = $this->connection->fetchOne(
-            'SELECT * FROM tl_calendar_events_story WHERE sacMemberId = ? && eventId = ? && publishState < ?',
+            'SELECT * FROM tl_calendar_events_blog WHERE sacMemberId = ? && eventId = ? && publishState < ?',
             [
                 $objUser->sacMemberId,
                 $request->request->get('eventId'),
@@ -379,10 +378,10 @@ class MemberDashboardWriteEventArticleController extends AbstractController
             return new JsonResponse(['status' => 'error']);
         }
 
-        $objStory = $calendarEventsStoryModelAdapter->findByPk($id);
+        $objBlog = $calendarEventsBlogModelAdapter->findByPk($id);
 
-        $multiSrc = $stringUtilAdapter->deserialize($objStory->multiSRC, true);
-        $orderSrc = $stringUtilAdapter->deserialize($objStory->orderSRC, true);
+        $multiSrc = $stringUtilAdapter->deserialize($objBlog->multiSRC, true);
+        $orderSrc = $stringUtilAdapter->deserialize($objBlog->orderSRC, true);
 
         $uuid = $stringUtilAdapter->uuidToBin($request->request->get('uuid'));
 
@@ -395,7 +394,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         if (false !== $key) {
             unset($multiSrc[$key]);
             $multiSrc = array_values($multiSrc);
-            $objStory->multiSRC = serialize($multiSrc);
+            $objBlog->multiSRC = serialize($multiSrc);
         }
 
         $key = array_search($uuid, $orderSrc, true);
@@ -403,11 +402,11 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         if (false !== $key) {
             unset($orderSrc[$key]);
             $orderSrc = array_values($multiSrc);
-            $objStory->orderSRC = serialize($orderSrc);
+            $objBlog->orderSRC = serialize($orderSrc);
         }
 
         // Save model
-        $objStory->save();
+        $objBlog->save();
 
         // Delete image from filesystem and db
         $filesModel = $filesModelAdapter->findByUuid($uuid);
@@ -424,7 +423,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
 
     /**
      * @throws \Exception
-     * @Route("/ajaxMemberDashboardWriteEventArticle/rotateImage", name="sac_event_tool_ajax_member_dashboard_write_event_article_rotate_image", defaults={"_scope" = "frontend"})
+     * @Route("/ajaxMemberDashboardWriteEventBlog/rotateImage", name="sac_event_tool_ajax_member_dashboard_write_event_blog_rotate_image", defaults={"_scope" = "frontend"})
      */
     public function rotateImageAction(): JsonResponse
     {
@@ -455,7 +454,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
 
     /**
      * @throws \Exception
-     * @Route("/ajaxMemberDashboardWriteEventArticle/getCaption", name="sac_event_tool_ajax_member_dashboard_write_event_article_get_caption", defaults={"_scope" = "frontend"})
+     * @Route("/ajaxMemberDashboardWriteEventBlog/getCaption", name="sac_event_tool_ajax_member_dashboard_write_event_blog_get_caption", defaults={"_scope" = "frontend"})
      */
     public function getCaptionAction(): JsonResponse
     {
@@ -510,7 +509,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
 
     /**
      * @throws \Exception
-     * @Route("/ajaxMemberDashboardWriteEventArticle/setCaption", name="sac_event_tool_ajax_member_dashboard_write_event_article_set_caption", defaults={"_scope" = "frontend"})
+     * @Route("/ajaxMemberDashboardWriteEventBlog/setCaption", name="sac_event_tool_ajax_member_dashboard_write_event_blog_set_caption", defaults={"_scope" = "frontend"})
      */
     public function setCaptionAction(): JsonResponse
     {
@@ -588,7 +587,7 @@ class MemberDashboardWriteEventArticleController extends AbstractController
         $request = $this->requestStack->getCurrentRequest();
 
         if (!$request->isXmlHttpRequest()) {
-            throw $this->createNotFoundException('The route "/ajaxMemberDashboardWriteEventArticle" is allowed to XMLHttpRequest requests only.');
+            throw $this->createNotFoundException('The route "/ajaxMemberDashboardWriteEventBlog" is allowed to XMLHttpRequest requests only.');
         }
     }
 }

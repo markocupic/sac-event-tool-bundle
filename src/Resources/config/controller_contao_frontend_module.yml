@@ -71,7 +71,7 @@ services:
         public: true
 
     # Member dashboard module: list event reports and the form to generate new event reports
-    Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEventReportListController:
+    Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEventBlogListController:
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:
@@ -80,13 +80,13 @@ services:
         public: true
 
     # Member dashboard module: display the forms for writing new event reports
-    Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardWriteEventArticleController:
+    Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEventBlogWriteController:
         arguments:
             - '@contao.framework'
             - '@translator'
             - '@security.helper'
             - '%kernel.project_dir%'
-            - '%sacevt.event.story.asset_dir%'
+            - '%sacevt.event.blog.asset_dir%'
             - '%sacevt.locale%'
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
@@ -164,8 +164,8 @@ services:
             - { name: container.service_subscriber }
         public: true
 
-    # Event story list module
-    Markocupic\SacEventToolBundle\Controller\FrontendModule\EventStoryListController:
+    # Event blog list module
+    Markocupic\SacEventToolBundle\Controller\FrontendModule\EventBlogListController:
         calls:
             - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         tags:
@@ -173,8 +173,8 @@ services:
             - { name: container.service_subscriber }
         public: true
 
-    # Event story reader module
-    Markocupic\SacEventToolBundle\Controller\FrontendModule\EventStoryReaderController:
+    # Event blog reader module
+    Markocupic\SacEventToolBundle\Controller\FrontendModule\EventBlogReaderController:
         arguments:
             - '@contao.framework'
             - '@request_stack'

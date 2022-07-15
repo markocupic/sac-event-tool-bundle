@@ -6,14 +6,14 @@
 <p><i class="fas fa-info-circle"></i> Bildreihenfolge kann durch Drag and Drop verändert werden.</p>
 <?php endif; ?>
 
-<div id="dashboardEventStoryGallery" class="<?php if ($this->publishState < 2): ?>sortable-thumbnail-container <?php endif; ?> dashboard-event-story-gallery row gx-2 gy-1">
+<div id="dashboardEventBlogGallery" class="<?php if ($this->publishState < 2): ?>sortable-thumbnail-container <?php endif; ?> dashboard-event-blog-gallery row gx-2 gy-1">
   <?php $i = 0; ?>
   <?php foreach ($this->images as $arrFile): ?>
   <div class="col-12 col-sm-6 col-lg-3 thumbnail <?php if ($this->publishState < 2): ?>sortable-item <?php endif; ?>responsive" data-item="<?= $i ?>" data-path="<?= $arrFile['path'] ?>" data-file-id="<?= $arrFile['id'] ?>" data-file-uuid="<?= Contao\StringUtil::binToUuid($arrFile['uuid']) ?>" title="Sortierung mit Drag and Drop ändern">
     {{image::<?= Contao\StringUtil::binToUuid($arrFile['uuid']) ?>?width=400&height=400&mode=crop}}
     <div class="d-none"><?= $arrFile['caption'] ?></div>
     <?php if ($this->publishState < 2): ?>
-    <div class="dashboard-event-story-thumb-buttons-container d-flex">
+    <div class="dashboard-event-blog-thumb-buttons-container d-flex">
       <?php if ('' === $arrFile['caption'] || '' === $arrFile['photographer']): ?>
       <button class="btn blinking missing-caption-or-photographer-name add-caption" title="Fehlende Bildlegende oder Name des Fotografen fehlt"><i class="fal fa-exclamation-circle"></i></button>
       <?php endif; ?>
@@ -39,12 +39,12 @@
         var path = $(this).closest('.thumbnail').attr('data-path');
         var item = $(this).closest('.thumbnail').attr('data-item');
         var fileUuid = $(this).closest('.thumbnail').attr('data-file-uuid');
-        var modal = $('.modal.write-story-image-caption').first();
+        var modal = $('.modal.write-event-blog-image-caption').first();
         $(modal).find('.image-full-res').attr('src', path);
         $(modal).attr('data-item', item);
 
         // Get caption text by xhr request
-        var jqxhr = $.post('ajaxMemberDashboardWriteEventArticle/getCaption', {
+        var jqxhr = $.post('ajaxMemberDashboardWriteEventBlog/getCaption', {
           'REQUEST_TOKEN': '{{request_token}}',
           'fileUuid': fileUuid
         }).done(function (json) {
@@ -62,19 +62,19 @@
 
 
       // Save caption to the server
-      $('.modal.write-story-image-caption button#saveCaptionButton').click(function () {
-        $('.write-story-image-caption').modal('hide');
-        var caption = $('.modal.write-story-image-caption #imageCaptionInput').val();
-        var photographer = $('.modal.write-story-image-caption #imagePhotographerInput').val();
+      $('.modal.write-event-blog-image-caption button#saveCaptionButton').click(function () {
+        $('.write-event-blog-image-caption').modal('hide');
+        var caption = $('.modal.write-event-blog-image-caption #imageCaptionInput').val();
+        var photographer = $('.modal.write-event-blog-image-caption #imagePhotographerInput').val();
         var modal = $(this).closest('.modal');
         var item = $(modal).attr('data-item');
-        var thumbnail = $('#dashboardEventStoryGallery').find('.thumbnail[data-item="' + item + '"]');
+        var thumbnail = $('#dashboardEventBlogGallery').find('.thumbnail[data-item="' + item + '"]');
         thumbnail.attr('data-caption', caption);
         var fileUuid = $(thumbnail).attr('data-file-uuid');
         $(modal).modal('hide');
 
 
-        var jqxhr = $.post('ajaxMemberDashboardWriteEventArticle/setCaption', {
+        var jqxhr = $.post('ajaxMemberDashboardWriteEventBlog/setCaption', {
           'REQUEST_TOKEN': '{{request_token}}',
           'fileUuid': fileUuid,
           'caption': caption,
@@ -107,7 +107,7 @@
         if (elImage.length) {
           var uuid = $(elImage).data('file-uuid');
           if (typeof uuid !== 'undefined') {
-            var jqxhr = $.post('ajaxMemberDashboardWriteEventArticle/removeImage', {
+            var jqxhr = $.post('ajaxMemberDashboardWriteEventBlog/removeImage', {
               'REQUEST_TOKEN': '{{request_token}}',
               'eventId': '<?= Contao\Input::get('eventId') ?>',
               'uuid': uuid
@@ -130,7 +130,7 @@
         if (elImage.length) {
           var fileId = $(elImage).data('file-id');
           if (typeof fileId !== 'undefined') {
-            var jqxhr = $.post('ajaxMemberDashboardWriteEventArticle/rotateImage', {
+            var jqxhr = $.post('ajaxMemberDashboardWriteEventBlog/rotateImage', {
               'REQUEST_TOKEN': '{{request_token}}',
               //'eventId': '<?= Contao\Input::get('eventId') ?>',
               'fileId': fileId
@@ -149,7 +149,7 @@
        * Image drag and drop sorting
        * @type {Element|*}
        */
-      var container = document.getElementById("dashboardEventStoryGallery");
+      var container = document.getElementById("dashboardEventBlogGallery");
       var sort = Sortable.create(container, {
         animation: 50, // ms, animation speed moving items when sorting, `0` — without animation
         //handle: ".sortable-item", // Restricts sort start click/touch to the specified element
@@ -161,7 +161,7 @@
           $(collection).each(function (index) {
             arrUuid.push($(this).data('fileUuid'));
           });
-          var jqxhr = $.post('ajaxMemberDashboardWriteEventArticle/sortGallery', {
+          var jqxhr = $.post('ajaxMemberDashboardWriteEventBlog/sortGallery', {
             'REQUEST_TOKEN': '{{request_token}}',
             'eventId': '<?= Contao\Input::get('eventId') ?>',
             'uuids': JSON.stringify(arrUuid)
