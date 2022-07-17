@@ -14,7 +14,7 @@
     {% endif %}
 
     <div class="row gx-5">
-        <!-- Col left -->
+        <!-- Start col left -->
         <div class="col-lg-6">
             {% if not getEventData.invoke('teaser') is empty %}
                 <!-- indexer::continue -->
@@ -46,14 +46,17 @@
 
                 <div class="eventdate event-detail event-info-box icon-box-small">
                     <h5>Datum/Dauer</h5>
-                    <p>{{ getEventData.invoke('eventPeriodLg') }}</p>
+                    <p>{{ getEventData.invoke('eventPeriodLg')|raw }}</p>
                 </div>
+
                 <div class="requirements event-detail event-info-box icon-box-small">
                     <h5>Eventnummer</h5>
+                    <!-- indexer::continue -->
                     <p class="event-id">
                         {#  event id f.ex. 2019-3233331 #}
-                        <!-- indexer::continue -->{{ getEventData.invoke('eventId') }}<!-- indexer::stop -->
+                        {{ getEventData.invoke('eventId') }}
                     </p>
+                    <!-- indexer::stop -->
                 </div>
 
                 {% if not getEventData.invoke('location') is empty %}
@@ -137,7 +140,7 @@
 
                     {% if not getEventData.invoke('disableOnlineRegistration') %}
                         <div class="event-detail-buttons mt-3">
-                            <!-- book event button -->
+                            <!-- "book event" button -->
                             <!-- indexer::continue -->
                             {{ "{{insert_module::408}}" }}
                             <!-- indexer::stop -->
@@ -150,7 +153,7 @@
         </div>
         <!-- End col left -->
 
-        <!-- Col right -->
+        <!-- Start col right -->
         <div class="col-lg-6">
 
             {% if not getEventData.invoke('tourType') is empty %}
@@ -264,7 +267,7 @@
         {% endif %}
     {% endif %}
 
-
+    {# Gallery #}
     {% if getEventData.invoke('addGallery') %}
         <!-- gallery start -->
         <hr>
@@ -272,12 +275,12 @@
         <!-- gallery end -->
     {% endif %}
 
-
 </div>
 <!-- indexer::continue -->
 
+{# Use a callable inside src/EventListener/Contao/EventParseTemplateListener.php to get "schema.org" data #}
 {% do addSchemaOrg.invoke() %}
-{#  Add schema.org inside EventParseTemplateListener.php #}
+
 {#
 {% set schemaOrg = getSchemaOrgData.invoke() %}
 {% if hasDetails %}

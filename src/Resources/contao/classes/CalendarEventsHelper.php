@@ -296,7 +296,7 @@ class CalendarEventsHelper
     /**
      * @throws \Exception
      */
-    public static function addEventDataToTemplate(FrontendTemplate $objTemplate): void
+    public static function addEventDataToTemplate(Template $objTemplate): void
     {
         $objEvent = CalendarEventsModel::findByPk($objTemplate->id);
 

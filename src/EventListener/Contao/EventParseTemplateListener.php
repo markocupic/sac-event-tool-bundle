@@ -57,31 +57,28 @@ class EventParseTemplateListener
         if (!empty($template->id) && str_starts_with($template->getName(), 'event_') && $this->contaoScope->isFrontend()) {
             // Run this code for event detail modules only
             if ($this->inputAdapter->get('events')) {
-                $this->calendarEventsHelperAdapter->addEventDataToTemplate($template);
-                $template->contaoScope = $this->contaoScope;
+                if (null !== ($event = $this->calendarEventsModelAdapter->findByIdOrAlias($this->inputAdapter->get('events')))) {
+                    $template->contaoScope = $this->contaoScope;
 
-                $user = $this->security->getUser();
-                $template->hasLoggedInFrontendUser = $user instanceof FrontendUser;
+                    $user = $this->security->getUser();
+                    $template->hasLoggedInFrontendUser = $user instanceof FrontendUser;
 
-                // Add schemaOrg
-                $template->addSchemaOrg = static function () use ($template): void {
-                    $schemaOrg = $template->getSchemaOrgData();
+                    // Add twig callable "schemaOrg()"
+                    $template->addSchemaOrg = static function () use ($template): void {
+                        $schemaOrg = $template->getSchemaOrgData();
 
-                    if ($schemaOrg && $template->hasDetails()) {
-                        $schemaOrg['description'] = $template->rawHtmlToPlainText($template->details);
-                    }
+                        if ($schemaOrg && $template->hasDetails()) {
+                            $schemaOrg['description'] = $template->rawHtmlToPlainText($template->details);
+                        }
 
-                    $template->addSchemaOrg($schemaOrg);
-                };
+                        $template->addSchemaOrg($schemaOrg);
+                    };
 
-                $event = $this->calendarEventsModelAdapter->findByAlias($this->inputAdapter->get('events'));
+                    // Add twig callable "getEventData()"
+                    $template->getEventData = (static fn ($prop) => CalendarEventsHelper::getEventData($event, $prop));
 
-                if (null === $event) {
-                    throw new \Exception('Could not find the event from get parameter "events".');
+                    $this->calendarEventsHelperAdapter->addEventDataToTemplate($template);
                 }
-
-                // Augment template with more data from the CalendarEventsHelper class.
-                $template->getEventData = (static fn ($prop) => CalendarEventsHelper::getEventData($event, $prop));
             }
         }
     }
