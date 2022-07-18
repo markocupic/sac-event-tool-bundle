@@ -70,30 +70,6 @@ services:
             - { name: container.service_subscriber }
         public: true
 
-    # Member dashboard module: list event reports and the form to generate new event reports
-    Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEventBlogListController:
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
-        tags:
-            - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
-        public: true
-
-    # Member dashboard module: display the forms for writing new event reports
-    Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEventBlogWriteController:
-        arguments:
-            - '@contao.framework'
-            - '@translator'
-            - '@security.helper'
-            - '%kernel.project_dir%'
-            - '%sacevt.event.blog.asset_dir%'
-            - '%sacevt.locale%'
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
-        tags:
-            - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-        public: true
-
     # Member dashboard module: display the member profile
     Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardProfileController:
         calls:
@@ -162,26 +138,6 @@ services:
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
             - { name: container.service_subscriber }
-        public: true
-
-    # Event blog list module
-    Markocupic\SacEventToolBundle\Controller\FrontendModule\EventBlogListController:
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
-        tags:
-            - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
-        public: true
-
-    # Event blog reader module
-    Markocupic\SacEventToolBundle\Controller\FrontendModule\EventBlogReaderController:
-        arguments:
-            - '@contao.framework'
-            - '@request_stack'
-            - '%kernel.project_dir%'
-            - '%sacevt.locale%'
-        tags:
-            - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
         public: true
 
     # Pilatus export module

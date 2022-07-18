@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationCheckoutLinkController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationController;
-use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEventBlogWriteController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardProfileController;
 
 // Backend Modules
@@ -24,7 +23,6 @@ $GLOBALS['TL_LANG']['MOD']['sac_course_main_types_tool'] = ['Kurs-Hauptkategorie
 $GLOBALS['TL_LANG']['MOD']['sac_course_sub_types_tool'] = ['Kurs-Unterkategorien'];
 $GLOBALS['TL_LANG']['MOD']['sac_calendar_events_tool'] = ['SAC Event-Tool'];
 $GLOBALS['TL_LANG']['MOD']['sac_member_database'] = ['SAC Mitgliederdatenbank'];
-$GLOBALS['TL_LANG']['MOD']['sac_calendar_events_blog_tool'] = ['Touren-/Kursberichte Tool'];
 $GLOBALS['TL_LANG']['MOD']['sac_tour_difficulty_tool'] = ['Schwierigkeitsgrade für Touren'];
 $GLOBALS['TL_LANG']['MOD']['sac_tour_type_tool'] = ['Tourentypen'];
 $GLOBALS['TL_LANG']['MOD']['sac_event_release_tool'] = ['Event-Freigabestufen-Tool'];
@@ -44,8 +42,6 @@ $GLOBALS['TL_LANG']['FMD'][EventRegistrationController::TYPE] = ['SAC Event Regi
 $GLOBALS['TL_LANG']['FMD'][EventRegistrationCheckoutLinkController::TYPE] = ['Link zur Checkout-Seite für Event-Anmeldung'];
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_upcoming_events'] = ['SAC Mitgliederkonto Dashboard - Meine nächsten Events'];
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_past_events'] = ['SAC Mitgliederkonto Dashboard - Meine absolvierten Events'];
-$GLOBALS['TL_LANG']['FMD']['member_dashboard_event_blog_list'] = ['SAC Mitgliederkonto Dashboard - Meine Tourenberichte'];
-$GLOBALS['TL_LANG']['FMD'][MemberDashboardEventBlogWriteController::TYPE] = ['SAC Mitgliederkonto Dashboard - Tourenbericht schreiben'];
 $GLOBALS['TL_LANG']['FMD'][MemberDashboardProfileController::TYPE] = ['SAC Mitgliederkonto Dashboard - Profil'];
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_edit_profile'] = ['SAC Mitgliederkonto Dashboard - Profil bearbeiten'];
 $GLOBALS['TL_LANG']['FMD']['member_dashboard_delete_profile'] = ['SAC Mitgliederkonto Dashboard - Profil löschen'];
@@ -56,6 +52,4 @@ $GLOBALS['TL_LANG']['FMD']['event_filter_form'] = ['SAC-Event-Liste-Filter'];
 $GLOBALS['TL_LANG']['FMD']['pilatus_export'] = ['SAC Event-Export für Monatszeitschrift'];
 $GLOBALS['TL_LANG']['FMD']['pilatus_export_2021'] = ['SAC Event-Export 2021 für Monatszeitschrift'];
 $GLOBALS['TL_LANG']['FMD']['jahresprogramm_export'] = ['SAC Event-Export für Jahresprogramm'];
-$GLOBALS['TL_LANG']['FMD']['event_blog_list'] = ['SAC Tourenberichte Listen Modul'];
-$GLOBALS['TL_LANG']['FMD']['event_blog_reader'] = ['SAC Tourenberichte Reader Modul'];
 $GLOBALS['TL_LANG']['FMD']['event_list'] = ['SAC Event Auflistungs Modul'];

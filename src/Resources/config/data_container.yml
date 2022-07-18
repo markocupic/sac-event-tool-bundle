@@ -61,17 +61,6 @@ services:
             - '@security.helper'
             - '@security.password_hasher_factory'
 
-    Markocupic\SacEventToolBundle\DataContainer\CalendarEventsBlog:
-        arguments:
-            - '@security.helper'
-            - '@database_connection'
-            - '@request_stack'
-            - '@Markocupic\SacEventToolBundle\Download\BinaryFileDownload'
-            - '%kernel.project_dir%'
-            - '%sacevt.temp_dir%'
-            - '%sacevt.event.blog.template.export%'
-            - '%sacevt.locale%'
-
     Markocupic\SacEventToolBundle\DataContainer\Content:
         arguments:
             - '@database_connection'

@@ -1,19 +1,4 @@
 services:
-    Markocupic\SacEventToolBundle\Controller\Ajax\MemberDashboardWriteEventBlogController:
-        arguments:
-            - '@contao.framework'
-            - '@database_connection'
-            - '@contao.csrf.token_manager'
-            - '@request_stack'
-            - '@security.helper'
-            - '@translator'
-            - '@Markocupic\SacEventToolBundle\Image\RotateImage'
-            - '%kernel.project_dir%'
-            - '%contao.csrf_token_name%'
-            - '%sacevt.locale%'
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
-        public: true
 
     Markocupic\SacEventToolBundle\Controller\Api\EventApiController:
         arguments:

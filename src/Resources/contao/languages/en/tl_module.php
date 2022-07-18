@@ -15,19 +15,10 @@ declare(strict_types=1);
 // Legends
 $GLOBALS['TL_LANG']['tl_module']['member_dashboard_upcoming_events_legend'] = 'Member Dashboard: Zukünftige Events';
 $GLOBALS['TL_LANG']['tl_module']['member_dashboard_event_type_filter_legend'] = 'Member Dashboard: Event-Filter-Einstellungen';
-$GLOBALS['TL_LANG']['tl_module']['events_blog_legend'] = 'Touren- und Kursberichte-Einstellungen';
 $GLOBALS['TL_LANG']['tl_module']['eventRegloginModule_legend'] = 'Login-Module-Einstellungen';
 
 // Fields
 $GLOBALS['TL_LANG']['tl_module']['unregisterFromEventNotificationId'] = ['Notification Center: Benachrichtigungs-ID bei Eventabsage eines Mitglieds', 'Geben Sie eine Benachrichtigung aus dem Notification Center ein.'];
-$GLOBALS['TL_LANG']['tl_module']['eventBlogTimeSpanForCreatingNew'] = ['Frist in Tagen wie lange nach Event-Ende noch Berichte eröffnet werden können', 'Geben Sie in Tagen an, wie lange nach Event-Ende es möglich sein soll, Berichte zu einem Event schreiben zu können.'];
-$GLOBALS['TL_LANG']['tl_module']['eventBlogLimit'] = ['Gesamtzahl der Beiträge', 'Hier können Sie die Gesamtzahl der Beiträge begrenzen. Geben Sie 0 ein, um alle anzuzeigen.'];
-$GLOBALS['TL_LANG']['tl_module']['eventBlogOrganizers'] = ['Veranstalter\\Ortsgruppen einschänken', 'Wählen Sie hier die Event-Veranstalter aus, deren Berichte angezeigt werden sollen.'];
-$GLOBALS['TL_LANG']['tl_module']['eventBlogJumpTo'] = ['Event-Bericht Reader', 'Bitte geben Sie hier die Seite mit dem Event-Reader Modul an.'];
-$GLOBALS['TL_LANG']['tl_module']['eventBlogFormJumpTo'] = ['Seite mit Tourenbericht Erfassungsformular', 'Bitte geben Sie hier die Seite mit dem Tourenbericht-Erfassungs-Modul an.'];
-$GLOBALS['TL_LANG']['tl_module']['eventBlogMaxImageWidth'] = ['Maximale Bildbreite in Pixeln', 'Legen Sie die maximale Bildbreite fest. Grössere Bilder werden beim Upload automatisch verkleinert.'];
-$GLOBALS['TL_LANG']['tl_module']['eventBlogMaxImageHeight'] = ['Maximale Bildhöhe in Pixeln', 'Legen Sie die maximale Bildhöhe fest. Grössere Bilder werden beim Upload automatisch verkleinert.'];
-$GLOBALS['TL_LANG']['tl_module']['eventBlogOnPublishNotification'] = ['Benachrichtigung bei neu erstelltem Event-Bericht', ''];
 $GLOBALS['TL_LANG']['tl_module']['eventType'] = ['Event Art', 'Legen Sie fest welche Event-Arten angezeigt werden sollen.'];
 $GLOBALS['TL_LANG']['tl_module']['eventFilterBoardFields'] = ['Event-Filter-Felder', 'Legen Sie hier die Felder fest, die im Filter angezeigt werden sollen.'];
 $GLOBALS['TL_LANG']['tl_module']['print_export_allowedEventTypes'] = ['Anzuzeigende Event-Typen', 'Geben Sie die anzuzeigenden Event-Typen an.'];

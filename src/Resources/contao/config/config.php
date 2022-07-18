@@ -47,9 +47,6 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
         'table' => ['TableWizard', 'importTable'],
         'list' => ['ListWizard', 'importList'],
     ],
-    'sac_calendar_events_blog_tool' => [
-        'tables' => ['tl_calendar_events_blog'],
-    ],
     'sac_course_main_types_tool' => [
         'tables' => ['tl_course_main_type'],
     ],
@@ -93,12 +90,6 @@ $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
 // Contao 5 ready fe modules are registered in controller-frontend-module.yml
 $GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = [
     'eventToolCalendarEventPreviewReader' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader',
-];
-
-// Maintenance
-// Delete unused event-blog folders
-$GLOBALS['TL_PURGE']['custom']['sac_event_blog'] = [
-    'callback' => ['Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainModuleEventBlog', 'run'],
 ];
 
 // TL_CONFIG
