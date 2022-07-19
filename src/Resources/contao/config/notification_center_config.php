@@ -66,17 +66,4 @@ $GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['sac_event_tool'] = [
         'email_html' => ['event_name', 'event_type', 'event_course_id', 'participant_uuid', 'state_of_subscription', 'participant_name', 'participant_email', 'sac_member_id', 'instructor_name', 'instructor_email', 'event_link_detail'],
         'attachment_tokens' => [],
     ],
-    // Type
-    'notify_on_new_event_blog' => [
-        // Field in tl_nc_language
-        'email_sender_name' => [],
-        'email_sender_address' => [],
-        'recipients' => ['author_email', 'instructor_email', 'webmaster_email'],
-        'email_recipient_cc' => ['author_email', 'instructor_email', 'webmaster_email'],
-        'email_replyTo' => [],
-        'email_subject' => ['hostname', 'blog_title', 'blog_text', 'blog_link_backend', 'blog_link_frontend', 'event_title', 'author_name', 'author_name', 'author_email', 'author_sac_member_id', 'instructor_name', 'instructor_email', 'webmaster_email'],
-        'email_text' => ['hostname', 'blog_title', 'blog_text', 'blog_link_backend', 'blog_link_frontend', 'event_title', 'author_name', 'author_name', 'author_email', 'author_sac_member_id', 'instructor_name', 'instructor_email', 'webmaster_email'],
-        'email_html' => ['hostname', 'blog_title', 'blog_text', 'blog_link_backend', 'blog_link_frontend', 'event_title', 'author_name', 'author_name', 'author_email', 'author_sac_member_id', 'instructor_name', 'instructor_email', 'webmaster_email'],
-        'attachment_tokens' => [],
-    ],
 ];
