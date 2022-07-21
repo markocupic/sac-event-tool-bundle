@@ -165,8 +165,8 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
         $messageAdapter = $this->framework->getAdapter(Message::class);
 
         $session = $request->getSession();
-        $template->hasInfoMessage = false;
-        $template->hasErrorMessage = false;
+        $template->hasInfoMessages = false;
+        $template->hasErrorMessages = false;
 
         if ($messageAdapter->hasInfo()) {
             $template->hasInfoMessage = true;

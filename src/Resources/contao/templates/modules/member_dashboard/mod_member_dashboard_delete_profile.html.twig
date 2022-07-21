@@ -1,0 +1,68 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+
+    {% if hasInfoMessages is same as true %}
+        {% for msg in infoMessages %}
+            <div class="alert alert-info" role="alert">
+                {{ msg|raw }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if hasErrorMessages is same as true %}
+        {% for msg in errorMessages %}
+            <div class="alert alert-danger" role="alert">
+                {{ msg|raw }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if passedConfirmation is same as false %}
+        <div class="alert alert-dark flex-column" role="alert">
+            Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten unwiderruflich gelöscht.
+            Deine Tourhistory ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.
+            Dieser Vorgang kann allerdings nur durchgeführt werden, wenn du keine hängigen Tourenbuchungen hast.
+            <br><br>
+            <div class="d-block">
+                <a href="{{ '{{env::request}}' }}?action=clear-profile" class="clear-profile-link btn btn-danger">Mein Profil löschen</a>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if passedConfirmation is same as true %}
+        <div class="alert alert-dark" id="lastWarningAlert" role="alert">
+            Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten unwiderruflich gelöscht.
+            Deine Tourhistory ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.
+            Dieser Vorgang kann allerdings nur durchgeführt werden, wenn du keine noch hängigen Tourenbuchungen hast.
+        </div>
+
+        <br>
+
+        {{ deleteProfileForm|raw }}
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                $('.hasteform_form-clear-profile form ').submit(() => {
+                    if (confirm("Möchtest du dein Profil endgültig und unwiderruflich löschen? Die Daten können danach nicht mehr wiederhergestellt werden.")) {
+                        return true;
+                    }
+                    return false;
+                });
+            });
+        </script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const toGo = document.getElementById('lastWarningAlert');
+                if (toGo) {
+                    toGo.scrollIntoView();
+                }
+            });
+        </script>
+    {% endif %}
+
+{% endblock %}
+
+
+
