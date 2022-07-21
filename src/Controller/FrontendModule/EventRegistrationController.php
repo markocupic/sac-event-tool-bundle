@@ -67,6 +67,10 @@ use Twig\Error\SyntaxError;
 class EventRegistrationController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_registration';
+    public const CHECKOUT_STEP_LOGIN = 'login';
+    public const CHECKOUT_STEP_REGISTER = 'register';
+    public const CHECKOUT_STEP_CONFIRM = 'confirm';
+
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Security $security;
@@ -75,6 +79,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private TranslatorInterface $translator;
     private string $projectDir;
     private LoggerInterface|null $logger;
+
+    public string $bla = 'foo';
 
     // Adapters
     private Adapter $calendarEventsHelperAdapter;
@@ -204,6 +210,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         }
 
         $this->template = $template;
+        $this->template->controller = $this;
         $this->template->eventModel = $this->eventModel;
         $this->template->memberModel = $this->memberModel;
         $this->template->moduleModel = $this->moduleModel;
@@ -580,6 +587,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         return $this->twig->render(
             '@MarkocupicSacEventTool/EventRegistration/event_registration_step_indicator.html.twig',
             [
+                'controller' => $this,
                 'step' => $strStep,
             ]
         );
