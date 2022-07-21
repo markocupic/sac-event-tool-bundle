@@ -62,9 +62,13 @@ $GLOBALS['TL_LANG']['MSC']['courseLevel'][3] = 'Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][4] = 'Tourenleiter Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][5] = 'Tourenleiter Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC']['course'] = 'Kurs';
+$GLOBALS['TL_LANG']['MSC']['course_short'] = 'Kurs';
 $GLOBALS['TL_LANG']['MSC']['tour'] = 'Tour';
+$GLOBALS['TL_LANG']['MSC']['tour_short'] = 'Tour';
 $GLOBALS['TL_LANG']['MSC']['lastMinuteTour'] = 'Last Minute Tour';
+$GLOBALS['TL_LANG']['MSC']['lastMinuteTour_short'] = 'Last Minute Tour';
 $GLOBALS['TL_LANG']['MSC']['generalEvent'] = 'Veranstaltung (Fitnesstrainings, Skiturnen, Kultur, Vorträge + sektionsübergreifende Events)';
+$GLOBALS['TL_LANG']['MSC']['generalEvent_short'] = 'Veranstaltung';
 
 // Buttons
 $GLOBALS['TL_LANG']['MSC']['sendEmail'] = 'E-Mail senden';
@@ -140,9 +144,9 @@ $GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED] = 'Anm
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_STATE_UNDEFINED] = 'Anmelde-Status unbekannt';
 
 // Event registration frontend module form explanations
-$GLOBALS['TL_LANG']['FORM']['evt_reg_mobileExpl'] = 'Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leer gelassen werden. Damit der/die Leiter/in dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine Mobilnummer zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.';
-$GLOBALS['TL_LANG']['FORM']['evt_reg_ahvExpl'] = 'Sämtliche Daten werden lediglich für interne Zwecke verwendet. Die AHV-Nummer wird ausschliesslich für die Abrechnung oder Rückforderung von J+S-Geldern verwendet. Deine persönlichen Daten werden vertraulich behandelt. Eine Weitergabe an Drittorganisationen ist ausgeschlossen.';
-$GLOBALS['TL_LANG']['FORM']['evt_reg_notesExpl'] = 'Bitte beschreibe und beantworte in wenigen Worten die erforderlichen Angaben für den Event wie: <ul class="list-bullet"><li>dein <strong>Leistungsniveau und Erfahrungen</strong></li><li>bereits <strong>absolvierte Referenztouren</strong> in den letzten paar Jahren (inkl. Angabe mit/ohne Bergführer/in)</li><li><strong>zusätzlich verlangte Angaben</strong> in den Anmeldebestimmungen</li><li>und <strong>weitere Anmerkungen, Wichtiges etc.</strong> nach Bedarf</li></ul>';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_ffield_expl_mobile'] = 'Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leer gelassen werden. Damit der/die Leiter/in dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine Mobilnummer zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_ffield_expl_ahvNumber'] = 'Sämtliche Daten werden lediglich für interne Zwecke verwendet. Die AHV-Nummer wird ausschliesslich für die Abrechnung oder Rückforderung von J+S-Geldern verwendet. Deine persönlichen Daten werden vertraulich behandelt. Eine Weitergabe an Drittorganisationen ist ausgeschlossen.';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_ffield_expl_notes'] = 'Bitte beschreibe und beantworte in wenigen Worten die erforderlichen Angaben für den Event wie: <ul class="list-bullet ps-3"><li>dein <strong>Leistungsniveau und Erfahrungen</strong></li><li>bereits <strong>absolvierte Referenztouren</strong> in den letzten paar Jahren (inkl. Angabe mit/ohne Bergführer/in)</li><li><strong>zusätzlich verlangte Angaben</strong> in den Anmeldebestimmungen</li><li>und <strong>weitere Anmerkungen, Wichtiges etc.</strong> nach Bedarf</li></ul>';
 
 // Miscellaneous
 $GLOBALS['TL_LANG']['MSC']['published'] = 'veröffentlicht';

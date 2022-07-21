@@ -100,10 +100,12 @@ services:
             - { name: container.service_subscriber }
         public: true
 
-    # Member dashboard module: display the forms for deleting the member profile
+    # Member dashboard module: display the form for deleting the member profile
     Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardDeleteProfileController:
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        arguments:
+            - '@contao.framework'
+            - '@security.helper'
+            - '@Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData'
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
             - { name: container.service_subscriber }

@@ -211,10 +211,10 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     }
 
                     // Log
-                    $systemAdapter->log(sprintf('New event confirmation download. SAC-User-ID: %s. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__.' Line: '.__LINE__, Log::DOWNLOAD_CERTIFICATE_OF_ATTENDANCE);
+                    $systemAdapter->log(sprintf('New event confirmation download. SAC-User-ID: %d. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__.' Line: '.__LINE__, Log::DOWNLOAD_CERTIFICATE_OF_ATTENDANCE);
 
                     // Create phpWord instance
-                    $filenamePattern = str_replace('%%s', '%s', $this->eventCourseConfirmationFileNamePattern);
+                    $filenamePattern = str_replace('%%d', '%d', $this->eventCourseConfirmationFileNamePattern);
                     $filename = sprintf($filenamePattern, $objMember->sacMemberId, $objRegistration->id, 'docx');
                     $destFilename = $this->tempDir.'/'.$filename;
                     $objPhpWord = new MsWordTemplateProcessor($this->eventTemplateCourseConfirmation, $destFilename);

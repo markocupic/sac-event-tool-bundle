@@ -160,7 +160,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
                 if (EventSubscriptionLevel::SUBSCRIPTION_REJECTED === $objEventsMember->stateOfSubscription) {
                     $objEventsMember->delete();
-                    $systemAdapter->log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__.' Line: '.__LINE__, Log::EVENT_UNSUBSCRIPTION);
+                    $systemAdapter->log(sprintf('User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__.' Line: '.__LINE__, Log::EVENT_UNSUBSCRIPTION);
 
                     return;
                 }
@@ -180,7 +180,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                 } elseif (empty($this->user->email) || !$validatorAdapter->isEmail($this->user->email)) {
                     $errorMsg = 'Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
                     $blnHasError = true;
-                } elseif ($objEventsMember->sacMemberId !== $this->user->sacMemberId) {
+                } elseif ((int)$objEventsMember->sacMemberId !== (int)$this->user->sacMemberId) {
                     $errorMsg = 'Du hast nicht die nötigen Benutzerrechte um dich vom Event "'.$objEvent->title.'" abzumelden.';
                     $blnHasError = true;
                 } elseif (null !== $objInstructor) {
@@ -211,7 +211,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                         'participant_name' => $objEventsMember->firstname.' '.$objEventsMember->lastname,
                         'participant_email' => $objEventsMember->email,
                         'event_link_detail' => $environmentAdapter->get('url').'/'.$eventsAdapter->generateEventUrl($objEvent),
-                        'sac_member_id' => '' !== $objEventsMember->sacMemberId ? $objEventsMember->sacMemberId : 'keine',
+                        'sac_member_id' => !empty($objEventsMember->sacMemberId) ? $objEventsMember->sacMemberId : 'keine',
                     ];
 
                     if ($objEvent->registrationGoesTo > 0) {
@@ -230,7 +230,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                     $messageAdapter->addInfo('Du hast dich vom Event "'.$objEventsMember->eventName.'" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.');
 
                     // Log
-                    $systemAdapter->log(sprintf('User with SAC-User-ID %s has unsubscribed himself from event with ID: %s ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__.' Line: '.__LINE__, Log::EVENT_UNSUBSCRIPTION);
+                    $systemAdapter->log(sprintf('User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__.' Line: '.__LINE__, Log::EVENT_UNSUBSCRIPTION);
 
                     $objNotification->send($arrTokens, $this->locale);
                 }

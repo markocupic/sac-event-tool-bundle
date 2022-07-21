@@ -136,7 +136,7 @@ class EventMember
                 $strIsActiveMember = '!inaktiv/keinMitglied';
                 $strMemberInSection = '';
 
-                if ('' !== $objEventMember->sacMemberId) {
+                if (!empty($objEventMember->sacMemberId)) {
                     $objMemberModel = $memberModelAdapter->findOneBySacMemberId($objEventMember->sacMemberId);
 
                     if (null !== $objMemberModel) {
