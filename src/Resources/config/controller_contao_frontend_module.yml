@@ -9,11 +9,11 @@ services:
         public: true
 
     Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvEventMemberExportController:
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        arguments:
+            - '@contao.framework'
+            - '@database_connection'
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
         public: true
 
     Markocupic\SacEventToolBundle\Controller\FrontendModule\EventRegistrationCheckoutLinkController:
