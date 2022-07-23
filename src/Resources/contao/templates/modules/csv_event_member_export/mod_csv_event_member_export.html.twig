@@ -1,0 +1,32 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+
+    {{ form|raw }}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Hide legend if it is a checkbox field
+            const checkBoxLegends = document.querySelectorAll('.mod_csv_event_member_export .checkbox_container legend');
+            if (checkBoxLegends) {
+                checkBoxLegends.forEach((el) => {
+                    el.style.display = 'none';
+                })
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Set Datepicker
+            var opt = {
+                dateFormat: '{{ dateFormat }}',
+                locale: 'de',
+            };
+
+            flatpickr('#ctrl_startDate', opt);
+            flatpickr('#ctrl_endDate', opt);
+        });
+    </script>
+
+{% endblock %}

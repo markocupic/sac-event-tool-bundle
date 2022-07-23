@@ -151,7 +151,7 @@ services:
         public: true
 
     # Csv Export module: Export members and users as a csv spreadsheet
-    Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvExportController:
+    Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvUserExportController:
         arguments:
             - '@contao.framework'
             - '@request_stack'

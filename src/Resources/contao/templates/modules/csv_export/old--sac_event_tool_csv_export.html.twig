@@ -1,0 +1,20 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+
+{% do addJavascriptResource('https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js') %}
+{% do addCssResource('https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.min.css') %}
+{% do addCssResource('https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap2.min.css') %}
+{% do addCssResource('https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.bootstrap2.min.css.map') %}
+
+{{ form|raw }}
+
+<script>
+    jQuery(document).ready(function () {
+        $('#ctrl_user-roles').selectize({
+            plugins: ['remove_button']
+        });
+    });
+</script>
+
+{% endblock %}

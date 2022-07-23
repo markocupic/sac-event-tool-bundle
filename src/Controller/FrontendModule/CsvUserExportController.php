@@ -41,11 +41,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @FrontendModule(CsvExportController::TYPE, category="sac_event_tool_frontend_modules")
+ * @FrontendModule(CsvUserExportController::TYPE, category="sac_event_tool_frontend_modules")
  */
-class CsvExportController extends AbstractFrontendModuleController
+class CsvUserExportController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'csv_export';
+    public const TYPE = 'csv_user_export';
     private const FIELD_DELIMITER = ';';
     private const FIELD_ENCLOSURE = '"';
 
