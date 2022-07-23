@@ -40,9 +40,7 @@ class VueTourList {
         };
 
         // Merge options and defaults
-        let params = {...defaults, ...opt}
-
-        console.log(params);
+        const params = {...defaults, ...opt}
 
         // Instantiate vue.js application
         new Vue({
@@ -83,13 +81,10 @@ class VueTourList {
                     if (self.blnIsBusy === false) {
                         self.blnIsBusy = true;
                         self.fetchItems();
-                        console.log('Loading events...')
                     }
                 },
 
                 getTake: function getTake() {
-                    let self = this;
-
                     let urlString = window.location.href;
                     let url = new URL(urlString);
                     let take = url.searchParams.get('take');
@@ -175,9 +170,18 @@ class VueTourList {
                         formData.append('fields[]', self.fields[i]);
                     }
 
-                    let params = new URLSearchParams(Array.from(formData)).toString();
+                    // Append url search params to the formData object too
+                    // -> e.g. https://my-website.ch/demo_a.html?take=200&username=jamesbond
+                    (new URLSearchParams((new URL(window.location.href)).search)).forEach((value, key) => {
+                        if (formData.has(key)) {
+                            formData.set(key, value);
+                        } else {
+                            formData.append(key, value);
+                        }
+                    });
 
-                    let url = 'eventApi/events?' + params;
+                    let urlParams = new URLSearchParams(Array.from(formData)).toString();
+                    let url = 'eventApi/events?' + urlParams;
 
                     // Fetch
                     fetch(url, {
@@ -212,7 +216,7 @@ class VueTourList {
                         }
 
                         if (self.blnAllEventsLoaded === true) {
-                            console.log('Finished downloading process. ' + self.loadedItems + ' events loaded.');
+                            //console.log('Finished downloading process. ' + self.loadedItems + ' events loaded.');
                         }
                         return json;
                     }).then(function (json) {
@@ -253,10 +257,8 @@ class VueTourList {
                 // Check if callback exists
                 callbackExists: function callbackExists(strCallback) {
                     let self = this;
-                    if (typeof self.callbacks !== "undefined" && typeof self.callbacks[strCallback] !== "undefined" && typeof self.callbacks[strCallback] === "function") {
-                        return true;
-                    }
-                    return false;
+                    return typeof self.callbacks !== "undefined" && typeof self.callbacks[strCallback] !== "undefined" && typeof self.callbacks[strCallback] === "function";
+
                 }
             }
         });
