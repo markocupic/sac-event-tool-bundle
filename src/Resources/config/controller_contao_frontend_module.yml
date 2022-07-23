@@ -135,22 +135,19 @@ services:
 
     # Jahresprpgramm export module
     Markocupic\SacEventToolBundle\Controller\FrontendModule\JahresprogrammExportController:
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        arguments:
+            - '@contao.framework'
+            - '@request_stack'
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
         public: true
 
     # Pilatus export module
     Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExport2021Controller:
         arguments:
             - '@contao.framework'
-            - '@request_stack'
             - '@database_connection'
             - '@contao.insert_tag.parser'
-        tags:
-            - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
         public: true
 
     # Csv Export module: Export members and users as a csv spreadsheet

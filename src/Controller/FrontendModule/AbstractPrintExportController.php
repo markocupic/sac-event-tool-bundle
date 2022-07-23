@@ -16,14 +16,26 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\EventReleaseLevelPolicyModel;
 
+/**
+ * This is the base class for:
+ * JahresprogrammExportController and PilatusExport2021Controller.
+ */
 abstract class AbstractPrintExportController extends AbstractFrontendModuleController
 {
+    private ContaoFramework $framework;
+
+    public function __construct(ContaoFramework $framework)
+    {
+        $this->framework = $framework;
+    }
+
     public function hasValidReleaseLevel(CalendarEventsModel $objEvent, int $minLevel = null): bool
     {
         /** @var EventReleaseLevelPolicyModel $eventReleaseLevelPolicyModelAdapter */
-        $eventReleaseLevelPolicyModelAdapter = $this->get('contao.framework')->getAdapter(EventReleaseLevelPolicyModel::class);
+        $eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
 
         if ($objEvent->published) {
             return true;

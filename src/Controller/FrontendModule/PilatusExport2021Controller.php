@@ -35,9 +35,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -47,54 +45,39 @@ class PilatusExport2021Controller extends AbstractPrintExportController
 {
     public const TYPE = 'pilatus_export_2021';
 
-    protected ModuleModel|null $model = null;
-    protected Form|null $objForm = null;
-    protected int|null $startDate = null;
-    protected int|null $endDate = null;
-    protected int|null $eventReleaseLevel = null;
-    protected string $dateFormat = 'j.';
-    //protected bool $showQrCode = false;
-    protected array|null $htmlCourseTable = null;
-    protected array|null $htmlTourTable = null;
-    protected array $events = [];
-
-    /**
-     * Editable course fields.
-     */
-    protected array $courseFeEditableFields = ['teaser', 'issues', 'terms', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous'];
-
-    /**
-     * Editable tour fields.
-     */
-    protected array $tourFeEditableFields = ['teaser', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous'];
-
     private ContaoFramework $framework;
-    private RequestStack $requestStack;
     private Connection $connection;
     private InsertTagParser $insertTagParser;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, InsertTagParser $insertTagParser)
+    private ModuleModel|null $model;
+    private Form|null $objForm = null;
+    private int|null $startDate = null;
+    private int|null $endDate = null;
+    private int|null $eventReleaseLevel = null;
+    private string $dateFormat = 'j.';
+    private array|null $htmlCourseTable = null;
+    private array|null $htmlTourTable = null;
+    private array $events = [];
+
+    // Editable course fields.
+    private array $courseFeEditableFields = ['teaser', 'issues', 'terms', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous'];
+
+    // Editable tour fields.
+    private array $tourFeEditableFields = ['teaser', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous'];
+
+    public function __construct(ContaoFramework $framework, Connection $connection, InsertTagParser $insertTagParser)
     {
         $this->framework = $framework;
-        $this->requestStack = $requestStack;
         $this->connection = $connection;
         $this->insertTagParser = $insertTagParser;
+
+        parent::__construct($this->framework);
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         $this->model = $model;
 
-        /** @var Request $request */
-        $request = $this->requestStack->getCurrentRequest();
-
-        // Handle form submits and reload page
-        if ('update-record' === $request->request->get('FORM_SUBMIT')) {
-            $this->updateRecord();
-            exit;
-        }
-
-        // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }
 
@@ -103,14 +86,13 @@ class PilatusExport2021Controller extends AbstractPrintExportController
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
-        /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         // Load language file
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
 
         // Generate the filter form
-        $this->generateForm();
+        $this->generateForm($request);
         $template->form = $this->objForm;
 
         // Course table
@@ -136,79 +118,20 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     }
 
     /**
-     * Update Record.
-     */
-    protected function updateRecord(): JsonResponse
-    {
-        $request = $this->requestStack->getCurrentRequest();
-
-        $arrFields = [];
-
-        if ('course' === $request->request->get('EVENT_TYPE')) {
-            $arrFields = $this->courseFeEditableFields;
-        } elseif ('tour' === $request->request->get('EVENT_TYPE')) {
-            $arrFields = $this->tourFeEditableFields;
-        }
-
-        $set = [];
-
-        foreach ($arrFields as $field) {
-            $set[$field] = $request->request->get($field);
-        }
-
-        $eventId = $request->request->get('id');
-
-        $arrReturn = [
-            'status' => 'error',
-            'eventId' => $eventId,
-            'message' => '',
-            'set' => $set,
-        ];
-
-        if ($eventId > 0 && \count($set) > 0) {
-            try {
-                $this->connection->update('tl_calendar_events', $set, ['id' => $eventId]);
-
-                $arrReturn['status'] = 'success';
-                $arrReturn['message'] = sprintf('Saved datarecord with ID %s successfully to the Database (tl_calendar_events).', $eventId);
-            } catch (\Exception $e) {
-                $arrReturn['status'] = 'error';
-                $arrReturn['message'] = 'Error during the upload process: '.$e->getMessage();
-            }
-        }
-
-        $json = new JsonResponse($arrReturn, 200);
-
-        return $json->send();
-    }
-
-    /**
      * Generate the form.
      *
      * @throws \Exception
      */
-    protected function generateForm(): void
+    private function generateForm(Request $request): void
     {
-        /** @var Request $request */
-        $request = $this->requestStack->getCurrentRequest();
-
-        /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
-
-        /** @var Environment $environmentAdapter */
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
-
-        /** @var Validator $validatorAdapter */
         $validatorAdapter = $this->framework->getAdapter(Validator::class);
 
         $objForm = new Form(
             'form-pilatus-export',
             'POST',
-            function (Form $objHaste): bool {
-                $request = $this->requestStack->getCurrentRequest();
-
-                return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
-            }
+            static fn (Form $objHaste): bool => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId()
         );
         $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
 
@@ -258,14 +181,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             'options' => [1 => 'FS1', 2 => 'FS2', 3 => 'FS3', 4 => 'FS4'],
             'eval' => ['mandatory' => false, 'includeBlankOption' => true],
         ]);
-        /*
-         * $objForm->addFormField('showQrCode', [
-         * 'label' => ['', 'QR Code anzeigen?'],
-         * 'inputType' => 'checkbox',
-         * 'eval' => ['mandatory' => false],
-         * ]);
-         */
-        // Let's add a submit button
+
         $objForm->addFormField('submit', [
             'label' => 'Export starten',
             'inputType' => 'submit',
@@ -310,12 +226,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
                     $objForm->getWidget('timeRangeEnd')->addError($strError);
                 }
             }
-            /**
-             * // Generate QR code
-             * if ($request->request->get('showQrCode')) {
-             * $this->showQrCode = true;
-             * }.
-             */
+
             if ($this->startDate && $this->endDate) {
                 $this->eventReleaseLevel = (int) $request->request->get('eventReleaseLevel') > 0 ? (int) $request->request->get('eventReleaseLevel') : null;
                 $this->htmlCourseTable = $this->generateEventTable(['course']);
@@ -329,21 +240,12 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     /**
      * @throws \Exception
      */
-    protected function generateEventTable(array $arrAllowedEventType): array|null
+    private function generateEventTable(array $arrAllowedEventType): array|null
     {
-        /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
-
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-
-        /** @var CalendarEventsJourneyModel $calendarEventsHelperJourneyModelAdapter */
         $calendarEventsHelperJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
-
-        /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
-        /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
         $arrTours = [];
@@ -415,9 +317,8 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     /**
      * Helper method.
      */
-    protected function getFirstDayOfWeekTimestamp(int $timestamp): int
+    private function getFirstDayOfWeekTimestamp(int $timestamp): int
     {
-        /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
         $date = $dateAdapter->parse('d-m-Y', $timestamp);
@@ -430,7 +331,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     /**
      * Helper method.
      */
-    protected function getLastDayOfWeekTimestamp(int $timestamp): int
+    private function getLastDayOfWeekTimestamp(int $timestamp): int
     {
         return $this->getFirstDayOfWeekTimestamp($timestamp) + 6 * 24 * 3600;
     }
@@ -438,18 +339,11 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     /**
      * Helper method.
      */
-    protected function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = ''): string
+    private function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = ''): string
     {
-        /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
-
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-
-        /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
-
-        /** @var Calendar $calendarAdapter */
         $calendarAdapter = $this->framework->getAdapter(Calendar::class);
 
         if (empty($dateFormat)) {
@@ -507,12 +401,9 @@ class PilatusExport2021Controller extends AbstractPrintExportController
      *
      * @throws \Exception
      */
-    protected function generateCourses(): void
+    private function generateCourses(): void
     {
-        /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
-        /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
         $arrEvents = [];
@@ -602,15 +493,10 @@ class PilatusExport2021Controller extends AbstractPrintExportController
      *
      * @throws \Exception
      */
-    protected function generateEvents(string $eventType): void
+    private function generateEvents(string $eventType): void
     {
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-
-        /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
-        /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
         $arrOrganizerContainer = [];
@@ -700,28 +586,14 @@ class PilatusExport2021Controller extends AbstractPrintExportController
      */
     private function getEventDetails(CalendarEventsModel $objEvent): array
     {
-        /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
-
-        /** @var Environment $environmentAdapter */
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
-
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-
-        /** @var Events $eventsAdapter */
         $eventsAdapter = $this->framework->getAdapter(Events::class);
-
-        /** @var CalendarEventsJourneyModel $calendarEventsJourneyModelAdapter */
         $calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
 
         $arrRow = $objEvent->row();
         $arrRow['url'] = $environmentAdapter->get('url').'/'.$eventsAdapter->generateEventUrl($objEvent);
-
-        /*
-         * if ($this->showQrCode) {
-         * //$arrRow['qrCode'] = $calendarEventsHelperAdapter->getEventQrCode($objEvent, ['scale' => 4]);
-         * }*/
         $arrRow['eventState'] = '' !== $objEvent->eventState ? $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->eventState][0] : '';
         $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate);
         $arrRow['eventDates'] = $this->getEventPeriod($objEvent, $this->dateFormat);

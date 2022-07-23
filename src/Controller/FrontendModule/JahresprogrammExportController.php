@@ -18,6 +18,7 @@ use Contao\Calendar;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\CourseMainTypeModel;
 use Contao\CourseSubTypeModel;
@@ -30,7 +31,6 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Template;
 use Contao\UserRoleModel;
-use Doctrine\DBAL\Connection;
 use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,33 +44,29 @@ class JahresprogrammExportController extends AbstractPrintExportController
 {
     public const TYPE = 'jahresprogramm_export';
 
-    protected ModuleModel|null $model = null;
-    protected Template|null $template = null;
-    protected int|null $startDate = null;
-    protected int|null $endDate = null;
-    protected int|null $organizer = null;
-    protected string|null $eventType = null;
-    protected int|null $eventReleaseLevel;
-    protected array|null $events = null;
-    protected array|null $instructors = null;
-    protected array|null $specialUsers = null;
+    private ContaoFramework $framework;
+    private RequestStack $requestStack;
+
+    private Template|null $template = null;
+    private int|null $startDate = null;
+    private int|null $endDate = null;
+    private int|null $organizer = null;
+    private string|null $eventType = null;
+    private int|null $eventReleaseLevel = null;
+    private array|null $events = null;
+    private array|null $instructors = null;
+
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack)
+    {
+        $this->framework = $framework;
+        $this->requestStack = $requestStack;
+
+        parent::__construct($framework);
+    }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        $this->model = $model;
-
-        // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
-
-        $services['request_stack'] = RequestStack::class;
-        $services['database_connection'] = Connection::class;
-
-        return $services;
     }
 
     /**
@@ -80,8 +76,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
     {
         $this->template = $template;
 
-        /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->get('contao.framework')->getAdapter(Controller::class);
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         // Load language file
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
@@ -94,27 +89,19 @@ class JahresprogrammExportController extends AbstractPrintExportController
     /**
      * @throws \Exception
      */
-    protected function generateForm(): Form
+    private function generateForm(): Form
     {
-        /** @var Request $request */
-        $request = $this->get('request_stack')->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
+        $eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
+        $environmentAdapter = $this->framework->getAdapter(Environment::class);
+        $databaseAdapter = $this->framework->getAdapter(Database::class);
 
-        /** @var EventOrganizerModel $eventOrganizerModelAdapter */
-        $eventOrganizerModelAdapter = $this->get('contao.framework')->getAdapter(EventOrganizerModel::class);
-
-        /** @var Environment $environmentAdapter */
-        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
-
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
-
-        /** @var Form $objForm */
         $objForm = new Form(
             'form-jahresprogramm-export',
             'POST',
             function (Form $objHaste): bool {
                 /** @var Request $request */
-                $request = $this->get('request_stack')->getCurrentRequest();
+                $request = $this->requestStack->getCurrentRequest();
 
                 return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
             }
@@ -169,6 +156,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
         while ($objUserRoles->next()) {
             $arrUserRoles[$objUserRoles->id] = $objUserRoles->title;
         }
+
         $objForm->addFormField('userRoles', [
             'label' => 'Neben den Event-Leitern zusätzliche Funktionäre anzeigen',
             'inputType' => 'select',
@@ -203,8 +191,8 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 $this->template->instructors = $this->instructors;
 
                 $arrayUserRoles = empty($request->request->get('userRoles')) ? [] : $request->request->get('userRoles');
-                $this->specialUsers = $this->getUsersByUserRole($arrayUserRoles);
-                $this->template->specialUsers = $this->specialUsers;
+                $specialUsers = $this->getUsersByUserRole($arrayUserRoles);
+                $this->template->specialUsers = $specialUsers;
             }
         }
 
@@ -214,37 +202,22 @@ class JahresprogrammExportController extends AbstractPrintExportController
     /**
      * @throws \Exception
      */
-    protected function getEventsAndInstructors(): void
+    private function getEventsAndInstructors(): void
     {
-        /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
-
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
-
-        /** @var CourseMainTypeModel $courseMainTypeModelAdapter */
-        $courseMainTypeModelAdapter = $this->get('contao.framework')->getAdapter(CourseMainTypeModel::class);
-
-        /** @var CourseSubTypeModel $courseSubTypeModelAdapter */
-        $courseSubTypeModelAdapter = $this->get('contao.framework')->getAdapter(CourseSubTypeModel::class);
-
-        /** @var CalendarEventsModel $calendarEventsModelAdapter */
-        $calendarEventsModelAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsModel::class);
-
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
-        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
-
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
-
-        /** @var EventOrganizerModel $eventOrganizerModelAdapter */
-        $eventOrganizerModelAdapter = $this->get('contao.framework')->getAdapter(EventOrganizerModel::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+        $dateAdapter = $this->framework->getAdapter(Date::class);
+        $courseMainTypeModelAdapter = $this->framework->getAdapter(CourseMainTypeModel::class);
+        $courseSubTypeModelAdapter = $this->framework->getAdapter(CourseSubTypeModel::class);
+        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $databaseAdapter = $this->framework->getAdapter(Database::class);
+        $eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
 
         $events = [];
         $objEvents = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE startDate>=? AND startDate<=?')->execute($this->startDate, $this->endDate);
 
         while ($objEvents->next()) {
-            // Check if event is at least on second highest level (Level 3/4)
+            // Check if event is at least on second-highest level (Level 3/4)
             $eventModel = $calendarEventsModelAdapter->findByPk($objEvents->id);
 
             if (!$this->hasValidReleaseLevel($eventModel, (int) $this->eventReleaseLevel)) {
@@ -308,9 +281,9 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
                     if ($this->organizer) {
                         if (null !== ($eventOrganizerModel = $eventOrganizerModelAdapter->findByPk($this->organizer))) {
-                            $showHeadline = $eventOrganizerModel->annualProgramShowHeadline ? true : false;
-                            $showTeaser = $eventOrganizerModel->annualProgramShowTeaser ? true : false;
-                            $showDetails = $eventOrganizerModel->annualProgramShowDetails ? true : false;
+                            $showHeadline = (bool) $eventOrganizerModel->annualProgramShowHeadline;
+                            $showTeaser = (bool) $eventOrganizerModel->annualProgramShowTeaser;
+                            $showDetails = (bool) $eventOrganizerModel->annualProgramShowDetails;
                         }
                     }
 
@@ -399,20 +372,15 @@ class JahresprogrammExportController extends AbstractPrintExportController
         }
     }
 
-    protected function getUsersByUserRole(array $arrUserRoles): array
+    private function getUsersByUserRole(array $arrUserRoles): array
     {
-        /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
-
-        /** @var UserRoleModel $userRoleModelAdapter */
-        $userRoleModelAdapter = $this->get('contao.framework')->getAdapter(UserRoleModel::class);
-
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->get('contao.framework')->getAdapter(Database::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+        $userRoleModelAdapter = $this->framework->getAdapter(UserRoleModel::class);
+        $databaseAdapter = $this->framework->getAdapter(Database::class);
 
         $specialUsers = [];
 
-        if (!empty($arrUserRoles) && \is_array($arrUserRoles)) {
+        if (!empty($arrUserRoles)) {
             $objUserRoles = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user_role WHERE id IN('.implode(',', array_map('\intval', $arrUserRoles)).') ORDER BY sorting');
 
             while ($objUserRoles->next()) {
@@ -464,17 +432,10 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
     private function getEventPeriod(CalendarEventsModel $objEvent, string $dateFormat = ''): string
     {
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->get('contao.framework')->getAdapter(Date::class);
-
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
-        $calendarEventsHelperAdapter = $this->get('contao.framework')->getAdapter(CalendarEventsHelper::class);
-
-        /** @var Config $configAdapter */
-        $configAdapter = $this->get('contao.framework')->getAdapter(Config::class);
-
-        /** @var Calendar $calendarAdapter */
-        $calendarAdapter = $this->get('contao.framework')->getAdapter(Calendar::class);
+        $dateAdapter = $this->framework->getAdapter(Date::class);
+        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $configAdapter = $this->framework->getAdapter(Config::class);
+        $calendarAdapter = $this->framework->getAdapter(Calendar::class);
 
         if (empty($dateFormat)) {
             $dateFormat = $configAdapter->get('dateFormat');
