@@ -145,39 +145,31 @@ class VueTourList {
 
                     let formData = new FormData();
 
-                    // Handle arrays correctly
-                    for (let prop in self.apiParams) {
-                        let property = self.apiParams[prop];
-                        if (prop === 'offset') {
-                            formData.append('offset', parseInt(self.apiParams.offset) + self.loadedItems);
-                        } else if (Array.isArray(property)) {
-                            for (let i = 0; i < property.length; ++i) {
-                                formData.append(prop + '[]', property[i]);
-                            }
-                        } else if (self.loadedItems === 0 && self.getTake() > 0) {
-                            if (formData.has('limit')) {
-                                formData.set('limit', self.getTake());
-                            } else {
-                                formData.append('limit', self.getTake());
+                    // Add api parameters to the Form Data object
+                    for (const [key, value] of Object.entries(self.apiParams)) {
+                        if (key === 'offset') {
+                            formData.append('offset', parseInt(value) + self.loadedItems);
+                        } else if (Array.isArray(value)) {// Handle arrays correctly
+                            for (let i = 0; i < value.length; ++i) {
+                                formData.append(key + '[]', value[i]);
                             }
                         } else {
-                            formData.append(prop, property);
+                            formData.append(key, value);
+                        }
+                    }
+
+                    // Set limit on page load/refresh
+                    if (self.loadedItems === 0 && self.getTake() > 0) {
+                        if (formData.has('limit')) {
+                            formData.set('limit', self.getTake());
+                        } else {
+                            formData.append('limit', self.getTake());
                         }
                     }
 
                     // Handle fields correctly
-                    for (let i = 0; i < self.fields.length; ++i) {
-                        formData.append('fields[]', self.fields[i]);
-                    }
-
-                    // Append url search params to the formData object too
-                    // -> e.g. https://my-website.ch/demo_a.html?take=200&username=jamesbond
-                    (new URLSearchParams((new URL(window.location.href)).search)).forEach((value, key) => {
-                        if (formData.has(key)) {
-                            formData.set(key, value);
-                        } else {
-                            formData.append(key, value);
-                        }
+                    self.fields.forEach((value, key) => {
+                        formData.append('fields[]', value);
                     });
 
                     let urlParams = new URLSearchParams(Array.from(formData)).toString();
@@ -190,9 +182,6 @@ class VueTourList {
                             },
                         }
                     ).then(function (res) {
-                        //Cache.prototype.(url, res);
-                        return res;
-                    }).then(function (res) {
                         return res.json();
                     }).then(function (json) {
 
