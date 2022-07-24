@@ -63,6 +63,7 @@
 <!-- Set up the vue.js course list -->
 <script>
     new VueTourList('#course-list', {
+        'modId': {{ id }},
         'apiParams': {
             'organizers': [{{ apiParam.organizers|raw }}],
             'eventType': [{{ apiParam.eventType|raw }}],

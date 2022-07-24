@@ -14,6 +14,7 @@ class VueTourList {
 
         // Defaults
         const defaults = {
+            'modId': null,
             'apiParams': {
                 'organizers': [],
                 'eventType': ["tour", "generalEvent", "lastMinuteTour", "course"],
@@ -54,6 +55,8 @@ class VueTourList {
 
             data: function data() {
                 return {
+                    // The module id (used by the take param)
+                    modId: params.modId,
                     // Api params
                     apiParams: params.apiParams,
                     // Fields array
@@ -85,9 +88,10 @@ class VueTourList {
                 },
 
                 getTake: function getTake() {
+                    let self = this;
                     let urlString = window.location.href;
                     let url = new URL(urlString);
-                    let take = url.searchParams.get('take');
+                    let take = url.searchParams.get('take_e' + self.modId);
 
                     return null === take ? null : parseInt(take);
                 },
@@ -128,7 +132,7 @@ class VueTourList {
                             urlParams.delete('itemId');
                         }
 
-                        // Current URL: https://my-website.ch/demo_a.html?take=200
+                        // Current URL: https://my-website.ch/demo_a.html?take_e234=200
                         const nextURL = href + (urlParams.toString() ? '?' + urlParams.toString() : '');
                         const nextTitle = document.title; // keep the same title
 
@@ -217,13 +221,13 @@ class VueTourList {
 
                         if (self.loadedItems > self.apiParams['limit']) {
                             take = self.loadedItems;
-                            if (!urlParams.has('take')) {
-                                urlParams.append('take', take);
+                            if (!urlParams.has('take_e' + self.modId)) {
+                                urlParams.append('take_e' + self.modId, take);
                             } else {
-                                urlParams.set('take', take);
+                                urlParams.set('take_e' + self.modId, take);
                             }
 
-                            // Current URL: https://my-website.ch/demo_a.html?take=200
+                            // Current URL: https://my-website.ch/demo_a.html?take_324=200
                             const nextURL = href + '?' + urlParams.toString();
                             const nextTitle = document.title; // keep the original title
 
@@ -247,7 +251,6 @@ class VueTourList {
                 callbackExists: function callbackExists(strCallback) {
                     let self = this;
                     return typeof self.callbacks !== "undefined" && typeof self.callbacks[strCallback] !== "undefined" && typeof self.callbacks[strCallback] === "function";
-
                 }
             }
         });
