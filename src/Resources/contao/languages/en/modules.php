@@ -12,7 +12,6 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use  Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExport2021Controller;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvEventMemberExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvUserExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventFilterFormController;
@@ -27,6 +26,7 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardEditP
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardPastEventsController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardProfileController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardUpcomingEventsController;
+use Markocupic\SacEventToolBundle\Controller\FrontendModule\PilatusExport2021Controller;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListController;
 
 // Backend Modules

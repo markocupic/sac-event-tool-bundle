@@ -90,14 +90,15 @@ services:
 
     # Member dashboard module: display the forms for editing the member profile
     Markocupic\SacEventToolBundle\Controller\FrontendModule\MemberDashboardAvatarController:
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
         arguments:
-            - '@request_stack'
+            - '@contao.framework'
             - '@contao.routing.scope_matcher'
+            - '@security.helper'
+            - '@contao.insert_tag.parser'
+            - '@Markocupic\SacEventToolBundle\Avatar\Avatar'
+            - '%kernel.project_dir%'
         tags:
             - { name: contao.frontend_module, category: sac_event_tool_frontend_modules }
-            - { name: container.service_subscriber }
         public: true
 
     # Member dashboard module: display the form for deleting the member profile
@@ -117,6 +118,7 @@ services:
             - '@contao.framework'
             - '@security.helper'
             - '@Markocupic\SacEventToolBundle\Image\RotateImage'
+            - '@Markocupic\SacEventToolBundle\Avatar\Avatar'
             - '%kernel.project_dir%'
             - '%sacevt.user.frontend.avatar_dir%'
         tags:

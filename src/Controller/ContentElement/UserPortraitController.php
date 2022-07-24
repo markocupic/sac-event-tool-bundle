@@ -18,11 +18,14 @@ use Contao\ContentModel;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\ContentElement;
+use Contao\FrontendUser;
 use Contao\PageModel;
 use Contao\Template;
 use Contao\UserModel;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * @ContentElement(UserPortraitController::TYPE, category="sac_event_tool_content_elements", template="ce_user_portrait")
@@ -32,10 +35,12 @@ class UserPortraitController extends AbstractContentElementController
     public const TYPE = 'user_portrait';
 
     private ContaoFramework $framework;
+    private Security $security;
 
-    public function __construct(ContaoFramework $framework)
+    public function __construct(ContaoFramework $framework, Security $security)
     {
         $this->framework = $framework;
+        $this->security = $security;
     }
 
     public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
@@ -45,25 +50,30 @@ class UserPortraitController extends AbstractContentElementController
 
     protected function getResponse(Template $template, ContentModel $model, Request $request): Response|null
     {
-        /** @var UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
-        $objUser = null;
+        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+
+        $user = null;
 
         if ($request->query->has('username')) {
             $username = $request->query->get('username');
 
-            if (null === ($objUser = $userModelAdapter->findByUsername($username))) {
+            if (null === ($user = $userModelAdapter->findByUsername($username))) {
                 return new Response('', Response::HTTP_NO_CONTENT);
             }
         }
 
         // Do not display profile of a disabled user.
-        if (null === $objUser || $objUser->disable) {
+        if (null === $user || $user->disable) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 
-        $template->objUser = $objUser;
+        $arrUser = $user->row();
+        $arrUser['mainQualification'] = $calendarEventsHelperAdapter->getMainQualification($user);
+        $template->user = $arrUser;
+        $template->userModel = $user;
+        $template->hasLoggedInFrontendUser = $this->security->getUser() instanceof FrontendUser;
 
         return $template->getResponse();
     }

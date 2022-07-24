@@ -3,6 +3,7 @@ services:
     Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController:
         arguments:
             - '@contao.framework'
+            - '@security.helper'
         tags:
             - { name: contao.content_element, category: sac_event_tool_content_elements, type: user_portrait }
         public: true
@@ -11,6 +12,7 @@ services:
         arguments:
             - '@contao.framework'
             - '@database_connection'
+            - '@Markocupic\SacEventToolBundle\Avatar\Avatar'
             - '%kernel.project_dir%'
         tags:
             - { name: contao.content_element, category: sac_event_tool_content_elements, type: user_portrait_list }

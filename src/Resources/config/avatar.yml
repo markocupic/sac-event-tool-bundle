@@ -1,0 +1,11 @@
+services:
+
+    # Avatar service
+    Markocupic\SacEventToolBundle\Avatar\Avatar:
+        public: true
+        arguments:
+            - '@contao.framework'
+            - '@contao.image.picture_factory'
+            - '%kernel.project_dir%'
+            - '%sacevt.avatar.female%'
+            - '%sacevt.avatar.male%'

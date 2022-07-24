@@ -1,0 +1,78 @@
+{% extends '@Contao/block_searchable' %}
+
+{% block content %}
+
+    <!-- indexer::stop -->
+    {{ '{{link::back}}' }}
+    <br>
+    <br>
+    <!-- indexer::continue -->
+
+    <div class="row">
+        <div class="image_container portrait col-sm-4 col-lg-3">
+            {{ '{{picture::'~getAvatarResourcePath(userModel)~'?size=18}}' }}
+        </div>
+
+        <div class="col-sm-8 col-lg-9">
+            <h5 class="ce_headline mt-sm-0">{{ user.lastname }} {{ user.firstname }}</h5>
+            <div class="ce_user_portrait_qualification">
+                {{ user.mainQualification }}
+            </div>
+
+            {% if hasLoggedInFrontendUser is same as false %}
+                <br>
+                <div class="alert d-block alert-info" role="alert">
+                    Bitte melde dich mit deinem Mitgliederkonto an, um die Kontaktdaten und mehr von <strong>{{ user.name }} ?></strong> zu sehen.
+                </div>
+                <br>
+            {% endif %}
+
+            {# Show personal data to logged users only #}
+            {% if hasLoggedInFrontendUser is same as true %}
+                <div class="ce_user_portrait_street">
+                    {{ user.street }}
+                </div>
+
+                <div class="ce_user_portrait_city">
+                    {{ user.postal }} {{ user.city }}
+                </div>
+
+                {% if not user.phone is empty %}
+                    <div class="ce_user_portrait_phone">
+                        {{ user.phone }}
+                    </div>
+                {% endif %}
+
+                {% if not user.mobile is empty %}
+                    <div class="ce_user_portrait_mobile">
+                        {{ user.mobile }}
+                    </div>
+                {% endif %}
+
+                {% if not user.email is empty %}
+                    <div class="ce_user_portrait_email">
+                        {{ '{{email::'~user.email~'}}' }}
+                    </div>
+                {% endif %}
+
+                {% if not user.hobbies is empty %}
+                    <div class="ce_user_portrait_hobbies">
+                        <h5 class="ce_headline">Hobbys</h5>
+                        {{ user.hobbies|nl2br }}
+                    </div>
+                {% endif %}
+
+                {% if not user.introducing is empty %}
+                    <h5 class="ce_headline">Selbstportrait</h5>
+                    <div class="ce_user_portrait_introducing">
+                        {{ user.introducing|nl2br }}
+                    </div>
+                {% endif %}
+            {% endif %}
+            {# End show personal data to logged users only #}
+
+        </div>
+    </div>
+
+{% endblock %}
+

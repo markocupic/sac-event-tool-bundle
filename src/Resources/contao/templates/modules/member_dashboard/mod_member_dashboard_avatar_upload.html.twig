@@ -1,0 +1,38 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+
+    {% if hasInfoMessage %}
+        <div class="alert alert-info" role="alert">
+            {{ infoMessage }}
+        </div>
+    {% endif %}
+
+    {% if hasErrorMessage %}
+        {% for msg in errorMessages %}
+            <div class="alert alert-danger" role="alert">
+                {{ msg }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-9">
+            <div class="">
+                {{ avatarForm|raw }}
+            </div>
+        </div>
+        <div class="col-3">
+            <figure class="member-dashboard-avatar responsive thumbnail image_container">
+                {{ '{{image::'~getAvatarResourcePath(userModel)~'?width=300}}' }}
+                {% if avatar is defined %}
+                    <a href="{{ '{{env::request}}' }}?do=rotate-image&fileId={{ avatar.id }}" class="member-dashboard-rotate-image-button" title="Bild im GUZS 90° drehen"><i class="fa fa-history turn-image"></i></a>
+                {% endif %}
+            </figure>
+            {% if user.hasAvatar is same as true %}
+                <small><a href="{{ getAvatarResourcePath(userModel) }}" title="Avatar downloaden" download>Avatar downloaden</a></small>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

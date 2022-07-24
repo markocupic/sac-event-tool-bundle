@@ -5,4 +5,15 @@ services:
         tags:
             - { name: twig.extension }
 
+    Markocupic\SacEventToolBundle\Twig\TwigAvatarManager:
+        arguments:
+            - '@Markocupic\SacEventToolBundle\Avatar\Avatar'
+        tags:
+            - { name: twig.extension }
 
+    Markocupic\SacEventToolBundle\Twig\TwigLoggedInFrontendUserManager:
+        arguments:
+            - '@contao.framework'
+            - '@security.helper'
+        tags:
+            - { name: twig.extension }

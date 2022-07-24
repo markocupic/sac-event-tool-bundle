@@ -32,7 +32,7 @@ PaletteManipulator::create()
     ->addField('userRole', 'role_legend', PaletteManipulator::POSITION_APPEND)
     ->addField('leiterQualifikation', 'instructor_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['emergencyPhone', 'emergencyPhoneName'], 'emergency_phone_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField('avatarSRC', 'frontend_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField('avatar', 'frontend_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['calendar_containers', 'calendar_containerp'], 'calendars_legend', PaletteManipulator::POSITION_PREPEND)
     ->addField('admin', 'admin_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration'], 'event_tool_legend', PaletteManipulator::POSITION_APPEND)
@@ -60,7 +60,7 @@ PaletteManipulator::create()
     ->addField(['uuid', 'sacMemberId', 'firstname', 'lastname', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'], 'name_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['hideInFrontendListings', 'userRole'], 'role_legend', PaletteManipulator::POSITION_APPEND)
     ->addField('leiterQualifikation', 'instructor_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(['avatarSRC', 'emergencyPhone', 'emergencyPhoneName', 'hobbies', 'introducing'], 'frontend_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['avatar', 'emergencyPhone', 'emergencyPhoneName', 'hobbies', 'introducing'], 'frontend_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['calendar_containers', 'calendar_containerp'], 'calendars_legend', PaletteManipulator::POSITION_PREPEND)
     ->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration'], 'event_tool_legend', PaletteManipulator::POSITION_APPEND)
     ->addField('rescissionCause', 'rescission_legend', PaletteManipulator::POSITION_APPEND)
@@ -111,7 +111,7 @@ PaletteManipulator::create()
     ->addField(['firstname', 'lastname', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'], 'name_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['emergencyPhone', 'emergencyPhoneName'], 'emergency_phone_legend', PaletteManipulator::POSITION_APPEND)
     ->addField('iban', 'bank_account_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(['avatarSRC', 'hobbies', 'introducing'], 'frontend_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['avatar', 'hobbies', 'introducing'], 'frontend_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration'], 'event_tool_legend', PaletteManipulator::POSITION_APPEND)
     //->addField(array('rescissionCause'), 'rescission_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('login', 'tl_user');
@@ -332,7 +332,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['orderLeiterQualifikation'] = [
     'sql' => 'blob NULL',
 ];
 
-$GLOBALS['TL_DCA']['tl_user']['fields']['avatarSRC'] = [
+$GLOBALS['TL_DCA']['tl_user']['fields']['avatar'] = [
     'exclude'   => true,
     'inputType' => 'fileTree',
     'eval'      => ['doNotCopy' => true, 'filesOnly' => true, 'fieldType' => 'radio', 'mandatory' => false, 'tl_class' => '', 'extensions' => '%contao.image.valid_extensions%'],

@@ -14,18 +14,19 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
-use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\FrontendUser;
+use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Template;
+use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 
@@ -35,111 +36,82 @@ use Symfony\Component\Security\Core\Security;
 class MemberDashboardAvatarController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_avatar';
+    protected FrontendUser|null $user = null;
+    private ContaoFramework $framework;
+    private ScopeMatcher $scopeMatcher;
+    private Security $security;
+    private InsertTagParser $insertTagParser;
+    private Avatar $avatar;
+    private string $projectDir;
 
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var ScopeMatcher
-     */
-    protected $scopeMatcher;
-
-    /**
-     * @var string
-     */
-    protected $projectDir;
-
-    /**
-     * @var FrontendUser
-     */
-    protected $objUser;
-
-    /**
-     * MemberDashboardAvatarController constructor.
-     */
-    public function __construct(RequestStack $requestStack, ScopeMatcher $scopeMatcher)
+    public function __construct(ContaoFramework $framework, ScopeMatcher $scopeMatcher, Security $security, InsertTagParser $insertTagParser, Avatar $avatar, string $projectDir)
     {
-        $this->requestStack = $requestStack;
+        $this->framework = $framework;
         $this->scopeMatcher = $scopeMatcher;
+        $this->security = $security;
+        $this->insertTagParser = $insertTagParser;
+        $this->avatar = $avatar;
+        $this->projectDir = $projectDir;
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         // Get logged in member object
-        if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser) {
-            $this->objUser = $objUser;
+        if (($user = $this->security->getUser()) instanceof FrontendUser) {
+            $this->user = $user;
         } else {
-            if ($this->isFrontend()) {
+            if ($this->isFrontend($request)) {
                 return new Response('', Response::HTTP_NO_CONTENT);
             }
         }
 
-        $this->projectDir = $this->getParameter('kernel.project_dir');
-
-        // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    public static function getSubscribedServices(): array
+    private function isFrontend(Request $request): bool
     {
-        $services = parent::getSubscribedServices();
-
-        $services['contao.framework'] = ContaoFramework::class;
-        $services['security.helper'] = Security::class;
-
-        return $services;
-    }
-
-    /**
-     * Identify the Contao scope (TL_MODE) of the current request.
-     *
-     * @return bool
-     */
-    public function isFrontend()
-    {
-        return null !== $this->requestStack->getCurrentRequest() ? $this->scopeMatcher->isFrontendRequest($this->requestStack->getCurrentRequest()) : false;
+        return $this->scopeMatcher->isFrontendRequest($request);
     }
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
-        $src = getAvatar($this->objUser->id, 'FE');
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
 
-        if (!empty($src)) {
-            if (is_file($this->projectDir.'/'.$src)) {
-                $size = StringUtil::deserialize($model->imgSize);
+        $resPath = $this->avatar->getAvatarResourcePath($memberModelAdapter->findByPk($this->user->id));
 
-                if (is_numeric($size)) {
-                    $size = [0, 0, (int) $size];
-                } elseif (!$size instanceof PictureConfiguration) {
-                    if (!\is_array($size)) {
-                        $size = [];
-                    }
+        if (!empty($resPath)) {
+            $size = $stringUtilAdapter->deserialize($model->imgSize);
 
-                    $size += [0, 0, 'crop'];
+            if (is_numeric($size)) {
+                $size = [0, 0, (int) $size];
+            } elseif (!$size instanceof PictureConfiguration) {
+                if (!\is_array($size)) {
+                    $size = [];
                 }
 
-                // If picture
-                if (isset($size[2]) && is_numeric($size[2])) {
-                    $template->image = Controller::replaceInsertTags(sprintf(
-                        '{{picture::%s?size=%s&alt=%s&class=%s}}',
-                        $src,
-                        $size[2],
-                        $this->objUser->firstname.' '.$this->objUser->lastname,
-                        $model->imageClass
-                    ));
-                } else { // If image
-                    $template->image = Controller::replaceInsertTags(sprintf(
-                        '{{image::%s?width=%s&height=%s&mode=%s&alt=%s&class=%s}}',
-                        $src,
-                        $size[0],
-                        $size[1],
-                        $size[2],
-                        $this->objUser->firstname.' '.$this->objUser->lastname,
-                        $model->imageClass
-                    ));
-                }
+                $size += [0, 0, 'crop'];
+            }
+
+            // If picture
+            if (isset($size[2]) && is_numeric($size[2])) {
+                $template->image = $this->insertTagParser->replace(sprintf(
+                    '{{picture::%s?size=%s&alt=%s&class=%s}}',
+                    $resPath,
+                    $size[2],
+                    $this->user->firstname.' '.$this->user->lastname,
+                    $model->imageClass
+                ));
+            } else { // If image
+                $template->image = $this->insertTagParser->replace(sprintf(
+                    '{{image::%s?width=%s&height=%s&mode=%s&alt=%s&class=%s}}',
+                    $resPath,
+                    $size[0],
+                    $size[1],
+                    $size[2],
+                    $this->user->firstname.' '.$this->user->lastname,
+                    $model->imageClass
+                ));
             }
         }
 

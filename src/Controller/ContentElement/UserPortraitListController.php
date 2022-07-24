@@ -27,6 +27,7 @@ use Contao\UserModel;
 use Contao\UserRoleModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -39,12 +40,14 @@ class UserPortraitListController extends AbstractContentElementController
 
     private ContaoFramework $framework;
     private Connection $connection;
+    private Avatar $avatar;
     private string $projectDir;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, string $projectDir)
+    public function __construct(ContaoFramework $framework, Connection $connection, Avatar $avatar, string $projectDir)
     {
         $this->framework = $framework;
         $this->connection = $connection;
+        $this->avatar = $avatar;
         $this->projectDir = $projectDir;
     }
 
@@ -169,7 +172,7 @@ class UserPortraitListController extends AbstractContentElementController
                 $objTemplate->roles = $arrRoles;
 
                 // Get users avatar
-                $strAvatarSRC = getAvatar($objUser->id);
+                $strAvatarSRC = $this->avatar->getAvatarResourcePath($objUser->current());
 
                 // Add image to template
                 if (\strlen($strAvatarSRC)) {

@@ -58,6 +58,7 @@ class MarkocupicSacEventToolExtension extends Extension
         $loader->load('services.yml');
         $loader->load('data_container.yml');
         $loader->load('twig.yml');
+        $loader->load('avatar.yml');
 
         // Friendly configuration
         $rootKey = $this->getAlias();

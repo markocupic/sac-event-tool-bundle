@@ -29,9 +29,9 @@ use Contao\MemberModel;
 use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\System;
 use Contao\Template;
 use Haste\Form\Form;
+use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Image\RotateImage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,16 +48,18 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     private ContaoFramework $framework;
     private Security $security;
     private RotateImage $rotateImage;
+    private Avatar $avatar;
     private string $projectDir;
     private string $avatarDir;
-    private FrontendUser|null $objUser;
+    private FrontendUser|null $user;
     private Template|null $template;
 
-    public function __construct(ContaoFramework $framework, Security $security, RotateImage $rotateImage, string $projectDir, string $avatarDir)
+    public function __construct(ContaoFramework $framework, Security $security, RotateImage $rotateImage, Avatar $avatar, string $projectDir, string $avatarDir)
     {
         $this->framework = $framework;
         $this->security = $security;
         $this->rotateImage = $rotateImage;
+        $this->avatar = $avatar;
         $this->projectDir = $projectDir;
         $this->avatarDir = $avatarDir;
     }
@@ -68,8 +70,8 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         // Get logged in member object
-        if (($objUser = $this->security->getUser()) instanceof FrontendUser) {
-            $this->objUser = $objUser;
+        if (($user = $this->security->getUser()) instanceof FrontendUser) {
+            $this->user = $user;
         }
 
         if (null !== $page) {
@@ -96,54 +98,93 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         // Do not allow for not authorized users
-        if (null === $this->objUser) {
+        if (null === $this->user) {
             throw new UnauthorizedHttpException('Not authorized. Please log in as frontend user.');
         }
+        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
+        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
 
         $this->template = $template;
 
-        $this->template->objUser = $this->objUser;
+        $user = $memberModelAdapter->findByPk($this->user->id);
+
+        $arrUser = $user->row();
 
         $objUploadFolder = new Folder($this->getUploadDir());
 
         // Check for valid avatar image and valid upload directory
         $this->checkAvatar();
 
+        $arrUser['hasAvatar'] = false;
+
         if (!$objUploadFolder->isEmpty()) {
-            $this->template->objUser->hasAvatar = true;
+            $filesModel = $filesModelAdapter->findByPath($this->avatar->getAvatarResourcePath($user));
+
+            if (null !== $filesModel) {
+                $template->avatar = $filesModel->row();
+                $arrUser['hasAvatar'] = true;
+            }
         }
 
         // Generate avatar uploader
         $this->template->avatarForm = $this->generateAvatarForm();
 
+        $template->user = $arrUser;
+        $template->userModel = $user;
+
         // Add messages to template
-        $this->addMessagesToTemplate();
+        $this->addMessagesToTemplate($request);
 
         return $this->template->getResponse();
     }
 
-    /**
-     * Add messages from session to template.
-     */
-    private function addMessagesToTemplate(): void
+    private function getUploadDir(): string
     {
-        $systemAdapter = $this->framework->getAdapter(System::class);
-        $messageAdapter = $this->framework->getAdapter(Message::class);
+        return sprintf(
+            '%s/%s',
+            $this->avatarDir,
+            $this->user->id,
+        );
+    }
 
-        if ($messageAdapter->hasInfo()) {
-            $this->template->hasInfoMessage = true;
-            $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.info');
-            $this->template->infoMessage = $session[0];
+    /**
+     * @throws \Exception
+     */
+    private function checkAvatar(): void
+    {
+        $hasError = false;
+
+        // Set adapters
+        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+
+        // Check for valid avatar
+        if (null !== $this->user) {
+            if ($this->user->avatar) {
+                $objFile = $filesModelAdapter->findByUuid($this->user->avatar);
+
+                if (null === $objFile) {
+                    $hasError = true;
+                }
+
+                if (!is_file($this->projectDir.'/'.$objFile->path)) {
+                    $hasError = true;
+                } else {
+                    $oFile = new File($objFile->path);
+
+                    if (!$oFile->isGdImage) {
+                        $hasError = true;
+                    }
+                }
+
+                if ($hasError) {
+                    $this->user->avatar = '';
+                    $this->user->save();
+                    $objUploadFolder = new Folder($this->getUploadDir());
+                    $objUploadFolder->purge();
+                    $objUploadFolder->delete();
+                }
+            }
         }
-
-        if ($messageAdapter->hasError()) {
-            $this->template->hasErrorMessage = true;
-            $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.error');
-            $this->template->errorMessage = $session[0];
-            $this->template->errorMessages = $session;
-        }
-
-        $messageAdapter->reset();
     }
 
     /**
@@ -202,7 +243,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         // Delete avatar
         if ('form-avatar-upload' === $inputAdapter->post('FORM_SUBMIT') && $inputAdapter->post('delete-avatar')) {
             $objUploadFolder->purge();
-            $oMember = $memberModelAdapter->findByPk($this->objUser->id);
+            $oMember = $memberModelAdapter->findByPk($this->user->id);
 
             if (null !== $oMember) {
                 $oMember->avatar = '';
@@ -217,7 +258,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
             $objFile = new File($_FILES['avatar']['name']);
 
             // Rename upload to avatar-<user-id>.jpg
-            $strAvatarFileName = 'avatar-'.$this->objUser->id.'.'.strtolower($objFile->extension);
+            $strAvatarFileName = 'avatar-'.$this->user->id.'.'.strtolower($objFile->extension);
 
             // Move uploaded file, so we can save the avatar uuid in tl_member.avatar
             move_uploaded_file($_FILES['avatar']['tmp_name'], $this->projectDir.'/'.$objUploadFolder->path.'/'.$strAvatarFileName);
@@ -227,7 +268,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 
             $fileModel = $filesModelAdapter->findByPath($objUploadFolder->path.'/'.$strAvatarFileName);
 
-            $oMember = $memberModelAdapter->findByPk($this->objUser->id);
+            $oMember = $memberModelAdapter->findByPk($this->user->id);
 
             if (null !== $oMember) {
                 $oMember->avatar = $fileModel->uuid;
@@ -246,51 +287,31 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     }
 
     /**
-     * @throws \Exception
+     * Add messages from session to template.
      */
-    private function checkAvatar(): void
+    private function addMessagesToTemplate(Request $request): void
     {
-        $hasError = false;
+        $messageAdapter = $this->framework->getAdapter(Message::class);
 
-        // Set adapters
-        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+        $this->template->hasInfoMessage = false;
+        $this->template->hasErrorMessage = false;
 
-        // Check for valid avatar
-        if (null !== $this->objUser) {
-            if ($this->objUser->avatar) {
-                $objFile = $filesModelAdapter->findByUuid($this->objUser->avatar);
+        $session = $request->getSession();
 
-                if (null === $objFile) {
-                    $hasError = true;
-                }
-
-                if (!is_file($this->projectDir.'/'.$objFile->path)) {
-                    $hasError = true;
-                } else {
-                    $oFile = new File($objFile->path);
-
-                    if (!$oFile->isGdImage) {
-                        $hasError = true;
-                    }
-                }
-
-                if ($hasError) {
-                    $this->objUser->avatar = '';
-                    $this->objUser->save();
-                    $objUploadFolder = new Folder($this->getUploadDir());
-                    $objUploadFolder->purge();
-                    $objUploadFolder->delete();
-                }
-            }
+        if ($messageAdapter->hasInfo()) {
+            $this->template->hasInfoMessage = true;
+            $bag = $session->getFlashBag()->get('contao.FE.info');
+            $this->template->infoMessage = $bag[0];
+            $this->template->infoMessages = $bag;
         }
-    }
 
-    private function getUploadDir(): string
-    {
-        return sprintf(
-            '%s/%s',
-            $this->avatarDir,
-            $this->objUser->id,
-        );
+        if ($messageAdapter->hasError()) {
+            $this->template->hasErrorMessage = true;
+            $bag = $session->getFlashBag()->get('contao.FE.error');
+            $this->template->errorMessage = $bag[0];
+            $this->template->errorMessages = $bag;
+        }
+
+        $messageAdapter->reset();
     }
 }

@@ -68,27 +68,6 @@ class ReplaceInsertTagsListener
             }
         }
 
-        // {{member_avatar::###pictureSizeID###}}
-        // Return picture of logged in member
-        if (false !== strpos($strTag, 'member_avatar')) {
-            $elements = explode('::', $strTag);
-
-            if (\is_array($elements) && \count($elements) > 1) {
-                $size = $elements[1];
-
-                if (FE_USER_LOGGED_IN) {
-                    $objUser = $memberModelAdapter->findByPk($frontendUserAdapter->getInstance()->id);
-
-                    if (null !== $objUser) {
-                        $strUrl = getAvatar($objUser->id, 'FE');
-                        $strInsertTag = sprintf('{{picture::%s?size=%s&alt=&s}}', $strUrl, $size, $objUser->firstname.' '.$objUser->lastname);
-
-                        return $controllerAdapter->replaceInsertTags($strInsertTag);
-                    }
-                }
-            }
-        }
-
         // Redirect to an internal page
         // {{redirect::###pageIdOrAlias###::###params###}}
         // {{redirect::konto-aktivieren}}

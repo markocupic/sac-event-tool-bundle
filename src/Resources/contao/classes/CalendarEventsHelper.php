@@ -34,7 +34,6 @@ use Contao\Events;
 use Contao\EventTypeModel;
 use Contao\FilesModel;
 use Contao\Folder;
-use Contao\FrontendTemplate;
 use Contao\MemberModel;
 use Contao\PageModel;
 use Contao\StringUtil;
@@ -324,15 +323,16 @@ class CalendarEventsHelper
             $strHtml .= '<div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4"><div class="">';
 
             $objUser = UserModel::findByPk($userId);
+            $avatarManager = System::getContainer()->get('Markocupic\SacEventToolBundle\Avatar\Avatar');
 
             if (null !== $objUser) {
-                $objPictureTpl = new FrontendTemplate('picture_default');
-                $objPictureTpl->setData(generateAvatar($userId, 18));
                 $parser = System::getContainer()->get('contao.insert_tag.parser');
+
+                $figureTag = '{{figure::'.$avatarManager->getAvatarResourcePath($objUser).'?size=18&metadata[title]='.StringUtil::specialchars($objUser->name).'&enableLightbox=0&options[attr][class]=avatar-large&template=image}}';
 
                 $strHtml .= '<div class="image_container portrait">';
                 $strHtml .= sprintf('<a href="%s?username=%s" title="Leiter Portrait ansehen">', $parser->replace('{{link_url::'.$userPortraitJumpTo.'}}'), UserModel::findByPk($userId)->username);
-                $strHtml .= sprintf('<figure class="avatar-large">%s</figure>', $objPictureTpl->parse());
+                $strHtml .= $parser->replace($figureTag);
                 $strHtml .= '</a></div>';
                 // End image
 
