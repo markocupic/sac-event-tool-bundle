@@ -97,6 +97,7 @@
 
 <!-- Set up the vue.js tour list -->
 <script>
+    console.log({{ apiParam.username }});
     new VueTourList('#tour-list', {
         'apiParams': {
             'organizers': [{{ apiParam.organizers|raw }}],
