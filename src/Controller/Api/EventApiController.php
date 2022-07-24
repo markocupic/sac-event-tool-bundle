@@ -295,8 +295,6 @@ class EventApiController extends AbstractController
         // Order by startDate ASC
         $qb->orderBy('t.startDate', 'ASC');
 
-        $query = $qb->getSQL();
-
         /** @var array $arrIds */
         $arrIds = $qb->fetchFirstColumn();
 
@@ -312,16 +310,12 @@ class EventApiController extends AbstractController
                 'countItems' => 0,
                 'itemsTotal' => \count($arrIds),
                 'queryTime' => $queryTime,
-                'sql' => $query,
                 'arrEventIds' => [],
-                'params' => [],
+                'sql' => $qb->getSQL(),
+                'params' => $qb->getParameters(),
             ],
             'data' => [],
         ];
-
-        foreach ($param as $k => $v) {
-            $arrJSON['meta']['params'][$k] = $v;
-        }
 
         if (!empty($arrIds)) {
             $qb = $this->connection->createQueryBuilder();
@@ -437,12 +431,8 @@ class EventApiController extends AbstractController
 
     /**
      * Deserialize arrays and convert binary uuids.
-     *
-     * @param $varValue
-     *
-     * @return array|string|null
      */
-    private function prepareValue($varValue)
+    private function prepareValue(mixed $varValue): mixed
     {
         /** @var Validator $validatorAdapter */
         $validatorAdapter = $this->framework->getAdapter(Validator::class);
@@ -478,7 +468,7 @@ class EventApiController extends AbstractController
     /**
      * array_map for deep arrays.
      */
-    private function arrayMapRecursive(array &$arr, callable $fn): array
+    private function arrayMapRecursive(array $arr, callable $fn): array
     {
         return array_map(
             fn ($item) => \is_array($item) ? $this->arrayMapRecursive($item, $fn) : $fn($item),
