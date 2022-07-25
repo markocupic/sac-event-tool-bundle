@@ -16,21 +16,25 @@
     <div class="row gx-5">
         <!-- Start col left -->
         <div class="col-lg-6">
-            {% if not getEventData.invoke('teaser') is empty %}
-                <!-- indexer::continue -->
-                <div class="teaser event-detail mb-3">
-                    <p><strong>{{ getEventData.invoke('teaser') }}</strong></p>
-                </div>
-                <!-- indexer::stop -->
-            {% endif %}
-
             <div class="mb-3 p-3 bg-white">
-                <div class="event-detail event-info-box organizer-logo mb-4">
-                    {{ getEventData.invoke('eventOrganizerLogos')|raw }}
+                {% if not getEventData.invoke('teaser') is empty %}
+                    <!-- indexer::continue -->
+                    <div class="teaser event-detail mb-3">
+                        <p><strong>{{ getEventData.invoke('teaser') }}</strong></p>
+                    </div>
+                    <!-- indexer::stop -->
+                {% endif %}
+
+                <div class="eventdate event-detail event-info-box icon-box-small">
+                    <h5>Datum/Dauer</h5>
+                    <p>{{ getEventData.invoke('eventPeriodLg')|raw }}</p>
                 </div>
 
                 <div class="organizers event-detail event-info-box icon-box-small">
                     <h5>Organisierende Gruppe</h5>
+                    <div class="event-detail event-info-box organizer-logo mb-4">
+                        {{ getEventData.invoke('eventOrganizerLogos')|raw }}
+                    </div>
                     {% if not getEventData.invoke('eventOrganizers') is empty %}
                         <p>{{ getEventData.invoke('eventOrganizers')|raw }}</p>
                     {% else %}
@@ -43,11 +47,6 @@
                         <h5>Mit Bergführer/in</h5>
                     </div>
                 {% endif %}
-
-                <div class="eventdate event-detail event-info-box icon-box-small">
-                    <h5>Datum/Dauer</h5>
-                    <p>{{ getEventData.invoke('eventPeriodLg')|raw }}</p>
-                </div>
 
                 <div class="requirements event-detail event-info-box icon-box-small">
                     <h5>Eventnummer</h5>
@@ -79,12 +78,18 @@
                     </div>
                 {% endif %}
 
+                {% if not getEventData.invoke('leistungen') is empty %}
+                    <div class="price event-detail event-info-box icon-box-small">
+                        <h5>Leistungen/Preis</h5>
+                        <p>{{ getEventData.invoke('leistungen')|nl2br }}</p>
+                    </div>
+                {% endif %}
+
             </div>
 
             <div class="mt-3 mb-3 p-3 bg-white">
                 <div class="instructor event-detail event-info-box icon-box-small">
                     <h5>Leitung/Betreuung</h5>
-
                     {% if not getEventData.invoke('instructorContactBoxes') is empty %}
                         <!-- indexer::continue -->
                         <div class="row mt-3 gx-2 gy-1">
@@ -95,13 +100,6 @@
                         <p>Leiter/in wurde gelöscht.</p>
                     {% endif %}
                 </div>
-
-                {% if not getEventData.invoke('leistungen') is empty %}
-                    <div class="price event-detail event-info-box icon-box-small">
-                        <h5>Leistungen/Preis</h5>
-                        <p>{{ getEventData.invoke('leistungen')|nl2br }}</p>
-                    </div>
-                {% endif %}
 
                 {% if getEventData.invoke('setRegistrationPeriod') %}
                     <div class="booking-text event-detail event-info-box icon-box-small">
@@ -126,7 +124,6 @@
                         {% if getEventData.invoke('generateMainInstructorContactDataFromDb') %}
                             <p class="mt-3">{{ getEventData.invoke('mainInstructorContactDataFromDb')|raw }}</p>
                         {% endif %}
-
                     </div>
                 {% endif %}
 
@@ -162,6 +159,13 @@
                     <h5 class="mt-lg-0">Touren-Typ</h5>
                     <p>{{ getEventData.invoke('tourTypesTitles')|raw }}</p>
                     <!-- indexer::stop -->
+                </div>
+            {% endif %}
+
+            {% if getEventData.invoke('eventType') == 'tour' %}
+                <div class="tour-difficulties event-detail event-info-box icon-box-small">
+                    <h5>Schwierigkeit</h5>
+                    <p>{{ getEventData.invoke('tourTechDifficultiesAsArray')|join('<br>')|raw }}</p>
                 </div>
             {% endif %}
 
@@ -203,13 +207,6 @@
                 </div>
             {% endif %}
 
-            {% if getEventData.invoke('eventType') == 'tour' %}
-                <div class="tour-difficulties event-detail event-info-box icon-box-small">
-                    <h5>Schwierigkeit</h5>
-                    <p>{{ getEventData.invoke('tourTechDifficultiesAsArray')|join('<br>')|raw }}</p>
-                </div>
-            {% endif %}
-
             {% if getEventData.invoke('eventType') == 'tour' and not getEventData.invoke('arrTourProfile') is empty %}
                 <div class="tour-profile event-detail event-info-box icon-box-small">
                     <h5>Profil</h5>
@@ -224,6 +221,13 @@
                 </div>
             {% endif %}
 
+            {% if not getEventData.invoke('meetingPoint') is empty %}
+                <div class="meeting-point event-detail event-info-box icon-box-small">
+                    <h5>Zeit und Treffpunkt</h5>
+                    <p>{{ getEventData.invoke('meetingPoint')|nl2br }}</p>
+                </div>
+            {% endif %}
+
             {% if not getEventData.invoke('equipment') is empty %}
                 <div class="equipment event-detail event-info-box icon-box-small">
                     <h5>Benötigtes Material</h5>
@@ -235,13 +239,6 @@
                 <div class="miscellaneous event-detail event-info-box icon-box-small last">
                     <h5>Sonstiges</h5>
                     <p>{{ getEventData.invoke('miscellaneous')|nl2br }}</p>
-                </div>
-            {% endif %}
-
-            {% if not getEventData.invoke('meetingPoint') is empty %}
-                <div class="meeting-point event-detail event-info-box icon-box-small">
-                    <h5>Zeit und Treffpunkt</h5>
-                    <p>{{ getEventData.invoke('meetingPoint')|nl2br }}</p>
                 </div>
             {% endif %}
 
