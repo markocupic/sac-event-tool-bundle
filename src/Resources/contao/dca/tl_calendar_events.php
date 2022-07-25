@@ -99,7 +99,7 @@ PaletteManipulator::create()
     ->addField(['eventDates', 'durationInfo'], 'date_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['isRecurringEvent'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
-    ->addField(['location', 'coordsCH1903', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'addIban'], 'details_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['location', 'coordsCH1903', 'journey', 'tourDetailText', 'tourProfile', 'requirements', 'leistungen', 'equipment', 'meetingPoint', 'bookingEvent', 'miscellaneous', 'linkSacRoutePortal', 'addIban'], 'details_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['addMinAndMaxMembers'], 'min_max_member_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['generateMainInstructorContactDataFromDb', 'disableOnlineRegistration', 'setRegistrationPeriod', 'registrationGoesTo'], 'registration_legend', PaletteManipulator::POSITION_APPEND)
     ->addField(['allowDeregistration'], 'deregistration_legend', PaletteManipulator::POSITION_APPEND)
@@ -796,6 +796,16 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['journey'] = [
     'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
     'eval'       => ['multiple' => false, 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr m12'],
     'sql'        => "varchar(255) NOT NULL default ''",
+];
+
+// linkSacRoutePortal
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['linkSacRoutePortal'] = [
+    'exclude'   => true,
+    'search'    => true,
+    'sorting'   => true,
+    'inputType' => 'text',
+    'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
+    'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
 // eventSubstitutionText

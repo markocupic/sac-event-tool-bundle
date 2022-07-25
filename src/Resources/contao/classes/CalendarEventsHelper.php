@@ -265,6 +265,10 @@ class CalendarEventsHelper
                 $value = static::getGeoLinkUrl($objEvent);
                 break;
 
+            case 'linkSacRoutePortal':
+                $value = static::getSacRoutePortalLink($objEvent);
+                break;
+
             case 'gallery':
                 $value = static::getGallery([
                     'multiSRC' => $objEvent->multiSRC,
@@ -1143,5 +1147,26 @@ class CalendarEventsHelper
         }
 
         return null;
+    }
+
+    public static function getSacRoutePortalLink(CalendarEventsModel $objEvent): string|null
+    {
+        if (empty($objEvent->linkSacRoutePortal)) {
+            return null;
+        }
+
+        $strPortalLink = html_entity_decode($objEvent->linkSacRoutePortal);
+
+        // Validate link
+        if (!filter_var($strPortalLink, FILTER_VALIDATE_URL)) {
+            return null;
+        }
+
+        // Only links from the SAC route portal are allowed
+        if (!str_starts_with($strPortalLink, System::getContainer()->getParameter('sacevt.event.sac_route_portal_base_link'))) {
+            return null;   
+        }
+
+        return $strPortalLink;
     }
 }
