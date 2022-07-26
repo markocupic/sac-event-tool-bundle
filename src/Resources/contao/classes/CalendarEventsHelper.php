@@ -1164,7 +1164,12 @@ class CalendarEventsHelper
 
         // Only links from the SAC route portal are allowed
         if (!str_starts_with($strPortalLink, System::getContainer()->getParameter('sacevt.event.sac_route_portal_base_link'))) {
-            return null;   
+            return null;
+        }
+
+        // Check if the SAC route portal base link is not entered
+        if ($strPortalLink === System::getContainer()->getParameter('sacevt.event.sac_route_portal_base_link')) {
+            return null;
         }
 
         return $strPortalLink;
