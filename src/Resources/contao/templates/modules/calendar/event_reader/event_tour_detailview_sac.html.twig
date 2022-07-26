@@ -2,13 +2,15 @@
 <p class="back"><a href="javascript:history.go(-1)" title="Zurück">Zurück</a></p>
 
 <div class="event event-detailview layout_full block{{ getEventData.invoke('class')|raw }}">
+
     {% if getEventData.invoke('eventState') %}
-        <h4 class="event-state-headline mb-0">{{ getEventData.invoke('eventStateLabel')|raw }}</h4>
+        <h4 class="event-state-headline mt-3 mb-0">{{ getEventData.invoke('eventStateLabel') }}</h4>
     {% endif %}
 
     <!-- indexer::continue -->
-    <h1 class="ce_headline">{{ getEventData.invoke('title') }}</h1>
+    <h1 class="ce_headline mt-3">{{ getEventData.invoke('title') }}</h1>
     <!-- indexer::stop -->
+
     {% if  getEventData.invoke('eventType') == 'lastMinuteTour' %}
         <h4 class="ce_headline last-minute-tour">Last minute tour (Spontantour)</h4>
     {% endif %}
@@ -276,7 +278,7 @@
     {# Gallery #}
     {% if getEventData.invoke('addGallery') %}
         <!-- gallery start -->
-        <hr>
+        <hr class="mt-5 mb-5">
         {{ getEventData.invoke('gallery')|raw }}
         <!-- gallery end -->
     {% endif %}
