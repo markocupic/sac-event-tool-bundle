@@ -16,36 +16,24 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\FrontendUser;
-use Contao\MemberModel;
 use Contao\PageModel;
 
 class ReplaceInsertTagsListener
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
 
-    /**
-     * ReplaceInsertTagsListener constructor.
-     */
+    private ContaoFramework $framework;
+
+
     public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
     }
 
-    /**
-     * @param $strTag
-     *
-     * @return bool|string
-     */
-    public function onReplaceInsertTags($strTag)
+
+    public function onReplaceInsertTags(string $strTag): bool|string
     {
         // Set adapters
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-        $frontendUserAdapter = $this->framework->getAdapter(FrontendUser::class);
         $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
 
         // Trim whitespaces
@@ -53,7 +41,7 @@ class ReplaceInsertTagsListener
 
         // Replace external link
         // {{external_link::http://google.ch::more}}
-        if (false !== strpos($strTag, 'external_link')) {
+        if (str_contains($strTag, 'external_link')) {
             $elements = explode('::', $strTag);
 
             if (\is_array($elements) && \count($elements) > 1) {
@@ -72,7 +60,7 @@ class ReplaceInsertTagsListener
         // {{redirect::###pageIdOrAlias###::###params###}}
         // {{redirect::konto-aktivieren}}
         // {{redirect::some-page-alias::?foo=bar&var=bla}}
-        if (false !== strpos($strTag, 'redirect')) {
+        if (str_contains($strTag, 'redirect')) {
             $elements = explode('::', $strTag);
 
             if (\is_array($elements) && \count($elements) > 1) {
