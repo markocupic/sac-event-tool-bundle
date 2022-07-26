@@ -136,19 +136,14 @@
             'suitableForBeginners',
         ],
         'callbacks': {
-            'oninsert': function (vue, json) {
-                window.setTimeout(function () {
-                    let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-                    let tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                        return new bootstrap.Tooltip(tooltipTriggerEl)
-                    })
-                }, 200);
+            'oninsert': async function (vue, json) {
+                // Wait still DOM is ready
+                await new Promise(resolve => setTimeout(resolve, 100));
 
-                window.setTimeout(function () {
-
-                    // Cache the event list object in the localStorage
-                    // before redirecting to the detail page
-                    let buttons = document.querySelectorAll('[data-has-event-href="true"]');
+                // Cache the event list object in the localStorage
+                // before redirecting to the detail page
+                await new Promise((resolve, reject) => {
+                    let buttons = document.querySelectorAll(vue.elId + ' [data-has-event-href="true"]');
                     buttons.forEach((button) => {
                         button.addEventListener('click', (event) => {
                             event.stopPropagation();
@@ -184,14 +179,30 @@
                                 'expiry': Date.now() + 5 * 60 * 1000,
                             }
 
-                            localStorage.setItem(btoa(nextURL), JSON.stringify(vueInstance));
+                            // Save the vue instance to the local storage.
+                            // This saves us a time-consuming request,
+                            // if the user clicks backs from the detail module to the listing module
+                            localStorage.setItem(btoa(nextURL + '&modId=' + vue.modId), JSON.stringify(vueInstance));
 
                             // Redirect to detail page
                             window.location.href = link;
 
                         });
+
                     });
-                }, 200);
+
+                    resolve('done!');
+                }).catch((error) => console.log(error));
+
+                // Re-initialize Bootstrap/Popper tooltips
+                await new Promise((resolve, reject) => {
+                    let tooltipTriggerList = [].slice.call(document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]'))
+                    tooltipTriggerList.map(function (tooltipTriggerEl) {
+                        return new bootstrap.Tooltip(tooltipTriggerEl);
+                    })
+
+                    resolve('done');
+                }).catch((error) => console.log(error));
             }
         },
     });

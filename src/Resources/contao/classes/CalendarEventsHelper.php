@@ -640,7 +640,7 @@ class CalendarEventsHelper
         }
 
         if ($blnTooltip) {
-            return Date::parse($dateFormat, self::getStartDate($objEvent)).($blnAppendEventDuration ? ' ('.self::getEventDuration($objEvent).')' : '').(!$blnInline ? '<br>' : ' ').'<a tabindex="0" class="more-date-infos" data-toggle="tooltip" data-placement="bottom" title="Eventdaten: '.implode(', ', $arrDates).'">und weitere</a>';
+            return Date::parse($dateFormat, self::getStartDate($objEvent)).($blnAppendEventDuration ? ' ('.self::getEventDuration($objEvent).')' : '').(!$blnInline ? '<br>' : ' ').'<a tabindex="0" class="more-date-infos" data-bs-toggle="tooltip" data-placement="bottom" title="Eventdaten: '.implode(', ', $arrDates).'">und weitere</a>';
         }
 
         $dateString = '';
@@ -766,7 +766,7 @@ class CalendarEventsHelper
 
                 if ('' !== $strDiff) {
                     if ($tooltip) {
-                        $html = '<span class="badge badge-pill bg-primary" data-toggle="tooltip" data-placement="top" title="Techn. Schwierigkeit: %s">%s</span>';
+                        $html = '<span class="badge badge-pill bg-primary" data-bs-toggle="tooltip" data-placement="top" title="Techn. Schwierigkeit: %s">%s</span>';
                         $arrReturn[] = sprintf($html, $strDiffTitle, $strDiff);
                     } else {
                         $arrReturn[] = $strDiff.' ('.$strDiffTitle.')';
@@ -790,7 +790,7 @@ class CalendarEventsHelper
 
                 if (null !== $objModel) {
                     if ($tooltip) {
-                        $html = '<span class="badge badge-pill bg-secondary" data-toggle="tooltip" data-placement="top" title="Typ: %s">%s</span>';
+                        $html = '<span class="badge badge-pill bg-secondary" data-bs-toggle="tooltip" data-placement="top" title="Typ: %s">%s</span>';
                         $arrReturn[] = sprintf($html, $objModel->{'title'}, $objModel->{$field});
                     } else {
                         $arrReturn[] = $objModel->{$field};
@@ -804,7 +804,7 @@ class CalendarEventsHelper
 
     public static function getBookingCounter(CalendarEventsModel $objEvent): string
     {
-        $strBadge = '<span class="badge badge-pill bg-%s" data-toggle="tooltip" data-placement="top" title="%s">%s</span>';
+        $strBadge = '<span class="badge badge-pill bg-%s" data-bs-toggle="tooltip" data-placement="top" title="%s">%s</span>';
 
         $calendarEventsMember = Database::getInstance()
             ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId = ? && stateOfSubscription = ?')

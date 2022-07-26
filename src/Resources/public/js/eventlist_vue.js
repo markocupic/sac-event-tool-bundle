@@ -11,7 +11,6 @@
  */
 class VueTourList {
     constructor(elId, opt) {
-
         // Defaults
         const defaults = {
             'modId': null,
@@ -55,6 +54,8 @@ class VueTourList {
 
             data: function data() {
                 return {
+                    // The element CSS ID selector: e.g. #myList
+                    elId: elId,
                     // The module id (used by the take param)
                     modId: params.modId,
                     // Api params
@@ -101,9 +102,10 @@ class VueTourList {
                     let self = this;
 
                     // Try to retrieve data from storage
-                    let storageData = localStorage.getItem(btoa(window.location.href));
+                    let storageData = localStorage.getItem(btoa(window.location.href + '&modId=' + self.modId));
+
                     if (storageData) {
-                        localStorage.removeItem(btoa(window.location.href));
+                        localStorage.removeItem(btoa(window.location.href + '&modId=' + self.modId));
                         let storageObject = JSON.parse(storageData);
 
                         // Return if storage data is outdated
