@@ -97,6 +97,7 @@
         <div class="col-12">
             <div class="p-4 bg-white">
                 <div class="booking-text event-detail event-info-box icon-box-small">
+                
                     {% if not getEventData.invoke('bookingEvent') is empty or getEventData.invoke('generateMainInstructorContactDataFromDb') %}
                         <h5>Anmeldung</h5>
                         <p>{% if getEventData.invoke('disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>

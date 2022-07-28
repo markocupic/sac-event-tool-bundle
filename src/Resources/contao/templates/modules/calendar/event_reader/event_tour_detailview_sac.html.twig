@@ -120,9 +120,9 @@
             </div>
 
             <div class="mt-3 mb-3 p-4 bg-white">
+                <div class="booking-text event-detail event-info-box icon-box-small">
 
-                {% if not getEventData.invoke('bookingEvent') is empty or getEventData.invoke('generateMainInstructorContactDataFromDb') %}
-                    <div class="booking-text event-detail event-info-box icon-box-small">
+                    {% if not getEventData.invoke('bookingEvent') is empty or getEventData.invoke('generateMainInstructorContactDataFromDb') %}
                         <h5>Anmeldung</h5>
                         <p>{% if getEventData.invoke('disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>
 
@@ -133,28 +133,28 @@
                         {% if getEventData.invoke('generateMainInstructorContactDataFromDb') %}
                             <p class="mt-3">{{ getEventData.invoke('mainInstructorContactDataFromDb')|raw }}</p>
                         {% endif %}
-                    </div>
-                {% endif %}
-
-                <!-- buttons -->
-                <div class="d-flex flex-wrap">
-                    <div class="mt-3 me-3">
-                        <a href="_download/download_event_ical?eventId={{ getEventData.invoke('id') }}" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary">
-                            <i class="fal fa-calendar-plus"></i> iCal download
-                        </a>
-                    </div>
-
-                    {% if not getEventData.invoke('disableOnlineRegistration') %}
-                        <div class="event-detail-buttons mt-3">
-                            <!-- "book event" button -->
-                            <!-- indexer::continue -->
-                            {{ "{{insert_module::408}}" }}
-                            <!-- indexer::stop -->
-                        </div>
                     {% endif %}
-                </div>
-                <!-- end buttons -->
 
+                    <!-- buttons -->
+                    <div class="d-flex flex-wrap">
+                        <div class="mt-3 me-3">
+                            <a href="_download/download_event_ical?eventId={{ getEventData.invoke('id') }}" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary">
+                                <i class="fal fa-calendar-plus"></i> iCal download
+                            </a>
+                        </div>
+
+                        {% if not getEventData.invoke('disableOnlineRegistration') %}
+                            <div class="event-detail-buttons mt-3">
+                                <!-- "book event" button -->
+                                <!-- indexer::continue -->
+                                {{ "{{insert_module::408}}" }}
+                                <!-- indexer::stop -->
+                            </div>
+                        {% endif %}
+                    </div>
+                    <!-- end buttons -->
+
+                </div>
             </div>
         </div>
         <!-- End col left -->
