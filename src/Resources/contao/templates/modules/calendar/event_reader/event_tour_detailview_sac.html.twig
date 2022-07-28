@@ -110,6 +110,13 @@
                     </div>
                 {% endif %}
 
+                {% if not getEventData.invoke('bookingCounterAsText') is empty %}
+                    <div class="booking-counter event-detail event-info-box icon-box-small">
+                        <h5>Bestätigte Anmeldungen</h5>
+                        <p>{{ getEventData.invoke('bookingCounterAsText') }}</p>
+                    </div>
+                {% endif %}
+
             </div>
 
             <div class="mt-3 mb-3 p-4 bg-white">

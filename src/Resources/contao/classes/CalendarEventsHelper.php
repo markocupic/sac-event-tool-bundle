@@ -184,6 +184,10 @@ class CalendarEventsHelper
                 $value = static::getBookingCounter($objEvent);
                 break;
 
+            case 'bookingCounterAsText':
+                $value = static::getBookingCounter($objEvent, true);
+                break;
+
             case 'tourTechDifficultiesAsArray':
                 $value = static::getTourTechDifficultiesAsArray($objEvent, false);
                 break;
@@ -802,9 +806,13 @@ class CalendarEventsHelper
         return $arrReturn;
     }
 
-    public static function getBookingCounter(CalendarEventsModel $objEvent): string
+    public static function getBookingCounter(CalendarEventsModel $objEvent, bool $withoutTooltip = false): string
     {
-        $strBadge = '<span class="badge badge-pill bg-%s" data-bs-toggle="tooltip" data-placement="top" title="%s">%s</span>';
+        if (!$withoutTooltip) {
+            $strBadge = '<span class="badge badge-pill bg-%s" data-bs-toggle="tooltip" data-placement="top" title="%s">%s</span>';
+        } else {
+            $strBadge = '%2$s (%3$s)';  // only text as output, e.g. 'noch 1 freie Plätze (5/6)`
+        }
 
         $calendarEventsMember = Database::getInstance()
             ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId = ? && stateOfSubscription = ?')
