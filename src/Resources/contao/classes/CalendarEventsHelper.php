@@ -808,9 +808,8 @@ class CalendarEventsHelper
 
     public static function getBookingCounter(CalendarEventsModel $objEvent, bool $withoutTooltip = false): string
     {
-        if (!$withoutTooltip) {
-            $strBadge = '<span class="badge badge-pill bg-%s" data-bs-toggle="tooltip" data-placement="top" title="%s">%s</span>';
-        } else {
+        $strBadge = '<span class="badge badge-pill bg-%s" data-bs-toggle="tooltip" data-placement="top" title="%s">%s</span>';
+        if ($withoutTooltip) {
             $strBadge = '%2$s (%3$s)';  // only text as output, e.g. 'noch 1 freie Plätze (5/6)`
         }
 
