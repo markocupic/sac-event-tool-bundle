@@ -100,17 +100,15 @@
             {# Start Anmeldung #}
             <div class="box-layout-white">
                 <div class="booking-text event-detail event-info-box icon-box-small">
-                    {% if not getEventData.invoke('bookingEvent') is empty or getEventData.invoke('generateMainInstructorContactDataFromDb') %}
-                        <h5>Anmeldung</h5>
-                        <p>{% if getEventData.invoke('disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>
+                    <h5>Anmeldung</h5>
+                    <p>{% if getEventData.invoke('disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>
 
-                        {% if not getEventData.invoke('bookingEvent') is empty %}
-                            <p>{{ getEventData.invoke('bookingEvent')|nl2br }}</p>
-                        {% endif %}
+                    {% if not getEventData.invoke('bookingEvent') is empty %}
+                        <p>{{ getEventData.invoke('bookingEvent')|nl2br }}</p>
+                    {% endif %}
 
-                        {% if getEventData.invoke('generateMainInstructorContactDataFromDb') %}
-                            <p class="m-0">{{ getEventData.invoke('mainInstructorContactDataFromDb') }}</p>
-                        {% endif %}
+                    {% if getEventData.invoke('generateMainInstructorContactDataFromDb') %}
+                        <p class="m-0">{{ getEventData.invoke('mainInstructorContactDataFromDb') }}</p>
                     {% endif %}
 
                     {# button bar #}
