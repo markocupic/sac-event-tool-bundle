@@ -4,3 +4,9 @@ services:
             - '%sacevt.locale%'
         tags:
             - { name: kernel.event_subscriber }
+
+    Markocupic\SacEventToolBundle\Subscriber\PreSingleSignOnLoginSubscriber:
+        arguments:
+            - '@database_connection'
+        tags:
+            - { name: kernel.event_subscriber }

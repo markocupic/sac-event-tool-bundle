@@ -20,15 +20,12 @@ use Contao\PageModel;
 
 class ReplaceInsertTagsListener
 {
-
     private ContaoFramework $framework;
-
 
     public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
     }
-
 
     public function onReplaceInsertTags(string $strTag): bool|string
     {
