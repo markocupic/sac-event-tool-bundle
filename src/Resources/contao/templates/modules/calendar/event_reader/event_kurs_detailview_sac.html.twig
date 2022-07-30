@@ -11,23 +11,26 @@
     <h1 class="ce_headline mt-3">{{ getEventData.invoke('title') }}</h1>
     <!-- indexer::stop -->
 
-    <!-- begin first row -->
-    <div class="row gx-5">
-        <!-- begin col left -->
+    {# begin first row #}
+    <div class="row gx-3">
+        {# begin col left #}
         <div class="col-md-6 col-lg-3 mt-3 mb-3">
-            <div class="teaser-image-course-detail">
-                {% set image_src = getEventData.invoke('eventImagePath')|raw ~ '?size=20&alt=' ~ getEventData.invoke('title')|replace({'&': 'und','?': '','[&]': 'und','&amp;': 'und','=': '',})|escape %}
-                {{ '{{picture::'~image_src~'}}' }}            </div>
+            <div class="box-layout-transparent">
+                <div class="teaser-image-course-detail">
+                    {% set image_src = getEventData.invoke('eventImagePath')|raw ~ '?size=20&alt=' ~ getEventData.invoke('title')|replace({'&': 'und','?': '','[&]': 'und','&amp;': 'und','=': '',})|escape %}
+                    {{ '{{picture::'~image_src~'}}' }}
+                </div>
+            </div>
         </div>
-        <!-- end col left -->
+        {# end col left #}
 
-        <!-- begin col right -->
+        {# begin col right #}
         <div class="col-md-6 col-lg-9 mt-3 mb-3">
-            <div class="p-4 bg-white">
+            <div class="box-layout-transparent">
                 {% if not getEventData.invoke('teaser') is empty %}
                     <!-- indexer::continue -->
-                    <div class="teaser event-detail mb-4">
-                        <p><strong>{{ getEventData.invoke('teaser')|nl2br }}</strong></p>
+                    <div class="teaser event-detail">
+                        <p class="mt-0"><strong>{{ getEventData.invoke('teaser')|nl2br }}</strong></p>
                     </div>
                     <!-- indexer::stop -->
                 {% endif %}
@@ -84,34 +87,31 @@
                         <p>{{ getEventData.invoke('leistungen')|nl2br }}</p>
                     </div>
                 {% endif %}
-
             </div>
         </div>
-        <!--end col right-->
+        {# end col right #}
     </div>
-    <!-- end first row -->
+    {# end first row #}
 
-    <!-- begin second row -->
-    <div class="row gx-5">
-
-        <div class="col-12">
-            <div class="p-4 bg-white">
+    {# begin second row #}
+    <div class="row gx-3">
+        {# begin col left #}
+        <div class="col-md-6">
+            {# Start Anmeldung #}
+            <div class="box-layout-white">
                 <div class="booking-text event-detail event-info-box icon-box-small">
-                
-                    {% if not getEventData.invoke('bookingEvent') is empty or getEventData.invoke('generateMainInstructorContactDataFromDb') %}
-                        <h5>Anmeldung</h5>
-                        <p>{% if getEventData.invoke('disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>
+                    <h5>Anmeldung</h5>
+                    <p>{% if getEventData.invoke('disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>
 
-                        {% if not getEventData.invoke('bookingEvent') is empty %}
-                            <p>{{ getEventData.invoke('bookingEvent')|nl2br }}</p>
-                        {% endif %}
-
-                        {% if getEventData.invoke('generateMainInstructorContactDataFromDb') %}
-                            <p class="m-0">{{ getEventData.invoke('mainInstructorContactDataFromDb') }}</p>
-                        {% endif %}
+                    {% if not getEventData.invoke('bookingEvent') is empty %}
+                        <p>{{ getEventData.invoke('bookingEvent')|nl2br }}</p>
                     {% endif %}
 
-                    <!-- button bar -->
+                    {% if getEventData.invoke('generateMainInstructorContactDataFromDb') %}
+                        <p class="m-0">{{ getEventData.invoke('mainInstructorContactDataFromDb') }}</p>
+                    {% endif %}
+
+                    {# button bar #}
                     <div class="d-flex flex-wrap">
                         <div class="me-2 mt-3 mb-3">
                             <a href="/_download/download_event_ical?eventId={{ getEventData.invoke('id') }}" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary">
@@ -126,25 +126,18 @@
                         </div>
 
                         {% if not getEventData.invoke('disableOnlineRegistration') %}
-                            <div class="event-detail-buttons mt-3">
-                                <!-- book event button -->
+                            <div class="event-detail-buttons me-2 mb-3">
+                                {# book event button #}
                                 {{ '{{insert_module::408}}' }}
                             </div>
                         {% endif %}
+
                     </div>
-                    <!-- end button bar -->
+                    {# end button bar #}
                 </div>
             </div>
-        </div>
-    </div>
-    <!-- end second row -->
-
-    <!-- begin third row -->
-    <div class="row gx-5">
-
-        <!--begin col left -->
-        <div class="col-md-6">
-            <div class="m-0 p-4">
+            {# End Anmeldung #}
+            <div class="box-layout-white">
                 {% if not getEventData.invoke('issues') is empty %}
                     <div class="topics event-detail event-info-box icon-box-small">
                         <!-- indexer::continue -->
@@ -202,15 +195,15 @@
 
             </div>
         </div>
-        <!-- end col left -->
+        {# end col left #}
 
-        <!--begin col right -->
-        <div class="col-md-6 mt-3 mb-3">
-            <div class="bg-white p-4">
+        {# begin col right #}
+        <div class="col-md-6">
+            <div class="box-layout-white">
                 <div class="instructor event-detail event-info-box icon-box-small">
                     <!-- indexer::continue -->
                     <h5>Kursleitung</h5>
-                    <div class="row gx-2 gy-1">
+                    <div class="row mt-3 g-2">
                         {% if not getEventData.invoke('instructorContactBoxes') is empty %}
                             {{ getEventData.invoke('instructorContactBoxes')|raw }}
                         {% else %}
@@ -236,36 +229,35 @@
 
             </div>
         </div>
-        <!--end col right -->
+        {# end col right #}
     </div>
-    <!-- end third row -->
+    {# end second row #}
 
-    <!-- enclosures/downloads -->
+    {# enclosures/downloads #}
     {# !Urheberrechtsverletzung bei urheberrechtlich geschützten Anhängen wie Topos, Karten, etc. #}
     {% if hasLoggedInFrontendUser or 'eventPreview' == app.request.query.get('modee') %}
         {% if getEventData.invoke('enclosure') %}
-            <div class="event-eclosures event-detail event-info-box icon-box-small">
-                <h5>Downloads/weitere Informationen</h5>
-                <div class="enclosure">
-                    {% for enclosureItem in enclosure %}
-                        <p>
-                            <img src="{{ enclosureItem.icon }}" width="18" height="18" alt="{{ enclosureItem.mime }}" class="mime_icon">
-                            <a href="{{ enclosureItem.href }}" title="{{ enclosureItem.title }}">{{ enclosureItem.link }} <span class="size">({{ enclosureItem.filesize }})</span></a>
-                        </p>
-                    {% endfor %}
+            <div class="box-layout-transparent">
+                <div class="event-eclosures event-detail event-info-box icon-box-small">
+                    <h5>Downloads/weitere Informationen</h5>
+                    <div class="enclosure">
+                        {% for enclosureItem in enclosure %}
+                            <p>
+                                <img src="{{ enclosureItem.icon }}" width="18" height="18" alt="{{ enclosureItem.mime }}" class="mime_icon">
+                                <a href="{{ enclosureItem.href }}" title="{{ enclosureItem.title }}">{{ enclosureItem.link }} <span class="size">({{ enclosureItem.filesize }})</span></a>
+                            </p>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         {% endif %}
     {% endif %}
 
+    {# gallery start #}
     {% if getEventData.invoke('addGallery') %}
-        <div class="mt-3 mb-3">
-            <!-- gallery start -->
-            <hr class="mt-5 mb-5">
-            {{ getEventData.invoke('gallery')|raw }}
-            <!-- gallery end -->
-        </div>
+        {{ getEventData.invoke('gallery')|raw }}
     {% endif %}
+    {# gallery end #}
 
 </div>
 
