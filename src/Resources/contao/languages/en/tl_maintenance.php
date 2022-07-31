@@ -12,5 +12,5 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-$GLOBALS['TL_LANG']['tl_maintenance_jobs']['clear_backend_user_rights']['0'] = 'Benutzerrechte aller Backend Benutzer clearen';
-$GLOBALS['TL_LANG']['tl_maintenance_jobs']['clear_backend_user_rights']['1'] = 'Löscht Benutzerrechte aller Backend Benutzer, die bei der Rechtevererbung "Gruppenrechte erweitern" eingestellt haben. Die Filemounts werden belassen.';
+$GLOBALS['TL_LANG']['tl_maintenance_jobs']['reset_backend_user_rights']['0'] = 'Benutzerrechte aller Backend Benutzer bereinigen/reseten';
+$GLOBALS['TL_LANG']['tl_maintenance_jobs']['reset_backend_user_rights']['1'] = 'Bereinigt Benutzerrechte aller Backend Benutzer, die bei der Rechtevererbung "Gruppenrechte erweitern" eingestellt haben. Der Pfad zum persönlichen Benutzerverzeichnis wird belassen.';

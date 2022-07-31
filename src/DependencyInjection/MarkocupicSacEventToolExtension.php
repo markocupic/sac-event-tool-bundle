@@ -73,7 +73,7 @@ class MarkocupicSacEventToolExtension extends Extension
         $container->setParameter($rootKey.'.avatar.female', $config['avatar']['female']);
         $container->setParameter($rootKey.'.avatar.male', $config['avatar']['male']);
         $container->setParameter($rootKey.'.user.backend.home_dir', $config['user']['backend']['home_dir']);
-        $container->setParameter($rootKey.'.user.backend.clear_user_rights_on_sso_login', $config['user']['backend']['clear_user_rights_on_sso_login']);
+        $container->setParameter($rootKey.'.user.backend.reset_user_rights_on_sso_login', $config['user']['backend']['reset_user_rights_on_sso_login']);
         $container->setParameter($rootKey.'.user.frontend.home_dir', $config['user']['frontend']['home_dir']);
         $container->setParameter($rootKey.'.user.frontend.avatar_dir', $config['user']['frontend']['avatar_dir']);
         $container->setParameter($rootKey.'.event.course.booklet_cover_image', $config['event']['course']['booklet_cover_image']);

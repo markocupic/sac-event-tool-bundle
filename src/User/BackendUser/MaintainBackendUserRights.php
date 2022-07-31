@@ -14,8 +14,11 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\User\BackendUser;
 
+use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Date;
 use Contao\FilesModel;
+use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 
@@ -25,17 +28,24 @@ class MaintainBackendUserRights
     private Connection $connection;
     private string $backendUserHomeDir;
 
+    private Adapter $stringUtil;
+    private Adapter $date;
+
     public function __construct(ContaoFramework $framework, Connection $connection, string $backendUserHomeDir)
     {
         $this->framework = $framework;
         $this->connection = $connection;
         $this->backendUserHomeDir = $backendUserHomeDir;
+
+        // Adapters
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
+        $this->date = $this->framework->getAdapter(Date::class);
     }
 
     /**
      * @throws Exception
      */
-    public function clearBackendUserRights(string $strUserIdentifier, array $arrSkip = []): void
+    public function resetBackendUserRights(string $strUserIdentifier, array $arrSkip = [], bool $mergeGroupRights = false): void
     {
         // Initialize contao framework
         $this->framework->initialize();
@@ -48,45 +58,85 @@ class MaintainBackendUserRights
 
         $columns = $schemaManager->listTableColumns('tl_user');
 
-        $arrUserProps = $this->connection->fetchAssociative('SELECT * FROM tl_user WHERE username = ?', [$strUserIdentifier]);
+        $arrUserProps = $this->connection
+            ->fetchAssociative(
+                'SELECT * FROM tl_user WHERE username = ?',
+                [$strUserIdentifier],
+            )
+        ;
 
         if (false !== $arrUserProps) {
             // Contao core permissions
-            $arrPerm = ['modules', 'themes', 'elements', 'fields', 'pagemounts', 'alpty', 'filemounts', 'fop', 'forms', 'formp', 'imageSizes', 'amg'];
+            $arrInherit = ['modules', 'themes', 'elements', 'fields', 'pagemounts', 'alpty', 'filemounts', 'fop', 'forms', 'formp', 'imageSizes', 'amg'];
 
             // Custom permissions like: faqs,faqp,news,newp,newsfeeds,newsfeedp,calendars,calendarp,calendarfeeds,calendarfeedp,newsletters,newsletterp,calendar_containers,calendar_containerp
             if (!empty($GLOBALS['TL_PERMISSIONS']) && \is_array($GLOBALS['TL_PERMISSIONS'])) {
-                $arrPerm = array_merge($arrPerm, $GLOBALS['TL_PERMISSIONS']);
+                $arrInherit = array_merge($arrInherit, $GLOBALS['TL_PERMISSIONS']);
             }
 
-            $arrPerm = array_diff($arrPerm, $arrSkip);
-            $arrPerm = array_unique($arrPerm);
+            $arrInherit = array_diff($arrInherit, $arrSkip);
+            $arrInherit = array_unique($arrInherit);
 
-            if (!empty($arrPerm)) {
-                $set = [];
+            if (!empty($arrInherit)) {
+                $arrInheritNew = [];
 
-                foreach ($arrPerm as $perm) {
-                    if (!isset($columns[strtolower($perm)])) {
+                foreach ($arrInherit as $field) {
+                    if (!isset($columns[strtolower($field)])) {
                         continue;
                     }
 
-                    if ('filemounts' === $perm) {
+                    if ('filemounts' === $field) {
                         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
 
                         // Set users home directory, if there is one
                         $objFolder = $filesModelAdapter->findByPath($this->backendUserHomeDir.'/'.$arrUserProps['id']);
 
                         if (null !== $objFolder) {
-                            $set[$perm] = serialize([$objFolder->uuid]);
+                            $permNew = [$objFolder->uuid];
                         } else {
                             // empty array
-                            $set[$perm] = serialize([]);
+                            $permNew = [];
                         }
                     } else {
                         // empty array
-                        $set[$perm] = serialize([]);
+                        $permNew = [];
+                    }
+
+                    $arrInheritNew[$field] = $permNew;
+                }
+
+                if ($mergeGroupRights) {
+                    $groups = $this->stringUtil->deserialize($arrUserProps['groups'], true);
+
+                    foreach ($groups as $id) {
+                        $time = $this->date->floorToMinute();
+
+                        $arrGroup = $this->connection
+                            ->fetchAssociative(
+                                "SELECT * FROM tl_user_group WHERE id = ? AND disable != '1' AND (start = '' OR start <= '$time') AND (stop='' OR stop > '$time')",
+                                [$id],
+                            )
+                        ;
+
+                        if (false !== $arrGroup) {
+                            foreach (array_keys($arrGroup) as $field) {
+                                if (!\in_array($field, $arrInherit, true)) {
+                                    continue;
+                                }
+
+                                $value = $this->stringUtil->deserialize($arrGroup[$field], true);
+
+                                // The page/file picker can return integers instead of arrays, so use empty() instead of is_array() and StringUtil::deserialize(true) here
+                                if (!empty($value)) {
+                                    $arrInheritNew[$field] = array_merge((\is_array($arrInheritNew[$field]) ? $arrInheritNew[$field] : ($arrInheritNew[$field] ? [$arrInheritNew[$field]] : [])), $value);
+                                    $arrInheritNew[$field] = array_unique($arrInheritNew[$field]);
+                                }
+                            }
+                        }
                     }
                 }
+
+                $set = array_map('serialize', $arrInheritNew);
 
                 if (!empty($set)) {
                     $set['tstamp'] = time();

@@ -40,12 +40,12 @@ class MaintainBackendUser
     /**
      * @throws Exception
      */
-    public function clearBackendUserRights(): void
+    public function resetBackendUserRights(): void
     {
         $stmt = $this->connection->executeQuery('SELECT username FROM tl_user WHERE admin = ? AND inherit = ?', ['', 'extend']);
 
         while (false !== ($userIdentifier = $stmt->fetchOne())) {
-            $this->maintainBackendUserProperties->clearBackendUserRights($userIdentifier);
+            $this->maintainBackendUserProperties->resetBackendUserRights($userIdentifier, [], true);
 
             // Log
             $strText = 'Successfully cleared the user properties of all non-admin backend users.';

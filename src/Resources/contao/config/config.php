@@ -89,8 +89,8 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
  * and tl_user-admin = ''
  * and tl_user.inherit = 'extend'
  */
-$GLOBALS['TL_PURGE']['custom']['clear_backend_user_rights'] = [
-    'callback' => [MaintainBackendUser::class, 'clearBackendUserRights'],
+$GLOBALS['TL_PURGE']['custom']['reset_backend_user_rights'] = [
+    'callback' => [MaintainBackendUser::class, 'resetBackendUserRights'],
 ];
 
 // Add permissions
