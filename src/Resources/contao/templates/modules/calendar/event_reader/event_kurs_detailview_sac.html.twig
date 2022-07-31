@@ -235,11 +235,11 @@
 
     {# enclosures/downloads #}
     {# !Urheberrechtsverletzung bei urheberrechtlich geschützten Anhängen wie Topos, Karten, etc. #}
-    {% if hasLoggedInFrontendUser or 'eventPreview' == app.request.query.get('modee') %}
-        {% if getEventData.invoke('enclosure') %}
-            <div class="box-layout-transparent">
-                <div class="event-eclosures event-detail event-info-box icon-box-small">
-                    <h5>Downloads/weitere Informationen</h5>
+    {% if getEventData.invoke('enclosure') %}
+        <div class="box-layout-transparent">
+            <div class="event-eclosures event-detail event-info-box icon-box-small">
+                <h5>Downloads / Weitere Informationen</h5>
+                {% if hasLoggedInFrontendUser or 'eventPreview' == app.request.query.get('modee') %}
                     <div class="enclosure">
                         {% for enclosureItem in enclosure %}
                             <p>
@@ -248,9 +248,11 @@
                             </p>
                         {% endfor %}
                     </div>
-                </div>
+                {% else %}
+                    <p>Bitte einloggen, um die Anlagen anschauen zu können.</p>
+                {% endif %}
             </div>
-        {% endif %}
+        </div>
     {% endif %}
 
     {# gallery start #}
