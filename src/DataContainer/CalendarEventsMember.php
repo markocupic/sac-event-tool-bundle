@@ -537,9 +537,10 @@ class CalendarEventsMember
     }
 
     /**
-     * Add more data to the registration, when user adds a new registration manually.
+     * Add more data to the registration, when a backend user adds a new registration manually.
      *
      * @Callback(table="tl_calendar_events_member", target="config.oncreate")
+     * @Callback(table="tl_calendar_events_member", target="config.oncopy")
      *
      * @throws Exception
      */
