@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\ContaoBackendMaintainance\MaintainBackendUser;
 use Markocupic\SacEventToolBundle\ContaoScope\ContaoScope;
 use Markocupic\SacEventToolBundle\Cron\Contao\DailyCron;
 use Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron;
@@ -80,6 +81,16 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
     'sac_user_role_tool' => [
         'tables' => ['tl_user_role'],
     ],
+];
+
+/*
+ * Backend maintenance: Clear backend user rights,
+ * who inherit group rights from tl_user_group
+ * and tl_user-admin = ''
+ * and tl_user.inherit = 'extend'
+ */
+$GLOBALS['TL_PURGE']['custom']['clear_backend_user_rights'] = [
+    'callback' => [MaintainBackendUser::class, 'clearBackendUserRights'],
 ];
 
 // Add permissions

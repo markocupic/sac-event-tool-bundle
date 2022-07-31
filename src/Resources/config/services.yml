@@ -78,6 +78,13 @@ services:
             - '%kernel.project_dir%'
             - '%sacevt.user.backend.home_dir%'
 
+    # Clear backend user properties
+    Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserProperties:
+        public: true
+        arguments:
+            - '@contao.framework'
+            - '@database_connection'
+
     # Cron: Sync tl_member with tl_user
     Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser:
         public: true

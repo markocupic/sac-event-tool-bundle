@@ -1,0 +1,10 @@
+services:
+
+    # MaintainBackendUser
+    Markocupic\SacEventToolBundle\ContaoBackendMaintainance\MaintainBackendUser:
+        public: true
+        arguments:
+            - '@contao.framework'
+            - '@database_connection'
+            - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserProperties'
+            - '@monolog.logger.contao'
