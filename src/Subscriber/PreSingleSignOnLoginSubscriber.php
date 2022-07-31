@@ -58,7 +58,7 @@ final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
             ;
 
             if (false !== $arrUserData) {
-                $this->maintainBackendUserProperties->clearBackendUserRights($userIdentifier, ['filemounts']);
+                $this->maintainBackendUserProperties->clearBackendUserRights($userIdentifier);
             }
         }
     }

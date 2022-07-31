@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\User\BackendUser;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\FilesModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 
@@ -22,11 +23,13 @@ class MaintainBackendUserProperties
 {
     private ContaoFramework $framework;
     private Connection $connection;
+    private string $backendUserHomeDir;
 
-    public function __construct(ContaoFramework $framework, Connection $connection)
+    public function __construct(ContaoFramework $framework, Connection $connection, string $backendUserHomeDir)
     {
         $this->framework = $framework;
         $this->connection = $connection;
+        $this->backendUserHomeDir = $backendUserHomeDir;
     }
 
     /**
@@ -37,11 +40,19 @@ class MaintainBackendUserProperties
         // Initialize contao framework
         $this->framework->initialize();
 
+        $schemaManager = $this->connection->createSchemaManager();
+
+        if (!$schemaManager->tablesExist('tl_user')) {
+            return;
+        }
+
+        $columns = $schemaManager->listTableColumns('tl_user');
+
         $arrUserProps = $this->connection->fetchAssociative('SELECT * FROM tl_user WHERE username = ?', [$strUserIdentifier]);
 
         if (false !== $arrUserProps) {
             // Contao core permissions
-            $arrPerm = ['alexf', 'modules', 'themes', 'elements', 'fields', 'pagemounts', 'alpty', 'filemounts', 'fop', 'forms', 'formp', 'imageSizes', 'amg'];
+            $arrPerm = ['modules', 'themes', 'elements', 'fields', 'pagemounts', 'alpty', 'filemounts', 'fop', 'forms', 'formp', 'imageSizes', 'amg'];
 
             // Custom permissions like: faqs,faqp,news,newp,newsfeeds,newsfeedp,calendars,calendarp,calendarfeeds,calendarfeedp,newsletters,newsletterp,calendar_containers,calendar_containerp
             if (!empty($GLOBALS['TL_PERMISSIONS']) && \is_array($GLOBALS['TL_PERMISSIONS'])) {
@@ -55,17 +66,31 @@ class MaintainBackendUserProperties
                 $set = [];
 
                 foreach ($arrPerm as $perm) {
-                    if (isset($arrUserProps[$perm])) {
+                    if (!isset($columns[strtolower($perm)])) {
+                        continue;
+                    }
+
+                    if ('filemounts' === $perm) {
+                        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+
+                        // Set users home directory, if there is one
+                        $objFolder = $filesModelAdapter->findByPath($this->backendUserHomeDir.'/'.$arrUserProps['id']);
+
+                        if (null !== $objFolder) {
+                            $set[$perm] = serialize([$objFolder->uuid]);
+                        } else {
+                            // empty array
+                            $set[$perm] = serialize([]);
+                        }
+                    } else {
+                        // empty array
                         $set[$perm] = serialize([]);
                     }
                 }
 
                 if (!empty($set)) {
                     $set['tstamp'] = time();
-
-                    if ('andrewiederhold' === $strUserIdentifier) {
-                        $this->connection->update('tl_user', $set, ['username' => $strUserIdentifier]);
-                    }
+                    $this->connection->update('tl_user', $set, ['username' => $strUserIdentifier]);
                 }
             }
         }

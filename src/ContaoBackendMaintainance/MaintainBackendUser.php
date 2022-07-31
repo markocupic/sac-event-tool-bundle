@@ -45,7 +45,7 @@ class MaintainBackendUser
         $stmt = $this->connection->executeQuery('SELECT username FROM tl_user WHERE admin = ? AND inherit = ?', ['', 'extend']);
 
         while (false !== ($userIdentifier = $stmt->fetchOne())) {
-            $this->maintainBackendUserProperties->clearBackendUserRights($userIdentifier, ['filemounts']);
+            $this->maintainBackendUserProperties->clearBackendUserRights($userIdentifier);
 
             // Log
             $strText = 'Successfully cleared the user properties of all non-admin backend users.';

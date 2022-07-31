@@ -84,6 +84,7 @@ services:
         arguments:
             - '@contao.framework'
             - '@database_connection'
+            - '%sacevt.user.backend.home_dir%'
 
     # Cron: Sync tl_member with tl_user
     Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser:
