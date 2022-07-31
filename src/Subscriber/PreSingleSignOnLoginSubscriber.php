@@ -25,11 +25,13 @@ final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
 {
     private Connection $connection;
     private MaintainBackendUserRights $maintainBackendUserRights;
+    private bool $clearUserRightOnSsoLogin;
 
-    public function __construct(Connection $connection, MaintainBackendUserRights $maintainBackendUserRights)
+    public function __construct(Connection $connection, MaintainBackendUserRights $maintainBackendUserRights, bool $clearUserRightOnSsoLogin)
     {
         $this->connection = $connection;
         $this->maintainBackendUserProperties = $maintainBackendUserRights;
+        $this->clearUserRightOnSsoLogin = $clearUserRightOnSsoLogin;
     }
 
     public static function getSubscribedEvents(): array
@@ -47,6 +49,10 @@ final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
      */
     public function clearBackendUserRights(PreInteractiveLoginEvent $event): void
     {
+        if (false === $this->clearUserRightOnSsoLogin) {
+            return;
+        }
+
         $userIdentifier = $event->getUserIdentifier();
 
         if (BackendUser::class === $event->getUserClass()) {
