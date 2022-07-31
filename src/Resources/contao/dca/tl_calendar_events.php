@@ -17,7 +17,6 @@ use Contao\Config;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\Date;
 use Contao\Input;
-use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\DataContainer\CalendarEvents;
@@ -646,27 +645,27 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
         'mandatory'    => true,
         'columnFields' => [
             'tourTechDifficultyMin' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'],
-                'exclude'    => true,
-                'inputType'  => 'select',
-                'reference'  => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'options'    => System::getContainer()->get(CalendarEvents::class)->getTourDifficulties(),
-                'relation'   => [
+                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'],
+                'exclude'          => true,
+                'inputType'        => 'select',
+                'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+                'options_callback' => [CalendarEvents::class, 'getTourDifficulties'],
+                'relation'         => [
                     'type' => 'hasMany',
                     'load' => 'eager',
                 ],
-                'foreignKey' => 'tl_tour_difficulty.shortcut',
-                'eval'       => ['style' => 'width:150px', 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'hidelabel'],
+                'foreignKey'       => 'tl_tour_difficulty.shortcut',
+                'eval'             => ['style' => 'width:150px', 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'hidelabel'],
             ],
             'tourTechDifficultyMax' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'],
-                'exclude'    => true,
-                'inputType'  => 'select',
-                'reference'  => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'options'    => System::getContainer()->get(CalendarEvents::class)->getTourDifficulties(),
-                'relation'   => ['type' => 'hasMany', 'load' => 'eager'],
-                'foreignKey' => 'tl_tour_difficulty.shortcut',
-                'eval'       => ['style' => 'width:150px', 'mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'hidelabel'],
+                'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'],
+                'exclude'          => true,
+                'inputType'        => 'select',
+                'reference'        => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+                'options_callback' => [CalendarEvents::class, 'getTourDifficulties'],
+                'relation'         => ['type' => 'hasMany', 'load' => 'eager'],
+                'foreignKey'       => 'tl_tour_difficulty.shortcut',
+                'eval'             => ['style' => 'width:150px', 'mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'hidelabel'],
             ],
         ],
     ],
