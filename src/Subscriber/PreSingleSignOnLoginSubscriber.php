@@ -17,19 +17,19 @@ namespace Markocupic\SacEventToolBundle\Subscriber;
 use Contao\BackendUser;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserProperties;
+use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserRights;
 use Markocupic\SwissAlpineClubContaoLoginClientBundle\Event\PreInteractiveLoginEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
 {
     private Connection $connection;
-    private MaintainBackendUserProperties $maintainBackendUserProperties;
+    private MaintainBackendUserRights $maintainBackendUserRights;
 
-    public function __construct(Connection $connection, MaintainBackendUserProperties $maintainBackendUserProperties)
+    public function __construct(Connection $connection, MaintainBackendUserRights $maintainBackendUserRights)
     {
         $this->connection = $connection;
-        $this->maintainBackendUserProperties = $maintainBackendUserProperties;
+        $this->maintainBackendUserProperties = $maintainBackendUserRights;
     }
 
     public static function getSubscribedEvents(): array

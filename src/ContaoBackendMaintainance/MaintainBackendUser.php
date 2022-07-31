@@ -18,7 +18,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserProperties;
+use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserRights;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -26,14 +26,14 @@ class MaintainBackendUser
 {
     private ContaoFramework $framework;
     private Connection $connection;
-    private MaintainBackendUserProperties $maintainBackendUserProperties;
+    private MaintainBackendUserRights $maintainBackendUserRights;
     private LoggerInterface $logger;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, MaintainBackendUserProperties $maintainBackendUserProperties, LoggerInterface|null $logger)
+    public function __construct(ContaoFramework $framework, Connection $connection, MaintainBackendUserRights $maintainBackendUserRights, LoggerInterface|null $logger)
     {
         $this->framework = $framework;
         $this->connection = $connection;
-        $this->maintainBackendUserProperties = $maintainBackendUserProperties;
+        $this->maintainBackendUserProperties = $maintainBackendUserRights;
         $this->logger = $logger;
     }
 

@@ -19,7 +19,7 @@ use Contao\FilesModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 
-class MaintainBackendUserProperties
+class MaintainBackendUserRights
 {
     private ContaoFramework $framework;
     private Connection $connection;

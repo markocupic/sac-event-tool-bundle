@@ -8,6 +8,6 @@ services:
     Markocupic\SacEventToolBundle\Subscriber\PreSingleSignOnLoginSubscriber:
         arguments:
             - '@database_connection'
-            - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserProperties'
+            - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserRights'
         tags:
             - { name: kernel.event_subscriber }

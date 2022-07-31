@@ -6,5 +6,5 @@ services:
         arguments:
             - '@contao.framework'
             - '@database_connection'
-            - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserProperties'
+            - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserRights'
             - '@monolog.logger.contao'

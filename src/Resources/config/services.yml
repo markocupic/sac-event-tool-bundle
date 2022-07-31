@@ -79,7 +79,7 @@ services:
             - '%sacevt.user.backend.home_dir%'
 
     # Clear backend user properties
-    Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserProperties:
+    Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserRights:
         public: true
         arguments:
             - '@contao.framework'
