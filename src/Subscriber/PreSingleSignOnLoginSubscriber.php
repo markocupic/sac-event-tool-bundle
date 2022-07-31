@@ -14,37 +14,52 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Subscriber;
 
-use Contao\File;
+use Contao\BackendUser;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
+use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserProperties;
 use Markocupic\SwissAlpineClubContaoLoginClientBundle\Event\PreInteractiveLoginEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
 {
     private Connection $connection;
+    private MaintainBackendUserProperties $maintainBackendUserProperties;
 
-    public function __construct(Connection $connection)
+    public function __construct(Connection $connection, MaintainBackendUserProperties $maintainBackendUserProperties)
     {
         $this->connection = $connection;
+        $this->maintainBackendUserProperties = $maintainBackendUserProperties;
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            PreInteractiveLoginEvent::NAME => ['onPreSingleSignOnLogin', 100],
+            PreInteractiveLoginEvent::NAME => ['clearBackendUserRights', 100],
         ];
     }
 
-    public function onPreSingleSignOnLogin(PreInteractiveLoginEvent $event): void
+    /**
+     * Clear user properties of the logged in Contao backend user, who inherit rights from one or more group policies.
+     * This way we can prevent a policy mess.
+     *
+     * @throws Exception
+     */
+    public function clearBackendUserRights(PreInteractiveLoginEvent $event): void
     {
-        $username = $event->getUserIdentifier();
-        //$resOwner = $event->getResourceOwner();
-        $strUserClass = $event->getUserClass();
-        //$contaoUserProvider = $event->getUserProvider();
+        $userIdentifier = $event->getUserIdentifier();
 
-        // Do some cool stuff with the nearly logged-in user
-        $file = new File('files/login.txt');
-        $file->append(sprintf('%s %s %s', date('Y-m-d H:i:s', time()), $strUserClass, $username));
-        $file->close();
+        if (BackendUser::class === $event->getUserClass()) {
+            $arrUserData = $this->connection
+                ->fetchAssociative(
+                    'SELECT * FROM tl_user WHERE username = ? AND admin = ? AND inherit = ?',
+                    [$userIdentifier, '', 'extend'],
+                )
+            ;
+
+            if (false !== $arrUserData) {
+                $this->maintainBackendUserProperties->clearBackendUserRights($userIdentifier, ['filemounts']);
+            }
+        }
     }
 }
