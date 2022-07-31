@@ -109,7 +109,7 @@
                         <p>Vom {{ getEventData.invoke('registrationStartDateFormatted') }} bis zum {{ getEventData.invoke('registrationEndDateFormatted') }}</p>
                     </div>
                 {% endif %}
-                
+
                 {% if not getEventData.invoke('bookingCounterAsText') is empty %}
                     <div class="booking-counter event-detail event-info-box icon-box-small">
                         <h5>Bestätigte Anmeldungen</h5>
@@ -277,7 +277,7 @@
         <div class="box-layout-transparent">
             <div class="event-eclosures event-detail event-info-box icon-box-small">
                 <h5>Downloads / Weitere Informationen</h5>
-                {% if hasLoggedInFrontendUser or 'eventPreview' == app.request.query.get('modee') %}
+                {% if hasLoggedInFrontendUser or 'eventPreview' == app.request.query.get('mode') %}
                     <div class="enclosure">
                         {% for enclosureItem in enclosure %}
                             <p>
