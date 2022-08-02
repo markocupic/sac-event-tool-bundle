@@ -655,6 +655,14 @@ class CalendarEvents
     }
 
     /**
+     * @throws \Exception
+     */
+    private function generateEventToken(int $eventId): string
+    {
+        return md5((string) random_int(100000000, 999999999)).'-'.$eventId;
+    }
+
+    /**
      * Do not allow to non-admins deleting records if there are child records (event registrations) in tl_calendar_events_member.
      *
      * @Callback(table="tl_calendar_events", target="config.ondelete", priority=100)
@@ -681,7 +689,7 @@ class CalendarEvents
      *
      * @throws Exception
      */
-    public function adjustEndDate(DataContainer $dc): void
+    public function adjustStartAndEndDate(DataContainer $dc): void
     {
         // Return if there is no active record (override all)
         if (!$dc->activeRecord) {
@@ -709,15 +717,16 @@ class CalendarEvents
             // Save as a timestamp
             $arrDates[] = ['new_repeat' => $v];
         }
+
         $set = [];
         $set['eventDates'] = serialize($arrDates);
         $startTime = !empty($arrDates[0]['new_repeat']) ? $arrDates[0]['new_repeat'] : 0;
         $endTime = !empty($arrDates[\count($arrDates) - 1]['new_repeat']) ? $arrDates[\count($arrDates) - 1]['new_repeat'] : 0;
 
-        $set['endTime'] = $endTime;
-        $set['endDate'] = $endTime;
-        $set['startDate'] = $startTime;
-        $set['startTime'] = $startTime;
+        $set['endTime'] = $dc->activeRecord->endTime = $endTime;
+        $set['endDate'] = $dc->activeRecord->endDate = $endTime;
+        $set['startDate'] = $dc->activeRecord->startDate = $startTime;
+        $set['startTime'] = $dc->activeRecord->startTime = $startTime;
 
         $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
     }
@@ -743,7 +752,7 @@ class CalendarEvents
 
         if (null !== $eventReleaseLevelModel) {
             $set = ['eventReleaseLevel' => $eventReleaseLevelModel->id];
-
+            $dc->activeRecord->eventReleaseLevel = $eventReleaseLevelModel->id;
             $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
         }
     }
@@ -770,9 +779,9 @@ class CalendarEvents
             }
         }
 
-        $set = [
-            'eventToken' => $this->generateEventToken((int) $dc->activeRecord->id),
-        ];
+        $strEventToken = $this->generateEventToken((int) $dc->activeRecord->id);
+        $set = ['eventToken' => $strEventToken];
+        $dc->activeRecord->eventToken = $strEventToken;
 
         $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id, 'eventToken' => '']);
     }
@@ -804,13 +813,11 @@ class CalendarEvents
                         $duration = $arrDuration['dateRows'];
 
                         if ($duration !== $countTimestamps) {
-                            $set = [
-                                'durationInfo' => '',
-                            ];
-
+                            $set = ['durationInfo' => ''];
+                            $dc->activeRecord->durationInfo = '';
                             $this->connection->update('tl_calendar_events', $set, ['id' => $objEvent->id]);
 
-                            $this->message->addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein. Setzen SIe für jeden Event-Tag eine Datumszeile!', $objEvent->title, $objEvent->id), TL_MODE);
+                            $this->message->addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein. Setzen Sie für jeden Event-Tag eine Datumszeile!', $objEvent->title, $objEvent->id), TL_MODE);
                         }
                     }
                 }
@@ -851,6 +858,9 @@ class CalendarEvents
                     'registrationStartDate' => $regStartDate,
                     'registrationEndDate' => $regEndDate,
                 ];
+
+                $dc->activeRecord->registrationStartDate = $regStartDate;
+                $dc->activeRecord->registrationEndDate = $regEndDate;
 
                 $this->connection->update('tl_calendar_events', $set, ['id' => $row['id']]);
             }
@@ -894,6 +904,7 @@ class CalendarEvents
                     $oEventReleaseLevelModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
 
                     $set = ['eventReleaseLevel' => $oEventReleaseLevelModel->id];
+                    $dc->activeRecord->eventReleaseLevel = $oEventReleaseLevelModel->id;
 
                     $this->connection->update('tl_calendar_events', $set, [$objEvent->id]);
                 }
@@ -1546,6 +1557,73 @@ class CalendarEvents
     }
 
     /**
+     * @throws \Exception
+     */
+    private function handleEventReleaseLevelAndPublishUnpublish(int $eventId, int $targetEventReleaseLevelId): int
+    {
+        $hasError = false;
+
+        $objEvent = $this->calendarEventsModel->findByPk($eventId);
+
+        if (null === $objEvent) {
+            throw new \Exception('Event not found.');
+        }
+
+        $lastEventReleaseModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
+
+        if (null !== $lastEventReleaseModel) {
+            // Display a message in the backend if the event has been published or unpublished.
+            // @todo For some reason this the comparison operator will not work without type casting the id.
+            if ((int) $lastEventReleaseModel->id === $targetEventReleaseLevelId) {
+                if (!$objEvent->published) {
+                    $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
+                }
+
+                $objEvent->published = '1';
+                $objEvent->save();
+
+                // HOOK: publishEvent, f.ex advice tourenchef by email
+                if (isset($GLOBALS['TL_HOOKS']['publishEvent']) && \is_array($GLOBALS['TL_HOOKS']['publishEvent'])) {
+                    foreach ($GLOBALS['TL_HOOKS']['publishEvent'] as $callback) {
+                        $this->system->importStatic($callback[0])->{$callback[1]}($objEvent);
+                    }
+                }
+            } else {
+                $eventReleaseModel = EventReleaseLevelPolicyModel::findByPk($targetEventReleaseLevelId);
+                $firstEventReleaseModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
+
+                if (null !== $eventReleaseModel) {
+                    if ((int) $eventReleaseModel->pid !== (int) $firstEventReleaseModel->pid) {
+                        $hasError = true;
+
+                        if ($objEvent->eventReleaseLevel > 0) {
+                            $targetEventReleaseLevelId = $objEvent->eventReleaseLevel;
+                            $this->message->addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" konnte nicht auf "%s" geändert werden, weil diese Freigabestufe zum Event-Typ ungültig ist. ', $objEvent->title, $objEvent->id, $eventReleaseModel->title));
+                        } else {
+                            $targetEventReleaseLevelId = $firstEventReleaseModel->id;
+                            $this->message->addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" musste auf "%s" korrigiert werden, weil eine zum Event-Typ ungültige Freigabestufe gewählt wurde. ', $objEvent->title, $objEvent->id, $firstEventReleaseModel->title));
+                        }
+                    }
+                }
+
+                if ($objEvent->published) {
+                    $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
+                }
+
+                $objEvent->published = '';
+                $objEvent->save();
+            }
+
+            if (!$hasError) {
+                // Display a message in the backend.
+                $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'], $objEvent->id, EventReleaseLevelPolicyModel::findByPk($targetEventReleaseLevelId)->level));
+            }
+        }
+
+        return $targetEventReleaseLevelId;
+    }
+
+    /**
      * Update main instructor (the first instructor in the list is the main instructor).
      *
      * @throws Exception
@@ -1730,80 +1808,5 @@ class CalendarEvents
         }
 
         return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function generateEventToken(int $eventId): string
-    {
-        return md5((string) random_int(100000000, 999999999)).'-'.$eventId;
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function handleEventReleaseLevelAndPublishUnpublish(int $eventId, int $targetEventReleaseLevelId): int
-    {
-        $hasError = false;
-
-        $objEvent = $this->calendarEventsModel->findByPk($eventId);
-
-        if (null === $objEvent) {
-            throw new \Exception('Event not found.');
-        }
-
-        $lastEventReleaseModel = EventReleaseLevelPolicyModel::findLastLevelByEventId($objEvent->id);
-
-        if (null !== $lastEventReleaseModel) {
-            // Display a message in the backend if the event has been published or unpublished.
-            // @todo For some reason this the comparison operator will not work without type casting the id.
-            if ((int) $lastEventReleaseModel->id === $targetEventReleaseLevelId) {
-                if (!$objEvent->published) {
-                    $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
-                }
-
-                $objEvent->published = '1';
-                $objEvent->save();
-
-                // HOOK: publishEvent, f.ex advice tourenchef by email
-                if (isset($GLOBALS['TL_HOOKS']['publishEvent']) && \is_array($GLOBALS['TL_HOOKS']['publishEvent'])) {
-                    foreach ($GLOBALS['TL_HOOKS']['publishEvent'] as $callback) {
-                        $this->system->importStatic($callback[0])->{$callback[1]}($objEvent);
-                    }
-                }
-            } else {
-                $eventReleaseModel = EventReleaseLevelPolicyModel::findByPk($targetEventReleaseLevelId);
-                $firstEventReleaseModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEvent->id);
-
-                if (null !== $eventReleaseModel) {
-                    if ((int) $eventReleaseModel->pid !== (int) $firstEventReleaseModel->pid) {
-                        $hasError = true;
-
-                        if ($objEvent->eventReleaseLevel > 0) {
-                            $targetEventReleaseLevelId = $objEvent->eventReleaseLevel;
-                            $this->message->addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" konnte nicht auf "%s" geändert werden, weil diese Freigabestufe zum Event-Typ ungültig ist. ', $objEvent->title, $objEvent->id, $eventReleaseModel->title));
-                        } else {
-                            $targetEventReleaseLevelId = $firstEventReleaseModel->id;
-                            $this->message->addError(sprintf('Die Freigabestufe für Event "%s (ID: %s)" musste auf "%s" korrigiert werden, weil eine zum Event-Typ ungültige Freigabestufe gewählt wurde. ', $objEvent->title, $objEvent->id, $firstEventReleaseModel->title));
-                        }
-                    }
-                }
-
-                if ($objEvent->published) {
-                    $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
-                }
-
-                $objEvent->published = '';
-                $objEvent->save();
-            }
-
-            if (!$hasError) {
-                // Display a message in the backend.
-                $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['setEventReleaseLevelTo'], $objEvent->id, EventReleaseLevelPolicyModel::findByPk($targetEventReleaseLevelId)->level));
-            }
-        }
-
-        return $targetEventReleaseLevelId;
     }
 }

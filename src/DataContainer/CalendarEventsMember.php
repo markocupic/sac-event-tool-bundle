@@ -565,7 +565,7 @@ class CalendarEventsMember
      */
     public function onsubmitCallback(DataContainer $dc): void
     {
-        if (!$dc->id) {
+        if (!$dc->activeRecord) {
             return;
         }
 
@@ -583,6 +583,7 @@ class CalendarEventsMember
 
             if ($id) {
                 $set['contaoMemberId'] = $id;
+                $dc->activeRecord->contaoMemberId = $id;
             }
         }
 
@@ -592,7 +593,10 @@ class CalendarEventsMember
         if ($arrEvent) {
             // Set correct event title and eventId
             $set['eventName'] = $arrEvent['title'];
+            $dc->activeRecord->eventName = $arrEvent['title'];
+
             $set['eventId'] = $arrEvent['id'];
+            $dc->activeRecord->eventId = $arrEvent['id'];
         }
 
         $this->connection->update('tl_calendar_events_member', $set, ['id' => $dc->id]);
