@@ -685,7 +685,10 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=90)
+     * Add a priority of -1
+     * In this way this callback will be executed after! the legacy callback tl_calendar_events.adjustTime().
+     *
+     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=-1)
      *
      * @throws Exception
      */
@@ -719,14 +722,11 @@ class CalendarEvents
         }
 
         $set = [];
-        $set['eventDates'] = serialize($arrDates);
         $startTime = !empty($arrDates[0]['new_repeat']) ? $arrDates[0]['new_repeat'] : 0;
         $endTime = !empty($arrDates[\count($arrDates) - 1]['new_repeat']) ? $arrDates[\count($arrDates) - 1]['new_repeat'] : 0;
 
-        $set['endTime'] = $dc->activeRecord->endTime = $endTime;
-        $set['endDate'] = $dc->activeRecord->endDate = $endTime;
-        $set['startDate'] = $dc->activeRecord->startDate = $startTime;
-        $set['startTime'] = $dc->activeRecord->startTime = $startTime;
+        $set['startDate'] = $set['startTime'] = $dc->activeRecord->startDate = $dc->activeRecord->startTime = $startTime;
+        $set['endDate'] = $set['endTime'] = $dc->activeRecord->endDate = $dc->activeRecord->endTime = $endTime;
 
         $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
     }
