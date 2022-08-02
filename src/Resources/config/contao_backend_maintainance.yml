@@ -4,7 +4,6 @@ services:
     Markocupic\SacEventToolBundle\ContaoBackendMaintainance\MaintainBackendUser:
         public: true
         arguments:
-            - '@contao.framework'
             - '@database_connection'
             - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserRights'
             - '@monolog.logger.contao'
