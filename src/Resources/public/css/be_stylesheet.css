@@ -237,6 +237,11 @@ div.tl_header_tour_rapport table td {
     color: #000;
 }
 
+.notice {
+    font-weight: bold;
+    color: red !important;
+}
+
 
 /** event dashboard buttons **/
 .event-dashboard .tl_submit_container ul {
@@ -248,8 +253,6 @@ div.tl_header_tour_rapport table td {
 
     margin: 2px 4px 2px 2px;
 }
-
-
 
 
 /** Stick navigation to the bottom for large screens **/
@@ -269,4 +272,10 @@ div.tl_header_tour_rapport table td {
     .event-dashboard .tl_submit_container {
         background-color: #172b3b !important;
     }
+}
+
+
+/** tl_help additions **/
+.tl_full_height {
+    height:auto !important;
 }
