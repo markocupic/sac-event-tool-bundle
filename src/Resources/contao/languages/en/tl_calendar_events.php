@@ -70,7 +70,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['maxMembers'] = ['Maximale Teilnehmerz
 $GLOBALS['TL_LANG']['tl_calendar_events']['equipment'] = ['Benötigtes Material/Ausrüstung', 'Geben Sie bitte eine Liste mit der benötigten Ausrüstung an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['bookingEvent'] = ['Anmeldung', 'Geben Sie bitte Details oder zusätzlich verlangte Angaben zur Anmeldung an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['miscellaneous'] = ['Sonstiges', 'Geben Sie bitte weitere/sonstige Informationen ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['isRecurringEvent'] = ['Sich wiederholender Event', 'Bitte geben Sie an, ob es sich bei diesem Event um einen sich wiederholenden Event handelt. <strong>Hinweis: Teilnehmer können sich nur vor der ersten Event-Durchführung für alle Eventdaten anmelden.</strong>'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['isRecurringEvent'] = ['Sich wiederholender Event', 'Bitte geben Sie an, ob es sich bei diesem Event um einen sich wiederholenden Event handelt. <strong>Hinweis: Teilnehmer können sich nur vor der ersten Event-Durchführung für alle Eventdaten anmelden!</strong>'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventDates'] = ['Eventdaten', 'Geben Sie bitte die Eventdaten ein. Für jeden Tag eine Zeile. <strong>Hinweis: Erstellen Sie bei einem Serien-Event jeweils separate Events!</strong> (Event kann kopiert/dupliziert werden)'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'] = ['Event-Dauer', 'Geben Sie die Event-Dauer an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventState'] = ['Event-Status', '<strong class="notice">!!! Teilnehmer müssen separat informiert werden !!!</strong> Geben Sie optional einen Event-Status an.'];

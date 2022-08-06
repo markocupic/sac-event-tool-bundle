@@ -49,7 +49,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['dateAdded'] = ['Anmeldedatum',
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['allowMultiSignUp'] = ['Mehrfachbuchung zulassen', 'Mehrfachbuchung zulassen, obwohl der Teilnehmer im selben Zeitraum bereits für einen Event angemeldet ist.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['firstname'] = ['Vorname', 'Geben Sie hier den Vornamen ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['lastname'] = ['Nachname', 'Geben Sie hier den Nachnamen ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['sacMemberId'] = ['SAC Mitgliedernummer', '<span style="font-weight:bold;color:red">Lasse das Feld leer</span>, falls die Person kein Sektionsmitglied ist.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['sacMemberId'] = ['SAC Mitgliedernummer', '<span class="notice">Lasse das Feld leer</span>, falls die Person kein Sektionsmitglied ist.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['ahvNumber'] = ['AHV-Nummer', 'Geben Sie hier die AHV-Nummer ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['contaoMemberId'] = ['Contao Mitglieder Id (tl_member)', 'Geben Sie hier die Contao Mitglieder-ID ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['street'] = ['Strasse', 'Geben Sie hier die Strasse ein.'];
