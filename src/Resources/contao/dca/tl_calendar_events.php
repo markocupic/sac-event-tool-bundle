@@ -287,6 +287,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
     'inputType' => 'multiColumnWizard',
     // Save instructors in a child table tl_calendar_events_instructors
     'eval'      => [
+        'tl_class'     => 'mcwColumnCount_1',
         'helpWizard'   => false,
         'mandatory'    => true,
         'columnFields' => [
@@ -474,6 +475,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDates'] = [
     'exclude'   => true,
     'inputType' => 'multiColumnWizard',
     'eval'      => [
+        'tl_class'        => 'mcwColumnCount_1',
         'columnsCallback' => [CalendarEvents::class, 'listFixedDates'],
         'buttons'         => ['up' => false, 'down' => false],
         'mandatory'       => true,
@@ -643,6 +645,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
     'inputType' => 'multiColumnWizard',
     'eval'      => [
         'mandatory'    => true,
+        'tl_class'     => 'mcwColumnCount_2',
         'columnFields' => [
             'tourTechDifficultyMin' => [
                 'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'],
@@ -655,7 +658,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
                     'load' => 'eager',
                 ],
                 'foreignKey'       => 'tl_tour_difficulty.shortcut',
-                'eval'             => ['style' => 'width:150px', 'mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'hidelabel'],
+                'eval'             => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'hidelabel'],
             ],
             'tourTechDifficultyMax' => [
                 'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'],
@@ -665,7 +668,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourTechDifficulty'] = [
                 'options_callback' => [CalendarEvents::class, 'getTourDifficulties'],
                 'relation'         => ['type' => 'hasMany', 'load' => 'eager'],
                 'foreignKey'       => 'tl_tour_difficulty.shortcut',
-                'eval'             => ['style' => 'width:150px', 'mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'hidelabel'],
+                'eval'             => ['mandatory' => false, 'includeBlankOption' => true, 'tl_class' => 'hidelabel'],
             ],
         ],
     ],
@@ -678,28 +681,29 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourProfile'] = [
     'inputType' => 'multiColumnWizard',
     'eval'      => [
         'mandatory'    => false,
+        'tl_class'     => 'mcwColumnCount_4',
         'columnFields' => [
             'tourProfileAscentMeters'  => [
                 'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'],
                 'inputType' => 'text',
                 'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'eval'      => ['datepicker' => false, 'rgxp' => 'natural', 'style' => 'width:150px', 'mandatory' => false, 'tl_class' => 'hidelabel'],
+                'eval'      => ['datepicker' => false, 'rgxp' => 'natural', 'mandatory' => false, 'tl_class' => 'hidelabel'],
             ],
             'tourProfileAscentTime'    => [
                 'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'],
                 'inputType' => 'text',
-                'eval'      => ['datepicker' => false, 'rgxp' => 'digit', 'style' => 'width:150px', 'mandatory' => false, 'tl_class' => 'hidelabel'],
+                'eval'      => ['datepicker' => false, 'rgxp' => 'digit', 'mandatory' => false, 'tl_class' => 'hidelabel'],
             ],
             'tourProfileDescentMeters' => [
                 'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'],
                 'inputType' => 'text',
                 'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-                'eval'      => ['datepicker' => false, 'rgxp' => 'natural', 'style' => 'width:150px', 'mandatory' => false, 'tl_class' => 'hidelabel'],
+                'eval'      => ['datepicker' => false, 'rgxp' => 'natural', 'mandatory' => false, 'tl_class' => 'hidelabel'],
             ],
             'tourProfileDescentTime'   => [
                 'label'     => &$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'],
                 'inputType' => 'text',
-                'eval'      => ['datepicker' => false, 'rgxp' => 'digit', 'style' => 'width:150px', 'mandatory' => false, 'tl_class' => 'hidelabel'],
+                'eval'      => ['datepicker' => false, 'rgxp' => 'digit', 'mandatory' => false, 'tl_class' => 'hidelabel'],
             ],
         ],
     ],
