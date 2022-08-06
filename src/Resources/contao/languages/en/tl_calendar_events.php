@@ -106,10 +106,10 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourSpecialIncidents'] = ['Besondere 
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventReportAdditionalNotices'] = ['Weitere Bemerkungen', 'Geben Sie hier weitere Informationen ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['filledInEventReportForm'] = ['Event-Rapport ausgefüllt', 'Event-Rapport wurde ausgefüllt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfile'] = ['Höhendifferenz und Zeitbedarf pro Tag', 'Machen Sie hier zu jedem Tag Angaben zum Profil der Tour.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'] = ['Höhendiff. im Aufstieg', 'Machen Sie hier Angaben zum Höhenunterschied im Aufstieg.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'] = ['Zeitbedarf im Aufstieg in h', 'Machen Sie hier Angaben zum Zeitbedarf im Aufstieg.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'] = ['Höhendiff. im Abstieg', 'Machen Sie hier Angaben zum Höhenunterschied im Abstieg.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = ['Zeitbedarf im Abstieg in h', 'Machen Sie hier Angaben zum Zeitbedarf im Abstieg.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'] = ['Höhendiff. in m im Aufstieg', 'Machen Sie hier Angaben zum Höhenunterschied im Aufstieg.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'] = ['Zeitbedarf in h im Aufstieg', 'Machen Sie hier Angaben zum Zeitbedarf im Aufstieg.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'] = ['Höhendiff. in m im Abstieg', 'Machen Sie hier Angaben zum Höhenunterschied im Abstieg.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = ['Zeitbedarf in h im Abstieg', 'Machen Sie hier Angaben zum Zeitbedarf im Abstieg.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'] = ['Hinterlegte Kontaktdaten immer anzeigen', '<strong class="notice">!!! Wichtig, falls Online-Anmeldung deaktiviert ist !!!</strong> Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung individualisieren.', ''];
 $GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung', 'Nutzen Sie dieses Feld, um eine individualisierte E-Mail-Bestätigungs für den Event zu erstellen. Fahren Sie mit der Maus über diesen Text, um mehr zu erfahren. Die Tags dienen als Platzhalter für eventspezifische Informationen.'];
