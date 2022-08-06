@@ -134,6 +134,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
             'exclude'   => true,
             'inputType' => 'multiColumnWizard',
             'eval'      => [
+                'tl_class'     => 'mcwColumnCount_4',
                 'mandatory'    => false,
                 'columnFields' => [
                     'group'              => [
@@ -143,7 +144,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
                         'reference'  => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
                         'relation'   => ['type' => 'hasMany', 'load' => 'eager'],
                         'foreignKey' => 'tl_user_group.name',
-                        'eval'       => ['style' => 'width:250px', 'mandatory' => true, 'includeBlankOption' => true],
+                        'eval'       => ['mandatory' => true, 'includeBlankOption' => true],
                     ],
                     'releaseLevelRights' => [
                         'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['releaseLevelRights'],
@@ -151,19 +152,17 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
                         'inputType' => 'select',
                         'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
                         'options'   => ['up', 'down', 'upAndDown'],
-                        'eval'      => ['style' => 'width:250px', 'mandatory' => true, 'includeBlankOption' => true],
+                        'eval'      => ['mandatory' => true, 'includeBlankOption' => true],
                     ],
                     'canWrite'           => [
                         'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canWrite'],
                         'exclude'   => true,
                         'inputType' => 'checkbox',
-                        'eval'      => ['style' => 'width:100px'],
                     ],
                     'canDelete'          => [
                         'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canDelete'],
                         'exclude'   => true,
                         'inputType' => 'checkbox',
-                        'eval'      => ['style' => 'width:100px'],
                     ],
                 ],
             ],

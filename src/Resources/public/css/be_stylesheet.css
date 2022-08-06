@@ -1,10 +1,18 @@
-#tl_buttons{
-    display:flex;
+/** multicolumn wizard fix: Fix cutted of sentences issue on small screens in the bottom-/tooltip section */
+[class*="mcwColumnCount_"] .tl_help.tl_tip {
+    height: auto !important;
+}
+
+/** End multicolumn wizard fix */
+
+#tl_buttons {
+    display: flex;
     text-align: left;
     justify-content: flex-end;
     flex-wrap: wrap;
     line-height: 2;
 }
+
 /** editAll & overrideAll navbar */
 #editAllNavbarHelper {
     position: fixed;
@@ -277,5 +285,5 @@ div.tl_header_tour_rapport table td {
 
 /** tl_help additions **/
 .tl_full_height {
-    height:auto !important;
+    height: auto !important;
 }
