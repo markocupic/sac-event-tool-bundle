@@ -102,7 +102,7 @@ class ParseBackendTemplateListener
                         $strLegend .= '</div>';
 
                         $strLegend .= '<div class="participation-state-legend">';
-                        $strLegend .= '<h3>Teilnahmestatus <span style="color:red">(Erst nach der Event-Durchführung auszufüllen!)</span></h3>';
+                        $strLegend .= '<h3>Teilnahmestatus <span class="notice">Hinweis: Darf erst nach der Event-Durchführung ausgefüllt werden!</span></h3>';
                         $strLegend .= '<ul>';
                         $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Bundle::ASSET_DIR, 'has-not-participated', 'Hat am Event nicht/noch nicht teilgenommen');
                         $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Bundle::ASSET_DIR, 'has-participated', 'Hat am Event teilgenommen');

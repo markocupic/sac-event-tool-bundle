@@ -42,7 +42,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['event_registration_confirmation_legen
 $GLOBALS['TL_LANG']['tl_calendar_events']['courseId'] = ['Kurs.Nr.', 'Geben Sie bitte die Kursnummer ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventType'] = ['Event-Art', 'Geben Sie bitte an, um welche Art von Event es sich handelt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['teaser'] = ['Event-Kurzbeschreibung', 'Geben Sie bitte eine Kurzbeschreibung für den Event ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['title'] = ['Event-/Touren-/Kursname', 'Geben Sie bitte einen Namen für den Event an.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['title'] = ['Event-/Touren-/Kursname', 'Geben Sie bitte einen Namen für den Event an.']; // TODO: Not working?
 $GLOBALS['TL_LANG']['tl_calendar_events']['suitableForBeginners'] = ['Für Anfänger geeignet', 'Der Event eignet sich für die Teilnahme von Anfängern in der entsprechenden Bergsport-Disziplin.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide'] = ['Event mit Bergführer', 'Geben Sie bitte an, ob der Event durch Bergführer geleitet wird'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['alias'][0] = 'Event-Alias (wird automatisch gesetzt)';
@@ -51,40 +51,41 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['instructor'] = ['Leiter', 'Wählen Si
 $GLOBALS['TL_LANG']['tl_calendar_events']['instructorId'] = ['Leiter auswählen. (Der Erstaufgeführte ist der Hauptleiter)', 'Wählen Sie bitte einen oder mehrere Leiter aus. Der Erstaufgeführte ist der Hauptverantwortliche und erhält die Onlineanmeldungen.'];
 //$GLOBALS['TL_LANG']['tl_calendar_events']['orderInstructor'] = "Sortierung Leiter";
 $GLOBALS['TL_LANG']['tl_calendar_events']['askForAhvNumber'] = ['Im Anmeldeformular zur Eingabe der AHV-Nummer auffordern (JUGEND)', 'Soll beim Anmeldeformular zur Eingabe der AHV-Nummer aufgefordert werden (Touren/Kurse Jugenden)?'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['teaser'] = ['Einführungstext', 'Geben Sie bitte einen kurzen Einführungstext ein.'];
+//$GLOBALS['TL_LANG']['tl_calendar_events']['teaser'] = ['Einführungstext', 'Geben Sie bitte einen kurzen Einführungstext ein.']; // Duplicated!
 $GLOBALS['TL_LANG']['tl_calendar_events']['terms'] = ['Kursziele', 'Geben Sie bitte die Kursziele ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['issues'] = ['Kursinhalte', 'Geben Sie bitte die Kursinhalte ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['requirements'] = ['Voraussetzungen', 'Geben Sie bitte die Voraussetzungen ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['leistungen'] = ['Preis und Leistungen', 'Geben Sie bitte die Leistungen ein.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['requirements'] = ['Voraussetzungen/Anforderungen', 'Geben Sie bitte die Voraussetzungen/Anforderungen für die Teilnehmer ein.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['leistungen'] = ['Preis und Leistungen', 'Geben Sie bitte die Preise und Leistungen für die Teilnehmer ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['courseLevel'] = ['Kursstufe', 'Geben Sie bitte die Kursstufe ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['courseTypeLevel0'] = ['Kursart (Hauptkategorien)', 'Geben Sie bitte die Kursart ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['courseTypeLevel1'] = ['Kursart (Unterkategorien)', 'Geben Sie bitte die Kursart ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['organizers'] = ['Organisierende Gruppe', 'Geben Sie bitte die organisierende Gruppe ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['meetingPoint'] = ['Zeit und Treffpunkt', 'Geben Sie bitte eine Zeit und einen Treffpunkt an.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['addIban'] = ['IBAN Nummer anzeigen', 'Geben Sie die IBAN-Nummer an, diese wird beim Anmeldevorgang angezeigt'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['iban'] = ['IBAN', 'Geben Sie die IBAN Nummer ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['ibanBeneficiary'] = ['Begünstigter (IBAN)', 'Geben Sie den zur IBAN Nummer gehörenden Begünstigten an.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['addMinAndMaxMembers'] = ['Minimale und maximale Teilnehmerzahl festlegen', 'Möchten Sie die Teilnehmerzahl festlegen?'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['minMembers'] = ['Minimale Teilnehmerzahl', 'Geben Sie bitte eine Teilnehmerzahl an.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['maxMembers'] = ['Maximale Teilnehmerzahl', 'Geben Sie bitte eine Teilnehmerzahl an.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['addIban'] = ['IBAN-Nummer anzeigen', 'Geben Sie eine IBAN-Nummer für Überweisungen an, welche beim Anmeldevorgang angezeigt wird'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['iban'] = ['IBAN', 'Geben Sie die IBAN-Nummer ein.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['ibanBeneficiary'] = ['Begünstigter (IBAN)', 'Geben Sie den zur IBAN-Nummer gehörenden Begünstigten an.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['addMinAndMaxMembers'] = ['Minimale und maximale Teilnehmerzahl festlegen', 'Möchten Sie die Teilnehmerzahl festlegen? <strong>Hinweis: Dies ist gemäss Tourenkommission erforderlich!</strong>'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['minMembers'] = ['Minimale Teilnehmerzahl', 'Geben Sie bitte eine minimale Anzahl Teilnehmer an.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['maxMembers'] = ['Maximale Teilnehmerzahl', 'Geben Sie bitte eine maximale Anzahl Teilnehmer an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['equipment'] = ['Benötigtes Material/Ausrüstung', 'Geben Sie bitte eine Liste mit der benötigten Ausrüstung an.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['bookingEvent'] = ['Anmeldung', 'Geben Sie bitte Details zur Anmeldung an.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['bookingEvent'] = ['Anmeldung', 'Geben Sie bitte Details oder zusätzlich verlangte Angaben zur Anmeldung an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['miscellaneous'] = ['Sonstiges', 'Geben Sie bitte weitere/sonstige Informationen ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['isRecurringEvent'] = ['Sich wiederholender Event', 'Bitte geben Sie an, ob es sich bei diesem Event um einen sich wiederholenden Event handelt.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['eventDates'] = ['Eventdaten', 'Geben Sie bitte die Eventdaten ein. Für jeden Tag eine Zeile.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'] = ['Event-Dauer', 'Geben SIe die Event-Dauer an.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['eventState'] = ['Event Status', 'Geben Sie optional einen Event-Status an. !!!Teilnehmer müssen informiert werden.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['isRecurringEvent'] = ['Sich wiederholender Event', 'Bitte geben Sie an, ob es sich bei diesem Event um einen sich wiederholenden Event handelt. <strong>Hinweis: Teilnehmer können sich nur vor der ersten Event-Durchführung für alle Eventdaten anmelden!</strong>'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['eventDates'] = ['Eventdaten', 'Geben Sie bitte die Eventdaten ein. Für jeden Tag eine Zeile. <strong>Hinweis: Erstellen Sie bei einem Serien-Event jeweils separate Events!</strong> (Event kann kopiert/dupliziert werden)'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'] = ['Event-Dauer', 'Geben Sie die Event-Dauer an.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['eventState'] = ['Event-Status', '<strong class="notice">!!! Teilnehmer müssen separat informiert werden !!!</strong> Geben Sie optional einen Event-Status an.'];
 /** @todo Falls verschoben, kann hier das Verschiebedatum angegeben werden. */
 // eventDeferDate
 //$GLOBALS['TL_LANG']['tl_calendar_events']['eventDeferDate'] = array("Verschiebedatum", "Geben Sie das Verschiebedatum an, falls der Anlass verschoben wurde.");
-$GLOBALS['TL_LANG']['tl_calendar_events']['singleSRCBroschuere'] = ['Hintergrundbild für PDF Kursbroschüre', 'Wählen Sie bitte ein Bild aus.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['singleSRCBroschuere'] = ['Hintergrundbild für PDF-Kursbroschüre', 'Wählen Sie bitte ein Bild aus.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['allowDeregistration'] = ['Angemeldeter Teilnehmer darf sich online vom Event abmelden', 'Geben Sie dem angemeldeten Teilnehmer die Möglichkeit unter Einhaltung einer definierten Abmeldefrist sich online vom Event abzumelden.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['deregistrationLimit'] = ['Abmeldefrist in Tagen', 'Definieren Sie den Zeitraum in Tagen, bis zu dem sich ein bereits angemeldeter Teilnehmer wieder online vom Event abmelden kann.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['addGallery'] = ['Dem Event eine Bildergalerie hinzufügen'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['multiSRC'] = ['Bilder auswählen', 'Treffen Sie eine Auswahl von Bildern. Evtl. mässen Sie Ihre Bilder zuerst über die Dateiverwaltung auf den Webserver laden.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['coordsCH1903'] = ['Ziel-Koordinaten (CH1903) für Kartenansicht', 'Koordinaten des Zieles im Format <em>2600000, 1200000</em> (CH1903+) oder <em>600000, 200000</em> (CH1903) eingeben. Die Koordinaten können auf <a href="https://map.geo.admin.ch" target="_blank">map.geo.admin.ch</a> und einem Klick mit der rechten Maustaste auf das Ziel herausgelesen und kopiert werden.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['location'] = ['Veranstaltungsort/Ausgangspunkt', 'Geben Sie bitte den Namen des Veranstaltungsortes oder Ausgangspunktes ein.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['coordsCH1903'] = ['Ziel-Koordinaten (CH1903) für Kartenansicht', 'Koordinaten des Zieles im Format <q><em><strong>2600000, 1200000</strong></em></q> (CH1903+) oder <q><em><strong>600000, 200000</strong></em></q> (CH1903) eingeben. Die Koordinaten können auf <a href="https://map.geo.admin.ch" target="_blank"><u><em>map.geo.admin.ch</em></u></a> und einem Klick mit der rechten Maustaste auf das Ziel herausgelesen und kopiert werden.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['journey'] = ['Anreise mit', 'Geben Sie an, wie zum Event angereist wird.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['linkSacRoutePortal'] = ['Link zu SAC-Tourenportal für Routen-Details', 'Link zu Details der Route von SAC-CAS Webseite eingeben. Der Link muss mit <a href="https://www.sac-cas.ch/de/huetten-und-touren/sac-tourenportal/" target="_blank">https://www.sac-cas.ch/de/huetten-und-touren/sac-tourenportal/</a> beginnen.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['linkSacRoutePortal'] = ['Link zu SAC-Tourenportal für Routen-Details', 'Link zu Details der Route von SAC-CAS Webseite eingeben. Der Link muss mit <a href="https://www.sac-cas.ch/de/huetten-und-touren/sac-tourenportal/" target="_blank"><u><em>https://www.sac-cas.ch/de/huetten-und-touren/sac-tourenportal/</em></u></a> beginnen.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['setRegistrationPeriod'] = ['Anmeldezeitraum definieren', 'Definieren Sie hier den Zeitraum, indem sich Teilnehmer für den Event mit dem Anmeldeformular anmelden können.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['disableOnlineRegistration'] = ['Online-Anmeldung deaktivieren', 'Wenn Sie diese Einstellung wählen, wird das Online-Anmeldeformular deaktiviert.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['registrationGoesTo'] = ['Online-Anmeldungen gehen nicht an den Hauptleiter, sondern an diese Person', 'Alle Online-Anmeldungen laufen gewöhnlich über den Hauptleiter (erster Leiter in der Liste). Geben Sie hier weitere Personen an, welche bei Online-Anmeldungen benachrichtigt werden und die Teilnehmerliste administrieren können.'];
@@ -92,9 +93,9 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['registrationStartDate'] = ['Anmeldung
 $GLOBALS['TL_LANG']['tl_calendar_events']['registrationEndDate'] = ['Anmeldung möglich bis', 'Definieren Sie hier, bis wann eine Anmeldung mit dem Anmeldformular möglich sein soll.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventReleaseLevel'] = ['Freigabestufe', 'Definieren Sie hier die Freigabestufe.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourType'] = ['Touren-Typ', 'Definieren Sie hier den Tourentyp.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'] = ['Technische Schwierigkeiten', 'Definieren Sie hier die technischen Schwierigkeiten. Max. Schwierigkeit nur bei von ... bis ... Angabe eintragen.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'] = ['Schwierigkeiten Minimum', 'Definieren Sie hier den minimalen technischen Schwierigkeitsgrad.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'] = ['Schwierigkeiten Maximum (optional)', 'Definieren Sie hier den maximalen technischen Schwierigkeitsgrad.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficulty'] = ['Technische Schwierigkeiten', 'Definieren Sie hier die technischen Schwierigkeiten. Hinweis: Maximale Schwierigkeit nur bei von ... bis ... Angabe eintragen!'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'] = ['Schwierigkeiten Standard/Minimum', 'Definieren Sie hier den standardmässigen oder minimalen technischen Schwierigkeitsgrad.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'] = ['Schwierigkeiten Maximum (optional)', 'Definieren Sie hier optional den maximalen technischen Schwierigkeitsgrad.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourDetailText'] = ['Details zur Tour/Route/Wegpunkte', 'Geben Sie hier weitere Details zur Tour an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['generalEventDetailText'] = ['Details zum Anlass', 'Geben Sie hier weitere Details zum Anlass an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['executionState'] = ['Durchführungsstatus', 'Geben Sie an, ob der Event durchgeführt werden konnte.'];
@@ -103,13 +104,13 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourWeatherConditions'] = ['Angaben z
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourAvalancheConditions'] = ['Lawinensituation', 'Geben Sie hier Angaben zur Lawinensituation ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourSpecialIncidents'] = ['Besondere Vorkommnisse', 'Geben Sie hier Informationen zu besonderen Vorkommnissen ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventReportAdditionalNotices'] = ['Weitere Bemerkungen', 'Geben Sie hier weitere Informationen ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['filledInEventReportForm'] = ['Event Rapport ausgefüllt', 'Event Rapport wurde ausgefüllt.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['filledInEventReportForm'] = ['Event-Rapport ausgefüllt', 'Event-Rapport wurde ausgefüllt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfile'] = ['Höhenunterschied und Zeitbedarf pro Tag', 'Machen Sie hier zu jedem Tag Angaben zum Profil der Tour.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentMeters'] = ['Höhenunterschied im Aufstieg', 'Machen Sie hier Angaben zum Höhenunterschied im Aufstieg.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'] = ['Zeitbedarf im Aufstieg in h', 'Machen Sie hier Angaben zum Zeitbedarf im Aufstieg.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'] = ['Höhenunterschied im Abstieg', 'Machen Sie hier Angaben zum Höhenunterschied im Abstieg.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = ['Zeitbedarf im Abstieg in h', 'Machen Sie hier Angaben zum Zeitbedarf im Abstieg.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'] = ['<span style="color:red">Kontaktdaten standardmässig aus der Datenbank generieren (Wichtig, falls Online-Anmeldung deaktiviert ist!!!)</span>', 'Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'] = ['Hinterlegte Kontaktdaten immer anzeigen', '<strong class="notice">!!! Wichtig, falls Online-Anmeldung deaktiviert ist !!!</strong> Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung individualisieren.', ''];
 $GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung', 'Nutzen Sie dieses Feld, um eine individualisierte E-Mail-Bestätigungs für den Event zu erstellen. Fahren Sie mit der Maus über diesen Text, um mehr zu erfahren. Die Tags dienen als Platzhalter für eventspezifische Informationen.'];
 

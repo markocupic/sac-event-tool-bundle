@@ -1165,7 +1165,7 @@ class CalendarEvents
             }
 
             if (!empty($help)) {
-                $help = '<p class="tl_help tl_tip">'.$help.'</p>';
+                $help = '<p class="tl_help tl_tip tl_full_height">'.$help.'</p>';
             }
 
             $return .= '
