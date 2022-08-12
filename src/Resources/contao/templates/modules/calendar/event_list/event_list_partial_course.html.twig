@@ -9,8 +9,10 @@
         <div v-for="(row, index) of rows" class="col-xl-6 event-item event-item-course event layout_upcoming" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
             <div class="row">
                 <!-- Start left col -->
-                <div class="col-sm-3 col-xl-5 d-none d-sm-block image-zoom-in">
-                    <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" v-bind:title="row.title" v-html="row.eventImage" class="responsive event-title-link"></a>
+                <div class="col-sm-3 col-xl-5 d-none d-sm-block">
+                    <div class="image-zoom-in">
+                        <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" v-bind:title="row.title" v-html="row.eventImage" class="responsive event-title-link"></a>
+                    </div>
                 </div>
                 <!-- Start right col -->
                 <div class="col-sm-9 col-xl-7">
