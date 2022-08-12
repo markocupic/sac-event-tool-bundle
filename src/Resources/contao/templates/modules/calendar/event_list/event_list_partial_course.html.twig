@@ -69,6 +69,8 @@
         'apiParams': {
             'organizers': [{{ apiParam.organizers|raw }}],
             'eventType': [{{ apiParam.eventType|raw }}],
+            'suitableForBeginners': '{{ apiParam.suitableForBeginners|raw }}',
+            'publicTransportEvent': '{{ apiParam.publicTransportEvent|raw }}',
             'tourType': '{{ apiParam.tourType|raw }}',
             'courseType': '{{ apiParam.courseType|raw }}',
             'courseId': '{{ apiParam.courseId|raw }}',
@@ -95,6 +97,9 @@
             'bookingCounter',
             'eventStateLabel',
             'eventState',
+            'suitableForBeginners',
+            'isPublicTransportEvent',
+            'getPublicTransportBadge',
         ],
         'callbacks': {
             'oninsert': async function (vue, json) {

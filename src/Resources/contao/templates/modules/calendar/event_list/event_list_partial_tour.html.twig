@@ -58,6 +58,7 @@
                         </div>
                         <div class="me-2" v-if="row.tourTechDifficulties" v-html="row.tourTechDifficulties"></div>
                         <div class="me-2" v-if="row.tourTypesShortcuts" v-html="row.tourTypesShortcuts"></div>
+                        <div class="me-2" v-if="row.isPublicTransportEvent" v-html="row.getPublicTransportBadge"></div>
                     </div>
                     <!-- end row icons -->
 
@@ -103,6 +104,7 @@
             'organizers': [{{ apiParam.organizers|raw }}],
             'eventType': [{{ apiParam.eventType|raw }}],
             'suitableForBeginners': '{{ apiParam.suitableForBeginners|raw }}',
+            'publicTransportEvent': '{{ apiParam.publicTransportEvent|raw }}',
             'tourType': '{{ apiParam.tourType|raw }}',
             'courseType': '{{ apiParam.courseType|raw }}',
             'courseId': '{{ apiParam.courseId|raw }}',
@@ -134,6 +136,8 @@
             'eventPeriodLgInline',
             'tourTypesIds',
             'suitableForBeginners',
+            'isPublicTransportEvent',
+            'getPublicTransportBadge',
         ],
         'callbacks': {
             'oninsert': async function (vue, json) {

@@ -42,6 +42,7 @@ use Contao\Template;
 use Contao\TourDifficultyModel;
 use Contao\TourTypeModel;
 use Contao\UserModel;
+use Doctrine\DBAL\Connection;
 use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
@@ -271,6 +272,28 @@ class CalendarEventsHelper
 
             case 'linkSacRoutePortal':
                 $value = static::getSacRoutePortalLink($objEvent);
+                break;
+
+            case 'isPublicTransportEvent':
+                $value = false;
+
+                /** @var Connection $connection */
+                $connection = System::getContainer()->get('database_connection');
+
+                $idPublicTransportJourney = $connection->fetchOne(
+                    'SELECT id from tl_calendar_events_journey WHERE alias = ?',
+                    ['public-transport']
+                );
+
+                if ($idPublicTransportJourney) {
+                    if ((int) $objEvent->journey === (int) $idPublicTransportJourney) {
+                        $value = true;
+                    }
+                }
+                break;
+
+            case 'getPublicTransportBadge':
+                $value = static::getPublicTransportBadge($objEvent);
                 break;
 
             case 'gallery':
@@ -731,6 +754,11 @@ class CalendarEventsHelper
         }
 
         return '';
+    }
+
+    public static function getPublicTransportBadge(CalendarEventsModel $objEvent): string
+    {
+        return '<span class="badge badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" title="Anreise mit ÖV">ÖV</span>';
     }
 
     public static function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false): array

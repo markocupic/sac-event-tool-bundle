@@ -96,6 +96,7 @@ class EventApiController extends AbstractController
             'textsearch' => $request->get('textsearch'),
             'username' => $request->get('username'),
             'suitableForBeginners' => $request->get('suitableForBeginners') ? '1' : '',
+            'publicTransportEvent' => $request->get('publicTransportEvent') ? '1' : '',
         ];
 
         $startTime = microtime(true);
@@ -130,8 +131,21 @@ class EventApiController extends AbstractController
 
         // Filter by suitableForBeginners
         if ('1' === $param['suitableForBeginners']) {
-            $qb->andWhere('t.suitableForBeginners', ':suitableForBeginners');
+            $qb->andWhere('t.suitableForBeginners = :suitableForBeginners');
             $qb->setParameter('suitableForBeginners', '1');
+        }
+
+        // Filter by publicTransportEvent
+        if ('1' === $param['publicTransportEvent']) {
+            $idPublicTransportJourney = $this->connection->fetchOne(
+                'SELECT id from tl_calendar_events_journey WHERE alias = ?',
+                ['public-transport'],
+            );
+
+            if ($idPublicTransportJourney) {
+                $qb->andWhere('t.journey = :publicTransportEvent');
+                $qb->setParameter('publicTransportEvent', (int) $idPublicTransportJourney);
+            }
         }
 
         // Filter by a certain instructor $_GET['username']

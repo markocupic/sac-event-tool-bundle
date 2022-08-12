@@ -21,6 +21,7 @@ $GLOBALS['TL_LANG']['tl_event_filter_form']['textsearch'] = ['Im Text suchen', '
 $GLOBALS['TL_LANG']['tl_event_filter_form']['organizers'] = ['Organisierende Gruppe', 'Organisierende Gruppe auswählen.'];
 $GLOBALS['TL_LANG']['tl_event_filter_form']['eventId'] = ['Eventnummer', 'Eventnummer eingeben.'];
 $GLOBALS['TL_LANG']['tl_event_filter_form']['suitableForBeginners'] = ['Für Einsteiger geeignet', 'Für Einsteiger geeignet'];
+$GLOBALS['TL_LANG']['tl_event_filter_form']['publicTransportEvent'] = ['Anreise mit ÖV', 'Anreise mit ÖV'];
 $GLOBALS['TL_LANG']['tl_event_filter_form']['courseId'] = ['Kursnummer', 'Kursnummer eingeben.'];
 
 // Labels

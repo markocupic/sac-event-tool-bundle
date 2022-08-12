@@ -22,4 +22,4 @@ $GLOBALS['TL_LANG']['tl_calendar_events_journey']['copy'] = ['Kopieren', 'Anreis
 
 // Fields
 $GLOBALS['TL_LANG']['tl_calendar_events_journey']['title'] = ['Anreise-Art-Bezeichnung', 'Geben Sie eine Bezeichnung für die Anreise-Art ein.'];
-$GLOBALS['TL_LANG']['tl_calendar_events_journey']['description'] = ['Anreise-Art-Beschreibung', 'Geben Sie eine Beschreibung für die Anreise-Art ein.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_journey']['alias'] = ['Alias', 'Wählen Sie einen Alias aus.'];

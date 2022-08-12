@@ -65,7 +65,11 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
         ],
         'suitableForBeginners' => [
             'inputType' => 'checkbox',
-            'sql'       => "varchar(10) NOT NULL default ''",
+            'sql'       => "char(1) NOT NULL default ''",
+        ],
+        'publicTransportEvent' => [
+            'inputType' => 'checkbox',
+            'sql'       => "char(1) NOT NULL default ''",
         ],
     ],
 ];

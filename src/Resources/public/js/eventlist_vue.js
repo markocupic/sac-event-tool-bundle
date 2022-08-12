@@ -18,6 +18,7 @@ class VueTourList {
                 'organizers': [],
                 'eventType': ["tour", "generalEvent", "lastMinuteTour", "course"],
                 'suitableForBeginners': '',
+                'publicTransportEvent':'',
                 'tourType': '',
                 'courseType': '',
                 'courseId': '',

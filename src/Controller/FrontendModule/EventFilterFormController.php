@@ -150,7 +150,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
         $objForm->addFieldsFromDca(
             'tl_event_filter_form',
             function (&$strField, &$arrDca) {
-                // Make sure to skip elements without inputType or you will get an exception
+                // Make sure to skip elements without inputType otherwise this will throw an exception
                 if (!isset($arrDca['inputType'])) {
                     return false;
                 }
@@ -203,6 +203,10 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
         if ($objForm->hasFormField('suitableForBeginners')) {
             $objForm->getWidget('suitableForBeginners')->template = 'form_bs_switch';
+        }
+
+        if ($objForm->hasFormField('publicTransportEvent')) {
+            $objForm->getWidget('publicTransportEvent')->template = 'form_bs_switch';
         }
 
         return $objForm;
