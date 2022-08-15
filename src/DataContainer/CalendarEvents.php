@@ -149,12 +149,27 @@ class CalendarEvents
     }
 
     /**
-     * Adjust filters depending on event type.
+     * Limitize filter fields to tour guides and course instructors
+     * and
+     * adjust filters depending on event type.
      *
      * @Callback(table="tl_calendar_events", target="config.onload", priority=80)
      */
     public function setFilterSearchAndSortingBoard(DataContainer $dc): void
     {
+        $user = $this->security->getUser();
+
+        if (!$user->admin) {
+            // Limitize filter fields tour guides and course instructors
+            foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $k) {
+                if ('mountainguide' === $k || 'author' === $k || 'organizers' === $k || 'tourType' === $k || 'journey' === $k || 'eventReleaseLevel' === $k || 'mainInstructor' === $k || 'courseTypeLevel0' === $k || 'startTime' === $k) {
+                    continue;
+                }
+
+                $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$k]['filter'] = null;
+            }
+        }
+
         if (\defined('CURRENT_ID') && CURRENT_ID > 0) {
             $objCalendar = $this->calendarModel->findByPk(CURRENT_ID);
 
@@ -286,15 +301,6 @@ class CalendarEvents
 
         // Do not allow cutting and editing to default users
         $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['edit'] = null;
-
-        // Limitize filter fields
-        foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $k) {
-            if ('mountainguide' === $k || 'author' === $k || 'organizers' === $k || 'tourType' === $k || 'eventReleaseLevel' === $k || 'mainInstructor' === $k || 'courseTypeLevel0' === $k || 'startTime' === $k) {
-                continue;
-            }
-
-            $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$k]['filter'] = null;
-        }
 
         // Prevent unauthorized publishing
         if ($request->query->has('tid')) {
