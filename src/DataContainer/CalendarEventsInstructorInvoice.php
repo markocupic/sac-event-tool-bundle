@@ -186,7 +186,7 @@ class CalendarEventsInstructorInvoice
      */
     public function listInvoices(array $row): string
     {
-        return '<div class="tl_content_left"><span class="level">Vergütungsformular mit Tour-Rapport von: '.UserModel::findByPk($row['userPid'])->name.'</span> <span>['.CalendarEventsModel::findByPk($row['pid'])->title.']</span></div>';
+        return '<div class="tl_content_left"><span class="level">Vergütungsformular mit Tourenrapport von: '.UserModel::findByPk($row['userPid'])->name.'</span> <span>['.CalendarEventsModel::findByPk($row['pid'])->title.']</span></div>';
     }
 
     /**
