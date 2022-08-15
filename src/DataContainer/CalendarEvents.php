@@ -18,6 +18,7 @@ use Contao\ArrayUtil;
 use Contao\Backend;
 use Contao\BackendUser;
 use Contao\Calendar;
+use Contao\CalendarEventsJourneyModel;
 use Contao\CalendarEventsModel;
 use Contao\CalendarModel;
 use Contao\Config;
@@ -65,8 +66,11 @@ class CalendarEvents
     private Security $security;
     private PasswordHasherFactoryInterface $passwordHasherFactory;
 
+    // Adapters
     private Adapter $arrayUtil;
     private Adapter $backend;
+    private Adapter $calendarEventsHelper;
+    private Adapter $calendarEventsJourneyModel;
     private Adapter $calendarEventsModel;
     private Adapter $calendarModel;
     private Adapter $config;
@@ -89,8 +93,11 @@ class CalendarEvents
         $this->security = $security;
         $this->passwordHasherFactory = $passwordHasherFactory;
 
+        // Adapters
         $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);
         $this->backend = $this->framework->getAdapter(Backend::class);
+        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsJourneyModel = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarModel = $this->framework->getAdapter(CalendarModel::class);
         $this->config = $this->framework->getAdapter(Config::class);
@@ -485,7 +492,7 @@ class CalendarEvents
             $csv->setDelimiter(';');
 
             // Selected fields
-            $arrFields = ['id', 'title', 'eventDates', 'organizers', 'mainInstructor', 'instructor', 'eventType', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel'];
+            $arrFields = ['id', 'title', 'eventDates', 'organizers', 'mainInstructor', 'instructor', 'eventType', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey'];
 
             // Insert headline first
             $this->controller->loadLanguageFile('tl_calendar_events');
@@ -512,27 +519,30 @@ class CalendarEvents
                             $objUser = $this->userModel->findByPk($objEvent->{$field});
                             $arrRow[] = null !== $objUser ? html_entity_decode($objUser->lastname.' '.$objUser->firstname) : '';
                         } elseif ('tourTechDifficulty' === $field) {
-                            $arrDiff = CalendarEventsHelper::getTourTechDifficultiesAsArray($objEvent->current(), false);
+                            $arrDiff = $this->calendarEventsHelper->getTourTechDifficultiesAsArray($objEvent->current(), false);
                             $arrRow[] = implode(' und ', $arrDiff);
                         } elseif ('eventDates' === $field) {
-                            $arrTimestamps = CalendarEventsHelper::getEventTimestamps($objEvent->current());
+                            $arrTimestamps = $this->calendarEventsHelper->getEventTimestamps($objEvent->current());
                             $arrDates = array_map(
                                 static fn ($tstamp) => Date::parse(Config::get('dateFormat'), $tstamp),
                                 $arrTimestamps
                             );
                             $arrRow[] = implode(',', $arrDates);
                         } elseif ('organizers' === $field) {
-                            $arrOrganizers = CalendarEventsHelper::getEventOrganizersAsArray($objEvent->current(), 'title');
+                            $arrOrganizers = $this->calendarEventsHelper->getEventOrganizersAsArray($objEvent->current(), 'title');
                             $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
                         } elseif ('instructor' === $field) {
-                            $arrInstructors = CalendarEventsHelper::getInstructorNamesAsArray($objEvent->current(), false, false);
+                            $arrInstructors = $this->calendarEventsHelper->getInstructorNamesAsArray($objEvent->current(), false, false);
                             $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
                         } elseif ('tourType' === $field) {
-                            $arrTourTypes = CalendarEventsHelper::getTourTypesAsArray($objEvent->current(), 'title');
+                            $arrTourTypes = $this->calendarEventsHelper->getTourTypesAsArray($objEvent->current(), 'title');
                             $arrRow[] = html_entity_decode(implode(',', $arrTourTypes));
                         } elseif ('eventReleaseLevel' === $field) {
                             $objFS = EventReleaseLevelPolicyModel::findByPk($objEvent->{$field});
                             $arrRow[] = null !== $objFS ? $objFS->level : '';
+                        } elseif ('journey' === $field) {
+                            $objJourney = $this->calendarEventsJourneyModel->findByPk($objEvent->{$field});
+                            $arrRow[] = null !== $objJourney ? $objJourney->title : $objEvent->{$field};
                         } else {
                             $arrRow[] = $objEvent->{$field};
                         }
@@ -807,7 +817,7 @@ class CalendarEvents
         $objEvent = $this->calendarEventsModel->findByPk($dc->activeRecord->id);
 
         if (null !== $objEvent) {
-            $arrTimestamps = CalendarEventsHelper::getEventTimestamps($objEvent);
+            $arrTimestamps = $this->calendarEventsHelper->getEventTimestamps($objEvent);
 
             if ('' !== $objEvent->durationInfo && !empty($arrTimestamps) && \is_array($arrTimestamps)) {
                 $countTimestamps = \count($arrTimestamps);
@@ -1486,7 +1496,7 @@ class CalendarEvents
             $strAuthor = ' <span style="color:#b3b3b3;padding-left:3px">[Hauptleiter: '.$objUser->name.']</span><br>';
         }
 
-        $strRegistrations = CalendarEventsHelper::getEventStateOfSubscriptionBadgesString($objEvent);
+        $strRegistrations = $this->calendarEventsHelper->getEventStateOfSubscriptionBadgesString($objEvent);
 
         if ('' !== $strRegistrations) {
             $strRegistrations = '<br>'.$strRegistrations;

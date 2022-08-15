@@ -72,7 +72,7 @@ class Member
     {
         return $this->connection
             ->fetchAllKeyValue('SELECT sectionId, name FROM tl_sac_section')
-            ;
+        ;
     }
 
     /**
