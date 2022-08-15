@@ -701,10 +701,10 @@ class CalendarEvents
     }
 
     /**
-     * Add a priority of -1
-     * In this way this callback will be executed after! the legacy callback tl_calendar_events.adjustTime().
+     * Add a priority of -100
+     * In this way this callback will be executed after! the legacy callback tl_calendar_events.adjustTime() but ahead of self::adjustRegistrationPeriod.
      *
-     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=-1)
+     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=-100)
      *
      * @throws Exception
      */
@@ -745,6 +745,51 @@ class CalendarEvents
         $set['endDate'] = $set['endTime'] = $dc->activeRecord->endDate = $dc->activeRecord->endTime = $endTime;
 
         $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
+    }
+
+    /**
+     * Add a priority of -110
+     * In this way this callback will be executed after! the legacy callback tl_calendar_events.adjustTime() but after self::adjustStartAndEndDate.
+     *
+     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=-110)
+     *
+     * @throws Exception
+     */
+    public function adjustRegistrationPeriod(DataContainer $dc): void
+    {
+        // Return if there is no active record (override all)
+        if (!$dc->activeRecord) {
+            return;
+        }
+
+        $row = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events WHERE id = ?', [$dc->activeRecord->id]);
+
+        if ($row) {
+            if ($row['setRegistrationPeriod']) {
+                $regEndDate = $row['registrationEndDate'];
+                $regStartDate = $row['registrationStartDate'];
+
+                if ($regEndDate > $row['startDate']) {
+                    $regEndDate = strtotime(date('Y-m-d', (int) $row['startDate']).' +1 day') - 1;
+                    $this->message->addInfo($GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck']);
+                }
+
+                if ($regStartDate > $regEndDate) {
+                    $regStartDate = $regEndDate - 86400;
+                    $this->message->addInfo($GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck']);
+                }
+
+                $set = [
+                    'registrationStartDate' => $regStartDate,
+                    'registrationEndDate' => $regEndDate,
+                ];
+
+                $dc->activeRecord->registrationStartDate = $regStartDate;
+                $dc->activeRecord->registrationEndDate = $regEndDate;
+
+                $this->connection->update('tl_calendar_events', $set, ['id' => $row['id']]);
+            }
+        }
     }
 
     /**
@@ -833,52 +878,10 @@ class CalendarEvents
                             $dc->activeRecord->durationInfo = '';
                             $this->connection->update('tl_calendar_events', $set, ['id' => $objEvent->id]);
 
-                            $this->message->addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein. Setzen Sie für jeden Event-Tag eine Datumszeile!', $objEvent->title, $objEvent->id), TL_MODE);
+                            $this->message->addError(sprintf('Die Event-Dauer in "%s" [ID:%s] stimmt nicht mit der Anzahl Event-Daten überein. Setzen Sie für jeden Event-Tag eine Datumszeile!', $objEvent->title, $objEvent->id));
                         }
                     }
                 }
-            }
-        }
-    }
-
-    /**
-     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=50)
-     *
-     * @throws Exception
-     */
-    public function adjustRegistrationPeriod(DataContainer $dc): void
-    {
-        // Return if there is no active record (override all)
-        if (!$dc->activeRecord) {
-            return;
-        }
-
-        $row = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events WHERE id = ?', [$dc->activeRecord->id]);
-
-        if ($row) {
-            if ($row['setRegistrationPeriod']) {
-                $regEndDate = $row['registrationEndDate'];
-                $regStartDate = $row['registrationStartDate'];
-
-                if ($regEndDate > $row['startDate']) {
-                    $regEndDate = $row['startDate'];
-                    $this->message->addInfo($GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck'], TL_MODE);
-                }
-
-                if ($regStartDate > $regEndDate) {
-                    $regStartDate = $regEndDate - 86400;
-                    $this->message->addInfo($GLOBALS['TL_LANG']['MSC']['patchedStartDatePleaseCheck'], TL_MODE);
-                }
-
-                $set = [
-                    'registrationStartDate' => $regStartDate,
-                    'registrationEndDate' => $regEndDate,
-                ];
-
-                $dc->activeRecord->registrationStartDate = $regStartDate;
-                $dc->activeRecord->registrationEndDate = $regEndDate;
-
-                $this->connection->update('tl_calendar_events', $set, ['id' => $row['id']]);
             }
         }
     }
