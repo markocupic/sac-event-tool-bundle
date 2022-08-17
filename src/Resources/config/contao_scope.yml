@@ -1,6 +1,6 @@
 services:
 
-    # Get the contao mode (TL_MODE)
+    # Get the contao scope (frontend or backend)
     Markocupic\SacEventToolBundle\ContaoScope\ContaoScope:
         public: true
         arguments:

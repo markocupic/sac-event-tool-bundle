@@ -260,7 +260,7 @@ class ClearFrontendUserData
 
             if ($blnHasError) {
                 foreach ($arrErrorMsg as $errorMsg) {
-                    $messageAdapter->add($errorMsg, 'TL_ERROR', TL_MODE);
+                    $messageAdapter->add($errorMsg, 'TL_ERROR');
                 }
 
                 return false;
