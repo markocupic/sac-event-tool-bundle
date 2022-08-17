@@ -76,7 +76,7 @@ class EventRapport2Docx
         $objEvent = $calendarEventsModelAdapter->findByPk($objEventInvoice->pid);
 
         if (!$objEventHelper->checkEventRapportHasFilledInCorrectly($objEventInvoice)) {
-            $messageAdapter->addError('Bitte füllen Sie den Touren-Rapport vollständig aus, bevor Sie das Vergütungsformular herunterladen.');
+            $messageAdapter->addError('Bitte füllen Sie den Tourenrapport vollständig aus, bevor Sie das Vergütungsformular herunterladen.');
             $controllerAdapter->redirect(System::getReferer());
         }
 

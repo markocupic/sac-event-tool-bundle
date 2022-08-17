@@ -15,7 +15,7 @@ declare(strict_types=1);
 // Legends
 $GLOBALS['TL_LANG']['tl_member']['section_legend'] = 'Sektions-Einstellungen';
 $GLOBALS['TL_LANG']['tl_member']['section_info_legend'] = 'Sektionsinformationen';
-$GLOBALS['TL_LANG']['tl_member']['avatar_legend'] = 'Avatar';
+$GLOBALS['TL_LANG']['tl_member']['avatar_legend'] = 'Profilbild';
 $GLOBALS['TL_LANG']['tl_member']['emergency_legend'] = 'Notfallangaben';
 $GLOBALS['TL_LANG']['tl_member']['food_legend'] = 'Essgewohnheiten';
 $GLOBALS['TL_LANG']['tl_member']['education_legend'] = 'Ausbildung';

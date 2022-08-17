@@ -113,8 +113,8 @@ class ParseBackendTemplateListener
 
                         $strLegend .= '<div class="legend-box">';
                         $strLegend .= '<div class="notice-legend">';
-                        $strLegend .= '<h3>Vergütungsformular mit Tour-Rapport</h3>';
-                        $strLegend .= '<p><strong>Stammsektion</strong>: Das Vergütungsformular und der Tour-Rapport (PDF-Ausdruck) müssen<strong> nach dem Event manuell per E-Mail</strong> an die entsprechende Stelle zeitnah gesendet werden!</p>';
+                        $strLegend .= '<h3>Vergütungsformular mit Tourenrapport</h3>';
+                        $strLegend .= '<p><strong>Stammsektion</strong>: Das Vergütungsformular und der Tourenrapport (PDF-Ausdruck) müssen<strong> nach dem Event manuell per E-Mail</strong> an die entsprechende Stelle zeitnah gesendet werden!</p>';
                         $strLegend .= '</div>';
                         $strLegend .= '</div>';
                         
