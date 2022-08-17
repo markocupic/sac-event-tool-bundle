@@ -12,6 +12,8 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\System;
+
 // Legends
 $GLOBALS['TL_LANG']['tl_member']['section_legend'] = 'Sektions-Einstellungen';
 $GLOBALS['TL_LANG']['tl_member']['section_info_legend'] = 'Sektionsinformationen';
@@ -21,9 +23,12 @@ $GLOBALS['TL_LANG']['tl_member']['food_legend'] = 'Essgewohnheiten';
 $GLOBALS['TL_LANG']['tl_member']['education_legend'] = 'Ausbildung';
 
 // Fields
-if (TL_MODE === 'FE') {
+$request = System::getContainer()->get('request_stack')->getCurrentRequest();
+
+if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isFrontendRequst($request)) {
     $GLOBALS['TL_LANG']['tl_member']['username'] = ['SAC Mitgliedernummer', 'Gib deine 6-stellige SAC-Mitgliedernummer ein.'];
 }
+
 $GLOBALS['TL_LANG']['tl_member']['uuid'] = ['UUID (Zentralkommitee Bern)', ''];
 $GLOBALS['TL_LANG']['tl_member']['activation'] = ['Aktivierungscode', ''];
 $GLOBALS['TL_LANG']['tl_member']['activationLinkLifetime'] = ['Gültigkeitsdauer Aktivierungstoken', ''];

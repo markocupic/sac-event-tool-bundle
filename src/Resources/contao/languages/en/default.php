@@ -12,6 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
@@ -22,7 +23,9 @@ $GLOBALS['TL_LANG']['CTE'][UserPortraitController::TYPE] = ['SAC-User-Portrait']
 $GLOBALS['TL_LANG']['CTE'][UserPortraitListController::TYPE] = ['SAC-User-Portrait-Liste'];
 
 // Override defaults
-if (TL_MODE === 'FE') {
+$request = System::getContainer()->get('request_stack')->getCurrentRequest();
+
+if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isFrontendRequst($request)) {
     $GLOBALS['TL_LANG']['MSC']['username'] = 'SAC Mitgliedernummer';
     $GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
 }
