@@ -25,7 +25,7 @@ $GLOBALS['TL_LANG']['CTE'][UserPortraitListController::TYPE] = ['SAC-User-Portra
 // Override defaults
 $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
-if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isFrontendRequst($request)) {
+if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isFrontendRequest($request)) {
     $GLOBALS['TL_LANG']['MSC']['username'] = 'SAC Mitgliedernummer';
     $GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
 }

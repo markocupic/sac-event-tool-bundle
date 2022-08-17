@@ -25,7 +25,7 @@ $GLOBALS['TL_LANG']['tl_member']['education_legend'] = 'Ausbildung';
 // Fields
 $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
-if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isFrontendRequst($request)) {
+if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isFrontendRequest($request)) {
     $GLOBALS['TL_LANG']['tl_member']['username'] = ['SAC Mitgliedernummer', 'Gib deine 6-stellige SAC-Mitgliedernummer ein.'];
 }
 
