@@ -34,6 +34,7 @@ use Contao\Events;
 use Contao\EventTypeModel;
 use Contao\FilesModel;
 use Contao\Folder;
+use Contao\FrontendUser;
 use Contao\MemberModel;
 use Contao\PageModel;
 use Contao\StringUtil;
@@ -386,7 +387,9 @@ class CalendarEventsHelper
                     $strHtml .= '</a>';
                 }
 
-                if (FE_USER_LOGGED_IN && !$objUser->hideInFrontendListings) {
+                $frontendUser = System::getContainer()->get('security.helper');
+
+                if ($frontendUser instanceof FrontendUser && !$objUser->hideInFrontendListings) {
                     $arrContact = ['phone', 'mobile', 'email'];
 
                     foreach ($arrContact as $field) {
