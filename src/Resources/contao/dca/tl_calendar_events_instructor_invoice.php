@@ -65,22 +65,22 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
             'generateInvoicePdf'      => [
                 'href'       => 'action=generateInvoicePdf',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/pdf.png',
-                'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['generateInvoice'].'\')) return false; Backend.getScrollOffset();"',
+                'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateInvoice'] ?? null).'\')) return false; Backend.getScrollOffset();"',
             ],
             'generateInvoiceDocx'     => [
                 'href'       => 'action=generateInvoiceDocx',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
-                'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['generateInvoice'].'\')) return false; Backend.getScrollOffset();"',
+                'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateInvoice'] ?? null).'\')) return false; Backend.getScrollOffset();"',
             ],
             'generateTourRapportPdf'  => [
                 'href'       => 'action=generateTourRapportPdf',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/pdf.png',
-                'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['generateTourRapport'].'\')) return false; Backend.getScrollOffset();"',
+                'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateTourRapport'] ?? null).'\')) return false; Backend.getScrollOffset();"',
             ],
             'generateTourRapportDocx' => [
                 'href'       => 'action=generateTourRapportDocx',
                 'icon'       => 'bundles/markocupicsaceventtool/icons/docx.png',
-                'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['generateTourRapport'].'\')) return false; Backend.getScrollOffset();"',
+                'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateTourRapport'] ?? null).'\')) return false; Backend.getScrollOffset();"',
             ],
         ],
     ],
