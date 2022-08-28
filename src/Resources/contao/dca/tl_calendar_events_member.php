@@ -98,7 +98,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
             'delete'                     => [
                 'href'       => 'act=delete',
                 'icon'       => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
+                'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
             ],
             // Regular "toggle" operation but without "icon" and with the haste specific params
             'toggleStateOfParticipation' => [
