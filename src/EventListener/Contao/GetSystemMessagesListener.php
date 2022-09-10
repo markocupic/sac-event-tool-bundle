@@ -73,7 +73,7 @@ class GetSystemMessagesListener
                 if ($objEvent->numRows) {
                     $strBuffer .= '<h3>'.$GLOBALS['TL_LANG']['MSC']['bmd_yourUpcomingEvents'].'</h3>';
                     $strBuffer .= '<table id="tl_upcoming_events" class="tl_listing">';
-                    $strBuffer .= '<thead><tr><th>Teiln.</th><th>Datum &amp; Eventname</th><th></th></tr></thead>';
+                    $strBuffer .= '<thead><tr><th>Anmeld.</th><th>Datum &amp; Eventname</th><th>Teiln.</th></tr></thead>';
                     $strBuffer .= '<tbody>';
 
                     $container = System::getContainer();
