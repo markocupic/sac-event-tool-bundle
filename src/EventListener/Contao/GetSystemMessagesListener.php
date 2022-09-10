@@ -101,6 +101,9 @@ class GetSystemMessagesListener
                     $strBuffer .= '</tbody>';
                     $strBuffer .= '</table>';
                 }
+
+                $strBuffer .= '<h3>Anleitungen und Tutorials</h3>';
+                $strBuffer .= '<p>Die Seite "Anleitungen und Tutorials" im Frontend unterstützt Sie bei der Verwendung vom SAC Event-Tool (Contao).</p>';
             }
         }
 

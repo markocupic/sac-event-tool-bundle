@@ -106,7 +106,7 @@ $GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'Möchten Sie das Vergütungsfor
 $GLOBALS['TL_LANG']['MSC']['emailSentToEventMembers'] = 'Der/die Teilnehmer wurden erfolgreich per E-Mail benachrichtigt.';
 
 // Backend member dashboard
-$GLOBALS['TL_LANG']['MSC']['bmd_yourUpcomingEvents'] = 'Deine nächsten Events';
+$GLOBALS['TL_LANG']['MSC']['bmd_yourUpcomingEvents'] = 'Ihre nächsten Events';
 $GLOBALS['TL_LANG']['MSC']['bmd_howToEditReadonlyProfileData'] = 'Änderungen an Name, Adresse, Telefon und E-Mail müssen auf der Webseite des SAC Zentralverbandes (https://sac-cas.ch) gemacht werden.';
 
 // Event registration frontend module
