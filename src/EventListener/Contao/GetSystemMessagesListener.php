@@ -73,7 +73,7 @@ class GetSystemMessagesListener
                 if ($objEvent->numRows) {
                     $strBuffer .= '<h3>'.$GLOBALS['TL_LANG']['MSC']['bmd_yourUpcomingEvents'].'</h3>';
                     $strBuffer .= '<table id="tl_upcoming_events" class="tl_listing">';
-                    $strBuffer .= '<thead><tr><th>Teiln.</th><th>Datum &amp; Eventname</th><th></th></tr></thead>';
+                    $strBuffer .= '<thead><tr><th>Anmeld.</th><th>Datum &amp; Eventname</th><th>Teiln.</th></tr></thead>';
                     $strBuffer .= '<tbody>';
 
                     $container = System::getContainer();
@@ -87,7 +87,7 @@ class GetSystemMessagesListener
                         $linkMemberList = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $objEvent->id, $rt);
 
                         $strBuffer .= sprintf(
-                            '<tr class="hover-row %s"><td>%s</td><td>[%s] <a href="%s" style="text-decoration:underline" target="_blank" title="Event \'%s\' bearbeiten">%s</a></td><td><a href="%s" style="text-decoration:underline" target="_blank" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>',
+                            '<tr class="hover-row %s"><td>%s</td><td>[%s] <a href="%s" style="text-decoration:underline" title="Event \'%s\' bearbeiten">%s</a></td><td><a href="%s" style="text-decoration:underline" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>',
                             $strCSSRowClass,
                             $calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($eventModel),
                             $dateAdapter->parse($configAdapter->get('dateFormat'), $objEvent->startDate),
@@ -101,6 +101,9 @@ class GetSystemMessagesListener
                     $strBuffer .= '</tbody>';
                     $strBuffer .= '</table>';
                 }
+
+                $strBuffer .= '<h3>Anleitungen und Tutorials</h3>';
+                $strBuffer .= '<p>Die Seite "Anleitungen und Tutorials" im Frontend unterstützt Sie bei der Verwendung vom SAC Event-Tool (Contao).</p>';
             }
         }
 
