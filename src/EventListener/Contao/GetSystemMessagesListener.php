@@ -87,7 +87,7 @@ class GetSystemMessagesListener
                         $linkMemberList = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $objEvent->id, $rt);
 
                         $strBuffer .= sprintf(
-                            '<tr class="hover-row %s"><td>%s</td><td>[%s] <a href="%s" style="text-decoration:underline" target="_blank" title="Event \'%s\' bearbeiten">%s</a></td><td><a href="%s" style="text-decoration:underline" target="_blank" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>',
+                            '<tr class="hover-row %s"><td>%s</td><td>[%s] <a href="%s" style="text-decoration:underline" title="Event \'%s\' bearbeiten">%s</a></td><td><a href="%s" style="text-decoration:underline" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>',
                             $strCSSRowClass,
                             $calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($eventModel),
                             $dateAdapter->parse($configAdapter->get('dateFormat'), $objEvent->startDate),
