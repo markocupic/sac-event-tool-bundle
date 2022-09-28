@@ -519,7 +519,7 @@ class CalendarEvents
                             $objUser = $this->userModel->findByPk($objEvent->{$field});
                             $arrRow[] = null !== $objUser ? html_entity_decode($objUser->lastname.' '.$objUser->firstname) : '';
                         } elseif ('tourTechDifficulty' === $field) {
-                            $arrDiff = $this->calendarEventsHelper->getTourTechDifficultiesAsArray($objEvent->current(), false);
+                            $arrDiff = $this->calendarEventsHelper->getTourTechDifficultiesAsArray($objEvent->current(), false, false);
                             $arrRow[] = implode(' und ', $arrDiff);
                         } elseif ('eventDates' === $field) {
                             $arrTimestamps = $this->calendarEventsHelper->getEventTimestamps($objEvent->current());
