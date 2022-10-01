@@ -191,11 +191,15 @@ class CalendarEventsHelper
                 break;
 
             case 'tourTechDifficultiesAsArray':
-                $value = static::getTourTechDifficultiesAsArray($objEvent, false);
+                $value = static::getTourTechDifficultiesAsArray($objEvent, false, false);
+                break;
+
+            case 'tourTechDifficultiesAsArrayWithExplanation':
+                $value = static::getTourTechDifficultiesAsArray($objEvent, false, true);
                 break;
 
             case 'tourTechDifficulties':
-                $value = implode(' ', static::getTourTechDifficultiesAsArray($objEvent, true));
+                $value = implode(' ', static::getTourTechDifficultiesAsArray($objEvent, true, false));
                 break;
 
             case 'instructors':
@@ -764,7 +768,7 @@ class CalendarEventsHelper
         return '<span class="badge badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" title="Anreise mit ÖV">ÖV</span>';
     }
 
-    public static function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false): array
+    public static function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false, bool $explanation = false): array
     {
         $arrReturn = [];
 
@@ -803,8 +807,10 @@ class CalendarEventsHelper
                     if ($tooltip) {
                         $html = '<span class="badge badge-pill bg-primary" data-bs-toggle="tooltip" data-placement="top" title="Techn. Schwierigkeit: %s">%s</span>';
                         $arrReturn[] = sprintf($html, $strDiffTitle, $strDiff);
-                    } else {
+                    } elseif ($explanation) {
                         $arrReturn[] = $strDiff.' ('.$strDiffTitle.')';
+                    } else {
+                        $arrReturn[] = $strDiff;
                     }
                 }
             }

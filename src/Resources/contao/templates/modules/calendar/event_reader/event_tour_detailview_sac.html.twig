@@ -169,7 +169,7 @@
                 {% if getEventData.invoke('eventType') == 'tour' %}
                     <div class="tour-difficulties event-detail event-info-box icon-box-small">
                         <h5>Schwierigkeit</h5>
-                        <p>{{ getEventData.invoke('tourTechDifficultiesAsArray')|join('<br>')|raw }}</p>
+                        <p>{{ getEventData.invoke('tourTechDifficultiesAsArrayWithExplanation')|join('<br>')|raw }}</p>
                     </div>
                 {% endif %}
 
