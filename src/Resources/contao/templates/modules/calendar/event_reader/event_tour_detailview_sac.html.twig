@@ -62,7 +62,7 @@
 
                 {% if not getEventData.invoke('location') is empty %}
                     <div class="location event-detail event-info-box icon-box-small">
-                        <h5>Veranstaltungsort</h5>
+                        <h5>Veranstaltungsort/Ausgangspunkt</h5>
                         <!-- indexer::continue -->
                         <p>{{ getEventData.invoke('location') }}</p>
                         <!-- indexer::stop -->
@@ -169,7 +169,7 @@
                 {% if getEventData.invoke('eventType') == 'tour' or getEventData.invoke('eventType') == 'lastMinuteTour' %}
                     <div class="tour-difficulties event-detail event-info-box icon-box-small">
                         <h5>Schwierigkeit</h5>
-                        <p>{{ getEventData.invoke('tourTechDifficultiesAsArray')|join('<br>')|raw }}</p>
+                        <p>{{ getEventData.invoke('tourTechDifficultiesAsArrayWithExplanation')|join('<br>')|raw }}</p>
                     </div>
                 {% endif %}
 
