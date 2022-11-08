@@ -47,7 +47,7 @@ $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_2'] = 'Anmeldefrist 
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_3'] = 'Event ausgebucht!';
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_4'] = 'Event abgesagt!';
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_5'] = 'Anmelden noch nicht möglich!';
-$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_6'] = 'Event verschoben!';
+$GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_6'] = 'Event verschoben! Online-Anmeldung nicht möglich.';
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_7'] = 'Keine Online-Anmeldung möglich!';
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_8'] = 'Max. Teilnehmerzahl erreicht. Anmeldung auf Warteliste möglich.';
 
