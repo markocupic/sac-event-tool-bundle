@@ -29,6 +29,7 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Date;
 use Contao\Environment;
 use Contao\EventOrganizerModel;
+use Contao\EventReleaseLevelPolicyModel;
 use Contao\Events;
 use Contao\FilesModel;
 use Contao\FrontendUser;
@@ -136,6 +137,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $this->urlAdapter = $this->framework->getAdapter(Url::class);
         $this->userModelAdapter = $this->framework->getAdapter(UserModel::class);
         $this->validatorAdapter = $this->framework->getAdapter(Validator::class);
+        $this->eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
+
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
@@ -163,6 +166,10 @@ class EventRegistrationController extends AbstractFrontendModuleController
         // Get instructor object from UserModel
         $this->mainInstructorModel = $this->userModelAdapter->findByPk($this->eventModel->mainInstructor);
 
+        if ('eventPreview' === $request->query->get('mode')) {
+            return new Response('', Response::HTTP_NO_CONTENT);
+        }
+
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
     }
@@ -183,6 +190,10 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         if (null === $this->eventModel) {
             $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventNotFound', [$this->inputAdapter->get('events') ?? 'NULL'], 'contao_default'));
+        } elseif (!$this->eventModel->published) {
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventNotActivatedYet', [$this->eventModel->title], 'contao_default'));
+        } elseif (null === $this->eventReleaseLevelPolicyModelAdapter->findOneByEventId($this->eventModel->id) || !$this->eventReleaseLevelPolicyModelAdapter->findOneByEventId($this->eventModel->id)->allowRegistration) {
+            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventReleaseLevelPolicyDoesNotAllowRegistrations', [$this->eventModel->title], 'contao_default'));
         } elseif ($this->eventModel->disableOnlineRegistration) {
             $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_onlineRegDisabled', [], 'contao_default'));
         } elseif (EventState::STATE_FULLY_BOOKED === $this->eventModel->eventState) {

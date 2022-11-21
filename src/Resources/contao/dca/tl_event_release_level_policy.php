@@ -61,7 +61,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
         ],
     ],
     'palettes' => [
-        'default' => 'level,title,description,allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowDeleteAccessToAuthor,allowDeleteAccessToInstructors,allowSwitchingToPrevLevel,allowSwitchingToNextLevel,groupReleaseLevelRights',
+        'default' => 'level,title,description,allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowDeleteAccessToAuthor,allowDeleteAccessToInstructors,allowSwitchingToPrevLevel,allowSwitchingToNextLevel,allowRegistration,groupReleaseLevelRights',
     ],
     'fields'   => [
         'id'                             => [
@@ -129,6 +129,12 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
             'filter'    => true,
             'inputType' => 'checkbox',
             'sql'       => "char(1) NOT NULL default '1'",
+        ],
+        'allowRegistration' => [
+            'exclude'   => true,
+            'filter'    => true,
+            'inputType' => 'checkbox',
+            'sql'       => "char(1) NOT NULL default ''",
         ],
         'groupReleaseLevelRights'        => [
             'exclude'   => true,

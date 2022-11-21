@@ -39,6 +39,7 @@ $GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowDeleteAccessToAuthor'
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowDeleteAccessToInstructors'] = ['Den Event-Leitern Löschzugriff auf diesem Level gewähren.', 'Mit dieser Einstellung gewähren Sie auf diesem Level den Event-Leitern Löschzugriff.'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowSwitchingToPrevLevel'] = ['Dem Event-Autor und dem Event-Leiter erlauben die Veröffentlichungsstufe herunterzustufen', ''];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowSwitchingToNextLevel'] = ['Dem Event-Autor und dem Event-Leiter erlauben die Veröffentlichungsstufe hochzustufen', ''];
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowRegistration'] = ['Online Anmeldung zu Event ermöglichen.', ''];
 
 // References
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['up'] = 'erlaube hochstufen';
