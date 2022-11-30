@@ -21,6 +21,7 @@ $GLOBALS['TL_LANG']['tl_user']['event_tool_legend'] = 'Event-Tool Einstellungen'
 $GLOBALS['TL_LANG']['tl_user']['rescission_legend'] = 'Benutzer-Deaktivierungs-Einstellungen';
 
 // Fields
+$GLOBALS['TL_LANG']['tl_user']['tstamp'] = ['Änderungsdatum', 'Wählen Sie das Änderungsdatum aus.'];
 $GLOBALS['TL_LANG']['tl_user']['uuid'] = ['UUID (Zentralkommitee Bern)', ''];
 $GLOBALS['TL_LANG']['tl_user']['userRole'] = ['Rolle/Funktion im Verein', 'Geben Sie hier bitte eine oder mehrere Rollen/Funktionen an.'];
 $GLOBALS['TL_LANG']['tl_user']['sacMemberId'] = ['SAC-Mitgliedernummer', 'Schreibe eine "0", falls der User kein Sektionsmitglied ist.'];
