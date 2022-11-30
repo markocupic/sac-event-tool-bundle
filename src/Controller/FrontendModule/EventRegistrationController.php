@@ -138,7 +138,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $this->userModelAdapter = $this->framework->getAdapter(UserModel::class);
         $this->validatorAdapter = $this->framework->getAdapter(Validator::class);
         $this->eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
-
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
