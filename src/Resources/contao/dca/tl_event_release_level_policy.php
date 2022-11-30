@@ -130,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
             'inputType' => 'checkbox',
             'sql'       => "char(1) NOT NULL default '1'",
         ],
-        'allowRegistration' => [
+        'allowRegistration'              => [
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'checkbox',

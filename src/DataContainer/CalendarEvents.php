@@ -26,6 +26,7 @@ use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\Database;
 use Contao\DataContainer;
@@ -44,6 +45,7 @@ use Contao\TourDifficultyCategoryModel;
 use Contao\User;
 use Contao\UserGroupModel;
 use Contao\UserModel;
+use Contao\Versions;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use League\Csv\CannotInsertRecord;
@@ -53,6 +55,8 @@ use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\Security;
@@ -65,6 +69,7 @@ class CalendarEvents
     private Util $util;
     private Security $security;
     private PasswordHasherFactoryInterface $passwordHasherFactory;
+    private LoggerInterface|null $logger;
 
     // Adapters
     private Adapter $arrayUtil;
@@ -84,7 +89,7 @@ class CalendarEvents
     private Adapter $system;
     private Adapter $userModel;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, Security $security, PasswordHasherFactoryInterface $passwordHasherFactory)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, Security $security, PasswordHasherFactoryInterface $passwordHasherFactory, LoggerInterface|null $logger)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
@@ -92,6 +97,7 @@ class CalendarEvents
         $this->util = $util;
         $this->security = $security;
         $this->passwordHasherFactory = $passwordHasherFactory;
+        $this->logger = $logger;
 
         // Adapters
         $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);
@@ -1543,15 +1549,40 @@ class CalendarEvents
                 $objEvent = $this->calendarEventsModel->findByPk($request->query->get('eventId'));
 
                 if (null !== $objEvent) {
-                    $objReleaseLevelModel = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
+                    $objReleaseLevelModelCurrent = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+                    $titleCurrent = $objReleaseLevelModelCurrent ? $objReleaseLevelModelCurrent->title : 'not defined';
 
-                    if (null !== $objReleaseLevelModel) {
-                        $objEvent->eventReleaseLevel = $objReleaseLevelModel->id;
+                    $objReleaseLevelModelNew = EventReleaseLevelPolicyModel::findNextLevel($objEvent->eventReleaseLevel);
+                    $titleNew = $objReleaseLevelModelNew ? $objReleaseLevelModelNew->title : 'not defined';
+
+                    if (null !== $objReleaseLevelModelNew) {
+                        $objEvent->eventReleaseLevel = $objReleaseLevelModelNew->id;
                         $objEvent->save();
+
+                        // Create new version
+                        $objVersions = new Versions('tl_calendar_events', $objEvent->id);
+                        $objVersions->initialize();
+                        $objVersions->create();
+
+                        // System log
+                        if (null !== $this->logger) {
+                            $this->logger->log(
+                                LogLevel::INFO,
+                                sprintf(
+                                    'Event release level for event with ID %d ["%s"] pushed %s from "%s" to "%s".',
+                                    $objEvent->id,
+                                    $objEvent->title,
+                                    $strDirection,
+                                    $titleCurrent,
+                                    $titleNew,
+                                ),
+                                ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)],
+                            );
+                        }
 
                         $this->handleEventReleaseLevelAndPublishUnpublish((int) $objEvent->id, (int) $objEvent->eventReleaseLevel);
 
-                        // HOOK: changeEventReleaseLevel, f.ex inform tourenchef via email
+                        // HOOK: changeEventReleaseLevel, e.g. inform tourenchef via email
                         if (isset($GLOBALS['TL_HOOKS']['changeEventReleaseLevel']) && \is_array($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'])) {
                             foreach ($GLOBALS['TL_HOOKS']['changeEventReleaseLevel'] as $callback) {
                                 $this->system->importStatic($callback[0])->{$callback[1]}($objEvent, $strDirection);
@@ -1769,11 +1800,36 @@ class CalendarEvents
                 $objEvent = $this->calendarEventsModel->findByPk($request->query->get('eventId'));
 
                 if (null !== $objEvent) {
-                    $objReleaseLevelModel = EventReleaseLevelPolicyModel::findPrevLevel($objEvent->eventReleaseLevel);
+                    $objReleaseLevelModelCurrent = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+                    $titleCurrent = $objReleaseLevelModelCurrent ? $objReleaseLevelModelCurrent->title : 'not defined';
 
-                    if (null !== $objReleaseLevelModel) {
-                        $objEvent->eventReleaseLevel = $objReleaseLevelModel->id;
+                    $objReleaseLevelModelNew = EventReleaseLevelPolicyModel::findPrevLevel($objEvent->eventReleaseLevel);
+                    $titleNew = $objReleaseLevelModelNew ? $objReleaseLevelModelNew->title : 'not defined';
+
+                    if (null !== $objReleaseLevelModelNew) {
+                        $objEvent->eventReleaseLevel = $objReleaseLevelModelNew->id;
                         $objEvent->save();
+
+                        // Create new version
+                        $objVersions = new Versions('tl_calendar_events', $objEvent->id);
+                        $objVersions->initialize();
+                        $objVersions->create();
+
+                        // System log
+                        if (null !== $this->logger) {
+                            $this->logger->log(
+                                LogLevel::INFO,
+                                sprintf(
+                                    'Event release level for event with ID %d ["%s"] pushed %s from "%s" to "%s".',
+                                    $objEvent->id,
+                                    $objEvent->title,
+                                    $strDirection,
+                                    $titleCurrent,
+                                    $titleNew,
+                                ),
+                                ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)],
+                            );
+                        }
 
                         $this->handleEventReleaseLevelAndPublishUnpublish((int) $objEvent->id, (int) $objEvent->eventReleaseLevel);
 

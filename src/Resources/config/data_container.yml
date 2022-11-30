@@ -60,6 +60,7 @@ services:
             - '@Markocupic\SacEventToolBundle\DataContainer\Util'
             - '@security.helper'
             - '@security.password_hasher_factory'
+            - '@monolog.logger.contao'
 
     Markocupic\SacEventToolBundle\DataContainer\Content:
         arguments:
