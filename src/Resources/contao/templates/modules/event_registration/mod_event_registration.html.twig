@@ -6,14 +6,14 @@
         {% if hasErrorMessage is defined %}
             <div class="alert alert-danger" role="alert">
                 <i class="fas fa-exclamation-circle"></i>
-                <div>{{ errorMessage }}</div>
+                <div>{{ errorMessage|raw }}</div>
             </div>
         {% endif %}
 
         {% if hasInfoMessage is defined %}
             <div class="alert alert-info" role="alert">
                 <i class="fas fa-info-circle me-2"></i>
-                <div>{{ infoMessage }}</div>
+                <div>{{ infoMessage|raw }}</div>
             </div>
         {% endif %}
     {% endif %}

@@ -5,6 +5,8 @@
         {% set current_step_index = 1 %}
     {% elseif step == 'confirm' %}
         {% set current_step_index = 2 %}
+    {% else %}
+        {% set current_step_index = 1 %}
     {% endif %}
 
     <span class="checkout-step{% if step is same as constant('CHECKOUT_STEP_LOGIN', controller) %} step--current{% endif %}{% if current_step_index > 0 %} step--done{% endif %}">1. Login</span>
