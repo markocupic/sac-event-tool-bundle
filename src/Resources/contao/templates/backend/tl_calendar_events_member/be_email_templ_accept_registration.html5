@@ -10,6 +10,7 @@ Du bist für den Event "<?= $this->eventName ?>" definitiv angemeldet und deine 
 Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte: 
 <?= $this->instructorEmail ?>
 
+
 Freundliche Grüsse
 
 <?= $this->instructorName ?>

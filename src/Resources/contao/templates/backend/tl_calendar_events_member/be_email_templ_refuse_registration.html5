@@ -11,6 +11,7 @@ Ich danke dir für dein Verständnis.
 Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte: 
 <?= $this->instructorEmail ?>
 
+
 Freundliche Grüsse
 
 <?= $this->instructorName ?>
