@@ -23,6 +23,7 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 use Contao\Email;
@@ -48,6 +49,8 @@ use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use NotificationCenter\Model\Notification;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -59,6 +62,7 @@ class CalendarEventsMember
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Connection $connection;
+    private LoggerInterface|null $logger;
     private Util $util;
     private TranslatorInterface $translator;
     private Security $security;
@@ -85,7 +89,7 @@ class CalendarEventsMember
     private Adapter $user;
     private Adapter $validator;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, ExportEventRegistrationList $registrationListExporterCsv, EventMemberList2Docx $registrationListExporterDocx, string $projectDir, string $eventAdminName, string $eventAdminEmail, string $locale)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, ExportEventRegistrationList $registrationListExporterCsv, EventMemberList2Docx $registrationListExporterDocx, string $projectDir, string $eventAdminName, string $eventAdminEmail, string $locale, LoggerInterface $logger = null)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
@@ -99,6 +103,7 @@ class CalendarEventsMember
         $this->eventAdminName = $eventAdminName;
         $this->eventAdminEmail = $eventAdminEmail;
         $this->locale = $locale;
+        $this->logger = $logger;
 
         // Adapters
         $this->backend = $this->framework->getAdapter(Backend::class);
@@ -529,6 +534,39 @@ class CalendarEventsMember
 
                         $objNotification->send($arrTokens, $this->locale);
                     }
+                }
+            }
+        }
+
+        return $varValue;
+    }
+
+    /**
+     * @Callback(table="tl_calendar_events_member", target="fields.hasParticipated.save")
+     */
+    public function saveCallbackHasParticipated(string $varValue, DataContainer $dc): string
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ($dc->id && 'hasteAjaxOperation' === $request->request->get('action')) {
+            $registration = $this->calendarEventsMember->findByPk($dc->id);
+
+            if (null !== $registration) {
+                $event = $this->calendarEvents->findByPk($registration->eventId);
+
+                if (null !== $event) {
+                    if ($varValue) {
+                        $log = 'Participation for "%s %s" on "%s" has been set from "unconfirmed" to "confirmed".';
+                    } else {
+                        $log = 'Participation for "%s %s" on "%s" has been set from "confirmed" to "unconfirmed".';
+                    }
+
+                    // System log
+                    $this->logger?->log(
+                        LogLevel::INFO,
+                        sprintf($log, $registration->firstname, $registration->lastname, $event->title),
+                        ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)],
+                    );
                 }
             }
         }

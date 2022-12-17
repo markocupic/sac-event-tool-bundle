@@ -50,6 +50,7 @@ services:
             - '%sacevt.event_admin_name%'
             - '%sacevt.event_admin_email%'
             - '%sacevt.locale%'
+            - '@monolog.logger.contao'
 
     Markocupic\SacEventToolBundle\DataContainer\CalendarEvents:
         public: true

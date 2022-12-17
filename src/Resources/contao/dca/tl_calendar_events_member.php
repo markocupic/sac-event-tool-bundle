@@ -26,9 +26,10 @@ System::loadLanguageFile('tl_member');
  */
 $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
     'config'      => [
-        'dataContainer' => 'Table',
-        'notCopyable'   => true,
-        'sql'           => [
+        'dataContainer'    => 'Table',
+        'notCopyable'      => true,
+        'enableVersioning' => true,
+        'sql'              => [
             'keys' => [
                 'id'            => 'primary',
                 'email,eventId' => 'index',
