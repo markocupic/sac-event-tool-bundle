@@ -52,7 +52,7 @@ class Log
     public const EVENT_UNSUBSCRIPTION = 'EVENT_UNSUBSCRIPTION';
 
     /**
-     * EVENT: Log type if a user has subscribed.
+     * EVENT: Log type when a user has subscribed.
      */
     public const EVENT_SUBSCRIPTION = 'EVENT_SUBSCRIPTION';
 
@@ -62,12 +62,22 @@ class Log
     public const EVENT_SUBSCRIPTION_ERROR = 'EVENT_SUBSCRIPTION_ERROR';
 
     /**
-     * DOWNLOAD: Log type if a user has downloaded its certificate of attendance.
+     * EVENT: Log type when an event registration has been confirmed by a tour guide.
+     */
+    public const EVENT_PARTICIPATION_CONFIRM = 'EVENT_PARTICIPATION_CONFIRM';
+
+    /**
+     * EVENT: Log type when an event registration has been unconfirmed by a tour guide.
+     */
+    public const EVENT_PARTICIPATION_UNCONFIRM = 'EVENT_PARTICIPATION_UNCONFIRM';
+
+    /**
+     * DOWNLOAD: Log type when a user has downloaded its certificate of attendance.
      */
     public const DOWNLOAD_CERTIFICATE_OF_ATTENDANCE = 'DOWNLOAD_CERTIFICATE_OF_ATTENDANCE';
 
     /**
-     * DOWNLOAD: Log type if a user has downloaded the workshop booklet.
+     * DOWNLOAD: Log type when a user has downloaded the workshop booklet.
      */
     public const DOWNLOAD_WORKSHOP_BOOKLET = 'DOWNLOAD_WORKSHOP_BOOKLET';
 }

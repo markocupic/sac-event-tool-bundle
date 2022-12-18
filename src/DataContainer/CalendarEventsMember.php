@@ -43,6 +43,7 @@ use League\Csv\InvalidArgument;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventMemberList2Docx;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
@@ -557,15 +558,17 @@ class CalendarEventsMember
                 if (null !== $event) {
                     if ($varValue) {
                         $log = 'Participation for "%s %s" on "%s" has been set from "unconfirmed" to "confirmed".';
+                        $context = Log::EVENT_PARTICIPATION_CONFIRM;
                     } else {
                         $log = 'Participation for "%s %s" on "%s" has been set from "confirmed" to "unconfirmed".';
+                        $context = Log::EVENT_PARTICIPATION_UNCONFIRM;
                     }
 
                     // System log
                     $this->logger?->log(
                         LogLevel::INFO,
                         sprintf($log, $registration->firstname, $registration->lastname, $event->title),
-                        ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)],
+                        ['contao' => new ContaoContext(__METHOD__, $context)],
                     );
                 }
             }
