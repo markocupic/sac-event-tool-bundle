@@ -117,7 +117,7 @@ class ParseBackendTemplateListener
                         $strLegend .= '<p><strong>Stammsektion</strong>: Das Vergütungsformular und der Tourenrapport (PDF-Ausdruck) müssen<strong> nach dem Event manuell per E-Mail</strong> an die entsprechende Stelle zeitnah gesendet werden!</p>';
                         $strLegend .= '</div>';
                         $strLegend .= '</div>';
-                        
+
                         // Add legend to the listing table
                         $strBuffer = preg_replace('/<table class=\"tl_listing(.*)<\/table>/sU', '${0}'.$strLegend, $strBuffer);
                     }

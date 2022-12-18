@@ -208,13 +208,12 @@ class EventReleaseLevelPolicyModel extends Model
 
     /**
      * @param $eventId
-     * @return static|null
      */
-    public static function findOneByEventId($eventId): ?static
+    public static function findOneByEventId($eventId): static|null
     {
         $event = CalendarEventsModel::findByPk($eventId);
-        if ($event === null)
-        {
+
+        if (null === $event) {
             return null;
         }
 
@@ -225,5 +224,4 @@ class EventReleaseLevelPolicyModel extends Model
 
         return static::findOneBy($arrColumns, $arrVars, []);
     }
-
 }

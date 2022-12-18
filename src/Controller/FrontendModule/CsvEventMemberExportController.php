@@ -29,12 +29,11 @@ use Doctrine\DBAL\Connection;
 use Haste\Form\Form;
 use League\Csv\ByteSequence;
 use League\Csv\Exception;
-use League\Csv\Reader;
+use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
 
 /**
  * @FrontendModule(CsvEventMemberExportController::TYPE, category="sac_event_tool_frontend_modules")
@@ -48,17 +47,13 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     private string $strEnclosure = '"';
     private array $arrLines = [];
 
-   public function __construct(ContaoFramework $framework, Connection $connection)
-   {
-       $this->framework = $framework;
-       $this->connection= $connection;
-   }
+    public function __construct(ContaoFramework $framework, Connection $connection)
+    {
+        $this->framework = $framework;
+        $this->connection = $connection;
+    }
 
     /**
-     * @param Template $template
-     * @param ModuleModel $model
-     * @param Request $request
-     * @return Response|null
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
@@ -72,8 +67,6 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
     }
 
     /**
-     * @param Request $request
-     * @return Form
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
@@ -82,9 +75,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $objForm = new Form(
             'form-event-member-export',
             'POST',
-            function ($objHaste) use ($request) {
-                return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
-            }
+            static fn ($objHaste) => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId()
         );
 
         $environment = $this->framework->getAdapter(Environment::class);
@@ -122,7 +113,6 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         ]);
 
         if ($objForm->validate()) {
-
             if ('form-event-member-export' === $request->request->get('FORM_SUBMIT')) {
                 $eventType = $request->request->get('event-type');
                 $arrFields = ['id', 'eventId', 'eventName', 'startDate', 'endDate', 'mainInstructor', 'mountainguide', 'eventState', 'executionState', 'firstname', 'lastname', 'gender', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'bookingType', 'hasParticipated', 'stateOfSubscription', 'dateAdded'];
@@ -159,14 +149,9 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
             }
         }
 
-        return  $objForm;
+        return $objForm;
     }
 
-    /**
-     * @param array $arrFields
-     * @param array $arrEventMember
-     * @return void
-     */
     private function addLine(array $arrFields, array $arrEventMember): void
     {
         $arrLine = [];
@@ -180,7 +165,6 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
     /**
      * @param $arrFields
-     * @return void
      */
     private function getHeadline($arrFields): void
     {
@@ -203,11 +187,6 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $this->arrLines[] = $arrHeadline;
     }
 
-    /**
-     * @param string $field
-     * @param array $arrEventMember
-     * @return string
-     */
     private function getField(string $field, array $arrEventMember): string
     {
         $date = $this->framework->getAdapter(Date::class);
@@ -286,8 +265,8 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
 
     /**
      * @param $filename
-     * @return void
-     * @throws \League\Csv\InvalidArgument
+     *
+     * @throws InvalidArgument
      */
     private function printCsv($filename): void
     {

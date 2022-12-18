@@ -173,7 +173,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
     }
 
     /**
-     * @param $GroupModel
+     * @param $type
      *
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception

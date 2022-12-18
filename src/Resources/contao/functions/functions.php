@@ -12,13 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-use Contao\FilesModel;
 use Contao\MemberModel;
-use Contao\Picture;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\UserModel;
-use Contao\Validator;
 
 /**
  * @param $userId

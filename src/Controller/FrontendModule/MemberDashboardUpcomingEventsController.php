@@ -180,7 +180,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                 } elseif (empty($this->user->email) || !$validatorAdapter->isEmail($this->user->email)) {
                     $errorMsg = 'Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
                     $blnHasError = true;
-                } elseif ((int)$objEventsMember->sacMemberId !== (int)$this->user->sacMemberId) {
+                } elseif ((int) $objEventsMember->sacMemberId !== (int) $this->user->sacMemberId) {
                     $errorMsg = 'Du hast nicht die nötigen Benutzerrechte um dich vom Event "'.$objEvent->title.'" abzumelden.';
                     $blnHasError = true;
                 } elseif (null !== $objInstructor) {

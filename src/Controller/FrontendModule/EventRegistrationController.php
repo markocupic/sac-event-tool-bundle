@@ -72,6 +72,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
     public const CHECKOUT_STEP_REGISTER = 'register';
     public const CHECKOUT_STEP_CONFIRM = 'confirm';
 
+    public string $bla = 'foo';
+
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Security $security;
@@ -80,8 +82,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private TranslatorInterface $translator;
     private string $projectDir;
     private LoggerInterface|null $logger;
-
-    public string $bla = 'foo';
 
     // Adapters
     private Adapter $calendarEventsHelperAdapter;

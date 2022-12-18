@@ -59,7 +59,7 @@ class ImportUserListener
                 $objUser = $userModelAdapter->findOneBySacMemberId($strUsername);
 
                 if (null !== $objUser) {
-                    if ((int) $objUser->sacMemberId > 0 && (string)$objUser->sacMemberId === (string) $strUsername) {
+                    if ((int) $objUser->sacMemberId > 0 && (string) $objUser->sacMemberId === (string) $strUsername) {
                         // Used for password recovery
                         /** @var Request $request */
                         $request->request->set('username', $objUser->username);

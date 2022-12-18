@@ -68,11 +68,6 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    private function isFrontend(Request $request): bool
-    {
-        return $this->scopeMatcher->isFrontendRequest($request);
-    }
-
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
@@ -116,5 +111,10 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
         }
 
         return $template->getResponse();
+    }
+
+    private function isFrontend(Request $request): bool
+    {
+        return $this->scopeMatcher->isFrontendRequest($request);
     }
 }

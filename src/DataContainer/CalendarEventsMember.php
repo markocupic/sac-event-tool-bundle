@@ -556,18 +556,20 @@ class CalendarEventsMember
                 $event = $this->calendarEvents->findByPk($registration->eventId);
 
                 if (null !== $event) {
+                    $sacMemberId = $registration->sacMemberId ?? '0';
+
                     if ($varValue) {
-                        $log = 'Participation for "%s %s" on "%s" has been set from "unconfirmed" to "confirmed".';
+                        $log = 'Participation for "%s %s [%s]" on "%s [%s]" has been set from "unconfirmed" to "confirmed".';
                         $context = Log::EVENT_PARTICIPATION_CONFIRM;
                     } else {
-                        $log = 'Participation for "%s %s" on "%s" has been set from "confirmed" to "unconfirmed".';
+                        $log = 'Participation for "%s %s [%s]" on "%s [%s]" has been set from "confirmed" to "unconfirmed".';
                         $context = Log::EVENT_PARTICIPATION_UNCONFIRM;
                     }
 
                     // System log
                     $this->logger?->log(
                         LogLevel::INFO,
-                        sprintf($log, $registration->firstname, $registration->lastname, $event->title),
+                        sprintf($log, $registration->firstname, $registration->lastname, $sacMemberId, $event->title, $event->id),
                         ['contao' => new ContaoContext(__METHOD__, $context)],
                     );
                 }
