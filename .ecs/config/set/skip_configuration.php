@@ -8,11 +8,16 @@ use Symplify\EasyCodingStandard\ValueObject\Option;
 
 return function (ECSConfig $ECSConfig): void {
     $parameters = $ECSConfig->parameters();
+    $ECSConfig->parallel();
+
+
 
     $parameters->set(Option::SKIP, [
+        '*/Resources/contao/dca/*',
 
         MethodChainingIndentationFixer::class => [
             '*/DependencyInjection/Configuration.php',
         ],
+
     ]);
 };
