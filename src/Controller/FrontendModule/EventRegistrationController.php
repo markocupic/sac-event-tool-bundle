@@ -72,8 +72,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
     public const CHECKOUT_STEP_REGISTER = 'register';
     public const CHECKOUT_STEP_CONFIRM = 'confirm';
 
-    public string $bla = 'foo';
-
     private ContaoFramework $framework;
     private RequestStack $requestStack;
     private Security $security;
