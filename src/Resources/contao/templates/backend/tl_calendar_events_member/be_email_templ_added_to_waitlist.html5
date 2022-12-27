@@ -10,7 +10,8 @@ Leider kann ich dir für den Event "<?= $this->eventName ?>" im Moment noch kein
 Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte: 
 <?= $this->instructorEmail ?>
 
-Freundliche Grüsse
+
+Beste Grüsse
 
 <?= $this->instructorName ?>
 
