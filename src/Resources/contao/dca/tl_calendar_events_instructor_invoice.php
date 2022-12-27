@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
         userPid;
         {event_legend},eventDuration;
         {expenses_legend},sleepingTaxes,sleepingTaxesText,miscTaxes,miscTaxesText;
-        {transport_legend},privateArrival,railwTaxes,railwTaxesText,cabelCarTaxes,cabelCarTaxesText,roadTaxes,carTaxesKm,countCars;
+        {transport_legend},railwTaxes,railwTaxesText,cabelCarTaxes,cabelCarTaxesText,roadTaxes,carTaxesKm,countCars,privateArrival;
         {phone_costs_legend},phoneTaxes;
         {iban_legend},iban;
         {notice_legend},notice
