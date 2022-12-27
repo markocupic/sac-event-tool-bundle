@@ -153,6 +153,9 @@ $GLOBALS['TL_LANG']['FORM']['evt_reg_ffield_expl_mobile'] = 'Das Feld "Mobilnumm
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ffield_expl_ahvNumber'] = 'Sämtliche Daten werden lediglich für interne Zwecke verwendet. Die AHV-Nummer wird ausschliesslich für die Abrechnung oder Rückforderung von J+S-Geldern verwendet. Deine persönlichen Daten werden vertraulich behandelt. Eine Weitergabe an Drittorganisationen ist ausgeschlossen.';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ffield_expl_notes'] = 'Bitte beschreibe und beantworte in wenigen Worten die erforderlichen Angaben für den Event wie: <ul class="list-bullet ps-3"><li>dein <strong>Leistungsniveau und Erfahrungen</strong></li><li>bereits <strong>absolvierte Referenztouren</strong> in den letzten paar Jahren (inkl. Angabe mit/ohne Bergführer/in)</li><li><strong>zusätzlich verlangte Angaben</strong> in den Anmeldebestimmungen</li><li>und <strong>weitere Anmerkungen, Wichtiges etc.</strong> nach Bedarf</li></ul>';
 
+// Event Instructor Invoice
+$GLOBALS['TL_LANG']['ERR']['invalidNumberOfPrivateArrivals'] = 'Die Zahl der privat angereisten Teilnehmer (%s) ist nicht zulässig und übersteigt die Gesamtanzahl der Teilnehmer und Leiter (%s). Bitte korrigieren Sie diese Zahl im Vergütungsformular.';
+
 // Miscellaneous
 $GLOBALS['TL_LANG']['MSC']['published'] = 'veröffentlicht';
 $GLOBALS['TL_LANG']['MSC']['unpublished'] = 'unveröffentlicht';

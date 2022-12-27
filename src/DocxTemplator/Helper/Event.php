@@ -22,6 +22,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\Date;
 use Contao\EventOrganizerModel;
+use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
@@ -29,26 +30,17 @@ use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventState;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Event
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
+    private TranslatorInterface $translator;
 
-    /**
-     * @var string
-     */
-    private $projectDir;
-
-    /**
-     * Event constructor.
-     */
-    public function __construct(ContaoFramework $framework, string $projectDir)
+    public function __construct(ContaoFramework $framework, TranslatorInterface $translator)
     {
         $this->framework = $framework;
-        $this->projectDir = $projectDir;
+        $this->translator = $translator;
 
         // Initialize contao framework
         $this->framework->initialize();
@@ -121,14 +113,24 @@ class Event
         // Set adapters
         /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
+
+        /** @var System $systemAdapter */
+        $systemAdapter = $this->framework->getAdapter(System::class);
+
         /** @var Database $databaseAdapter */
         $databaseAdapter = $this->framework->getAdapter(Database::class);
+
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+
         /** @var CalendarEventsJourneyModel $calendarEventsJourneyModel */
         $calendarEventsJourneyModel = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
+
         /** @var UserModel $userModel */
         $userModel = $this->framework->getAdapter(UserModel::class);
+
+        /** @var Message $messageAdapter */
+        $messageAdapter = $this->framework->getAdapter(Message::class);
 
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
 
@@ -139,6 +141,7 @@ class Event
         // Member list
         /** @var EventMember $objEventMemberHelper */
         $objEventMemberHelper = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember');
+
         $objEventMember = $objEventMemberHelper->getParticipatedEventMembers($objEvent);
 
         if (null !== $objEventMember) {
@@ -172,6 +175,11 @@ class Event
 
         $countParticipantsTotal = $countInstructors + $countParticipants;
 
+        if ($countParticipantsTotal < $objEventInvoice->privateArrival) {
+            $messageAdapter->addError($this->translator->trans('ERR.invalidNumberOfPrivateArrivals', [$objEventInvoice->privateArrival, $countParticipantsTotal], 'contao_default'));
+            $controllerAdapter->redirect($systemAdapter->getReferer());
+        }
+
         $transport = null !== $calendarEventsJourneyModel->findByPk($objEvent->journey) ? $calendarEventsJourneyModel->findByPk($objEvent->journey)->title : 'keine Angabe';
         $objPhpWord->replace('eventTransport', $this->prepareString($transport));
         $objPhpWord->replace('eventCanceled', EventState::STATE_CANCELED === $objEvent->eventState || EventExecutionState::STATE_CANCELED === $objEvent->executionState ? 'Ja' : 'Nein');
@@ -193,7 +201,7 @@ class Event
         $objPhpWord->replace('avalancheConditions', $this->prepareString($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->tourAvalancheConditions][0]));
         $objPhpWord->replace('specialIncidents', $this->prepareString($objEvent->tourSpecialIncidents));
 
-        $arrFields = ['sleepingTaxes', 'sleepingTaxesText', 'miscTaxes', 'miscTaxesText', 'railwTaxes', 'railwTaxesText', 'cabelCarTaxes', 'cabelCarTaxesText', 'roadTaxes', 'carTaxesKm', 'countCars', 'phoneTaxes'];
+        $arrFields = ['sleepingTaxes', 'sleepingTaxesText', 'miscTaxes', 'miscTaxesText', 'privateArrival', 'railwTaxes', 'railwTaxesText', 'cabelCarTaxes', 'cabelCarTaxesText', 'roadTaxes', 'carTaxesKm', 'countCars', 'phoneTaxes'];
 
         foreach ($arrFields as $field) {
             $objPhpWord->replace($field, $this->prepareString($objEventInvoice->{$field}));
@@ -207,7 +215,11 @@ class Event
 
             if ($objEventMember->numRows) {
                 // ((CHF 0.60 x AnzKm + Park-/Strassen-/Tunnelgebühren) x AnzAutos) : AnzPersonen
-                $carTaxes = (0.6 * $objEventInvoice->carTaxesKm + $objEventInvoice->roadTaxes) * $objEventInvoice->countCars / $countParticipantsTotal;
+                $carTaxes = (0.6 * $objEventInvoice->carTaxesKm + $objEventInvoice->roadTaxes) * $objEventInvoice->countCars;
+
+                if ($countParticipantsTotal - $objEventInvoice->privateArrival > 0) {
+                    $carTaxes = $carTaxes / ($countParticipantsTotal - $objEventInvoice->privateArrival);
+                }
             }
         }
 

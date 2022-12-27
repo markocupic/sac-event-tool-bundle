@@ -59,10 +59,13 @@ class EventRapport2Docx
         // Set adapters
         /** @var CalendarEventsModel CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+
         /** @var UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
+
         /** @var Message $messageAdapter */
         $messageAdapter = $this->framework->getAdapter(Message::class);
+
         /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 

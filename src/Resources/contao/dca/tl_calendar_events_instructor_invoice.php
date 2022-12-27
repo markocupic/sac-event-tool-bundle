@@ -85,10 +85,17 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
         ],
     ],
     'palettes' => [
-        'default' => 'userPid;{event_legend},eventDuration;{expenses_legend},sleepingTaxes,sleepingTaxesText,miscTaxes,miscTaxesText;{transport_legend},railwTaxes,railwTaxesText,cabelCarTaxes,cabelCarTaxesText,roadTaxes,carTaxesKm,countCars;{phone_costs_legend},phoneTaxes;{iban_legend},iban;{notice_legend},notice',
+        'default' => '
+        userPid;
+        {event_legend},eventDuration;
+        {expenses_legend},sleepingTaxes,sleepingTaxesText,miscTaxes,miscTaxesText;
+        {transport_legend},privateArrival,railwTaxes,railwTaxesText,cabelCarTaxes,cabelCarTaxesText,roadTaxes,carTaxesKm,countCars;
+        {phone_costs_legend},phoneTaxes;
+        {iban_legend},iban;
+        {notice_legend},notice
+        ',
     ],
-
-    'fields' => [
+    'fields'   => [
         'id'                => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
@@ -147,6 +154,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
             'inputType' => 'text',
             'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
             'sql'       => "varchar(255) NOT NULL default ''",
+        ],
+        'privateArrival'    => [
+            'exclude'   => true,
+            'inputType' => 'select',
+            'options'   => range(0, 20),
+            'eval'      => ['multiple' => false, 'mandatory' => true, 'tl_class' => 'clr m12'],
+            'sql'       => "int(10) unsigned NOT NULL default '0'",
         ],
         'railwTaxes'        => [
             'exclude'   => true,

@@ -53,7 +53,7 @@ services:
         public: true
         arguments:
             - '@contao.framework'
-            - '%kernel.project_dir%'
+            - '@translator'
 
     # Generate docx/pdf event rapports, event invoices and event memberlists from docx templates
     Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember:

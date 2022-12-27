@@ -25,7 +25,9 @@ use Contao\System;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx;
+use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
@@ -42,6 +44,7 @@ class CalendarEventsInstructorInvoice
     private TranslatorInterface $translator;
     private Security $security;
     private EventRapport2Docx $eventRapport2Docx;
+    private EventMember $eventMember;
     private string $eventTemplateTourInvoice;
     private string $eventTemplateTourRapport;
     private string $eventTourInvoiceFileNamePattern;
@@ -50,7 +53,7 @@ class CalendarEventsInstructorInvoice
     /**
      * Import the back end user object.
      */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, EventRapport2Docx $eventRapport2Docx, string $eventTemplateTourInvoice, string $eventTemplateTourRapport, string $eventTourInvoiceFileNamePattern, string $eventTourRapportFileNamePattern)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, EventRapport2Docx $eventRapport2Docx, EventMember $eventMember, string $eventTemplateTourInvoice, string $eventTemplateTourRapport, string $eventTourInvoiceFileNamePattern, string $eventTourRapportFileNamePattern)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
@@ -59,6 +62,7 @@ class CalendarEventsInstructorInvoice
         $this->translator = $translator;
         $this->security = $security;
         $this->eventRapport2Docx = $eventRapport2Docx;
+        $this->eventMember = $eventMember;
         $this->eventTemplateTourInvoice = $eventTemplateTourInvoice;
         $this->eventTemplateTourRapport = $eventTemplateTourRapport;
         $this->eventTourInvoiceFileNamePattern = $eventTourInvoiceFileNamePattern;
@@ -235,6 +239,46 @@ class CalendarEventsInstructorInvoice
             }
         }
 
+        return $value;
+    }
+
+    /**
+     * @throws \Exception
+     * @Callback(table="tl_calendar_events_instructor_invoice", target="fields.privateArrival.save")
+     */
+    public function validatePrivateArrival(int $value, DataContainer $dc): int
+    {
+        if (!$dc->id || !$dc->activeRecord) {
+            return $value;
+        }
+
+        $objEvent = CalendarEventsModel::findByPk($dc->activeRecord->pid);
+
+        if (null === $objEvent) {
+            return $value;
+        }
+
+        $objEventMember = $this->eventMember->getParticipatedEventMembers($objEvent);
+
+        if (null === $objEventMember) {
+            return $value;
+        }
+
+        $countParticipants = $objEventMember->count();
+
+        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+
+        // Count instructors
+        $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent, false);
+        $countInstructors = \count($arrInstructors);
+
+        $countParticipantsTotal = $countParticipants + $countInstructors;
+
+        if ($countParticipantsTotal < (int) $value) {
+            throw new \Exception($this->translator->trans('ERR.invalidNumberOfPrivateArrivals', [$value, $countParticipantsTotal], 'contao_default'));
+        }
+
+        // Return the processed value
         return $value;
     }
 }
