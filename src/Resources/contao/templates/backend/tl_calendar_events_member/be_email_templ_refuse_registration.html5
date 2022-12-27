@@ -12,7 +12,7 @@ Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte:
 <?= $this->instructorEmail ?>
 
 
-Freundliche Grüsse
+Beste Grüsse
 
 <?= $this->instructorName ?>
 
