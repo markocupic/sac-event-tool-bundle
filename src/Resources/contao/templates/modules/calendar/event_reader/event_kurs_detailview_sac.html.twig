@@ -108,7 +108,7 @@
                     {% endif %}
 
                     {% if getEventData.invoke('generateMainInstructorContactDataFromDb') %}
-                        <p class="m-0">{{ getEventData.invoke('mainInstructorContactDataFromDb') }}</p>
+                        <p class="m-0">{{ getEventData.invoke('mainInstructorContactDataFromDb')|raw }}</p>
                     {% endif %}
 
                     {# button bar #}

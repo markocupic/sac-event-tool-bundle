@@ -124,7 +124,7 @@
                     <p>{% if getEventData.invoke('disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>
 
                     {% if not getEventData.invoke('bookingEvent') is empty %}
-                        <p class="mt-3">{{ getEventData.invoke('bookingEvent') }}</p>
+                        <p class="mt-3">{{ getEventData.invoke('bookingEvent')|nl2br }}</p>
                     {% endif %}
 
                     {% if getEventData.invoke('generateMainInstructorContactDataFromDb') %}
