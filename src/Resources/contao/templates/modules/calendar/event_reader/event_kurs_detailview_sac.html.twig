@@ -36,8 +36,13 @@
                 {% endif %}
 
                 <div class="eventdate event-detail event-info-box icon-box-small">
-                    <h5>Kursdaten</h5>
-                    <p>{{ getEventData.invoke('eventPeriodLg')|raw }}</p>
+                    <h5>Kursdaten/Dauer</h5>
+                    <p>
+                        {{ getEventData.invoke('eventPeriodLg')|raw }} 
+                        {% if not getEventData.invoke('eventDuration') is empty %}
+                            <small>({{ getEventData.invoke('eventDuration') }})</small>
+                        {% endif %}                    
+                    </p>
                 </div>
 
                 <div class="organizers event-detail event-info-box icon-box-small">
