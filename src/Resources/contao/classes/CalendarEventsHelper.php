@@ -674,7 +674,7 @@ class CalendarEventsHelper
         }
 
         if ($blnTooltip) {
-            return Date::parse($dateFormat, self::getStartDate($objEvent)).($blnAppendEventDuration ? ' ('.self::getEventDuration($objEvent).')' : '').(!$blnInline ? '<br>' : ' ').'<a tabindex="0" class="more-date-infos" data-bs-toggle="tooltip" data-placement="bottom" title="Eventdaten: '.implode(', ', $arrDates).'">und weitere</a>';
+            return Date::parse($dateFormat, self::getStartDate($objEvent)).($blnAppendEventDuration ? ' ('.self::getEventDuration($objEvent).')' : '').(!$blnInline ? '<br>' : ' ').'<a tabindex="0" class="more-date-infos" data-bs-toggle="tooltip" data-placement="bottom" data-bs-title="Eventdaten: '.implode(', ', $arrDates).'">und weitere</a>';
         }
 
         $dateString = '';
@@ -874,8 +874,6 @@ class CalendarEventsHelper
         }
         // There is no booking limit. Show registered members
         return sprintf($strBadge, 'dark', $memberCount.' bestätigte Plätze', $memberCount.'/?');
-
-        return '';
     }
 
     public static function getEventStateOfSubscriptionBadgesString(CalendarEventsModel $objEvent): string
