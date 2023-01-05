@@ -15,15 +15,17 @@ declare(strict_types=1);
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\ContaoBackendMaintainance\MaintainBackendUser;
-use Markocupic\SacEventToolBundle\Cron\Contao\DailyCron;
-use Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron;
 
 $projectDir = System::getContainer()->getParameter('kernel.project_dir');
 
-// Add notification center configs
+/**
+ * Add notification center configs
+ */
 require_once $projectDir.'/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/config/notification_center_config.php';
 
-// include custom functions
+/**
+ * Include custom functions
+ */
 require_once $projectDir.'/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/functions/functions.php';
 
 /*
@@ -31,45 +33,45 @@ require_once $projectDir.'/vendor/markocupic/sac-event-tool-bundle/src/Resources
  */
 $GLOBALS['BE_MOD']['content']['calendar']['tables'] = ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'];
 $GLOBALS['BE_MOD']['sac_be_modules'] = [
-    'sac_section_tool' => [
+    'sac_section_tool'           => [
         'tables' => ['tl_sac_section'],
     ],
-    'sac_calendar_events_tool' => [
+    'sac_calendar_events_tool'   => [
         'tables' => ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'],
-        'table' => ['TableWizard', 'importTable'],
-        'list' => ['ListWizard', 'importList'],
+        'table'  => ['TableWizard', 'importTable'],
+        'list'   => ['ListWizard', 'importList'],
     ],
     'sac_course_main_types_tool' => [
         'tables' => ['tl_course_main_type'],
     ],
-    'sac_course_sub_types_tool' => [
+    'sac_course_sub_types_tool'  => [
         'tables' => ['tl_course_sub_type'],
     ],
-    'sac_event_type_tool' => [
+    'sac_event_type_tool'        => [
         'tables' => ['tl_event_type'],
     ],
-    'sac_tour_difficulty_tool' => [
+    'sac_tour_difficulty_tool'   => [
         'tables' => ['tl_tour_difficulty_category', 'tl_tour_difficulty'],
-        'table' => ['TableWizard', 'importTable'],
-        'list' => ['ListWizard', 'importList'],
+        'table'  => ['TableWizard', 'importTable'],
+        'list'   => ['ListWizard', 'importList'],
     ],
-    'sac_tour_type_tool' => [
+    'sac_tour_type_tool'         => [
         'tables' => ['tl_tour_type'],
     ],
-    'sac_event_release_tool' => [
+    'sac_event_release_tool'     => [
         'tables' => ['tl_event_release_level_policy_package', 'tl_event_release_level_policy'],
-        'table' => ['TableWizard', 'importTable'],
-        'list' => ['ListWizard', 'importList'],
+        'table'  => ['TableWizard', 'importTable'],
+        'list'   => ['ListWizard', 'importList'],
     ],
-    'sac_event_organizer_tool' => [
+    'sac_event_organizer_tool'   => [
         'tables' => ['tl_event_organizer'],
-        'table' => ['TableWizard', 'importTable'],
-        'list' => ['ListWizard', 'importList'],
+        'table'  => ['TableWizard', 'importTable'],
+        'list'   => ['ListWizard', 'importList'],
     ],
-    'sac_event_journey_tool' => [
+    'sac_event_journey_tool'     => [
         'tables' => ['tl_calendar_events_journey'],
     ],
-    'sac_user_role_tool' => [
+    'sac_user_role_tool'         => [
         'tables' => ['tl_user_role'],
     ],
 ];
@@ -98,12 +100,6 @@ $GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = [
     'eventToolCalendarEventPreviewReader' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader',
 ];
 
-/*
- * Cron jobs
- */
-$GLOBALS['TL_CRON']['daily']['SAC_EVT_DAILY'] = [DailyCron::class, 'dailyCron'];
-$GLOBALS['TL_CRON']['hourly']['SAC_EVT_HOURLY'] = [HourlyCron::class, 'hourlyCron'];
-
 // TL_CONFIG
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'] = [
     'course',
@@ -112,7 +108,9 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'] = [
     'generalEvent',
 ];
 
-// Event member subscription state !Please do not change these settings because the states are hardcoded
+/**
+ * Event member subscription state !Please do not change these settings because the states are hardcoded
+ */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'] = [
     EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED,
     EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED,
@@ -121,7 +119,9 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'] = [
     EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED,
 ];
 
-// Avalanche levels
+/**
+ * Avalanche levels
+ */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'] = [
     'avalanche_level_0',
     'avalanche_level_1',
@@ -131,7 +131,9 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL']
     'avalanche_level_5',
 ];
 
-// Tourguide qualifications
+/**
+ * Tourguide qualifications
+ */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = [
     1 => 'Tourenleiter/in SAC',
     2 => 'Bergführer/in IVBV',
@@ -143,24 +145,28 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = [
     8 => 'IGKA Instruktor/in',
 ];
 
-// Backend user rescission/retirement cause
+/**
+ * Backend user rescission/retirement cause
+ */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'] = [
     'deceased', // verstorben
     'recission', // Rücktritt
     'leaving', // Austritt
 ];
 
-// Course levels
+/**
+ * Course levels
+ */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = [
-    1 => '1',
-    2 => '2',
-    3 => '3',
-    4 => '4',
-    5 => '5',
-    6 => '1 - 2',
-    7 => '1 - 3',
-    8 => '1 - 4',
-    9 => '1 - 5',
+    1  => '1',
+    2  => '2',
+    3  => '3',
+    4  => '4',
+    5  => '5',
+    6  => '1 - 2',
+    7  => '1 - 3',
+    8  => '1 - 4',
+    9  => '1 - 5',
     10 => '2 - 3',
     11 => '2 - 4',
     12 => '2 - 5',
@@ -169,56 +175,60 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = [
     15 => '4 - 5',
 ];
 
-// Event durations
+/**
+ * Event durations
+ */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'] = [
-    'ca. 1 h' => ['dateRows' => 1],
-    'ca. 2 h' => ['dateRows' => 1],
-    'ca. 3 h' => ['dateRows' => 1],
-    'ca. 4 h' => ['dateRows' => 1],
-    'ca. 5 h' => ['dateRows' => 1],
-    'ca. 6 h' => ['dateRows' => 1],
-    'ca. 7 h' => ['dateRows' => 1],
-    'ca. 8 h' => ['dateRows' => 1],
-    'ca. 9 h' => ['dateRows' => 1],
-    '1/2 Tag' => ['dateRows' => 1],
-    '1 Tag' => ['dateRows' => 1],
-    '1 1/2 Tage' => ['dateRows' => 2],
-    '2 Tage' => ['dateRows' => 2],
-    '2 1/2 Tage' => ['dateRows' => 3],
-    '3 Tage' => ['dateRows' => 3],
-    '3 1/2 Tage' => ['dateRows' => 4],
-    '4 Tage' => ['dateRows' => 4],
-    '4 1/2 Tage' => ['dateRows' => 5],
-    '5 Tage' => ['dateRows' => 5],
-    '5 1/2 Tage' => ['dateRows' => 6],
-    '6 Tage' => ['dateRows' => 6],
-    '6 1/2 Tage' => ['dateRows' => 7],
-    '7 Tage' => ['dateRows' => 7],
-    '7 1/2 Tage' => ['dateRows' => 8],
-    '8 Tage' => ['dateRows' => 8],
-    '8 1/2 Tage' => ['dateRows' => 9],
-    '9 Tage' => ['dateRows' => 9],
-    '9 1/2 Tage' => ['dateRows' => 10],
-    '10 Tage' => ['dateRows' => 10],
-    '10 1/2 Tage' => ['dateRows' => 11],
-    '11 Tage' => ['dateRows' => 11],
-    '11 1/2 Tage' => ['dateRows' => 12],
-    '12 Tage' => ['dateRows' => 12],
-    '12 1/2 Tage' => ['dateRows' => 13],
-    '13 Tage' => ['dateRows' => 13],
-    '13 1/2 Tage' => ['dateRows' => 14],
-    '14 Tage' => ['dateRows' => 14],
-    '1 Abend' => ['dateRows' => 1],
-    '2 Abende' => ['dateRows' => 2],
-    '3 Abende' => ['dateRows' => 3],
-    '4 Abende' => ['dateRows' => 4],
-    '5 Abende' => ['dateRows' => 5],
-    '6 Abende' => ['dateRows' => 6],
-    '7 Abende' => ['dateRows' => 7],
+    'ca. 1 h'           => ['dateRows' => 1],
+    'ca. 2 h'           => ['dateRows' => 1],
+    'ca. 3 h'           => ['dateRows' => 1],
+    'ca. 4 h'           => ['dateRows' => 1],
+    'ca. 5 h'           => ['dateRows' => 1],
+    'ca. 6 h'           => ['dateRows' => 1],
+    'ca. 7 h'           => ['dateRows' => 1],
+    'ca. 8 h'           => ['dateRows' => 1],
+    'ca. 9 h'           => ['dateRows' => 1],
+    '1/2 Tag'           => ['dateRows' => 1],
+    '1 Tag'             => ['dateRows' => 1],
+    '1 1/2 Tage'        => ['dateRows' => 2],
+    '2 Tage'            => ['dateRows' => 2],
+    '2 1/2 Tage'        => ['dateRows' => 3],
+    '3 Tage'            => ['dateRows' => 3],
+    '3 1/2 Tage'        => ['dateRows' => 4],
+    '4 Tage'            => ['dateRows' => 4],
+    '4 1/2 Tage'        => ['dateRows' => 5],
+    '5 Tage'            => ['dateRows' => 5],
+    '5 1/2 Tage'        => ['dateRows' => 6],
+    '6 Tage'            => ['dateRows' => 6],
+    '6 1/2 Tage'        => ['dateRows' => 7],
+    '7 Tage'            => ['dateRows' => 7],
+    '7 1/2 Tage'        => ['dateRows' => 8],
+    '8 Tage'            => ['dateRows' => 8],
+    '8 1/2 Tage'        => ['dateRows' => 9],
+    '9 Tage'            => ['dateRows' => 9],
+    '9 1/2 Tage'        => ['dateRows' => 10],
+    '10 Tage'           => ['dateRows' => 10],
+    '10 1/2 Tage'       => ['dateRows' => 11],
+    '11 Tage'           => ['dateRows' => 11],
+    '11 1/2 Tage'       => ['dateRows' => 12],
+    '12 Tage'           => ['dateRows' => 12],
+    '12 1/2 Tage'       => ['dateRows' => 13],
+    '13 Tage'           => ['dateRows' => 13],
+    '13 1/2 Tage'       => ['dateRows' => 14],
+    '14 Tage'           => ['dateRows' => 14],
+    '1 Abend'           => ['dateRows' => 1],
+    '2 Abende'          => ['dateRows' => 2],
+    '3 Abende'          => ['dateRows' => 3],
+    '4 Abende'          => ['dateRows' => 4],
+    '5 Abende'          => ['dateRows' => 5],
+    '6 Abende'          => ['dateRows' => 6],
+    '7 Abende'          => ['dateRows' => 7],
     '1 Abend und 1 Tag' => ['dateRows' => 2],
 ];
 
-// Car seats info: We use that in the event registration form
+/**
+ * Car seats info: We use that in the event registration form
+ */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'] = [
     'kein Auto',
     '2',
@@ -231,7 +241,9 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'] = [
     '9',
 ];
 
-// Ticket info: We use that in the event registration form.
+/**
+ * Ticket info: We use that in the event registration form.
+ */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = [
     'Nichts',
     'GA',
