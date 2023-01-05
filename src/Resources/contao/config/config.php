@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -15,14 +15,10 @@ declare(strict_types=1);
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\ContaoBackendMaintainance\MaintainBackendUser;
-use Markocupic\SacEventToolBundle\ContaoScope\ContaoScope;
 use Markocupic\SacEventToolBundle\Cron\Contao\DailyCron;
 use Markocupic\SacEventToolBundle\Cron\Contao\HourlyCron;
 
 $projectDir = System::getContainer()->getParameter('kernel.project_dir');
-
-/** @var ContaoScope $contaoScope */
-$contaoScope = System::getContainer()->get('Markocupic\SacEventToolBundle\ContaoScope\ContaoScope');
 
 // Add notification center configs
 require_once $projectDir.'/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/config/notification_center_config.php';
@@ -30,14 +26,9 @@ require_once $projectDir.'/vendor/markocupic/sac-event-tool-bundle/src/Resources
 // include custom functions
 require_once $projectDir.'/vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/functions/functions.php';
 
-if ($contaoScope->isBackend()) {
-    // Add Backend CSS
-    $GLOBALS['TL_CSS'][] = 'bundles/markocupicsaceventtool/css/be_stylesheet.css|static';
-
-    // Add Backend javascript
-    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/backend_edit_all_navbar_helper.js';
-}
-
+/*
+ * Contao backend modules
+ */
 $GLOBALS['BE_MOD']['content']['calendar']['tables'] = ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'];
 $GLOBALS['BE_MOD']['sac_be_modules'] = [
     'sac_section_tool' => [
@@ -84,8 +75,8 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
 ];
 
 /*
- * Backend maintenance: Clear backend user rights,
- * who inherit group rights from tl_user_group
+ * Backend maintenance: Clear backend user permissions,
+ * who inherit group permissions from tl_user_group
  * and tl_user-admin = ''
  * and tl_user.inherit = 'extend'
  */
@@ -93,15 +84,25 @@ $GLOBALS['TL_PURGE']['custom']['reset_backend_user_rights'] = [
     'callback' => [MaintainBackendUser::class, 'resetBackendUserRights'],
 ];
 
-// Add permissions
+/*
+ * Contao backend permissions
+ */
 $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containers';
 $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
 
-// Frontend Modules Contao 4 style
-// Contao 5 ready fe modules are registered in controller-frontend-module.yml
+/*
+ * Legacy Contao frontend modules
+ * Contao 5 ready fe modules are registered in controller-frontend-module.yml
+ */
 $GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = [
     'eventToolCalendarEventPreviewReader' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader',
 ];
+
+/*
+ * Cron jobs
+ */
+$GLOBALS['TL_CRON']['daily']['SAC_EVT_DAILY'] = [DailyCron::class, 'dailyCron'];
+$GLOBALS['TL_CRON']['hourly']['SAC_EVT_HOURLY'] = [HourlyCron::class, 'hourlyCron'];
 
 // TL_CONFIG
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'] = [
@@ -120,7 +121,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'] = [
     EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED,
 ];
 
-// Backend user roles
+// Avalanche levels
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL'] = [
     'avalanche_level_0',
     'avalanche_level_1',
@@ -130,7 +131,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL']
     'avalanche_level_5',
 ];
 
-// Guide qualifications
+// Tourguide qualifications
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = [
     1 => 'Tourenleiter/in SAC',
     2 => 'Bergführer/in IVBV',
@@ -142,13 +143,14 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = [
     8 => 'IGKA Instruktor/in',
 ];
 
+// Backend user rescission/retirement cause
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'] = [
     'deceased', // verstorben
     'recission', // Rücktritt
     'leaving', // Austritt
 ];
 
-// TL_CONFIG
+// Course levels
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = [
     1 => '1',
     2 => '2',
@@ -167,6 +169,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'] = [
     15 => '4 - 5',
 ];
 
+// Event durations
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'] = [
     'ca. 1 h' => ['dateRows' => 1],
     'ca. 2 h' => ['dateRows' => 1],
@@ -215,7 +218,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'] = [
     '1 Abend und 1 Tag' => ['dateRows' => 2],
 ];
 
-// Car seats info used in the event registration form
+// Car seats info: We use that in the event registration form
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'] = [
     'kein Auto',
     '2',
@@ -228,13 +231,9 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'] = [
     '9',
 ];
 
-// Ticket info used in the event registration form
+// Ticket info: We use that in the event registration form.
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'] = [
     'Nichts',
     'GA',
     'Halbtax-Abo',
 ];
-
-/* Cron jobs */
-$GLOBALS['TL_CRON']['daily']['SAC_EVT_DAILY'] = [DailyCron::class, 'dailyCron'];
-$GLOBALS['TL_CRON']['hourly']['SAC_EVT_HOURLY'] = [HourlyCron::class, 'hourlyCron'];
