@@ -1,52 +1,54 @@
 {
-  "name": "markocupic/sac-event-tool-bundle",
-  "type": "contao-bundle",
-  "description": "Contao 4 Event tool bundle for SAC (Swiss Alpine Club Sections)",
-  "license": "GPL-3.0-or-later",
-  "authors": [
-    {
-      "name": "Marko Cupic",
-      "homepage": "https://github.com/markocupic"
-    }
-  ],
-  "require": {
-    "php": "^8.1",
-    "ext-pdo": "*",
-    "contao/core-bundle": "^4.13",
-    "terminal42/notification_center": "^1.6",
-    "markocupic/notification-center-default-email-bundle": "^1.0",
-    "menatwork/contao-multicolumnwizard-bundle": "^3.5",
-    "codefog/contao-haste": "^4.25",
-    "eluceo/ical": "^2.5",
-    "league/csv": "^9.7",
-    "tecnickcom/tcpdf": "^6.4",
-    "ramsey/uuid": "^3.8|^4.3",
-    "chillerlan/php-qrcode": "^4.3",
-    "terminal42/contao-fineuploader": "^3.2",
-    "markocupic/phpoffice-bundle": "^1.2",
-    "markocupic/cloudconvert-bundle": "^2.0",
-    "markocupic/contao-component-vue-js": "^2.6",
-    "markocupic/contao-utf8-arrows-insert-tag-bundle": "^1.0",
-    "markocupic/rss-feed-generator-bundle": "^1.1",
-    "markocupic/zip-bundle": "^1.0"
-  },
-  "require-dev": {
-    "contao/easy-coding-standard": "^5.0",
-    "contao/manager-bundle": "^4.13",
-    "contao/manager-plugin": "^2.3.1",
-    "contao/test-case": "^4.6",
-    "phpunit/phpunit": "^9.3",
-    "symfony/phpunit-bridge": "^5.4"
-  },
-  "autoload": {
-    "psr-4": {
-      "Markocupic\\SacEventToolBundle\\": "src/"
+    "name": "markocupic/sac-event-tool-bundle",
+    "type": "contao-bundle",
+    "description": "Contao 4 Event tool bundle for SAC (Swiss Alpine Club Sections)",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Marko Cupic",
+            "homepage": "https://github.com/markocupic"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-pdo": "*",
+        "contao/core-bundle": "^4.13",
+        "contao/calendar-bundle": "^4.13",
+        "chillerlan/php-qrcode": "^4.3",
+        "codefog/contao-haste": "^4.25",
+        "eluceo/ical": "^2.5",
+        "league/csv": "^9.7",
+        "markocupic/cloudconvert-bundle": "^2.0",
+        "markocupic/contao-component-vue-js": "^2.6",
+        "markocupic/contao-utf8-arrows-insert-tag-bundle": "^1.0",
+        "markocupic/notification-center-default-email-bundle": "^1.0",
+        "markocupic/phpoffice-bundle": "^1.2",
+        "markocupic/rss-feed-generator-bundle": "^1.1",
+        "markocupic/zip-bundle": "^1.0",
+        "menatwork/contao-multicolumnwizard-bundle": "^3.5",
+        "ramsey/uuid": "^3.8|^4.3",
+        "symfony/stopwatch": "*",
+        "tecnickcom/tcpdf": "^6.4",
+        "terminal42/contao-fineuploader": "^3.2",
+        "terminal42/notification_center": "^1.6"
     },
-    "classmap": [
-      "src/Resources/contao"
-    ]
-  },
-  "extra": {
-    "contao-manager-plugin": "Markocupic\\SacEventToolBundle\\ContaoManager\\Plugin"
-  }
+    "require-dev": {
+        "contao/easy-coding-standard": "^5.0",
+        "contao/manager-bundle": "^4.13",
+        "contao/manager-plugin": "^2.3.1",
+        "contao/test-case": "^4.6",
+        "phpunit/phpunit": "^9.3",
+        "symfony/phpunit-bridge": "^5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Markocupic\\SacEventToolBundle\\": "src/"
+        },
+        "classmap": [
+            "src/Resources/contao"
+        ]
+    },
+    "extra": {
+        "contao-manager-plugin": "Markocupic\\SacEventToolBundle\\ContaoManager\\Plugin"
+    }
 }
