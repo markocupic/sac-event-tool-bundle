@@ -1,0 +1,22 @@
+services:
+    # Register backend assets
+    Markocupic\SacEventToolBundle\EventSubscriber\BackendAssetsSubscriber:
+        public: true
+        arguments:
+            - '@contao.routing.scope_matcher'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    Markocupic\SacEventToolBundle\EventSubscriber\NotifyOnEventRegistration:
+        arguments:
+            - '%sacevt.locale%'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    Markocupic\SacEventToolBundle\EventSubscriber\PreSingleSignOnLoginSubscriber:
+        arguments:
+            - '@database_connection'
+            - '@Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserRights'
+            - '%sacevt.user.backend.reset_user_rights_on_sso_login%'
+        tags:
+            - { name: kernel.event_subscriber }

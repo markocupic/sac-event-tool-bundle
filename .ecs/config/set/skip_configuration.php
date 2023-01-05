@@ -10,14 +10,10 @@ return function (ECSConfig $ECSConfig): void {
     $parameters = $ECSConfig->parameters();
     $ECSConfig->parallel();
 
-
-
     $parameters->set(Option::SKIP, [
-        '*/Resources/contao/dca/*',
-
+        '*/contao/*',
         MethodChainingIndentationFixer::class => [
             '*/DependencyInjection/Configuration.php',
         ],
-
     ]);
 };

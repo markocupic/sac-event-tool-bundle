@@ -49,8 +49,8 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('avatar')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('female')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/avatars/avatar-default-female.png')->end()
-                        ->scalarNode('male')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/avatars/avatar-default-male.png')->end()
+                        ->scalarNode('female')->defaultValue('vendor/markocupic/sac-event-tool-bundle/public/images/avatars/avatar-default-female.png')->end()
+                        ->scalarNode('male')->defaultValue('vendor/markocupic/sac-event-tool-bundle/public/images/avatars/avatar-default-male.png')->end()
                     ->end()
                 ->end()
                 // Backend and frontend users
@@ -80,22 +80,22 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('course')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->scalarNode('booklet_cover_image')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/cover.jpg')->end()
+                                ->scalarNode('booklet_cover_image')->defaultValue('vendor/markocupic/sac-event-tool-bundle/public/images/events/course/booklet/cover.jpg')->end()
                                 ->scalarNode('booklet_filename_pattern')->defaultValue('Kursprogramm_%%s.pdf')->end()
-                                ->scalarNode('fallback_image')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/fallback_image.svg')->end()
+                                ->scalarNode('fallback_image')->defaultValue('vendor/markocupic/sac-event-tool-bundle/public/images/events/course/fallback_image.svg')->end()
                             ->end()
                         ->end()
                         ->arrayNode('template')
                             ->addDefaultsIfNotSet()
                             ->children()
                                 // Event member list docx template
-                                ->scalarNode('member_list')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/docx/event_memberlist.docx')->end()
+                                ->scalarNode('member_list')->defaultValue('vendor/markocupic/sac-event-tool-bundle/contao/templates/docx/event_memberlist.docx')->end()
                                 // Event tour invoice docx template
-                                ->scalarNode('tour_invoice')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/docx/event_invoice_tour.docx')->end()
+                                ->scalarNode('tour_invoice')->defaultValue('vendor/markocupic/sac-event-tool-bundle/contao/templates/docx/event_invoice_tour.docx')->end()
                                 // Event tour rapport docx template
-                                ->scalarNode('tour_rapport')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/docx/event_rapport_tour.docx')->end()
+                                ->scalarNode('tour_rapport')->defaultValue('vendor/markocupic/sac-event-tool-bundle/contao/templates/docx/event_rapport_tour.docx')->end()
                                 // Event course confirmation docx template
-                                ->scalarNode('course_confirmation')->defaultValue('vendor/markocupic/sac-event-tool-bundle/src/Resources/contao/templates/docx/course_confirmation.docx')->end()
+                                ->scalarNode('course_confirmation')->defaultValue('vendor/markocupic/sac-event-tool-bundle/contao/templates/docx/course_confirmation.docx')->end()
                             ->end()
                         ->end()
                         // Member list file name pattern

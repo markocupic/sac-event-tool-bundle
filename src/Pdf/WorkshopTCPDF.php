@@ -35,12 +35,12 @@ class WorkshopTCPDF extends \TCPDF
         if ('cover' === $this->type) {
             $this->backgroundImage = System::getContainer()->getParameter('sacevt.event.course.booklet_cover_image');
         } elseif ('TOC' === $this->type) {
-            $this->backgroundImage = 'vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/toc.jpg';
-            $this->backgroundImageBottom = 'vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/background.png';
+            $this->backgroundImage = 'vendor/markocupic/sac-event-tool-bundle/public/images/events/course/booklet/toc.jpg';
+            $this->backgroundImageBottom = 'vendor/markocupic/sac-event-tool-bundle/public/images/events/course/booklet/background.png';
         } elseif ('eventPage' === $this->type) {
             // default
-            $this->backgroundImage = 'vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/fallback.jpg';
-            $this->backgroundImageBottom = 'vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/background.png';
+            $this->backgroundImage = 'vendor/markocupic/sac-event-tool-bundle/public/images/events/course/booklet/fallback.jpg';
+            $this->backgroundImageBottom = 'vendor/markocupic/sac-event-tool-bundle/public/images/events/course/booklet/background.png';
 
             // set background image
             if ('' !== $this->objEvent->singleSRCBroschuere) {
@@ -51,7 +51,7 @@ class WorkshopTCPDF extends \TCPDF
                 }
             }
         } else {
-            $this->backgroundImage = 'vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/fallback.jpg';
+            $this->backgroundImage = 'vendor/markocupic/sac-event-tool-bundle/public/images/events/course/booklet/fallback.jpg';
         }
 
         // set the starting point for the page content
@@ -96,7 +96,7 @@ class WorkshopTCPDF extends \TCPDF
         }
 
         // logo
-        $this->Image($rootDir.'/vendor/markocupic/sac-event-tool-bundle/src/Resources/public/images/events/course/booklet/logo_sac.png', 150, 5, 50, '', '', '', '', false, 300, '', false, false, 0);
+        $this->Image($rootDir.'/vendor/markocupic/sac-event-tool-bundle/public/images/events/course/booklet/logo_sac.png', 150, 5, 50, '', '', '', '', false, 300, '', false, false, 0);
 
         // Stripe bottom
         if ('eventPage' === $this->type) {

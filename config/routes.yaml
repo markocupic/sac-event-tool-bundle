@@ -1,0 +1,3 @@
+sac_event_tool:
+    resource: ../src/Controller
+    type: annotation
