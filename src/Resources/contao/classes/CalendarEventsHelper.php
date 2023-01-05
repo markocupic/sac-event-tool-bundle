@@ -367,7 +367,7 @@ class CalendarEventsHelper
                 $figureTag = '{{figure::'.$avatarManager->getAvatarResourcePath($objUser).'?size=18&metadata[title]='.StringUtil::specialchars($objUser->name).'&enableLightbox=0&options[attr][class]=avatar-large&template=image}}';
 
                 $strHtml .= '<div class="image_container portrait">';
-                $strHtml .= sprintf('<a href="%s?username=%s" title="Leiter Portrait ansehen">', $parser->replace('{{link_url::'.$userPortraitJumpTo.'}}'), UserModel::findByPk($userId)->username);
+                $strHtml .= sprintf('<a href="%s?username=%s" data-title="Leiter Portrait ansehen">', $parser->replace('{{link_url::'.$userPortraitJumpTo.'}}'), UserModel::findByPk($userId)->username);
                 $strHtml .= $parser->replace($figureTag);
                 $strHtml .= '</a></div>';
                 // End image
@@ -382,7 +382,7 @@ class CalendarEventsHelper
 
                 if (!$objUser->hideInFrontendListings) {
                     $parser = System::getContainer()->get('contao.insert_tag.parser');
-                    $strHtml .= sprintf('<a href="%s?username=%s" title="Leiter Portrait ansehen">', $parser->replace('{{link_url::'.$userPortraitJumpTo.'}}'), $objUser->username);
+                    $strHtml .= sprintf('<a href="%s?username=%s" data-title="Leiter Portrait ansehen">', $parser->replace('{{link_url::'.$userPortraitJumpTo.'}}'), $objUser->username);
                 }
 
                 $strHtml .= sprintf('%s %s%s', $objUser->lastname, $objUser->firstname, $strQuali);
@@ -399,7 +399,7 @@ class CalendarEventsHelper
                     foreach ($arrContact as $field) {
                         if ('' !== $objUser->{$field}) {
                             $strHtml .= sprintf('<div class="ce_user_portrait_%s">', $field);
-                            $strHtml .= sprintf('<small title="%s">%s</small>', $objUser->{$field}, $objUser->{$field});
+                            $strHtml .= sprintf('<small data-title="%s">%s</small>', $objUser->{$field}, $objUser->{$field});
                             $strHtml .= '</div>';
                         }
                     }
@@ -674,7 +674,7 @@ class CalendarEventsHelper
         }
 
         if ($blnTooltip) {
-            return Date::parse($dateFormat, self::getStartDate($objEvent)).($blnAppendEventDuration ? ' ('.self::getEventDuration($objEvent).')' : '').(!$blnInline ? '<br>' : ' ').'<a tabindex="0" class="more-date-infos" data-bs-toggle="tooltip" data-placement="bottom" data-bs-title="Eventdaten: '.implode(', ', $arrDates).'">und weitere</a>';
+            return Date::parse($dateFormat, self::getStartDate($objEvent)).($blnAppendEventDuration ? ' ('.self::getEventDuration($objEvent).')' : '').(!$blnInline ? '<br>' : ' ').'<a tabindex="0" class="more-date-infos" data-bs-toggle="tooltip" data-placement="bottom" data-title="Eventdaten: '.implode(', ', $arrDates).'">und weitere</a>';
         }
 
         $dateString = '';
@@ -765,7 +765,7 @@ class CalendarEventsHelper
 
     public static function getPublicTransportBadge(CalendarEventsModel $objEvent): string
     {
-        return '<span class="badge badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" title="Anreise mit ÖV">ÖV</span>';
+        return '<span class="badge badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" data-title="Anreise mit ÖV">ÖV</span>';
     }
 
     public static function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false, bool $explanation = false): array
@@ -805,7 +805,7 @@ class CalendarEventsHelper
 
                 if ('' !== $strDiff) {
                     if ($tooltip) {
-                        $html = '<span class="badge badge-pill bg-primary" data-bs-toggle="tooltip" data-placement="top" title="Techn. Schwierigkeit: %s">%s</span>';
+                        $html = '<span class="badge badge-pill bg-primary" data-bs-toggle="tooltip" data-placement="top" data-title="Techn. Schwierigkeit: %s">%s</span>';
                         $arrReturn[] = sprintf($html, $strDiffTitle, $strDiff);
                     } elseif ($explanation) {
                         $arrReturn[] = $strDiff.' ('.$strDiffTitle.')';
@@ -831,7 +831,7 @@ class CalendarEventsHelper
 
                 if (null !== $objModel) {
                     if ($tooltip) {
-                        $html = '<span class="badge badge-pill bg-secondary" data-bs-toggle="tooltip" data-placement="top" title="Typ: %s">%s</span>';
+                        $html = '<span class="badge badge-pill bg-secondary" data-bs-toggle="tooltip" data-placement="top" data-title="Typ: %s">%s</span>';
                         $arrReturn[] = sprintf($html, $objModel->{'title'}, $objModel->{$field});
                     } else {
                         $arrReturn[] = $objModel->{$field};
@@ -845,7 +845,7 @@ class CalendarEventsHelper
 
     public static function getBookingCounter(CalendarEventsModel $objEvent, bool $withoutTooltip = false): string
     {
-        $strBadge = '<span class="badge badge-pill bg-%s" data-bs-toggle="tooltip" data-placement="top" title="%s">%s</span>';
+        $strBadge = '<span class="badge badge-pill bg-%s" data-bs-toggle="tooltip" data-placement="top" data-title="%s">%s</span>';
 
         if ($withoutTooltip) {
             $strBadge = '%2$s (%3$s)'; // only text as output, e.g. 'noch 1 freie Plätze (5/6)`
@@ -914,23 +914,23 @@ class CalendarEventsHelper
             $href = sprintf("'contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s'", $objEvent->id, REQUEST_TOKEN, $refererId);
 
             if ($intNotConfirmed > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge not-confirmed blink" title="%s unbeantwortete Anmeldeanfragen" role="button" onclick="window.location.href=%s">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge not-confirmed blink" data-title="%s unbeantwortete Anmeldeanfragen" role="button" onclick="window.location.href=%s">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
             }
 
             if ($intAccepted > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge accepted" title="%s bestätigte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intAccepted, $href, $intAccepted);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge accepted" data-title="%s bestätigte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intAccepted, $href, $intAccepted);
             }
 
             if ($intRefused > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge refused" title="%s abgelehnte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intRefused, $href, $intRefused);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge refused" data-title="%s abgelehnte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intRefused, $href, $intRefused);
             }
 
             if ($intWaitlisted > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge waitlisted" title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=%s">%s</span>', $intWaitlisted, $href, $intWaitlisted);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge waitlisted" data-title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=%s">%s</span>', $intWaitlisted, $href, $intWaitlisted);
             }
 
             if ($intUnsubscribedUser > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge unsubscribed-user" title="%s stornierte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge unsubscribed-user" data-title="%s stornierte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
             }
         }
 

@@ -41,7 +41,7 @@
 
                     <!-- row state icon -->
                     <div class="mt-1 title">
-                        <span data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:title="row.eventStateLabel">
+                        <span data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel">
                             <i class="event-state-icon fa-fw" v-bind:class="row.eventState"></i>
                         </span>
                         <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link font-weight-bold"><strong><% row.eventTitle %></strong></a>
@@ -52,7 +52,7 @@
                     <div class="d-flex">
                         <div class="me-2" v-if="row.bookingCounter" v-html="row.bookingCounter"></div>
                         <div class="me-2" v-if="row.suitableForBeginners">
-                                <span class="badge badge-pill bg-warning" data-bs-toggle="tooltip" data-placement="top" title="Für Einsteiger geeignet">
+                                <span class="badge badge-pill bg-warning" data-bs-toggle="tooltip" data-placement="top" data-title="Für Einsteiger geeignet">
                                     <i class="event-for-beginners"></i>
                                 </span>
                         </div>
@@ -141,73 +141,110 @@
         ],
         'callbacks': {
             'oninsert': async function (vue, json) {
-                // Wait still DOM is ready
-                await new Promise(resolve => setTimeout(resolve, 100));
 
-                // Cache the event list object in the localStorage
-                // before redirecting to the detail page
-                await new Promise((resolve, reject) => {
-                    let buttons = document.querySelectorAll(vue.elId + ' [data-has-event-href="true"]');
-                    buttons.forEach((button) => {
-                        button.addEventListener('click', (event) => {
-                            event.stopPropagation();
-                            event.preventDefault();
-                            let link = button.getAttribute('data-href');
+                // Async await stack with auto invocation (See: https://gist.github.com/markocupic/0f49df91b8968ef471b78865707a43d2)
+                (async () => {
 
-                            let eventBox = button.closest('.event-item');
-                            let eventId = eventBox.dataset.id;
+                    // Wait until DOM is ready
+                    await (() => {
+                        return new Promise(resolve => setTimeout(resolve, 100));
+                    })();
 
-                            let url = new URL(window.location.href);
-                            let urlParams = new URLSearchParams(url.search);
-                            let href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+                    await (() => {
+                        return new Promise((resolve, reject) => {
+                            let el = document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]');
+                            if (typeof el !== 'undefinded' && el.length > 0) {
+                                let i = 0;
 
-                            if (urlParams.has('itemId')) {
-                                urlParams.set('itemId', eventId);
-                            } else {
-                                urlParams.append('itemId', eventId);
+                                for (i = 0; i < el.length; ++i) {
+                                    let title = '';
+                                    // This is the default
+                                    // Because we don't want to loose the title-attribute when popper.js has beedn initialized.
+                                    if (el[i].hasAttribute('data-title')) {
+                                        title = el[i].getAttribute('data-title');
+                                        el[i].setAttribute('data-bs-title', title);
+                                        el[i].setAttribute('title', title);
+                                        el[i].setAttribute('data-bs-toggle', 'tooltip');
+                                    } else if (el[i].hasAttribute('title')) { // Fallback
+                                        title = el[i].getAttribute('title');
+                                        el[i].setAttribute('data-bs-title', title);
+                                        el[i].setAttribute('data-title', title);
+                                        el[i].setAttribute('data-bs-toggle', 'tooltip');
+                                    }
+                                }
                             }
-
-                            // Current URL: https://my-website.com/page_a.html?event=200
-                            const nextURL = href + '?' + urlParams.toString();
-                            const nextTitle = document.title; // keep the same title
-
-                            // This will create a new entry in the browser's history, without reloading
-                            window.history.replaceState({}, nextTitle, nextURL);
-
-                            let vueInstance = {
-                                'rows': vue.rows,
-                                'arrEventIds': vue.arrEventIds,
-                                'itemsTotal': vue.itemsTotal,
-                                'loadedItems': vue.loadedItems,
-                                'blnAllEventsLoaded': vue.blnAllEventsLoaded,
-                                'expiry': Date.now() + 5 * 60 * 1000,
-                            }
-
-                            // Save the vue instance to the local storage.
-                            // This saves us a time-consuming request,
-                            // if the user clicks backs from the detail module to the listing module
-                            localStorage.setItem(btoa(nextURL + '&modId=' + vue.modId), JSON.stringify(vueInstance));
-
-                            // Redirect to detail page
-                            window.location.href = link;
-
+                            resolve('Add the title & data-bs-title attribute from data-title, because popper.js deletes the orig. title-attribute when initializing.');
                         });
+                    })();
 
-                    });
+                    // Re-initialize Bootstrap/Popper tooltips
+                    await (() => {
+                        return new Promise((resolve, reject) => {
 
-                    resolve('done!');
-                }).catch((error) => console.log(error));
+                            let tooltipTriggerList = [].slice.call(document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]'))
+                            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                                return new bootstrap.Tooltip(tooltipTriggerEl);
+                            })
+                            resolve('Re-initialize Bootstrap popper.js tooltips.');
+                        });
+                    })();
 
-                // Re-initialize Bootstrap/Popper tooltips
-                await new Promise((resolve, reject) => {
-                    let tooltipTriggerList = [].slice.call(document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]'))
-                    tooltipTriggerList.map(function (tooltipTriggerEl) {
-                        return new bootstrap.Tooltip(tooltipTriggerEl);
-                    })
+                    // Cache the event list object in the localStorage
+                    // before redirecting to the detail page
+                    await (() => {
+                        return new Promise((resolve, reject) => {
+                            let buttons = document.querySelectorAll(vue.elId + ' [data-has-event-href="true"]');
+                            buttons.forEach((button) => {
+                                button.addEventListener('click', (event) => {
+                                    event.stopPropagation();
+                                    event.preventDefault();
+                                    let link = button.getAttribute('data-href');
 
-                    resolve('done');
-                }).catch((error) => console.log(error));
+                                    let eventBox = button.closest('.event-item');
+                                    let eventId = eventBox.dataset.id;
+
+                                    let url = new URL(window.location.href);
+                                    let urlParams = new URLSearchParams(url.search);
+                                    let href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+
+                                    if (urlParams.has('itemId')) {
+                                        urlParams.set('itemId', eventId);
+                                    } else {
+                                        urlParams.append('itemId', eventId);
+                                    }
+
+                                    // Current URL: https://my-website.com/page_a.html?event=200
+                                    const nextURL = href + '?' + urlParams.toString();
+                                    const nextTitle = document.title; // keep the same title
+
+                                    // This will create a new entry in the browser's history, without reloading
+                                    window.history.replaceState({}, nextTitle, nextURL);
+
+                                    let vueInstance = {
+                                        'rows': vue.rows,
+                                        'arrEventIds': vue.arrEventIds,
+                                        'itemsTotal': vue.itemsTotal,
+                                        'loadedItems': vue.loadedItems,
+                                        'blnAllEventsLoaded': vue.blnAllEventsLoaded,
+                                        'expiry': Date.now() + 5 * 60 * 1000,
+                                    }
+
+                                    // Save the vue instance to the local storage.
+                                    // This saves us a time-consuming request,
+                                    // if the user clicks backs from the detail module to the listing module
+                                    localStorage.setItem(btoa(nextURL + '&modId=' + vue.modId), JSON.stringify(vueInstance));
+
+                                    // Redirect to detail page
+                                    window.location.href = link;
+                                });
+                            });
+                            resolve('Cached the event list object to the localStorage!');
+                        });
+                    })();
+
+
+                })();
             }
-        },
+        }
     });
 </script>
