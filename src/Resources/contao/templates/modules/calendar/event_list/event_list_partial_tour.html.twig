@@ -158,8 +158,9 @@
 
                                 for (i = 0; i < el.length; ++i) {
                                     let title = '';
-                                    // This is the default
-                                    // Because we don't want to loose the title-attribute when popper.js has beedn initialized.
+                                    // Get the title attribute by default from the data-title attribute.
+                                    // The reason why we are doing this:
+                                    // Popper.js deletes the original title attribute when it has been initialized.
                                     if (el[i].hasAttribute('data-title')) {
                                         title = el[i].getAttribute('data-title');
                                         el[i].setAttribute('data-bs-title', title);
@@ -173,11 +174,11 @@
                                     }
                                 }
                             }
-                            resolve('Add the title & data-bs-title attribute from data-title, because popper.js deletes the orig. title-attribute when initializing.');
+                            resolve('Add the title- and data-bs-title attribute from the data-title attribute.');
                         });
                     })();
 
-                    // Re-initialize Bootstrap/Popper tooltips
+                    // Re-initialize Bootstrap/Popper.js tooltips
                     await (() => {
                         return new Promise((resolve, reject) => {
 
@@ -189,8 +190,8 @@
                         });
                     })();
 
-                    // Cache the event list object in the localStorage
-                    // before redirecting to the detail page
+                    // Cache the event list object in the browsers local storage
+                    // before we redirect to the detail page.
                     await (() => {
                         return new Promise((resolve, reject) => {
                             let buttons = document.querySelectorAll(vue.elId + ' [data-has-event-href="true"]');
@@ -217,7 +218,7 @@
                                     const nextURL = href + '?' + urlParams.toString();
                                     const nextTitle = document.title; // keep the same title
 
-                                    // This will create a new entry in the browser's history, without reloading
+                                    // This will create a new entry in the browser's history, without reloading.
                                     window.history.replaceState({}, nextTitle, nextURL);
 
                                     let vueInstance = {
@@ -230,8 +231,8 @@
                                     }
 
                                     // Save the vue instance to the local storage.
-                                    // This saves us a time-consuming request,
-                                    // if the user clicks backs from the detail module to the listing module
+                                    // That will prevent a time-consuming request,
+                                    // if the user clicks backs from the detail module to the listing module.
                                     localStorage.setItem(btoa(nextURL + '&modId=' + vue.modId), JSON.stringify(vueInstance));
 
                                     // Redirect to detail page
@@ -241,8 +242,6 @@
                             resolve('Cached the event list object to the localStorage!');
                         });
                     })();
-
-
                 })();
             }
         }
