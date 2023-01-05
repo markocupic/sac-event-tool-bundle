@@ -16,7 +16,6 @@ namespace Markocupic\SacEventToolBundle\Controller\Api;
 
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Date;
 use Contao\StringUtil;
 use Contao\UserModel;
 use Contao\Validator;
@@ -28,10 +27,11 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 class EventApiController extends AbstractController
 {
-    public const CACHE_MAX_AGE = 300;
+    public const CACHE_MAX_AGE = 0;
 
     private ContaoFramework $framework;
     private RequestStack $requestStack;
@@ -67,9 +67,6 @@ class EventApiController extends AbstractController
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->framework->getAdapter(Date::class);
-
         /** @var UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
@@ -99,7 +96,8 @@ class EventApiController extends AbstractController
             'publicTransportEvent' => $request->get('publicTransportEvent') ? '1' : '',
         ];
 
-        $startTime = microtime(true);
+        $stopwatch = new Stopwatch();
+        $stopwatch->start('event list api query time');
 
         // Ignore date range, ff certain query params were set
         $blnIgnoreDate = false;
@@ -150,18 +148,20 @@ class EventApiController extends AbstractController
 
         // Filter by a certain instructor $_GET['username']
         if (!empty($param['username'])) {
-            if (($user = $userModelAdapter->findByUsername($param['username'])) === null) {
+            if (null !== ($user = $userModelAdapter->findOneBy('username', $param['username']))) {
+                $userId = (int) $user->id;
+            } else {
                 // Do not show any events if username does not exist
                 $userId = 0;
-            } else {
-                $userId = $user->id;
             }
+
             $qb2 = $this->connection->createQueryBuilder();
             $qb2->select('pid')
                 ->from('tl_calendar_events_instructor', 't')
                 ->where('t.userId = :instructorId')
                 ->setParameter('instructorId', $userId)
             ;
+
             $arrEvents = $qb2->fetchFirstColumn();
 
             $qb->andWhere($qb->expr()->in('t.id', ':arrEvents'));
@@ -278,31 +278,30 @@ class EventApiController extends AbstractController
         }
 
         if (!$blnIgnoreDate) {
-            // dateStart filter
-            if (!empty($param['dateStart']) && (false !== ($dateStart = strtotime($param['dateStart'])))) {
-                $qb->andWhere($qb->expr()->gte('t.endDate', ':dateStart'));
-                $qb->setParameter('dateStart', $dateStart);
-            }
-            // event filter: year filter
-            elseif ((int) $param['year'] > 2000) {
+            if (!empty($param['dateStart']) && (false !== ($tstampStart = strtotime($param['dateStart'])))) {
+                // event filter: date start filter
+                $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
+                $qb->setParameter('tstampStart', $tstampStart);
+            } elseif ((int) $param['year'] > 2000) {
+                // event filter: year filter
                 $year = (int) $param['year'];
-                $intStart = strtotime('01-01-'.$year);
-                $intEnd = (int) (strtotime('31-12-'.$year) + 24 * 3600 - 1);
-                $qb->andWhere($qb->expr()->gte('t.endDate', ':startDate'));
-                $qb->andWhere($qb->expr()->lte('t.endDate', ':endDate'));
-                $qb->setParameter('startDate', $intStart);
-                $qb->setParameter('endDate', $intEnd);
+                $tstampStart = strtotime($year.'-01-01');
+                $tstampStop = (int) (strtotime('31-12-'.$year) + 24 * 3600 - 1);
+                $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
+                $qb->andWhere($qb->expr()->lte('t.endDate', ':tstampStop'));
+                $qb->setParameter('tstampStart', $tstampStart);
+                $qb->setParameter('tstampStop', $tstampStop);
             } else {
-                // Show upcoming events
-                $intNow = (int) strtotime($dateAdapter->parse('Y-m-d'));
-                $qb->andWhere($qb->expr()->gte('t.endDate', ':intNow'));
-                $qb->setParameter('intNow', $intNow);
+                // event filter: upcoming events
+                $tstampStart = strtotime(date('Y-m-d', time()));
+                $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
+                $qb->setParameter('tstampStart', $tstampStart);
             }
 
-            // event filter: dateEnd filter
+            // event filter: date stop filter
             if (!empty($param['dateEnd']) && (false !== ($dateEnd = strtotime($param['dateEnd'])))) {
-                $qb->andWhere($qb->expr()->lte('t.endDate', ':dateEnd'));
-                $qb->setParameter('dateEnd', $dateEnd);
+                $qb->andWhere($qb->expr()->lte('t.endDate', ':tstampStop'));
+                $qb->setParameter('tstampStop', $dateEnd);
             }
         }
 
@@ -312,9 +311,6 @@ class EventApiController extends AbstractController
         /** @var array $arrIds */
         $arrIds = $qb->fetchFirstColumn();
 
-        $endTime = microtime(true);
-        $queryTime = $endTime - $startTime;
-
         // Now we have all the ids, let's prepare the second query
         $arrFields = empty($param['fields']) ? [] : $param['fields'];
 
@@ -323,7 +319,7 @@ class EventApiController extends AbstractController
                 'status' => 'success',
                 'countItems' => 0,
                 'itemsTotal' => \count($arrIds),
-                'queryTime' => $queryTime,
+                'queryTime' => '',
                 'arrEventIds' => [],
                 'sql' => $qb->getSQL(),
                 'params' => $qb->getParameters(),
@@ -377,6 +373,8 @@ class EventApiController extends AbstractController
                 }
             }
         }
+
+        $arrJSON['meta']['queryTime'] = (string) $stopwatch->stop('event list api query time');
 
         // Allow cross domain requests
         $response = new JsonResponse($arrJSON, 200, ['Access-Control-Allow-Origin' => '*']);
