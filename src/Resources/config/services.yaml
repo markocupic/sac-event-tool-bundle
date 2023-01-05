@@ -1,17 +1,5 @@
 services:
 
-    # For test purposes only
-    Markocupic\SacEventToolBundle\Controller\TestController:
-        public: true
-        arguments:
-            - '@database_connection'
-            - '@contao.framework'
-            - '@twig'
-        tags:
-            - { name: container.service_subscriber }
-        calls:
-            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
-
     # Add a session bag
     Markocupic\SacEventToolBundle\Session\Attribute\ArrayAttributeBag:
         arguments:
@@ -129,4 +117,3 @@ services:
     # Send file to the browser
     Markocupic\SacEventToolBundle\Download\BinaryFileDownload:
         public: true
-

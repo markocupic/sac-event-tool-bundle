@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -43,23 +43,22 @@ class MarkocupicSacEventToolExtension extends Extension
             new FileLocator(__DIR__.'/../Resources/config')
         );
 
-        $loader->load('security.yml');
-        $loader->load('listener.yml');
-        $loader->load('subscriber.yml');
-        $loader->load('parameters.yml');
-        $loader->load('controller_download.yml');
-        $loader->load('controller_ajax.yml');
-        $loader->load('controller_contao_frontend_module.yml');
-        $loader->load('controller_contao_content_element.yml');
-        $loader->load('controller_feed.yml');
-        $loader->load('sac_member_database.yml');
-        $loader->load('cron.yml');
-        $loader->load('contao_scope.yml');
-        $loader->load('services.yml');
-        $loader->load('data_container.yml');
-        $loader->load('twig.yml');
-        $loader->load('avatar.yml');
-        $loader->load('contao_backend_maintainance.yml');
+        $loader->load('security.yaml');
+        $loader->load('listener.yaml');
+        $loader->load('event_subscriber.yaml');
+        $loader->load('parameters.yaml');
+        $loader->load('controller_download.yaml');
+        $loader->load('controller_ajax.yaml');
+        $loader->load('controller_contao_frontend_module.yaml');
+        $loader->load('controller_contao_content_element.yaml');
+        $loader->load('controller_feed.yaml');
+        $loader->load('sac_member_database.yaml');
+        $loader->load('contao_scope.yaml');
+        $loader->load('services.yaml');
+        $loader->load('data_container.yaml');
+        $loader->load('twig.yaml');
+        $loader->load('avatar.yaml');
+        $loader->load('contao_backend_maintainance.yaml');
 
         // Friendly configuration
         $rootKey = $this->getAlias();
