@@ -35,6 +35,7 @@ use League\Csv\Reader;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
+use Markocupic\SacEventToolBundle\String\PhoneNumber;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -322,7 +323,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
         }
 
         if ('phone' === $field || 'mobile' === $field) {
-            return beautifyPhoneNumber($arrUser[$field]);
+            return PhoneNumber::beautify($arrUser[$field]);
         }
 
         return (string) $arrUser[$field];

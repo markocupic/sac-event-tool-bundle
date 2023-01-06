@@ -39,11 +39,6 @@ $projectDir = System::getContainer()->getParameter('kernel.project_dir');
  */
 require_once $projectDir.'/vendor/markocupic/sac-event-tool-bundle/contao/config/notification_center_config.php';
 
-/**
- * Include custom functions
- */
-require_once $projectDir.'/vendor/markocupic/sac-event-tool-bundle/contao/functions/functions.php';
-
 /*
  * Contao backend modules
  */
