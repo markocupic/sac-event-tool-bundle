@@ -18,10 +18,10 @@ class PhoneNumber
 {
     public static function beautify(string $strNumber = ''): string
     {
-		// Remove whitespaces
-		$strNumber = preg_replace('/\s+/', '', $strNumber);
+        // Remove whitespaces
+        $strNumber = preg_replace('/\s+/', '', $strNumber);
 
-		if ('' !== $strNumber) {
+        if ('' !== $strNumber) {
             // Remove country code
             $strNumber = str_replace('+41', '', $strNumber);
             $strNumber = str_replace('0041', '', $strNumber);

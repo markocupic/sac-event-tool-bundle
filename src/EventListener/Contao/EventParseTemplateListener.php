@@ -57,7 +57,7 @@ class EventParseTemplateListener
         if (!empty($template->id) && str_starts_with($template->getName(), 'event_') && $this->contaoScope->isFrontend()) {
             // Run this code for event detail modules only
             if ($this->inputAdapter->get('events')) {
-                if (null !== ($event = $this->calendarEventsModelAdapter->findByIdOrAlias($this->inputAdapter->get('events')))) {
+                if (null !== $this->calendarEventsModelAdapter->findByIdOrAlias($this->inputAdapter->get('events'))) {
                     $template->contaoScope = $this->contaoScope;
 
                     $user = $this->security->getUser();
@@ -73,11 +73,6 @@ class EventParseTemplateListener
 
                         $template->addSchemaOrg($schemaOrg);
                     };
-
-                    // Add twig callable "getEventData()"
-                    $template->getEventData = (static fn ($prop) => CalendarEventsHelper::getEventData($event, $prop));
-
-                    $this->calendarEventsHelperAdapter->addEventDataToTemplate($template);
                 }
             }
         }

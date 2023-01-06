@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use Contao\Calendar;
+use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
@@ -331,22 +332,6 @@ class CalendarEventsHelper
     /**
      * @throws \Exception
      */
-    public static function addEventDataToTemplate(Template $objTemplate): void
-    {
-        $objEvent = CalendarEventsModel::findByPk($objTemplate->id);
-
-        if (null !== $objEvent) {
-            $objTemplate->getEventData = (
-                static function ($prop) use (&$objEvent, &$objTemplate) {
-                    return static::getEventData($objEvent, $prop, $objTemplate);
-                }
-            );
-        }
-    }
-
-    /**
-     * @throws \Exception
-     */
     public static function generateInstructorContactBoxes(CalendarEventsModel $objEvent): string
     {
         $strHtml = '';
@@ -359,7 +344,7 @@ class CalendarEventsHelper
             $strHtml .= '<div class="mb-4 col-6 col-sm-4 col-md-6 col-xl-4"><div class="">';
 
             $objUser = UserModel::findByPk($userId);
-            $avatarManager = System::getContainer()->get('Markocupic\SacEventToolBundle\Avatar\Avatar');
+            $avatarManager = System::getContainer()->get(Avatar::class);
 
             if (null !== $objUser) {
                 $parser = System::getContainer()->get('contao.insert_tag.parser');

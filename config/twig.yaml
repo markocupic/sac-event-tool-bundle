@@ -1,19 +1,25 @@
 services:
 
     # Twig extensions
-    Markocupic\SacEventToolBundle\Twig\TwigAssetManager:
+    Markocupic\SacEventToolBundle\Twig\Extension\TwigAssetManager:
         tags:
             - { name: twig.extension }
 
-    Markocupic\SacEventToolBundle\Twig\TwigAvatarManager:
+    Markocupic\SacEventToolBundle\Twig\Extension\TwigAvatarManager:
         arguments:
             - '@Markocupic\SacEventToolBundle\Avatar\Avatar'
         tags:
             - { name: twig.extension }
 
-    Markocupic\SacEventToolBundle\Twig\TwigLoggedInFrontendUserManager:
+    Markocupic\SacEventToolBundle\Twig\Extension\TwigLoggedInFrontendUserManager:
         arguments:
             - '@contao.framework'
             - '@security.helper'
+        tags:
+            - { name: twig.extension }
+
+    Markocupic\SacEventToolBundle\Twig\Extension\TwigEventDataManager:
+        arguments:
+            - '@contao.framework'
         tags:
             - { name: twig.extension }

@@ -1,14 +1,17 @@
+{# Get the event model #}
+{% set model = get_event_by_pk(id) %}
+
 <!-- indexer::stop -->
 <p class="back m-0"><a href="javascript:history.go(-1)" title="Zurück">Zurück</a></p>
 
-<div class="event event-detailview layout_full block{{ getEventData.invoke('class') }}">
+<div class="event event-detailview layout_full block{{ get_event_data(model, 'class') }}">
 
-    {% if getEventData.invoke('eventState') %}
-        <h4 class="event-state-headline mt-3 mb-0">{{ getEventData.invoke('eventStateLabel') }}</h4>
+    {% if get_event_data(model, 'eventState') %}
+        <h4 class="event-state-headline mt-3 mb-0">{{ get_event_data(model, 'eventStateLabel') }}</h4>
     {% endif %}
 
     <!-- indexer::continue -->
-    <h1 class="ce_headline mt-3">{{ getEventData.invoke('title') }}</h1>
+    <h1 class="ce_headline mt-3">{{ get_event_data(model, 'title') }}</h1>
     <!-- indexer::stop -->
 
     {# begin first row #}
@@ -17,7 +20,7 @@
         <div class="col-md-6 col-lg-3 mt-3 mb-3">
             <div class="box-layout-transparent">
                 <div class="teaser-image-course-detail">
-                    {% set image_src = getEventData.invoke('eventImagePath')|raw ~ '?size=20&alt=' ~ getEventData.invoke('title')|replace({'&': 'und','?': '','[&]': 'und','&amp;': 'und','=': '',})|escape %}
+                    {% set image_src = get_event_data(model, 'eventImagePath')|raw ~ '?size=20&alt=' ~ get_event_data(model, 'title')|replace({'&': 'und','?': '','[&]': 'und','&amp;': 'und','=': '',})|escape %}
                     {{ '{{picture::'~image_src~'}}' }}
                 </div>
             </div>
@@ -27,10 +30,10 @@
         {# begin col right #}
         <div class="col-md-6 col-lg-9 mt-3 mb-3">
             <div class="box-layout-transparent">
-                {% if not getEventData.invoke('teaser') is empty %}
+                {% if not get_event_data(model, 'teaser') is empty %}
                     <!-- indexer::continue -->
                     <div class="teaser event-detail">
-                        <p class="mt-0"><strong>{{ getEventData.invoke('teaser')|nl2br }}</strong></p>
+                        <p class="mt-0"><strong>{{ get_event_data(model, 'teaser')|nl2br }}</strong></p>
                     </div>
                     <!-- indexer::stop -->
                 {% endif %}
@@ -38,58 +41,58 @@
                 <div class="eventdate event-detail event-info-box icon-box-small">
                     <h5>Kursdaten/Dauer</h5>
                     <p>
-                        {{ getEventData.invoke('eventPeriodLg')|raw }} 
-                        {% if not getEventData.invoke('eventDuration') is empty %}
-                            <small>({{ getEventData.invoke('eventDuration') }})</small>
-                        {% endif %}                    
+                        {{ get_event_data(model, 'eventPeriodLg')|raw }}
+                        {% if not get_event_data(model, 'eventDuration') is empty %}
+                            <small>({{ get_event_data(model, 'eventDuration') }})</small>
+                        {% endif %}
                     </p>
                 </div>
 
                 <div class="organizers event-detail event-info-box icon-box-small">
                     <h5>Organisierende Gruppe</h5>
                     <div class="organizer-logo m2-4 mb-2">
-                        {{ getEventData.invoke('eventOrganizerLogos')|raw }}
+                        {{ get_event_data(model, 'eventOrganizerLogos')|raw }}
                     </div>
-                    {% if not getEventData.invoke('eventOrganizers') is empty %}
-                        <p>{{ getEventData.invoke('eventOrganizers')|raw }}</p>
+                    {% if not get_event_data(model, 'eventOrganizers') is empty %}
+                        <p>{{ get_event_data(model, 'eventOrganizers')|raw }}</p>
                     {% else %}
                         <p>Keine Gruppe ausgewählt</p>
                     {% endif %}
                 </div>
 
-                {% if not getEventData.invoke('courseId') is empty %}
+                {% if not get_event_data(model, 'courseId') is empty %}
                     <!-- indexer::continue -->
                     <div class="courseId event-detail event-info-box icon-box-small">
                         <h5>Kursnummer</h5>
-                        <p>{{ getEventData.invoke('courseId') }}</p>
+                        <p>{{ get_event_data(model, 'courseId') }}</p>
                     </div>
                     <!-- indexer::stop -->
                 {% endif %}
 
-                {% if not getEventData.invoke('location') is empty %}
+                {% if not get_event_data(model, 'location') is empty %}
                     <div class="location event-detail event-info-box icon-box-small">
                         <!-- indexer::continue -->
                         <h5>Kursort</h5>
-                        <p>{{ getEventData.invoke('location') }}</p>
+                        <p>{{ get_event_data(model, 'location') }}</p>
                         <!-- indexer::stop -->
                     </div>
                 {% endif %}
 
-                {% if getEventData.invoke('hasCoords') %}
+                {% if get_event_data(model, 'hasCoords') %}
                     <div class="geo-location event-detail event-info-box icon-box-small">
                         <h5>Karte</h5>
                         <!-- indexer::continue -->
                         <div class="swiss-topo-location-map">
-                            <iframe src="{{ getEventData.invoke('geoLinkUrl') }}" width="100%" height="100%" allow="geolocation"></iframe>
+                            <iframe src="{{ get_event_data(model, 'geoLinkUrl') }}" width="100%" height="100%" allow="geolocation"></iframe>
                         </div>
                         <!-- indexer::stop -->
                     </div>
                 {% endif %}
 
-                {% if not getEventData.invoke('leistungen') is empty %}
+                {% if not get_event_data(model, 'leistungen') is empty %}
                     <div class="price event-detail event-info-box icon-box-small">
                         <h5>Leistungen/Preis</h5>
-                        <p>{{ getEventData.invoke('leistungen')|nl2br }}</p>
+                        <p>{{ get_event_data(model, 'leistungen')|nl2br }}</p>
                     </div>
                 {% endif %}
             </div>
@@ -106,31 +109,31 @@
             <div class="box-layout-white">
                 <div class="booking-text event-detail event-info-box icon-box-small">
                     <h5>Anmeldung</h5>
-                    <p>{% if getEventData.invoke('disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>
+                    <p>{% if get_event_data(model, 'disableOnlineRegistration') %}Keine {% endif %}Online-Anmeldung</p>
 
-                    {% if not getEventData.invoke('bookingEvent') is empty %}
-                        <p>{{ getEventData.invoke('bookingEvent')|nl2br }}</p>
+                    {% if not get_event_data(model, 'bookingEvent') is empty %}
+                        <p>{{ get_event_data(model, 'bookingEvent')|nl2br }}</p>
                     {% endif %}
 
-                    {% if getEventData.invoke('generateMainInstructorContactDataFromDb') %}
-                        <p class="m-0">{{ getEventData.invoke('mainInstructorContactDataFromDb')|raw }}</p>
+                    {% if get_event_data(model, 'generateMainInstructorContactDataFromDb') %}
+                        <p class="m-0">{{ get_event_data(model, 'mainInstructorContactDataFromDb')|raw }}</p>
                     {% endif %}
 
                     {# button bar #}
                     <div class="d-flex flex-wrap">
                         <div class="me-2 mt-3 mb-3">
-                            <a href="/_download/download_event_ical?eventId={{ getEventData.invoke('id') }}" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary">
+                            <a href="/_download/download_event_ical?eventId={{ get_event_data(model, 'id') }}" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary">
                                 <i class="fal fa-calendar-plus"></i> iCal
                             </a>
                         </div>
 
                         <div class="me-2 mt-3 mb-3">
-                            <a href="/_download/print_workshop_details_as_pdf?eventId={{ getEventData.invoke('id') }}" title="Details drucken" class="btn btn-block btn-outline-primary">
+                            <a href="/_download/print_workshop_details_as_pdf?eventId={{ get_event_data(model, 'id') }}" title="Details drucken" class="btn btn-block btn-outline-primary">
                                 <i class="fal fa-print"></i> Detailinfos
                             </a>
                         </div>
 
-                        {% if not getEventData.invoke('disableOnlineRegistration') %}
+                        {% if not get_event_data(model, 'disableOnlineRegistration') %}
                             <div class="me-2 mt-3 mb-3">
                                 {# book event button #}
                                 {{ '{{insert_module::408}}' }}
@@ -143,64 +146,64 @@
             </div>
             {# End Anmeldung #}
             <div class="box-layout-white">
-                {% if not getEventData.invoke('issues') is empty %}
+                {% if not get_event_data(model, 'issues') is empty %}
                     <div class="topics event-detail event-info-box icon-box-small">
                         <!-- indexer::continue -->
                         <h5>Kursinhalte</h5>
-                        <p>{{ getEventData.invoke('issues')|nl2br }}</p>
+                        <p>{{ get_event_data(model, 'issues')|nl2br }}</p>
                         <!-- indexer::stop -->
                     </div>
                 {% endif %}
 
-                {% if not getEventData.invoke('terms') is empty %}
+                {% if not get_event_data(model, 'terms') is empty %}
                     <div class="terms event-detail event-info-box icon-box-small">
                         <!-- indexer::continue -->
                         <h5>Kursziele</h5>
-                        <p>{{ getEventData.invoke('terms')|nl2br }}</p>
+                        <p>{{ get_event_data(model, 'terms')|nl2br }}</p>
                         <!-- indexer::stop -->
                     </div>
                 {% endif %}
 
-                {% if not getEventData.invoke('requirements') is empty %}
+                {% if not get_event_data(model, 'requirements') is empty %}
                     <div class="qualifications event-detail event-info-box icon-box-small">
                         <!-- indexer::continue -->
                         <h5>Voraussetzungen/Anforderungen</h5>
-                        <p>{{ getEventData.invoke('requirements')|nl2br }}</p>
+                        <p>{{ get_event_data(model, 'requirements')|nl2br }}</p>
                         <!-- indexer::stop -->
                     </div>
                 {% endif %}
 
-                {% if not getEventData.invoke('journey') is empty and getEventData.invoke('journey') != 'not-specified' %}
+                {% if not get_event_data(model, 'journey') is empty and get_event_data(model, 'journey') != 'not-specified' %}
                     <div class="journey event-detail event-info-box icon-box-small">
                         <h5>Anreise mit</h5>
-                        <p>{{ getEventData.invoke('journey')|nl2br }}</p>
+                        <p>{{ get_event_data(model, 'journey')|nl2br }}</p>
                     </div>
                 {% endif %}
 
-                {% if not getEventData.invoke('meetingPoint') is empty %}
+                {% if not get_event_data(model, 'meetingPoint') is empty %}
                     <div class="meeting-point event-detail event-info-box icon-box-small">
                         <h5>Zeit und Treffpunkt</h5>
-                        <p>{{ getEventData.invoke('meetingPoint')|nl2br }}</p>
+                        <p>{{ get_event_data(model, 'meetingPoint')|nl2br }}</p>
                     </div>
                 {% endif %}
 
-                {% if not getEventData.invoke('equipment') is empty %}
+                {% if not get_event_data(model, 'equipment') is empty %}
                     <div class="equipment event-detail event-info-box icon-box-small">
                         <h5>Benötigtes Material</h5>
-                        <p>{{ getEventData.invoke('equipment')|nl2br }}</p>
+                        <p>{{ get_event_data(model, 'equipment')|nl2br }}</p>
                     </div>
                 {% endif %}
 
-                {% if not getEventData.invoke('miscellaneous') is empty %}
+                {% if not get_event_data(model, 'miscellaneous') is empty %}
                     <div class="miscellaneous event-detail event-info-box icon-box-small last">
                         <h5>Sonstiges</h5>
-                        <p>{{ getEventData.invoke('miscellaneous')|nl2br }}</p>
+                        <p>{{ get_event_data(model, 'miscellaneous')|nl2br }}</p>
                     </div>
                 {% endif %}
 
                 {# enclosures/downloads #}
                 {# !Urheberrechtsverletzung bei urheberrechtlich geschützten Anhängen wie Topos, Karten, etc. #}
-                {% if getEventData.invoke('enclosure') %}
+                {% if get_event_data(model, 'enclosure') %}
                     <div class="event-eclosures event-detail event-info-box icon-box-small">
                         <h5>Downloads / Weitere Informationen</h5>
                         {% if hasLoggedInFrontendUser or 'eventPreview' == app.request.query.get('mode') %}  {# poor security level! #}
@@ -228,8 +231,8 @@
                     <!-- indexer::continue -->
                     <h5>Kursleitung</h5>
                     <div class="row mt-3 g-2">
-                        {% if not getEventData.invoke('instructorContactBoxes') is empty %}
-                            {{ getEventData.invoke('instructorContactBoxes')|raw }}
+                        {% if not get_event_data(model, 'instructorContactBoxes') is empty %}
+                            {{ get_event_data(model, 'instructorContactBoxes')|raw }}
                         {% else %}
                             <p>Leiter/in wurde gelöscht.</p>
                         {% endif %}
@@ -237,17 +240,17 @@
                     <!-- indexer::stop -->
                 </div>
 
-                {% if getEventData.invoke('setRegistrationPeriod') %}
+                {% if get_event_data(model, 'setRegistrationPeriod') %}
                     <div class="booking-text event-detail event-info-box icon-box-small">
                         <h5>Anmeldung möglich</h5>
-                        <p>Vom {{ getEventData.invoke('registrationStartDateFormatted') }} bis zum {{ getEventData.invoke('registrationEndDateFormatted') }}</p>
+                        <p>Vom {{ get_event_data(model, 'registrationStartDateFormatted') }} bis zum {{ get_event_data(model, 'registrationEndDateFormatted') }}</p>
                     </div>
                 {% endif %}
 
-                {% if not getEventData.invoke('bookingCounterAsText') is empty %}
+                {% if not get_event_data(model, 'bookingCounterAsText') is empty %}
                     <div class="booking-counter event-detail event-info-box icon-box-small">
                         <h5>Bestätigte Anmeldungen</h5>
-                        <p>{{ getEventData.invoke('bookingCounterAsText') }}</p>
+                        <p>{{ get_event_data(model, 'bookingCounterAsText') }}</p>
                     </div>
                 {% endif %}
 
@@ -258,8 +261,8 @@
     {# end second row #}
 
     {# gallery start #}
-    {% if getEventData.invoke('addGallery') %}
-        {{ getEventData.invoke('gallery')|raw }}
+    {% if get_event_data(model, 'addGallery') %}
+        {{ get_event_data(model, 'gallery')|raw }}
     {% endif %}
     {# gallery end #}
 
