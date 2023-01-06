@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DocxTemplator\Helper;
 
-use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
@@ -23,6 +22,7 @@ use Contao\Model\Collection;
 use Contao\UserModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 
 class EventMember
 {

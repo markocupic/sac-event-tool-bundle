@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\Calendar;
-use Contao\CalendarEventsJourneyModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
@@ -35,6 +34,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 

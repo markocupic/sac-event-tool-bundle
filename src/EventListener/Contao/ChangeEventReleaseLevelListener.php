@@ -19,8 +19,8 @@ use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Email;
-use Contao\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\ContaoScope\ContaoScope;
+use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 
 class ChangeEventReleaseLevelListener
 {

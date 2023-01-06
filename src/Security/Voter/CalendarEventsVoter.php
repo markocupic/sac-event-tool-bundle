@@ -18,9 +18,9 @@ use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\EventReleaseLevelPolicyModel;
 use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 

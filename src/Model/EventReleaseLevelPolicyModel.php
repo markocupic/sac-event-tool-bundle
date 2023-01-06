@@ -12,7 +12,11 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Contao;
+namespace Markocupic\SacEventToolBundle\Model;
+
+use Contao\CalendarEventsModel;
+use Contao\Message;
+use Contao\Model;
 
 /**
  * @method static findByPid(int|mixed|null $id)
@@ -28,10 +32,8 @@ class EventReleaseLevelPolicyModel extends Model
 
     /**
      * @param $eventReleaseRecordId
-     *
-     * @return static|null
      */
-    public static function findNextLevel($eventReleaseRecordId)
+    public static function findNextLevel($eventReleaseRecordId): static|null
     {
         $eventReleaseLevelModel = static::findByPk($eventReleaseRecordId);
 
@@ -56,10 +58,8 @@ class EventReleaseLevelPolicyModel extends Model
 
     /**
      * @param $eventId
-     *
-     * @return static|null
      */
-    public static function findFirstLevelByEventId($eventId)
+    public static function findFirstLevelByEventId($eventId): static|null
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
 
@@ -86,7 +86,7 @@ class EventReleaseLevelPolicyModel extends Model
         $options = [
             'order' => 'level ASC',
         ];
-        $objReleaseLevelModel = self::findOneBy(['tl_event_release_level_policy.pid=?'], [$objEventReleaseLevelPolicyPackageModel->id], $options);
+        $objReleaseLevelModel = static::findOneBy(['tl_event_release_level_policy.pid=?'], [$objEventReleaseLevelPolicyPackageModel->id], $options);
 
         if (null === $objReleaseLevelModel) {
             Message::addError('No ReleaseLevelModel found for tl_calendar_events with ID '.$objEvent->id.'. Error in '.__METHOD__.' Line: '.__LINE__);
@@ -99,10 +99,8 @@ class EventReleaseLevelPolicyModel extends Model
 
     /**
      * @param $eventId
-     *
-     * @return static|null
      */
-    public static function findLastLevelByEventId($eventId)
+    public static function findLastLevelByEventId($eventId): static|null
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
 
@@ -129,7 +127,7 @@ class EventReleaseLevelPolicyModel extends Model
         $options = [
             'order' => 'level DESC',
         ];
-        $objReleaseLevelModel = self::findOneBy(['tl_event_release_level_policy.pid=?'], [$objEventReleaseLevelPolicyPackageModel->id], $options);
+        $objReleaseLevelModel = static::findOneBy(['tl_event_release_level_policy.pid=?'], [$objEventReleaseLevelPolicyPackageModel->id], $options);
 
         if (null === $objReleaseLevelModel) {
             Message::addError('No ReleaseLevelModel found for tl_calendar_events with ID '.$objEvent->id.'. Error in '.__METHOD__.' Line: '.__LINE__);
@@ -142,10 +140,8 @@ class EventReleaseLevelPolicyModel extends Model
 
     /**
      * @param $levelId
-     *
-     * @return static|null
      */
-    public static function findPrevLevel($levelId)
+    public static function findPrevLevel($levelId): static|null
     {
         $eventReleaseLevelModel = static::findByPk($levelId);
 
@@ -171,10 +167,8 @@ class EventReleaseLevelPolicyModel extends Model
     /**
      * @param $eventId
      * @param $level
-     *
-     * @return bool|void
      */
-    public static function levelExists($eventId, $level = null)
+    public static function levelExists($eventId, $level = null): bool
     {
         $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($eventId);
 
@@ -193,10 +187,8 @@ class EventReleaseLevelPolicyModel extends Model
     /**
      * @param $pid
      * @param $level
-     *
-     * @return static
      */
-    public static function findOneByPidAndLevel($pid, $level = null)
+    public static function findOneByPidAndLevel($pid, $level = null): static|null
     {
         $t = static::$strTable;
         $arrColumns = [];

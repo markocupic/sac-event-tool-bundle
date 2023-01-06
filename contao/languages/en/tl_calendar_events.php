@@ -80,7 +80,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['eventState'] = ['Event-Status', '<str
 $GLOBALS['TL_LANG']['tl_calendar_events']['singleSRCBroschuere'] = ['Hintergrundbild für PDF-Kursbroschüre', 'Wählen Sie bitte ein Bild aus.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['allowDeregistration'] = ['Angemeldeter Teilnehmer darf sich online vom Event abmelden', 'Geben Sie dem angemeldeten Teilnehmer die Möglichkeit unter Einhaltung einer definierten Abmeldefrist sich online vom Event abzumelden.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['deregistrationLimit'] = ['Abmeldefrist in Tagen', 'Definieren Sie den Zeitraum in Tagen, bis zu dem sich ein bereits angemeldeter Teilnehmer wieder online vom Event abmelden kann.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['addGallery'] = ['Dem Event eine Bildergalerie hinzufügen'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['addGallery'] = ['Bildergalerie hinzufügen', 'Aktivieren Sie die Bildergalerie.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['multiSRC'] = ['Bilder auswählen', '<strong class="notice">!!! Sie müssen die Urheberrechte der Bilder besitzen !!!</strong> Treffen Sie eine Auswahl von Bildern. Evtl. müssen Sie Ihre Bilder zuerst über die Dateiverwaltung auf den Webserver laden.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['location'] = ['Veranstaltungsort/Ausgangspunkt', 'Geben Sie bitte den Namen des Veranstaltungsortes oder Ausgangspunktes ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['coordsCH1903'] = ['Ziel-Koordinaten für Kartenansicht (CH1903)', 'Koordinaten des Zieles im Format <q><em><strong>2600000, 1200000</strong></em></q> oder <q><em><strong>600000, 200000</strong></em></q> eingeben. Diese können auf <a href="https://map.geo.admin.ch" target="_blank"><u><em>map.geo.admin.ch</em></u></a> und einem Klick mit der rechten Maustaste auf das Ziel herausgelesen und kopiert werden.'];
@@ -111,7 +111,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileAscentTime'] = ['Zeitbedar
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentMeters'] = ['Höhendiff. in m im Abstieg', 'Machen Sie hier Angaben zum Höhenunterschied im Abstieg.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = ['Zeitbedarf in h im Abstieg', 'Machen Sie hier Angaben zum Zeitbedarf im Abstieg.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'] = ['Hinterlegte Kontaktdaten immer anzeigen', '<strong class="notice">!!! Wichtig, falls Online-Anmeldung deaktiviert ist !!!</strong> Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung individualisieren.', ''];
+$GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung individualisieren.', 'Hier können Sie den Text für die E-Mail-Anmeldebestätigung individualisieren.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung', 'Nutzen Sie dieses Feld, um eine individualisierte E-Mail-Bestätigungs für den Event zu erstellen. Fahren Sie mit der Maus über diesen Text, um mehr zu erfahren. Die Tags dienen als Platzhalter für eventspezifische Informationen.'];
 
 // References

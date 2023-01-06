@@ -24,10 +24,10 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Template;
 use Contao\UserModel;
-use Contao\UserRoleModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
+use Markocupic\SacEventToolBundle\Model\UserRoleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 

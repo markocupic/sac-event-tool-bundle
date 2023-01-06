@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\User\FrontendUser;
 
-use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -26,6 +25,7 @@ use Contao\MemberModel;
 use Contao\Message;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Psr\Log\LogLevel;
 
 class ClearFrontendUserData

@@ -14,14 +14,11 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DocxTemplator\Helper;
 
-use Contao\CalendarEventsInstructorInvoiceModel;
-use Contao\CalendarEventsJourneyModel;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\Date;
-use Contao\EventOrganizerModel;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
@@ -30,6 +27,9 @@ use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventState;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
+use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Event

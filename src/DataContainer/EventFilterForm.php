@@ -15,10 +15,10 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\CoreBundle\ServiceAnnotation\Callback;
-use Contao\CourseMainTypeModel;
-use Contao\CourseSubTypeModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception;
+use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
+use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
 
 class EventFilterForm
 {

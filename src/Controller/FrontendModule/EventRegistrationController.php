@@ -16,8 +16,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
-use Contao\CalendarEventsJourneyModel;
-use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
@@ -28,8 +26,6 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Date;
 use Contao\Environment;
-use Contao\EventOrganizerModel;
-use Contao\EventReleaseLevelPolicyModel;
 use Contao\Events;
 use Contao\FilesModel;
 use Contao\FrontendUser;
@@ -48,6 +44,10 @@ use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
+use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
+use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Ramsey\Uuid\Uuid;

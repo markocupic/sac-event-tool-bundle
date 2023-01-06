@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\EventSubscriber;
 
-use Contao\CalendarEventsMemberModel;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
@@ -25,6 +24,7 @@ use Contao\ModuleModel;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use NotificationCenter\Model\Notification;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

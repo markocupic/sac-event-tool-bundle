@@ -12,8 +12,16 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Contao;
+namespace Markocupic\SacEventToolBundle\Model;
 
+use Contao\CalendarEventsModel;
+use Contao\Database;
+use Contao\Date;
+use Contao\Events;
+use Contao\Frontend;
+use Contao\MemberModel;
+use Contao\Model;
+use Contao\UserModel;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 
 class CalendarEventsMemberModel extends Model
@@ -74,10 +82,8 @@ class CalendarEventsMemberModel extends Model
      * @param null  $intStartDateMin
      * @param null  $intStartDateMax
      * @param bool  $blnInstructorRole
-     *
-     * @return array
      */
-    public static function findEventsByMemberId($memberId, $arrEventTypeFilter = [], $intStartDateMin = null, $intStartDateMax = null, $blnInstructorRole = false)
+    public static function findEventsByMemberId($memberId, $arrEventTypeFilter = [], $intStartDateMin = null, $intStartDateMax = null, $blnInstructorRole = false): array
     {
         $arrEvents = [];
         $arrEventIDS = [];
@@ -141,13 +147,10 @@ class CalendarEventsMemberModel extends Model
                         $arr['dateSpan'] = $objEvents->startDate !== $objEvents->endDate ? Date::parse('d.m.', $objEvents->startDate).' - '.Date::parse('d.m.Y', $objEvents->endDate) : Date::parse('d.m.Y', $objEvents->startDate);
                         $arr['registrationId'] = $objJoinedEvents->id;
                         $arr['role'] = 'member';
-
-                        if (null !== $objEventModel) {
-                            $arr['objEvent'] = $objEventModel;
-                            $arr['eventModel'] = $objEventModel;
-                            $arr['eventRegistrationModel'] = self::findByPk($objJoinedEvents->id);
-                            $arr['eventUrl'] = Events::generateEventUrl($objEventModel);
-                        }
+                        $arr['objEvent'] = $objEventModel;
+                        $arr['eventModel'] = $objEventModel;
+                        $arr['eventRegistrationModel'] = self::findByPk($objJoinedEvents->id);
+                        $arr['eventUrl'] = Events::generateEventUrl($objEventModel);
                         $arr['unregisterUrl'] = Frontend::addToUrl('do=unregisterUserFromEvent&amp;registrationId='.$objJoinedEvents->id);
                         $arrEvents[] = $arr;
                     } else {
@@ -158,12 +161,9 @@ class CalendarEventsMemberModel extends Model
                             $arr['dateSpan'] = $objEvents->startDate !== $objEvents->endDate ? Date::parse('d.m.', $objEvents->startDate).' - '.Date::parse('d.m.Y', $objEvents->endDate) : Date::parse('d.m.Y', $objEvents->startDate);
                             $arr['registrationId'] = null;
                             $arr['role'] = 'instructor';
-
-                            if (null !== $objEventModel) {
-                                $arr['objEvent'] = $objEventModel;
-                                $arr['eventModel'] = $objEventModel;
-                                $arr['eventUrl'] = Events::generateEventUrl($objEventModel);
-                            }
+                            $arr['objEvent'] = $objEventModel;
+                            $arr['eventModel'] = $objEventModel;
+                            $arr['eventUrl'] = Events::generateEventUrl($objEventModel);
                             $arrEvents[] = $arr;
                         }
                     }
@@ -188,21 +188,19 @@ class CalendarEventsMemberModel extends Model
     /**
      * @param $memberId
      * @param array $arrEventTypeFilter
-     *
-     * @return array
      */
-    public static function findPastEventsByMemberId($memberId, $arrEventTypeFilter = [], $blnInstructorRole = false)
+    public static function findPastEventsByMemberId($memberId, $arrEventTypeFilter = [], $blnInstructorRole = false): array
     {
         return static::findEventsByMemberId($memberId, $arrEventTypeFilter, null, time(), $blnInstructorRole);
     }
 
     public static function canAcceptSubscription(self $objMember, CalendarEventsModel $objEvent): bool
     {
-        if (null !== $objEvent && !$objEvent->addMinAndMaxMembers) {
+        if (!$objEvent->addMinAndMaxMembers) {
             return true;
         }
 
-        if (null !== $objEvent && $objEvent->addMinAndMaxMembers && (int) $objEvent->maxMembers > 0) {
+        if ($objEvent->addMinAndMaxMembers && (int) $objEvent->maxMembers > 0) {
             if (!$objEvent->addMinAndMaxMembers || ($objEvent->addMinAndMaxMembers && empty($objEvent->maxMembers))) {
                 return true;
             }

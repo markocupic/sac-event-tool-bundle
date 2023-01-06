@@ -12,7 +12,10 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Contao;
+namespace Markocupic\SacEventToolBundle\Model;
+
+use Contao\CalendarEventsModel;
+use Contao\Model;
 
 class EventReleaseLevelPolicyPackageModel extends Model
 {
@@ -26,7 +29,7 @@ class EventReleaseLevelPolicyPackageModel extends Model
     /**
      * @param $eventId
      */
-    public static function findReleaseLevelPolicyPackageModelByEventId($eventId)
+    public static function findReleaseLevelPolicyPackageModelByEventId($eventId): static|null
     {
         $objEvent = CalendarEventsModel::findByPk($eventId);
 
@@ -36,12 +39,10 @@ class EventReleaseLevelPolicyPackageModel extends Model
 
         $objEventType = EventTypeModel::findByAlias($objEvent->eventType);
 
-        if (null === $objEventType) {
+        if (null === $objEventType || !$objEventType->levelAccessPermissionPackage > 0) {
             return null;
         }
 
-        if ($objEventType->levelAccessPermissionPackage > 0) {
-            return self::findByPk($objEventType->levelAccessPermissionPackage);
-        }
+        return static::findByPk($objEventType->levelAccessPermissionPackage);
     }
 }

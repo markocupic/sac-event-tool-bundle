@@ -17,7 +17,7 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\EventReleaseLevelPolicyModel;
+use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 
 /**
  * This is the base class for:

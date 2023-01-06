@@ -18,7 +18,6 @@ use Contao\ArrayUtil;
 use Contao\Backend;
 use Contao\BackendUser;
 use Contao\Calendar;
-use Contao\CalendarEventsJourneyModel;
 use Contao\CalendarEventsModel;
 use Contao\CalendarModel;
 use Contao\Config;
@@ -32,16 +31,12 @@ use Contao\Database;
 use Contao\DataContainer;
 use Contao\Date;
 use Contao\DcaExtractor;
-use Contao\EventReleaseLevelPolicyModel;
-use Contao\EventReleaseLevelPolicyPackageModel;
-use Contao\EventTypeModel;
 use Contao\FilesModel;
 use Contao\Idna;
 use Contao\Image;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
-use Contao\TourDifficultyCategoryModel;
 use Contao\User;
 use Contao\UserGroupModel;
 use Contao\UserModel;
@@ -54,6 +49,11 @@ use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventState;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
+use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
+use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
+use Markocupic\SacEventToolBundle\Model\EventTypeModel;
+use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -313,7 +313,7 @@ class CalendarEvents
         }
 
         // Do not allow cutting and editing to default users
-        $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['edit'] = null;
+        unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['edit']);
 
         // Prevent unauthorized publishing
         if ($request->query->has('tid')) {
@@ -1170,8 +1170,8 @@ class CalendarEvents
 
             // Label and help
             if (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'])) {
-                $label = \is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label']) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'][0] : $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'];
-                $help = \is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label']) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'][1] : $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'];
+                $label = $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'][0] ?? $i;
+                $help = $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'][1] ?? $i;
             } else {
                 $label = isset($GLOBALS['TL_LANG']['MSC'][$i]) && \is_array($GLOBALS['TL_LANG']['MSC'][$i]) ? $GLOBALS['TL_LANG']['MSC'][$i][0] : $GLOBALS['TL_LANG']['MSC'][$i];
                 $help = isset($GLOBALS['TL_LANG']['MSC'][$i]) && \is_array($GLOBALS['TL_LANG']['MSC'][$i]) ? $GLOBALS['TL_LANG']['MSC'][$i][1] : $GLOBALS['TL_LANG']['MSC'][$i];

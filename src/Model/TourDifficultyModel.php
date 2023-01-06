@@ -12,14 +12,16 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Contao;
+namespace Markocupic\SacEventToolBundle\Model;
 
-class CalendarEventsJourneyModel extends Model
+use Contao\Model;
+
+class TourDifficultyModel extends Model
 {
     /**
      * Table name.
      *
      * @var string
      */
-    protected static $strTable = 'tl_calendar_events_journey';
+    protected static $strTable = 'tl_tour_difficulty';
 }

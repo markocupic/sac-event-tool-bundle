@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\CalendarEventsInstructorInvoiceModel;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -28,6 +27,7 @@ use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;

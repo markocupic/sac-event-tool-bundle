@@ -20,8 +20,8 @@ use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Template;
-use Contao\TourDifficultyCategoryModel;
-use Contao\TourDifficultyModel;
+use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
+use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 

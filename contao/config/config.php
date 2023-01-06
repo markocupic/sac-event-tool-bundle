@@ -15,6 +15,22 @@ declare(strict_types=1);
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\ContaoBackendMaintainance\MaintainBackendUser;
+use Markocupic\SacEventToolBundle\Model\CalendarContainerModel;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorModel;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
+use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
+use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
+use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
+use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
+use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
+use Markocupic\SacEventToolBundle\Model\EventTypeModel;
+use Markocupic\SacEventToolBundle\Model\SacSectionModel;
+use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
+use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
+use Markocupic\SacEventToolBundle\Model\TourTypeModel;
+use Markocupic\SacEventToolBundle\Model\UserRoleModel;
 
 $projectDir = System::getContainer()->getParameter('kernel.project_dir');
 
@@ -75,6 +91,26 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
 		'tables' => ['tl_user_role'],
 	],
 ];
+
+/**
+ * Register the models
+ */
+$GLOBALS['TL_MODELS'][CalendarContainerModel::getTable()] = CalendarContainerModel::class;
+$GLOBALS['TL_MODELS'][CalendarEventsInstructorInvoiceModel::getTable()] = CalendarEventsInstructorInvoiceModel::class;
+$GLOBALS['TL_MODELS'][CalendarEventsInstructorModel::getTable()] = CalendarEventsInstructorModel::class;
+$GLOBALS['TL_MODELS'][CalendarEventsJourneyModel::getTable()] = CalendarEventsJourneyModel::class;
+$GLOBALS['TL_MODELS'][CalendarEventsMemberModel::getTable()] = CalendarEventsMemberModel::class;
+$GLOBALS['TL_MODELS'][CourseMainTypeModel::getTable()] = CourseMainTypeModel::class;
+$GLOBALS['TL_MODELS'][CourseSubTypeModel::getTable()] = CourseSubTypeModel::class;
+$GLOBALS['TL_MODELS'][EventOrganizerModel::getTable()] = EventOrganizerModel::class;
+$GLOBALS['TL_MODELS'][EventReleaseLevelPolicyModel::getTable()] = EventReleaseLevelPolicyModel::class;
+$GLOBALS['TL_MODELS'][EventReleaseLevelPolicyPackageModel::getTable()] = EventReleaseLevelPolicyPackageModel::class;
+$GLOBALS['TL_MODELS'][EventTypeModel::getTable()] = EventTypeModel::class;
+$GLOBALS['TL_MODELS'][SacSectionModel::getTable()] = SacSectionModel::class;
+$GLOBALS['TL_MODELS'][TourDifficultyCategoryModel::getTable()] = TourDifficultyCategoryModel::class;
+$GLOBALS['TL_MODELS'][TourDifficultyModel::getTable()] = TourDifficultyModel::class;
+$GLOBALS['TL_MODELS'][TourTypeModel::getTable()] = TourTypeModel::class;
+$GLOBALS['TL_MODELS'][UserRoleModel::getTable()] = UserRoleModel::class;
 
 /*
  * Backend maintenance: Clear backend user permissions,

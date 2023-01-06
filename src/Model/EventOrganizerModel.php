@@ -12,7 +12,10 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Contao;
+namespace Markocupic\SacEventToolBundle\Model;
+
+use Contao\Model;
+use Contao\Model\Collection;
 
 class EventOrganizerModel extends Model
 {

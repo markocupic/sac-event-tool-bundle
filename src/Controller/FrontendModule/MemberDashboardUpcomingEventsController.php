@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
-use Contao\CalendarEventsMemberModel;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -32,6 +31,7 @@ use Contao\UserModel;
 use Contao\Validator;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\Config\Log;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use NotificationCenter\Model\Notification;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
