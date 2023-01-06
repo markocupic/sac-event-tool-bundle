@@ -18,7 +18,6 @@ use Contao\ContentModel;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\ServiceAnnotation\ContentElement;
-use Contao\FrontendUser;
 use Contao\PageModel;
 use Contao\Template;
 use Contao\UserModel;
@@ -73,7 +72,6 @@ class UserPortraitController extends AbstractContentElementController
         $arrUser['mainQualification'] = $calendarEventsHelperAdapter->getMainQualification($user);
         $template->user = $arrUser;
         $template->userModel = $user;
-        $template->hasLoggedInFrontendUser = $this->security->getUser() instanceof FrontendUser;
 
         return $template->getResponse();
     }

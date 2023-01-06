@@ -19,7 +19,7 @@
                 {{ user.mainQualification }}
             </div>
 
-            {% if hasLoggedInFrontendUser is same as false %}
+            {% if has_logged_in_frontend_user() is same as false %}
                 <br>
                 <div class="alert d-block alert-info" role="alert">
                     Bitte melde dich mit deinem Mitgliederkonto an, um die Kontaktdaten und mehr von <strong>{{ user.name }} </strong> zu sehen.
@@ -28,7 +28,7 @@
             {% endif %}
 
             {# Show personal data to logged users only #}
-            {% if hasLoggedInFrontendUser is same as true %}
+            {% if has_logged_in_frontend_user() is same as true %}
                 <div class="ce_user_portrait_street">
                     {{ user.street }}
                 </div>

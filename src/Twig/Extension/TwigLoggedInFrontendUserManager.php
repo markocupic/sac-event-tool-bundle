@@ -35,8 +35,8 @@ class TwigLoggedInFrontendUserManager extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('hasLoggedInFrontendUser', [$this, 'hasLoggedInFrontendUser']),
-            new TwigFunction('getLoggedInFrontendUser', [$this, 'getLoggedInFrontendUser']),
+            new TwigFunction('has_logged_in_frontend_user', [$this, 'hasLoggedInFrontendUser']),
+            new TwigFunction('get_logged_in_frontend_user', [$this, 'getLoggedInFrontendUser']),
         ];
     }
 
@@ -58,7 +58,7 @@ class TwigLoggedInFrontendUserManager extends AbstractExtension
      * or null if there is no logged in Contao frontend user.
      *
      * Inside your Twig template:
-     * {% set user = getLoggedInFrontendUser() %}
+     * {% set user = get_logged_in_frontend_user() %}
      * Hi, my name is {{ user.firstname }}
      *
      * @see: https://docs.contao.org/dev/framework/asset-management.
