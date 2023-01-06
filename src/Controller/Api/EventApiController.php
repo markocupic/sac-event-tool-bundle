@@ -31,7 +31,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class EventApiController extends AbstractController
 {
-    public const CACHE_MAX_AGE = 0;
+    public const CACHE_MAX_AGE = 300;
 
     private ContaoFramework $framework;
     private RequestStack $requestStack;
