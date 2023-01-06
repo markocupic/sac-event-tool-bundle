@@ -27,5 +27,6 @@ services:
     Markocupic\SacEventToolBundle\Twig\Extension\TwigSchemaOrgDataManager:
         arguments:
             - '@contao.framework'
+            - '@request_stack'
         tags:
             - { name: twig.extension }

@@ -18,16 +18,21 @@ use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Events;
 use Contao\FrontendTemplate;
+use Contao\System;
+use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class TwigSchemaOrgDataManager extends AbstractExtension
 {
     private ContaoFramework $framework;
+    private RequestStack $requestStack;
 
-    public function __construct(ContaoFramework $framework)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack)
     {
         $this->framework = $framework;
+        $this->requestStack = $requestStack;
     }
 
     public function getFunctions(): array
@@ -49,7 +54,23 @@ class TwigSchemaOrgDataManager extends AbstractExtension
     {
         $this->framework->initialize();
 
+        $request = $this->requestStack->getCurrentRequest();
+
         $jsonLd = Events::getSchemaOrgData($model);
+        $jsonLd['location'] = $model->location;
+        $jsonLd['tourguide'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($model));
+
+        $mainSection = System::getContainer()->getParameter('sacevt.section_name');
+        $organizers = array_map(
+            static fn ($el) => $mainSection.': '.$el,
+            CalendarEventsHelper::getEventOrganizersAsArray($model, 'title'),
+        );
+
+        $jsonLd['organizer'] = [
+            '@type' => 'Organization',
+            'name' => implode(', ', $organizers),
+            'url' => $request->getScheme().'://'.$request->getHost(),
+        ];
 
         if ($template->addImage && $template->figure) {
             $jsonLd['image'] = $template->figure->getSchemaOrgData();

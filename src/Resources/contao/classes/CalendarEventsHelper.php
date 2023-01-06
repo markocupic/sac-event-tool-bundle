@@ -349,6 +349,7 @@ class CalendarEventsHelper
             if (null !== $objUser) {
                 $parser = System::getContainer()->get('contao.insert_tag.parser');
 
+				// Use a figure and add the title tag, this way Contao will automatically generate the necessary JsonLD tags.
                 $figureTag = '{{figure::'.$avatarManager->getAvatarResourcePath($objUser).'?size=18&metadata[title]='.StringUtil::specialchars($objUser->name).'&enableLightbox=0&options[attr][class]=avatar-large&template=image}}';
 
                 $strHtml .= '<div class="image_container portrait">';
