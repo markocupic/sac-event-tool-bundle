@@ -80,15 +80,6 @@ services:
         tags:
             - { name: contao.hook, hook: importUser, method: onImportUser }
 
-    # Augment event template with more data
-    Markocupic\SacEventToolBundle\EventListener\Contao\EventParseTemplateListener:
-        arguments:
-            - '@contao.framework'
-            - '@security.helper'
-            - '@Markocupic\SacEventToolBundle\ContaoScope\ContaoScope'
-        tags:
-            - { name: contao.hook, hook: parseTemplate, method: onParseTemplate, priority: 0 }
-
     # Contao post login hook (Create backend user home directories if they do not exist & remove no more used directories)
     Markocupic\SacEventToolBundle\EventListener\Contao\PostLoginListener:
         public: true

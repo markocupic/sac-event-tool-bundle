@@ -279,7 +279,7 @@
                 {% if get_event_data(model, 'enclosure') %}
                     <div class="event-eclosures event-detail event-info-box icon-box-small">
                         <h5>Downloads / Weitere Informationen</h5>
-                        {% if hasLoggedInFrontendUser or 'eventPreview' == app.request.query.get('mode') %} {# poor security level! #}
+                        {% if has_logged_in_frontend_user() or 'eventPreview' == app.request.query.get('mode') %} {# poor security level! #}
                             <div class="enclosure">
                                 {% for enclosureItem in enclosure %}
                                     <p>
@@ -309,15 +309,5 @@
 </div>
 <!-- indexer::continue -->
 
-{# Use a callable inside src/EventListener/Contao/EventParseTemplateListener.php to get "schema.org" data #}
-{% do addSchemaOrg.invoke() %}
-
-{#
-{% set schemaOrg = getSchemaOrgData.invoke() %}
-{% if hasDetails %}
-    {% set schemaOrg = schemaOrg|merge({
-        "description": rawHtmlToPlainText.invoke(details)
-    }) %}
-{% endif %}
-{% do addSchemaOrg.invoke(schemaOrg) %}
-#}
+{# add jsonLD schema.org data #}
+{% do add_event_schema_org_data(model, Template) %}
