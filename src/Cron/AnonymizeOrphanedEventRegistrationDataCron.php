@@ -16,17 +16,18 @@ namespace Markocupic\SacEventToolBundle\Cron;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCronJob;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\System;
 use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 
 #[AsCronJob('daily')]
 class AnonymizeOrphanedEventRegistrationDataCron
 {
     private ContaoFramework $framework;
+    private ClearFrontendUserData $clearFrontendUserData;
 
-    public function __construct(ContaoFramework $framework)
+    public function __construct(ContaoFramework $framework, ClearFrontendUserData $clearFrontendUserData)
     {
         $this->framework = $framework;
+        $this->clearFrontendUserData = $clearFrontendUserData;
     }
 
     /**
@@ -38,7 +39,6 @@ class AnonymizeOrphanedEventRegistrationDataCron
         // Initialize contao framework
         $this->framework->initialize();
 
-        $cron = System::getContainer()->get(ClearFrontendUserData::class);
-        $cron->anonymizeOrphanedCalendarEventsMemberDataRecords();
+        $this->clearFrontendUserData->anonymizeOrphanedCalendarEventsMemberDataRecords();
     }
 }

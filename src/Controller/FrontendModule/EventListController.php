@@ -72,7 +72,7 @@ class EventListController extends AbstractFrontendModuleController
         $ApiParam = [];
 
         foreach ($arrKeys as $key) {
-            $ApiParam[$key] = $this->getApiParam($key, $request->query->get($key, ''));
+            $ApiParam[$key] = $this->getApiParam($key, $request->query->get($key));
         }
 
         // Get picture id
@@ -88,7 +88,7 @@ class EventListController extends AbstractFrontendModuleController
         return $template->getResponse();
     }
 
-    private function getApiParam(string $strKey, string $value = '')
+    private function getApiParam(string $strKey, mixed $value)
     {
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
@@ -101,9 +101,11 @@ class EventListController extends AbstractFrontendModuleController
                     if (\is_array($value)) {
                         $value = implode(',', $value);
                     } elseif (is_numeric($value)) {
+                        // Do nothing
                     }
                     // Or the organizers GET param can be transmitted like this: organizers=5,7,3
-                    elseif (strpos($value, ',')) {
+                    elseif (str_contains($value, ',')) {
+                        // Do nothing
                     } else {
                         // Or the organizers GET param can be transmitted like this: organizers[]=5&organizers[]=7&organizers[]=3
                         $value = implode(',', $stringUtilAdapter->deserialize($value, true));

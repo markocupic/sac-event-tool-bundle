@@ -16,7 +16,6 @@ namespace Markocupic\SacEventToolBundle\Cron;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCronJob;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\System;
 use Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase;
 use Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser;
 
@@ -24,25 +23,29 @@ use Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser;
 class SacMemberDatabaseSyncCron
 {
     private ContaoFramework $framework;
+    private SyncSacMemberDatabase $syncSacMemberDatabase;
+    private SyncMemberWithUser $syncMemberWithUser;
 
-    public function __construct(ContaoFramework $framework)
+    public function __construct(ContaoFramework $framework, SyncSacMemberDatabase $syncSacMemberDatabase, SyncMemberWithUser $syncMemberWithUser)
     {
         $this->framework = $framework;
+        $this->syncSacMemberDatabase = $syncSacMemberDatabase;
+        $this->syncMemberWithUser = $syncMemberWithUser;
     }
 
     /**
      * Sync SAC member database.
      * Sync tl_member with tl_user.
+     *
+     * @throws \Exception
      */
     public function __invoke(): void
     {
         // Initialize contao framework
         $this->framework->initialize();
 
-        $cron = System::getContainer()->get(SyncSacMemberDatabase::class);
-        $cron->run();
+        $this->syncSacMemberDatabase->run();
 
-        $cron = System::getContainer()->get(SyncMemberWithUser::class);
-        $cron->syncMemberWithUser();
+        $this->syncMemberWithUser->syncMemberWithUser();
     }
 }
