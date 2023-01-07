@@ -20,10 +20,10 @@ use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Date;
 use Contao\Environment;
 use Contao\Events;
@@ -49,7 +49,6 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,9 +61,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
-/**
- * @FrontendModule(EventRegistrationController::TYPE, category="sac_event_tool_frontend_modules")
- */
+#[AsFrontendModule(EventRegistrationController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_event_registration')]
 class EventRegistrationController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_registration';
@@ -79,7 +76,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private TwigEnvironment $twig;
     private TranslatorInterface $translator;
     private string $projectDir;
-    private LoggerInterface|null $logger;
+    private LoggerInterface|null $contaoGeneralLogger;
 
     // Adapters
     private Adapter $calendarEventsHelperAdapter;
@@ -107,7 +104,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private Form|null $objForm = null;
     private Template|null $template = null;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Security $security, EventDispatcherInterface $eventDispatcher, TwigEnvironment $twig, TranslatorInterface $translator, string $projectDir, LoggerInterface $logger = null)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Security $security, EventDispatcherInterface $eventDispatcher, TwigEnvironment $twig, TranslatorInterface $translator, string $projectDir, LoggerInterface $contaoGeneralLogger = null)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
@@ -116,7 +113,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $this->twig = $twig;
         $this->translator = $translator;
         $this->projectDir = $projectDir;
-        $this->logger = $logger;
+        $this->contaoGeneralLogger = $contaoGeneralLogger;
 
         // Adapters
         $this->calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
@@ -243,9 +240,9 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $this->template->errorMessage = $errorMessage;
 
                 // Log
-                if ($this->logger) {
+                if ($this->contaoGeneralLogger) {
                     $strText = sprintf('Event registration error: "%s"', $errorMessage);
-                    $this->logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION_ERROR)]);
+                    $this->contaoGeneralLogger->info($strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION_ERROR)]);
                 }
 
                 if ($url = $this->getRoute('info')) {
@@ -406,7 +403,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $objEventRegistration->save();
 
                 // Log
-                if ($this->logger) {
+                if ($this->contaoGeneralLogger) {
                     $strText = sprintf(
                         'New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").',
                         $this->memberModel->firstname,
@@ -416,7 +413,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                         $this->eventModel->title
                     );
 
-                    $this->logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION)]);
+                    $this->contaoGeneralLogger->info($strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION)]);
                 }
 
                 // Dispatch event registration event (e.g. send notification)

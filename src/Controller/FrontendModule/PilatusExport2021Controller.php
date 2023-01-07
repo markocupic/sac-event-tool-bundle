@@ -18,9 +18,9 @@ use Contao\Calendar;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\InsertTag\InsertTagParser;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Date;
 use Contao\Environment;
 use Contao\Events;
@@ -38,9 +38,7 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @FrontendModule(PilatusExport2021Controller::TYPE, category="sac_event_tool_frontend_modules")
- */
+#[AsFrontendModule(PilatusExport2021Controller::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_pilatus_export_2021')]
 class PilatusExport2021Controller extends AbstractPrintExportController
 {
     public const TYPE = 'pilatus_export_2021';

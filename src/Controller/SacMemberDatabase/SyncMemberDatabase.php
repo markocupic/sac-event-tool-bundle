@@ -29,8 +29,6 @@ class SyncMemberDatabase extends AbstractController
     {
         $this->framework = $framework;
         $this->syncSacMemberDatabase = $syncSacMemberDatabase;
-
-        $this->framework->initialize();
     }
 
     /**
@@ -40,6 +38,8 @@ class SyncMemberDatabase extends AbstractController
      */
     public function syncDatabaseAction(): JsonResponse
     {
+        $this->framework->initialize();
+
         // Run database sync
         $this->syncSacMemberDatabase->run();
 
@@ -50,56 +50,6 @@ class SyncMemberDatabase extends AbstractController
             'message' => 'Successfully executed the db sync.',
             'password updates' => (string) $count,
         ];
-
-        return new JsonResponse($arrJson);
-    }
-
-    /**
-     * Reconstructed anonymized entries from tl_calendar_events_membewr2
-     * 24.05.2021.
-     *
-     * @Route("/_repair", name="repair", defaults={"_scope" = "frontend"})
-     */
-    public function repair(): JsonResponse
-    {
-        /**
-         * $this->framework->initialize();
-         * $arrUsers = [
-         * 11360,
-         * 14530,
-         * 14526,
-         * 20057,
-         * 18904,
-         * 18901,
-         * 21575,
-         * 21574,
-         * 21573,
-         * 21572,
-         * 21520,
-         * 21519,
-         * 21375,
-         * 21372,
-         * 20336,
-         * ];.
-         *
-         * $i = 0;
-         *
-         * foreach ($arrUsers as $id) {
-         * $objEventMember = CalendarEventsMemberModel::findByPk($id);
-         *
-         * if (null !== $objEventMember) {
-         * ++$i;
-         * $objTemp = Database::getInstance()
-         * ->prepare('SELECT * FROM tl_calendar_events_member2 WHERE id=?')
-         * ->limit(1)
-         * ->execute($id)
-         * ;
-         * $objEventMember->emergencyPhoneName = $objTemp->emergencyPhoneName;
-         * $objEventMember->save();
-         * }
-         * }
-         */
-        $arrJson = ['message' => 'Successfully executed '.$i.' repaira.'];
 
         return new JsonResponse($arrJson);
     }

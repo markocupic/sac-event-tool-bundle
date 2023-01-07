@@ -26,16 +26,16 @@ class MaintainBackendUserRights
 {
     private ContaoFramework $framework;
     private Connection $connection;
-    private string $backendUserHomeDir;
+    private string $sacevtUserBackendHomeDir;
 
     private Adapter $stringUtil;
     private Adapter $date;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, string $backendUserHomeDir)
+    public function __construct(ContaoFramework $framework, Connection $connection, string $sacevtUserBackendHomeDir)
     {
         $this->framework = $framework;
         $this->connection = $connection;
-        $this->backendUserHomeDir = $backendUserHomeDir;
+        $this->sacevtUserBackendHomeDir = $sacevtUserBackendHomeDir;
 
         // Adapters
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
@@ -89,7 +89,7 @@ class MaintainBackendUserRights
                         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
 
                         // Set users home directory, if there is one
-                        $objFolder = $filesModelAdapter->findByPath($this->backendUserHomeDir.'/'.$arrUserProps['id']);
+                        $objFolder = $filesModelAdapter->findByPath($this->sacevtUserBackendHomeDir.'/'.$arrUserProps['id']);
 
                         if (null !== $objFolder) {
                             $permNew = [$objFolder->uuid];

@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 use Contao\BackendTemplate;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Input;
 use Contao\StringUtil;
@@ -27,28 +28,23 @@ use Knp\Menu\Renderer\ListRenderer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 
+/**
+ * Generates the event member dashboard.
+ */
+#[AsHook('parseBackendTemplate', priority: 100)]
 class ParseBackendTemplateListener
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
 
-    /**
-     * ParseBackendTemplateListener constructor.
-     */
     public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
     }
 
     /**
-     * @param $strBuffer
-     * @param $strTemplate
-     *
      * @throws \Exception
      */
-    public function onParseBackendTemplate($strBuffer, $strTemplate): string
+    public function __invoke(string $strBuffer, string $strTemplate): string
     {
         // Set adapters
         $inputAdapter = $this->framework->getAdapter(Input::class);
@@ -61,13 +57,8 @@ class ParseBackendTemplateListener
             // Add icon explanation legend to tl_calendar_events_member
             if ('sac_calendar_events_tool' === $inputAdapter->get('do') && 'tl_calendar_events' === $inputAdapter->get('table') && 'edit' === $inputAdapter->get('act')) {
                 if (preg_match('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $strBuffer, $matches)) {
-                    if ('writeTourReport' !== $inputAdapter->get('call')) {
-                        $strDashboard = $this->_generateEventDashboard();
-                        $strBuffer = preg_replace('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $matches[0].$strDashboard, $strBuffer);
-                    } else {
-                        $strDashboard = $this->_generateEventDashboard();
-                        $strBuffer = preg_replace('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $matches[0].$strDashboard, $strBuffer);
-                    }
+                    $strDashboard = $this->_generateEventDashboard();
+                    $strBuffer = preg_replace('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $matches[0].$strDashboard, $strBuffer);
                 }
             }
 
@@ -79,9 +70,8 @@ class ParseBackendTemplateListener
                     if (preg_match('/<table class=\"tl_listing(.*)<\/table>/sU', $strBuffer)) {
                         $controllerAdapter->loadDataContainer('tl_calendar_events_member');
                         $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
-                        $strLegend = '';
 
-                        $strLegend .= '<div class="legend-box">';
+                        $strLegend = '<div class="legend-box">';
 
                         // Event details
                         $strLegend .= '<div class="event-detail-legend">';
@@ -136,6 +126,9 @@ class ParseBackendTemplateListener
         return $strBuffer;
     }
 
+    /**
+     * @throws \Exception
+     */
     private function _generateEventDashboard(): string
     {
         // Set adapters
@@ -164,8 +157,8 @@ class ParseBackendTemplateListener
         $menu = $factory->createItem('Event Dashboard');
 
         // HOOK: Use hooks to generate the mini dashboard. Soother plugins are able to add items as well.
-        if (isset($GLOBALS['TL_HOOKS']['sacEvtOnGenerateEventDashboard']) && \is_array($GLOBALS['TL_HOOKS']['sacEvtOnGenerateEventDashboard'])) {
-            foreach ($GLOBALS['TL_HOOKS']['sacEvtOnGenerateEventDashboard'] as $callback) {
+        if (isset($GLOBALS['TL_HOOKS']['generateEventDashboard']) && \is_array($GLOBALS['TL_HOOKS']['generateEventDashboard'])) {
+            foreach ($GLOBALS['TL_HOOKS']['generateEventDashboard'] as $callback) {
                 System::importStatic($callback[0])->{$callback[1]}($menu, $objEvent);
             }
         }

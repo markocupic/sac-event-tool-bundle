@@ -34,16 +34,16 @@ class ClearFrontendUserData
 
     private string $projectDir;
 
-    private string $feUserAvatarDir;
+    private string $sacevtUserFrontendAvatarDir;
 
     /**
      * ClearFrontendUserData constructor.
      */
-    public function __construct(ContaoFramework $framework, string $projectDir, string $feUserAvatarDir)
+    public function __construct(ContaoFramework $framework, string $projectDir, string $sacevtUserFrontendAvatarDir)
     {
         $this->framework = $framework;
         $this->projectDir = $projectDir;
-        $this->feUserAvatarDir = $feUserAvatarDir;
+        $this->sacevtUserFrontendAvatarDir = $sacevtUserFrontendAvatarDir;
 
         // Initialize contao framework
         $this->framework->initialize();
@@ -288,10 +288,8 @@ class ClearFrontendUserData
      */
     public function deleteAvatarDirectory(int $memberId): void
     {
-        $strAvatarDir = $this->feUserAvatarDir;
-
-        if (is_dir($this->projectDir.'/'.$strAvatarDir.'/'.$memberId)) {
-            $strDir = $strAvatarDir.'/'.$memberId;
+        if (is_dir($this->projectDir.'/'.$this->sacevtUserFrontendAvatarDir.'/'.$memberId)) {
+            $strDir = $this->sacevtUserFrontendAvatarDir.'/'.$memberId;
             $objDir = new Folder($strDir);
 
             if (null !== $objDir) {

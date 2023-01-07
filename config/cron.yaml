@@ -1,9 +1,0 @@
-services:
-
-    Markocupic\SacEventToolBundle\Cron\AnonymizeOrphanedEventRegistrationDataCron:
-        arguments:
-            - '@contao.framework'
-
-    Markocupic\SacEventToolBundle\Cron\SacMemberDatabaseSyncCron:
-        arguments:
-            - '@contao.framework'

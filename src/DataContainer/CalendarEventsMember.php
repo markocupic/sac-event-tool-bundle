@@ -70,9 +70,9 @@ class CalendarEventsMember
     private ExportEventRegistrationList $registrationListExporterCsv;
     private EventMemberList2Docx $registrationListExporterDocx;
     private string $projectDir;
-    private string $eventAdminName;
-    private string $eventAdminEmail;
-    private string $locale;
+    private string $sacevtEventAdminName;
+    private string $sacevtEventAdminEmail;
+    private string $sacevtLocale;
 
     // Adapters
     private Adapter $backend;
@@ -90,7 +90,7 @@ class CalendarEventsMember
     private Adapter $user;
     private Adapter $validator;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, ExportEventRegistrationList $registrationListExporterCsv, EventMemberList2Docx $registrationListExporterDocx, string $projectDir, string $eventAdminName, string $eventAdminEmail, string $locale, LoggerInterface $logger = null)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, ExportEventRegistrationList $registrationListExporterCsv, EventMemberList2Docx $registrationListExporterDocx, string $projectDir, string $sacevtEventAdminName, string $sacevtEventAdminEmail, string $sacevtLocale, LoggerInterface $logger = null)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
@@ -101,9 +101,9 @@ class CalendarEventsMember
         $this->registrationListExporterCsv = $registrationListExporterCsv;
         $this->registrationListExporterDocx = $registrationListExporterDocx;
         $this->projectDir = $projectDir;
-        $this->eventAdminName = $eventAdminName;
-        $this->eventAdminEmail = $eventAdminEmail;
-        $this->locale = $locale;
+        $this->sacevtEventAdminName = $sacevtEventAdminName;
+        $this->sacevtEventAdminEmail = $sacevtEventAdminEmail;
+        $this->sacevtLocale = $sacevtLocale;
         $this->logger = $logger;
 
         // Adapters
@@ -281,13 +281,13 @@ class CalendarEventsMember
                 }
             }
 
-            if (!$this->validator->isEmail($this->eventAdminEmail)) {
+            if (!$this->validator->isEmail($this->sacevtEventAdminEmail)) {
                 throw new \Exception('Please set a valid email address in parameter %sacevt.event_admin_email%.');
             }
 
             $objEmail = new Email();
-            $objEmail->fromName = html_entity_decode($this->eventAdminName);
-            $objEmail->from = $this->eventAdminEmail;
+            $objEmail->fromName = html_entity_decode($this->sacevtEventAdminName);
+            $objEmail->from = $this->sacevtEventAdminEmail;
             $objEmail->replyTo($user->email);
             $objEmail->subject = html_entity_decode((string) $request->request->get('emailSubject'));
             $objEmail->text = html_entity_decode((string) $request->request->get('emailText'));
@@ -533,7 +533,7 @@ class CalendarEventsMember
                             'event_link_detail' => 'https://'.$this->environment->get('host').'/'.$this->events->generateEventUrl($objEvent),
                         ];
 
-                        $objNotification->send($arrTokens, $this->locale);
+                        $objNotification->send($arrTokens, $this->sacevtLocale);
                     }
                 }
             }
@@ -911,7 +911,7 @@ class CalendarEventsMember
                 $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
 
                 if (null !== $objEventMemberModel) {
-                    if (!$this->validator->isEmail($this->eventAdminEmail)) {
+                    if (!$this->validator->isEmail($this->sacevtEventAdminEmail)) {
                         throw new \Exception('Please set a valid email address in parameter sacevt.event_admin_email.');
                     }
                     $objEmail = $this->notification->findOneByType('default_email');
@@ -920,8 +920,8 @@ class CalendarEventsMember
                     if (null !== $objEmail) {
                         // Set token array
                         $arrTokens = [
-                            'email_sender_name' => html_entity_decode(html_entity_decode($this->eventAdminName)),
-                            'email_sender_email' => $this->eventAdminEmail,
+                            'email_sender_name' => html_entity_decode(html_entity_decode($this->sacevtEventAdminName)),
+                            'email_sender_email' => $this->sacevtEventAdminEmail,
                             'send_to' => $objEventMemberModel->email,
                             'reply_to' => $user->email,
                             'email_subject' => html_entity_decode((string) $request->request->get('subject')),
@@ -942,7 +942,7 @@ class CalendarEventsMember
                             $this->message->addError('Es ist ein Fehler aufgetreten. Da die maximale Teilnehmerzahl bereits erreicht ist, kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.');
                         } // Send email
                         elseif ($this->validator->isEmail($objEventMemberModel->email)) {
-                            $objEmail->send($arrTokens, $this->locale);
+                            $objEmail->send($arrTokens, $this->sacevtLocale);
 
                             $set = ['stateOfSubscription' => $arrAction['stateOfSubscription']];
                             $this->connection->update('tl_calendar_events_member', $set, ['id' => $dc->id]);

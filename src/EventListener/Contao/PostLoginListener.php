@@ -15,39 +15,32 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\BackendUser;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\User;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory;
 
+/**
+ * Create user directories if they do not exist
+ * and remove them if they are no more used.
+ */
+#[AsHook('postLogin', priority: 100)]
 class PostLoginListener
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
+    private MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory;
 
-    /**
-     * @var MaintainBackendUsersHomeDirectory
-     */
-    private $maintainBackendUsersHomeDirectory;
-
-    /**
-     * PostLoginListener constructor.
-     */
     public function __construct(ContaoFramework $framework, MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory)
     {
         $this->framework = $framework;
         $this->maintainBackendUsersHomeDirectory = $maintainBackendUsersHomeDirectory;
-        $this->framework->initialize();
     }
 
-    /**
-     * Create user directories if they do not exist
-     * and remove them if they are no more used.
-     */
-    public function onPostLogin(User $user): void
+    public function __invoke(User $user): void
     {
+        $this->framework->initialize();
+
         /** @var UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 

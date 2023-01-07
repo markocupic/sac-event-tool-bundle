@@ -40,15 +40,15 @@ class UpcomingEventsController extends AbstractController
 
     private string $projectDir;
 
-    private string $locale;
+    private string $sacevtLocale;
 
-    public function __construct(ContaoFramework $framework, FeedFactory $feedFactory, Connection $connection, string $projectDir, string $locale)
+    public function __construct(ContaoFramework $framework, FeedFactory $feedFactory, Connection $connection, string $projectDir, string $sacevtLocale)
     {
         $this->framework = $framework;
         $this->feedFactory = $feedFactory;
         $this->connection = $connection;
         $this->projectDir = $projectDir;
-        $this->locale = $locale;
+        $this->sacevtLocale = $sacevtLocale;
     }
 
     /**
@@ -115,7 +115,7 @@ class UpcomingEventsController extends AbstractController
         );
 
         $rss->addChannelField(
-            new Item('language', $this->locale)
+            new Item('language', $this->sacevtLocale)
         );
 
         $rss->addChannelField(

@@ -17,13 +17,11 @@ namespace Markocupic\SacEventToolBundle\Controller\Download;
 use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\System;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx;
 use Markocupic\SacEventToolBundle\Ical\SendEventIcal;
 use Markocupic\SacEventToolBundle\Pdf\WorkshopBookletGenerator;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -36,15 +34,17 @@ class DownloadController extends AbstractController
     private RequestStack $requestStack;
     private WorkshopBookletGenerator $workshopBookletGenerator;
     private ExportEvents2Docx $exportEvents2Docx;
-    private LoggerInterface|null $logger;
+    private LoggerInterface|null $contaoGeneralLogger;
+    private SendEventIcal $sendEventIcal;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, WorkshopBookletGenerator $workshopBookletGenerator, ExportEvents2Docx $exportEvents2Docx, LoggerInterface|null $logger)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, WorkshopBookletGenerator $workshopBookletGenerator, ExportEvents2Docx $exportEvents2Docx, SendEventIcal $sendEventIcal, LoggerInterface|null $contaoGeneralLogger)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->workshopBookletGenerator = $workshopBookletGenerator;
         $this->exportEvents2Docx = $exportEvents2Docx;
-        $this->logger = $logger;
+        $this->sendEventIcal = $sendEventIcal;
+        $this->contaoGeneralLogger = $contaoGeneralLogger;
 
         $this->framework->initialize();
     }
@@ -73,8 +73,7 @@ class DownloadController extends AbstractController
         $this->workshopBookletGenerator->setDownload(true);
 
         // Log download
-        $this->logger->log(
-            LogLevel::INFO,
+        $this->contaoGeneralLogger->info(
             'The course booklet has been downloaded.',
             ['contao' => new ContaoContext(__METHOD__, Log::DOWNLOAD_WORKSHOP_BOOKLET)]
         );
@@ -146,9 +145,7 @@ class DownloadController extends AbstractController
             $objEvent = $calendarEventsModelAdapter->findByPk($request->query->get('eventId'));
 
             if (null !== $objEvent) {
-                /** @var SendEventIcal $ical */
-                $ical = System::getContainer()->get('Markocupic\SacEventToolBundle\Ical\SendEventIcal');
-                $ical->sendEventIcalToBrowser($objEvent);
+                $this->sendEventIcal->sendEventIcalToBrowser($objEvent);
             }
         }
 

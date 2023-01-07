@@ -18,8 +18,8 @@ use Contao\Calendar;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
@@ -37,9 +37,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @FrontendModule(JahresprogrammExportController::TYPE, category="sac_event_tool_frontend_modules")
- */
+#[AsFrontendModule(JahresprogrammExportController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_jahresprogramm_export')]
 class JahresprogrammExportController extends AbstractPrintExportController
 {
     public const TYPE = 'jahresprogramm_export';

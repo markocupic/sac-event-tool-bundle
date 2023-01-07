@@ -15,7 +15,8 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
@@ -23,46 +24,58 @@ use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @FrontendModule(EventListController::TYPE, category="sac_event_tool_frontend_modules")
- */
+#[AsFrontendModule(EventListController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_event_list')]
 class EventListController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_list';
+    protected ModuleModel|null $model = null;
 
-    /**
-     * @var ModuleModel
-     */
-    protected $model;
+    private ContaoFramework $framework;
+
+    public function __construct(ContaoFramework $framework)
+    {
+        $this->framework = $framework;
+    }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         $this->model = $model;
 
-        // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        return parent::getSubscribedServices();
     }
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         // Get filter params from request
-        $arrKeys = ['limit', 'calendarIds', 'eventType', 'suitableForBeginners', 'publicTransportEvent', 'organizers', 'tourType', 'courseType', 'courseId', 'year', 'dateStart', 'textsearch', 'eventId', 'courseId', 'arrIds', 'username'];
+        $arrKeys = [
+            'limit',
+            'calendarIds',
+            'eventType',
+            'suitableForBeginners',
+            'publicTransportEvent',
+            'organizers',
+            'tourType',
+            'courseType',
+            'courseId',
+            'year',
+            'dateStart',
+            'textsearch',
+            'eventId',
+            'courseId',
+            'arrIds',
+            'username',
+        ];
 
         $ApiParam = [];
 
         foreach ($arrKeys as $key) {
-            $ApiParam[$key] = $this->getApiParam($key, $request->query->get($key));
+            $ApiParam[$key] = $this->getApiParam($key, $request->query->get($key, ''));
         }
 
-        // Get picture Id
+        // Get picture id
         $arrPicture = $stringUtilAdapter->deserialize($model->imgSize, true);
         $pictureId = isset($arrPicture[2]) && is_numeric($arrPicture[2]) ? $arrPicture[2] : '0';
 
@@ -75,10 +88,10 @@ class EventListController extends AbstractFrontendModuleController
         return $template->getResponse();
     }
 
-    private function getApiParam($strKey, $value = '')
+    private function getApiParam(string $strKey, string $value = '')
     {
         /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->get('contao.framework')->getAdapter(StringUtil::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         switch ($strKey) {
             case 'organizers':
@@ -88,11 +101,9 @@ class EventListController extends AbstractFrontendModuleController
                     if (\is_array($value)) {
                         $value = implode(',', $value);
                     } elseif (is_numeric($value)) {
-                        $value = $value;
                     }
                     // Or the organizers GET param can be transmitted like this: organizers=5,7,3
                     elseif (strpos($value, ',')) {
-                        $value = $value;
                     } else {
                         // Or the organizers GET param can be transmitted like this: organizers[]=5&organizers[]=7&organizers[]=3
                         $value = implode(',', $stringUtilAdapter->deserialize($value, true));
@@ -125,7 +136,6 @@ class EventListController extends AbstractFrontendModuleController
             case 'dateStart':
             case 'textsearch':
             case 'eventId':
-            case 'courseId':
             case 'suitableForBeginners':
             case 'publicTransportEvent':
             case 'arrIds':

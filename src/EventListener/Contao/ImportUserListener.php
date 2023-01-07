@@ -14,40 +14,28 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Input;
 use Contao\UserModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Allow backend users to authenticate with their sacMemberId.
+ */
+#[AsHook('importUser', priority: 100)]
 class ImportUserListener
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
+    private RequestStack $requestStack;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * ImportUserListener constructor.
-     */
     public function __construct(ContaoFramework $framework, RequestStack $requestStack)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * Allow backend users to authenticate with their sacMemberId.
-     *
-     * @param $strUsername
-     * @param $strPassword
-     * @param $strTable
-     */
-    public function onImportUser($strUsername, $strPassword, $strTable): bool
+    public function __invoke(string $strUsername, string $strPassword, string $strTable): bool
     {
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
         $inputAdapter = $this->framework->getAdapter(Input::class);
@@ -61,7 +49,6 @@ class ImportUserListener
                 if (null !== $objUser) {
                     if ((int) $objUser->sacMemberId > 0 && (string) $objUser->sacMemberId === (string) $strUsername) {
                         // Used for password recovery
-                        /** @var Request $request */
                         $request->request->set('username', $objUser->username);
 
                         // Used for backend login

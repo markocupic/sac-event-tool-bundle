@@ -25,13 +25,13 @@ final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
 {
     private Connection $connection;
     private MaintainBackendUserRights $maintainBackendUserRights;
-    private bool $resetUserRightOnSsoLogin;
+    private bool $sacevtUserBackendResetUserRightsOnSsoLogin;
 
-    public function __construct(Connection $connection, MaintainBackendUserRights $maintainBackendUserRights, bool $resetUserRightOnSsoLogin)
+    public function __construct(Connection $connection, MaintainBackendUserRights $maintainBackendUserRights, bool $sacevtUserBackendResetUserRightsOnSsoLogin)
     {
         $this->connection = $connection;
-        $this->maintainBackendUserProperties = $maintainBackendUserRights;
-        $this->resetUserRightOnSsoLogin = $resetUserRightOnSsoLogin;
+        $this->maintainBackendUserRights = $maintainBackendUserRights;
+        $this->sacevtUserBackendResetUserRightsOnSsoLogin = $sacevtUserBackendResetUserRightsOnSsoLogin;
     }
 
     public static function getSubscribedEvents(): array
@@ -49,7 +49,7 @@ final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
      */
     public function resetBackendUserRights(PreInteractiveLoginEvent $event): void
     {
-        if (false === $this->resetUserRightOnSsoLogin) {
+        if (false === $this->sacevtUserBackendResetUserRightsOnSsoLogin) {
             return;
         }
 
@@ -64,7 +64,7 @@ final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
             ;
 
             if (false !== $arrUserData) {
-                $this->maintainBackendUserProperties->resetBackendUserRights($userIdentifier, [], true);
+                $this->maintainBackendUserRights->resetBackendUserRights($userIdentifier, [], true);
             }
         }
     }

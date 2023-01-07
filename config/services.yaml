@@ -1,4 +1,39 @@
 services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        bind:
+            $passwordHasherFactory: '@security.password_hasher_factory'
+            $projectDir: '%kernel.project_dir%'
+            $sacevtAvatarFemale: '%sacevt.avatar.female%'
+            $sacevtAvatarMale: '%sacevt.avatar.male%'
+            $sacevtEventAdminEmail: '%sacevt.event_admin_email%'
+            $sacevtEventAdminName: '%sacevt.event_admin_name%'
+            $sacevtEventCourseBookletFilenamePattern: '%sacevt.event.course.booklet_filename_pattern%'
+            $sacevtEventCourseConfirmationFileNamePattern: '%sacevt.event.course_confirmation_file_name_pattern%'
+            $sacevtEventMemberListFileNamePattern: '%sacevt.event.member_list_file_name_pattern%'
+            $sacevtEventTemplateCourseConfirmation: '%sacevt.event.template.course_confirmation%'
+            $sacevtEventTemplateMemberList: '%sacevt.event.template.member_list%'
+            $sacevtEventTemplateTourInvoice: '%sacevt.event.template.tour_invoice%'
+            $sacevtEventTemplateTourRapport: '%sacevt.event.template.tour_rapport%'
+            $sacevtEventTourInvoiceFileNamePattern: '%sacevt.event.tour_invoice_file_name_pattern%'
+            $sacevtEventTourRapportFileNamePattern: '%sacevt.event.tour_rapport_file_name_pattern%'
+            $sacevtLocale: '%sacevt.locale%'
+            $sacevtMemberSyncCredentials: '%sacevt.member_sync_credentials%'
+            $sacevtTempDir: '%sacevt.temp_dir%'
+            $sacevtUserBackendHomeDir: '%sacevt.user.backend.home_dir%'
+            $sacevtUserBackendResetUserRightsOnSsoLogin: '%sacevt.user.backend.reset_user_rights_on_sso_login%'
+            $sacevtUserFrontendAvatarDir: '%sacevt.user.frontend.avatar_dir%'
+
+    _instanceof:
+        Symfony\Bundle\FrameworkBundle\Controller\AbstractController:
+            calls:
+                - [ setContainer, [ '@service_container' ] ]
+
+    Markocupic\SacEventToolBundle\:
+        resource: ../src/
+        exclude: ../src/{ContaoManager,Session,Config,Event,DependencyInjection,Resources,Model}
 
     # Add a session bag
     Markocupic\SacEventToolBundle\Session\Attribute\ArrayAttributeBag:
@@ -7,113 +42,14 @@ services:
         calls:
             - [ setName, [ 'markocupic_sac_event_tool_attributes' ] ]
 
-    # Generate docx/pdf event memberlists from docx templates
-    Markocupic\SacEventToolBundle\DocxTemplator\EventMemberList2Docx:
-        public: true
-        arguments:
-            - '@contao.framework'
-            - '@Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event'
-            - '@Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember'
-            - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
-            - '%sacevt.temp_dir%'
-            - '%kernel.project_dir%'
-            - '%sacevt.event.template.member_list%'
-            - '%sacevt.event.member_list_file_name_pattern%'
-
-    # Generate csv event registration list
-    Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList:
-        arguments:
-            - '@contao.framework'
-            - '@database_connection'
-            - '%sacevt.event.member_list_file_name_pattern%'
-
-    # Generate docx/pdf event rapports and event invoices from docx templates
-    Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx:
-        public: true
-        arguments:
-            - '@contao.framework'
-            - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
-            - '%kernel.project_dir%'
-            - '%sacevt.temp_dir%'
-
     # Generate docx/pdf event rapports, event invoices and event memberlists from docx templates
     Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event:
         public: true
-        arguments:
-            - '@contao.framework'
-            - '@translator'
 
     # Generate docx/pdf event rapports, event invoices and event memberlists from docx templates
     Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember:
         public: true
-        arguments:
-            - '@contao.framework'
-            - '%kernel.project_dir%'
 
-    # Clear/Anonymize frontend user data f.ex if frontend user has been deleted
-    Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData:
+    Markocupic\SacEventToolBundle\Avatar\Avatar:
         public: true
-        arguments:
-            - '@contao.framework'
-            - '%kernel.project_dir%'
-            - '%sacevt.user.frontend.avatar_dir%'
 
-    # Generate backend users home directory / remove old backend user home directories
-    Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory:
-        public: true
-        arguments:
-            - '@contao.framework'
-            - '%kernel.project_dir%'
-            - '%sacevt.user.backend.home_dir%'
-
-    # Clear backend user properties
-    Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserRights:
-        public: true
-        arguments:
-            - '@contao.framework'
-            - '@database_connection'
-            - '%sacevt.user.backend.home_dir%'
-
-    # Cron: Sync tl_member with tl_user
-    Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser:
-        public: true
-        arguments:
-            - '@contao.framework'
-            - '@monolog.logger.contao'
-
-    # Rotate image
-    Markocupic\SacEventToolBundle\Image\RotateImage:
-        public: true
-        arguments:
-            - '@contao.framework'
-            - '%kernel.project_dir%'
-
-    # Generate worhshop booklet
-    Markocupic\SacEventToolBundle\Pdf\WorkshopBookletGenerator:
-        public: true
-        arguments:
-            - '@contao.framework'
-            - '@database_connection'
-            - '@Markocupic\SacEventToolBundle\Download\BinaryFileDownload'
-            - '%kernel.project_dir%'
-            - '%sacevt.temp_dir%'
-            - '%sacevt.event.course.booklet_filename_pattern%'
-
-    # Export events as docx file
-    Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx:
-        public: true
-        arguments:
-            - '@contao.framework'
-            - '@Markocupic\SacEventToolBundle\Download\BinaryFileDownload'
-            - '%kernel.project_dir%'
-
-    # Send ical to the browser
-    Markocupic\SacEventToolBundle\Ical\SendEventIcal:
-        public: true
-        arguments:
-            - '@contao.framework'
-            - '@Contao\CoreBundle\InsertTag\InsertTagParser'
-
-    # Send file to the browser
-    Markocupic\SacEventToolBundle\Download\BinaryFileDownload:
-        public: true

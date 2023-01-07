@@ -16,8 +16,8 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Dbafs;
 use Contao\Environment;
 use Contao\File;
@@ -38,9 +38,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 
-/**
- * @FrontendModule(MemberDashboardAvatarUploadController::TYPE, category="sac_event_tool_frontend_modules")
- */
+#[AsFrontendModule(MemberDashboardAvatarUploadController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_avatar_upload')]
 class MemberDashboardAvatarUploadController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_avatar_upload';
@@ -50,18 +48,18 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     private RotateImage $rotateImage;
     private Avatar $avatar;
     private string $projectDir;
-    private string $avatarDir;
+    private string $sacevtUserFrontendAvatarDir;
     private FrontendUser|null $user;
     private Template|null $template;
 
-    public function __construct(ContaoFramework $framework, Security $security, RotateImage $rotateImage, Avatar $avatar, string $projectDir, string $avatarDir)
+    public function __construct(ContaoFramework $framework, Security $security, RotateImage $rotateImage, Avatar $avatar, string $projectDir, string $sacevtUserFrontendAvatarDir)
     {
         $this->framework = $framework;
         $this->security = $security;
         $this->rotateImage = $rotateImage;
         $this->avatar = $avatar;
         $this->projectDir = $projectDir;
-        $this->avatarDir = $avatarDir;
+        $this->sacevtUserFrontendAvatarDir = $sacevtUserFrontendAvatarDir;
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
@@ -142,7 +140,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
     {
         return sprintf(
             '%s/%s',
-            $this->avatarDir,
+            $this->sacevtUserFrontendAvatarDir,
             $this->user->id,
         );
     }

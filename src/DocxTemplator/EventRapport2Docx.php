@@ -34,17 +34,17 @@ class EventRapport2Docx
     private ContaoFramework $framework;
     private ConvertFile $convertFile;
     private string $projectDir;
-    private string $tempDir;
+    private string $sacevtTempDir;
 
     /**
      * EventRapport constructor.
      */
-    public function __construct(ContaoFramework $framework, ConvertFile $convertFile, string $projectDir, string $tempDir)
+    public function __construct(ContaoFramework $framework, ConvertFile $convertFile, string $projectDir, string $sacevtTempDir)
     {
         $this->framework = $framework;
         $this->convertFile = $convertFile;
         $this->projectDir = $projectDir;
-        $this->tempDir = $tempDir;
+        $this->sacevtTempDir = $sacevtTempDir;
 
         // Initialize contao framework
         $this->framework->initialize();
@@ -94,7 +94,7 @@ class EventRapport2Docx
 
         if (null !== $objEvent && null !== $objBiller) {
             $filenamePattern = str_replace('%%s', '%s', $strFilenamePattern);
-            $destFilename = $this->tempDir.'/'.sprintf($filenamePattern, time(), 'docx');
+            $destFilename = $this->sacevtTempDir.'/'.sprintf($filenamePattern, time(), 'docx');
 
             $objPhpWord = new MsWordTemplateProcessor($templateSRC, $destFilename);
 

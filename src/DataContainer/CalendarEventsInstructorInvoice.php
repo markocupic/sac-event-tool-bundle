@@ -45,15 +45,15 @@ class CalendarEventsInstructorInvoice
     private Security $security;
     private EventRapport2Docx $eventRapport2Docx;
     private EventMember $eventMember;
-    private string $eventTemplateTourInvoice;
-    private string $eventTemplateTourRapport;
-    private string $eventTourInvoiceFileNamePattern;
-    private string $eventTourRapportFileNamePattern;
+    private string $sacevtEventTemplateTourInvoice;
+    private string $sacevtEventTemplateTourRapport;
+    private string $sacevtEventTourInvoiceFileNamePattern;
+    private string $sacevtEventTourRapportFileNamePattern;
 
     /**
      * Import the back end user object.
      */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, EventRapport2Docx $eventRapport2Docx, EventMember $eventMember, string $eventTemplateTourInvoice, string $eventTemplateTourRapport, string $eventTourInvoiceFileNamePattern, string $eventTourRapportFileNamePattern)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, EventRapport2Docx $eventRapport2Docx, EventMember $eventMember, string $sacevtEventTemplateTourInvoice, string $sacevtEventTemplateTourRapport, string $sacevtEventTourInvoiceFileNamePattern, string $sacevtEventTourRapportFileNamePattern)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
@@ -63,10 +63,10 @@ class CalendarEventsInstructorInvoice
         $this->security = $security;
         $this->eventRapport2Docx = $eventRapport2Docx;
         $this->eventMember = $eventMember;
-        $this->eventTemplateTourInvoice = $eventTemplateTourInvoice;
-        $this->eventTemplateTourRapport = $eventTemplateTourRapport;
-        $this->eventTourInvoiceFileNamePattern = $eventTourInvoiceFileNamePattern;
-        $this->eventTourRapportFileNamePattern = $eventTourRapportFileNamePattern;
+        $this->sacevtEventTemplateTourInvoice = $sacevtEventTemplateTourInvoice;
+        $this->sacevtEventTemplateTourRapport = $sacevtEventTemplateTourRapport;
+        $this->sacevtEventTourInvoiceFileNamePattern = $sacevtEventTourInvoiceFileNamePattern;
+        $this->sacevtEventTourRapportFileNamePattern = $sacevtEventTourRapportFileNamePattern;
     }
 
     /**
@@ -136,19 +136,19 @@ class CalendarEventsInstructorInvoice
             $objTemplator = $this->eventRapport2Docx;
 
             if ('generateInvoiceDocx' === $request->query->get('action')) {
-                $objTemplator->generate('invoice', $objEventInvoice, 'docx', $this->eventTemplateTourInvoice, $this->eventTourInvoiceFileNamePattern);
+                $objTemplator->generate('invoice', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
             }
 
             if ('generateInvoicePdf' === $request->query->get('action')) {
-                $objTemplator->generate('invoice', $objEventInvoice, 'pdf', $this->eventTemplateTourInvoice, $this->eventTourInvoiceFileNamePattern);
+                $objTemplator->generate('invoice', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
             }
 
             if ('generateTourRapportDocx' === $request->query->get('action')) {
-                $objTemplator->generate('rapport', $objEventInvoice, 'docx', $this->eventTemplateTourRapport, $this->eventTourRapportFileNamePattern);
+                $objTemplator->generate('rapport', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
             }
 
             if ('generateTourRapportPdf' === $request->query->get('action')) {
-                $objTemplator->generate('rapport', $objEventInvoice, 'pdf', $this->eventTemplateTourRapport, $this->eventTourRapportFileNamePattern);
+                $objTemplator->generate('rapport', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
             }
         }
     }

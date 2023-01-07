@@ -15,8 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
-use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\FrontendUser;
 use Contao\ModuleModel;
 use Contao\PageModel;
@@ -26,32 +25,24 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 
-/**
- * @FrontendModule("MemberDashboardProfileController::TYPE", category="sac_event_tool_frontend_modules")
- */
+#[AsFrontendModule(MemberDashboardProfileController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_profile')]
 class MemberDashboardProfileController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_profile';
 
-    /**
-     * @var FrontendUser
-     */
-    protected $objUser;
+    private Security $security;
+    private FrontendUser|null $objUser = null;
+    private Template|null $template = null;
 
-    /**
-     * @var Template
-     */
-    protected $template;
-
-    /**
-     * @var PageModel
-     */
-    protected $objPage;
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         // Get logged in member object
-        if (($objUser = $this->get('security.helper')->getUser()) instanceof FrontendUser) {
+        if (($objUser = $this->security->getUser()) instanceof FrontendUser) {
             $this->objUser = $objUser;
         }
 
@@ -59,23 +50,10 @@ class MemberDashboardProfileController extends AbstractFrontendModuleController
             // Neither cache nor search page
             $page->noSearch = 1;
             $page->cache = 0;
-
-            // Set the page object
-            $this->objPage = $page;
         }
 
         // Call the parent method
         return parent::__invoke($request, $model, $section, $classes);
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
-
-        $services['contao.framework'] = ContaoFramework::class;
-        $services['security.helper'] = Security::class;
-
-        return $services;
     }
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
@@ -86,7 +64,6 @@ class MemberDashboardProfileController extends AbstractFrontendModuleController
         }
 
         $this->template = $template;
-
         $this->template->user = $this->objUser;
 
         return $this->template->getResponse();

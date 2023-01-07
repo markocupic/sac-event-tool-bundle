@@ -15,8 +15,9 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Environment;
 use Contao\FrontendUser;
 use Contao\MemberModel;
@@ -25,28 +26,38 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Template;
 use Haste\Form\Form;
+use Markocupic\SacEventToolBundle\Config\Log;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * @FrontendModule(MemberDashboardEditProfileController::TYPE, category="sac_event_tool_frontend_modules")
- */
+#[AsFrontendModule(MemberDashboardEditProfileController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_edit_profile')]
 class MemberDashboardEditProfileController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_edit_profile';
 
+    private ContaoFramework $framework;
+    private Security $security;
+    private TranslatorInterface $translator;
+    private LoggerInterface $contaoGeneralLogger;
     private FrontendUser|null $objUser;
-
     private Template|null $template;
+
+    public function __construct(ContaoFramework $framework, Security $security, TranslatorInterface $translator, LoggerInterface $contaoGeneralLogger)
+    {
+        $this->framework = $framework;
+        $this->security = $security;
+        $this->translator = $translator;
+        $this->contaoGeneralLogger = $contaoGeneralLogger;
+    }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
         // Get logged in member object
-        $this->objUser = $this->get('security.helper')->getUser();
+        $this->objUser = $this->security->getUser();
 
         if (null !== $page) {
             // Neither cache nor search page
@@ -55,18 +66,6 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         }
 
         return parent::__invoke($request, $model, $section, $classes);
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
-
-        $services['contao.framework'] = ContaoFramework::class;
-        $services['security.helper'] = Security::class;
-        $services['translator'] = TranslatorInterface::class;
-        $services['requestStack'] = RequestStack::class;
-
-        return $services;
     }
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
@@ -81,10 +80,10 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         $this->template->objUser = $this->objUser;
 
         // Generate the users profile form
-        $this->template->userProfileForm = $this->generateUserProfileForm();
+        $this->template->userProfileForm = $this->generateUserProfileForm($request);
 
         // Add messages to template
-        $this->addMessagesToTemplate();
+        $this->addMessagesToTemplate($request);
 
         return $this->template->getResponse();
     }
@@ -92,10 +91,9 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
     /**
      * Add messages from session to template.
      */
-    protected function addMessagesToTemplate(): void
+    private function addMessagesToTemplate(Request $request): void
     {
-        $messageAdapter = $this->get('contao.framework')->getAdapter(Message::class);
-        $request = $this->get('request_stack')->getCurrentRequest();
+        $messageAdapter = $this->framework->getAdapter(Message::class);
         $session = $request->getSession();
         $flashBag = $session->getFlashBag();
 
@@ -116,20 +114,11 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         $messageAdapter->reset();
     }
 
-    protected function generateUserProfileForm(): string
+    private function generateUserProfileForm(Request $request): string
     {
         // Set adapters
-        $environmentAdapter = $this->get('contao.framework')->getAdapter(Environment::class);
-        $memberModelAdapter = $this->get('contao.framework')->getAdapter(MemberModel::class);
-
-        /** @var TranslatorInterface $translator */
-        $translator = $this->get('translator');
-
-        /** @var RequestStack $requestStack */
-        $requestStack = $this->get('request_stack');
-
-        /** @var Request $request */
-        $request = $requestStack->getCurrentRequest();
+        $environmentAdapter = $this->framework->getAdapter(Environment::class);
+        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
 
         $objForm = new Form(
             'form-user-profile',
@@ -141,25 +130,25 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
 
         // Now let's add form fields:
         $objForm->addFormField('emergencyPhone', [
-            'label' => $translator->trans('FORM.evt_reg_emergencyPhone', [], 'contao_default'),
+            'label' => $this->translator->trans('FORM.evt_reg_emergencyPhone', [], 'contao_default'),
             'inputType' => 'text',
             'eval' => ['rgxp' => 'phone', 'mandatory' => true, 'maxlength' => 64],
         ]);
 
         $objForm->addFormField('emergencyPhoneName', [
-            'label' => $translator->trans('FORM.evt_reg_emergencyPhoneName', [], 'contao_default'),
+            'label' => $this->translator->trans('FORM.evt_reg_emergencyPhoneName', [], 'contao_default'),
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 255],
         ]);
 
         $objForm->addFormField('foodHabits', [
-            'label' => $translator->trans('FORM.evt_reg_foodHabits', [], 'contao_default'),
+            'label' => $this->translator->trans('FORM.evt_reg_foodHabits', [], 'contao_default'),
             'inputType' => 'text',
             'eval' => ['mandatory' => false, 'maxlength' => 5000],
         ]);
 
         $objForm->addFormField('submit', [
-            'label' => $translator->trans('MSC.save', [], 'contao_default'),
+            'label' => $this->translator->trans('MSC.save', [], 'contao_default'),
             'inputType' => 'submit',
         ]);
 
@@ -182,6 +171,16 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         if ($objForm->validate()) {
             // The model will now contain the changes, so you can save it.
             $objModel->save();
+
+            $this->contaoGeneralLogger->info(
+                sprintf(
+                    'Frontend user %s %s "%s" has updated his user profile.',
+                    $this->objUser->firstname,
+                    $this->objUser->lastname,
+                    $this->objUser->username,
+                ),
+                ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_DASHBOARD_UPDATE_PROFILE)]
+            );
         }
 
         return $objForm->generate();

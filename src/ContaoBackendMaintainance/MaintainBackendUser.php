@@ -14,24 +14,22 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\ContaoBackendMaintainance;
 
-use Contao\CoreBundle\Monolog\ContaoContext;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserRights;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 
 class MaintainBackendUser
 {
     private Connection $connection;
     private MaintainBackendUserRights $maintainBackendUserRights;
-    private LoggerInterface $logger;
+    private LoggerInterface $contaoGeneralLogger;
 
-    public function __construct(Connection $connection, MaintainBackendUserRights $maintainBackendUserRights, LoggerInterface|null $logger)
+    public function __construct(Connection $connection, MaintainBackendUserRights $maintainBackendUserRights, LoggerInterface|null $contaoGeneralLogger)
     {
         $this->connection = $connection;
-        $this->maintainBackendUserProperties = $maintainBackendUserRights;
-        $this->logger = $logger;
+        $this->maintainBackendUserRights = $maintainBackendUserRights;
+        $this->contaoGeneralLogger = $contaoGeneralLogger;
     }
 
     /**
@@ -44,13 +42,13 @@ class MaintainBackendUser
 
         while (false !== ($userIdentifier = $stmt->fetchOne())) {
             $hasUsers = true;
-            $this->maintainBackendUserProperties->resetBackendUserRights($userIdentifier, [], true);
+            $this->maintainBackendUserRights->resetBackendUserRights($userIdentifier, [], true);
         }
 
         if (true === $hasUsers) {
             // Log
             $strText = 'Successfully cleared the user properties of all non-admin backend users.';
-            $this->logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)]);
+            $this->contaoGeneralLogger->info($strText);
         }
     }
 }

@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 use Contao\BackendTemplate;
 use Contao\BackendUser;
 use Contao\Config;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
@@ -31,6 +32,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use function Safe\json_encode;
 
+#[AsHook('executePreActions', priority: 100)]
 class ExecutePreActionsListener
 {
     private ContaoFramework $framework;
@@ -64,7 +66,7 @@ class ExecutePreActionsListener
      * @throws Exception
      * @throws JsonException
      */
-    public function onExecutePreActions(string $strAction = ''): void
+    public function __invoke(string $strAction = ''): void
     {
         // Get current request
         $request = $this->requestStack->getCurrentRequest();

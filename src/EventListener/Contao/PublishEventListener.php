@@ -17,25 +17,20 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Config;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Email;
 use Markocupic\SacEventToolBundle\ContaoScope\ContaoScope;
 
+/**
+ * Experimental: Send an email if a backend user changes the event release level.
+ */
+#[AsHook('publishEvent', priority: 100)]
 class PublishEventListener
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
+    private ContaoScope $contaoScope;
 
-    /**
-     * @var ContaoScope;
-     */
-    private $contaoScope;
-
-    /**
-     * PublishEventListener constructor.
-     */
     public function __construct(ContaoFramework $framework, ContaoScope $contaoScope)
     {
         $this->framework = $framework;
@@ -45,7 +40,7 @@ class PublishEventListener
     /**
      * @throws \Exception
      */
-    public function onPublishEvent(CalendarEventsModel $objEvent): void
+    public function __invoke(CalendarEventsModel $objEvent): void
     {
         if ($this->contaoScope->isBackend()) {
             $backendUserAdapter = $this->framework->getAdapter(BackendUser::class);

@@ -16,8 +16,8 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Date;
 use Contao\Environment;
 use Contao\File;
@@ -41,9 +41,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * @FrontendModule(CsvUserExportController::TYPE, category="sac_event_tool_frontend_modules")
- */
+#[AsFrontendModule(CsvUserExportController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_csv_user_export')]
 class CsvUserExportController extends AbstractFrontendModuleController
 {
     public const TYPE = 'csv_user_export';
@@ -55,17 +53,17 @@ class CsvUserExportController extends AbstractFrontendModuleController
     private Connection $connection;
     private TranslatorInterface $translator;
     private BinaryFileDownload $binaryFileDownload;
-    private string $tempDir;
+    private string $sacevtTempDir;
     private string $projectDir;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, BinaryFileDownload $binaryFileDownload, string $tempDir, string $projectDir)
+    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, BinaryFileDownload $binaryFileDownload, string $sacevtTempDir, string $projectDir)
     {
         $this->framework = $framework;
         $this->requestStack = $requestStack;
         $this->connection = $connection;
         $this->translator = $translator;
         $this->binaryFileDownload = $binaryFileDownload;
-        $this->tempDir = $tempDir;
+        $this->sacevtTempDir = $sacevtTempDir;
         $this->projectDir = $projectDir;
     }
 
@@ -74,7 +72,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
      * @throws \Doctrine\DBAL\Exception
      * @throws InvalidArgument
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
         $template->form = $this->getForm()->generate();
 
@@ -180,7 +178,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
      * @throws \Doctrine\DBAL\Exception
      * @throws InvalidArgument
      */
-    private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $result, string $GroupModelClassName, bool $blnKeepGroupsInOneLine = false): void
+    private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $result, string $GroupModelClassName, bool $blnKeepGroupsInOneLine = false): Response
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -289,7 +287,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
         }
 
         // Downlaod data as CSV spreadsheet
-        $this->sendToBrowser($arrData, $filename);
+        return $this->sendToBrowser($arrData, $filename);
     }
 
     private function getHeadline(array $arrFields, string $strTable): array
@@ -333,7 +331,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
      * @throws Exception
      * @throws InvalidArgument
      */
-    private function sendToBrowser(array $arrData, string $filename): void
+    private function sendToBrowser(array $arrData, string $filename): Response
     {
         /** @var Writer $writerAdapter */
         $writerAdapter = $this->framework->getAdapter(Writer::class);
@@ -357,10 +355,10 @@ class CsvUserExportController extends AbstractFrontendModuleController
         $csv->insertAll($arrFinal);
 
         // Save data to temporary file
-        $objFile = new File($this->tempDir.'/'.$filename);
+        $objFile = new File($this->sacevtTempDir.'/'.$filename);
         $objFile->write($csv->toString());
         $objFile->close();
 
-        $this->binaryFileDownload->sendFileToBrowser($this->projectDir.'/'.$objFile->path);
+        return $this->binaryFileDownload->sendFileToBrowser($this->projectDir.'/'.$objFile->path);
     }
 }

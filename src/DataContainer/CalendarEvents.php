@@ -1000,10 +1000,10 @@ class CalendarEvents
 
             // Decrypt the value
             if ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['encrypt'] ?? null) {
-                $passwordHasher = $this->passwordHasherFactory
+                $passwordHasherFactory = $this->passwordHasherFactory
                     ->getPasswordHasher(User::class)
                 ;
-                $value = $passwordHasher->hash($value);
+                $value = $passwordHasherFactory->hash($value);
             }
 
             // Default value

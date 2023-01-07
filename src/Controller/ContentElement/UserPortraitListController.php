@@ -17,8 +17,8 @@ namespace Markocupic\SacEventToolBundle\Controller\ContentElement;
 use Contao\ContentModel;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\ServiceAnnotation\ContentElement;
 use Contao\FrontendTemplate;
 use Contao\PageModel;
 use Contao\StringUtil;
@@ -31,9 +31,7 @@ use Markocupic\SacEventToolBundle\Model\UserRoleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @ContentElement(UserPortraitListController::TYPE, category="sac_event_tool_content_elements", template="ce_user_portrait_list")
- */
+#[AsContentElement(UserPortraitListController::TYPE, category:'sac_event_tool_content_elements', template:'ce_user_portrait_list')]
 class UserPortraitListController extends AbstractContentElementController
 {
     public const TYPE = 'user_portrait_list';

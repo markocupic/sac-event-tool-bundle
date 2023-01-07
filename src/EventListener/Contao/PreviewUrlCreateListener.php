@@ -20,17 +20,13 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Adds the calendar ID to the front end preview URL.
+ */
 class PreviewUrlCreateListener
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private RequestStack $requestStack;
+    private ContaoFramework $framework;
 
     public function __construct(RequestStack $requestStack, ContaoFramework $framework)
     {
@@ -38,11 +34,6 @@ class PreviewUrlCreateListener
         $this->framework = $framework;
     }
 
-    /**
-     * Adds the calendar ID to the front end preview URL.
-     *
-     * @throws \RuntimeException
-     */
     public function onPreviewUrlCreate(PreviewUrlCreateEvent $event): void
     {
         //#1: if (!$this->framework->isInitialized() || 'calendar' !== $event->getKey()) {

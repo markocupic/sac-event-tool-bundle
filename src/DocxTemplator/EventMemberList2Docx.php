@@ -35,26 +35,26 @@ class EventMemberList2Docx
     private Event $eventHelper;
     private EventMember $eventMemberHelper;
     private ConvertFile $convertFile;
-    private string $tempDir;
+    private string $sacevtTempDir;
     private string $projectDir;
-    private string $eventMemberListTemplate;
-    private string $eventMemberListFileNamePattern;
+    private string $sacevtEventTemplateMemberList;
+    private string $sacevtEventMemberListFileNamePattern;
 
     // Adapters
     private Adapter $calendarEventsMemberModelAdapter;
     private Adapter $controllerAdapter;
     private Adapter $messageAdapter;
 
-    public function __construct(ContaoFramework $framework, Event $eventHelper, EventMember $eventMemberHelper, ConvertFile $convertFile, string $tempDir, string $projectDir, string $eventMemberListTemplate, string $eventMemberListFileNamePattern)
+    public function __construct(ContaoFramework $framework, Event $eventHelper, EventMember $eventMemberHelper, ConvertFile $convertFile, string $sacevtTempDir, string $projectDir, string $sacevtEventTemplateMemberList, string $sacevtEventMemberListFileNamePattern)
     {
         $this->framework = $framework;
         $this->eventHelper = $eventHelper;
         $this->eventMemberHelper = $eventMemberHelper;
         $this->convertFile = $convertFile;
-        $this->tempDir = $tempDir;
+        $this->sacevtTempDir = $sacevtTempDir;
         $this->projectDir = $projectDir;
-        $this->eventMemberListTemplate = $eventMemberListTemplate;
-        $this->eventMemberListFileNamePattern = $eventMemberListFileNamePattern;
+        $this->sacevtEventTemplateMemberList = $sacevtEventTemplateMemberList;
+        $this->sacevtEventMemberListFileNamePattern = $sacevtEventMemberListFileNamePattern;
 
         // Adapters
         $this->calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
@@ -92,8 +92,8 @@ class EventMemberList2Docx
         }
 
         // Create phpWord instance
-        $targetFilePath = $this->tempDir.'/'.sprintf($this->eventMemberListFileNamePattern, time(), 'docx');
-        $objPhpWord = new MsWordTemplateProcessor($this->eventMemberListTemplate, $targetFilePath);
+        $targetFilePath = $this->sacevtTempDir.'/'.sprintf($this->sacevtEventMemberListFileNamePattern, time(), 'docx');
+        $objPhpWord = new MsWordTemplateProcessor($this->sacevtEventTemplateMemberList, $targetFilePath);
 
         // Get event data
         $this->eventHelper->setEventData($objPhpWord, $objEvent);

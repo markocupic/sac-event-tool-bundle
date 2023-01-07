@@ -14,31 +14,23 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\MemberModel;
 use Contao\Widget;
 
+#[AsHook('addCustomRegexp', priority: 100)]
 class AddCustomRegexpListener
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
 
-    /**
-     * Constructor.
-     */
     public function __construct(ContaoFramework $framework)
     {
         $this->framework = $framework;
     }
 
-    /**
-     * @param $strRegexp
-     * @param $varValue
-     */
-    public function onAddCustomRegexp($strRegexp, $varValue, Widget $objWidget): bool
+    public function __invoke(string $strRegexp, $varValue, Widget $objWidget): bool
     {
         // Set adapters
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);

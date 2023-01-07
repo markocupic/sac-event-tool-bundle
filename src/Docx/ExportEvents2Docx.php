@@ -32,6 +32,7 @@ use PhpOffice\PhpWord\Exception\Exception;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use Safe\DateTime;
+use Symfony\Component\HttpFoundation\Response;
 
 class ExportEvents2Docx
 {
@@ -54,7 +55,7 @@ class ExportEvents2Docx
     /**
      * @throws Exception
      */
-    public function generate(int $year, string $eventId = null): void
+    public function generate(int $year, string $eventId = null): Response
     {
         $this->strTable = 'tl_calendar_events';
         Controller::loadDataContainer('tl_calendar_events');
@@ -183,7 +184,8 @@ class ExportEvents2Docx
         $objWriter->save($this->projectDir.'/'.$path);
 
         $fileSRC = $this->projectDir.'/'.$path;
-        $this->binaryFileDownload->sendFileToBrowser($fileSRC, basename($fileSRC), true);
+
+        return $this->binaryFileDownload->sendFileToBrowser($fileSRC, basename($fileSRC), true);
     }
 
     private function addMultilineText(Cell $objCell, string $textlines): void

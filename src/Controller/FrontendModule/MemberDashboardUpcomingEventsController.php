@@ -16,8 +16,9 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Environment;
 use Contao\Events;
 use Contao\FrontendUser;
@@ -25,7 +26,6 @@ use Contao\Input;
 use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
-use Contao\System;
 use Contao\Template;
 use Contao\UserModel;
 use Contao\Validator;
@@ -33,39 +33,34 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use NotificationCenter\Model\Notification;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 
-/**
- * @FrontendModule(MemberDashboardUpcomingEventsController::TYPE, category="sac_event_tool_frontend_modules")
- */
+#[AsFrontendModule(MemberDashboardUpcomingEventsController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_upcoming_events')]
 class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_upcoming_events';
 
     private ContaoFramework $framework;
-
     private Security $security;
-
-    private string $locale;
-
+    private string $sacevtLocale;
     private FrontendUser|null $user = null;
-
     private Template|null $template = null;
+    private LoggerInterface|null $contaoGeneralLogger;
 
-    public function __construct(ContaoFramework $framework, Security $security, string $locale)
+    public function __construct(ContaoFramework $framework, Security $security, string $sacevtLocale, LoggerInterface $contaoGeneralLogger = null)
     {
         $this->framework = $framework;
         $this->security = $security;
-        $this->locale = $locale;
+        $this->sacevtLocale = $sacevtLocale;
+        $this->contaoGeneralLogger = $contaoGeneralLogger;
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        // Return empty string, if user is not logged in as a frontend user
-
         // Set adapters
         $inputAdapter = $this->framework->getAdapter(Input::class);
 
@@ -81,7 +76,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
         // Sign out from Event
         if ('unregisterUserFromEvent' === $inputAdapter->get('do')) {
-            $this->unregisterUserFromEvent($inputAdapter->get('registrationId'), $model->unregisterFromEventNotificationId);
+            $this->unregisterUserFromEvent((int) $inputAdapter->get('registrationId'), (int) $model->unregisterFromEventNotificationId);
             $this->redirect($page->getFrontendUrl());
         }
 
@@ -110,7 +105,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         }
 
         // Add messages to template
-        $this->addMessagesToTemplate();
+        $this->addMessagesToTemplate($request);
 
         // Load language
         $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
@@ -122,10 +117,9 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
     }
 
     /**
-     * @param $registrationId
-     * @param $notificationId
+     * @throws \Exception
      */
-    protected function unregisterUserFromEvent($registrationId, $notificationId): void
+    private function unregisterUserFromEvent(int $registrationId, int $notificationId): void
     {
         // Set adapters
         $messageAdapter = $this->framework->getAdapter(Message::class);
@@ -136,7 +130,6 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
         $eventsAdapter = $this->framework->getAdapter(Events::class);
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $systemAdapter = $this->framework->getAdapter(System::class);
 
         $blnHasError = true;
         $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event abgemeldet werden. Bitte nimm mit dem verantwortlichen Leiter Kontakt auf.';
@@ -160,7 +153,18 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
                 if (EventSubscriptionLevel::SUBSCRIPTION_REJECTED === $objEventsMember->stateOfSubscription) {
                     $objEventsMember->delete();
-                    $systemAdapter->log(sprintf('User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__.' Line: '.__LINE__, Log::EVENT_UNSUBSCRIPTION);
+
+                    if ($this->contaoGeneralLogger) {
+                        $this->contaoGeneralLogger->info(
+                            sprintf(
+                                'User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")',
+                                $objEventsMember->sacMemberId,
+                                $objEventsMember->eventId,
+                                $objEventsMember->eventName
+                            ),
+                            ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)]
+                        );
+                    }
 
                     return;
                 }
@@ -179,16 +183,13 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                     $errorMsg = 'Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden, da die Abmeldefrist von '.$objEvent->deregistrationLimit.' Tag(en) abgelaufen ist. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
                 } elseif (empty($this->user->email) || !$validatorAdapter->isEmail($this->user->email)) {
                     $errorMsg = 'Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
-                    $blnHasError = true;
                 } elseif ((int) $objEventsMember->sacMemberId !== (int) $this->user->sacMemberId) {
                     $errorMsg = 'Du hast nicht die nötigen Benutzerrechte um dich vom Event "'.$objEvent->title.'" abzumelden.';
-                    $blnHasError = true;
                 } elseif (null !== $objInstructor) {
                     // unregister from event
                     $blnHasError = false;
                 } else {
                     $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
-                    $blnHasError = true;
                 }
 
                 // Unregister from event
@@ -229,10 +230,19 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
                     $messageAdapter->addInfo('Du hast dich vom Event "'.$objEventsMember->eventName.'" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.');
 
-                    // Log
-                    $systemAdapter->log(sprintf('User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")', $objEventsMember->sacMemberId, $objEventsMember->eventId, $objEventsMember->eventName), __FILE__.' Line: '.__LINE__, Log::EVENT_UNSUBSCRIPTION);
+                    if ($this->contaoGeneralLogger) {
+                        $this->contaoGeneralLogger->info(
+                            sprintf(
+                                'User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")',
+                                $objEventsMember->sacMemberId,
+                                $objEventsMember->eventId,
+                                $objEventsMember->eventName
+                            ),
+                            ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)]
+                        );
+                    }
 
-                    $objNotification->send($arrTokens, $this->locale);
+                    $objNotification->send($arrTokens, $this->sacevtLocale);
                 }
             }
         }
@@ -245,20 +255,19 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
     /**
      * Add messages from session to template.
      */
-    protected function addMessagesToTemplate(): void
+    private function addMessagesToTemplate(Request $request): void
     {
         $messageAdapter = $this->framework->getAdapter(Message::class);
-        $systemAdapter = $this->framework->getAdapter(System::class);
 
         if ($messageAdapter->hasInfo()) {
             $this->template->hasInfoMessage = true;
-            $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.info');
+            $session = $request->getSession()->getFlashBag()->get('contao.FE.info');
             $this->template->infoMessage = $session[0];
         }
 
         if ($messageAdapter->hasError()) {
             $this->template->hasErrorMessage = true;
-            $session = $systemAdapter->getContainer()->get('session')->getFlashBag()->get('contao.FE.error');
+            $session = $request->getSession()->getFlashBag()->get('contao.FE.error');
             $this->template->errorMessage = $session[0];
             $this->template->errorMessages = $session;
         }

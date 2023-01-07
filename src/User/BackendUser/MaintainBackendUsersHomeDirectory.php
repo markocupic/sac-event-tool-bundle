@@ -30,16 +30,16 @@ class MaintainBackendUsersHomeDirectory
 
     private string $projectDir;
 
-    private string $backendUserHomeDir;
+    private string $sacevtUserBackendHomeDir;
 
     /**
      * MaintainBackendUsersHomeDirectory constructor.
      */
-    public function __construct(ContaoFramework $framework, string $projectDir, string $backendUserHomeDir)
+    public function __construct(ContaoFramework $framework, string $projectDir, string $sacevtUserBackendHomeDir)
     {
         $this->framework = $framework;
         $this->projectDir = $projectDir;
-        $this->backendUserHomeDir = $backendUserHomeDir;
+        $this->sacevtUserBackendHomeDir = $sacevtUserBackendHomeDir;
 
         // Initialize contao framework
         $this->framework->initialize();
@@ -47,8 +47,6 @@ class MaintainBackendUsersHomeDirectory
 
     /**
      * Create backend users home directories.
-     *
-     * @param \Markocupic\SacEventToolBundle\UserModel $objUser
      */
     public function createBackendUsersHomeDirectory(UserModel $objUser): void
     {
@@ -61,21 +59,21 @@ class MaintainBackendUsersHomeDirectory
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        new Folder($this->backendUserHomeDir.'/'.$objUser->id);
-        new Folder($this->backendUserHomeDir.'/'.$objUser->id.'/avatar');
-        new Folder($this->backendUserHomeDir.'/'.$objUser->id.'/documents');
-        new Folder($this->backendUserHomeDir.'/'.$objUser->id.'/images');
+        new Folder($this->sacevtUserBackendHomeDir.'/'.$objUser->id);
+        new Folder($this->sacevtUserBackendHomeDir.'/'.$objUser->id.'/avatar');
+        new Folder($this->sacevtUserBackendHomeDir.'/'.$objUser->id.'/documents');
+        new Folder($this->sacevtUserBackendHomeDir.'/'.$objUser->id.'/images');
 
         // Copy default avatar
-        if (!is_file($this->projectDir.'/'.$this->backendUserHomeDir.'/'.$objUser->id.'/avatar/default.jpg')) {
-            $filesAdapter->getInstance()->copy($this->backendUserHomeDir.'/new/avatar/default.jpg', $this->backendUserHomeDir.'/'.$objUser->id.'/avatar/default.jpg');
+        if (!is_file($this->projectDir.'/'.$this->sacevtUserBackendHomeDir.'/'.$objUser->id.'/avatar/default.jpg')) {
+            $filesAdapter->getInstance()->copy($this->sacevtUserBackendHomeDir.'/new/avatar/default.jpg', $this->sacevtUserBackendHomeDir.'/'.$objUser->id.'/avatar/default.jpg');
             $logger = System::getContainer()->get('monolog.logger.contao');
-            $strText = sprintf('Created new homedirectory (and added filemount) for User with ID %s in "%s".', $objUser->id, $this->backendUserHomeDir.'/'.$objUser->id);
+            $strText = sprintf('Created new homedirectory (and added filemount) for User with ID %s in "%s".', $objUser->id, $this->sacevtUserBackendHomeDir.'/'.$objUser->id);
             $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, 'NEW BACKEND USER HOME DIRECTORY')]);
         }
 
         // Add filemount for the user directory
-        $strFolder = $this->backendUserHomeDir.'/'.$objUser->id;
+        $strFolder = $this->sacevtUserBackendHomeDir.'/'.$objUser->id;
         $objFile = $filesModelAdapter->findByPath($strFolder);
         $arrFileMounts = $stringUtilAdapter->deserialize($objUser->filemounts, true);
         $arrFileMounts[] = $objFile->uuid;
@@ -97,7 +95,7 @@ class MaintainBackendUsersHomeDirectory
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
         // Scan for unused old directories
-        $scanDir = scan($this->backendUserHomeDir, true);
+        $scanDir = scan($this->sacevtUserBackendHomeDir, true);
 
         if (!empty($scanDir) && \is_array($scanDir)) {
             foreach ($scanDir as $userDir) {
@@ -105,16 +103,16 @@ class MaintainBackendUsersHomeDirectory
                     continue;
                 }
 
-                if (is_dir($this->projectDir.'/'.$this->backendUserHomeDir.'/'.$userDir)) {
+                if (is_dir($this->projectDir.'/'.$this->sacevtUserBackendHomeDir.'/'.$userDir)) {
                     if (!$userModelAdapter->findByPk($userDir)) {
-                        $objFolder = new Folder($this->backendUserHomeDir.'/'.$userDir);
+                        $objFolder = new Folder($this->sacevtUserBackendHomeDir.'/'.$userDir);
 
                         if ($objFolder) {
-                            $objFolder->renameTo($this->backendUserHomeDir.'/old__'.$userDir);
-                            $objFileModel = $filesModelAdapter->findByPath($this->backendUserHomeDir.'/'.$userDir);
+                            $objFolder->renameTo($this->sacevtUserBackendHomeDir.'/old__'.$userDir);
+                            $objFileModel = $filesModelAdapter->findByPath($this->sacevtUserBackendHomeDir.'/'.$userDir);
 
                             if (null !== $objFileModel) {
-                                $objFileModel->path = $this->backendUserHomeDir.'/old__'.$userDir;
+                                $objFileModel->path = $this->sacevtUserBackendHomeDir.'/old__'.$userDir;
                                 $objFileModel->save();
                             }
                         }

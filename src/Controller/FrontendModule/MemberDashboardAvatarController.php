@@ -15,11 +15,12 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\CoreBundle\Routing\ScopeMatcher;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\FrontendUser;
+use Contao\Image\PictureConfiguration;
 use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\PageModel;
@@ -30,9 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 
-/**
- * @FrontendModule(MemberDashboardAvatarController::TYPE, category="sac_event_tool_frontend_modules")
- */
+#[AsFrontendModule(MemberDashboardAvatarController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_avatar')]
 class MemberDashboardAvatarController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_avatar';
@@ -42,16 +41,14 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
     private Security $security;
     private InsertTagParser $insertTagParser;
     private Avatar $avatar;
-    private string $projectDir;
 
-    public function __construct(ContaoFramework $framework, ScopeMatcher $scopeMatcher, Security $security, InsertTagParser $insertTagParser, Avatar $avatar, string $projectDir)
+    public function __construct(ContaoFramework $framework, ScopeMatcher $scopeMatcher, Security $security, InsertTagParser $insertTagParser, Avatar $avatar)
     {
         $this->framework = $framework;
         $this->scopeMatcher = $scopeMatcher;
         $this->security = $security;
         $this->insertTagParser = $insertTagParser;
         $this->avatar = $avatar;
-        $this->projectDir = $projectDir;
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response

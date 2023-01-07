@@ -15,9 +15,11 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\Controller;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\PageModel;
 
+#[AsHook('replaceInsertTags', priority: 100)]
 class ReplaceInsertTagsListener
 {
     private ContaoFramework $framework;
@@ -27,7 +29,7 @@ class ReplaceInsertTagsListener
         $this->framework = $framework;
     }
 
-    public function onReplaceInsertTags(string $strTag): bool|string
+    public function __invoke(string $strTag): bool|string
     {
         // Set adapters
         $controllerAdapter = $this->framework->getAdapter(Controller::class);

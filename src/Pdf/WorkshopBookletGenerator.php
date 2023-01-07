@@ -38,22 +38,22 @@ class WorkshopBookletGenerator
     private Connection $connection;
     private BinaryFileDownload $binaryFileDownload;
     private string $projectDir;
-    private string $tempDir;
-    private string $bookletFilenamePattern;
+    private string $sacevtTempDir;
+    private string $sacevtEventCourseBookletFilenamePattern;
     private WorkshopTCPDF|null $pdf;
     private int|null $year;
     private int|null $eventId = null;
     private bool $download = false;
     private bool $printSingleEvent = false;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, BinaryFileDownload $binaryFileDownload, string $projectDir, string $tempDir, string $bookletFilenamePattern)
+    public function __construct(ContaoFramework $framework, Connection $connection, BinaryFileDownload $binaryFileDownload, string $projectDir, string $sacevtTempDir, string $sacevtEventCourseBookletFilenamePattern)
     {
         $this->framework = $framework;
         $this->connection = $connection;
         $this->binaryFileDownload = $binaryFileDownload;
         $this->projectDir = $projectDir;
-        $this->tempDir = $tempDir;
-        $this->bookletFilenamePattern = $bookletFilenamePattern;
+        $this->sacevtTempDir = $sacevtTempDir;
+        $this->sacevtEventCourseBookletFilenamePattern = $sacevtEventCourseBookletFilenamePattern;
 
         $this->framework->initialize(true);
 
@@ -119,7 +119,7 @@ class WorkshopBookletGenerator
 
         // Get the font directory
         $bundleSRC = System::getContainer()->get('kernel')->locateResource('@MarkocupicSacEventToolBundle');
-        $fontDirectory = $bundleSRC.'Pdf/fonts/opensans';
+        $fontDirectory = $bundleSRC.'src/Pdf/fonts/opensans';
 
         // Create new PDF document
         // Extend TCPDF for special footer and header handling
@@ -208,8 +208,8 @@ class WorkshopBookletGenerator
         }
 
         // Kursprogramm_%s.pdf
-        $filename = sprintf($this->bookletFilenamePattern, $this->year);
-        $path = $this->projectDir.'/'.$this->tempDir.'/'.$filename;
+        $filename = sprintf($this->sacevtEventCourseBookletFilenamePattern, $this->year);
+        $path = $this->projectDir.'/'.$this->sacevtTempDir.'/'.$filename;
 
         if (false === $this->download) {
             $this->pdf->Output($path, 'F');
@@ -236,7 +236,7 @@ class WorkshopBookletGenerator
         $this->pdf->Output($path, 'F');
 
         // Send file to the browser
-        $this->binaryFileDownload->sendFileToBrowser($path, basename($path), true);
+        return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), true);
     }
 
     public function getDateString(int $eventId): string

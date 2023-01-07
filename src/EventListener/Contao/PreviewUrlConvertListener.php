@@ -21,17 +21,13 @@ use Contao\Events;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Adds the front end preview URL to the event.
+ */
 class PreviewUrlConvertListener
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private RequestStack $requestStack;
+    private ContaoFramework $framework;
 
     public function __construct(RequestStack $requestStack, ContaoFramework $framework)
     {
@@ -39,9 +35,6 @@ class PreviewUrlConvertListener
         $this->framework = $framework;
     }
 
-    /**
-     * Adds the front end preview URL to the event.
-     */
     public function onPreviewUrlConvert(PreviewUrlConvertEvent $event): void
     {
         if (!$this->framework->isInitialized()) {

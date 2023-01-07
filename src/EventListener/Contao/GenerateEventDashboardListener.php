@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Input;
 use Contao\System;
@@ -25,7 +26,11 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Symfony\Component\Security\Core\Security;
 
-class SacEvtOnGenerateEventDashboardListener
+/**
+ * Generates the small button bar on the bottom of the event form.
+ */
+#[AsHook('generateEventDashboard', priority: 100)]
+class GenerateEventDashboardListener
 {
     private ContaoFramework $framework;
     private Security $security;
@@ -36,7 +41,10 @@ class SacEvtOnGenerateEventDashboardListener
         $this->security = $security;
     }
 
-    public function onGenerateEventDashboardListener(MenuItem $menu, CalendarEventsModel $objEvent): void
+    /**
+     * @throws \Exception
+     */
+    public function __invoke(MenuItem $menu, CalendarEventsModel $objEvent): void
     {
         // Set adapters
         $inputAdapter = $this->framework->getAdapter(Input::class);
@@ -56,7 +64,7 @@ class SacEvtOnGenerateEventDashboardListener
         // Get the backend module name
         $module = $inputAdapter->get('do');
 
-        // Go to event button
+        // "Go to event" button
         $href = sprintf('contao/main.php?do=%s&id=%s&table=tl_calendar_events&act=%s&rt=%s&ref=%s', $module, $objEvent->id, 'edit', $requestToken, $refererId);
         $menu->addChild('Event', ['uri' => $href])
             ->setLinkAttribute('role', 'button')
@@ -66,7 +74,7 @@ class SacEvtOnGenerateEventDashboardListener
             ->setLinkAttribute('title', 'Event bearbeiten')
         ;
 
-        // Go to event list button
+        // "Go to event list" button
         $href = sprintf('contao/main.php?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, $requestToken, $refererId);
         $menu->addChild('Eventliste', ['uri' => $href])
             ->setLinkAttribute('role', 'button')
@@ -76,7 +84,7 @@ class SacEvtOnGenerateEventDashboardListener
             ->setLinkAttribute('title', 'Eventliste anzeigen')
         ;
 
-        // Go to event preview button
+        // "Go to event preview" button
         if (($href = $calendarEventsHelperAdapter->generateEventPreviewUrl($objEvent)) !== '') {
             $menu->addChild('Vorschau', ['uri' => $href])
                 ->setLinkAttribute('role', 'button')
@@ -87,7 +95,7 @@ class SacEvtOnGenerateEventDashboardListener
             ;
         }
 
-        // Go to event participant list button
+        // "Go to event participant list" button
         if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id) {
             $href = sprintf('contao/main.php?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
             $menu->addChild('Teilnehmerliste', ['uri' => $href])

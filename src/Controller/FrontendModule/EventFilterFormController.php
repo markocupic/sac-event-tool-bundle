@@ -16,8 +16,8 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Date;
 use Contao\Environment;
 use Contao\Input;
@@ -31,28 +31,22 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * @FrontendModule(EventFilterFormController::TYPE, category="sac_event_tool_frontend_modules")
- */
+#[AsFrontendModule(EventFilterFormController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_event_filter_form')]
 class EventFilterFormController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_filter_form';
 
     private ContaoFramework $framework;
-
     private TranslatorInterface $translator;
-
-    private string $locale;
-
+    private string $sacevtLocale;
     private array|null $arrAllowedFields = null;
-
     private PageModel|null $objPage = null;
 
-    public function __construct(ContaoFramework $framework, TranslatorInterface $translator, string $locale)
+    public function __construct(ContaoFramework $framework, TranslatorInterface $translator, string $sacevtLocale)
     {
         $this->framework = $framework;
         $this->translator = $translator;
-        $this->locale = $locale;
+        $this->sacevtLocale = $sacevtLocale;
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
@@ -109,7 +103,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
         $template->form = $this->generateForm();
 
         // Datepicker
-        $template->locale = $this->locale;
+        $template->sacevt_locale = $this->sacevtLocale;
 
         return $template->getResponse();
     }

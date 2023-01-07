@@ -18,8 +18,8 @@ use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\ServiceAnnotation\FrontendModule;
 use Contao\Date;
 use Contao\Environment;
 use Contao\MemberModel;
@@ -35,9 +35,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @FrontendModule(CsvEventMemberExportController::TYPE, category="sac_event_tool_frontend_modules")
- */
+#[AsFrontendModule(CsvEventMemberExportController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_csv_event_member_export')]
 class CsvEventMemberExportController extends AbstractFrontendModuleController
 {
     public const TYPE = 'csv_event_member_export';

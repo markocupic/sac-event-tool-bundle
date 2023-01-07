@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\Automator;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FilesModel;
 use Contao\LayoutModel;
@@ -23,26 +24,16 @@ use Contao\PageRegular;
 use Contao\StringUtil;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Purge script cache in debug mode.
+ */
+#[AsHook('getPageLayout', priority: 100)]
 class GetPageLayoutListener
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
+    private KernelInterface $kernel;
+    private string $projectDir;
 
-    /**
-     * @var KernelInterface
-     */
-    private $kernel;
-
-    /**
-     * @var string
-     */
-    private $projectDir;
-
-    /**
-     * GetPageLayoutListener constructor.
-     */
     public function __construct(ContaoFramework $framework, KernelInterface $kernel, string $projectDir)
     {
         $this->framework = $framework;
@@ -50,12 +41,7 @@ class GetPageLayoutListener
         $this->projectDir = $projectDir;
     }
 
-    /**
-     * @param $objPage
-     * @param $objLayout
-     * @param $objPty
-     */
-    public function purgeScriptCacheInDebugMode(PageModel $objPage, LayoutModel $objLayout, PageRegular $objPty): void
+    public function __invoke(PageModel $objPage, LayoutModel $objLayout, PageRegular $objPty): void
     {
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);

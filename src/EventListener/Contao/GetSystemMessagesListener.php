@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Config;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\Date;
@@ -24,33 +25,22 @@ use Contao\System;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\ContaoScope\ContaoScope;
 
+/**
+ * List all upcoming events (where logged in backend user is the main instructor).
+ */
+#[AsHook('getSystemMessages', priority: 100)]
 class GetSystemMessagesListener
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
+    private ContaoScope $contaoScope;
 
-    /**
-     * @var ContaoScope;
-     */
-    private $contaoScope;
-
-    /**
-     * GetSystemMessagesListener constructor.
-     */
     public function __construct(ContaoFramework $framework, ContaoScope $contaoScope)
     {
         $this->framework = $framework;
         $this->contaoScope = $contaoScope;
     }
 
-    /**
-     * Show all upcoming events (where user is main instructor) for the logged in user.
-     *
-     * @return string
-     */
-    public function listUntreatedEventSubscriptions()
+    public function __invoke(): string
     {
         $strBuffer = '';
 

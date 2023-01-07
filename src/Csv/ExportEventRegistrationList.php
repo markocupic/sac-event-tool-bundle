@@ -59,17 +59,17 @@ class ExportEventRegistrationList
 
     private ContaoFramework $framework;
     private Connection $connection;
-    private string $eventMemberListFileNamePattern;
+    private string $sacevtEventMemberListFileNamePattern;
 
     // Adapters
     private Adapter $configAdapter;
     private Adapter $controllerAdapter;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, string $eventMemberListFileNamePattern)
+    public function __construct(ContaoFramework $framework, Connection $connection, string $sacevtEventMemberListFileNamePattern)
     {
         $this->framework = $framework;
         $this->connection = $connection;
-        $this->eventMemberListFileNamePattern = $eventMemberListFileNamePattern;
+        $this->sacevtEventMemberListFileNamePattern = $sacevtEventMemberListFileNamePattern;
 
         // Adapters
         $this->configAdapter = $this->framework->getAdapter(Config::class);
@@ -128,7 +128,7 @@ class ExportEventRegistrationList
         $eventTitle = preg_replace('/[^a-zA-Z0-9_-]+/', '_', strtolower($event->title));
 
         // Generate the file name
-        $filename = sprintf($this->eventMemberListFileNamePattern, $eventTitle, 'csv');
+        $filename = sprintf($this->sacevtEventMemberListFileNamePattern, $eventTitle, 'csv');
 
         // Output
         $csv->output($filename);

@@ -32,7 +32,7 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
 {
     public const PRIORITY = 10000;
 
-    private string $locale;
+    private string $sacevtLocale;
     private array $arrData = [];
     private ContaoFramework|null $framework = null;
     private MemberModel|null $memberModel = null;
@@ -40,9 +40,9 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
     private CalendarEventsMemberModel|null $eventMemberModel = null;
     private ModuleModel|null $moduleModel = null;
 
-    public function __construct(string $locale)
+    public function __construct(string $sacevtLocale)
     {
-        $this->locale = $locale;
+        $this->sacevtLocale = $sacevtLocale;
     }
 
     public static function getSubscribedEvents(): array
@@ -138,7 +138,7 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
                 'event_link_detail' => 'https://'.$environmentAdapter->get('host').'/'.$eventsAdapter->generateEventUrl($this->eventModel),
             ];
 
-            $objNotification->send($arrTokens, $this->locale);
+            $objNotification->send($arrTokens, $this->sacevtLocale);
         }
     }
 

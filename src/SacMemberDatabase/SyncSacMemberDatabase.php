@@ -19,7 +19,7 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\File;
 use Contao\FrontendUser;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception as DbalException;
+use Doctrine\DBAL\Exception;
 use FTP\Connection as FtpConnection;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\String\PhoneNumber;
@@ -27,7 +27,6 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Safe\Exceptions\StringsException;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
-use function Safe\sprintf;
 
 class SyncSacMemberDatabase
 {
@@ -37,30 +36,29 @@ class SyncSacMemberDatabase
 
     private ContaoFramework $framework;
     private Connection $connection;
-    private PasswordHasherFactory $passwordHasher;
-    private array $credentials;
+    private PasswordHasherFactory $passwordHasherFactory;
+    private array $sacevtMemberSyncCredentials;
     private string $projectDir;
-    private string $locale;
+    private string $sacevtLocale;
     private LoggerInterface|null $logger;
 
     private string|null $ftp_hostname = null;
     private string|null $ftp_username = null;
     private string|null $ftp_password = null;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, PasswordHasherFactory $passwordHasher, array $credentials, string $projectDir, string $locale, LoggerInterface $logger = null)
+    public function __construct(ContaoFramework $framework, Connection $connection, PasswordHasherFactory $passwordHasherFactory, array $sacevtMemberSyncCredentials, string $projectDir, string $sacevtLocale, LoggerInterface $logger = null)
     {
         $this->framework = $framework;
         $this->connection = $connection;
-        $this->passwordHasher = $passwordHasher;
-        $this->credentials = $credentials;
+        $this->passwordHasherFactory = $passwordHasherFactory;
+        $this->sacevtMemberSyncCredentials = $sacevtMemberSyncCredentials;
         $this->projectDir = $projectDir;
-        $this->locale = $locale;
+        $this->sacevtLocale = $sacevtLocale;
         $this->logger = $logger;
     }
 
     /**
-     * @throws StringsException
-     * @throws DbalException
+     * @throws \Exception
      */
     public function run(): void
     {
@@ -70,8 +68,8 @@ class SyncSacMemberDatabase
     }
 
     /**
+     * @throws Exception
      * @throws StringsException
-     * @throws DbalException
      */
     public function setPassword(int $limit = 20): int
     {
@@ -94,7 +92,7 @@ class SyncSacMemberDatabase
             $result = $this->connection->executeQuery($strUpd, ['']);
 
             while (false !== ($id = $result->fetchOne())) {
-                $password = $this->passwordHasher
+                $password = $this->passwordHasherFactory
                     ->getPasswordHasher(FrontendUser::class)
                     ->hash(uniqid())
                 ;
@@ -121,15 +119,14 @@ class SyncSacMemberDatabase
     private function prepare(): void
     {
         $this->framework->initialize(false);
-        $this->ftp_hostname = (string) $this->credentials['hostname'];
-        $this->ftp_username = (string) $this->credentials['username'];
-        $this->ftp_password = (string) $this->credentials['password'];
+        $this->ftp_hostname = (string) $this->sacevtMemberSyncCredentials['hostname'];
+        $this->ftp_username = (string) $this->sacevtMemberSyncCredentials['username'];
+        $this->ftp_password = (string) $this->sacevtMemberSyncCredentials['password'];
     }
 
     /**
+     * @throws Exception
      * @throws StringsException
-     * @throws DbalException
-     * @throws \Exception
      */
     private function fetchFilesFromFtp(): void
     {
@@ -160,7 +157,6 @@ class SyncSacMemberDatabase
     }
 
     /**
-     * @throws StringsException
      * @throws \Exception
      */
     private function openFtpConnection(): FtpConnection
@@ -180,8 +176,8 @@ class SyncSacMemberDatabase
     /**
      * Sync tl_member with Navision db dump.
      *
+     * @throws Exception
      * @throws StringsException
-     * @throws DbalException
      */
     private function syncContaoDatabase(): void
     {
@@ -239,7 +235,7 @@ class SyncSacMemberDatabase
                     $set['email'] = $arrLine[16];
                     $set['gender'] = 'weiblich' === strtolower($arrLine[17]) ? 'female' : 'male';
                     $set['profession'] = $arrLine[18];
-                    $set['language'] = 'd' === strtolower($arrLine[19]) ? $this->locale : strtolower($arrLine[19]);
+                    $set['language'] = 'd' === strtolower($arrLine[19]) ? $this->sacevtLocale : strtolower($arrLine[19]);
                     $set['entryYear'] = $arrLine[20];
                     $set['membershipType'] = $arrLine[23];
                     $set['sectionInfo1'] = $arrLine[24];

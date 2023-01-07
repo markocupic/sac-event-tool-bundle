@@ -14,33 +14,24 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Avatar;
 
-use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Image\PictureFactory;
 use Contao\FilesModel;
 use Contao\MemberModel;
-use Contao\Model;
 use Contao\UserModel;
 
 class Avatar
 {
-    private ContaoFramework $framework;
-    private PictureFactory $pictureFactory;
     private string $projectDir;
-    private string $resAvatarFemale;
-    private string $resAvatarMale;
+    private string $sacevtAvatarFemale;
+    private string $sacevtAvatarMale;
 
-    public function __construct(ContaoFramework $framework, PictureFactory $pictureFactory, string $projectDir, string $resAvatarFemale, string $resAvatarMale)
+    public function __construct(string $projectDir, string $sacevtAvatarFemale, string $sacevtAvatarMale)
     {
-        $this->framework = $framework;
-        $this->pictureFactory = $pictureFactory;
         $this->projectDir = $projectDir;
-        $this->resAvatarFemale = $resAvatarFemale;
-        $this->resAvatarMale = $resAvatarMale;
+        $this->sacevtAvatarFemale = $sacevtAvatarFemale;
+        $this->sacevtAvatarMale = $sacevtAvatarMale;
     }
 
     /**
-     * @param Model $userModel
-     *
      * @todo serve an avatar if gender === 'other'
      */
     public function getAvatarResourcePath(MemberModel|UserModel $userModel): string
@@ -56,17 +47,16 @@ class Avatar
         }
 
         if ('female' === $userModel->gender) {
-            return $this->resAvatarFemale;
+            return $this->sacevtAvatarFemale;
         }
 
         if ('male' === $userModel->gender) {
-            return $this->resAvatarMale;
+            return $this->sacevtAvatarMale;
         }
+        //elseif ('other' === $userModel->gender) {
+        //return $this->sacevtAvatarOther;
+        //}
 
-        if ('other' === $userModel->gender) {
-            return $this->resAvatarMale;
-        }
-
-        return $this->resAvatarMale;
+        return $this->sacevtAvatarMale;
     }
 }
