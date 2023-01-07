@@ -19,41 +19,36 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 
+/**
+ * Sync tl_member with tl_user.
+ */
 class SyncMemberWithUser
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
+    private LoggerInterface|null $contaoGeneralLogger;
 
-    /**
-     * @var ?LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * SyncMemberWithUser constructor.
-     */
-    public function __construct(ContaoFramework $framework, LoggerInterface $logger = null)
+    public function __construct(ContaoFramework $framework, LoggerInterface $contaoGeneralLogger = null)
     {
         $this->framework = $framework;
-        $this->logger = $logger;
+        $this->contaoGeneralLogger = $contaoGeneralLogger;
     }
 
-    /**
-     * Sync tl_member with tl_user.
-     */
     public function syncMemberWithUser(): void
     {
-        // Initialize contao framework
         $this->framework->initialize();
 
-        $objUser = Database::getInstance()->prepare('SELECT * FROM tl_user WHERE sacMemberId>?')->execute(0);
+        $objUser = Database::getInstance()
+            ->prepare('SELECT * FROM tl_user WHERE sacMemberId > ?')
+            ->execute(0)
+        ;
 
         while ($objUser->next()) {
-            $objMember = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')->limit(1)->execute($objUser->sacMemberId);
+            $objMember = Database::getInstance()
+                ->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')
+                ->limit(1)
+                ->execute($objUser->sacMemberId)
+            ;
 
             if ($objMember->numRows) {
                 $set = [
@@ -70,27 +65,32 @@ class SyncMemberWithUser
                     'phone' => $objMember->phone,
                     'mobile' => $objMember->mobile,
                 ];
-                $objUpdateStmt = Database::getInstance()->prepare('UPDATE tl_user %s WHERE id=?')->set($set)->execute($objUser->id);
+
+                $objUpdateStmt = Database::getInstance()
+                    ->prepare('UPDATE tl_user %s WHERE id=?')
+                    ->set($set)
+                    ->execute($objUser->id)
+                ;
 
                 if ($objUpdateStmt->affectedRows) {
-                    // Log
-                    $msg = sprintf('Synced tl_user with tl_member. Updated tl_user (%s %s [SAC Member-ID: %s]).', $objMember->firstname, $objMember->lastname, $objMember->sacMemberId);
-                    $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS);
+                    $msg = sprintf(
+                        'Synced tl_user with tl_member. Updated tl_user (%s %s [SAC Member-ID: %s]).',
+                        $objMember->firstname,
+                        $objMember->lastname,
+                        $objMember->sacMemberId
+                    );
+
+                    $this->contaoGeneralLogger?->info(
+                        $msg,
+                        ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS)]
+                    );
                 }
             } else {
-                Database::getInstance()->prepare('UPDATE tl_user SET sacMemberId=? WHERE id=?')->execute(0, $objUser->id);
+                Database::getInstance()
+                    ->prepare('UPDATE tl_user SET sacMemberId = ? WHERE id = ?')
+                    ->execute(0, $objUser->id)
+                ;
             }
-        }
-    }
-
-    private function log(string $strLogLevel, string $strText, string $strMethod, string $strCategory): void
-    {
-        if (null !== $this->logger) {
-            $this->logger->log(
-                $strLogLevel,
-                $strText,
-                ['contao' => new ContaoContext($strMethod, $strCategory)]
-            );
         }
     }
 }

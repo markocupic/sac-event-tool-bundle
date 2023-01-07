@@ -22,7 +22,7 @@ use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 
-class MaintainBackendUserRights
+class MaintainBackendUserPermissions
 {
     private ContaoFramework $framework;
     private Connection $connection;
@@ -45,7 +45,7 @@ class MaintainBackendUserRights
     /**
      * @throws Exception
      */
-    public function resetBackendUserRights(string $strUserIdentifier, array $arrSkip = [], bool $mergeGroupRights = false): void
+    public function resetBackendUserPermissions(string $strUserIdentifier, array $arrSkip = [], bool $mergeGroupRights = false): void
     {
         // Initialize contao framework
         $this->framework->initialize();

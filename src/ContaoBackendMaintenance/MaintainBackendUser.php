@@ -12,42 +12,41 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\ContaoBackendMaintainance;
+namespace Markocupic\SacEventToolBundle\ContaoBackendMaintenance;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserRights;
+use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserPermissions;
 use Psr\Log\LoggerInterface;
 
 class MaintainBackendUser
 {
     private Connection $connection;
-    private MaintainBackendUserRights $maintainBackendUserRights;
-    private LoggerInterface $contaoGeneralLogger;
+    private MaintainBackendUserPermissions $maintainBackendUserPermissions;
+    private LoggerInterface|null $contaoGeneralLogger;
 
-    public function __construct(Connection $connection, MaintainBackendUserRights $maintainBackendUserRights, LoggerInterface|null $contaoGeneralLogger)
+    public function __construct(Connection $connection, MaintainBackendUserPermissions $maintainBackendUserPermissions, LoggerInterface|null $contaoGeneralLogger = null)
     {
         $this->connection = $connection;
-        $this->maintainBackendUserRights = $maintainBackendUserRights;
+        $this->maintainBackendUserPermissions = $maintainBackendUserPermissions;
         $this->contaoGeneralLogger = $contaoGeneralLogger;
     }
 
     /**
      * @throws Exception
      */
-    public function resetBackendUserRights(): void
+    public function resetBackendUserPermissions(): void
     {
         $hasUsers = false;
         $stmt = $this->connection->executeQuery('SELECT username FROM tl_user WHERE admin = ? AND inherit = ?', ['', 'extend']);
 
         while (false !== ($userIdentifier = $stmt->fetchOne())) {
             $hasUsers = true;
-            $this->maintainBackendUserRights->resetBackendUserRights($userIdentifier, [], true);
+            $this->maintainBackendUserPermissions->resetBackendUserPermissions($userIdentifier, [], true);
         }
 
-        if (true === $hasUsers) {
-            // Log
-            $strText = 'Successfully cleared the user properties of all non-admin backend users.';
+        if ($this->contaoGeneralLogger && true === $hasUsers) {
+            $strText = 'Successfully reset backend permissions of all non-admin users.';
             $this->contaoGeneralLogger->info($strText);
         }
     }

@@ -20,26 +20,23 @@ use Contao\Files;
 use Contao\FilesModel;
 use Contao\Folder;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\UserModel;
-use Psr\Log\LogLevel;
+use Markocupic\SacEventToolBundle\Config\Log;
+use Psr\Log\LoggerInterface;
 
 class MaintainBackendUsersHomeDirectory
 {
     private ContaoFramework $framework;
-
     private string $projectDir;
-
     private string $sacevtUserBackendHomeDir;
+    private LoggerInterface|null $contaoGeneralLogger;
 
-    /**
-     * MaintainBackendUsersHomeDirectory constructor.
-     */
-    public function __construct(ContaoFramework $framework, string $projectDir, string $sacevtUserBackendHomeDir)
+    public function __construct(ContaoFramework $framework, string $projectDir, string $sacevtUserBackendHomeDir, LoggerInterface $contaoGeneralLogger = null)
     {
         $this->framework = $framework;
         $this->projectDir = $projectDir;
         $this->sacevtUserBackendHomeDir = $sacevtUserBackendHomeDir;
+        $this->contaoGeneralLogger = $contaoGeneralLogger;
 
         // Initialize contao framework
         $this->framework->initialize();
@@ -47,6 +44,8 @@ class MaintainBackendUsersHomeDirectory
 
     /**
      * Create backend users home directories.
+     *
+     * @throws \Exception
      */
     public function createBackendUsersHomeDirectory(UserModel $objUser): void
     {
@@ -67,12 +66,20 @@ class MaintainBackendUsersHomeDirectory
         // Copy default avatar
         if (!is_file($this->projectDir.'/'.$this->sacevtUserBackendHomeDir.'/'.$objUser->id.'/avatar/default.jpg')) {
             $filesAdapter->getInstance()->copy($this->sacevtUserBackendHomeDir.'/new/avatar/default.jpg', $this->sacevtUserBackendHomeDir.'/'.$objUser->id.'/avatar/default.jpg');
-            $logger = System::getContainer()->get('monolog.logger.contao');
-            $strText = sprintf('Created new homedirectory (and added filemount) for User with ID %s in "%s".', $objUser->id, $this->sacevtUserBackendHomeDir.'/'.$objUser->id);
-            $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, 'NEW BACKEND USER HOME DIRECTORY')]);
+
+            $this->contaoGeneralLogger?->info(
+                sprintf(
+                    'Created a new home directory (and added file mounts) for user with ID %s in "%s".',
+                    $objUser->id,
+                    $this->sacevtUserBackendHomeDir.'/'.$objUser->id,
+                ),
+                [
+                    'contao' => new ContaoContext(__METHOD__, Log::CREATE_USER_HOME_DIRECTORY),
+                ]
+            );
         }
 
-        // Add filemount for the user directory
+        // Add file mount for the user directory
         $strFolder = $this->sacevtUserBackendHomeDir.'/'.$objUser->id;
         $objFile = $filesModelAdapter->findByPath($strFolder);
         $arrFileMounts = $stringUtilAdapter->deserialize($objUser->filemounts, true);
@@ -86,7 +93,7 @@ class MaintainBackendUsersHomeDirectory
     /**
      * Remove no more user backend user home directories.
      */
-    public function removeUnusedBackendUsersHomeDirectories(): void
+    public function removeUnusedBackendUserHomeDirectories(): void
     {
         /** @var FilesModel $filesModelAdapter */
         $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
@@ -94,12 +101,15 @@ class MaintainBackendUsersHomeDirectory
         /** @var UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
-        // Scan for unused old directories
-        $scanDir = scan($this->sacevtUserBackendHomeDir, true);
+        /** @var Folder $folderAdapter */
+        $folderAdapter = $this->framework->getAdapter(Folder::class);
 
-        if (!empty($scanDir) && \is_array($scanDir)) {
+        // Scan for no more used "old" directories and add the prefix "old_"
+        $scanDir = $folderAdapter->scan($this->sacevtUserBackendHomeDir, true);
+
+        if (!empty($scanDir)) {
             foreach ($scanDir as $userDir) {
-                if ('new' === $userDir || false !== strpos($userDir, 'old__')) {
+                if ('new' === $userDir || str_contains($userDir, 'old__')) {
                     continue;
                 }
 
@@ -107,14 +117,12 @@ class MaintainBackendUsersHomeDirectory
                     if (!$userModelAdapter->findByPk($userDir)) {
                         $objFolder = new Folder($this->sacevtUserBackendHomeDir.'/'.$userDir);
 
-                        if ($objFolder) {
-                            $objFolder->renameTo($this->sacevtUserBackendHomeDir.'/old__'.$userDir);
-                            $objFileModel = $filesModelAdapter->findByPath($this->sacevtUserBackendHomeDir.'/'.$userDir);
+                        $objFolder->renameTo($this->sacevtUserBackendHomeDir.'/old__'.$userDir);
+                        $objFileModel = $filesModelAdapter->findByPath($this->sacevtUserBackendHomeDir.'/'.$userDir);
 
-                            if (null !== $objFileModel) {
-                                $objFileModel->path = $this->sacevtUserBackendHomeDir.'/old__'.$userDir;
-                                $objFileModel->save();
-                            }
+                        if (null !== $objFileModel) {
+                            $objFileModel->path = $this->sacevtUserBackendHomeDir.'/old__'.$userDir;
+                            $objFileModel->save();
                         }
                     }
                 }

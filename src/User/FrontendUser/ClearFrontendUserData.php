@@ -14,38 +14,33 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\User\FrontendUser;
 
-use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\Database;
 use Contao\Date;
 use Contao\Folder;
 use Contao\MemberModel;
 use Contao\Message;
-use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 
 class ClearFrontendUserData
 {
     private ContaoFramework $framework;
-
     private string $projectDir;
-
     private string $sacevtUserFrontendAvatarDir;
+    private LoggerInterface|null $contaoGeneralLogger;
 
-    /**
-     * ClearFrontendUserData constructor.
-     */
-    public function __construct(ContaoFramework $framework, string $projectDir, string $sacevtUserFrontendAvatarDir)
+    public function __construct(ContaoFramework $framework, string $projectDir, string $sacevtUserFrontendAvatarDir, LoggerInterface $contaoGeneralLogger = null)
     {
         $this->framework = $framework;
         $this->projectDir = $projectDir;
         $this->sacevtUserFrontendAvatarDir = $sacevtUserFrontendAvatarDir;
+        $this->contaoGeneralLogger = $contaoGeneralLogger;
 
-        // Initialize contao framework
+        // Initialize the contao framework
         $this->framework->initialize();
     }
 
@@ -82,67 +77,74 @@ class ClearFrontendUserData
                 }
 
                 if (!$blnFound) {
-                    $container = System::getContainer();
-                    $logger = $container->get('monolog.logger.contao');
                     $message = sprintf(
-                        'Teilnehmer %s %s mit ID %s [%s] am Event mit ID %s [%s] konnte nicht in tl_member gefunden werden."',
+                        'Could not assign a frontend user to the registration with ID %s (%s %s [%s]) and the event with ID %s "%s".',
+                        $objEventsMember->id,
                         $objEventsMember->firstname,
                         $objEventsMember->lastname,
-                        $objEventsMember->id,
                         $objEventsMember->sacMemberId,
                         $objEventsMember->eventId,
                         $objEventsMember->eventName,
                     );
 
-                    $logger->log(LogLevel::INFO, $message, ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, 'EVENT_MEMBER_NOT_FOUND')]);
+                    $this->contaoGeneralLogger?->info(
+                        $message,
+                        ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, 'EVENT_MEMBER_NOT_FOUND')],
+                    );
 
                     // Notify admin
                     if (!empty($configAdapter->get('adminEmail'))) {
-                        mail($configAdapter->get('adminEmail'), 'Unbekannter Teilnehmer in Event '.$objEventsMember->eventName, $message.' In '.__FILE__.' LINE: '.__LINE__);
+                        mail(
+                            $configAdapter->get('adminEmail'),
+                            'Unbekannter Teilnehmer in Event '.$objEventsMember->eventName,
+                            $message.' In '.__FILE__.' LINE: '.__LINE__
+                        );
                     }
 
                     /*
-                     * @todo Teilnehmer werden unbeabsichtig anonymisiert
+                     * @todo: Currently disabled because event registrations has been erroneously anonymized.
                      */
-                    //$this->anonymizeCalendarEventsMemberDataRecord($objEventsMember->current());
+                    //$this->anonymizeEventRegistration($objEventsMember->current());
                 }
             }
         }
     }
 
-    public function anonymizeCalendarEventsMemberDataRecord(CalendarEventsMemberModel $objCalendarEventsMember): bool
+    public function anonymizeEventRegistration(CalendarEventsMemberModel $objCalendarEventsMember): bool
     {
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
-        if (null !== $objCalendarEventsMember) {
-            if (null !== $objCalendarEventsMember) {
-                if (!$objCalendarEventsMember->anonymized) {
-                    // Log
-                    $container = System::getContainer();
-                    $logger = $container->get('monolog.logger.contao');
-                    $logger->log(LogLevel::INFO, sprintf('Anonymized tl_calendar_events_member.id=%s. Firstname: %s, Lastname: %s (%s)"', $objCalendarEventsMember->id, $objCalendarEventsMember->firstname, $objCalendarEventsMember->lastname, $objCalendarEventsMember->sacMemberId), ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, 'ANONYMIZED_CALENDAR_EVENTS_MEMBER_DATA')]);
+        if (!$objCalendarEventsMember->anonymized) {
+            $this->contaoGeneralLogger?->info(
+                sprintf(
+                    'Anonymized tl_calendar_events_member.id=%s. Firstname: %s, Lastname: %s (%s)"',
+                    $objCalendarEventsMember->id,
+                    $objCalendarEventsMember->firstname,
+                    $objCalendarEventsMember->lastname,
+                    $objCalendarEventsMember->sacMemberId
+                ),
+                ['contao' => new ContaoContext(__METHOD__, 'ANONYMIZED_CALENDAR_EVENTS_MEMBER_DATA')],
+            );
 
-                    $objCalendarEventsMember->firstname = 'Vorname [anonymisiert]';
-                    $objCalendarEventsMember->lastname = 'Nachname [anonymisiert]';
-                    $objCalendarEventsMember->email = '';
-                    $objCalendarEventsMember->sacMemberId = '';
-                    $objCalendarEventsMember->street = 'Adresse [anonymisiert]';
-                    $objCalendarEventsMember->postal = '0';
-                    $objCalendarEventsMember->city = 'Ort [anonymisiert]';
-                    $objCalendarEventsMember->mobile = '';
-                    $objCalendarEventsMember->foodHabits = '';
-                    $objCalendarEventsMember->dateOfBirth = '';
-                    $objCalendarEventsMember->contaoMemberId = 0;
-                    $objCalendarEventsMember->notes = 'Benutzerdaten anonymisiert am '.$dateAdapter->parse('d.m.Y', time());
-                    $objCalendarEventsMember->emergencyPhone = '999 99 99';
-                    $objCalendarEventsMember->emergencyPhoneName = ' [anonymisiert]';
-                    $objCalendarEventsMember->anonymized = '1';
-                    $objCalendarEventsMember->save();
-                }
+            $objCalendarEventsMember->firstname = 'Vorname [anonymisiert]';
+            $objCalendarEventsMember->lastname = 'Nachname [anonymisiert]';
+            $objCalendarEventsMember->email = '';
+            $objCalendarEventsMember->sacMemberId = '';
+            $objCalendarEventsMember->street = 'Adresse [anonymisiert]';
+            $objCalendarEventsMember->postal = '0';
+            $objCalendarEventsMember->city = 'Ort [anonymisiert]';
+            $objCalendarEventsMember->mobile = '';
+            $objCalendarEventsMember->foodHabits = '';
+            $objCalendarEventsMember->dateOfBirth = '';
+            $objCalendarEventsMember->contaoMemberId = 0;
+            $objCalendarEventsMember->notes = 'Benutzerdaten anonymisiert am '.$dateAdapter->parse('d.m.Y', time());
+            $objCalendarEventsMember->emergencyPhone = '999 99 99';
+            $objCalendarEventsMember->emergencyPhoneName = ' [anonymisiert]';
+            $objCalendarEventsMember->anonymized = '1';
+            $objCalendarEventsMember->save();
 
-                return true;
-            }
+            return true;
         }
 
         return false;
@@ -153,23 +155,16 @@ class ClearFrontendUserData
         /** @var MemberModel $memberModelAdapter */
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
 
-        /** @var MemberModel $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
         $objMember = $memberModelAdapter->findByPk($memberId);
 
         if (null !== $objMember) {
-            // Log
-            $container = System::getContainer();
-            $logger = $container->get('monolog.logger.contao');
-            $logger->log(
-                LogLevel::INFO,
+            $this->contaoGeneralLogger?->info(
                 sprintf(
                     'Login for member with ID:%s [%s] has been deactivated.',
                     $objMember->id,
                     $objMember->sacMemberId
                 ),
-                ['contao' => new ContaoContext(__FILE__.' Line: '.__LINE__, $configAdapter->get('DISABLE_MEMBER_LOGIN'))]
+                ['contao' => new ContaoContext(__METHOD__, Log::DISABLE_FRONTEND_USER_LOGIN)]
             );
 
             $objMember->login = '';
@@ -183,16 +178,18 @@ class ClearFrontendUserData
         /** @var MemberModel $memberModelAdapter */
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
 
-        /** @var MemberModel $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
         $objMember = $memberModelAdapter->findByPk($memberId);
 
         if (null !== $objMember) {
-            // Log
-            $logger = System::getContainer()->get('monolog.logger.contao');
-            $strText = sprintf('Member with ID:%s has been deleted.', $objMember->id);
-            $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, $configAdapter->get('DELETE_MEMBER'))]);
+            $this->contaoGeneralLogger?->info(
+                sprintf(
+                    'Member with ID %s (%s %s) has been deleted.',
+                    $objMember->id,
+                    $objMember->firstname,
+                    $objMember->lastname,
+                ),
+                ['contao' => new ContaoContext(__METHOD__, Log::DELETE_FRONTEND_USER)],
+            );
 
             $objMember->delete();
         }
@@ -215,10 +212,11 @@ class ClearFrontendUserData
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
-        /** @var MemberModel $configAdapter */
+        /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
 
         $arrEventsMember = [];
+        $arrErrorMsg = [];
         $blnHasError = false;
         $objMember = $memberModelAdapter->findByPk($memberId);
 
@@ -241,7 +239,13 @@ class ClearFrontendUserData
                             continue;
                         }
 
-                        $arrErrorMsg[] = sprintf('Dein Profil kann nicht gelöscht werden, weil du beim Event "%s [%s]" vom %s auf der Buchungsliste stehst. Bitte melde dich zuerst vom Event ab oder nimm gegebenenfalls mit dem Leiter Kontakt auf.', $objEvent->title, $objEventsMember->stateOfSubscription, $dateAdapter->parse($configAdapter->get('dateFormat'), $objEvent->startDate));
+                        $arrErrorMsg[] = sprintf(
+                            'Dein Profil kann nicht gelöscht werden, weil du beim Event "%s [%s]" vom %s auf der Buchungsliste stehst. Bitte melde dich zuerst vom Event ab oder nimm gegebenenfalls mit dem Leiter Kontakt auf.',
+                            $objEvent->title,
+                            $objEventsMember->stateOfSubscription,
+                            $dateAdapter->parse($configAdapter->get('dateFormat'), $objEvent->startDate),
+                        );
+
                         $blnHasError = true;
                     }
                 }
@@ -271,9 +275,10 @@ class ClearFrontendUserData
                 $objEventsMember = $calendarEventsMemberModelAdapter->findByPk($eventsMemberId);
 
                 if (null !== $objEventsMember) {
-                    $this->anonymizeCalendarEventsMemberDataRecord($objEventsMember);
+                    $this->anonymizeEventRegistration($objEventsMember);
                 }
             }
+
             // Delete avatar directory
             $this->deleteAvatarDirectory($memberId);
 
@@ -292,53 +297,17 @@ class ClearFrontendUserData
             $strDir = $this->sacevtUserFrontendAvatarDir.'/'.$memberId;
             $objDir = new Folder($strDir);
 
-            if (null !== $objDir) {
-                // Log
-                $logger = System::getContainer()->get('monolog.logger.contao');
-                $strText = sprintf('Deleted avatar directory "%s" for member with ID:%s.', $strDir, $memberId);
-                $logger->log(LogLevel::INFO, $strText, ['contao' => new ContaoContext(__METHOD__, 'DELETED_AVATAR_DIRECTORY')]);
+            $this->contaoGeneralLogger?->info(
+                sprintf(
+                    'Deleted avatar directory "%s" for member with ID %s.',
+                    $strDir,
+                    $memberId,
+                ),
+                ['contao' => new ContaoContext(__METHOD__, Log::DELETE_FRONTEND_USER_AVATAR_DIRECTORY)],
+            );
 
-                $objDir->purge();
-                $objDir->delete();
-            }
+            $objDir->purge();
+            $objDir->delete();
         }
-    }
-
-    private function findUpcomingEventsByMemberId(int $memberId): array
-    {
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
-
-        /** @var CalendarEventsModel $calendarEventsModelAdapter */
-        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-
-        /** @var MemberModel $memberModelAdapter */
-        $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-
-        /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
-        $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
-
-        $arrEvents = [];
-        $objMember = $memberModelAdapter->findByPk($memberId);
-
-        if (null !== $objMember) {
-            $objEvents = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE endDate>? ORDER BY startDate')->execute(time());
-
-            while ($objEvents->next()) {
-                $objJoinedEvents = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE sacMemberId=? AND eventId=?')->limit(1)->execute($objMember->sacMemberId, $objEvents->id);
-
-                if ($objJoinedEvents->numRows) {
-                    $arr = $objEvents->row();
-                    $objEventsModel = $calendarEventsModelAdapter->findByPk($objEvents->id);
-                    $arr['id'] = $objEvents->id;
-                    $arr['eventModel'] = $objEventsModel;
-                    $arr['registrationId'] = $objJoinedEvents->id;
-                    $arr['eventRegistrationModel'] = $calendarEventsMemberModelAdapter->findByPk($objJoinedEvents->id);
-                    $arrEvents[] = $arr;
-                }
-            }
-        }
-
-        return $arrEvents;
     }
 }

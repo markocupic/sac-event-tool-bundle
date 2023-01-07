@@ -55,7 +55,7 @@ class PostLoginListener
             }
 
             // Scan for unused/old directories and remove them
-            $this->maintainBackendUsersHomeDirectory->removeUnusedBackendUsersHomeDirectories();
+            $this->maintainBackendUsersHomeDirectory->removeUnusedBackendUserHomeDirectories();
         }
     }
 }

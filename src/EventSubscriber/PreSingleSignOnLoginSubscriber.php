@@ -17,27 +17,27 @@ namespace Markocupic\SacEventToolBundle\EventSubscriber;
 use Contao\BackendUser;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserRights;
+use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserPermissions;
 use Markocupic\SwissAlpineClubContaoLoginClientBundle\Event\PreInteractiveLoginEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
 {
     private Connection $connection;
-    private MaintainBackendUserRights $maintainBackendUserRights;
+    private MaintainBackendUserPermissions $maintainBackendUserPermissions;
     private bool $sacevtUserBackendResetUserRightsOnSsoLogin;
 
-    public function __construct(Connection $connection, MaintainBackendUserRights $maintainBackendUserRights, bool $sacevtUserBackendResetUserRightsOnSsoLogin)
+    public function __construct(Connection $connection, MaintainBackendUserPermissions $maintainBackendUserPermissions, bool $sacevtUserBackendResetUserRightsOnSsoLogin)
     {
         $this->connection = $connection;
-        $this->maintainBackendUserRights = $maintainBackendUserRights;
+        $this->maintainBackendUserPermissions = $maintainBackendUserPermissions;
         $this->sacevtUserBackendResetUserRightsOnSsoLogin = $sacevtUserBackendResetUserRightsOnSsoLogin;
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            PreInteractiveLoginEvent::NAME => ['resetBackendUserRights', 100],
+            PreInteractiveLoginEvent::NAME => ['resetBackendUserPermissions', 100],
         ];
     }
 
@@ -47,7 +47,7 @@ final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
      *
      * @throws Exception
      */
-    public function resetBackendUserRights(PreInteractiveLoginEvent $event): void
+    public function resetBackendUserPermissions(PreInteractiveLoginEvent $event): void
     {
         if (false === $this->sacevtUserBackendResetUserRightsOnSsoLogin) {
             return;
@@ -64,7 +64,7 @@ final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
             ;
 
             if (false !== $arrUserData) {
-                $this->maintainBackendUserRights->resetBackendUserRights($userIdentifier, [], true);
+                $this->maintainBackendUserPermissions->resetBackendUserPermissions($userIdentifier, [], true);
             }
         }
     }

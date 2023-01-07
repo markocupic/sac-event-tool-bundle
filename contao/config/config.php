@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
-use Markocupic\SacEventToolBundle\ContaoBackendMaintainance\MaintainBackendUser;
+use Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainBackendUser;
 use Markocupic\SacEventToolBundle\Model\CalendarContainerModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorModel;
@@ -114,7 +114,7 @@ $GLOBALS['TL_MODELS'][UserRoleModel::getTable()] = UserRoleModel::class;
  * and tl_user.inherit = 'extend'
  */
 $GLOBALS['TL_PURGE']['custom']['reset_backend_user_rights'] = [
-	'callback' => [MaintainBackendUser::class, 'resetBackendUserRights'],
+	'callback' => [MaintainBackendUser::class, 'resetBackendUserPermissions'],
 ];
 
 /*
