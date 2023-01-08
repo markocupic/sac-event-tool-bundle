@@ -38,7 +38,7 @@ class RotateImage
     /**
      * @throws \ImagickException
      */
-    public function rotate(FilesModel $filesModel = null, int $angle = 270, string $target = ''): bool
+    public function rotate(FilesModel $filesModel = null, int $angle = 90, string $target = ''): bool
     {
         if (null === $filesModel) {
             return false;
@@ -80,10 +80,6 @@ class RotateImage
                     }
                 }
             }
-
-            $this->messageAdapter->addError(sprintf('Please install class "%s" or php function "%s" for rotating images.', 'Imagick', 'imagerotate'));
-
-            return false;
         }
 
         if (\function_exists('imagerotate')) {

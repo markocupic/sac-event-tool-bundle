@@ -81,7 +81,7 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         // Rotate image by 90°
         if ('rotate-image' === $inputAdapter->get('do') && '' !== $inputAdapter->get('fileId')) {
             $objFiles = FilesModel::findOneById($inputAdapter->get('fileId'));
-            $this->rotateImage->rotate($objFiles);
+            $this->rotateImage->rotate($objFiles, 90);
 
             $controllerAdapter->redirect($page->getFrontendUrl());
         }

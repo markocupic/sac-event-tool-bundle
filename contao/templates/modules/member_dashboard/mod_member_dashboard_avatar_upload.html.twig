@@ -26,7 +26,7 @@
             <figure class="member-dashboard-avatar responsive thumbnail image_container">
                 {{ '{{image::'~getAvatarResourcePath(userModel)~'?width=300}}' }}
                 {% if avatar is defined %}
-                    <a href="{{ '{{env::request}}' }}?do=rotate-image&fileId={{ avatar.id }}" class="member-dashboard-rotate-image-button" title="Bild im GUZS 90° drehen"><i class="fa fa-history turn-image"></i></a>
+                    <a href="{{ '{{env::request}}' }}?do=rotate-image&fileId={{ avatar.id }}" class="member-dashboard-rotate-image-button" title="Bild im UZS um 90° drehen"><i class="fa-solid fa-rotate-right turn-image"></i></a>
                 {% endif %}
             </figure>
             {% if user.hasAvatar is same as true %}
