@@ -17,7 +17,6 @@ namespace Markocupic\SacEventToolBundle\Csv;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
-use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Doctrine\DBAL\Connection;
@@ -27,6 +26,7 @@ use League\Csv\InvalidArgument;
 use League\Csv\Reader;
 use League\Csv\Writer;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportEventRegistrationList
 {
@@ -81,7 +81,7 @@ class ExportEventRegistrationList
      * @throws InvalidArgument
      * @throws Exception
      */
-    public function generate(CalendarEventsModel $event): void
+    public function generate(CalendarEventsModel $event): Response
     {
         // Create empty document
         $csv = Writer::createFromString();
@@ -130,9 +130,17 @@ class ExportEventRegistrationList
         // Generate the file name
         $filename = sprintf($this->sacevtEventMemberListFileNamePattern, $eventTitle, 'csv');
 
-        // Output
-        $csv->output($filename);
+        // Sent the file to the browser.
+        $response = new StreamedResponse(
+            static function () use ($csv, $filename): void {
+                $csv->output($filename);
+            }
+        );
 
-        throw new ResponseException(new Response(''));
+        $response->headers->set('Content-Type', 'application/vnd.ms-excel');
+        $response->headers->set('Content-Disposition', 'attachment;filename="'.$filename.'"');
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response->send();
     }
 }

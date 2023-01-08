@@ -53,6 +53,7 @@ use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -417,21 +418,23 @@ class CalendarEventsMember
      * @throws CopyFileException
      * @throws CreateTemporaryFileException
      */
-    public function exportMemberList(DataContainer $dc): void
+    public function exportMemberList(DataContainer $dc): Response|null
     {
         $request = $this->requestStack->getCurrentRequest();
 
         if ($request->query->has('id') && null !== ($objEvent = $this->calendarEvents->findByPk($request->query->get('id')))) {
             // Download the registration list as a docx file
             if ('downloadEventMemberListDocx' === $request->query->get('action')) {
-                $this->registrationListExporterDocx->generate($objEvent, 'docx');
+                return $this->registrationListExporterDocx->generate($objEvent, 'docx');
             }
 
             // Download the registration list as a csv file
             if ('downloadEventMemberListCsv' === $request->query->get('action')) {
-                $this->registrationListExporterCsv->generate($objEvent);
+                return $this->registrationListExporterCsv->generate($objEvent);
             }
         }
+
+        return null;
     }
 
     /**

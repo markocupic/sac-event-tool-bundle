@@ -28,6 +28,7 @@ use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
+use Symfony\Component\HttpFoundation\Response;
 
 class EventMemberList2Docx
 {
@@ -69,7 +70,7 @@ class EventMemberList2Docx
      * @throws CopyFileException
      * @throws CreateTemporaryFileException
      */
-    public function generate(CalendarEventsModel $objEvent, string $outputType = 'docx'): void
+    public function generate(CalendarEventsModel $objEvent, string $outputType = 'docx'): Response
     {
         $objEventMember = $this->calendarEventsMemberModelAdapter->findBy(
             [
@@ -109,7 +110,7 @@ class EventMemberList2Docx
             ;
 
             // Generate pdf
-            $this->convertFile
+            return $this->convertFile
                 ->file($this->projectDir.'/'.$targetFilePath)
                 ->sendToBrowser(true, true)
                 ->uncached(true)
@@ -119,12 +120,12 @@ class EventMemberList2Docx
 
         if ('docx' === $outputType) {
             // Generate Docx file from template;
-            $objPhpWord->generateUncached(true)
+            return $objPhpWord->generateUncached(true)
                 ->sendToBrowser(true)
                 ->generate()
             ;
         }
 
-        throw new \Exception('No output type defined. The output type must be "docx" or "pdf".');
+        throw new \LogicException('No output type defined. Please define the output type either "docx" or "pdf".');
     }
 }
