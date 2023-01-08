@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Image;
 
+use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\File;
 use Contao\FilesModel;
@@ -22,60 +23,45 @@ use Contao\Message;
 
 class RotateImage
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
+    private ContaoFramework $framework;
+    private string $projectDir;
+    private Adapter $messageAdapter;
 
-    /**
-     * @var string
-     */
-    private $projectDir;
-
-    /**
-     * RotateImage constructor.
-     */
     public function __construct(ContaoFramework $framework, string $projectDir)
     {
         $this->framework = $framework;
         $this->projectDir = $projectDir;
+
+        $this->messageAdapter = $framework->getAdapter(Message::class);
     }
 
     /**
      * @throws \ImagickException
      */
-    public function rotate(FilesModel $objFiles = null, int $angle = 270, string $target = ''): bool
+    public function rotate(FilesModel $filesModel = null, int $angle = 270, string $target = ''): bool
     {
-        if (null === $objFiles) {
+        if (null === $filesModel) {
             return false;
         }
 
-        // Initialize contao framework
         $this->framework->initialize();
 
-        /** @var Message $messageAdapter */
-        $messageAdapter = $this->framework->getAdapter(Message::class);
-
-        $src = $objFiles->path;
-
-        if (!file_exists($this->projectDir.'/'.$src)) {
-            $messageAdapter->addError(sprintf('File "%s" not found.', $src));
+        if (!file_exists($filesModel->getAbsolutePath())) {
+            $this->messageAdapter->addError(sprintf('File "%s" not found.', $filesModel->getAbsolutePath()));
 
             return false;
         }
 
-        $objFile = new File($src);
+        $objFile = new File($filesModel->path);
 
         if (!$objFile->isGdImage) {
-            $messageAdapter->addError(sprintf('File "%s" could not be rotated, because it is not an image.', $src));
+            $this->messageAdapter->addError(sprintf('File "%s" could not be rotated, because it is not an image.', $filesModel->getAbsolutePath()));
 
             return false;
         }
 
-        $source = $this->projectDir.'/'.$src;
-
         if ('' === $target) {
-            $target = $source;
+            $target = $filesModel->getAbsolutePath();
         } else {
             new Folder(\dirname($target));
             $target = $this->projectDir.'/'.$target;
@@ -84,34 +70,47 @@ class RotateImage
         if (class_exists('Imagick') && class_exists('ImagickPixel')) {
             $imagick = new \Imagick();
 
-            $imagick->readImage($source);
-            $imagick->rotateImage(new \ImagickPixel('none'), $angle);
-            $imagick->writeImage($target);
-            $imagick->clear();
-            $imagick->destroy();
+            if ($imagick->readImage($filesModel->getAbsolutePath())) {
+                if ($imagick->rotateImage(new \ImagickPixel('none'), $angle)) {
+                    if ($imagick->writeImage($target)) {
+                        $imagick->clear();
+                        $imagick->destroy();
 
-            return true;
-        }
-
-        if (\function_exists('imagerotate')) {
-            $source = imagecreatefromjpeg($this->projectDir.'/'.$src);
-
-            //rotate
-            $imgTmp = imagerotate($source, $angle, 0);
-
-            // Output
-            imagejpeg($imgTmp, $target);
-
-            imagedestroy($source);
-
-            if (is_file($target)) {
-                return true;
+                        return true;
+                    }
+                }
             }
-        } else {
-            $messageAdapter->addError(sprintf('Please install class "%s" or php function "%s" for rotating images.', 'Imagick', 'imagerotate'));
+
+            $this->messageAdapter->addError(sprintf('Please install class "%s" or php function "%s" for rotating images.', 'Imagick', 'imagerotate'));
 
             return false;
         }
+
+        if (\function_exists('imagerotate')) {
+            $objGdImage = imagecreatefromjpeg($filesModel->getAbsolutePath());
+
+            if (false !== $objGdImage) {
+                $objRotGdImage = imagerotate($objGdImage, $angle, 0);
+
+                if (imagejpeg($objRotGdImage, $target)) {
+                    // Free the memory
+                    imagedestroy($objGdImage);
+                    imagedestroy($objRotGdImage);
+
+                    if (is_file($target)) {
+                        return true;
+                    }
+                }
+
+                imagedestroy($objGdImage);
+            }
+
+            $this->messageAdapter->addError('An unexpected error occurred while attempting to rotate the image.');
+
+            return false;
+        }
+
+        $this->messageAdapter->addError('Could not find any PHP library to rotate the image.');
 
         return false;
     }
