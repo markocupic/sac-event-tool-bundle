@@ -20,6 +20,7 @@ use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController
 use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendTemplate;
+use Contao\FrontendUser;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Template;
@@ -30,6 +31,7 @@ use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Security;
 
 #[AsContentElement(UserPortraitListController::TYPE, category:'sac_event_tool_content_elements', template:'ce_user_portrait_list')]
 class UserPortraitListController extends AbstractContentElementController
@@ -38,16 +40,18 @@ class UserPortraitListController extends AbstractContentElementController
 
     private ContaoFramework $framework;
     private Connection $connection;
-    private Avatar $avatar;
+	private Security $security;
+	private Avatar $avatar;
     private string $projectDir;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, Avatar $avatar, string $projectDir)
+	public function __construct(ContaoFramework $framework, Connection $connection, Security $security, Avatar $avatar, string $projectDir)
     {
         $this->framework = $framework;
         $this->connection = $connection;
+		$this->security = $security;
         $this->avatar = $avatar;
         $this->projectDir = $projectDir;
-    }
+	}
 
     public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
     {
@@ -65,7 +69,7 @@ class UserPortraitListController extends AbstractContentElementController
         /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
-        /** @var Controller $stringUtilAdapter */
+        /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
         /** @var UserRoleModel $userRoleModelAdapter */
@@ -198,7 +202,10 @@ class UserPortraitListController extends AbstractContentElementController
             $template->items = $strItems;
         }
 
-        $template->hasMultiple = $itemCount > 1;
+		$user = $this->security->getUser();
+		$template->hasLoggedInFrontendUser = $user instanceof FrontendUser::class;
+
+		$template->hasMultiple = $itemCount > 1;
         $template->itemCount = $itemCount;
 
         return $template->getResponse();

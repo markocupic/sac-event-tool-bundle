@@ -10,7 +10,7 @@
     <strong><?= trim($this->lastname.' '.$this->firstname) ?></strong>
     <small>
       {{br}}
-      <?php if (FE_USER_LOGGED_IN): ?>
+      <?php if ($this->hasLoggedInFrontendUser): ?>
       <!-- Show personal data to logged users only -->
       <?php if ('' != $this->street): ?><?= $this->street ?>{{br}}<?php endif; ?>
       <?php if ('' != $this->postal): ?><?= $this->postal ?>&nbsp;<?php endif; ?>
