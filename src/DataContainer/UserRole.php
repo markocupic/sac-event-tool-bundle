@@ -33,7 +33,7 @@ class UserRole
     }
 
     /**
-     * Add the not "role currently vacant" label to each record,
+     * Add the "role currently vacant" label to each record,
      * if the user role could not be found in tl_user.
      *
      * @throws Exception
