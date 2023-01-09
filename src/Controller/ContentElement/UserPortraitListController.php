@@ -203,7 +203,7 @@ class UserPortraitListController extends AbstractContentElementController
         }
 
 		$user = $this->security->getUser();
-		$template->hasLoggedInFrontendUser = $user instanceof FrontendUser::class;
+		$template->hasLoggedInFrontendUser = $user instanceof FrontendUser;
 
 		$template->hasMultiple = $itemCount > 1;
         $template->itemCount = $itemCount;
