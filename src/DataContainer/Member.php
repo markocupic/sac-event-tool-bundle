@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Controller;
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Contao\Message;
 use Doctrine\DBAL\Connection;
@@ -41,10 +41,9 @@ class Member
     }
 
     /**
-     * @Callback(table="tl_member", target="config.delete")
-     *
      * @throws \Exception
      */
+    #[AsCallback(table: 'tl_member', target: 'config.delete', priority: 100)]
     public function clearMemberProfile(DataContainer $dc): void
     {
         // Clear personal data f.ex.
@@ -64,10 +63,9 @@ class Member
     }
 
     /**
-     * @Callback(table="tl_member", target="fields.sectionId.options")
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_member', target: 'fields.sectionId.options', priority: 100)]
     public function listSections(): array
     {
         return $this->connection
@@ -78,9 +76,8 @@ class Member
     /**
      * Display the section name instead of the section id
      * 4250,4252 becomes SAC PILATUS, SAC PILATUS NAPF.
-     *
-     * @Callback(table="tl_member", target="config.onshow")
      */
+    #[AsCallback(table: 'tl_member', target: 'config.onshow', priority: 100)]
     public function decryptSectionIds(array $data, array $row, DataContainer $dc): array
     {
         return $this->util->decryptSectionIds($data, $row, $dc, self::TABLE);

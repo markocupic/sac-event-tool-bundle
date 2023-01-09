@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Doctrine\DBAL\Connection;
 
 class EventOrganizer
@@ -26,9 +26,7 @@ class EventOrganizer
         $this->connection = $connection;
     }
 
-    /**
-     * @Callback(table="tl_event_organizer", target="fields.belongsToOrganization.options")
-     */
+    #[AsCallback(table: 'tl_event_organizer', target: 'fields.belongsToOrganization.options', priority: 100)]
     public function getSacSections(): array
     {
         $arrOptions = [];

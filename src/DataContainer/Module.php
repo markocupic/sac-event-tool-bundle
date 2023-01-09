@@ -15,14 +15,12 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Controller;
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\System;
 
 class Module
 {
-    /**
-     * @Callback(table="tl_module", target="fields.eventFilterBoardFields.options")
-     */
+    #[AsCallback(table: 'tl_module', target: 'fields.eventFilterBoardFields.options', priority: 100)]
     public function getEventFilterBoardFields()
     {
         $opt = [];
@@ -39,9 +37,8 @@ class Module
 
     /**
      * Return all templates as array.
-     *
-     * @Callback(table="tl_module", target="fields.eventListPartialTpl.options")
      */
+    #[AsCallback(table: 'tl_module', target: 'fields.eventListPartialTpl.options', priority: 100)]
     public function getEventListTemplates()
     {
         return Controller::getTemplateGroup('event_list_partial_');

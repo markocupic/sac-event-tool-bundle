@@ -16,8 +16,8 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\CalendarEventsModel;
 use Contao\Controller;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 use Contao\Message;
 use Contao\System;
@@ -70,10 +70,9 @@ class CalendarEventsInstructorInvoice
     }
 
     /**
-     * Set correct referer.
-     *
-     * @Callback(table="tl_calendar_events_instructor_invoice", target="config.onload", priority=100)
+     * Set the correct referer.
      */
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 100)]
     public function setCorrectReferer(): void
     {
         $this->util->setCorrectReferer();
@@ -81,9 +80,8 @@ class CalendarEventsInstructorInvoice
 
     /**
      * Check permissions.
-     *
-     * @Callback(table="tl_calendar_events_instructor_invoice", target="config.onload", priority=90)
      */
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 90)]
     public function checkPermissions(): void
     {
         $user = $this->security->getUser();
@@ -121,8 +119,8 @@ class CalendarEventsInstructorInvoice
     /**
      * @throws CopyFileException
      * @throws CreateTemporaryFileException
-     * @Callback(table="tl_calendar_events_instructor_invoice", target="config.onload", priority=80)
      */
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 80)]
     public function routeActions(): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -155,9 +153,8 @@ class CalendarEventsInstructorInvoice
 
     /**
      * Display a warning if report form hasn't been filled out.
-     *
-     * @Callback(table="tl_calendar_events_instructor_invoice", target="config.onload", priority=70)
      */
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 70)]
     public function warnIfReportFormHasNotFilledIn(): void
     {
         if (\defined('CURRENT_ID') && CURRENT_ID !== '') {
@@ -174,8 +171,8 @@ class CalendarEventsInstructorInvoice
 
     /**
      * @throws Exception
-     * @Callback(table="tl_calendar_events_instructor_invoice", target="config.onload", priority=60)
      */
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 60)]
     public function reviseTable(): void
     {
         $count = $this->connection->executeStatement('DELETE FROM tl_calendar_events_instructor_invoice WHERE NOT EXISTS (SELECT * FROM tl_user WHERE tl_calendar_events_instructor_invoice.userPid = tl_user.id)');
@@ -185,9 +182,7 @@ class CalendarEventsInstructorInvoice
         }
     }
 
-    /**
-     * @Callback(table="tl_calendar_events_instructor_invoice", target="list.sorting.child_record")
-     */
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.sorting.child_record')]
     public function listInvoices(array $row): string
     {
         return '<div class="tl_content_left"><span class="level">Vergütungsformular mit Tourenrapport von: '.UserModel::findByPk($row['userPid'])->name.'</span> <span>['.CalendarEventsModel::findByPk($row['pid'])->title.']</span></div>';
@@ -196,6 +191,7 @@ class CalendarEventsInstructorInvoice
     /**
      * @Callback(table="tl_calendar_events_instructor_invoice", target="edit.buttons")
      */
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'edit.buttons')]
     public function buttonsCallback(array $arrButtons, DataContainer $dc): array
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -207,13 +203,8 @@ class CalendarEventsInstructorInvoice
         return $arrButtons;
     }
 
-    /**
-     * @param $value
-     *
-     * @return mixed|null
-     * @Callback(table="tl_calendar_events_instructor_invoice", target="fields.iban.load")
-     */
-    public function getIbanFromUser($value, DataContainer $dc)
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'fields.iban.load')]
+    public function getIbanFromUser(mixed $value, DataContainer $dc): mixed
     {
         if ($dc->activeRecord) {
             if (null !== ($objInvoice = CalendarEventsInstructorInvoiceModel::findByPk($dc->activeRecord->id))) {
@@ -244,8 +235,8 @@ class CalendarEventsInstructorInvoice
 
     /**
      * @throws \Exception
-     * @Callback(table="tl_calendar_events_instructor_invoice", target="fields.privateArrival.save")
      */
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'fields.privateArrival.save')]
     public function validatePrivateArrival(int $value, DataContainer $dc): int
     {
         if (!$dc->id || !$dc->activeRecord) {

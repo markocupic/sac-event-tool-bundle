@@ -14,13 +14,11 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 
 class TourDifficulty
 {
-    /**
-     * @Callback(table="tl_tour_difficulty", target="list.sorting.child_record")
-     */
+    #[AsCallback(table: 'tl_tour_difficulty', target: 'list.sorting.child_record', priority: 100)]
     public function listDifficulties(array $row): string
     {
         return '<div class="tl_content_left"><span class="level">'.$row['title'].'</span> '.$row['shortcut']."</div>\n";

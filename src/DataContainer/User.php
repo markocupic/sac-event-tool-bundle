@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Intl\Countries;
-use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 use Contao\Message;
 use Contao\UserModel;
@@ -50,10 +50,9 @@ class User
     }
 
     /**
-     * @Callback(table="tl_user", target="fields.sectionId.options")
-     *
      * @throws \Doctrine\DBAL\Exception
      */
+    #[AsCallback(table: 'tl_user', target: 'fields.sectionId.options', priority: 100)]
     public function listSections(): array
     {
         $arrOptions = [];
@@ -67,9 +66,7 @@ class User
         return $arrOptions;
     }
 
-    /**
-     * @Callback(table="tl_user", target="fields.country.options")
-     */
+    #[AsCallback(table: 'tl_user', target: 'fields.country.options', priority: 100)]
     public function getCountries(): array
     {
         $arrCountries = $this->countries->getCountries();
@@ -79,9 +76,8 @@ class User
 
     /**
      * Add backend assets.
-     *
-     * @Callback(table="tl_user", target="config.onload")
      */
+    #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
     public function addBackendAssets(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -96,8 +92,8 @@ class User
      *
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
-     * @Callback(table="tl_user", target="config.onload")
      */
+    #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
     public function addReadonlyAttributeToSyncedFields(DataContainer $dc): void
     {
         if ($dc->id > 0) {
@@ -134,9 +130,8 @@ class User
 
     /**
      * Show message in the user profile section of the Contao backend.
-     *
-     * @Callback(table="tl_user", target="config.onload")
      */
+    #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
     public function showReadonlyFieldsInfoMessage(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -155,9 +150,8 @@ class User
     /**
      * Display the section name instead of the section id
      * 4250,4252 becomes SAC PILATUS, SAC PILATUS NAPF.
-     *
-     * @Callback(table="tl_user", target="config.onshow")
      */
+    #[AsCallback(table: 'tl_user', target: 'config.onshow', priority: 100)]
     public function decryptSectionIds(array $data, array $row, DataContainer $dc): array
     {
         return $this->util->decryptSectionIds($data, $row, $dc, self::TABLE);
@@ -167,8 +161,8 @@ class User
      * Set defaults and auto-create backend users home directory when creating a new user.
      *
      * @throws \Doctrine\DBAL\Exception
-     * @Callback(table="tl_user", target="config.oncreate")
      */
+    #[AsCallback(table: 'tl_user', target: 'config.oncreate', priority: 100)]
     public function setDefaultsOnCreatingNew(string $strTable, int $id, array $arrSet): void
     {
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
@@ -195,9 +189,8 @@ class User
     /**
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
-     *
-     * @Callback(table="tl_user", target="fields.userRole.options")
      */
+    #[AsCallback(table: 'tl_user', target: 'fields.userRole.options', priority: 100)]
     public function getUserRoles(): array
     {
         $options = [];

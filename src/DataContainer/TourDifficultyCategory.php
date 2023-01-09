@@ -16,7 +16,7 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Backend;
 use Contao\BackendUser;
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\Image;
 use Contao\StringUtil;
 use Symfony\Component\Security\Core\Security;
@@ -32,9 +32,8 @@ class TourDifficultyCategory
 
     /**
      * Return the edit header button.
-     *
-     * @Callback(table="tl_tour_difficulty_category", target="operations.editheader.button")
      */
+    #[AsCallback(table: 'tl_tour_difficulty_category', target: 'operations.editheader.button', priority: 100)]
     public function editHeaderButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         /** @var BackendUser $user */

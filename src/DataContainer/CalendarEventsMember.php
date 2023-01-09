@@ -20,10 +20,10 @@ use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\DataContainer;
 use Contao\Email;
 use Contao\Environment;
@@ -125,10 +125,9 @@ class CalendarEventsMember
     }
 
     /**
-     * Set correct referer.
-     *
-     * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
+     * Set the correct referer.
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
     public function setCorrectReferer(): void
     {
         $this->util->setCorrectReferer();
@@ -136,9 +135,8 @@ class CalendarEventsMember
 
     /**
      * Load backend assets.
-     *
-     * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
     public function loadBackendAssets(): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -151,10 +149,9 @@ class CalendarEventsMember
     /**
      * Show or hide the "send email" button in the global operations section.
      *
-     * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
     public function showSendEmailButton(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -178,11 +175,10 @@ class CalendarEventsMember
     /**
      * Send emails to event members.
      *
-     * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
-     *
      * @throws \Doctrine\Dbal\Exception
      * @throws \Exception
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
     public function sendEmailAction(DataContainer $dc): void
     {
         if (!$dc->id) {
@@ -336,10 +332,9 @@ class CalendarEventsMember
     /**
      * Check permissions.
      *
-     * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
-     *
      * @throws \Exception
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
     public function checkPermissions(DataContainer $dc): void
     {
         $user = $this->security->getUser();
@@ -410,14 +405,13 @@ class CalendarEventsMember
     /**
      * Export registration list as a DOCX or CSV file.
      *
-     * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
-     *
      * @throws Exception
      * @throws CannotInsertRecord
      * @throws InvalidArgument
      * @throws CopyFileException
      * @throws CreateTemporaryFileException
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
     public function exportMemberList(DataContainer $dc): Response|null
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -440,10 +434,9 @@ class CalendarEventsMember
     /**
      * Delete orphaned records.
      *
-     * @Callback(table="tl_calendar_events_member", target="config.onload", priority=100)
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
     public function reviseTable(): void
     {
         $reload = false;
@@ -483,10 +476,9 @@ class CalendarEventsMember
     /**
      * List SAC sections.
      *
-     * @Callback(table="tl_calendar_events_member", target="fields.sectionId.options")
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.sectionId.options', priority: 100)]
     public function listSections(): array
     {
         return $this->connection
@@ -495,10 +487,9 @@ class CalendarEventsMember
     }
 
     /**
-     * @Callback(table="tl_calendar_events_member", target="fields.stateOfSubscription.save")
-     *
      * @return mixed|string|null
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.stateOfSubscription.save', priority: 100)]
     public function saveCallbackStateOfSubscription($varValue, DataContainer $dc): mixed
     {
         $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
@@ -545,9 +536,7 @@ class CalendarEventsMember
         return $varValue;
     }
 
-    /**
-     * @Callback(table="tl_calendar_events_member", target="fields.hasParticipated.save")
-     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.hasParticipated.save', priority: 100)]
     public function saveCallbackHasParticipated(string $varValue, DataContainer $dc): string
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -585,11 +574,10 @@ class CalendarEventsMember
     /**
      * Add more data to the registration, when a backend user adds a new registration manually.
      *
-     * @Callback(table="tl_calendar_events_member", target="config.oncreate")
-     * @Callback(table="tl_calendar_events_member", target="config.oncopy")
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.oncreate', priority: 100)]
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.oncopy', priority: 100)]
     public function oncreateCallback(string $strTable, int $insertId, array $arrFields, DataContainer $dc): void
     {
         if (!$dc->id) {
@@ -605,10 +593,9 @@ class CalendarEventsMember
     /**
      * Add more data to the registration, when user adds a new registration manually.
      *
-     * @Callback(table="tl_calendar_events_member", target="config.onsubmit")
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onsubmit', priority: 100)]
     public function onsubmitCallback(DataContainer $dc): void
     {
         if (!$dc->activeRecord) {
@@ -648,9 +635,7 @@ class CalendarEventsMember
         $this->connection->update('tl_calendar_events_member', $set, ['id' => $dc->id]);
     }
 
-    /**
-     * @Callback(table="tl_calendar_events_member", target="config.onload")
-     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
     public function setStateOfSubscription(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -733,9 +718,8 @@ class CalendarEventsMember
     /**
      * Generate href for $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']
      * Generate href for $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['printInstructorInvoice'].
-     *
-     * @Callback(table="tl_calendar_events_member", target="config.onload")
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
     public function setGlobalOperations(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -783,9 +767,8 @@ class CalendarEventsMember
     /**
      * Display the section name instead of the section id
      * 4250,4252 becomes SAC PILATUS, SAC PILATUS NAPF.
-     *
-     * @Callback(table="tl_calendar_events_member", target="config.onshow")
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onshow', priority: 100)]
     public function decryptSectionIds(array $data, array $row, DataContainer $dc): array
     {
         return $this->util->decryptSectionIds($data, $row, $dc, self::TABLE);
@@ -793,9 +776,8 @@ class CalendarEventsMember
 
     /**
      * Add an icon to each record.
-     *
-     * @Callback(table="tl_calendar_events_member", target="list.label.label")
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'list.label.label', priority: 100)]
     public function addIcon(array $row, string $label, DataContainer $dc, array $args): array
     {
         $icon = 'icons/'.$row['stateOfSubscription'].'.svg';
@@ -804,9 +786,7 @@ class CalendarEventsMember
         return $args;
     }
 
-    /**
-     * @Callback(table="tl_calendar_events_member", target="fields.dashboard.input_field")
-     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.dashboard.input_field', priority: 100)]
     public function parseDashboard(DataContainer $dc): string
     {
         $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
@@ -834,12 +814,11 @@ class CalendarEventsMember
     }
 
     /**
-     * @Callback(table="tl_calendar_events_member", target="fields.refuseWithEmail.input_field")
-     * @Callback(table="tl_calendar_events_member", target="fields.acceptWithEmail.input_field")
-     * @Callback(table="tl_calendar_events_member", target="fields.addToWaitlist.input_field")
-     *
      * @throws \Exception
      */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.refuseWithEmail.input_field', priority: 100)]
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.acceptWithEmail.input_field', priority: 100)]
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.addToWaitlist.input_field', priority: 100)]
     public function inputFieldCallbackNotifyMemberAboutSubscriptionState(DataContainer $dc): string
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -1051,9 +1030,7 @@ class CalendarEventsMember
         }
     }
 
-    /**
-     * @Callback(table="tl_calendar_events_member", target="list.global_operations.backToEventSettings.button")
-     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'list.global_operations.backToEventSettings.button', priority: 100)]
     public function buttonCbBackToEventSettings(string|null $href, string $label, string $title, string $class, string $attributes, string $table): string
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -1067,9 +1044,7 @@ class CalendarEventsMember
         return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $href, $class, $title, $attributes, $label);
     }
 
-    /**
-     * @Callback(table="tl_calendar_events_member", target="edit.buttons")
-     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'edit.buttons', priority: 100)]
     public function buttonsCallback(array $arrButtons, DataContainer $dc): array
     {
         $request = $this->requestStack->getCurrentRequest();

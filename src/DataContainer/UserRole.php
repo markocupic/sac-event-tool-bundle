@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
@@ -36,10 +36,9 @@ class UserRole
      * Add the not "role currently vacant" label to each record,
      * if the user role could not be found in tl_user.
      *
-     * @Callback(table="tl_user_role", target="list.label.label")
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_user_role', target: 'list.label.label', priority: 100)]
     public function checkForUsage(array $row, string $label, DataContainer $dc, string $args): string
     {
         $arrRoles = [];

@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
@@ -29,9 +29,7 @@ class EventFilterForm
         $this->connection = $connection;
     }
 
-    /**
-     * @Callback(table="tl_event_filter_form", target="fields.courseType.options")
-     */
+    #[AsCallback(table: 'tl_event_filter_form', target: 'fields.courseType.options', priority: 100)]
     public function getCourseTypes(): array
     {
         $opt = [];
@@ -50,11 +48,10 @@ class EventFilterForm
     }
 
     /**
-     * @Callback(table="tl_event_filter_form", target="fields.organizers.options")
-     *
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
+    #[AsCallback(table: 'tl_event_filter_form', target: 'fields.organizers.options', priority: 100)]
     public function getOrganizers(): array
     {
         $arrOptions = [];

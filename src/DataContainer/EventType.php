@@ -14,14 +14,12 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 
 class EventType
 {
-    /**
-     * @Callback(table="tl_event_type", target="fields.alias.load")
-     */
+    #[AsCallback(table: 'tl_event_type', target: 'fields.alias.load', priority: 100)]
     public function loadCallbackAlias(string|null $strValue, DataContainer $dc): string|null
     {
         // Prevent renaming the alias if it was set

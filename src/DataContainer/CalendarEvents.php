@@ -23,10 +23,10 @@ use Contao\CalendarModel;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Date;
@@ -119,20 +119,18 @@ class CalendarEvents
     }
 
     /**
-     * Set correct referer.
-     *
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=100)
+     * Set the correct referer.
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 100)]
     public function setCorrectReferer(): void
     {
         $this->util->setCorrectReferer();
     }
 
     /**
-     * Set palette on creating new.
-     *
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=90)
+     * Set the "on create new" palette.
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 90)]
     public function setPaletteWhenCreatingNew(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -165,9 +163,8 @@ class CalendarEvents
      * Limitize filter fields to tour guides and course instructors
      * and
      * adjust filters depending on event type.
-     *
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=80)
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 80)]
     public function setFilterSearchAndSortingBoard(DataContainer $dc): void
     {
         $user = $this->security->getUser();
@@ -213,10 +210,9 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=70)
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 70)]
     public function onloadCallbackDeleteInvalidEvents(DataContainer $dc): void
     {
         $this->connection->executeStatement(
@@ -226,10 +222,9 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=60)
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 60)]
     public function onloadCallback(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -442,9 +437,8 @@ class CalendarEvents
 
     /**
      * Set palette for course, tour, tour_report, etc.
-     *
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=50)
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 50)]
     public function onloadCallbackSetPalettes(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -472,13 +466,12 @@ class CalendarEvents
     }
 
     /**
-     * CSV-export of all events of a calendar.
-     *
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=40)
+     * Make a CSV-export of every event of a certain calendar.
      *
      * @throws CannotInsertRecord
      * @throws InvalidArgument
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 40)]
     public function onloadCallbackExportCalendar(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -566,12 +559,11 @@ class CalendarEvents
 
     /**
      * Shift all event dates of a certain calendar by +/- 1 year
-     * https://somehost/contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=21&transformDate=+52weeks&rt=hUFF18TV1YCLddb-Cyb48dRH8y_9iI-BgM-Nc1rB8o8&ref=2sjHl6mB.
-     *
-     * @Callback(table="tl_calendar_events", target="config.onload", priority=30)
+     * contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=21&transformDate=+52weeks.
      *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 30)]
     public function onloadCallbackShiftEventDates(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -621,8 +613,14 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="config.oncreate", priority=100)
+     * Set defaults.
+     *
+     * @param string        $strTable
+     * @param int           $insertId
+     * @param array         $set
+     * @param DataContainer $dc
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.oncreate', priority: 100)]
     public function onCreate(string $strTable, int $insertId, array $set, DataContainer $dc): void
     {
         $user = $this->security->getUser();
@@ -647,10 +645,9 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="config.oncopy", priority=100)
-     *
      * @throws \Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.oncopy', priority: 100)]
     public function onCopy(int $insertId, DataContainer $dc): void
     {
         $user = $this->security->getUser();
@@ -677,12 +674,12 @@ class CalendarEvents
     }
 
     /**
-     * Do not allow to non-admins deleting records if there are child records (event registrations) in tl_calendar_events_member.
-     *
-     * @Callback(table="tl_calendar_events", target="config.ondelete", priority=100)
+     * Do not allow to non-admins deleting records,
+     * if there are registrations on the current event.
      *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.ondelete', priority: 100)]
     public function onDelete(DataContainer $dc): void
     {
         // Return if there is no ID
@@ -700,12 +697,12 @@ class CalendarEvents
 
     /**
      * Add a priority of -100
-     * In this way this callback will be executed after! the legacy callback tl_calendar_events.adjustTime() but ahead of self::adjustRegistrationPeriod.
-     *
-     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=-100)
+     * This way this callback will be executed after! the legacy callback tl_calendar_events.adjustTime()
+     * but before self::adjustRegistrationPeriod.
      *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: -100)]
     public function adjustStartAndEndDate(DataContainer $dc): void
     {
         // Return if there is no active record (override all)
@@ -747,12 +744,12 @@ class CalendarEvents
 
     /**
      * Add a priority of -110
-     * In this way this callback will be executed after! the legacy callback tl_calendar_events.adjustTime() but after self::adjustStartAndEndDate.
-     *
-     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=-110)
+     * This way this callback will be executed after! the legacy callback tl_calendar_events.adjustTime()
+     * but before self::adjustStartAndEndDate.
      *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: -110)]
     public function adjustRegistrationPeriod(DataContainer $dc): void
     {
         // Return if there is no active record (override all)
@@ -791,10 +788,9 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=80)
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: 80)]
     public function adjustEventReleaseLevel(DataContainer $dc): void
     {
         // Return if there is no active record (override all)
@@ -817,11 +813,10 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=70)
-     *
      * @throws Exception
      * @throws \Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: 70)]
     public function setEventToken(DataContainer $dc): void
     {
         // Return if there is no active record (override all)
@@ -846,10 +841,9 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=60)
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: 60)]
     public function adjustDurationInfo(DataContainer $dc): void
     {
         // Return if there is no active record (override all)
@@ -885,10 +879,9 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="config.onsubmit", priority=40)
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: 40)]
     public function setAlias(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -946,10 +939,9 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="fields.alias.input_field", priority=100)
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.alias.input_field', priority: 100)]
     public function showFieldValue(DataContainer $dc): string
     {
         $field = $dc->field;
@@ -1197,9 +1189,7 @@ class CalendarEvents
         return $return;
     }
 
-    /**
-     * @Callback(table="tl_calendar_events", target="fields.eventDates.load", priority=100)
-     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventDates.load', priority: 100)]
     public function loadCallbackEventDates(string|null $varValue, DataContainer $dc): array
     {
         $arrValues = $this->stringUtil->deserialize($varValue, true);
@@ -1216,9 +1206,7 @@ class CalendarEvents
         return $arrValues;
     }
 
-    /**
-     * @Callback(table="tl_calendar_events", target="edit.buttons", priority=100)
-     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'edit.buttons', priority: 100)]
     public function editButtons($arrButtons, $dc)
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -1230,9 +1218,7 @@ class CalendarEvents
         return $arrButtons;
     }
 
-    /**
-     * @Callback(table="tl_calendar_events", target="fields.durationInfo.options", priority=100)
-     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.durationInfo.options', priority: 100)]
     public function optionsCallbackGetEventDuration(): array
     {
         if (!empty($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo']) && \is_array($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'])) {
@@ -1251,10 +1237,9 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="fields.organizers.options", priority=90)
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.organizers.options', priority: 90)]
     public function optionsCallbackGetOrganizers(): array
     {
         return $this->connection
@@ -1263,10 +1248,9 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="fields.courseTypeLevel0.options", priority=80)
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.courseTypeLevel0.options', priority: 80)]
     public function optionsCallbackCourseTypeLevel0(): array
     {
         return $this->connection
@@ -1302,10 +1286,9 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="fields.eventType.options", priority=70)
-     *
      * @throws \Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventType.options', priority: 70)]
     public function getEventTypes(DataContainer|null $dc): array
     {
         $options = [];
@@ -1349,10 +1332,9 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="fields.courseTypeLevel1.options", priority=60)
-     *
      * @throws Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.courseTypeLevel1.options', priority: 60)]
     public function getCourseSubType(DataContainer $dc): array
     {
         $options = [];
@@ -1375,11 +1357,10 @@ class CalendarEvents
     }
 
     /**
-     * @Callback(table="tl_calendar_events", target="fields.eventReleaseLevel.options", priority=50)
-     *
      * @throws Exception
      * @throws \Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventReleaseLevel.options', priority: 50)]
     public function getReleaseLevels(DataContainer $dc): array
     {
         $options = [];
@@ -1466,9 +1447,7 @@ class CalendarEvents
         ];
     }
 
-    /**
-     * @Callback(table="tl_calendar_events", target="list.sorting.child_record", priority=100)
-     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'list.sorting.child_record', priority: 100)]
     public function childRecordCallback(array $arrRow): string
     {
         $span = Calendar::calculateSpan($arrRow['startTime'], $arrRow['endTime']);
@@ -1517,10 +1496,9 @@ class CalendarEvents
     /**
      * Push event to next release level.
      *
-     * @Callback(table="tl_calendar_events", target="list.operations.releaseLevelNext.button", priority=100)
-     *
      * @throws \Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.releaseLevelNext.button', priority: 100)]
     public function releaseLevelNext(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -1602,9 +1580,8 @@ class CalendarEvents
      * Update main instructor (the first instructor in the list is the main instructor).
      *
      * @throws Exception
-     *
-     * @Callback(table="tl_calendar_events", target="fields.instructor.save", priority=100)
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.instructor.save', priority: 100)]
     public function saveCallbackSetMaininstructor(string|null $varValue, DataContainer $dc): string|null
     {
         if ($dc->id > 0) {
@@ -1652,12 +1629,11 @@ class CalendarEvents
     }
 
     /**
-     * Publish or unpublish events if eventReleaseLevel has reached the highest/last level.
+     * Publish or unpublish events if eventReleaseLevel has reached the highest/lowest level.
      *
      * @throws \Exception
-     *
-     * @Callback(table="tl_calendar_events", target="fields.eventReleaseLevel.save", priority=90)
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventReleaseLevel.save', priority: 90)]
     public function saveCallbackEventReleaseLevel(int $targetEventReleaseLevelId, DataContainer $dc): int
     {
         return $this->handleEventReleaseLevelAndPublishUnpublish((int) $dc->activeRecord->id, $targetEventReleaseLevelId);
@@ -1665,9 +1641,8 @@ class CalendarEvents
 
     /**
      * @throws \Exception
-     *
-     * @Callback(table="tl_calendar_events", target="fields.eventType.save", priority=80)
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventType.save', priority: 80)]
     public function saveCallbackEventType(string $strEventType, DataContainer $dc, int $intId = null): string
     {
         if ('' !== $strEventType) {
@@ -1701,10 +1676,9 @@ class CalendarEvents
     /**
      * Downgrade event to the previous release level.
      *
-     * @Callback(table="tl_calendar_events", target="list.operations.releaseLevelPrev.button", priority=90)
-     *
      * @throws \Exception
      */
+    #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.releaseLevelPrev.button', priority: 90)]
     public function releaseLevelPrev(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -1782,9 +1756,7 @@ class CalendarEvents
         return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 
-    /**
-     * @Callback(table="tl_calendar_events", target="list.operations.delete.button", priority=80)
-     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.delete.button', priority: 80)]
     public function deleteIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $row['id']);
@@ -1796,9 +1768,7 @@ class CalendarEvents
         return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 
-    /**
-     * @Callback(table="tl_calendar_events", target="list.operations.copy.button", priority=70)
-     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.copy.button', priority: 70)]
     public function copyIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $row['id']);

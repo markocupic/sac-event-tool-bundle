@@ -16,7 +16,7 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception;
@@ -32,10 +32,9 @@ class Content
     }
 
     /**
-     * @Callback(table="tl_content", target="config.onload")
-     *
      * @throws \Doctrine\DBAL\Exception
      */
+    #[AsCallback(table: 'tl_content', target: 'config.onload', priority: 100)]
     public function setPalette(DataContainer $dc): void
     {
         if ($dc->id > 0) {
@@ -64,11 +63,10 @@ class Content
     /**
      * Get all user roles.
      *
-     * @Callback(table="tl_content", target="fields.userList_userRoles.options")
-     *
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
+    #[AsCallback(table: 'tl_content', target: 'fields.userList_userRoles.options', priority: 100)]
     public function optionsCallbackUserRoles(): array
     {
         $options = [];
@@ -84,9 +82,8 @@ class Content
 
     /**
      * Return all user portrait list templates as array.
-     *
-     * @Callback(table="tl_content", target="fields.userList_template.options")
      */
+    #[AsCallback(table: 'tl_content', target: 'fields.userList_template.options', priority: 100)]
     public function getUserListTemplates(): array
     {
         return Controller::getTemplateGroup('ce_user_portrait_list');
@@ -94,9 +91,8 @@ class Content
 
     /**
      * Return all user portrait list partial templates as array.
-     *
-     * @Callback(table="tl_content", target="fields.userList_partial_template.options")
      */
+    #[AsCallback(table: 'tl_content', target: 'fields.userList_partial_template.options', priority: 100)]
     public function getUserListPartialTemplates(): array
     {
         return Controller::getTemplateGroup('user_portrait_list_partial_');

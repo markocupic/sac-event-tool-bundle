@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 
 class Calendar
 {
@@ -26,18 +26,15 @@ class Calendar
     }
 
     /**
-     * Set correct referer.
-     *
-     * @Callback(table="tl_calendar", target="config.onload", priority=100)
+     * Set the correct referer.
      */
+    #[AsCallback(table: 'tl_calendar', target: 'config.onload', priority: 100)]
     public function setCorrectReferer(): void
     {
         $this->util->setCorrectReferer();
     }
 
-    /**
-     * @Callback(table="tl_calendar", target="list.sorting.child_record")
-     */
+    #[AsCallback(table: 'tl_calendar', target: 'list.sorting.child_record')]
     public function listCalendars(array $arrRow): string
     {
         return $arrRow['title'];

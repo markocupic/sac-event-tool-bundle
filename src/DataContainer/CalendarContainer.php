@@ -16,8 +16,8 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 
 use Contao\Backend;
 use Contao\BackendUser;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
-use Contao\CoreBundle\ServiceAnnotation\Callback;
 use Contao\Image;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
@@ -44,11 +44,7 @@ class CalendarContainer
         $this->security = $security;
     }
 
-    /**
-     * Check permissions to edit table tl_calendar.
-     *
-     * @Callback(table="tl_calendar", target="config.onload")
-     */
+    #[AsCallback(table: 'tl_calendar_container', target: 'config.onload')]
     public function setCorrectReferer(): void
     {
         $this->util->setCorrectReferer();
@@ -56,9 +52,8 @@ class CalendarContainer
 
     /**
      * Check permissions to edit table tl_calendar.
-     *
-     * @Callback(table="tl_calendar_container", target="config.onload")
      */
+    #[AsCallback(table: 'tl_calendar_container', target: 'config.onload')]
     public function checkPermission(): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -186,9 +181,8 @@ class CalendarContainer
 
     /**
      * Return the edit header button.
-     *
-     * @Callback(table="tl_calendar_container", target="operations.editheader.button")
      */
+    #[AsCallback(table: 'tl_calendar_container', target: 'operations.editheader.button')]
     public function editHeaderButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         /** @var BackendUser $user */
@@ -199,9 +193,8 @@ class CalendarContainer
 
     /**
      * Return the copy calendar button.
-     *
-     * @Callback(table="tl_calendar_container", target="operations.copy.button")
      */
+    #[AsCallback(table: 'tl_calendar_container', target: 'operations.copy.button')]
     public function copyButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         /** @var BackendUser $user */
@@ -212,9 +205,8 @@ class CalendarContainer
 
     /**
      * Return the delete calendar button.
-     *
-     * @Callback(table="tl_calendar_container", target="operations.delete.button")
      */
+    #[AsCallback(table: 'tl_calendar_container', target: 'operations.delete.button')]
     public function deleteButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
     {
         /** @var BackendUser $user */
