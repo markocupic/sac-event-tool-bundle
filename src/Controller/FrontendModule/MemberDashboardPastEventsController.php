@@ -150,7 +150,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
     /**
      * @throws \Exception
      */
-    private function downloadCourseCertificate(): void
+    private function downloadCourseCertificate(): Response
     {
         // Set adapters
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
@@ -221,7 +221,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     ;
 
                     // Generate pdf
-                    $this->convertFile
+                    return $this->convertFile
                         ->file($this->projectDir.'/'.$destFilename)
                         ->uncached(false)
                         ->sendToBrowser(true, true)
