@@ -40,18 +40,18 @@ class UserPortraitListController extends AbstractContentElementController
 
     private ContaoFramework $framework;
     private Connection $connection;
-	private Security $security;
-	private Avatar $avatar;
+    private Security $security;
+    private Avatar $avatar;
     private string $projectDir;
 
-	public function __construct(ContaoFramework $framework, Connection $connection, Security $security, Avatar $avatar, string $projectDir)
+    public function __construct(ContaoFramework $framework, Connection $connection, Security $security, Avatar $avatar, string $projectDir)
     {
         $this->framework = $framework;
         $this->connection = $connection;
-		$this->security = $security;
+        $this->security = $security;
         $this->avatar = $avatar;
         $this->projectDir = $projectDir;
-	}
+    }
 
     public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
     {
@@ -202,10 +202,10 @@ class UserPortraitListController extends AbstractContentElementController
             $template->items = $strItems;
         }
 
-		$user = $this->security->getUser();
-		$template->hasLoggedInFrontendUser = $user instanceof FrontendUser;
+        $user = $this->security->getUser();
+        $template->hasLoggedInFrontendUser = $user instanceof FrontendUser;
 
-		$template->hasMultiple = $itemCount > 1;
+        $template->hasMultiple = $itemCount > 1;
         $template->itemCount = $itemCount;
 
         return $template->getResponse();

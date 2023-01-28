@@ -28,20 +28,12 @@ use Psr\Log\LoggerInterface;
 
 class ClearFrontendUserData
 {
-    private ContaoFramework $framework;
-    private string $projectDir;
-    private string $sacevtUserFrontendAvatarDir;
-    private LoggerInterface|null $contaoGeneralLogger;
-
-    public function __construct(ContaoFramework $framework, string $projectDir, string $sacevtUserFrontendAvatarDir, LoggerInterface $contaoGeneralLogger = null)
-    {
-        $this->framework = $framework;
-        $this->projectDir = $projectDir;
-        $this->sacevtUserFrontendAvatarDir = $sacevtUserFrontendAvatarDir;
-        $this->contaoGeneralLogger = $contaoGeneralLogger;
-
-        // Initialize the contao framework
-        $this->framework->initialize();
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly string $projectDir,
+        private readonly string $sacevtUserFrontendAvatarDir,
+        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+    ) {
     }
 
     /**
@@ -49,6 +41,8 @@ class ClearFrontendUserData
      */
     public function anonymizeOrphanedCalendarEventsMemberDataRecords(): void
     {
+        $this->framework->initialize();
+
         /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
 
@@ -112,6 +106,8 @@ class ClearFrontendUserData
 
     public function anonymizeEventRegistration(CalendarEventsMemberModel $objCalendarEventsMember): bool
     {
+        $this->framework->initialize();
+
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
@@ -152,6 +148,8 @@ class ClearFrontendUserData
 
     public function disableLogin(int $memberId): void
     {
+        $this->framework->initialize();
+
         /** @var MemberModel $memberModelAdapter */
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
 
@@ -175,6 +173,8 @@ class ClearFrontendUserData
 
     public function deleteFrontendAccount(int $memberId): void
     {
+        $this->framework->initialize();
+
         /** @var MemberModel $memberModelAdapter */
         $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
 
@@ -200,6 +200,8 @@ class ClearFrontendUserData
      */
     public function clearMemberProfile(int $memberId, bool $blnForceClearing = false): bool
     {
+        $this->framework->initialize();
+
         /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
 
@@ -293,6 +295,8 @@ class ClearFrontendUserData
      */
     public function deleteAvatarDirectory(int $memberId): void
     {
+        $this->framework->initialize();
+
         if (is_dir($this->projectDir.'/'.$this->sacevtUserFrontendAvatarDir.'/'.$memberId)) {
             $strDir = $this->sacevtUserFrontendAvatarDir.'/'.$memberId;
             $objDir = new Folder($strDir);
