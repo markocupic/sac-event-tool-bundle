@@ -29,7 +29,6 @@
         "ramsey/uuid": "^3.8|^4.3",
         "symfony/stopwatch": "*",
         "tecnickcom/tcpdf": "^6.4",
-        "terminal42/contao-fineuploader": "^3.2",
         "terminal42/notification_center": "^1.6"
     },
     "require-dev": {
