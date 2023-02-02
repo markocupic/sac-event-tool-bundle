@@ -31,13 +31,10 @@ use Markocupic\SacEventToolBundle\ContaoScope\ContaoScope;
 #[AsHook('getSystemMessages', priority: 100)]
 class GetSystemMessagesListener
 {
-    private ContaoFramework $framework;
-    private ContaoScope $contaoScope;
-
-    public function __construct(ContaoFramework $framework, ContaoScope $contaoScope)
-    {
-        $this->framework = $framework;
-        $this->contaoScope = $contaoScope;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly ContaoScope $contaoScope,
+    ) {
     }
 
     public function __invoke(): string
@@ -56,7 +53,7 @@ class GetSystemMessagesListener
             $timeCut = time() - 15 * 24 * 3600; // 14 + 1 days
 
             if ($objUser->id > 0) {
-                // Dashboard: List all upcoming events where user acts as an instructor or where registration goes to the logged in user.
+                // Dashboard: List all upcoming events where user acts as an instructor or where registration goes to the logged-in user.
                 $objEvent = $databaseAdapter->getInstance()
                     ->prepare('SELECT * FROM tl_calendar_events AS t1 WHERE (t1.registrationGoesTo=? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId=?)) AND t1.startDate>? ORDER BY t1.startDate')
                     ->execute($objUser->id, $objUser->id, $timeCut)
@@ -87,16 +84,17 @@ class GetSystemMessagesListener
                             $objEvent->title,
                             $objEvent->title,
                             $linkMemberList,
-                            $objEvent->title
+                            $objEvent->title,
                         );
                     }
                     $strBuffer .= '</tbody>';
                     $strBuffer .= '</table>';
                 }
 
-                // Dashboard: List past 10 events (max. 13 months old) where user acts as an instructor or where registration goes to the logged in user.
+                // Dashboard: List past 10 events (max. 13 months old) where user acts as an instructor or where registration goes to the logged-in user.
                 $objEvent = $databaseAdapter->getInstance()
-                    ->prepare('SELECT * FROM tl_calendar_events AS t1 WHERE (t1.registrationGoesTo=? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId=?)) AND t1.startDate<=? AND t1.startDate>? ORDER BY t1.startDate DESC LIMIT 10')
+                    ->prepare('SELECT * FROM tl_calendar_events AS t1 WHERE (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate <= ? AND t1.startDate > ? ORDER BY t1.startDate DESC')
+                    ->limit(10)
                     ->execute($objUser->id, $objUser->id, $timeCut, time() - 396 * 30 * 24 * 3600)
                 ;
 
@@ -110,8 +108,6 @@ class GetSystemMessagesListener
                     $rt = $container->get('contao.csrf.token_manager')->getToken($container->getParameter('contao.csrf_token_name'))->getValue();
 
                     while ($objEvent->next()) {
-                        $eventModel = CalendarEventsModel::findByPk($objEvent->id);
-
                         $strCSSRowClass = $objEvent->endDate > time() ? 'upcoming-event' : 'past-event';
                         $link = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s', $objEvent->id, $rt);
                         $linkMemberList = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $objEvent->id, $rt);
@@ -124,7 +120,7 @@ class GetSystemMessagesListener
                             $objEvent->title,
                             $objEvent->title,
                             $linkMemberList,
-                            $objEvent->title
+                            $objEvent->title,
                         );
                     }
                     $strBuffer .= '</tbody>';
