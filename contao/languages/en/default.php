@@ -107,6 +107,7 @@ $GLOBALS['TL_LANG']['MSC']['emailSentToEventMembers'] = 'Der/die Teilnehmer wurd
 
 // Backend member dashboard
 $GLOBALS['TL_LANG']['MSC']['bmd_yourUpcomingEvents'] = 'Ihre nächsten Events';
+$GLOBALS['TL_LANG']['MSC']['bmd_yourPastEvents'] = 'Ihre vergangenen Events';
 $GLOBALS['TL_LANG']['MSC']['bmd_howToEditReadonlyProfileData'] = 'Änderungen an Name, Adresse, Telefon und E-Mail müssen auf der Webseite des SAC Zentralverbandes (https://sac-cas.ch) gemacht werden.';
 
 // Event registration frontend module

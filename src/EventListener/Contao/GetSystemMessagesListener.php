@@ -53,11 +53,13 @@ class GetSystemMessagesListener
 
             $objUser = $backendUserAdapter->getInstance();
 
+            $timeCut = time() - 15 * 24 * 3600; // 14 + 1 days
+
             if ($objUser->id > 0) {
-                // Dashboard: List all events where user acts as an instructor or where registration goes to the logged in user.
+                // Dashboard: List all upcoming events where user acts as an instructor or where registration goes to the logged in user.
                 $objEvent = $databaseAdapter->getInstance()
                     ->prepare('SELECT * FROM tl_calendar_events AS t1 WHERE (t1.registrationGoesTo=? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId=?)) AND t1.startDate>? ORDER BY t1.startDate')
-                    ->execute($objUser->id, $objUser->id, time() - 3 * 30 * 24 * 3600)
+                    ->execute($objUser->id, $objUser->id, $timeCut)
                 ;
 
                 if ($objEvent->numRows) {
@@ -77,7 +79,7 @@ class GetSystemMessagesListener
                         $linkMemberList = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $objEvent->id, $rt);
 
                         $strBuffer .= sprintf(
-                            '<tr class="hover-row %s"><td>%s</td><td>[%s] <a href="%s" style="text-decoration:underline" title="Event \'%s\' bearbeiten">%s</a></td><td><a href="%s" style="text-decoration:underline" title="Zur TN-Liste für \'%s\'">TN-Liste</a></td></tr>',
+                            '<tr class="hover-row %s"><td>%s</td><td>[%s] <a href="%s" style="text-decoration:underline" title="Event \'%s\' bearbeiten"><strong>%s</strong></a></td><td><a href="%s" style="text-decoration:underline" title="Zur TN-Liste und Rapporte für \'%s\'">TN-Liste</a></td></tr>',
                             $strCSSRowClass,
                             $calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($eventModel),
                             $dateAdapter->parse($configAdapter->get('dateFormat'), $objEvent->startDate),
@@ -92,8 +94,46 @@ class GetSystemMessagesListener
                     $strBuffer .= '</table>';
                 }
 
+                // Dashboard: List past 10 events (max. 13 months old) where user acts as an instructor or where registration goes to the logged in user.
+                $objEvent = $databaseAdapter->getInstance()
+                    ->prepare('SELECT * FROM tl_calendar_events AS t1 WHERE (t1.registrationGoesTo=? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId=?)) AND t1.startDate<=? AND t1.startDate>? ORDER BY t1.startDate DESC LIMIT 10')
+                    ->execute($objUser->id, $objUser->id, $timeCut, time() - 396 * 30 * 24 * 3600)
+                ;
+
+                if ($objEvent->numRows) {
+                    $strBuffer .= '<h3>'.$GLOBALS['TL_LANG']['MSC']['bmd_yourPastEvents'].'</h3>';
+                    $strBuffer .= '<table id="tl_upcoming_events" class="tl_listing">';
+                    $strBuffer .= '<thead><tr><th>Datum &amp; Eventname</th><th>Teiln. / Rapporte</th></tr></thead>';
+                    $strBuffer .= '<tbody>';
+
+                    $container = System::getContainer();
+                    $rt = $container->get('contao.csrf.token_manager')->getToken($container->getParameter('contao.csrf_token_name'))->getValue();
+
+                    while ($objEvent->next()) {
+                        $eventModel = CalendarEventsModel::findByPk($objEvent->id);
+
+                        $strCSSRowClass = $objEvent->endDate > time() ? 'upcoming-event' : 'past-event';
+                        $link = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s', $objEvent->id, $rt);
+                        $linkMemberList = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $objEvent->id, $rt);
+
+                        $strBuffer .= sprintf(
+                            '<tr class="hover-row %s"><td>[%s] <a href="%s" style="text-decoration:underline" title="Event \'%s\' bearbeiten"><strong>%s</strong></a></td><td><a href="%s" style="text-decoration:underline" title="Zur TN-Liste und Rapporte für \'%s\'">TN-Liste / Rapporte</a></td></tr>',
+                            $strCSSRowClass,
+                            $dateAdapter->parse($configAdapter->get('dateFormat'), $objEvent->startDate),
+                            $link,
+                            $objEvent->title,
+                            $objEvent->title,
+                            $linkMemberList,
+                            $objEvent->title
+                        );
+                    }
+                    $strBuffer .= '</tbody>';
+                    $strBuffer .= '</table>';
+                }
+
                 $strBuffer .= '<h3>Anleitungen und Tutorials</h3>';
-                $strBuffer .= '<p>Die Seite "Anleitungen und Tutorials" im Frontend unterstützt Sie bei der Verwendung vom SAC Event-Tool (Contao).</p>';
+                $strBuffer .= '<p>Die Seite "Anleitungen und Tutorials" beim Menü "Service" im Frontend/Website unterstützt Sie bei der Verwendung vom SAC Event-Tool (Backend/Contao).</p>';
+                $strBuffer .= '<hr>';
             }
         }
 
