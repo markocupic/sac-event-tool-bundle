@@ -91,17 +91,17 @@ class GetSystemMessagesListener
                     $strBuffer .= '</table>';
                 }
 
-                // Dashboard: List past 10 events (max. 13 months old) where user acts as an instructor or where registration goes to the logged-in user.
+                // Dashboard: List past 10 events (or max. 18 months / 1.5 years old) where user acts as an instructor or where registration goes to the logged-in user.
                 $objEvent = $databaseAdapter->getInstance()
                     ->prepare('SELECT * FROM tl_calendar_events AS t1 WHERE (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate <= ? AND t1.startDate > ? ORDER BY t1.startDate DESC')
                     ->limit(10)
-                    ->execute($objUser->id, $objUser->id, $timeCut, time() - 396 * 30 * 24 * 3600)
+                    ->execute($objUser->id, $objUser->id, $timeCut, time() - 1.5 * 365 * 24 * 3600)
                 ;
 
                 if ($objEvent->numRows) {
                     $strBuffer .= '<h3>'.$GLOBALS['TL_LANG']['MSC']['bmd_yourPastEvents'].'</h3>';
                     $strBuffer .= '<table id="tl_upcoming_events" class="tl_listing">';
-                    $strBuffer .= '<thead><tr><th>Datum &amp; Eventname</th><th>Teiln. / Rapporte</th></tr></thead>';
+                    $strBuffer .= '<thead><tr><th>Datum &amp; Eventname</th><th>Rapporte</th></tr></thead>';
                     $strBuffer .= '<tbody>';
 
                     $container = System::getContainer();
