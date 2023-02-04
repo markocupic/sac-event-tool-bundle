@@ -14,16 +14,16 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
-use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Input;
-use Contao\System;
 use Knp\Menu\MenuItem;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 
 /**
@@ -32,13 +32,12 @@ use Symfony\Component\Security\Core\Security;
 #[AsHook('generateEventDashboard', priority: 100)]
 class GenerateEventDashboardListener
 {
-    private ContaoFramework $framework;
-    private Security $security;
-
-    public function __construct(ContaoFramework $framework, Security $security)
-    {
-        $this->framework = $framework;
-        $this->security = $security;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Security $security,
+        private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
+        private readonly RequestStack $requestStack,
+    ) {
     }
 
     /**
@@ -50,16 +49,13 @@ class GenerateEventDashboardListener
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
 
-        $objUser = $backendUserAdapter->getInstance();
-        $container = System::getContainer();
-        $requestToken = $container->get('contao.csrf.token_manager')->getToken($container->getParameter('contao.csrf_token_name'))->getValue();
-
+        $user = $this->security->getUser();
+        $requestToken = $this->contaoCsrfTokenManager->getDefaultTokenValue();
         $objCalendar = $objEvent->getRelated('pid');
 
         // Get the refererId
-        $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->get('_contao_referer_id');
+        $refererId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
         // Get the backend module name
         $module = $inputAdapter->get('do');
@@ -74,7 +70,7 @@ class GenerateEventDashboardListener
             ->setLinkAttribute('title', 'Event bearbeiten')
         ;
 
-        // "Go to event list" button
+        // "Go to event-list" button
         $href = sprintf('contao/main.php?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, $requestToken, $refererId);
         $menu->addChild('Eventliste', ['uri' => $href])
             ->setLinkAttribute('role', 'button')
@@ -96,7 +92,7 @@ class GenerateEventDashboardListener
         }
 
         // "Go to event participant list" button
-        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id) {
+        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
             $href = sprintf('contao/main.php?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
             $menu->addChild('Teilnehmerliste', ['uri' => $href])
                 ->setAttribute('role', 'button')
@@ -108,7 +104,7 @@ class GenerateEventDashboardListener
         }
 
         // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und Vergütungsformular drucken" button
-        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $objUser->id) {
+        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
             if ('tour' === $objEvent->eventType || 'lastMinuteTour' === $objEvent->eventType) {
                 $href = $controllerAdapter->addToUrl('call=writeTourReport&rt='.$requestToken, true);
                 $menu->addChild('Tourenrapport bearbeiten', ['uri' => $href])

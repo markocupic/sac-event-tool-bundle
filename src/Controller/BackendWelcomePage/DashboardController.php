@@ -20,7 +20,6 @@ use Contao\Config;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\System;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
@@ -115,7 +114,7 @@ class DashboardController
     private function prepareForTwig(array $arrEvents): array
     {
         $events = [];
-        $rt = $this->contaoCsrfTokenManager->getToken(System::getContainer()->getParameter('contao.csrf_token_name'));
+        $rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
 
         foreach ($arrEvents as $row) {
             $event = [];
