@@ -1,0 +1,49 @@
+{% if upcoming_events is not empty %}
+    <h3>{{ 'MSC.bmd_yourUpcomingEvents'|trans({}, 'contao_default') }}</h3>
+    <table id="tl_upcoming_events" class="tl_listing">
+        <thead>
+        <tr>
+            <th>Anmeld.</th>
+            <th>Datum &amp; Eventname</th>
+            <th>Teiln. / Rapporte</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for event in upcoming_events %}
+            <tr class="hover-row {{ event.row_class }}">
+                <td>{{ event.badge|raw }}</td>
+                <td>[{{ event.date }}] <a href="{{ event.link_event }}" style="text-decoration:underline" title="Event '{{ event.title }}' bearbeiten"><strong>{{ event.title }}</strong></a></td>
+                <td><a href="{{ event.link_registrations }}" style="text-decoration:underline" title="Zur TN-Liste und Rapporte für '%s'">TN-Liste / Rapporte</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if past_events is not empty %}
+    <h3>{{ 'MSC.bmd_yourPastEvents'|trans({}, 'contao_default') }}</h3>
+    <table id="tl_upcoming_events" class="tl_listing">
+        <thead>
+        <tr>
+            {# <th>Anmeld.</th> #}
+            <th>Datum &amp; Eventname</th>
+            <th>Teiln. / Rapporte</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for event in past_events %}
+            <tr class="hover-row {{ event.row_class }}">
+                {# <td>{{ event.badge|raw }}</td> #}
+                <td>[{{ event.date }}] <a href="{{ event.link_event }}" style="text-decoration:underline" title="Event '{{ event.title }}' bearbeiten"><strong>{{ event.title }}</strong></a></td>
+                <td><a href="{{ event.link_registrations }}" style="text-decoration:underline" title="Zur TN-Liste und Rapporte für '%s'">TN-Liste / Rapporte</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if upcoming_events is not empty or past_events is not empty %}
+    <h3>Anleitungen und Tutorials</h3>
+    <p>Die Seite "Anleitungen und Tutorials" beim Menü "Service" im Frontend/Website unterstützt Sie bei der Verwendung vom SAC Event-Tool (Backend/Contao).</p>
+    <hr>
+{% endif %}
