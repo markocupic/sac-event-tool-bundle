@@ -1037,7 +1037,7 @@ class CalendarEventsMember
 
         $href = $this->stringUtil->ampersand('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s');
         $eventId = $request->query->get('id');
-        $refererId = $request->get('_contao_referer_id');
+        $refererId = $request->attributes->get('_contao_referer_id');
 
         $href = sprintf($href, $eventId, REQUEST_TOKEN, $refererId);
 
