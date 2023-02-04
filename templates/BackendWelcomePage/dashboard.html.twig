@@ -1,51 +1,73 @@
-{% if upcoming_events is not empty %}
-    <h3>{{ 'MSC.bmd_yourUpcomingEvents'|trans({}, 'contao_default') }}</h3>
-    <table id="tl_upcoming_events" class="tl_listing">
-        <thead>
-        <tr>
-            <th>Anmeld.</th>
-            <th>Datum &amp; Eventname</th>
-            <th></th>
-            <th>Teiln. / Rapporte</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for event in upcoming_events %}
-            <tr class="hover-row {{ event.row_class }}">
-                <td>{{ event.badge|raw }}</td>
-                <td>[{{ event.date }}] <a href="{{ event.link_event }}" style="text-decoration:underline" title="Event '{{ event.title }}' bearbeiten"><strong>{{ event.title }}</strong></a></td>
-                <td><i class="fa-solid fa-eye"></i></td>
-                <td><a href="{{ event.link_registrations }}" style="text-decoration:underline" title="Zur TN-Liste und Rapporte für '%s'">TN-Liste / Rapporte</a></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+{% if events is not empty %}
+    <div style="overflow-x: auto">
+        <table id="tl_my_events" class="tl_listing">
+            {% set index = 0 %}
+            {% for event in events %}
+                {% if event.separator is defined %}
+                    {% if event.separator == 'upcoming-events' and has_upcoming_events %}
+                        {% set index = 0 %}
+                        <tr>
+                            <td colspan="4" class="separator">{{ 'MSC.bmd_yourUpcomingEvents'|trans({}, 'contao_default') }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if event.separator == 'past-events' and has_past_events %}
+                        {% set index = 0 %}
+                        <tr>
+                            <td colspan="4" class="separator">{{ 'MSC.bmd_yourPastEvents'|trans({}, 'contao_default') }}</td>
+                        </tr>
+                    {% endif %}
+                {% else %}
+                    {% set index = index + 1 %}
+                    {% set odd_or_even = index%2 == 0 ? ' event' : ' odd' %}
+                    <tr class="hover-row {{ event.row_class }}{{ odd_or_even }}">
+                        <td>{{ event.badge|raw }}</td>
+                        <td>{{ event.date }}</td>
+                        <td>
+                            <a href="{{ event.href_event }}" style="text-decoration:underline" title="Event '{{ event.title|raw }}' bearbeiten"><strong>{{ event.title }}</strong></a>
+                        </td>
+                        <td class="my-events-icon-col text-align-right">
+                            <a href="{{ event.href_preview }}" title="zur Vorschau von '{{ event.title }}'">
+                                <i class="fa-solid fa-presentation-screen"></i>
+                            </a>
+
+                            <a href="{{ event.href_registrations }}" title="TN-Liste und Rapporte für '{{ event.title }}'">
+                                <i class="fa-solid fa-people-group"></i>
+                            </a>
+
+                            {% if event.href_email is not empty %}
+                                <a href="{{ event.href_email }}" title="E-Mail an Teilnehmer für '{{ event.title }}'">
+                                    <i class="fa-solid fa-at"></i>
+                                </a>
+                            {% else %}
+                                <i class="fa-solid fa-at" title="E-Mail nicht verfügbar" style="filter:opacity(0.20)"></i>
+                            {% endif %}
+
+                            {% if event.href_report is not empty %}
+                                <a href="{{ event.href_report }}" title="Rapport erfassen für '{{ event.title }}'">
+                                    <i class="fa-solid fa-file-word"></i>
+                                </a>
+                            {% else %}
+                                <i class="fa-solid fa-file-word" title="Rapport erfassen nicht verfügbar" style="filter:opacity(0.20)"></i>
+                            {% endif %}
+
+                            {% if event.href_print_report is not empty %}
+                                <a href="{{ event.href_print_report }}" title="Rapport drucken für '{{ event.title }}'">
+                                    <i class="fa-solid fa-print"></i>
+                                </a>
+                            {% else %}
+                                <i class="fa-solid fa-print" title="Rapport drucken nicht verfügbar" style="filter:opacity(0.20)"></i>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+        <br>
+    </div>
 {% endif %}
 
-{% if past_events is not empty %}
-    <h3>{{ 'MSC.bmd_yourPastEvents'|trans({}, 'contao_default') }}</h3>
-    <table id="tl_upcoming_events" class="tl_listing">
-        <thead>
-        <tr>
-            {# <th>Anmeld.</th> #}
-            <th>Datum &amp; Eventname</th>
-            <th>Teiln. / Rapporte</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for event in past_events %}
-            <tr class="hover-row {{ event.row_class }}">
-                {# <td>{{ event.badge|raw }}</td> #}
-                <td>[{{ event.date }}] <a href="{{ event.link_event }}" style="text-decoration:underline" title="Event '{{ event.title }}' bearbeiten"><strong>{{ event.title }}</strong></a></td>
-                <td><a href="{{ event.link_registrations }}" style="text-decoration:underline" title="Zur TN-Liste und Rapporte für '%s'">TN-Liste / Rapporte</a></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-{% endif %}
-
-{% if upcoming_events is not empty or past_events is not empty %}
+{% if events is not empty %}
     <h3>Anleitungen und Tutorials</h3>
-    <p>Die Seite "Anleitungen und Tutorials" beim Menü "Service" im Frontend/Website unterstützt Sie bei der Verwendung vom SAC Event-Tool (Backend/Contao).</p>
+    <p>Die Seite "Anleitungen und Tutorials" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).</p>
     <hr>
 {% endif %}

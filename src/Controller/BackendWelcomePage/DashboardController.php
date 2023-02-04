@@ -20,9 +20,11 @@ use Contao\Config;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use Twig\Environment as Twig;
@@ -34,10 +36,12 @@ class DashboardController
 {
     private Adapter $calendarEventsHelperAdapter;
     private Adapter $configAdapter;
+    private Adapter $stringUtilAdapter;
 
     public function __construct(
         ContaoFramework $framework,
         private readonly Connection $connection,
+        private readonly RequestStack $requestStack,
         private readonly Twig $twig,
         private readonly Security $security,
         private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
@@ -45,6 +49,7 @@ class DashboardController
         // Adapters
         $this->calendarEventsHelperAdapter = $framework->getAdapter(CalendarEventsHelper::class);
         $this->configAdapter = $framework->getAdapter(Config::class);
+        $this->stringUtilAdapter = $framework->getAdapter(StringUtil::class);
     }
 
     /**
@@ -59,12 +64,23 @@ class DashboardController
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
+        $upcomingEvents = $this->getUpcomingEvents($user);
+        $pastEvents = $this->getPastEvents($user);
+
+        $events = array_merge(
+            [['separator' => 'upcoming-events']],
+            $this->prepareForTwig($upcomingEvents, 'upcoming-event'),
+            [['separator' => 'past-events']],
+            $this->prepareForTwig($pastEvents, 'past-event')
+        );
+
         if ($user instanceof BackendUser) {
             $html = $this->twig->render(
                 '@MarkocupicSacEventTool/BackendWelcomePage/dashboard.html.twig',
                 [
-                    'upcoming_events' => $this->prepareForTwig($this->getUpcomingEvents($user)),
-                    'past_events' => $this->prepareForTwig($this->getPastEvents($user)),
+                    'events' => $events,
+                    'has_upcoming_events' => !empty($upcomingEvents),
+                    'has_past_events' => !empty($pastEvents),
                 ]
             );
         }
@@ -111,27 +127,74 @@ class DashboardController
         return $result->fetchAllAssociative();
     }
 
-    private function prepareForTwig(array $arrEvents): array
+    private function prepareForTwig(array $arrEvents, string $rowClass): array
     {
         $events = [];
         $rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
+        $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
         foreach ($arrEvents as $row) {
             $event = [];
             $eventModel = CalendarEventsModel::findByPk($row['id']);
-            $linkEvent = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s', $eventModel->id, $rt);
-            $linkRegistrations = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s', $eventModel->id, $rt);
+            $title = $this->stringUtilAdapter->decodeEntities($eventModel->title);
+            $title = $this->stringUtilAdapter->restoreBasicEntities($title);
+            $hrefEmail = $this->generateEmailHref($eventModel);
+            $hrefEvent = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
+            $hrefPreview = $this->calendarEventsHelperAdapter->generateEventPreviewUrl($eventModel);
+            $hrefRegistrations = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
 
-            $event['row_class'] = $eventModel->endDate > time() ? 'upcoming-event' : 'past-event';
+            $event['row_class'] = $rowClass;
             $event['badge'] = $this->calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($eventModel);
-            $event['title'] = $eventModel->title;
+            $event['title'] = $title;
             $event['date'] = date($this->configAdapter->get('dateFormat'), (int) $eventModel->startDate);
-            $event['link_event'] = $linkEvent;
-            $event['link_registrations'] = $linkRegistrations;
+            $event['href_email'] = $hrefEmail;
+            $event['href_print_report'] = $this->generatePrintReportHref($eventModel);
+            $event['href_report'] = $this->generateReportHref($eventModel);
+            $event['href_event'] = $hrefEvent;
+            $event['href_preview'] = $hrefPreview;
+            $event['href_registrations'] = $hrefRegistrations;
 
             $events[] = $event;
         }
 
         return $events;
+    }
+
+    private function generateEmailHref(CalendarEventsModel $eventModel): string|null
+    {
+        $rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
+        $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
+
+        $regId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$eventModel->id]);
+
+        if ($regId) {
+            return sprintf('contao?do=sac_calendar_events_tool&id=%d&table=tl_calendar_events_member&act=edit&action=sendEmail&eventId=%d&rt=%s&ref=%s', $regId, $eventModel->id, $rt, $refId);
+        }
+
+        return null;
+    }
+
+    private function generateReportHref(CalendarEventsModel $eventModel): string|null
+    {
+        $rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
+        $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
+
+        if ('tour' === $eventModel->eventType || 'lastMinuteTour' === $eventModel->eventType) {
+            return sprintf('contao?act=edit&do=sac_calendar_events_tool&table=tl_calendar_events&id=%d&call=writeTourReport&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
+        }
+
+        return null;
+    }
+
+    private function generatePrintReportHref(CalendarEventsModel $eventModel): string|null
+    {
+        $rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
+        $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
+
+        if ('tour' === $eventModel->eventType || 'lastMinuteTour' === $eventModel->eventType) {
+            return sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events_instructor_invoice&id=%d&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
+        }
+
+        return null;
     }
 }
