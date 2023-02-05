@@ -19,6 +19,7 @@ use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\Template;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\Controller\BackendHomeScreen\DashboardController;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -30,6 +31,7 @@ class ParseTemplateListener
     public function __construct(
         private readonly DashboardController $dashboard,
         private readonly Security $security,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -41,10 +43,14 @@ class ParseTemplateListener
      */
     public function __invoke(Template $template): void
     {
+        $request = $this->requestStack->getCurrentRequest();
+
         // List upcoming and past events on the backend home screen.
         if (str_starts_with($template->getName(), 'be_main')) {
-            if ($this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, 'sac_calendar_events_tool')) {
-                $template->main = $this->dashboard->generate()->getContent().$template->main;
+            if (!$request->query->has('mtg') && !$request->query->has('error') && !$request->query->has('do') && !$request->query->has('act')) {
+                if ($this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, 'sac_calendar_events_tool')) {
+                    $template->main = $this->dashboard->generate()->getContent().$template->main;
+                }
             }
         }
     }
