@@ -105,10 +105,22 @@ $GLOBALS['TL_LANG']['MSC']['goToPartcipantList'] = 'Möchten Sie zur Teilnehmerl
 $GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'Möchten Sie das Vergütungsformular bearbeiten/erstellen?';
 $GLOBALS['TL_LANG']['MSC']['emailSentToEventMembers'] = 'Der/die Teilnehmer wurden erfolgreich per E-Mail benachrichtigt.';
 
-// Backend member dashboard
-$GLOBALS['TL_LANG']['MSC']['bmd_yourUpcomingEvents'] = 'Ihre nächsten Events';
-$GLOBALS['TL_LANG']['MSC']['bmd_yourPastEvents'] = 'Ihre vergangenen Events';
-$GLOBALS['TL_LANG']['MSC']['bmd_howToEditReadonlyProfileData'] = 'Änderungen an Name, Adresse, Telefon und E-Mail müssen auf der Webseite des SAC Zentralverbandes (https://sac-cas.ch) gemacht werden.';
+// Backend home screen dashboard
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_sacEvents'] = 'SAC Events';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_yourUpcomingEvents'] = 'Ihre nächsten Events';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_yourPastEvents'] = 'Ihre vergangenen Events';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_howToEditReadonlyProfileData'] = 'Änderungen an Name, Adresse, Telefon und E-Mail müssen auf der Webseite des SAC Zentralverbandes (https://sac-cas.ch) gemacht werden.';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_editEvent'] = 'Event bearbeiten';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_livePreview'] = 'Event Vorschau';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_printReport'] = 'Rapport drucken';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_printReportDisabled'] = 'Rapport drucken nicht verfügbar';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_registrationList'] = 'Event Registrierungen';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_sendEmail'] = 'E-Mail versenden';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_sendEmailDisabled'] = 'E-Mail versenden nicht verfügbar';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReport'] = 'Rapport erfassen';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReportDisabled'] = 'Rapport erfassen nicht verfügbar';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorials'] = 'Anleitungen und Tutorials';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorialsText'] = 'Die Seite "Anleitungen und Tutorials" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).';
 
 // Event registration frontend module
 $GLOBALS['TL_LANG']['ERR']['evt_reg_eventNotFound'] = 'Event mit ID: %s nicht gefunden.';

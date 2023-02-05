@@ -1,7 +1,7 @@
 {% if events is not empty %}
     <div id="tl_backend_home_screen_my_events">
         <div id="tl_backend_home_screen_my_events_inner">
-            <h2>Deine Events</h2>
+            <h2><i class="fa-solid fa-mountain-sun"></i> {{ 'MSC.bhs_dashb_sacEvents'|trans({}, 'contao_default') }}</h2>
             <table class="tl_listing">
                 {% set index = 0 %}
                 {% for event in events %}
@@ -9,13 +9,13 @@
                         {% if event.separator == 'upcoming-events' and has_upcoming_events %}
                             {% set index = 0 %}
                             <tr>
-                                <td colspan="8" class="separator">{{ 'MSC.bmd_yourUpcomingEvents'|trans({}, 'contao_default') }}</td>
+                                <td colspan="8" class="separator">{{ 'MSC.bhs_dashb_yourUpcomingEvents'|trans({}, 'contao_default') }}</td>
                             </tr>
                         {% endif %}
                         {% if event.separator == 'past-events' and has_past_events %}
                             {% set index = 0 %}
                             <tr>
-                                <td colspan="8" class="separator">{{ 'MSC.bmd_yourPastEvents'|trans({}, 'contao_default') }}</td>
+                                <td colspan="8" class="separator">{{ 'MSC.bhs_dashb_yourPastEvents'|trans({}, 'contao_default') }}</td>
                             </tr>
                         {% endif %}
                     {% else %}
@@ -25,51 +25,51 @@
                             <td class="my-events-badge-col text-align-left">{{ event.badge|raw }}</td>
                             <td class="my-events-date-col text-align-left">{{ event.date }}</td>
                             <td class="my-events-title-col text-align-left">
-                                <a href="{{ event.href_event }}" style="text-decoration:underline" title="Event '{{ event.title|raw }}' bearbeiten"><strong>{{ event.title }}</strong></a>
+                                <a href="{{ event.href_event }}" style="text-decoration:underline" title="{{ 'MSC.bhs_dashb_editEvent'|trans({}, 'contao_default') }}"><strong>{{ event.title }}</strong></a>
                             </td>
                             <td class="my-events-icon-col text-align-center">
-                                <a href="{{ event.href_preview }}" title="zur Vorschau von '{{ event.title }}'">
+                                <a href="{{ event.href_preview }}" title="{{ 'MSC.bhs_dashb_livePreview'|trans({}, 'contao_default') }}">
                                     <i class="fa-solid fa-fw fa-presentation-screen"></i>
                                 </a>
                             </td>
                             <td class="my-events-icon-col text-align-center">
-                                <a href="{{ event.href_registrations }}" title="TN-Liste und Rapporte für '{{ event.title }}'">
+                                <a href="{{ event.href_registrations }}" title="{{ 'MSC.bhs_dashb_registrationList'|trans({}, 'contao_default') }}">
                                     <i class="fa-solid fa-fw fa-people-group"></i>
                                 </a>
                             </td>
                             <td class="my-events-icon-col text-align-center">
                                 {% if event.href_email is not empty %}
-                                    <a href="{{ event.href_email }}" title="E-Mail an Teilnehmer für '{{ event.title }}'">
+                                    <a href="{{ event.href_email }}" title="{{ 'MSC.bhs_dashb_sendEmail'|trans({}, 'contao_default') }}">
                                         <i class="fa-solid fa-fw fa-at"></i>
                                     </a>
                                 {% else %}
-                                    <i class="fa-solid fa-fw fa-at brightened" title="E-Mail nicht verfügbar"></i>
+                                    <i class="fa-solid fa-fw fa-at brightened" title="{{ 'MSC.bhs_dashb_sendEmailDisabled'|trans({}, 'contao_default') }}"></i>
                                 {% endif %}
                             </td>
                             <td class="my-events-icon-col text-align-center">
                                 {% if event.href_report is not empty %}
-                                    <a href="{{ event.href_report }}" title="Rapport erfassen für '{{ event.title }}'">
+                                    <a href="{{ event.href_report }}" title="{{ 'MSC.bhs_dashb_writeReport'|trans({}, 'contao_default') }}">
                                         <i class="fa-solid fa-fw fa-file-word"></i>
                                     </a>
                                 {% else %}
-                                    <i class="fa-solid fa-fw fa-file-word brightened" title="Rapport erfassen nicht verfügbar"></i>
+                                    <i class="fa-solid fa-fw fa-file-word brightened" title="{{ 'MSC.bhs_dashb_writeReportDisabled'|trans({}, 'contao_default') }}"></i>
                                 {% endif %}
                             </td>
                             <td class="my-events-icon-col text-align-center">
                                 {% if event.href_print_report is not empty %}
-                                    <a href="{{ event.href_print_report }}" title="Rapport drucken für '{{ event.title }}'">
+                                    <a href="{{ event.href_print_report }}" title="{{ 'MSC.bhs_dashb_printReport'|trans({}, 'contao_default') }}">
                                         <i class="fa-solid fa-fw fa-print"></i>
                                     </a>
                                 {% else %}
-                                    <i class="fa-solid fa-fw fa-print brightened" title="Rapport drucken nicht verfügbar"></i>
+                                    <i class="fa-solid fa-fw fa-print brightened" title="{{ 'MSC.bhs_dashb_printReportDisabled'|trans({}, 'contao_default') }}"></i>
                                 {% endif %}
                             </td>
                         </tr>
                     {% endif %}
                 {% endfor %}
             </table>
-            <h2>Anleitungen und Tutorials</h2>
-            <p>Die Seite "Anleitungen und Tutorials" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).</p>
+            <h2>{{ 'MSC.bhs_dashb_guidesAndTutorials'|trans({}, 'contao_default') }}</h2>
+            <p>{{ 'MSC.bhs_dashb_guidesAndTutorialsText'|trans({}, 'contao_default') }}</p>
         </div>
     </div>
     <script>
