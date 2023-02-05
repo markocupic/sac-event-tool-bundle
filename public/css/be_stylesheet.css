@@ -256,7 +256,7 @@ div.tl_header_tour_rapport table td {
 	color: #000000;
 }
 
-#tl_backend_home_screen_my_events_inner td i.brightened {
+#tl_backend_home_screen_my_events_inner td .brightened {
 	filter: opacity(0.20);
 }
 
