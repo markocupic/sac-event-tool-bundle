@@ -43,6 +43,9 @@ class BackendAssetsSubscriber implements EventSubscriberInterface
 
             // Add Backend javascript
             $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/backend_edit_all_navbar_helper.js';
+
+            // Load Font Awesome key from configuration
+            $GLOBALS['TL_HEAD'][] = '<script src="assets/contaocomponent-fontawesome-free/fontawesomefree/js/all.js"></script>';
         }
     }
 }
