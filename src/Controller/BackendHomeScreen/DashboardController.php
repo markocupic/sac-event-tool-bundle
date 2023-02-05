@@ -158,17 +158,25 @@ class DashboardController
                 $refId,
             );
 
+            $hrefEventListing = sprintf(
+                'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%d&rt=%s&ref=%s',
+                $eventModel->pid,
+                $rt,
+                $refId,
+            );
+
             $event = [];
             $event['row_class'] = $rowClass;
             $event['badge'] = $this->calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($eventModel);
             $event['title'] = $title;
             $event['date'] = date($this->configAdapter->get('dateFormat'), (int) $eventModel->startDate);
+            $event['href_eventListing'] = $hrefEventListing;
             $event['href_email'] = $this->generateEmailHref($eventModel);
-            $event['href_print_report'] = $this->generatePrintReportHref($eventModel);
-            $event['href_report'] = $this->generateReportHref($eventModel);
             $event['href_event'] = $hrefEvent;
             $event['href_preview'] = $this->calendarEventsHelperAdapter->generateEventPreviewUrl($eventModel);
+            $event['href_print_report'] = $this->generatePrintReportHref($eventModel);
             $event['href_registrations'] = $hrefRegistrations;
+            $event['href_report'] = $this->generateReportHref($eventModel);
 
             $events[] = $event;
         }
