@@ -79,7 +79,7 @@ class DashboardController
 
         if ($user instanceof BackendUser) {
             $html = $this->twig->render(
-                '@MarkocupicSacEventTool/BackendWelcomePage/dashboard.html.twig',
+                '@MarkocupicSacEventTool/BackendHomeScreen/dashboard.html.twig',
                 [
                     'events' => $events,
                     'has_upcoming_events' => !empty($upcomingEvents),

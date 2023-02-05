@@ -9,13 +9,13 @@
                         {% if event.separator == 'upcoming-events' and has_upcoming_events %}
                             {% set index = 0 %}
                             <tr>
-                                <td colspan="8" class="separator">{{ 'MSC.bhs_dashb_yourUpcomingEvents'|trans({}, 'contao_default') }}</td>
+                                <td colspan="9" class="separator">{{ 'MSC.bhs_dashb_yourUpcomingEvents'|trans({}, 'contao_default') }}</td>
                             </tr>
                         {% endif %}
                         {% if event.separator == 'past-events' and has_past_events %}
                             {% set index = 0 %}
                             <tr>
-                                <td colspan="8" class="separator">{{ 'MSC.bhs_dashb_yourPastEvents'|trans({}, 'contao_default') }}</td>
+                                <td colspan="9" class="separator">{{ 'MSC.bhs_dashb_yourPastEvents'|trans({}, 'contao_default') }}</td>
                             </tr>
                         {% endif %}
                     {% else %}
