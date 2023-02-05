@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-namespace Markocupic\SacEventToolBundle\Controller\BackendWelcomePage;
+namespace Markocupic\SacEventToolBundle\Controller\BackendHomeScreen;
 
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
@@ -35,6 +35,7 @@ use Twig\Error\SyntaxError;
 class DashboardController
 {
     private Adapter $calendarEventsHelperAdapter;
+    private Adapter $calendarEventsModelAdapter;
     private Adapter $configAdapter;
     private Adapter $stringUtilAdapter;
 
@@ -48,6 +49,7 @@ class DashboardController
     ) {
         // Adapters
         $this->calendarEventsHelperAdapter = $framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsModelAdapter = $framework->getAdapter(CalendarEventsModel::class);
         $this->configAdapter = $framework->getAdapter(Config::class);
         $this->stringUtilAdapter = $framework->getAdapter(StringUtil::class);
     }
@@ -60,7 +62,6 @@ class DashboardController
      */
     public function generate(): Response
     {
-        $html = '';
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
@@ -73,6 +74,8 @@ class DashboardController
             [['separator' => 'past-events']],
             $this->prepareForTwig($pastEvents, 'past-event')
         );
+
+        $html = '';
 
         if ($user instanceof BackendUser) {
             $html = $this->twig->render(
@@ -127,6 +130,9 @@ class DashboardController
         return $result->fetchAllAssociative();
     }
 
+    /**
+     * @throws Exception
+     */
     private function prepareForTwig(array $arrEvents, string $rowClass): array
     {
         $events = [];
@@ -134,24 +140,34 @@ class DashboardController
         $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
         foreach ($arrEvents as $row) {
-            $event = [];
-            $eventModel = CalendarEventsModel::findByPk($row['id']);
+            $eventModel = $this->calendarEventsModelAdapter->findByPk($row['id']);
             $title = $this->stringUtilAdapter->decodeEntities($eventModel->title);
             $title = $this->stringUtilAdapter->restoreBasicEntities($title);
-            $hrefEmail = $this->generateEmailHref($eventModel);
-            $hrefEvent = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
-            $hrefPreview = $this->calendarEventsHelperAdapter->generateEventPreviewUrl($eventModel);
-            $hrefRegistrations = sprintf('contao/main.php?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
 
+            $hrefEvent = sprintf(
+                'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
+                $eventModel->id,
+                $rt,
+                $refId,
+            );
+
+            $hrefRegistrations = sprintf(
+                'contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s',
+                $eventModel->id,
+                $rt,
+                $refId,
+            );
+
+            $event = [];
             $event['row_class'] = $rowClass;
             $event['badge'] = $this->calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($eventModel);
             $event['title'] = $title;
             $event['date'] = date($this->configAdapter->get('dateFormat'), (int) $eventModel->startDate);
-            $event['href_email'] = $hrefEmail;
+            $event['href_email'] = $this->generateEmailHref($eventModel);
             $event['href_print_report'] = $this->generatePrintReportHref($eventModel);
             $event['href_report'] = $this->generateReportHref($eventModel);
             $event['href_event'] = $hrefEvent;
-            $event['href_preview'] = $hrefPreview;
+            $event['href_preview'] = $this->calendarEventsHelperAdapter->generateEventPreviewUrl($eventModel);
             $event['href_registrations'] = $hrefRegistrations;
 
             $events[] = $event;
@@ -160,6 +176,9 @@ class DashboardController
         return $events;
     }
 
+    /**
+     * @throws Exception
+     */
     private function generateEmailHref(CalendarEventsModel $eventModel): string|null
     {
         $rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();

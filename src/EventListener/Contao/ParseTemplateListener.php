@@ -16,18 +16,16 @@ namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Security\ContaoCorePermissions;
+use Contao\Template;
 use Doctrine\DBAL\Exception;
-use Markocupic\SacEventToolBundle\Controller\BackendWelcomePage\DashboardController;
+use Markocupic\SacEventToolBundle\Controller\BackendHomeScreen\DashboardController;
 use Symfony\Component\Security\Core\Security;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
-/**
- * List all upcoming and past events (where logged in backend user is the main instructor).
- */
-#[AsHook('getSystemMessages', priority: 100)]
-class GetSystemMessagesListener
+#[AsHook('parseTemplate', priority: 100)]
+class ParseTemplateListener
 {
     public function __construct(
         private readonly DashboardController $dashboard,
@@ -41,12 +39,13 @@ class GetSystemMessagesListener
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    public function __invoke(): string
+    public function __invoke(Template $template): void
     {
-        if ($this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, 'sac_calendar_events_tool')) {
-            return $this->dashboard->generate()->getContent();
+        // List upcoming and past events on the backend home screen.
+        if (str_starts_with($template->getName(), 'be_main')) {
+            if ($this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, 'sac_calendar_events_tool')) {
+                $template->main = $this->dashboard->generate()->getContent().$template->main;
+            }
         }
-
-        return '';
     }
 }

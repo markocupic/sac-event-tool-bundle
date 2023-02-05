@@ -1,6 +1,7 @@
 {% if events is not empty %}
-    <div id="tl_my_events">
-        <div id="tl_my_events_inner">
+    <div id="tl_backend_home_screen_my_events">
+        <div id="tl_backend_home_screen_my_events_inner">
+            <h2>Deine Events</h2>
             <table class="tl_listing">
                 {% set index = 0 %}
                 {% for event in events %}
@@ -28,48 +29,43 @@
                             </td>
                             <td class="my-events-icon-col text-align-right">
                                 <a href="{{ event.href_preview }}" title="zur Vorschau von '{{ event.title }}'">
-                                    <i class="fa-solid fa-presentation-screen"></i>
+                                    <i class="fa-solid fa-fw fa-presentation-screen"></i>
                                 </a>
 
                                 <a href="{{ event.href_registrations }}" title="TN-Liste und Rapporte für '{{ event.title }}'">
-                                    <i class="fa-solid fa-people-group"></i>
+                                    <i class="fa-solid fa-fw fa-people-group"></i>
                                 </a>
 
                                 {% if event.href_email is not empty %}
                                     <a href="{{ event.href_email }}" title="E-Mail an Teilnehmer für '{{ event.title }}'">
-                                        <i class="fa-solid fa-at"></i>
+                                        <i class="fa-solid fa-fw fa-at"></i>
                                     </a>
                                 {% else %}
-                                    <i class="fa-solid fa-at" title="E-Mail nicht verfügbar" style="filter:opacity(0.20)"></i>
+                                    <i class="fa-solid fa-fw fa-at" title="E-Mail nicht verfügbar" style="filter:opacity(0.20)"></i>
                                 {% endif %}
 
                                 {% if event.href_report is not empty %}
                                     <a href="{{ event.href_report }}" title="Rapport erfassen für '{{ event.title }}'">
-                                        <i class="fa-solid fa-file-word"></i>
+                                        <i class="fa-solid fa-fw fa-file-word"></i>
                                     </a>
                                 {% else %}
-                                    <i class="fa-solid fa-file-word" title="Rapport erfassen nicht verfügbar" style="filter:opacity(0.20)"></i>
+                                    <i class="fa-solid fa-fw fa-file-word" title="Rapport erfassen nicht verfügbar" style="filter:opacity(0.20)"></i>
                                 {% endif %}
 
                                 {% if event.href_print_report is not empty %}
                                     <a href="{{ event.href_print_report }}" title="Rapport drucken für '{{ event.title }}'">
-                                        <i class="fa-solid fa-print"></i>
+                                        <i class="fa-solid fa-fw fa-print"></i>
                                     </a>
                                 {% else %}
-                                    <i class="fa-solid fa-print" title="Rapport drucken nicht verfügbar" style="filter:opacity(0.20)"></i>
+                                    <i class="fa-solid fa-fw fa-print" title="Rapport drucken nicht verfügbar" style="filter:opacity(0.20)"></i>
                                 {% endif %}
                             </td>
                         </tr>
                     {% endif %}
                 {% endfor %}
             </table>
+            <h2>Anleitungen und Tutorials</h2>
+            <p>Die Seite "Anleitungen und Tutorials" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).</p>
         </div>
-        <br>
     </div>
-{% endif %}
-
-{% if events is not empty %}
-    <h3>Anleitungen und Tutorials</h3>
-    <p>Die Seite "Anleitungen und Tutorials" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).</p>
-    <hr>
 {% endif %}

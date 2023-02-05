@@ -204,50 +204,54 @@ div.tl_header_tour_rapport table td {
 	background-color: #d86811;
 }
 
-#tl_messages h3 {
-	font-size: .875rem;
-	margin: 15px 0 5px;
+/** backend home screen - start */
+#tl_backend_home_screen_my_events h2 {
+	margin: 18px 0 6px;
 }
 
-#tl_my_events {
+#tl_backend_home_screen_my_events {
 	overflow-x: auto;
+	padding: 0 15px 4px;
+	border-bottom: 1px solid #e6e6e8;
 }
 
-#tl_my_events_inner {
+#tl_backend_home_screen_my_events_innerr {
 	min-width: 700px;
 	width: auto;
 }
 
-#tl_my_events td.separator {
+#tl_backend_home_screen_my_events_inner td.separator {
 	padding-top: 2rem;
-	font-weight: bold;
-	color: #000;
+	font-weight: 600;
+	color: #222;
 }
 
-#tl_my_events th {
+#tl_backend_home_screen_my_events_inner th {
 	background: #f6f6f8;
 	padding: 6px;
 	border-top: 1px solid #e9e9e9;
 }
 
-#tl_my_events td.text-align-right {
+#tl_backend_home_screen_my_events_inner td.text-align-right {
 	text-align: right;
 }
 
-#tl_my_events td.my-events-icon-col > * {
+#tl_backend_home_screen_my_events_inner td.my-events-icon-col > * {
 	margin-left: 6px;
 	margin-right: 6px;
 	color: #000000;
 }
 
-#tl_my_events .subscription-badge {
+#tl_backend_home_screen_my_events_inner .subscription-badge {
 	margin-left: 4px !important;
 }
 
-#tl_my_events td {
+#tl_backend_home_screen_my_events_inner td {
 	border-bottom: 1px solid #e9e9e9;
 	padding: 6px 6px;
 }
+
+/** backend home screen - end */
 
 /** alerts **/
 .alert {
