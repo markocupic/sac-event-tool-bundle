@@ -20,13 +20,12 @@ use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Input;
-use Contao\StringUtil;
 use Contao\System;
 use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\Renderer\ListRenderer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Markocupic\SacEventToolBundle\Config\Bundle;
+use Twig\Environment as Twig;
 
 /**
  * Generates the event member dashboard.
@@ -34,11 +33,10 @@ use Markocupic\SacEventToolBundle\Config\Bundle;
 #[AsHook('parseBackendTemplate', priority: 100)]
 class ParseBackendTemplateListener
 {
-    private ContaoFramework $framework;
-
-    public function __construct(ContaoFramework $framework)
-    {
-        $this->framework = $framework;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Twig $twig,
+    ) {
     }
 
     /**
@@ -49,7 +47,6 @@ class ParseBackendTemplateListener
         // Set adapters
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
@@ -71,45 +68,23 @@ class ParseBackendTemplateListener
                         $controllerAdapter->loadDataContainer('tl_calendar_events_member');
                         $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
-                        $strLegend = '<div class="legend-box">';
+                        $arrEvent = $objEvent->row();
+                        $arrEvent['time_span'] = $calendarEventsHelperAdapter->getEventPeriod($objEvent);
+                        $arrEvent['instructors'] = $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent);
 
-                        // Event details
-                        $strLegend .= '<div class="event-detail-legend">';
-                        $strLegend .= '<h3>'.$stringUtilAdapter->substr($objEvent->title, 30, '...').'</h3>';
-                        $strLegend .= '<p>'.$calendarEventsHelperAdapter->getEventPeriod($objEvent).'</p>';
-                        $strLegend .= '<p><strong>Leiter:</strong><br>'.implode('<br>', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent)).'</p>';
-                        $strLegend .= '</div>';
+                        $arrRegistration = [];
+                        $arrRegistration['states'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields']['stateOfSubscription']['options'];
 
-                        $strLegend .= '<div class="subscription-state-legend">';
-                        $strLegend .= '<h3>Status der Event-Anmeldung</h3>';
-                        $strLegend .= '<ul>';
-                        $arrStates = $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields']['stateOfSubscription']['options'];
-
-                        foreach ($arrStates as $state) {
-                            $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Bundle::ASSET_DIR, $state, $GLOBALS['TL_LANG']['MSC'][$state]);
-                        }
-                        $strLegend .= '</ul>';
-                        $strLegend .= '</div>';
-
-                        $strLegend .= '<div class="participation-state-legend">';
-                        $strLegend .= '<h3>Teilnahmestatus <span class="notice">Hinweis: Darf erst nach der Event-Durchführung ausgefüllt werden!</span></h3>';
-                        $strLegend .= '<ul>';
-                        $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Bundle::ASSET_DIR, 'has-not-participated', 'Hat am Event nicht/noch nicht teilgenommen');
-                        $strLegend .= sprintf('<li><img src="%s/icons/%s.svg" width="16" height="16"> %s</li>', Bundle::ASSET_DIR, 'has-participated', 'Hat am Event teilgenommen');
-                        $strLegend .= '</ul>';
-                        $strLegend .= '</div>';
-
-                        $strLegend .= '</div>';
-
-                        $strLegend .= '<div class="legend-box">';
-                        $strLegend .= '<div class="notice-legend">';
-                        $strLegend .= '<h3>Vergütungsformular mit Tourenrapport</h3>';
-                        $strLegend .= '<p><strong>Stammsektion</strong>: Das Vergütungsformular und der Tourenrapport (PDF-Ausdruck) müssen<strong> nach dem Event manuell per E-Mail</strong> an die entsprechende Stelle zeitnah gesendet werden!</p>';
-                        $strLegend .= '</div>';
-                        $strLegend .= '</div>';
+                        $html = $this->twig->render(
+                            '@MarkocupicSacEventTool/CalendarEventsMember/explanations.html.twig',
+                            [
+                                'event' => $arrEvent,
+                                'registration' => $arrRegistration,
+                            ]
+                        );
 
                         // Add legend to the listing table
-                        $strBuffer = preg_replace('/<table class=\"tl_listing(.*)<\/table>/sU', '${0}'.$strLegend, $strBuffer);
+                        $strBuffer = preg_replace('/<table class=\"tl_listing(.*)<\/table>/sU', '${0}'.$html, $strBuffer);
                     }
                 }
             }
@@ -156,7 +131,7 @@ class ParseBackendTemplateListener
         $factory = new MenuFactory();
         $menu = $factory->createItem('Event Dashboard');
 
-        // HOOK: Use hooks to generate the mini dashboard. Soother plugins are able to add items as well.
+        // HOOK: Use hooks to generate the mini dashboard. So other plugins are able to add items as well.
         if (isset($GLOBALS['TL_HOOKS']['generateEventDashboard']) && \is_array($GLOBALS['TL_HOOKS']['generateEventDashboard'])) {
             foreach ($GLOBALS['TL_HOOKS']['generateEventDashboard'] as $callback) {
                 System::importStatic($callback[0])->{$callback[1]}($menu, $objEvent);

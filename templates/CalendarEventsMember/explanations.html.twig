@@ -1,0 +1,33 @@
+<div class="legend-box">
+
+    <div class="event-detail-legend">
+        <h3>{{ (event.title|length > 30 ? event.title|slice(0, 30) ~ '…' : event.title) }}</h3>
+        <p>{{ event.time_span }}</p>
+        <p><strong>Leiter:</strong><br>{{ event.instructors|join('<br>')|raw }}</p>
+    </div>
+
+    <div class="subscription-state-legend">
+        <h3>Status der Event-Anmeldung</h3>
+        <ul>
+            {% for state in registration.states %}
+                <li><img src="bundles/markocupicsaceventtool/icons/subscription-states/{{ state }}.svg" width="16" height="16"> {{ ('MSC.'~state)|trans({}, 'contao_default') }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="participation-state-legend">
+        <h3>Teilnahmestatus <span class="notice">Hinweis: Darf erst nach der Event-Durchführung ausgefüllt werden!</span></h3>
+        <ul>
+            <li><img src="bundles/markocupicsaceventtool/icons/fontawesome/default/square-regular.svg" width="16" height="16"> Hat am Event nicht/noch nicht teilgenommen</li>
+            <li><img src="bundles/markocupicsaceventtool/icons/fontawesome/default/square-check-regular.svg" width="16" height="16"> Hat am Event teilgenommen</li>
+        </ul>
+    </div>
+
+</div>
+
+<div class="legend-box">
+    <div class="notice-legend">
+        <h3>Vergütungsformular mit Tourenrapport</h3>
+        <p><strong>Stammsektion</strong>: Das Vergütungsformular und der Tourenrapport (PDF-Ausdruck) müssen<strong> nach dem Event manuell per E-Mail</strong> an die entsprechende Stelle zeitnah gesendet werden!</p>
+    </div>
+</div>

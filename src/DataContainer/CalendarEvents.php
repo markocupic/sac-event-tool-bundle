@@ -1570,7 +1570,7 @@ class CalendarEvents
         }
 
         if (false === $canPushToNextReleaseLevel) {
-            return '';
+            return Image::getHtml(str_replace('default', 'brightened', $icon), $label).' ';
         }
 
         return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
@@ -1750,7 +1750,7 @@ class CalendarEvents
         }
 
         if (false === $canPushToNextReleaseLevel) {
-            return '';
+            return Image::getHtml(str_replace('default', 'brightened', $icon), $label).' ';
         }
 
         return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
@@ -1762,7 +1762,7 @@ class CalendarEvents
         $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $row['id']);
 
         if (!$blnAllow) {
-            return '';
+            return Image::getHtml($icon, $label).' ';
         }
 
         return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';

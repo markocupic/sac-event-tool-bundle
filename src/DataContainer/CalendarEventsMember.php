@@ -780,7 +780,7 @@ class CalendarEventsMember
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.label.label', priority: 100)]
     public function addIcon(array $row, string $label, DataContainer $dc, array $args): array
     {
-        $icon = 'icons/'.$row['stateOfSubscription'].'.svg';
+        $icon = 'icons/subscription-states/'.$row['stateOfSubscription'].'.svg';
         $args[0] = sprintf('<div><img src="%s/%s" alt="%s" width="16" height=16"></div>', Bundle::ASSET_DIR, $icon, $row['stateOfSubscription']);
 
         return $args;

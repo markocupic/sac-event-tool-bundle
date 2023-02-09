@@ -55,7 +55,7 @@ table#ctrl_eventDates thead tr:first-child {
 }
 
 #tl_navigation .group-sac_be_modules {
-	background: url(../../markocupicsaceventtool/icons/sun.svg) 3px 2px no-repeat;
+	background: url(../../markocupicsaceventtool/icons/sac-event-tool-backend-module-icon.svg) 3px 2px no-repeat;
 }
 
 /** Global operations**/
@@ -144,14 +144,12 @@ div.legend-box li {
 	line-height: 1.4;
 	min-height: 37px;
 }
-
-.tl_content_right .invoice img,
-.tl_content_right .generateInvoicePdf img,
-.tl_content_right .generateInvoiceDocx img {
+/**
+.tl_content_right .invoice img{
 	width: 16px !important;
 	height: auto !important;
 }
-
+**/
 div.tl_header_tour_rapport {
 	background-color: #f3f3f5;
 	display: block;

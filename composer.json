@@ -21,6 +21,7 @@
         "markocupic/cloudconvert-bundle": "^2.0",
         "markocupic/contao-component-fontawesome-free": "^6.0",
         "markocupic/contao-component-vue-js": "^2.6",
+        "markocupic/contao-custom-global-operation": "^1.0",
         "markocupic/contao-utf8-arrows-insert-tag-bundle": "^1.0",
         "markocupic/notification-center-default-email-bundle": "^1.0",
         "markocupic/phpoffice-bundle": "^1.2",

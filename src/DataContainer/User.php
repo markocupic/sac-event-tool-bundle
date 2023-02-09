@@ -143,7 +143,7 @@ class User
         $messageAdapter = $this->framework->getAdapter(Message::class);
 
         $messageAdapter->addInfo(
-            $this->translator->trans('MSC.bmd_howToEditReadonlyProfileData', [], 'contao_default')
+            $this->translator->trans('MSC.bhs_dashb_howToEditReadonlyProfileData', [], 'contao_default')
         );
     }
 
