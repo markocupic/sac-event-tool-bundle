@@ -247,6 +247,7 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'] = [
 	'13 Tage'           => ['dateRows' => 13],
 	'13 1/2 Tage'       => ['dateRows' => 14],
 	'14 Tage'           => ['dateRows' => 14],
+	'1 Vormittag'       => ['dateRows' => 1],
 	'1 Abend'           => ['dateRows' => 1],
 	'2 Abende'          => ['dateRows' => 2],
 	'3 Abende'          => ['dateRows' => 3],
