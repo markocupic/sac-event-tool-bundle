@@ -2,7 +2,7 @@
 
     <div class="event-detail-legend">
         <h3>{{ (event.title|length > 30 ? event.title|slice(0, 30) ~ '…' : event.title) }}</h3>
-        <p>{{ event.time_span }}</p>
+        <p>{{ event.time_span|raw }}</p>
         <p><strong>Leiter:</strong><br>{{ event.instructors|join('<br>')|raw }}</p>
     </div>
 
