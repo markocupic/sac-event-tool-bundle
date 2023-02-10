@@ -31,3 +31,13 @@
         <p><strong>Stammsektion</strong>: Das Vergütungsformular und der Tourenrapport (PDF-Ausdruck) müssen<strong> nach dem Event manuell per E-Mail</strong> an die entsprechende Stelle zeitnah gesendet werden!</p>
     </div>
 </div>
+
+<script>
+    // Badges: Add the title attribute from data-title.
+    const el = document.querySelectorAll('.event-detail-legend [data-title]');
+    let i;
+    for (i = 0; i < el.length; ++i) {
+        let titleString = el[i].getAttribute('data-title');
+        el[i].setAttribute('title', titleString);
+    }
+</script>
