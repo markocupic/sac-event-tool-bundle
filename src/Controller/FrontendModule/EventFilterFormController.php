@@ -36,17 +36,14 @@ class EventFilterFormController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_filter_form';
 
-    private ContaoFramework $framework;
-    private TranslatorInterface $translator;
-    private string $sacevtLocale;
     private array|null $arrAllowedFields = null;
     private PageModel|null $objPage = null;
 
-    public function __construct(ContaoFramework $framework, TranslatorInterface $translator, string $sacevtLocale)
-    {
-        $this->framework = $framework;
-        $this->translator = $translator;
-        $this->sacevtLocale = $sacevtLocale;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly TranslatorInterface $translator,
+        private readonly string $sacevtLocale,
+    ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response

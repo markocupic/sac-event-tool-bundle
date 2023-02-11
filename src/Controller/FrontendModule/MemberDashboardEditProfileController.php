@@ -39,19 +39,15 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
 {
     public const TYPE = 'member_dashboard_edit_profile';
 
-    private ContaoFramework $framework;
-    private Security $security;
-    private TranslatorInterface $translator;
-    private LoggerInterface $contaoGeneralLogger;
     private FrontendUser|null $objUser;
     private Template|null $template;
 
-    public function __construct(ContaoFramework $framework, Security $security, TranslatorInterface $translator, LoggerInterface $contaoGeneralLogger)
-    {
-        $this->framework = $framework;
-        $this->security = $security;
-        $this->translator = $translator;
-        $this->contaoGeneralLogger = $contaoGeneralLogger;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Security $security,
+        private readonly TranslatorInterface $translator,
+        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+    ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response

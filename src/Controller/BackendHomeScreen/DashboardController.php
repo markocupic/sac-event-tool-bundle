@@ -40,7 +40,7 @@ class DashboardController
     private Adapter $stringUtilAdapter;
 
     public function __construct(
-        ContaoFramework $framework,
+        private readonly ContaoFramework $framework,
         private readonly Connection $connection,
         private readonly RequestStack $requestStack,
         private readonly Twig $twig,
@@ -48,10 +48,10 @@ class DashboardController
         private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
     ) {
         // Adapters
-        $this->calendarEventsHelperAdapter = $framework->getAdapter(CalendarEventsHelper::class);
-        $this->calendarEventsModelAdapter = $framework->getAdapter(CalendarEventsModel::class);
-        $this->configAdapter = $framework->getAdapter(Config::class);
-        $this->stringUtilAdapter = $framework->getAdapter(StringUtil::class);
+        $this->calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
+        $this->configAdapter = $this->framework->getAdapter(Config::class);
+        $this->stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
     }
 
     /**

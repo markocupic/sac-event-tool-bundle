@@ -24,11 +24,9 @@ use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListCont
 
 class Content
 {
-    private Connection $connection;
-
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private readonly Connection $connection,
+    ) {
     }
 
     /**

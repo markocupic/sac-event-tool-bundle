@@ -23,15 +23,12 @@ use Contao\Message;
 
 class RotateImage
 {
-    private ContaoFramework $framework;
-    private string $projectDir;
     private Adapter $messageAdapter;
 
-    public function __construct(ContaoFramework $framework, string $projectDir)
-    {
-        $this->framework = $framework;
-        $this->projectDir = $projectDir;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly string $projectDir,
+    ) {
         $this->messageAdapter = $framework->getAdapter(Message::class);
     }
 

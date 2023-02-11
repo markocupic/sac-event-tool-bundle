@@ -36,17 +36,13 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
 {
     public const TYPE = 'member_dashboard_delete_profile';
 
-    private ContaoFramework $framework;
-    private Security $security;
-    private ClearFrontendUserData $clearFrontendUserData;
-
     private FrontendUser|null $user;
 
-    public function __construct(ContaoFramework $framework, Security $security, ClearFrontendUserData $clearFrontendUserData)
-    {
-        $this->framework = $framework;
-        $this->security = $security;
-        $this->clearFrontendUserData = $clearFrontendUserData;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Security $security,
+        private readonly ClearFrontendUserData $clearFrontendUserData,
+    ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response

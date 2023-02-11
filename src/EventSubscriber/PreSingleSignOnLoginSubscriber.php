@@ -23,15 +23,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
 {
-    private Connection $connection;
-    private MaintainBackendUserPermissions $maintainBackendUserPermissions;
-    private bool $sacevtUserBackendResetUserRightsOnSsoLogin;
-
-    public function __construct(Connection $connection, MaintainBackendUserPermissions $maintainBackendUserPermissions, bool $sacevtUserBackendResetUserRightsOnSsoLogin)
-    {
-        $this->connection = $connection;
-        $this->maintainBackendUserPermissions = $maintainBackendUserPermissions;
-        $this->sacevtUserBackendResetUserRightsOnSsoLogin = $sacevtUserBackendResetUserRightsOnSsoLogin;
+    public function __construct(
+        private readonly Connection $connection,
+        private readonly MaintainBackendUserPermissions $maintainBackendUserPermissions,
+        private readonly bool $sacevtUserBackendResetUserRightsOnSsoLogin,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

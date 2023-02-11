@@ -25,13 +25,10 @@ use Psr\Log\LoggerInterface;
  */
 class SyncMemberWithUser
 {
-    private ContaoFramework $framework;
-    private LoggerInterface|null $contaoGeneralLogger;
-
-    public function __construct(ContaoFramework $framework, LoggerInterface $contaoGeneralLogger = null)
-    {
-        $this->framework = $framework;
-        $this->contaoGeneralLogger = $contaoGeneralLogger;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+    ) {
     }
 
     public function syncMemberWithUser(): void

@@ -25,11 +25,9 @@ use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
  */
 abstract class AbstractPrintExportController extends AbstractFrontendModuleController
 {
-    private ContaoFramework $framework;
-
-    public function __construct(ContaoFramework $framework)
-    {
-        $this->framework = $framework;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+    ) {
     }
 
     public function hasValidReleaseLevel(CalendarEventsModel $objEvent, int $minLevel = null): bool

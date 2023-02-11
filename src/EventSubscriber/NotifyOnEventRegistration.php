@@ -32,7 +32,6 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
 {
     public const PRIORITY = 10000;
 
-    private string $sacevtLocale;
     private array $arrData = [];
     private ContaoFramework|null $framework = null;
     private MemberModel|null $memberModel = null;
@@ -40,9 +39,9 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
     private CalendarEventsMemberModel|null $eventMemberModel = null;
     private ModuleModel|null $moduleModel = null;
 
-    public function __construct(string $sacevtLocale)
-    {
-        $this->sacevtLocale = $sacevtLocale;
+    public function __construct(
+        private readonly string $sacevtLocale,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -26,13 +26,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 #[AsHook('importUser', priority: 100)]
 class ImportUserListener
 {
-    private ContaoFramework $framework;
-    private RequestStack $requestStack;
-
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+    ) {
     }
 
     public function __invoke(string $strUsername, string $strPassword, string $strTable): bool

@@ -34,27 +34,20 @@ use Symfony\Component\HttpFoundation\Response;
 
 class WorkshopBookletGenerator
 {
-    private ContaoFramework $framework;
-    private Connection $connection;
-    private BinaryFileDownload $binaryFileDownload;
-    private string $projectDir;
-    private string $sacevtTempDir;
-    private string $sacevtEventCourseBookletFilenamePattern;
     private WorkshopTCPDF|null $pdf;
     private int|null $year;
     private int|null $eventId = null;
     private bool $download = false;
     private bool $printSingleEvent = false;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, BinaryFileDownload $binaryFileDownload, string $projectDir, string $sacevtTempDir, string $sacevtEventCourseBookletFilenamePattern)
-    {
-        $this->framework = $framework;
-        $this->connection = $connection;
-        $this->binaryFileDownload = $binaryFileDownload;
-        $this->projectDir = $projectDir;
-        $this->sacevtTempDir = $sacevtTempDir;
-        $this->sacevtEventCourseBookletFilenamePattern = $sacevtEventCourseBookletFilenamePattern;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
+        private readonly BinaryFileDownload $binaryFileDownload,
+        private readonly string $projectDir,
+        private readonly string $sacevtTempDir,
+        private readonly string $sacevtEventCourseBookletFilenamePattern,
+    ) {
         $this->framework->initialize(true);
 
         // Set defaults

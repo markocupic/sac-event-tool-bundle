@@ -20,15 +20,11 @@ use Contao\UserModel;
 
 class Avatar
 {
-    private string $projectDir;
-    private string $sacevtAvatarFemale;
-    private string $sacevtAvatarMale;
-
-    public function __construct(string $projectDir, string $sacevtAvatarFemale, string $sacevtAvatarMale)
-    {
-        $this->projectDir = $projectDir;
-        $this->sacevtAvatarFemale = $sacevtAvatarFemale;
-        $this->sacevtAvatarMale = $sacevtAvatarMale;
+    public function __construct(
+        private readonly string $projectDir,
+        private readonly string $sacevtAvatarFemale,
+        private readonly string $sacevtAvatarMale,
+    ) {
     }
 
     /**

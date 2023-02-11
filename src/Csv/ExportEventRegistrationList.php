@@ -57,20 +57,15 @@ class ExportEventRegistrationList
         'hasParticipated',
     ];
 
-    private ContaoFramework $framework;
-    private Connection $connection;
-    private string $sacevtEventMemberListFileNamePattern;
-
     // Adapters
     private Adapter $configAdapter;
     private Adapter $controllerAdapter;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, string $sacevtEventMemberListFileNamePattern)
-    {
-        $this->framework = $framework;
-        $this->connection = $connection;
-        $this->sacevtEventMemberListFileNamePattern = $sacevtEventMemberListFileNamePattern;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
+        private readonly string $sacevtEventMemberListFileNamePattern,
+    ) {
         // Adapters
         $this->configAdapter = $this->framework->getAdapter(Config::class);
         $this->controllerAdapter = $this->framework->getAdapter(Controller::class);

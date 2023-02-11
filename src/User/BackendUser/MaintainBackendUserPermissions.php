@@ -24,19 +24,14 @@ use Doctrine\DBAL\Exception;
 
 class MaintainBackendUserPermissions
 {
-    private ContaoFramework $framework;
-    private Connection $connection;
-    private string $sacevtUserBackendHomeDir;
-
     private Adapter $stringUtil;
     private Adapter $date;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, string $sacevtUserBackendHomeDir)
-    {
-        $this->framework = $framework;
-        $this->connection = $connection;
-        $this->sacevtUserBackendHomeDir = $sacevtUserBackendHomeDir;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
+        private readonly string $sacevtUserBackendHomeDir,
+    ) {
         // Adapters
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->date = $this->framework->getAdapter(Date::class);

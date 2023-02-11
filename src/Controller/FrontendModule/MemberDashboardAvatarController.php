@@ -36,19 +36,14 @@ class MemberDashboardAvatarController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_avatar';
     protected FrontendUser|null $user = null;
-    private ContaoFramework $framework;
-    private ScopeMatcher $scopeMatcher;
-    private Security $security;
-    private InsertTagParser $insertTagParser;
-    private Avatar $avatar;
 
-    public function __construct(ContaoFramework $framework, ScopeMatcher $scopeMatcher, Security $security, InsertTagParser $insertTagParser, Avatar $avatar)
-    {
-        $this->framework = $framework;
-        $this->scopeMatcher = $scopeMatcher;
-        $this->security = $security;
-        $this->insertTagParser = $insertTagParser;
-        $this->avatar = $avatar;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly ScopeMatcher $scopeMatcher,
+        private readonly Security $security,
+        private readonly InsertTagParser $insertTagParser,
+        private readonly Avatar $avatar,
+    ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response

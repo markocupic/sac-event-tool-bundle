@@ -30,11 +30,9 @@ class EventListController extends AbstractFrontendModuleController
     public const TYPE = 'event_list';
     protected ModuleModel|null $model = null;
 
-    private ContaoFramework $framework;
-
-    public function __construct(ContaoFramework $framework)
-    {
-        $this->framework = $framework;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+    ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response

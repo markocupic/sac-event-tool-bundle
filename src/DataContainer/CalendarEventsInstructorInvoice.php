@@ -37,36 +37,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CalendarEventsInstructorInvoice
 {
-    private ContaoFramework $framework;
-    private RequestStack $requestStack;
-    private Connection $connection;
-    private Util $util;
-    private TranslatorInterface $translator;
-    private Security $security;
-    private EventRapport2Docx $eventRapport2Docx;
-    private EventMember $eventMember;
-    private string $sacevtEventTemplateTourInvoice;
-    private string $sacevtEventTemplateTourRapport;
-    private string $sacevtEventTourInvoiceFileNamePattern;
-    private string $sacevtEventTourRapportFileNamePattern;
-
     /**
      * Import the back end user object.
      */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, EventRapport2Docx $eventRapport2Docx, EventMember $eventMember, string $sacevtEventTemplateTourInvoice, string $sacevtEventTemplateTourRapport, string $sacevtEventTourInvoiceFileNamePattern, string $sacevtEventTourRapportFileNamePattern)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->connection = $connection;
-        $this->util = $util;
-        $this->translator = $translator;
-        $this->security = $security;
-        $this->eventRapport2Docx = $eventRapport2Docx;
-        $this->eventMember = $eventMember;
-        $this->sacevtEventTemplateTourInvoice = $sacevtEventTemplateTourInvoice;
-        $this->sacevtEventTemplateTourRapport = $sacevtEventTemplateTourRapport;
-        $this->sacevtEventTourInvoiceFileNamePattern = $sacevtEventTourInvoiceFileNamePattern;
-        $this->sacevtEventTourRapportFileNamePattern = $sacevtEventTourRapportFileNamePattern;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+        private readonly Connection $connection,
+        private readonly Util $util,
+        private readonly TranslatorInterface $translator,
+        private readonly Security $security,
+        private readonly EventRapport2Docx $eventRapport2Docx,
+        private readonly EventMember $eventMember,
+        private readonly string $sacevtEventTemplateTourInvoice,
+        private readonly string $sacevtEventTemplateTourRapport,
+        private readonly string $sacevtEventTourInvoiceFileNamePattern,
+        private readonly string $sacevtEventTourRapportFileNamePattern,
+    ) {
     }
 
     /**

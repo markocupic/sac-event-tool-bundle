@@ -26,7 +26,6 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Date;
@@ -56,21 +55,12 @@ use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\Security;
 
 class CalendarEvents
 {
-    private ContaoFramework $framework;
-    private RequestStack $requestStack;
-    private Connection $connection;
-    private Util $util;
-    private Security $security;
-    private PasswordHasherFactoryInterface $passwordHasherFactory;
-    private LoggerInterface|null $logger;
-
     // Adapters
     private Adapter $arrayUtil;
     private Adapter $backend;
@@ -89,16 +79,15 @@ class CalendarEvents
     private Adapter $system;
     private Adapter $userModel;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, Security $security, PasswordHasherFactoryInterface $passwordHasherFactory, LoggerInterface|null $logger)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->connection = $connection;
-        $this->util = $util;
-        $this->security = $security;
-        $this->passwordHasherFactory = $passwordHasherFactory;
-        $this->logger = $logger;
-
+    public function __construct(
+        private ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+        private readonly Connection $connection,
+        private readonly Util $util,
+        private readonly Security $security,
+        private readonly PasswordHasherFactoryInterface $passwordHasherFactory,
+        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+    ) {
         // Adapters
         $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);
         $this->backend = $this->framework->getAdapter(Backend::class);
@@ -1535,9 +1524,8 @@ class CalendarEvents
                         $objVersions->create();
 
                         // System log
-                        if (null !== $this->logger) {
-                            $this->logger->log(
-                                LogLevel::INFO,
+                        if (null !== $this->contaoGeneralLogger) {
+                            $this->contaoGeneralLogger->info(
                                 sprintf(
                                     'Event release level for event with ID %d ["%s"] pushed %s from "%s" to "%s".',
                                     $objEvent->id,
@@ -1546,7 +1534,6 @@ class CalendarEvents
                                     $titleCurrent,
                                     $titleNew,
                                 ),
-                                ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)],
                             );
                         }
 
@@ -1715,9 +1702,8 @@ class CalendarEvents
                         $objVersions->create();
 
                         // System log
-                        if (null !== $this->logger) {
-                            $this->logger->log(
-                                LogLevel::INFO,
+                        if (null !== $this->contaoGeneralLogger) {
+                            $this->contaoGeneralLogger->info(
                                 sprintf(
                                     'Event release level for event with ID %d ["%s"] pushed %s from "%s" to "%s".',
                                     $objEvent->id,
@@ -1726,7 +1712,6 @@ class CalendarEvents
                                     $titleCurrent,
                                     $titleNew,
                                 ),
-                                ['contao' => new ContaoContext(__METHOD__, ContaoContext::GENERAL)],
                             );
                         }
 

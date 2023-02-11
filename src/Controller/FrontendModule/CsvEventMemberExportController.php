@@ -39,16 +39,15 @@ use Symfony\Component\HttpFoundation\Response;
 class CsvEventMemberExportController extends AbstractFrontendModuleController
 {
     public const TYPE = 'csv_event_member_export';
-    private ContaoFramework $framework;
-    private Connection $connection;
+
     private string $strDelimiter = ';';
     private string $strEnclosure = '"';
     private array $arrLines = [];
 
-    public function __construct(ContaoFramework $framework, Connection $connection)
-    {
-        $this->framework = $framework;
-        $this->connection = $connection;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
+    ) {
     }
 
     /**

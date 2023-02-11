@@ -27,17 +27,12 @@ class Member
 {
     public const TABLE = 'tl_member';
 
-    private Connection $connection;
-    private Util $util;
-    private TranslatorInterface $translator;
-    private ClearFrontendUserData $clearFrontendUserData;
-
-    public function __construct(Connection $connection, Util $util, TranslatorInterface $translator, ClearFrontendUserData $clearFrontendUserData)
-    {
-        $this->connection = $connection;
-        $this->util = $util;
-        $this->translator = $translator;
-        $this->clearFrontendUserData = $clearFrontendUserData;
+    public function __construct(
+        private readonly Connection $connection,
+        private readonly Util $util,
+        private readonly TranslatorInterface $translator,
+        private readonly ClearFrontendUserData $clearFrontendUserData,
+    ) {
     }
 
     /**

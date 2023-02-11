@@ -51,7 +51,6 @@ use NotificationCenter\Model\Notification;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
@@ -60,20 +59,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CalendarEventsMember
 {
     public const TABLE = 'tl_calendar_events_member';
-
-    private ContaoFramework $framework;
-    private RequestStack $requestStack;
-    private Connection $connection;
-    private LoggerInterface|null $logger;
-    private Util $util;
-    private TranslatorInterface $translator;
-    private Security $security;
-    private ExportEventRegistrationList $registrationListExporterCsv;
-    private EventMemberList2Docx $registrationListExporterDocx;
-    private string $projectDir;
-    private string $sacevtEventAdminName;
-    private string $sacevtEventAdminEmail;
-    private string $sacevtLocale;
 
     // Adapters
     private Adapter $backend;
@@ -91,22 +76,21 @@ class CalendarEventsMember
     private Adapter $user;
     private Adapter $validator;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, Util $util, TranslatorInterface $translator, Security $security, ExportEventRegistrationList $registrationListExporterCsv, EventMemberList2Docx $registrationListExporterDocx, string $projectDir, string $sacevtEventAdminName, string $sacevtEventAdminEmail, string $sacevtLocale, LoggerInterface $logger = null)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->connection = $connection;
-        $this->util = $util;
-        $this->translator = $translator;
-        $this->security = $security;
-        $this->registrationListExporterCsv = $registrationListExporterCsv;
-        $this->registrationListExporterDocx = $registrationListExporterDocx;
-        $this->projectDir = $projectDir;
-        $this->sacevtEventAdminName = $sacevtEventAdminName;
-        $this->sacevtEventAdminEmail = $sacevtEventAdminEmail;
-        $this->sacevtLocale = $sacevtLocale;
-        $this->logger = $logger;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+        private readonly Connection $connection,
+        private readonly Util $util,
+        private readonly TranslatorInterface $translator,
+        private readonly Security $security,
+        private readonly ExportEventRegistrationList $registrationListExporterCsv,
+        private readonly EventMemberList2Docx $registrationListExporterDocx,
+        private readonly string $projectDir,
+        private readonly string $sacevtEventAdminName,
+        private readonly string $sacevtEventAdminEmail,
+        private readonly string $sacevtLocale,
+        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+    ) {
         // Adapters
         $this->backend = $this->framework->getAdapter(Backend::class);
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
@@ -551,16 +535,15 @@ class CalendarEventsMember
                     $sacMemberId = $registration->sacMemberId ?? '0';
 
                     if ($varValue) {
-                        $log = 'Participation for "%s %s [%s]" on "%s [%s]" has been set from "unconfirmed" to "confirmed".';
+                        $log = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "unconfirmed" to "confirmed".';
                         $context = Log::EVENT_PARTICIPATION_CONFIRM;
                     } else {
-                        $log = 'Participation for "%s %s [%s]" on "%s [%s]" has been set from "confirmed" to "unconfirmed".';
+                        $log = 'Participation state for "%s %s [%s]" on "%s [%s]" has been set from "confirmed" to "unconfirmed".';
                         $context = Log::EVENT_PARTICIPATION_UNCONFIRM;
                     }
 
                     // System log
-                    $this->logger?->log(
-                        LogLevel::INFO,
+                    $this->contaoGeneralLogger?->info(
                         sprintf($log, $registration->firstname, $registration->lastname, $sacMemberId, $event->title, $event->id),
                         ['contao' => new ContaoContext(__METHOD__, $context)],
                     );

@@ -30,22 +30,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DownloadController extends AbstractController
 {
-    private ContaoFramework $framework;
-    private RequestStack $requestStack;
-    private WorkshopBookletGenerator $workshopBookletGenerator;
-    private ExportEvents2Docx $exportEvents2Docx;
-    private LoggerInterface|null $contaoGeneralLogger;
-    private SendEventIcal $sendEventIcal;
-
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, WorkshopBookletGenerator $workshopBookletGenerator, ExportEvents2Docx $exportEvents2Docx, SendEventIcal $sendEventIcal, LoggerInterface|null $contaoGeneralLogger)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->workshopBookletGenerator = $workshopBookletGenerator;
-        $this->exportEvents2Docx = $exportEvents2Docx;
-        $this->sendEventIcal = $sendEventIcal;
-        $this->contaoGeneralLogger = $contaoGeneralLogger;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+        private readonly WorkshopBookletGenerator $workshopBookletGenerator,
+        private readonly ExportEvents2Docx $exportEvents2Docx,
+        private readonly SendEventIcal $sendEventIcal,
+        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+    ) {
         $this->framework->initialize();
     }
 

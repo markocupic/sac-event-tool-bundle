@@ -42,9 +42,6 @@ class JahresprogrammExportController extends AbstractPrintExportController
 {
     public const TYPE = 'jahresprogramm_export';
 
-    private ContaoFramework $framework;
-    private RequestStack $requestStack;
-
     private Template|null $template = null;
     private int|null $startDate = null;
     private int|null $endDate = null;
@@ -54,11 +51,10 @@ class JahresprogrammExportController extends AbstractPrintExportController
     private array|null $events = null;
     private array|null $instructors = null;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+    ) {
         parent::__construct($framework);
     }
 

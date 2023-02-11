@@ -23,11 +23,9 @@ use Contao\Widget;
 #[AsHook('addCustomRegexp', priority: 100)]
 class AddCustomRegexpListener
 {
-    private ContaoFramework $framework;
-
-    public function __construct(ContaoFramework $framework)
-    {
-        $this->framework = $framework;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+    ) {
     }
 
     public function __invoke(string $strRegexp, $varValue, Widget $objWidget): bool

@@ -32,23 +32,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class UpcomingEventsController extends AbstractController
 {
-    private ContaoFramework $framework;
-
-    private FeedFactory $feedFactory;
-
-    private Connection $connection;
-
-    private string $projectDir;
-
-    private string $sacevtLocale;
-
-    public function __construct(ContaoFramework $framework, FeedFactory $feedFactory, Connection $connection, string $projectDir, string $sacevtLocale)
-    {
-        $this->framework = $framework;
-        $this->feedFactory = $feedFactory;
-        $this->connection = $connection;
-        $this->projectDir = $projectDir;
-        $this->sacevtLocale = $sacevtLocale;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly FeedFactory $feedFactory,
+        private readonly Connection $connection,
+        private readonly string $projectDir,
+        private readonly string $sacevtLocale,
+    ) {
     }
 
     /**

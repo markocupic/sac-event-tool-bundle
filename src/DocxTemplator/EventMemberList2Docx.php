@@ -32,31 +32,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EventMemberList2Docx
 {
-    private ContaoFramework $framework;
-    private Event $eventHelper;
-    private EventMember $eventMemberHelper;
-    private ConvertFile $convertFile;
-    private string $sacevtTempDir;
-    private string $projectDir;
-    private string $sacevtEventTemplateMemberList;
-    private string $sacevtEventMemberListFileNamePattern;
-
     // Adapters
     private Adapter $calendarEventsMemberModelAdapter;
     private Adapter $controllerAdapter;
     private Adapter $messageAdapter;
 
-    public function __construct(ContaoFramework $framework, Event $eventHelper, EventMember $eventMemberHelper, ConvertFile $convertFile, string $sacevtTempDir, string $projectDir, string $sacevtEventTemplateMemberList, string $sacevtEventMemberListFileNamePattern)
-    {
-        $this->framework = $framework;
-        $this->eventHelper = $eventHelper;
-        $this->eventMemberHelper = $eventMemberHelper;
-        $this->convertFile = $convertFile;
-        $this->sacevtTempDir = $sacevtTempDir;
-        $this->projectDir = $projectDir;
-        $this->sacevtEventTemplateMemberList = $sacevtEventTemplateMemberList;
-        $this->sacevtEventMemberListFileNamePattern = $sacevtEventMemberListFileNamePattern;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Event $eventHelper,
+        private readonly EventMember $eventMemberHelper,
+        private readonly ConvertFile $convertFile,
+        private readonly string $sacevtTempDir,
+        private readonly string $projectDir,
+        private readonly string $sacevtEventTemplateMemberList,
+        private readonly string $sacevtEventMemberListFileNamePattern,
+    ) {
         // Adapters
         $this->calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->controllerAdapter = $this->framework->getAdapter(Controller::class);

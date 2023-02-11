@@ -26,13 +26,10 @@ use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 #[AsHook('changeEventReleaseLevel', priority: 100)]
 class ChangeEventReleaseLevelListener
 {
-    private ContaoFramework $framework;
-    private ContaoScope $contaoScope;
-
-    public function __construct(ContaoFramework $framework, ContaoScope $contaoScope)
-    {
-        $this->framework = $framework;
-        $this->contaoScope = $contaoScope;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly ContaoScope $contaoScope,
+    ) {
     }
 
     /**

@@ -21,11 +21,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class BackendAssetsSubscriber implements EventSubscriberInterface
 {
-    protected ScopeMatcher $scopeMatcher;
-
-    public function __construct(ScopeMatcher $scopeMatcher)
-    {
-        $this->scopeMatcher = $scopeMatcher;
+    public function __construct(
+        private readonly ScopeMatcher $scopeMatcher,
+    ) {
     }
 
     public static function getSubscribedEvents()

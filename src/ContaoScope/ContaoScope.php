@@ -21,16 +21,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContaoScope
 {
-    private ContaoFramework $framework;
-    private RequestStack $requestStack;
-    private ScopeMatcher $scopeMatcher;
     private string $contaoScope = '';
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, ScopeMatcher $scopeMatcher)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->scopeMatcher = $scopeMatcher;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+        private readonly ScopeMatcher $scopeMatcher,
+    ) {
     }
 
     /**

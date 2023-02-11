@@ -26,13 +26,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class PreviewUrlConvertListener
 {
-    private RequestStack $requestStack;
-    private ContaoFramework $framework;
-
-    public function __construct(RequestStack $requestStack, ContaoFramework $framework)
-    {
-        $this->requestStack = $requestStack;
-        $this->framework = $framework;
+    public function __construct(
+        private readonly RequestStack $requestStack,
+        private readonly ContaoFramework $framework,
+    ) {
     }
 
     public function onPreviewUrlConvert(PreviewUrlConvertEvent $event): void

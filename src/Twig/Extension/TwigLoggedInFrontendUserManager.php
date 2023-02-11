@@ -23,13 +23,10 @@ use Twig\TwigFunction;
 
 class TwigLoggedInFrontendUserManager extends AbstractExtension
 {
-    private ContaoFramework $framework;
-    private Security $security;
-
-    public function __construct(ContaoFramework $framework, Security $security)
-    {
-        $this->framework = $framework;
-        $this->security = $security;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Security $security,
+    ) {
     }
 
     public function getFunctions(): array

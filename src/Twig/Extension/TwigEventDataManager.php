@@ -22,11 +22,9 @@ use Twig\TwigFunction;
 
 class TwigEventDataManager extends AbstractExtension
 {
-    private ContaoFramework $framework;
-
-    public function __construct(ContaoFramework $framework)
-    {
-        $this->framework = $framework;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+    ) {
     }
 
     public function getFunctions(): array

@@ -26,25 +26,10 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 
 class EventMember
 {
-    /**
-     * @var ContaoFramework
-     */
-    private $framework;
-
-    /**
-     * @var string
-     */
-    private $projectDir;
-
-    /**
-     * EventMember constructor.
-     */
-    public function __construct(ContaoFramework $framework, string $projectDir)
-    {
-        $this->framework = $framework;
-        $this->projectDir = $projectDir;
-
-        // Initialize contao framework
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly string $projectDir,
+    ) {
         $this->framework->initialize();
     }
 

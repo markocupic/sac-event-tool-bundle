@@ -19,11 +19,9 @@ use Doctrine\DBAL\Connection;
 
 class EventOrganizer
 {
-    private Connection $connection;
-
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private readonly Connection $connection,
+    ) {
     }
 
     #[AsCallback(table: 'tl_event_organizer', target: 'fields.belongsToOrganization.options', priority: 100)]

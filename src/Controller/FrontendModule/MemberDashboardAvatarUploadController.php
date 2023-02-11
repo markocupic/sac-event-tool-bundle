@@ -43,23 +43,17 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
 {
     public const TYPE = 'member_dashboard_avatar_upload';
 
-    private ContaoFramework $framework;
-    private Security $security;
-    private RotateImage $rotateImage;
-    private Avatar $avatar;
-    private string $projectDir;
-    private string $sacevtUserFrontendAvatarDir;
     private FrontendUser|null $user;
     private Template|null $template;
 
-    public function __construct(ContaoFramework $framework, Security $security, RotateImage $rotateImage, Avatar $avatar, string $projectDir, string $sacevtUserFrontendAvatarDir)
-    {
-        $this->framework = $framework;
-        $this->security = $security;
-        $this->rotateImage = $rotateImage;
-        $this->avatar = $avatar;
-        $this->projectDir = $projectDir;
-        $this->sacevtUserFrontendAvatarDir = $sacevtUserFrontendAvatarDir;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Security $security,
+        private readonly RotateImage $rotateImage,
+        private readonly Avatar $avatar,
+        private readonly string $projectDir,
+        private readonly string $sacevtUserFrontendAvatarDir,
+    ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response

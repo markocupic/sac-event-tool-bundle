@@ -31,18 +31,14 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 
 class SendEventIcal
 {
-    private ContaoFramework $framework;
-    private InsertTagParser $insertTagParser;
-
     // Adapters
     private Adapter $environment;
     private Adapter $events;
 
-    public function __construct(ContaoFramework $framework, InsertTagParser $insertTagParser)
-    {
-        $this->framework = $framework;
-        $this->insertTagParser = $insertTagParser;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly InsertTagParser $insertTagParser,
+    ) {
         // Adapters
         $this->environment = $this->framework->getAdapter(Environment::class);
         $this->events = $this->framework->getAdapter(Events::class);

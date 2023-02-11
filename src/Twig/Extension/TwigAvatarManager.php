@@ -22,11 +22,9 @@ use Twig\TwigFunction;
 
 class TwigAvatarManager extends AbstractExtension
 {
-    private Avatar $avatar;
-
-    public function __construct(Avatar $avatar)
-    {
-        $this->avatar = $avatar;
+    public function __construct(
+        private readonly Avatar $avatar,
+    ) {
     }
 
     public function getFunctions(): array

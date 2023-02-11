@@ -30,13 +30,12 @@ class MemberDashboardProfileController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_profile';
 
-    private Security $security;
     private FrontendUser|null $objUser = null;
     private Template|null $template = null;
 
-    public function __construct(Security $security)
-    {
-        $this->security = $security;
+    public function __construct(
+        private readonly Security $security,
+    ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response

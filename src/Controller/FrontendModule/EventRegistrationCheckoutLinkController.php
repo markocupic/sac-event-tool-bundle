@@ -32,15 +32,13 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
 {
     public const TYPE = 'event_registration_checkout_link';
 
-    private ContaoFramework $framework;
-    private ScopeMatcher $scopeMatcher;
     private PageModel|null $objJumpTo = null;
     private CalendarEventsModel|null $objEvent = null;
 
-    public function __construct(ContaoFramework $framework, ScopeMatcher $scopeMatcher)
-    {
-        $this->framework = $framework;
-        $this->scopeMatcher = $scopeMatcher;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly ScopeMatcher $scopeMatcher,
+    ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response

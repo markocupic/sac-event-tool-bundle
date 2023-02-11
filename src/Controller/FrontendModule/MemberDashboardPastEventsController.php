@@ -45,25 +45,18 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
 {
     public const TYPE = 'member_dashboard_past_events';
 
-    private ContaoFramework $framework;
-    private Security $security;
-    private ConvertFile $convertFile;
-    private string $projectDir;
-    private string $sacevtTempDir;
-    private string $sacevtEventTemplateCourseConfirmation;
-    private string $sacevtEventCourseConfirmationFileNamePattern;
     private FrontendUser|null $objUser;
     private Template|null $template;
 
-    public function __construct(ContaoFramework $framework, Security $security, ConvertFile $convertFile, string $projectDir, string $sacevtTempDir, string $sacevtEventTemplateCourseConfirmation, string $sacevtEventCourseConfirmationFileNamePattern)
-    {
-        $this->framework = $framework;
-        $this->security = $security;
-        $this->convertFile = $convertFile;
-        $this->projectDir = $projectDir;
-        $this->sacevtTempDir = $sacevtTempDir;
-        $this->sacevtEventTemplateCourseConfirmation = $sacevtEventTemplateCourseConfirmation;
-        $this->sacevtEventCourseConfirmationFileNamePattern = $sacevtEventCourseConfirmationFileNamePattern;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Security $security,
+        private readonly ConvertFile $convertFile,
+        private readonly string $projectDir,
+        private readonly string $sacevtTempDir,
+        private readonly string $sacevtEventTemplateCourseConfirmation,
+        private readonly string $sacevtEventCourseConfirmationFileNamePattern,
+    ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
@@ -232,6 +225,8 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                 throw new \Exception('There was an error while trying to generate the course confirmation.');
             }
         }
+
+        throw new \LogicException('There was an error while trying to generate the course confirmation.');
     }
 
     /**

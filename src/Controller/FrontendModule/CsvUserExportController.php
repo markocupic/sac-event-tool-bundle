@@ -48,23 +48,15 @@ class CsvUserExportController extends AbstractFrontendModuleController
     private const FIELD_DELIMITER = ';';
     private const FIELD_ENCLOSURE = '"';
 
-    private ContaoFramework $framework;
-    private RequestStack $requestStack;
-    private Connection $connection;
-    private TranslatorInterface $translator;
-    private BinaryFileDownload $binaryFileDownload;
-    private string $sacevtTempDir;
-    private string $projectDir;
-
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, BinaryFileDownload $binaryFileDownload, string $sacevtTempDir, string $projectDir)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->connection = $connection;
-        $this->translator = $translator;
-        $this->binaryFileDownload = $binaryFileDownload;
-        $this->sacevtTempDir = $sacevtTempDir;
-        $this->projectDir = $projectDir;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+        private readonly Connection $connection,
+        private readonly TranslatorInterface $translator,
+        private readonly BinaryFileDownload $binaryFileDownload,
+        private readonly string $sacevtTempDir,
+        private readonly string $projectDir,
+    ) {
     }
 
     /**

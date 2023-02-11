@@ -23,13 +23,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserRole
 {
-    private Connection $connection;
-    private TranslatorInterface $translator;
-
-    public function __construct(Connection $connection, TranslatorInterface $translator)
-    {
-        $this->connection = $connection;
-        $this->translator = $translator;
+    public function __construct(
+        private readonly Connection $connection,
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     /**

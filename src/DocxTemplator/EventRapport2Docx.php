@@ -35,22 +35,14 @@ class EventRapport2Docx
     public const OUTPUT_TYPE_PDF = 'pdf';
     public const OUTPUT_TYPE_DOCX = 'docx';
 
-    private ContaoFramework $framework;
-    private ConvertFile $convertFile;
-    private Event $docxEventHelper;
-    private EventMember $docxEventMemberHelper;
-    private string $projectDir;
-    private string $sacevtTempDir;
-
-    public function __construct(ContaoFramework $framework, ConvertFile $convertFile, Event $docxEventHelper, EventMember $docxEventMemberHelper, string $projectDir, string $sacevtTempDir)
-    {
-        $this->framework = $framework;
-        $this->convertFile = $convertFile;
-        $this->docxEventHelper = $docxEventHelper;
-        $this->docxEventMemberHelper = $docxEventMemberHelper;
-        $this->projectDir = $projectDir;
-        $this->sacevtTempDir = $sacevtTempDir;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly ConvertFile $convertFile,
+        private readonly Event $docxEventHelper,
+        private readonly EventMember $docxEventMemberHelper,
+        private readonly string $projectDir,
+        private readonly string $sacevtTempDir,
+    ) {
         $this->framework->initialize();
     }
 

@@ -28,20 +28,15 @@ use Symfony\Component\Security\Core\Security;
 
 class CalendarContainer
 {
-    private RequestStack $requestStack;
-    private Connection $connection;
-    private Util $util;
-    private Security $security;
-
     /**
      * Import the back end user object.
      */
-    public function __construct(RequestStack $requestStack, Connection $connection, Util $util, Security $security)
-    {
-        $this->requestStack = $requestStack;
-        $this->connection = $connection;
-        $this->util = $util;
-        $this->security = $security;
+    public function __construct(
+        private readonly RequestStack $requestStack,
+        private readonly Connection $connection,
+        private readonly Util $util,
+        private readonly Security $security,
+    ) {
     }
 
     #[AsCallback(table: 'tl_calendar_container', target: 'config.onload')]

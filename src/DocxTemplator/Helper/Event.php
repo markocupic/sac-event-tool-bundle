@@ -34,14 +34,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Event
 {
-    private ContaoFramework $framework;
-    private TranslatorInterface $translator;
-
-    public function __construct(ContaoFramework $framework, TranslatorInterface $translator)
-    {
-        $this->framework = $framework;
-        $this->translator = $translator;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly TranslatorInterface $translator,
+    ) {
         // Initialize contao framework
         $this->framework->initialize();
     }

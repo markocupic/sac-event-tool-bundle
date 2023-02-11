@@ -21,15 +21,11 @@ use Psr\Log\LoggerInterface;
 
 class MaintainBackendUser
 {
-    private Connection $connection;
-    private MaintainBackendUserPermissions $maintainBackendUserPermissions;
-    private LoggerInterface|null $contaoGeneralLogger;
-
-    public function __construct(Connection $connection, MaintainBackendUserPermissions $maintainBackendUserPermissions, LoggerInterface|null $contaoGeneralLogger = null)
-    {
-        $this->connection = $connection;
-        $this->maintainBackendUserPermissions = $maintainBackendUserPermissions;
-        $this->contaoGeneralLogger = $contaoGeneralLogger;
+    public function __construct(
+        private readonly Connection $connection,
+        private readonly MaintainBackendUserPermissions $maintainBackendUserPermissions,
+        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+    ) {
     }
 
     /**

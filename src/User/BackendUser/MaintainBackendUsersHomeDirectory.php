@@ -26,18 +26,12 @@ use Psr\Log\LoggerInterface;
 
 class MaintainBackendUsersHomeDirectory
 {
-    private ContaoFramework $framework;
-    private string $projectDir;
-    private string $sacevtUserBackendHomeDir;
-    private LoggerInterface|null $contaoGeneralLogger;
-
-    public function __construct(ContaoFramework $framework, string $projectDir, string $sacevtUserBackendHomeDir, LoggerInterface $contaoGeneralLogger = null)
-    {
-        $this->framework = $framework;
-        $this->projectDir = $projectDir;
-        $this->sacevtUserBackendHomeDir = $sacevtUserBackendHomeDir;
-        $this->contaoGeneralLogger = $contaoGeneralLogger;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly string $projectDir,
+        private readonly string $sacevtUserBackendHomeDir,
+        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+    ) {
         // Initialize contao framework
         $this->framework->initialize();
     }

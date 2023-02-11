@@ -43,10 +43,6 @@ class PilatusExport2021Controller extends AbstractPrintExportController
 {
     public const TYPE = 'pilatus_export_2021';
 
-    private ContaoFramework $framework;
-    private Connection $connection;
-    private InsertTagParser $insertTagParser;
-
     private ModuleModel|null $model;
     private Form|null $objForm = null;
     private int|null $startDate = null;
@@ -63,12 +59,11 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     // Editable tour fields.
     private array $tourFeEditableFields = ['teaser', 'tourDetailText', 'requirements', 'equipment', 'leistungen', 'bookingEvent', 'meetingPoint', 'miscellaneous'];
 
-    public function __construct(ContaoFramework $framework, Connection $connection, InsertTagParser $insertTagParser)
-    {
-        $this->framework = $framework;
-        $this->connection = $connection;
-        $this->insertTagParser = $insertTagParser;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
+        private readonly InsertTagParser $insertTagParser,
+    ) {
         parent::__construct($this->framework);
     }
 

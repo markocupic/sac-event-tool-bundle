@@ -22,11 +22,9 @@ use Contao\PageModel;
 #[AsHook('replaceInsertTags', priority: 100)]
 class ReplaceInsertTagsListener
 {
-    private ContaoFramework $framework;
-
-    public function __construct(ContaoFramework $framework)
-    {
-        $this->framework = $framework;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+    ) {
     }
 
     public function __invoke(string $strTag): bool|string

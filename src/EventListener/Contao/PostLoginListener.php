@@ -28,13 +28,10 @@ use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirec
 #[AsHook('postLogin', priority: 100)]
 class PostLoginListener
 {
-    private ContaoFramework $framework;
-    private MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory;
-
-    public function __construct(ContaoFramework $framework, MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory)
-    {
-        $this->framework = $framework;
-        $this->maintainBackendUsersHomeDirectory = $maintainBackendUsersHomeDirectory;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory,
+    ) {
     }
 
     public function __invoke(User $user): void

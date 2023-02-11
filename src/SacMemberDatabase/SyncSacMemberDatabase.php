@@ -34,27 +34,19 @@ class SyncSacMemberDatabase
     public const FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
     public const FTP_DB_DUMP_FIELD_DELIMITER = '$';
 
-    private ContaoFramework $framework;
-    private Connection $connection;
-    private PasswordHasherFactory $passwordHasherFactory;
-    private array $sacevtMemberSyncCredentials;
-    private string $projectDir;
-    private string $sacevtLocale;
-    private LoggerInterface|null $logger;
-
     private string|null $ftp_hostname = null;
     private string|null $ftp_username = null;
     private string|null $ftp_password = null;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, PasswordHasherFactory $passwordHasherFactory, array $sacevtMemberSyncCredentials, string $projectDir, string $sacevtLocale, LoggerInterface $logger = null)
-    {
-        $this->framework = $framework;
-        $this->connection = $connection;
-        $this->passwordHasherFactory = $passwordHasherFactory;
-        $this->sacevtMemberSyncCredentials = $sacevtMemberSyncCredentials;
-        $this->projectDir = $projectDir;
-        $this->sacevtLocale = $sacevtLocale;
-        $this->logger = $logger;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
+        private readonly PasswordHasherFactory $passwordHasherFactory,
+        private readonly array $sacevtMemberSyncCredentials,
+        private readonly string $projectDir,
+        private readonly string $sacevtLocale,
+        private readonly LoggerInterface|null $logger = null,
+    ) {
     }
 
     /**
@@ -401,12 +393,10 @@ class SyncSacMemberDatabase
 
     private function log(string $strLogLevel, string $strText, string $strMethod, string $strCategory): void
     {
-        if (null !== $this->logger) {
-            $this->logger->log(
-                $strLogLevel,
-                $strText,
-                ['contao' => new ContaoContext($strMethod, $strCategory)]
-            );
-        }
+        $this->logger?->log(
+            $strLogLevel,
+            $strText,
+            ['contao' => new ContaoContext($strMethod, $strCategory)]
+        );
     }
 }

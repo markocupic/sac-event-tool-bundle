@@ -26,13 +26,10 @@ use Twig\TwigFunction;
 
 class TwigSchemaOrgDataManager extends AbstractExtension
 {
-    private ContaoFramework $framework;
-    private RequestStack $requestStack;
-
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+    ) {
     }
 
     public function getFunctions(): array

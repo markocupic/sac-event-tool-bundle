@@ -30,15 +30,11 @@ use Symfony\Component\HttpKernel\KernelInterface;
 #[AsHook('getPageLayout', priority: 100)]
 class GetPageLayoutListener
 {
-    private ContaoFramework $framework;
-    private KernelInterface $kernel;
-    private string $projectDir;
-
-    public function __construct(ContaoFramework $framework, KernelInterface $kernel, string $projectDir)
-    {
-        $this->framework = $framework;
-        $this->kernel = $kernel;
-        $this->projectDir = $projectDir;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly KernelInterface $kernel,
+        private readonly string $projectDir,
+    ) {
     }
 
     public function __invoke(PageModel $objPage, LayoutModel $objLayout, PageRegular $objPty): void

@@ -22,15 +22,11 @@ use Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser;
 #[AsCronJob('hourly')]
 class SacMemberDatabaseSyncCron
 {
-    private ContaoFramework $framework;
-    private SyncSacMemberDatabase $syncSacMemberDatabase;
-    private SyncMemberWithUser $syncMemberWithUser;
-
-    public function __construct(ContaoFramework $framework, SyncSacMemberDatabase $syncSacMemberDatabase, SyncMemberWithUser $syncMemberWithUser)
-    {
-        $this->framework = $framework;
-        $this->syncSacMemberDatabase = $syncSacMemberDatabase;
-        $this->syncMemberWithUser = $syncMemberWithUser;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly SyncSacMemberDatabase $syncSacMemberDatabase,
+        private readonly SyncMemberWithUser $syncMemberWithUser,
+    ) {
     }
 
     /**

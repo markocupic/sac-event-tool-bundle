@@ -22,11 +22,9 @@ use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
 
 class EventFilterForm
 {
-    private Connection $connection;
-
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private readonly Connection $connection,
+    ) {
     }
 
     #[AsCallback(table: 'tl_event_filter_form', target: 'fields.courseType.options', priority: 100)]

@@ -38,19 +38,13 @@ class UserPortraitListController extends AbstractContentElementController
 {
     public const TYPE = 'user_portrait_list';
 
-    private ContaoFramework $framework;
-    private Connection $connection;
-    private Security $security;
-    private Avatar $avatar;
-    private string $projectDir;
-
-    public function __construct(ContaoFramework $framework, Connection $connection, Security $security, Avatar $avatar, string $projectDir)
-    {
-        $this->framework = $framework;
-        $this->connection = $connection;
-        $this->security = $security;
-        $this->avatar = $avatar;
-        $this->projectDir = $projectDir;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
+        private readonly Security $security,
+        private readonly Avatar $avatar,
+        private readonly string $projectDir,
+    ) {
     }
 
     public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response

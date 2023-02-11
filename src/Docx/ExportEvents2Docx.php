@@ -37,18 +37,15 @@ use Symfony\Component\HttpFoundation\Response;
 class ExportEvents2Docx
 {
     private const TEMP_PATH = 'system/tmp';
-    private ContaoFramework $framework;
-    private BinaryFileDownload $binaryFileDownload;
-    private string $projectDir;
+
     private string|null $strTable;
     private array|null $arrDatarecord;
 
-    public function __construct(ContaoFramework $framework, BinaryFileDownload $binaryFileDownload, string $projectDir)
-    {
-        $this->framework = $framework;
-        $this->binaryFileDownload = $binaryFileDownload;
-        $this->projectDir = $projectDir;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly BinaryFileDownload $binaryFileDownload,
+        private readonly string $projectDir,
+    ) {
         $this->framework->initialize(true);
     }
 

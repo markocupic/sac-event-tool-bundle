@@ -44,19 +44,15 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 {
     public const TYPE = 'member_dashboard_upcoming_events';
 
-    private ContaoFramework $framework;
-    private Security $security;
-    private string $sacevtLocale;
     private FrontendUser|null $user = null;
     private Template|null $template = null;
-    private LoggerInterface|null $contaoGeneralLogger;
 
-    public function __construct(ContaoFramework $framework, Security $security, string $sacevtLocale, LoggerInterface $contaoGeneralLogger = null)
-    {
-        $this->framework = $framework;
-        $this->security = $security;
-        $this->sacevtLocale = $sacevtLocale;
-        $this->contaoGeneralLogger = $contaoGeneralLogger;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Security $security,
+        private readonly string $sacevtLocale,
+        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+    ) {
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
@@ -154,17 +150,15 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                 if (EventSubscriptionLevel::SUBSCRIPTION_REJECTED === $objEventsMember->stateOfSubscription) {
                     $objEventsMember->delete();
 
-                    if ($this->contaoGeneralLogger) {
-                        $this->contaoGeneralLogger->info(
-                            sprintf(
-                                'User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")',
-                                $objEventsMember->sacMemberId,
-                                $objEventsMember->eventId,
-                                $objEventsMember->eventName
-                            ),
-                            ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)]
-                        );
-                    }
+                    $this->contaoGeneralLogger?->info(
+                        sprintf(
+                            'User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")',
+                            $objEventsMember->sacMemberId,
+                            $objEventsMember->eventId,
+                            $objEventsMember->eventName
+                        ),
+                        ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)]
+                    );
 
                     return;
                 }
@@ -230,17 +224,15 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
                     $messageAdapter->addInfo('Du hast dich vom Event "'.$objEventsMember->eventName.'" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.');
 
-                    if ($this->contaoGeneralLogger) {
-                        $this->contaoGeneralLogger->info(
-                            sprintf(
-                                'User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")',
-                                $objEventsMember->sacMemberId,
-                                $objEventsMember->eventId,
-                                $objEventsMember->eventName
-                            ),
-                            ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)]
-                        );
-                    }
+                    $this->contaoGeneralLogger?->info(
+                        sprintf(
+                            'User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")',
+                            $objEventsMember->sacMemberId,
+                            $objEventsMember->eventId,
+                            $objEventsMember->eventName
+                        ),
+                        ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)]
+                    );
 
                     $objNotification->send($arrTokens, $this->sacevtLocale);
                 }

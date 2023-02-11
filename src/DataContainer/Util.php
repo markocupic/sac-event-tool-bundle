@@ -21,13 +21,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class Util
 {
-    private RequestStack $requestStack;
-    private Connection $connection;
-
-    public function __construct(RequestStack $requestStack, Connection $connection)
-    {
-        $this->requestStack = $requestStack;
-        $this->connection = $connection;
+    public function __construct(
+        private readonly RequestStack $requestStack,
+        private readonly Connection $connection,
+    ) {
     }
 
     /**

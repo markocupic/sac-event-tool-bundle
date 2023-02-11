@@ -30,23 +30,15 @@ class User
 {
     public const TABLE = 'tl_user';
 
-    private ContaoFramework $framework;
-    private Util $util;
-    private RequestStack $requestStack;
-    private Connection $connection;
-    private TranslatorInterface $translator;
-    private Countries $countries;
-    private MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory;
-
-    public function __construct(ContaoFramework $framework, Util $util, RequestStack $requestStack, Connection $connection, TranslatorInterface $translator, Countries $countries, MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory)
-    {
-        $this->framework = $framework;
-        $this->util = $util;
-        $this->requestStack = $requestStack;
-        $this->connection = $connection;
-        $this->translator = $translator;
-        $this->countries = $countries;
-        $this->maintainBackendUsersHomeDirectory = $maintainBackendUsersHomeDirectory;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Util $util,
+        private readonly RequestStack $requestStack,
+        private readonly Connection $connection,
+        private readonly TranslatorInterface $translator,
+        private readonly Countries $countries,
+        private readonly MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory,
+    ) {
     }
 
     /**

@@ -18,11 +18,9 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 
 class Calendar
 {
-    private Util $util;
-
-    public function __construct(Util $util)
-    {
-        $this->util = $util;
+    public function __construct(
+        private readonly Util $util,
+    ) {
     }
 
     /**

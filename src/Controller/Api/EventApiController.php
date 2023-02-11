@@ -33,19 +33,15 @@ class EventApiController extends AbstractController
 {
     public const CACHE_MAX_AGE = 300;
 
-    private ContaoFramework $framework;
-    private RequestStack $requestStack;
-    private Connection $connection;
-
     /**
      * EventApiController constructor.
      * Get event data as json object.
      */
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Connection $connection)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->connection = $connection;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+        private readonly Connection $connection,
+    ) {
     }
 
     /**

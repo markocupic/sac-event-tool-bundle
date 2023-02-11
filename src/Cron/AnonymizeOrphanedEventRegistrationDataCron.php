@@ -21,13 +21,10 @@ use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 #[AsCronJob('daily')]
 class AnonymizeOrphanedEventRegistrationDataCron
 {
-    private ContaoFramework $framework;
-    private ClearFrontendUserData $clearFrontendUserData;
-
-    public function __construct(ContaoFramework $framework, ClearFrontendUserData $clearFrontendUserData)
-    {
-        $this->framework = $framework;
-        $this->clearFrontendUserData = $clearFrontendUserData;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly ClearFrontendUserData $clearFrontendUserData,
+    ) {
     }
 
     /**

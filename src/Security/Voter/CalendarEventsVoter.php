@@ -31,8 +31,6 @@ class CalendarEventsVoter extends Voter
     public const CAN_UPGRADE_EVENT_RELEASE_LEVEL = 'sacevt_can_upgrade_event_release_level';
     public const CAN_DOWNGRADE_EVENT_RELEASE_LEVEL = 'sacevt_can_downgrade_event_release_level';
 
-    private ContaoFramework $framework;
-
     // Adapters
     private Adapter $calendarEvent;
     private Adapter $calendarEventsHelper;
@@ -42,10 +40,9 @@ class CalendarEventsVoter extends Voter
     private CalendarEventsModel|null $event = null;
     private BackendUser|null $user = null;
 
-    public function __construct(ContaoFramework $framework)
-    {
-        $this->framework = $framework;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+    ) {
         // Adapters
         $this->calendarEvent = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);

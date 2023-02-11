@@ -28,11 +28,10 @@ use Symfony\Component\HttpFoundation\Response;
 class TourDifficultyListController extends AbstractFrontendModuleController
 {
     public const TYPE = 'tour_difficulty_list';
-    private ContaoFramework $framework;
 
-    public function __construct(ContaoFramework $framework)
-    {
-        $this->framework = $framework;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+    ) {
     }
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null

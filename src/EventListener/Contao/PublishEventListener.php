@@ -28,13 +28,10 @@ use Markocupic\SacEventToolBundle\ContaoScope\ContaoScope;
 #[AsHook('publishEvent', priority: 100)]
 class PublishEventListener
 {
-    private ContaoFramework $framework;
-    private ContaoScope $contaoScope;
-
-    public function __construct(ContaoFramework $framework, ContaoScope $contaoScope)
-    {
-        $this->framework = $framework;
-        $this->contaoScope = $contaoScope;
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly ContaoScope $contaoScope,
+    ) {
     }
 
     /**

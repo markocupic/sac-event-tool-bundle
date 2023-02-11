@@ -69,15 +69,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
     public const CHECKOUT_STEP_REGISTER = 'register';
     public const CHECKOUT_STEP_CONFIRM = 'confirm';
 
-    private ContaoFramework $framework;
-    private RequestStack $requestStack;
-    private Security $security;
-    private EventDispatcherInterface $eventDispatcher;
-    private TwigEnvironment $twig;
-    private TranslatorInterface $translator;
-    private string $projectDir;
-    private LoggerInterface|null $contaoGeneralLogger;
-
     // Adapters
     private Adapter $calendarEventsHelperAdapter;
     private Adapter $calendarEventsJourneyModelAdapter;
@@ -104,17 +95,16 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private Form|null $objForm = null;
     private Template|null $template = null;
 
-    public function __construct(ContaoFramework $framework, RequestStack $requestStack, Security $security, EventDispatcherInterface $eventDispatcher, TwigEnvironment $twig, TranslatorInterface $translator, string $projectDir, LoggerInterface $contaoGeneralLogger = null)
-    {
-        $this->framework = $framework;
-        $this->requestStack = $requestStack;
-        $this->security = $security;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->twig = $twig;
-        $this->translator = $translator;
-        $this->projectDir = $projectDir;
-        $this->contaoGeneralLogger = $contaoGeneralLogger;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
+        private readonly Security $security,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly TwigEnvironment $twig,
+        private readonly TranslatorInterface $translator,
+        private readonly string $projectDir,
+        private readonly LoggerInterface|null $contaoGeneralLogger = null,
+    ) {
         // Adapters
         $this->calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);

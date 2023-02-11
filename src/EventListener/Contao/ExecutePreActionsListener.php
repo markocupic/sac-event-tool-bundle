@@ -35,10 +35,6 @@ use function Safe\json_encode;
 #[AsHook('executePreActions', priority: 100)]
 class ExecutePreActionsListener
 {
-    private ContaoFramework $framework;
-    private Connection $connection;
-    private RequestStack $requestStack;
-
     // Adapters
     private Adapter $backendUserAdapter;
     private Adapter $configAdapter;
@@ -47,12 +43,11 @@ class ExecutePreActionsListener
     private Adapter $stringUtilAdapter;
     private Adapter $validatorAdapter;
 
-    public function __construct(ContaoFramework $framework, Connection $connection, RequestStack $requestStack)
-    {
-        $this->framework = $framework;
-        $this->connection = $connection;
-        $this->requestStack = $requestStack;
-
+    public function __construct(
+        private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
+        private readonly RequestStack $requestStack,
+    ) {
         // Adapters
         $this->backendUserAdapter = $this->framework->getAdapter(BackendUser::class);
         $this->configAdapter = $this->framework->getAdapter(Config::class);
