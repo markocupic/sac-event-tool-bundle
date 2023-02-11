@@ -91,6 +91,7 @@ table#ctrl_eventDates thead tr:first-child {
 div.legend-box {
 	display: flex;
 	flex-direction: row;
+	flex-wrap: wrap;
 }
 
 div.legend-box > div {
@@ -144,6 +145,7 @@ div.legend-box li {
 	line-height: 1.4;
 	min-height: 37px;
 }
+
 /**
 .tl_content_right .invoice img{
 	width: 16px !important;
