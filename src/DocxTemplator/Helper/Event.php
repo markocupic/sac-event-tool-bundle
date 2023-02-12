@@ -17,19 +17,19 @@ namespace Markocupic\SacEventToolBundle\DocxTemplator\Helper;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Database;
 use Contao\Date;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
-use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Event
@@ -37,22 +37,32 @@ class Event
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly TranslatorInterface $translator,
+        private readonly Connection $connection,
     ) {
-        // Initialize contao framework
-        $this->framework->initialize();
     }
 
+    public function bold($string)
+    {
+        $string = str_replace('&lt;B&gt;', '</w:t></w:r><w:r><w:rPr><w:b/></w:rPr><w:t xml:space="preserve"> ', $string);
+
+        return str_replace('&lt;/B&gt;', '</w:t></w:r><w:r><w:t xml:space="preserve">', $string);
+    }
+
+    /**
+     * @throws Exception
+     */
     public function setEventData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent): void
     {
         // Set adapters
         /** @var Controller $controllerAdapter */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
+
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
-        /** @var EventOrganizerModel $eventOrganizerModelAdapter */
-        $eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
+
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
 
@@ -85,15 +95,24 @@ class Event
         $strTourProfile = implode("\r\n", $arrTourProfile);
         $strTourProfile = str_replace('Tag: ', 'Tag:'."\r\n", $strTourProfile);
 
-        // emergencyConcept
+        // Get emergencyConcept data
         $arrEmergencyConcept = [];
-        $arrOrganizers = $stringUtilAdapter->deserialize($objEvent->organizers, true);
+        $organizers = $stringUtilAdapter->deserialize($objEvent->organizers, true);
 
-        foreach ($arrOrganizers as $organizer) {
-            $objOrganizer = $eventOrganizerModelAdapter->findByPk($organizer);
-            $arrEmergencyConcept[] = $objOrganizer->title.":\r\n".$objOrganizer->emergencyConcept;
+        if (!empty($organizers)) {
+            $arrOrganizers = $this->connection->fetchAllAssociative('SELECT id,title,emergencyConcept FROM tl_event_organizer WHERE id IN ('.implode(',', array_map('\intval', $organizers)).') ORDER BY emergencyConcept, title');
+
+            foreach ($arrOrganizers as $i => $arrOrganizer) {
+                // Do not print duplicate content
+                if (isset($arrOrganizers[$i + 1]) && $arrOrganizers[$i + 1]['emergencyConcept'] === $arrOrganizer['emergencyConcept']) {
+                    $arrEmergencyConcept[] = '<B>'.$arrOrganizer['title'].'</B>'.":\r\n";
+                } else {
+                    $arrEmergencyConcept[] = '<B>'.$arrOrganizer['title'].'</B>'.":\r\n".$arrOrganizer['emergencyConcept']."\r\n\r\n";
+                }
+            }
         }
-        $strEmergencyConcept = implode("\r\n\r\n", $arrEmergencyConcept);
+
+        $strEmergencyConcept = rtrim(implode('', $arrEmergencyConcept));
 
         $objPhpWord->replace('eventDates', $this->prepareString($strEventDuration));
         $objPhpWord->replace('eventMeetingpoint', $this->prepareString($objEvent->meetingPoint));
@@ -112,9 +131,6 @@ class Event
 
         /** @var System $systemAdapter */
         $systemAdapter = $this->framework->getAdapter(System::class);
-
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
 
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
@@ -207,9 +223,9 @@ class Event
         $carTaxes = 0;
 
         if ($objEventInvoice->countCars > 0 && $objEventInvoice->carTaxesKm > 0) {
-            $objEventMember = $databaseAdapter->getInstance()->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId=? AND hasParticipated=?')->execute($objEvent->id, '1');
+            $resEventMember = $this->connection->fetchOne('SELECT * FROM tl_calendar_events_member WHERE eventId = ? AND hasParticipated = ?', [$objEvent->id, '1']);
 
-            if ($objEventMember->numRows) {
+            if (false !== $resEventMember) {
                 // ((CHF 0.60 x AnzKm + Park-/Strassen-/Tunnelgebühren) x AnzAutos) : AnzPersonen
                 $carTaxes = (0.6 * $objEventInvoice->carTaxesKm + $objEventInvoice->roadTaxes) * $objEventInvoice->countCars;
 
@@ -262,10 +278,7 @@ class Event
         return false;
     }
 
-    /**
-     * @param string $string
-     */
-    protected function prepareString($string = ''): string
+    protected function prepareString(mixed $string = ''): string
     {
         if (null === $string) {
             return '';
