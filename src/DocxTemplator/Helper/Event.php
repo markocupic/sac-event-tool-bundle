@@ -22,6 +22,7 @@ use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
@@ -100,7 +101,11 @@ class Event
         $organizers = $stringUtilAdapter->deserialize($objEvent->organizers, true);
 
         if (!empty($organizers)) {
-            $arrOrganizers = $this->connection->fetchAllAssociative('SELECT id,title,emergencyConcept FROM tl_event_organizer WHERE id IN ('.implode(',', array_map('\intval', $organizers)).') ORDER BY emergencyConcept, title');
+            $arrOrganizers = $this->connection->fetchAllAssociative(
+                'SELECT id,title,emergencyConcept FROM tl_event_organizer WHERE id IN (?) ORDER BY emergencyConcept, title',
+                [array_map('\intval', $organizers)],
+                [ArrayParameterType::INTEGER],
+            );
 
             foreach ($arrOrganizers as $i => $arrOrganizer) {
                 // Do not print duplicate content

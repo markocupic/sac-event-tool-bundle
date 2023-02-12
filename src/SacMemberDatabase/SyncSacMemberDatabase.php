@@ -18,6 +18,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\File;
 use Contao\FrontendUser;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use FTP\Connection as FtpConnection;
@@ -317,7 +318,7 @@ class SyncSacMemberDatabase
                 $qb = $this->connection->createQueryBuilder();
                 $qb->update('tl_member', 'm')
                     ->add('where', $qb->expr()->in('m.sacMemberId', ':arr_sac_member_ids'))
-                    ->setParameter('arr_sac_member_ids', $arrSacMemberIds, Connection::PARAM_INT_ARRAY)
+                    ->setParameter('arr_sac_member_ids', $arrSacMemberIds, ArrayParameterType::INTEGER)
 
                     // Reset sacMemberId to true, if member exists in the downloaded database dump
                     ->set('m.isSacMember', ':isSacMember')

@@ -30,6 +30,7 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Template;
 use Contao\Validator;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Haste\Form\Form;
@@ -251,7 +252,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             ->andWhere($qb->expr()->in('t.eventType', ':eventtypes'))
             ->setParameter('startdate', $this->startDate)
             ->setParameter('enddate', $this->endDate)
-            ->setParameter('eventtypes', $arrAllowedEventType, Connection::PARAM_STR_ARRAY)
+            ->setParameter('eventtypes', $arrAllowedEventType, ArrayParameterType::INTEGER)
             ->addOrderBy('t.startDate', 'ASC')
         ;
 
@@ -435,7 +436,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             ->andWhere('t1.startDate <= :enddate')
             ->andWhere($qb->expr()->in('t1.courseTypeLevel1', $qbSub->getSQL()))
             ->setParameter('eventtype', $eventType)
-            ->setParameter('arrAllowedEventTypes', $arrAllowedEventTypes, Connection::PARAM_STR_ARRAY)
+            ->setParameter('arrAllowedEventTypes', $arrAllowedEventTypes, ArrayParameterType::INTEGER)
             ->setParameter('startdate', $this->startDate)
             ->setParameter('enddate', $this->endDate)
             ->orderBy('t1.courseId')
@@ -517,7 +518,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
                 ->andWhere('t1.startDate >= :startdate')
                 ->andWhere('t1.startDate <= :enddate')
                 ->setParameter('eventtype', $eventType)
-                ->setParameter('arrAllowedEventTypes', $arrAllowedEventTypes, Connection::PARAM_STR_ARRAY)
+                ->setParameter('arrAllowedEventTypes', $arrAllowedEventTypes, ArrayParameterType::INTEGER)
                 ->setParameter('startdate', $this->startDate)
                 ->setParameter('enddate', $this->endDate)
                 ->orderBy('t1.startDate', 'ASC')

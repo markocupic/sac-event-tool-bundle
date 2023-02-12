@@ -19,6 +19,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
 use Contao\UserModel;
 use Contao\Validator;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
@@ -108,19 +109,19 @@ class EventApiController extends AbstractController
         // Filter by calendar ids tl_calendar.id
         if (!empty($param['calendarIds'])) {
             $qb->andWhere($qb->expr()->in('t.pid', ':calendarIds'));
-            $qb->setParameter('calendarIds', $param['calendarIds'], Connection::PARAM_INT_ARRAY);
+            $qb->setParameter('calendarIds', $param['calendarIds'], ArrayParameterType::INTEGER);
         }
 
         // Filter by event ids tl_calendar_events.id
         if (!empty($param['arrIds'])) {
             $qb->andWhere($qb->expr()->in('t.id', ':arrIds'));
-            $qb->setParameter('arrIds', $param['arrIds'], Connection::PARAM_INT_ARRAY);
+            $qb->setParameter('arrIds', $param['arrIds'], ArrayParameterType::INTEGER);
         }
 
         // Filter by event types "tour","course","generalEvent","lastMinuteTour"
         if (!empty($param['eventType'])) {
             $qb->andWhere($qb->expr()->in('t.eventType', ':eventType'));
-            $qb->setParameter('eventType', $param['eventType'], Connection::PARAM_STR_ARRAY);
+            $qb->setParameter('eventType', $param['eventType'], ArrayParameterType::INTEGER);
         }
 
         // Filter by suitableForBeginners
@@ -161,7 +162,7 @@ class EventApiController extends AbstractController
             $arrEvents = $qb2->fetchFirstColumn();
 
             $qb->andWhere($qb->expr()->in('t.id', ':arrEvents'));
-            $qb->setParameter('arrEvents', $arrEvents, Connection::PARAM_INT_ARRAY);
+            $qb->setParameter('arrEvents', $arrEvents, ArrayParameterType::INTEGER);
         }
 
         // Search term (search for expression in tl_calendar_events.title and tl_calendar_events.teaser
@@ -328,7 +329,7 @@ class EventApiController extends AbstractController
             $qb->select('*')
                 ->from('tl_calendar_events', 't')
                 ->where($qb->expr()->in('t.id', ':ids'))
-                ->setParameter('ids', $arrIds, Connection::PARAM_INT_ARRAY)
+                ->setParameter('ids', $arrIds, ArrayParameterType::INTEGER)
                 ->orderBy('t.startDate', 'ASC')
             ;
 
