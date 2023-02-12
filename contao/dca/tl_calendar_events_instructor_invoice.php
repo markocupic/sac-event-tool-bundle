@@ -15,7 +15,7 @@ declare(strict_types=1);
 use Contao\BackendUser;
 
 $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
-	'config' => [
+	'config'   => [
 		'dataContainer'    => 'Table',
 		'ptable'           => 'tl_calendar_events',
 		'doNotCopyRecords' => true,
@@ -28,7 +28,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			],
 		],
 	],
-
 	'list'     => [
 		'sorting'           => [
 			'mode'            => 4,
@@ -89,7 +88,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
         userPid;
         {event_legend},eventDuration;
         {expenses_legend},sleepingTaxes,sleepingTaxesText,miscTaxes,miscTaxesText;
-        {transport_legend},railwTaxes,railwTaxesText,cabelCarTaxes,cabelCarTaxesText,roadTaxes,carTaxesKm,countCars,privateArrival;
+        {transport_legend},railwTaxes,railwTaxesText,cableCarTaxes,cableCarTaxesText,roadTaxes,carTaxesKm,countCars,privateArrival;
         {phone_costs_legend},phoneTaxes;
         {iban_legend},iban;
         {notice_legend},notice
@@ -175,14 +174,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
-		'cabelCarTaxes'     => [
+		'cableCarTaxes'     => [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 6, 'tl_class' => 'clr'],
 			'sql'       => "varchar(6) NOT NULL default '0'",
 		],
-		'cabelCarTaxesText' => [
+		'cableCarTaxesText' => [
 			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => false, 'maxlength' => 255, 'tl_class' => 'clr'],

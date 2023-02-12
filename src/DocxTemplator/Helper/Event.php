@@ -39,14 +39,8 @@ class Event
         private readonly ContaoFramework $framework,
         private readonly TranslatorInterface $translator,
         private readonly Connection $connection,
+        private readonly EventMember $eventMemberHelper,
     ) {
-    }
-
-    public function bold($string)
-    {
-        $string = str_replace('&lt;B&gt;', '</w:t></w:r><w:r><w:rPr><w:b/></w:rPr><w:t xml:space="preserve"> ', $string);
-
-        return str_replace('&lt;/B&gt;', '</w:t></w:r><w:r><w:t xml:space="preserve">', $string);
     }
 
     /**
@@ -61,16 +55,12 @@ class Event
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->framework->getAdapter(Date::class);
-
         /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
 
         // Event data
         $objPhpWord->replace('eventTitle', $this->prepareString($objEvent->title));
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
-        $arrEventTstamps = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
 
         if ('course' === $objEvent->eventType) {
             $objPhpWord->replace('courseId', $this->prepareString('Kurs-Nr: '.$objEvent->courseId));
@@ -80,14 +70,15 @@ class Event
 
         // Generate event duration string
         $arrEventDates = [];
+        $eventTimestamps = $calendarEventsHelperAdapter->getEventTimestamps($objEvent);
 
-        foreach ($arrEventTstamps as $i => $v) {
-            if (\count($arrEventTstamps) - 1 === $i) {
+        foreach ($eventTimestamps as $i => $v) {
+            if (\count($eventTimestamps) - 1 === $i) {
                 $strFormat = 'd.m.Y';
             } else {
                 $strFormat = 'd.m.';
             }
-            $arrEventDates[] = $dateAdapter->parse($strFormat, $v);
+            $arrEventDates[] = date($strFormat, (int) $v);
         }
         $strEventDuration = implode(', ', $arrEventDates);
 
@@ -96,13 +87,13 @@ class Event
         $strTourProfile = implode("\r\n", $arrTourProfile);
         $strTourProfile = str_replace('Tag: ', 'Tag:'."\r\n", $strTourProfile);
 
-        // Get emergencyConcept data
+        // Get emergency concept data
         $arrEmergencyConcept = [];
         $organizers = $stringUtilAdapter->deserialize($objEvent->organizers, true);
 
         if (!empty($organizers)) {
             $arrOrganizers = $this->connection->fetchAllAssociative(
-                'SELECT id,title,emergencyConcept FROM tl_event_organizer WHERE id IN (?) ORDER BY emergencyConcept, title',
+                'SELECT id, title, emergencyConcept FROM tl_event_organizer WHERE id IN (?) ORDER BY emergencyConcept, title',
                 [array_map('\intval', $organizers)],
                 [ArrayParameterType::INTEGER],
             );
@@ -128,6 +119,9 @@ class Event
         $objPhpWord->replace('eventMiscellaneous', $this->prepareString($objEvent->miscellaneous), ['multiline' => true]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function setTourRapportData(MsWordTemplateProcessor $objPhpWord, CalendarEventsModel $objEvent, CalendarEventsInstructorInvoiceModel $objEventInvoice, UserModel $objBiller): void
     {
         // Set adapters
@@ -156,10 +150,7 @@ class Event
 
         // Count participants
         // Member list
-        /** @var EventMember $objEventMemberHelper */
-        $objEventMemberHelper = System::getContainer()->get('Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember');
-
-        $objEventMember = $objEventMemberHelper->getParticipatedEventMembers($objEvent);
+        $objEventMember = $this->eventMemberHelper->getParticipatedEventMembers($objEvent);
 
         if (null !== $objEventMember) {
             while ($objEventMember->next()) {
@@ -197,7 +188,7 @@ class Event
             $controllerAdapter->redirect($systemAdapter->getReferer());
         }
 
-        $transport = null !== $calendarEventsJourneyModel->findByPk($objEvent->journey) ? $calendarEventsJourneyModel->findByPk($objEvent->journey)->title : 'keine Angabe';
+        $transport = $calendarEventsJourneyModel->findByPk($objEvent->journey)->title ?? 'keine Angabe';
         $objPhpWord->replace('eventTransport', $this->prepareString($transport));
         $objPhpWord->replace('eventCanceled', EventState::STATE_CANCELED === $objEvent->eventState || EventExecutionState::STATE_CANCELED === $objEvent->executionState ? 'Ja' : 'Nein');
         $objPhpWord->replace('eventHasExecuted', EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED === $objEvent->executionState ? 'Ja' : 'Nein');
@@ -218,7 +209,7 @@ class Event
         $objPhpWord->replace('avalancheConditions', $this->prepareString($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->tourAvalancheConditions][0]));
         $objPhpWord->replace('specialIncidents', $this->prepareString($objEvent->tourSpecialIncidents));
 
-        $arrFields = ['sleepingTaxes', 'sleepingTaxesText', 'miscTaxes', 'miscTaxesText', 'privateArrival', 'railwTaxes', 'railwTaxesText', 'cabelCarTaxes', 'cabelCarTaxesText', 'roadTaxes', 'carTaxesKm', 'countCars', 'phoneTaxes'];
+        $arrFields = ['sleepingTaxes', 'sleepingTaxesText', 'miscTaxes', 'miscTaxesText', 'privateArrival', 'railwTaxes', 'railwTaxesText', 'cableCarTaxes', 'cableCarTaxesText', 'roadTaxes', 'carTaxesKm', 'countCars', 'phoneTaxes'];
 
         foreach ($arrFields as $field) {
             $objPhpWord->replace($field, $this->prepareString($objEventInvoice->{$field}));
@@ -241,7 +232,7 @@ class Event
         }
 
         $objPhpWord->replace('carTaxes', $this->prepareString(round($carTaxes, 2)));
-        $totalCosts = $objEventInvoice->sleepingTaxes + $objEventInvoice->miscTaxes + $objEventInvoice->railwTaxes + $objEventInvoice->cabelCarTaxes + $objEventInvoice->phoneTaxes + $carTaxes;
+        $totalCosts = $objEventInvoice->sleepingTaxes + $objEventInvoice->miscTaxes + $objEventInvoice->railwTaxes + $objEventInvoice->cableCarTaxes + $objEventInvoice->phoneTaxes + $carTaxes;
         $objPhpWord->replace('totalCosts', $this->prepareString(ceil($totalCosts)));
 
         // Notice

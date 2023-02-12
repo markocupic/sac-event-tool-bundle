@@ -16,9 +16,6 @@ namespace Markocupic\SacEventToolBundle\Model;
 
 use Contao\Model;
 
-/**
- * @method findByPk($invoiceId)
- */
 class CalendarEventsInstructorInvoiceModel extends Model
 {
     /**

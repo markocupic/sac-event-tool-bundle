@@ -191,10 +191,7 @@ class EventMember
         $objPhpWord->replace('eventId', $objEvent->id);
     }
 
-    /**
-     * @param $objEvent
-     */
-    public function getParticipatedEventMembers($objEvent): Collection|null
+    public function getParticipatedEventMembers(CalendarEventsModel $objEvent): Collection|null
     {
         /** @var CalendarEventsMemberModel $calendarEventsMemberModelAdapter */
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
