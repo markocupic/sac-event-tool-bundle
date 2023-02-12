@@ -89,14 +89,53 @@ table#ctrl_eventDates thead tr:first-child {
 
 /** Subscription state legend and participation state legend in tl_calendar_events_member **/
 div.legend-box {
+	padding-top: 16px;
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
+	column-gap: 16px;
+	row-gap: 16px;
+	position: relative;
 }
 
-div.legend-box > div {
-	margin-top: 3rem;
-	margin-right: 2rem;
+div.legend-box > .event-detail-legend {
+	width: 100%;
+}
+
+div.legend-box > .subscription-state-legend {
+	width: 100%;
+}
+
+div.legend-box > .participation-state-legend {
+	width: 100%;
+}
+
+@media (min-width: 600px) {
+	div.legend-box > .event-detail-legend {
+		flex: 1 1 0;
+	}
+
+	div.legend-box > .subscription-state-legend {
+		flex: 1 1 0;
+	}
+
+	div.legend-box > .participation-state-legend {
+		width: 100%;
+	}
+}
+
+@media (min-width: 1200px) {
+	div.legend-box > .event-detail-legend {
+		flex: 1 1 0;
+	}
+
+	div.legend-box > .subscription-state-legend {
+		flex: 1 1 0;
+	}
+
+	div.legend-box > .participation-state-legend {
+		flex: 2 1 0;
+	}
 }
 
 div.legend-box h3 {
