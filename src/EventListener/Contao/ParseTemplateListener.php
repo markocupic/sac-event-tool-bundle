@@ -48,7 +48,7 @@ class ParseTemplateListener
         // List upcoming and past events on the backend home screen.
         if (str_starts_with($template->getName(), 'be_main')) {
             if (!$request->query->has('mtg') && !$request->query->has('error') && !$request->query->has('do') && !$request->query->has('act')) {
-                if ($this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, 'sac_calendar_events_tool')) {
+                if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, 'sac_calendar_events_tool')) {
                     $template->main = $this->dashboard->generate()->getContent().$template->main;
                 }
             }

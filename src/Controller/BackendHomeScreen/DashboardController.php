@@ -62,22 +62,22 @@ class DashboardController
      */
     public function generate(): Response
     {
+        $html = '';
+
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
-        $upcomingEvents = $this->getUpcomingEvents($user);
-        $pastEvents = $this->getPastEvents($user);
-
-        $events = array_merge(
-            [['separator' => 'upcoming-events']],
-            $this->prepareForTwig($upcomingEvents, 'upcoming-event'),
-            [['separator' => 'past-events']],
-            $this->prepareForTwig($pastEvents, 'past-event')
-        );
-
-        $html = '';
-
         if ($user instanceof BackendUser) {
+            $upcomingEvents = $this->getUpcomingEvents($user);
+            $pastEvents = $this->getPastEvents($user);
+
+            $events = array_merge(
+                [['separator' => 'upcoming-events']],
+                $this->prepareForTwig($upcomingEvents, 'upcoming-event'),
+                [['separator' => 'past-events']],
+                $this->prepareForTwig($pastEvents, 'past-event')
+            );
+
             $html = $this->twig->render(
                 '@MarkocupicSacEventTool/BackendHomeScreen/dashboard.html.twig',
                 [
