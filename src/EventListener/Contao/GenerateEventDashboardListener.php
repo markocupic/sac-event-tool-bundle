@@ -61,7 +61,7 @@ class GenerateEventDashboardListener
         $module = $inputAdapter->get('do');
 
         // "Go to event" button
-        $href = sprintf('contao?do=%s&id=%s&table=tl_calendar_events&act=%s&rt=%s&ref=%s', $module, $objEvent->id, 'edit', $requestToken, $refererId);
+        $href = sprintf('contao?do=%s&id=%d&table=tl_calendar_events&act=%s&rt=%s&ref=%s', $module, $objEvent->id, 'edit', $requestToken, $refererId);
         $menu->addChild('Event', ['uri' => $href])
             ->setLinkAttribute('role', 'button')
             ->setLinkAttribute('class', 'tl_submit')
@@ -71,7 +71,7 @@ class GenerateEventDashboardListener
         ;
 
         // "Go to event-list" button
-        $href = sprintf('contao?do=%s&table=tl_calendar_events&id=%s&rt=%s&ref=%s', $module, $objCalendar->id, $requestToken, $refererId);
+        $href = sprintf('contao?do=%s&table=tl_calendar_events&id=%d&rt=%s&ref=%s', $module, $objCalendar->id, $requestToken, $refererId);
         $menu->addChild('Eventliste', ['uri' => $href])
             ->setLinkAttribute('role', 'button')
             ->setLinkAttribute('class', 'tl_submit')
@@ -93,7 +93,7 @@ class GenerateEventDashboardListener
 
         // "Go to event participant list" button
         if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
-            $href = sprintf('contao?do=%s&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
+            $href = sprintf('contao?do=%s&table=tl_calendar_events_member&id=%d&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
             $menu->addChild('Teilnehmerliste', ['uri' => $href])
                 ->setAttribute('role', 'button')
                 ->setLinkAttribute('class', 'tl_submit')
@@ -115,7 +115,7 @@ class GenerateEventDashboardListener
                     ->setLinkAttribute('title', 'Tourenrapport anzeigen und bearbeiten [ALT + r]')
                 ;
 
-                $href = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%s&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
+                $href = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%d&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
                 $menu->addChild('Vergütungsformular und Tourenrapport drucken', ['uri' => $href])
                     ->setAttribute('role', 'button')
                     ->setLinkAttribute('class', 'tl_submit')
