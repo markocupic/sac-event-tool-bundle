@@ -10,22 +10,22 @@
                     {% if event.separator == 'upcoming-events' %}
                         {% set index = 0 %}
                         <tr>
-                            <td colspan="9" class="separator">{{ 'MSC.bhs_dashb_yourUpcomingEvents'|trans({}, 'contao_default') }}</td>
+                            <td colspan="10" class="separator">{{ 'MSC.bhs_dashb_yourUpcomingEvents'|trans({}, 'contao_default') }}</td>
                         </tr>
                         {% if has_upcoming_events is same as(false) %}
                             <tr class="even">
-                                <td colspan="9">{{ 'MSC.bhs_dashb_noUpcomingEventsDetected'|trans({}, 'contao_default') }}</td>
+                                <td colspan="10">{{ 'MSC.bhs_dashb_noUpcomingEventsDetected'|trans({}, 'contao_default') }}</td>
                             </tr>
                         {% endif %}
                     {% endif %}
                     {% if event.separator == 'past-events' %}
                         {% set index = 0 %}
                         <tr>
-                            <td colspan="9" class="separator">{{ 'MSC.bhs_dashb_yourPastEvents'|trans({}, 'contao_default') }}</td>
+                            <td colspan="10" class="separator">{{ 'MSC.bhs_dashb_yourPastEvents'|trans({}, 'contao_default') }}</td>
                         </tr>
                         {% if has_past_events is same as(false) %}
                             <tr class="even">
-                                <td colspan="9">{{ 'MSC.bhs_dashb_noPastEventsDetected'|trans({}, 'contao_default') }}</td>
+                                <td colspan="10">{{ 'MSC.bhs_dashb_noPastEventsDetected'|trans({}, 'contao_default') }}</td>
                             </tr>
                         {% endif %}
                     {% endif %}
@@ -35,6 +35,7 @@
                     <tr class="hover-row {{ event.row_class }}{{ odd_or_even }}">
                         <td class="my-events-badge-col text-align-left">{{ event.badge|raw }}</td>
                         <td class="my-events-date-col text-align-left">{{ event.date }}</td>
+                        <td class="my-events-state-col text-align-left">{{ event.state_icon|raw }}</td>
                         <td class="my-events-title-col text-align-left">
                             <a href="{{ event.href_event }}" style="text-decoration:underline" title="{{ 'MSC.bhs_dashb_editEvent'|trans({}, 'contao_default') }}"><strong>{{ event.title }}</strong></a>
                         </td>

@@ -287,6 +287,11 @@ div.tl_header_tour_rapport table td {
 	width: 68px;
 }
 
+#tl_backend_home_screen_my_events_inner td.my-events-state-col {
+	width: 16px;
+	padding: 0;
+}
+
 #tl_backend_home_screen_my_events_inner td.my-events-icon-col {
 	width: 18px;
 }

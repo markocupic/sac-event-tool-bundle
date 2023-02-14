@@ -132,6 +132,7 @@ class DashboardController
 
     /**
      * @throws Exception
+     * @throws \Exception
      */
     private function prepareForTwig(array $arrEvents, string $rowClass): array
     {
@@ -170,6 +171,7 @@ class DashboardController
             $event['badge'] = $this->calendarEventsHelperAdapter->getEventStateOfSubscriptionBadgesString($eventModel);
             $event['title'] = $title;
             $event['date'] = date($this->configAdapter->get('dateFormat'), (int) $eventModel->startDate);
+            $event['state_icon'] = $this->calendarEventsHelperAdapter->getEventStateIcon($eventModel);
             $event['href_eventListing'] = $hrefEventListing;
             $event['href_email'] = $this->generateEmailHref($eventModel);
             $event['href_event'] = $hrefEvent;
