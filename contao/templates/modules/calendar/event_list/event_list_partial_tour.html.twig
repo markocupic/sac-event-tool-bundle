@@ -40,10 +40,8 @@
                     <!-- end row last minute event -->
 
                     <!-- row state icon -->
-                    <div class="mt-1 title">
-                        <span data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel">
-                            <i class="event-state-icon fa-fw" v-bind:class="row.eventState"></i>
-                        </span>
+                    <div class="title d-flex align-items-start">
+                        <span class="event-state-icon" v-html="row.eventStateIcon" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel"></span>
                         <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link font-weight-bold"><strong><% row.eventTitle %></strong></a>
                     </div>
                     <!-- end row state icon -->
@@ -131,6 +129,7 @@
             'tourTechDifficulties',
             'bookingCounter',
             'eventState',
+            'eventStateIcon',
             'eventStateLabel',
             'eventDuration',
             'eventPeriodLgInline',

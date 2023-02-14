@@ -16,8 +16,8 @@
                 </div>
                 <!-- Start right col -->
                 <div class="col-sm-9 col-xl-7">
-                    <div class="title d-flex align-items-start mb-2">
-                        <span class="event-state-icon fa-fw" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel" v-bind:class="row.eventState"> </span>
+                    <div class="title d-flex align-items-start">
+                    <span class="event-state-icon" v-html="row.eventStateIcon" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel" v-bind:class="row.eventState"></span>
                         <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link lh-base">
                             <h4 class="d-flex headline m-0 p-0 lh-base">
                                 <% row.title %>
@@ -97,6 +97,7 @@
             'bookingCounter',
             'eventStateLabel',
             'eventState',
+            'eventStateIcon',
             'suitableForBeginners',
             'isPublicTransportEvent',
             'getPublicTransportBadge',
@@ -209,4 +210,3 @@
         }
     });
 </script>
-
