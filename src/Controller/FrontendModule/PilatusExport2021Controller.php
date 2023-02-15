@@ -252,7 +252,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             ->andWhere($qb->expr()->in('t.eventType', ':eventtypes'))
             ->setParameter('startdate', $this->startDate)
             ->setParameter('enddate', $this->endDate)
-            ->setParameter('eventtypes', $arrAllowedEventType, ArrayParameterType::INTEGER)
+            ->setParameter('eventtypes', $arrAllowedEventType, ArrayParameterType::STRING)
             ->addOrderBy('t.startDate', 'ASC')
         ;
 
@@ -436,7 +436,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             ->andWhere('t1.startDate <= :enddate')
             ->andWhere($qb->expr()->in('t1.courseTypeLevel1', $qbSub->getSQL()))
             ->setParameter('eventtype', $eventType)
-            ->setParameter('arrAllowedEventTypes', $arrAllowedEventTypes, ArrayParameterType::INTEGER)
+            ->setParameter('arrAllowedEventTypes', $arrAllowedEventTypes, ArrayParameterType::STRING)
             ->setParameter('startdate', $this->startDate)
             ->setParameter('enddate', $this->endDate)
             ->orderBy('t1.courseId')
@@ -518,7 +518,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
                 ->andWhere('t1.startDate >= :startdate')
                 ->andWhere('t1.startDate <= :enddate')
                 ->setParameter('eventtype', $eventType)
-                ->setParameter('arrAllowedEventTypes', $arrAllowedEventTypes, ArrayParameterType::INTEGER)
+                ->setParameter('arrAllowedEventTypes', $arrAllowedEventTypes, ArrayParameterType::STRING)
                 ->setParameter('startdate', $this->startDate)
                 ->setParameter('enddate', $this->endDate)
                 ->orderBy('t1.startDate', 'ASC')
