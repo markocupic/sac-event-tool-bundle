@@ -61,7 +61,11 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 		],
 	],
 	'palettes' => [
-		'default' => 'level,title,description,allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowDeleteAccessToAuthor,allowDeleteAccessToInstructors,allowSwitchingToPrevLevel,allowSwitchingToNextLevel,allowRegistration,groupReleaseLevelRights',
+		'default' => '
+		{title_legend},level,title,description;
+		{event_grants_legend},allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowDeleteAccessToAuthor,allowDeleteAccessToInstructors,groupEventPerm;
+		{event_release_level_grants_legend},allowSwitchingToPrevLevel,allowSwitchingToNextLevel,groupReleaseLevelPerm;
+		{event_registrations_grants_legend},allowRegistration',
 	],
 	'fields'   => [
 		'id'                             => [
@@ -130,6 +134,33 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 			'inputType' => 'checkbox',
 			'sql'       => "char(1) NOT NULL default '1'",
 		],
+		'groupEventPerm'                 => [
+			'exclude'   => true,
+			'inputType' => 'multiColumnWizard',
+			'eval'      => [
+				'mandatory'    => false,
+				'columnFields' => [
+					'group'       => [
+						'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['group'],
+						'exclude'    => true,
+						'inputType'  => 'select',
+						'reference'  => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
+						'relation'   => ['type' => 'hasMany', 'load' => 'eager'],
+						'foreignKey' => 'tl_user_group.name',
+						'eval'       => ['style' => 'width: 80%', 'mandatory' => false, 'includeBlankOption' => true],
+					],
+					'permissions' => [
+						'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissions'],
+						'exclude'   => true,
+						'inputType' => 'select',
+						'options'   => ['canWriteEvent', 'canDeleteEvent'],
+						'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
+						'eval'      => ['style' => 'width: 80%', 'multiple' => true, 'chosen' => true, 'mandatory' => false],
+					],
+				],
+			],
+			'sql'       => 'blob NULL',
+		],
 		'allowRegistration'              => [
 			'exclude'   => true,
 			'filter'    => true,
@@ -137,39 +168,29 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 			'eval'      => ['isBoolean' => true],
 			'sql'       => "char(1) NOT NULL default ''",
 		],
-		'groupReleaseLevelRights'        => [
+		'groupReleaseLevelPerm'          => [
 			'exclude'   => true,
 			'inputType' => 'multiColumnWizard',
 			'eval'      => [
 				'tl_class'     => 'mcwColumnCount_4',
 				'mandatory'    => false,
 				'columnFields' => [
-					'group'              => [
+					'group'       => [
 						'label'      => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['group'],
 						'exclude'    => true,
 						'inputType'  => 'select',
 						'reference'  => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
 						'relation'   => ['type' => 'hasMany', 'load' => 'eager'],
 						'foreignKey' => 'tl_user_group.name',
-						'eval'       => ['mandatory' => true, 'includeBlankOption' => true],
+						'eval'       => ['tl_class' => 'w50', 'mandatory' => false, 'includeBlankOption' => true],
 					],
-					'releaseLevelRights' => [
-						'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['releaseLevelRights'],
+					'permissions' => [
+						'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissions'],
 						'exclude'   => true,
 						'inputType' => 'select',
+						'options'   => ['canRelLevelUp', 'canRelLevelDown'],
 						'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
-						'options'   => ['up', 'down', 'upAndDown'],
-						'eval'      => ['mandatory' => true, 'includeBlankOption' => true],
-					],
-					'canWrite'           => [
-						'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canWrite'],
-						'exclude'   => true,
-						'inputType' => 'checkbox',
-					],
-					'canDelete'          => [
-						'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canDelete'],
-						'exclude'   => true,
-						'inputType' => 'checkbox',
+						'eval'      => ['tl_class' => 'w50', 'multiple' => true, 'chosen' => true, 'mandatory' => false],
 					],
 				],
 			],

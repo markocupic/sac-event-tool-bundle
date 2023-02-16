@@ -23,6 +23,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Security;
 
 class CalendarEventsVoter extends Voter
 {
@@ -42,6 +43,7 @@ class CalendarEventsVoter extends Voter
 
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly Security $security,
     ) {
         // Adapters
         $this->calendarEvent = $this->framework->getAdapter(CalendarEventsModel::class);
@@ -105,7 +107,7 @@ class CalendarEventsVoter extends Voter
      * - to admins
      * - to permitted event-authors (-> tl_event_release_level_policy.allowDeleteAccessToAuthor
      * - to permitted event-instructors (-> tl_event_release_level_policy.allowDeleteAccessToInstructors
-     * - to "super-users" (-> tl_event_release_level_policy.groupReleaseLevelRights).
+     * - to "super-users" (-> tl_event_release_level_policy.groupEventPerm).
      *
      * @throws \Exception
      */
@@ -125,7 +127,7 @@ class CalendarEventsVoter extends Voter
         }
 
         // Allow deletion to admins.
-        if ($this->user->admin) {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             return true;
         }
 
@@ -139,9 +141,7 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-        $arrEventInstructors = $this->calendarEventsHelper
-            ->getInstructorsAsArray($this->event, false)
-        ;
+        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event, false);
 
         if ($releaseLevelPolicy->allowDeleteAccessToInstructors) {
             if (\in_array($this->user->id, $arrEventInstructors, false)) {
@@ -154,12 +154,14 @@ class CalendarEventsVoter extends Voter
         }
 
         // Check if the user is member in an allowed group
-        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupReleaseLevelRights, true);
+        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);
         $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
 
         foreach ($arrAllowedGroups as $v) {
-            if (\in_array($v['group'], $arrUserGroups, false)) {
-                if ($v['canDelete']) {
+            if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
+                $arrPerm = isset($v['permissions']) && \is_array($v['permissions']) ? $v['permissions'] : [];
+
+                if (\in_array('canDeleteEvent', $arrPerm, true)) {
                     // Grant delete-access to "super-users"
                     return true;
                 }
@@ -175,7 +177,7 @@ class CalendarEventsVoter extends Voter
      * - to admins
      * - to permitted event-authors (-> tl_event_release_level_policy.allowWriteAccessToAuthor
      * - to permitted event-instructors (-> tl_event_release_level_policy.allowWriteAccessToInstructors
-     * - to "super-users" (-> tl_event_release_level_policy.groupReleaseLevelRights).
+     * - to "super-users" (-> tl_event_release_level_policy.groupEventPerm).
      *
      * @throws \Exception
      */
@@ -195,7 +197,7 @@ class CalendarEventsVoter extends Voter
         }
 
         // Allow deletion to admins.
-        if ($this->user->admin) {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             return true;
         }
 
@@ -209,9 +211,7 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-        $arrEventInstructors = $this->calendarEventsHelper
-            ->getInstructorsAsArray($this->event, false)
-        ;
+        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event, false);
 
         if ($releaseLevelPolicy->allowWriteAccessToInstructors) {
             if (\in_array($this->user->id, $arrEventInstructors, false)) {
@@ -224,12 +224,14 @@ class CalendarEventsVoter extends Voter
         }
 
         // Check if the user is member in an allowed group
-        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupReleaseLevelRights, true);
+        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);
         $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
 
         foreach ($arrAllowedGroups as $v) {
-            if (\in_array($v['group'], $arrUserGroups, false)) {
-                if ($v['canWrite']) {
+            if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
+                $arrPerm = isset($v['permissions']) && \is_array($v['permissions']) ? $v['permissions'] : [];
+
+                if (\in_array('canWriteEvent', $arrPerm, true)) {
                     // Grant write-access to "super-users"
                     return true;
                 }
@@ -245,7 +247,7 @@ class CalendarEventsVoter extends Voter
      * - to admins
      * - to permitted event-authors (-> tl_event_release_level_policy.allowWriteAccessToAuthor
      * - to permitted event-instructors (-> tl_event_release_level_policy.allowWriteAccessToInstructors
-     * - to "super-users" (-> tl_event_release_level_policy.groupReleaseLevelRights).
+     * - to "super-users" (-> tl_event_release_level_policy.groupReleaseLevelPerm).
      *
      * @throws \Exception
      */
@@ -265,13 +267,11 @@ class CalendarEventsVoter extends Voter
         }
 
         // Allow deletion to admins.
-        if ($this->user->admin) {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             return true;
         }
 
-        $arrEventInstructors = $this->calendarEventsHelper
-            ->getInstructorsAsArray($this->event, false)
-        ;
+        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event, false);
 
         if ((int) $this->user->id === (int) $this->event->author || \in_array($this->user->id, $arrEventInstructors, false)) {
             if ($releaseLevelPolicy->allowWriteAccessToAuthor) {
@@ -287,21 +287,23 @@ class CalendarEventsVoter extends Voter
         }
 
         // Check if the user is member in an allowed group
-        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupReleaseLevelRights, true);
+        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupReleaseLevelPerm, true);
         $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
 
         foreach ($arrAllowedGroups as $v) {
-            $arrAllowedGroups[$v['group']] = $v;
+            if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
+                $arrPerm = isset($v['permissions']) && \is_array($v['permissions']) ? $v['permissions'] : [];
 
-            if (\in_array($v['group'], $arrUserGroups, false)) {
                 if (self::CAN_UPGRADE_EVENT_RELEASE_LEVEL === $attribute) {
-                    if ('up' === $v['releaseLevelRights'] || 'upAndDown' === $v['releaseLevelRights']) {
+                    if (\in_array('canRelLevelUp', $arrPerm, true)) {
+                        // Grant upgrading event release level
                         return true;
                     }
                 }
 
                 if (self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL === $attribute) {
-                    if ('down' === $v['releaseLevelRights'] || 'upAndDown' === $v['releaseLevelRights']) {
+                    if (\in_array('canRelLevelDown', $arrPerm, true)) {
+                        // Grant downgrading event release level
                         return true;
                     }
                 }

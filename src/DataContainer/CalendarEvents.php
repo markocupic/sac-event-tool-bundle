@@ -80,7 +80,7 @@ class CalendarEvents
     private Adapter $userModel;
 
     public function __construct(
-        private ContaoFramework $framework,
+        private readonly ContaoFramework $framework,
         private readonly RequestStack $requestStack,
         private readonly Connection $connection,
         private readonly Util $util,
@@ -156,9 +156,7 @@ class CalendarEvents
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 80)]
     public function setFilterSearchAndSortingBoard(DataContainer $dc): void
     {
-        $user = $this->security->getUser();
-
-        if (!$user->admin) {
+        if (!$this->security->isGranted('ROLE_ADMIN')) {
             // Limitize filter fields tour guides and course instructors
             foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $k) {
                 if ('mountainguide' === $k || 'author' === $k || 'organizers' === $k || 'tourType' === $k || 'journey' === $k || 'eventReleaseLevel' === $k || 'mainInstructor' === $k || 'courseTypeLevel0' === $k || 'startTime' === $k) {
@@ -221,17 +219,17 @@ class CalendarEvents
         $user = $this->security->getUser();
 
         // Minimize header fields for default users
-        if (!$user->admin) {
+        if (!$this->security->isGranted('ROLE_ADMIN')) {
             $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['headerFields'] = ['title'];
         }
 
         // Minimize operations for default users
-        if (!$user->admin) {
+        if (!$this->security->isGranted('ROLE_ADMIN')) {
             unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['show']);
         }
 
         // Do not allow some specific global operations to default users
-        if (!$user->admin) {
+        if (!$this->security->isGranted('ROLE_ADMIN')) {
             unset($GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year'], $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year']);
         }
 
@@ -246,32 +244,16 @@ class CalendarEvents
                 $objEvent = $this->calendarEventsModel->findByPk($eventId);
 
                 if (null !== $objEvent) {
-                    $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($eventId);
+                    $canUpgrade = $this->security->isGranted(CalendarEventsVoter::CAN_UPGRADE_EVENT_RELEASE_LEVEL, $objEvent->id);
+                    $canDowngrade = $this->security->isGranted(CalendarEventsVoter::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $objEvent->id);
 
-                    if (null !== $objEventReleaseLevelPolicyPackageModel) {
-                        $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPid($objEventReleaseLevelPolicyPackageModel->id);
-
-                        if (null !== $objReleaseLevelModel) {
-                            while ($objReleaseLevelModel->next()) {
-                                $allow = false;
-                                $arrGroupsUserBelongsTo = $this->stringUtil->deserialize($user->groups, true);
-                                $arrGroups = $this->stringUtil->deserialize($objReleaseLevelModel->groupReleaseLevelRights, true);
-
-                                foreach ($arrGroups as $v) {
-                                    if (\in_array($v['group'], $arrGroupsUserBelongsTo, false)) {
-                                        if ('upAndDown' === $v['releaseLevelRights']) {
-                                            $allow = true;
-                                            continue;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    if (false === $canUpgrade || false === $canDowngrade) {
+                        $allow = false;
                     }
                 }
             }
 
-            if ($user->admin || true === $allow) {
+            if ($this->security->isGranted('ROLE_ADMIN') || true === $allow) {
                 PaletteManipulator::create()
                     ->addField(['eventReleaseLevel'], 'title_legend', PaletteManipulator::POSITION_APPEND)
                     ->applyToPalette('default', 'tl_calendar_events')
@@ -292,7 +274,7 @@ class CalendarEvents
         }
 
         // Skip here if the user is an admin
-        if ($user->admin) {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             return;
         }
 
@@ -408,7 +390,7 @@ class CalendarEvents
                         if (null !== $objEventReleaseLevelPolicyModel) {
                             if ($objEventReleaseLevelPolicyModel->id !== $objEventsModel->eventReleaseLevel) {
                                 foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldname) {
-                                    if (true === $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEditingOnFirstReleaseLevelOnly']) {
+                                    if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
                                         if ('editAll' === $request->query->get('act')) {
                                             $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['input_field_callback'] = [self::class, 'showFieldValue'];
                                         } else {
@@ -816,7 +798,7 @@ class CalendarEvents
         $objEvent = $this->calendarEventsModel->findByPk($dc->activeRecord->id);
 
         if (null !== $objEvent) {
-            if (false === strpos($objEvent->eventToken, '-'.$dc->activeRecord->id)) {
+            if (!str_contains($objEvent->eventToken, '-'.$dc->activeRecord->id)) {
                 $objEvent->eventToken = $this->generateEventToken((int) $dc->activeRecord->id);
                 $objEvent->save();
             }
@@ -845,7 +827,7 @@ class CalendarEvents
         if (null !== $objEvent) {
             $arrTimestamps = $this->calendarEventsHelper->getEventTimestamps($objEvent);
 
-            if ('' !== $objEvent->durationInfo && !empty($arrTimestamps) && \is_array($arrTimestamps)) {
+            if ('' !== $objEvent->durationInfo && !empty($arrTimestamps)) {
                 $countTimestamps = \count($arrTimestamps);
 
                 if (isset($GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['durationInfo'][$objEvent->durationInfo])) {
@@ -1354,12 +1336,12 @@ class CalendarEvents
     {
         $options = [];
 
-        $objUser = BackendUser::getInstance();
+        $user = $this->security->getUser();
         $arrAllowedEventTypes = [];
 
-        if (null !== $objUser) {
-            if (!$objUser->admin) {
-                $arrGroups = $this->stringUtil->deserialize($objUser->groups, true);
+        if ($user instanceof BackendUser) {
+            if (!$this->security->isGranted('ROLE_ADMIN')) {
+                $arrGroups = $this->stringUtil->deserialize($user->groups, true);
 
                 foreach ($arrGroups as $group) {
                     $objGroup = UserGroupModel::findByPk($group);
@@ -1524,18 +1506,16 @@ class CalendarEvents
                         $objVersions->create();
 
                         // System log
-                        if (null !== $this->contaoGeneralLogger) {
-                            $this->contaoGeneralLogger->info(
-                                sprintf(
-                                    'Event release level for event with ID %d ["%s"] pushed %s from "%s" to "%s".',
-                                    $objEvent->id,
-                                    $objEvent->title,
-                                    $strDirection,
-                                    $titleCurrent,
-                                    $titleNew,
-                                ),
-                            );
-                        }
+                        $this->contaoGeneralLogger?->info(
+                            sprintf(
+                                'Event release level for event with ID %d ["%s"] pushed %s from "%s" to "%s".',
+                                $objEvent->id,
+                                $objEvent->title,
+                                $strDirection,
+                                $titleCurrent,
+                                $titleNew,
+                            ),
+                        );
 
                         $this->handleEventReleaseLevelAndPublishUnpublish((int) $objEvent->id, (int) $objEvent->eventReleaseLevel);
 
@@ -1702,18 +1682,16 @@ class CalendarEvents
                         $objVersions->create();
 
                         // System log
-                        if (null !== $this->contaoGeneralLogger) {
-                            $this->contaoGeneralLogger->info(
-                                sprintf(
-                                    'Event release level for event with ID %d ["%s"] pushed %s from "%s" to "%s".',
-                                    $objEvent->id,
-                                    $objEvent->title,
-                                    $strDirection,
-                                    $titleCurrent,
-                                    $titleNew,
-                                ),
-                            );
-                        }
+                        $this->contaoGeneralLogger?->info(
+                            sprintf(
+                                'Event release level for event with ID %d ["%s"] pushed %s from "%s" to "%s".',
+                                $objEvent->id,
+                                $objEvent->title,
+                                $strDirection,
+                                $titleCurrent,
+                                $titleNew,
+                            ),
+                        );
 
                         $this->handleEventReleaseLevelAndPublishUnpublish((int) $objEvent->id, (int) $objEvent->eventReleaseLevel);
 
