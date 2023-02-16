@@ -879,48 +879,37 @@ class CalendarEventsMember
                     if (!$this->validator->isEmail($this->sacevtEventAdminEmail)) {
                         throw new \Exception('Please set a valid email address in parameter sacevt.event_admin_email.');
                     }
-                    $objEmail = $this->notification->findOneByType('default_email');
 
-                    // Use terminal42/notification_center
-                    if (null !== $objEmail) {
-                        // Set token array
-                        $arrTokens = [
-                            'email_sender_name' => html_entity_decode(html_entity_decode($this->sacevtEventAdminName)),
-                            'email_sender_email' => $this->sacevtEventAdminEmail,
-                            'send_to' => $objEventMemberModel->email,
-                            'reply_to' => $user->email,
-                            'email_subject' => html_entity_decode((string) $request->request->get('subject')),
-                            'email_text' => html_entity_decode(strip_tags((string) $request->request->get('text'))),
-                            'attachment_tokens' => null,
-                            'recipient_cc' => null,
-                            'recipient_bcc' => null,
-                            'email_html' => null,
-                        ];
+                    $objEmail = new Email();
+                    $objEmail->fromName = html_entity_decode(html_entity_decode($this->sacevtEventAdminName));
+                    $objEmail->from = $this->sacevtEventAdminEmail;
+                    $objEmail->replyTo($user->email);
+                    $objEmail->subject = html_entity_decode((string) $request->request->get('subject'));
+                    $objEmail->text = html_entity_decode(strip_tags((string) $request->request->get('text')));
 
-                        // Check if member has already booked at the same time
-                        $objMember = $this->member->findOneBySacMemberId($objEventMemberModel->sacMemberId);
-                        $objEvent = $this->calendarEvents->findByPk($objEventMemberModel->eventId);
+                    // Check if member has already booked at the same time
+                    $objMember = $this->member->findOneBySacMemberId($objEventMemberModel->sacMemberId);
+                    $objEvent = $this->calendarEvents->findByPk($objEventMemberModel->eventId);
 
-                        if ('acceptWithEmail' === $request->query->get('action') && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && null !== $objEvent && $this->calendarEventsHelper->areBookingDatesOccupied($objEvent, $objMember)) {
-                            $this->message->addError('Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
-                        } elseif ('acceptWithEmail' === $request->query->get('action') && null !== $objEvent && !$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
-                            $this->message->addError('Es ist ein Fehler aufgetreten. Da die maximale Teilnehmerzahl bereits erreicht ist, kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.');
-                        } // Send email
-                        elseif ($this->validator->isEmail($objEventMemberModel->email)) {
-                            $objEmail->send($arrTokens, $this->sacevtLocale);
+                    if ('acceptWithEmail' === $request->query->get('action') && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && null !== $objEvent && $this->calendarEventsHelper->areBookingDatesOccupied($objEvent, $objMember)) {
+                        $this->message->addError('Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
+                    } elseif ('acceptWithEmail' === $request->query->get('action') && null !== $objEvent && !$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
+                        $this->message->addError('Es ist ein Fehler aufgetreten. Da die maximale Teilnehmerzahl bereits erreicht ist, kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.');
+                    } // Send email
+                    elseif ($this->validator->isEmail($objEventMemberModel->email)) {
+                        $objEmail->sendTo($objEventMemberModel->email);
 
-                            $set = ['stateOfSubscription' => $arrAction['stateOfSubscription']];
-                            $this->connection->update('tl_calendar_events_member', $set, ['id' => $dc->id]);
+                        $set = ['stateOfSubscription' => $arrAction['stateOfSubscription']];
+                        $this->connection->update('tl_calendar_events_member', $set, ['id' => $dc->id]);
 
-                            $this->message->addInfo($arrAction['sessionInfoText']);
-                        } else {
-                            $this->message->addInfo('Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.');
-                        }
+                        $this->message->addInfo($arrAction['sessionInfoText']);
+                    } else {
+                        $this->message->addInfo('Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.');
                     }
                 }
                 $this->controller->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$request->query->get('id').'&act=edit&rt='.$request->query->get('rt'));
             } else {
-                // Add value to ffields
+                // Add value to fields
                 if ('' !== $request->request->get('subject')) {
                     $objForm->getWidget('subject')->value = $request->request->get('subject');
                 }
