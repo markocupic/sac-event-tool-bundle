@@ -47,6 +47,7 @@ use Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventMemberList2Docx;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
+use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
 use NotificationCenter\Model\Notification;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
@@ -85,6 +86,7 @@ class CalendarEventsMember
         private readonly Security $security,
         private readonly ExportEventRegistrationList $registrationListExporterCsv,
         private readonly EventMemberList2Docx $registrationListExporterDocx,
+        private readonly EventRegistrationUtil $eventRegistrationUtil,
         private readonly string $projectDir,
         private readonly string $sacevtEventAdminName,
         private readonly string $sacevtEventAdminEmail,
@@ -208,7 +210,7 @@ class CalendarEventsMember
             if (null !== $objInstructor) {
                 if ('' !== $objInstructor->email) {
                     if ($this->validator->isEmail($objInstructor->email)) {
-                        $options['tl_user-'.$objInstructor->id] = $objInstructor->firstname.' '.$objInstructor->lastname.' (Leiter)';
+                        $options['tl_user-'.$objInstructor->id] = sprintf('<strong>%s %s (Leiter)</strong>', $objInstructor->firstname, $objInstructor->lastname);
                     }
                 }
             }
@@ -225,11 +227,14 @@ class CalendarEventsMember
                     throw new \Exception('$GLOBALS["TL_CONFIG"]["SAC-EVENT-TOOL-CONFIG"]["MEMBER-SUBSCRIPTION-STATE"] not found. Please check the config file.');
                 }
 
+                $registrationModel = CalendarEventsMemberModel::findByPk($arrReg['id']);
+                $icon = $this->eventRegistrationUtil->getSubscriptionStateIcon($registrationModel);
+
                 $regState = (string) $arrReg['stateOfSubscription'];
                 $regState = \in_array($regState, $arrSubscriptionStates, true) ? $regState : EventSubscriptionLevel::SUBSCRIPTION_STATE_UNDEFINED;
                 $strLabel = $GLOBALS['TL_LANG']['MSC'][$regState] ?? $regState;
 
-                $options['tl_calendar_events_member-'.$arrReg['id']] = $arrReg['firstname'].' '.$arrReg['lastname'].' ('.$strLabel.')';
+                $options['tl_calendar_events_member-'.$arrReg['id']] = sprintf('%s %s %s (%s)', $icon, $arrReg['firstname'], $arrReg['lastname'], $strLabel);
             }
         }
 
@@ -763,8 +768,9 @@ class CalendarEventsMember
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.label.label', priority: 100)]
     public function addIcon(array $row, string $label, DataContainer $dc, array $args): array
     {
-        $icon = 'icons/subscription-states/'.$row['stateOfSubscription'].'.svg';
-        $args[0] = sprintf('<div><img src="%s/%s" alt="%s" width="16" height=16"></div>', Bundle::ASSET_DIR, $icon, $row['stateOfSubscription']);
+        $registrationModel = $this->calendarEventsMember->findByPk($row['id']);
+        $icon = $this->eventRegistrationUtil->getSubscriptionStateIcon($registrationModel);
+        $args[0] = sprintf('<div>%s</div>', $icon);
 
         return $args;
     }
