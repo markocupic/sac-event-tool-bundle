@@ -347,7 +347,7 @@ class CalendarEvents
             $arrIDS = $session['IDS'];
 
             if (!empty($arrIDS) && \is_array($arrIDS)) {
-                $objEventsModel = $this->calendarEventsModel->findByPk($arrIDS[1]);
+                $objEventsModel = $this->calendarEventsModel->findByPk($arrIDS[0]);
 
                 if (null !== $objEventsModel) {
                     if ($objEventsModel->eventReleaseLevel > 0) {
