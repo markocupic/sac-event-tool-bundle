@@ -52,6 +52,82 @@ class CalendarEventsVoter extends Voter
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }
 
+    /**
+     * Grant switch-release-level-access (upgrade/downgrade)...
+     * - to all users, if there is no release package assigned to the calendar (tl_calendar).
+     * - do not allow downgrading if the event release level is on the first level
+     * - do not allow upgrading if the event release level is on the last level
+     * but allow upgrading or downgrading...
+     * - to admins
+     * - to permitted event-authors (-> tl_event_release_level_policy.allowWriteAccessToAuthor
+     * - to permitted event-instructors (-> tl_event_release_level_policy.allowWriteAccessToInstructors
+     * - to "super-users" (-> tl_event_release_level_policy.groupReleaseLevelPerm).
+     *
+     * @throws \Exception
+     */
+    public function canChangeReleaseLevel(CalendarEventsModel $eventsModel, BackendUser $user, EventReleaseLevelPolicyModel $eventReleaseLevelPolicyModel, string $direction): bool
+    {
+        if ('up' !== $direction && 'down' !== $direction) {
+            throw new \Exception(sprintf('Direction must be "up" or "down" "%s" given!', $direction));
+        }
+
+        if ('up' === $direction) {
+            if ($eventReleaseLevelPolicyModel === $eventReleaseLevelPolicyModel::findLastLevelByEventId($eventsModel->id)) {
+                return false;
+            }
+        } else {
+            if ($eventReleaseLevelPolicyModel === $eventReleaseLevelPolicyModel::findFirstLevelByEventId($eventsModel->id)) {
+                return false;
+            }
+        }
+
+        // Allow switching release level to admins.
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return true;
+        }
+
+        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($eventsModel, false);
+
+        if ((int) $user->id === (int) $eventsModel->author || \in_array($user->id, $arrEventInstructors, false)) {
+            if ($eventReleaseLevelPolicyModel->allowWriteAccessToAuthor) {
+                if ('up' === $direction) {
+                    // User is author or instructor and is allowed to upgrade the event
+                    if ($eventReleaseLevelPolicyModel->allowSwitchingToNextLevel) {
+                        return true;
+                    }
+                } else {
+                    if ($eventReleaseLevelPolicyModel->allowSwitchingToPrevLevel) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // Check if the user is member in an allowed group
+        $arrAllowedGroups = $this->stringUtil->deserialize($eventReleaseLevelPolicyModel->groupReleaseLevelPerm, true);
+        $arrUserGroups = $this->stringUtil->deserialize($user->groups, true);
+
+        foreach ($arrAllowedGroups as $v) {
+            if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
+                $arrPerm = isset($v['permissions']) && \is_array($v['permissions']) ? $v['permissions'] : [];
+
+                if ('up' === $direction) {
+                    if (\in_array('canRelLevelUp', $arrPerm, true)) {
+                        // User is author or instructor and is allowed to upgrade the event
+                        return true;
+                    }
+                } else {
+                    if (\in_array('canRelLevelDown', $arrPerm, true)) {
+                        // User is author or instructor and is allowed to downgrade the event
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     protected function supports($attribute, $subject): bool
     {
         return \in_array(
@@ -262,54 +338,18 @@ class CalendarEventsVoter extends Voter
                 throw new \Exception(sprintf($msg, $this->event->id));
             }
         } else {
-            // Grant delete-access if the event is not assigned to a release level.
+            // Grant write- or write-access if the event is not assigned to a release level.
             return true;
         }
 
-        // Allow deletion to admins.
-        if ($this->security->isGranted('ROLE_ADMIN')) {
-            return true;
+        if (self::CAN_UPGRADE_EVENT_RELEASE_LEVEL === $attribute) {
+            $direction = 'up';
+        } elseif (self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL === $attribute) {
+            $direction = 'down';
+        } else {
+            throw new \LogicException(sprintf('$attribute should be either "%s" or "%s" "%s" given.', self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $attribute));
         }
 
-        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event, false);
-
-        if ((int) $this->user->id === (int) $this->event->author || \in_array($this->user->id, $arrEventInstructors, false)) {
-            if ($releaseLevelPolicy->allowWriteAccessToAuthor) {
-                // User is author or instructor and is allowed to upgrade the event
-                if (self::CAN_UPGRADE_EVENT_RELEASE_LEVEL === $attribute && $releaseLevelPolicy->allowSwitchingToNextLevel) {
-                    return true;
-                }
-                // User is author or instructor and is allowed to downgrade the event
-                if (self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL === $attribute && $releaseLevelPolicy->allowSwitchingToPrevLevel) {
-                    return true;
-                }
-            }
-        }
-
-        // Check if the user is member in an allowed group
-        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupReleaseLevelPerm, true);
-        $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
-
-        foreach ($arrAllowedGroups as $v) {
-            if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
-                $arrPerm = isset($v['permissions']) && \is_array($v['permissions']) ? $v['permissions'] : [];
-
-                if (self::CAN_UPGRADE_EVENT_RELEASE_LEVEL === $attribute) {
-                    if (\in_array('canRelLevelUp', $arrPerm, true)) {
-                        // Grant upgrading event release level
-                        return true;
-                    }
-                }
-
-                if (self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL === $attribute) {
-                    if (\in_array('canRelLevelDown', $arrPerm, true)) {
-                        // Grant downgrading event release level
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        return $this->canChangeReleaseLevel($this->event, $this->user, $releaseLevelPolicy, $direction);
     }
 }
