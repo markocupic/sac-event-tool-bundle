@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Codefog\HasteBundle\Form\Form;
 use Contao\Calendar;
 use Contao\CalendarEventsModel;
 use Contao\Config;
@@ -27,7 +28,6 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Template;
-use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
 use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
@@ -93,15 +93,9 @@ class JahresprogrammExportController extends AbstractPrintExportController
         $objForm = new Form(
             'form-jahresprogramm-export',
             'POST',
-            function (Form $objHaste): bool {
-                /** @var Request $request */
-                $request = $this->requestStack->getCurrentRequest();
-
-                return $request->request->get('FORM_SUBMIT') === $objHaste->getFormId();
-            }
         );
 
-        $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
+        $objForm->setAction($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
         $objForm->addFormField('eventType', [

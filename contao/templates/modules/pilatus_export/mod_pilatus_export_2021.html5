@@ -4,7 +4,7 @@
 
 <?php $this->block('content'); ?>
 
-<?= $this->form ?>
+<?= $this->form->generate() ?>
 
 <script>
     //Set Datepicker

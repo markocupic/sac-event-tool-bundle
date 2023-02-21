@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Codefog\HasteBundle\Form\Form;
 use Contao\Backend;
 use Contao\BackendTemplate;
 use Contao\BackendUser;
@@ -36,7 +37,6 @@ use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Haste\Form\Form;
 use League\Csv\CannotInsertRecord;
 use League\Csv\InvalidArgument;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
@@ -293,7 +293,7 @@ class CalendarEventsMember
 
                             if (null !== $objFile) {
                                 if (is_file($this->projectDir.'/'.$objFile->path)) {
-                                    $objEmail->attachFile($objFile->path);
+                                    $objEmail->attachFile($this->projectDir.'/'.$objFile->path);
                                 }
                             }
                         }
@@ -855,7 +855,6 @@ class CalendarEventsMember
         $objForm = new Form(
             $arrAction['formId'],
             'POST',
-            static fn ($objHaste) => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId()
         );
 
         // Now let's add form fields:

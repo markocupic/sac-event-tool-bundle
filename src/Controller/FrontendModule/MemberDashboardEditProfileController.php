@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Codefog\HasteBundle\Form\Form;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -25,7 +26,6 @@ use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Template;
-use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -119,10 +119,9 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
         $objForm = new Form(
             'form-user-profile',
             'POST',
-            static fn ($objHaste) => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId()
         );
 
-        $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
+        $objForm->setAction($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
         $objForm->addFormField('emergencyPhone', [
@@ -162,7 +161,7 @@ class MemberDashboardEditProfileController extends AbstractFrontendModuleControl
 
         // Bind form to the MemberModel
         $objModel = $memberModelAdapter->findByPk($this->objUser->id);
-        $objForm->bindModel($objModel);
+        $objForm->setBoundModel($objModel);
 
         if ($objForm->validate()) {
             // The model will now contain the changes, so you can save it.

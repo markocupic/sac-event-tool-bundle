@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle;
 
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use Codefog\HasteBundle\UrlParser;
 use Contao\Calendar;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
@@ -45,7 +46,6 @@ use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Markocupic\SacEventToolBundle\Model\TourTypeModel;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
-use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 
@@ -1012,10 +1012,12 @@ class CalendarEventsHelper
 					$objPage = PageModel::findByPk($objEventType->previewPage);
 
 					if ($objPage instanceof PageModel) {
+
+						$urlParser = System::getContainer()->get(UrlParser::class);
 						$params = (Config::get('useAutoItem') ? '/' : '/events/').($objEvent->alias ?: $objEvent->id);
 						$strUrl = StringUtil::ampersand($objPage->getFrontendUrl($params));
-						$strUrl = Url::addQueryString('mode=eventPreview', $strUrl);
-						$strUrl = Url::addQueryString('eventToken='.$objEvent->eventToken, $strUrl);
+						$strUrl = $urlParser->addQueryString('mode=eventPreview', $strUrl);
+						$strUrl = $urlParser->addQueryString('eventToken='.$objEvent->eventToken, $strUrl);
 					}
 				}
 			}

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Codefog\HasteBundle\Form\Form;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
@@ -28,7 +29,6 @@ use Contao\Template;
 use Contao\UserGroupModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
-use Haste\Form\Form;
 use League\Csv\Exception;
 use League\Csv\InvalidArgument;
 use League\Csv\Reader;
@@ -86,7 +86,6 @@ class CsvUserExportController extends AbstractFrontendModuleController
         $objForm = new Form(
             'form-user-export',
             'POST',
-            static fn ($objHaste) => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId()
         );
 
         $arrUserRoles = [];
@@ -97,7 +96,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
             $arrUserRoles[$rowUserRole['id']] = $rowUserRole['title'];
         }
 
-        $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
+        $objForm->setAction($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
         $objForm->addFormField('export-type', [

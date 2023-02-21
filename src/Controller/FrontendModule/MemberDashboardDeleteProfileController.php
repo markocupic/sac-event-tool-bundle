@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Codefog\HasteBundle\Form\Form;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Exception\RedirectResponseException;
@@ -24,7 +25,6 @@ use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Template;
-use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -98,10 +98,9 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
         $objForm = new Form(
             'form-clear-profile',
             'POST',
-            static fn ($objHaste) => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId()
         );
 
-        $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
+        $objForm->setAction($environmentAdapter->get('uri'));
 
         $objForm->addFormField('deleteProfile', [
             'label' => ['Profil löschen', ''],
@@ -116,7 +115,7 @@ class MemberDashboardDeleteProfileController extends AbstractFrontendModuleContr
 
         // Let's add a submit button
         $objForm->addFormField('submit', [
-            'label' => 'Profil unwiederkehrlich löschen',
+            'label' => 'Profil unwiderruflich löschen',
             'inputType' => 'submit',
         ]);
 

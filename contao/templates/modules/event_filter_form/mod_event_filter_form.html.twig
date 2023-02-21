@@ -5,7 +5,7 @@
 {% block content %}
 
     <div class="filter-board {{ form.getFormId() }} block" id="{{ form.getFormId() }}">
-        <form action="{{ form.getFormAction() }}" enctype="{{ form.getEnctype() }}" method="{{ form.getMethod() }}">
+        <form action="{{ form.getAction() }}" enctype="{{ form.getEnctype() }}" method="{{ form.getHttpMethod() }}">
             {# start formbody #}
             <div class="formbody">
                 {# start row #}

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Codefog\HasteBundle\Form\Form;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
@@ -30,7 +31,6 @@ use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Template;
-use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Image\RotateImage;
 use Symfony\Component\HttpFoundation\Request;
@@ -195,14 +195,9 @@ class MemberDashboardAvatarUploadController extends AbstractFrontendModuleContro
         $objForm = new Form(
             'form-avatar-upload',
             'POST',
-            function ($objHaste) {
-                $inputAdapter = $this->framework->getAdapter(Input::class);
-
-                return $inputAdapter->post('FORM_SUBMIT') === $objHaste->getFormId();
-            }
         );
 
-        $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
+        $objForm->setAction($environmentAdapter->get('uri'));
 
         // Now let's add form fields:
         $objForm->addFormField('avatar', [

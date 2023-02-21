@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Codefog\HasteBundle\Form\Form;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
@@ -26,7 +27,6 @@ use Contao\MemberModel;
 use Contao\ModuleModel;
 use Contao\Template;
 use Doctrine\DBAL\Connection;
-use Haste\Form\Form;
 use League\Csv\ByteSequence;
 use League\Csv\Exception;
 use League\Csv\InvalidArgument;
@@ -72,11 +72,10 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $objForm = new Form(
             'form-event-member-export',
             'POST',
-            static fn ($objHaste) => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId()
         );
 
         $environment = $this->framework->getAdapter(Environment::class);
-        $objForm->setFormActionFromUri($environment->get('uri'));
+        $objForm->setAction($environment->get('uri'));
 
         // Now let's add form fields:
         $objForm->addFormField('event-type', [

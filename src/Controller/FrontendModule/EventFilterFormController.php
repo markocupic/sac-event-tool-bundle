@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Codefog\HasteBundle\Form\Form;
+use Codefog\HasteBundle\UrlParser;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
@@ -25,8 +27,6 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Template;
-use Haste\Form\Form;
-use Haste\Util\Url;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -42,6 +42,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly TranslatorInterface $translator,
+        private readonly UrlParser $urlParser,
         private readonly string $sacevtLocale,
     ) {
     }
@@ -69,9 +70,6 @@ class EventFilterFormController extends AbstractFrontendModuleController
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        /** @var Url $urlAdapter */
-        $urlAdapter = $this->framework->getAdapter(Url::class);
-
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
@@ -81,14 +79,14 @@ class EventFilterFormController extends AbstractFrontendModuleController
             // Clean url dateStart url param & redirect
             if ($inputAdapter->get('year') > 0 && '' !== $inputAdapter->get('dateStart')) {
                 if ($inputAdapter->get('year') !== $dateAdapter->parse('Y', strtotime($inputAdapter->get('dateStart')))) {
-                    $url = $urlAdapter->removeQueryString(['dateStart']);
+                    $url = $this->urlParser->removeQueryString(['dateStart']);
                     $controllerAdapter->redirect($url);
                 }
             }
             // Clean url dateStart url param & redirect
             if (empty($inputAdapter->get('year')) && !empty($inputAdapter->get('dateStart'))) {
                 if ($dateAdapter->parse('Y') !== $dateAdapter->parse('Y', strtotime($inputAdapter->get('dateStart')))) {
-                    $url = $urlAdapter->removeQueryString(['dateStart']);
+                    $url = $this->urlParser->removeQueryString(['dateStart']);
                     $controllerAdapter->redirect($url);
                 }
             }
@@ -136,7 +134,7 @@ class EventFilterFormController extends AbstractFrontendModuleController
 
         // Action
         $url = $this->objPage->getFrontendUrl();
-        $objForm->setFormActionFromUri($url);
+        $objForm->setAction($url);
 
         $objForm->addFieldsFromDca(
             'tl_event_filter_form',

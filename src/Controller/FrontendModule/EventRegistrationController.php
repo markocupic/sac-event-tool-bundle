@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Codefog\HasteBundle\Form\Form;
+use Codefog\HasteBundle\UrlParser;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
@@ -37,8 +39,6 @@ use Contao\StringUtil;
 use Contao\Template;
 use Contao\UserModel;
 use Contao\Validator;
-use Haste\Form\Form;
-use Haste\Util\Url;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
@@ -102,6 +102,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly TwigEnvironment $twig,
         private readonly TranslatorInterface $translator,
+        private readonly UrlParser $urlParser,
         private readonly string $projectDir,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
@@ -119,7 +120,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $this->filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
         $this->inputAdapter = $this->framework->getAdapter(Input::class);
         $this->stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-        $this->urlAdapter = $this->framework->getAdapter(Url::class);
         $this->userModelAdapter = $this->framework->getAdapter(UserModel::class);
         $this->validatorAdapter = $this->framework->getAdapter(Validator::class);
         $this->eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
@@ -255,10 +255,10 @@ class EventRegistrationController extends AbstractFrontendModuleController
             }
         } else {
             // All ok! Generate the registration form.
-            $this->generateForm();
+            $this->buildForm();
 
             if (null !== $this->objForm) {
-                $this->template->form = $this->objForm->generate();
+                //$this->template->form = $this->objForm->generate();
                 $this->template->objForm = $this->objForm;
             }
 
@@ -283,23 +283,20 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $request = $this->requestStack->getCurrentRequest();
 
         if ($request->query->get('action') !== $action) {
-            return $this->urlAdapter->addQueryString('action='.$action, $this->environmentAdapter->get('uri'));
+            return $this->urlParser->addQueryString('action='.$action, $this->environmentAdapter->get('uri'));
         }
 
         return null;
     }
 
-    private function generateForm(): void
+    private function buildForm(): void
     {
-        $request = $this->requestStack->getCurrentRequest();
-
         $objForm = new Form(
             'form-event-registration',
             'POST',
-            static fn ($objHaste) => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId(),
         );
 
-        $objForm->setFormActionFromUri($this->environmentAdapter->get('uri'));
+        $objForm->setAction($this->environmentAdapter->get('uri'));
 
         if (null !== ($objJourney = $this->calendarEventsJourneyModelAdapter->findByPk($this->eventModel->journey))) {
             if ('public-transport' === $objJourney->alias) {

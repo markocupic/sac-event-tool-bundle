@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
+use Codefog\HasteBundle\Form\Form;
 use Contao\Calendar;
 use Contao\CalendarEventsModel;
 use Contao\Config;
@@ -33,7 +34,6 @@ use Contao\Validator;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Haste\Form\Form;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -125,9 +125,9 @@ class PilatusExport2021Controller extends AbstractPrintExportController
         $objForm = new Form(
             'form-pilatus-export',
             'POST',
-            static fn (Form $objHaste): bool => $request->request->get('FORM_SUBMIT') === $objHaste->getFormId()
         );
-        $objForm->setFormActionFromUri($environmentAdapter->get('uri'));
+
+        $objForm->setAction($environmentAdapter->get('uri'));
 
         $year = (int) date('Y');
 
