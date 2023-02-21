@@ -1,7 +1,7 @@
 {
     "name": "markocupic/sac-event-tool-bundle",
     "type": "contao-bundle",
-    "description": "Contao 4 Event tool bundle for SAC (Swiss Alpine Club Sections)",
+    "description": "Contao Event-Tool Bundle for SAC (Swiss Alpine Club Sections)",
     "license": "GPL-3.0-or-later",
     "authors": [
         {
@@ -15,7 +15,7 @@
         "contao/core-bundle": "^4.13",
         "contao/calendar-bundle": "^4.13",
         "chillerlan/php-qrcode": "^4.3",
-        "codefog/contao-haste": "^4.25",
+        "codefog/contao-haste": "^5.0",
         "eluceo/ical": "^2.5",
         "league/csv": "^9.7",
         "markocupic/cloudconvert-bundle": "^2.0",
@@ -52,3 +52,4 @@
         "contao-manager-plugin": "Markocupic\\SacEventToolBundle\\ContaoManager\\Plugin"
     }
 }
+
