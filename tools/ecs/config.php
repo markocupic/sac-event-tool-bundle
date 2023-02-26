@@ -27,7 +27,7 @@ return static function (ECSConfig $ecsConfig): void {
         ]);
 
     $ecsConfig->skip([
-		'*/contao/*',
+		'*/contao/dca*',
 		MethodChainingIndentationFixer::class => [
             'DependencyInjection/Configuration.php',
         ],
