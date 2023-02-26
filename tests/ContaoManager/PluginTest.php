@@ -19,8 +19,7 @@ use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\DelegatingParser;
 use Contao\TestCase\ContaoTestCase;
-use Markocupic\ExportTable\ContaoManager\Plugin;
-use Markocupic\ExportTable\MarkocupicExportTable;
+use Markocupic\SacEventToolBundle\ContaoManager\Plugin;
 use Markocupic\RssFeedGeneratorBundle\MarkocupicRssFeedGeneratorBundle;
 use Markocupic\SacEventToolBundle\MarkocupicSacEventToolBundle;
 
