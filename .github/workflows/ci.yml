@@ -26,20 +26,27 @@ jobs:
                 run: composer cs-fixer
 
     phpstan:
-        name: phpstan basic checker
+        name: PHPStan
         runs-on: ubuntu-latest
         steps:
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
+                with:
+                    php-version: 8.1
+                    extensions: dom, fileinfo, filter, gd, hash, intl, json, mbstring, mysqli, pcre, pdo_mysql, zlib
+                    coverage: none
+                env:
+                    COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             -   name: Checkout
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
 
-            -   name: Install ecs
-                run: cd tools/phpstan && composer update --no-interaction --no-suggest
-
-            -   name: Run phpstan
-                run: composer phpstan
+            -   name: Install the dependencies
+                run: |
+                    composer update --no-interaction --no-progress
+                    cd tools/ecs && composer update --no-interaction --no-suggest
+            -   name: Run PHPStan
+                run: tools/phpstan/vendor/bin/phpstan analyse --no-progress
 
     tests:
         name: PHP ${{ matrix.php }}
