@@ -46,7 +46,7 @@ jobs:
                     composer update --no-interaction --no-progress
                     cd tools/phpstan && composer update --no-interaction --no-suggest
             -   name: Run PHPStan
-                run: tools/phpstan/vendor/bin/phpstan analyse --no-progress
+                run: composer phpstan
 
     tests:
         name: PHP ${{ matrix.php }}
