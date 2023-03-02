@@ -3,5 +3,10 @@
         "phpstan/phpstan": "^1.10",
         "markocupic/swiss-alpine-club-contao-login-client-bundle": "^2.0",
         "contao/test-case": "^4.13"
+    },
+    "config": {
+        "allow-plugins": {
+            "contao-components/installer": false
+        }
     }
 }
