@@ -6,7 +6,9 @@
     },
     "config": {
         "allow-plugins": {
-            "contao-components/installer": false
+            "contao-components/installer": false,
+            "contao/manager-plugin": false,
+            "contao-community-alliance/composer-plugin": true
         }
     }
 }
