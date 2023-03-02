@@ -31,12 +31,19 @@ use Contao\Environment;
 use Contao\Events;
 use Contao\FrontendTemplate;
 use Contao\Input;
-use Contao\Module;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 
+/**
+ * Front end module "event reader".
+ *
+ * @property Comments $Comments
+ * @property string   $com_template
+ * @property string   $cal_template
+ * @property array    $cal_calendar
+ */
 class ModuleSacEventToolEventPreviewReader extends Events
 {
     /**
@@ -47,10 +54,13 @@ class ModuleSacEventToolEventPreviewReader extends Events
     protected $strTemplate = 'mod_eventreader';
 
     /**
-     * Display a token-protected preview of the edited event.
-     * Use the compile method of \Contao\ModuleEventReader.
+     * Display a wildcard in the back end.
+     *
+     * @throws InternalServerErrorException
+     *
+     * @return string
      */
-    public function generate(): string
+    public function generate()
     {
         $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
@@ -66,37 +76,31 @@ class ModuleSacEventToolEventPreviewReader extends Events
         }
 
         // Set the item from the auto_item parameter
-        if (!isset($_GET['events']) && Config::get('useAutoItem') && isset($_GET['auto_item'])) {
+        if (!isset($_GET['events']) && isset($_GET['auto_item']) && Config::get('useAutoItem')) {
             Input::setGet('events', Input::get('auto_item'));
         }
 
-        $blnShow = false;
+        /* Start Hack Marko Cupic */
+        // Return an empty string if "events" is not set (to combine list and reader on same page)
 
-        if ('' !== Input::get('events')) {
-            $objEvent = CalendarEventsModel::findByIdOrAlias(Input::get('events'));
-
-            if (null !== $objEvent) {
-                if ($objEvent->eventToken === Input::get('eventToken')) {
-                    $blnShow = true;
-                }
-            }
+        if (!Input::get('events')) {
+            return '';
         }
 
-        if (!$blnShow) {
-            throw new PageNotFoundException('Page not found: '.Environment::get('uri'));
+        $objEvent = CalendarEventsModel::findByIdOrAlias(Input::get('events'));
+
+        if (null === $objEvent) {
+            throw new InternalServerErrorException('Event "'.Input::get('events').'" not found.');
         }
 
-        /** @var PageModel $objPage */
-        global $objPage;
+        if ($objEvent->eventToken !== Input::get('eventToken')) {
+            throw new InternalServerErrorException('Invalid eventToken!');
+        }
 
-        $objPage->noSearch = 1;
-        $objPage->cache = 0;
-
-        // These settings must be made temporarily, otherwise
-        // the parent::_compile() method will throw an error.
         $this->cal_calendar = [$objEvent->pid];
+        /* End Hack Marko Cupic */
 
-        return Module::generate();
+        return parent::generate();
     }
 
     /**
@@ -120,10 +124,11 @@ class ModuleSacEventToolEventPreviewReader extends Events
         }
 
         // Hack by marko Cupic: Get the current event
-        //$objEvent = CalendarEventsModel::findPublishedByParentAndIdOrAlias(Input::get('events'), $this->cal_calendar);
-        $objEvent = CalendarEventsModel::findByAlias(Input::get('events')); // Hack
-        $objEvent->pid = $this->cal_calendar[0]; // Hack
-        $objEvent->source = 'default'; // Hack
+        // Get the current event
+        // $objEvent = CalendarEventsModel::findPublishedByParentAndIdOrAlias(Input::get('events'), $this->cal_calendar); // Hack Marko Cupic
+        $objEvent = CalendarEventsModel::findByIdOrAlias(Input::get('events')); // Hack Marko Cupic
+        $objEvent->pid = $this->cal_calendar[0]; // Hack Marko Cupic
+        $objEvent->source = 'default'; // Hack Marko Cupic
 
         // The event does not exist (see #33)
         if (null === $objEvent) {
@@ -261,9 +266,7 @@ class ModuleSacEventToolEventPreviewReader extends Events
         if ('default' !== $objEvent->source) {
             $objTemplate->hasDetails = true;
             $objTemplate->hasReader = false;
-        }
-
-        // Compile the event text
+        } // Compile the event text
         else {
             $id = $objEvent->id;
 
@@ -432,7 +435,7 @@ class ModuleSacEventToolEventPreviewReader extends Events
         $arrNotifies = [];
 
         // Notify the system administrator
-        if ('notify_author' !== $objCalendar->notify) {
+        if ('notify_author' !== $objCalendar->notify && isset($GLOBALS['TL_ADMIN_EMAIL'])) {
             $arrNotifies[] = $GLOBALS['TL_ADMIN_EMAIL'];
         }
 
