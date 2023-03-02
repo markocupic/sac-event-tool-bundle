@@ -83,9 +83,9 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private Adapter $filesModelAdapter;
     private Adapter $inputAdapter;
     private Adapter $stringUtilAdapter;
-    private Adapter $urlAdapter;
     private Adapter $userModelAdapter;
     private Adapter $validatorAdapter;
+    private Adapter $eventReleaseLevelPolicyModelAdapter;
 
     // Class properties that are initialized after class instantiation
     private ModuleModel|null $moduleModel = null;

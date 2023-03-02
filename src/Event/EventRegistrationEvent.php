@@ -14,19 +14,31 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Event;
 
+use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\MemberModel;
+use Contao\ModuleModel;
+use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class EventRegistrationEvent extends Event
 {
     public const NAME = 'markocupic.sac_event_tool_bundle.event_registration';
 
+    public ContaoFramework $framework;
+    public MemberModel $memberModel;
+    public CalendarEventsModel $eventModel;
+    public CalendarEventsMemberModel $eventMemberModel;
+    public ModuleModel $moduleModel;
+    public array $arrData;
+
     public function __construct(\stdClass $event)
     {
         $this->framework = $event->framework;
-        $this->arrData = $event->arrData;
         $this->memberModel = $event->memberModel;
         $this->eventModel = $event->eventModel;
         $this->eventMemberModel = $event->eventMemberModel;
         $this->moduleModel = $event->moduleModel;
+        $this->arrData = $event->arrData;
     }
 }

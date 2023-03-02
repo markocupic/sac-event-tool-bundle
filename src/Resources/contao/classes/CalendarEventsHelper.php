@@ -1011,7 +1011,7 @@ class CalendarEventsHelper
         $strUrl = '';
 
         if ('' !== $objEvent->eventType) {
-            $objEventType = EventTypeModel::findByAlias($objEvent->eventType);
+            $objEventType = EventTypeModel::findOneBy('alias', $objEvent->eventType);
 
             if (null !== $objEventType) {
                 if ($objEventType->previewPage > 0) {

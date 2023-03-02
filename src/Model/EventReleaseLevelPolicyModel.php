@@ -67,7 +67,7 @@ class EventReleaseLevelPolicyModel extends Model
             return null;
         }
 
-        $objEventType = EventTypeModel::findByAlias($objEvent->eventType);
+        $objEventType = EventTypeModel::findOneBy('alias', $objEvent->eventType);
 
         if (null === $objEventType) {
             return null;
@@ -108,7 +108,7 @@ class EventReleaseLevelPolicyModel extends Model
             return null;
         }
 
-        $objEventType = EventTypeModel::findByAlias($objEvent->eventType);
+        $objEventType = EventTypeModel::findOneBy('alias', $objEvent->eventType);
 
         if (null === $objEventType) {
             return null;

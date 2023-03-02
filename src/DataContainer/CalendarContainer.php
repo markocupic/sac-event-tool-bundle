@@ -74,7 +74,7 @@ class CalendarContainer
             $GLOBALS['TL_DCA']['tl_calendar_container']['config']['closed'] = true;
         }
 
-        /** @var SessionInterface $objSession */
+        /** @var SessionInterface $session */
         $session = $request->getSession();
 
         // Check current action
@@ -156,7 +156,7 @@ class CalendarContainer
             case 'editAll':
             case 'deleteAll':
             case 'overrideAll':
-                $arrSession = $objSession->all();
+                $arrSession = $session->all();
 
                 if ('deleteAll' === $request->query->get('act') && !$user->hasAccess('delete', 'calendar_containerp')) {
                     $arrSession['CURRENT']['IDS'] = [];

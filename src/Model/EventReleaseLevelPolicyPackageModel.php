@@ -37,7 +37,7 @@ class EventReleaseLevelPolicyPackageModel extends Model
             return null;
         }
 
-        $objEventType = EventTypeModel::findByAlias($objEvent->eventType);
+        $objEventType = EventTypeModel::findOneBy('alias', $objEvent->eventType);
 
         if (null === $objEventType || !$objEventType->levelAccessPermissionPackage > 0) {
             return null;

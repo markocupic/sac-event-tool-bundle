@@ -305,7 +305,7 @@ class EventApiController extends AbstractController
         // Order by startDate ASC
         $qb->orderBy('t.startDate', 'ASC');
 
-        /** @var array $arrIds */
+        /** @var array<int> $arrIds */
         $arrIds = $qb->fetchFirstColumn();
 
         // Now we have all the ids, let's prepare the second query

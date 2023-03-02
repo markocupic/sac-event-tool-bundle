@@ -912,6 +912,7 @@ class CalendarEventsMember
                         $this->message->addInfo('Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.');
                     }
                 }
+
                 $this->controller->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$request->query->get('id').'&act=edit&rt='.$request->query->get('rt'));
             } else {
                 // Add value to fields
@@ -991,7 +992,7 @@ class CalendarEventsMember
                 // Get event type
                 $eventType = \strlen((string) $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType]) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType].': ' : 'Event: ';
 
-                // Add value to ffields
+                // Add value to fields
                 $objForm->getWidget('subject')->value = sprintf($arrAction['emailSubject'], $eventType.$objEvent->title);
                 $objForm->getWidget('text')->value = $emailBodyText;
 
@@ -1002,9 +1003,9 @@ class CalendarEventsMember
 
                 return $objTemplate->parse();
             }
-
-            return '';
         }
+
+        throw new \LogicException('This place in the code should normally not be reached.');
     }
 
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.global_operations.backToEventSettings.button', priority: 100)]
