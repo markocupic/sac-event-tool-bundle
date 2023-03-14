@@ -108,7 +108,7 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
 
             // Set token array
             $arrTokens = [
-                'event_leistungen' => html_entity_decode($this->eventModel->leistungen),
+                'event_leistungen' => html_entity_decode((string) $this->eventModel->leistungen),
                 'event_type' => html_entity_decode((string) $this->eventModel->eventType),
                 'event_add_iban' => $this->eventModel->addIban,
                 'event_course_id' => $this->eventModel->courseId,
