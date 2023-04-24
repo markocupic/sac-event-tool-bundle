@@ -42,14 +42,17 @@ services:
         calls:
             - [ setName, [ 'markocupic_sac_event_tool_attributes' ] ]
 
-    # Generate docx/pdf event rapports, event invoices and event memberlists from docx templates
+    # Generate docx/pdf event rapports, event invoices and event member lists from docx templates
     Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event:
         public: true
 
-    # Generate docx/pdf event rapports, event invoices and event memberlists from docx templates
+    # Generate docx/pdf event rapports, event invoices and event member lists from docx templates
     Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember:
         public: true
 
     Markocupic\SacEventToolBundle\Avatar\Avatar:
+        public: true
+
+    Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainBackendUser:
         public: true
 

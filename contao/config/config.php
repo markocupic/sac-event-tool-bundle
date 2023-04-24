@@ -31,6 +31,7 @@ use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Markocupic\SacEventToolBundle\Model\TourTypeModel;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
+use Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader;
 
 $projectDir = System::getContainer()->getParameter('kernel.project_dir');
 
@@ -128,7 +129,7 @@ $GLOBALS['TL_PERMISSIONS'][] = 'calendar_containerp';
  * Contao 5 ready fe modules are registered in controller-frontend-module.yml
  */
 $GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = [
-    'eventToolCalendarEventPreviewReader' => 'Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader',
+    'eventToolCalendarEventPreviewReader' => ModuleSacEventToolEventPreviewReader::class,
 ];
 
 // TL_CONFIG
