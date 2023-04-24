@@ -34,7 +34,15 @@ class MaintainBackendUser
     public function resetBackendUserPermissions(): void
     {
         $hasUsers = false;
-        $stmt = $this->connection->executeQuery('SELECT username FROM tl_user WHERE admin = ? AND inherit = ?', ['', 'extend']);
+        $stmt = $this->connection
+            ->executeQuery(
+                'SELECT username FROM tl_user WHERE username IS NOT NULL AND admin = ? AND inherit = ?',
+                [
+                    '',
+                    'extend',
+                ]
+            )
+        ;
 
         while (false !== ($userIdentifier = $stmt->fetchOne())) {
             $hasUsers = true;
