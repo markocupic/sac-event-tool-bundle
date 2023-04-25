@@ -349,7 +349,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'inputType' => 'select',
 			'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
 			'options'   => ['onlineForm', 'manually'],
-			'eval'      => ['doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true],
+			'eval'      => ['readonly' => true, 'doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true],
 			'sql'       => "varchar(255) NOT NULL default 'manually'",
 		],
 		'allowMultiSignUp'            => [

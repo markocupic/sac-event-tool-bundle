@@ -22,6 +22,7 @@ use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -30,6 +31,7 @@ use Contao\Email;
 use Contao\Environment;
 use Contao\Events;
 use Contao\FilesModel;
+use Contao\Image;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\StringUtil;
@@ -62,6 +64,7 @@ class CalendarEventsMember
     public const TABLE = 'tl_calendar_events_member';
 
     // Adapters
+    private Adapter $image;
     private Adapter $backend;
     private Adapter $calendarEvents;
     private Adapter $calendarEventsHelper;
@@ -94,6 +97,7 @@ class CalendarEventsMember
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
         // Adapters
+        $this->image = $this->framework->getAdapter(Image::class);
         $this->backend = $this->framework->getAdapter(Backend::class);
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
@@ -319,27 +323,34 @@ class CalendarEventsMember
     }
 
     /**
-     * Check permissions.
-     *
      * @throws \Exception
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
-    public function checkPermissions(DataContainer $dc): void
+    public function checkPermission(DataContainer $dc): void
     {
         $user = $this->security->getUser();
 
         $request = $this->requestStack->getCurrentRequest();
 
-        // Allow full access only to admins, owners and allowed groups
-        if ($user->admin) {
+        $id = \strlen((string) $request->query->get('id')) ? $request->query->get('id') : CURRENT_ID;
+
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             return;
+        }
+
+        $registration = $this->calendarEventsMember->findByPk($id);
+
+        // Do not allow non-admins to delete event registrations with the booking type 'onlineForm'!
+        if ($registration && 'onlineForm' === $registration->bookingType && ('delete' === $request->query->get('act') || 'deleteAll' === $request->query->get('act'))) {
+            throw new AccessDeniedException('Not enough permissions to '.$request->query->get('act').' the event registration ID '.$request->query->get('id').'.');
         }
 
         if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, CURRENT_ID)) {
-            // User is allowed to edit table
+            // Grant write access to the event registration table if the user is member of an allowed group.
             return;
         }
 
+        // Do not show certain buttons if the user is not member of an allowed group.
         if (!$request->query->get('act') && $request->query->get('id')) {
             $objEvent = $this->calendarEvents->findByPk($request->query->get('id'));
 
@@ -359,21 +370,19 @@ class CalendarEventsMember
             }
         }
 
-        if ('delete' === $request->query->get('act') || 'toggle' === $request->query->get('act') || 'edit' === $request->query->get('act') || 'select' === $request->query->get('act')) {
-            $id = \strlen((string) $request->query->get('id')) ? $request->query->get('id') : CURRENT_ID;
-
+        // Grant write-access to the event-author, to event tour guides and registration admins (tl_calendar_events.registrationGoesTo) on the respective event.
+        if ('toggle' === $request->query->get('act') || 'edit' === $request->query->get('act') || 'select' === $request->query->get('act')) {
             if ('select' === $request->query->get('act')) {
                 $objEvent = $this->calendarEvents->findByPk($id);
             } else {
                 /** @var CalendarEventsMemberModel $objEvent */
-                if (null !== ($objMember = $this->calendarEventsMember->findByPk($id))) {
+                if (null !== $registration) {
                     /** @var CalendarEventsModel $objEvent */
-                    $objEvent = $objMember->getRelated('eventId');
+                    $objEvent = $registration->getRelated('eventId');
                 }
             }
 
             if (null !== $objEvent) {
-                // Allow write-access to authors, tour guides and registration admins (tl_calendar_events.registrationGoesTo)
                 $arrAuthors = $this->stringUtil->deserialize($objEvent->author, true);
                 $arrRegistrationGoesTo = $this->stringUtil->deserialize($objEvent->registrationGoesTo, true);
                 $arrInstructor = CalendarEventsHelper::getInstructorsAsArray($objEvent);
@@ -1040,5 +1049,31 @@ class CalendarEventsMember
         unset($arrButtons['saveNback'], $arrButtons['saveNduplicate'], $arrButtons['saveNcreate']);
 
         return $arrButtons;
+    }
+
+    /**
+     * Return the delete user button.
+     *
+     * @param array  $row
+     * @param string $href
+     * @param string $label
+     * @param string $title
+     * @param string $icon
+     * @param string $attributes
+     *
+     * @return string
+     */
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'list.operations.delete.button', priority: 100)]
+    public function deleteRegistration(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    {
+        $allowDeletion = false;
+
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            $allowDeletion = true;
+        } elseif (isset($row['bookingType']) && 'onlineForm' !== $row['bookingType']) {
+            $allowDeletion = true;
+        }
+
+        return $allowDeletion ? '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ' : $this->image->getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
     }
 }
