@@ -522,7 +522,7 @@ class CalendarEventsMember
                             'participant_uuid' => $objEventMemberModel->uuid,
                             'participant_name' => html_entity_decode($objEventMemberModel->firstname.' '.$objEventMemberModel->lastname),
                             'participant_email' => $objEventMemberModel->email,
-                            'event_link_detail' => 'https://'.$this->environment->get('host').'/'.$this->events->generateEventUrl($objEvent),
+                            'event_link_detail' => $this->events->generateEventUrl($objEvent, true),
                         ];
 
                         $objNotification->send($arrTokens, $this->sacevtLocale);
