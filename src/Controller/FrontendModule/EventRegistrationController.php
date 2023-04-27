@@ -41,7 +41,7 @@ use Contao\UserModel;
 use Contao\Validator;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventState;
-use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
@@ -361,7 +361,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $arrData['eventId'] = $this->eventModel->id;
                 $arrData['dateAdded'] = time();
                 $arrData['uuid'] = Uuid::uuid4()->toString();
-                $arrData['stateOfSubscription'] = $this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel) ? EventSubscriptionLevel::SUBSCRIPTION_ON_WAITINGLIST : EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED;
+                $arrData['stateOfSubscription'] = $this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel) ? EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST : EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED;
                 $arrData['bookingType'] = 'onlineForm';
                 $arrData['sectionId'] = $this->memberModel->sectionId;
 

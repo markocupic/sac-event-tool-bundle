@@ -22,7 +22,7 @@ use Contao\Message;
 use Contao\System;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
-use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
@@ -69,7 +69,7 @@ class EventMemberList2Docx
             ],
             [
                 $objEvent->id,
-                EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED,
+                EventSubscriptionState::SUBSCRIPTION_ACCEPTED,
             ],
             [
                 'order' => 'tl_calendar_events_member.lastname, tl_calendar_events_member.firstname',

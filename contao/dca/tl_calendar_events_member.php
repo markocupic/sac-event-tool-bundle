@@ -18,6 +18,7 @@ use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Ramsey\Uuid\Uuid;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 
 System::loadLanguageFile('tl_member');
 
@@ -188,11 +189,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'filter'    => true,
 			'sorting'   => true,
 			'inputType' => 'select',
-			'default'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'][0],
 			'reference' => &$GLOBALS['TL_LANG']['MSC'],
-			'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'],
 			'eval'      => ['doNotShow' => false, 'readonly' => false, 'includeBlankOption' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-			'sql'       => "varchar(255) NOT NULL default ''",
+			'sql'       => "varchar(255) NOT NULL default '".EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED."'",
 		],
 		'gender'                      => [
 			'inputType' => 'select',

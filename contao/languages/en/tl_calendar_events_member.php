@@ -88,3 +88,6 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['onlineForm'] = 'Buchung über 
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['cashPayment'] = 'Barzahlung';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['bankTransfer'] = 'Bank-/Postüberweisung';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['twint'] = 'TWINT';
+
+// Messages
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['notificationDueToMissingEmailDisabled'] = 'Benachrichtigungen wegen fehlender E-Mail-Adresse nicht möglich.';

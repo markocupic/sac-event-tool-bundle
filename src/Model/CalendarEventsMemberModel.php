@@ -22,7 +22,7 @@ use Contao\Frontend;
 use Contao\MemberModel;
 use Contao\Model;
 use Contao\UserModel;
-use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 
 class CalendarEventsMemberModel extends Model
 {
@@ -207,7 +207,7 @@ class CalendarEventsMemberModel extends Model
 
             $objDb = Database::getInstance()
                 ->prepare('SELECT * FROM tl_calendar_events_member WHERE id != ? && eventId=? && stateOfSubscription=?')
-                ->execute($objMember->id, $objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED)
+                ->execute($objMember->id, $objEvent->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED)
             ;
 
             if ($objDb->numRows < $objEvent->maxMembers) {

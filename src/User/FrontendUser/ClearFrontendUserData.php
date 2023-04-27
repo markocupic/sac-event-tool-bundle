@@ -21,7 +21,7 @@ use Contao\Date;
 use Contao\Folder;
 use Contao\MemberModel;
 use Contao\Message;
-use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Psr\Log\LoggerInterface;
@@ -237,7 +237,7 @@ class ClearFrontendUserData
                             continue;
                         }
 
-                        if (EventSubscriptionLevel::SUBSCRIPTION_REFUSED === $objEventsMember->stateOfSubscription) {
+                        if (EventSubscriptionState::SUBSCRIPTION_REFUSED === $objEventsMember->stateOfSubscription) {
                             continue;
                         }
 

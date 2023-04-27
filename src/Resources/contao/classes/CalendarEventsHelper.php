@@ -39,7 +39,7 @@ use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Config\EventState;
-use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
@@ -410,7 +410,7 @@ class CalendarEventsHelper
     {
         $objEventsMember = Database::getInstance()
             ->prepare('SELECT COUNT(id) AS registrationCount FROM tl_calendar_events_member WHERE eventId = ? AND stateOfSubscription = ?')
-            ->execute($objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED)
+            ->execute($objEvent->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED)
         ;
 
         $registrationCount = $objEventsMember->registrationCount;
@@ -472,7 +472,7 @@ class CalendarEventsHelper
     {
         $objEventsMember = Database::getInstance()
             ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId = ? AND stateOfSubscription = ?')
-            ->execute($objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED)
+            ->execute($objEvent->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED)
         ;
 
         $registrationCount = $objEventsMember->numRows;
@@ -858,7 +858,7 @@ class CalendarEventsHelper
 
         $calendarEventsMember = Database::getInstance()
             ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId = ? && stateOfSubscription = ?')
-            ->execute($objEvent->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED)
+            ->execute($objEvent->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED)
         ;
 
         $memberCount = $calendarEventsMember->numRows;
@@ -895,23 +895,23 @@ class CalendarEventsHelper
 
         if (null !== $eventsMemberModel) {
             while ($eventsMemberModel->next()) {
-                if (EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED === $eventsMemberModel->stateOfSubscription) {
+                if (EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED === $eventsMemberModel->stateOfSubscription) {
                     ++$intNotConfirmed;
                 }
 
-                if (EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED === $eventsMemberModel->stateOfSubscription) {
+                if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $eventsMemberModel->stateOfSubscription) {
                     ++$intAccepted;
                 }
 
-                if (EventSubscriptionLevel::SUBSCRIPTION_REFUSED === $eventsMemberModel->stateOfSubscription) {
+                if (EventSubscriptionState::SUBSCRIPTION_REFUSED === $eventsMemberModel->stateOfSubscription) {
                     ++$intRefused;
                 }
 
-                if (EventSubscriptionLevel::SUBSCRIPTION_ON_WAITINGLIST === $eventsMemberModel->stateOfSubscription) {
+                if (EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST === $eventsMemberModel->stateOfSubscription) {
                     ++$intWaitlisted;
                 }
 
-                if (EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED === $eventsMemberModel->stateOfSubscription) {
+                if (EventSubscriptionState::USER_HAS_UNSUBSCRIBED === $eventsMemberModel->stateOfSubscription) {
                     ++$intUnsubscribedUser;
                 }
             }
@@ -981,7 +981,7 @@ class CalendarEventsHelper
         // Get all future events of the member
         $objMemberEvents = Database::getInstance()
             ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId != ? AND contaoMemberId = ? AND stateOfSubscription = ? AND hasParticipated = ?')
-            ->execute($objEvent->id, $objMember->id, EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED, '')
+            ->execute($objEvent->id, $objMember->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED, '')
         ;
 
         while ($objMemberEvents->next()) {

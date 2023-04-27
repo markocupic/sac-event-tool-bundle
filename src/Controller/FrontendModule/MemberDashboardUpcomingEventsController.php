@@ -29,7 +29,7 @@ use Contao\PageModel;
 use Contao\Template;
 use Contao\UserModel;
 use Contao\Validator;
-use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use NotificationCenter\Model\Notification;
@@ -147,7 +147,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
             if (null !== $objEvent) {
                 $objInstructor = $objEvent->getRelated('mainInstructor');
 
-                if (EventSubscriptionLevel::SUBSCRIPTION_REFUSED === $objEventsMember->stateOfSubscription) {
+                if (EventSubscriptionState::SUBSCRIPTION_REFUSED === $objEventsMember->stateOfSubscription) {
                     $objEventsMember->delete();
 
                     $this->contaoGeneralLogger?->info(
@@ -163,9 +163,9 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
                     return;
                 }
 
-                if (EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED === $objEventsMember->stateOfSubscription) {
+                if (EventSubscriptionState::USER_HAS_UNSUBSCRIBED === $objEventsMember->stateOfSubscription) {
                     $errorMsg = 'Abmeldung fehlgeschlagen! Du hast dich vom Event "'.$objEvent->title.'" bereits abgemeldet.';
-                } elseif (EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED === $objEventsMember->stateOfSubscription || EventSubscriptionLevel::SUBSCRIPTION_ON_WAITINGLIST === $objEventsMember->stateOfSubscription) {
+                } elseif (EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED === $objEventsMember->stateOfSubscription || EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST === $objEventsMember->stateOfSubscription) {
                     // allow unregistering if member is not confirmed on the event
                     // allow unregistering if member is waitlisted on the event
                     $blnHasError = false;
@@ -188,7 +188,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
                 // Unregister from event
                 if (!$blnHasError) {
-                    $objEventsMember->stateOfSubscription = EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED;
+                    $objEventsMember->stateOfSubscription = EventSubscriptionState::USER_HAS_UNSUBSCRIBED;
 
                     // Save data record in tl_calendar_events_member
                     $objEventsMember->save();

@@ -42,7 +42,7 @@ use League\Csv\CannotInsertRecord;
 use League\Csv\InvalidArgument;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\Bundle;
-use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventParticipantController;
 use Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList;
@@ -226,17 +226,12 @@ class CalendarEventsMember
 
         while (false !== ($arrReg = $stmt->fetchAssociative())) {
             if ($this->validator->isEmail($arrReg['email'])) {
-                $arrSubscriptionStates = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['MEMBER-SUBSCRIPTION-STATE'];
-
-                if (empty($arrSubscriptionStates) || !\is_array($arrSubscriptionStates)) {
-                    throw new \Exception('$GLOBALS["TL_CONFIG"]["SAC-EVENT-TOOL-CONFIG"]["MEMBER-SUBSCRIPTION-STATE"] not found. Please check the config file.');
-                }
-
+                $arrSubscriptionStates = EventSubscriptionState::ALL;
                 $registrationModel = CalendarEventsMemberModel::findByPk($arrReg['id']);
                 $icon = $this->eventRegistrationUtil->getSubscriptionStateIcon($registrationModel);
 
                 $regState = (string) $arrReg['stateOfSubscription'];
-                $regState = \in_array($regState, $arrSubscriptionStates, true) ? $regState : EventSubscriptionLevel::SUBSCRIPTION_STATE_UNDEFINED;
+                $regState = \in_array($regState, $arrSubscriptionStates, true) ? $regState : EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED;
                 $strLabel = $GLOBALS['TL_LANG']['MSC'][$regState] ?? $regState;
 
                 $options['tl_calendar_events_member-'.$arrReg['id']] = sprintf('%s %s %s (%s)', $icon, $arrReg['firstname'], $arrReg['lastname'], $strLabel);
@@ -484,6 +479,27 @@ class CalendarEventsMember
         ;
     }
 
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.stateOfSubscription.options', priority: 100)]
+    public function listEventSubscriptionStates(DataContainer $dc): array
+    {
+        $stateOfSubscription = $this->connection->fetchOne('SELECT stateOfSubscription FROM tl_calendar_events_member WHERE id = ?', [$dc->id]);
+        $arrEventSubscriptionStates = EventSubscriptionState::ALL;
+
+        // Do not allow the undefined event subscription state
+        $arrEventSubscriptionStates = array_values(array_diff($arrEventSubscriptionStates, [EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED]));
+
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return $arrEventSubscriptionStates;
+        }
+
+        // Do not allow switching back to the initial state to non-admins
+        if (EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED !== $stateOfSubscription) {
+            $arrEventSubscriptionStates = array_values(array_diff($arrEventSubscriptionStates, [EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED]));
+        }
+
+        return array_values($arrEventSubscriptionStates);
+    }
+
     /**
      * @return mixed|string|null
      */
@@ -502,13 +518,13 @@ class CalendarEventsMember
                 $objMember = $this->member->findOneBySacMemberId($objEventMemberModel->sacMemberId);
 
                 // Do not allow the maximum number of participants to be exceeded.
-                if (EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED === $varValue) {
+                if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $varValue) {
                     if (!$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
-                        $varValue = EventSubscriptionLevel::SUBSCRIPTION_ON_WAITINGLIST;
+                        $varValue = EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST;
                     }
                 }
 
-                if (EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && $this->calendarEventsHelper->areBookingDatesOccupied($objEvent, $objMember)) {
+                if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $varValue && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && $this->calendarEventsHelper->areBookingDatesOccupied($objEvent, $objMember)) {
                     $this->message->addError('Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
                     $varValue = $objEventMemberModel->stateOfSubscription;
                 } elseif ($this->validator->isEmail($objEventMemberModel->email)) {
@@ -713,13 +729,17 @@ class CalendarEventsMember
             $event = $this->calendarEvents->findByPk($registration->eventId);
 
             if (null !== $event) {
+                if ($registration->tstamp && !$this->validator->isEmail($registration->email)) {
+                    $this->message->addInfo($this->translator->trans('tl_calendar_events_member.notificationDueToMissingEmailDisabled', [], 'contao_default'));
+                }
+
                 if (!$registration->hasParticipated && $this->validator->isEmail($registration->email)) {
                     if ($this->validator->isEmail($registration->email)) {
                         $template = new BackendTemplate('be_calendar_events_registration_dashboard');
                         $template->registration = $registration;
                         $template->state_of_subscription = $registration->stateOfSubscription;
 
-                        $uri = $this->urlParser->addQueryString('key=notify_event_participant');
+                        $uri = $this->urlParser->addQueryString('key='.NotifyEventParticipantController::PARAM_KEY);
 
                         $hrefs = [];
 
@@ -728,11 +748,9 @@ class CalendarEventsMember
                         }
 
                         $template->button_hrefs = $hrefs;
-
-                        $template->event_is_fully_booked = $this->calendarEventsHelper->eventIsFullyBooked($event);
-
                         $template->event = $event->row();
                         $template->show_email_buttons = true;
+                        $template->event_is_fully_booked = $this->calendarEventsHelper->eventIsFullyBooked($event);
 
                         return $template->parse();
                     }

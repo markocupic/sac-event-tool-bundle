@@ -29,7 +29,7 @@ use Contao\MemberModel;
 use Contao\Message;
 use Contao\Validator;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
@@ -37,6 +37,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NotifyEventParticipantController
 {
+    // query key assigned to the controller
+    public const PARAM_KEY = 'notify_event_participant';
+
+    // Actions
     public const ACCEPT_WITH_EMAIL_ACTION = 'accept_with_email';
     public const ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION = 'add_to_waitinglist_with_email';
     public const REFUSE_WITH_EMAIL_ACTION = 'refuse_with_email';
@@ -150,7 +154,7 @@ class NotifyEventParticipantController
             self::ACCEPT_WITH_EMAIL_ACTION => [
                 'formId' => strtolower(self::ACCEPT_WITH_EMAIL_ACTION).'_form',
                 'headline' => 'Anmeldeanfrage bestätigen',
-                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED,
+                'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ACCEPTED,
                 'sessionInfoText' => 'Diese Anmeldeanfrage wurde erfolgreich bestätigt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'emailTemplate' => 'be_email_templ_accept_registration',
                 'emailSubject' => 'Zusage für %s "%s"',
@@ -158,7 +162,7 @@ class NotifyEventParticipantController
             self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION => [
                 'formId' => strtolower(self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION).'_form',
                 'headline' => 'Anmeldestatus auf "Warteliste" ändern',
-                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_ON_WAITINGLIST,
+                'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST,
                 'sessionInfoText' => 'Der Status dieser Registrierung wurde erfolgreich auf "Warteliste" gesetzt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'emailTemplate' => 'be_email_templ_add_to_waitinglist',
                 'emailSubject' => 'Auf Warteliste für %s "%s"',
@@ -166,7 +170,7 @@ class NotifyEventParticipantController
             self::REFUSE_WITH_EMAIL_ACTION => [
                 'formId' => strtolower(self::REFUSE_WITH_EMAIL_ACTION).'_form',
                 'headline' => 'Anmeldeanfrage ablehnen',
-                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_REFUSED,
+                'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_REFUSED,
                 'sessionInfoText' => 'Diese Anmeldeanfrage wurde abgelehnt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'emailTemplate' => 'be_email_templ_refuse_registration',
                 'emailSubject' => 'Anmeldeanfrage für %s "%s" abgelehnt',
@@ -174,7 +178,7 @@ class NotifyEventParticipantController
             self::CANCEL_WITH_EMAIL_ACTION => [
                 'formId' => strtolower(self::CANCEL_WITH_EMAIL_ACTION).'_form',
                 'headline' => 'Anmeldeanfrage stornieren',
-                'stateOfSubscription' => EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED,
+                'stateOfSubscription' => EventSubscriptionState::USER_HAS_UNSUBSCRIBED,
                 'sessionInfoText' => 'Diese Anmeldeanfrage wurde storniert und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'emailTemplate' => 'be_email_templ_cancel_registration',
                 'emailSubject' => 'Anmeldeanfrage für %s "%s" storniert',
