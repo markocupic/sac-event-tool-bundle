@@ -2,11 +2,11 @@ Hallo <?= $this->participantFirstname ?> <?= $this->participantLastname ?>
 
 
 <?php if ('course' === $this->eventType): ?>
-Leider kann ich dir für den Kurs <?php if ('' != $this->courseId): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>" keine Zusage erteilen und deine Anmeldeanfrage ist abgelehnt.
+Deine Registrierung für den Kurs <?php if ('' != $this->courseId): ?><?= $this->courseId ?> <?php endif; ?>"<?= $this->eventName ?>" wurde storniert.
 <?php else: ?>
-Leider kann ich dir für den Event "<?= $this->eventName ?>" keine Zusage erteilen und deine Anmeldeanfrage ist abgelehnt.
+Deine Registrierung für den Event "<?= $this->eventName ?>" wurde storniert.
 <?php endif; ?>
-Ich danke dir für dein Verständnis.
+Vielen Dank für Deine Kenntnisnahme.
 
 Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte folgende E-Mail-Adresse:
 

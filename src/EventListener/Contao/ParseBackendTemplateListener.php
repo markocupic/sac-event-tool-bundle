@@ -88,14 +88,6 @@ class ParseBackendTemplateListener
                     }
                 }
             }
-
-            // Do not show submit container in the e-mail mode of tl_calendar_events_member
-            if ('sac_calendar_events_tool' === $inputAdapter->get('do') && 'tl_calendar_events_member' === $inputAdapter->get('table') && ('refuseWithEmail' === $inputAdapter->get('call') || 'accept_with_email' === $inputAdapter->get('call'))) {
-                if (preg_match('/<div class=\"tl_formbody_submit(.*)<\/form>/sU', $strBuffer)) {
-                    // Remove submit tl_formbody_submit
-                    $strBuffer = preg_replace('/<div class=\"tl_formbody_submit(.*)<\/form>/sU', '</form>', $strBuffer);
-                }
-            }
         }
 
         return $strBuffer;

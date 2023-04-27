@@ -12,6 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+// Main headline label
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['notify_event_participant'] = ['Teilnehmer benachrichtigen', 'Teilnehmer benachrichtigen'];
+
 // Global operations
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['writeTourReport'] = 'Tourenrapport bearbeiten';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['printInstructorInvoice'] = 'Vergütungsformular und Tourenrapport drucken';
@@ -29,8 +32,6 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['show'] = ['Details', 'Details 
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['stateOfSubscription_legend'] = 'Anmeldestatus-Einstellungen';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['stateOfParticipation_legend'] = 'Abschliessende Einstellungen zum Teilnahmestatus';
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['acceptWithEmail_legend'] = 'Zusage für Event per E-Mail';
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['refuseWithEmail_legend'] = 'Event-Absage per E-Mail';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['notes_legend'] = 'Anmerkungen';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['personal_legend'] = 'Personalien';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['address_legend'] = 'Adresse';

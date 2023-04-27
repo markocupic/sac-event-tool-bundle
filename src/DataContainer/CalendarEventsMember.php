@@ -14,12 +14,11 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Codefog\HasteBundle\Form\Form;
+use Codefog\HasteBundle\UrlParser;
 use Contao\Backend;
 use Contao\BackendTemplate;
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
-use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
@@ -85,6 +84,7 @@ class CalendarEventsMember
         private readonly RequestStack $requestStack,
         private readonly Connection $connection,
         private readonly Util $util,
+        private readonly UrlParser $urlParser,
         private readonly TranslatorInterface $translator,
         private readonly Security $security,
         private readonly ExportEventRegistrationList $registrationListExporterCsv,
@@ -479,8 +479,7 @@ class CalendarEventsMember
     #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.sectionId.options', priority: 100)]
     public function listSections(): array
     {
-        return $this->connection
-            ->fetchAllKeyValue('SELECT sectionId, name FROM tl_sac_section')
+        return $this->connection->fetchAllKeyValue('SELECT sectionId, name FROM tl_sac_section')
         ;
     }
 
@@ -569,7 +568,7 @@ class CalendarEventsMember
     }
 
     /**
-     * Add more data to the registration, when a backend user adds a new registration manually.
+     * Add more data to the registration, when a backend user manually adds a new registration.
      *
      * @throws Exception
      */
@@ -630,86 +629,6 @@ class CalendarEventsMember
         }
 
         $this->connection->update('tl_calendar_events_member', $set, ['id' => $dc->id]);
-    }
-
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
-    public function setStateOfSubscription(DataContainer $dc): void
-    {
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ('select' === $request->query->get('act')) {
-            return;
-        }
-
-        if ('editAll' === $request->query->get('act')) {
-            return;
-        }
-
-        if ('overrideAll' === $request->query->get('act')) {
-            return;
-        }
-
-        if (!$dc->id || !$request->query->has('act')) {
-            return;
-        }
-
-        if ('create' === $request->query->get('act')) {
-            return;
-        }
-
-        $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
-
-        if (null === $objEventMemberModel) {
-            return;
-        }
-
-        if ('refuseWithEmail' === $request->query->get('action')) {
-            // Show another palette
-            $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['refuseWithEmail'];
-
-            return;
-        }
-
-        if ('acceptWithEmail' === $request->query->get('action')) {
-            // Show another palette
-            $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['acceptWithEmail'];
-
-            return;
-        }
-
-        if ('addToWaitlist' === $request->query->get('action')) {
-            // Show another palette
-            $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['addToWaitlist'];
-
-            return;
-        }
-
-        if (isset($_POST['refuseWithEmail'])) {
-            // Show another palette
-            $this->controller->redirect($this->backend->addToUrl('action=refuseWithEmail'));
-        }
-
-        if (isset($_POST['acceptWithEmail'])) {
-            $blnAllow = true;
-
-            $objEvent = $this->calendarEvents->findByPk($objEventMemberModel->eventId);
-
-            if (null !== $objEvent && !$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
-                $blnAllow = false;
-            }
-
-            if ($blnAllow) {
-                // Show another palette
-                $this->controller->redirect($this->backend->addToUrl('action=acceptWithEmail'));
-            } else {
-                $this->message->addError('Dem Teilnehmer kann die Teilnahme am Event nicht bestätigt werden, da die maximale Teilnehmerzahl bereits erreicht wurde.');
-            }
-        }
-
-        if (isset($_POST['addToWaitlist'])) {
-            // Show another palette
-            $this->controller->redirect($this->backend->addToUrl('action=addToWaitlist'));
-        }
     }
 
     /**
@@ -785,240 +704,44 @@ class CalendarEventsMember
     }
 
     #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.dashboard.input_field', priority: 100)]
-    public function parseDashboard(DataContainer $dc): string
+    public function parseNotificationButtonDashboard(DataContainer $dc): string
     {
-        $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
+        $registration = $this->calendarEventsMember->findByPk($dc->id);
 
-        if (null !== $objEventMemberModel) {
-            $objTemplate = new BackendTemplate('be_calendar_events_registration_dashboard');
-            $objTemplate->objRegistration = $objEventMemberModel;
-            $objTemplate->stateOfSubscription = $objEventMemberModel->stateOfSubscription;
-            $objEvent = $this->calendarEvents->findByPk($objEventMemberModel->eventId);
+        if (null !== $registration) {
+            $template = new BackendTemplate('be_calendar_events_registration_dashboard');
+            $template->registration = $registration;
+            $template->stateOfSubscription = $registration->stateOfSubscription;
+            $event = $this->calendarEvents->findByPk($registration->eventId);
 
-            if (null !== $objEvent) {
-                $objTemplate->objEvent = $objEvent;
+            $uri = $this->urlParser->addQueryString('key=notify_event_participant');
+            $template->button_hrefs = [
+                'add_to_waitlist' => $this->urlParser->addQueryString('action=add_to_waitlist', $uri),
+                'refuse_with_email' => $this->urlParser->addQueryString('action=refuse_with_email', $uri),
+                'cancel_with_email' => $this->urlParser->addQueryString('action=cancel_with_email', $uri),
+                'accept_with_email' => $this->urlParser->addQueryString('action=accept_with_email', $uri),
+            ];
 
-                if (!$objEventMemberModel->hasParticipated && '' !== $objEventMemberModel->email) {
-                    if ($this->validator->isEmail($objEventMemberModel->email)) {
-                        $objTemplate->showEmailButtons = true;
+            if (null !== $event) {
+                $template->event_is_fully_booked = $this->calendarEventsHelper->eventIsFullyBooked($event);
+
+                $template->event = $event->row();
+
+                if (!$registration->hasParticipated && '' !== $registration->email) {
+                    if ($this->validator->isEmail($registration->email)) {
+                        $template->showEmailButtons = true;
                     }
                 }
 
-                return $objTemplate->parse();
+                return $template->parse();
             }
         }
 
         return '';
     }
 
-    /**
-     * @throws \Exception
-     */
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.refuseWithEmail.input_field', priority: 100)]
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.acceptWithEmail.input_field', priority: 100)]
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.addToWaitlist.input_field', priority: 100)]
-    public function inputFieldCallbackNotifyMemberAboutSubscriptionState(DataContainer $dc): string
-    {
-        $request = $this->requestStack->getCurrentRequest();
-
-        /** @var BackendUser $user */
-        $user = $this->security->getUser();
-
-        // Build action array first
-        $arrActions = [
-            'acceptWithEmail' => [
-                'formId' => 'subscription-accepted-form',
-                'headline' => 'Zusage zum Event',
-                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED,
-                'sessionInfoText' => 'Dem Benutzer wurde mit einer E-Mail eine Zusage für diesen Event versandt.',
-                'emailTemplate' => 'be_email_templ_accept_registration',
-                'emailSubject' => 'Zusage für %s',
-            ],
-            'addToWaitlist' => [
-                'formId' => 'subscription-waitlisted-form',
-                'headline' => 'Auf Warteliste setzen',
-                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED,
-                'sessionInfoText' => 'Dem Benutzer wurde auf die Warteliste gesetzt und mit einer E-Mail darüber informiert.',
-                'emailTemplate' => 'be_email_templ_added_to_waitlist',
-                'emailSubject' => 'Auf Warteliste für %s',
-            ],
-            'refuseWithEmail' => [
-                'formId' => 'subscription-refused-form',
-                'headline' => 'Absage mitteilen',
-                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_REJECTED,
-                'sessionInfoText' => 'Dem Benutzer wurde mit einer E-Mail eine Absage versandt.',
-                'emailTemplate' => 'be_email_templ_refuse_registration',
-                'emailSubject' => 'Absage für %s',
-            ],
-        ];
-
-        if (!$request->query->has('action') || !\is_array($arrActions[$request->query->get('action')]) || empty($arrActions[$request->query->get('action')])) {
-            $this->message->addInfo('Es ist ein Fehler aufgetreten.');
-            $this->controller->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$request->query->get('id').'&act=edit&rt='.$request->query->get('rt'));
-        }
-
-        // Set action array
-        $arrAction = $arrActions[$request->query->get('action')];
-
-        // Generate form fields
-        $objForm = new Form(
-            $arrAction['formId'],
-            'POST',
-        );
-
-        // Now let's add form fields:
-        $objForm->addFormField('subject', [
-            'label' => 'Betreff',
-            'inputType' => 'text',
-            'eval' => ['mandatory' => true],
-        ]);
-
-        $objForm->addFormField('text', [
-            'label' => 'Nachricht',
-            'inputType' => 'textarea',
-            'eval' => ['rows' => 20, 'cols' => 80, 'mandatory' => true],
-        ]);
-
-        $objForm->addFormField('submit', [
-            'label' => 'Nachricht absenden',
-            'inputType' => 'submit',
-        ]);
-
-        // Send notification
-        if ('tl_calendar_events_member' === $request->request->get('FORM_SUBMIT')) {
-            if ('' !== $request->request->get('subject') && '' !== $request->request->get('text')) {
-                $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
-
-                if (null !== $objEventMemberModel) {
-                    if (!$this->validator->isEmail($this->sacevtEventAdminEmail)) {
-                        throw new \Exception('Please set a valid email address in parameter sacevt.event_admin_email.');
-                    }
-
-                    $objEmail = new Email();
-                    $objEmail->fromName = html_entity_decode(html_entity_decode($this->sacevtEventAdminName));
-                    $objEmail->from = $this->sacevtEventAdminEmail;
-                    $objEmail->replyTo($user->email);
-                    $objEmail->subject = html_entity_decode((string) $request->request->get('subject'));
-                    $objEmail->text = html_entity_decode(strip_tags((string) $request->request->get('text')));
-
-                    // Check if member has already booked at the same time
-                    $objMember = $this->member->findOneBySacMemberId($objEventMemberModel->sacMemberId);
-                    $objEvent = $this->calendarEvents->findByPk($objEventMemberModel->eventId);
-
-                    if ('acceptWithEmail' === $request->query->get('action') && null !== $objMember && !$objEventMemberModel->allowMultiSignUp && null !== $objEvent && $this->calendarEventsHelper->areBookingDatesOccupied($objEvent, $objMember)) {
-                        $this->message->addError('Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
-                    } elseif ('acceptWithEmail' === $request->query->get('action') && null !== $objEvent && !$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
-                        $this->message->addError('Es ist ein Fehler aufgetreten. Da die maximale Teilnehmerzahl bereits erreicht ist, kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.');
-                    } // Send email
-                    elseif ($this->validator->isEmail($objEventMemberModel->email)) {
-                        $objEmail->sendTo($objEventMemberModel->email);
-
-                        $set = ['stateOfSubscription' => $arrAction['stateOfSubscription']];
-                        $this->connection->update('tl_calendar_events_member', $set, ['id' => $dc->id]);
-
-                        $this->message->addInfo($arrAction['sessionInfoText']);
-                    } else {
-                        $this->message->addInfo('Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.');
-                    }
-                }
-
-                $this->controller->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$request->query->get('id').'&act=edit&rt='.$request->query->get('rt'));
-            } else {
-                // Add value to fields
-                if ('' !== $request->request->get('subject')) {
-                    $objForm->getWidget('subject')->value = $request->request->get('subject');
-                }
-
-                if ('' !== $request->request->get('text')) {
-                    $objForm->getWidget('text')->value = strip_tags($request->request->get('text'));
-                }
-
-                // Generate template
-                $objTemplate = new BackendTemplate('be_calendar_events_registration_email');
-                $objTemplate->headline = $arrAction['headline'];
-                $objTemplate->form = $objForm;
-
-                return $objTemplate->parse();
-            }
-        } else { // Prefill form
-            // Get the registration object
-            $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
-
-            if (null !== $objEventMemberModel) {
-                /** @var CalendarEventsModel $objEvent */
-                $objEvent = $objEventMemberModel->getRelated('eventId');
-
-                // Get event dates as a comma separated string
-                $eventDates = $this->calendarEventsHelper->getEventTimestamps($objEvent);
-                $strDates = implode(', ', array_map(
-                    static fn ($tstamp) => date(Config::get('dateFormat'), (int) $tstamp),
-                    $eventDates
-                ));
-
-                // Build token array
-                $arrTokens = [
-                    'participantFirstname' => $objEventMemberModel->firstname,
-                    'participantLastname' => $objEventMemberModel->lastname,
-                    'participant_uuid' => $objEventMemberModel->uuid,
-                    'eventName' => $objEvent->title,
-                    'eventIban' => $objEvent->addIban ? $objEvent->iban : '',
-                    'eventIbanBeneficiary' => $objEvent->addIban ? $objEvent->ibanBeneficiary : '',
-                    'courseId' => $objEvent->courseId,
-                    'eventType' => $objEvent->eventType,
-                    'eventUrl' => $this->events->generateEventUrl($objEvent, true),
-                    'eventDates' => $strDates,
-                    'instructorName' => $user->name,
-                    'instructorFirstname' => $user->firstname,
-                    'instructorLastname' => $user->lastname,
-                    'instructorPhone' => $user->phone,
-                    'instructorMobile' => $user->mobile,
-                    'instructorStreet' => $user->street,
-                    'instructorPostal' => $user->postal,
-                    'instructorCity' => $user->city,
-                    'instructorEmail' => $user->email,
-                ];
-
-                if ('acceptWithEmail' === $request->query->get('action') && $objEvent->customizeEventRegistrationConfirmationEmailText && '' !== $objEvent->customEventRegistrationConfirmationEmailText) {
-                    // Only for acceptWithEmail!!!
-                    // Replace tags for custom notification set in the events settings (tags can be used case-insensitive!)
-                    $emailBodyText = $objEvent->customEventRegistrationConfirmationEmailText;
-
-                    foreach ($arrTokens as $k => $v) {
-                        $strPattern = '/##'.$k.'##/i';
-                        $emailBodyText = preg_replace($strPattern, $v, $emailBodyText);
-                    }
-                    $emailBodyText = strip_tags($emailBodyText);
-                } else {
-                    // Build email text from template
-                    $objEmailTemplate = new BackendTemplate($arrAction['emailTemplate']);
-
-                    foreach ($arrTokens as $k => $v) {
-                        $objEmailTemplate->{$k} = $v;
-                    }
-                    $emailBodyText = strip_tags($objEmailTemplate->parse());
-                }
-
-                // Get event type
-                $eventType = \strlen((string) $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType]) ? $GLOBALS['TL_LANG']['MSC'][$objEvent->eventType].': ' : 'Event: ';
-
-                // Add value to fields
-                $objForm->getWidget('subject')->value = sprintf($arrAction['emailSubject'], $eventType.$objEvent->title);
-                $objForm->getWidget('text')->value = $emailBodyText;
-
-                // Generate template
-                $objTemplate = new BackendTemplate('be_calendar_events_registration_email');
-                $objTemplate->headline = $arrAction['headline'];
-                $objTemplate->form = $objForm;
-
-                return $objTemplate->parse();
-            }
-        }
-
-        throw new \LogicException('This place in the code should normally not be reached.');
-    }
-
     #[AsCallback(table: 'tl_calendar_events_member', target: 'list.global_operations.backToEventSettings.button', priority: 100)]
-    public function buttonCbBackToEventSettings(string|null $href, string $label, string $title, string $class, string $attributes, string $table): string
+    public function showBackToEventSettingsButton(string|null $href, string $label, string $title, string $class, string $attributes, string $table): string
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -1035,11 +758,6 @@ class CalendarEventsMember
     public function buttonsCallback(array $arrButtons, DataContainer $dc): array
     {
         $request = $this->requestStack->getCurrentRequest();
-
-        // Remove all buttons
-        if ('refuseWithEmail' === $request->query->get('action') || 'acceptWithEmail' === $request->query->get('action') || 'addToWaitlist' === $request->query->get('action')) {
-            $arrButtons = [];
-        }
 
         if ('sendEmail' === $request->query->get('action')) {
             $arrButtons['saveNclose'] = '<button type="submit" name="saveNclose" id="saveNclose" class="tl_submit" accesskey="c">E-Mail absenden</button>';

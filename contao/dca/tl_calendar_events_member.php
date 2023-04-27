@@ -140,9 +140,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'__selector__'    => ['addEmailAttachment', 'hasLeadClimbingEducation', 'hasPaid'],
 		'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,dateAdded,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionId,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
 		'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy',
-		'refuseWithEmail' => '{refuseWithEmail_legend},refuseWithEmail',
-		'acceptWithEmail' => '{acceptWithEmail_legend},acceptWithEmail',
-		'addToWaitlist'   => '{addToWaitlist_legend},addToWaitlist',
 	],
 	'subpalettes' => [
 		'addEmailAttachment'       => 'emailAttachment',
@@ -356,21 +353,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'inputType' => 'checkbox',
 			'eval'      => ['submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'long clr'],
 			'sql'       => "char(1) NOT NULL default ''",
-		],
-		'acceptWithEmail'             => [
-			'inputType' => 'text',
-			'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-			'sql'       => "varchar(255) NOT NULL default ''",
-		],
-		'refuseWithEmail'             => [
-			'inputType' => 'text',
-			'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-			'sql'       => "varchar(255) NOT NULL default ''",
-		],
-		'addToWaitlist'               => [
-			'inputType' => 'text',
-			'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
-			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'emailRecipients'             => [
 			'options'   => [],

@@ -69,13 +69,19 @@ table#ctrl_eventDates thead tr:first-child {
 	margin-left: 15px;
 }
 
-#tl_calendar_events_member #refuseWithEmail {
+#tl_calendar_events_member .tl_submit.btn-refuse-with-email {
 	background-color: red;
 	color: white;
 	border-color: red;
 }
 
-#tl_calendar_events_member #acceptWithEmail {
+#tl_calendar_events_member .tl_submit.btn-cancel-with-email {
+	background-color: orange;
+	color: white;
+	border-color: orange;
+}
+
+#tl_calendar_events_member .tl_submit.btn-accept-with-email {
 	background-color: darkgreen;
 	color: white;
 	border-color: darkgreen;

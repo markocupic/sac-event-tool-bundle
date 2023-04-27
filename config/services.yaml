@@ -56,3 +56,5 @@ services:
     Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainBackendUser:
         public: true
 
+    Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventParticipantController:
+        public: true

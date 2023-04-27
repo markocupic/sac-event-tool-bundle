@@ -15,6 +15,7 @@ declare(strict_types=1);
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainBackendUser;
+use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventParticipantController;
 use Markocupic\SacEventToolBundle\Model\CalendarContainerModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorModel;
@@ -52,6 +53,7 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
         'tables' => ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'],
         'table' => ['TableWizard', 'importTable'],
         'list' => ['ListWizard', 'importList'],
+        'notify_event_participant' => [NotifyEventParticipantController::class, 'generate'],
     ],
     'sac_course_main_types_tool' => [
         'tables' => ['tl_course_main_type'],

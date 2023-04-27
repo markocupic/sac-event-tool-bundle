@@ -1,0 +1,46 @@
+{% set onclick_A = 'Soll die Teilnahme dieses Teilnehmers per E-Mail abgelehnt werden?' %}
+{% set onclick_B = 'Soll diesem Anwärter die Teilnahme per E-Mail zugesichert werden?' %}
+{% set onclick_C = 'Soll dieser Anwärter per E-Mail auf die Warteliste gesetzt werden?' %}
+
+<div style="margin-left: 15px; margin-right: 15px; position: relative;">
+    {% if stateOfSubscription == constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionLevel::SUBSCRIPTION_REJECTED') %}
+        <div>Status: Dem Anwärter wurde die Teilnahme verweigert.</div>
+    {% endif %}
+
+    {% if stateOfSubscription == constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED') %}
+        <div>Status: Dem Anwärter wurde die Teilnahme zugesagt.</div>
+    {% endif %}
+
+    {% if stateOfSubscription == constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED') %}
+        <div>Status: Der Anwärter befindet sich auf der Warteliste.</div>
+    {% endif %}
+    <br>
+</div>
+
+{% if showEmailButtons|default %}
+    <div class="tl_submit_container">
+        {% if stateOfSubscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionLevel::SUBSCRIPTION_REJECTED') and stateOfSubscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED') %}
+            <a href="{{ button_hrefs.refuse_with_email }}" onclick="if (!confirm('{{ onclick_A }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-refuse-with-email">Ablehnen mit E-Mail</a>
+            <a href="{{ button_hrefs.cancel_with_email }}" onclick="if (!confirm('{{ onclick_A }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-cancel-with-email">Stornieren mit E-Mail</a>
+        {% endif %}
+
+        {% if stateOfSubscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED') and not event_is_fully_booked %}
+            <a href="{{ button_hrefs.accept_with_email }}" onclick="if (!confirm('{{ onclick_B }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-accept-with-email">Zusagen mit E-Mail</a>
+        {% endif %}
+
+        {% if stateOfSubscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED') %}
+            <a href="{{ button_hrefs.add_to_waitlist }}" onclick="if (!confirm('{{ onclick_C }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-add-to-waitlist">Auf Warteliste mit E-Mail</a>
+        {% endif %}
+    </div>
+
+    {% if event.eventState == constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_FULLY_BOOKED') and stateOfSubscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED') %}
+        <div class="alert alert-danger">Dieser Anlass ist ausgebucht! Es kann keine weitere Anmeldung entgegengenommen werden. Die Person kann auf die Warteliste genommen werden.</div>
+    {% elseif event_is_fully_booked and stateOfSubscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED') %}
+        <div class="alert alert-danger">Für diesen Anlass ist die maximale Teilnehmerzahl von {{ event.maxMembers|default('0') }} Personen erreicht! Es kann keine weitere Anmeldung angenommen werden. Die Person kann auf die Warteliste genommen werden.</div>
+    {% endif %}
+
+{% endif %}
+
+{% if registration.hasParticipated %}
+    <div class="alert alert-primary">Dieser Teilnehmer/diese Teilnehmerin hat am Anlass teilgenommen.</div>
+{% endif %}
