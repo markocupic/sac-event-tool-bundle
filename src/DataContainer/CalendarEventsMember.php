@@ -44,6 +44,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\Config\Log;
+use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventParticipantController;
 use Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventMemberList2Docx;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
@@ -503,7 +504,7 @@ class CalendarEventsMember
                 // Do not allow the maximum number of participants to be exceeded.
                 if (EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED === $varValue) {
                     if (!$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
-                        $varValue = EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED;
+                        $varValue = EventSubscriptionLevel::SUBSCRIPTION_ON_WAITINGLIST;
                     }
                 }
 
@@ -709,31 +710,33 @@ class CalendarEventsMember
         $registration = $this->calendarEventsMember->findByPk($dc->id);
 
         if (null !== $registration) {
-            $template = new BackendTemplate('be_calendar_events_registration_dashboard');
-            $template->registration = $registration;
-            $template->stateOfSubscription = $registration->stateOfSubscription;
             $event = $this->calendarEvents->findByPk($registration->eventId);
 
-            $uri = $this->urlParser->addQueryString('key=notify_event_participant');
-            $template->button_hrefs = [
-                'add_to_waitlist' => $this->urlParser->addQueryString('action=add_to_waitlist', $uri),
-                'refuse_with_email' => $this->urlParser->addQueryString('action=refuse_with_email', $uri),
-                'cancel_with_email' => $this->urlParser->addQueryString('action=cancel_with_email', $uri),
-                'accept_with_email' => $this->urlParser->addQueryString('action=accept_with_email', $uri),
-            ];
-
             if (null !== $event) {
-                $template->event_is_fully_booked = $this->calendarEventsHelper->eventIsFullyBooked($event);
-
-                $template->event = $event->row();
-
-                if (!$registration->hasParticipated && '' !== $registration->email) {
+                if (!$registration->hasParticipated && $this->validator->isEmail($registration->email)) {
                     if ($this->validator->isEmail($registration->email)) {
-                        $template->showEmailButtons = true;
+                        $template = new BackendTemplate('be_calendar_events_registration_dashboard');
+                        $template->registration = $registration;
+                        $template->state_of_subscription = $registration->stateOfSubscription;
+
+                        $uri = $this->urlParser->addQueryString('key=notify_event_participant');
+
+                        $hrefs = [];
+
+                        foreach (NotifyEventParticipantController::ACTIONS as $action) {
+                            $hrefs[$action] = $this->urlParser->addQueryString('action='.$action, $uri);
+                        }
+
+                        $template->button_hrefs = $hrefs;
+
+                        $template->event_is_fully_booked = $this->calendarEventsHelper->eventIsFullyBooked($event);
+
+                        $template->event = $event->row();
+                        $template->show_email_buttons = true;
+
+                        return $template->parse();
                     }
                 }
-
-                return $template->parse();
             }
         }
 

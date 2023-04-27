@@ -8,7 +8,7 @@ Deine Registrierung für den Event "<?= $this->eventName ?>" wurde storniert.
 <?php endif; ?>
 Vielen Dank für Deine Kenntnisnahme.
 
-Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte folgende E-Mail-Adresse:
+Bitte antworte nicht auf diese Nachricht, sondern nutze für Rückfragen bitte folgende E-Mail-Adresse:
 
 <?= $this->instructorEmail ?>
 

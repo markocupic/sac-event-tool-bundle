@@ -152,10 +152,6 @@ div.legend-box li {
 	line-height: 1.5;
 }
 
-#pal_stateOfParticipation_legend, #pal_stateOfSubscription_legend {
-	background-color: #f3f3f5;
-}
-
 #acceptAutocompleteBox {
 	padding: 15px 0;
 }

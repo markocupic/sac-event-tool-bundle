@@ -147,7 +147,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
             if (null !== $objEvent) {
                 $objInstructor = $objEvent->getRelated('mainInstructor');
 
-                if (EventSubscriptionLevel::SUBSCRIPTION_REJECTED === $objEventsMember->stateOfSubscription) {
+                if (EventSubscriptionLevel::SUBSCRIPTION_REFUSED === $objEventsMember->stateOfSubscription) {
                     $objEventsMember->delete();
 
                     $this->contaoGeneralLogger?->info(
@@ -165,7 +165,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
                 if (EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED === $objEventsMember->stateOfSubscription) {
                     $errorMsg = 'Abmeldung fehlgeschlagen! Du hast dich vom Event "'.$objEvent->title.'" bereits abgemeldet.';
-                } elseif (EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED === $objEventsMember->stateOfSubscription || EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED === $objEventsMember->stateOfSubscription) {
+                } elseif (EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED === $objEventsMember->stateOfSubscription || EventSubscriptionLevel::SUBSCRIPTION_ON_WAITINGLIST === $objEventsMember->stateOfSubscription) {
                     // allow unregistering if member is not confirmed on the event
                     // allow unregistering if member is waitlisted on the event
                     $blnHasError = false;

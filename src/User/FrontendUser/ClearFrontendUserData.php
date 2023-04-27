@@ -237,7 +237,7 @@ class ClearFrontendUserData
                             continue;
                         }
 
-                        if (EventSubscriptionLevel::SUBSCRIPTION_REJECTED === $objEventsMember->stateOfSubscription) {
+                        if (EventSubscriptionLevel::SUBSCRIPTION_REFUSED === $objEventsMember->stateOfSubscription) {
                             continue;
                         }
 

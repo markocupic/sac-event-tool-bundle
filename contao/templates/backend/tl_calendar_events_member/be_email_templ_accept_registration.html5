@@ -7,7 +7,7 @@ Du bist für den Kurs <?php if ('' != $this->courseId): ?><?= $this->courseId ?>
 Du bist für den Event "<?= $this->eventName ?>" definitiv angemeldet und deine Teilnahme ist bestätigt.
 <?php endif; ?>
 
-Bitte antworte nicht auf diese Nachricht, sondern nutze für Fragen bitte folgende E-Mail-Adresse:
+Bitte antworte nicht auf diese Nachricht, sondern nutze für Rückfragen bitte folgende E-Mail-Adresse:
 
 <?= $this->instructorEmail ?>
 

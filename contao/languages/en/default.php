@@ -158,11 +158,11 @@ $GLOBALS['TL_LANG']['FORM']['evt_reg_submit'] = 'Für Event anmelden';
 
 // Booking states/Subscription states
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_NOT_CONFIRMED] = 'Anmeldeanfrage unbeantwortet';
-$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED] = 'Anmeldung bestätigt';
-$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_REJECTED] = 'Anmeldeanfrage abgelehnt';
-$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED] = 'Auf Warteliste';
-$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED] = 'Anmeldung storniert';
-$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_STATE_UNDEFINED] = 'Anmelde-Status unbekannt';
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED] = 'Anmeldeanfrage bestätigt';
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_REFUSED] = 'Anmeldeanfrage abgelehnt';
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_ON_WAITINGLIST] = 'Anmeldeanfrage auf Warteliste';
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED] = 'Anmeldeanfrage storniert';
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionLevel::SUBSCRIPTION_STATE_UNDEFINED] = 'Status der Anmeldeanfrage unbekannt';
 
 // Event registration frontend module form explanations
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ffield_expl_mobile'] = 'Das Feld "Mobilnummer" ist kein Pflichtfeld und kann leer gelassen werden. Damit der/die Leiter/in dich aber während der Tour bei Zwischenfällen erreichen kann, ist es für ihn sehr hilfreich, deine Mobilnummer zu kennen. Selbstverständlich werden diese Angaben vertraulich behandelt und nicht an Dritte weitergegeben.';

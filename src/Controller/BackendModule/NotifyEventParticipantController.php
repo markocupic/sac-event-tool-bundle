@@ -33,14 +33,20 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionLevel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NotifyEventParticipantController
 {
-    private const ACTIONS = [
-        'accept_with_email',
-        'add_to_waitlist',
-        'refuse_with_email',
-        'cancel_with_email',
+    public const ACCEPT_WITH_EMAIL_ACTION = 'accept_with_email';
+    public const ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION = 'add_to_waitinglist_with_email';
+    public const REFUSE_WITH_EMAIL_ACTION = 'refuse_with_email';
+    public const CANCEL_WITH_EMAIL_ACTION = 'cancel_with_email';
+
+    public const ACTIONS = [
+        self::ACCEPT_WITH_EMAIL_ACTION,
+        self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION,
+        self::REFUSE_WITH_EMAIL_ACTION,
+        self::CANCEL_WITH_EMAIL_ACTION,
     ];
 
     private CalendarEventsMemberModel|null $registration;
@@ -65,6 +71,7 @@ class NotifyEventParticipantController
         private readonly RequestStack $requestStack,
         private readonly Security $security,
         private readonly UrlParser $urlParser,
+        private readonly TranslatorInterface $translator,
         private readonly string $sacevtEventAdminEmail,
         private readonly string $sacevtEventAdminName,
     ) {
@@ -131,46 +138,46 @@ class NotifyEventParticipantController
 
         $this->action = $request->query->get('action', null);
 
-        if (empty($this->action) || !\in_array($this->action, self::ACTIONS, true) || null === ($this->configuration = $this->getConfiguration($this->action))) {
+        if (empty($this->action) || !\in_array($this->action, self::ACTIONS, true) || null === ($this->configuration = $this->getActionConfig($this->action))) {
             $this->message->addInfo(sprintf('Ungültiger Query-Parameter "action" => "%s".', $this->action));
             $this->controller->redirect($errorUri);
         }
     }
 
-    private function getConfiguration(string $action): array|null
+    private function getActionConfig(string $action): array|null
     {
         $configs = [
-            'accept_with_email' => [
-                'formId' => 'subscription-accepted-form',
-                'headline' => 'Zusage zum Event',
+            self::ACCEPT_WITH_EMAIL_ACTION => [
+                'formId' => strtolower(self::ACCEPT_WITH_EMAIL_ACTION).'_form',
+                'headline' => 'Anmeldeanfrage bestätigen',
                 'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_ACCEPTED,
-                'sessionInfoText' => 'Dem Benutzer wurde mit einer E-Mail eine Zusage für diesen Event versandt.',
+                'sessionInfoText' => 'Diese Anmeldeanfrage wurde erfolgreich bestätigt und die Person per E-Mail darüber in Kenntnis gesetzt.',
                 'emailTemplate' => 'be_email_templ_accept_registration',
-                'emailSubject' => 'Zusage für %s',
+                'emailSubject' => 'Zusage für %s "%s"',
             ],
-            'add_to_waitlist' => [
-                'formId' => 'subscription-waitlisted-form',
-                'headline' => 'Auf Warteliste setzen',
-                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED,
-                'sessionInfoText' => 'Dem Benutzer wurde auf die Warteliste gesetzt und mit einer E-Mail darüber informiert.',
-                'emailTemplate' => 'be_email_templ_added_to_waitlist',
-                'emailSubject' => 'Auf Warteliste für %s',
+            self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION => [
+                'formId' => strtolower(self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION).'_form',
+                'headline' => 'Anmeldestatus auf "Warteliste" ändern',
+                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_ON_WAITINGLIST,
+                'sessionInfoText' => 'Der Status dieser Registrierung wurde erfolgreich auf "Warteliste" gesetzt und die Person darüber per E-Mail in Kenntnis gesetzt.',
+                'emailTemplate' => 'be_email_templ_add_to_waitinglist',
+                'emailSubject' => 'Auf Warteliste für %s "%s"',
             ],
-            'refuse_with_email' => [
-                'formId' => 'subscription-refused-form',
-                'headline' => 'Absage kommunizieren',
-                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_REJECTED,
-                'sessionInfoText' => 'Dem Benutzer wurde mit einer E-Mail eine Absage versandt.',
+            self::REFUSE_WITH_EMAIL_ACTION => [
+                'formId' => strtolower(self::REFUSE_WITH_EMAIL_ACTION).'_form',
+                'headline' => 'Anmeldeanfrage ablehnen',
+                'stateOfSubscription' => EventSubscriptionLevel::SUBSCRIPTION_REFUSED,
+                'sessionInfoText' => 'Diese Anmeldeanfrage wurde abgelehnt und die Person darüber per E-Mail in Kenntnis gesetzt.',
                 'emailTemplate' => 'be_email_templ_refuse_registration',
-                'emailSubject' => 'Absage für %s',
+                'emailSubject' => 'Anmeldeanfrage für %s "%s" abgelehnt',
             ],
-            'cancel_with_email' => [
-                'formId' => 'cancel-registration-form',
-                'headline' => 'Stornierung kommunizieren',
+            self::CANCEL_WITH_EMAIL_ACTION => [
+                'formId' => strtolower(self::CANCEL_WITH_EMAIL_ACTION).'_form',
+                'headline' => 'Anmeldeanfrage stornieren',
                 'stateOfSubscription' => EventSubscriptionLevel::USER_HAS_UNSUBSCRIBED,
-                'sessionInfoText' => 'Die Registrierung wurde storniert und die Person mit einer E-Mail darüber in Kenntnis gesetzt.',
+                'sessionInfoText' => 'Diese Anmeldeanfrage wurde storniert und die Person mit einer E-Mail darüber in Kenntnis gesetzt.',
                 'emailTemplate' => 'be_email_templ_cancel_registration',
-                'emailSubject' => 'Stornierung %s',
+                'emailSubject' => 'Anmeldeanfrage für %s "%s" storniert',
             ],
         ];
 
@@ -187,7 +194,6 @@ class NotifyEventParticipantController
 
         $form->addContaoHiddenFields();
 
-        // Now let's add form fields:
         $form->addFormField('subject', [
             'label' => 'Betreff',
             'inputType' => 'text',
@@ -222,24 +228,25 @@ class NotifyEventParticipantController
                 }
                 $emailBodyText = strip_tags($emailBodyText);
             } else {
-                // Build email text from template
+                // Get email body text from template
                 $template = new BackendTemplate($this->configuration['emailTemplate']);
 
                 foreach ($arrTokens as $k => $v) {
                     $template->{$k} = $v;
                 }
+
                 $emailBodyText = strip_tags($template->parse());
             }
 
             // Get event type
-            $eventType = \strlen((string) $GLOBALS['TL_LANG']['MSC'][$this->event->eventType]) ? $GLOBALS['TL_LANG']['MSC'][$this->event->eventType].': ' : 'Event: ';
+            $eventType = $this->translator->trans('MSC.'.$this->event->eventType, [], 'contao_default');
 
             // Add value to fields
-            $form->getWidget('subject')->value = sprintf($this->configuration['emailSubject'], $eventType.$this->event->title);
+            $form->getWidget('subject')->value = sprintf($this->configuration['emailSubject'], $eventType, $this->event->title);
             $form->getWidget('text')->value = $emailBodyText;
         }
 
-        if ($form->validate()) {
+        if ($request->request->get('FORM_SUBMIT') === $this->configuration['formId'] && $form->validate()) {
             if ($this->notify($form)) {
                 $uri = $this->getBackUrl();
                 $this->controller->redirect($uri);
@@ -254,7 +261,7 @@ class NotifyEventParticipantController
         $hasError = false;
 
         if (!$this->validator->isEmail($this->sacevtEventAdminEmail)) {
-            throw new \Exception('Please set a valid email address in parameter sacevt.event_admin_email.');
+            throw new \Exception('Please set a valid email address for the service parameter "sacevt.event_admin_email."');
         }
 
         $email = new Email();
@@ -264,15 +271,31 @@ class NotifyEventParticipantController
         $email->subject = html_entity_decode((string) $form->getWidget('subject')->value);
         $email->text = html_entity_decode(strip_tags((string) $form->getWidget('text')->value));
 
-        // Check if member has already booked at the same time
+        // Check if another event has already been booked at the same time.
         $objMember = $this->member->findOneBySacMemberId($this->registration->sacMemberId);
 
-        if ('accept_with_email' === $this->action && null !== $objMember && !$this->registration->allowMultiSignUp && $this->calendarEventsHelper->areBookingDatesOccupied($this->event, $objMember)) {
-            $this->message->addError('Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
-        } elseif ('accept_with_email' === $this->action && !$this->calendarEventsMember->canAcceptSubscription($this->registration, $this->event)) {
-            $this->message->addError('Es ist ein Fehler aufgetreten. Da die maximale Teilnehmerzahl bereits erreicht ist, kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.');
-        } // Send email
-        elseif ($this->validator->isEmail($this->registration->email)) {
+        if (
+            self::ACCEPT_WITH_EMAIL_ACTION === $this->action &&
+            null !== $objMember &&
+            !$this->registration->allowMultiSignUp &&
+            $this->calendarEventsHelper->areBookingDatesOccupied($this->event, $objMember)
+        ) {
+            $this->message->addError(
+                'Es ist ein Fehler aufgetreten. '.
+                'Der Teilnehmer kann nicht angemeldet werden, weil er zur selben Zeit bereits an einem anderen Event bestätigt wurde. '.
+                'Wenn Sie die Anmeldeanfrage trotzdem bestätigen möchten, so wählen Sie die Option "Mehrfachbuchung zulassen" aus.'
+            );
+        } elseif (
+            self::ACCEPT_WITH_EMAIL_ACTION === $this->action
+            && !$this->calendarEventsMember->canAcceptSubscription($this->registration, $this->event)
+        ) {
+            $this->message->addError(
+                'Es ist ein Fehler aufgetreten. '.
+                'Da die maximale Teilnehmerzahl bereits erreicht ist, '.
+                'kann für den Teilnehmer die Teilnahme am Event nicht bestätigt werden.'
+            );
+        } elseif ($this->validator->isEmail($this->registration->email)) {
+            // Send email notification
             if ($email->sendTo($this->registration->email)) {
                 $this->registration->stateOfSubscription = $this->configuration['stateOfSubscription'];
                 $this->registration->save();
@@ -280,13 +303,17 @@ class NotifyEventParticipantController
 
                 return true;
             }
+
             $hasError = true;
         } else {
             $hasError = true;
         }
 
         if ($hasError) {
-            $this->message->addInfo('Es ist ein Fehler aufgetreten. Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.');
+            $this->message->addInfo(
+                'Es ist ein Fehler aufgetreten. '.
+                'Überprüfen Sie die E-Mail-Adressen. Dem Teilnehmer konnte keine E-Mail versandt werden.'
+            );
 
             return false;
         }

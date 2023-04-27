@@ -903,11 +903,11 @@ class CalendarEventsHelper
                     ++$intAccepted;
                 }
 
-                if (EventSubscriptionLevel::SUBSCRIPTION_REJECTED === $eventsMemberModel->stateOfSubscription) {
+                if (EventSubscriptionLevel::SUBSCRIPTION_REFUSED === $eventsMemberModel->stateOfSubscription) {
                     ++$intRefused;
                 }
 
-                if (EventSubscriptionLevel::SUBSCRIPTION_WAITLISTED === $eventsMemberModel->stateOfSubscription) {
+                if (EventSubscriptionLevel::SUBSCRIPTION_ON_WAITINGLIST === $eventsMemberModel->stateOfSubscription) {
                     ++$intWaitlisted;
                 }
 
