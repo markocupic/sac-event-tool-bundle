@@ -25,6 +25,7 @@ use Knp\Menu\Matcher\Matcher;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\Renderer\ListRenderer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Twig\Environment as Twig;
 
 /**
@@ -73,7 +74,7 @@ class ParseBackendTemplateListener
                         $arrEvent['instructors'] = $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent);
 
                         $arrRegistration = [];
-                        $arrRegistration['states'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields']['stateOfSubscription']['options'];
+                        $arrRegistration['states'] = array_diff(EventSubscriptionState::ALL, [EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED]);
 
                         $html = $this->twig->render(
                             '@MarkocupicSacEventTool/CalendarEventsMember/explanations.html.twig',
