@@ -7,17 +7,17 @@
     <div class="tl_submit_container">
         <h3 style="font-size:.875rem; margin: .5rem 0">Teilnehmer benachrichtigen</h3>
 
-        {% if state_of_subscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::SUBSCRIPTION_REFUSED') and state_of_subscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::USER_HAS_UNSUBSCRIBED') %}
-            <a href="{{ button_hrefs.refuse_with_email }}" onclick="if (!confirm('{{ onclick_confirm_A }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-refuse-with-email">Ablehnen mit E-Mail</a>
-            <a href="{{ button_hrefs.cancel_with_email }}" onclick="if (!confirm('{{ onclick_confirm_B }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-cancel-with-email">Stornieren mit E-Mail</a>
-        {% endif %}
-
         {% if state_of_subscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::SUBSCRIPTION_ACCEPTED') and not event_is_fully_booked %}
             <a href="{{ button_hrefs.accept_with_email }}" onclick="if (!confirm('{{ onclick_confirm_C }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-accept-with-email">Bestätigen mit E-Mail</a>
         {% endif %}
 
         {% if state_of_subscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST') %}
             <a href="{{ button_hrefs.add_to_waitinglist_with_email }}" onclick="if (!confirm('{{ onclick_confirm_D }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-add-to-waitinglist-with-email">Auf Warteliste mit E-Mail</a>
+        {% endif %}
+
+        {% if state_of_subscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::SUBSCRIPTION_REFUSED') and state_of_subscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::USER_HAS_UNSUBSCRIBED') %}
+            <a href="{{ button_hrefs.refuse_with_email }}" onclick="if (!confirm('{{ onclick_confirm_A }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-refuse-with-email">Ablehnen mit E-Mail</a>
+            <a href="{{ button_hrefs.cancel_with_email }}" onclick="if (!confirm('{{ onclick_confirm_B }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-cancel-with-email">Stornieren mit E-Mail</a>
         {% endif %}
     </div>
 
