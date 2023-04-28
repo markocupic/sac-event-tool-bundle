@@ -733,6 +733,10 @@ class CalendarEventsMember
                     $this->message->addInfo($this->translator->trans('tl_calendar_events_member.notificationDueToMissingEmailDisabled', [], 'contao_default'));
                 }
 
+                if ($registration->hasParticipated) {
+                    $this->message->addInfo('Dieser Teilnehmer/diese Teilnehmerin hat am Anlass teilgenommen.');
+                }
+
                 if (!$registration->hasParticipated && $this->validator->isEmail($registration->email)) {
                     if ($this->validator->isEmail($registration->email)) {
                         $template = new BackendTemplate('be_calendar_events_registration_dashboard');

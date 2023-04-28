@@ -155,7 +155,7 @@ class NotifyEventParticipantController
                 'formId' => strtolower(self::ACCEPT_WITH_EMAIL_ACTION).'_form',
                 'headline' => 'Anmeldeanfrage bestätigen',
                 'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ACCEPTED,
-                'sessionInfoText' => 'Diese Anmeldeanfrage wurde erfolgreich bestätigt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
+                'sessionInfoText' => 'Die Anmeldeanfrage wurde erfolgreich bestätigt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'emailTemplate' => 'be_email_templ_accept_registration',
                 'emailSubject' => 'Zusage für %s "%s"',
             ],
@@ -171,7 +171,7 @@ class NotifyEventParticipantController
                 'formId' => strtolower(self::REFUSE_WITH_EMAIL_ACTION).'_form',
                 'headline' => 'Anmeldeanfrage ablehnen',
                 'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_REFUSED,
-                'sessionInfoText' => 'Diese Anmeldeanfrage wurde abgelehnt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
+                'sessionInfoText' => 'Die Anmeldeanfrage wurde abgelehnt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'emailTemplate' => 'be_email_templ_refuse_registration',
                 'emailSubject' => 'Anmeldeanfrage für %s "%s" abgelehnt',
             ],
@@ -179,7 +179,7 @@ class NotifyEventParticipantController
                 'formId' => strtolower(self::CANCEL_WITH_EMAIL_ACTION).'_form',
                 'headline' => 'Anmeldeanfrage stornieren',
                 'stateOfSubscription' => EventSubscriptionState::USER_HAS_UNSUBSCRIBED,
-                'sessionInfoText' => 'Diese Anmeldeanfrage wurde storniert und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
+                'sessionInfoText' => 'Die Anmeldeanfrage wurde storniert und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'emailTemplate' => 'be_email_templ_cancel_registration',
                 'emailSubject' => 'Anmeldeanfrage für %s "%s" storniert',
             ],
@@ -363,6 +363,8 @@ class NotifyEventParticipantController
 
     private function getBackUrl(): string
     {
-        return $this->urlParser->removeQueryString(['key', 'action']);
+        $uri = $this->urlParser->removeQueryString(['act', 'id', 'key', 'action']);
+
+        return $this->urlParser->addQueryString('id='.$this->event->id, $uri);
     }
 }
