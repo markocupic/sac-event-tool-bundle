@@ -734,7 +734,7 @@ class CalendarEventsMember
                 }
 
                 if ($registration->hasParticipated) {
-                    $this->message->addInfo('Dieser Teilnehmer/diese Teilnehmerin hat am Anlass teilgenommen.');
+                    $this->message->addInfo('Dieser Teilnehmer/diese Teilnehmerin hat am Anlass teilgenommen. Es können deshalb keine Benachrichtigungen versandt werden.');
                 }
 
                 if (!$registration->hasParticipated && $this->validator->isEmail($registration->email)) {
