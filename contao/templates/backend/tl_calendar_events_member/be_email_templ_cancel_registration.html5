@@ -15,7 +15,7 @@ Bitte antworte nicht auf diese Nachricht, sondern nutze für Rückfragen bitte f
 
 Beste Grüsse
 
-<?= $this->instructorName ?>
+<?= $this->instructorFirstname ?> <?= $this->instructorLastname ?>
 
 
 
