@@ -69,24 +69,6 @@ table#ctrl_eventDates thead tr:first-child {
 	margin-left: 15px;
 }
 
-#tl_calendar_events_member .tl_submit.btn-refuse-with-email {
-	background-color: red;
-	color: white;
-	border-color: red;
-}
-
-#tl_calendar_events_member .tl_submit.btn-cancel-with-email {
-	background-color: orange;
-	color: white;
-	border-color: orange;
-}
-
-#tl_calendar_events_member .tl_submit.btn-accept-with-email {
-	background-color: darkgreen;
-	color: white;
-	border-color: darkgreen;
-}
-
 /** Contao haste easy ajax operations icons **/
 .tl_listing_container.list_view a.toggleStateOfParticipation img {
 	width: 16px;
@@ -244,6 +226,31 @@ div.tl_header_tour_rapport table td {
 .subscription-badge.unsubscribed-user {
 	background-color: #d86811;
 }
+
+#tl_calendar_events_member .tl_submit.btn-accept-with-email {
+	background-color: #91dc5a;
+	color: black;
+	border-color: #91dc5a;
+}
+
+#tl_calendar_events_member .tl_submit.btn-add-to-waitinglist-with-email {
+	background-color: #006df0;
+	color: white;
+	border-color: #006df0;
+}
+
+#tl_calendar_events_member .tl_submit.btn-refuse-with-email {
+	background-color: #d80027;
+	color: white;
+	border-color: #d80027;
+}
+
+#tl_calendar_events_member .tl_submit.btn-cancel-with-email {
+	background-color: #d86811;
+	color: white;
+	border-color: #d86811;
+}
+
 
 /** backend home screen - start */
 #tl_backend_home_screen_my_events h2 {
