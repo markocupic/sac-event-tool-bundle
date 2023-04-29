@@ -233,11 +233,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId'] = [
 	'sql'       => "varchar(255) NOT NULL default ''",
 ];
 
-// eventToken
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventToken'] = [
-	'sql' => "varchar(255) NOT NULL default ''",
-];
-
 // suitableForBeginners
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['suitableForBeginners'] = [
 	'exclude'   => true,
@@ -901,6 +896,5 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourSpecialIncidents']['eval
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourWeatherConditions']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm']['eval']['doNotCopy'] = true;
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventToken']['eval']['doNotCopy'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration']['eval']['doNotCopy'] = false;
 //$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDeferDate']['eval']['doNotCopy'] = false;
