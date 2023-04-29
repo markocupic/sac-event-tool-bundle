@@ -97,7 +97,7 @@ class NotifyEventParticipantController
         $template = new BackendTemplate('be_calendar_events_registration_email');
         $template->headline = $this->configuration['headline'];
         $template->form = $this->createAndValidateForm()->generate();
-        $template->back = $this->getBackUrl();
+        $template->back = $this->getBackUri();
 
         return $template->parse();
     }
@@ -113,9 +113,6 @@ class NotifyEventParticipantController
      */
     private function initialize(): void
     {
-        $errorUri = $this->urlParser->removeQueryString(['key', 'act']);
-        $errorUri = $this->urlParser->addQueryString('act=edit', $errorUri);
-
         $request = $this->requestStack->getCurrentRequest();
 
         $id = $request->query->get('id');
@@ -124,27 +121,27 @@ class NotifyEventParticipantController
 
         if (null === $this->registration) {
             $this->message->addInfo('Es wurde keine gültige Event-Registrierung gefunden.');
-            $this->controller->redirect($errorUri);
+            $this->controller->redirect($this->getErrorUri());
         }
 
         $this->event = $this->calendarEvents->findByPk($this->registration->eventId);
 
         if (null === $this->event) {
             $this->message->addInfo('Es wurde kein zur Registrierung gehörender Event gefunden.');
-            $this->controller->redirect($errorUri);
+            $this->controller->redirect($this->getErrorUri());
         }
 
         $this->user = $this->security->getUser();
 
         if (!$this->user instanceof BackendUser) {
-            throw new \Exception('Access denied! User has to be a logged in backend user.');
+            throw new \Exception('Access denied! User has to be a logged in Contao backend user.');
         }
 
         $this->action = $request->query->get('action', null);
 
         if (empty($this->action) || !\in_array($this->action, self::ACTIONS, true) || null === ($this->configuration = $this->getActionConfig($this->action))) {
             $this->message->addInfo(sprintf('Ungültiger Query-Parameter "action" => "%s".', $this->action));
-            $this->controller->redirect($errorUri);
+            $this->controller->redirect($this->getErrorUri());
         }
     }
 
@@ -190,7 +187,6 @@ class NotifyEventParticipantController
 
     private function createAndValidateForm(): Form
     {
-        // Generate form fields
         $form = new Form(
             $this->configuration['formId'],
             'POST',
@@ -221,7 +217,7 @@ class NotifyEventParticipantController
         if (!$request->isMethod('post')) {
             $arrTokens = $this->getTokenArray();
 
-            if ('accept_with_email' === $this->action && $this->event->customizeEventRegistrationConfirmationEmailText && !empty($this->event->customEventRegistrationConfirmationEmailText)) {
+            if (self::ACCEPT_WITH_EMAIL_ACTION === $this->action && $this->event->customizeEventRegistrationConfirmationEmailText && !empty($this->event->customEventRegistrationConfirmationEmailText)) {
                 // Only for accept_with_email!!!
                 // Replace tags for custom notification set in the events settings (tags can be used case-insensitive!)
                 $emailBodyText = $this->event->customEventRegistrationConfirmationEmailText;
@@ -252,7 +248,7 @@ class NotifyEventParticipantController
 
         if ($request->request->get('FORM_SUBMIT') === $this->configuration['formId'] && $form->validate()) {
             if ($this->notify($form)) {
-                $uri = $this->getBackUrl();
+                $uri = $this->getBackUri();
                 $this->controller->redirect($uri);
             }
         }
@@ -275,7 +271,7 @@ class NotifyEventParticipantController
         $email->subject = html_entity_decode((string) $form->getWidget('subject')->value);
         $email->text = html_entity_decode(strip_tags((string) $form->getWidget('text')->value));
 
-        // Check if another event has already been booked at the same time.
+        // Check if event participant has already been booked on another event at the same time.
         $objMember = $this->member->findOneBySacMemberId($this->registration->sacMemberId);
 
         if (
@@ -361,10 +357,17 @@ class NotifyEventParticipantController
         ];
     }
 
-    private function getBackUrl(): string
+    private function getBackUri(): string
     {
         $uri = $this->urlParser->removeQueryString(['act', 'id', 'key', 'action']);
 
         return $this->urlParser->addQueryString('id='.$this->event->id, $uri);
+    }
+
+    private function getErrorUri(): string
+    {
+        $uri = $this->urlParser->removeQueryString(['key', 'act']);
+
+        return $this->urlParser->addQueryString('act=edit', $uri);
     }
 }
