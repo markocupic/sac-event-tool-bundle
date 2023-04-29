@@ -378,7 +378,7 @@ class SyncSacMemberDatabase
 
             // Log
             $msg = sprintf(
-                'Finished syncing SAC member database with tl_member. Traversed %s entries. Total inserts: %s. Total updates: %s. Duration: %s s.',
+                'Finished syncing SAC member database with tl_member. Processed %s records. Total inserts: %s. Total updates: %s. Duration: %s s.',
                 \count($arrMember),
                 $countInserts,
                 $countUpdates,
