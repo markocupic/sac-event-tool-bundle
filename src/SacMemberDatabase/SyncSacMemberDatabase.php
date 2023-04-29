@@ -214,44 +214,44 @@ class SyncSacMemberDatabase
                                 continue;
                             }
 
-                            $arrLine[0] = ltrim((string) $arrLine[0], '0');
+                            $arrLine[0] = (int) ($arrLine[0]);
 
-                            if (!is_numeric($arrLine[0])) {
+                            // First column must contain the sac member id (e.g. 134100)
+                            if ($arrLine[0] < 1) {
                                 continue;
                             }
 
-                            $arrSacMemberIds[] = (int) ($arrLine[0]);
+                            $arrSacMemberIds[] = $arrLine[0];
 
                             $set = [];
-                            $set['sacMemberId'] = (int) ($arrLine[0]);
-                            $set['username'] = (int) ($arrLine[0]);
-                            // Allow multi membership
-                            $set['sectionId'] = [$arrLine[1]];
-                            $set['lastname'] = $arrLine[2];
-                            $set['firstname'] = $arrLine[3];
-                            $set['addressExtra'] = $arrLine[4];
-                            $set['street'] = trim($arrLine[5]);
-                            $set['streetExtra'] = $arrLine[6];
-                            $set['postal'] = $arrLine[7];
-                            $set['city'] = $arrLine[8];
-                            $set['country'] = empty(strtolower($arrLine[9])) ? 'ch' : strtolower($arrLine[9]);
-                            $set['dateOfBirth'] = strtotime($arrLine[10]);
-                            $set['phoneBusiness'] = PhoneNumber::beautify($arrLine[11]);
-                            $set['phone'] = PhoneNumber::beautify($arrLine[12]);
-                            $set['mobile'] = PhoneNumber::beautify($arrLine[14]);
-                            $set['fax'] = $arrLine[15];
-                            $set['email'] = $arrLine[16];
-                            $set['gender'] = 'weiblich' === strtolower($arrLine[17]) ? 'female' : 'male';
-                            $set['profession'] = $arrLine[18];
-                            $set['language'] = 'd' === strtolower($arrLine[19]) ? $this->sacevtLocale : strtolower($arrLine[19]);
-                            $set['entryYear'] = $arrLine[20];
-                            $set['membershipType'] = $arrLine[23];
-                            $set['sectionInfo1'] = $arrLine[24];
-                            $set['sectionInfo2'] = $arrLine[25];
-                            $set['sectionInfo3'] = $arrLine[26];
-                            $set['sectionInfo4'] = $arrLine[27];
-                            $set['debit'] = $arrLine[28];
-                            $set['memberStatus'] = $arrLine[29];
+                            $set['sacMemberId'] = $arrLine[0]; // int
+                            $set['username'] = (string) ($arrLine[0]); // string
+                            $set['sectionId'] = [(int) ($arrLine[1])]; // array => allow multi membership
+                            $set['lastname'] = $arrLine[2]; // string
+                            $set['firstname'] = $arrLine[3]; // string
+                            $set['addressExtra'] = $arrLine[4]; // string
+                            $set['street'] = trim($arrLine[5]); // string
+                            $set['streetExtra'] = $arrLine[6]; // string
+                            $set['postal'] = $arrLine[7]; // string
+                            $set['city'] = $arrLine[8]; // string
+                            $set['country'] = empty(strtolower($arrLine[9])) ? 'ch' : strtolower($arrLine[9]); // string
+                            $set['dateOfBirth'] = strtotime($arrLine[10]); // int
+                            $set['phoneBusiness'] = PhoneNumber::beautify($arrLine[11]); // string
+                            $set['phone'] = PhoneNumber::beautify($arrLine[12]); // string
+                            $set['mobile'] = PhoneNumber::beautify($arrLine[14]); // string
+                            $set['fax'] = $arrLine[15]; // string
+                            $set['email'] = $arrLine[16]; // string
+                            $set['gender'] = 'weiblich' === strtolower($arrLine[17]) ? 'female' : 'male'; // string
+                            $set['profession'] = $arrLine[18]; // string
+                            $set['language'] = 'd' === strtolower($arrLine[19]) ? $this->sacevtLocale : strtolower($arrLine[19]); // string
+                            $set['entryYear'] = $arrLine[20]; // string
+                            $set['membershipType'] = $arrLine[23]; // string
+                            $set['sectionInfo1'] = $arrLine[24]; // string
+                            $set['sectionInfo2'] = $arrLine[25]; // string
+                            $set['sectionInfo3'] = $arrLine[26]; // string
+                            $set['sectionInfo4'] = $arrLine[27]; // string
+                            $set['debit'] = $arrLine[28]; // string
+                            $set['memberStatus'] = $arrLine[29]; // string
 
                             $set = array_map(
                                 static function ($value) {
@@ -266,7 +266,7 @@ class SyncSacMemberDatabase
                                 $set
                             );
 
-                            // Check if member is already in the array
+                            // Check if member is already in the array (allow multi membership)
                             if (isset($arrMember[$set['sacMemberId']])) {
                                 $arrMember[$set['sacMemberId']]['sectionId'] = array_merge($arrMember[$set['sacMemberId']]['sectionId'], $set['sectionId']);
                             } else {
