@@ -14,9 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\SacMemberDatabase;
 
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\File;
 use Contao\FrontendUser;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
@@ -26,21 +24,27 @@ use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\String\PhoneNumber;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Safe\Exceptions\StringsException;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 class SyncSacMemberDatabase
 {
     public const FTP_DB_DUMP_FILE_PATH = 'system/tmp/Adressen_0000%s.csv';
     public const FTP_DB_DUMP_END_OF_FILE_STRING = '* * * Dateiende * * *';
     public const FTP_DB_DUMP_FIELD_DELIMITER = '$';
+    public const STOP_WATCH_EVENT = 'sac_database_sync';
 
     private string|null $ftp_hostname = null;
     private string|null $ftp_username = null;
     private string|null $ftp_password = null;
+    private array $syncLog = [
+        'processed' => 0,
+        'inserts' => 0,
+        'updates' => 0,
+        'duration' => 0,
+    ];
 
     public function __construct(
-        private readonly ContaoFramework $framework,
         private readonly Connection $connection,
         private readonly PasswordHasherFactory $passwordHasherFactory,
         private readonly array $sacevtMemberSyncCredentials,
@@ -55,14 +59,20 @@ class SyncSacMemberDatabase
      */
     public function run(): void
     {
+        $stopWatchEvent = (new Stopwatch())->start(self::STOP_WATCH_EVENT);
+
+        $this->resetSyncLog();
         $this->prepare();
         $this->fetchFilesFromFtp();
         $this->syncContaoDatabase();
+        $this->setPassword();
+        $this->syncLog['duration'] = round($stopWatchEvent->stop()->getDuration() / 1000);
+
+        $this->contaoSystemLog();
     }
 
     /**
      * @throws Exception
-     * @throws StringsException
      */
     public function setPassword(int $limit = 20): int
     {
@@ -109,9 +119,13 @@ class SyncSacMemberDatabase
         return $count;
     }
 
+    public function getSyncLog(): array
+    {
+        return $this->syncLog;
+    }
+
     private function prepare(): void
     {
-        $this->framework->initialize(false);
         $this->ftp_hostname = (string) $this->sacevtMemberSyncCredentials['hostname'];
         $this->ftp_username = (string) $this->sacevtMemberSyncCredentials['username'];
         $this->ftp_password = (string) $this->sacevtMemberSyncCredentials['password'];
@@ -119,7 +133,6 @@ class SyncSacMemberDatabase
 
     /**
      * @throws Exception
-     * @throws StringsException
      */
     private function fetchFilesFromFtp(): void
     {
@@ -170,21 +183,19 @@ class SyncSacMemberDatabase
      * Sync tl_member with Navision db dump.
      *
      * @throws Exception
-     * @throws StringsException
      */
     private function syncContaoDatabase(): void
     {
-        $startTime = time();
-
         try {
             $this->connection->executeStatement('LOCK TABLES tl_member WRITE, tl_sac_section WRITE;');
             $this->connection->beginTransaction();
 
-            // All users members & nonmembers
-            $arrMemberIDS = $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member');
+            // All members & non-members
+            $arrMemberIDS = array_map('intval', $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member'));
 
             // Members only
             $arrDisabledMemberIDS = $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member WHERE isSacMember = ?', ['']);
+            $arrDisabledMemberIDS = array_map('intval', $arrDisabledMemberIDS);
 
             // Valid/active members
             $arrSacMemberIds = [];
@@ -194,69 +205,76 @@ class SyncSacMemberDatabase
             $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
 
             foreach ($arrSectionIds as $sectionId) {
-                $objFile = new File(sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId));
+                $stream = fopen($this->projectDir.'/'.sprintf(static::FTP_DB_DUMP_FILE_PATH, $sectionId), 'r');
 
-                $arrFile = $objFile->getContentAsArray();
-
-                foreach ($arrFile as $line) {
-                    // End of line
-                    if (str_contains($line, static::FTP_DB_DUMP_END_OF_FILE_STRING)) {
-                        continue;
-                    }
-                    $arrLine = explode(static::FTP_DB_DUMP_FIELD_DELIMITER, $line);
-
-                    $arrSacMemberIds[] = (int) ($arrLine[0]);
-
-                    $set = [];
-                    $set['sacMemberId'] = (int) ($arrLine[0]);
-                    $set['username'] = (int) ($arrLine[0]);
-                    // Allow multi membership
-                    $set['sectionId'] = [ltrim($arrLine[1], '0')];
-                    $set['lastname'] = $arrLine[2];
-                    $set['firstname'] = $arrLine[3];
-                    $set['addressExtra'] = $arrLine[4];
-                    $set['street'] = trim($arrLine[5]);
-                    $set['streetExtra'] = $arrLine[6];
-                    $set['postal'] = $arrLine[7];
-                    $set['city'] = $arrLine[8];
-                    $set['country'] = empty(strtolower($arrLine[9])) ? 'ch' : strtolower($arrLine[9]);
-                    $set['dateOfBirth'] = strtotime($arrLine[10]);
-                    $set['phoneBusiness'] = PhoneNumber::beautify($arrLine[11]);
-                    $set['phone'] = PhoneNumber::beautify($arrLine[12]);
-                    $set['mobile'] = PhoneNumber::beautify($arrLine[14]);
-                    $set['fax'] = $arrLine[15];
-                    $set['email'] = $arrLine[16];
-                    $set['gender'] = 'weiblich' === strtolower($arrLine[17]) ? 'female' : 'male';
-                    $set['profession'] = $arrLine[18];
-                    $set['language'] = 'd' === strtolower($arrLine[19]) ? $this->sacevtLocale : strtolower($arrLine[19]);
-                    $set['entryYear'] = $arrLine[20];
-                    $set['membershipType'] = $arrLine[23];
-                    $set['sectionInfo1'] = $arrLine[24];
-                    $set['sectionInfo2'] = $arrLine[25];
-                    $set['sectionInfo3'] = $arrLine[26];
-                    $set['sectionInfo4'] = $arrLine[27];
-                    $set['debit'] = $arrLine[28];
-                    $set['memberStatus'] = $arrLine[29];
-
-                    $set = array_map(
-                        static function ($value) {
-                            if (!\is_array($value)) {
-                                $value = \is_string($value) ? trim((string) $value) : $value;
-
-                                return \is_string($value) ? utf8_encode($value) : $value;
+                if ($stream) {
+                    while (!feof($stream)) {
+                        if (false !== ($arrLine = fgetcsv($stream, null, static::FTP_DB_DUMP_FIELD_DELIMITER))) {
+                            if (empty($arrLine) || empty($arrLine[0])) {
+                                continue;
                             }
 
-                            return $value;
-                        },
-                        $set
-                    );
+                            $arrLine[0] = ltrim((string) $arrLine[0], '0');
 
-                    // Check if member is already in the array
-                    if (isset($arrMember[$set['sacMemberId']])) {
-                        $arrMember[$set['sacMemberId']]['sectionId'] = array_merge($arrMember[$set['sacMemberId']]['sectionId'], $set['sectionId']);
-                    } else {
-                        $arrMember[$set['sacMemberId']] = $set;
+                            if (!is_numeric($arrLine[0])) {
+                                continue;
+                            }
+
+                            $arrSacMemberIds[] = (int) ($arrLine[0]);
+
+                            $set = [];
+                            $set['sacMemberId'] = (int) ($arrLine[0]);
+                            $set['username'] = (int) ($arrLine[0]);
+                            // Allow multi membership
+                            $set['sectionId'] = [$arrLine[1]];
+                            $set['lastname'] = $arrLine[2];
+                            $set['firstname'] = $arrLine[3];
+                            $set['addressExtra'] = $arrLine[4];
+                            $set['street'] = trim($arrLine[5]);
+                            $set['streetExtra'] = $arrLine[6];
+                            $set['postal'] = $arrLine[7];
+                            $set['city'] = $arrLine[8];
+                            $set['country'] = empty(strtolower($arrLine[9])) ? 'ch' : strtolower($arrLine[9]);
+                            $set['dateOfBirth'] = strtotime($arrLine[10]);
+                            $set['phoneBusiness'] = PhoneNumber::beautify($arrLine[11]);
+                            $set['phone'] = PhoneNumber::beautify($arrLine[12]);
+                            $set['mobile'] = PhoneNumber::beautify($arrLine[14]);
+                            $set['fax'] = $arrLine[15];
+                            $set['email'] = $arrLine[16];
+                            $set['gender'] = 'weiblich' === strtolower($arrLine[17]) ? 'female' : 'male';
+                            $set['profession'] = $arrLine[18];
+                            $set['language'] = 'd' === strtolower($arrLine[19]) ? $this->sacevtLocale : strtolower($arrLine[19]);
+                            $set['entryYear'] = $arrLine[20];
+                            $set['membershipType'] = $arrLine[23];
+                            $set['sectionInfo1'] = $arrLine[24];
+                            $set['sectionInfo2'] = $arrLine[25];
+                            $set['sectionInfo3'] = $arrLine[26];
+                            $set['sectionInfo4'] = $arrLine[27];
+                            $set['debit'] = $arrLine[28];
+                            $set['memberStatus'] = $arrLine[29];
+
+                            $set = array_map(
+                                static function ($value) {
+                                    if (!\is_array($value)) {
+                                        $value = \is_string($value) ? trim((string) $value) : $value;
+
+                                        return \is_string($value) ? utf8_encode($value) : $value;
+                                    }
+
+                                    return $value;
+                                },
+                                $set
+                            );
+
+                            // Check if member is already in the array
+                            if (isset($arrMember[$set['sacMemberId']])) {
+                                $arrMember[$set['sacMemberId']]['sectionId'] = array_merge($arrMember[$set['sacMemberId']]['sectionId'], $set['sectionId']);
+                            } else {
+                                $arrMember[$set['sacMemberId']] = $set;
+                            }
+                        }
                     }
+                    fclose($stream);
                 }
             }
 
@@ -283,7 +301,7 @@ class SyncSacMemberDatabase
             foreach ($arrMember as $sacMemberId => $arrValues) {
                 $arrValues['sectionId'] = serialize($arrValues['sectionId']);
 
-                if (!\in_array($sacMemberId, $arrMemberIDS, false)) {
+                if (!\in_array($sacMemberId, $arrMemberIDS, true)) {
                     $arrValues['dateAdded'] = time();
                     $arrValues['tstamp'] = time();
 
@@ -349,6 +367,8 @@ class SyncSacMemberDatabase
         $stmt = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember = ?', ['']);
 
         while (false !== ($rowDisabledMember = $stmt->fetchAssociative())) {
+            $rowDisabledMember['sacMemberId'] = (int) ($rowDisabledMember['sacMemberId']);
+
             $set = [
                 'tstamp' => time(),
                 'disable' => '1',
@@ -361,7 +381,7 @@ class SyncSacMemberDatabase
             $this->connection->update('tl_member', $set, ['id' => $id]);
 
             // Log if user has been disabled
-            if (!\in_array($rowDisabledMember['sacMemberId'], $arrDisabledMemberIDS, false)) {
+            if (!\in_array($rowDisabledMember['sacMemberId'], $arrDisabledMemberIDS, true)) {
                 $msg = sprintf(
                     'Disable SAC-Member "%s %s" SAC-User-ID: %s during the sync process. Could not find the user in the SAC main database from Bern.',
                     $rowDisabledMember['firstname'],
@@ -374,22 +394,24 @@ class SyncSacMemberDatabase
         }
 
         if ($i === \count($arrMember)) {
-            $duration = time() - $startTime;
-
-            // Log
-            $msg = sprintf(
-                'Finished syncing SAC member database with tl_member. Processed %s records. Total inserts: %s. Total updates: %s. Duration: %s s.',
-                \count($arrMember),
-                $countInserts,
-                $countUpdates,
-                $duration
-            );
-
-            $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_SUCCESS);
+            $this->syncLog['processed'] = $i;
+            $this->syncLog['inserts'] = $countInserts;
+            $this->syncLog['updates'] = $countUpdates;
         }
+    }
 
-        // Set password if there isn't one
-        $this->setPassword();
+    private function contaoSystemLog(): void
+    {
+        // Log
+        $msg = sprintf(
+            'Finished syncing SAC member database with tl_member. Processed %d data records. Total inserts: %d. Total updates: %d. Duration: %d s.',
+            $this->syncLog['processed'],
+            $this->syncLog['inserts'],
+            $this->syncLog['updates'],
+            $this->syncLog['duration'],
+        );
+
+        $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_SUCCESS);
     }
 
     private function log(string $strLogLevel, string $strText, string $strMethod, string $strCategory): void
@@ -399,5 +421,16 @@ class SyncSacMemberDatabase
             $strText,
             ['contao' => new ContaoContext($strMethod, $strCategory)]
         );
+    }
+
+    private function resetSyncLog(): void
+    {
+        // Reset sync log
+        $this->syncLog = [
+            'processed' => 0,
+            'inserts' => 0,
+            'updates' => 0,
+            'duration' => 0,
+        ];
     }
 }

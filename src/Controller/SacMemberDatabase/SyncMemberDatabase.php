@@ -28,24 +28,21 @@ class SyncMemberDatabase extends AbstractController
     ) {
     }
 
-    /**
-     * This is the frontend route for the member sync.
-     *
-     * @Route("/_sync_sac_member_database", name="sac_event_tool_sync_sac_member_database", defaults={"_scope" = "frontend"})
-     */
+    #[Route('/_sync_sac_member_database', name: 'sac_event_tool_sync_sac_member_database')]
     public function syncDatabaseAction(): JsonResponse
     {
-        $this->framework->initialize();
-
         // Run database sync
         $this->syncSacMemberDatabase->run();
 
-        // Set password if there isn't one.
-        $count = 0;
+        // Get the log
+        $arrLog = $this->syncSacMemberDatabase->getSyncLog();
 
         $arrJson = [
             'message' => 'Successfully executed the db sync.',
-            'password updates' => (string) $count,
+            'processed' => $arrLog['processed'],
+            'inserts' => $arrLog['inserts'],
+            'updates' => $arrLog['updates'],
+            'duration' => $arrLog['duration'].' s',
         ];
 
         return new JsonResponse($arrJson);
