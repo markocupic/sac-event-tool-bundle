@@ -165,9 +165,9 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
 
                 if (EventSubscriptionState::USER_HAS_UNSUBSCRIBED === $objEventsMember->stateOfSubscription) {
                     $errorMsg = 'Abmeldung fehlgeschlagen! Du hast dich vom Event "'.$objEvent->title.'" bereits abgemeldet.';
-                } elseif (EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED === $objEventsMember->stateOfSubscription || EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST === $objEventsMember->stateOfSubscription) {
+                } elseif (EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED === $objEventsMember->stateOfSubscription || EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST === $objEventsMember->stateOfSubscription) {
                     // allow unregistering if member is not confirmed on the event
-                    // allow unregistering if member is waitlisted on the event
+                    // allow unregistering if member is on the waiting list for this event
                     $blnHasError = false;
                 } elseif (!$objEvent->allowDeregistration) {
                     $errorMsg = $objEvent->allowDeregistration.'Du kannst dich vom Event "'.$objEvent->title.'" nicht abmelden. Die Anmeldung ist definitiv. Nimm Kontakt mit dem Event-Organisator auf.';

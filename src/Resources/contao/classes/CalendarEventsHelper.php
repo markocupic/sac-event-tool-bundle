@@ -909,7 +909,7 @@ class CalendarEventsHelper
                     ++$intRefused;
                 }
 
-                if (EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST === $eventsMemberModel->stateOfSubscription) {
+                if (EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST === $eventsMemberModel->stateOfSubscription) {
                     ++$intWaitlisted;
                 }
 
@@ -934,7 +934,7 @@ class CalendarEventsHelper
             }
 
             if ($intWaitlisted > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge waitlisted" data-title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=%s">%s</span>', $intWaitlisted, $href, $intWaitlisted);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge on-waiting-list" data-title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=%s">%s</span>', $intWaitlisted, $href, $intWaitlisted);
             }
 
             if ($intUnsubscribedUser > 0) {

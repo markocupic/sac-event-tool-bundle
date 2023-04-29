@@ -361,7 +361,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $arrData['eventId'] = $this->eventModel->id;
                 $arrData['dateAdded'] = time();
                 $arrData['uuid'] = Uuid::uuid4()->toString();
-                $arrData['stateOfSubscription'] = $this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel) ? EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST : EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED;
+                $arrData['stateOfSubscription'] = $this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel) ? EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST : EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED;
                 $arrData['bookingType'] = 'onlineForm';
                 $arrData['sectionId'] = $this->memberModel->sectionId;
 

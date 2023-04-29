@@ -162,7 +162,7 @@ class NotifyEventParticipantController
             self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION => [
                 'formId' => strtolower(self::ADD_TO_WAITING_LIST_WITH_EMAIL_ACTION).'_form',
                 'headline' => 'Anmeldestatus auf "Warteliste" ändern',
-                'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST,
+                'stateOfSubscription' => EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST,
                 'sessionInfoText' => 'Der Status dieser Registrierung wurde erfolgreich auf "Warteliste" gesetzt und die Person wurde darüber per E-Mail in Kenntnis gesetzt.',
                 'emailTemplate' => 'be_email_templ_add_to_waitinglist',
                 'emailSubject' => 'Auf Warteliste für %s "%s"',

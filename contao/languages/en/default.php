@@ -160,7 +160,7 @@ $GLOBALS['TL_LANG']['FORM']['evt_reg_submit'] = 'Für Event anmelden';
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED] = 'Anmeldeanfrage unbeantwortet';
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_ACCEPTED] = 'Anmeldeanfrage bestätigt';
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_REFUSED] = 'Anmeldeanfrage abgelehnt';
-$GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST] = 'Anmeldeanfrage auf Warteliste';
+$GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST] = 'Anmeldeanfrage auf Warteliste';
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::USER_HAS_UNSUBSCRIBED] = 'Anmeldeanfrage storniert';
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED] = 'Status der Anmeldeanfrage unbekannt';
 

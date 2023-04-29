@@ -520,7 +520,7 @@ class CalendarEventsMember
                 // Do not allow the maximum number of participants to be exceeded.
                 if (EventSubscriptionState::SUBSCRIPTION_ACCEPTED === $varValue) {
                     if (!$this->calendarEventsMember->canAcceptSubscription($objEventMemberModel, $objEvent)) {
-                        $varValue = EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST;
+                        $varValue = EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST;
                     }
                 }
 

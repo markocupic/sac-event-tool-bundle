@@ -11,7 +11,7 @@
             <a href="{{ button_hrefs.accept_with_email }}" onclick="if (!confirm('{{ onclick_confirm_C }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-accept-with-email">Bestätigen mit E-Mail</a>
         {% endif %}
 
-        {% if state_of_subscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::SUBSCRIPTION_ON_WAITINGLIST') %}
+        {% if state_of_subscription != constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST') %}
             <a href="{{ button_hrefs.add_to_waitinglist_with_email }}" onclick="if (!confirm('{{ onclick_confirm_D }}'))return false;Backend.getScrollOffset()" class="tl_submit btn-add-to-waitinglist-with-email">Auf Warteliste mit E-Mail</a>
         {% endif %}
 
