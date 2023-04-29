@@ -22,6 +22,7 @@ use Contao\CalendarModel;
 use Contao\Comments;
 use Contao\Config;
 use Contao\ContentModel;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\InternalServerErrorException;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Exception\RedirectResponseException;
@@ -35,6 +36,7 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
+use Symfony\Component\HttpKernel\UriSigner;
 
 /**
  * Front end module "event reader".
@@ -93,8 +95,11 @@ class ModuleSacEventToolEventPreviewReader extends Events
             throw new InternalServerErrorException('Event "'.Input::get('events').'" not found.');
         }
 
-        if ($objEvent->eventToken !== Input::get('eventToken')) {
-            throw new InternalServerErrorException('Invalid eventToken!');
+        /** @var UriSigner $uriSigner */
+        $uriSigner = System::getContainer()->get('uri_signer');
+
+        if (!$uriSigner->checkRequest($request)) {
+            throw new AccessDeniedException('Denied access to this resource.');
         }
 
         $this->cal_calendar = [$objEvent->pid];

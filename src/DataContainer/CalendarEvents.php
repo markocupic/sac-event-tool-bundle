@@ -603,7 +603,6 @@ class CalendarEvents
         if (null !== $objEventsModel) {
             // Set logged-in user as author
             $objEventsModel->author = $user->id;
-            $objEventsModel->eventToken = $this->generateEventToken($insertId);
             $objEventsModel->save();
 
             // Set eventReleaseLevel
@@ -755,34 +754,6 @@ class CalendarEvents
             $dc->activeRecord->eventReleaseLevel = $eventReleaseLevelModel->id;
             $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
         }
-    }
-
-    /**
-     * @throws Exception
-     * @throws \Exception
-     */
-    #[AsCallback(table: 'tl_calendar_events', target: 'config.onsubmit', priority: 70)]
-    public function setEventToken(DataContainer $dc): void
-    {
-        // Return if there is no active record (override all)
-        if (!$dc->activeRecord) {
-            return;
-        }
-
-        $objEvent = $this->calendarEventsModel->findByPk($dc->activeRecord->id);
-
-        if (null !== $objEvent) {
-            if (!str_contains($objEvent->eventToken, '-'.$dc->activeRecord->id)) {
-                $objEvent->eventToken = $this->generateEventToken((int) $dc->activeRecord->id);
-                $objEvent->save();
-            }
-        }
-
-        $strEventToken = $this->generateEventToken((int) $dc->activeRecord->id);
-        $set = ['eventToken' => $strEventToken];
-        $dc->activeRecord->eventToken = $strEventToken;
-
-        $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id, 'eventToken' => '']);
     }
 
     /**
@@ -1737,14 +1708,6 @@ class CalendarEvents
         }
 
         return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function generateEventToken(int $eventId): string
-    {
-        return md5((string) random_int(100000000, 999999999)).'-'.$eventId;
     }
 
     /**

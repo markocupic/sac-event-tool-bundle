@@ -48,6 +48,8 @@ use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Markocupic\SacEventToolBundle\Model\TourTypeModel;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\UriSigner;
 
 class CalendarEventsHelper
 {
@@ -1008,6 +1010,15 @@ class CalendarEventsHelper
 
     public static function generateEventPreviewUrl(CalendarEventsModel $objEvent): string
     {
+        /** @var UriSigner $uriSigner */
+        $uriSigner = System::getContainer()->get('uri_signer');
+
+        /** @var Request $request */
+        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
+
+        /** @var UrlParser $urlParser */
+        $urlParser = System::getContainer()->get(UrlParser::class);
+
         $strUrl = '';
 
         if ('' !== $objEvent->eventType) {
@@ -1018,11 +1029,10 @@ class CalendarEventsHelper
                     $objPage = PageModel::findByPk($objEventType->previewPage);
 
                     if ($objPage instanceof PageModel) {
-                        $urlParser = System::getContainer()->get(UrlParser::class);
                         $params = (Config::get('useAutoItem') ? '/' : '/events/').($objEvent->alias ?: $objEvent->id);
                         $strUrl = StringUtil::ampersand($objPage->getFrontendUrl($params));
-                        $strUrl = $urlParser->addQueryString('mode=eventPreview', $strUrl);
-                        $strUrl = $urlParser->addQueryString('eventToken='.$objEvent->eventToken, $strUrl);
+                        $strUrl = $urlParser->addQueryString('event_preview=true', $strUrl);
+                        $strUrl = $uriSigner->sign($request->getSchemeAndHttpHost().'/'.$strUrl);
                     }
                 }
             }

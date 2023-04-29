@@ -150,7 +150,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         // Get instructor object from UserModel
         $this->mainInstructorModel = $this->userModelAdapter->findByPk($this->eventModel->mainInstructor);
 
-        if ('eventPreview' === $request->query->get('mode')) {
+        if ('true' === $request->query->get('event_preview')) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 

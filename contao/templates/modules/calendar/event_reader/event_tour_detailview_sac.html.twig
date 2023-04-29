@@ -277,9 +277,9 @@
                 {# enclosures/downloads #}
                 {# !Urheberrechtsverletzung bei urheberrechtlich geschützten Anhängen wie Topos, Karten, etc. #}
                 {% if get_event_data(model, 'enclosure') %}
-                    <div class="event-eclosures event-detail event-info-box icon-box-small">
+                    <div class="event-enclosures event-detail event-info-box icon-box-small">
                         <h5>Downloads / Weitere Informationen</h5>
-                        {% if has_logged_in_frontend_user() or 'eventPreview' == app.request.query.get('mode') %} {# poor security level! #}
+                        {% if has_logged_in_frontend_user() or 'true' == app.request.query.get('event_preview') %} {# poor security level! #}
                             <div class="enclosure">
                                 {% for enclosureItem in enclosure %}
                                     <p>
