@@ -14,44 +14,48 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Controller\SacMemberDatabase;
 
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Markocupic\SacEventToolBundle\SacMemberDatabase\SyncSacMemberDatabase;
+use Markocupic\SacEventToolBundle\User\BackendUser\SyncMemberWithUser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Mirror/Update tl_member from SAC Member Database Zentralverband Bern
- * Unidirectional sync SAC Member Database Zentralverband Bern -> tl_member.
+ * Mirror/Update tl_user from tl_member
+ * Unidirectional sync tl_member -> tl_user.
  */
-class SyncMemberDatabase extends AbstractController
+#[Route('/_sync_from_member_to_user', name: 'sac_event_tool_sync_from_member_to_user')]
+class SyncFromMemberToUser extends AbstractController
 {
     public function __construct(
-        private readonly ContaoFramework $framework,
+        private readonly SyncMemberWithUser $syncMemberWithUser,
         private readonly SyncSacMemberDatabase $syncSacMemberDatabase,
     ) {
     }
 
-    #[Route('/_sync_sac_member_database', name: 'sac_event_tool_sync_sac_member_database')]
-    public function syncDatabaseAction(): JsonResponse
+    public function __invoke(): JsonResponse
     {
-        // Run database sync
-        $this->syncSacMemberDatabase->run();
+        // Run mirroring
+        $this->syncMemberWithUser->syncMemberWithUser();
 
         // Get the log
-        $arrLog = $this->syncSacMemberDatabase->getSyncLog();
+        $arrLog = $this->syncMemberWithUser->getSyncLog();
 
         $arrJson = [
             'message' => 'Successfully executed the db sync.',
             'processed' => $arrLog['processed'],
-            'inserts' => $arrLog['inserts'],
             'updates' => $arrLog['updates'],
-            'log' => $arrLog['log'],
             'duration' => $arrLog['duration'].' s',
             'with_error' => $arrLog['with_error'],
             'exception' => $arrLog['exception'],
+            'log' => $arrLog['log'],
         ];
 
         return new JsonResponse($arrJson);
+    }
+
+    public function run(): JsonResponse
+    {
+        return $this();
     }
 }

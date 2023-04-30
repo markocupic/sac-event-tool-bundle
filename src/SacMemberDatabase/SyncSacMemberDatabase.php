@@ -27,6 +27,10 @@ use Psr\Log\LogLevel;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\Stopwatch\Stopwatch;
 
+/**
+ * Mirror/Update tl_member from SAC Member Database Zentralverband Bern
+ * Unidirectional sync SAC Member Database Zentralverband Bern -> tl_member.
+ */
 class SyncSacMemberDatabase
 {
     public const FTP_DB_DUMP_FILE_PATH = 'system/tmp/Adressen_0000%s.csv';
@@ -38,10 +42,13 @@ class SyncSacMemberDatabase
     private string|null $ftp_username = null;
     private string|null $ftp_password = null;
     private array $syncLog = [
+        'log' => [],
         'processed' => 0,
         'inserts' => 0,
         'updates' => 0,
         'duration' => 0,
+        'with_error' => false,
+        'exception' => '',
     ];
 
     public function __construct(
@@ -355,6 +362,9 @@ class SyncSacMemberDatabase
             $msg = 'Error during the database sync process. Starting transaction rollback now.';
             $this->log(LogLevel::CRITICAL, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_TRANSACTION_ERROR);
 
+            $this->syncLog['with_error'] = true;
+            $this->syncLog['exception'] = $e->getMessage();
+
             // Transaction rollback
             $this->connection->rollBack();
             $this->connection->executeStatement('UNLOCK TABLES;');
@@ -416,6 +426,8 @@ class SyncSacMemberDatabase
 
     private function log(string $strLogLevel, string $strText, string $strMethod, string $strCategory): void
     {
+        $this->syncLog['log'][] = $strText;
+
         $this->logger?->log(
             $strLogLevel,
             $strText,
@@ -427,10 +439,13 @@ class SyncSacMemberDatabase
     {
         // Reset sync log
         $this->syncLog = [
+            'log' => [],
             'processed' => 0,
             'inserts' => 0,
             'updates' => 0,
             'duration' => 0,
+            'with_error' => false,
+            'exception' => '',
         ];
     }
 }

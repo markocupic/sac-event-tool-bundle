@@ -14,80 +14,138 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\User\BackendUser;
 
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\Database;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
- * Sync tl_member with tl_user.
+ * Mirror/Update tl_user from tl_member
+ * Unidirectional sync tl_member -> tl_user.
  */
 class SyncMemberWithUser
 {
+    private array $syncLog = [
+        'log' => [],
+        'processed' => 0,
+        'updates' => 0,
+        'duration' => 0,
+        'with_error' => false,
+        'exception' => '',
+    ];
+
     public function __construct(
-        private readonly ContaoFramework $framework,
+        private readonly Connection $connection,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
     }
 
+    /**
+     * @throws Exception
+     */
     public function syncMemberWithUser(): void
     {
-        $this->framework->initialize();
+        $stopWatchEvent = (new Stopwatch())->start('SYNC_MEMBER_WITH_USER');
+        $this->resetSyncLog();
 
-        $objUser = Database::getInstance()
-            ->prepare('SELECT * FROM tl_user WHERE sacMemberId > ?')
-            ->execute(0)
-        ;
+        $this->connection->beginTransaction();
 
-        while ($objUser->next()) {
-            $objMember = Database::getInstance()
-                ->prepare('SELECT * FROM tl_member WHERE sacMemberId=?')
-                ->limit(1)
-                ->execute($objUser->sacMemberId)
-            ;
+        try {
+            $arrUsers = $this->connection->fetchAllAssociative(
+                'SELECT * FROM tl_user WHERE sacMemberId > ?',
+                [0],
+            );
 
-            if ($objMember->numRows) {
-                $set = [
-                    'firstname' => $objMember->firstname,
-                    'lastname' => $objMember->lastname,
-                    'sectionId' => $objMember->sectionId,
-                    'dateOfBirth' => $objMember->dateOfBirth,
-                    'email' => '' !== $objMember->email ? $objMember->email : 'invalid_'.$objUser->username.'_'.$objUser->sacMemberId.'@noemail.ch',
-                    'street' => $objMember->street,
-                    'postal' => $objMember->postal,
-                    'city' => $objMember->city,
-                    'country' => $objMember->country,
-                    'gender' => $objMember->gender,
-                    'phone' => $objMember->phone,
-                    'mobile' => $objMember->mobile,
-                ];
+            foreach ($arrUsers as $arrUser) {
+                ++$this->syncLog['processed'];
 
-                $objUpdateStmt = Database::getInstance()
-                    ->prepare('UPDATE tl_user %s WHERE id=?')
-                    ->set($set)
-                    ->execute($objUser->id)
-                ;
+                $arrMember = $this->connection->fetchAssociative(
+                    'SELECT * FROM tl_member WHERE sacMemberId = ?',
+                    [$arrUser['sacMemberId']],
+                );
 
-                if ($objUpdateStmt->affectedRows) {
-                    $msg = sprintf(
-                        'Synced tl_user with tl_member. Updated tl_user (%s %s [SAC Member-ID: %s]).',
-                        $objMember->firstname,
-                        $objMember->lastname,
-                        $objMember->sacMemberId
-                    );
+                if (false !== $arrMember) {
+                    $set = [
+                        'firstname' => (string) $arrMember['firstname'],
+                        'lastname' => (string) $arrMember['lastname'],
+                        'name' => $arrMember['lastname'].' '.$arrMember['firstname'],
+                        'sectionId' => $arrMember['sectionId'],
+                        'dateOfBirth' => (int) $arrMember['dateOfBirth'],
+                        'email' => '' !== $arrMember['email'] ? (string) $arrMember['email'] : 'invalid_'.$arrUser['username'].'_'.$arrUser['sacMemberId'].'@noemail.ch',
+                        'street' => (string) $arrMember['street'],
+                        'postal' => (string) $arrMember['postal'],
+                        'city' => (string) $arrMember['city'],
+                        'country' => (string) $arrMember['country'],
+                        'gender' => (string) $arrMember['gender'],
+                        'phone' => (string) $arrMember['phone'],
+                        'mobile' => (string) $arrMember['mobile'],
+                    ];
 
-                    $this->contaoGeneralLogger?->info(
-                        $msg,
-                        ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS)]
-                    );
+                    if ($this->connection->update('tl_user', $set, ['id' => $arrUser['id']])) {
+                        $msg = sprintf(
+                            'Synced tl_user with tl_member. Updated tl_user (%s %s [SAC Member-ID: %s]).',
+                            $arrMember['firstname'],
+                            $arrMember['lastname'],
+                            $arrMember['sacMemberId'],
+                        );
+
+                        $this->contaoGeneralLogger?->info(
+                            $msg,
+                            ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS)]
+                        );
+                        ++$this->syncLog['updates'];
+                        $this->syncLog['log'][] = $msg;
+                    }
+                } else {
+                    $set = [
+                        'sacMemberId' => 0,
+                        'tstamp' => time(),
+                    ];
+
+                    if ($this->connection->update('tl_user', $set, ['id' => $arrUser['id']])) {
+                        $msg = sprintf(
+                            'Updated "%s". Set tl_user.sacMemberId to "0" after syncing tl_member with tl_user. "%s" no longer seems to be a club member.',
+                            $arrUser['name'],
+                            $arrUser['name'],
+                        );
+
+                        $this->contaoGeneralLogger?->info(
+                            $msg,
+                            ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS)]
+                        );
+
+                        $this->syncLog['log'][] = $msg;
+                    }
                 }
-            } else {
-                Database::getInstance()
-                    ->prepare('UPDATE tl_user SET sacMemberId = ? WHERE id = ?')
-                    ->execute(0, $objUser->id)
-                ;
             }
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->connection->rollBack();
+
+            $this->syncLog['with_error'] = true;
+            $this->syncLog['exception'] = $e->getMessage();
         }
+
+        $this->syncLog['duration'] = round($stopWatchEvent->stop()->getDuration() / 1000, 3);
+    }
+
+    public function getSyncLog(): array
+    {
+        return $this->syncLog;
+    }
+
+    private function resetSyncLog(): void
+    {
+        // Reset sync log
+        $this->syncLog = [
+            'log' => [],
+            'processed' => 0,
+            'updates' => 0,
+            'duration' => 0,
+            'with_error' => false,
+            'exception' => '',
+        ];
     }
 }
