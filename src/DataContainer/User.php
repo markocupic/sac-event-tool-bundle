@@ -45,17 +45,9 @@ class User
      * @throws \Doctrine\DBAL\Exception
      */
     #[AsCallback(table: 'tl_user', target: 'fields.sectionId.options', priority: 100)]
-    public function listSections(): array
+    public function listSacSections(): array
     {
-        $arrOptions = [];
-
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_sac_section', []);
-
-        while (false !== ($arrSection = $stmt->fetchAssociative())) {
-            $arrOptions[$arrSection['sectionId']] = $arrSection['name'];
-        }
-
-        return $arrOptions;
+        return $this->util->listSacSections();
     }
 
     #[AsCallback(table: 'tl_user', target: 'fields.country.options', priority: 100)]
@@ -163,7 +155,7 @@ class User
             // Create backend users home directory
             $this->maintainBackendUsersHomeDirectory->createBackendUsersHomeDirectory($objUser);
 
-            if ('extend' !== $arrSet['inherit']) {
+            if ('extend' !== ($arrSet['inherit'] ?? null)) {
                 $randomPassword = sha1((string) random_int(0, getrandmax()));
 
                 $set = [

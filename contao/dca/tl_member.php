@@ -92,8 +92,8 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = [
 	'sorting'   => true,
 	'flag'      => 1,
 	'inputType' => 'text',
-	'eval'      => ['doNotCopy' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'rgxp' => 'natural'],
-	'sql'       => "int(10) unsigned NOT NULL default '0'",
+	'eval'      => ['doNotCopy' => true, 'readonly' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'rgxp' => 'natural'],
+	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['hasLeadClimbingEducation'] = [

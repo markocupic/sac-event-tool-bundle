@@ -61,11 +61,9 @@ class Member
      * @throws Exception
      */
     #[AsCallback(table: 'tl_member', target: 'fields.sectionId.options', priority: 100)]
-    public function listSections(): array
+    public function listSacSections(): array
     {
-        return $this->connection
-            ->fetchAllKeyValue('SELECT sectionId, name FROM tl_sac_section')
-        ;
+        return $this->util->listSacSections();
     }
 
     /**

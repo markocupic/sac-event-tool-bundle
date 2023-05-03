@@ -14,13 +14,15 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\SacMemberDatabase;
 
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\Email;
 use Contao\FrontendUser;
-use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use FTP\Connection as FtpConnection;
 use Markocupic\SacEventToolBundle\Config\Log;
+use Markocupic\SacEventToolBundle\DataContainer\Util;
 use Markocupic\SacEventToolBundle\String\PhoneNumber;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -29,7 +31,8 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Mirror/Update tl_member from SAC Member Database Zentralverband Bern
- * Unidirectional sync SAC Member Database Zentralverband Bern -> tl_member.
+ * Unidirectional sync
+ * SAC Member Database Zentralverband Bern -> tl_member.
  */
 class SyncSacMemberDatabase
 {
@@ -52,8 +55,10 @@ class SyncSacMemberDatabase
     ];
 
     public function __construct(
+        private readonly ContaoFramework $framework,
         private readonly Connection $connection,
         private readonly PasswordHasherFactory $passwordHasherFactory,
+        private readonly Util $util,
         private readonly array $sacevtMemberSyncCredentials,
         private readonly string $projectDir,
         private readonly string $sacevtLocale,
@@ -93,13 +98,7 @@ class SyncSacMemberDatabase
             $this->connection->executeStatement('LOCK TABLES tl_member WRITE;');
             $this->connection->beginTransaction();
 
-            // Set a password if there isn't one.
-            $strUpd = sprintf(
-                'SELECT id FROM tl_member WHERE password = ? LIMIT 0,%d',
-                $limit,
-            );
-
-            $result = $this->connection->executeQuery($strUpd, ['']);
+            $result = $this->connection->executeQuery("SELECT id FROM tl_member WHERE password = ? LIMIT 0,$limit", ['']);
 
             while (false !== ($id = $result->fetchOne())) {
                 $password = $this->passwordHasherFactory
@@ -143,6 +142,8 @@ class SyncSacMemberDatabase
      */
     private function fetchFilesFromFtp(): void
     {
+        $this->connection->executeStatement('DELETE FROM tl_log WHERE text LIKE "Update SAC-member%"');
+
         // Open FTP connection
         $connId = $this->openFtpConnection();
 
@@ -198,16 +199,13 @@ class SyncSacMemberDatabase
             $this->connection->beginTransaction();
 
             // All members & non-members
-            $arrMemberIDS = array_map('intval', $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member'));
+            $arrAllMemberIDS = array_map('intval', $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member'));
 
             // Members only
             $arrDisabledMemberIDS = $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member WHERE isSacMember = ?', ['']);
             $arrDisabledMemberIDS = array_map('intval', $arrDisabledMemberIDS);
 
-            // Valid/active members
-            $arrSacMemberIds = [];
-
-            $arrMember = [];
+            $arrAllMemberRemote = [];
 
             $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
 
@@ -228,39 +226,37 @@ class SyncSacMemberDatabase
                                 continue;
                             }
 
-                            $arrSacMemberIds[] = $arrLine[0];
+                            $setRemote = [];
+                            $setRemote['sacMemberId'] = $arrLine[0]; // int
+                            $setRemote['username'] = (string) ($arrLine[0]); // string
+                            $setRemote['sectionId'] = [(string) ($arrLine[1])]; // array => allow multi membership
+                            $setRemote['lastname'] = $arrLine[2]; // string
+                            $setRemote['firstname'] = $arrLine[3]; // string
+                            $setRemote['addressExtra'] = $arrLine[4]; // string
+                            $setRemote['street'] = trim($arrLine[5]); // string
+                            $setRemote['streetExtra'] = $arrLine[6]; // string
+                            $setRemote['postal'] = $arrLine[7]; // string
+                            $setRemote['city'] = $arrLine[8]; // string
+                            $setRemote['country'] = empty(strtolower($arrLine[9])) ? 'ch' : strtolower($arrLine[9]); // string
+                            $setRemote['dateOfBirth'] = (string) strtotime($arrLine[10]); // string!
+                            $setRemote['phoneBusiness'] = PhoneNumber::beautify($arrLine[11]); // string
+                            $setRemote['phone'] = PhoneNumber::beautify($arrLine[12]); // string
+                            $setRemote['mobile'] = PhoneNumber::beautify($arrLine[14]); // string
+                            $setRemote['fax'] = $arrLine[15]; // string
+                            $setRemote['email'] = $arrLine[16]; // string
+                            $setRemote['gender'] = 'weiblich' === strtolower($arrLine[17]) ? 'female' : 'male'; // string
+                            $setRemote['profession'] = $arrLine[18]; // string
+                            $setRemote['language'] = 'd' === strtolower($arrLine[19]) ? $this->sacevtLocale : strtolower($arrLine[19]); // string
+                            $setRemote['entryYear'] = $arrLine[20]; // string
+                            $setRemote['membershipType'] = $arrLine[23]; // string
+                            $setRemote['sectionInfo1'] = $arrLine[24]; // string
+                            $setRemote['sectionInfo2'] = $arrLine[25]; // string
+                            $setRemote['sectionInfo3'] = $arrLine[26]; // string
+                            $setRemote['sectionInfo4'] = $arrLine[27]; // string
+                            $setRemote['debit'] = $arrLine[28]; // string
+                            $setRemote['memberStatus'] = $arrLine[29]; // string
 
-                            $set = [];
-                            $set['sacMemberId'] = $arrLine[0]; // int
-                            $set['username'] = (string) ($arrLine[0]); // string
-                            $set['sectionId'] = [(int) ($arrLine[1])]; // array => allow multi membership
-                            $set['lastname'] = $arrLine[2]; // string
-                            $set['firstname'] = $arrLine[3]; // string
-                            $set['addressExtra'] = $arrLine[4]; // string
-                            $set['street'] = trim($arrLine[5]); // string
-                            $set['streetExtra'] = $arrLine[6]; // string
-                            $set['postal'] = $arrLine[7]; // string
-                            $set['city'] = $arrLine[8]; // string
-                            $set['country'] = empty(strtolower($arrLine[9])) ? 'ch' : strtolower($arrLine[9]); // string
-                            $set['dateOfBirth'] = strtotime($arrLine[10]); // int
-                            $set['phoneBusiness'] = PhoneNumber::beautify($arrLine[11]); // string
-                            $set['phone'] = PhoneNumber::beautify($arrLine[12]); // string
-                            $set['mobile'] = PhoneNumber::beautify($arrLine[14]); // string
-                            $set['fax'] = $arrLine[15]; // string
-                            $set['email'] = $arrLine[16]; // string
-                            $set['gender'] = 'weiblich' === strtolower($arrLine[17]) ? 'female' : 'male'; // string
-                            $set['profession'] = $arrLine[18]; // string
-                            $set['language'] = 'd' === strtolower($arrLine[19]) ? $this->sacevtLocale : strtolower($arrLine[19]); // string
-                            $set['entryYear'] = $arrLine[20]; // string
-                            $set['membershipType'] = $arrLine[23]; // string
-                            $set['sectionInfo1'] = $arrLine[24]; // string
-                            $set['sectionInfo2'] = $arrLine[25]; // string
-                            $set['sectionInfo3'] = $arrLine[26]; // string
-                            $set['sectionInfo4'] = $arrLine[27]; // string
-                            $set['debit'] = $arrLine[28]; // string
-                            $set['memberStatus'] = $arrLine[29]; // string
-
-                            $set = array_map(
+                            $setRemote = array_map(
                                 static function ($value) {
                                     if (!\is_array($value)) {
                                         $value = \is_string($value) ? trim((string) $value) : $value;
@@ -270,14 +266,14 @@ class SyncSacMemberDatabase
 
                                     return $value;
                                 },
-                                $set
+                                $setRemote
                             );
 
                             // Check if member is already in the array (allow multi membership)
-                            if (isset($arrMember[$set['sacMemberId']])) {
-                                $arrMember[$set['sacMemberId']]['sectionId'] = array_merge($arrMember[$set['sacMemberId']]['sectionId'], $set['sectionId']);
+                            if (isset($arrAllMemberRemote[$setRemote['sacMemberId']])) {
+                                $arrAllMemberRemote[$setRemote['sacMemberId']]['sectionId'] = array_merge($arrAllMemberRemote[$setRemote['sacMemberId']]['sectionId'], $setRemote['sectionId']);
                             } else {
-                                $arrMember[$set['sacMemberId']] = $set;
+                                $arrAllMemberRemote[$setRemote['sacMemberId']] = $setRemote;
                             }
                         }
                     }
@@ -285,51 +281,82 @@ class SyncSacMemberDatabase
                 }
             }
 
-            @ini_set('max_execution_time', 0);
+            // Disable all records
+            $this->connection->executeStatement("UPDATE tl_member SET login = '', disable = '1', isSacMember = ''");
 
-            // Consider the suhosin.memory_limit (see #7035)
-            if (\extension_loaded('suhosin')) {
-                if (($limit = \ini_get('suhosin.memory_limit')) !== '') {
-                    @ini_set('memory_limit', $limit);
-                }
-            } else {
-                @ini_set('memory_limit', -1);
+            // Enable authorized members again
+            foreach (array_keys($arrAllMemberRemote) as $sacMemberId) {
+                $this->connection->executeStatement("UPDATE tl_member SET login = '', disable = '1', isSacMember = '' WHERE sacMemberId = ?", [$sacMemberId]);
             }
 
-            // Set tl_member.isSacMember and tl_member.disable to '' for all records
-            $this->connection->executeStatement('UPDATE tl_member SET disable = ?, isSacMember = ?', ['', '']);
-
             $countInserts = 0;
-
             $countUpdates = 0;
-
             $i = 0;
 
-            foreach ($arrMember as $sacMemberId => $arrValues) {
-                $arrValues['sectionId'] = serialize($arrValues['sectionId']);
+            foreach ($arrAllMemberRemote as $sacMemberId => $arrValuesRemote) {
+                // Set the correct order and set the right indices,
+                // because we don't want the subsequent code
+                // to update the whole database every time.
+                $arrValuesRemote['sectionId'] = serialize($this->formatSectionId($arrValuesRemote['sectionId']));
 
-                if (!\in_array($sacMemberId, $arrMemberIDS, true)) {
-                    $arrValues['dateAdded'] = time();
-                    $arrValues['tstamp'] = time();
+                if (!\in_array($sacMemberId, $arrAllMemberIDS, true)) {
+                    $arrValuesRemote['dateAdded'] = time();
+                    $arrValuesRemote['tstamp'] = time();
+                    $arrValuesRemote['isSacMember'] = '1';
+                    $arrValuesRemote['login'] = '1';
+                    $arrValuesRemote['disable'] = '';
 
                     // Insert new member
-                    if ($this->connection->insert('tl_member', $arrValues)) {
+                    if ($this->connection->insert('tl_member', $arrValuesRemote)) {
                         // Log
-                        $msg = sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
+                        $msg = sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrValuesRemote['firstname'], $arrValuesRemote['lastname'], $arrValuesRemote['sacMemberId']);
 
                         $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER);
                         ++$countInserts;
                     }
                 } else {
-                    // Update/sync data record
-                    if ($this->connection->update('tl_member', $arrValues, ['sacMemberId' => $sacMemberId])) {
+                    // Activate account again
+                    $set = [
+                        'login' => '1',
+                        'disable' => '',
+                        'isSacMember' => '1',
+                    ];
+
+                    $this->connection->update('tl_member', $set, ['sacMemberId' => $sacMemberId]);
+
+                    ///////
+                    $this->framework->initialize();
+                    $row = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE sacMemberId = ?', [$sacMemberId]);
+                    //////
+
+                    // Update/sync data record, but only if there was a change
+                    if ($this->connection->update('tl_member', $arrValuesRemote, ['sacMemberId' => $sacMemberId])) {
+                        /////////////
+                        $arrLine = [];
+
+                        foreach ($arrValuesRemote as $key => $value) {
+                            $arrLine[] = sprintf('key: %s type remote: %s type db: %s value remote: %s value db: %s', $key, \gettype($value), \gettype($row[$key]), $value, $row[$key]);
+                        }
+
+                        $ii = $ii ?? 0;
+                        ++$ii;
+
+                        if ($ii < 3) {
+                            $email = new Email();
+                            $email->from = 'internet@sac-pilatus.ch';
+                            $email->subject = 'Update DB';
+                            $email->text = implode("\r\n", $arrLine);
+                            // $email->sendTo('m.cupic@gmx.ch');
+                        }
+                        ////////////////////////////
+
                         $set = [
                             'tstamp' => time(),
                         ];
 
                         $this->connection->update('tl_member', $set, ['sacMemberId' => $sacMemberId]);
 
-                        $msg = sprintf('Update SAC-member "%s %s" with SAC-User-ID: %s in tl_member.', $arrValues['firstname'], $arrValues['lastname'], $arrValues['sacMemberId']);
+                        $msg = sprintf('Update SAC-member "%s %s" with SAC-User-ID: %s in tl_member.', $arrValuesRemote['firstname'], $arrValuesRemote['lastname'], $arrValuesRemote['sacMemberId']);
                         $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_UPDATE_NEW_MEMBER);
 
                         ++$countUpdates;
@@ -337,23 +364,6 @@ class SyncSacMemberDatabase
                 }
 
                 ++$i;
-            }
-
-            if (!empty($arrSacMemberIds)) {
-                $qb = $this->connection->createQueryBuilder();
-                $qb->update('tl_member', 'm')
-                    ->add('where', $qb->expr()->in('m.sacMemberId', ':arr_sac_member_ids'))
-                    ->setParameter('arr_sac_member_ids', $arrSacMemberIds, ArrayParameterType::INTEGER)
-
-                    // Reset sacMemberId to true, if member exists in the downloaded database dump
-                    ->set('m.isSacMember', ':isSacMember')
-                    ->set('m.disable', ':disable')
-                    ->set('m.login', ':login')
-                    ->setParameter('isSacMember', '1')
-                    ->setParameter('disable', '')
-                    ->setParameter('login', '1')
-                    ->executeStatement()
-                ;
             }
 
             $this->connection->commit();
@@ -403,7 +413,7 @@ class SyncSacMemberDatabase
             }
         }
 
-        if ($i === \count($arrMember)) {
+        if ($i === \count($arrAllMemberRemote)) {
             $this->syncLog['processed'] = $i;
             $this->syncLog['inserts'] = $countInserts;
             $this->syncLog['updates'] = $countUpdates;
@@ -447,5 +457,33 @@ class SyncSacMemberDatabase
             'with_error' => false,
             'exception' => '',
         ];
+    }
+
+    /**
+     * Correctly format the section ids (the key is important!):
+     * e.g. [0 => '4250', 2 => '4252']
+     * -> user is member of two SAC Sektionen/Ortsgruppen.
+     */
+    private function formatSectionId(array $arrValue): array
+    {
+        // First remove leading zeros 00004253 -> 4253
+        $arrValue = array_map('intval', $arrValue);
+
+        // Convert to string again
+        $arrValue = array_map('strval', $arrValue);
+
+        $arrAll = array_map('strval', array_keys($this->util->listSacSections()));
+
+        $arrValue = array_filter(
+            $arrAll,
+            static fn ($v, $k) => \in_array(
+                $v,
+                $arrValue,
+                true,
+            ),
+            ARRAY_FILTER_USE_BOTH,
+        );
+
+        return array_map('strval', $arrValue);
     }
 }

@@ -185,8 +185,8 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['sacMemberId'] = [
 	'sorting'   => true,
 	'flag'      => 1,
 	'inputType' => 'text',
-	'eval'      => ['doNotCopy' => true, 'rgxp' => 'sacMemberIdIsUniqueAndValid', 'readonly' => false, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
-	'sql'       => "int(10) unsigned NOT NULL default '0'",
+	'eval'      => ['doNotCopy' => true, 'rgxp' => 'sacMemberIdIsUniqueAndValid', 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'clr'],
+	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['sectionId'] = [

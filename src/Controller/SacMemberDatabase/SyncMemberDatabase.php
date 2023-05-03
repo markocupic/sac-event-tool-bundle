@@ -22,7 +22,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Mirror/Update tl_member from SAC Member Database Zentralverband Bern
- * Unidirectional sync SAC Member Database Zentralverband Bern -> tl_member.
+ * Unidirectional sync
+ * SAC Member Database Zentralverband Bern -> tl_member.
  */
 class SyncMemberDatabase extends AbstractController
 {

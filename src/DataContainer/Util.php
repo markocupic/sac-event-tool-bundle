@@ -27,6 +27,13 @@ class Util
     ) {
     }
 
+    public function listSacSections(): array
+    {
+        return $this->connection
+            ->fetchAllKeyValue('SELECT sectionId, name FROM tl_sac_section ORDER BY sectionId ASC')
+            ;
+    }
+
     /**
      * Set the correct referer.
      */
