@@ -14,9 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\User\BackendUser;
 
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\Email;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\Config\Log;
@@ -40,7 +38,6 @@ class SyncMemberWithUser
 
     public function __construct(
         private readonly Connection $connection,
-        private readonly ContaoFramework $framework,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
     }
@@ -90,8 +87,6 @@ class SyncMemberWithUser
                     ];
 
                     if ($this->connection->update('tl_user', $set, ['id' => $arrUser['id']])) {
-                        $this->monitoringTest($set, $arrUser);
-
                         $msg = sprintf(
                             'Synced tl_user with tl_member. Updated tl_user (%s %s [SAC Member-ID: %s]).',
                             $arrMember['firstname'],
@@ -155,30 +150,5 @@ class SyncMemberWithUser
             'with_error' => false,
             'exception' => '',
         ];
-    }
-
-    private function monitoringTest(array $arrNew, array $arrOld): void
-    {
-        $this->framework->initialize();
-
-        $content = [];
-
-        foreach ($arrNew as $key => $value) {
-            $content[] = sprintf(
-                'sacBern.%s: %s has type: %s versus tl_member.%s: %s has type: %s',
-                $key,
-                $value,
-                \gettype($value),
-                $key,
-                $arrOld[$key],
-                \gettype($arrOld[$key]),
-            );
-        }
-
-        $mail = new Email();
-        $mail->from = 'internet@sac-pilatus.ch';
-        $mail->subject = '_sync_sac_member_database';
-        $mail->text = implode("\r\n", $content);
-        $mail->sendTo('m.cupic@gmx.ch');
     }
 }
