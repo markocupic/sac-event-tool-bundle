@@ -27,7 +27,7 @@
         "markocupic/rss-feed-generator-bundle": "^1.1",
         "markocupic/zip-bundle": "^1.0",
         "menatwork/contao-multicolumnwizard-bundle": "^3.5",
-        "ramsey/uuid": "^3.8|^4.3",
+        "ramsey/uuid": "^3.8 || ^4.3",
         "symfony/stopwatch": "*",
         "tecnickcom/tcpdf": "^6.4",
         "terminal42/notification_center": "^1.6"
