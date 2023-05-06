@@ -16,14 +16,20 @@ namespace Markocupic\SacEventToolBundle\Util;
 
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Framework\Adapter;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 
 class EventReleaseLevelPolicyUtil
 {
+    private Adapter $eventReleaseLevelPolicyModel;
+
     public function __construct(
+        private readonly ContaoFramework $framework,
         private readonly CalendarEventsVoter $calendarEventsVoter,
     ) {
+        $this->eventReleaseLevelPolicyModel = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
     }
 
     /**
@@ -37,14 +43,14 @@ class EventReleaseLevelPolicyUtil
     {
         $allowedIDS = [];
 
-        $currentEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findByPk($eventModel->eventReleaseLevel);
+        $currentEventReleaseLevelPolicyModel = $this->eventReleaseLevelPolicyModel->findByPk($eventModel->eventReleaseLevel);
 
         if (null === $currentEventReleaseLevelPolicyModel) {
             return $allowedIDS;
         }
 
         // Test downwards
-        $prevLevel = EventReleaseLevelPolicyModel::findByPk($currentEventReleaseLevelPolicyModel->id);
+        $prevLevel = $this->eventReleaseLevelPolicyModel->findByPk($currentEventReleaseLevelPolicyModel->id);
 
         $stop = false;
 
@@ -55,7 +61,7 @@ class EventReleaseLevelPolicyUtil
             }
 
             if ($this->calendarEventsVoter->canChangeReleaseLevel($eventModel, $user, $prevLevel, 'down')) {
-                $prevLevel = EventReleaseLevelPolicyModel::findPrevLevel($prevLevel->id);
+                $prevLevel = $this->eventReleaseLevelPolicyModel->findPrevLevel($prevLevel->id);
                 $allowedIDS[] = $prevLevel->id;
             } else {
                 $stop = true;
@@ -68,7 +74,7 @@ class EventReleaseLevelPolicyUtil
         $allowedIDS[] = $currentEventReleaseLevelPolicyModel->id;
 
         // Test upwards
-        $nextLevel = EventReleaseLevelPolicyModel::findByPk($currentEventReleaseLevelPolicyModel->id);
+        $nextLevel = $this->eventReleaseLevelPolicyModel->findByPk($currentEventReleaseLevelPolicyModel->id);
 
         $stop = false;
 
@@ -79,7 +85,7 @@ class EventReleaseLevelPolicyUtil
             }
 
             if ($this->calendarEventsVoter->canChangeReleaseLevel($eventModel, $user, $nextLevel, 'up')) {
-                $nextLevel = EventReleaseLevelPolicyModel::findNextLevel($nextLevel->id);
+                $nextLevel = $this->eventReleaseLevelPolicyModel->findNextLevel($nextLevel->id);
                 $allowedIDS[] = $nextLevel->id;
             } else {
                 $stop = true;
