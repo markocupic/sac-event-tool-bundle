@@ -15,10 +15,10 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Ical;
 
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\InsertTag\InsertTagParser;
-use Contao\Environment;
 use Contao\Events;
 use Eluceo\iCal\Domain\Entity\Calendar;
 use Eluceo\iCal\Domain\Entity\Event;
@@ -28,19 +28,20 @@ use Eluceo\iCal\Domain\ValueObject\SingleDay;
 use Eluceo\iCal\Domain\ValueObject\Uri;
 use Eluceo\iCal\Presentation\Factory\CalendarFactory;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class SendEventIcal
 {
-    // Adapters
-    private Adapter $environment;
+    private Adapter $calendarEventsHelper;
     private Adapter $events;
 
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly RequestStack $requestStack,
         private readonly InsertTagParser $insertTagParser,
     ) {
-        // Adapters
-        $this->environment = $this->framework->getAdapter(Environment::class);
+        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->events = $this->framework->getAdapter(Events::class);
     }
 
@@ -60,20 +61,20 @@ class SendEventIcal
         $location = $this->insertTagParser->replaceInline($location);
 
         // Get url
-        $url = $this->environment->get('url').'/'.$this->events->generateEventUrl($objEvent);
+        $url = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost().'/'.$this->events->generateEventUrl($objEvent);
 
         $arrEvents = [];
-        $arrEventTstamps = CalendarEventsHelper::getEventTimestamps($objEvent);
+        $arrEventTstamps = $this->calendarEventsHelper->getEventTimestamps($objEvent);
 
-        foreach ($arrEventTstamps as $timestamp) {
-            $occurence = new SingleDay(new Date(new \DateTime(date($dateFormat, (int) $timestamp)), true));
+        foreach ($arrEventTstamps as $eventTstamp) {
+            $occurrence = new SingleDay(new Date(new \DateTime(date($dateFormat, (int) $eventTstamp)), true));
 
             $vEvent = new Event();
             $vEvent
                 ->setSummary($summary)
                 ->setLocation(new Location($location))
                 ->setUrl(new Uri($url))
-                ->setOccurrence($occurence)
+                ->setOccurrence($occurrence)
                      ;
             $arrEvents[] = $vEvent;
         }
@@ -82,10 +83,10 @@ class SendEventIcal
         $componentFactory = new CalendarFactory();
         $calendarComponent = $componentFactory->createCalendar($vCalendar);
 
-        header('Content-Type: text/calendar; charset=utf-8');
-        header('Content-Disposition: attachment; filename="'.$objEvent->alias.'.ics"');
-        echo $calendarComponent;
+        $response = new Response((string) $calendarComponent);
+        $response->headers->set('Content-Type', 'text/calendar; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$objEvent->alias.'.ics"');
 
-        exit;
+        throw new ResponseException($response);
     }
 }
