@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\Api;
 
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
 use Contao\UserModel;
@@ -25,7 +26,6 @@ use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -34,38 +34,38 @@ class EventApiController extends AbstractController
 {
     public const CACHE_MAX_AGE = 300;
 
+    private readonly Adapter $calendarEventsHelper;
+    private readonly Adapter $calendarEventsModel;
+    private readonly Adapter $stringUtil;
+    private readonly Adapter $userModel;
+    private readonly Adapter $validator;
+
     /**
-     * EventApiController constructor.
-     * Get event data as json object.
+     * Get event data from JSON.
      */
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly RequestStack $requestStack,
         private readonly Connection $connection,
     ) {
+        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
+        $this->userModel = $this->framework->getAdapter(UserModel::class);
+        $this->validator = $this->framework->getAdapter(Validator::class);
     }
 
     /**
      * Get event list filtered by params delivered from a filter board
-     * This controller is used for the vje.js event list module.
-     *
-     * @Route("/eventApi/events", name="sac_event_tool_api_event_api_get_events", defaults={"_scope" = "frontend", "_token_check" = false})
+     * This controller is used for the vue.js event list module.
      *
      * @throws Exception
      * @throws \Exception
      */
+    #[Route('/eventApi/events', name: 'sac_event_tool_api_event_api_get_events', defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function getEventList(): JsonResponse
     {
         $this->framework->initialize();
-
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-
-        /** @var CalendarEventsModel $calendarEventsModelAdapter */
-        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-
-        /** @var UserModel $userModelAdapter */
-        $userModelAdapter = $this->framework->getAdapter(UserModel::class);
 
         $request = $this->requestStack->getCurrentRequest();
 
@@ -145,7 +145,7 @@ class EventApiController extends AbstractController
 
         // Filter by a certain instructor $_GET['username']
         if (!empty($param['username'])) {
-            if (null !== ($user = $userModelAdapter->findOneBy('username', $param['username']))) {
+            if (null !== ($user = $this->userModel->findOneBy('username', $param['username']))) {
                 $userId = (int) $user->id;
             } else {
                 // Do not show any events if username does not exist
@@ -350,7 +350,7 @@ class EventApiController extends AbstractController
                 $oData = null;
 
                 /** @var CalendarEventsModel $objEvent */
-                $objEvent = $calendarEventsModelAdapter->findByPk($arrEvent['id']);
+                $objEvent = $this->calendarEventsModel->findByPk($arrEvent['id']);
 
                 if (null !== $objEvent) {
                     $arrJSON['meta']['arrEventIds'][] = $arrEvent['id'];
@@ -359,7 +359,7 @@ class EventApiController extends AbstractController
                         $oData = new \stdClass();
 
                         foreach ($arrFields as $field) {
-                            $v = $calendarEventsHelperAdapter->getEventData($objEvent, $field);
+                            $v = $this->calendarEventsHelper->getEventData($objEvent, $field);
                             $aField = explode('||', $field);
                             $field = $aField[0];
                             $oData->{$field} = $this->prepareValue($v);
@@ -386,24 +386,16 @@ class EventApiController extends AbstractController
     }
 
     /**
-     * This controller is used for the "pilatus" export, where events are loaded by ajax when the modal windows opens
+     * This controller is used for the "pilatus" export, where events are loaded by xhr when the modal windows opens
      * $_POST['id'], $_POST['fields'] as comma separated string is optional.
-     *
-     * @Route("/eventApi/getEventById", name="sac_event_tool_api_event_api_get_event_by_id", defaults={"_scope" = "frontend", "_token_check" = false})
      *
      * @throws \Exception
      */
+    #[Route('/eventApi/getEventById', name: 'sac_event_tool_api_event_api_get_event_by_id', defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function getEventById(): JsonResponse
     {
         $this->framework->initialize();
 
-        /** @var CalendarEventsHelper $calendarEventsHelperAdapter */
-        $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
-
-        /** @var CalendarEventsModel $calendarEventsModelAdapter */
-        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
-
-        /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
         $eventId = (int) $request->request->get('id');
@@ -416,7 +408,7 @@ class EventApiController extends AbstractController
             'arrFields' => $arrFields,
         ];
 
-        if (null !== ($objEvent = $calendarEventsModelAdapter->findOneById($eventId))) {
+        if (null !== ($objEvent = $this->calendarEventsModel->findOneById($eventId))) {
             $arrEvent = $objEvent->row();
             $arrJSON['status'] = 'success';
             $aEvent = [];
@@ -429,7 +421,7 @@ class EventApiController extends AbstractController
                     }
                 }
 
-                $aEvent[$k] = $this->prepareValue($calendarEventsHelperAdapter->getEventData($objEvent, $k));
+                $aEvent[$k] = $this->prepareValue($this->calendarEventsHelper->getEventData($objEvent, $k));
             }
             $arrJSON['arrEventData'] = $aEvent;
         }
@@ -439,39 +431,31 @@ class EventApiController extends AbstractController
     }
 
     /**
-     * Deserialize arrays and convert binary uuids.
+     * Deserialize arrays, convert binary uuids and clean strings from illegal characters.
      */
     private function prepareValue(mixed $varValue): mixed
     {
-        /** @var Validator $validatorAdapter */
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-
-        /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
         // Transform bin uuids
-        $varValue = $validatorAdapter->isBinaryUuid($varValue) ? $stringUtilAdapter->binToUuid($varValue) : $varValue;
+        $varValue = $this->validator->isBinaryUuid($varValue) ? $this->stringUtil->binToUuid($varValue) : $varValue;
 
         // Deserialize arrays and convert binary uuids
-        $tmp = $stringUtilAdapter->deserialize($varValue);
+        $tmp = $this->stringUtil->deserialize($varValue);
 
         if (!empty($tmp) && \is_array($tmp)) {
             $tmp = $this->arrayMapRecursive(
                 $tmp,
                 function ($v) {
-                    /** @var Validator $validatorAdapter */
-                    $validatorAdapter = $this->framework->getAdapter(Validator::class);
+                    $v = \is_string($v) && $this->validator->isBinaryUuid($v) ? $this->stringUtil->binToUuid($v) : $v;
 
-                    /** @var StringUtil $stringUtilAdapter */
-                    $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
-                    return \is_string($v) && $validatorAdapter->isBinaryUuid($v) ? $stringUtilAdapter->binToUuid($v) : $v;
+                    return \is_string($v) || \is_array($v) ? mb_convert_encoding($v, 'UTF-8', 'UTF-8') : $v;
                 }
             );
         }
-        $varValue = !empty($tmp) && \is_array($tmp) ? $tmp : $varValue;
 
-        return \is_string($varValue) ? $stringUtilAdapter->decodeEntities($varValue) : $varValue;
+        $varValue = !empty($tmp) && \is_array($tmp) ? $tmp : $varValue;
+        $varValue = \is_string($varValue) ? $this->stringUtil->decodeEntities($varValue) : $varValue;
+
+        return \is_string($varValue) ? mb_convert_encoding($varValue, 'UTF-8', 'UTF-8') : $varValue;
     }
 
     /**
