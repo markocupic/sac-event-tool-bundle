@@ -57,7 +57,7 @@ class EventApiController extends AbstractController
 
     /**
      * Get event list filtered by params delivered from a filter board
-     * This controller is used for the vue.js event list module.
+     * This route is used for the vue.js event list module.
      *
      * @throws Exception
      * @throws \Exception
@@ -386,7 +386,7 @@ class EventApiController extends AbstractController
     }
 
     /**
-     * This controller is used for the "pilatus" export, where events are loaded by xhr when the modal windows opens
+     * This route is used for the "pilatus" export, where events are loaded by xhr when the modal windows opens
      * $_POST['id'], $_POST['fields'] as comma separated string is optional.
      *
      * @throws \Exception
@@ -438,34 +438,18 @@ class EventApiController extends AbstractController
         // Transform bin uuids
         $varValue = $this->validator->isBinaryUuid($varValue) ? $this->stringUtil->binToUuid($varValue) : $varValue;
 
-        // Deserialize arrays and convert binary uuids
-        $tmp = $this->stringUtil->deserialize($varValue);
+        // Deserialize arrays
+        $varValue = $this->stringUtil->deserialize($varValue);
 
-        if (!empty($tmp) && \is_array($tmp)) {
-            $tmp = $this->arrayMapRecursive(
-                $tmp,
-                function ($v) {
-                    $v = \is_string($v) && $this->validator->isBinaryUuid($v) ? $this->stringUtil->binToUuid($v) : $v;
-
-                    return \is_string($v) || \is_array($v) ? mb_convert_encoding($v, 'UTF-8', 'UTF-8') : $v;
-                }
-            );
+        // Clean arrays recursively
+        if (!empty($varValue) && \is_array($varValue)) {
+            $varValue = array_map(fn ($v) => $this->prepareValue($v), $varValue);
         }
 
         $varValue = !empty($tmp) && \is_array($tmp) ? $tmp : $varValue;
+        $varValue = \is_string($varValue) && $this->validator->isBinaryUuid($varValue) ? $this->stringUtil->binToUuid($varValue) : $varValue;
         $varValue = \is_string($varValue) ? $this->stringUtil->decodeEntities($varValue) : $varValue;
 
-        return \is_string($varValue) ? mb_convert_encoding($varValue, 'UTF-8', 'UTF-8') : $varValue;
-    }
-
-    /**
-     * array_map for deep arrays.
-     */
-    private function arrayMapRecursive(array $arr, callable $fn): array
-    {
-        return array_map(
-            fn ($item) => \is_array($item) ? $this->arrayMapRecursive($item, $fn) : $fn($item),
-            $arr
-        );
+        return \is_string($varValue) || \is_array($varValue) ? mb_convert_encoding($varValue, 'UTF-8', 'UTF-8') : $varValue;
     }
 }
