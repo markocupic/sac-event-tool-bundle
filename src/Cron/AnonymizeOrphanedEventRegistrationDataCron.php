@@ -36,6 +36,6 @@ class AnonymizeOrphanedEventRegistrationDataCron
         // Initialize contao framework
         $this->framework->initialize();
 
-        $this->clearFrontendUserData->anonymizeOrphanedCalendarEventsMemberDataRecords();
+        $this->clearFrontendUserData->anonymizeOrphanedEventRegistrations();
     }
 }

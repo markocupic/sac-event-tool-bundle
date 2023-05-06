@@ -37,9 +37,9 @@ class ClearFrontendUserData
     }
 
     /**
-     * Anonymize orphaned entries in tl_calendar_events_member.
+     * Anonymize orphaned records in tl_calendar_events_member.
      */
-    public function anonymizeOrphanedCalendarEventsMemberDataRecords(): void
+    public function anonymizeOrphanedEventRegistrations(): void
     {
         $this->framework->initialize();
 
