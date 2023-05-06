@@ -24,11 +24,13 @@ use Twig\TwigFunction;
 class TwigEventDataManager extends AbstractExtension
 {
     private Adapter $calendarEventsHelper;
+    private Adapter $calendarEventsModel;
 
     public function __construct(
         private readonly ContaoFramework $framework,
     ) {
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
     }
 
     public function getFunctions(): array
@@ -50,6 +52,6 @@ class TwigEventDataManager extends AbstractExtension
     {
         $this->framework->initialize();
 
-        return $this->calendarEventsHelper->findByPk($id);
+        return $this->calendarEventsModel->findByPk($id);
     }
 }
