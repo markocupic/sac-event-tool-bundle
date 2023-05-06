@@ -19,7 +19,6 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Events;
 use Contao\FrontendTemplate;
-use Contao\System;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
@@ -37,7 +36,6 @@ class TwigSchemaOrgDataManager extends AbstractExtension
     ) {
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->events = $this->framework->getAdapter(Events::class);
-        $this->system = $this->framework->getAdapter(System::class);
     }
 
     public function getFunctions(): array
