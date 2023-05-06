@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Twig\Extension;
 
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Events;
 use Contao\FrontendTemplate;
@@ -26,10 +27,17 @@ use Twig\TwigFunction;
 
 class TwigSchemaOrgDataManager extends AbstractExtension
 {
+    private Adapter $calendarEventsHelper;
+    private Adapter $events;
+
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly RequestStack $requestStack,
+        private readonly string $sacevtSectionName,
     ) {
+        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $this->events = $this->framework->getAdapter(Events::class);
+        $this->system = $this->framework->getAdapter(System::class);
     }
 
     public function getFunctions(): array
@@ -53,20 +61,20 @@ class TwigSchemaOrgDataManager extends AbstractExtension
 
         $request = $this->requestStack->getCurrentRequest();
 
-        $jsonLd = Events::getSchemaOrgData($model);
+        $jsonLd = $this->events->getSchemaOrgData($model);
         $jsonLd['location'] = $model->location;
-        $jsonLd['tourguide'] = implode(', ', CalendarEventsHelper::getInstructorNamesAsArray($model));
+        $jsonLd['tourguide'] = implode(', ', $this->calendarEventsHelper->getInstructorNamesAsArray($model));
 
-        $mainSection = System::getContainer()->getParameter('sacevt.section_name');
+        $mainSection = $this->sacevtSectionName;
         $organizers = array_map(
             static fn ($el) => $mainSection.': '.$el,
-            CalendarEventsHelper::getEventOrganizersAsArray($model, 'title'),
+            $this->calendarEventsHelper->getEventOrganizersAsArray($model, 'title'),
         );
 
         $jsonLd['organizer'] = [
             '@type' => 'Organization',
             'name' => implode(', ', $organizers),
-            'url' => $request->getScheme().'://'.$request->getHost(),
+            'url' => $request->getSchemeAndHttpHost(),
         ];
 
         if ($template->addImage && $template->figure) {

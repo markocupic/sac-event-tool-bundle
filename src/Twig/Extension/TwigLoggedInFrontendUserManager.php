@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Twig\Extension;
 
+use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
 use Contao\MemberModel;
@@ -23,10 +24,13 @@ use Twig\TwigFunction;
 
 class TwigLoggedInFrontendUserManager extends AbstractExtension
 {
+    private Adapter $member;
+
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly Security $security,
     ) {
+        $this->member = $this->framework->getAdapter(MemberModel::class);
     }
 
     public function getFunctions(): array
@@ -65,9 +69,7 @@ class TwigLoggedInFrontendUserManager extends AbstractExtension
         $user = $this->security->getUser();
 
         if ($user instanceof FrontendUser) {
-            $memberModelAdapter = $this->framework->getAdapter(MemberModel::class);
-
-            if (null !== ($model = $memberModelAdapter->findByPk($user->id))) {
+            if (null !== ($model = $this->member->findByPk($user->id))) {
                 return $model;
             }
         }

@@ -6,6 +6,7 @@ services:
         bind:
             $passwordHasherFactory: '@security.password_hasher_factory'
             $projectDir: '%kernel.project_dir%'
+            $sacevtSectionName: '%sacevt.section_name%'
             $sacevtAvatarFemale: '%sacevt.avatar.female%'
             $sacevtAvatarMale: '%sacevt.avatar.male%'
             $sacevtEventAdminEmail: '%sacevt.event_admin_email%'

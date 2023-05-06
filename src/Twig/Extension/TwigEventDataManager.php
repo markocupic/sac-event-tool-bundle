@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Twig\Extension;
 
 use Contao\CalendarEventsModel;
+use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Twig\Extension\AbstractExtension;
@@ -22,9 +23,12 @@ use Twig\TwigFunction;
 
 class TwigEventDataManager extends AbstractExtension
 {
+    private Adapter $calendarEventsHelper;
+
     public function __construct(
         private readonly ContaoFramework $framework,
     ) {
+        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
     }
 
     public function getFunctions(): array
@@ -39,13 +43,13 @@ class TwigEventDataManager extends AbstractExtension
     {
         $this->framework->initialize();
 
-        return CalendarEventsHelper::getEventData($model, $prop);
+        return $this->calendarEventsHelper->getEventData($model, $prop);
     }
 
     public function getEventByPk($id): CalendarEventsModel|null
     {
         $this->framework->initialize();
 
-        return CalendarEventsModel::findByPk($id);
+        return $this->calendarEventsHelper->findByPk($id);
     }
 }
