@@ -16,10 +16,14 @@ namespace Markocupic\SacEventToolBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
+use Contao\CoreBundle\Framework\Adapter;
+use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendUser;
 use Contao\ModuleModel;
 use Contao\PageModel;
+use Contao\StringUtil;
 use Contao\Template;
+use Markocupic\SacEventToolBundle\Model\SacSectionModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -30,12 +34,18 @@ class MemberDashboardProfileController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_profile';
 
+    private Adapter $sacSectionModel;
+    private Adapter $stringUtil;
+
     private FrontendUser|null $objUser = null;
     private Template|null $template = null;
 
     public function __construct(
+        private readonly ContaoFramework $framework,
         private readonly Security $security,
     ) {
+        $this->sacSectionModel = $this->framework->getAdapter(SacSectionModel::class);
+        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
@@ -64,6 +74,21 @@ class MemberDashboardProfileController extends AbstractFrontendModuleController
 
         $this->template = $template;
         $this->template->user = $this->objUser;
+
+        // SAC sections user belongs to
+        $arrSectionNames = ['-'];
+        $arrSectionIds = $this->stringUtil->deserialize($this->objUser->sectionId, true);
+
+        if (null !== ($sections = $this->sacSectionModel->findMultipleBySectionIds($arrSectionIds))) {
+            // Override default
+            $arrSectionNames = [];
+
+            foreach ($sections as $section) {
+                $arrSectionNames[] = $section->name;
+            }
+        }
+
+        $this->template->sac_sections = $arrSectionNames;
 
         return $this->template->getResponse();
     }

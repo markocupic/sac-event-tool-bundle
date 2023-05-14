@@ -1,0 +1,34 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+
+    <p class="mt-4 mt-md-0">
+        <strong class="text-danger">{{ user.firstname }} {{ user.lastname }}</strong>
+        <br>
+        {{ user.street }}
+        <br>
+        {{ user.postal }} {{ user.city }}
+        <br>
+        <small class="text-muted">Zuletzt eingeloggt: {{ user.lastLogin|date('d.m.Y') }}</small>
+    </p>
+
+    <p>
+        <strong class="text-danger">Telefon:</strong> {{ user.phone }}
+        <br>
+        <strong class="text-danger">Mobile:</strong> {{ user.mobile }}
+        <br>
+        <strong class="text-danger">E-Mail:</strong> {{ user.email }}
+        <br>
+        <strong class="text-danger">Mitglieder-Nr.:</strong> {{ user.sacMemberId }}
+        <br>
+        <strong class="text-danger">Sektionen:</strong> {{ sac_sections|join(', ') }}
+    </p>
+
+    {% if user.hasLeadClimbingEducation %}
+        <p>
+            <i class="fas fa-mountain text-danger"></i>
+            <strong class="text-danger">Seilschaftsführer-Ausbildung seit:</strong> {{ user.dateOfLeadClimbingEducation|date('d.m.Y') }}
+        </p>
+    {% endif %}
+
+{% endblock %}
