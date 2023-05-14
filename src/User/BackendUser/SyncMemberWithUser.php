@@ -31,6 +31,7 @@ class SyncMemberWithUser
         'log' => [],
         'processed' => 0,
         'updates' => 0,
+        'disabled' => 0,
         'duration' => 0,
         'with_error' => false,
         'exception' => '',
@@ -119,6 +120,7 @@ class SyncMemberWithUser
                             ['contao' => new ContaoContext(__METHOD__, Log::MEMBER_WITH_USER_SYNC_SUCCESS)]
                         );
 
+                        ++$this->syncLog['disabled'];
                         $this->syncLog['log'][] = $msg;
                     }
                 }
@@ -131,7 +133,7 @@ class SyncMemberWithUser
             $this->syncLog['exception'] = $e->getMessage();
         }
 
-        $this->syncLog['duration'] = round($stopWatchEvent->stop()->getDuration() / 1000, 3);
+        $this->syncLog['duration'] = round($stopWatchEvent->stop()->getDuration() / 1000, 6);
     }
 
     public function getSyncLog(): array
@@ -146,6 +148,7 @@ class SyncMemberWithUser
             'log' => [],
             'processed' => 0,
             'updates' => 0,
+            'disabled' => 0,
             'duration' => 0,
             'with_error' => false,
             'exception' => '',

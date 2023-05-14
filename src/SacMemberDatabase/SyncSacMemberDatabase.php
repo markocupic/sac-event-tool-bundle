@@ -16,7 +16,6 @@ namespace Markocupic\SacEventToolBundle\SacMemberDatabase;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\Email;
 use Contao\FrontendUser;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
@@ -49,6 +48,7 @@ class SyncSacMemberDatabase
         'processed' => 0,
         'inserts' => 0,
         'updates' => 0,
+        'disabled' => 0,
         'duration' => 0,
         'with_error' => false,
         'exception' => '',
@@ -79,8 +79,6 @@ class SyncSacMemberDatabase
         $this->syncContaoDatabase();
         $this->setPassword();
         $this->syncLog['duration'] = round($stopWatchEvent->stop()->getDuration() / 1000);
-
-        $this->contaoSystemLog();
     }
 
     /**
@@ -324,32 +322,8 @@ class SyncSacMemberDatabase
 
                     $this->connection->update('tl_member', $set, ['sacMemberId' => $sacMemberId]);
 
-                    ///////
-                    $this->framework->initialize();
-                    $row = $this->connection->fetchAssociative('SELECT * FROM tl_member WHERE sacMemberId = ?', [$sacMemberId]);
-                    //////
-
                     // Update/sync data record, but only if there was a change
                     if ($this->connection->update('tl_member', $arrValuesRemote, ['sacMemberId' => $sacMemberId])) {
-                        /////////////
-                        $arrLine = [];
-
-                        foreach ($arrValuesRemote as $key => $value) {
-                            $arrLine[] = sprintf('key: %s type remote: %s type db: %s value remote: %s value db: %s', $key, \gettype($value), \gettype($row[$key]), $value, $row[$key]);
-                        }
-
-                        $ii = $ii ?? 0;
-                        ++$ii;
-
-                        if ($ii < 3) {
-                            $email = new Email();
-                            $email->from = 'internet@sac-pilatus.ch';
-                            $email->subject = 'Update DB';
-                            $email->text = implode("\r\n", $arrLine);
-                            // $email->sendTo('m.cupic@gmx.ch');
-                        }
-                        ////////////////////////////
-
                         $set = [
                             'tstamp' => time(),
                         ];
@@ -410,6 +384,8 @@ class SyncSacMemberDatabase
                 );
 
                 $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_DISABLE_MEMBER);
+
+                ++$this->syncLog['disabled'];
             }
         }
 
@@ -418,20 +394,6 @@ class SyncSacMemberDatabase
             $this->syncLog['inserts'] = $countInserts;
             $this->syncLog['updates'] = $countUpdates;
         }
-    }
-
-    private function contaoSystemLog(): void
-    {
-        // Log
-        $msg = sprintf(
-            'Finished syncing SAC member database with tl_member. Processed %d data records. Total inserts: %d. Total updates: %d. Duration: %d s.',
-            $this->syncLog['processed'],
-            $this->syncLog['inserts'],
-            $this->syncLog['updates'],
-            $this->syncLog['duration'],
-        );
-
-        $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_SUCCESS);
     }
 
     private function log(string $strLogLevel, string $strText, string $strMethod, string $strCategory): void
@@ -453,6 +415,7 @@ class SyncSacMemberDatabase
             'processed' => 0,
             'inserts' => 0,
             'updates' => 0,
+            'disabled' => 0,
             'duration' => 0,
             'with_error' => false,
             'exception' => '',
