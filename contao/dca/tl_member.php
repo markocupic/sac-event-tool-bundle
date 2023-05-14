@@ -57,27 +57,6 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['uuid'] = [
 	'sql'       => "varchar(128) NOT NULL default ''",
 ];
 
-$GLOBALS['TL_DCA']['tl_member']['fields']['activationLinkLifetime'] = [
-	'exclude'   => true,
-	'inputType' => 'text',
-	'eval'      => ['rgxp' => 'datim', 'mandatory' => false, 'datepicker' => true, 'tl_class' => 'clr wizard'],
-	'sql'       => 'int(10) unsigned NULL',
-];
-
-$GLOBALS['TL_DCA']['tl_member']['fields']['activation'] = [
-	'exclude'   => true,
-	'inputType' => 'text',
-	'eval'      => ['mandatory' => false, 'tl_class' => 'w50'],
-	'sql'       => "varchar(64) NOT NULL default ''",
-];
-
-$GLOBALS['TL_DCA']['tl_member']['fields']['activationFalseTokenCounter'] = [
-	'exclude'   => true,
-	'inputType' => 'text',
-	'eval'      => ['rgxp' => 'natural'],
-	'sql'       => 'int(10) unsigned NULL',
-];
-
 $GLOBALS['TL_DCA']['tl_member']['fields']['isSacMember'] = [
 	'exclude'   => true,
 	'filter'    => true,

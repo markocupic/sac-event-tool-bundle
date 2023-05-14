@@ -30,8 +30,6 @@ if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isF
 }
 
 $GLOBALS['TL_LANG']['tl_member']['uuid'] = ['UUID (Zentralkommitee Bern)', ''];
-$GLOBALS['TL_LANG']['tl_member']['activation'] = ['Aktivierungscode', ''];
-$GLOBALS['TL_LANG']['tl_member']['activationLinkLifetime'] = ['Gültigkeitsdauer Aktivierungstoken', ''];
 $GLOBALS['TL_LANG']['tl_member']['isSacMember'] = ['Dieser User ist ein SAC-Mitglied', 'Dieses Mitglied wurde in der Datenbank (CSV-File) beim täglichen Sync gefunden.'];
 $GLOBALS['TL_LANG']['tl_member']['hasLeadClimbingEducation'] = ['Seilschaftsführer', 'Geben Sie an, ob das Mitglied die Seilschaftsführer-Ausbildung besitzt.'];
 $GLOBALS['TL_LANG']['tl_member']['dateOfLeadClimbingEducation'] = ['Datum der Seilschaftsführer-Ausbildung', 'Geben Sie an, wann das Mitglied die Seilschaftsführer-Ausbildung absolviert hat.'];
