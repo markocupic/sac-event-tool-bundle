@@ -1413,7 +1413,7 @@ class CalendarEvents
 
         if (null !== $eventReleaseLevelModel) {
             $strLevel = sprintf(
-                '<span class="release-level-%s" title="Freigabestufe: %s">FS: %s</span> ',
+                '<span class="release-level-%s text-decoration-underline" title="Freigabestufe: %s">FS: %s</span> ',
                 $eventReleaseLevelModel->level,
                 $eventReleaseLevelModel->title,
                 $eventReleaseLevelModel->level,
