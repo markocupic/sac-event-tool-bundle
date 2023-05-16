@@ -1,8 +1,12 @@
+/** General **/
+.text-decoration-underline {
+	text-decoration: underline;
+}
+
 /** multicolumn wizard fix: Fix cutted of sentences issue on small screens in the bottom-/tooltip section */
 [class*="mcwColumnCount_"] .tl_help.tl_tip {
 	height: auto !important;
 }
-
 /** End multicolumn wizard fix */
 
 #tl_buttons {
