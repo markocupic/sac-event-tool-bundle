@@ -29,6 +29,7 @@ use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventState;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -62,7 +63,7 @@ class Event
         $objPhpWord->replace('eventTitle', $this->prepareString($objEvent->title));
         $controllerAdapter->loadLanguageFile('tl_calendar_events');
 
-        if ('course' === $objEvent->eventType) {
+        if (EventType::COURSE === $objEvent->eventType) {
             $objPhpWord->replace('courseId', $this->prepareString('Kurs-Nr: '.$objEvent->courseId));
         } else {
             $objPhpWord->replace('courseId', '');

@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvEventMemberExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\CsvUserExportController;
 use Markocupic\SacEventToolBundle\Controller\FrontendModule\EventFilterFormController;
@@ -64,7 +65,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventType'] = [
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'select',
-	'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
+	'options'   => EventType::ALL,
 	'eval'      => ['mandatory' => true, 'multiple' => true, 'includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'clr'],
 	'sql'       => 'blob NULL',
 ];
@@ -117,7 +118,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventBlogOrganizers'] = [
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = [
 	'inputType' => 'select',
-	'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
+	'options'   => EventType::ALL,
 	'eval'      => ['mandatory' => false, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
 	'sql'       => 'blob NULL',
 ];

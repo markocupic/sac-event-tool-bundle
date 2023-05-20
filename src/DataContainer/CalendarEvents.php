@@ -48,6 +48,7 @@ use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventState;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyPackageModel;
@@ -137,10 +138,10 @@ class CalendarEvents
             if (EventState::STATE_DEFERRED === $objCalendarEventsModel->eventState) {
                 PaletteManipulator::create()
                     ->applyToPalette('default', 'tl_calendar_events')
-                    ->applyToPalette('tour', 'tl_calendar_events')
-                    ->applyToPalette('lastMinuteTour', 'tl_calendar_events')
-                    ->applyToPalette('generalEvent', 'tl_calendar_events')
-                    ->applyToPalette('course', 'tl_calendar_events')
+                    ->applyToPalette(EventType::TOUR, 'tl_calendar_events')
+                    ->applyToPalette(EventType::LAST_MINUTE_TOUR, 'tl_calendar_events')
+                    ->applyToPalette(EventType::GENERAL_EVENT, 'tl_calendar_events')
+                    ->applyToPalette(EventType::COURSE, 'tl_calendar_events')
                 ;
             }
         }
@@ -185,13 +186,13 @@ class CalendarEvents
             if (null !== $objCalendar) {
                 $arrAllowedEventTypes = $this->stringUtil->deserialize($objCalendar->allowedEventTypes, true);
 
-                if (!\in_array('tour', $arrAllowedEventTypes, true) && !\in_array('lastMinuteTour', $arrAllowedEventTypes, true)) {
+                if (!\in_array(EventType::TOUR, $arrAllowedEventTypes, true) && !\in_array(EventType::LAST_MINUTE_TOUR, $arrAllowedEventTypes, true)) {
                     $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType']['filter'] = false;
                     $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType']['search'] = false;
                     $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['tourType']['sorting'] = false;
                 }
 
-                if (!\in_array('course', $arrAllowedEventTypes, true)) {
+                if (!\in_array(EventType::COURSE, $arrAllowedEventTypes, true)) {
                     $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0']['filter'] = false;
                     $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0']['search'] = false;
                     $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0']['sorting'] = false;

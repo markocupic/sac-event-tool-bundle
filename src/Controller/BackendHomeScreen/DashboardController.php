@@ -24,6 +24,7 @@ use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
@@ -208,7 +209,7 @@ class DashboardController
         $rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
         $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
-        if ('tour' === $eventModel->eventType || 'lastMinuteTour' === $eventModel->eventType) {
+        if (EventType::TOUR === $eventModel->eventType || EventType::LAST_MINUTE_TOUR === $eventModel->eventType) {
             return sprintf('contao?act=edit&do=sac_calendar_events_tool&table=tl_calendar_events&id=%d&call=writeTourReport&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
         }
 
@@ -220,7 +221,7 @@ class DashboardController
         $rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
         $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
-        if ('tour' === $eventModel->eventType || 'lastMinuteTour' === $eventModel->eventType) {
+        if (EventType::TOUR === $eventModel->eventType || EventType::LAST_MINUTE_TOUR === $eventModel->eventType) {
             return sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events_instructor_invoice&id=%d&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
         }
 

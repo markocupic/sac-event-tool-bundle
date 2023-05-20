@@ -25,6 +25,7 @@ use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
 use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
@@ -166,7 +167,7 @@ class WorkshopBookletGenerator
 
             $stmt = $this->connection->executeQuery(
                 'SELECT * FROM tl_calendar_events WHERE eventType = ? AND startTime >= ? AND endTime < ? AND published = ? ORDER BY courseTypeLevel0, title, startDate',
-                ['course', $start, $stop, '1']
+                [EventType::COURSE, $start, $stop, '1']
             );
         }
 

@@ -33,6 +33,7 @@ use Contao\Validator;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -129,7 +130,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                 }
             }
 
-            if ('course' === $event['eventType']) {
+            if (EventType::COURSE === $event['eventType']) {
                 $event['downloadCourseConfirmationLink'] = $frontendAdapter->addToUrl('do=download_course_certificate&amp;id='.$event['registrationId']);
             }
             $arrEvents[] = $event;

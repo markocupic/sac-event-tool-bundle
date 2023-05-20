@@ -15,6 +15,7 @@ declare(strict_types=1);
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
 
@@ -64,14 +65,14 @@ $GLOBALS['TL_LANG']['MSC']['courseLevel'][2] = 'Grundstufe';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][3] = 'Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][4] = 'Tourenleiter Fortbildungskurs';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][5] = 'Tourenleiter Fortbildungskurs';
-$GLOBALS['TL_LANG']['MSC']['course'] = 'Kurs';
-$GLOBALS['TL_LANG']['MSC']['course_short'] = 'Kurs';
-$GLOBALS['TL_LANG']['MSC']['tour'] = 'Tour';
-$GLOBALS['TL_LANG']['MSC']['tour_short'] = 'Tour';
-$GLOBALS['TL_LANG']['MSC']['lastMinuteTour'] = 'Last Minute Tour';
-$GLOBALS['TL_LANG']['MSC']['lastMinuteTour_short'] = 'Last Minute Tour';
-$GLOBALS['TL_LANG']['MSC']['generalEvent'] = 'Veranstaltung (Fitnesstrainings, Skiturnen, Kultur, Vorträge + sektionsübergreifende Events)';
-$GLOBALS['TL_LANG']['MSC']['generalEvent_short'] = 'Veranstaltung';
+$GLOBALS['TL_LANG']['MSC'][EventType::COURSE] = 'Kurs';
+$GLOBALS['TL_LANG']['MSC'][EventType::COURSE.'_short'] = 'Kurs';
+$GLOBALS['TL_LANG']['MSC'][EventType::TOUR] = 'Tour';
+$GLOBALS['TL_LANG']['MSC'][EventType::TOUR.'_short'] = 'Tour';
+$GLOBALS['TL_LANG']['MSC'][EventType::LAST_MINUTE_TOUR] = 'Last Minute Tour';
+$GLOBALS['TL_LANG']['MSC'][EventType::LAST_MINUTE_TOUR.'_short'] = 'Last Minute Tour';
+$GLOBALS['TL_LANG']['MSC'][EventType::GENERAL_EVENT] = 'Veranstaltung (Fitnesstrainings, Skiturnen, Kultur, Vorträge + sektionsübergreifende Events)';
+$GLOBALS['TL_LANG']['MSC'][EventType::GENERAL_EVENT.'_short'] = 'Veranstaltung';
 
 // Buttons
 $GLOBALS['TL_LANG']['MSC']['sendEmail'] = 'E-Mail senden';

@@ -29,6 +29,7 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Template;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
 use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
@@ -102,7 +103,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
             'label' => 'Event-Typ',
             'reference' => $GLOBALS['TL_LANG']['MSC'],
             'inputType' => 'select',
-            'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
+            'options' => EventType::ALL,
             'eval' => ['includeBlankOption' => true, 'mandatory' => true],
         ]);
 
@@ -232,7 +233,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
             $arrEvents = [];
 
             // Let's use different queries for each event type
-            if ('course' === $this->eventType) {
+            if (EventType::COURSE === $this->eventType) {
                 $objEvent = CalendarEventsModel::findMultipleByIds($events, ['order' => 'tl_calendar_events.courseTypeLevel0, tl_calendar_events.courseTypeLevel1, tl_calendar_events.startDate, tl_calendar_events.endDate, tl_calendar_events.courseId']);
             } else {
                 $objEvent = CalendarEventsModel::findMultipleByIds($events, ['order' => 'tl_calendar_events.startDate, tl_calendar_events.endDate']);
@@ -246,7 +247,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $arrTourType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent->current(), 'shortcut', false);
                     $dateFormat = 'D, j.';
 
-                    if ('course' === $objEvent->eventType) {
+                    if (EventType::COURSE === $objEvent->eventType) {
                         // KU = Kurs
                         $arrTourType[] = 'KU';
                         //$dateFormat = 'j.n.';
@@ -315,7 +316,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
                     $arrData['bookingInfo'] = 'Event-Nummer '.$calendarEventsHelperAdapter->getEventData($objEvent->current(), 'eventId');
 
-                    if ('course' === $objEvent->eventType) {
+                    if (EventType::COURSE === $objEvent->eventType) {
                         $arrData['bookingInfo'] = 'Kurs-Nummer '.$calendarEventsHelperAdapter->getEventData($objEvent->current(), 'courseId');
                     }
                     $arrEvents[] = $arrData;

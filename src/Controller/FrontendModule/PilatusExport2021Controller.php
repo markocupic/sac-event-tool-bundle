@@ -35,6 +35,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -223,8 +224,8 @@ class PilatusExport2021Controller extends AbstractPrintExportController
 
             if ($this->startDate && $this->endDate) {
                 $this->eventReleaseLevel = (int) $request->request->get('eventReleaseLevel') > 0 ? (int) $request->request->get('eventReleaseLevel') : null;
-                $this->htmlCourseTable = $this->generateEventTable(['course']);
-                $this->htmlTourTable = $this->generateEventTable(['tour', 'generalEvent']);
+                $this->htmlCourseTable = $this->generateEventTable([EventType::COURSE]);
+                $this->htmlTourTable = $this->generateEventTable([EventType::TOUR, EventType::GENERAL_EVENT]);
             }
         }
 
@@ -282,20 +283,20 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate).', '.$dateAdapter->parse('j.', $this->getFirstDayOfWeekTimestamp((int) $objEvent->startDate)).'-'.$dateAdapter->parse('j. F', $this->getLastDayOfWeekTimestamp((int) $objEvent->startDate));
             $arrRow['eventDates'] = $this->getEventPeriod($objEvent, 'd.');
             $arrRow['weekday'] = $this->getEventPeriod($objEvent, 'D');
-            $arrRow['title'] = $objEvent->title.('lastMinuteTour' === $objEvent->eventType ? ' (LAST MINUTE TOUR!)' : '');
+            $arrRow['title'] = $objEvent->title.(EventType::LAST_MINUTE_TOUR === $objEvent->eventType ? ' (LAST MINUTE TOUR!)' : '');
             $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, false));
             $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent, 'titlePrint'));
             $arrRow['eventId'] = date('Y', (int) $objEvent->startDate).'-'.$objEvent->id;
             $arrRow['journey'] = null !== $calendarEventsHelperJourneyModelAdapter->findByPk($objEvent->journey) ? $calendarEventsHelperJourneyModelAdapter->findByPk($objEvent->journey)->title : null;
 
-            if ('course' === $objEvent->eventType) {
+            if (EventType::COURSE === $objEvent->eventType) {
                 $arrRow['eventId'] = $objEvent->courseId;
             }
 
             // tourType
             $arrEventType = $calendarEventsHelperAdapter->getTourTypesAsArray($objEvent, 'shortcut', false);
 
-            if ('course' === $objEvent->eventType) {
+            if (EventType::COURSE === $objEvent->eventType) {
                 // KU = Kurs
                 $arrEventType[] = 'KU';
             }
@@ -402,7 +403,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
 
         $arrEvents = [];
 
-        $eventType = 'course';
+        $eventType = EventType::COURSE;
 
         $arrAllowedEventTypes = $stringUtilAdapter->deserialize($this->model->print_export_allowedEventTypes, true);
 

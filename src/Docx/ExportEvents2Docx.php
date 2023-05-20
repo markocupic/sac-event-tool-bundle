@@ -23,6 +23,7 @@ use Contao\Environment;
 use Contao\StringUtil;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
 use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
@@ -94,7 +95,7 @@ class ExportEvents2Docx
 
         $objEvent = Database::getInstance()
             ->prepare('SELECT * FROM tl_calendar_events WHERE eventType = ? AND startTime >= ? AND endTime < ? AND published = ? ORDER BY courseTypeLevel0, title, startDate')
-            ->execute('course', $start, $stop, 1)
+            ->execute(EventType::COURSE, $start, $stop, 1)
         ;
 
         if (null !== $objEvent) {

@@ -22,6 +22,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Input;
 use Knp\Menu\MenuItem;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
@@ -105,7 +106,7 @@ class GenerateEventDashboardListener
 
         // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und Vergütungsformular drucken" button
         if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
-            if ('tour' === $objEvent->eventType || 'lastMinuteTour' === $objEvent->eventType) {
+            if (EventType::TOUR === $objEvent->eventType || EventType::LAST_MINUTE_TOUR === $objEvent->eventType) {
                 $href = $controllerAdapter->addToUrl('call=writeTourReport&rt='.$requestToken, true);
                 $menu->addChild('Tourenrapport bearbeiten', ['uri' => $href])
                     ->setLinkAttribute('role', 'button')

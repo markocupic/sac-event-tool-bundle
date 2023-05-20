@@ -133,14 +133,6 @@ $GLOBALS['FE_MOD']['sac_event_tool_frontend_modules'] = [
     'eventToolCalendarEventPreviewReader' => ModuleSacEventToolEventPreviewReader::class,
 ];
 
-// TL_CONFIG
-$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'] = [
-    'course',
-    'tour',
-    'lastMinuteTour',
-    'generalEvent',
-];
-
 /*
  * Avalanche levels
  */

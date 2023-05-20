@@ -40,6 +40,7 @@ use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
@@ -174,19 +175,19 @@ class CalendarEventsHelper
                 break;
 
             case 'isLastMinuteTour':
-                $value = 'lastMinuteTour' === $objEvent->eventType;
+                $value = EventType::LAST_MINUTE_TOUR === $objEvent->eventType;
                 break;
 
             case 'isTour':
-                $value = 'tour' === $objEvent->eventType;
+                $value = EventType::TOUR === $objEvent->eventType;
                 break;
 
             case 'isGeneralEvent':
-                $value = 'generalEvent' === $objEvent->eventType;
+                $value = EventType::GENERAL_EVENT === $objEvent->eventType;
                 break;
 
             case 'isCourse':
-                $value = 'course' === $objEvent->eventType;
+                $value = EventType::COURSE === $objEvent->eventType;
                 break;
 
             case 'bookingCounter':

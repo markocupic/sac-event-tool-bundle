@@ -42,6 +42,7 @@ use Contao\Validator;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
@@ -425,7 +426,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     private function setMoreTemplateVars(): void
     {
-        if ('tour' === $this->eventModel->eventType || 'last-minute-tour' === $this->eventModel->eventType || 'course' === $this->eventModel->eventType) {
+        if (EventType::TOUR === $this->eventModel->eventType || EventType::LAST_MINUTE_TOUR === $this->eventModel->eventType || EventType::COURSE === $this->eventModel->eventType) {
             $arrOrganizers = $this->stringUtilAdapter->deserialize($this->eventModel->organizers, true);
 
             if (isset($arrOrganizers[0])) {
@@ -434,11 +435,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 if (null !== $objOrganizer) {
                     $prefix = '';
 
-                    if ('tour' === $this->eventModel->eventType || 'last-minute-tour' === $this->eventModel->eventType) {
+                    if (EventType::TOUR === $this->eventModel->eventType || EventType::LAST_MINUTE_TOUR === $this->eventModel->eventType) {
                         $prefix = 'tour';
                     }
 
-                    if ('course' === $this->eventModel->eventType) {
+                    if (EventType::COURSE === $this->eventModel->eventType) {
                         $prefix = 'course';
                     }
 

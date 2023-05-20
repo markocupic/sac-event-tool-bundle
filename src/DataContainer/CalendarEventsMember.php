@@ -43,6 +43,7 @@ use League\Csv\InvalidArgument;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventParticipantController;
 use Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList;
@@ -674,7 +675,7 @@ class CalendarEventsMember
         if (null !== $objEvent) {
             // Check if backend user is allowed
             if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
-                if ('tour' === $objEvent->eventType || 'lastMinuteTour' === $objEvent->eventType) {
+                if (EventType::TOUR === $objEvent->eventType || EventType::LAST_MINUTE_TOUR === $objEvent->eventType) {
                     $href = $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'];
                     $href = sprintf($href, $eventId);
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['writeTourReport']['href'] = $href;

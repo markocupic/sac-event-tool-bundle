@@ -12,6 +12,8 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Config\EventType;
+
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar']['event_type_legend'] = 'Event Typen Einstellungen';
 $GLOBALS['TL_LANG']['tl_calendar']['event_reader_legend'] = 'Event Detailseite Einstellungen';
@@ -23,8 +25,8 @@ $GLOBALS['TL_LANG']['tl_calendar']['adviceOnEventPublish'] = ['Benachrichtigen b
 $GLOBALS['TL_LANG']['tl_calendar']['userPortraitJumpTo'] = ['Seite mit User Portrait Inhaltselement.', 'Wählen Sie aus dem Seitenbaum eine Seite, welche das User-Portrait-Inhaltselement enthält.'];
 
 // References
-$GLOBALS['TL_LANG']['tl_calendar']['course'] = 'SAC-Kurskalender';
-$GLOBALS['TL_LANG']['tl_calendar']['tour'] = 'SAC-Tourenkalender';
+$GLOBALS['TL_LANG']['tl_calendar'][EventType::COURSE] = 'SAC-Kurskalender';
+$GLOBALS['TL_LANG']['tl_calendar'][EventType::TOUR] = 'SAC-Tourenkalender';
 
 // Operations
 $GLOBALS['TL_LANG']['tl_calendar']['cut'] = ['Kalender verschieben', 'Event ID %s verschieben'];

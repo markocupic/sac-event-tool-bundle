@@ -19,6 +19,7 @@ use Contao\Date;
 use Contao\Input;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventState;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\DataContainer\CalendarEvents;
 
 // Keys
@@ -52,10 +53,10 @@ $strLegends = '
 ';
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $strLegends;
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour'] = $strLegends;
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['lastMinuteTour'] = $strLegends;
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['course'] = $strLegends;
-$GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['generalEvent'] = $strLegends;
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][EventType::TOUR] = $strLegends;
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][EventType::LAST_MINUTE_TOUR] = $strLegends;
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][EventType::COURSE] = $strLegends;
+$GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][EventType::GENERAL_EVENT] = $strLegends;
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour_report'] = $strLegends;
 
 // Define selectors
@@ -108,8 +109,8 @@ PaletteManipulator::create()
 	->addField(['addEnclosure'], 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['source'], 'source_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['cssClass', 'noComments'], 'expert_legend', PaletteManipulator::POSITION_APPEND)
-	->applyToPalette('tour', 'tl_calendar_events')
-	->applyToPalette('lastMinuteTour', 'tl_calendar_events');
+	->applyToPalette(EventType::TOUR, 'tl_calendar_events')
+	->applyToPalette(EventType::LAST_MINUTE_TOUR, 'tl_calendar_events');
 
 // generalEvent
 // same like tour but remove Fields: 'suitableForBeginners', 'tourTechDifficulty', 'tourProfile', 'mountainguide','tourDetailText', 'requirements'
@@ -130,7 +131,7 @@ PaletteManipulator::create()
 	->addField(['addEnclosure'], 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['source'], 'source_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['cssClass', 'noComments'], 'expert_legend', PaletteManipulator::POSITION_APPEND)
-	->applyToPalette('generalEvent', 'tl_calendar_events');
+	->applyToPalette(EventType::GENERAL_EVENT, 'tl_calendar_events');
 
 // Course palette
 PaletteManipulator::create()
@@ -151,7 +152,7 @@ PaletteManipulator::create()
 	->addField(['addEnclosure'], 'enclosure_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['source'], 'source_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['cssClass', 'noComments'], 'expert_legend', PaletteManipulator::POSITION_APPEND)
-	->applyToPalette('course', 'tl_calendar_events');
+	->applyToPalette(EventType::COURSE, 'tl_calendar_events');
 
 // Tour report palette
 PaletteManipulator::create()

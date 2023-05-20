@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 use Contao\BackendUser;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Markocupic\SacEventToolBundle\Config\EventType;
 
 // Table config
 $GLOBALS['TL_DCA']['tl_calendar']['config']['ptable'] = 'tl_calendar_container';
@@ -52,7 +53,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['allowedEventTypes'] = [
 	'filter'    => true,
 	'inputType' => 'checkbox',
 	'reference' => &$GLOBALS['TL_LANG']['MSC'],
-	'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['EVENT-TYPE'],
+	'options'   => EventType::ALL,
 	'eval'      => ['multiple' => true, 'includeBlankOption' => false, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => true],
 	'sql'       => 'blob NULL',
 ];

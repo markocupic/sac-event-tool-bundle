@@ -26,6 +26,7 @@ use Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory;
 use Markocupic\RssFeedGeneratorBundle\Item\Item;
 use Markocupic\RssFeedGeneratorBundle\Item\ItemGroup;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -188,10 +189,10 @@ class UpcomingEventsController extends AbstractController
             ->andWhere('t.startDate > :startDate')
             ->andWhere(
                 $qb->expr()->or(
-                    $qb->expr()->and("t.eventType = 'tour'"),
-                    $qb->expr()->and("t.eventType = 'course'"),
-                    $qb->expr()->and("t.eventType = 'lastMinuteTour'"),
-                    $qb->expr()->and("t.eventType = 'tour'"),
+                    $qb->expr()->and("t.eventType = '".EventType::TOUR."'"),
+                    $qb->expr()->and("t.eventType = '".EventType::COURSE."'"),
+                    $qb->expr()->and("t.eventType = '".EventType::LAST_MINUTE_TOUR."'"),
+                    $qb->expr()->and("t.eventType = '".EventType::GENERAL_EVENT."'"),
                 )
             )
         ;

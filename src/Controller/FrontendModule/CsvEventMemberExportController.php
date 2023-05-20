@@ -32,6 +32,7 @@ use League\Csv\Exception;
 use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -81,7 +82,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
         $objForm->addFormField('event-type', [
             'label' => ['Event-Typ auswählen', ''],
             'inputType' => 'select',
-            'options' => ['all' => 'Alle Events', 'tour' => 'Tour', 'course' => 'Kurs'],
+            'options' => ['all' => 'Alle Events', EventType::TOUR => 'Tour', EventType::COURSE => 'Kurs'],
         ]);
 
         $objForm->addFormField('startDate', [
