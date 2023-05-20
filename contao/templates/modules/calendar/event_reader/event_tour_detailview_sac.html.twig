@@ -142,7 +142,7 @@
                     {# buttons #}
                     <div class="d-flex flex-wrap">
                         <div class="me-2 mt-3 mb-3">
-                            <a href="_download/download_event_ical?eventId={{ get_event_data(model, 'id') }}" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary">
+                            <a href="{{ path('sac_event_tool_download_event_ical', {'eventId': get_event_data(model, 'id')}) }}" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary">
                                 <i class="fal fa-calendar-plus"></i> iCal download
                             </a>
                         </div>

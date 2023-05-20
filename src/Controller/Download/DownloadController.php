@@ -23,8 +23,6 @@ use Markocupic\SacEventToolBundle\Ical\SendEventIcal;
 use Markocupic\SacEventToolBundle\Pdf\WorkshopBookletGenerator;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -32,7 +30,6 @@ class DownloadController extends AbstractController
 {
     public function __construct(
         private readonly ContaoFramework $framework,
-        private readonly RequestStack $requestStack,
         private readonly WorkshopBookletGenerator $workshopBookletGenerator,
         private readonly ExportEvents2Docx $exportEvents2Docx,
         private readonly SendEventIcal $sendEventIcal,
@@ -43,25 +40,17 @@ class DownloadController extends AbstractController
 
     /**
      * Download workshops as pdf booklet
-     * /_download/print_workshop_booklet_as_pdf?year=2019&cat=0
-     * /_download/print_workshop_booklet_as_pdf?year=current&cat=0.
-     *
-     * @Route("/_download/print_workshop_booklet_as_pdf", name="sac_event_tool_download_print_workshop_booklet_as_pdf", defaults={"_scope" = "frontend", "_token_check" = false})
+     * /_download/print_workshop_booklet_as_pdf/2023
+     * /_download/print_workshop_booklet_as_pdf -> current year.
      */
-    public function printWorkshopBookletAsPdfAction(): Response
+    #[Route('/_download/print_workshop_booklet_as_pdf/{year}', name: 'sac_event_tool_download_print_workshop_booklet_as_pdf', defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    public function printWorkshopBookletAsPdfAction(int $year = 0): Response
     {
-        /** @var Request $request */
-        $request = $this->requestStack->getCurrentRequest();
-
-        $year = $request->query->get('year') ?: null;
-
-        if (!empty($year)) {
-            if ('current' === $year) {
-                $year = date('Y');
-            }
-            $this->workshopBookletGenerator->setYear((int) $year);
+        if (!$year) {
+            $year = (int) date('Y');
         }
 
+        $this->workshopBookletGenerator->setYear($year);
         $this->workshopBookletGenerator->setDownload(true);
 
         // Log download
@@ -75,81 +64,74 @@ class DownloadController extends AbstractController
 
     /**
      * Download events as docx file
-     * /_download/print_workshop_details_as_docx?&year=2017
-     * /_download/print_workshop_details_as_docx?&year=2017&eventId=89.
-     *
-     * @Route("/_download/print_workshop_details_as_docx", name="sac_event_tool_download_print_workshop_details_as_docx", defaults={"_scope" = "frontend", "_token_check" = false})
+     * /_download/print_workshop_details_as_docx --> current year
+     * /_download/print_workshop_details_as_docx/2017
+     * /_download/print_workshop_details_as_docx/year=2017/89.
      */
-    public function printWorkshopDetailsAsDocxAction(): Response
+    #[Route('/_download/print_workshop_details_as_docx/{year}/{eventId}', name: 'sac_event_tool_download_print_workshop_details_as_docx', defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    public function printWorkshopDetailsAsDocxAction(int $year = 0, int $eventId = null): Response
     {
-        $request = $this->requestStack->getCurrentRequest();
+        /** @var CalendarEventsModel $calendarEventsModelAdapter */
+        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        if (!$request->query->has('year')) {
-            $year = 'current';
-        } else {
-            $year = $request->query->get('year');
+        $objEvent = $calendarEventsModelAdapter->findByPk($eventId);
+
+        if (null !== $eventId && null === $objEvent) {
+            return new Response('Download failed. Please check if the event id is valid.', Response::HTTP_BAD_REQUEST);
         }
 
-        if ('current' === $year) {
+        if (0 === $year) {
             $year = date('Y');
         }
 
-        return $this->exportEvents2Docx->generate((int) $year, $request->query->get('eventId', null));
+        return $this->exportEvents2Docx->generate((int) $year, $eventId);
     }
 
     /**
      * Download workshop details as pdf
-     * /_download/print_workshop_details_as_pdf?eventId=643.
-     *
-     * @Route("/_download/print_workshop_details_as_pdf", name="sac_event_tool_download_print_workshop_details_as_pdf", defaults={"_scope" = "frontend", "_token_check" = false})
+     * /_download/print_workshop_details_as_pdf/643.
      */
-    public function printWorkshopDetailsAsPdfAction(): Response
+    #[Route('/_download/print_workshop_details_as_pdf/{eventId}', name: 'sac_event_tool_download_print_workshop_details_as_pdf', defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    public function printWorkshopDetailsAsPdfAction(int $eventId): Response
     {
-        /** @var Request $request */
-        $request = $this->requestStack->getCurrentRequest();
+        /** @var CalendarEventsModel $calendarEventsModelAdapter */
+        $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        $eventId = $request->query->get('eventId', null);
+        $objEvent = $calendarEventsModelAdapter->findByPk($eventId);
 
-        if (null !== $eventId) {
-            $this->workshopBookletGenerator->setEventId((int) $eventId);
+        if (null !== $objEvent) {
+            $this->workshopBookletGenerator->setEventId($eventId);
+            $this->workshopBookletGenerator->setDownload(true);
+
+            return $this->workshopBookletGenerator->generate();
         }
 
-        $this->workshopBookletGenerator->setDownload(true);
-
-        return $this->workshopBookletGenerator->generate();
+        return new Response('Download failed. Please check if the event id is valid.', Response::HTTP_BAD_REQUEST);
     }
 
     /**
      * Send ical to the browser.
-     *
-     * @Route("/_download/download_event_ical", name="sac_event_tool_download_download_event_ical", defaults={"_scope" = "frontend", "_token_check" = false})
      */
-    public function downloadEventIcalAction(): Response
+    #[Route('/_download/download_event_ical/{eventId}', name: 'sac_event_tool_download_event_ical', defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    public function downloadEventIcalAction(int $eventId): Response
     {
-        /** @var Request $request */
-        $request = $this->requestStack->getCurrentRequest();
-
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        // Course Filter
-        if ($request->query->get('eventId') > 0) {
-            $objEvent = $calendarEventsModelAdapter->findByPk($request->query->get('eventId'));
+        $objEvent = $calendarEventsModelAdapter->findByPk($eventId);
 
-            if (null !== $objEvent) {
-                $this->sendEventIcal->sendEventIcalToBrowser($objEvent);
-            }
+        if (null !== $objEvent) {
+            $this->sendEventIcal->sendEventIcalToBrowser($objEvent);
         }
 
-        return new Response('Ical download failed. Please select add an event id to the eventId GET parameter.', Response::HTTP_BAD_REQUEST);
+        return new Response('Ical download failed. Please check if the event id is valid.', Response::HTTP_BAD_REQUEST);
     }
 
     /**
      * The defaultAction has to be at the bottom of the class
      * Handles download requests.
-     *
-     * @Route("/_download/{slug}", name="sac_event_tool_download", defaults={"_scope" = "frontend", "_token_check" = false})
      */
+    #[Route('/_download/{slug}', name: 'sac_event_tool_download', defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function defaultAction($slug = ''): Response
     {
         $msg = sprintf('Welcome to %s::%s. You have called the Service with this route: _download/%s', self::class, __FUNCTION__, $slug);
