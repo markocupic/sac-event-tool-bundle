@@ -26,13 +26,12 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\Date;
-use Contao\Environment;
 use Contao\Events;
 use Contao\FilesModel;
 use Contao\FrontendUser;
 use Contao\Input;
 use Contao\MemberModel;
+use Contao\Message;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
@@ -62,7 +61,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
-#[AsFrontendModule(EventRegistrationController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_event_registration')]
+#[AsFrontendModule(EventRegistrationController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_event_registration')]
 class EventRegistrationController extends AbstractFrontendModuleController
 {
     public const TYPE = 'event_registration';
@@ -71,59 +70,54 @@ class EventRegistrationController extends AbstractFrontendModuleController
     public const CHECKOUT_STEP_CONFIRM = 'confirm';
 
     // Adapters
+    private Adapter $messageAdapter;
     private Adapter $calendarEventsHelperAdapter;
     private Adapter $calendarEventsJourneyModelAdapter;
     private Adapter $calendarEventsMemberModelAdapter;
     private Adapter $calendarEventsModelAdapter;
     private Adapter $configAdapter;
     private Adapter $controllerAdapter;
-    private Adapter $dateAdapter;
-    private Adapter $environmentAdapter;
     private Adapter $eventOrganizerModelAdapter;
+    private Adapter $eventReleaseLevelPolicyModelAdapter;
     private Adapter $eventsAdapter;
     private Adapter $filesModelAdapter;
     private Adapter $inputAdapter;
     private Adapter $stringUtilAdapter;
     private Adapter $userModelAdapter;
     private Adapter $validatorAdapter;
-    private Adapter $eventReleaseLevelPolicyModelAdapter;
 
     // Class properties that are initialized after class instantiation
-    private ModuleModel|null $moduleModel = null;
     private CalendarEventsModel|null $eventModel = null;
     private MemberModel|null $memberModel = null;
+    private ModuleModel|null $moduleModel = null;
     private UserModel|null $mainInstructorModel = null;
-    private Form|null $objForm = null;
-    private Template|null $template = null;
 
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly EventDispatcherInterface $eventDispatcher,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly TwigEnvironment $twig,
         private readonly TranslatorInterface $translator,
+        private readonly TwigEnvironment $twig,
         private readonly UrlParser $urlParser,
         private readonly string $projectDir,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
-        // Adapters
+        $this->messageAdapter = $this->framework->getAdapter(Message::class);
         $this->calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->calendarEventsJourneyModelAdapter = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
         $this->calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->configAdapter = $this->framework->getAdapter(Config::class);
         $this->controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $this->dateAdapter = $this->framework->getAdapter(Date::class);
-        $this->environmentAdapter = $this->framework->getAdapter(Environment::class);
         $this->eventOrganizerModelAdapter = $this->framework->getAdapter(EventOrganizerModel::class);
+        $this->eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
         $this->eventsAdapter = $this->framework->getAdapter(Events::class);
         $this->filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
         $this->inputAdapter = $this->framework->getAdapter(Input::class);
         $this->stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
         $this->userModelAdapter = $this->framework->getAdapter(UserModel::class);
         $this->validatorAdapter = $this->framework->getAdapter(Validator::class);
-        $this->eventReleaseLevelPolicyModelAdapter = $this->framework->getAdapter(EventReleaseLevelPolicyModel::class);
     }
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
@@ -151,6 +145,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         // Get instructor object from UserModel
         $this->mainInstructorModel = $this->userModelAdapter->findByPk($this->eventModel->mainInstructor);
 
+        // Do not show the registration module in the event preview mode
         if ('true' === $request->query->get('event_preview')) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }
@@ -166,87 +161,41 @@ class EventRegistrationController extends AbstractFrontendModuleController
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
-        $request = $this->requestStack->getCurrentRequest();
-        $session = $request->getSession();
-
-        $flash = $session->getFlashBag();
-        $sessInfKey = 'contao.FE.info';
-        $sessErrKey = 'contao.FE.error';
-
-        if (null === $this->eventModel) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventNotFound', [$this->inputAdapter->get('events') ?? 'NULL'], 'contao_default'));
-        } elseif (!$this->eventModel->published) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventNotActivatedYet', [$this->eventModel->title], 'contao_default'));
-        } elseif (null === $this->eventReleaseLevelPolicyModelAdapter->findOneByEventId($this->eventModel->id) || !$this->eventReleaseLevelPolicyModelAdapter->findOneByEventId($this->eventModel->id)->allowRegistration) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventReleaseLevelPolicyDoesNotAllowRegistrations', [$this->eventModel->title], 'contao_default'));
-        } elseif ($this->eventModel->disableOnlineRegistration) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_onlineRegDisabled', [], 'contao_default'));
-        } elseif (EventState::STATE_FULLY_BOOKED === $this->eventModel->eventState) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventFullyBooked', [], 'contao_default'));
-        } elseif (EventState::STATE_CANCELED === $this->eventModel->eventState) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventCanceled', [], 'contao_default'));
-        } elseif (EventState::STATE_DEFERRED === $this->eventModel->eventState) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventDeferred', [], 'contao_default'));
-        } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationStartDate > time()) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossibleOn', [$this->eventModel->title, $this->dateAdapter->parse('d.m.Y H:i', $this->eventModel->registrationStartDate)], 'contao_default'));
-        } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationEndDate < time()) {
-            $strDate = $this->dateAdapter->parse('d.m.Y', $this->eventModel->registrationEndDate);
-            $strTime = $this->dateAdapter->parse('H:i', $this->eventModel->registrationEndDate);
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationDeadlineExpired', [$strDate, $strTime], 'contao_default'));
-        } elseif (!$this->eventModel->setRegistrationPeriod && $this->eventModel->startDate - 60 * 60 * 24 < time()) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_registrationPossible24HoursBeforeEventStart', [], 'contao_default'));
-        } elseif ($this->memberModel && true === $this->calendarEventsHelperAdapter->areBookingDatesOccupied($this->eventModel, $this->memberModel)) {
-            $flash->set($sessInfKey, $this->translator->trans('ERR.evt_reg_eventDateOverlapError', [], 'contao_default'));
-        } elseif (null === $this->mainInstructorModel) {
-            $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_mainInstructorNotFound', [$this->eventModel->mainInstructor], 'contao_default'));
-        } elseif (empty($this->mainInstructorModel->email) || !$this->validatorAdapter->isEmail($this->mainInstructorModel->email)) {
-            $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_mainInstructorsEmailAddrNotFound', [$this->eventModel->mainInstructor], 'contao_default'));
-        } elseif (null !== $this->memberModel && (empty($this->memberModel->email) || !$this->validatorAdapter->isEmail($this->memberModel->email))) {
-            $flash->set($sessErrKey, $this->translator->trans('ERR.evt_reg_membersEmailAddrNotFound', [], 'contao_default'));
-        }
-
-        $this->template = $template;
-        $this->template->controller = $this;
-        $this->template->eventModel = $this->eventModel;
-        $this->template->memberModel = $this->memberModel;
-        $this->template->moduleModel = $this->moduleModel;
+        // Do numerous checks to be sure that the event can be booked.
+        $this->validateRegistrationRequest();
 
         // Set more template vars
-        $this->setMoreTemplateVars();
+        $template = $this->addTemplateVars($template);
 
         if (null !== $this->memberModel && true === $this->calendarEventsMemberModelAdapter->isRegistered($this->memberModel->id, $this->eventModel->id)) {
-            $this->template->regInfo = $this->parseEventRegistrationConfirmTemplate();
+            $template->regInfo = $this->parseEventRegistrationConfirmTemplate();
 
             if ($url = $this->getRoute('confirm')) {
                 return $this->redirect($url);
             }
-        }
+        } // Add messages to the template
+        elseif ($this->messageAdapter->hasInfo() || $this->messageAdapter->hasError()) {
+            // Add messages to template from session flash bag
+            if ($this->messageAdapter->hasError()) {
+                $errorMessage = $this->getFirstErrorMessage($request);
+                $template->errorMessage = $errorMessage;
 
-        // Add messages to the template
-        elseif ($flash->has($sessInfKey) || $flash->has($sessErrKey)) {
-            // Add messages to template from session flash
-            if ($flash->has($sessErrKey)) {
-                $this->template->hasErrorMessage = true;
-                $errorMessage = $flash->get($sessErrKey)[0];
-                $this->template->errorMessage = $errorMessage;
-
-                // Log
+                // Contao system log
                 if ($this->contaoGeneralLogger) {
                     $strText = sprintf('Event registration error: "%s"', $errorMessage);
                     $this->contaoGeneralLogger->info($strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION_ERROR)]);
                 }
 
-                if ($url = $this->getRoute('info')) {
+                if ($url = $this->getRoute('registration_interrupted')) {
                     return $this->redirect($url);
                 }
             }
 
-            if ($flash->has($sessInfKey)) {
-                $this->template->hasInfoMessage = true;
-                $infoMessage = $flash->get($sessInfKey)[0];
-                $this->template->infoMessage = $infoMessage;
+            if ($this->messageAdapter->hasInfo()) {
+                $infoMessage = $this->getFirstInfoMessage($request);
+                $template->infoMessage = $infoMessage;
 
-                if ($url = $this->getRoute('info')) {
+                if ($url = $this->getRoute('registration_interrupted')) {
                     return $this->redirect($url);
                 }
             }
@@ -255,17 +204,12 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 return $this->redirect($url);
             }
         } else {
-            // All ok! Generate the registration form.
-            $this->buildForm();
-
-            if (null !== $this->objForm) {
-                //$this->template->form = $this->objForm->generate();
-                $this->template->objForm = $this->objForm;
-            }
+            // All ok! Booking request has passed all checks. So let's generate the registration form.
+            $template->form = $this->generateForm($request);
 
             // Check if event is already fully booked
             if (true === $this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel)) {
-                $this->template->bookingLimitReaches = true;
+                $template->bookingLimitReaches = true;
             }
 
             if ($url = $this->getRoute('register')) {
@@ -273,10 +217,45 @@ class EventRegistrationController extends AbstractFrontendModuleController
             }
         }
 
-        $this->template->action = $request->query->get('action');
-        $this->template->stepIndicator = $this->parseStepIndicatorTemplate($request->query->get('action'));
+        $template->action = $request->query->get('action');
+        $template->stepIndicator = $this->parseStepIndicatorTemplate($request->query->get('action'));
 
-        return $this->template->getResponse();
+        return $template->getResponse();
+    }
+
+    private function validateRegistrationRequest(): void
+    {
+        if (null === $this->eventModel) {
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventNotFound', [$this->inputAdapter->get('events') ?? 'NULL'], 'contao_default'));
+        } elseif (!$this->eventModel->published) {
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventNotActivatedYet', [$this->eventModel->title], 'contao_default'));
+        } elseif (null === $this->eventReleaseLevelPolicyModelAdapter->findOneByEventId($this->eventModel->id) || !$this->eventReleaseLevelPolicyModelAdapter->findOneByEventId($this->eventModel->id)->allowRegistration) {
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventReleaseLevelPolicyDoesNotAllowRegistrations', [$this->eventModel->title], 'contao_default'));
+        } elseif ($this->eventModel->disableOnlineRegistration) {
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_onlineRegDisabled', [], 'contao_default'));
+        } elseif (EventState::STATE_FULLY_BOOKED === $this->eventModel->eventState) {
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventFullyBooked', [], 'contao_default'));
+        } elseif (EventState::STATE_CANCELED === $this->eventModel->eventState) {
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventCanceled', [], 'contao_default'));
+        } elseif (EventState::STATE_DEFERRED === $this->eventModel->eventState) {
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventDeferred', [], 'contao_default'));
+        } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationStartDate > time()) {
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_registrationPossibleOn', [$this->eventModel->title, date('d.m.Y H:i', (int) $this->eventModel->registrationStartDate)], 'contao_default'));
+        } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationEndDate < time()) {
+            $strDate = date('d.m.Y', (int) $this->eventModel->registrationEndDate);
+            $strTime = date('H:i', (int) $this->eventModel->registrationEndDate);
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_registrationDeadlineExpired', [$strDate, $strTime], 'contao_default'));
+        } elseif (!$this->eventModel->setRegistrationPeriod && $this->eventModel->startDate - 60 * 60 * 24 < time()) {
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_registrationPossible24HoursBeforeEventStart', [], 'contao_default'));
+        } elseif ($this->memberModel && true === $this->calendarEventsHelperAdapter->areBookingDatesOccupied($this->eventModel, $this->memberModel)) {
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventDateOverlapError', [], 'contao_default'));
+        } elseif (null === $this->mainInstructorModel) {
+            $this->messageAdapter->addError($this->translator->trans('ERR.evt_reg_mainInstructorNotFound', [$this->eventModel->mainInstructor], 'contao_default'));
+        } elseif (empty($this->mainInstructorModel->email) || !$this->validatorAdapter->isEmail($this->mainInstructorModel->email)) {
+            $this->messageAdapter->addError($this->translator->trans('ERR.evt_reg_mainInstructorsEmailAddrNotFound', [$this->eventModel->mainInstructor], 'contao_default'));
+        } elseif (null !== $this->memberModel && (empty($this->memberModel->email) || !$this->validatorAdapter->isEmail($this->memberModel->email))) {
+            $this->messageAdapter->addError($this->translator->trans('ERR.evt_reg_membersEmailAddrNotFound', [], 'contao_default'));
+        }
     }
 
     private function getRoute(string $action): string|null
@@ -284,20 +263,20 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $request = $this->requestStack->getCurrentRequest();
 
         if ($request->query->get('action') !== $action) {
-            return $this->urlParser->addQueryString('action='.$action, $this->environmentAdapter->get('uri'));
+            return $this->urlParser->addQueryString('action='.$action, $request->getUri());
         }
 
         return null;
     }
 
-    private function buildForm(): void
+    private function generateForm(Request $request): Form
     {
         $objForm = new Form(
             'form-event-registration',
             'POST',
         );
 
-        $objForm->setAction($this->environmentAdapter->get('uri'));
+        $objForm->setAction($request->getUri());
 
         if (null !== ($objJourney = $this->calendarEventsJourneyModelAdapter->findByPk($this->eventModel->journey))) {
             if ('public-transport' === $objJourney->alias) {
@@ -346,9 +325,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate()) {
-            // Save data to tl_calendar_events_member
-
             if (null !== $this->memberModel) {
+                // Save data to tl_calendar_events_member
                 $arrDataForm = $objForm->fetchAll();
                 $arrData = array_merge($this->memberModel->row(), $arrDataForm);
 
@@ -366,7 +344,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $arrData['bookingType'] = 'onlineForm';
                 $arrData['sectionId'] = $this->memberModel->sectionId;
 
-                // Save emergency phone number to user profile
+                // Save emergency phone number to the user profile
                 if (empty($this->memberModel->emergencyPhone)) {
                     $this->memberModel->emergencyPhone = $arrData['emergencyPhone'];
                     $this->memberModel->save();
@@ -378,7 +356,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                     $this->memberModel->save();
                 }
 
-                // Save emergency phone name to user profile
+                // Save AHV number to user profile
                 if (!empty($arrData['ahvNumber'])) {
                     $this->memberModel->ahvNumber = $arrData['ahvNumber'];
                     $this->memberModel->save();
@@ -421,11 +399,16 @@ class EventRegistrationController extends AbstractFrontendModuleController
             }
         }
 
-        $this->objForm = $objForm;
+        return $objForm;
     }
 
-    private function setMoreTemplateVars(): void
+    private function addTemplateVars(Template $template): Template
     {
+        $template->controller = $this;
+        $template->eventModel = $this->eventModel;
+        $template->memberModel = $this->memberModel;
+        $template->moduleModel = $this->moduleModel;
+
         if (EventType::TOUR === $this->eventModel->eventType || EventType::LAST_MINUTE_TOUR === $this->eventModel->eventType || EventType::COURSE === $this->eventModel->eventType) {
             $arrOrganizers = $this->stringUtilAdapter->deserialize($this->eventModel->organizers, true);
 
@@ -449,18 +432,20 @@ class EventRegistrationController extends AbstractFrontendModuleController
                                 $objFile = $this->filesModelAdapter->findByUuid($objOrganizer->{$prefix.'RegulationSRC'});
 
                                 if (null !== $objFile && is_file($this->projectDir.'/'.$objFile->path)) {
-                                    $this->template->objEventRegulationFile = $objFile;
+                                    $template->objEventRegulationFile = $objFile;
                                 }
                             }
                         }
 
                         if ('' !== $objOrganizer->{$prefix.'RegulationExtract'}) {
-                            $this->template->eventRegulationExtract = $objOrganizer->{$prefix.'RegulationExtract'};
+                            $template->eventRegulationExtract = $objOrganizer->{$prefix.'RegulationExtract'};
                         }
                     }
                 }
             }
         }
+
+        return $template;
     }
 
     private function getFormFieldDca(string $field): array
@@ -584,5 +569,21 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 'step' => $strStep,
             ]
         );
+    }
+
+    private function getFirstErrorMessage(Request $request): string|null
+    {
+        $session = $request->getSession();
+        $flash = $session->getFlashBag();
+
+        return $flash->get('contao.FE.error')[0] ?? null;
+    }
+
+    private function getFirstInfoMessage(Request $request): string|null
+    {
+        $session = $request->getSession();
+        $flash = $session->getFlashBag();
+
+        return $flash->get('contao.FE.info')[0] ?? null;
     }
 }

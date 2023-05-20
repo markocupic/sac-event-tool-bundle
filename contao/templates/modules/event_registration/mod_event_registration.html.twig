@@ -2,15 +2,15 @@
 
 {% block content %}
 
-    {% if 'info' == action %}
-        {% if hasErrorMessage is defined %}
+    {% if 'registration_interrupted' == action %}
+        {% if errorMessage|default %}
             <div class="alert alert-danger" role="alert">
                 <i class="fas fa-exclamation-circle"></i>
                 <div>{{ errorMessage|raw }}</div>
             </div>
         {% endif %}
 
-        {% if hasInfoMessage is defined %}
+        {% if infoMessage|default %}
             <div class="alert alert-info" role="alert">
                 <i class="fas fa-info-circle me-2"></i>
                 <div>{{ infoMessage|raw }}</div>
@@ -39,7 +39,7 @@
     {% if 'register' == action %}
         {{ stepIndicator|raw }}
 
-        {% if bookingLimitReaches is defined and bookingLimitReaches is same as(true) %}
+        {% if bookingLimitReaches|default is same as(true) %}
             <div class="alert alert-info" role="alert">
                 <i class="fas fa-info-circle"></i>
                 <div>{{ 'ERR.evt_reg_bookingLimitReaches'|trans({}, 'contao_default') }}</div>
@@ -69,33 +69,33 @@
 
         {# start form #}
         <div class="hasteform_form-event-registration block">
-            <form action="{{ objForm.getAction() }}" method="{{ objForm.getHttpMethod() }}" enctype="{{ objForm.getEnctype() }}">
+            <form action="{{ form.getAction() }}" method="{{ form.getHttpMethod() }}" enctype="{{ form.getEnctype() }}">
                 <div class="formbody bg-reg-form">
 
                     <div class="ps-3 pe-3">
-                        {% if objForm.hasFormField('FORM_SUBMIT') %}
-                            {{ objForm.getWidget('FORM_SUBMIT').parse()|raw }}
+                        {% if form.hasFormField('FORM_SUBMIT') %}
+                            {{ form.getWidget('FORM_SUBMIT').parse()|raw }}
                         {% endif %}
 
-                        {% if objForm.hasFormField('REQUEST_TOKEN') %}
-                            {{ objForm.getWidget('REQUEST_TOKEN').parse()|raw }}
+                        {% if form.hasFormField('REQUEST_TOKEN') %}
+                            {{ form.getWidget('REQUEST_TOKEN').parse()|raw }}
                         {% endif %}
 
-                        {% if objForm.hasFormField('carInfo') %}
+                        {% if form.hasFormField('carInfo') %}
                             <div class="mt-0 mb-4 p-3" data-reg-widget="carInfo">
-                                {{ objForm.getWidget('carInfo').parse()|raw }}
+                                {{ form.getWidget('carInfo').parse()|raw }}
                             </div>
                         {% endif %}
 
-                        {% if objForm.hasFormField('ticketInfo') %}
+                        {% if form.hasFormField('ticketInfo') %}
                             <div class="mt-0 mb-4 p-3" data-reg-widget="ticketInfo">
-                                {{ objForm.getWidget('ticketInfo').parse()|raw }}
+                                {{ form.getWidget('ticketInfo').parse()|raw }}
                             </div>
                         {% endif %}
 
-                        {% if objForm.hasFormField('mobile') %}
+                        {% if form.hasFormField('mobile') %}
                             <div class="mt-0 mb-4 p-3" data-reg-widget="mobile">
-                                {{ objForm.getWidget('mobile').parse()|raw }}
+                                {{ form.getWidget('mobile').parse()|raw }}
                                 <div data-ffield-explanation="mobile">
                                     <div class="alert alert-success" role="alert">
                                         <i class="fas fa-check-circle"></i>
@@ -107,21 +107,21 @@
                             </div>
                         {% endif %}
 
-                        {% if objForm.hasFormField('emergencyPhone') %}
+                        {% if form.hasFormField('emergencyPhone') %}
                             <div class="mt-0 mb-4 p-3" data-reg-widget="emergencyPhone">
-                                {{ objForm.getWidget('emergencyPhone').parse()|raw }}
+                                {{ form.getWidget('emergencyPhone').parse()|raw }}
                             </div>
                         {% endif %}
 
-                        {% if objForm.hasFormField('emergencyPhoneName') %}
+                        {% if form.hasFormField('emergencyPhoneName') %}
                             <div class="mt-0 mb-4 p-3" data-reg-widget="emergencyPhoneName">
-                                {{ objForm.getWidget('emergencyPhoneName').parse()|raw }}
+                                {{ form.getWidget('emergencyPhoneName').parse()|raw }}
                             </div>
                         {% endif %}
 
-                        {% if objForm.hasFormField('notes') %}
+                        {% if form.hasFormField('notes') %}
                             <div class="mt-0 mb-4 p-3" data-reg-widget="notes">
-                                {{ objForm.getWidget('notes').parse()|raw }}
+                                {{ form.getWidget('notes').parse()|raw }}
                                 <div data-ffield-explanation="notes">
                                     <div class="alert alert-success" role="alert">
                                         <i class="fas fa-check-circle"></i>
@@ -133,9 +133,9 @@
                             </div>
                         {% endif %}
 
-                        {% if objForm.hasFormField('ahvNumber') %}
+                        {% if form.hasFormField('ahvNumber') %}
                             <div class="mt-0 mb-4 p-3" data-reg-widget="ahvNumber">
-                                {{ objForm.getWidget('ahvNumber').parse()|raw }}
+                                {{ form.getWidget('ahvNumber').parse()|raw }}
                                 <div data-ffield-explanation="ahvNumber">
                                     <div class="alert alert-success" role="alert">
                                         <i class="fas fa-check-circle"></i>
@@ -147,21 +147,21 @@
                             </div>
                         {% endif %}
 
-                        {% if objForm.hasFormField('foodHabits') %}
+                        {% if form.hasFormField('foodHabits') %}
                             <div class="mt-0 mb-4 p-3" data-reg-widget="foodHabits">
-                                {{ objForm.getWidget('foodHabits').parse()|raw }}
+                                {{ form.getWidget('foodHabits').parse()|raw }}
                             </div>
                         {% endif %}
 
-                        {% if objForm.hasFormField('agb') %}
+                        {% if form.hasFormField('agb') %}
                             <div class="mt-0 mb-4 p-3" data-reg-widget="agb">
-                                {{ objForm.getWidget('agb').parse()|raw }}
+                                {{ form.getWidget('agb').parse()|raw }}
                             </div>
                         {% endif %}
 
-                        {% if objForm.hasFormField('submit') %}
+                        {% if form.hasFormField('submit') %}
                             <div class="mt-0 mb-0 p-3" data-reg-widget="submit">
-                                {{ objForm.getWidget('submit').parse()|raw }}
+                                {{ form.getWidget('submit').parse()|raw }}
                             </div>
                         {% endif %}
                     </div>
@@ -199,11 +199,11 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
                     </div>
                     <div class="modal-body">
-                        {% if eventRegulationExtract is defined %}
+                        {% if eventRegulationExtract|default %}
                             {{ eventRegulationExtract|raw }}
                         {% endif %}
 
-                        {% if objEventRegulationFile is defined %}
+                        {% if objEventRegulationFile|default %}
                             <p>Download: <a href="{{ objEventRegulationFile.path }}" download="{{ objEventRegulationFile.name }}">{{ objEventRegulationFile.name }}</a></p>
                         {% endif %}
                     </div>
