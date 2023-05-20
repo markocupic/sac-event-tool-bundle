@@ -12,6 +12,8 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Markocupic\SacEventToolBundle\Config\BookingType;
+
 // Main headline label
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['notify_event_participant'] = ['Teilnehmer benachrichtigen', 'Teilnehmer benachrichtigen'];
 
@@ -83,8 +85,8 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['hasPaid'] = ['Teilnahmekosten 
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['paymentMethod'] = ['Zahlungsart', 'Geben Sie die Zahlungsart an.'];
 
 // References
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['manually'] = 'Manuelle Erfassung der Personalien des Event-Teilnehmers';
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['onlineForm'] = 'Buchung über Online-Buchungsformular';
+$GLOBALS['TL_LANG']['tl_calendar_events_member'][BookingType::MANUALLY] = 'Manuelle Erfassung der Personalien des Event-Teilnehmers';
+$GLOBALS['TL_LANG']['tl_calendar_events_member'][BookingType::ONLINE_FORM] = 'Buchung über Online-Buchungsformular';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['cashPayment'] = 'Barzahlung';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['bankTransfer'] = 'Bank-/Postüberweisung';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['twint'] = 'TWINT';

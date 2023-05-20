@@ -16,6 +16,7 @@ use Contao\Config;
 use Contao\DataContainer;
 use Contao\Input;
 use Contao\System;
+use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Ramsey\Uuid\Uuid;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
@@ -138,9 +139,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		],
 	],
 	'palettes'    => [
-		'__selector__'    => ['addEmailAttachment', 'hasLeadClimbingEducation', 'hasPaid'],
-		'default'         => '{stateOfSubscription_legend},dashboard,stateOfSubscription,dateAdded,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionId,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
-		'sendEmail'       => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy',
+		'__selector__' => ['addEmailAttachment', 'hasLeadClimbingEducation', 'hasPaid'],
+		'default'      => '{stateOfSubscription_legend},dashboard,stateOfSubscription,dateAdded,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionId,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
+		'sendEmail'    => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy',
 	],
 	'subpalettes' => [
 		'addEmailAttachment'       => 'emailAttachment',
@@ -344,9 +345,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'exclude'   => true,
 			'inputType' => 'select',
 			'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
-			'options'   => ['onlineForm', 'manually'],
+			'options'   => BookingType::ALL,
 			'eval'      => ['readonly' => true, 'doNotShow' => true, 'includeBlankOption' => false, 'doNotCopy' => true],
-			'sql'       => "varchar(255) NOT NULL default 'manually'",
+			'sql'       => "varchar(255) NOT NULL default '".BookingType::MANUALLY."'",
 		],
 		'allowMultiSignUp'            => [
 			'inputType' => 'checkbox',

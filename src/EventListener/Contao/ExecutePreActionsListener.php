@@ -18,6 +18,7 @@ use Contao\BackendTemplate;
 use Contao\BackendUser;
 use Contao\Config;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
@@ -28,9 +29,8 @@ use Contao\Validator;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Safe\Exceptions\JsonException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use function Safe\json_encode;
 
 #[AsHook('executePreActions', priority: 100)]
 class ExecutePreActionsListener
@@ -66,7 +66,7 @@ class ExecutePreActionsListener
         // Get current request
         $request = $this->requestStack->getCurrentRequest();
 
-        // Autocompleter when registrating event members manually in the backend
+        // Auto-completer: registering event members manually in the backend!
         if ('autocompleterLoadMemberDataFromSacMemberId' === $strAction) {
             // Output
             $json = ['status' => 'error'];
@@ -92,7 +92,7 @@ class ExecutePreActionsListener
             }
 
             // Send json data to the browser
-            $this->_jsonSend($json);
+            $this->json($json);
         }
 
         // editAllNavbarHandler in the Contao backend when using the overrideAll or editAll mode
@@ -109,7 +109,7 @@ class ExecutePreActionsListener
                     $json['status'] = 'success';
                 }
                 // Send json data to the browser
-                $this->_jsonSend($json);
+                $this->json($json);
             }
 
             if ('getSessionData' === $request->request->get('subaction')) {
@@ -144,7 +144,7 @@ class ExecutePreActionsListener
                     }
                 }
                 // Send json data to the browser
-                $this->_jsonSend($json);
+                $this->json($json);
             }
 
             if ('saveSessionData' === $request->request->get('subaction')) {
@@ -184,20 +184,16 @@ class ExecutePreActionsListener
                 }
 
                 // Send json data to the browser
-                $this->_jsonSend($json);
+                $this->json($json);
             }
         }
     }
 
-    /**
-     * @throws JsonException
-     */
-    private function _jsonSend(array $json): void
+    private function json(array $json): void
     {
-        // !!! Do not use new JsonResponse($json) because session data will be overwritten
-        header('Content-Type: application/json');
-        header('Status: '.Response::HTTP_OK);
-        echo json_encode($json);
-        exit();
+        $json = mb_convert_encoding($json, 'UTF-8', 'UTF-8');
+        $response = new JsonResponse($json);
+
+        throw new ResponseException($response);
     }
 }

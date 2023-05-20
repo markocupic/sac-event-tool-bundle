@@ -11,14 +11,13 @@
 "use strict";
 
 window.addEvent('domready', function () {
-
   var globalTimeout = null;
   if (!$$('input[name="sacMemberId"]')[0]) {
     return;
   }
 
   $$('input[name="sacMemberId"]')[0].addEvent('keyup', function (event) {
-    if (globalTimeout != null) {
+	  if (globalTimeout != null) {
       clearTimeout(globalTimeout);
     }
     globalTimeout = setTimeout(function () {

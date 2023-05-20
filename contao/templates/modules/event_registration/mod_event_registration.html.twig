@@ -2,7 +2,7 @@
 
 {% block content %}
 
-    {% if 'registration_interrupted' == action %}
+    {% if 'registration_interrupted' == step %}
         {% if errorMessage|default %}
             <div class="alert alert-danger" role="alert">
                 <i class="fas fa-exclamation-circle"></i>
@@ -18,7 +18,7 @@
         {% endif %}
     {% endif %}
 
-    {% if 'login' == action %}
+    {% if 'login' == step %}
         {{ stepIndicator|raw }}
         <div class="alert alert-info" role="alert">
             <i class="fas fa-info-circle"></i>
@@ -31,15 +31,15 @@
         </div>
     {% endif %}
 
-    {% if 'confirm' == action %}
+    {% if 'confirm' == step %}
         {{ stepIndicator|raw }}
         {{ regInfo|raw }}
     {% endif %}
 
-    {% if 'register' == action %}
+    {% if 'register' == step %}
         {{ stepIndicator|raw }}
 
-        {% if bookingLimitReaches|default is same as(true) %}
+        {% if eventFullyBooked|default is same as(true) %}
             <div class="alert alert-info" role="alert">
                 <i class="fas fa-info-circle"></i>
                 <div>{{ 'ERR.evt_reg_bookingLimitReaches'|trans({}, 'contao_default') }}</div>

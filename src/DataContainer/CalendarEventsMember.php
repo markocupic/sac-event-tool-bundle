@@ -41,6 +41,7 @@ use Doctrine\DBAL\Exception;
 use League\Csv\CannotInsertRecord;
 use League\Csv\InvalidArgument;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
@@ -133,7 +134,7 @@ class CalendarEventsMember
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ('sac_calendar_events_tool' === $request->query->get('do') && '' !== $request->query->get('ref')) {
+        if (('calendar' === $request->query->get('do') || 'sac_calendar_events_tool' === $request->query->get('do')) && '' !== $request->query->get('ref')) {
             $GLOBALS['TL_JAVASCRIPT'][] = Bundle::ASSET_DIR.'/js/backend_member_autocomplete.js';
         }
     }
@@ -338,7 +339,7 @@ class CalendarEventsMember
         $registration = $this->calendarEventsMember->findByPk($id);
 
         // Do not allow non-admins to delete event registrations with the booking type 'onlineForm'!
-        if ($registration && 'onlineForm' === $registration->bookingType && ('delete' === $request->query->get('act') || 'deleteAll' === $request->query->get('act'))) {
+        if ($registration && BookingType::ONLINE_FORM === $registration->bookingType && ('delete' === $request->query->get('act') || 'deleteAll' === $request->query->get('act'))) {
             throw new AccessDeniedException('Not enough permissions to '.$request->query->get('act').' the event registration ID '.$request->query->get('id').'.');
         }
 
@@ -814,7 +815,7 @@ class CalendarEventsMember
 
         if ($this->security->isGranted('ROLE_ADMIN')) {
             $allowDeletion = true;
-        } elseif (isset($row['bookingType']) && 'onlineForm' !== $row['bookingType']) {
+        } elseif (isset($row['bookingType']) && BookingType::ONLINE_FORM !== $row['bookingType']) {
             $allowDeletion = true;
         }
 
