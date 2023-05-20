@@ -39,6 +39,7 @@ use Contao\Template;
 use Contao\UserModel;
 use Contao\Validator;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
@@ -161,63 +162,69 @@ class EventRegistrationController extends AbstractFrontendModuleController
      */
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
-        // Do numerous checks to be sure that the event can be booked.
+        // Do numerous checks to be sure that the event is bookable.
+        // If validation fails write an info/error message.
         $this->validateRegistrationRequest();
 
-        // Set more template vars
-        $template = $this->addTemplateVars($template);
-
-        if (null !== $this->memberModel && true === $this->calendarEventsMemberModelAdapter->isRegistered($this->memberModel->id, $this->eventModel->id)) {
-            $template->regInfo = $this->parseEventRegistrationConfirmTemplate();
-
+        if (null !== $this->memberModel && $this->calendarEventsMemberModelAdapter->isRegistered($this->memberModel->id, $this->eventModel->id)) {
             if ($url = $this->getRoute('confirm')) {
                 return $this->redirect($url);
             }
-        } // Add messages to the template
-        elseif ($this->messageAdapter->hasInfo() || $this->messageAdapter->hasError()) {
-            // Add messages to template from session flash bag
-            if ($this->messageAdapter->hasError()) {
-                $errorMessage = $this->getFirstErrorMessage($request);
-                $template->errorMessage = $errorMessage;
-
-                // Contao system log
-                if ($this->contaoGeneralLogger) {
-                    $strText = sprintf('Event registration error: "%s"', $errorMessage);
-                    $this->contaoGeneralLogger->info($strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION_ERROR)]);
-                }
-
-                if ($url = $this->getRoute('registration_interrupted')) {
-                    return $this->redirect($url);
-                }
-            }
-
-            if ($this->messageAdapter->hasInfo()) {
-                $infoMessage = $this->getFirstInfoMessage($request);
-                $template->infoMessage = $infoMessage;
-
-                if ($url = $this->getRoute('registration_interrupted')) {
-                    return $this->redirect($url);
-                }
+        } elseif ($this->messageAdapter->hasInfo() || $this->messageAdapter->hasError()) {
+            if ($url = $this->getRoute('registration_interrupted')) {
+                return $this->redirect($url);
             }
         } elseif (null === $this->memberModel) {
             if ($url = $this->getRoute('login')) {
                 return $this->redirect($url);
             }
         } else {
-            // All ok! Booking request has passed all checks. So let's generate the registration form.
-            $template->form = $this->generateForm($request);
-
-            // Check if event is already fully booked
-            if (true === $this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel)) {
-                $template->bookingLimitReaches = true;
-            }
-
             if ($url = $this->getRoute('register')) {
                 return $this->redirect($url);
             }
         }
 
-        $template->action = $request->query->get('action');
+        $step = $request->query->get('action');
+
+        switch ($step) {
+            case 'login':
+                break;
+            case 'register':
+                // All ok! Booking request has passed all checks. So let's generate the registration form now.
+                $template->form = $this->generateForm($request);
+
+                // Check if event is already fully booked.
+                if ($this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel)) {
+                    $template->eventFullyBooked = true;
+                }
+
+                break;
+            case 'confirm':
+                $template->regInfo = $this->parseEventRegistrationConfirmTemplate();
+                break;
+            case 'registration_interrupted':
+                if ($this->messageAdapter->hasError()) {
+                    $errorMessage = $this->getFirstErrorMessage($request);
+                    $template->errorMessage = $errorMessage;
+
+                    // Contao system log
+                    if ($this->contaoGeneralLogger) {
+                        $strText = sprintf('Event registration error: "%s"', $errorMessage);
+                        $this->contaoGeneralLogger->info($strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION_ERROR)]);
+                    }
+                }
+
+                if ($this->messageAdapter->hasInfo()) {
+                    $infoMessage = $this->getFirstInfoMessage($request);
+                    $template->infoMessage = $infoMessage;
+                }
+
+                break;
+        }
+
+        // Set more template vars.
+        $template = $this->addTemplateVars($template);
+        $template->step = $step;
         $template->stepIndicator = $this->parseStepIndicatorTemplate($request->query->get('action'));
 
         return $template->getResponse();
@@ -341,7 +348,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $arrData['dateAdded'] = time();
                 $arrData['uuid'] = Uuid::uuid4()->toString();
                 $arrData['stateOfSubscription'] = $this->calendarEventsHelperAdapter->eventIsFullyBooked($this->eventModel) ? EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST : EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED;
-                $arrData['bookingType'] = 'onlineForm';
+                $arrData['bookingType'] = BookingType::ONLINE_FORM;
                 $arrData['sectionId'] = $this->memberModel->sectionId;
 
                 // Save emergency phone number to the user profile
@@ -368,7 +375,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $objEventRegistration->setRow($arrData);
                 $objEventRegistration->save();
 
-                // Log
+                // Contao system log
                 if ($this->contaoGeneralLogger) {
                     $strText = sprintf(
                         'New Registration from "%s %s [ID: %s]" for event with ID: %s ("%s").',
@@ -419,11 +426,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
                     $prefix = '';
 
                     if (EventType::TOUR === $this->eventModel->eventType || EventType::LAST_MINUTE_TOUR === $this->eventModel->eventType) {
-                        $prefix = 'tour';
+                        $prefix = EventType::TOUR;
                     }
 
                     if (EventType::COURSE === $this->eventModel->eventType) {
-                        $prefix = 'course';
+                        $prefix = EventType::COURSE;
                     }
 
                     if ('' !== $prefix) {
