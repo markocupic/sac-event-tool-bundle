@@ -128,7 +128,7 @@ $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noPastEventsDetected'] = 'Es wurden keine 
 
 // Event registration frontend module
 $GLOBALS['TL_LANG']['ERR']['evt_reg_eventNotFound'] = 'Event mit ID: %s nicht gefunden.';
-$GLOBALS['TL_LANG']['ERR']['evt_reg_eventNotActivatedYet'] = 'Der Event "%s" ist nicht veröffentlicht und eine Online-Anmeldung ist (noch) nicht möglich.';
+$GLOBALS['TL_LANG']['ERR']['evt_reg_eventNotPublishedYet'] = 'Der Event "%s" ist nicht veröffentlicht und eine Online-Anmeldung ist (noch) nicht möglich.';
 $GLOBALS['TL_LANG']['ERR']['evt_reg_eventReleaseLevelPolicyDoesNotAllowRegistrations'] = 'Die Veröffentlichungsstufe für Event "%s" erlaubt Online-Anmeldungen nicht.';
 $GLOBALS['TL_LANG']['ERR']['evt_reg_onlineRegDisabled'] = 'Der/Die Leiter/in hat die Online-Anmeldung zu diesem Event deaktiviert. Bitte beachte die Tourenausschreibung.';
 $GLOBALS['TL_LANG']['ERR']['evt_reg_eventFullyBooked'] = 'Dieser Anlass ist ausgebucht. Bitte erkundige dich beim Leiter/in, ob eine Nachmeldung möglich ist.';

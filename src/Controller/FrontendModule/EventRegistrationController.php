@@ -69,8 +69,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
     public const CHECKOUT_STEP_LOGIN = 'login';
     public const CHECKOUT_STEP_REGISTER = 'register';
     public const CHECKOUT_STEP_CONFIRM = 'confirm';
+    public const CHECKOUT_STEP_REGISTRATION_INTERRUPTED = 'registration_interrupted';
 
-    // Adapters
     private Adapter $messageAdapter;
     private Adapter $calendarEventsHelperAdapter;
     private Adapter $calendarEventsJourneyModelAdapter;
@@ -123,10 +123,10 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        // Set the module object (Contao\ModuleModel)
+        // Set the module object (Contao\ModuleModel).
         $this->moduleModel = $model;
 
-        // Do not index nor cache page
+        // Do not index nor cache page.
         $page->noSearch = true;
         $page->cache = false;
         $page->clientCache = false;
@@ -140,13 +140,13 @@ class EventRegistrationController extends AbstractFrontendModuleController
             $this->inputAdapter->setGet('events', $this->inputAdapter->get('auto_item'));
         }
 
-        // Get $this->eventModel from GET
+        // Get the event model from url query.
         $this->eventModel = $this->calendarEventsModelAdapter->findByIdOrAlias($this->inputAdapter->get('events'));
 
-        // Get instructor object from UserModel
+        // Get the main instructor object.
         $this->mainInstructorModel = $this->userModelAdapter->findByPk($this->eventModel->mainInstructor);
 
-        // Do not show the registration module in the event preview mode
+        // Do not show the registration module in the event preview mode.
         if ('true' === $request->query->get('event_preview')) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }
@@ -163,33 +163,33 @@ class EventRegistrationController extends AbstractFrontendModuleController
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
     {
         // Do numerous checks to be sure that the event is bookable.
-        // If validation fails write an info/error message.
+        // If validation fails write an info/error message to the session flash bag.
         $this->validateRegistrationRequest();
 
         if (null !== $this->memberModel && $this->calendarEventsMemberModelAdapter->isRegistered($this->memberModel->id, $this->eventModel->id)) {
-            if ($url = $this->getRoute('confirm')) {
+            if ($url = $this->getRoute(self::CHECKOUT_STEP_CONFIRM)) {
                 return $this->redirect($url);
             }
         } elseif ($this->messageAdapter->hasInfo() || $this->messageAdapter->hasError()) {
-            if ($url = $this->getRoute('registration_interrupted')) {
+            if ($url = $this->getRoute(self::CHECKOUT_STEP_REGISTRATION_INTERRUPTED)) {
                 return $this->redirect($url);
             }
         } elseif (null === $this->memberModel) {
-            if ($url = $this->getRoute('login')) {
+            if ($url = $this->getRoute(self::CHECKOUT_STEP_LOGIN)) {
                 return $this->redirect($url);
             }
         } else {
-            if ($url = $this->getRoute('register')) {
+            if ($url = $this->getRoute(self::CHECKOUT_STEP_REGISTER)) {
                 return $this->redirect($url);
             }
         }
 
-        $step = $request->query->get('action');
+        $currentStep = $request->query->get('action');
 
-        switch ($step) {
-            case 'login':
+        switch ($currentStep) {
+            case self::CHECKOUT_STEP_LOGIN:
                 break;
-            case 'register':
+            case self::CHECKOUT_STEP_REGISTER:
                 // All ok! Booking request has passed all checks. So let's generate the registration form now.
                 $template->form = $this->generateForm($request);
 
@@ -199,10 +199,10 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 }
 
                 break;
-            case 'confirm':
+            case self::CHECKOUT_STEP_CONFIRM:
                 $template->regInfo = $this->parseEventRegistrationConfirmTemplate();
                 break;
-            case 'registration_interrupted':
+            case self::CHECKOUT_STEP_REGISTRATION_INTERRUPTED:
                 if ($this->messageAdapter->hasError()) {
                     $errorMessage = $this->getFirstErrorMessage($request);
                     $template->errorMessage = $errorMessage;
@@ -224,7 +224,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
         // Set more template vars.
         $template = $this->addTemplateVars($template);
-        $template->step = $step;
+        $template->currentStep = $currentStep;
         $template->stepIndicator = $this->parseStepIndicatorTemplate($request->query->get('action'));
 
         return $template->getResponse();
@@ -235,7 +235,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         if (null === $this->eventModel) {
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventNotFound', [$this->inputAdapter->get('events') ?? 'NULL'], 'contao_default'));
         } elseif (!$this->eventModel->published) {
-            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventNotActivatedYet', [$this->eventModel->title], 'contao_default'));
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventNotPublishedYet', [$this->eventModel->title], 'contao_default'));
         } elseif (null === $this->eventReleaseLevelPolicyModelAdapter->findOneByEventId($this->eventModel->id) || !$this->eventReleaseLevelPolicyModelAdapter->findOneByEventId($this->eventModel->id)->allowRegistration) {
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventReleaseLevelPolicyDoesNotAllowRegistrations', [$this->eventModel->title], 'contao_default'));
         } elseif ($this->eventModel->disableOnlineRegistration) {
@@ -304,7 +304,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $objForm->addFormField('emergencyPhoneName', $this->getFormFieldDca('emergencyPhoneName'));
         $objForm->addFormField('notes', $this->getFormFieldDca('notes'));
 
-        // Only show this field if it is a multi day event
+        // Do only ask for food habits if we have a multi day event.
         if ($this->isMultiDayEvent()) {
             $objForm->addFormField('foodHabits', $this->getFormFieldDca('foodHabits'));
         }
@@ -316,7 +316,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         // DO NOT use this method with generate() as the "form" template provides those fields by default.
         $objForm->addContaoHiddenFields();
 
-        // Get form presets from tl_member
+        // Get form presets from tl_member.
         $arrFields = ['mobile', 'emergencyPhone', 'emergencyPhoneName', 'foodHabits', 'ahvNumber'];
 
         foreach ($arrFields as $field) {
@@ -330,14 +330,14 @@ class EventRegistrationController extends AbstractFrontendModuleController
             }
         }
 
-        // validate() also checks whether the form has been submitted
+        // validate() also checks whether the form has been submitted.
         if ($objForm->validate()) {
             if (null !== $this->memberModel) {
                 // Save data to tl_calendar_events_member
                 $arrDataForm = $objForm->fetchAll();
                 $arrData = array_merge($this->memberModel->row(), $arrDataForm);
 
-                // Do not send ahv number if it is not required
+                // Do not send ahv number if it is not required.
                 if (!isset($arrDataForm['ahvNumber'])) {
                     unset($arrData['ahvNumber']);
                 }
@@ -351,19 +351,19 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $arrData['bookingType'] = BookingType::ONLINE_FORM;
                 $arrData['sectionId'] = $this->memberModel->sectionId;
 
-                // Save emergency phone number to the user profile
+                // Save emergency phone number to users profile.
                 if (empty($this->memberModel->emergencyPhone)) {
                     $this->memberModel->emergencyPhone = $arrData['emergencyPhone'];
                     $this->memberModel->save();
                 }
 
-                // Save emergency phone name to user profile
+                // Save emergency phone name to users profile.
                 if (empty($this->memberModel->emergencyPhoneName)) {
                     $this->memberModel->emergencyPhoneName = $arrData['emergencyPhoneName'];
                     $this->memberModel->save();
                 }
 
-                // Save AHV number to user profile
+                // Save AHV number to users profile.
                 if (!empty($arrData['ahvNumber'])) {
                     $this->memberModel->ahvNumber = $arrData['ahvNumber'];
                     $this->memberModel->save();
@@ -389,7 +389,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                     $this->contaoGeneralLogger->info($strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION)]);
                 }
 
-                // Dispatch event registration event (e.g. send notification)
+                // Dispatch event registration event (e.g. send notification).
                 $event = new \stdClass();
                 $event->framework = $this->framework;
                 $event->arrData = $arrData;
@@ -398,10 +398,10 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $event->eventMemberModel = $objEventRegistration;
                 $event->moduleModel = $this->moduleModel;
 
-                // Use an event subscriber to notify member
+                // Use an event subscriber to notify member.
                 $this->eventDispatcher->dispatch(new EventRegistrationEvent($event), EventRegistrationEvent::NAME);
 
-                // Reload page
+                // Reload page.
                 $this->controllerAdapter->reload();
             }
         }
@@ -573,7 +573,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
             '@MarkocupicSacEventTool/EventRegistration/event_registration_step_indicator.html.twig',
             [
                 'controller' => $this,
-                'step' => $strStep,
+                'current_step' => $strStep,
             ]
         );
     }

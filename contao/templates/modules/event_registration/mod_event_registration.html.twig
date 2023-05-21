@@ -2,7 +2,8 @@
 
 {% block content %}
 
-    {% if 'registration_interrupted' == step %}
+    {% if constant('CHECKOUT_STEP_REGISTRATION_INTERRUPTED', controller) == currentStep %}
+
         {% if errorMessage|default %}
             <div class="alert alert-danger" role="alert">
                 <i class="fas fa-exclamation-circle"></i>
@@ -16,9 +17,9 @@
                 <div>{{ infoMessage|raw }}</div>
             </div>
         {% endif %}
-    {% endif %}
 
-    {% if 'login' == step %}
+    {% elseif constant('CHECKOUT_STEP_LOGIN', controller) == currentStep %}
+
         {{ stepIndicator|raw }}
         <div class="alert alert-info" role="alert">
             <i class="fas fa-info-circle"></i>
@@ -29,14 +30,14 @@
         <div class="mt-5 mb-4">
             {{ '{{insert_module::' ~ moduleModel.eventRegLoginModule ~ '}}' }}
         </div>
-    {% endif %}
 
-    {% if 'confirm' == step %}
+    {% elseif constant('CHECKOUT_STEP_CONFIRM', controller) == currentStep %}
+
         {{ stepIndicator|raw }}
         {{ regInfo|raw }}
-    {% endif %}
 
-    {% if 'register' == step %}
+    {% elseif constant('CHECKOUT_STEP_REGISTER', controller) == currentStep %}
+
         {{ stepIndicator|raw }}
 
         {% if eventFullyBooked|default is same as(true) %}
