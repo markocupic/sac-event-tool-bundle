@@ -1,7 +1,5 @@
 <?php
 
-/** @noinspection PhpUndefinedFieldInspection */
-
 declare(strict_types=1);
 
 /*
@@ -200,7 +198,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
                 break;
             case self::CHECKOUT_STEP_CONFIRM:
-                $template->regInfo = $this->parseEventRegistrationConfirmTemplate();
+                $template->regInfo = $this->renderEventRegistrationConfirmTemplate();
                 break;
             case self::CHECKOUT_STEP_REGISTRATION_INTERRUPTED:
                 if ($this->messageAdapter->hasError()) {
@@ -220,12 +218,15 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 }
 
                 break;
+
+            default:
+                throw new \LogicException('This place in the code should not be reachable.');
         }
 
-        // Set more template vars.
+        // Add more data to the template.
         $template = $this->addTemplateVars($template);
         $template->currentStep = $currentStep;
-        $template->stepIndicator = $this->parseStepIndicatorTemplate($request->query->get('action'));
+        $template->stepIndicator = $this->renderStepIndicatorTemplate($request->query->get('action'));
 
         return $template->getResponse();
     }
@@ -233,34 +234,48 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private function validateRegistrationRequest(): void
     {
         if (null === $this->eventModel) {
+            // Check if event entity exists.
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventNotFound', [$this->inputAdapter->get('events') ?? 'NULL'], 'contao_default'));
         } elseif (!$this->eventModel->published) {
+            // Check if event is published.
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventNotPublishedYet', [$this->eventModel->title], 'contao_default'));
         } elseif (null === $this->eventReleaseLevelPolicyModelAdapter->findOneByEventId($this->eventModel->id) || !$this->eventReleaseLevelPolicyModelAdapter->findOneByEventId($this->eventModel->id)->allowRegistration) {
+            // Tests whether the event is assigned a policy release level and whether the policy allows registration to the event.
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventReleaseLevelPolicyDoesNotAllowRegistrations', [$this->eventModel->title], 'contao_default'));
         } elseif ($this->eventModel->disableOnlineRegistration) {
+            // Check if online registration has been enabled on the event.
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_onlineRegDisabled', [], 'contao_default'));
         } elseif (EventState::STATE_FULLY_BOOKED === $this->eventModel->eventState) {
+            // Check if the event has been marked as "fully booked".
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventFullyBooked', [], 'contao_default'));
         } elseif (EventState::STATE_CANCELED === $this->eventModel->eventState) {
+            // Check if the event has been marked as "canceled".
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventCanceled', [], 'contao_default'));
         } elseif (EventState::STATE_DEFERRED === $this->eventModel->eventState) {
+            // Check if the event has been marked as "deferred".
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventDeferred', [], 'contao_default'));
         } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationStartDate > time()) {
+            // Check if registration is already allowed at this time.
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_registrationPossibleOn', [$this->eventModel->title, date('d.m.Y H:i', (int) $this->eventModel->registrationStartDate)], 'contao_default'));
         } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationEndDate < time()) {
+            // Check if registration is still allowed at this time.
             $strDate = date('d.m.Y', (int) $this->eventModel->registrationEndDate);
             $strTime = date('H:i', (int) $this->eventModel->registrationEndDate);
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_registrationDeadlineExpired', [$strDate, $strTime], 'contao_default'));
         } elseif (!$this->eventModel->setRegistrationPeriod && $this->eventModel->startDate - 60 * 60 * 24 < time()) {
+            // If no registration time has been set, it should only be possible to register online up to 24 h before the event start date.
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_registrationPossible24HoursBeforeEventStart', [], 'contao_default'));
         } elseif ($this->memberModel && true === $this->calendarEventsHelperAdapter->areBookingDatesOccupied($this->eventModel, $this->memberModel)) {
+            // Check if the person registering has already booked other events at the event time.
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventDateOverlapError', [], 'contao_default'));
         } elseif (null === $this->mainInstructorModel) {
+            // Check if a main instructor has been assigned to the event.
             $this->messageAdapter->addError($this->translator->trans('ERR.evt_reg_mainInstructorNotFound', [$this->eventModel->mainInstructor], 'contao_default'));
         } elseif (empty($this->mainInstructorModel->email) || !$this->validatorAdapter->isEmail($this->mainInstructorModel->email)) {
+            // Check if the main instructor has valid email address.
             $this->messageAdapter->addError($this->translator->trans('ERR.evt_reg_mainInstructorsEmailAddrNotFound', [$this->eventModel->mainInstructor], 'contao_default'));
         } elseif (null !== $this->memberModel && (empty($this->memberModel->email) || !$this->validatorAdapter->isEmail($this->memberModel->email))) {
+            // Check if the person registering has a valid email address.
             $this->messageAdapter->addError($this->translator->trans('ERR.evt_reg_membersEmailAddrNotFound', [], 'contao_default'));
         }
     }
@@ -389,7 +404,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
                     $this->contaoGeneralLogger->info($strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION)]);
                 }
 
-                // Dispatch event registration event (e.g. send notification).
                 $event = new \stdClass();
                 $event->framework = $this->framework;
                 $event->arrData = $arrData;
@@ -398,7 +412,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $event->eventMemberModel = $objEventRegistration;
                 $event->moduleModel = $this->moduleModel;
 
-                // Use an event subscriber to notify member.
+                // Dispatch event registration event (e.g. notify user upon event registration).
                 $this->eventDispatcher->dispatch(new EventRegistrationEvent($event), EventRegistrationEvent::NAME);
 
                 // Reload page.
@@ -533,7 +547,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    private function parseEventRegistrationConfirmTemplate(): string
+    private function renderEventRegistrationConfirmTemplate(): string
     {
         $this->controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
@@ -567,7 +581,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    private function parseStepIndicatorTemplate(string $strStep): string
+    private function renderStepIndicatorTemplate(string $strStep): string
     {
         return $this->twig->render(
             '@MarkocupicSacEventTool/EventRegistration/event_registration_step_indicator.html.twig',
