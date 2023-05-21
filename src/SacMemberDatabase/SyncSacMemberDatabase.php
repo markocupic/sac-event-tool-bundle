@@ -227,7 +227,8 @@ class SyncSacMemberDatabase
                             $setRemote = [];
                             $setRemote['sacMemberId'] = $arrLine[0]; // int
                             $setRemote['username'] = (string) ($arrLine[0]); // string
-                            $setRemote['sectionId'] = [(string) ($arrLine[1])]; // array => allow multi membership
+                            // Remove leading zeros 00004253 -> 4253 and convert to string again
+                            $setRemote['sectionId'] = [(string) (int) ($arrLine[1])]; // array => allow multi membership
                             $setRemote['lastname'] = $arrLine[2]; // string
                             $setRemote['firstname'] = $arrLine[3]; // string
                             $setRemote['addressExtra'] = $arrLine[4]; // string
@@ -423,18 +424,12 @@ class SyncSacMemberDatabase
     }
 
     /**
-     * Correctly format the section ids (the key is important!):
+     * Correctly format the section ids (the key and the order is important!):
      * e.g. [0 => '4250', 2 => '4252']
      * -> user is member of two SAC Sektionen/Ortsgruppen.
      */
     private function formatSectionId(array $arrValue): array
     {
-        // First remove leading zeros 00004253 -> 4253
-        $arrValue = array_map('intval', $arrValue);
-
-        // Convert to string again
-        $arrValue = array_map('strval', $arrValue);
-
         $arrAll = array_map('strval', array_keys($this->util->listSacSections()));
 
         $arrValue = array_filter(
