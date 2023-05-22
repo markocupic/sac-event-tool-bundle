@@ -19,4 +19,9 @@ class EventState
     public const STATE_FULLY_BOOKED = 'event_fully_booked';
     public const STATE_CANCELED = 'event_canceled';
     public const STATE_DEFERRED = 'event_deferred';
+    public const ALL = [
+        self::STATE_FULLY_BOOKED,
+        self::STATE_CANCELED,
+        self::STATE_DEFERRED,
+    ];
 }

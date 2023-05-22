@@ -179,11 +179,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
-	'href'                 => 'action=onloadCallbackExportCalendar',
-	'class'                => 'header_icon',
-	'icon'                 => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-excel-regular.svg',
-	'attributes'           => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-	'custom_glob_op'       => true,
+	'href'                   => 'action=onloadCallbackExportCalendar',
+	'class'                  => 'header_icon',
+	'icon'                   => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-excel-regular.svg',
+	'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+	'custom_glob_op'         => true,
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
 ];
 
@@ -490,7 +490,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'select',
-	'options'   => [EventState::STATE_FULLY_BOOKED, EventState::STATE_DEFERRED, EventState::STATE_CANCELED],
+	'options'   => EventState::ALL,
 	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
 	'eval'      => ['submitOnChange' => false, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false],
 	'sql'       => "varchar(32) NOT NULL default ''",
@@ -776,7 +776,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'select',
-	'options'   => [EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED, EventExecutionState::STATE_DEFERRED, EventExecutionState::STATE_ADAPTED, EventExecutionState::STATE_CANCELED],
+	'options'   => EventExecutionState::ALL,
 	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
 	'eval'      => ['includeBlankOption' => true, 'doNotShow' => true, 'tl_class' => 'clr m12', 'mandatory' => true],
 	'sql'       => "varchar(32) NOT NULL default ''",
