@@ -167,10 +167,10 @@ class UserPortraitListController extends AbstractContentElementController
                 $objTemplate->roleEmails = $arrRoleEmails;
                 $objTemplate->roles = $arrRoles;
 
-                // Get users avatar
+                // Get users avatar file path.
                 $strAvatarSRC = $this->avatar->getAvatarResourcePath($objUser->current());
 
-                // Add image to template
+                // Add an image to the template
                 if (\strlen($strAvatarSRC)) {
                     if (is_file($this->projectDir.'/'.$strAvatarSRC)) {
                         // Create partial object
@@ -197,8 +197,8 @@ class UserPortraitListController extends AbstractContentElementController
         }
 
         $user = $this->security->getUser();
-        $template->hasLoggedInFrontendUser = $user instanceof FrontendUser;
 
+        $template->hasLoggedInFrontendUser = $user instanceof FrontendUser;
         $template->hasMultiple = $itemCount > 1;
         $template->itemCount = $itemCount;
 
