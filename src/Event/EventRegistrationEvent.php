@@ -15,30 +15,53 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Event;
 
 use Contao\CalendarEventsModel;
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\MemberModel;
 use Contao\ModuleModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class EventRegistrationEvent extends Event
 {
     public const NAME = 'markocupic.sac_event_tool_bundle.event_registration';
 
-    public ContaoFramework $framework;
-    public MemberModel $memberModel;
-    public CalendarEventsModel $eventModel;
-    public CalendarEventsMemberModel $eventMemberModel;
-    public ModuleModel $moduleModel;
-    public array $arrData;
+    public function __construct(
+        private readonly Request $request,
+        private readonly CalendarEventsMemberModel $eventMemberModel,
+        private readonly CalendarEventsModel $eventModel,
+        private readonly MemberModel $memberModel,
+        private readonly ModuleModel $moduleModel,
+        private readonly array $arrData,
+    ) {
+    }
 
-    public function __construct(\stdClass $event)
+    public function getRequest(): Request
     {
-        $this->framework = $event->framework;
-        $this->memberModel = $event->memberModel;
-        $this->eventModel = $event->eventModel;
-        $this->eventMemberModel = $event->eventMemberModel;
-        $this->moduleModel = $event->moduleModel;
-        $this->arrData = $event->arrData;
+        return $this->request;
+    }
+
+    public function getRegistration(): CalendarEventsMemberModel
+    {
+        return $this->eventMemberModel;
+    }
+
+    public function getEvent(): CalendarEventsModel
+    {
+        return $this->eventModel;
+    }
+
+    public function getContaoMemberModel(): MemberModel
+    {
+        return $this->memberModel;
+    }
+
+    public function getRegistrationModule(): ModuleModel
+    {
+        return $this->moduleModel;
+    }
+
+    public function getData(): array
+    {
+        return $this->arrData;
     }
 }

@@ -404,16 +404,17 @@ class EventRegistrationController extends AbstractFrontendModuleController
                     $this->contaoGeneralLogger->info($strText, ['contao' => new ContaoContext(__METHOD__, Log::EVENT_SUBSCRIPTION)]);
                 }
 
-                $event = new \stdClass();
-                $event->framework = $this->framework;
-                $event->arrData = $arrData;
-                $event->memberModel = $this->memberModel;
-                $event->eventModel = $this->eventModel;
-                $event->eventMemberModel = $objEventRegistration;
-                $event->moduleModel = $this->moduleModel;
+                $event = new EventRegistrationEvent(
+                    $request,
+                    $objEventRegistration,
+                    $this->eventModel,
+                    $this->memberModel,
+                    $this->moduleModel,
+                    $arrData,
+                );
 
                 // Dispatch event registration event (e.g. notify user upon event registration).
-                $this->eventDispatcher->dispatch(new EventRegistrationEvent($event), EventRegistrationEvent::NAME);
+                $this->eventDispatcher->dispatch($event, EventRegistrationEvent::NAME);
 
                 // Reload page.
                 $this->controllerAdapter->reload();
