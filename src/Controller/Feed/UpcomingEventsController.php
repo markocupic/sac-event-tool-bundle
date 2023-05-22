@@ -20,7 +20,9 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Environment;
 use Contao\Events;
 use Contao\StringUtil;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Result;
 use Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory;
 use Markocupic\RssFeedGeneratorBundle\Item\Item;
@@ -80,7 +82,7 @@ class UpcomingEventsController extends AbstractController
         // Set namespace
         $rss->setRootAttributes([
             // Add xmlns:tourdb' => 'http://www.tourenangebot.ch/schema/tourdbrss/1.0,
-            // otherwise SAC Bern will not recognize events startdates and enddates
+            // otherwise SAC Bern will not recognize events start- and end-dates
             'xmlns:tourdb' => 'http://www.tourenangebot.ch/schema/tourdbrss/1.0',
             'xmlns:media' => 'http://search.yahoo.com/mrss/',
             'xmlns:atom' => 'http://www.w3.org/2005/Atom',
@@ -88,7 +90,7 @@ class UpcomingEventsController extends AbstractController
 
         // Add channel fields
 
-        // Add atom link
+        // Add an atom link
         $rss->addChannelField(
             new Item('atom:link', '', [], [
                 'href' => $this->environment->get('base').$filePath,
@@ -168,6 +170,9 @@ class UpcomingEventsController extends AbstractController
         return $rss->render($this->projectDir.'/web/'.$filePath);
     }
 
+    /**
+     * @throws Exception
+     */
     private function getEvents(string $section, int $limit): Result|null
     {
         $qb = $this->connection->createQueryBuilder();
@@ -187,17 +192,11 @@ class UpcomingEventsController extends AbstractController
             ->from('tl_calendar_events', 't')
             ->where('t.published = :published')
             ->andWhere('t.startDate > :startDate')
-            ->andWhere(
-                $qb->expr()->or(
-                    $qb->expr()->and("t.eventType = '".EventType::TOUR."'"),
-                    $qb->expr()->and("t.eventType = '".EventType::COURSE."'"),
-                    $qb->expr()->and("t.eventType = '".EventType::LAST_MINUTE_TOUR."'"),
-                    $qb->expr()->and("t.eventType = '".EventType::GENERAL_EVENT."'"),
-                )
-            )
+            ->andWhere($qb->expr()->in('t.eventType', ':eventTypes'))
+            ->setParameter('published', '1')
+            ->setParameter('startDate', time())
+            ->setParameter('eventTypes', EventType::ALL, ArrayParameterType::STRING)
         ;
-        $qb->setParameter('published', '1');
-        $qb->setParameter('startDate', time());
 
         $arrOrExpr = [];
 
