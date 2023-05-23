@@ -244,7 +244,7 @@ class DashboardController
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
-        if ($user->admin) {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             $arrIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar_container');
         } else {
             $arrIds = $user->calendar_containers;
@@ -269,7 +269,7 @@ class DashboardController
         /** @var BackendUser $user */
         $user = $this->security->getUser();
 
-        if ($user->admin) {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             $arrCalendarIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar');
         } else {
             $arrCalendarIds = $user->calendars;
