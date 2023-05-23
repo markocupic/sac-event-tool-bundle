@@ -99,11 +99,11 @@ class DashboardController
     {
         $timeCut = time() - 15 * 24 * 3600; // 14 + 1 days
 
-        $arrCalIds = $this->getAllowedCalendarIds();
-        $arrCalIds = empty($arrCalIds) ? [0] : $arrCalIds;
+        $arrAllowedCalIds = $this->getAllowedCalendarIds();
+        $arrAllowedCalIds = empty($arrAllowedCalIds) ? [0] : $arrAllowedCalIds;
 
         $result = $this->connection->executeQuery(
-            'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN('.implode(',', $arrCalIds).') AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate > ? ORDER BY t1.startDate',
+            'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN('.implode(',', $arrAllowedCalIds).') AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate > ? ORDER BY t1.startDate',
             [
                 $user->id,
                 $user->id,
@@ -121,11 +121,11 @@ class DashboardController
     {
         $timeCut = time() - 15 * 24 * 3600; // 14 + 1 days
 
-        $arrCalIds = $this->getAllowedCalendarIds();
-        $arrCalIds = empty($arrCalIds) ? [0] : $arrCalIds;
+        $arrAllowedCalIds = $this->getAllowedCalendarIds();
+        $arrAllowedCalIds = empty($arrAllowedCalIds) ? [0] : $arrAllowedCalIds;
 
         $result = $this->connection->executeQuery(
-            'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN ('.implode(',', $arrCalIds).') AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate <= ? AND t1.startDate > ? ORDER BY t1.startDate DESC LIMIT 0,10',
+            'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN ('.implode(',', $arrAllowedCalIds).') AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate <= ? AND t1.startDate > ? ORDER BY t1.startDate DESC LIMIT 0,10',
             [
                 $user->id,
                 $user->id,
@@ -239,7 +239,7 @@ class DashboardController
      *
      * @return array<int>
      */
-    private function getAllowedEventContainerIds(): array
+    private function getAllowedCalendarContainerIds(): array
     {
         /** @var BackendUser $user */
         $user = $this->security->getUser();
@@ -264,7 +264,7 @@ class DashboardController
      */
     private function getAllowedCalendarIds(): array
     {
-        $arrContainerIds = $this->getAllowedEventContainerIds();
+        $arrCalContainerIds = $this->getAllowedCalendarContainerIds();
 
         /** @var BackendUser $user */
         $user = $this->security->getUser();
@@ -285,7 +285,7 @@ class DashboardController
             $pid = $this->connection->fetchOne('SELECT pid FROM tl_calendar WHERE id = ?', [$calId]);
 
             if (false !== $pid) {
-                if (\in_array($pid, $arrContainerIds, true)) {
+                if (\in_array($pid, $arrCalContainerIds, true)) {
                     $arrAllowed[] = $calId;
                 }
             }
