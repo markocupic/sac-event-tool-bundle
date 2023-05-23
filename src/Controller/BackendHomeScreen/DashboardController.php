@@ -99,10 +99,12 @@ class DashboardController
     {
         $timeCut = time() - 15 * 24 * 3600; // 14 + 1 days
 
+        $arrCalIds = $this->getAllowedCalendarIds();
+        $arrCalIds = empty($arrCalIds) ? [0] : $arrCalIds;
+
         $result = $this->connection->executeQuery(
-            'SELECT * FROM tl_calendar_events AS t1 WHERE published = ? AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate > ? ORDER BY t1.startDate',
+            'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN('.implode(',', $arrCalIds).') AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate > ? ORDER BY t1.startDate',
             [
-                '1',
                 $user->id,
                 $user->id,
                 $timeCut,
@@ -119,10 +121,12 @@ class DashboardController
     {
         $timeCut = time() - 15 * 24 * 3600; // 14 + 1 days
 
+        $arrCalIds = $this->getAllowedCalendarIds();
+        $arrCalIds = empty($arrCalIds) ? [0] : $arrCalIds;
+
         $result = $this->connection->executeQuery(
-            'SELECT * FROM tl_calendar_events AS t1 WHERE published = ? AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate <= ? AND t1.startDate > ? ORDER BY t1.startDate DESC LIMIT 0,10',
+            'SELECT * FROM tl_calendar_events AS t1 WHERE pid IN ('.implode(',', $arrCalIds).') AND (t1.registrationGoesTo = ? OR t1.id IN (SELECT t2.pid FROM tl_calendar_events_instructor AS t2 WHERE t2.userId = ?)) AND t1.startDate <= ? AND t1.startDate > ? ORDER BY t1.startDate DESC LIMIT 0,10',
             [
-                '1',
                 $user->id,
                 $user->id,
                 $timeCut,
@@ -228,5 +232,65 @@ class DashboardController
         }
 
         return null;
+    }
+
+    /**
+     * @throws Exception
+     *
+     * @return array<int>
+     */
+    private function getAllowedEventContainerIds(): array
+    {
+        /** @var BackendUser $user */
+        $user = $this->security->getUser();
+
+        if ($user->admin) {
+            $arrIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar_container');
+        } else {
+            $arrIds = $user->calendar_containers;
+
+            if (!\is_array($arrIds) || empty($arrIds)) {
+                $arrIds = [];
+            }
+        }
+
+        return array_map('\intval', $arrIds);
+    }
+
+    /**
+     * @throws Exception
+     *
+     * @return array<int>
+     */
+    private function getAllowedCalendarIds(): array
+    {
+        $arrContainerIds = $this->getAllowedEventContainerIds();
+
+        /** @var BackendUser $user */
+        $user = $this->security->getUser();
+
+        if ($user->admin) {
+            $arrCalendarIds = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar');
+        } else {
+            $arrCalendarIds = $user->calendars;
+
+            if (!\is_array($arrCalendarIds) || empty($arrCalendarIds)) {
+                $arrCalendarIds = [];
+            }
+        }
+
+        $arrAllowed = [];
+
+        foreach ($arrCalendarIds as $calId) {
+            $pid = $this->connection->fetchOne('SELECT pid FROM tl_calendar WHERE id = ?', [$calId]);
+
+            if (false !== $pid) {
+                if (\in_array($pid, $arrContainerIds, true)) {
+                    $arrAllowed[] = $calId;
+                }
+            }
+        }
+
+        return array_map('\intval', $arrAllowed);
     }
 }
