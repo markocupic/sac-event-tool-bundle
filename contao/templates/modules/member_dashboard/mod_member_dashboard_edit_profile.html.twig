@@ -1,0 +1,21 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+
+    {% if hasInfoMessage %}
+        <div class="alert alert-info" role="alert">
+            {{ infoMessage|raw }}
+        </div>
+    {% endif %}
+
+    {% if hasInfoMessage %}
+        {% for message in errorMessages %}
+            <div class="alert alert-danger" role="alert">
+                {{ message|raw }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {{ userProfileForm|raw }}
+
+{% endblock %}
