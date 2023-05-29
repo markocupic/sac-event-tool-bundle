@@ -1,0 +1,71 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+
+    {% if hasInfoMessage|default %}
+        <div class="alert alert-info" role="alert">
+            {{ infoMessage|raw }}
+        </div>
+    {% endif %}
+
+    {% if hasErrorMessage|default %}
+        {% for message in errorMessages %}
+            <div class="alert alert-danger" role="alert">
+                {{ message|raw }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <table class="table layout-table table-responsive table-striped">
+        <tr>
+            <th>Datum</th>
+            <th>Event-Name</th>
+            <th>Anmeldestatus</th>
+            <th>&nbsp;</th>
+        </tr>
+
+        {% for event in arrUpcomingEvents|default([]) %}
+
+            {% set stateOfSubscription = ('MSC.' ~ event.eventRegistrationModel.stateOfSubscription)|trans({}, 'contao_default') %}
+
+            <tr>
+                <td>{{ event.dateSpan|raw }}</td>
+                <td>
+                    {% if  constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_DEFERRED') == event.eventState %}
+                        <small><span style="color:red">Event verschoben!</span></small><br>
+                    {% endif %}
+
+                    {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_CANCELED') == event.eventState %}
+                        <small><span style="color:red">Event abgesagt!</span></small><br>
+                    {% endif %}
+
+                    <a href="{{ event.eventUrl }}" title="zum Event">{{ event.eventModel.title }}</a>
+                </td>
+                <td><span class="badge bg-primary">{{ stateOfSubscription }}</span></td>
+                <td class="text-center">
+                    {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::USER_HAS_UNSUBSCRIBED') != event.eventRegistrationModel.stateOfSubscription %}
+                        <a href="{{ event.unregisterUrl }}" role="button" title="Anmeldung stornieren" class="sign-out-from-event-button btn btn-sm btn-danger">
+                            stornieren
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+
+        {% endfor %}
+    </table>
+
+    <script>
+        let buttons = document.querySelectorAll('.sign-out-from-event-button');
+        if (buttons)
+        {
+            buttons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    if (!confirm('Willst du dich wirklich vom Event abmelden?')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        }
+    </script>
+
+{% endblock %}
