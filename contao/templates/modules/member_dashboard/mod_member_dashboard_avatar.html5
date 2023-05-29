@@ -1,9 +1,0 @@
-<?php $this->extend('block_unsearchable'); ?>
-
-<?php $this->block('content'); ?>
-<?php if ($this->image): ?>
-<?= $this->image ?>
-<?php endif; ?>
-
-<?php $this->endblock(); ?>
-

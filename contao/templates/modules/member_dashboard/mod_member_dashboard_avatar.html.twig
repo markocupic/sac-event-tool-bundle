@@ -1,0 +1,8 @@
+{% extends '@Contao/block_unsearchable' %}
+
+{% block content %}
+    {% if image|default %}
+        {{ image|raw }}
+    {% endif %}
+
+{% endblock %}
