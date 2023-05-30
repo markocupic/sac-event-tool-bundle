@@ -45,8 +45,8 @@ class UpcomingEventsController extends AbstractController
         private readonly ContaoFramework $framework,
         private readonly FeedFactory $feedFactory,
         private readonly Connection $connection,
-        private readonly string $projectDir,
         private readonly string $sacevtLocale,
+        private readonly string $webDir,
     ) {
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
@@ -167,7 +167,7 @@ class UpcomingEventsController extends AbstractController
             );
         }
 
-        return $rss->render($this->projectDir.'/public/'.$filePath);
+        return $rss->render($this->webDir.'/'.$filePath);
     }
 
     /**

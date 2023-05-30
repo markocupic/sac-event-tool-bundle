@@ -49,6 +49,7 @@ use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Markocupic\SacEventToolBundle\Model\TourTypeModel;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\UriSigner;
 
@@ -632,13 +633,13 @@ class CalendarEventsHelper
     public static function getEventImagePath(CalendarEventsModel $objEvent): string
     {
         // Get root dir
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
+        $projectDir = System::getContainer()->getParameter('kernel.project_dir');
         System::getContainer()->get('contao.framework')->initialize();
 
         if ('' !== $objEvent->singleSRC) {
             $objFile = FilesModel::findByUuid($objEvent->singleSRC);
 
-            if (null !== $objFile && is_file($rootDir.'/'.$objFile->path)) {
+            if (null !== $objFile && is_file($projectDir.'/'.$objFile->path)) {
                 return $objFile->path;
             }
         }
@@ -1128,14 +1129,21 @@ class CalendarEventsHelper
         return $arrHtml;
     }
 
+    /**
+     * Not needed at the moment.
+     */
     public static function getEventQrCode(CalendarEventsModel $objEvent, array $arrOptions = [], bool $blnAbsoluteUrl = true, bool $blnCache = true): string|null
     {
         // Generate QR code folder
         $objFolder = new Folder('system/qrcodes');
 
         // Symlink
-        $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-        SymlinkUtil::symlink($objFolder->path, 'public/'.$objFolder->path, $rootDir);
+        $projectDir = System::getContainer()->getParameter('kernel.project_dir');
+        $webDir = System::getContainer()->getParameter('contao.web_dir');
+        $relWebDir = Path::makeRelative($webDir, $projectDir); // public
+
+        // Symlink (target: 'system/qrcodes', link: 'public/system/qrcodes')
+        SymlinkUtil::symlink($objFolder->path, $relWebDir.'/'.$objFolder->path, $projectDir);
 
         // Generate path
         $filepath = sprintf($objFolder->path.'/'.'eventQRcode_%s.png', $objEvent->id);
