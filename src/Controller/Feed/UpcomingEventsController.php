@@ -167,7 +167,7 @@ class UpcomingEventsController extends AbstractController
             );
         }
 
-        return $rss->render($this->projectDir.'/web/'.$filePath);
+        return $rss->render($this->projectDir.'/public/'.$filePath);
     }
 
     /**

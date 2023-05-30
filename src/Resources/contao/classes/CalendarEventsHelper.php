@@ -1135,7 +1135,7 @@ class CalendarEventsHelper
 
         // Symlink
         $rootDir = System::getContainer()->getParameter('kernel.project_dir');
-        SymlinkUtil::symlink($objFolder->path, 'web/'.$objFolder->path, $rootDir);
+        SymlinkUtil::symlink($objFolder->path, 'public/'.$objFolder->path, $rootDir);
 
         // Generate path
         $filepath = sprintf($objFolder->path.'/'.'eventQRcode_%s.png', $objEvent->id);
