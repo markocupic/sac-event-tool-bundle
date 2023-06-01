@@ -155,13 +155,19 @@
                         {% endif %}
 
                         {% if form.hasFormField('agb') %}
-                            <div class="mt-0 mb-4 p-3" data-reg-widget="agb">
+                            <div class="mt-0 mb-0 ps-3 pe-3" data-reg-widget="agb">
                                 {{ form.getWidget('agb').parse()|raw }}
                             </div>
                         {% endif %}
 
+                        {% if form.hasFormField('hasAcceptedPrivacyRules') %}
+                            <div class="mt-0 mb-4 ps-3 pe-3" data-reg-widget="hasAcceptedPrivacyRules">
+                                {{ form.getWidget('hasAcceptedPrivacyRules').parse()|raw }}
+                            </div>
+                        {% endif %}
+
                         {% if form.hasFormField('submit') %}
-                            <div class="mt-0 mb-0 p-3" data-reg-widget="submit">
+                            <div class="mt-0 mb-0" data-reg-widget="submit">
                                 {{ form.getWidget('submit').parse()|raw }}
                             </div>
                         {% endif %}
@@ -215,6 +221,41 @@
             </div>
         </div>
         {# End AGB Modal #}
+
+        {# hasAcceptedPrivacyRules Modal #}
+        <div class="modal fade" id="hasAcceptedPrivacyRulesModal" tabindex="-1" role="dialog" aria-labelledby="hasAcceptedPrivacyRulesTitle" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen-xl-down modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="agbTitle">Hinweise zum Datenschutz und zu meinen Persönlichkeitsrechten</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="list-bullet">
+                            <li>
+                                Die Sektion SAC Pilatus bearbeitet die von Dir angegebenen Personendaten entsprechend
+                                dem Bundesgesetz über den Datenschutz (DSG), insbesondere zum Zweck,
+                                Dir die sichere Teilnahme an unseren Kursen, Touren oder anderen Veranstaltungen ("Veranstaltungen") zu ermöglichen.
+                            </li>
+                            <li>
+                                Anlässlich unserer Veranstaltungen werden teilweise Foto- und Videoaufnahmen gemacht,
+                                auf denen gegebenenfalls auch Teilnehmende erkennbar sind.
+                                Die Foto- und Videoaufnahmen können unter Umständen in unseren Publikationen
+                                (Mitgliederzeitschrift, Jahresprogramm, etc.) abgedruckt oder auf unserer Website angezeigt werden.
+                                Falls Du damit nicht einverstanden bist, meldest Du Dich bitte vor dem Start der Veranstaltung
+                                bei einer Leitungsperson und teilst ihr mit,
+                                dass Du mit Foto- und Videoaufnahmen von Dir nicht einverstanden bist.
+                                Andernfalls gehen wir davon aus, dass Du dagegen keine Einwände hast.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schliessen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {# End hasAcceptedPrivacyRules Modal #}
 
     {% endif %}
 

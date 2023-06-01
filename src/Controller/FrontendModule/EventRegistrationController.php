@@ -325,6 +325,8 @@ class EventRegistrationController extends AbstractFrontendModuleController
         }
 
         $objForm->addFormField('agb', $this->getFormFieldDca('agb'));
+        $objForm->addFormField('hasAcceptedPrivacyRules', $this->getFormFieldDca('hasAcceptedPrivacyRules'));
+
         $objForm->addFormField('submit', $this->getFormFieldDca('submit'));
 
         // Automatically add the FORM_SUBMIT and REQUEST_TOKEN hidden fields.
@@ -518,6 +520,11 @@ class EventRegistrationController extends AbstractFrontendModuleController
             ],
             'agb' => [
                 'label' => ['', $this->translator->trans('FORM.evt_reg_agb', [], 'contao_default')],
+                'inputType' => 'checkbox',
+                'eval' => ['mandatory' => true],
+            ],
+            'hasAcceptedPrivacyRules' => [
+                'label' => ['', $this->translator->trans('FORM.evt_reg_hasAcceptedPrivacyRules', [], 'contao_default')],
                 'inputType' => 'checkbox',
                 'eval' => ['mandatory' => true],
             ],
