@@ -140,7 +140,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 	],
 	'palettes'    => [
 		'__selector__' => ['addEmailAttachment', 'hasLeadClimbingEducation', 'hasPaid'],
-		'default'      => '{stateOfSubscription_legend},dashboard,stateOfSubscription,dateAdded,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionId,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated',
+		'default'      => '{stateOfSubscription_legend},dashboard,stateOfSubscription,dateAdded,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionId,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;{agb_legend},agb,hasAcceptedPrivacyRules',
 		'sendEmail'    => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy',
 	],
 	'subpalettes' => [
@@ -294,7 +294,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		],
 		'agb'                         => [
 			'inputType' => 'checkbox',
-			'eval'      => ['doNotShow' => true, 'doNotCopy' => true],
+			'exclude'   => true,
+			'eval'      => ['doNotShow' => false, 'doNotCopy' => true],
+			'sql'       => "char(1) NOT NULL default ''",
+		],
+		'hasAcceptedPrivacyRules'     => [
+			'inputType' => 'checkbox',
+			'exclude'   => true,
+			'eval'      => ['doNotShow' => false, 'doNotCopy' => true],
 			'sql'       => "char(1) NOT NULL default ''",
 		],
 		'ahvNumber'                   => [

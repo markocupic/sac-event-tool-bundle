@@ -32,6 +32,7 @@ use League\Csv\Exception;
 use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -129,7 +130,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                     }
 
                     if ($request->request->get('mountainguide')) {
-                        if (!$arrEvent['mountainguide']) {
+                        if (EventMountainGuide::NO_MOUNTAIN_GUIDE === $arrEvent['mountainguide']) {
                             continue;
                         }
                     }
@@ -245,7 +246,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
             $objEvent = $calendarEventsModel->findByPk($arrEventMember['eventId']);
 
             if (null !== $objEvent) {
-                $value = $objEvent->$field;
+                $value = $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][$objEvent->$field];
             }
         } elseif ('phone' === $field) {
             $objMember = $memberModel->findOneBySacMemberId($arrEventMember['sacMemberId']);

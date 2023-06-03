@@ -942,6 +942,8 @@ class CalendarEvents
                 $row[$i] = $value;
             } elseif ('eventState' === $i) {
                 $row[$i] = '' === $value ? '---' : $value;
+            } elseif ('mountainguide' === $i) {
+                $row[$i] = $GLOBALS['TL_LANG'][$strTable]['mountainguide_reference'][(int) $row[$i]];
             } elseif ('eventDates' === $i) {
                 if (!empty($value) && \is_array($value)) {
                     $arrDate = [];
@@ -1572,6 +1574,34 @@ class CalendarEvents
     public function saveCallbackEventReleaseLevel(int $targetEventReleaseLevelId, DataContainer $dc): int
     {
         return $this->handleEventReleaseLevelAndPublishUnpublish((int) $dc->activeRecord->id, $targetEventReleaseLevelId);
+    }
+
+    /**
+     * Don't allow the max value to be the same as the min value.
+     *
+     * @param $value
+     * @param DataContainer $dc
+     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.tourTechDifficulty.save', priority: 90)]
+    public function setCorrectTourTechDifficulty(string $value, DataContainer $dc): string
+    {
+        $arrValue = $this->stringUtil->deserialize($value, true);
+        $hasUpdate = false;
+
+        if (!empty($arrValue)) {
+            foreach ($arrValue as $i => $tourTechDiff) {
+                if (isset($tourTechDiff['tourTechDifficultyMin'],$tourTechDiff['tourTechDifficultyMax']) && $tourTechDiff['tourTechDifficultyMin'] === $tourTechDiff['tourTechDifficultyMax']) {
+                    $arrValue[$i]['tourTechDifficultyMax'] = '';
+                    $hasUpdate = true;
+                }
+            }
+
+            if ($hasUpdate) {
+                return serialize($arrValue);
+            }
+        }
+
+        return $value;
     }
 
     /**

@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
+use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventState;
 
 // Global operations
@@ -44,7 +45,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['eventType'] = ['Event-Art', 'Geben Si
 $GLOBALS['TL_LANG']['tl_calendar_events']['teaser'] = ['Event-Kurzbeschreibung', 'Geben Sie bitte eine Kurzbeschreibung für den Event ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['title'] = ['Event-/Touren-/Kursname', 'Geben Sie bitte einen Namen für den Event an.']; // TODO: Not working?
 $GLOBALS['TL_LANG']['tl_calendar_events']['suitableForBeginners'] = ['Für Anfänger geeignet', 'Der Event eignet sich für die Teilnahme von Anfängern in der entsprechenden Bergsport-Disziplin.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide'] = ['Event mit Bergführer', 'Geben Sie bitte an, ob der Event durch Bergführer geleitet wird'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide'] = ['Event mit Bergführer', 'Geben Sie bitte an, ob der Event durch Bergführer und mit oder ohne Bergführerangebot geleitet wird'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['alias'][0] = 'Event-Alias (wird automatisch gesetzt)';
 $GLOBALS['TL_LANG']['tl_calendar_events']['mainInstructor'] = ['Hauptleiter', 'Wählen Sie bitte einen Hauptleiter.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['instructor'] = ['Leiter', 'Wählen Sie bitte einen oder mehrere Leiter aus. Der Erstaufgeführte ist der Hauptverantwortliche und erhält die Onlineanmeldungen.'];
@@ -129,6 +130,9 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['iceClimbing'] = ['Eisklettern'];
 $GLOBALS['TL_LANG']['tl_calendar_events'][EventState::STATE_FULLY_BOOKED] = ['Event ausgebucht'];
 $GLOBALS['TL_LANG']['tl_calendar_events'][EventState::STATE_CANCELED] = ['Event abgesagt'];
 $GLOBALS['TL_LANG']['tl_calendar_events'][EventState::STATE_DEFERRED] = ['Event verschoben'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMountainGuide::NO_MOUNTAIN_GUIDE] = '«ohne Bergführer/in» und «ohne Bergführerangebot»';
+$GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMountainGuide::WITH_MOUNTAIN_GUIDE] = '«mit Bergführer/in» und «ohne Bergführerangebot»';
+$GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER] = '«mit Bergführer/in» und «mit Bergführerangebot»';
 
 // Use these states for the report
 $GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED] = ['Event wie ausgeschrieben durchgeführt.'];

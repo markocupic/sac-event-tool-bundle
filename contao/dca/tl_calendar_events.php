@@ -18,6 +18,7 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\Date;
 use Contao\Input;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
+use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\DataContainer\CalendarEvents;
@@ -264,8 +265,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventType'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mountainguide'] = [
 	'exclude'   => true,
 	'filter'    => true,
-	'inputType' => 'checkbox',
-	'sql'       => "char(1) NOT NULL default ''",
+	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'],
+	'inputType' => 'select',
+	'options'   => EventMountainGuide::ALL,
+	'sql'       => "int(1) unsigned NOT NULL default '0'",
 ];
 
 // Hauptleiter (main instructor) is set automatically (the first instructor in the list is set as "Hauptleiter"
