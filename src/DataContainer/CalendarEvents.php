@@ -1577,6 +1577,34 @@ class CalendarEvents
     }
 
     /**
+     * Don't allow the max value to be the same as the min value.
+     *
+     * @param $value
+     * @param DataContainer $dc
+     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.tourTechDifficulty.save', priority: 90)]
+    public function setCorrectTourTechDifficulty(string $value, DataContainer $dc): string
+    {
+        $arrValue = $this->stringUtil->deserialize($value, true);
+        $hasUpdate = false;
+
+        if (!empty($arrValue)) {
+            foreach ($arrValue as $i => $tourTechDiff) {
+                if (isset($tourTechDiff['tourTechDifficultyMin'],$tourTechDiff['tourTechDifficultyMax']) && $tourTechDiff['tourTechDifficultyMin'] === $tourTechDiff['tourTechDifficultyMax']) {
+                    $arrValue[$i]['tourTechDifficultyMax'] = '';
+                    $hasUpdate = true;
+                }
+            }
+
+            if ($hasUpdate) {
+                return serialize($arrValue);
+            }
+        }
+
+        return $value;
+    }
+
+    /**
      * @throws \Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventType.save', priority: 80)]
