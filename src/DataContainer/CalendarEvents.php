@@ -942,6 +942,8 @@ class CalendarEvents
                 $row[$i] = $value;
             } elseif ('eventState' === $i) {
                 $row[$i] = '' === $value ? '---' : $value;
+            } elseif ('mountainguide' === $i) {
+                $row[$i] = $GLOBALS['TL_LANG'][$strTable]['mountainguide_reference'][(int) $row[$i]];
             } elseif ('eventDates' === $i) {
                 if (!empty($value) && \is_array($value)) {
                     $arrDate = [];

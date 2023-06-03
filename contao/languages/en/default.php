@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 use Contao\System;
+use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
@@ -56,9 +57,6 @@ $GLOBALS['TL_LANG']['MSC']['calendar_events'][EventState::STATE_FULLY_BOOKED] = 
 $GLOBALS['TL_LANG']['MSC']['calendar_events'][EventState::STATE_CANCELED] = 'Event abgesagt!';
 $GLOBALS['TL_LANG']['MSC']['calendar_events'][EventState::STATE_DEFERRED] = 'Event verschoben!';
 
-$GLOBALS['TL_LANG']['MSC']['calendar_events']['withoutMountainGuide'] = 'Ohne Bergführer/in';
-$GLOBALS['TL_LANG']['MSC']['calendar_events']['withMountainGuide'] = 'Mit Bergführer/in';
-
 // References
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][1] = 'Einführungskurs';
 $GLOBALS['TL_LANG']['MSC']['courseLevel'][2] = 'Grundstufe';
@@ -73,6 +71,9 @@ $GLOBALS['TL_LANG']['MSC'][EventType::LAST_MINUTE_TOUR] = 'Last Minute Tour';
 $GLOBALS['TL_LANG']['MSC'][EventType::LAST_MINUTE_TOUR.'_short'] = 'Last Minute Tour';
 $GLOBALS['TL_LANG']['MSC'][EventType::GENERAL_EVENT] = 'Veranstaltung (Fitnesstrainings, Skiturnen, Kultur, Vorträge + sektionsübergreifende Events)';
 $GLOBALS['TL_LANG']['MSC'][EventType::GENERAL_EVENT.'_short'] = 'Veranstaltung';
+$GLOBALS['TL_LANG']['MSC']['event_mountainguide'][EventMountainGuide::NO_MOUNTAIN_GUIDE] = '«ohne Bergführer/in» und «ohne Bergführerangebot»';
+$GLOBALS['TL_LANG']['MSC']['event_mountainguide'][EventMountainGuide::WITH_MOUNTAIN_GUIDE] = '«mit Bergführer/in» und «ohne Bergführerangebot»';
+$GLOBALS['TL_LANG']['MSC']['event_mountainguide'][EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER] = '«mit Bergführer/in» und «mit Bergführerangebot»';
 
 // Buttons
 $GLOBALS['TL_LANG']['MSC']['sendEmail'] = 'E-Mail senden';

@@ -325,9 +325,6 @@ class WorkshopBookletGenerator
         // Event location
         $objPartial->location = $this->nl2br($objEvent->location);
 
-        // Mountain guide
-        $objPartial->mountainguide = $objEvent->mountainguide;
-
         // Instructors
         $arrInstructors = CalendarEventsHelper::getInstructorsAsArray($objEvent);
         $arrItems = array_map(

@@ -284,7 +284,7 @@ class ExportEvents2Docx
             }
 
             if ('mountainguide' === $field) {
-                $value = $value > 0 ? 'Mit Bergfuehrer' : 'Mit SAC-Kursleiter';
+                $value = $value > 0 ? $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][$value] : 'Mit SAC-Kursleiter';
                 $value = utf8_encode($value);
             }
             /*

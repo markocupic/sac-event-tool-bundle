@@ -55,6 +55,7 @@
                 {% if get_event_data(model, 'mountainguide') %}
                     <div class="eventdate event-detail event-info-box icon-box-small">
                         <h5>Mit Bergführer/in</h5>
+                        <p>{{ ('MSC.event_mountainguide.'~get_event_data(model, 'mountainguide'))|trans({}, 'contao_default') }}</p>
                     </div>
                 {% endif %}
 
