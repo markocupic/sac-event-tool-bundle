@@ -21,8 +21,10 @@ use Contao\Database;
 use Contao\Date;
 use Contao\Environment;
 use Contao\StringUtil;
+use Contao\System;
 use Contao\UserModel;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
@@ -284,8 +286,10 @@ class ExportEvents2Docx
             }
 
             if ('mountainguide' === $field) {
-                $value = $value > 0 ? $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][$value] : 'Mit SAC-Kursleiter';
-                $value = utf8_encode($value);
+                System::loadLanguageFile('default');
+
+                $value = \in_array($value, EventMountainGuide::ALL, true) && EventMountainGuide::NO_MOUNTAIN_GUIDE !== $value ? $GLOBALS['TL_LANG']['MSC']['event_mountainguide'][$value] : 'Mit SAC-Kursleiter';
+                $value = utf8_encode(iconv('UTF-8', 'ISO-8859-1', $value));
             }
             /*
             if ($field === 'issues')
