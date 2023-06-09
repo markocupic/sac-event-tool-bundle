@@ -1,0 +1,22 @@
+<div class="modal fade" id="{{ attr_modal_id }}" tabindex="-1" role="dialog" aria-labelledby="{{ attr_modal_title }}" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen-xl-down modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agbTitle">Kurs- und Tourenreglement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+            </div>
+            <div class="modal-body">
+                {% if event_regulations_extract|default %}
+                    {{ event_regulations_extract|raw }}
+                {% endif %}
+
+                {% if event_regulations_file|default %}
+                    <p>Download: <a href="{{ event_regulations_file.path }}" download="{{ event_regulations_file.name }}">{{ event_regulations_file.name }}</a></p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schliessen</button>
+            </div>
+        </div>
+    </div>
+</div>
