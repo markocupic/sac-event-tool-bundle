@@ -40,7 +40,6 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
-use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
@@ -432,42 +431,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
         $template->eventModel = $this->eventModel;
         $template->memberModel = $this->memberModel;
         $template->moduleModel = $this->moduleModel;
-
-        if (EventType::TOUR === $this->eventModel->eventType || EventType::LAST_MINUTE_TOUR === $this->eventModel->eventType || EventType::COURSE === $this->eventModel->eventType) {
-            $arrOrganizers = $this->stringUtilAdapter->deserialize($this->eventModel->organizers, true);
-
-            if (isset($arrOrganizers[0])) {
-                $objOrganizer = $this->eventOrganizerModelAdapter->findByPk($arrOrganizers[0]);
-
-                if (null !== $objOrganizer) {
-                    $prefix = '';
-
-                    if (EventType::TOUR === $this->eventModel->eventType || EventType::LAST_MINUTE_TOUR === $this->eventModel->eventType) {
-                        $prefix = EventType::TOUR;
-                    }
-
-                    if (EventType::COURSE === $this->eventModel->eventType) {
-                        $prefix = EventType::COURSE;
-                    }
-
-                    if ('' !== $prefix) {
-                        if ('' !== $objOrganizer->{$prefix.'RegulationSRC'}) {
-                            if ($this->validatorAdapter->isBinaryUuid($objOrganizer->{$prefix.'RegulationSRC'})) {
-                                $objFile = $this->filesModelAdapter->findByUuid($objOrganizer->{$prefix.'RegulationSRC'});
-
-                                if (null !== $objFile && is_file($this->projectDir.'/'.$objFile->path)) {
-                                    $template->objEventRegulationFile = $objFile;
-                                }
-                            }
-                        }
-
-                        if ('' !== $objOrganizer->{$prefix.'RegulationExtract'}) {
-                            $template->eventRegulationExtract = $objOrganizer->{$prefix.'RegulationExtract'};
-                        }
-                    }
-                }
-            }
-        }
 
         return $template;
     }
