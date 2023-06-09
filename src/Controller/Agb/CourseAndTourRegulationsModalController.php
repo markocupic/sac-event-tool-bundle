@@ -101,5 +101,7 @@ class CourseAndTourRegulationsModalController extends AbstractController
                 }
             }
         }
+
+        return new Response('', Response::HTTP_NO_CONTENT);
     }
 }
