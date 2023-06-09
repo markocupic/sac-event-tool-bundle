@@ -99,11 +99,11 @@
                         <h5>Leistungen/Preis</h5>
 
                         {% if is_with_mountainguide_offer %}
-                            <p><strong>Mit Bergführer/in und mit Bergführer-Angebot</strong></p>
+                            <p><strong>Mit Bergführer/in als Bergführerangebot</strong></p>
                         {% endif %}
 
                         {% if is_with_mountainguide %}
-                            <p><strong>Mit Bergführer/in, ohne Bergführer-Angebot</strong></p>
+                            <p><strong>Mit Bergführer/in</strong></p>
                         {% endif %}
 
                         <p>{{ get_event_data(model, 'leistungen')|nl2br }}</p>
