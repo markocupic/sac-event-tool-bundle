@@ -79,7 +79,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
 

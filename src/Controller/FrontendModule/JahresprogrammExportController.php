@@ -67,7 +67,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
     /**
      * @throws \Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
         $this->template = $template;
 

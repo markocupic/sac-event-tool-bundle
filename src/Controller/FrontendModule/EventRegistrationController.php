@@ -75,12 +75,9 @@ class EventRegistrationController extends AbstractFrontendModuleController
     private Adapter $calendarEventsModelAdapter;
     private Adapter $configAdapter;
     private Adapter $controllerAdapter;
-    private Adapter $eventOrganizerModelAdapter;
     private Adapter $eventReleaseLevelPolicyModelAdapter;
     private Adapter $eventsAdapter;
-    private Adapter $filesModelAdapter;
     private Adapter $inputAdapter;
-    private Adapter $stringUtilAdapter;
     private Adapter $userModelAdapter;
     private Adapter $validatorAdapter;
 
@@ -98,7 +95,6 @@ class EventRegistrationController extends AbstractFrontendModuleController
         private readonly TranslatorInterface $translator,
         private readonly TwigEnvironment $twig,
         private readonly UrlParser $urlParser,
-        private readonly string $projectDir,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
         $this->messageAdapter = $this->framework->getAdapter(Message::class);
@@ -157,7 +153,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
         // Do numerous checks to be sure that the event is bookable.
         // If validation fails write an info/error message to the session flash bag.

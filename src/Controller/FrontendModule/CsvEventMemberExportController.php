@@ -56,7 +56,7 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
         $form = $this->getForm($request);
         $template->form = $form->generate();

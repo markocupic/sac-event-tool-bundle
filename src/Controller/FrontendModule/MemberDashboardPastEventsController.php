@@ -85,7 +85,7 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
         return parent::__invoke($request, $model, $section, $classes);
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
         // Do not allow for not authorized users
         if (null === $this->objUser) {
