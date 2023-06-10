@@ -34,18 +34,17 @@ class TourDifficultyListController extends AbstractFrontendModuleController
     ) {
     }
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response|null
+    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
         $arrDifficulty = [];
         $pid = 0;
-        $options = ['order' => 'code ASC'];
         $tourDifficultyAdapter = $this->framework->getAdapter(TourDifficultyModel::class);
-        $objDifficulty = $tourDifficultyAdapter->findAll($options);
+        $objDifficulty = $tourDifficultyAdapter->findAll(['order' => 'code ASC']);
 
         if (null !== $objDifficulty) {
             while ($objDifficulty->next()) {
                 if ($pid !== $objDifficulty->pid) {
-                    $objDifficulty->catStart = true;
+                    $objDifficulty->isCatStart = true;
                     $tourDifficultyCategoryAdapter = $this->framework->getAdapter(TourDifficultyCategoryModel::class);
                     $objDifficultyCategory = $tourDifficultyCategoryAdapter->findByPk($objDifficulty->pid);
 
@@ -53,6 +52,7 @@ class TourDifficultyListController extends AbstractFrontendModuleController
                         $objDifficulty->catTitle = $objDifficultyCategory->title;
                     }
                 }
+
                 $pid = $objDifficulty->pid;
                 $arrDifficulty[] = $objDifficulty->row();
             }
