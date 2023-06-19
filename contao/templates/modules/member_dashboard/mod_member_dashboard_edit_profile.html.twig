@@ -2,13 +2,13 @@
 
 {% block content %}
 
-    {% if hasInfoMessage %}
+    {% if hasInfoMessage|default %}
         <div class="alert alert-info" role="alert">
             {{ infoMessage|raw }}
         </div>
     {% endif %}
 
-    {% if hasInfoMessage %}
+    {% if hasInfoMessage|default %}
         {% for message in errorMessages %}
             <div class="alert alert-danger" role="alert">
                 {{ message|raw }}
