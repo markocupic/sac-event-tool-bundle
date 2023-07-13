@@ -20,6 +20,7 @@ use Contao\BackendTemplate;
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
@@ -84,15 +85,16 @@ class CalendarEventsMember
 
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
         private readonly RequestStack $requestStack,
         private readonly Connection $connection,
-        private readonly Util $util,
-        private readonly UrlParser $urlParser,
-        private readonly TranslatorInterface $translator,
-        private readonly Security $security,
-        private readonly ExportEventRegistrationList $registrationListExporterCsv,
         private readonly EventMemberList2Docx $registrationListExporterDocx,
         private readonly EventRegistrationUtil $eventRegistrationUtil,
+        private readonly ExportEventRegistrationList $registrationListExporterCsv,
+        private readonly Security $security,
+        private readonly TranslatorInterface $translator,
+        private readonly UrlParser $urlParser,
+        private readonly Util $util,
         private readonly string $projectDir,
         private readonly string $sacevtEventAdminName,
         private readonly string $sacevtEventAdminEmail,
@@ -774,13 +776,15 @@ class CalendarEventsMember
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        $href = $this->stringUtil->ampersand('contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s');
-        $eventId = $request->query->get('id');
-        $refererId = $request->attributes->get('_contao_referer_id');
+        $href = sprintf(
+            'contao?do=%s&table=tl_calendar_events&id=%d&act=edit&rt=%s&ref=%s',
+            $request->query->get('do'),
+            $request->query->get('id'),
+            $this->contaoCsrfTokenManager->getDefaultTokenValue(),
+            $request->attributes->get('_contao_referer_id'),
+        );
 
-        $href = sprintf($href, $eventId, REQUEST_TOKEN, $refererId);
-
-        return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $href, $class, $title, $attributes, $label);
+        return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->ampersand($href), $class, $title, $attributes, $label);
     }
 
     #[AsCallback(table: 'tl_calendar_events_member', target: 'edit.buttons', priority: 100)]
