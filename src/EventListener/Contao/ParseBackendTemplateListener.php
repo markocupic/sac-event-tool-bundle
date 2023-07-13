@@ -54,9 +54,9 @@ class ParseBackendTemplateListener
         if ('be_main' === $strTemplate) {
             // Add icon explanation legend to tl_calendar_events_member
             if ('sac_calendar_events_tool' === $inputAdapter->get('do') && 'tl_calendar_events' === $inputAdapter->get('table') && 'edit' === $inputAdapter->get('act')) {
-                if (preg_match('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $strBuffer, $matches)) {
+                if (preg_match('/<div class="tl_formbody_edit">/sU', $strBuffer, $matches)) {
                     $strDashboard = $this->_generateEventDashboard();
-                    $strBuffer = preg_replace('/<input type="hidden" name="FORM_FIELDS\[\]" value="(.*)>/sU', $matches[0].$strDashboard, $strBuffer);
+                    $strBuffer = preg_replace('/<div class="tl_formbody_edit">/sU', $matches[0].$strDashboard, $strBuffer);
                 }
             }
 
