@@ -69,13 +69,13 @@ class CalendarEventsInstructorInvoice
      * Check permissions.
      */
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 90)]
-    public function checkPermissions(): void
+    public function checkPermissions(DataContainer $dc): void
     {
         $user = $this->security->getUser();
 
         $request = $this->requestStack->getCurrentRequest();
 
-        if (\defined('CURRENT_ID') && CURRENT_ID !== '') {
+        if ($dc->currentPid) {
             if ('generateInvoiceDocx' === $request->query->get('action') || 'generateInvoicePdf' === $request->query->get('action') || 'generateTourRapportDocx' === $request->query->get('action') || 'generateTourRapportPdf' === $request->query->get('action')) {
                 $objInvoice = CalendarEventsInstructorInvoiceModel::findByPk($request->query->get('id'));
 
@@ -85,7 +85,7 @@ class CalendarEventsInstructorInvoice
                     }
                 }
             } else {
-                $objEvent = CalendarEventsModel::findByPk(CURRENT_ID);
+                $objEvent = CalendarEventsModel::findByPk($dc->currentPid);
             }
 
             if (isset($objEvent)) {
@@ -142,10 +142,10 @@ class CalendarEventsInstructorInvoice
      * Display a warning if report form hasn't been filled out.
      */
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 70)]
-    public function warnIfReportFormHasNotFilledIn(): void
+    public function warnIfReportFormHasNotFilledIn(DataContainer $dc): void
     {
-        if (\defined('CURRENT_ID') && CURRENT_ID !== '') {
-            $objEvent = CalendarEventsModel::findByPk(CURRENT_ID);
+        if ($dc->currentPid) {
+            $objEvent = CalendarEventsModel::findByPk($dc->currentPid);
 
             if (null !== $objEvent) {
                 if (!$objEvent->filledInEventReportForm) {

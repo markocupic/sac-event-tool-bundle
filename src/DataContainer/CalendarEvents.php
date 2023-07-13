@@ -180,8 +180,8 @@ class CalendarEvents
         }
 
         // Adjust filters depending on event type
-        if (\defined('CURRENT_ID') && CURRENT_ID > 0) {
-            $objCalendar = $this->calendarModel->findByPk(CURRENT_ID);
+        if ($dc->currentPid) {
+            $objCalendar = $this->calendarModel->findByPk($dc->currentPid);
 
             if (null !== $objCalendar) {
                 $arrAllowedEventTypes = $this->stringUtil->deserialize($objCalendar->allowedEventTypes, true);
@@ -318,7 +318,7 @@ class CalendarEvents
 
             $session = $objSessionBag->all();
 
-            $filter = DataContainer::MODE_PARENT === $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['mode'] ? 'tl_calendar_events_'.CURRENT_ID : 'tl_calendar_events';
+            $filter = DataContainer::MODE_PARENT === $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['mode'] ? 'tl_calendar_events_'.$dc->currentPid : 'tl_calendar_events';
 
             if (!isset($session['filter'][$filter]['eventReleaseLevel'])) {
                 $this->message->addInfo('"Mehrere bearbeiten" nur möglich, wenn ein Freigabestufen-Filter gesetzt wurde."');
@@ -330,7 +330,7 @@ class CalendarEvents
         if ('select' === $request->query->get('act') || 'editAll' === $request->query->get('act')) {
             $arrIDS = [0];
 
-            $ids = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar_events WHERE pid = ?', [CURRENT_ID]);
+            $ids = $this->connection->fetchFirstColumn('SELECT id FROM tl_calendar_events WHERE pid = ?', [$dc->currentPid]);
 
             foreach ($ids as $id) {
                 if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $id)) {
@@ -1234,8 +1234,8 @@ class CalendarEvents
             return $options;
         }
 
-        if (!$dc->id && CURRENT_ID > 0) {
-            $objCalendar = $this->calendarModel->findByPk(CURRENT_ID);
+        if (!$dc->id && $dc->currentPid > 0) {
+            $objCalendar = $this->calendarModel->findByPk($dc->currentPid);
         } elseif ($dc->id > 0) {
             $objCalendar = $this->calendarEventsModel->findByPk($dc->id)->getRelated('pid');
         }

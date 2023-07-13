@@ -330,20 +330,20 @@ class CalendarEventsMember
 
         $request = $this->requestStack->getCurrentRequest();
 
-        $id = \strlen((string) $request->query->get('id')) ? $request->query->get('id') : CURRENT_ID;
-
         if ($this->security->isGranted('ROLE_ADMIN')) {
             return;
         }
 
-        $registration = $this->calendarEventsMember->findByPk($id);
-
         // Do not allow non-admins to delete event registrations with the booking type 'onlineForm'!
-        if ($registration && BookingType::ONLINE_FORM === $registration->bookingType && ('delete' === $request->query->get('act') || 'deleteAll' === $request->query->get('act'))) {
-            throw new AccessDeniedException('Not enough permissions to '.$request->query->get('act').' the event registration ID '.$request->query->get('id').'.');
+        if ('delete' === $request->query->get('act') || 'deleteAll' === $request->query->get('act')) {
+            $registration = $this->calendarEventsMember->findByPk($dc->id);
+
+            if (null !== $registration && BookingType::ONLINE_FORM === $registration->bookingType) {
+                throw new AccessDeniedException('Not enough permissions to '.$request->query->get('act').' the event registration with ID '.$dc->id.'.');
+            }
         }
 
-        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, CURRENT_ID)) {
+        if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->currentPid)) {
             // Grant write access to the event registration table if the user is member of an allowed group.
             return;
         }
@@ -371,8 +371,10 @@ class CalendarEventsMember
         // Grant write-access to the event-author, to event tour guides and registration admins (tl_calendar_events.registrationGoesTo) on the respective event.
         if ('toggle' === $request->query->get('act') || 'edit' === $request->query->get('act') || 'select' === $request->query->get('act')) {
             if ('select' === $request->query->get('act')) {
-                $objEvent = $this->calendarEvents->findByPk($id);
+                $objEvent = $this->calendarEvents->findByPk($dc->id);
             } else {
+                $registration = $this->calendarEventsMember->findByPk($dc->id);
+
                 /** @var CalendarEventsMemberModel $objEvent */
                 if (null !== $registration) {
                     /** @var CalendarEventsModel $objEvent */
@@ -511,8 +513,8 @@ class CalendarEventsMember
         $objEventMemberModel = $this->calendarEventsMember->findByPk($dc->id);
 
         if (null !== $objEventMemberModel) {
-            // Retrieve the event id from CURRENT_ID if we have a new entry.
-            $eventId = !empty($objEventMemberModel->eventId) ? $objEventMemberModel->eventId : CURRENT_ID;
+            // Retrieve the event id
+            $eventId = !empty($objEventMemberModel->eventId) ? $objEventMemberModel->eventId : $dc->currentPid;
             $objEvent = $this->calendarEvents->findByPk($eventId);
 
             if (null !== $objEvent && $objEventMemberModel->stateOfSubscription !== $varValue) {
