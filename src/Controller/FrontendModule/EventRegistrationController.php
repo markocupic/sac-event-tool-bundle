@@ -24,6 +24,7 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Events;
 use Contao\FrontendUser;
 use Contao\Input;
@@ -88,6 +89,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         private readonly ContaoFramework $framework,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly RequestStack $requestStack,
+        private readonly ScopeMatcher $scopeMatcher,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
         private readonly TwigEnvironment $twig,
@@ -110,32 +112,36 @@ class EventRegistrationController extends AbstractFrontendModuleController
 
     public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
     {
-        // Set the module object (Contao\ModuleModel).
-        $this->moduleModel = $model;
+        if ($this->scopeMatcher->isFrontendRequest($request)) {
+            // Set the module object (Contao\ModuleModel).
+            $this->moduleModel = $model;
 
-        // Do not index nor cache page.
-        $page->noSearch = true;
-        $page->cache = false;
-        $page->clientCache = false;
+            // Do not index nor cache page.
+            if (null !== $page) {
+                $page->noSearch = true;
+                $page->cache = false;
+                $page->clientCache = false;
+            }
 
-        if (($objUser = $this->security->getUser()) instanceof FrontendUser) {
-            $this->memberModel = MemberModel::findByPk($objUser->id);
-        }
+            if (($objUser = $this->security->getUser()) instanceof FrontendUser) {
+                $this->memberModel = MemberModel::findByPk($objUser->id);
+            }
 
-        // Set the item from the auto_item parameter
-        if (!isset($_GET['events']) && $this->configAdapter->get('useAutoItem') && isset($_GET['auto_item'])) {
-            $this->inputAdapter->setGet('events', $this->inputAdapter->get('auto_item'));
-        }
+            // Set the item from the auto_item parameter
+            if (!isset($_GET['events']) && $this->configAdapter->get('useAutoItem') && isset($_GET['auto_item'])) {
+                $this->inputAdapter->setGet('events', $this->inputAdapter->get('auto_item'));
+            }
 
-        // Get the event model from url query.
-        $this->eventModel = $this->calendarEventsModelAdapter->findByIdOrAlias($this->inputAdapter->get('events'));
+            // Get the event model from url query.
+            $this->eventModel = $this->calendarEventsModelAdapter->findByIdOrAlias($this->inputAdapter->get('events'));
 
-        // Get the main instructor object.
-        $this->mainInstructorModel = $this->userModelAdapter->findByPk($this->eventModel->mainInstructor);
+            // Get the main instructor object.
+            $this->mainInstructorModel = $this->userModelAdapter->findByPk($this->eventModel->mainInstructor);
 
-        // Do not show the registration module in the event preview mode.
-        if ('true' === $request->query->get('event_preview')) {
-            return new Response('', Response::HTTP_NO_CONTENT);
+            // Do not show the registration module in the event preview mode.
+            if ('true' === $request->query->get('event_preview')) {
+                return new Response('', Response::HTTP_NO_CONTENT);
+            }
         }
 
         // Call the parent method
