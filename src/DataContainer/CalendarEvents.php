@@ -1222,6 +1222,23 @@ class CalendarEvents
     }
 
     /**
+     * Options callback for Multi Column Wizard field tl_calendar_events.instructor.
+     *
+     * @throws Exception
+     */
+    public function listInstructors(): array
+    {
+        $options = [];
+        $stmt = $this->connection->executeQuery('SELECT id,firstname,lastname,city FROM tl_user WHERE disable = ? && lastname != ? && firstname != ? ORDER BY lastname', ['', '', '']);
+
+        while (false !== ($row = $stmt->fetchAssociative())) {
+            $options[$row['id']] = $row['lastname'].' '.$row['lastname'].', '.$row['city'];
+        }
+
+        return $options;
+    }
+
+    /**
      * @throws \Exception
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventType.options', priority: 70)]

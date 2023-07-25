@@ -17,6 +17,7 @@ use Contao\Config;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\Date;
 use Contao\Input;
+use Contao\System;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventState;
@@ -297,15 +298,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
 		'mandatory'    => true,
 		'columnFields' => [
 			'instructorId' => [
-				'label'      => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructorId'],
-				'exclude'    => true,
-				'inputType'  => 'select',
-				'default'    => BackendUser::getInstance()->id,
-				'filter'     => true,
-				//'reference'  => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-				'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
-				'foreignKey' => "tl_user.CONCAT(lastname, ' ', firstname, ', ', city)",
-				'eval'       => ['style' => 'width:350px', 'mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'multiple' => false, 'tl_class' => 'hidelabel'],
+				'label'            => &$GLOBALS['TL_LANG']['tl_calendar_events']['instructorId'],
+				'exclude'          => true,
+				'inputType'        => 'select',
+				'default'          => BackendUser::getInstance()->id,
+				'filter'           => true,
+				'relation'         => ['type' => 'hasOne', 'load' => 'eager'],
+				'options_callback' => [System::getContainer()->get(CalendarEvents::class), 'listInstructors'],
+				'eval'             => ['style' => 'width:350px', 'mandatory' => true, 'includeBlankOption' => true, 'chosen' => true, 'multiple' => false, 'tl_class' => 'hidelabel'],
 			],
 		],
 	],
