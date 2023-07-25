@@ -248,8 +248,13 @@ class CalendarEventsHelper
                 $value = CourseSubTypeModel::findByPk($objEvent->courseTypeLevel1)->name;
                 break;
 
+            // inside vue.js templates: eventOrganizerLogos||60
+            // The first parameter defines the logo width
             case 'eventOrganizerLogos':
-                $value = implode('', static::getEventOrganizersLogoAsHtml($objEvent, '{{image::%s?width=60}}'));
+                $intDefaultWidth = 60;
+                $width = $arrArgs[1] ?? $intDefaultWidth;
+                $strInsertTag = '{{image::%s?width='.$width.'&alt=%s}}';
+                $value = static::getEventOrganizersLogoAsHtml($objEvent, $strInsertTag);
                 break;
 
             case 'eventOrganizers':
@@ -1099,7 +1104,7 @@ class CalendarEventsHelper
         return $arrProfile;
     }
 
-    public static function getEventOrganizersLogoAsHtml(CalendarEventsModel $objEvent, string $strInsertTag = '{{image::%s}}', bool $allowDuplicate = false): array
+    public static function getEventOrganizersLogoAsHtml(CalendarEventsModel $objEvent, string $strInsertTag = '{{image::%s&alt=%s}}', bool $allowDuplicate = false): array
     {
         $arrHtml = [];
         $arrUuids = [];
@@ -1114,6 +1119,8 @@ class CalendarEventsHelper
                     if (\in_array($objOrganizer->singleSRC, $arrUuids, false) && !$allowDuplicate) {
                         continue;
                     }
+
+                    $strInsertTag = str_replace('alt=%s', 'alt='.$objOrganizer->title, $strInsertTag);
 
                     $arrUuids[] = $objOrganizer->singleSRC;
                     $parser = System::getContainer()->get('contao.insert_tag.parser');

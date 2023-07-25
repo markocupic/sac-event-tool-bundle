@@ -20,6 +20,10 @@
                             </span>
                         </div>
                     </div>
+                    {# The logo will not be displayed if the event is organized by multiple groups. #}
+                    <div class="event-organizer-logo mt-3" v-if="row.eventOrganizerLogos.length === 1">
+                        <div v-html="row.eventOrganizerLogos[0]"></div>
+                    </div>
                 </div>
                 <!-- end left col -->
 
@@ -76,10 +80,10 @@
 
     <div v-if="blnIsBusy === true">
         <div class="d-flex mt-4 justify-content-center">
-            <div class="mt-3 mb-3"><i class="fal fa-5x fa-circle-notch fa-spin"></i></div>
+            <div class="mt-3 mb-3"><i class="fas fa-5x text-light fa-rotate fa-spin"></i></div>
         </div>
         <div class="d-flex justify-content-center">
-            <div class="mt-3 mb-3">... lade Events ...</div>
+            <div class="mt-3 mb-3 text-muted">... lade Events ...</div>
         </div>
     </div>
 
@@ -137,6 +141,7 @@
             'suitableForBeginners',
             'isPublicTransportEvent',
             'getPublicTransportBadge',
+            'eventOrganizerLogos||50'
         ],
         'callbacks': {
             'oninsert': async function (vue, json) {
@@ -151,28 +156,26 @@
 
                     await (() => {
                         return new Promise((resolve, reject) => {
-                            let el = document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]');
-                            if (typeof el !== 'undefinded' && el.length > 0) {
-                                let i = 0;
+                            let elements = document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]');
 
-                                for (i = 0; i < el.length; ++i) {
-                                    let title = '';
-                                    // Get the title attribute by default from the data-title attribute.
-                                    // The reason why we are doing this:
-                                    // Popper.js deletes the original title attribute when it has been initialized.
-                                    if (el[i].hasAttribute('data-title')) {
-                                        title = el[i].getAttribute('data-title');
-                                        el[i].setAttribute('data-bs-title', title);
-                                        el[i].setAttribute('title', title);
-                                        el[i].setAttribute('data-bs-toggle', 'tooltip');
-                                    } else if (el[i].hasAttribute('title')) { // Fallback
-                                        title = el[i].getAttribute('title');
-                                        el[i].setAttribute('data-bs-title', title);
-                                        el[i].setAttribute('data-title', title);
-                                        el[i].setAttribute('data-bs-toggle', 'tooltip');
-                                    }
+                            for (const el of elements) {
+                                let title = '';
+                                // Get the title attribute by default from the data-title attribute.
+                                // The reason why we are doing this:
+                                // Popper.js deletes the original title attribute when it has been initialized.
+                                if (el.hasAttribute('data-title')) {
+                                    title = el.getAttribute('data-title');
+                                    el.setAttribute('data-bs-title', title);
+                                    el.setAttribute('title', title);
+                                    el.setAttribute('data-bs-toggle', 'tooltip');
+                                } else if (el.hasAttribute('title')) { // Fallback
+                                    title = el.getAttribute('title');
+                                    el.setAttribute('data-bs-title', title);
+                                    el.setAttribute('data-title', title);
+                                    el.setAttribute('data-bs-toggle', 'tooltip');
                                 }
                             }
+
                             resolve('Add the title- and data-bs-title attribute from the data-title attribute.');
                         });
                     })();
@@ -194,7 +197,8 @@
                     await (() => {
                         return new Promise((resolve, reject) => {
                             let buttons = document.querySelectorAll(vue.elId + ' [data-has-event-href="true"]');
-                            buttons.forEach((button) => {
+
+                            for (button of buttons) {
                                 button.addEventListener('click', (event) => {
                                     event.stopPropagation();
                                     event.preventDefault();
@@ -237,7 +241,8 @@
                                     // Redirect to detail page
                                     window.location.href = link;
                                 });
-                            });
+                            }
+
                             resolve('Cached the event list object to the localStorage!');
                         });
                     })();

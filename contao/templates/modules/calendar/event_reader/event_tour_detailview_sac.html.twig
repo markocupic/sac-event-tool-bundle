@@ -43,7 +43,7 @@
                 <div class="organizers event-detail event-info-box icon-box-small">
                     <h5>Organisierende Gruppe</h5>
                     <div class="event-detail event-info-box organizer-logo mb-4">
-                        {{ get_event_data(model, 'eventOrganizerLogos')|raw }}
+                        {{ get_event_data(model, 'eventOrganizerLogos')|join('')|raw }}
                     </div>
                     {% if not get_event_data(model, 'eventOrganizers') is empty %}
                         <p>{{ get_event_data(model, 'eventOrganizers')|raw }}</p>
