@@ -18,8 +18,14 @@ use Contao\DataContainer;
 // Add tl_user.sacMemberId to index
 $GLOBALS['TL_DCA']['tl_user']['config']['sql']['keys']['sacMemberId'] = 'index';
 
-// Manipulate palette default
+// ***** Manipulate palette default ******
+
 PaletteManipulator::create()
+	->removeField(['username', 'name', 'email'], 'name_legend')
+	->applyToPalette('default', 'tl_user');
+
+PaletteManipulator::create()
+	->addLegend('name_legend', 'backend_legend', PaletteManipulator::POSITION_PREPEND, false)
 	->addLegend('admin_legend', 'password_legend', PaletteManipulator::POSITION_AFTER)
 	->addLegend('frontend_legend', 'backend_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('bank_account_legend', 'frontend_legend', PaletteManipulator::POSITION_BEFORE)
@@ -29,7 +35,7 @@ PaletteManipulator::create()
 	->addLegend('event_tool_legend', 'emergency_phone_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('rescission_legend', 'event_tool_legend', PaletteManipulator::POSITION_BEFORE)
 	->addField('iban', 'bank_account_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['uuid', 'sacMemberId', 'firstname', 'lastname', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'], 'name_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['sacMemberId', 'username', 'email', 'name', 'firstname', 'lastname', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website', 'uuid'], 'name_legend', PaletteManipulator::POSITION_APPEND)
 	->addField('userRole', 'role_legend', PaletteManipulator::POSITION_APPEND)
 	->addField('leiterQualifikation', 'instructor_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['emergencyPhone', 'emergencyPhoneName'], 'emergency_phone_legend', PaletteManipulator::POSITION_APPEND)
@@ -40,17 +46,15 @@ PaletteManipulator::create()
 	->addField('rescissionCause', 'rescission_legend', PaletteManipulator::POSITION_APPEND)
 	->applyToPalette('default', 'tl_user');
 
-// Manipulate palette extend
-$arrRemove = [
-	'alternate_email',
-	'alternate_email_2',
-];
+// ***** Manipulate palette extend ******
 
-foreach ($arrRemove as $field) {
-	$GLOBALS['TL_DCA']['tl_user']['palettes']['extend'] = str_replace(','.$field, '', $GLOBALS['TL_DCA']['tl_user']['palettes']['extend']);
-}
+// Remove some Contao core fields to achieve a new order (see below).
+PaletteManipulator::create()
+	->removeField(['username', 'name', 'email'], 'name_legend')
+	->applyToPalette('extend', 'tl_user');
 
 PaletteManipulator::create()
+	->addLegend('name_legend', 'backend_legend', PaletteManipulator::POSITION_PREPEND, false)
 	->addLegend('frontend_legend', 'backend_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('bank_account_legend', 'frontend_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('role_legend', 'backend_legend', PaletteManipulator::POSITION_BEFORE)
@@ -58,7 +62,7 @@ PaletteManipulator::create()
 	->addLegend('event_tool_legend', 'instructor_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('rescission_legend', 'event_tool_legend', PaletteManipulator::POSITION_BEFORE)
 	->addField('iban', 'bank_account_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['uuid', 'sacMemberId', 'firstname', 'lastname', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'], 'name_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['sacMemberId', 'username', 'email', 'name', 'firstname', 'lastname', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website', 'uuid'], 'name_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['hideInFrontendListings', 'userRole'], 'role_legend', PaletteManipulator::POSITION_APPEND)
 	->addField('leiterQualifikation', 'instructor_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['avatar', 'emergencyPhone', 'emergencyPhoneName', 'hobbies', 'introducing'], 'frontend_legend', PaletteManipulator::POSITION_APPEND)
@@ -67,16 +71,15 @@ PaletteManipulator::create()
 	->addField('rescissionCause', 'rescission_legend', PaletteManipulator::POSITION_APPEND)
 	->applyToPalette('extend', 'tl_user');
 
-// Manipulate palette admin
-$arrRemove = [
-	'alternate_email',
-	'alternate_email_2',
-];
+// ***** Manipulate palette admin ******
 
-foreach ($arrRemove as $field) {
-	$GLOBALS['TL_DCA']['tl_user']['palettes']['admin'] = str_replace(','.$field, '', $GLOBALS['TL_DCA']['tl_user']['palettes']['login']);
-}
+// Remove some Contao core fields to achieve a new order (see below).
 PaletteManipulator::create()
+	->removeField(['username', 'name', 'email'], 'name_legend')
+	->applyToPalette('admin', 'tl_user');
+
+PaletteManipulator::create()
+	->addLegend('name_legend', 'backend_legend', PaletteManipulator::POSITION_PREPEND, false)
 	->addLegend('admin_legend', 'password_legend', PaletteManipulator::POSITION_AFTER)
 	->addLegend('frontend_legend', 'backend_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('bank_account_legend', 'frontend_legend', PaletteManipulator::POSITION_BEFORE)
@@ -85,7 +88,7 @@ PaletteManipulator::create()
 	->addLegend('event_tool_legend', 'instructor_legend', PaletteManipulator::POSITION_BEFORE)
 	->addLegend('rescission_legend', 'event_tool_legend', PaletteManipulator::POSITION_BEFORE)
 	->addField('iban', 'bank_account_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['uuid', 'sacMemberId', 'firstname', 'lastname', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website'], 'name_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['sacMemberId', 'username', 'email', 'name', 'firstname', 'lastname', 'sectionId', 'dateOfBirth', 'street', 'postal', 'city', 'phone', 'mobile', 'website', 'uuid'], 'name_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['hideInFrontendListings', 'userRole'], 'role_legend', PaletteManipulator::POSITION_APPEND)
 	->addField('leiterQualifikation', 'instructor_legend', PaletteManipulator::POSITION_APPEND)
 	->addField('admin', 'admin_legend', PaletteManipulator::POSITION_APPEND)
