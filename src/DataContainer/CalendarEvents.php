@@ -1232,7 +1232,7 @@ class CalendarEvents
         $stmt = $this->connection->executeQuery('SELECT id,firstname,lastname,city FROM tl_user WHERE disable = ? && lastname != ? && firstname != ? ORDER BY lastname', ['', '', '']);
 
         while (false !== ($row = $stmt->fetchAssociative())) {
-            $options[$row['id']] = $row['lastname'].' '.$row['lastname'].', '.$row['city'];
+            $options[$row['id']] = $row['lastname'].' '.$row['firstname'].', '.$row['city'];
         }
 
         return $options;
