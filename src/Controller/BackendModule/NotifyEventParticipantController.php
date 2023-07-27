@@ -94,7 +94,7 @@ class NotifyEventParticipantController
     {
         $this->initialize();
 
-        $template = new BackendTemplate('be_calendar_events_registration_email');
+        $template = new BackendTemplate('be_notify_event_participant');
         $template->headline = $this->configuration['headline'];
         $template->form = $this->createAndValidateForm()->generate();
         $template->back = $this->getBackUri();

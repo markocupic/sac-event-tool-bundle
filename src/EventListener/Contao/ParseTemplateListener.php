@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
+use Contao\CoreBundle\Controller\BackendController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\Template;
@@ -43,13 +44,16 @@ class ParseTemplateListener
      */
     public function __invoke(Template $template): void
     {
+        // List upcoming and past events on the backend home screen.
         $request = $this->requestStack->getCurrentRequest();
 
-        // List upcoming and past events on the backend home screen.
-        if (str_starts_with($template->getName(), 'be_main')) {
-            if (!$request->query->has('mtg') && !$request->query->has('error') && !$request->query->has('do') && !$request->query->has('act')) {
-                if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, 'sac_calendar_events_tool')) {
-                    $template->main = $this->dashboard->generate()->getContent().$template->main;
+        // Do not show the dashboard when using custom routes/controllers
+        if ($request->attributes->get('_controller') === BackendController::class.'::mainAction') {
+            if (str_starts_with($template->getName(), 'be_main')) {
+                if (!$request->query->has('mtg') && !$request->query->has('error') && !$request->query->has('do') && !$request->query->has('act')) {
+                    if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, 'sac_calendar_events_tool')) {
+                        $template->main = $this->dashboard->generate()->getContent().$template->main;
+                    }
                 }
             }
         }

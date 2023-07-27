@@ -60,3 +60,4 @@ services:
 
     Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventParticipantController:
         public: true
+

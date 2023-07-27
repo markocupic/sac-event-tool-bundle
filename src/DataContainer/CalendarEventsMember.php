@@ -27,7 +27,6 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\DataContainer;
-use Contao\Email;
 use Contao\Environment;
 use Contao\Events;
 use Contao\FilesModel;
@@ -35,6 +34,7 @@ use Contao\Image;
 use Contao\MemberModel;
 use Contao\Message;
 use Contao\StringUtil;
+use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
@@ -48,6 +48,7 @@ use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventParticipantController;
+use Markocupic\SacEventToolBundle\Controller\BackendModule\SendEmailToParticipantController;
 use Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventMemberList2Docx;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
@@ -157,168 +158,11 @@ class CalendarEventsMember
             return;
         }
 
-        // Do only show email buttons in the global operation's section there are registrations
+        // Do only show email buttons in the global operation's section if there are registrations
         $regId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$eventId]);
 
         if (!$regId) {
             unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail']);
-        } else {
-            $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail']['href'] = str_replace('sendEmail', 'sendEmail&id='.$regId.'&eventId='.$eventId, $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail']['href']);
-        }
-    }
-
-    /**
-     * Send emails to event members.
-     *
-     * @throws \Doctrine\Dbal\Exception
-     * @throws \Exception
-     */
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
-    public function sendEmailAction(DataContainer $dc): void
-    {
-        if (!$dc->id) {
-            return;
-        }
-
-        $request = $this->requestStack->getCurrentRequest();
-
-        $user = $this->security->getUser();
-
-        if ('sendEmail' !== $request->query->get('action')) {
-            return;
-        }
-
-        $eventId = $request->query->get('eventId');
-
-        if (null === ($objEvent = $this->calendarEvents->findByPk($eventId))) {
-            return;
-        }
-
-        // Reset email fields
-        $set = [
-            'emailRecipients' => '',
-            'emailSubject' => '',
-            'emailText' => '',
-            'emailSendCopy' => '',
-            'addEmailAttachment' => '',
-            'emailAttachment' => '',
-        ];
-
-        $this->connection->update('tl_calendar_events_member', $set, ['id' => $dc->id]);
-
-        // Set correct palette
-        $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events_member']['palettes']['sendEmail'];
-
-        $options = [];
-
-        $arrGuideIDS = $this->calendarEventsHelper->getInstructorsAsArray($objEvent, false);
-
-        foreach ($arrGuideIDS as $userId) {
-            $objInstructor = $this->user->findByPk($userId);
-
-            if (null !== $objInstructor) {
-                if ('' !== $objInstructor->email) {
-                    if ($this->validator->isEmail($objInstructor->email)) {
-                        $options['tl_user-'.$objInstructor->id] = sprintf('<strong>%s %s (Leiter)</strong>', $objInstructor->firstname, $objInstructor->lastname);
-                    }
-                }
-            }
-        }
-
-        // Then get event participants
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId = ? ORDER BY stateOfSubscription, firstname', [$eventId]);
-
-        while (false !== ($arrReg = $stmt->fetchAssociative())) {
-            if ($this->validator->isEmail($arrReg['email'])) {
-                $arrSubscriptionStates = EventSubscriptionState::ALL;
-                $registrationModel = CalendarEventsMemberModel::findByPk($arrReg['id']);
-                $icon = $this->eventRegistrationUtil->getSubscriptionStateIcon($registrationModel);
-
-                $regState = (string) $arrReg['stateOfSubscription'];
-                $regState = \in_array($regState, $arrSubscriptionStates, true) ? $regState : EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED;
-                $strLabel = $GLOBALS['TL_LANG']['MSC'][$regState] ?? $regState;
-
-                $options['tl_calendar_events_member-'.$arrReg['id']] = sprintf('%s %s %s (%s)', $icon, $arrReg['firstname'], $arrReg['lastname'], $strLabel);
-            }
-        }
-
-        // Set the email recipient list
-        $GLOBALS['TL_DCA']['tl_calendar_events_member']['fields']['emailRecipients']['options'] = $options;
-
-        // Process form
-        if ('tl_calendar_events_member' === $request->request->get('FORM_SUBMIT') && isset($_POST['saveNclose'])) {
-            $arrRecipients = [];
-
-            foreach ($request->request->get('emailRecipients') as $key) {
-                if (str_contains($key, 'tl_user-')) {
-                    $id = str_replace('tl_user-', '', $key);
-                    $objInstructor = $this->user->findByPk($id);
-
-                    if (null !== $objInstructor) {
-                        if ($this->validator->isEmail($objInstructor->email)) {
-                            $arrRecipients[] = $objInstructor->email;
-                        }
-                    }
-                } elseif (str_contains($key, 'tl_calendar_events_member-')) {
-                    $id = str_replace('tl_calendar_events_member-', '', $key);
-                    $objEventMember = $this->calendarEventsMember->findByPk($id);
-
-                    if (null !== $objEventMember) {
-                        if ($this->validator->isEmail($objEventMember->email)) {
-                            $arrRecipients[] = $objEventMember->email;
-                        }
-                    }
-                }
-            }
-
-            if (!$this->validator->isEmail($this->sacevtEventAdminEmail)) {
-                throw new \Exception('Please set a valid email address in parameter %sacevt.event_admin_email%.');
-            }
-
-            $objEmail = new Email();
-            $objEmail->fromName = html_entity_decode($this->sacevtEventAdminName);
-            $objEmail->from = $this->sacevtEventAdminEmail;
-            $objEmail->replyTo($user->email);
-            $objEmail->subject = html_entity_decode((string) $request->request->get('emailSubject'));
-            $objEmail->text = html_entity_decode((string) $request->request->get('emailText'));
-
-            if ($request->request->get('emailSendCopy')) {
-                $objEmail->sendBcc($user->email);
-            }
-
-            // Add email attachments
-            if ($request->request->get('addEmailAttachment')) {
-                if ($request->request->has('emailAttachment')) {
-                    $uuids = explode(',', $request->request->get('emailAttachment'));
-
-                    if (!empty($uuids) && \is_array($uuids)) {
-                        foreach ($uuids as $uuid) {
-                            $objFile = $this->files->findByUuid($uuid);
-
-                            if (null !== $objFile) {
-                                if (is_file($this->projectDir.'/'.$objFile->path)) {
-                                    $objEmail->attachFile($this->projectDir.'/'.$objFile->path);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ($objEmail->sendTo($arrRecipients)) {
-                unset($_POST['addEmailAttachment'], $_POST['emailAttachment']);
-
-                // Show a message in the backend
-                $msg = $this->translator->trans('MSC.emailSentToEventMembers', [], 'contao_default');
-                $this->message->addInfo($msg);
-
-                // Redirect user to the event member list
-                $strUrl = 'contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s';
-                $eventId = $request->query->get('eventId');
-                $rt = $request->query->get('rt');
-                $href = sprintf($strUrl, $eventId, $rt);
-                $this->controller->redirect($href);
-            }
         }
     }
 
@@ -787,16 +631,23 @@ class CalendarEventsMember
         return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->ampersand($href), $class, $title, $attributes, $label);
     }
 
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'edit.buttons', priority: 100)]
-    public function buttonsCallback(array $arrButtons, DataContainer $dc): array
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'list.global_operations.sendEmail.button', priority: 100)]
+    public function generateSendEmailButton(string|null $href, string $label, string $title, string $class, string $attributes, string $table): string
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ('sendEmail' === $request->query->get('action')) {
-            $arrButtons['saveNclose'] = '<button type="submit" name="saveNclose" id="saveNclose" class="tl_submit" accesskey="c">E-Mail absenden</button>';
-            unset($arrButtons['save']);
-        }
+        $url = System::getContainer()->get('uri_signer')->sign(System::getContainer()->get('router')->generate(SendEmailToParticipantController::class, [
+            'event_id' => $request->query->get('id'),
+            'rt' => $request->query->get('rt'),
+            'sid' => uniqid(),
+        ]));
 
+        return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->ampersand($url), $class, $title, $attributes, $label);
+    }
+
+    #[AsCallback(table: 'tl_calendar_events_member', target: 'edit.buttons', priority: 100)]
+    public function buttonsCallback(array $arrButtons, DataContainer $dc): array
+    {
         unset($arrButtons['saveNback'], $arrButtons['saveNduplicate'], $arrButtons['saveNcreate']);
 
         return $arrButtons;

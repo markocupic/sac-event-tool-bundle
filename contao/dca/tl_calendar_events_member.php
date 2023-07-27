@@ -18,6 +18,7 @@ use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\Bundle;
+use Markocupic\SacEventToolBundle\Controller\BackendModule\SendEmailToParticipantController;
 use Ramsey\Uuid\Uuid;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 
@@ -65,7 +66,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 100],
 			],
 			'sendEmail'                    => [
-				'href'                   => 'act=edit&action=sendEmail',
+				// use a button_callback for generating the url
 				'class'                  => 'send_email',
 				'icon'                   => 'bundles/markocupicsaceventtool/icons/fontawesome/default/at-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
@@ -89,7 +90,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 70],
 			],
 			'writeTourReport'              => [
-				'href'                   => 'table=tl_calendar_events&amp;&act=edit&amp;call=writeTourReport&amp;id=%d',
+				'href'                   => 'table=tl_calendar_events&act=edit&call=writeTourReport&id=%d',
 				'class'                  => 'writeTourRapport',
 				'icon'                   => 'bundles/markocupicsaceventtool/icons/fontawesome/default/pencil-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
@@ -141,10 +142,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 	'palettes'    => [
 		'__selector__' => ['addEmailAttachment', 'hasLeadClimbingEducation', 'hasPaid'],
 		'default'      => '{stateOfSubscription_legend},dashboard,stateOfSubscription,dateAdded,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionId,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;{agb_legend},agb,hasAcceptedPrivacyRules',
-		'sendEmail'    => '{sendEmail_legend},emailRecipients,emailSubject,emailText,addEmailAttachment,emailSendCopy',
 	],
 	'subpalettes' => [
-		'addEmailAttachment'       => 'emailAttachment',
 		'hasLeadClimbingEducation' => 'dateOfLeadClimbingEducation',
 		'hasPaid'                  => 'paymentMethod',
 	],
@@ -359,41 +358,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'allowMultiSignUp'            => [
 			'inputType' => 'checkbox',
 			'eval'      => ['submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'long clr'],
-			'sql'       => "char(1) NOT NULL default ''",
-		],
-		'emailRecipients'             => [
-			'options'   => [],
-			// Set via onload callback
-			'inputType' => 'checkbox',
-			'eval'      => ['multiple' => true, 'mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''],
-			'sql'       => 'blob NULL',
-		],
-		'emailSubject'                => [
-			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'doNotShow' => true, 'doNotCopy' => true, 'tl_class' => ''],
-			'sql'       => "varchar(255) NOT NULL default ''",
-		],
-		'emailText'                   => [
-			'inputType' => 'textarea',
-			'eval'      => ['mandatory' => true, 'doNotShow' => true, 'doNotCopy' => true, 'rows' => 6, 'style' => 'height:50px', 'tl_class' => ''],
-			'sql'       => 'mediumtext NULL',
-		],
-		'addEmailAttachment'          => [
-			'exclude'   => true,
-			'filter'    => true,
-			'inputType' => 'checkbox',
-			'eval'      => ['doNotShow' => true, 'submitOnChange' => true],
-			'sql'       => "char(1) NOT NULL default ''",
-		],
-		'emailAttachment'             => [
-			'exclude'   => true,
-			'inputType' => 'fileTree',
-			'eval'      => ['doNotShow' => true, 'multiple' => true, 'fieldType' => 'checkbox', 'extensions' => Config::get('allowedDownload'), 'files' => true, 'filesOnly' => true, 'mandatory' => true],
-			'sql'       => 'binary(16) NULL',
-		],
-		'emailSendCopy'               => [
-			'inputType' => 'checkbox',
-			'eval'      => ['doNotShow' => true, 'doNotCopy' => true],
 			'sql'       => "char(1) NOT NULL default ''",
 		],
 		'anonymized'                  => [

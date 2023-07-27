@@ -1,0 +1,330 @@
+{% extends "@ContaoCore/Backend/be_page.html.twig" %}
+
+{% block headline %}
+    {{ 'MSC.evt_setp_appTitle'|trans({'%s': event.title}, 'contao_default') }}
+{% endblock %}
+
+    {% block error %}{% if error|default %}
+        {{ error|raw }}
+    {% endif %}{% endblock %}
+
+{% block main %}
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <div id="emailApp">
+        <div id="tl_buttons">
+            <a href="{{ back }}" class="header_back" title="" accesskey="b" onclick="Backend.getScrollOffset()">{{ 'MSC.backBTTitle'|trans({}, 'contao_default') }}</a>
+        </div>
+
+        <div class="notify-event_participant_form">
+            {{ form|raw }}
+        </div>
+
+        <div id="fileUploader" v-cloak>
+            <div>
+                <label v-if="attachments.length"><strong>{{ 'MSC.evt_setp_emailAttachments'|trans({}, 'contao_default') }}</strong></label>
+
+                <ul v-if="attachments.length" class="email-attachment-list">
+                    <li v-for="attachment in attachments">
+                        <a class="delete-attachment-btn" v-bind:data-file-id="attachment.file_id" @click.stop="deleteAttachment" href="{{ app.request.getRequestUri() }}" :title="'{{ 'MSC.evt_setp_deleteAttachment'|trans({}, 'contao_default') }}'">
+                            <span v-bind:data-file-id="attachment.file_id" @click.stop="deleteAttachment"></span>
+                        </a>
+                        <span>[[ attachment.name ]]</span>
+                    </li>
+                </ul>
+
+                <p v-if="hasPendingUploads()" class="pending-upload-indicator blink">Upload Vorgang läuft. Bitte warten.</p>
+                <p v-if="ajaxMessageSuccess" class="ajax-message-success">[[ ajaxMessageSuccess ]]</p>
+
+                <form @submit="handleSubmit">
+                    <input id="ctrl_attachment_upload" type="file" @change="handleFileSelect">
+                    <button v-bind:style="initialized ? 'display:none' : ''" type="submit">Upload</button>
+                </form>
+
+                <div v-if="hasAjaxError" class="upload-error-box">
+                    <p v-if="hasAjaxError" class="tl_error">[[ ajaxErrorMessage ]]</p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            window.addEventListener('DOMContentLoaded', (event) => {
+
+                const requestToken = '{{ request_token }}';
+                const allowedExtensions = ['{{ allowed_extensions|join("','")|raw }}'];
+                const maxFileSize = {{ max_filesize }};
+                const generalAjaxErrorMessage = '{{ 'MSC.evt_setp_generalAjaxError'|trans({}, 'contao_default') }}';
+
+                const {createApp} = Vue
+
+                const app = createApp({
+                    data() {
+                        return {
+                            initialized: false,
+                            attachments: [],
+                            uploadsPending: [],
+                            uploadIndex: 0,
+                            maxFileSize: 0,
+                            allowedExtensions: [],
+                            hasAjaxError: false,
+                            ajaxErrorMessage: '',
+                            ajaxMessageSuccess: '',
+                        }
+                    },
+                    mounted() {
+                        this.initialize();
+                        this.maxFileSize = maxFileSize;
+                        this.allowedExtensions = allowedExtensions;
+                    },
+                    methods: {
+                        /**
+                         * Initialize app
+                         */
+                        initialize() {
+                            const formData = new FormData();
+                            formData.append('action', 'initialize');
+                            formData.append('REQUEST_TOKEN', requestToken);
+
+                            fetch(window.location.href, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'x-requested-with': 'XMLHttpRequest',
+                                },
+                            }).then(response => {
+                                if (response.ok) {
+                                    return response.json();
+                                } else {
+                                    console.error(response.statusText ?? generalAjaxErrorMessage);
+                                    throw new Error(response.statusText ?? generalAjaxErrorMessage);
+                                }
+                            }).then(json => {
+                                if (json['status'] === 'success') {
+                                    this.attachments = json['attachments'];
+                                    this.hasAjaxError = false;
+                                    this.ajaxErrorMessage = '';
+                                } else {
+                                    console.error(json);
+                                    throw new Error(json['message'] ?? generalAjaxErrorMessage);
+                                }
+                            }).catch(error => {
+                                const errMessage = error.message ?? generalAjaxErrorMessage;
+                                this.hasAjaxError = true;
+                                this.ajaxErrorMessage = errMessage;
+                            });
+                            this.initialized = true
+                        },
+                        hasPendingUploads() {
+                            return this.uploadsPending.length > 0;
+                        },
+
+                        /**
+                         * @param event
+                         * @returns {Promise<void>}
+                         */
+                        async handleFileSelect(event) {
+                            const selectedFile = event.target.files[0];
+                            const extension = this.getFileExtension(selectedFile.name.toLocaleString());
+
+                            if (selectedFile.size > this.maxFileSize) {
+                                // File size exceeds the limit
+                                const message = await this.getTranslation('MSC.evt_setp_maxFilesizeExceeded', [this.maxFileSize / 1000000])
+                                alert(message);
+                                return;
+                            }
+
+                            if (this.allowedExtensions.indexOf(extension) < 0) {
+                                // Invalid file type
+                                const message = await this.getTranslation('MSC.evt_setp_notAllowedFileExtension', [this.allowedExtensions.join(', ')])
+                                alert(message);
+                                return;
+                            }
+
+                            this.selectedFile = selectedFile
+                            this.triggerFormSubmit();
+                        },
+
+                        /**
+                         *
+                         */
+                        triggerFormSubmit() {
+                            document.querySelector('#fileUploader [type="submit"]').click();
+                        },
+
+                        /**
+                         *
+                         * @param event
+                         */
+                        handleSubmit(event) {
+                            event.preventDefault();
+                            this.uploadIndex++;
+                            const uploadIndex = 'upload_' + this.uploadIndex;
+                            this.uploadsPending.push(uploadIndex);
+
+                            this.uploading = true;
+                            document.querySelector('#emailApp #ctrl_submit').setAttribute('disabled', 'true');
+
+                            const fileInput = document.getElementById('ctrl_attachment_upload');
+                            const file = fileInput.files[0];
+
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            formData.append('action', 'uploadFile');
+                            formData.append('REQUEST_TOKEN', requestToken);
+
+                            fetch(window.location.href, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'x-requested-with': 'XMLHttpRequest',
+                                },
+                            }).then(response => {
+                                if (response.ok) {
+                                    return response.json();
+                                } else {
+                                    console.error(response.statusText ?? generalAjaxErrorMessage);
+                                    throw new Error(response.statusText ?? generalAjaxErrorMessage);
+                                }
+                            }).then(json => {
+                                this.attachments = json['attachments'];
+
+                                if (json['status'] === 'success') {
+                                    // Reset form
+                                    document.querySelector('#fileUploader [type="file"]').value = '';
+
+                                    this.attachments = json['attachments'];
+                                    this.hasAjaxError = false;
+                                    this.ajaxErrorMessage = '';
+
+                                    // Show success message for 10s
+                                    this.ajaxMessageSuccess = json['message'] ?? '';
+                                    window.setTimeout(() => this.ajaxMessageSuccess = '', 10000);
+                                } else {
+                                    console.error(json);
+                                    throw new Error(json['message'] ?? generalAjaxErrorMessage);
+                                }
+                            }).catch(error => {
+                                const errMessage = error.message ?? generalAjaxErrorMessage;
+                                this.hasAjaxError = true;
+                                this.ajaxErrorMessage = errMessage;
+                            }).finally(() => {
+                                const index = this.uploadsPending.indexOf(uploadIndex)
+                                this.uploadsPending.splice(index, 1);
+                                document.querySelector('#emailApp #ctrl_submit').removeAttribute('disabled');
+                            });
+                        },
+
+                        /**
+                         * @param event
+                         */
+                        deleteAttachment(event) {
+                            event.preventDefault();
+                            const formData = new FormData();
+                            formData.append('action', 'deleteAttachment');
+                            formData.append('fileId', event.target.getAttribute('data-file-id'));
+                            formData.append('REQUEST_TOKEN', requestToken);
+
+                            fetch(window.location.href, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'x-requested-with': 'XMLHttpRequest',
+                                },
+                            }).then(response => {
+                                if (response.ok) {
+                                    return response.json();
+                                } else {
+                                    console.error(response.statusText ?? generalAjaxErrorMessage);
+                                    throw new Error(response.statusText ?? generalAjaxErrorMessage);
+                                }
+                            }).then(json => {
+                                if (json['status'] === 'success') {
+                                    this.attachments = json['attachments'];
+                                    this.hasAjaxError = false;
+                                    this.ajaxErrorMessage = '';
+                                } else {
+                                    console.error(json);
+                                    throw new Error(json['message'] ?? generalAjaxErrorMessage);
+                                }
+                            }).catch(error => {
+                                const errMessage = error.message ?? generalAjaxErrorMessage;
+                                this.hasAjaxError = true;
+                                this.ajaxErrorMessage = errMessage;
+                            });
+                        },
+
+                        /**
+                         * @param transKey
+                         * @param args
+                         * @returns {Promise<Response>}
+                         */
+                        getTranslation(transKey, args = []) {
+                            const formData = new FormData();
+                            formData.append('action', 'getTranslation');
+                            formData.append('transKey', transKey);
+                            formData.append('args', JSON.stringify(args));
+                            formData.append('REQUEST_TOKEN', requestToken);
+
+                            return fetch(window.location.href, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'x-requested-with': 'XMLHttpRequest',
+                                },
+                            }).then(response => {
+                                if (response.ok) {
+                                    return response.json();
+                                } else {
+                                    console.error(response.statusText ?? generalAjaxErrorMessage);
+                                    throw new Error(response.statusText ?? generalAjaxErrorMessage);
+                                }
+                            }).then(json => {
+                                if (json['status'] === 'success') {
+                                    this.hasAjaxError = false;
+                                    this.ajaxErrorMessage = '';
+                                    return json['translation'];
+                                } else {
+                                    console.error(json);
+                                    throw new Error(json['message'] ?? generalAjaxErrorMessage);
+                                }
+                            }).catch(error => {
+                                const errMessage = error.message ?? generalAjaxErrorMessage;
+                                this.hasAjaxError = true;
+                                this.ajaxErrorMessage = errMessage;
+                            });
+                        },
+
+                        /**
+                         * @param filename
+                         * @returns {string|string}
+                         */
+                        getFileExtension(filename) {
+                            const ext = /^.+\.([^.]+)$/.exec(filename);
+                            return ext === null ? "" : ext[1];
+                        },
+
+                    }
+                });
+
+                app.config.compilerOptions.delimiters = ['[[ ', ' ]]'];
+                app.mount('#fileUploader');
+            });
+        </script>
+
+        <script>
+            /**
+             * Prevent multiple form submits
+             * Disable submit button upon form submission
+             */
+            window.addEventListener('DOMContentLoaded', (event) => {
+                document.querySelector('.hasteform_email_app_form form').addEventListener('submit', () => {
+                    document.getElementById('ctrl_submit').disabled = 1;
+                    window.setTimeout(() => {
+                        document.getElementById('ctrl_submit').removeAttribute('disabled');
+                    }, 2000);
+                });
+            });
+        </script>
+    </div>
+
+{% endblock %}
+
