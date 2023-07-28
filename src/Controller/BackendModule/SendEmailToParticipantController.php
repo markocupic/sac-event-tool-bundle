@@ -69,13 +69,16 @@ class SendEmailToParticipantController extends AbstractController
     private string|null $sid = null;
 
     // Adapters
-    private Adapter $message;
-    private Adapter $controller;
-    private Adapter $validator;
-    private Adapter $events;
+    private Adapter $calendarEvents;
     private Adapter $calendarEventsHelper;
     private Adapter $calendarEventsMember;
-    private Adapter $calendarEvents;
+    private Adapter $controller;
+    private Adapter $environment;
+    private Adapter $events;
+    private Adapter $message;
+    private Adapter $system;
+    private Adapter $userModel;
+    private Adapter $validator;
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -88,15 +91,15 @@ class SendEmailToParticipantController extends AbstractController
         private readonly string $sacevtEventAdminEmail,
         private readonly string $sacevtEventAdminName,
     ) {
-        $this->environment = $this->framework->getAdapter(Environment::class);
-        $this->message = $this->framework->getAdapter(Message::class);
-        $this->system = $this->framework->getAdapter(System::class);
-        $this->userModel = $this->framework->getAdapter(UserModel::class);
         $this->calendarEvents = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
+        $this->environment = $this->framework->getAdapter(Environment::class);
         $this->events = $this->framework->getAdapter(Events::class);
+        $this->message = $this->framework->getAdapter(Message::class);
+        $this->system = $this->framework->getAdapter(System::class);
+        $this->userModel = $this->framework->getAdapter(UserModel::class);
         $this->validator = $this->framework->getAdapter(Validator::class);
     }
 

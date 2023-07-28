@@ -1,8 +1,8 @@
-{% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.min.js|static') %}
+{% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.global.prod.js?3.3.4') %}
 {% do addJavascriptResource('bundles/markocupicsaceventtool/js/eventlist_vue.js|static') %}
 
 <div id="course-list">
-    <span v-if="itemsTotal > 0" class="text-muted"><small>Zu deiner Suchanfrage wurden <% itemsTotal %> Events gefunden. </small></span>
+    <span v-if="itemsTotal > 0" class="text-muted"><small>Zu deiner Suchanfrage wurden [[ itemsTotal ]] Events gefunden. </small></span>
     <span v-if="blnIsBusy === true" class="ms-2 text-success"><small>Lade events...</small></span>
     <div class="event-container row">
 
@@ -20,15 +20,15 @@
                         <span class="event-state-icon" v-html="row.eventStateIcon" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel" v-bind:class="row.eventState"></span>
                         <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link lh-base">
                             <h4 class="d-flex headline m-0 p-0 lh-base">
-                                <% row.title %>
+                                [[ row.title ]]
                             </h4>
                         </a>
                     </div>
                     <div class="detail-item">
-                        <strong><% row.courseTypeLevel0Name %>: <% row.courseTypeLevel1Name %></strong>
+                        <strong>[[ row.courseTypeLevel0Name ]]: [[ row.courseTypeLevel1Name ]]</strong>
                     </div>
                     <div class="detail-item">
-                        <i class="fa fa-fw fa-user"></i> <span>Leitung: <% row.instructorsWithQualification %></span>
+                        <i class="fa fa-fw fa-user"></i> <span>Leitung: [[ row.instructorsWithQualification ]]</span>
                     </div>
                     <div class="detail-item">
                         <i class="fa fa-fw fa-calendar-alt"></i>

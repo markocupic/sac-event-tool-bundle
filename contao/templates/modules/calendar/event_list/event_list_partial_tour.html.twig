@@ -1,8 +1,8 @@
-{% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.min.js|static') %}
-{% do addJavascriptResource('bundles/markocupicsaceventtool/js/eventlist_vue.js|static') %}
+{% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.global.prod.js?3.3.4') %}
+{% do addJavascriptResource('bundles/markocupicsaceventtool/js/eventlist_vue.js') %}
 
 <div id="tour-list">
-    <span v-if="itemsTotal > 0" class="text-muted"><small>Zu deiner Suchanfrage wurden <% itemsTotal %> Events gefunden. </small></span>
+    <span v-if="itemsTotal > 0" class="text-muted"><small>Zu deiner Suchanfrage wurden [[ itemsTotal ]] Events gefunden. </small></span>
     <span v-if="blnIsBusy === true" class="ms-2 text-success"><small>Lade events...</small></span>
     <div class="event-container row">
         <div v-for="(row, index) of rows" class="event-item event-item-tour event col-12 col-lg-6" v-bind:data-id="row.id" v-bind:data-event-type="row.tourTypesIds">
@@ -46,7 +46,7 @@
                     <!-- row state icon -->
                     <div class="title d-flex align-items-start">
                         <span class="event-state-icon" v-html="row.eventStateIcon" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel"></span>
-                        <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link font-weight-bold"><strong><% row.eventTitle %></strong></a>
+                        <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link font-weight-bold"><strong>[[ row.eventTitle ]]</strong></a>
                     </div>
                     <!-- end row state icon -->
 
@@ -100,153 +100,155 @@
 
 <!-- Set up the vue.js tour list -->
 <script>
-    new VueTourList('#tour-list', {
-        'modId': {{ id }},
-        'apiParams': {
-            'organizers': [{{ apiParam.organizers }}],
-            'eventType': ['{{ apiParam.eventType }}'],
-            'suitableForBeginners': '{{ apiParam.suitableForBeginners }}',
-            'publicTransportEvent': '{{ apiParam.publicTransportEvent }}',
-            'tourType': '{{ apiParam.tourType }}',
-            'courseType': '{{ apiParam.courseType }}',
-            'courseId': '{{ apiParam.courseId }}',
-            'year': '{{ apiParam.year }}',
-            'dateStart': '{{ apiParam.dateStart }}',
-            'textsearch': '{{ apiParam.textsearch }}',
-            'eventId': '{{ apiParam.eventId }}',
-            'arrIds': [{{ apiParam.arrIds }}],
-            'username': '{{ apiParam.username }}',
-            'calendarIds': [{{ apiParam.calendarIds }}],
-            'limit': '{{ apiParam.limit }}',
-            'offset': '0',
-        },
-        'fields': [
-            'id',
-            'title',
-            'startDateDay',
-            'startDateMonth',
-            'eventType',
-            'eventTitle',
-            'eventUrl',
-            'instructors',
-            'tourTypesShortcuts',
-            'tourTechDifficulties',
-            'bookingCounter',
-            'eventState',
-            'eventStateIcon',
-            'eventStateLabel',
-            'eventDuration',
-            'eventPeriodLgInline',
-            'tourTypesIds',
-            'suitableForBeginners',
-            'isPublicTransportEvent',
-            'getPublicTransportBadge',
-            'eventOrganizerLogos||50'
-        ],
-        'callbacks': {
-            'oninsert': async function (vue, json) {
+    window.addEventListener("DOMContentLoaded", (event) => {
+        new VueTourList('#tour-list', {
+            'modId': {{ id }},
+            'apiParams': {
+                'organizers': [{{ apiParam.organizers }}],
+                'eventType': ['{{ apiParam.eventType }}'],
+                'suitableForBeginners': '{{ apiParam.suitableForBeginners }}',
+                'publicTransportEvent': '{{ apiParam.publicTransportEvent }}',
+                'tourType': '{{ apiParam.tourType }}',
+                'courseType': '{{ apiParam.courseType }}',
+                'courseId': '{{ apiParam.courseId }}',
+                'year': '{{ apiParam.year }}',
+                'dateStart': '{{ apiParam.dateStart }}',
+                'textsearch': '{{ apiParam.textsearch }}',
+                'eventId': '{{ apiParam.eventId }}',
+                'arrIds': [{{ apiParam.arrIds }}],
+                'username': '{{ apiParam.username }}',
+                'calendarIds': [{{ apiParam.calendarIds }}],
+                'limit': '{{ apiParam.limit }}',
+                'offset': '0',
+            },
+            'fields': [
+                'id',
+                'title',
+                'startDateDay',
+                'startDateMonth',
+                'eventType',
+                'eventTitle',
+                'eventUrl',
+                'instructors',
+                'tourTypesShortcuts',
+                'tourTechDifficulties',
+                'bookingCounter',
+                'eventState',
+                'eventStateIcon',
+                'eventStateLabel',
+                'eventDuration',
+                'eventPeriodLgInline',
+                'tourTypesIds',
+                'suitableForBeginners',
+                'isPublicTransportEvent',
+                'getPublicTransportBadge',
+                'eventOrganizerLogos||50'
+            ],
+            'callbacks': {
+                'oninsert': async function (vue, json) {
 
-                // Async await stack with auto invocation (See: https://gist.github.com/markocupic/0f49df91b8968ef471b78865707a43d2)
-                (async () => {
+                    // Async await stack with auto invocation (See: https://gist.github.com/markocupic/0f49df91b8968ef471b78865707a43d2)
+                    (async () => {
 
-                    // Wait until DOM is ready
-                    await (() => {
-                        return new Promise(resolve => setTimeout(resolve, 100));
-                    })();
+                        // Wait until DOM is ready
+                        await (() => {
+                            return new Promise(resolve => setTimeout(resolve, 100));
+                        })();
 
-                    await (() => {
-                        return new Promise((resolve, reject) => {
-                            const el = document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]');
-                            if (typeof el !== 'undefinded' && el.length > 0) {
+                        await (() => {
+                            return new Promise((resolve, reject) => {
+                                const el = document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]');
+                                if (typeof el !== 'undefinded' && el.length > 0) {
 
-                                for (let i = 0; i < el.length; ++i) {
-                                    let title = '';
-                                    // Get the title attribute by default from the data-title attribute.
-                                    // The reason why we are doing this:
-                                    // Popper.js deletes the original title attribute when it has been initialized.
-                                    if (el[i].hasAttribute('data-title')) {
-                                        title = el[i].getAttribute('data-title');
-                                        el[i].setAttribute('data-bs-title', title);
-                                        el[i].setAttribute('title', title);
-                                        el[i].setAttribute('data-bs-toggle', 'tooltip');
-                                    } else if (el[i].hasAttribute('title')) { // Fallback
-                                        title = el[i].getAttribute('title');
-                                        el[i].setAttribute('data-bs-title', title);
-                                        el[i].setAttribute('data-title', title);
-                                        el[i].setAttribute('data-bs-toggle', 'tooltip');
+                                    for (let i = 0; i < el.length; ++i) {
+                                        let title = '';
+                                        // Get the title attribute by default from the data-title attribute.
+                                        // The reason why we are doing this:
+                                        // Popper.js deletes the original title attribute when it has been initialized.
+                                        if (el[i].hasAttribute('data-title')) {
+                                            title = el[i].getAttribute('data-title');
+                                            el[i].setAttribute('data-bs-title', title);
+                                            el[i].setAttribute('title', title);
+                                            el[i].setAttribute('data-bs-toggle', 'tooltip');
+                                        } else if (el[i].hasAttribute('title')) { // Fallback
+                                            title = el[i].getAttribute('title');
+                                            el[i].setAttribute('data-bs-title', title);
+                                            el[i].setAttribute('data-title', title);
+                                            el[i].setAttribute('data-bs-toggle', 'tooltip');
+                                        }
                                     }
                                 }
-                            }
-                            resolve('Add the title- and data-bs-title attribute from the data-title attribute.');
-                        });
-                    })();
-
-                    // Re-initialize Bootstrap/Popper.js tooltips
-                    await (() => {
-                        return new Promise((resolve, reject) => {
-
-                            const tooltipTriggerList = [].slice.call(document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]'))
-                            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                                return new bootstrap.Tooltip(tooltipTriggerEl);
+                                resolve('Add the title- and data-bs-title attribute from the data-title attribute.');
                             });
-                            resolve('Re-initialize Bootstrap popper.js tooltips.');
-                        });
-                    })();
+                        })();
 
-                    // Cache the event list object in the browsers local storage
-                    // before we redirect to the detail page.
-                    await (() => {
-                        return new Promise((resolve, reject) => {
-                            const buttons = document.querySelectorAll(vue.elId + ' [data-has-event-href="true"]');
-                            for (const button of buttons) {
-                                button.addEventListener('click', (event) => {
-                                    event.stopPropagation();
-                                    event.preventDefault();
-                                    const link = button.getAttribute('data-href');
+                        // Re-initialize Bootstrap/Popper.js tooltips
+                        await (() => {
+                            return new Promise((resolve, reject) => {
 
-                                    const eventBox = button.closest('.event-item');
-                                    const eventId = eventBox.dataset.id;
-
-                                    const url = new URL(window.location.href);
-                                    const urlParams = new URLSearchParams(url.search);
-                                    const href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
-
-                                    if (urlParams.has('itemId')) {
-                                        urlParams.set('itemId', eventId);
-                                    } else {
-                                        urlParams.append('itemId', eventId);
-                                    }
-
-                                    // Current URL: https://my-website.com/page_a.html?event=200
-                                    const nextURL = href + '?' + urlParams.toString();
-                                    const nextTitle = document.title; // keep the same title
-
-                                    // This will create a new entry in the browser's history, without reloading.
-                                    window.history.replaceState({}, nextTitle, nextURL);
-
-                                    const vueInstance = {
-                                        'rows': vue.rows,
-                                        'arrEventIds': vue.arrEventIds,
-                                        'itemsTotal': vue.itemsTotal,
-                                        'loadedItems': vue.loadedItems,
-                                        'blnAllEventsLoaded': vue.blnAllEventsLoaded,
-                                        'expiry': Date.now() + 5 * 60 * 1000,
-                                    }
-
-                                    // Save the vue instance to the local storage.
-                                    // That will prevent a time-consuming request,
-                                    // if the user clicks back from the detail module to the listing module.
-                                    localStorage.setItem(btoa(nextURL + '&modId=' + vue.modId), JSON.stringify(vueInstance));
-
-                                    // Redirect to detail page
-                                    window.location.href = link;
+                                const tooltipTriggerList = [].slice.call(document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]'))
+                                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                                    return new bootstrap.Tooltip(tooltipTriggerEl);
                                 });
-                            }
-                            resolve('Cached the event list object to the localStorage!');
-                        });
+                                resolve('Re-initialize Bootstrap popper.js tooltips.');
+                            });
+                        })();
+
+                        // Cache the event list object in the browsers local storage
+                        // before we redirect to the detail page.
+                        await (() => {
+                            return new Promise((resolve, reject) => {
+                                const buttons = document.querySelectorAll(vue.elId + ' [data-has-event-href="true"]');
+                                for (const button of buttons) {
+                                    button.addEventListener('click', (event) => {
+                                        event.stopPropagation();
+                                        event.preventDefault();
+                                        const link = button.getAttribute('data-href');
+
+                                        const eventBox = button.closest('.event-item');
+                                        const eventId = eventBox.dataset.id;
+
+                                        const url = new URL(window.location.href);
+                                        const urlParams = new URLSearchParams(url.search);
+                                        const href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+
+                                        if (urlParams.has('itemId')) {
+                                            urlParams.set('itemId', eventId);
+                                        } else {
+                                            urlParams.append('itemId', eventId);
+                                        }
+
+                                        // Current URL: https://my-website.com/page_a.html?event=200
+                                        const nextURL = href + '?' + urlParams.toString();
+                                        const nextTitle = document.title; // keep the same title
+
+                                        // This will create a new entry in the browser's history, without reloading.
+                                        window.history.replaceState({}, nextTitle, nextURL);
+
+                                        const vueInstance = {
+                                            'rows': vue.rows,
+                                            'arrEventIds': vue.arrEventIds,
+                                            'itemsTotal': vue.itemsTotal,
+                                            'loadedItems': vue.loadedItems,
+                                            'blnAllEventsLoaded': vue.blnAllEventsLoaded,
+                                            'expiry': Date.now() + 5 * 60 * 1000,
+                                        }
+
+                                        // Save the vue instance to the local storage.
+                                        // That will prevent a time-consuming request,
+                                        // if the user clicks back from the detail module to the listing module.
+                                        localStorage.setItem(btoa(nextURL + '&modId=' + vue.modId), JSON.stringify(vueInstance));
+
+                                        // Redirect to detail page
+                                        window.location.href = link;
+                                    });
+                                }
+                                resolve('Cached the event list object to the localStorage!');
+                            });
+                        })();
                     })();
-                })();
+                }
             }
-        }
+        });
     });
 </script>

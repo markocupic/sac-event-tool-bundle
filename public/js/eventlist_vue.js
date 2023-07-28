@@ -10,254 +10,252 @@
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 class VueTourList {
-    constructor(elId, opt) {
-        // Defaults
-        const defaults = {
-            'modId': null,
-            'apiParams': {
-                'organizers': [],
-                'eventType': ["tour", "generalEvent", "lastMinuteTour", "course"],
-                'suitableForBeginners': '',
-                'publicTransportEvent':'',
-                'tourType': '',
-                'courseType': '',
-                'courseId': '',
-                'year': '',
-                'dateStart': '',
-                'textsearch': '',
-                'eventId': '',
-                'username': '',
-                // Let empty for all published
-                'calendarIds': [],
-                'limit': '50',
-                'offset': '0',
-            },
-            'fields': [],
-            'callbacks': {
-                'oninsert': function (vue, json) {
-                    //
-                }
-            }
-        };
+	constructor(elId, opt) {
+		// Defaults
+		const defaults = {
+			'modId': null,
+			'apiParams': {
+				'organizers': [],
+				'eventType': ["tour", "generalEvent", "lastMinuteTour", "course"],
+				'suitableForBeginners': '',
+				'publicTransportEvent': '',
+				'tourType': '',
+				'courseType': '',
+				'courseId': '',
+				'year': '',
+				'dateStart': '',
+				'textsearch': '',
+				'eventId': '',
+				'username': '',
+				// Let empty for all published
+				'calendarIds': [],
+				'limit': '50',
+				'offset': '0',
+			},
+			'fields': [],
+			'callbacks': {
+				'oninsert': function (vue, json) {
+					//
+				}
+			}
+		};
 
-        // Merge options and defaults
-        const params = {...defaults, ...opt}
+		// Merge options and defaults
+		const params = {...defaults, ...opt}
 
-        // Instantiate vue.js application
-        new Vue({
-            el: elId,
-            delimiters: ["<%", "%>"],
-            created: function created() {
-                let self = this;
+		const {createApp} = Vue
 
-                self.prepareRequest();
-            },
+		// Instantiate vue.js application
+		const app = createApp({
+			data() {
+				return {
+					// The element CSS ID selector: e.g. #myList
+					elId: elId,
+					// The module id (used by the take param)
+					modId: params.modId,
+					// Api params
+					apiParams: params.apiParams,
+					// Fields array
+					fields: (params.fields && Array.isArray(params.fields)) ? params.fields : null,
+					// Callbacks
+					callbacks: params.callbacks,
+					// Result row
+					rows: [],
+					// Loaded events (ids)
+					arrEventIds: [],
+					// is busy bool
+					blnIsBusy: false,
+					// total found items
+					itemsTotal: 0,
+					// already loaded items
+					loadedItems: 0,
+					// all events loades bool
+					blnAllEventsLoaded: false,
+				};
+			},
+			mounted() {
+				let self = this;
+				self.prepareRequest();
+			},
+			methods: {
+				// Prepare ajax request
+				prepareRequest: function prepareRequest() {
+					let self = this;
+					if (self.blnIsBusy === false) {
+						self.blnIsBusy = true;
+						self.fetchItems();
+					}
+				},
 
-            data: function data() {
-                return {
-                    // The element CSS ID selector: e.g. #myList
-                    elId: elId,
-                    // The module id (used by the take param)
-                    modId: params.modId,
-                    // Api params
-                    apiParams: params.apiParams,
-                    // Fields array
-                    fields: (params.fields && Array.isArray(params.fields)) ? params.fields : null,
-                    // Callbacks
-                    callbacks: params.callbacks,
-                    // Result row
-                    rows: [],
-                    // Loaded events (ids)
-                    arrEventIds: [],
-                    // is busy bool
-                    blnIsBusy: false,
-                    // total found items
-                    itemsTotal: 0,
-                    // already loaded items
-                    loadedItems: 0,
-                    // all events loades bool
-                    blnAllEventsLoaded: false,
-                };
-            },
-            methods: {
-                // Prepare ajax request
-                prepareRequest: function prepareRequest() {
-                    let self = this;
-                    if (self.blnIsBusy === false) {
-                        self.blnIsBusy = true;
-                        self.fetchItems();
-                    }
-                },
+				getTake: function getTake() {
+					let self = this;
+					let urlString = window.location.href;
+					let url = new URL(urlString);
+					let take = url.searchParams.get('take_e' + self.modId);
 
-                getTake: function getTake() {
-                    let self = this;
-                    let urlString = window.location.href;
-                    let url = new URL(urlString);
-                    let take = url.searchParams.get('take_e' + self.modId);
+					return null === take ? null : parseInt(take);
+				},
 
-                    return null === take ? null : parseInt(take);
-                },
+				// Load items from server
+				fetchItems: function fetchItems() {
+					let self = this;
 
-                // Load items from server
-                fetchItems: function fetchItems() {
-                    let self = this;
+					// Try to retrieve data from storage
+					let storageData = localStorage.getItem(btoa(window.location.href + '&modId=' + self.modId));
 
-                    // Try to retrieve data from storage
-                    let storageData = localStorage.getItem(btoa(window.location.href + '&modId=' + self.modId));
+					if (storageData) {
+						localStorage.removeItem(btoa(window.location.href + '&modId=' + self.modId));
+						let storageObject = JSON.parse(storageData);
 
-                    if (storageData) {
-                        localStorage.removeItem(btoa(window.location.href + '&modId=' + self.modId));
-                        let storageObject = JSON.parse(storageData);
+						// Return if storage data is outdated
+						if (storageObject.expiry < Date.now()) {
+							return;
+						}
 
-                        // Return if storage data is outdated
-                        if (storageObject.expiry < Date.now()) {
-                            return;
-                        }
+						self.rows = storageObject.rows;
+						self.arrEventIds = storageObject.arrEventIds;
+						self.itemsTotal = storageObject.itemsTotal;
+						self.loadedItems = storageObject.loadedItems;
+						self.blnAllEventsLoaded = storageObject.blnAllEventsLoaded;
+						self.blnIsBusy = false;
 
-                        self.rows = storageObject.rows;
-                        self.arrEventIds = storageObject.arrEventIds;
-                        self.itemsTotal = storageObject.itemsTotal;
-                        self.loadedItems = storageObject.loadedItems;
-                        self.blnAllEventsLoaded = storageObject.blnAllEventsLoaded;
-                        self.blnIsBusy = false;
+						// Trigger oninsert callback
+						if (self.callbackExists('oninsert')) {
+							self.callbacks.oninsert(self, null);
+						}
 
-                        // Trigger oninsert callback
-                        if (self.callbackExists('oninsert')) {
-                            self.callbacks.oninsert(self, null);
-                        }
+						let url = new URL(window.location.href);
+						let urlParams = new URLSearchParams(url.search);
+						let href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
 
-                        let url = new URL(window.location.href);
-                        let urlParams = new URLSearchParams(url.search);
-                        let href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+						// Remove the "itemId" parameter when the user returns from the detail view
+						if (urlParams.has('itemId')) {
+							urlParams.delete('itemId');
+						}
 
-                        // Remove the "itemId" parameter when the user returns from the detail view
-                        if (urlParams.has('itemId')) {
-                            urlParams.delete('itemId');
-                        }
+						// Current URL: https://my-website.ch/demo_a.html?take_e234=200
+						const nextURL = href + (urlParams.toString() ? '?' + urlParams.toString() : '');
+						const nextTitle = document.title; // keep the same title
 
-                        // Current URL: https://my-website.ch/demo_a.html?take_e234=200
-                        const nextURL = href + (urlParams.toString() ? '?' + urlParams.toString() : '');
-                        const nextTitle = document.title; // keep the same title
+						// This will create a new entry in the browser's history, without reloading
+						window.history.replaceState({}, nextTitle, nextURL);
 
-                        // This will create a new entry in the browser's history, without reloading
-                        window.history.replaceState({}, nextTitle, nextURL);
+						return;
+					}
 
-                        return;
-                    }
+					if (self.blnAllEventsLoaded === true) {
 
-                    if (self.blnAllEventsLoaded === true) {
+						return;
+					}
 
-                        return;
-                    }
+					let formData = new FormData();
 
-                    let formData = new FormData();
+					// Add api parameters to the Form Data object
+					for (const [key, value] of Object.entries(self.apiParams)) {
+						if (key === 'offset') {
+							formData.append('offset', parseInt(value) + self.loadedItems);
+						} else if (Array.isArray(value)) {// Handle arrays correctly
+							for (let i = 0; i < value.length; ++i) {
+								formData.append(key + '[]', value[i]);
+							}
+						} else {
+							formData.append(key, value);
+						}
+					}
 
-                    // Add api parameters to the Form Data object
-                    for (const [key, value] of Object.entries(self.apiParams)) {
-                        if (key === 'offset') {
-                            formData.append('offset', parseInt(value) + self.loadedItems);
-                        } else if (Array.isArray(value)) {// Handle arrays correctly
-                            for (let i = 0; i < value.length; ++i) {
-                                formData.append(key + '[]', value[i]);
-                            }
-                        } else {
-                            formData.append(key, value);
-                        }
-                    }
+					// Set limit on page load/refresh
+					if (self.loadedItems === 0 && self.getTake() > 0) {
+						if (formData.has('limit')) {
+							formData.set('limit', self.getTake());
+						} else {
+							formData.append('limit', self.getTake());
+						}
+					}
 
-                    // Set limit on page load/refresh
-                    if (self.loadedItems === 0 && self.getTake() > 0) {
-                        if (formData.has('limit')) {
-                            formData.set('limit', self.getTake());
-                        } else {
-                            formData.append('limit', self.getTake());
-                        }
-                    }
+					// Handle fields correctly
+					for (const prop of self.fields) {
+						formData.append('fields[]', prop);
+					}
 
-                    // Handle fields correctly
-                    self.fields.forEach((value, key) => {
-                        formData.append('fields[]', value);
-                    });
+					let urlParams = new URLSearchParams(Array.from(formData)).toString();
+					let url = 'eventApi/events?' + urlParams;
 
-                    let urlParams = new URLSearchParams(Array.from(formData)).toString();
-                    let url = 'eventApi/events?' + urlParams;
+					// Fetch
+					fetch(url, {
+							headers: {
+								'x-requested-with': 'XMLHttpRequest'
+							},
+						}
+					).then(function (res) {
+						return res.json();
+					}).then(function (json) {
 
-                    // Fetch
-                    fetch(url, {
-                            headers: {
-                                'x-requested-with': 'XMLHttpRequest'
-                            },
-                        }
-                    ).then(function (res) {
-                        return res.json();
-                    }).then(function (json) {
+						self.blnIsBusy = false;
 
-                        self.blnIsBusy = false;
+						let i = 0;
+						self.itemsTotal = parseInt(json['meta']['itemsTotal']);
+						for (const row of json['data']) {
+							i++;
+							self.rows.push(row);
+							self.loadedItems++;
+						}
 
-                        let i = 0;
-                        self.itemsTotal = parseInt(json['meta']['itemsTotal']);
-                        json['data'].forEach(function (row) {
-                            i++;
-                            self.rows.push(row);
-                            self.loadedItems++;
-                        });
+						// Store all ids of loaded events in self.arrEventIds
+						for (const id of json['meta']['arrEventIds']) {
+							self.arrEventIds.push(id);
+						}
 
-                        // Store all ids of loaded events in self.arrEventIds
-                        json['meta']['arrEventIds'].forEach(function (id) {
-                            self.arrEventIds.push(id);
-                        });
+						if (i === 0 || parseInt(json['meta']['itemsTotal']) === self.loadedItems) {
+							self.blnAllEventsLoaded = true
+						}
 
-                        if (i === 0 || parseInt(json['meta']['itemsTotal']) === self.loadedItems) {
-                            self.blnAllEventsLoaded = true
-                        }
+						if (self.blnAllEventsLoaded === true) {
+							//console.log('Finished downloading process. ' + self.loadedItems + ' events loaded.');
+						}
+						return json;
+					}).then(function (json) {
+						let take = self.getTake();
 
-                        if (self.blnAllEventsLoaded === true) {
-                            //console.log('Finished downloading process. ' + self.loadedItems + ' events loaded.');
-                        }
-                        return json;
-                    }).then(function (json) {
-                        let take = self.getTake();
+						let url = new URL(window.location.href);
+						let urlParams = new URLSearchParams(url.search);
+						let href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
 
-                        let url = new URL(window.location.href);
-                        let urlParams = new URLSearchParams(url.search);
-                        let href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+						if (self.loadedItems > self.apiParams['limit']) {
+							take = self.loadedItems;
+							if (!urlParams.has('take_e' + self.modId)) {
+								urlParams.append('take_e' + self.modId, take);
+							} else {
+								urlParams.set('take_e' + self.modId, take);
+							}
 
-                        if (self.loadedItems > self.apiParams['limit']) {
-                            take = self.loadedItems;
-                            if (!urlParams.has('take_e' + self.modId)) {
-                                urlParams.append('take_e' + self.modId, take);
-                            } else {
-                                urlParams.set('take_e' + self.modId, take);
-                            }
+							// Current URL: https://my-website.ch/demo_a.html?take_324=200
+							const nextURL = href + '?' + urlParams.toString();
+							const nextTitle = document.title; // keep the original title
 
-                            // Current URL: https://my-website.ch/demo_a.html?take_324=200
-                            const nextURL = href + '?' + urlParams.toString();
-                            const nextTitle = document.title; // keep the original title
+							// This will create a new entry in the browser's history, without reloading
+							window.history.replaceState({}, nextTitle, nextURL);
+						}
 
-                            // This will create a new entry in the browser's history, without reloading
-                            window.history.replaceState({}, nextTitle, nextURL);
-                        }
+						return json;
 
-                        return json;
+					}).then(function (json) {
+						// Trigger oninsert callback
+						if (self.callbackExists('oninsert')) {
+							self.callbacks.oninsert(self, json);
+						}
+						return json;
+					});
 
-                    }).then(function (json) {
-                        // Trigger oninsert callback
-                        if (self.callbackExists('oninsert')) {
-                            self.callbacks.oninsert(self, json);
-                        }
-                        return json;
-                    });
+				},
 
-                },
-
-                // Check if callback exists
-                callbackExists: function callbackExists(strCallback) {
-                    let self = this;
-                    return typeof self.callbacks !== "undefined" && typeof self.callbacks[strCallback] !== "undefined" && typeof self.callbacks[strCallback] === "function";
-                }
-            }
-        });
-    }
+				// Check if callback exists
+				callbackExists: function callbackExists(strCallback) {
+					let self = this;
+					return typeof self.callbacks !== "undefined" && typeof self.callbacks[strCallback] !== "undefined" && typeof self.callbacks[strCallback] === "function";
+				}
+			}
+		});
+		app.config.compilerOptions.delimiters = ['[[ ', ' ]]'];
+		app.mount(elId);
+	}
 }
-
-
