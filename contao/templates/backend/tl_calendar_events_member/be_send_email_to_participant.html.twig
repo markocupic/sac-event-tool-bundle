@@ -1,7 +1,7 @@
 {% extends "@ContaoCore/Backend/be_page.html.twig" %}
 
 {% block headline %}
-    {{ 'MSC.evt_epe_appTitle'|trans({'%s': event.title}, 'contao_default') }}
+    {{ 'MSC.evt_setp_appTitle'|trans({'%s': event.title}, 'contao_default') }}
 {% endblock %}
 
     {% block error %}{% if error|default %}
@@ -10,7 +10,7 @@
 
 {% block main %}
     <script src="assets/contao-component-vue-js/vue/dist/vue.global.prod.js?3.3.4"></script>
-    <div id="eventParticipantEmail">
+    <div id="emailApp">
         <div id="tl_buttons">
             <a href="{{ back }}" class="header_back" title="" accesskey="b" onclick="Backend.getScrollOffset()">{{ 'MSC.backBTTitle'|trans({}, 'contao_default') }}</a>
         </div>
@@ -21,11 +21,11 @@
 
         <div id="fileUploader" v-cloak>
             <div>
-                <label v-if="attachments.length"><strong>{{ 'MSC.evt_epe_emailAttachments'|trans({}, 'contao_default') }}</strong></label>
+                <label v-if="attachments.length"><strong>{{ 'MSC.evt_setp_emailAttachments'|trans({}, 'contao_default') }}</strong></label>
 
                 <ul v-if="attachments.length" class="email-attachment-list">
                     <li v-for="attachment in attachments">
-                        <a class="delete-attachment-btn" v-bind:data-file-id="attachment.file_id" @click.stop="deleteAttachment" href="{{ app.request.getRequestUri() }}" :title="'{{ 'MSC.evt_epe_deleteAttachment'|trans({}, 'contao_default') }}'">
+                        <a class="delete-attachment-btn" v-bind:data-file-id="attachment.file_id" @click.stop="deleteAttachment" href="{{ app.request.getRequestUri() }}" :title="'{{ 'MSC.evt_setp_deleteAttachment'|trans({}, 'contao_default') }}'">
                             <span v-bind:data-file-id="attachment.file_id" @click.stop="deleteAttachment"></span>
                         </a>
                         <span>[[ attachment.name ]]</span>
@@ -52,7 +52,7 @@
                 const requestToken = '{{ request_token }}';
                 const allowedExtensions = ['{{ allowed_extensions|join("','")|raw }}'];
                 const maxFileSize = {{ max_filesize }};
-                const generalAjaxErrorMessage = '{{ 'MSC.evt_epe_generalAjaxError'|trans({}, 'contao_default') }}';
+                const generalAjaxErrorMessage = '{{ 'MSC.evt_setp_generalAjaxError'|trans({}, 'contao_default') }}';
 
                 const {createApp} = Vue
 
@@ -127,14 +127,14 @@
 
                             if (selectedFile.size > this.maxFileSize) {
                                 // File size exceeds the limit
-                                const message = await this.getTranslation('MSC.evt_epe_maxFilesizeExceeded', [this.maxFileSize / 1000000])
+                                const message = await this.getTranslation('MSC.evt_setp_maxFilesizeExceeded', [this.maxFileSize / 1000000])
                                 alert(message);
                                 return;
                             }
 
                             if (this.allowedExtensions.indexOf(extension) < 0) {
                                 // Invalid file type
-                                const message = await this.getTranslation('MSC.evt_epe_notAllowedFileExtension', [this.allowedExtensions.join(', ')])
+                                const message = await this.getTranslation('MSC.evt_setp_notAllowedFileExtension', [this.allowedExtensions.join(', ')])
                                 alert(message);
                                 return;
                             }
@@ -161,7 +161,7 @@
                             this.uploadsPending.push(uploadIndex);
 
                             this.uploading = true;
-                            document.querySelector('#eventParticipantEmail #ctrl_submit').setAttribute('disabled', 'true');
+                            document.querySelector('#emailApp #ctrl_submit').setAttribute('disabled', 'true');
 
                             const fileInput = document.getElementById('ctrl_attachment_upload');
                             const file = fileInput.files[0];
@@ -209,7 +209,7 @@
                             }).finally(() => {
                                 const index = this.uploadsPending.indexOf(uploadIndex)
                                 this.uploadsPending.splice(index, 1);
-                                document.querySelector('#eventParticipantEmail #ctrl_submit').removeAttribute('disabled');
+                                document.querySelector('#emailApp #ctrl_submit').removeAttribute('disabled');
                             });
                         },
 

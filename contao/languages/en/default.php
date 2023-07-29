@@ -181,20 +181,20 @@ $GLOBALS['TL_LANG']['MSC']['unpublished'] = 'unveröffentlicht';
 // Meta wizard
 $GLOBALS['TL_LANG']['MSC']['aw_photographer'] = 'Photograph';
 
-// Backend route contao/event_participant_email
-$GLOBALS['TL_LANG']['MSC']['evt_epe_accessDenied'] = 'Zugriff zur App verweigert. Bitte aktualisieren Sie die Seite und rufen Sie die App erneut auf.';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_emailRecipients'] = 'E-Mail Empfänger';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_emailSubject'] = 'E-Mail Betreff';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_emailText'] = 'E-Mail Text';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_sendEmail'] = 'E-Mail versenden';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_emailAttachments'] = 'Dateianhänge';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_deleteAttachment'] = 'Anhang entfernen';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_maxFilesizeExceeded'] = 'Die maximale Dateigrösse von für Dateianhänge beträgt %s MB.';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_notAllowedFileExtension'] = 'Die Datei besitzt eine unerlaubte Dateiendung. Erlaubt sind Dateien mit der Endung: %s.';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_fileNotSubmitted'] = 'Es wurde keine Datei hochgeladen.';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_appTitle'] = 'E-Mails an TN/TL von "%s" versenden';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_sendingEmailFailed'] = 'Die Email konnte nicht versendet werden. Bitte überprüfen Sie Ihre Angaben.';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_generalAjaxError'] = 'Der Befehl konnte nicht ausgeführt werden. Bitte kontrollieren Sie die Verbindung oder laden Sie die Seite neu.';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_eventNotFound'] = 'Event mit ID %s konnte nicht gefunden werden.';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_emailSentToEventMembers'] = 'Ihre E-Mail wurde erfolgreich versendet.';
-$GLOBALS['TL_LANG']['MSC']['evt_epe_fileUploadedSuccessful'] = 'Datei erfolgreich hochgeladen.';
+// Backend route contao/send_email_to_participant
+$GLOBALS['TL_LANG']['MSC']['evt_setp_emailRecipients'] = 'E-Mail Empfänger';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_emailSubject'] = 'E-Mail Betreff';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_emailText'] = 'E-Mail Text';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_sendEmail'] = 'E-Mail versenden';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_emailAttachments'] = 'Dateianhänge';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_deleteAttachment'] = 'Anhang entfernen';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_maxFilesizeExceeded'] = 'Die maximale Dateigrösse von für Dateianhänge beträgt %s MB.';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_notAllowedFileExtension'] = 'Die Datei besitzt eine unerlaubte Dateiendung. Erlaubt sind Dateien mit der Endung: %s.';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_fileNotSubmitted'] = 'Es wurde keine Datei hochgeladen.';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_appTitle'] = 'E-Mails an TN/TL von "%s" versenden';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_sendingEmailFailed'] = 'Die Email konnte nicht versendet werden. Bitte überprüfen Sie Ihre Angaben.';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_accessDenied'] = 'Der Zugriff auf die E-Mail-App wurde verweigert. Bitte probieren Sie es noch einmal.';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_generalAjaxError'] = 'Der Befehl konnte nicht ausgeführt werden. Bitte kontrollieren Sie die Verbindung oder laden Sie die Seite neu.';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_eventNotFound'] = 'Event mit ID %s konnte nicht gefunden werden.';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_emailSentToEventMembers'] = 'Ihre E-Mail wurde erfolgreich versendet.';
+$GLOBALS['TL_LANG']['MSC']['evt_setp_fileUploadedSuccessful'] = 'Datei erfolgreich hochgeladen.';
