@@ -30,7 +30,6 @@ use Contao\System;
 use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
@@ -61,7 +60,7 @@ use Twig\Environment as Twig;
 class SendEmailToParticipantController extends AbstractController
 {
     public const SESSION_BAG_KEY = 'sacevt_be_send_email';
-    public const MAX_FILE_SIZE = 3000000;
+    public const MAX_FILE_SIZE = 4000000;
     public const ALLOWED_EXTENSIONS = ['csv', 'bmp', 'png', 'svg', 'jpg', 'jpeg', 'tiff', 'doc', 'docx', 'pdf', 'xls', 'xlsx', 'txt', 'zip', 'rtf'];
 
     private CalendarEventsModel|null $event = null;
@@ -103,12 +102,8 @@ class SendEmailToParticipantController extends AbstractController
         $this->validator = $this->framework->getAdapter(Validator::class);
     }
 
-    /**
-     * @throws \Exception
-     */
     public function __invoke(int $event_id, string $sid, string $rt): Response
     {
-        // Initialize app
         $this->initialize($event_id, $sid);
 
         $uriSigner = $this->system->getContainer()->get('uri_signer');
@@ -155,9 +150,6 @@ class SendEmailToParticipantController extends AbstractController
         return new Response($template->parse());
     }
 
-    /**
-     * @throws \Exception
-     */
     private function initialize(int $eventId, string $sid): void
     {
         // Set a unique security ID (used for the session bag)
@@ -167,7 +159,7 @@ class SendEmailToParticipantController extends AbstractController
         $this->event = $this->calendarEvents->findByPk($eventId);
 
         if (null === $this->event) {
-            $this->message->error($this->translator->trans('MSC.evt_setp_eventNotFound', [$eventId], 'contao_default'));
+            $this->message->addError($this->translator->trans('MSC.evt_setp_eventNotFound', [$eventId], 'contao_default'));
             $this->controller->redirect($this->getBackUri());
         }
 
@@ -179,9 +171,6 @@ class SendEmailToParticipantController extends AbstractController
         }
     }
 
-    /**
-     * @throws \Exception
-     */
     private function createAndValidateForm(): Form
     {
         $form = new Form(
@@ -218,69 +207,17 @@ class SendEmailToParticipantController extends AbstractController
 
         $request = $this->requestStack->getCurrentRequest();
 
+        // Try to send the email, if form inputs have passed the validation.
         if ($form->validate()) {
-            $arrEmailRecipients = [];
-            $recipients = $form->getWidget('recipients')->value;
-
-            foreach ($recipients as $recipient) {
-                $arrRecipient = explode('-', $recipient);
-
-                if ('tl_user' === $arrRecipient[0]) {
-                    $arrEmailRecipients[] = $this->userModel->findByPk($arrRecipient[1])->email;
-                } else {
-                    $arrEmailRecipients[] = $this->calendarEventsMember->findByPk($arrRecipient[1])->email;
-                }
-            }
-
-            $objEmail = new Email();
-            $objEmail->fromName = html_entity_decode((string) $this->sacevtEventAdminName);
-            $objEmail->from = $this->sacevtEventAdminEmail;
-            $objEmail->replyTo($this->user->email);
-            $objEmail->subject = html_entity_decode((string) $request->request->get('subject'));
-            $objEmail->text = html_entity_decode((string) $request->request->get('text'));
-
-            // Handle attachments
-            $fs = new Filesystem();
-
-            $bag = $this->getSessionBag();
-            $files = $bag['attachments'] ?? [];
-
-            foreach ($files as $file) {
-                if (is_file($file['storage_path'])) {
-                    $filenameNew = \dirname($file['storage_path']).'/'.$file['name'];
-                    $fs->rename($file['storage_path'], $filenameNew);
-                    $objEmail->attachFile($filenameNew);
-                }
-            }
-
-            $blnSend = false;
-
-            try {
-                $blnSend = $objEmail->sendTo($arrEmailRecipients);
-            } catch (\Exception $e) {
-                $this->saveFormInputsToSession($form);
-
-                $this->message->addError($this->translator->trans('MSC.evt_setp_sendingEmailFailed', [], 'contao_default'));
-                $this->message->addError($e->getMessage());
-
-                $this->controller->reload();
-            }
-
-            if ($blnSend) {
-                // Delete uploaded attachments from server
-                foreach ($files as $file) {
-                    if (is_dir(\dirname($file['storage_path']))) {
-                        $fs->remove(\dirname($file['storage_path']));
-                    }
-                }
-
-                // Show a message in the backend
+            if ($this->sendEmail($form)) {
+                // Show a confirmation message for the successful sending of the message
                 $msg = $this->translator->trans('MSC.evt_setp_emailSentToEventMembers', [], 'contao_default');
                 $this->message->addInfo($msg);
 
+                $this->clearTemporaryCreatedAttachments();
                 $this->clearSessionBag();
 
-                // All ok! Redirect user back to the event member list
+                // All ok! Redirect the user back to the event member list.
                 $this->controller->redirect($this->getBackUri());
             }
 
@@ -290,14 +227,14 @@ class SendEmailToParticipantController extends AbstractController
             $this->controller->reload();
         }
 
-        // Preset input fields "subject" and "text" with text
+        // Preset input fields "subject" and "text" with a default text
         if ('email_app_form' !== $request->request->get('FORM_SUBMIT')) {
             if (empty($form->getWidget('text')->value) && empty($form->getWidget('subject')->value)) {
                 $form->getWidget('text')->value = $this->twig->render(
                     '@MarkocupicSacEventTool/EventRegistration/send_email_to_participant_text_template.twig',
                     [
                         'event' => $this->event,
-                        'user' => UserModel::findByPk($this->user->id),
+                        'user' => $this->userModel->findByPk($this->user->id),
                         'event_url' => $this->events->generateEventUrl($this->event, true),
                     ]
                 );
@@ -308,14 +245,69 @@ class SendEmailToParticipantController extends AbstractController
                         'event' => $this->event,
                     ]
                 );
-
-                $this->saveFormInputsToSession($form);
             }
-
-            $form = $this->setFormInputsFromSession($form);
         }
 
+        $this->saveFormInputsToSession($form);
+        $this->setFormInputsFromSession($form);
+
         return $form;
+    }
+
+    private function sendEmail(Form $form): bool
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        $arrEmailRecipients = [];
+        $recipients = $form->getWidget('recipients')->value;
+
+        foreach ($recipients as $recipient) {
+            $arrRecipient = explode('-', $recipient);
+
+            if ('tl_user' === $arrRecipient[0]) {
+                $arrEmailRecipients[] = $this->userModel->findByPk($arrRecipient[1])->email;
+            } else {
+                $arrEmailRecipients[] = $this->calendarEventsMember->findByPk($arrRecipient[1])->email;
+            }
+        }
+
+        $objEmail = new Email();
+        $objEmail->fromName = html_entity_decode($this->sacevtEventAdminName);
+        $objEmail->from = $this->sacevtEventAdminEmail;
+        $objEmail->replyTo($this->user->email);
+        $objEmail->subject = html_entity_decode((string) $request->request->get('subject'));
+        $objEmail->text = html_entity_decode((string) $request->request->get('text'));
+
+        // Handle file attachments
+        $fs = new Filesystem();
+
+        $bag = $this->getSessionBag();
+        $files = $bag['attachments'] ?? [];
+        $arrOrigFilenamePaths = [];
+
+        // Make a copy of each uploaded file using the original filename
+        foreach ($files as $file) {
+            if (is_file($file['temp_storage_path'])) {
+                $pathOrigFilename = \dirname($file['temp_storage_path']).'/'.$file['name'];
+                $arrOrigFilenamePaths[] = $pathOrigFilename;
+
+                $fs->copy($file['temp_storage_path'], $pathOrigFilename, true);
+                $objEmail->attachFile($pathOrigFilename);
+            }
+        }
+
+        try {
+            $blnSend = $objEmail->sendTo($arrEmailRecipients);
+        } catch (\Exception $e) {
+            $blnSend = false;
+        } finally {
+            // In any case, delete the temporarily created files.
+            foreach ($arrOrigFilenamePaths as $path) {
+                $fs->remove($path);
+            }
+        }
+
+        return $blnSend;
     }
 
     private function xhrInitialize(): Response
@@ -337,7 +329,7 @@ class SendEmailToParticipantController extends AbstractController
 
         foreach ($bag['attachments'] as $index => $attachment) {
             if ($attachment['file_id'] === $fileId) {
-                $storagePath = \dirname($attachment['storage_path']);
+                $storagePath = \dirname($attachment['temp_storage_path']);
                 unset($bag['attachments'][$index]);
                 $json['deleted_source'] = $storagePath;
 
@@ -380,7 +372,7 @@ class SendEmailToParticipantController extends AbstractController
             $arrFile['error'] = $uploadedFile->getError();
             $arrFile['extension'] = $uploadedFile->getClientOriginalExtension();
             $arrFile['file_id'] = uniqid();
-            $arrFile['storage_path'] = Path::canonicalize(sys_get_temp_dir().'/'.$arrFile['file_id'].'/'.uniqid());
+            $arrFile['temp_storage_path'] = Path::canonicalize(sys_get_temp_dir().'/'.$arrFile['file_id'].'/'.uniqid());
 
             if ($uploadedFile->getError()) {
                 $hasError = true;
@@ -399,15 +391,15 @@ class SendEmailToParticipantController extends AbstractController
 
             if (!$hasError) {
                 $fs = new Filesystem();
-                $fs->mkdir(\dirname($arrFile['storage_path']));
+                $fs->mkdir(\dirname($arrFile['temp_storage_path']));
 
                 try {
-                    // Move file to the temp dir
-                    if ($uploadedFile->move(\dirname($arrFile['storage_path']), basename($arrFile['storage_path']))) {
+                    // Move file to the temp storage directory
+                    if ($uploadedFile->move(\dirname($arrFile['temp_storage_path']), basename($arrFile['temp_storage_path']))) {
                         $json['status'] = 'success';
                         $json['message'] = $this->translator->trans('MSC.evt_setp_fileUploadedSuccessful', [implode(',', self::ALLOWED_EXTENSIONS)], 'contao_default');
 
-                        // Save new upload to the session
+                        // Save file data to the session
                         $bag = $this->getSessionBag();
                         $bag['attachments'][] = $arrFile;
                         $this->setSessionBag($bag);
@@ -430,10 +422,7 @@ class SendEmailToParticipantController extends AbstractController
         return new JsonResponse($json);
     }
 
-    /**
-     * @param $args
-     */
-    private function xhrGetTranslation(string $transKey, $args): Response
+    private function xhrGetTranslation(string $transKey, string $args): Response
     {
         $args = json_decode($args);
         $json = [];
@@ -453,63 +442,86 @@ class SendEmailToParticipantController extends AbstractController
         $this->setSessionBag($bag);
     }
 
-    private function setFormInputsFromSession(Form $form): Form
+    private function setFormInputsFromSession(Form $form): void
     {
         $bag = $this->getSessionBag();
 
         $form->getWidget('recipients')->value = $bag['recipients'];
         $form->getWidget('subject')->value = $bag['subject'];
         $form->getWidget('text')->value = $bag['text'];
-
-        return $form;
     }
 
     private function getBackUri(): string
     {
         return $this->system->getContainer()
             ->get('router')
-            ->generate('contao_backend', ['do' => 'sac_calendar_events_tool', 'table' => 'tl_calendar_events_member', 'id' => $this->event->id, 'rt' => $this->requestStack->getCurrentRequest()->attributes->get('rt')])
+            ->generate(
+                'contao_backend',
+                [
+                    'do' => 'sac_calendar_events_tool',
+                    'table' => 'tl_calendar_events_member',
+                    'id' => $this->event->id,
+                    'rt' => $this->requestStack->getCurrentRequest()->attributes->get('rt'),
+                ]
+            )
         ;
     }
 
-    /**
-     * @throws Exception
-     *
-     * @return array
-     */
-    private function getRegistrations()
+    private function getRegistrations(): array
     {
         $options = [];
 
-        // Get the instructors first
-        $arrGuideIDS = $this->calendarEventsHelper->getInstructorsAsArray($this->event, false);
+        // Get the instructors
+        $arrInstrIds = $this->calendarEventsHelper->getInstructorsAsArray($this->event, false);
 
-        foreach ($arrGuideIDS as $userId) {
-            $objInstructor = UserModel::findByPk($userId);
+        foreach ($arrInstrIds as $userId) {
+            $objInstructor = $this->userModel->findByPk($userId);
 
             if (null !== $objInstructor) {
                 if (!empty($objInstructor->email)) {
                     if ($this->validator->isEmail($objInstructor->email)) {
-                        $options['tl_user-'.$objInstructor->id] = sprintf('<strong>%s %s (Leiter)</strong>', $objInstructor->firstname, $objInstructor->lastname);
+                        $options['tl_user-'.$objInstructor->id] = sprintf(
+                            '<strong>%s %s (Leiter)</strong>',
+                            $objInstructor->firstname,
+                            $objInstructor->lastname,
+                        );
                     }
                 }
             }
         }
 
-        // Then get the event participants
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId = ? ORDER BY stateOfSubscription, firstname', [$this->event->id]);
+        // Get the event participants
+        $stmt = $this->connection
+            ->executeQuery(
+                'SELECT * FROM tl_calendar_events_member WHERE eventId = ? ORDER BY stateOfSubscription, firstname',
+                [
+                    $this->event->id,
+                ]
+            )
+        ;
 
         while (false !== ($arrReg = $stmt->fetchAssociative())) {
             if ($this->validator->isEmail($arrReg['email'])) {
                 $arrSubscriptionStates = EventSubscriptionState::ALL;
                 $registrationModel = $this->calendarEventsMember->findByPk($arrReg['id']);
+
+                if (null === $registrationModel) {
+                    continue;
+                }
+
                 $icon = $this->eventRegistrationUtil->getSubscriptionStateIcon($registrationModel);
 
                 $regState = (string) $arrReg['stateOfSubscription'];
                 $regState = \in_array($regState, $arrSubscriptionStates, true) ? $regState : EventSubscriptionState::SUBSCRIPTION_STATE_UNDEFINED;
                 $strLabel = $GLOBALS['TL_LANG']['MSC'][$regState] ?? $regState;
 
-                $options['tl_calendar_events_member-'.$arrReg['id']] = sprintf('%s %s %s (%s)', $icon, $arrReg['firstname'], $arrReg['lastname'], $strLabel);
+                $options['tl_calendar_events_member-'.$arrReg['id']] = sprintf(
+                    '%s %s %s (%s)',
+                    $icon,
+                    $arrReg['firstname'],
+                    $arrReg['lastname'],
+                    $strLabel,
+                );
             }
         }
 
@@ -528,6 +540,7 @@ class SendEmailToParticipantController extends AbstractController
                 'subject' => '',
                 'text' => '',
             ];
+
             $session->set(self::SESSION_BAG_KEY, $bagAll);
         }
 
@@ -559,5 +572,19 @@ class SendEmailToParticipantController extends AbstractController
         $bagAll = array_values($bagAll);
 
         $session->set(self::SESSION_BAG_KEY, $bagAll);
+    }
+
+    private function clearTemporaryCreatedAttachments(): void
+    {
+        $bag = $this->getSessionBag();
+        $files = $bag['attachments'] ?? [];
+
+        $fs = new Filesystem();
+
+        foreach ($files as $file) {
+            if (is_dir(\dirname($file['temp_storage_path']))) {
+                $fs->remove(\dirname($file['temp_storage_path']));
+            }
+        }
     }
 }
