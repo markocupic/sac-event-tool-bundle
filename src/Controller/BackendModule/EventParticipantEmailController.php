@@ -50,16 +50,16 @@ use Twig\Environment as Twig;
  * This controller allows sending emails directly from the participant list.
  *
  * involved files:
- * vendor/markocupic/sac-event-tool-bundle/contao/templates/backend/tl_calendar_events_member/be_send_email_to_participant.html.twig
- * vendor/markocupic/sac-event-tool-bundle/templates/EventRegistration/send_email_to_participant_subject_template.twig
- * vendor/markocupic/sac-event-tool-bundle/templates/EventRegistration/send_email_to_participant_text_template.twig
+ * vendor/markocupic/sac-event-tool-bundle/contao/templates/backend/tl_calendar_events_member/be_event_participant_email.html.twig
+ * vendor/markocupic/sac-event-tool-bundle/templates/EventRegistration/event_participant_email_subject_template.twig
+ * vendor/markocupic/sac-event-tool-bundle/templates/EventRegistration/event_participant_email_text_template.twig
  * vendor/markocupic/sac-event-tool-bundle/contao/languages/en/default.php
  * vendor/markocupic/sac-event-tool-bundle/public/css/be_stylesheet.css
  */
-#[Route('/contao/send_email_to_participant/{event_id}/{sid}/{rt}', name: SendEmailToParticipantController::class, defaults: ['_scope' => 'backend', '_token_check' => true])]
-class SendEmailToParticipantController extends AbstractController
+#[Route('/contao/event_participant_email/{event_id}/{sid}/{rt}', name: EventParticipantEmailController::class, defaults: ['_scope' => 'backend', '_token_check' => true])]
+class EventParticipantEmailController extends AbstractController
 {
-    public const SESSION_BAG_KEY = 'sacevt_be_send_email';
+    public const SESSION_BAG_KEY = 'sacevt_event_participant_email';
     public const MAX_FILE_SIZE = 4000000;
     public const ALLOWED_EXTENSIONS = ['csv', 'bmp', 'png', 'svg', 'jpg', 'jpeg', 'tiff', 'doc', 'docx', 'pdf', 'xls', 'xlsx', 'txt', 'zip', 'rtf'];
 
@@ -109,7 +109,7 @@ class SendEmailToParticipantController extends AbstractController
         $uriSigner = $this->system->getContainer()->get('uri_signer');
 
         if (!$uriSigner->check($this->requestStack->getCurrentRequest()->getRequestUri())) {
-            $this->message->addError($this->translator->trans('MSC.accessDenied', [], 'contao_default'));
+            $this->message->addError($this->translator->trans('MSC.evt_epe_accessDenied', [], 'contao_default'));
             $this->controller->redirect($this->getBackUri());
         }
 
@@ -135,7 +135,7 @@ class SendEmailToParticipantController extends AbstractController
             throw new AccessDeniedException('Access denied. Please use a valid "action" parameter.');
         }
 
-        $template = new BackendTemplate('be_send_email_to_participant');
+        $template = new BackendTemplate('be_event_participant_email');
         $template->event = $this->event;
         $template->allowed_extensions = self::ALLOWED_EXTENSIONS;
         $template->back = $this->getBackUri();
@@ -159,7 +159,7 @@ class SendEmailToParticipantController extends AbstractController
         $this->event = $this->calendarEvents->findByPk($eventId);
 
         if (null === $this->event) {
-            $this->message->addError($this->translator->trans('MSC.evt_setp_eventNotFound', [$eventId], 'contao_default'));
+            $this->message->addError($this->translator->trans('MSC.evt_epe_eventNotFound', [$eventId], 'contao_default'));
             $this->controller->redirect($this->getBackUri());
         }
 
@@ -181,26 +181,26 @@ class SendEmailToParticipantController extends AbstractController
         $form->addContaoHiddenFields();
 
         $form->addFormField('recipients', [
-            'label' => $this->translator->trans('MSC.evt_setp_emailRecipients', [], 'contao_default'),
+            'label' => $this->translator->trans('MSC.evt_epe_emailRecipients', [], 'contao_default'),
             'inputType' => 'checkbox',
             'options' => $this->getRegistrations(),
             'eval' => ['class' => 'tl_checkbox_container', 'multiple' => true, 'mandatory' => true],
         ]);
 
         $form->addFormField('subject', [
-            'label' => $this->translator->trans('MSC.evt_setp_emailSubject', [], 'contao_default'),
+            'label' => $this->translator->trans('MSC.evt_epe_emailSubject', [], 'contao_default'),
             'inputType' => 'text',
             'eval' => ['mandatory' => true],
         ]);
 
         $form->addFormField('text', [
-            'label' => $this->translator->trans('MSC.evt_setp_emailText', [], 'contao_default'),
+            'label' => $this->translator->trans('MSC.evt_epe_emailText', [], 'contao_default'),
             'inputType' => 'textarea',
             'eval' => ['rows' => 20, 'cols' => 80, 'mandatory' => true],
         ]);
 
         $form->addFormField('submit', [
-            'label' => $this->translator->trans('MSC.evt_setp_sendEmail', [], 'contao_default'),
+            'label' => $this->translator->trans('MSC.evt_epe_sendEmail', [], 'contao_default'),
             'inputType' => 'submit',
             'eval' => ['class' => 'tl_submit'],
         ]);
@@ -211,7 +211,7 @@ class SendEmailToParticipantController extends AbstractController
         if ($form->validate()) {
             if ($this->sendEmail($form)) {
                 // Show a confirmation message for the successful sending of the message
-                $msg = $this->translator->trans('MSC.evt_setp_emailSentToEventMembers', [], 'contao_default');
+                $msg = $this->translator->trans('MSC.evt_epe_emailSentToEventMembers', [], 'contao_default');
                 $this->message->addInfo($msg);
 
                 $this->clearTemporaryCreatedAttachments();
@@ -223,7 +223,7 @@ class SendEmailToParticipantController extends AbstractController
 
             // Sending email failed! Reload page and show error message.
             $this->saveFormInputsToSession($form);
-            $this->message->addError($this->translator->trans('MSC.evt_setp_sendingEmailFailed', [], 'contao_default'));
+            $this->message->addError($this->translator->trans('MSC.evt_epe_sendingEmailFailed', [], 'contao_default'));
             $this->controller->reload();
         }
 
@@ -231,7 +231,7 @@ class SendEmailToParticipantController extends AbstractController
         if ('email_app_form' !== $request->request->get('FORM_SUBMIT')) {
             if (empty($form->getWidget('text')->value) && empty($form->getWidget('subject')->value)) {
                 $form->getWidget('text')->value = $this->twig->render(
-                    '@MarkocupicSacEventTool/EventRegistration/send_email_to_participant_text_template.twig',
+                    '@MarkocupicSacEventTool/EventRegistration/event_participant_email_text_template.twig',
                     [
                         'event' => $this->event,
                         'user' => $this->userModel->findByPk($this->user->id),
@@ -240,7 +240,7 @@ class SendEmailToParticipantController extends AbstractController
                 );
 
                 $form->getWidget('subject')->value = $this->twig->render(
-                    '@MarkocupicSacEventTool/EventRegistration/send_email_to_participant_subject_template.twig',
+                    '@MarkocupicSacEventTool/EventRegistration/event_participant_email_subject_template.twig',
                     [
                         'event' => $this->event,
                     ]
@@ -381,12 +381,12 @@ class SendEmailToParticipantController extends AbstractController
 
             if (!$hasError && $uploadedFile->getSize() > self::MAX_FILE_SIZE) {
                 $hasError = true;
-                $json['message'] = $this->translator->trans('MSC.evt_setp_maxFilesizeExceeded', [self::MAX_FILE_SIZE], 'contao_default');
+                $json['message'] = $this->translator->trans('MSC.evt_epe_maxFilesizeExceeded', [self::MAX_FILE_SIZE], 'contao_default');
             }
 
             if (!$hasError && !\in_array(strtolower($uploadedFile->getClientOriginalExtension()), self::ALLOWED_EXTENSIONS, true)) {
                 $hasError = true;
-                $json['message'] = $this->translator->trans('MSC.evt_setp_notAllowedFileExtension', [implode(',', self::ALLOWED_EXTENSIONS)], 'contao_default');
+                $json['message'] = $this->translator->trans('MSC.evt_epe_notAllowedFileExtension', [implode(',', self::ALLOWED_EXTENSIONS)], 'contao_default');
             }
 
             if (!$hasError) {
@@ -397,14 +397,14 @@ class SendEmailToParticipantController extends AbstractController
                     // Move file to the temp storage directory
                     if ($uploadedFile->move(\dirname($arrFile['temp_storage_path']), basename($arrFile['temp_storage_path']))) {
                         $json['status'] = 'success';
-                        $json['message'] = $this->translator->trans('MSC.evt_setp_fileUploadedSuccessful', [implode(',', self::ALLOWED_EXTENSIONS)], 'contao_default');
+                        $json['message'] = $this->translator->trans('MSC.evt_epe_fileUploadedSuccessful', [implode(',', self::ALLOWED_EXTENSIONS)], 'contao_default');
 
                         // Save file data to the session
                         $bag = $this->getSessionBag();
                         $bag['attachments'][] = $arrFile;
                         $this->setSessionBag($bag);
                     } else {
-                        throw new \Exception($this->translator->trans('MSC.evt_setp_fileNotSubmitted', [], 'contao_default'));
+                        throw new \Exception($this->translator->trans('MSC.evt_epe_fileNotSubmitted', [], 'contao_default'));
                     }
                 } catch (\Exception $e) {
                     $json['status'] = 'error';
@@ -412,7 +412,7 @@ class SendEmailToParticipantController extends AbstractController
                 }
             }
         } else {
-            $json['message'] = $this->translator->trans('MSC.evt_setp_fileNotSubmitted', [], 'contao_default');
+            $json['message'] = $this->translator->trans('MSC.evt_epe_fileNotSubmitted', [], 'contao_default');
         }
 
         $bag = $this->getSessionBag();

@@ -18,7 +18,7 @@ use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Config\BookingType;
 use Markocupic\SacEventToolBundle\Config\Bundle;
-use Markocupic\SacEventToolBundle\Controller\BackendModule\SendEmailToParticipantController;
+use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmailController;
 use Ramsey\Uuid\Uuid;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 

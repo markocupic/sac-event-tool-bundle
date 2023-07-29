@@ -47,8 +47,8 @@ use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Config\Log;
+use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmailController;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventParticipantController;
-use Markocupic\SacEventToolBundle\Controller\BackendModule\SendEmailToParticipantController;
 use Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventMemberList2Docx;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
@@ -636,7 +636,7 @@ class CalendarEventsMember
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        $url = System::getContainer()->get('uri_signer')->sign(System::getContainer()->get('router')->generate(SendEmailToParticipantController::class, [
+        $url = System::getContainer()->get('uri_signer')->sign(System::getContainer()->get('router')->generate(EventParticipantEmailController::class, [
             'event_id' => $request->query->get('id'),
             'rt' => $request->query->get('rt'),
             'sid' => uniqid(),

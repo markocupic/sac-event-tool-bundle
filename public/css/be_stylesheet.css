@@ -402,67 +402,67 @@ div.tl_header_tour_rapport table td {
 /**
  * Send emails to participants
  */
-#emailApp #fileUploader[v-cloak] {
+#eventParticipantEmail #fileUploader[v-cloak] {
 	opacity: 0;
 }
 
-#emailApp #fileUploader {
+#eventParticipantEmail #fileUploader {
 	transition: opacity 1.5s linear;
 }
 
-#emailApp {
+#eventParticipantEmail {
 	margin: 15px;
 }
 
-#emailApp label {
+#eventParticipantEmail label {
 	font-weight: 600;
 }
 
-#emailApp legend {
+#eventParticipantEmail legend {
 	display: flex;
 }
 
-#emailApp .widget {
+#eventParticipantEmail .widget {
 	margin: 1rem 0 !important;
 }
 
-#emailApp .widget-text, #emailApp .widget-textarea {
+#eventParticipantEmail .widget-text, #eventParticipantEmail .widget-textarea {
 	display: flex;
 	flex-direction: column;
 }
 
-#emailApp input[type="text"], #emailApp textarea {
+#eventParticipantEmail input[type="text"], #eventParticipantEmail textarea {
 	padding: 5px 6px;
 }
 
-#emailApp .widget-checkbox span {
+#eventParticipantEmail .widget-checkbox span {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
 	align-items: center;
 }
 
-#emailApp .widget.tl_submit {
+#eventParticipantEmail .widget.tl_submit {
 	background: 0 !important;
 	border: 0;
 	padding: 0;
 }
 
-#emailApp .tl_checkbox_container span > * {
+#eventParticipantEmail .tl_checkbox_container span > * {
 	margin: .5rem .5rem .5rem 0 !important;
 }
 
-#emailApp .email-attachment-list {
+#eventParticipantEmail .email-attachment-list {
 	margin: 2rem 0 1rem 0;
 }
 
-#emailApp .email-attachment-list li {
+#eventParticipantEmail .email-attachment-list li {
 	margin: .75rem 0;
 	display: flex;
 	align-items: flex-start;
 }
 
-#emailApp .delete-attachment-btn span {
+#eventParticipantEmail .delete-attachment-btn span {
 	border: 0;
 	padding: 0;
 	margin: 0 .5rem 0 0;
@@ -473,15 +473,15 @@ div.tl_header_tour_rapport table td {
 	background-repeat: no-repeat;
 }
 
-#emailApp .pending-upload-indicator, #emailApp .ajax-message-success {
+#eventParticipantEmail .pending-upload-indicator, #eventParticipantEmail .ajax-message-success {
 	color: green;
 }
 
-#emailApp .upload-error-box {
+#eventParticipantEmail .upload-error-box {
 	margin: 2rem 0 0 0;
 }
 
-#emailApp .blink {
+#eventParticipantEmail .blink {
 	animation: blinker 1s linear infinite;
 }
 
