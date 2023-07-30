@@ -135,12 +135,10 @@ class EventParticipantEmailController extends AbstractController
             throw new AccessDeniedException('Access denied. Please use a valid "action" parameter.');
         }
 
-        $bag = $this->getSessionBag();
-
         $template = new BackendTemplate('be_event_participant_email');
         $template->event = $this->event;
         $template->allowed_extensions = self::ALLOWED_EXTENSIONS;
-        $template->back = $bag['referer'];
+        $template->back = $this->getBackUri();
         $template->form = $this->createAndValidateForm()->generate();
         $template->max_filesize = self::MAX_FILE_SIZE;
         $template->request_token = $rt;
@@ -455,18 +453,9 @@ class EventParticipantEmailController extends AbstractController
 
     private function getBackUri(): string
     {
-        return $this->system->getContainer()
-            ->get('router')
-            ->generate(
-                'contao_backend',
-                [
-                    'do' => 'sac_calendar_events_tool',
-                    'table' => 'tl_calendar_events_member',
-                    'id' => $this->event->id,
-                    'rt' => $this->requestStack->getCurrentRequest()->attributes->get('rt'),
-                ]
-            )
-        ;
+        $bag = $this->getSessionBag();
+
+        return $bag['referer'];
     }
 
     private function getRegistrations(): array
