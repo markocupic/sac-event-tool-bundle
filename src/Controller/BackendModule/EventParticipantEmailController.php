@@ -135,10 +135,12 @@ class EventParticipantEmailController extends AbstractController
             throw new AccessDeniedException('Access denied. Please use a valid "action" parameter.');
         }
 
+        $bag = $this->getSessionBag();
+
         $template = new BackendTemplate('be_event_participant_email');
         $template->event = $this->event;
         $template->allowed_extensions = self::ALLOWED_EXTENSIONS;
-        $template->back = $this->getBackUri();
+        $template->back = $bag['referer'];
         $template->form = $this->createAndValidateForm()->generate();
         $template->max_filesize = self::MAX_FILE_SIZE;
         $template->request_token = $rt;
@@ -535,6 +537,7 @@ class EventParticipantEmailController extends AbstractController
 
         if (!isset($bagAll[$this->sid])) {
             $bagAll[$this->sid] = [
+                'referer' => System::getReferer(),
                 'attachments' => [],
                 'recipients' => [],
                 'subject' => '',
