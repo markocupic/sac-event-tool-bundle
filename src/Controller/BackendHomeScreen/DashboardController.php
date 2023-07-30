@@ -21,10 +21,12 @@ use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
+use Contao\System;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventType;
+use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmailController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
@@ -198,13 +200,14 @@ class DashboardController
      */
     private function generateEmailHref(CalendarEventsModel $eventModel): string|null
     {
-        $rt = $this->contaoCsrfTokenManager->getDefaultTokenValue();
-        $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
-
         $regId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$eventModel->id]);
 
         if ($regId) {
-            return sprintf('contao?do=sac_calendar_events_tool&id=%d&table=tl_calendar_events_member&act=edit&action=sendEmail&eventId=%d&rt=%s&ref=%s', $regId, $eventModel->id, $rt, $refId);
+            return System::getContainer()->get('uri_signer')->sign(System::getContainer()->get('router')->generate(EventParticipantEmailController::class, [
+                'event_id' => $eventModel->id,
+                'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
+                'sid' => uniqid(),
+            ]));
         }
 
         return null;
