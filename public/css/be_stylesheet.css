@@ -404,6 +404,10 @@ div.tl_header_tour_rapport table td {
 	margin: 8px 0;
 }
 
+#eventParticipantEmail #selectAllBox a {
+	text-decoration: underline;
+}
+
 #eventParticipantEmail #fileUploader[v-cloak] {
 	opacity: 0;
 }
