@@ -190,7 +190,7 @@ class EventParticipantEmailController extends AbstractController
         $form->addFormField('recipientsCc', [
             'label' => $this->translator->trans('MSC.evt_epe_emailRecipientsCc', [], 'contao_default'),
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'emails', 'mandatory' => false],
+            'eval' => ['rgxp' => 'emails', 'placeholder' => 'person_x@foo.ch,person_y@bar.ch,...'],
         ]);
 
         $form->addFormField('subject', [
