@@ -184,6 +184,7 @@ $GLOBALS['TL_LANG']['MSC']['aw_photographer'] = 'Photograph';
 // Backend route contao/event_participant_email
 $GLOBALS['TL_LANG']['MSC']['evt_epe_accessDenied'] = 'Zugriff zur App verweigert. Bitte aktualisieren Sie die Seite und rufen Sie die App erneut auf.';
 $GLOBALS['TL_LANG']['MSC']['evt_epe_emailRecipients'] = 'E-Mail Empfänger';
+$GLOBALS['TL_LANG']['MSC']['evt_epe_emailRecipientsCc'] = 'Weitere E-Mail Empfänger (kommasepariert)';
 $GLOBALS['TL_LANG']['MSC']['evt_epe_emailSubject'] = 'E-Mail Betreff';
 $GLOBALS['TL_LANG']['MSC']['evt_epe_emailText'] = 'E-Mail Text';
 $GLOBALS['TL_LANG']['MSC']['evt_epe_sendEmail'] = 'E-Mail versenden';
@@ -198,3 +199,5 @@ $GLOBALS['TL_LANG']['MSC']['evt_epe_generalAjaxError'] = 'Der Befehl konnte nich
 $GLOBALS['TL_LANG']['MSC']['evt_epe_eventNotFound'] = 'Event mit ID %s konnte nicht gefunden werden.';
 $GLOBALS['TL_LANG']['MSC']['evt_epe_emailSentToEventMembers'] = 'Ihre E-Mail wurde erfolgreich versendet.';
 $GLOBALS['TL_LANG']['MSC']['evt_epe_fileUploadedSuccessful'] = 'Datei erfolgreich hochgeladen.';
+$GLOBALS['TL_LANG']['MSC']['evt_epe_selectAll'] = 'alle anwählen';
+$GLOBALS['TL_LANG']['MSC']['evt_epe_unselectAll'] = 'alle abwählen';

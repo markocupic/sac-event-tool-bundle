@@ -393,15 +393,17 @@ div.tl_header_tour_rapport table td {
 	height: auto !important;
 }
 
-
 .tl_gerror {
 	display: none;
 }
 
 
-/**
- * Send emails to participants
- */
+/** Send emails to participants */
+#eventParticipantEmail #selectAllBox {
+	display: block;
+	margin: 8px 0;
+}
+
 #eventParticipantEmail #fileUploader[v-cloak] {
 	opacity: 0;
 }
@@ -433,6 +435,7 @@ div.tl_header_tour_rapport table td {
 
 #eventParticipantEmail input[type="text"], #eventParticipantEmail textarea {
 	padding: 5px 6px;
+	margin-top: 4px;
 }
 
 #eventParticipantEmail .widget-checkbox span {
@@ -491,6 +494,4 @@ div.tl_header_tour_rapport table td {
 	}
 }
 
-/**
- * End Send emails to participants
- */
+/** End Send emails to participants */

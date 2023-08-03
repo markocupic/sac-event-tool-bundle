@@ -187,6 +187,12 @@ class EventParticipantEmailController extends AbstractController
             'eval' => ['class' => 'tl_checkbox_container', 'multiple' => true, 'mandatory' => true],
         ]);
 
+        $form->addFormField('recipientsCc', [
+            'label' => $this->translator->trans('MSC.evt_epe_emailRecipientsCc', [], 'contao_default'),
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'emails', 'mandatory' => false],
+        ]);
+
         $form->addFormField('subject', [
             'label' => $this->translator->trans('MSC.evt_epe_emailSubject', [], 'contao_default'),
             'inputType' => 'text',
@@ -270,6 +276,11 @@ class EventParticipantEmailController extends AbstractController
                 $arrEmailRecipients[] = $this->calendarEventsMember->findByPk($arrRecipient[1])->email;
             }
         }
+
+        $recipients = $form->getWidget('recipientsCc')->value;
+        $recipients = str_replace([' ', ';'], ['', ','], (string) $recipients);
+        $arrEmailRecipients = array_merge($arrEmailRecipients, array_filter(explode(',', $recipients)));
+        $arrEmailRecipients = array_unique($arrEmailRecipients);
 
         $objEmail = new Email();
         $objEmail->fromName = html_entity_decode($this->sacevtEventAdminName);

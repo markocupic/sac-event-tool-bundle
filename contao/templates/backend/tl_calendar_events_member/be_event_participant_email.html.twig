@@ -323,6 +323,58 @@
                     }, 2000);
                 });
             });
+
+            /**
+             * Inject select and unselect all button
+             */
+            window.addEventListener('DOMContentLoaded', (event) => {
+
+                const template = document.createElement('template');
+                template.innerHTML = `<div id='selectAllBox'><a href="#" id="selectAllBtn">{{ 'MSC.evt_epe_selectAll'|trans([], 'contao_default') }}</a> <a href="#" id="unselectAllBtn">{{ 'MSC.evt_epe_unselectAll'|trans([], 'contao_default') }}</a></div>`;
+                const el1 = template.content.firstElementChild;
+
+                // Get the reference element
+                const el2 = document.querySelector('#ctrl_recipients input[type="hidden"]');
+
+                // Get the parent element
+                const parentDiv = el2.parentNode;
+
+                // Insert the new element into before sp2
+                parentDiv.insertBefore(el1, el2);
+
+                window.setTimeout(() => {
+
+                    function selectAll() {
+                        const checkboxes = document.querySelectorAll('[name="recipients[]"]');
+                        for (const checkbox of checkboxes) {
+                            if (checkbox.type === 'checkbox') {
+                                checkbox.checked = true;
+                            }
+                        }
+                    }
+
+                    function unselectAll() {
+                        const checkboxes = document.querySelectorAll('[name="recipients[]"]');
+                        for (const checkbox of checkboxes) {
+                            if (checkbox.type === 'checkbox') {
+                                checkbox.checked = false;
+                            }
+                        }
+                    }
+
+                    document.getElementById('selectAllBtn').addEventListener('click', (event) => {
+                        event.preventDefault();
+                        selectAll();
+                    });
+
+                    document.getElementById('unselectAllBtn').addEventListener('click', (event) => {
+                        event.preventDefault();
+                        unselectAll();
+                    });
+                }, 100);
+
+            });
+
         </script>
     </div>
 
