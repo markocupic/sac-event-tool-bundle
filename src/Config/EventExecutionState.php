@@ -20,12 +20,12 @@ namespace Markocupic\SacEventToolBundle\Config;
 class EventExecutionState
 {
     public const STATE_EXECUTED_LIKE_PREDICTED = 'event_executed_like_predicted';
-    public const STATE_DEFERRED = 'event_deferred';
+    public const STATE_RESCHEDULED = 'event_rescheduled';
     public const STATE_ADAPTED = 'event_adapted';
     public const STATE_CANCELED = 'event_canceled';
     public const ALL = [
         self::STATE_EXECUTED_LIKE_PREDICTED,
-        self::STATE_DEFERRED,
+        self::STATE_RESCHEDULED,
         self::STATE_ADAPTED,
         self::STATE_CANCELED,
     ];

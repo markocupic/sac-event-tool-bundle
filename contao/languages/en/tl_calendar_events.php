@@ -75,9 +75,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['isRecurringEvent'] = ['Sich wiederhol
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventDates'] = ['Eventdaten', 'Geben Sie bitte die Eventdaten ein. Für jeden Tag eine Zeile. <strong>Hinweis: Erstellen Sie bei einem Serien-Event jeweils separate Events!</strong> (Event kann kopiert/dupliziert werden)'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['durationInfo'] = ['Event-Dauer', 'Geben Sie die Event-Dauer an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventState'] = ['Event-Status', '<strong class="notice">!!! Teilnehmer müssen separat informiert werden !!!</strong> Geben Sie optional einen Event-Status an.'];
-/** @todo Falls verschoben, kann hier das Verschiebedatum angegeben werden. */
-// eventDeferDate
-//$GLOBALS['TL_LANG']['tl_calendar_events']['eventDeferDate'] = array("Verschiebedatum", "Geben Sie das Verschiebedatum an, falls der Anlass verschoben wurde.");
+$GLOBALS['TL_LANG']['tl_calendar_events']['rescheduledEventDate'] = ['Verschiebedatum', 'Geben Sie das Verschiebedatum ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['singleSRCBroschuere'] = ['Hintergrundbild für PDF-Kursbroschüre', 'Wählen Sie bitte ein Bild aus.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['allowDeregistration'] = ['Angemeldeter Teilnehmer darf sich online vom Event abmelden', 'Geben Sie dem angemeldeten Teilnehmer die Möglichkeit unter Einhaltung einer definierten Abmeldefrist sich online vom Event abzumelden.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['deregistrationLimit'] = ['Abmeldefrist in Tagen', 'Definieren Sie den Zeitraum in Tagen, bis zu dem sich ein bereits angemeldeter Teilnehmer wieder online vom Event abmelden kann.'];
@@ -129,7 +127,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['endurance'] = ['Konditionelle Anforde
 $GLOBALS['TL_LANG']['tl_calendar_events']['iceClimbing'] = ['Eisklettern'];
 $GLOBALS['TL_LANG']['tl_calendar_events'][EventState::STATE_FULLY_BOOKED] = ['Event ausgebucht'];
 $GLOBALS['TL_LANG']['tl_calendar_events'][EventState::STATE_CANCELED] = ['Event abgesagt'];
-$GLOBALS['TL_LANG']['tl_calendar_events'][EventState::STATE_DEFERRED] = ['Event verschoben'];
+$GLOBALS['TL_LANG']['tl_calendar_events'][EventState::STATE_RESCHEDULED] = ['Event verschoben'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMountainGuide::NO_MOUNTAIN_GUIDE] = '«ohne Bergführer/in» und «ohne Bergführerangebot»';
 $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMountainGuide::WITH_MOUNTAIN_GUIDE] = '«mit Bergführer/in» und «ohne Bergführerangebot»';
 $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER] = '«mit Bergführer/in» und «mit Bergführerangebot»';
@@ -137,9 +135,9 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMounta
 // Use these states for the report
 $GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED] = ['Event wie ausgeschrieben durchgeführt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_ADAPTED] = ['Ausweichtour-/event'];
-// These states are already transated by EventState::STATE_CANCELED and EventState::STATE_DEFERRED
+// These states are already transated by EventState::STATE_CANCELED and EventState::STATE_RESCHEDULED
 //$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_CANCELED] = ['Event abgesagt'];
-//$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_DEFERRED] = ['Event verschoben'];
+//$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_RESCHEDULED] = ['Event verschoben'];
 
 $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_0'] = ['Keine Lawinengefahr'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_1'] = ['Geringe Lawinengefahr'];

@@ -74,7 +74,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['__selector__'][] = 'custom
 PaletteManipulator::create()
 	->addField(['eventType'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['singleSRCBroschuere'], 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['title', 'alias', 'courseId', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'], 'title_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['title', 'alias', 'courseId', 'eventState', 'rescheduledEventDate', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'tourTechDifficulty', 'teaser'], 'title_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['suitableForBeginners', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'], 'title_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['eventDates', 'durationInfo'], 'date_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['addTime', 'startTime', 'endTime'], 'date_legend', PaletteManipulator::POSITION_APPEND)
@@ -97,7 +97,7 @@ PaletteManipulator::create()
 // Tour and lastMinuteTour palette
 PaletteManipulator::create()
 	->addField(['eventType'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['title', 'alias', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'suitableForBeginners', 'tourTechDifficulty', 'teaser'], 'title_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['title', 'alias', 'eventState', 'rescheduledEventDate', 'author', 'instructor', 'mountainguide', 'organizers', 'tourType', 'suitableForBeginners', 'tourTechDifficulty', 'teaser'], 'title_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['eventDates', 'durationInfo'], 'date_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['isRecurringEvent'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
@@ -119,7 +119,7 @@ PaletteManipulator::create()
 // Add field: 'generalEventDetailText'
 PaletteManipulator::create()
 	->addField(['eventType'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['title', 'alias', 'eventState', 'author', 'instructor', 'organizers', 'tourType', 'teaser'], 'title_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['title', 'alias', 'eventState', 'rescheduledEventDate', 'author', 'instructor', 'organizers', 'tourType', 'teaser'], 'title_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['eventDates', 'durationInfo'], 'date_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['isRecurringEvent'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
@@ -139,7 +139,7 @@ PaletteManipulator::create()
 PaletteManipulator::create()
 	->addField(['eventType'], 'event_type_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['singleSRCBroschuere'], 'broschuere_legend', PaletteManipulator::POSITION_APPEND)
-	->addField(['title', 'alias', 'courseId', 'eventState', 'author', 'instructor', 'mountainguide', 'organizers', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'], 'title_legend', PaletteManipulator::POSITION_APPEND)
+	->addField(['title', 'alias', 'courseId', 'eventState', 'rescheduledEventDate', 'author', 'instructor', 'mountainguide', 'organizers', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1'], 'title_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['eventDates', 'durationInfo'], 'date_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['isRecurringEvent'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
 	->addField(['recurring'], 'recurring_legend', PaletteManipulator::POSITION_APPEND)
@@ -495,21 +495,17 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
 	'inputType' => 'select',
 	'options'   => EventState::ALL,
 	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-	'eval'      => ['submitOnChange' => false, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr m12', 'mandatory' => false],
+	'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr w50', 'mandatory' => false],
 	'sql'       => "varchar(32) NOT NULL default ''",
 ];
 
-/** @todo Falls verschoben, kann hier das Verschiebedatum angegeben werden. */
-// eventDeferDate
-/*
- * $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventDeferDate'] = array(
- * 'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['eventDeferDate'],
- * 'exclude' => true,
- * 'inputType' => 'text',
- * 'eval' => array('rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => true, 'datepicker' => true, 'tl_class' => 'clr wizard'),
- * 'sql' => "int(10) unsigned NULL"
- * );
- */
+// rescheduledEventDate
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['rescheduledEventDate'] = [
+	'exclude'   => true,
+	'inputType' => 'text',
+	'eval'      => ['rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
+	'sql'       => "int(10) unsigned NULL",
+];
 
 // meetingPoint
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['meetingPoint'] = [

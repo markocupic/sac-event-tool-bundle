@@ -29,6 +29,11 @@
 
                 <!-- right col -->
                 <div class="event-list-tour-col-2">
+                    {# Event has been rescheduled #}
+                    <div class="small text-danger me-1" v-if="row.eventState === 'event_status_6'">
+                        <span class="small" v-html="row.eventStateLabel"></span>
+                    </div>
+
                     <!-- row event period -->
                     <div class="d-flex flex-wrap">
                         <div class="small me-1"><span v-html="row.eventPeriodLgInline"></span></div>

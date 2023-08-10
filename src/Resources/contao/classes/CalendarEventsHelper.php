@@ -173,6 +173,12 @@ class CalendarEventsHelper
 
             case 'eventStateLabel':
                 $value = '' !== $GLOBALS['TL_LANG']['MSC']['calendar_events'][static::getEventState($objEvent)] ? $GLOBALS['TL_LANG']['MSC']['calendar_events'][static::getEventState($objEvent)] : static::getEventState($objEvent);
+
+                if (EventState::STATE_RESCHEDULED === $objEvent->eventState) {
+                    $dateFormat = Config::get('dateFormat');
+                    $newDate = $objEvent->rescheduledEventDate ? date($dateFormat, (int) $objEvent->rescheduledEventDate) : 'unbest';
+                    $value = sprintf($GLOBALS['TL_LANG']['MSC']['calendar_events'][static::getEventState($objEvent)], $newDate);
+                }
                 break;
 
             case 'isLastMinuteTour':
@@ -430,7 +436,7 @@ class CalendarEventsHelper
         }
 
         // Event deferred
-        if (EventState::STATE_DEFERRED === $objEvent->eventState) {
+        if (EventState::STATE_RESCHEDULED === $objEvent->eventState) {
             return 'event_status_6';
         }
 

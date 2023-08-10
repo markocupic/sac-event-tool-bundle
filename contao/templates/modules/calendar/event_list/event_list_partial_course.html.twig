@@ -34,6 +34,10 @@
                         <i class="fa fa-fw fa-calendar-alt"></i>
                         <span v-html="row.eventPeriodLgInline"></span>
                     </div>
+                    {# if the event has been rescheduled #}
+                    <div class="detail-item small text-danger" v-if="row.eventState === 'event_status_6'">
+                        <span v-html="row.eventStateLabel"></span>
+                    </div>
                     <div class="detail-item">
                         <div v-html="row.bookingCounter" class="me-1"></div>
                     </div>

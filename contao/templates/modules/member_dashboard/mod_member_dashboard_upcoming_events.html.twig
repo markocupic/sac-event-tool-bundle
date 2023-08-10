@@ -31,7 +31,7 @@
             <tr>
                 <td>{{ event.dateSpan|raw }}</td>
                 <td>
-                    {% if  constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_DEFERRED') == event.eventState %}
+                    {% if  constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_RESCHEDULED') == event.eventState %}
                         <small><span style="color:red">Event verschoben!</span></small><br>
                     {% endif %}
 

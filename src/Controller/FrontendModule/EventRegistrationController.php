@@ -246,7 +246,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
         } elseif (EventState::STATE_CANCELED === $this->eventModel->eventState) {
             // Check if the event has been marked as "canceled".
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventCanceled', [], 'contao_default'));
-        } elseif (EventState::STATE_DEFERRED === $this->eventModel->eventState) {
+        } elseif (EventState::STATE_RESCHEDULED === $this->eventModel->eventState) {
             // Check if the event has been marked as "deferred".
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventDeferred', [], 'contao_default'));
         } elseif ($this->eventModel->setRegistrationPeriod && $this->eventModel->registrationStartDate > time()) {

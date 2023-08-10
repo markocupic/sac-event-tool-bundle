@@ -47,6 +47,7 @@ use League\Csv\CharsetConverter;
 use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
@@ -135,7 +136,7 @@ class CalendarEvents
             }
 
             // If event has been deferred
-            if (EventState::STATE_DEFERRED === $objCalendarEventsModel->eventState) {
+            if (EventState::STATE_RESCHEDULED === $objCalendarEventsModel->eventState) {
                 PaletteManipulator::create()
                     ->applyToPalette('default', 'tl_calendar_events')
                     ->applyToPalette(EventType::TOUR, 'tl_calendar_events')
@@ -398,6 +399,18 @@ class CalendarEvents
             if (null !== $objCalendarEventsModel) {
                 if (isset($GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][$objCalendarEventsModel->eventType])) {
                     $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][$objCalendarEventsModel->eventType];
+                }
+            }
+
+            // Remove the field "rescheduledEventDate" if the event has not been rescheduled
+            if (EventExecutionState::STATE_RESCHEDULED !== $objCalendarEventsModel->eventState) {
+                $palettes = ['default', 'tour', 'lastMinuteTour', 'course', 'generalEvent', 'tour_report'];
+
+                foreach ($palettes as $strPaletteName) {
+                    PaletteManipulator::create()
+                        ->removeField('rescheduledEventDate')
+                        ->applyToPalette($strPaletteName, 'tl_calendar_events')
+                        ;
                 }
             }
         }
