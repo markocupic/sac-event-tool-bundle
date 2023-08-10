@@ -10,7 +10,7 @@
             <div class="event-list-inner-box d-flex p-3 mb-3">
                 <!-- left col -->
                 <div class="event-list-tour-col-1" data-has-event-href="true" v-bind:data-href="row.eventUrl">
-                    <div class="event-list-badge-wrapper me-4 rounded-circle d-flex align-items-center justify-content-center">
+                    <div class="event-list-date-badge-wrapper me-4 rounded-circle d-flex align-items-center justify-content-center">
                         <div class="d-flex flex-column">
                             <span class="event-list-badge-day text-center lh-1">
                             <strong v-html="row.startDateDay"></strong>
@@ -56,16 +56,16 @@
                     <!-- end row state icon -->
 
                     <!-- start row icons -->
-                    <div class="d-flex">
-                        <div class="me-2" v-if="row.bookingCounter" v-html="row.bookingCounter"></div>
-                        <div class="me-2" v-if="row.suitableForBeginners">
+                    <div class="d-flex flex-wrap badge-container">
+                        <div class="d-flex flex-wrap" v-if="row.bookingCounter" v-html="row.bookingCounter"></div>
+                        <div class="d-flex flex-wrap" v-if="row.suitableForBeginners">
                                 <span class="badge badge-pill bg-warning" data-bs-toggle="tooltip" data-placement="top" data-title="Für Einsteiger geeignet">
                                     <i class="event-for-beginners"></i>
                                 </span>
                         </div>
-                        <div class="me-2" v-if="row.tourTechDifficulties" v-html="row.tourTechDifficulties"></div>
-                        <div class="me-2" v-if="row.tourTypesShortcuts" v-html="row.tourTypesShortcuts"></div>
-                        <div class="me-2" v-if="row.isPublicTransportEvent" v-html="row.getPublicTransportBadge"></div>
+                        <div class="d-flex flex-wrap" v-if="row.tourTechDifficulties" v-html="row.tourTechDifficulties"></div>
+                        <div class="d-flex flex-wrap" v-if="row.tourTypesShortcuts" v-html="row.tourTypesShortcuts"></div>
+                        <div class="d-flex flex-wrap" v-if="row.isPublicTransportEvent" v-html="row.getPublicTransportBadge"></div>
                     </div>
                     <!-- end row icons -->
 
