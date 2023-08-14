@@ -28,8 +28,8 @@ $GLOBALS['TL_LANG']['CTE'][UserPortraitListController::TYPE] = ['SAC-User-Portra
 $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
 if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isFrontendRequest($request)) {
-    $GLOBALS['TL_LANG']['MSC']['username'] = 'SAC Mitgliedernummer';
-    $GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
+	$GLOBALS['TL_LANG']['MSC']['username'] = 'SAC Mitgliedernummer';
+	$GLOBALS['TL_LANG']['MSC']['confirmation'] = 'Passwort erneut eingeben';
 }
 
 // DCA
@@ -147,6 +147,7 @@ $GLOBALS['TL_LANG']['ERR']['evt_reg_bookingLimitReaches'] = 'Die maximale Teilne
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ibanText'] = 'Bitte beachte, dass es sich bei diesem Anlass um einen Event mit Bezahlung durch Vorauskasse handelt. Deine Anmeldung wird erst bestätigt, nachdem der Teilnahmebeitrag bei uns eingegangen ist. Details dazu erhältst du nach der Anmeldung per E-Mail.';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ibanBeneficiary'] = 'Begünstigte/r';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ticketInfo'] = 'Ich besitze ein/eine';
+$GLOBALS['TL_LANG']['FORM']['evt_reg_blankLabelTicketInfo'] = 'bitte auswählen';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_carInfo'] = 'Ich könnte ein Auto mit ... Plätzen (inkl. Fahrer/in) stellen';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_ahvNumber'] = 'AHV-Nummer';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_mobile'] = 'Mobilnummer';

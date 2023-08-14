@@ -438,7 +438,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 'label' => $this->translator->trans('FORM.evt_reg_ticketInfo', [], 'contao_default'),
                 'inputType' => 'select',
                 'options' => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
-                'eval' => ['includeBlankOption' => false, 'mandatory' => true],
+                'eval' => ['includeBlankOption' => true, 'blankOptionLabel' => $this->translator->trans('FORM.evt_reg_blankLabelTicketInfo', [], 'contao_default'), 'mandatory' => true],
             ],
             'carInfo' => [
                 'label' => $this->translator->trans('FORM.evt_reg_carInfo', [], 'contao_default'),
