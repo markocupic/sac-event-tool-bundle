@@ -1771,6 +1771,16 @@ class CalendarEvents
         return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 
+    #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.preview.button', priority: 70)]
+    public function previewIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    {
+        $eventModel = $this->calendarEventsModel->findByPk($row['id']);
+
+        $href = $this->calendarEventsHelper->generateEventPreviewUrl($eventModel);
+
+        return '<a href="'.$href.'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+    }
+
     /**
      * @throws \Exception
      */

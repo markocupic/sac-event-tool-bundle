@@ -189,8 +189,22 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCal
 	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
 ];
 
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
+	'href'                   => 'action=onloadCallbackExportCalendar',
+	'class'                  => 'header_icon',
+	'icon'                   => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-excel-regular.svg',
+	'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
+	'custom_glob_op'         => true,
+	'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
+];
+
 // Operations
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle']['showInHeader'] = false;
+
+$GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['preview'] = [
+	'href' => 'action=preview', // use a button callback to generate the url
+	'icon' => 'bundles/markocupicsaceventtool/icons/fontawesome/default/presentation-screen-solid.svg',
+];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = [
 	'href' => 'table=tl_calendar_events_member',
@@ -198,15 +212,16 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] 
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelPrev'] = [
-	'href' => 'action=releaseLevelPrev',
+	'href' => 'action=releaseLevelPrev', // use a button callback to generate the url
 	'icon' => 'bundles/markocupicsaceventtool/icons/fontawesome/default/square-arrow-down-solid.svg',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelNext'] = [
-	'href' => 'action=releaseLevelNext',
+	'href' => 'action=releaseLevelNext', // use a button callback to generate the url
 	'icon' => 'bundles/markocupicsaceventtool/icons/fontawesome/default/square-arrow-up-solid.svg',
 ];
 
+// alias
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['alias']['eval']['tl_class'] = 'clr';
 
 // title
