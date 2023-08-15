@@ -24,6 +24,7 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
@@ -58,6 +59,7 @@ use Markocupic\SacEventToolBundle\Model\TourDifficultyCategoryModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\Security;
 
@@ -442,7 +444,7 @@ class CalendarEvents
             $csv->setDelimiter(';');
 
             // Selected fields
-            $arrFields = ['id', 'title', 'eventDates', 'organizers', 'mainInstructor', 'instructor', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey'];
+            $arrFields = array_unique(['id', 'title', 'eventDates', 'organizers', 'mainInstructor', 'instructor', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey']);
 
             // Insert headline first
             $this->controller->loadLanguageFile('tl_calendar_events');
@@ -465,7 +467,9 @@ class CalendarEvents
                     $arrRow = [];
 
                     foreach ($arrFields as $field) {
-                        if ('mainInstructor' === $field) {
+                        if ('eventType' === $field) {
+                            $arrRow[] = $GLOBALS['TL_LANG']['MSC'][$objEvent->{$field}] ?? $objEvent->{$field};
+                        } elseif ('mainInstructor' === $field) {
                             $objUser = $this->userModel->findByPk($objEvent->{$field});
                             $arrRow[] = null !== $objUser ? html_entity_decode($objUser->lastname.' '.$objUser->firstname) : '';
                         } elseif ('tourTechDifficulty' === $field) {
@@ -493,6 +497,8 @@ class CalendarEvents
                         } elseif ('journey' === $field) {
                             $objJourney = $this->calendarEventsJourneyModel->findByPk($objEvent->{$field});
                             $arrRow[] = null !== $objJourney ? $objJourney->title : $objEvent->{$field};
+                        } elseif ('courseLevel' === $field) {
+                            $arrRow[] = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->{$field}] ?? $objEvent->{$field};
                         } elseif ('courseTypeLevel0' === $field) {
                             $arrRow[] = empty($objEvent->{$field}) ? '' : (string) $this->connection->fetchOne('SELECT name FROM tl_course_main_type WHERE id = ?', [$objEvent->{$field}]);
                         } elseif ('courseTypeLevel1' === $field) {
@@ -506,13 +512,16 @@ class CalendarEvents
                         }
                     }
 
+                    $arrRow = array_map(fn ($strValue) => $this->stringUtil->prepareSlug($strValue), $arrRow);
+
                     $csv->insertOne($arrRow);
                 }
             }
 
             $objCalendar = $this->calendarModel->findByPk($request->query->get('id'));
-            $csv->output($objCalendar->title.'.csv');
-            exit;
+            $response = new Response((string) $csv->output($this->stringUtil->prepareSlug($objCalendar->title).'.csv'));
+
+            throw new ResponseException($response);
         }
     }
 
