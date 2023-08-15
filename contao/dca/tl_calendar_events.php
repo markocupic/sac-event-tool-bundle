@@ -202,8 +202,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCal
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle']['showInHeader'] = false;
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['preview'] = [
-	'href' => 'action=preview', // use a button callback to generate the url
-	'icon' => 'bundles/markocupicsaceventtool/icons/fontawesome/default/presentation-screen-solid.svg',
+	'href'       => 'action=preview', // use a button callback to generate the url
+	'attributes' => 'target="_blank"',
+	'icon'       => 'bundles/markocupicsaceventtool/icons/fontawesome/default/presentation-screen-solid.svg',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = [
