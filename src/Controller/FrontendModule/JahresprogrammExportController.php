@@ -162,12 +162,13 @@ class JahresprogrammExportController extends AbstractPrintExportController
 
         // validate() also checks whether the form has been submitted
         if ($objForm->validate()) {
-            if ('' !== $request->request->get('startDate') && '' !== $request->request->get('endDate') && '' !== $request->request->get('eventType')) {
+            if ($request->request->get('startDate') && $request->request->get('endDate') && $request->request->get('eventType')) {
                 $this->startDate = strtotime($request->request->get('startDate'));
                 $this->endDate = strtotime($request->request->get('endDate'));
                 $this->eventType = $request->request->get('eventType');
                 $this->organizer = $request->request->get('organizer') > 0 ? (int) $request->request->get('organizer') : null;
-                $this->eventReleaseLevel = (int) $request->request->get('eventReleaseLevel', $this->eventReleaseLevel);
+
+                $this->eventReleaseLevel = empty($request->request->get('eventReleaseLevel')) ? $this->eventReleaseLevel : (int) $request->request->get('eventReleaseLevel');
 
                 // Get events and instructors (fill $this->events and $this->instructors)
                 $this->getEventsAndInstructors();

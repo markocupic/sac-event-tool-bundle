@@ -224,7 +224,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             }
 
             if ($this->startDate && $this->endDate) {
-                $this->eventReleaseLevel = (int) $request->request->get('eventReleaseLevel', $this->eventReleaseLevel);
+                $this->eventReleaseLevel = empty($request->request->get('eventReleaseLevel')) ? $this->eventReleaseLevel : (int) $request->request->get('eventReleaseLevel');
                 $this->htmlCourseTable = $this->generateEventTable([EventType::COURSE]);
                 $this->htmlTourTable = $this->generateEventTable([EventType::TOUR, EventType::GENERAL_EVENT]);
             }
