@@ -533,7 +533,7 @@ class CalendarEventsHelper
 
     public static function generateMainInstructorContactDataFromDb(CalendarEventsModel $objEvent): string
     {
-        $arrInstructors = static::getInstructorsAsArray($objEvent, false);
+        $arrInstructors = static::getInstructorsAsArray($objEvent);
         $objUser = UserModel::findByPk($arrInstructors[0]);
 
         if (null !== $objUser) {

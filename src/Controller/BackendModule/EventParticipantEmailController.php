@@ -474,7 +474,7 @@ class EventParticipantEmailController extends AbstractController
         $options = [];
 
         // Get the instructors
-        $arrInstrIds = $this->calendarEventsHelper->getInstructorsAsArray($this->event, false);
+        $arrInstrIds = $this->calendarEventsHelper->getInstructorsAsArray($this->event);
 
         foreach ($arrInstrIds as $userId) {
             $objInstructor = $this->userModel->findByPk($userId);

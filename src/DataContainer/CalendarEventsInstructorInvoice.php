@@ -247,7 +247,7 @@ class CalendarEventsInstructorInvoice
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
 
         // Count instructors
-        $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent, false);
+        $arrInstructors = $calendarEventsHelperAdapter->getInstructorsAsArray($objEvent);
         $countInstructors = \count($arrInstructors);
 
         $countParticipantsTotal = $countParticipants + $countInstructors;

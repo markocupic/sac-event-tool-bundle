@@ -86,7 +86,7 @@ class CalendarEventsVoter extends Voter
             return true;
         }
 
-        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($eventsModel, false);
+        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($eventsModel);
 
         if ((int) $user->id === (int) $eventsModel->author || \in_array($user->id, $arrEventInstructors, false)) {
             if ($eventReleaseLevelPolicyModel->allowWriteAccessToAuthor) {
@@ -217,7 +217,7 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event, false);
+        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event);
 
         if ($releaseLevelPolicy->allowDeleteAccessToInstructors) {
             if (\in_array($this->user->id, $arrEventInstructors, false)) {
@@ -287,7 +287,7 @@ class CalendarEventsVoter extends Voter
             }
         }
 
-        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event, false);
+        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event);
 
         if ($releaseLevelPolicy->allowWriteAccessToInstructors) {
             if (\in_array($this->user->id, $arrEventInstructors, false)) {
