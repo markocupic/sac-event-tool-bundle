@@ -302,7 +302,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                     $arrData['courseTypeLevel1'] = null !== $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1) ? $courseSubTypeModelAdapter->findByPk($objEvent->courseTypeLevel1)->name : '';
                     $arrData['date'] = $this->getEventPeriod($objEvent->current(), $dateFormat);
                     $arrData['month'] = $dateAdapter->parse('F', $objEvent->startDate);
-                    $arrData['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->current(), false, false));
+                    $arrData['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent->current(), false, true));
                     $arrData['tourType'] = implode(', ', $arrTourType);
                     $arrData['difficulty'] = implode(', ', $calendarEventsHelperAdapter->getTourTechDifficultiesAsArray($objEvent->current()));
                     // Layout settings
@@ -376,7 +376,11 @@ class JahresprogrammExportController extends AbstractPrintExportController
             while ($objUserRoles->next()) {
                 $userRole = $objUserRoles->id;
                 $arrUsers = [];
-                $objUser = $databaseAdapter->getInstance()->execute('SELECT * FROM tl_user ORDER BY lastname, firstname');
+                $objUser = $databaseAdapter
+                    ->getInstance()
+                    ->prepare('SELECT * FROM tl_user WHERE disabled = ? ORDER BY lastname, firstname')
+                    ->execute('')
+                ;
 
                 while ($objUser->next()) {
                     $userRoles = $stringUtilAdapter->deserialize($objUser->userRole, true);

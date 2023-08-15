@@ -285,7 +285,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             $arrRow['eventDates'] = $this->getEventPeriod($objEvent, 'd.');
             $arrRow['weekday'] = $this->getEventPeriod($objEvent, 'D');
             $arrRow['title'] = $objEvent->title.(EventType::LAST_MINUTE_TOUR === $objEvent->eventType ? ' (LAST MINUTE TOUR!)' : '');
-            $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, false));
+            $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, true));
             $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent, 'titlePrint'));
             $arrRow['eventId'] = date('Y', (int) $objEvent->startDate).'-'.$objEvent->id;
             $arrRow['journey'] = null !== $calendarEventsHelperJourneyModelAdapter->findByPk($objEvent->journey) ? $calendarEventsHelperJourneyModelAdapter->findByPk($objEvent->journey)->title : null;
@@ -594,7 +594,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
         $arrRow['week'] = $dateAdapter->parse('W', $objEvent->startDate);
         $arrRow['eventDates'] = $this->getEventPeriod($objEvent, $this->dateFormat);
         $arrRow['weekday'] = $this->getEventPeriod($objEvent, 'D');
-        $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, false));
+        $arrRow['instructors'] = implode(', ', $calendarEventsHelperAdapter->getInstructorNamesAsArray($objEvent, false, true));
         $arrRow['organizers'] = implode(', ', $calendarEventsHelperAdapter->getEventOrganizersAsArray($objEvent, 'title'));
         $arrRow['tourProfile'] = implode('<br>', $calendarEventsHelperAdapter->getTourProfileAsArray($objEvent));
         $arrRow['journey'] = null !== $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey) ? $calendarEventsJourneyModelAdapter->findByPk($objEvent->journey)->title : '';
