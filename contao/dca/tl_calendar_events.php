@@ -243,7 +243,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['rte'] = nu
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['mandatory'] = true;
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['teaser']['eval']['maxlength'] = 520;
 
-// minMembers
+// courseId
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseId'] = [
 	'exclude'   => true,
 	'search'    => true,

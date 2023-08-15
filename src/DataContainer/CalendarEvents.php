@@ -444,7 +444,7 @@ class CalendarEvents
             $csv->setDelimiter(';');
 
             // Selected fields
-            $arrFields = array_unique(['id', 'title', 'eventDates', 'organizers', 'mainInstructor', 'instructor', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey']);
+            $arrFields = array_unique(['id', 'title', 'location', 'eventDates', 'eventDurationInDays', 'published', 'organizers', 'mountainguide', 'mainInstructor', 'instructor', 'minMembers', 'maxMembers', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey']);
 
             // Insert headline first
             $this->controller->loadLanguageFile('tl_calendar_events');
@@ -482,11 +482,13 @@ class CalendarEvents
                                 $arrTimestamps
                             );
                             $arrRow[] = implode(',', $arrDates);
+                        } elseif ('eventDurationInDays' === $field) {
+                            $arrRow[] = \count($this->calendarEventsHelper->getEventTimestamps($objEvent->current()));
                         } elseif ('organizers' === $field) {
                             $arrOrganizers = $this->calendarEventsHelper->getEventOrganizersAsArray($objEvent->current(), 'title');
                             $arrRow[] = html_entity_decode(implode(',', $arrOrganizers));
                         } elseif ('instructor' === $field) {
-                            $arrInstructors = $this->calendarEventsHelper->getInstructorNamesAsArray($objEvent->current(), false, false);
+                            $arrInstructors = $this->calendarEventsHelper->getInstructorNamesAsArray($objEvent->current(), false, true);
                             $arrRow[] = html_entity_decode(implode(',', $arrInstructors));
                         } elseif ('tourType' === $field) {
                             $arrTourTypes = $this->calendarEventsHelper->getTourTypesAsArray($objEvent->current(), 'title');
