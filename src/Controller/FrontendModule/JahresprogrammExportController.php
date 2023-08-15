@@ -42,6 +42,7 @@ use Symfony\Component\HttpFoundation\Response;
 class JahresprogrammExportController extends AbstractPrintExportController
 {
     public const TYPE = 'jahresprogramm_export';
+    private const DEFAULT_EVENT_RELEASE_LEVEL = 3;
 
     private Template|null $template = null;
     private int|null $startDate = null;
@@ -166,7 +167,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 $this->endDate = strtotime($request->request->get('endDate'));
                 $this->eventType = $request->request->get('eventType');
                 $this->organizer = $request->request->get('organizer') > 0 ? (int) $request->request->get('organizer') : null;
-                $this->eventReleaseLevel = $request->request->get('eventReleaseLevel') > 0 ? (int) $request->request->get('eventReleaseLevel') : null;
+                $this->eventReleaseLevel = $request->request->get('eventReleaseLevel') > 0 ? (int) $request->request->get('eventReleaseLevel') : self::DEFAULT_EVENT_RELEASE_LEVEL;
 
                 // Get events and instructors (fill $this->events and $this->instructors)
                 $this->getEventsAndInstructors();
@@ -209,7 +210,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
             // Check if event is at least on second-highest level (Level 3/4)
             $eventModel = $calendarEventsModelAdapter->findByPk($objEvents->id);
 
-            if (!$this->hasValidReleaseLevel($eventModel, (int) $this->eventReleaseLevel)) {
+            if (!$this->hasValidReleaseLevel($eventModel, $this->eventReleaseLevel)) {
                 continue;
             }
 
