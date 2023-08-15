@@ -49,7 +49,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
     private int|null $endDate = null;
     private int|null $organizer = null;
     private string|null $eventType = null;
-    private int|null $eventReleaseLevel = null;
+    private int $eventReleaseLevel = self::DEFAULT_EVENT_RELEASE_LEVEL;
     private array|null $events = null;
     private array|null $instructors = null;
 
@@ -167,7 +167,7 @@ class JahresprogrammExportController extends AbstractPrintExportController
                 $this->endDate = strtotime($request->request->get('endDate'));
                 $this->eventType = $request->request->get('eventType');
                 $this->organizer = $request->request->get('organizer') > 0 ? (int) $request->request->get('organizer') : null;
-                $this->eventReleaseLevel = $request->request->get('eventReleaseLevel') > 0 ? (int) $request->request->get('eventReleaseLevel') : self::DEFAULT_EVENT_RELEASE_LEVEL;
+                $this->eventReleaseLevel = (int) $request->request->get('eventReleaseLevel', $this->eventReleaseLevel);
 
                 // Get events and instructors (fill $this->events and $this->instructors)
                 $this->getEventsAndInstructors();

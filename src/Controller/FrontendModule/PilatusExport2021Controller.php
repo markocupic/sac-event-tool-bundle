@@ -44,12 +44,13 @@ use Symfony\Component\HttpFoundation\Response;
 class PilatusExport2021Controller extends AbstractPrintExportController
 {
     public const TYPE = 'pilatus_export_2021';
+    private const DEFAULT_EVENT_RELEASE_LEVEL = 3;
 
     private ModuleModel|null $model;
     private Form|null $objForm = null;
     private int|null $startDate = null;
     private int|null $endDate = null;
-    private int|null $eventReleaseLevel = null;
+    private int $eventReleaseLevel = self::DEFAULT_EVENT_RELEASE_LEVEL;
     private string $dateFormat = 'j.';
     private array|null $htmlCourseTable = null;
     private array|null $htmlTourTable = null;
@@ -223,7 +224,7 @@ class PilatusExport2021Controller extends AbstractPrintExportController
             }
 
             if ($this->startDate && $this->endDate) {
-                $this->eventReleaseLevel = (int) $request->request->get('eventReleaseLevel') > 0 ? (int) $request->request->get('eventReleaseLevel') : null;
+                $this->eventReleaseLevel = (int) $request->request->get('eventReleaseLevel', $this->eventReleaseLevel);
                 $this->htmlCourseTable = $this->generateEventTable([EventType::COURSE]);
                 $this->htmlTourTable = $this->generateEventTable([EventType::TOUR, EventType::GENERAL_EVENT]);
             }
