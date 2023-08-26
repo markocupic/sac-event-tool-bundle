@@ -30,6 +30,7 @@ use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 
 class EventRapport2Docx
@@ -101,7 +102,7 @@ class EventRapport2Docx
         }
 
         $filenamePattern = str_replace('%%s', '%s', $strFilenamePattern);
-        $destFilename = $this->sacevtTempDir.'/'.sprintf($filenamePattern, time(), 'docx');
+        $destFilename = $this->sacevtTempDir.'/'.sprintf($filenamePattern, $objEvent->id.'_'.$userModelAdapter->id, 'docx');
 
         $objPhpWord = new MsWordTemplateProcessor($templateSRC, $destFilename);
 
@@ -120,13 +121,36 @@ class EventRapport2Docx
         }
 
         if (self::OUTPUT_TYPE_PDF === $outputType) {
-            // Generate Docx file from template;
+            // Use the cached version of the PDF file, if...
+            // - data has not been changed and
+            // - no changes have been made to the template
+            $hash = hash('md5', json_encode($objPhpWord->getData()).hash_file('md5', $this->projectDir.'/'.$templateSRC));
+
+            // Create temp dirs
+            $pdfTempDir = $this->projectDir.'/system/tmp/cloudconvert/pdf';
+            $docxTempDir = $this->projectDir.'/system/tmp/cloudconvert/docx';
+
+            $fs = new Filesystem();
+            $fs->mkdir([$pdfTempDir, $docxTempDir]);
+
+            if (is_file($pdfTempDir.'/'.$hash) && is_file($docxTempDir.'/'.$hash)) {
+                $fs->copy($pdfTempDir.'/'.$hash, $this->projectDir.'/'.$destFilename, true);
+
+                // Return the cached version of the PDF file.
+                return new \SplFileObject($this->projectDir.'/'.$destFilename);
+            }
+
+            // Generate DOCX file from template;
             $objPhpWord->generateUncached(true)
                 ->generate()
             ;
 
-            // Generate pdf document and send it to the browser
+            // Copy the DOCX version of the file to the cache.
+            $fs->copy($this->projectDir.'/'.$destFilename, $docxTempDir.'/'.$hash, true);
+
+            // Generate the PDF document
             $this->convertFile
+                ->sendToBrowser(false)
                 ->file($this->projectDir.'/'.$destFilename)
                 ->uncached(true)
                 ->convertTo('pdf')
@@ -134,11 +158,14 @@ class EventRapport2Docx
 
             $destFilename = str_replace('.docx', '.pdf', $destFilename);
 
+            // Copy the PDF version of the file to the cache.
+            $fs->copy($this->projectDir.'/'.$destFilename, $pdfTempDir.'/'.$hash, true);
+
             return new \SplFileObject($this->projectDir.'/'.$destFilename);
         }
 
         if (self::OUTPUT_TYPE_DOCX === $outputType) {
-            // Generate docx document from template and send it to the browser;
+            // Generate the DOCX version
             $objPhpWord->generateUncached(true)
                 ->generate()
                 ;

@@ -161,23 +161,27 @@ readonly class CalendarEventsInstructorInvoice
         $objEventInvoice = CalendarEventsInstructorInvoiceModel::findByPk($id);
 
         if (null !== $objEventInvoice) {
-            /** @var EventRapport2Docx $objTemplator */
-            $objTemplator = $this->eventRapport2Docx;
+            $action = $request->query->get('action');
 
-            if ('generateInvoiceDocx' === $request->query->get('action')) {
-                $objTemplator->downloadDocument('invoice', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
-            }
+            if ($action) {
+                /** @var EventRapport2Docx $objTemplator */
+                $objTemplator = $this->eventRapport2Docx;
 
-            if ('generateInvoicePdf' === $request->query->get('action')) {
-                $objTemplator->downloadDocument('invoice', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
-            }
+                if ('generateInvoiceDocx' === $request->query->get('action')) {
+                    $objTemplator->downloadDocument('invoice', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
+                }
 
-            if ('generateTourRapportDocx' === $request->query->get('action')) {
-                $objTemplator->downloadDocument('rapport', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
-            }
+                if ('generateInvoicePdf' === $request->query->get('action')) {
+                    $objTemplator->downloadDocument('invoice', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
+                }
 
-            if ('generateTourRapportPdf' === $request->query->get('action')) {
-                $objTemplator->downloadDocument('rapport', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
+                if ('generateTourRapportDocx' === $request->query->get('action')) {
+                    $objTemplator->downloadDocument('rapport', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
+                }
+
+                if ('generateTourRapportPdf' === $request->query->get('action')) {
+                    $objTemplator->downloadDocument('rapport', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
+                }
             }
         }
     }
