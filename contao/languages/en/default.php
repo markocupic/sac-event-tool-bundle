@@ -178,6 +178,7 @@ $GLOBALS['TL_LANG']['ERR']['evt_strn_sendNotificationFailure'] = 'Tourrapport un
 $GLOBALS['TL_LANG']['ERR']['evt_strn_sendNotificationFailed'] = 'Die E-Mail konnte nicht versandt werden, weil es zu einem unerwarteten Fehler gekommen ist. Bitte probieren Sie den selben Vorgang nochmals auszuführen. Kontaktieren Sie bitte den Administrator dieser Webseite, sollte der Fehler erneut auftreten.';
 $GLOBALS['TL_LANG']['ERR']['evt_strn_cloudconvConversionCreditUsedUp'] = 'Die E-Mail konnte nicht versandt werden, weil bei der DOCX zu PDF Konvertierung von "%s" ein Fehler aufgetreten ist. Die Anzahl der täglich erlaubten Konvertierungen wurde überschritten.';
 $GLOBALS['TL_LANG']['ERR']['evt_strn_cloudconvUnexpectedError'] = 'Die E-Mail konnte nicht versandt werden, weil bei der DOCX zu PDF Konvertierung von "%s" ein unerwarteter Fehler aufgetreten ist. Probieren Sie den selben Vorgang noch einmal durchzuführen. Kontaktieren Sie bitte den Administrator dieser Webseite, sollte der Fehler erneut auftreten.';
+$GLOBALS['TL_LANG']['MSC']['evt_strn_multiFormSubmitWarning'] = 'Sie haben diese Benachrichtigung bereits %dx versendet. Das letzte Mal am %s. Möchten Sie die Benachrichtigung wirklich ein weiteres Mal versenden?';
 
 // Booking states/Subscription states
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED] = 'Anmeldeanfrage unbeantwortet';

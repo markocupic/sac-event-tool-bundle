@@ -9,6 +9,11 @@
 {% endif %}{% endblock %}
 
 {% block main %}
+    {% if info|default %}
+        <div class="tl_message">
+            <p class="tl_info">{{ info }}</p>
+        </div>
+    {% endif %}
 
     <div id="tl_buttons">
         <a href="{{ back }}" class="header_back" title="" accesskey="b" onclick="Backend.getScrollOffset()">{{ 'MSC.backBTTitle'|trans({}, 'contao_default') }}</a>
@@ -27,6 +32,10 @@
             <li>Tourrapport</li>
             <li>Vergütungsformular</li>
         </ul>
+    </div>
+
+    <div class="widget">
+        <p>Sie erhalten automatisch eine Kopie dieser Nachricht.</p>
     </div>
 
     <style type='text/css'>

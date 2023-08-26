@@ -117,6 +117,11 @@ class SendTourRapportNotificationController extends AbstractController
             $template->form = $form->generate();
             $template->request_token = $rt;
 
+            if ($invoice->countNotifications) {
+                // Protect the user from submitting the form multiple times.
+                $template->info = $this->translator->trans('MSC.evt_strn_multiFormSubmitWarning', [$invoice->countNotifications, date('d.m.Y H:i', (int) $invoice->notificationSentOn)], 'contao_default');
+            }
+
             return new Response($template->parse());
         }
 
@@ -189,8 +194,12 @@ class SendTourRapportNotificationController extends AbstractController
 
         if ($blnSend) {
             // Everything ok...
+            $invoice->notificationSentOn = time();
+            ++$invoice->countNotifications;
+            $invoice->save();
+
             $msg = $this->translator->trans('MSC.evt_strn_successfullySendNotification', [$strRecipients], 'contao_default');
-            $this->message->addInfo($msg);
+            $this->message->addConfirmation($msg);
         } else {
             // If sending email fails...
             $msg = $this->translator->trans('ERR.evt_strn_sendNotificationFailed', [$strRecipients], 'contao_default');
