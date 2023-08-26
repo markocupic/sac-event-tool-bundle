@@ -185,7 +185,7 @@ class ExportEvents2Docx
 
         $fileSRC = $this->projectDir.'/'.$path;
 
-        return $this->binaryFileDownload->sendFileToBrowser($fileSRC, basename($fileSRC), true);
+        return $this->binaryFileDownload->sendFileToBrowser($fileSRC, basename($fileSRC), false);
     }
 
     private function addMultilineText(Cell $objCell, string $textlines): void

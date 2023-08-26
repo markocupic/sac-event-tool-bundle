@@ -277,7 +277,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
             }
         }
 
-        // Downlaod data as CSV spreadsheet
+        // Download data as CSV spreadsheet
         return $this->sendToBrowser($arrData, $filename);
     }
 
@@ -350,6 +350,6 @@ class CsvUserExportController extends AbstractFrontendModuleController
         $objFile->write($csv->toString());
         $objFile->close();
 
-        return $this->binaryFileDownload->sendFileToBrowser($this->projectDir.'/'.$objFile->path);
+        return $this->binaryFileDownload->sendFileToBrowser($this->projectDir.'/'.$objFile->path, '', false);
     }
 }

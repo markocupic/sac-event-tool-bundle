@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Download;
 
+use Contao\CoreBundle\Exception\ResponseException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mime\MimeTypes;
@@ -40,6 +41,6 @@ class BinaryFileDownload
         $response->headers->set('Connection', 'close');
         $response->headers->set('Content-Type', $mimeType);
 
-        return $response->send();
+        throw new ResponseException($response);
     }
 }

@@ -31,6 +31,7 @@ use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
 use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Safe\DateTime;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class WorkshopBookletGenerator
@@ -99,7 +100,7 @@ class WorkshopBookletGenerator
     /**
      * @throws Exception
      */
-    public function generate(): Response
+    public function generate(): BinaryFileResponse
     {
         $addToc = true;
         $addCover = true;
@@ -221,7 +222,7 @@ class WorkshopBookletGenerator
             $this->pdf->Output($path, 'F');
 
             // Send file to the browser
-            $this->binaryFileDownload->sendFileToBrowser($path, basename($path), true);
+            return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), false);
         }
 
         $this->pdf->setTitle(basename($path));
@@ -230,7 +231,7 @@ class WorkshopBookletGenerator
         $this->pdf->Output($path, 'F');
 
         // Send file to the browser
-        return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), true);
+        return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), false);
     }
 
     public function getDateString(int $eventId): string

@@ -31,7 +31,7 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class EventRapport2Docx
 {
@@ -185,7 +185,7 @@ class EventRapport2Docx
      * @throws CreateTemporaryFileException
      * @throws Exception
      */
-    public function downloadDocument(string $documentType, CalendarEventsInstructorInvoiceModel $objEventInvoice, string $outputType, string $templateSRC, string $strFilenamePattern): Response
+    public function downloadDocument(string $documentType, CalendarEventsInstructorInvoiceModel $objEventInvoice, string $outputType, string $templateSRC, string $strFilenamePattern): BinaryFileResponse
     {
         $objFile = $this->generateDocument($documentType, $objEventInvoice, $outputType, $templateSRC, $strFilenamePattern);
 
