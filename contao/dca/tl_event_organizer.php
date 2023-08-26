@@ -47,15 +47,15 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 		'operations'        => [
 			'edit'   => [
 				'href' => 'act=edit',
-				'icon' => 'edit.gif',
+				'icon' => 'edit.svg',
 			],
 			'copy'   => [
 				'href' => 'act=copy',
-				'icon' => 'copy.gif',
+				'icon' => 'copy.svg',
 			],
 			'delete' => [
 				'href'       => 'act=delete',
-				'icon'       => 'delete.gif',
+				'icon'       => 'delete.svg',
 				'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
 			],
 			'show'   => [

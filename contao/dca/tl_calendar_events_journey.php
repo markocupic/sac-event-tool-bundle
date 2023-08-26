@@ -50,11 +50,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events_journey'] = [
 			],
 			'copy'   => [
 				'href' => 'act=copy',
-				'icon' => 'copy.gif',
+				'icon' => 'copy.svg',
 			],
 			'delete' => [
 				'href'       => 'act=delete',
-				'icon'       => 'delete.gif',
+				'icon'       => 'delete.svg',
 				'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
 			],
 		],
