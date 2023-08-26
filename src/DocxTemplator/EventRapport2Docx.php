@@ -102,9 +102,10 @@ class EventRapport2Docx
         }
 
         $filenamePattern = str_replace('%%s', '%s', $strFilenamePattern);
-        $destFilename = $this->sacevtTempDir.'/'.sprintf($filenamePattern, $objEvent->id.'_'.$userModelAdapter->id, 'docx');
+        $destFilenameDocx = $this->sacevtTempDir.'/'.sprintf($filenamePattern, $objEvent->id.'_'.$objEventInvoice->userPid, 'docx');
+        $destFilenamePdf = str_replace('.docx', '.pdf', $destFilenameDocx);
 
-        $objPhpWord = new MsWordTemplateProcessor($templateSRC, $destFilename);
+        $objPhpWord = new MsWordTemplateProcessor($templateSRC, $destFilenameDocx);
 
         // Page #1
         // Tour rapport
@@ -134,10 +135,10 @@ class EventRapport2Docx
             $fs->mkdir([$pdfTempDir, $docxTempDir]);
 
             if (is_file($pdfTempDir.'/'.$hash) && is_file($docxTempDir.'/'.$hash)) {
-                $fs->copy($pdfTempDir.'/'.$hash, $this->projectDir.'/'.$destFilename, true);
+                $fs->copy($pdfTempDir.'/'.$hash, $this->projectDir.'/'.$destFilenamePdf, true);
 
                 // Return the cached version of the PDF file.
-                return new \SplFileObject($this->projectDir.'/'.$destFilename);
+                return new \SplFileObject($this->projectDir.'/'.$destFilenamePdf);
             }
 
             // Generate DOCX file from template;
@@ -146,22 +147,20 @@ class EventRapport2Docx
             ;
 
             // Copy the DOCX version of the file to the cache.
-            $fs->copy($this->projectDir.'/'.$destFilename, $docxTempDir.'/'.$hash, true);
+            $fs->copy($this->projectDir.'/'.$destFilenameDocx, $docxTempDir.'/'.$hash, true);
 
             // Generate the PDF document
             $this->convertFile
                 ->sendToBrowser(false)
-                ->file($this->projectDir.'/'.$destFilename)
+                ->file($this->projectDir.'/'.$destFilenameDocx)
                 ->uncached(true)
                 ->convertTo('pdf')
                 ;
 
-            $destFilename = str_replace('.docx', '.pdf', $destFilename);
-
             // Copy the PDF version of the file to the cache.
-            $fs->copy($this->projectDir.'/'.$destFilename, $pdfTempDir.'/'.$hash, true);
+            $fs->copy($this->projectDir.'/'.$destFilenamePdf, $pdfTempDir.'/'.$hash, true);
 
-            return new \SplFileObject($this->projectDir.'/'.$destFilename);
+            return new \SplFileObject($this->projectDir.'/'.$destFilenamePdf);
         }
 
         if (self::OUTPUT_TYPE_DOCX === $outputType) {
@@ -170,7 +169,7 @@ class EventRapport2Docx
                 ->generate()
                 ;
 
-            return new \SplFileObject($this->projectDir.'/'.$destFilename);
+            return new \SplFileObject($this->projectDir.'/'.$destFilenameDocx);
         }
 
         throw new \LogicException(sprintf('Invalid output Type "%s". Type must be "%s" or "%s".', self::OUTPUT_TYPE_DOCX, self::OUTPUT_TYPE_PDF, $outputType));
