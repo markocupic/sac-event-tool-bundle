@@ -1,0 +1,89 @@
+{% extends "@ContaoCore/Backend/be_page.html.twig" %}
+
+{% block headline %}
+    {{ 'MSC.evt_strn_title'|trans({}, 'contao_default') }}
+{% endblock %}
+
+{% block error %}{% if error|default %}
+    {{ error|raw }}
+{% endif %}{% endblock %}
+
+{% block main %}
+
+    <div id="tl_buttons">
+        <a href="{{ back }}" class="header_back" title="" accesskey="b" onclick="Backend.getScrollOffset()">{{ 'MSC.backBTTitle'|trans({}, 'contao_default') }}</a>
+    </div>
+
+    <div class="send_tour_rapport_notification_form">
+        <h1 class="headline">{{ 'MSC.evt_strn_title'|trans({}, 'contao_default') }}</h1>
+        {{ form|raw }}
+    </div>
+
+    <div class="widget email-attachment-list">
+        <br>
+        <br>
+        <h3>Dateianhänge:</h3>
+        <ul>
+            <li>Tourrapport</li>
+            <li>Vergütungsformular</li>
+        </ul>
+    </div>
+
+    <style type='text/css'>
+        .send_tour_rapport_notification_form {
+            border-top: 1px solid #e6e6e8;
+        }
+
+        .send_tour_rapport_notification_form .headline {
+            margin: 15px 15px 40px 15px;
+            font-size: 1.25rem;
+            color: green;
+        }
+
+        .send_tour_rapport_notification_form .widget {
+            margin-bottom: 40px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .send_tour_rapport_notification_form input.text, .send_tour_rapport_notification_form textarea {
+            width: 100%;
+            padding: 4px;
+        }
+
+        .send_tour_rapport_notification_form label {
+            display: block;
+            margin: 12px 0 5px 0;
+            font-weight: bold;
+        }
+
+        .send_tour_rapport_notification_form .submit {
+            padding: 7px 12px;
+            border: 1px solid #aaa;
+            border-radius: 2px;
+            box-sizing: border-box;
+            cursor: pointer;
+            background: #eee;
+            transition: background .2s ease;
+        }
+
+        .email-attachment-list {
+            margin-bottom: 15px;
+        }
+
+    </style>
+
+    <script>
+        /**
+         * Prevent multiple clicks
+         * Disable Submit Button Upon Form Submission
+         */
+        window.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelector('.hasteform_send_tour_rapport_notification_form form').addEventListener('submit', () => {
+                if (document.getElementById('ctrl_recipients').value != '' && document.getElementById('ctrl_subject').value != '' && document.getElementById('ctrl_text').value != '') {
+                    document.getElementById('ctrl_submit').disabled = 1;
+                }
+            });
+        });
+    </script>
+{% endblock main %}

@@ -50,36 +50,45 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 		'operations'        => [
 			'edit'                    => [
 				'href' => 'act=edit',
-				'icon' => 'edit.gif',
+				'icon' => 'edit.svg',
 			],
 			'copy'                    => [
 				'href' => 'act=copy',
-				'icon' => 'copy.gif',
+				'icon' => 'copy.svg',
 			],
 			'delete'                  => [
 				'href'       => 'act=delete',
-				'icon'       => 'delete.gif',
+				'icon'       => 'delete.svg',
 				'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
+			],
+			'show'                    => [
+				'href' => 'act=show',
+				'icon' => 'show.svg',
 			],
 			'generateInvoicePdf'      => [
 				'href'       => 'action=generateInvoicePdf',
 				'icon'       => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-pdf-regular.svg',
-				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateInvoice'] ?? null).'\')) return false; Backend.getScrollOffset();"',
+				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateInvoiceConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
 			],
 			'generateInvoiceDocx'     => [
 				'href'       => 'action=generateInvoiceDocx',
 				'icon'       => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-word-regular.svg',
-				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateInvoice'] ?? null).'\')) return false; Backend.getScrollOffset();"',
+				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateInvoiceConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
 			],
 			'generateTourRapportPdf'  => [
 				'href'       => 'action=generateTourRapportPdf',
 				'icon'       => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-pdf-regular.svg',
-				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateTourRapport'] ?? null).'\')) return false; Backend.getScrollOffset();"',
+				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateTourRapportConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
 			],
 			'generateTourRapportDocx' => [
 				'href'       => 'action=generateTourRapportDocx',
 				'icon'       => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-word-regular.svg',
-				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateTourRapport'] ?? null).'\')) return false; Backend.getScrollOffset();"',
+				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateTourRapportConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
+			],
+			'sendRapport'             => [
+				'href'       => 'action=sendRapport',
+				'icon'       => 'bundles/markocupicsaceventtool/icons/fontawesome/default/paper-plane-solid.svg',
+				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['sendRapportConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
 			],
 		],
 	],

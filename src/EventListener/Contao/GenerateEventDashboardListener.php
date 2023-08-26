@@ -104,25 +104,25 @@ class GenerateEventDashboardListener
             ;
         }
 
-        // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und Vergütungsformular drucken" button
+        // Go to "Angaben für Tourrapport erfassen"- & "Tourrapport und Vergütungsformular drucken und einreichen" button
         if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEvent->id) || $objEvent->registrationGoesTo === $user->id) {
             if (EventType::TOUR === $objEvent->eventType || EventType::LAST_MINUTE_TOUR === $objEvent->eventType) {
                 $href = $controllerAdapter->addToUrl('call=writeTourReport&rt='.$requestToken, true);
-                $menu->addChild('Tourenrapport bearbeiten', ['uri' => $href])
+                $menu->addChild('Tourrapport bearbeiten', ['uri' => $href])
                     ->setLinkAttribute('role', 'button')
                     ->setLinkAttribute('class', 'tl_submit')
                     ->setLinkAttribute('target', '_blank')
                     ->setLinkAttribute('accesskey', 'r')
-                    ->setLinkAttribute('title', 'Tourenrapport anzeigen und bearbeiten [ALT + r]')
+                    ->setLinkAttribute('title', 'Tourrapport anzeigen und bearbeiten [ALT + r]')
                 ;
 
                 $href = sprintf('contao?do=%s&table=tl_calendar_events_instructor_invoice&id=%d&rt=%s&ref=%s', $module, $inputAdapter->get('id'), $requestToken, $refererId);
-                $menu->addChild('Vergütungsformular und Tourenrapport drucken', ['uri' => $href])
+                $menu->addChild('Tourrapport und Vergütungsformular drucken und einreichen', ['uri' => $href])
                     ->setAttribute('role', 'button')
                     ->setLinkAttribute('class', 'tl_submit')
                     ->setLinkAttribute('target', '_blank')
                     ->setLinkAttribute('accesskey', 'i')
-                    ->setLinkAttribute('title', 'Vergütungsformular und Tourenrapport anzeigen und drucken [ALT + i]')
+                    ->setLinkAttribute('title', 'Vergütungsformular und Tourrapport anzeigen und drucken [ALT + i]')
                 ;
             }
         }

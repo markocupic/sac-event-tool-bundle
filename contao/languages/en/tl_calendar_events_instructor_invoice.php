@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
-$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['new'] = ['Neues Vergütungsformular mit Tourenrapport', 'Neues Vergütungsformular mit Tourenrapport hinzufügen.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['new'] = ['Neues Vergütungsformular mit Tourrapport', 'Neues Vergütungsformular mit Tourrapport hinzufügen.'];
 
 // Operations
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['edit'] = ['Vergütungsformular bearbeiten', 'Vergütungsformular mit ID %s bearbeiten.'];
@@ -20,8 +20,9 @@ $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['delete'] = ['Verg�
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['copy'] = ['Vergütungsformular kopieren', 'Vergütungsformular mit ID %s kopieren.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoicePdf'] = ['Vergütungsformular drucken PDF', 'PDF Vergütungsformular mit ID %s ausdrucken.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoiceDocx'] = ['Vergütungsformular drucken MsWord', 'MsWord Vergütungsformular mit ID %s ausdrucken.'];
-$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportPdf'] = ['Tourenrapport drucken PDF', 'Tourenrapport als PDF mit ID %s ausdrucken.'];
-$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportDocx'] = ['Tourenrapport drucken MsWord', 'Tourenrapport als MsWord mit ID %s ausdrucken.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportPdf'] = ['Tourrapport drucken PDF', 'Tourrapport als PDF mit ID %s ausdrucken.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportDocx'] = ['Tourrapport drucken MsWord', 'Tourrapport als MsWord mit ID %s ausdrucken.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['sendRapport'] = ['Tourrapport und Vergütungsformlar per E-Mail einreichen', 'Tourrapport und Vergütungsformlar mit ID %s per E-Mail einreichen.'];
 
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['user_legend'] = 'Begünstigter';

@@ -14,20 +14,27 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\Backend;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
+use Contao\Image;
 use Contao\Message;
+use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Controller\BackendModule\SendTourRapportNotificationController;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
+use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
@@ -35,24 +42,25 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CalendarEventsInstructorInvoice
+readonly class CalendarEventsInstructorInvoice
 {
     /**
      * Import the back end user object.
      */
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly RequestStack $requestStack,
-        private readonly Connection $connection,
-        private readonly Util $util,
-        private readonly TranslatorInterface $translator,
-        private readonly Security $security,
-        private readonly EventRapport2Docx $eventRapport2Docx,
-        private readonly EventMember $eventMember,
-        private readonly string $sacevtEventTemplateTourInvoice,
-        private readonly string $sacevtEventTemplateTourRapport,
-        private readonly string $sacevtEventTourInvoiceFileNamePattern,
-        private readonly string $sacevtEventTourRapportFileNamePattern,
+        private ContaoFramework $framework,
+        private RequestStack $requestStack,
+        private Connection $connection,
+        private Util $util,
+        private TranslatorInterface $translator,
+        private Security $security,
+        private ContaoCsrfTokenManager $contaoCsrfTokenManager,
+        private EventRapport2Docx $eventRapport2Docx,
+        private EventMember $eventMember,
+        private string $sacevtEventTemplateTourInvoice,
+        private string $sacevtEventTemplateTourRapport,
+        private string $sacevtEventTourInvoiceFileNamePattern,
+        private string $sacevtEventTourRapportFileNamePattern,
     ) {
     }
 
@@ -75,8 +83,18 @@ class CalendarEventsInstructorInvoice
 
         $request = $this->requestStack->getCurrentRequest();
 
+        $action = $request->query->get('action', '');
+
+        $arrOperations = [
+            'generateInvoiceDocx',
+            'generateInvoicePdf',
+            'generateTourRapportDocx',
+            'generateTourRapportPdf',
+            'sendRapport',
+        ];
+
         if ($dc->currentPid) {
-            if ('generateInvoiceDocx' === $request->query->get('action') || 'generateInvoicePdf' === $request->query->get('action') || 'generateTourRapportDocx' === $request->query->get('action') || 'generateTourRapportPdf' === $request->query->get('action')) {
+            if (\in_array($action, $arrOperations, true)) {
                 $objInvoice = CalendarEventsInstructorInvoiceModel::findByPk($request->query->get('id'));
 
                 if (null !== $objInvoice) {
@@ -101,6 +119,32 @@ class CalendarEventsInstructorInvoice
                 }
             }
         }
+
+        $act = $request->query->get('act', '');
+        $user = $this->security->getUser();
+
+        switch ($act) {
+            case 'select':
+            case 'copyAll':
+            case 'deleteAll':
+            case 'editAll':
+            case 'overrideAll':
+                Message::addError($this->translator->trans('ERR.actionNotSupported', [], 'contao_default'));
+                Controller::redirect(System::getReferer());
+                // no break
+            case 'edit':
+            case 'delete':
+
+            // A common user should not be allowed to edit another user's report
+            if (!$this->security->isGranted('ROLE_ADMIN')) {
+                $id = $this->requestStack->getCurrentRequest()->query->get('id');
+                $userPid = (int) $this->connection->fetchOne('SELECT userPid FROM tl_calendar_events_instructor_invoice WHERE id = ?', [$id]);
+
+                if ((int) $user->id !== $userPid) {
+                    throw new AccessDeniedException('Not enough permissions to '.$act.' data record ID '.$id.'.');
+                }
+            }
+        }
     }
 
     /**
@@ -121,19 +165,19 @@ class CalendarEventsInstructorInvoice
             $objTemplator = $this->eventRapport2Docx;
 
             if ('generateInvoiceDocx' === $request->query->get('action')) {
-                $objTemplator->generate('invoice', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
+                $objTemplator->downloadDocument('invoice', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
             }
 
             if ('generateInvoicePdf' === $request->query->get('action')) {
-                $objTemplator->generate('invoice', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
+                $objTemplator->downloadDocument('invoice', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
             }
 
             if ('generateTourRapportDocx' === $request->query->get('action')) {
-                $objTemplator->generate('rapport', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
+                $objTemplator->downloadDocument('rapport', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
             }
 
             if ('generateTourRapportPdf' === $request->query->get('action')) {
-                $objTemplator->generate('rapport', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
+                $objTemplator->downloadDocument('rapport', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
             }
         }
     }
@@ -149,7 +193,29 @@ class CalendarEventsInstructorInvoice
 
             if (null !== $objEvent) {
                 if (!$objEvent->filledInEventReportForm) {
-                    Message::addError('Bevor ein Vergütungsformular erstellt wird, sollte der Rapport vollständig ausgefüllt worden sein.', 'BE');
+                    Message::addError('Bevor ein Vergütungsformular erstellt werden kann, muss der Rapport vollständig ausgefüllt worden sein.', 'BE');
+                    Controller::redirect(System::getReferer());
+                }
+            }
+        }
+    }
+
+    /**
+     * Display a warning if report form hasn't been filled out.
+     */
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 70)]
+    public function checkBeforeSendTourRapport(DataContainer $dc): void
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        $action = $request->query->get('action', '');
+
+        if ($dc->currentPid && 'sendRapport' === $action) {
+            $objEvent = CalendarEventsModel::findByPk($dc->currentPid);
+
+            if (null !== $objEvent) {
+                if (!$objEvent->filledInEventReportForm) {
+                    Message::addError('Bevor der Tourrapport und das Vergütungsformular versandt werden können, sollte der Tourrapport vollständig ausgefüllt worden sein.', 'BE');
                     Controller::redirect(System::getReferer());
                 }
             }
@@ -172,7 +238,77 @@ class CalendarEventsInstructorInvoice
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.sorting.child_record')]
     public function listInvoices(array $row): string
     {
-        return '<div class="tl_content_left"><span class="level">Vergütungsformular mit Tourenrapport von: '.UserModel::findByPk($row['userPid'])->name.'</span> <span>['.CalendarEventsModel::findByPk($row['pid'])->title.']</span></div>';
+        return '<div class="tl_content_left"><span class="level">Vergütungsformular mit Tourrapport von: '.UserModel::findByPk($row['userPid'])->name.'</span> <span>['.CalendarEventsModel::findByPk($row['pid'])->title.']</span></div>';
+    }
+
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.edit.button', priority: 90)]
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.delete.button', priority: 90)]
+    public function editButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    {
+        $blnAllow = true;
+
+        $user = $this->security->getUser();
+
+        // A common user should not be allowed to edit another user's report
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            $blnAllow = true;
+        } elseif ((int) $row['userPid'] !== (int) $user->id) {
+            $blnAllow = false;
+        }
+
+        if (false === $blnAllow) {
+            return Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
+        }
+
+        return '<a href="'.Backend::addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+    }
+
+    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'list.operations.sendRapport.button', priority: 90)]
+    public function sendRapport(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    {
+        $blnAllow = false;
+        $blnRapportNotificationEnabled = false;
+
+        $objEvent = CalendarEventsModel::findByPk($row['pid']);
+
+        $arrOrganizers = StringUtil::deserialize($objEvent->organizers, true);
+        $organizers = EventOrganizerModel::findByIds($arrOrganizers);
+
+        if (null !== $organizers) {
+            while ($organizers->next()) {
+                if ($organizers->enableRapportNotification) {
+                    // Only show the icon without a link, if rapport notification is disabled in the organizer model.
+                    $blnRapportNotificationEnabled = true;
+                }
+            }
+        }
+
+        if (null !== $objEvent && $objEvent->filledInEventReportForm && $blnRapportNotificationEnabled) {
+            $blnAllow = true;
+        }
+
+        if (true === $blnAllow) {
+            $user = $this->security->getUser();
+            // A common user should not be allowed to send another user's report
+            if ($this->security->isGranted('ROLE_ADMIN')) {
+                $blnAllow = true;
+            } elseif ((int) $row['userPid'] !== (int) $user->id) {
+                $blnAllow = false;
+            }
+        }
+
+        if (false === $blnAllow) {
+            return Image::getHtml(str_replace('default', 'brightened', $icon), $label).' ';
+        }
+
+        // Generate a signed url
+        $href = System::getContainer()->get('uri_signer')->sign(System::getContainer()->get('router')->generate(SendTourRapportNotificationController::class, [
+            'rapport_id' => $row['id'],
+            'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
+            'sid' => uniqid(),
+        ]));
+
+        return '<a href="'.$href.'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 
     /**

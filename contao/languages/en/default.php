@@ -35,13 +35,19 @@ if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isF
 // DCA
 // tl_user_role
 $GLOBALS['TL_LANG']['MSC']['roleCurrentlyVacant'] = 'Benutzer-Rolle im Moment vakant';
+
 // tl_member
 $GLOBALS['TL_LANG']['ERR']['clearMemberProfile'] = 'Das Mitglied mit ID %d kann nicht gelöscht werden, weil es bei einem oder mehreren Events noch auf der Buchungsliste steht.';
+
 // tl_event_release_level_policy
 $GLOBALS['TL_LANG']['MSC']['level'] = 'Stufe';
+
 // tl_calendar_events_member
 $GLOBALS['TL_LANG']['ERR']['accessDenied'] = 'Zutritt verweigert.';
 $GLOBALS['TL_LANG']['MSC']['messageSuccessfullySent'] = 'Die Nachricht wurde erfolgreich versandt.';
+
+// tl_calendar_events_instructor_invoice
+$GLOBALS['TL_LANG']['ERR']['actionNotSupported'] = 'Diese Aktion wird nicht unterstützt.';
 
 // Events
 $GLOBALS['TL_LANG']['MSC']['calendar_events']['event_status_1'] = 'Freie Plätze!';
@@ -81,8 +87,8 @@ $GLOBALS['TL_LANG']['MSC']['plus1year'] = '+1 Jahr';
 $GLOBALS['TL_LANG']['MSC']['minus1year'] = '-1 Jahr';
 $GLOBALS['TL_LANG']['MSC']['plusOneReleaseLevel'] = 'Freigabestufe ++';
 $GLOBALS['TL_LANG']['MSC']['minusOneReleaseLevel'] = 'Freigabestufe --';
-$GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'] = 'Vergütungsformular und Tourenrapport drucken';
-$GLOBALS['TL_LANG']['MSC']['writeTourReportButton'] = 'Tourenrapport bearbeiten';
+$GLOBALS['TL_LANG']['MSC']['printInstructorInvoiceButton'] = 'Tourrapport und Vergütungsformular drucken und einreichen';
+$GLOBALS['TL_LANG']['MSC']['writeTourReportButton'] = 'Tourrapport bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['backToEvent'] = 'Zurück zum Event';
 $GLOBALS['TL_LANG']['MSC']['onloadCallbackExportCalendar'] = 'Events exportieren';
 
@@ -100,9 +106,10 @@ $GLOBALS['TL_LANG']['MSC']['patchedEndDatePleaseCheck'] = 'Das Datum für das En
 $GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Datensatz mit ID %s zu bearbeiten.';
 $GLOBALS['TL_LANG']['MSC']['missingPermissionsToDeleteEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Datensatz mit ID %s zu löschen.';
 $GLOBALS['TL_LANG']['MSC']['missingPermissionsToPublishOrUnpublishEvent'] = 'Sie haben nicht die erforderliche Berechtigung den Datensatz mit ID %s zu veröffentlichen.';
-$GLOBALS['TL_LANG']['MSC']['generateInvoice'] = 'Möchten Sie das Vergütungsformular ausdrucken?';
-$GLOBALS['TL_LANG']['MSC']['generateTourRapport'] = 'Möchten Sie den Tourenrapport ausdrucken?';
-$GLOBALS['TL_LANG']['MSC']['writeTourReport'] = 'Möchten Sie den Tourenrapport erstellen/bearbeiten?';
+$GLOBALS['TL_LANG']['MSC']['generateInvoiceConfirm'] = 'Möchten Sie das Vergütungsformular ausdrucken?';
+$GLOBALS['TL_LANG']['MSC']['generateRapportConfirm'] = 'Möchten Sie den Tourrapport ausdrucken?';
+$GLOBALS['TL_LANG']['MSC']['sendRapportConfirm'] = 'Möchten Sie den Tourrapport und das Vergütungsformular per E-Mail einreichen?';
+$GLOBALS['TL_LANG']['MSC']['writeTourReport'] = 'Möchten Sie den Tourrapport erstellen/bearbeiten?';
 $GLOBALS['TL_LANG']['MSC']['goToPartcipantList'] = 'Möchten Sie zur Teilnehmerliste wechseln?';
 $GLOBALS['TL_LANG']['MSC']['goToInvoiceList'] = 'Möchten Sie das Vergütungsformular bearbeiten/erstellen?';
 
@@ -114,13 +121,13 @@ $GLOBALS['TL_LANG']['MSC']['bhs_dashb_howToEditReadonlyProfileData'] = 'Änderun
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_editEvent'] = 'Event bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_eventListing'] = 'Event-Liste';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_livePreview'] = 'Event Vorschau';
-$GLOBALS['TL_LANG']['MSC']['bhs_dashb_printReport'] = 'Rapport drucken';
-$GLOBALS['TL_LANG']['MSC']['bhs_dashb_printReportDisabled'] = 'Rapport drucken nicht verfügbar';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_printReport'] = 'Tourrapport drucken';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_printReportDisabled'] = 'Tourrapport drucken nicht verfügbar';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_registrationList'] = 'Event Registrierungen';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_sendEmail'] = 'E-Mail versenden';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_sendEmailDisabled'] = 'E-Mail versenden nicht verfügbar';
-$GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReport'] = 'Rapport erfassen';
-$GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReportDisabled'] = 'Rapport erfassen nicht verfügbar';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReport'] = 'Tourrapport erfassen';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReportDisabled'] = 'Tourrapport erfassen nicht verfügbar';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorials'] = 'Anleitungen und Tutorials';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorialsText'] = 'Die Seite "Anleitungen und Tutorials" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_noUpcomingEventsDetected'] = 'In nächster Zeit stehen bei Ihnen keine Events an, wo Sie eine Leitungsfunktion ausüben.';
@@ -158,6 +165,19 @@ $GLOBALS['TL_LANG']['FORM']['evt_reg_foodHabits'] = 'Essgewohnheiten (Vegetarier
 $GLOBALS['TL_LANG']['FORM']['evt_reg_agb'] = 'Ich akzeptiere <a href="#" data-bs-toggle="modal" data-bs-target="#courseAndTourRegulationsModal">das Kurs- und Tourenreglement.</a>*';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_hasAcceptedPrivacyRules'] = 'Ich habe die <a href="#" data-bs-toggle="modal" data-bs-target="#hasAcceptedPrivacyRulesModal">Hinweise zum Datenschutz und zu meinen Persönlichkeitsrechten</a> zur Kenntnis genommen und bin damit einverstanden.*';
 $GLOBALS['TL_LANG']['FORM']['evt_reg_submit'] = 'Für Event anmelden';
+
+// Send tour rapport notification module
+$GLOBALS['TL_LANG']['MSC']['evt_strn_successfullySendNotification'] = 'Tourrapport und Vergütungsformular erfolgreich versandt an "%s".';
+$GLOBALS['TL_LANG']['MSC']['evt_strn_title'] = 'Versand Tourrapport & Vergütungsformular';
+$GLOBALS['TL_LANG']['MSC']['evt_strn_emailRecipients'] = 'E-Mail-Empfänger';
+$GLOBALS['TL_LANG']['MSC']['evt_strn_emailSubject'] = 'Betreff';
+$GLOBALS['TL_LANG']['MSC']['evt_strn_emailText'] = 'Text';
+$GLOBALS['TL_LANG']['MSC']['evt_strn_sendEmail'] = 'E-Mail absenden';
+$GLOBALS['TL_LANG']['ERR']['evt_strn_linkExpired'] = 'Der Link ist abgelaufen. Laden Sie die Seite neu und probieren Sie erneut.';
+$GLOBALS['TL_LANG']['ERR']['evt_strn_sendNotificationFailure'] = 'Tourrapport und Vergütungsformular konnten nicht erfolgreich versandt werden an "%s". Bitte prüfen Sie die E-Mail-Adressen der Empfänger. Kontaktieren Sie bitte den Administrator dieser Webseite, sollte der Fehler erneut auftreten.';
+$GLOBALS['TL_LANG']['ERR']['evt_strn_sendNotificationFailed'] = 'Die E-Mail konnte nicht versandt werden, weil es zu einem unerwarteten Fehler gekommen ist. Bitte probieren Sie den selben Vorgang nochmals auszuführen. Kontaktieren Sie bitte den Administrator dieser Webseite, sollte der Fehler erneut auftreten.';
+$GLOBALS['TL_LANG']['ERR']['evt_strn_cloudconvConversionCreditUsedUp'] = 'Die E-Mail konnte nicht versandt werden, weil bei der DOCX zu PDF Konvertierung von "%s" ein Fehler aufgetreten ist. Die Anzahl der täglich erlaubten Konvertierungen wurde überschritten.';
+$GLOBALS['TL_LANG']['ERR']['evt_strn_cloudconvUnexpectedError'] = 'Die E-Mail konnte nicht versandt werden, weil bei der DOCX zu PDF Konvertierung von "%s" ein unerwarteter Fehler aufgetreten ist. Probieren Sie den selben Vorgang noch einmal durchzuführen. Kontaktieren Sie bitte den Administrator dieser Webseite, sollte der Fehler erneut auftreten.';
 
 // Booking states/Subscription states
 $GLOBALS['TL_LANG']['MSC'][EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED] = 'Anmeldeanfrage unbeantwortet';

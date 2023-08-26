@@ -514,14 +514,14 @@ class CalendarEvents
                         }
                     }
 
-                    $arrRow = array_map(fn ($strValue) => $this->stringUtil->prepareSlug($strValue), $arrRow);
+                    $arrRow = array_map(fn ($strValue) => $this->stringUtil->revertInputEncoding($strValue), $arrRow);
 
                     $csv->insertOne($arrRow);
                 }
             }
 
             $objCalendar = $this->calendarModel->findByPk($request->query->get('id'));
-            $response = new Response((string) $csv->output($this->stringUtil->prepareSlug($objCalendar->title).'.csv'));
+            $response = new Response((string) $csv->output($this->stringUtil->revertInputEncoding($objCalendar->title).'.csv'));
 
             throw new ResponseException($response);
         }

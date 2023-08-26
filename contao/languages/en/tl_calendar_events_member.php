@@ -18,8 +18,8 @@ use Markocupic\SacEventToolBundle\Config\BookingType;
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['notify_event_participant'] = ['Teilnehmer benachrichtigen', 'Teilnehmer benachrichtigen'];
 
 // Global operations
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['writeTourReport'] = 'Tourenrapport bearbeiten';
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['printInstructorInvoice'] = 'Vergütungsformular und Tourenrapport drucken';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['writeTourReport'] = 'Tourrapport bearbeiten';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['printInstructorInvoice'] = 'Tourrapport und Vergütungsformular drucken und einreichen';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Csv'] = 'Teilnehmerliste Excel';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Docx'] = 'Teilnehmerliste Word';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['sendEmail'] = 'E-Mail';

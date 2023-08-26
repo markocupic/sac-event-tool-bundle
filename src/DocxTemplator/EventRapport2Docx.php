@@ -20,11 +20,13 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Message;
 use Contao\System;
 use Contao\UserModel;
+use Doctrine\DBAL\Exception;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
+use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
@@ -35,8 +37,12 @@ class EventRapport2Docx
     public const OUTPUT_TYPE_PDF = 'pdf';
     public const OUTPUT_TYPE_DOCX = 'docx';
 
+    public const DOCUMENT_TYPE_RAPPORT = 'rapport';
+    public const DOCUMENT_TYPE_INVOICE = 'invoice';
+
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly BinaryFileDownload $binaryFileDownload,
         private readonly ConvertFile $convertFile,
         private readonly Event $docxEventHelper,
         private readonly EventMember $docxEventMemberHelper,
@@ -47,10 +53,15 @@ class EventRapport2Docx
     }
 
     /**
+     * This method will generate either
+     * the event report or the invoice/reimbursement form
+     * as a file on the file system.
+     *
      * @throws CopyFileException
      * @throws CreateTemporaryFileException
+     * @throws Exception
      */
-    public function generate(string $type, CalendarEventsInstructorInvoiceModel $objEventInvoice, string $outputType, string $templateSRC, string $strFilenamePattern): Response
+    public function generateDocument(string $documentType, CalendarEventsInstructorInvoiceModel $objEventInvoice, string $outputType, string $templateSRC, string $strFilenamePattern): \SplFileObject
     {
         // Set adapters
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
@@ -70,14 +81,14 @@ class EventRapport2Docx
         }
 
         if (!$this->docxEventHelper->checkEventRapportHasFilledInCorrectly($objEventInvoice)) {
-            $messageAdapter->addError('Bitte füllen Sie den Tourenrapport vollständig aus, bevor Sie das Vergütungsformular herunterladen.');
+            $messageAdapter->addError('Bitte füllen Sie den Tourrapport vollständig aus, bevor Sie das Vergütungsformular herunterladen.');
 
             throw new RedirectResponseException(System::getReferer());
         }
 
         if (EventState::STATE_CANCELED !== $objEvent->eventState && null === $this->docxEventMemberHelper->getParticipatedEventMembers($objEvent)) {
             // Send error message if there are no members assigned to the event
-            $messageAdapter->addError('Bitte überprüfe die Teilnehmerliste. Es wurdem keine Teilnehmer gefunden, die am Event teilgenommen haben. Falls du den Event abgesagt hast, musst du dies unter Event Status beim Event selber vermerken.');
+            $messageAdapter->addError('Bitte überprüfe die Teilnehmerliste. Es wurden keine Teilnehmer gefunden, die am Event teilgenommen haben. Falls du den Event abgesagt hast, musst du dies unter Event Status beim Event selber vermerken.');
 
             throw new RedirectResponseException(System::getReferer());
         }
@@ -104,34 +115,54 @@ class EventRapport2Docx
 
         // Page #2
         // Member list
-        if ('rapport' === $type) {
+        if (self::DOCUMENT_TYPE_RAPPORT === $documentType) {
             $this->docxEventMemberHelper->setEventMemberData($objPhpWord, $objEvent, $this->docxEventMemberHelper->getParticipatedEventMembers($objEvent));
         }
 
         if (self::OUTPUT_TYPE_PDF === $outputType) {
             // Generate Docx file from template;
             $objPhpWord->generateUncached(true)
-                ->sendToBrowser(false)
                 ->generate()
             ;
 
             // Generate pdf document and send it to the browser
-            return $this->convertFile
+            $this->convertFile
                 ->file($this->projectDir.'/'.$destFilename)
                 ->uncached(true)
-                ->sendToBrowser(true, true)
                 ->convertTo('pdf')
                 ;
+
+            $destFilename = str_replace('.docx', '.pdf', $destFilename);
+
+            return new \SplFileObject($this->projectDir.'/'.$destFilename);
         }
 
         if (self::OUTPUT_TYPE_DOCX === $outputType) {
             // Generate docx document from template and send it to the browser;
-            return $objPhpWord->generateUncached(true)
-                ->sendToBrowser(true, false)
+            $objPhpWord->generateUncached(true)
                 ->generate()
-            ;
+                ;
+
+            return new \SplFileObject($this->projectDir.'/'.$destFilename);
         }
 
         throw new \LogicException(sprintf('Invalid output Type "%s". Type must be "%s" or "%s".', self::OUTPUT_TYPE_DOCX, self::OUTPUT_TYPE_PDF, $outputType));
+    }
+
+    /**
+     * This method will generate either
+     * the event report or the invoice/reimbursement form
+     * as a file on the file system
+     * and finally send this file to the browser.
+     *
+     * @throws CopyFileException
+     * @throws CreateTemporaryFileException
+     * @throws Exception
+     */
+    public function downloadDocument(string $documentType, CalendarEventsInstructorInvoiceModel $objEventInvoice, string $outputType, string $templateSRC, string $strFilenamePattern): Response
+    {
+        $objFile = $this->generateDocument($documentType, $objEventInvoice, $outputType, $templateSRC, $strFilenamePattern);
+
+        return $this->binaryFileDownload->sendFileToBrowser($objFile->getRealPath(), '', false);
     }
 }

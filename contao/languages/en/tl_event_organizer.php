@@ -28,6 +28,7 @@ $GLOBALS['TL_LANG']['tl_event_organizer']['logo_legend'] = 'Logo Einstellungen';
 $GLOBALS['TL_LANG']['tl_event_organizer']['event_regulation_legend'] = 'Kurs- und Tourenreglement Einstellungen für Event-Anmeldungen';
 $GLOBALS['TL_LANG']['tl_event_organizer']['eventList_legend'] = 'Event Listing Einstellungen';
 $GLOBALS['TL_LANG']['tl_event_organizer']['annual_program_legend'] = 'Jahresprogramm Export Einstellungen';
+$GLOBALS['TL_LANG']['tl_event_organizer']['event_rapport_legend'] = 'Einstellungen für E-Mail-Versand Tourrapport & Vergütungsformular';
 
 // Field
 $GLOBALS['TL_LANG']['tl_event_organizer']['title'] = ['Gruppenbezeichnung', 'Geben Sie eine Bezeichnung für die Gruppe/OG an.'];
@@ -47,3 +48,5 @@ $GLOBALS['TL_LANG']['tl_event_organizer']['annualProgramShowHeadline'] = ['Zeige
 $GLOBALS['TL_LANG']['tl_event_organizer']['annualProgramShowTeaser'] = ['Zeige den Teasertext', ''];
 $GLOBALS['TL_LANG']['tl_event_organizer']['annualProgramShowDetails'] = ['Zeige die Details', ''];
 $GLOBALS['TL_LANG']['tl_event_organizer']['belongsToOrganization'] = ['Teil von Sektion/OG', 'Geben Sie an, welcher OG die Untergruppe angehört.de'];
+$GLOBALS['TL_LANG']['tl_event_organizer']['enableRapportNotification'] = ['Automatisches Absenden des Tourrapports und des Vergütungsformulars aktivieren', 'Möchten Sie das automatisches Absenden des Tourrapports und des Vergütungsformulars aktivieren?'];
+$GLOBALS['TL_LANG']['tl_event_organizer']['eventRapportNotificationRecipients'] = ['Empfänger (E-Mail-Adressen kommagetrennt)', 'Wählen Sie einen oder mehrere Empfänger aus (üblicherweise der Tourenchef/die Tourenchefin)'];

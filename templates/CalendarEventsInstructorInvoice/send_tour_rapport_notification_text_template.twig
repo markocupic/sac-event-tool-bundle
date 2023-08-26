@@ -1,0 +1,21 @@
+Liebe/r Tourenchef/in oder Spesenverantwortliche/r
+
+Im Anhang findest du den Tourrapport und das Vergütungsformular für:
+
+
+"{{ event.title }}" [ID: {{ event.id }}]
+Startdatum: {{ event.startDate|date("d.m.Y") }}
+Leiter: {{ instructor.firstname }} {{ instructor.lastname }}
+
+
+Beste Grüsse
+
+{{ instructor.firstname }} {{ instructor.lastname }}
+
+
+{{ instructor.mobile|default('') }}
+{{ instructor.email|default('') }}
+
+
+{{ event.title }}
+{{ event_url }}

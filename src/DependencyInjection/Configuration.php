@@ -103,7 +103,7 @@ class Configuration implements ConfigurationInterface
                         // Event tour invoice file name pattern
                         ->scalarNode('tour_invoice_file_name_pattern')->defaultValue('SAC_Event_Verguetungsformular_%%s.%%s')->end()
                         // Event tour rapport file name pattern
-                        ->scalarNode('tour_rapport_file_name_pattern')->defaultValue('SAC_Event_Tour-Rapport_%%s.%%s')->end()
+                        ->scalarNode('tour_rapport_file_name_pattern')->defaultValue('SAC_Event_Tourrapport_%%s.%%s')->end()
                         // Event course confirmation file name pattern
                         ->scalarNode('course_confirmation_file_name_pattern')->defaultValue('SAC_Event_Kursbestaetigung_%%s_regId_%%s.%%s')->end()
                         // Default email text for accepting registrations
