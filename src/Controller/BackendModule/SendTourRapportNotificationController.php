@@ -198,7 +198,7 @@ class SendTourRapportNotificationController extends AbstractController
             ++$invoice->countNotifications;
             $invoice->save();
 
-            $msg = $this->translator->trans('MSC.evt_strn_successfullySendNotification', [$strRecipients], 'contao_default');
+            $msg = $this->translator->trans('MSC.evt_strn_successfullySendNotification', [$strRecipients, $biller->email], 'contao_default');
             $this->message->addConfirmation($msg);
         } else {
             // If sending email fails...
