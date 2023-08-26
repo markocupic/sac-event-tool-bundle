@@ -34,6 +34,7 @@ use Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -58,7 +59,7 @@ use Twig\Environment as Twig;
  * vendor/markocupic/sac-event-tool-bundle/contao/languages/en/default.php
  * vendor/markocupic/sac-event-tool-bundle/public/css/be_stylesheet.css
  */
-#[Route('/contao/send_tour_rapport_notification/{rapport_id}/{sid}/{rt}', name: SendTourRapportNotificationController::class, defaults: ['_scope' => 'backend', '_token_check' => true])]
+#[Route('/contao/send_tour_rapport_notification/{rapport_id}/{sid}/{rt}/{action}', name: SendTourRapportNotificationController::class, defaults: ['_scope' => 'backend', '_token_check' => true])]
 class SendTourRapportNotificationController extends AbstractController
 {
     public const SESSION_BAG_KEY = 'sacevt_send_tour_notification';
@@ -93,29 +94,41 @@ class SendTourRapportNotificationController extends AbstractController
         $this->events = $this->framework->getAdapter(Events::class);
     }
 
-    public function __invoke(int $rapport_id, string $sid, string $rt, Request $request): Response
+    public function __invoke(int $rapport_id, string $sid, string $rt, Request $request, string $action = ''): Response
     {
         $this->framework->initialize();
         $this->sid = $sid;
+        $uriSigner = $this->system->getContainer()->get('uri_signer');
+        $router = $this->system->getContainer()->get('router');
 
         // Do some checks
         $this->checkIsCsrfTokenValid($rt);
-        $this->checkIsSignedUrlValid($request);
+        $this->checkIsSignedUrlValid($request, $uriSigner);
         $this->setRefererIfNotSet($this->system->getReferer());
 
         $invoice = $this->getInvoice($rapport_id);
         $event = $this->getEvent($rapport_id);
         $biller = $this->getBiller($rapport_id);
 
+        if ('download_tour_rapport' === $action) {
+            return $this->downloadTourRapport($invoice);
+        }
+
+        if ('download_invoice' === $action) {
+            return $this->downloadInvoice($invoice);
+        }
+
         $form = $this->createAndValidateForm($request, $event, $biller);
 
         if (!$form->isSubmitted()) {
             // Display the email form
             $template = new BackendTemplate('be_send_tour_rapport_notification');
+            $template->request_token = $rt;
             $template->event = $event;
             $template->back = $this->getBackUri($request);
             $template->form = $form->generate();
-            $template->request_token = $rt;
+            $template->download_tour_rapport_uri = $uriSigner->sign($router->generate(self::class, ['rapport_id' => $rapport_id, 'sid' => $sid, 'rt' => $rt, 'action' => 'download_tour_rapport']));
+            $template->download_invoice_uri = $uriSigner->sign($router->generate(self::class, ['rapport_id' => $rapport_id, 'sid' => $sid, 'rt' => $rt, 'action' => 'download_invoice']));
 
             if ($invoice->countNotifications) {
                 // Protect the user from submitting the form multiple times.
@@ -209,6 +222,32 @@ class SendTourRapportNotificationController extends AbstractController
         return $this->redirectBackToRefererPage($request);
     }
 
+    protected function downloadTourRapport(CalendarEventsInstructorInvoiceModel $invoice): BinaryFileResponse
+    {
+        return $this->eventRapport2Docx
+            ->downloadDocument(
+                'rapport',
+                $invoice,
+                EventRapport2Docx::OUTPUT_TYPE_PDF,
+                $this->sacevtEventTemplateTourRapport,
+                $this->sacevtEventTourRapportFileNamePattern,
+            )
+        ;
+    }
+
+    protected function downloadInvoice(CalendarEventsInstructorInvoiceModel $invoice): BinaryFileResponse
+    {
+        return $this->eventRapport2Docx
+            ->downloadDocument(
+                'invoice',
+                $invoice,
+                EventRapport2Docx::OUTPUT_TYPE_PDF,
+                $this->sacevtEventTemplateTourInvoice,
+                $this->sacevtEventTourInvoiceFileNamePattern,
+            )
+        ;
+    }
+
     protected function checkIsCsrfTokenValid(string $strToken): void
     {
         $container = $this->system->getContainer();
@@ -218,12 +257,10 @@ class SendTourRapportNotificationController extends AbstractController
         }
     }
 
-    protected function checkIsSignedUrlValid(Request $request): void
+    protected function checkIsSignedUrlValid(Request $request, $uriSigner): void
     {
-        $uriSigner = $this->system->getContainer()->get('uri_signer');
-
         if (!$uriSigner->check($request->getRequestUri())) {
-            $this->message->addError($this->translator->trans('MSC.evt_strn_linkExpired', [], 'contao_default'));
+            $this->message->addError($this->translator->trans('ERR.evt_strn_linkExpired', [], 'contao_default'));
             $this->controller->redirect($this->system->getReferer());
         }
     }
