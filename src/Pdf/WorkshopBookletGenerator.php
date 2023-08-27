@@ -222,7 +222,7 @@ class WorkshopBookletGenerator
             $this->pdf->Output($path, 'F');
 
             // Send file to the browser
-            return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), false);
+            return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), false, true);
         }
 
         $this->pdf->setTitle(basename($path));
@@ -231,7 +231,7 @@ class WorkshopBookletGenerator
         $this->pdf->Output($path, 'F');
 
         // Send file to the browser
-        return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), false);
+        return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), false, true);
     }
 
     public function getDateString(int $eventId): string

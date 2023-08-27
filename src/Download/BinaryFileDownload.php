@@ -22,7 +22,7 @@ use Symfony\Component\String\UnicodeString;
 
 class BinaryFileDownload
 {
-    public function sendFileToBrowser(string $filePath, string $filename = '', bool $inline = false): BinaryFileResponse
+    public function sendFileToBrowser(string $filePath, string $filename = '', bool $inline = false, bool $deleteFileAfterSend = false): BinaryFileResponse
     {
         $response = new BinaryFileResponse($filePath);
         $response->setPrivate(); // public by default
@@ -40,6 +40,7 @@ class BinaryFileDownload
         $response->headers->addCacheControlDirective('must-revalidate');
         $response->headers->set('Connection', 'close');
         $response->headers->set('Content-Type', $mimeType);
+        $response->deleteFileAfterSend($deleteFileAfterSend);
 
         throw new ResponseException($response);
     }

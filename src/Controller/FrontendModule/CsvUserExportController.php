@@ -350,6 +350,6 @@ class CsvUserExportController extends AbstractFrontendModuleController
         $objFile->write($csv->toString());
         $objFile->close();
 
-        return $this->binaryFileDownload->sendFileToBrowser($this->projectDir.'/'.$objFile->path, '', false);
+        return $this->binaryFileDownload->sendFileToBrowser($this->projectDir.'/'.$objFile->path, '', false, true);
     }
 }

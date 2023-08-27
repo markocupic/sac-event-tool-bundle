@@ -189,6 +189,6 @@ class EventRapport2Docx
     {
         $objFile = $this->generateDocument($documentType, $objEventInvoice, $outputType, $templateSRC, $strFilenamePattern);
 
-        return $this->binaryFileDownload->sendFileToBrowser($objFile->getRealPath(), '', false);
+        return $this->binaryFileDownload->sendFileToBrowser($objFile->getRealPath(), '', false, true);
     }
 }

@@ -102,7 +102,7 @@ class EventMemberList2Docx
             // Generate pdf
             return $this->convertFile
                 ->file($this->projectDir.'/'.$targetFilePath)
-                ->sendToBrowser(true, true)
+                ->sendToBrowser(true, true, true)
                 ->uncached(true)
                 ->convertTo('pdf')
                 ;
