@@ -73,17 +73,17 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 90],
 			],
-			'downloadEventMemberList2Csv'  => [
-				'href'                   => 'action=downloadEventMemberListCsv',
+			'downloadEventRegistrationListCsv'  => [
+				'href'                   => 'action=downloadEventRegistrationListCsv&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'class'                  => 'header_icon',
 				'icon'                   => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-excel-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 				'custom_glob_op'         => true,
 				'custom_glob_op_options' => ['add_to_menu_group' => 'registration', 'sorting' => 80],
 			],
-			'downloadEventMemberList2Docx' => [
-				'href'                   => 'action=downloadEventMemberListDocx',
-				'class'                  => 'download_registration_list',
+			'downloadEventRegistrationListDocx' => [
+				'href'                   => 'action=downloadEventRegistrationListDocx&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
+				'class'                  => 'download_event_registration_list',
 				'icon'                   => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-word-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 				'custom_glob_op'         => true,

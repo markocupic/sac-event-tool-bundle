@@ -49,8 +49,8 @@ use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmailController;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventParticipantController;
-use Markocupic\SacEventToolBundle\Csv\ExportEventRegistrationList;
-use Markocupic\SacEventToolBundle\DocxTemplator\EventMemberList2Docx;
+use Markocupic\SacEventToolBundle\Csv\EventRegistrationListGeneratorCsv;
+use Markocupic\SacEventToolBundle\DocxTemplator\EventRegistrationListGeneratorDocx;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
@@ -68,7 +68,6 @@ class CalendarEventsMember
     public const TABLE = 'tl_calendar_events_member';
 
     // Adapters
-    private Adapter $image;
     private Adapter $backend;
     private Adapter $calendarEvents;
     private Adapter $calendarEventsHelper;
@@ -77,6 +76,7 @@ class CalendarEventsMember
     private Adapter $environment;
     private Adapter $events;
     private Adapter $files;
+    private Adapter $image;
     private Adapter $member;
     private Adapter $message;
     private Adapter $notification;
@@ -85,13 +85,13 @@ class CalendarEventsMember
     private Adapter $validator;
 
     public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
-        private readonly RequestStack $requestStack,
         private readonly Connection $connection,
-        private readonly EventMemberList2Docx $registrationListExporterDocx,
+        private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
+        private readonly ContaoFramework $framework,
+        private readonly EventRegistrationListGeneratorCsv $registrationListGeneratorCsv,
+        private readonly EventRegistrationListGeneratorDocx $registrationListGeneratorDocx,
         private readonly EventRegistrationUtil $eventRegistrationUtil,
-        private readonly ExportEventRegistrationList $registrationListExporterCsv,
+        private readonly RequestStack $requestStack,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
         private readonly UrlParser $urlParser,
@@ -247,7 +247,7 @@ class CalendarEventsMember
     }
 
     /**
-     * Export registration list as a DOCX or CSV file.
+     * Download registration list as a DOCX or CSV file.
      *
      * @throws Exception
      * @throws CannotInsertRecord
@@ -262,13 +262,13 @@ class CalendarEventsMember
 
         if ($request->query->has('id') && null !== ($objEvent = $this->calendarEvents->findByPk($request->query->get('id')))) {
             // Download the registration list as a docx file
-            if ('downloadEventMemberListDocx' === $request->query->get('action')) {
-                return $this->registrationListExporterDocx->generate($objEvent, 'docx');
+            if ('downloadEventRegistrationListDocx' === $request->query->get('action')) {
+                return $this->registrationListGeneratorDocx->generate($objEvent, 'docx');
             }
 
             // Download the registration list as a csv file
-            if ('downloadEventMemberListCsv' === $request->query->get('action')) {
-                return $this->registrationListExporterCsv->generate($objEvent);
+            if ('downloadEventRegistrationListCsv' === $request->query->get('action')) {
+                return $this->registrationListGeneratorCsv->generate($objEvent);
             }
         }
 

@@ -30,7 +30,7 @@ use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Component\HttpFoundation\Response;
 
-class EventMemberList2Docx
+class EventRegistrationListGeneratorDocx
 {
     // Adapters
     private Adapter $calendarEventsMemberModelAdapter;

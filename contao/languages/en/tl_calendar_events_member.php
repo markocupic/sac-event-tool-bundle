@@ -20,8 +20,8 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['notify_event_participant'] = [
 // Global operations
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['writeTourReport'] = 'Tourrapport bearbeiten';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['printInstructorInvoice'] = 'Tourrapport und Vergütungsformular drucken und einreichen';
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Csv'] = 'Teilnehmerliste Excel';
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventMemberList2Docx'] = 'Teilnehmerliste Word';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventRegistrationListCsv'] = 'Teilnehmerliste Excel';
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['downloadEventRegistrationListDocx'] = 'Teilnehmerliste Word';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['sendEmail'] = 'E-Mail';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['new'] = ['Teilnehmer hinzufügen', 'Fügen Sie hier manuell einen neuen Teilnehmer hinzu.'];
 

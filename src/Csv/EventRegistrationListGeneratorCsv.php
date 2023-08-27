@@ -28,7 +28,7 @@ use League\Csv\Writer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class ExportEventRegistrationList
+class EventRegistrationListGeneratorCsv
 {
     private const DELIMITER = ';';
     private const FIELDS = [

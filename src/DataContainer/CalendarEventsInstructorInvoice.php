@@ -31,8 +31,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Controller\BackendModule\SendTourRapportNotificationController;
-use Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
+use Markocupic\SacEventToolBundle\DocxTemplator\TourRapportGenerator;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
@@ -55,7 +55,7 @@ readonly class CalendarEventsInstructorInvoice
         private TranslatorInterface $translator,
         private Security $security,
         private ContaoCsrfTokenManager $contaoCsrfTokenManager,
-        private EventRapport2Docx $eventRapport2Docx,
+        private TourRapportGenerator $tourRapportGenerator,
         private EventMember $eventMember,
         private string $sacevtEventTemplateTourInvoice,
         private string $sacevtEventTemplateTourRapport,
@@ -164,23 +164,23 @@ readonly class CalendarEventsInstructorInvoice
             $action = $request->query->get('action');
 
             if ($action) {
-                /** @var EventRapport2Docx $objTemplator */
-                $objTemplator = $this->eventRapport2Docx;
+                /** @var TourRapportGenerator $objTemplator */
+                $objTemplator = $this->tourRapportGenerator;
 
                 if ('generateInvoiceDocx' === $request->query->get('action')) {
-                    $objTemplator->downloadDocument('invoice', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
+                    $objTemplator->download('invoice', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
                 }
 
                 if ('generateInvoicePdf' === $request->query->get('action')) {
-                    $objTemplator->downloadDocument('invoice', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
+                    $objTemplator->download('invoice', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
                 }
 
                 if ('generateTourRapportDocx' === $request->query->get('action')) {
-                    $objTemplator->downloadDocument('rapport', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
+                    $objTemplator->download('rapport', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
                 }
 
                 if ('generateTourRapportPdf' === $request->query->get('action')) {
-                    $objTemplator->downloadDocument('rapport', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
+                    $objTemplator->download('rapport', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
                 }
             }
         }

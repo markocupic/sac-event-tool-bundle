@@ -30,7 +30,7 @@ use Contao\Model\Collection;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
-use Markocupic\SacEventToolBundle\DocxTemplator\EventRapport2Docx;
+use Markocupic\SacEventToolBundle\DocxTemplator\TourRapportGenerator;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -75,7 +75,7 @@ class SendTourRapportNotificationController extends AbstractController
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly ContaoCsrfTokenManager $csrfTokenManager,
-        private readonly EventRapport2Docx $eventRapport2Docx,
+        private readonly TourRapportGenerator $tourRapportGenerator,
         private readonly RequestStack $requestStack,
         private readonly TranslatorInterface $translator,
         private readonly Twig $twig,
@@ -146,11 +146,11 @@ class SendTourRapportNotificationController extends AbstractController
 
         // I. Generate tour report file and convert from docx to pdf using the Cloudconvert API.
         try {
-            $rapportFile = $this->eventRapport2Docx
-                ->generateDocument(
+            $rapportFile = $this->tourRapportGenerator
+                ->generate(
                     'rapport',
                     $invoice,
-                    EventRapport2Docx::OUTPUT_TYPE_PDF,
+                    TourRapportGenerator::OUTPUT_TYPE_PDF,
                     $this->sacevtEventTemplateTourRapport,
                     $this->sacevtEventTourRapportFileNamePattern,
                 )
@@ -170,11 +170,11 @@ class SendTourRapportNotificationController extends AbstractController
 
         // II. Generate tour invoice file and convert from docx to pdf using the Cloudconvert API.
         try {
-            $invoiceFile = $this->eventRapport2Docx
-                ->generateDocument(
+            $invoiceFile = $this->tourRapportGenerator
+                ->generate(
                     'invoice',
                     $invoice,
-                    EventRapport2Docx::OUTPUT_TYPE_PDF,
+                    TourRapportGenerator::OUTPUT_TYPE_PDF,
                     $this->sacevtEventTemplateTourInvoice,
                     $this->sacevtEventTourInvoiceFileNamePattern,
                 )
@@ -224,11 +224,11 @@ class SendTourRapportNotificationController extends AbstractController
 
     protected function downloadTourRapport(CalendarEventsInstructorInvoiceModel $invoice): BinaryFileResponse
     {
-        return $this->eventRapport2Docx
-            ->downloadDocument(
+        return $this->tourRapportGenerator
+            ->download(
                 'rapport',
                 $invoice,
-                EventRapport2Docx::OUTPUT_TYPE_PDF,
+                TourRapportGenerator::OUTPUT_TYPE_PDF,
                 $this->sacevtEventTemplateTourRapport,
                 $this->sacevtEventTourRapportFileNamePattern,
             )
@@ -237,11 +237,11 @@ class SendTourRapportNotificationController extends AbstractController
 
     protected function downloadInvoice(CalendarEventsInstructorInvoiceModel $invoice): BinaryFileResponse
     {
-        return $this->eventRapport2Docx
-            ->downloadDocument(
+        return $this->tourRapportGenerator
+            ->download(
                 'invoice',
                 $invoice,
-                EventRapport2Docx::OUTPUT_TYPE_PDF,
+                TourRapportGenerator::OUTPUT_TYPE_PDF,
                 $this->sacevtEventTemplateTourInvoice,
                 $this->sacevtEventTourInvoiceFileNamePattern,
             )
