@@ -68,27 +68,27 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'generateInvoicePdf'      => [
 				'href'       => 'action=generateInvoicePdf&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'icon'       => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-pdf-regular.svg',
-				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateInvoiceConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
+				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoicePdfConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
 			],
 			'generateInvoiceDocx'     => [
 				'href'       => 'action=generateInvoiceDocx&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'icon'       => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-word-regular.svg',
-				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateInvoiceConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
+				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateInvoiceDocxConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
 			],
 			'generateTourRapportPdf'  => [
 				'href'       => 'action=generateTourRapportPdf&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'icon'       => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-pdf-regular.svg',
-				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateTourRapportConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
+				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportPdfConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
 			],
 			'generateTourRapportDocx' => [
 				'href'       => 'action=generateTourRapportDocx&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'icon'       => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-word-regular.svg',
-				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['generateTourRapportConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
+				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['generateTourRapportDocxConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
 			],
 			'sendRapport'             => [
 				'href'       => 'action=sendRapport',
 				'icon'       => 'bundles/markocupicsaceventtool/icons/fontawesome/default/paper-plane-solid.svg',
-				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['MSC']['sendRapportConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
+				'attributes' => 'onclick="if (!confirm(\''.($GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['submitRapportConfirm'] ?? null).'\')) return false; Backend.getScrollOffset();"',
 			],
 		],
 	],
