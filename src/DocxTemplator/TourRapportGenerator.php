@@ -28,7 +28,6 @@ use Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -116,40 +115,21 @@ class TourRapportGenerator
             // Use the cached version of the PDF file, if...
             // - data has not been changed and
             // - no changes have been made to the template
-            $hash = hash('md5', json_encode($phpWord->getData()).hash_file('md5', $this->projectDir.'/'.$templateSRC));
-
-            // Create cache dirs
-            $pdfCacheDir = $this->projectDir.'/system/tmp/cloudconvert/pdf';
-            $docxCacheDir = $this->projectDir.'/system/tmp/cloudconvert/docx';
-
-            $fs = new Filesystem();
-            $fs->mkdir([$pdfCacheDir, $docxCacheDir]);
-
-            if (is_file($pdfCacheDir.'/'.$hash) && is_file($docxCacheDir.'/'.$hash)) {
-                $fs->copy($pdfCacheDir.'/'.$hash, $targetPathPdf, true);
-
-                // Return the cached version of the PDF file.
-                return new \SplFileObject($targetPathPdf);
-            }
+            $hashCode = hash('md5', json_encode($phpWord->getData()).hash_file('md5', $this->projectDir.'/'.$templateSRC));
 
             // Generate DOCX file from template;
             $phpWord->generateUncached(true)
                 ->generate()
             ;
 
-            // Copy the DOCX version of the file to the cache.
-            $fs->copy($targetPathDocx, $docxCacheDir.'/'.$hash, true);
-
             // Generate the PDF document
             $this->convertFile
-                ->sendToBrowser(false)
+                ->sendToBrowser(false, false, true)
                 ->file($targetPathDocx)
-                ->uncached(true)
-                ->convertTo(self::OUTPUT_TYPE_PDF)
+                ->uncached(false)
+                ->setCacheHashCode($hashCode)
+                ->convertTo(self::OUTPUT_TYPE_PDF, $targetPathPdf)
                 ;
-
-            // Copy the PDF version of the file to the cache.
-            $fs->copy($targetPathPdf, $pdfCacheDir.'/'.$hash, true);
 
             return new \SplFileObject($targetPathPdf);
         }
