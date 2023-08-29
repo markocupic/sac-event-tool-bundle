@@ -514,7 +514,7 @@ class CalendarEvents
                         }
                     }
 
-                    $arrRow = array_map(fn ($strValue) => $this->stringUtil->revertInputEncoding($strValue), $arrRow);
+                    $arrRow = array_map(fn ($strValue) => $this->stringUtil->revertInputEncoding((string) $strValue), $arrRow);
 
                     $csv->insertOne($arrRow);
                 }
