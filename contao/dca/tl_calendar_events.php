@@ -284,6 +284,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mountainguide'] = [
 	'filter'    => true,
 	'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'],
 	'inputType' => 'select',
+	'eval'      => ['tl_class' => 'clr w50'],
 	'options'   => EventMountainGuide::ALL,
 	'sql'       => "int(1) unsigned NOT NULL default '0'",
 ];
@@ -309,7 +310,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['instructor'] = [
 	'inputType' => 'multiColumnWizard',
 	// Save instructors in a child table tl_calendar_events_instructors
 	'eval'      => [
-		'tl_class'     => 'mcwColumnCount_1',
+		'tl_class'     => 'clr w50 mcwColumnCount_1',
 		'helpWizard'   => false,
 		'mandatory'    => true,
 		'columnFields' => [
