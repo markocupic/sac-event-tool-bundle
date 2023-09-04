@@ -405,7 +405,7 @@ class CalendarEvents
             }
 
             // Remove the field "rescheduledEventDate" if the event has not been rescheduled
-            if (EventExecutionState::STATE_RESCHEDULED !== $objCalendarEventsModel->eventState) {
+            if (null !== $objCalendarEventsModel && EventExecutionState::STATE_RESCHEDULED !== $objCalendarEventsModel->eventState) {
                 $palettes = ['default', 'tour', 'lastMinuteTour', 'course', 'generalEvent', 'tour_report'];
 
                 foreach ($palettes as $strPaletteName) {
