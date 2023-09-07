@@ -134,7 +134,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 		'iban'               => [
 			'exclude'   => true,
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'maxlength' => 34, 'tl_class' => 'clr'],
+			'eval'      => ['mandatory' => true, 'maxlength' => 34, 'doNotCopy' => true, 'tl_class' => 'clr'],
 			'sql'       => "varchar(34) NOT NULL default ''",
 		],
 		'sleepingTaxes'      => [
@@ -167,7 +167,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'exclude'   => true,
 			'inputType' => 'select',
 			'options'   => range(0, 20),
-			'eval'      => ['multiple' => false, 'mandatory' => true, 'tl_class' => 'clr m12'],
+			'eval'      => ['multiple' => false, 'mandatory' => true, 'doNotCopy' => true, 'tl_class' => 'clr m12'],
 			'sql'       => "int(10) unsigned NOT NULL default '0'",
 		],
 		'railwTaxes'         => [
@@ -207,7 +207,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 6, 'tl_class' => 'clr'],
+			'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 6, 'doNotCopy' => true, 'tl_class' => 'clr'],
 			'sql'       => "varchar(6) NOT NULL default '0'",
 		],
 		'countCars'          => [
@@ -222,13 +222,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'exclude'   => true,
 			'default'   => '0',
 			'inputType' => 'text',
-			'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 3, 'tl_class' => 'clr'],
+			'eval'      => ['mandatory' => true, 'rgxp' => 'digit', 'maxlength' => 3, 'doNotCopy' => true, 'tl_class' => 'clr'],
 			'sql'       => "varchar(3) NOT NULL default '0'",
 		],
 		'notice'             => [
 			'exclude'   => true,
 			'inputType' => 'textarea',
-			'eval'      => ['mandatory' => false, 'tl_class' => 'clr'],
+			'eval'      => ['mandatory' => false, 'doNotCopy' => true, 'tl_class' => 'clr'],
 			'sql'       => 'text NULL',
 		],
 		'countNotifications' => [
