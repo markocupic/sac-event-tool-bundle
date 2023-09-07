@@ -521,7 +521,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['rescheduledEventDate'] = [
 	'exclude'   => true,
 	'inputType' => 'text',
 	'eval'      => ['rgxp' => 'date', 'mandatory' => true, 'doNotCopy' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-	'sql'       => "int(10) unsigned NULL",
+	'sql'       => "bigint(20) unsigned NULL",
 ];
 
 // meetingPoint
@@ -595,7 +595,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationStartDate'] = [
 	'exclude'   => true,
 	'inputType' => 'text',
 	'eval'      => ['rgxp' => 'date', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-	'sql'       => 'int(10) unsigned NULL',
+	'sql'       => 'bigint(20) unsigned NULL',
 ];
 
 // Set registration end date
@@ -604,7 +604,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationEndDate'] = [
 	'exclude'   => true,
 	'inputType' => 'text',
 	'eval'      => ['rgxp' => 'datim', 'mandatory' => true, 'datepicker' => true, 'tl_class' => 'w50 wizard'],
-	'sql'       => 'int(10) unsigned NULL',
+	'sql'       => 'bigint(20) unsigned NULL',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['allowDeregistration'] = [

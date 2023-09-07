@@ -183,7 +183,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'flag'      => 5,
 			'sorting'   => true,
 			'eval'      => ['rgxp' => 'date', 'datepicker' => true, 'doNotCopy' => true, 'tl_class' => 'w50 wizard'],
-			'sql'       => "int(10) unsigned NOT NULL default '0'",
+			'sql'       => "bigint(20) unsigned NOT NULL default 0",
 		],
 		'stateOfSubscription'         => [
 			'filter'    => true,
