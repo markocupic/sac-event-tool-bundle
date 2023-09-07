@@ -667,7 +667,7 @@ class CalendarEvents
     /**
      * Add a priority of -100
      * This way this callback will be executed after! the legacy callback tl_calendar_events.adjustTime()
-     * but before self::adjustRegistrationPeriod.
+     * but before self::adjustRegistrationPeriod (priority: -110).
      *
      * @throws Exception
      */
@@ -714,7 +714,7 @@ class CalendarEvents
     /**
      * Add a priority of -110
      * This way this callback will be executed after! the legacy callback tl_calendar_events.adjustTime()
-     * but before self::adjustStartAndEndDate.
+     * and after self::adjustStartAndEndDate (priority: -100).
      *
      * @throws Exception
      */
@@ -729,7 +729,7 @@ class CalendarEvents
         $row = $this->connection->fetchAssociative('SELECT * FROM tl_calendar_events WHERE id = ?', [$dc->activeRecord->id]);
 
         if ($row) {
-            if ($row['setRegistrationPeriod']) {
+            if ($row['setRegistrationPeriod'] && $row['startDate']) {
                 $regEndDate = $row['registrationEndDate'];
                 $regStartDate = $row['registrationStartDate'];
 
