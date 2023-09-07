@@ -333,26 +333,25 @@ readonly class CalendarEventsInstructorInvoice
     #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'fields.iban.load')]
     public function getIbanFromUser(mixed $value, DataContainer $dc): mixed
     {
-        if ($dc->activeRecord) {
-            if (null !== ($objInvoice = CalendarEventsInstructorInvoiceModel::findByPk($dc->activeRecord->id))) {
-                if ($objInvoice->userPid > 0 && null !== ($objUser = UserModel::findByPk($objInvoice->userPid))) {
-                    if ('' !== $objUser->iban) {
-                        if ($value !== $objUser->iban) {
-                            $value = $objUser->iban;
-                            $objInvoice->iban = $value;
-                            $objInvoice->save();
-                            Message::addInfo(
-                                sprintf(
-                                    'Die IBAN Nummer für "%s" wurde aus der Benutzerdatenbank übernommen. Falls die IBAN nicht stimmt, muss diese zuerst unter "Profil" berichtigt werden!',
-                                    $objUser->name
-                                )
-                            );
-                        }
+        $value = '';
 
-                        $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice']['fields']['iban']['eval']['readonly'] = true;
-                    } else {
-                        Message::addInfo('Leider wurde für deinen Namen keine IBAN gefunden. Bitte hinterlege deine IBAN in deinem Profil, damit diese in Zukunft automatisch beim Erstellen einer Abrechnung im Feld "IBAN" eingefügt werden kann.');
-                    }
+        if (null !== ($objInvoice = CalendarEventsInstructorInvoiceModel::findByPk($dc->id))) {
+            if ($objInvoice->userPid > 0 && null !== ($objUser = UserModel::findByPk($objInvoice->userPid))) {
+                $value = $objUser->iban;
+                $objInvoice->iban = $value;
+                $objInvoice->save();
+
+                if (!empty($value)) {
+                    $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice']['fields']['iban']['eval']['readonly'] = true;
+
+                    Message::addInfo(
+                        sprintf(
+                            'Die IBAN Nummer für "%s" wurde aus der Benutzerdatenbank übernommen. Falls die IBAN nicht stimmt, muss diese zuerst unter "Profil" berichtigt werden!',
+                            $objUser->name
+                        )
+                    );
+                } else {
+                    Message::addInfo('Leider wurde für deinen Namen keine IBAN gefunden. Bitte hinterlege deine IBAN in deinem Profil, damit diese in Zukunft automatisch beim Erstellen einer Abrechnung im Feld "IBAN" eingefügt werden kann.');
                 }
             }
         }
