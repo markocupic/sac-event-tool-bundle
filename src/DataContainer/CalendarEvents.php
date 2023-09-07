@@ -521,7 +521,11 @@ class CalendarEvents
             }
 
             $objCalendar = $this->calendarModel->findByPk($request->query->get('id'));
-            $response = new Response((string) $csv->output($this->stringUtil->revertInputEncoding($objCalendar->title).'.csv'));
+
+            $fileName = $this->stringUtil->revertInputEncoding($objCalendar->title).'.csv';
+            $fileName = $this->stringUtil->sanitizeFileName($fileName);
+
+            $response = new Response((string) $csv->output($fileName));
 
             throw new ResponseException($response);
         }
