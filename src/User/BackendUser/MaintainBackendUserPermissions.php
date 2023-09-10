@@ -134,7 +134,6 @@ class MaintainBackendUserPermissions
                 $set = array_map('serialize', $arrInheritNew);
 
                 if (!empty($set)) {
-                    $set['tstamp'] = time();
                     $this->connection->update('tl_user', $set, ['username' => $strUserIdentifier]);
                 }
             }
