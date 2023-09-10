@@ -19,6 +19,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 		'dataContainer'    => 'Table',
 		'ptable'           => 'tl_calendar_events',
 		'doNotCopyRecords' => true,
+		'notCopyable'      => true,
 		'enableVersioning' => true,
 		'switchToEdit'     => true,
 		'sql'              => [
@@ -51,10 +52,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'edit'                    => [
 				'href' => 'act=edit',
 				'icon' => 'edit.svg',
-			],
-			'copy'                    => [
-				'href' => 'act=copy',
-				'icon' => 'copy.svg',
 			],
 			'delete'                  => [
 				'href'       => 'act=delete',
