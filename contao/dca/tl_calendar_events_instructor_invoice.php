@@ -114,7 +114,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'foreignKey' => 'tl_user.name',
 			'inputType'  => 'select',
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
-			'eval'       => ['submitOnChange' => true, 'mandatory' => true, 'multiple' => false, 'class' => 'clr'],
+			'eval'       => ['submitOnChange' => true, 'mandatory' => true, 'readonly' => true, 'multiple' => false, 'class' => 'clr'],
 			'sql'        => "int(10) unsigned NOT NULL default '0'",
 		],
 		'tstamp'             => [
