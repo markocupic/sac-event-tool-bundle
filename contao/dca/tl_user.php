@@ -126,7 +126,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['tl_class'] = 'clr';
 $GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['tl_class'] = 'clr';
 $GLOBALS['TL_DCA']['tl_user']['fields']['email']['sorting'] = true;
 $GLOBALS['TL_DCA']['tl_user']['fields']['tstamp']['sorting'] = true;
-$GLOBALS['TL_DCA']['tl_user']['fields']['tstamp']['flag'] = DataContainer::SORT_DAY_ASC;
+$GLOBALS['TL_DCA']['tl_user']['fields']['tstamp']['flag'] = DataContainer::SORT_DAY_DESC;
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['uuid'] = [
 	'exclude'   => true,
