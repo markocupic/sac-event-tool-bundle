@@ -135,7 +135,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
                 if ('user-role-export' === $request->request->get('export-type')) {
                     $strTable = 'tl_user';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'leiterQualifikation', 'lastLogin', 'password', 'pwChange', 'userRole'];
+                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'leiterQualifikation', 'lastLogin', 'userRole'];
                     $strGroupFieldName = 'userRole';
                     $result = $this->connection->executeQuery('SELECT * FROM tl_user ORDER BY lastname, firstname');
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, UserRoleModel::class, $blnKeepGroupsInOneLine);
@@ -143,7 +143,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
                 if ('user-group-export' === $request->request->get('export-type')) {
                     $strTable = 'tl_user';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'lastLogin', 'password', 'pwChange', 'groups'];
+                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
                     $result = $this->connection->executeQuery('SELECT * FROM tl_user ORDER BY lastname, firstname');
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, UserGroupModel::class, $blnKeepGroupsInOneLine);
@@ -292,30 +292,38 @@ class CsvUserExportController extends AbstractFrontendModuleController
         $arrHeadline = [];
 
         foreach ($arrFields as $field) {
-            $fieldname = $this->translator->trans(sprintf('%s.%s.0', $strTable, $field), [], 'contao_default') ?: $field;
-            $arrHeadline[] = $fieldname;
+            $fieldName = $this->translator->trans(sprintf('%s.%s.0', $strTable, $field), [], 'contao_default') ?: $field;
+            $arrHeadline[] = $fieldName;
         }
 
         return $arrHeadline;
     }
 
-    private function getField(string $field, array $arrUser): string
+    private function getField(string $fieldName, array $arrUser): string
     {
         $dateAdapter = $this->framework->getAdapter(Date::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        if ('password' === $field) {
+        if ('password' === $fieldName) {
             return '#######';
         }
 
-        if ('lastLogin' === $field) {
+        if ('lastLogin' === $fieldName) {
             return $dateAdapter->parse('Y-m-d', $arrUser['lastLogin']);
         }
 
-        if ('phone' === $field || 'mobile' === $field) {
-            return PhoneNumber::beautify($arrUser[$field]);
+        if ('phone' === $fieldName || 'mobile' === $fieldName) {
+            return PhoneNumber::beautify($arrUser[$fieldName]);
         }
 
-        return (string) $arrUser[$field];
+        if ('leiterQualifikation' === $fieldName) {
+            $arrQuali = $stringUtilAdapter->deserialize($arrUser['leiterQualifikation'] ?? [], true);
+            $arrQuali = array_map(static fn ($item) => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'][$item] ?? $item, $arrQuali);
+
+            return implode(', ', $arrQuali);
+        }
+
+        return (string) $arrUser[$fieldName];
     }
 
     /**
