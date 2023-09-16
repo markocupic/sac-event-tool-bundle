@@ -323,6 +323,10 @@ class CsvUserExportController extends AbstractFrontendModuleController
             return implode(', ', $arrQuali);
         }
 
+        if ('rescissionCause' === $fieldName) {
+            return $GLOBALS['TL_LANG']['tl_user']['rescissionCauseOptions'][$arrUser['rescissionCause']] ?? $arrUser['rescissionCause'];
+        }
+
         return (string) $arrUser[$fieldName];
     }
 
