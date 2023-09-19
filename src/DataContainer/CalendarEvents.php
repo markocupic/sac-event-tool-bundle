@@ -444,7 +444,7 @@ class CalendarEvents
             $csv->setDelimiter(';');
 
             // Selected fields
-            $arrFields = array_unique(['id', 'title', 'location', 'eventDates', 'eventDurationInDays', 'published', 'organizers', 'mountainguide', 'mainInstructor', 'instructor', 'minMembers', 'maxMembers', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey']);
+            $arrFields = array_unique(['id', 'title', 'location', 'eventDates', 'eventDurationInDays', 'published', 'organizers', 'mountainguide', 'mainInstructor', 'instructor', 'minMembers', 'maxMembers', 'executionState', 'eventState', 'eventType', 'courseLevel', 'courseTypeLevel0', 'courseTypeLevel1', 'tourType', 'tourTechDifficulty', 'eventReleaseLevel', 'journey', 'teaser', 'tourDetailText', 'requirements']);
 
             // Insert headline first
             $this->controller->loadLanguageFile('tl_calendar_events');
@@ -509,6 +509,8 @@ class CalendarEvents
                             $arrRow[] = empty($objEvent->{$field}) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->{$field}][0] ?? $objEvent->{$field};
                         } elseif ('eventState' === $field) {
                             $arrRow[] = empty($objEvent->{$field}) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->{$field}][0] ?? $objEvent->{$field};
+                        } elseif (\in_array($field, ['teaser', 'tourDetailText', 'requirements'], true)) {
+                            $arrRow[] = str_replace(['<br>', '<br/>'], [' ', ' '], nl2br((string) $objEvent->{$field}));
                         } else {
                             $arrRow[] = $objEvent->{$field};
                         }
