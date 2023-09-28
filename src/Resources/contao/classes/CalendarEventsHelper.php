@@ -205,6 +205,10 @@ class CalendarEventsHelper
                 $value = static::getBookingCounter($objEvent, true);
                 break;
 
+            case 'minMembers':
+                $value = $objEvent->minMembers;
+                break;
+
             case 'tourTechDifficultiesAsArray':
                 $value = static::getTourTechDifficultiesAsArray($objEvent, false, false);
                 break;

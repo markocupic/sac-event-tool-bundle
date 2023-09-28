@@ -285,6 +285,9 @@
                     <div class="booking-counter event-detail event-info-box icon-box-small">
                         <h5>Bestätigte Anmeldungen</h5>
                         <p>{{ get_event_data(model, 'bookingCounterAsText') }}</p>
+                        {% if get_event_data(model, 'minMembers')|default(0) > 0 %}
+                            <p><small>(min. {{ get_event_data(model, 'minMembers') }} Teilnehmende)</small></p>
+                        {% endif %}
                     </div>
                 {% endif %}
 
