@@ -181,6 +181,7 @@ class DashboardController
             $event['title'] = $title;
             $event['date'] = date($this->configAdapter->get('dateFormat'), (int) $eventModel->startDate);
             $event['state_icon'] = $this->calendarEventsHelperAdapter->getEventStateIcon($eventModel);
+            $event['release_level'] = $this->calendarEventsHelperAdapter->getEventReleaseLevelAsString($eventModel);
             $event['href_eventListing'] = $hrefEventListing;
             $event['href_email'] = $this->generateEmailHref($eventModel);
             $event['href_event'] = $hrefEvent;
