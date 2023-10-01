@@ -39,7 +39,7 @@
                         <td class="my-events-title-col text-align-left">
                             <a href="{{ event.href_event }}" style="text-decoration:underline" title="{{ 'MSC.bhs_dashb_editEvent'|trans({}, 'contao_default') }}"><strong>{{ event.title }}</strong></a>
                             {% if event.release_level is not empty %}
-                                <small>({{ event.release_level }})</small>
+                                &nbsp;<small>({{ event.release_level }})</small>
                             {% endif %}
                         </td>
                         <td class="my-events-icon-col text-align-center">

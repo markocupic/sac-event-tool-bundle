@@ -1272,6 +1272,9 @@ class CalendarEventsHelper
                 'FS: %s',
                 $eventReleaseLevelModel->level
             );
+            if ($eventReleaseLevelModel->level <= 1) {
+                $strLevel .= " Entwurf";
+            }
         }
         return $strLevel;
     }
