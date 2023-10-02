@@ -13,6 +13,7 @@
         "php": "^8.1",
         "ext-pdo": "*",
         "contao/core-bundle": "^4.13",
+        "contao/newsletter-bundle": "^4.13",
         "contao/calendar-bundle": "^4.13",
         "chillerlan/php-qrcode": "^4.3",
         "codefog/contao-haste": "^5.0",
