@@ -46,6 +46,7 @@ use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
 use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
+use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
 use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Markocupic\SacEventToolBundle\Model\TourTypeModel;
@@ -1260,5 +1261,25 @@ class CalendarEventsHelper
         }
 
         return $strPortalLink;
+    }
+
+    public static function getEventReleaseLevelAsString(CalendarEventsModel $objEvent): string|null
+    {
+        if (empty($objEvent->id) || empty($objEvent->eventReleaseLevel)) {
+            return null;
+        }
+        
+        $strLevel = null;
+        $eventReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+        if (null !== $eventReleaseLevelModel) {
+            $strLevel = sprintf(
+                'FS: %s',
+                $eventReleaseLevelModel->level
+            );
+            if ($eventReleaseLevelModel->level <= 1) {
+                $strLevel .= " Entwurf";
+            }
+        }
+        return $strLevel;
     }
 }

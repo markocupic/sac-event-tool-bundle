@@ -38,6 +38,9 @@
                         <td class="my-events-state-col text-align-left">{{ event.state_icon|raw }}</td>
                         <td class="my-events-title-col text-align-left">
                             <a href="{{ event.href_event }}" style="text-decoration:underline" title="{{ 'MSC.bhs_dashb_editEvent'|trans({}, 'contao_default') }}"><strong>{{ event.title }}</strong></a>
+                            {% if event.release_level is not empty %}
+                                &nbsp;<small>(<a href="{{ event.href_eventListing }}" style="text-decoration:underline" title="{{ 'MSC.bhs_dashb_editReleaseLevel'|trans({}, 'contao_default') }}">{{ event.release_level }}</a>)</small>
+                            {% endif %}
                         </td>
                         <td class="my-events-icon-col text-align-center">
                             <a href="{{ event.href_preview }}" target="_blank" title="{{ 'MSC.bhs_dashb_livePreview'|trans({}, 'contao_default') }}">
