@@ -151,7 +151,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
                 if ('member-group-export' === $request->request->get('export-type')) {
                     $strTable = 'tl_member';
-                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'rescissionCause', 'sacMemberId', 'login', 'lastLogin', 'groups'];
+                    $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
                     $result = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember=? ORDER BY lastname, firstname', ['1']);
                     $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, MemberGroupModel::class, $blnKeepGroupsInOneLine);
@@ -323,7 +323,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
             return implode(', ', $arrQuali);
         }
 
-        if ('rescissionCause' === $fieldName) {
+        if (isset($arrUser['rescissionCause']) && 'rescissionCause' === $fieldName) {
             return $GLOBALS['TL_LANG']['tl_user']['rescissionCauseOptions'][$arrUser['rescissionCause']] ?? $arrUser['rescissionCause'];
         }
 
