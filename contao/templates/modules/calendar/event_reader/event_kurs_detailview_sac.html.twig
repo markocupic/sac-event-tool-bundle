@@ -180,6 +180,24 @@
             </div>
             {# End Anmeldung #}
             <div class="box-layout-white">
+                {% if not get_event_data(model, 'courseTypeLevel0Name') is empty and not get_event_data(model, 'courseTypeLevel1Name') is empty %}
+                    <!-- indexer::continue -->
+                    <div class="courseType event-detail event-info-box icon-box-small">
+                        <h5>Kursart</h5>
+                        <p><strong>{{ get_event_data(model, 'courseTypeLevel0Name') }}: {{ get_event_data(model, 'courseTypeLevel1Name') }}</strong></p>
+                    </div>
+                    <!-- indexer::stop -->
+                {% endif %}
+
+                {% if not get_event_data(model, 'courseLevelName') is empty %}
+                    <!-- indexer::continue -->
+                    <div class="courseLevel event-detail event-info-box icon-box-small">
+                        <h5>Kursstufe</h5>
+                        <p>{{ get_event_data(model, 'courseLevelName') }}</p>
+                    </div>
+                    <!-- indexer::stop -->
+                {% endif %}
+
                 {% if not get_event_data(model, 'issues') is empty %}
                     <div class="topics event-detail event-info-box icon-box-small">
                         <!-- indexer::continue -->

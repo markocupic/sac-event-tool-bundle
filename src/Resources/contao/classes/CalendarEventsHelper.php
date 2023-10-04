@@ -250,6 +250,10 @@ class CalendarEventsHelper
                     $value = $parser->replace(sprintf('{{picture::%s?size=%s}}', $src, $pictureSize));
                 }
                 break;
+                
+            case 'courseLevelName':
+                $value = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel] ?? '';
+                break;              
 
             case 'courseTypeLevel0Name':
                 $value = CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name;
