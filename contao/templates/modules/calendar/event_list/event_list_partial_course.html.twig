@@ -20,7 +20,7 @@
                         <span class="event-state-icon" v-html="row.eventStateIcon" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel" v-bind:class="row.eventState"></span>
                         <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link lh-base">
                             <h4 class="d-flex headline m-0 p-0 lh-base">
-                                [[ row.title ]]
+                                <strong>[[ row.title ]]</strong>
                             </h4>
                         </a>
                     </div>
@@ -28,18 +28,27 @@
                         <strong>[[ row.courseTypeLevel0Name ]]: [[ row.courseTypeLevel1Name ]]</strong>
                     </div>
                     <div class="detail-item">
-                        <i class="fa fa-fw fa-user"></i> <span>Leitung: [[ row.instructorsWithQualification ]]</span>
+                        <i class="fa fa-fw fa-bars"></i> <span>Kursstufe: [[ row.courseLevelName ]]</span>
                     </div>
                     <div class="detail-item">
                         <i class="fa fa-fw fa-calendar-alt"></i>
-                        <span v-html="row.eventPeriodLgInline"></span>
+                        &nbsp;<span v-html="row.eventPeriodLgInline"></span> <small>(Dauer: <span v-html="row.eventDuration"></span>)</small>
                     </div>
                     {# if the event has been rescheduled #}
                     <div class="detail-item small text-danger" v-if="row.eventState === 'event_status_6'">
                         <span v-html="row.eventStateLabel"></span>
                     </div>
                     <div class="detail-item">
+                        <i class="fa fa-fw fa-user"></i> <span>Leitung: [[ row.instructorsWithQualification ]]</span>
+                    </div>
+                    <div class="detail-item d-flex flex-wrap">
                         <div v-html="row.bookingCounter" class="me-1"></div>
+                        <div v-if="row.suitableForBeginners" class="me-1">
+                            <span class="badge badge-pill bg-warning" data-bs-toggle="tooltip" data-placement="top" data-title="Für Einsteiger geeignet">
+                                <i class="event-for-beginners"></i>
+                            </span>
+                        </div>
+                        <div v-if="row.isPublicTransportEvent" v-html="row.getPublicTransportBadge" class="me-1"></div>
                     </div>
                     {# The logo will not be displayed if the event is organized by multiple groups. #}
                     <div class="detail-item">
