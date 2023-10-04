@@ -16,40 +16,40 @@
         {% endfor %}
     {% endif %}
 
-    <table class="table layout-table table-responsive table-striped">
+    <div class="table-responsive">
+        <table class="table layout-table table-striped">
+            {% for event in arrPastEvents %}
 
-        {% for event in arrPastEvents %}
+                {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::COURSE') == event.objEvent.eventType|default %}
+                    <tr>
+                        <td>{{ event.dateSpan|raw }}</td>
+                        <td>{{ event.objEvent.title }}</td>
+                        <td class="text-center">
+                            <a href="{{ event.downloadCourseConfirmationLink }}" title="Kursbestätigung downloaden" class="btn btn-sm btn-info">
+                                <i class="fal fa-fw fa-download"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
 
-            {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::COURSE') == event.objEvent.eventType|default %}
-                <tr>
-                    <td>{{ event.dateSpan|raw }}</td>
-                    <td>{{ event.objEvent.title }}</td>
-                    <td class="text-center">
-                        <a href="{{ event.downloadCourseConfirmationLink }}" title="Kursbestätigung downloaden" class="btn btn-sm btn-info">
-                            <i class="fal fa-fw fa-download"></i>
-                        </a>
-                    </td>
-                </tr>
-            {% endif %}
+                {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::TOUR') == event.objEvent.eventType|default or constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::LAST_MINUTE_TOUR') == event.objEvent.eventType|default %}
+                    <tr>
+                        <td>{{ event.dateSpan|raw }}</td>
+                        <td>
+                            {{ event.objEvent.title }}
+                            {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::LAST_MINUTE_TOUR') == event.objEvent.eventType|default %}
+                                <span style="color:green">&nbsp;(Last Minute)</span>
+                            {% endif %}
+                            {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventExecutionState::STATE_ADAPTED') == event.objEvent.executionState|default %}
+                                <br>
+                                <small><span style="color:red">Ausweichtour: {{ event.objEvent.eventSubstitutionText }}</span></small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
 
-            {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::TOUR') == event.objEvent.eventType|default or constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::LAST_MINUTE_TOUR') == event.objEvent.eventType|default %}
-                <tr>
-                    <td>{{ event.dateSpan|raw }}</td>
-                    <td>
-                        {{ event.objEvent.title }}
-                        {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::LAST_MINUTE_TOUR') == event.objEvent.eventType|default %}
-                            <span style="color:green">&nbsp;(Last Minute)</span>
-                        {% endif %}
-                        {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventExecutionState::STATE_ADAPTED') == event.objEvent.executionState|default %}
-                            <br>
-                            <small><span style="color:red">Ausweichtour: {{ event.objEvent.eventSubstitutionText }}</span></small>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endif %}
+            {% endfor %}
 
-        {% endfor %}
-
-    </table>
-
+        </table>
+    </div>
 {% endblock %}

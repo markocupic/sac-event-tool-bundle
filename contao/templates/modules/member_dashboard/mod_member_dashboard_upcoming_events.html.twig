@@ -16,43 +16,45 @@
         {% endfor %}
     {% endif %}
 
-    <table class="table layout-table table-responsive table-striped">
-        <tr>
-            <th>Datum</th>
-            <th>Event-Name</th>
-            <th>Anmeldestatus</th>
-            <th>&nbsp;</th>
-        </tr>
-
-        {% for event in arrUpcomingEvents|default([]) %}
-
-            {% set stateOfSubscription = ('MSC.' ~ event.eventRegistrationModel.stateOfSubscription)|trans({}, 'contao_default') %}
-
+    <div class="table-responsive">
+        <table class="table layout-table table-striped">
             <tr>
-                <td>{{ event.dateSpan|raw }}</td>
-                <td>
-                    {% if  constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_RESCHEDULED') == event.eventState %}
-                        <small><span style="color:red">Event verschoben!</span></small><br>
-                    {% endif %}
-
-                    {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_CANCELED') == event.eventState %}
-                        <small><span style="color:red">Event abgesagt!</span></small><br>
-                    {% endif %}
-
-                    <a href="{{ event.eventUrl }}" title="zum Event">{{ event.eventModel.title }}</a>
-                </td>
-                <td><span class="badge bg-primary">{{ stateOfSubscription }}</span></td>
-                <td class="text-center">
-                    {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::USER_HAS_UNSUBSCRIBED') != event.eventRegistrationModel.stateOfSubscription %}
-                        <a href="{{ event.unregisterUrl }}" role="button" title="Anmeldung stornieren" class="sign-out-from-event-button btn btn-sm btn-danger">
-                            stornieren
-                        </a>
-                    {% endif %}
-                </td>
+                <th>Datum</th>
+                <th>Event-Name</th>
+                <th>Anmeldestatus</th>
+                <th>&nbsp;</th>
             </tr>
 
-        {% endfor %}
-    </table>
+            {% for event in arrUpcomingEvents|default([]) %}
+
+                {% set stateOfSubscription = ('MSC.' ~ event.eventRegistrationModel.stateOfSubscription)|trans({}, 'contao_default') %}
+
+                <tr>
+                    <td>{{ event.dateSpan|raw }}</td>
+                    <td>
+                        {% if  constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_RESCHEDULED') == event.eventState %}
+                            <small><span style="color:red">Event verschoben!</span></small><br>
+                        {% endif %}
+
+                        {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventState::STATE_CANCELED') == event.eventState %}
+                            <small><span style="color:red">Event abgesagt!</span></small><br>
+                        {% endif %}
+
+                        <a href="{{ event.eventUrl }}" title="zum Event">{{ event.eventModel.title }}</a>
+                    </td>
+                    <td><span class="badge bg-primary">{{ stateOfSubscription }}</span></td>
+                    <td class="text-center">
+                        {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventSubscriptionState::USER_HAS_UNSUBSCRIBED') != event.eventRegistrationModel.stateOfSubscription %}
+                            <a href="{{ event.unregisterUrl }}" role="button" title="Anmeldung stornieren" class="sign-out-from-event-button btn btn-sm btn-danger">
+                                stornieren
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+
+            {% endfor %}
+        </table>
+    </div>
 
     <script>
         let buttons = document.querySelectorAll('.sign-out-from-event-button');
