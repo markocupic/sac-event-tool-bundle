@@ -28,6 +28,7 @@
         "markocupic/phpoffice-bundle": "^1.3",
         "markocupic/rss-feed-generator-bundle": "^1.1",
         "markocupic/zip-bundle": "^1.0",
+        "markocupic/composer-file-copier-plugin": "^0.2",
         "menatwork/contao-multicolumnwizard-bundle": "^3.5",
         "ramsey/uuid": "^3.8 || ^4.3",
         "symfony/stopwatch": "*",
@@ -46,13 +47,20 @@
         ]
     },
     "extra": {
-        "contao-manager-plugin": "Markocupic\\SacEventToolBundle\\ContaoManager\\Plugin"
+        "contao-manager-plugin": "Markocupic\\SacEventToolBundle\\ContaoManager\\Plugin",
+        "composer-file-copier-plugin": [
+            {
+                "source": "contao/languages/en",
+                "target": "vendor/markocupic/sac-event-tool-bundle/contao/languages/de"
+            }
+        ]
     },
     "config": {
         "allow-plugins": {
             "contao-components/installer": false,
             "contao/manager-plugin": false,
-            "contao-community-alliance/composer-plugin": true
+            "contao-community-alliance/composer-plugin": true,
+            "markocupic/composer-file-copier-plugin": true
         }
     },
     "scripts": {
