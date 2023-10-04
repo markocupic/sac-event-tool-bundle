@@ -250,10 +250,10 @@ class CalendarEventsHelper
                     $value = $parser->replace(sprintf('{{picture::%s?size=%s}}', $src, $pictureSize));
                 }
                 break;
-                
+
             case 'courseLevelName':
                 $value = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['courseLevel'][$objEvent->courseLevel] ?? '';
-                break;              
+                break;
 
             case 'courseTypeLevel0Name':
                 $value = CourseMainTypeModel::findByPk($objEvent->courseTypeLevel0)->name;
@@ -1272,18 +1272,21 @@ class CalendarEventsHelper
         if (empty($objEvent->id) || empty($objEvent->eventReleaseLevel)) {
             return null;
         }
-        
+
         $strLevel = null;
         $eventReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($objEvent->eventReleaseLevel);
+
         if (null !== $eventReleaseLevelModel) {
             $strLevel = sprintf(
                 'FS: %s',
                 $eventReleaseLevelModel->level
             );
+
             if ($eventReleaseLevelModel->level <= 1) {
-                $strLevel .= " Entwurf";
+                $strLevel .= ' Entwurf';
             }
         }
+
         return $strLevel;
     }
 }

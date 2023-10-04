@@ -28,18 +28,17 @@
                         <strong>[[ row.courseTypeLevel0Name ]]: [[ row.courseTypeLevel1Name ]]</strong>
                     </div>
                     <div class="detail-item">
-                        <i class="fa fa-fw fa-bars"></i> <span>Kursstufe: [[ row.courseLevelName ]]</span>
+                        <i class="fa fa-fw fa-bars me-1"></i><span>Kursstufe: [[ row.courseLevelName ]]</span>
                     </div>
                     <div class="detail-item">
-                        <i class="fa fa-fw fa-calendar-alt"></i>
-                        &nbsp;<span v-html="row.eventPeriodLgInline"></span> <small>(Dauer: <span v-html="row.eventDuration"></span>)</small>
+                        <i class="fa fa-fw fa-calendar-alt me-1"></i><span class="me-1 small" v-html="row.eventPeriodLgInline"></span><span class="small text-muted" v-html="'(Dauer: ' + row.eventDuration + ')'"></span>
                     </div>
                     {# if the event has been rescheduled #}
                     <div class="detail-item small text-danger" v-if="row.eventState === 'event_status_6'">
                         <span v-html="row.eventStateLabel"></span>
                     </div>
                     <div class="detail-item">
-                        <i class="fa fa-fw fa-user"></i> <span>Leitung: [[ row.instructorsWithQualification ]]</span>
+                        <i class="fa fa-fw fa-user me-1"></i><span>Leitung: [[ row.instructorsWithQualification ]]</span>
                     </div>
                     <div class="detail-item d-flex flex-wrap">
                         <div v-html="row.bookingCounter" class="me-1"></div>
@@ -121,6 +120,8 @@
             'isPublicTransportEvent',
             'getPublicTransportBadge',
             'eventOrganizerLogos||50',
+            'courseLevelName',
+            'eventDuration',
         ],
         'callbacks': {
             'oninsert': async function (vue, json) {
