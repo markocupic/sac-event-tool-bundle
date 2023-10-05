@@ -47,7 +47,6 @@
                                 <i class="event-for-beginners"></i>
                             </span>
                         </div>
-                        <div v-if="row.isPublicTransportEvent" v-html="row.getPublicTransportBadge" class="me-1"></div>
                     </div>
                     {# The logo will not be displayed if the event is organized by multiple groups. #}
                     <div class="detail-item">
@@ -117,8 +116,6 @@
             'eventState',
             'eventStateIcon',
             'suitableForBeginners',
-            'isPublicTransportEvent',
-            'getPublicTransportBadge',
             'eventOrganizerLogos||50',
             'courseLevelName',
             'eventDuration',
