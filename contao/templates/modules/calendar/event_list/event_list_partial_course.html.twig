@@ -42,11 +42,6 @@
                     </div>
                     <div class="detail-item d-flex flex-wrap">
                         <div v-html="row.bookingCounter" class="me-1"></div>
-                        <div v-if="row.suitableForBeginners" class="me-1">
-                            <span class="badge badge-pill bg-warning" data-bs-toggle="tooltip" data-placement="top" data-title="Für Einsteiger geeignet">
-                                <i class="event-for-beginners"></i>
-                            </span>
-                        </div>
                         <div v-if="row.isPublicTransportEvent" v-html="row.getPublicTransportBadge" class="me-1"></div>
                     </div>
                     {# The logo will not be displayed if the event is organized by multiple groups. #}
@@ -87,7 +82,6 @@
         'apiParams': {
             'organizers': [{{ apiParam.organizers }}],
             'eventType': ['{{ apiParam.eventType }}'],
-            'suitableForBeginners': '{{ apiParam.suitableForBeginners }}',
             'publicTransportEvent': '{{ apiParam.publicTransportEvent }}',
             'tourType': '{{ apiParam.tourType }}',
             'courseType': '{{ apiParam.courseType }}',
@@ -116,7 +110,6 @@
             'eventStateLabel',
             'eventState',
             'eventStateIcon',
-            'suitableForBeginners',
             'isPublicTransportEvent',
             'getPublicTransportBadge',
             'eventOrganizerLogos||50',
