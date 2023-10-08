@@ -8,79 +8,76 @@
         <div v-for="(row, index) of rows" class="event-item event-item-tour event col-12 col-lg-6" v-bind:data-id="row.id" v-bind:data-event-type="row.tourTypesIds">
 
             <div class="event-list-inner-box d-flex p-3 mb-3">
-                <!-- left col -->
+
+                {# left col #}
                 <div class="event-list-tour-col-1" data-has-event-href="true" v-bind:data-href="row.eventUrl">
                     <div class="event-list-date-badge-wrapper me-4 rounded-circle d-flex align-items-center justify-content-center">
                         <div class="d-flex flex-column">
-                            <span class="event-list-badge-day text-center lh-1">
-                            <strong v-html="row.startDateDay"></strong>
+                            <span class="event-list-badge-day text-center">
+                                <span v-html="row.startDateDay"></span>
                             </span>
-                            <span class="event-list-badge-month text-uppercase text-center font-weight-bolder lh-1 pb-2">
-                                <strong v-html="row.startDateMonth"></strong>
+                            <span class="event-list-badge-month text-uppercase text-center">
+                                <span v-html="row.startDateMonth"></span>
                             </span>
                         </div>
                     </div>
                     {# The logo will not be displayed if the event is organized by multiple groups. #}
-                    <div class="event-organizer-logo mt-3" v-if="row.eventOrganizerLogos.length === 1">
-                        <div v-html="row.eventOrganizerLogos[0]"></div>
+                    <div class="event-organizer-logo mt-3">
+                        <div v-if="row.eventOrganizerLogos.length === 1" v-html="row.eventOrganizerLogos[0]"></div>
                     </div>
                 </div>
-                <!-- end left col -->
+                {# end left col #}
 
-                <!-- right col -->
+                {# right col #}
                 <div class="event-list-tour-col-2">
                     {# Event has been rescheduled #}
                     <div class="small text-danger me-1" v-if="row.eventState === 'event_status_6'">
                         <span class="small" v-html="row.eventStateLabel"></span>
                     </div>
 
-                    <!-- row event period -->
+                    {# row event period #}
                     <div class="d-flex flex-wrap">
                         <div class="small me-1"><span v-html="row.eventPeriodLgInline"></span></div>
                         <div class="small text-muted me-1">(Dauer: <span v-html="row.eventDuration"></span>)</div>
                     </div>
-                    <!-- end row event period -->
+                    {# end row event period #}
 
-                    <!-- row last minute event -->
+                    {# row last minute event #}
                     <div class="last-minute-tour d-block small" v-if="row.eventType === 'lastMinuteTour'">
                         <i class="fa fa-clock"></i>
                         <span class="text-uppercase">last minute tour</span>
                     </div>
-                    <!-- end row last minute event -->
+                    {# end row last minute event #}
 
-                    <!-- row state icon -->
-                    <div class="title d-flex align-items-start">
+                    {# row state icon #}
+                    <div class="title d-flex my-2 align-items-start">
                         <span class="event-state-icon" v-html="row.eventStateIcon" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel"></span>
-                        <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link font-weight-bold"><strong>[[ row.eventTitle ]]</strong></a>
+                        <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link fw-bold"><strong>[[ row.eventTitle ]]</strong></a>
                     </div>
-                    <!-- end row state icon -->
+                    {# end row state icon #}
 
-                    <!-- start row icons -->
+                    {# start row icons #}
                     <div class="d-flex flex-wrap badge-container">
                         <div class="d-flex flex-wrap" v-if="row.bookingCounter" v-html="row.bookingCounter"></div>
                         <div class="d-flex flex-wrap" v-if="row.suitableForBeginners">
-                                <span class="badge badge-pill bg-warning" data-bs-toggle="tooltip" data-placement="top" data-title="Für Einsteiger geeignet">
-                                    <i class="event-for-beginners"></i>
-                                </span>
+                            <span class="badge badge-pill bg-warning" data-bs-toggle="tooltip" data-placement="top" data-title="Für Einsteiger geeignet">
+                                <i class="event-for-beginners"></i>
+                            </span>
                         </div>
                         <div class="d-flex flex-wrap" v-if="row.tourTechDifficulties" v-html="row.tourTechDifficulties"></div>
                         <div class="d-flex flex-wrap" v-if="row.tourTypesShortcuts" v-html="row.tourTypesShortcuts"></div>
                         <div class="d-flex flex-wrap" v-if="row.isPublicTransportEvent" v-html="row.getPublicTransportBadge"></div>
                     </div>
-                    <!-- end row icons -->
+                    {# end row icons #}
 
-                    <!-- start row instructors -->
+                    {# start row instructors #}
                     <div class="small text-muted" v-html="row.instructors"></div>
-                    <!-- end row instructors -->
+                    {# end row instructors #}
 
                 </div>
-                <!-- end right col -->
-
-                <div v-html="row.eventImage"></div>
-
+                {# end right col #}
             </div>
         </div>
-
     </div>
 
     <div v-if="blnIsBusy === true">
@@ -103,7 +100,7 @@
     </div>
 </div>
 
-<!-- Set up the vue.js tour list -->
+{# Set up the vue.js tour list #}
 <script>
     window.addEventListener("DOMContentLoaded", (event) => {
         new VueTourList('#tour-list', {
