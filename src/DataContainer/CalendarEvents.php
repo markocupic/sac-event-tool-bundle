@@ -910,7 +910,7 @@ class CalendarEvents
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.alias.input_field', priority: 100)]
     public function showFieldValue(DataContainer $dc): string
     {
-        $field = $dc->field;
+        $fieldName = $dc->field;
 
         $strTable = 'tl_calendar_events';
 
@@ -920,241 +920,218 @@ class CalendarEvents
 
         $intId = $dc->activeRecord->id;
 
-        $row = $this->connection->fetchAssociative('SELECT '.$field.' FROM tl_calendar_events WHERE id = ?', [$intId]);
+        $varFieldValue = $this->connection->fetchOne('SELECT '.$fieldName.' FROM tl_calendar_events WHERE id = ?', [$intId]);
 
-        if (!$row) {
+        if (false === $varFieldValue) {
             return '';
         }
 
-        $return = '';
-
         // Get the order fields
         $objDcaExtractor = $this->dcaExtractor->getInstance($strTable);
+
         $arrOrder = $objDcaExtractor->getOrderFields();
+        $arrDcaFields = \is_array($GLOBALS['TL_DCA'][$strTable]['fields'] ?? []) ? $GLOBALS['TL_DCA'][$strTable]['fields'] : [];
+        $allowedFields = array_unique(array_merge(['id', 'pid', 'sorting', 'tstamp'], array_keys($arrDcaFields)));
 
-        // Get all fields
-        $fields = array_keys($row);
-        $allowedFields = ['id', 'pid', 'sorting', 'tstamp'];
-
-        if (\is_array($GLOBALS['TL_DCA'][$strTable]['fields'])) {
-            $allowedFields = array_unique(array_merge($allowedFields, array_keys($GLOBALS['TL_DCA'][$strTable]['fields'])));
+        if (!\in_array($fieldName, $allowedFields, true)) {
+            return '';
         }
 
-        // Use the field order of the DCA file
-        $fields = array_intersect($allowedFields, $fields);
+        // Do only show allowed fields
+        if ('password' === ($arrDcaFields[$fieldName]['inputType'] ?? false) || ($arrDcaFields[$fieldName]['eval']['doNotShow'] ?? false) || ($arrDcaFields[$fieldName]['eval']['hideInput'] ?? false)) {
+            return '********';
+        }
 
-        // Show all allowed fields
-        foreach ($fields as $i) {
-            if (!\in_array($i, $allowedFields, true) || 'password' === $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] || (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['doNotShow']) && $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['doNotShow']) || (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['hideInput']) && $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['hideInput'])) {
-                continue;
-            }
+        $varFieldValue = $this->stringUtil->deserialize($varFieldValue);
 
-            // Special treatment for table tl_undo
-            if ('tl_undo' === $strTable && 'data' === $i) {
-                continue;
-            }
-
-            $value = $this->stringUtil->deserialize($row[$i]);
-
-            // Decrypt the value
-            if ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['encrypt'] ?? null) {
-                $passwordHasherFactory = $this->passwordHasherFactory
-                    ->getPasswordHasher(User::class)
+        // Decrypt the value
+        if ($arrDcaFields[$fieldName]['eval']['encrypt'] ?? null) {
+            $passwordHasherFactory = $this->passwordHasherFactory
+                ->getPasswordHasher(User::class)
                 ;
-                $value = $passwordHasherFactory->hash($value);
+            $varFieldValue = $passwordHasherFactory->hash($varFieldValue);
+        }
+
+        // Get the field value
+        if ('eventState' === $fieldName) {
+            $varFieldValue = '' === $varFieldValue ? '---' : $varFieldValue;
+        } elseif ('mountainguide' === $fieldName) {
+            $varFieldValue = $GLOBALS['TL_LANG'][$strTable]['mountainguide_reference'][(int) $varFieldValue];
+        } elseif ('eventDates' === $fieldName) {
+            if (!empty($varFieldValue) && \is_array($varFieldValue)) {
+                $arrDate = [];
+
+                foreach ($varFieldValue as $arrTstamp) {
+                    $arrDate[] = $this->date->parse('D, d.m.Y', $arrTstamp['new_repeat']);
+                }
+                $varFieldValue = implode('<br>', $arrDate);
+            }
+        } elseif ('tourProfile' === $fieldName) {
+            // Special treatment for tourProfile
+            $arrProfile = [];
+            $m = 0;
+
+            if (!empty($varFieldValue) && \is_array($varFieldValue)) {
+                foreach ($varFieldValue as $profile) {
+                    ++$m;
+
+                    if (\count($varFieldValue) > 1) {
+                        $pattern = $m.'. Tag &nbsp;&nbsp;&nbsp; Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                    } else {
+                        $pattern = 'Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
+                    }
+
+                    $arrProfile[] = sprintf($pattern, $profile['tourProfileAscentMeters'], $profile['tourProfileAscentTime'], $profile['tourProfileDescentMeters'], $profile['tourProfileDescentTime']);
+                }
             }
 
-            // Default value
-            $row[$i] = '';
+            if (!empty($arrProfile)) {
+                $varFieldValue = implode('<br>', $arrProfile);
+            }
+        } elseif ('instructor' === $fieldName) {
+            // Special treatment for instructor
+            $arrInstructors = [];
 
-            // Get the field value
-            if ('eventType' === $i) {
-                $row[$i] = $value;
-            } elseif ('eventState' === $i) {
-                $row[$i] = '' === $value ? '---' : $value;
-            } elseif ('mountainguide' === $i) {
-                $row[$i] = $GLOBALS['TL_LANG'][$strTable]['mountainguide_reference'][(int)$value];
-            } elseif ('eventDates' === $i) {
-                if (!empty($value) && \is_array($value)) {
-                    $arrDate = [];
+            foreach ($varFieldValue as $arrInstructor) {
+                if ($arrInstructor['instructorId'] > 0) {
+                    $objUser = $this->userModel->findByPk($arrInstructor['instructorId']);
 
-                    foreach ($value as $arrTstamp) {
-                        $arrDate[] = $this->date->parse('D, d.m.Y', $arrTstamp['new_repeat']);
-                    }
-                    $row[$i] = implode('<br>', $arrDate);
-                }
-            } elseif ('tourProfile' === $i) {
-                // Special treatment for tourProfile
-                $arrProfile = [];
-                $m = 0;
-
-                if (!empty($value) && \is_array($value)) {
-                    foreach ($value as $profile) {
-                        ++$m;
-
-                        if (\count($value) > 1) {
-                            $pattern = $m.'. Tag &nbsp;&nbsp;&nbsp; Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
-                        } else {
-                            $pattern = 'Aufstieg: %s m/%s h &nbsp;&nbsp;&nbsp;Abstieg: %s m/%s h';
-                        }
-
-                        $arrProfile[] = sprintf($pattern, $profile['tourProfileAscentMeters'], $profile['tourProfileAscentTime'], $profile['tourProfileDescentMeters'], $profile['tourProfileDescentTime']);
+                    if (null !== $objUser) {
+                        $arrInstructors[] = $objUser->name;
                     }
                 }
+            }
 
-                if (!empty($arrProfile)) {
-                    $row[$i] = implode('<br>', $arrProfile);
-                }
-            } elseif ('instructor' === $i) {
-                // Special treatment for instructor
-                $arrInstructors = [];
+            if (!empty($arrInstructors)) {
+                $varFieldValue = implode('<br>', $arrInstructors);
+            }
+        } elseif ('tourTechDifficulty' === $fieldName) {
+            // Special treatment for tourTechDifficulty
+            $arrDiff = [];
 
-                foreach ($value as $arrInstructor) {
-                    if ($arrInstructor['instructorId'] > 0) {
-                        $objUser = $this->userModel->findByPk($arrInstructor['instructorId']);
+            foreach ($varFieldValue as $difficulty) {
+                $strDiff = '';
 
-                        if (null !== $objUser) {
-                            $arrInstructors[] = $objUser->name;
-                        }
+                if (\strlen((string) $difficulty['tourTechDifficultyMin']) && \strlen($difficulty['tourTechDifficultyMax'])) {
+                    $strMin = $this->connection->fetchOne('SELECT shortcut FROM tl_tour_difficulty WHERE id = ?', [$difficulty['tourTechDifficultyMin']]);
+
+                    if ($strMin) {
+                        $strDiff = $strMin;
                     }
+
+                    $strMax = $this->connection->fetchOne('SELECT shortcut FROM tl_tour_difficulty WHERE id = ?', [$difficulty['tourTechDifficultyMax']]);
+
+                    if ($strMax) {
+                        $strDiff .= ' - '.$strMax;
+                    }
+
+                    $arrDiff[] = $strDiff;
+                } elseif (\strlen((string) $difficulty['tourTechDifficultyMin'])) {
+                    $strMin = $this->connection->fetchOne('SELECT shortcut FROM tl_tour_difficulty WHERE id = ?', [$difficulty['tourTechDifficultyMin']]);
+
+                    if ($strMin) {
+                        $strDiff = $strMin;
+                    }
+
+                    $arrDiff[] = $strDiff;
                 }
+            }
 
-                if (!empty($arrInstructors)) {
-                    $row[$i] = implode('<br>', $arrInstructors);
+            if (!empty($arrDiff)) {
+                $varFieldValue = implode(', ', $arrDiff);
+            }
+        } elseif (isset($arrDcaFields[$fieldName]['foreignKey'])) {
+            $temp = [];
+            $chunks = explode('.', $arrDcaFields[$fieldName]['foreignKey'], 2);
+
+            foreach ((array) $varFieldValue as $v) {
+                // Use \Contao\Database::quoteIdentifier instead of Doctrine\DBAL\Connection::quoteIdentifier
+                // because only Contao can handle chained foreign keys like this:
+                // 'foreignKey' => "tl_user.CONCAT(lastname, ' ', firstname, ', ', city)",
+                $keyValue = $this->connection->fetchOne('SELECT '.Database::quoteIdentifier($chunks[1]).' AS value FROM '.$chunks[0].' WHERE id = ?', [$v]);
+
+                if ($keyValue) {
+                    $temp[] = $keyValue;
                 }
-            } elseif ('tourTechDifficulty' === $i) {
-                // Special treatment for tourTechDifficulty
-                $arrDiff = [];
+            }
 
-                foreach ($value as $difficulty) {
-                    $strDiff = '';
-
-                    if (\strlen((string) $difficulty['tourTechDifficultyMin']) && \strlen($difficulty['tourTechDifficultyMax'])) {
-                        $strMin = $this->connection->fetchOne('SELECT shortcut FROM tl_tour_difficulty WHERE id = ?', [$difficulty['tourTechDifficultyMin']]);
-
-                        if ($strMin) {
-                            $strDiff = $strMin;
-                        }
-
-                        $strMax = $this->connection->fetchOne('SELECT shortcut FROM tl_tour_difficulty WHERE id = ?', [$difficulty['tourTechDifficultyMax']]);
-
-                        if ($strMax) {
-                            $strDiff .= ' - '.$strMax;
-                        }
-
-                        $arrDiff[] = $strDiff;
-                    } elseif (\strlen((string) $difficulty['tourTechDifficultyMin'])) {
-                        $strMin = $this->connection->fetchOne('SELECT shortcut FROM tl_tour_difficulty WHERE id = ?', [$difficulty['tourTechDifficultyMin']]);
-
-                        if ($strMin) {
-                            $strDiff = $strMin;
-                        }
-
-                        $arrDiff[] = $strDiff;
+            $varFieldValue = implode(', ', $temp);
+        } elseif (($arrDcaFields[$fieldName]['inputType'] ?? null) === 'fileTree' || \in_array($fieldName, $arrOrder, true)) {
+            if (\is_array($varFieldValue)) {
+                foreach ($varFieldValue as $kk => $vv) {
+                    if (($objFile = $this->filesModel->findByUuid($vv)) instanceof FilesModel) {
+                        $varFieldValue[$kk] = $objFile->path.' ('.$this->stringUtil->binToUuid($vv).')';
+                    } else {
+                        $varFieldValue[$kk] = '';
                     }
                 }
 
-                if (!empty($arrDiff)) {
-                    $row[$i] = implode(', ', $arrDiff);
-                }
-            } elseif (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['foreignKey'])) {
-                $temp = [];
-                $chunks = explode('.', $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['foreignKey'], 2);
-
-                foreach ((array) $value as $v) {
-                    // Use \Contao\Database::quoteIdentifier instead of Doctrine\DBAL\Connection::quoteIdentifier
-                    // because only Contao can handle chained foreign keys like this:
-                    // 'foreignKey' => "tl_user.CONCAT(lastname, ' ', firstname, ', ', city)",
-                    $keyValue = $this->connection->fetchOne('SELECT '.Database::quoteIdentifier($chunks[1]).' AS value FROM '.$chunks[0].' WHERE id = ?', [$v]);
-
-                    if ($keyValue) {
-                        $temp[] = $keyValue;
-                    }
-                }
-
-                $row[$i] = implode(', ', $temp);
-            } elseif (($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] ?? null) === 'fileTree' || \in_array($i, $arrOrder, true)) {
-                if (\is_array($value)) {
-                    foreach ($value as $kk => $vv) {
-                        if (($objFile = $this->filesModel->findByUuid($vv)) instanceof FilesModel) {
-                            $value[$kk] = $objFile->path.' ('.$this->stringUtil->binToUuid($vv).')';
-                        } else {
-                            $value[$kk] = '';
-                        }
-                    }
-
-                    $row[$i] = implode(', ', $value);
-                } elseif (($objFile = $this->filesModel->findByUuid($value)) instanceof FilesModel) {
-                    $row[$i] = $objFile->path.' ('.$this->stringUtil->binToUuid($value).')';
-                } else {
-                    $row[$i] = '';
-                }
-            } elseif (\is_array($value)) {
-                if (isset($value['value'], $value['unit']) && 2 === \count($value)) {
-                    $row[$i] = trim($value['value'].', '.$value['unit']);
-                } else {
-                    foreach ($value as $kk => $vv) {
-                        if (\is_array($vv)) {
-                            $values = array_values($vv);
-                            $value[$kk] = array_shift($values).' ('.implode(', ', array_filter($values)).')';
-                        }
-                    }
-
-                    if ($this->arrayUtil->isAssoc($value)) {
-                        foreach ($value as $kk => $vv) {
-                            $value[$kk] = $kk.': '.$vv;
-                        }
-                    }
-
-                    $row[$i] = implode(', ', $value);
-                }
-            } elseif (($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] ?? null) === 'date') {
-                $row[$i] = $value ? $this->date->parse($this->config->get('dateFormat'), $value) : '-';
-            } elseif (($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] ?? null) === 'time') {
-                $row[$i] = $value ? $this->date->parse($this->config->get('timeFormat'), $value) : '-';
-            } elseif ('tstamp' === $i || ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] ?? null) === 'datim' || \in_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['flag'] ?? null, [DataContainer::SORT_DAY_ASC, DataContainer::SORT_DAY_DESC, DataContainer::SORT_MONTH_ASC, DataContainer::SORT_MONTH_DESC, DataContainer::SORT_YEAR_ASC, DataContainer::SORT_YEAR_DESC], true)) {
-                $row[$i] = $value ? $this->date->parse($this->config->get('datimFormat'), $value) : '-';
-            } elseif (($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['isBoolean'] ?? null) || (($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] ?? null) === 'checkbox' && !($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['multiple'] ?? null))) {
-                $row[$i] = $value ? $GLOBALS['TL_LANG']['MSC']['yes'] : $GLOBALS['TL_LANG']['MSC']['no'];
-            } elseif (($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['rgxp'] ?? null) === 'email') {
-                $row[$i] = $this->idna->decodeEmail($value);
-            } elseif (($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['inputType'] ?? null) === 'textarea' && (($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['allowHtml'] ?? null) || ($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['preserveTags'] ?? null))) {
-                $row[$i] = $this->stringUtil->specialchars($value);
-            } elseif (\is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'] ?? null)) {
-                $row[$i] = isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]]) ? (\is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]]) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]][0] : $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['reference'][$row[$i]]) : $row[$i];
-            } elseif (($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['eval']['isAssociative'] ?? null) || $this->arrayUtil->isAssoc($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options'] ?? null)) {
-                $row[$i] = $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['options'][$row[$i]] ?? null;
+                $varFieldValue = implode(', ', $varFieldValue);
+            } elseif (($objFile = $this->filesModel->findByUuid($varFieldValue)) instanceof FilesModel) {
+                $varFieldValue = $objFile->path.' ('.$this->stringUtil->binToUuid($varFieldValue).')';
             } else {
-                $row[$i] = $value;
+                $varFieldValue = '';
             }
-
-            // Label and help
-            if (isset($GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'])) {
-                $label = $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'][0] ?? $i;
-                $help = $GLOBALS['TL_DCA'][$strTable]['fields'][$i]['label'][1] ?? $i;
+        } elseif (\is_array($varFieldValue)) {
+            if (isset($varFieldValue['value'], $varFieldValue['unit']) && 2 === \count($varFieldValue)) {
+                $varFieldValue = trim($varFieldValue['value'].', '.$varFieldValue['unit']);
             } else {
-                $label = isset($GLOBALS['TL_LANG']['MSC'][$i]) && \is_array($GLOBALS['TL_LANG']['MSC'][$i]) ? $GLOBALS['TL_LANG']['MSC'][$i][0] : $GLOBALS['TL_LANG']['MSC'][$i];
-                $help = isset($GLOBALS['TL_LANG']['MSC'][$i]) && \is_array($GLOBALS['TL_LANG']['MSC'][$i]) ? $GLOBALS['TL_LANG']['MSC'][$i][1] : $GLOBALS['TL_LANG']['MSC'][$i];
-            }
+                foreach ($varFieldValue as $kk => $vv) {
+                    if (\is_array($vv)) {
+                        $values = array_values($vv);
+                        $varFieldValue[$kk] = array_shift($values).' ('.implode(', ', array_filter($values)).')';
+                    }
+                }
 
-            if (empty($label)) {
-                $label = $i;
-            }
+                if ($this->arrayUtil->isAssoc($varFieldValue)) {
+                    foreach ($varFieldValue as $kk => $vv) {
+                        $varFieldValue[$kk] = $kk.': '.$vv;
+                    }
+                }
 
-            if (!empty($help)) {
-                $help = '<p class="tl_help tl_tip tl_full_height">'.$help.'</p>';
+                $varFieldValue = implode(', ', $varFieldValue);
             }
+        } elseif (($arrDcaFields[$fieldName]['eval']['rgxp'] ?? null) === 'date') {
+            $varFieldValue = $varFieldValue ? $this->date->parse($this->config->get('dateFormat'), $varFieldValue) : '-';
+        } elseif (($arrDcaFields[$fieldName]['eval']['rgxp'] ?? null) === 'time') {
+            $varFieldValue = $varFieldValue ? $this->date->parse($this->config->get('timeFormat'), $varFieldValue) : '-';
+        } elseif ('tstamp' === $fieldName || ($arrDcaFields[$fieldName]['eval']['rgxp'] ?? null) === 'datim' || \in_array($arrDcaFields[$fieldName]['flag'] ?? null, [DataContainer::SORT_DAY_ASC, DataContainer::SORT_DAY_DESC, DataContainer::SORT_MONTH_ASC, DataContainer::SORT_MONTH_DESC, DataContainer::SORT_YEAR_ASC, DataContainer::SORT_YEAR_DESC], true)) {
+            $varFieldValue = $varFieldValue ? $this->date->parse($this->config->get('datimFormat'), $varFieldValue) : '-';
+        } elseif (($arrDcaFields[$fieldName]['eval']['isBoolean'] ?? null) || (($arrDcaFields[$fieldName]['inputType'] ?? null) === 'checkbox' && !($arrDcaFields[$fieldName]['eval']['multiple'] ?? null))) {
+            $varFieldValue = $varFieldValue ? $GLOBALS['TL_LANG']['MSC']['yes'] : $GLOBALS['TL_LANG']['MSC']['no'];
+        } elseif (($arrDcaFields[$fieldName]['eval']['rgxp'] ?? null) === 'email') {
+            $varFieldValue = $this->idna->decodeEmail($varFieldValue);
+        } elseif (($arrDcaFields[$fieldName]['inputType'] ?? null) === 'textarea' && (($arrDcaFields[$fieldName]['eval']['allowHtml'] ?? null) || ($arrDcaFields[$fieldName]['eval']['preserveTags'] ?? null))) {
+            $varFieldValue = $this->stringUtil->specialchars($varFieldValue);
+        } elseif (\is_array($arrDcaFields[$fieldName]['reference'] ?? null)) {
+            $varFieldValue = isset($arrDcaFields[$fieldName]['reference'][$varFieldValue]) ? (\is_array($arrDcaFields[$fieldName]['reference'][$varFieldValue]) ? $arrDcaFields[$fieldName]['reference'][$varFieldValue][0] : $arrDcaFields[$fieldName]['reference'][$varFieldValue]) : $varFieldValue;
+        } elseif (($arrDcaFields[$fieldName]['eval']['isAssociative'] ?? null) || $this->arrayUtil->isAssoc($arrDcaFields[$fieldName]['options'] ?? null)) {
+            $varFieldValue = $arrDcaFields[$fieldName]['options'][$varFieldValue] ?? null;
+        }
 
-            $return .= '
+        // Label and help
+        if (isset($arrDcaFields[$fieldName]['label'])) {
+            $label = $arrDcaFields[$fieldName]['label'][0] ?? $fieldName;
+            $help = $arrDcaFields[$fieldName]['label'][1] ?? $fieldName;
+        } else {
+            $label = isset($GLOBALS['TL_LANG']['MSC'][$fieldName]) && \is_array($GLOBALS['TL_LANG']['MSC'][$fieldName]) ? $GLOBALS['TL_LANG']['MSC'][$fieldName][0] : $GLOBALS['TL_LANG']['MSC'][$fieldName];
+            $help = isset($GLOBALS['TL_LANG']['MSC'][$fieldName]) && \is_array($GLOBALS['TL_LANG']['MSC'][$fieldName]) ? $GLOBALS['TL_LANG']['MSC'][$fieldName][1] : $GLOBALS['TL_LANG']['MSC'][$fieldName];
+        }
+
+        if (empty($label)) {
+            $label = $fieldName;
+        }
+
+        if (!empty($help)) {
+            $help = '<p class="tl_help tl_tip tl_full_height">'.$help.'</p>';
+        }
+
+        return '
 <div class="clr readonly">
     <h3><label for="ctrl_title">'.$label.'</label></h3>
-    <div class="field-content-box" data-field="'.$this->stringUtil->specialchars($field).'">'.$row[$i].'</div>
+    <div class="field-content-box" data-field="'.$this->stringUtil->specialchars($fieldName).'">'.(string) $varFieldValue.'</div>
 '.$help.'
 </div>';
-        }
-
-        // Return html
-        return $return;
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'fields.eventDates.load', priority: 100)]
