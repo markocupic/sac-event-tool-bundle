@@ -973,7 +973,7 @@ class CalendarEvents
             } elseif ('eventState' === $i) {
                 $row[$i] = '' === $value ? '---' : $value;
             } elseif ('mountainguide' === $i) {
-                $row[$i] = $GLOBALS['TL_LANG'][$strTable]['mountainguide_reference'][(int) $row[$i]];
+                $row[$i] = $GLOBALS['TL_LANG'][$strTable]['mountainguide_reference'][(int)$value];
             } elseif ('eventDates' === $i) {
                 if (!empty($value) && \is_array($value)) {
                     $arrDate = [];
@@ -1148,7 +1148,7 @@ class CalendarEvents
             $return .= '
 <div class="clr readonly">
     <h3><label for="ctrl_title">'.$label.'</label></h3>
-    <div class="field-content-box">'.$row[$i].'</div>
+    <div class="field-content-box" data-field="'.$this->stringUtil->specialchars($field).'">'.$row[$i].'</div>
 '.$help.'
 </div>';
         }
