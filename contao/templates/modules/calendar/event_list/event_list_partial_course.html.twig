@@ -24,20 +24,20 @@
                             </h4>
                         </a>
                     </div>
-                    <div class="detail-item">
-                        <strong>[[ row.courseTypeLevel0Name ]]: [[ row.courseTypeLevel1Name ]]</strong>
+                    <div class="detail-item small">
+                        <strong><span class="small">[[ row.courseTypeLevel0Name ]]: [[ row.courseTypeLevel1Name ]]</span></strong>
                     </div>
-                    <div class="detail-item">
-                        <i class="fa fa-fw fa-bars me-1"></i><span>Kursstufe: [[ row.courseLevelName ]]</span>
+                    <div class="detail-item small">
+                        <i class="fa fa-fw fa-stairs me-1"></i><span>Kursstufe: [[ row.courseLevelName ]]</span>
                     </div>
-                    <div class="detail-item">
-                        <i class="fa fa-fw fa-calendar-alt me-1"></i><span class="me-1 small" v-html="row.eventPeriodLgInline"></span><span class="small text-muted" v-html="'(Dauer: ' + row.eventDuration + ')'"></span>
+                    <div class="detail-item small">
+                        <i class="fa fa-fw fa-calendar-alt me-1"></i><span class="me-1 small" v-html="row.eventPeriodLgInline"></span><span class="text-muted" v-html="'(Dauer: ' + row.eventDuration + ')'"></span>
                     </div>
                     {# if the event has been rescheduled #}
                     <div class="detail-item small text-danger" v-if="row.eventState === 'event_status_6'">
                         <span v-html="row.eventStateLabel"></span>
                     </div>
-                    <div class="detail-item">
+                    <div class="detail-item small">
                         <i class="fa fa-fw fa-user me-1"></i><span>Leitung: [[ row.instructorsWithQualification ]]</span>
                     </div>
                     <div class="detail-item d-flex flex-wrap">
