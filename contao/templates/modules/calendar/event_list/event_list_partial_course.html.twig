@@ -2,52 +2,58 @@
 {% do addJavascriptResource('bundles/markocupicsaceventtool/js/eventlist_vue.js|static') %}
 
 <div id="course-list">
-    <span v-if="itemsTotal > 0" class="text-muted"><small>Zu deiner Suchanfrage wurden [[ itemsTotal ]] Events gefunden. </small></span>
+    <span v-if="itemsTotal > 0" class="text-muted mb-3"><small>Zu deiner Suchanfrage wurden [[ itemsTotal ]] Events gefunden. </small></span>
     <span v-if="blnIsBusy === true" class="ms-2 text-success"><small>Lade events...</small></span>
-    <div class="event-container row">
+    <div class="event-container row g-3">
 
-        <div v-for="(row, index) of rows" class="col-xl-6 event-item event-item-course event layout_upcoming" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
-            <div class="row">
-                <!-- Start left col -->
-                <div class="col-sm-3 col-xl-5 d-none d-sm-block">
-                    <div class="image-zoom-in">
-                        <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" v-bind:title="row.title" v-html="row.eventImage" class="responsive event-title-link"></a>
+        <div v-for="(row, index) of rows" class="col-xs-12 col-md-6 event-item event-item-course event layout_upcoming" data-aos="fade-down" data-aos-duration="600" data-aos-once="true" data-aos-anchor-placement="top-bottom" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
+            <div class="course-list-inner-box bg-white">
+                <div class="row gx-0">
+                    <!-- Start left col -->
+                    <div class="col-0 col-xl-5 d-none d-xl-block">
+                        <div class="image-zoom-in">
+                            <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" v-bind:title="row.title" v-html="row.eventImage" class="responsive event-title-link"></a>
+                        </div>
                     </div>
-                </div>
-                <!-- Start right col -->
-                <div class="col-sm-9 col-xl-7">
-                    <div class="title d-flex align-items-start">
-                        <span class="event-state-icon" v-html="row.eventStateIcon" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel" v-bind:class="row.eventState"></span>
-                        <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link lh-base">
-                            <h4 class="d-flex headline m-0 p-0 lh-base">
-                                <strong>[[ row.title ]]</strong>
-                            </h4>
-                        </a>
-                    </div>
-                    <div class="detail-item small">
-                        <strong><span class="small">[[ row.courseTypeLevel0Name ]]: [[ row.courseTypeLevel1Name ]]</span></strong>
-                    </div>
-                    <div class="detail-item small">
-                        <i class="fa fa-fw fa-stairs me-1"></i><span>Kursstufe: [[ row.courseLevelName ]]</span>
-                    </div>
-                    <div class="detail-item small">
-                        <i class="fa fa-fw fa-calendar-alt me-1"></i><span class="me-1 small" v-html="row.eventPeriodLgInline"></span><span class="text-muted" v-html="'(Dauer: ' + row.eventDuration + ')'"></span>
-                    </div>
-                    {# if the event has been rescheduled #}
-                    <div class="detail-item small text-danger" v-if="row.eventState === 'event_status_6'">
-                        <span v-html="row.eventStateLabel"></span>
-                    </div>
-                    <div class="detail-item small">
-                        <i class="fa fa-fw fa-user me-1"></i><span>Leitung: [[ row.instructorsWithQualification ]]</span>
-                    </div>
-                    <div class="detail-item d-flex flex-wrap">
-                        <div v-html="row.bookingCounter" class="me-1"></div>
-                        <div v-if="row.isPublicTransportEvent" v-html="row.getPublicTransportBadge" class="me-1"></div>
-                    </div>
-                    {# The logo will not be displayed if the event is organized by multiple groups. #}
-                    <div class="detail-item">
-                        <div class="event-organizer-logo mt-3" v-if="row.eventOrganizerLogos.length === 1">
-                            <div v-html="row.eventOrganizerLogos[0]"></div>
+                    <!-- Start right col -->
+                    <div class="col-12 col-xl-7 position-relative">
+                        <div class="p-3">
+                            <div class="title">
+                                <a v-bind:href="row.eventUrl" data-has-event-href="true" v-bind:data-href="row.eventUrl" class="event-title-link lh-base">
+                                    <h4 class="d-flex headline m-0 p-0 lh-base">
+                                        <strong>[[ row.title ]]</strong>
+                                    </h4>
+                                </a>
+                            </div>
+                            <div class="detail-item small mb-3">
+                                <strong><span class="small">[[ row.courseTypeLevel0Name ]]: [[ row.courseTypeLevel1Name ]]</span></strong>
+                            </div>
+                            <div class="detail-item small mb-2 d-flex align-items-start">
+                                <i class="fa fa-fw fa-stairs mt-1 me-1"></i><span>Kursstufe: [[ row.courseLevelName ]]</span>
+                            </div>
+                            <div class="detail-item small mb-2 d-flex align-items-start">
+                                <i class="fa fa-fw fa-calendar-alt mt-1 me-1"></i><span class="me-1 small" v-html="row.eventPeriodLgInline"></span><span class="text-muted" v-html="'(Dauer: ' + row.eventDuration + ')'"></span>
+                            </div>
+                            {# if the event has been rescheduled #}
+                            <div class="detail-item small text-danger mb-2" v-if="row.eventState === 'event_status_6'">
+                                <span v-html="row.eventStateLabel"></span>
+                            </div>
+                            <div class="detail-item small mb-2 d-flex align-items-start">
+                                <i class="fa fa-fw fa-user mt-1 me-1"></i><span>Leitung: [[ row.instructorsWithQualification ]]</span>
+                            </div>
+                            <div class="detail-item d-flex flex-wrap mb-2">
+                                <div class="event-state-icon me-1" v-html="row.eventStateIcon" data-bs-toggle="tooltip" data-placement="top" v-bind:aria-label="row.eventStateLabel" v-bind:data-title="row.eventStateLabel" v-bind:class="row.eventState"></div>
+                                <div v-html="row.bookingCounter" class="me-1"></div>
+                                <div v-if="row.isPublicTransportEvent" v-html="row.getPublicTransportBadge" class="me-1"></div>
+                                <div class="more-btn"><a v-bind:href="row.eventUrl"><span class="badge badge-sm badge-pill">Zum Angebot</span></a></div>
+                            </div>
+                            {# The logo will not be displayed if the event is organized by multiple groups. #}
+                            <div class="detail-item" v-if="row.eventOrganizerLogos.length === 1">
+                                {# position absolute bottom right #}
+                                <div class="event-organizer-logo position-absolute">
+                                    <div v-html="row.eventOrganizerLogos[0]"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -151,6 +157,14 @@
                                 }
                             }
                             resolve('Add the title- and data-bs-title attribute from the data-title attribute.');
+                        });
+                    })();
+
+                    // Re-initialize AOS
+                    await (() => {
+                        return new Promise((resolve, reject) => {
+                            AOS.refresh();
+                            resolve('Re-initialize AOS.');
                         });
                     })();
 

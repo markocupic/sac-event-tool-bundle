@@ -794,7 +794,7 @@ class CalendarEventsHelper
 
     public static function getPublicTransportBadge(CalendarEventsModel $objEvent): string
     {
-        return '<span class="badge badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" data-title="Anreise mit ÖV">ÖV</span>';
+        return '<span class="badge badge-sm badge-pill bg-success" data-bs-toggle="tooltip" data-placement="top" data-title="Anreise mit ÖV">ÖV</span>';
     }
 
     public static function getTourTechDifficultiesAsArray(CalendarEventsModel $objEvent, bool $tooltip = false, bool $explanation = false): array
@@ -834,7 +834,7 @@ class CalendarEventsHelper
 
                 if ('' !== $strDiff) {
                     if ($tooltip) {
-                        $html = '<span class="badge badge-pill bg-primary" data-bs-toggle="tooltip" data-placement="top" data-title="Techn. Schwierigkeit: %s">%s</span>';
+                        $html = '<span class="badge badge-sm badge-pill bg-primary" data-bs-toggle="tooltip" data-placement="top" data-title="Techn. Schwierigkeit: %s">%s</span>';
                         $arrReturn[] = sprintf($html, $strDiffTitle, $strDiff);
                     } elseif ($explanation) {
                         $arrReturn[] = $strDiff.' ('.$strDiffTitle.')';
@@ -860,7 +860,7 @@ class CalendarEventsHelper
 
                 if (null !== $objModel) {
                     if ($tooltip) {
-                        $html = '<span class="badge badge-pill bg-secondary" data-bs-toggle="tooltip" data-placement="top" data-title="Typ: %s">%s</span>';
+                        $html = '<span class="badge badge-sm badge-pill bg-secondary" data-bs-toggle="tooltip" data-placement="top" data-title="Typ: %s">%s</span>';
                         $arrReturn[] = sprintf($html, $objModel->{'title'}, $objModel->{$field});
                     } else {
                         $arrReturn[] = $objModel->{$field};
@@ -874,7 +874,7 @@ class CalendarEventsHelper
 
     public static function getBookingCounter(CalendarEventsModel $objEvent, bool $withoutTooltip = false): string
     {
-        $strBadge = '<span class="badge badge-pill bg-%s" data-bs-toggle="tooltip" data-placement="top" data-title="%s">%s</span>';
+        $strBadge = '<span class="badge badge-sm badge-pill bg-%s" data-bs-toggle="tooltip" data-placement="top" data-title="%s">%s</span>';
 
         if ($withoutTooltip) {
             $strBadge = '%2$s (%3$s)'; // only text as output, e.g. 'noch 1 freie Plätze (5/6)`
