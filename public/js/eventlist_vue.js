@@ -24,7 +24,7 @@ class VueTourList {
 				'courseId': '',
 				'year': '',
 				'dateStart': '',
-				'textsearch': '',
+				'textSearch': '',
 				'eventId': '',
 				'username': '',
 				// Let empty for all published

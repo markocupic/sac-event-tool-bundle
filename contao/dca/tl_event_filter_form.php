@@ -48,7 +48,7 @@ $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
 			'eval'      => ['multiple' => true],
 			'sql'       => "varchar(10) NOT NULL default ''",
 		],
-		'textsearch'           => [
+		'textSearch'           => [
 			'inputType' => 'text',
 			'eval'      => ['placeholder' => &$GLOBALS['TL_LANG']['tl_event_filter_form']['enterSearchTerms']],
 			'sql'       => "varchar(10) NOT NULL default ''",

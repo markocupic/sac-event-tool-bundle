@@ -60,7 +60,7 @@ class EventListController extends AbstractFrontendModuleController
             'courseId',
             'year',
             'dateStart',
-            'textsearch',
+            'textSearch',
             'eventId',
             'courseId',
             'arrIds',
@@ -134,7 +134,7 @@ class EventListController extends AbstractFrontendModuleController
             case 'courseId':
             case 'year':
             case 'dateStart':
-            case 'textsearch':
+            case 'textSearch':
             case 'eventId':
             case 'suitableForBeginners':
             case 'publicTransportEvent':

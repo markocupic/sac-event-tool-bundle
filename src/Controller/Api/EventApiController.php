@@ -87,7 +87,7 @@ class EventApiController extends AbstractController
             'eventId' => $request->get('eventId'),
             'dateStart' => $request->get('dateStart'),
             'dateEnd' => $request->get('dateEnd'),
-            'textsearch' => $request->get('textsearch'),
+            'textSearch' => $request->get('textSearch'),
             'username' => $request->get('username'),
             'suitableForBeginners' => $request->get('suitableForBeginners') ? '1' : '',
             'publicTransportEvent' => $request->get('publicTransportEvent') ? '1' : '',
@@ -166,11 +166,11 @@ class EventApiController extends AbstractController
         }
 
         // Search term (search for expression in tl_calendar_events.title and tl_calendar_events.teaser
-        if (!empty($param['textsearch'])) {
+        if (!empty($param['textSearch'])) {
             $arrOrExpr = [];
 
             // Support multiple search expressions
-            foreach (explode(' ', $param['textsearch']) as $strNeedle) {
+            foreach (explode(' ', $param['textSearch']) as $strNeedle) {
                 if (empty(trim($strNeedle))) {
                     continue;
                 }
