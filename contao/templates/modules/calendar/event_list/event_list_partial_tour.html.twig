@@ -1,7 +1,7 @@
 {% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.global.prod.js?3.3.4') %}
 {% do addJavascriptResource('bundles/markocupicsaceventtool/js/eventlist_vue.js') %}
 
-<div id="tour-list">
+<div id="tour-list" v-cloak>
     <span v-if="itemsTotal > 0" class="text-muted"><small>Zu deiner Suchanfrage wurden [[ itemsTotal ]] Events gefunden. </small></span>
     <span v-if="blnIsBusy === true" class="ms-2 text-success"><small>Lade events...</small></span>
     <div class="event-container row">
