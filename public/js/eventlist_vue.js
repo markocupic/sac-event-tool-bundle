@@ -3,7 +3,7 @@
 /*
  * This file is part of SAC Event Tool Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -63,7 +63,7 @@ class VueTourList {
 					rows: [],
 					// Loaded events (ids)
 					arrEventIds: [],
-					// is busy bool
+					// is busy boolean
 					blnIsBusy: false,
 					// total found items
 					itemsTotal: 0,
@@ -74,13 +74,13 @@ class VueTourList {
 				};
 			},
 			mounted() {
-				let self = this;
+				const self = this;
 				self.prepareRequest();
 			},
 			methods: {
 				// Prepare ajax request
 				prepareRequest: function prepareRequest() {
-					let self = this;
+					const self = this;
 					if (self.blnIsBusy === false) {
 						self.blnIsBusy = true;
 						self.fetchItems();
@@ -88,24 +88,24 @@ class VueTourList {
 				},
 
 				getTake: function getTake() {
-					let self = this;
-					let urlString = window.location.href;
-					let url = new URL(urlString);
-					let take = url.searchParams.get('take_e' + self.modId);
+					const self = this;
+					const urlString = window.location.href;
+					const url = new URL(urlString);
+					const take = url.searchParams.get('take_e' + self.modId);
 
 					return null === take ? null : parseInt(take);
 				},
 
 				// Load items from server
 				fetchItems: function fetchItems() {
-					let self = this;
+					const self = this;
 
 					// Try to retrieve data from storage
-					let storageData = localStorage.getItem(btoa(window.location.href + '&modId=' + self.modId));
+					const storageData = localStorage.getItem(btoa(window.location.href + '&modId=' + self.modId));
 
 					if (storageData) {
 						localStorage.removeItem(btoa(window.location.href + '&modId=' + self.modId));
-						let storageObject = JSON.parse(storageData);
+						const storageObject = JSON.parse(storageData);
 
 						// Return if storage data is outdated
 						if (storageObject.expiry < Date.now()) {
@@ -119,14 +119,14 @@ class VueTourList {
 						self.blnAllEventsLoaded = storageObject.blnAllEventsLoaded;
 						self.blnIsBusy = false;
 
-						// Trigger oninsert callback
+						// Trigger on insert callback
 						if (self.callbackExists('oninsert')) {
 							self.callbacks.oninsert(self, null);
 						}
 
-						let url = new URL(window.location.href);
-						let urlParams = new URLSearchParams(url.search);
-						let href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+						const url = new URL(window.location.href);
+						const urlParams = new URLSearchParams(url.search);
+						const href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
 
 						// Remove the "itemId" parameter when the user returns from the detail view
 						if (urlParams.has('itemId')) {
@@ -148,7 +148,7 @@ class VueTourList {
 						return;
 					}
 
-					let formData = new FormData();
+					const formData = new FormData();
 
 					// Add api parameters to the Form Data object
 					for (const [key, value] of Object.entries(self.apiParams)) {
@@ -177,8 +177,8 @@ class VueTourList {
 						formData.append('fields[]', prop);
 					}
 
-					let urlParams = new URLSearchParams(Array.from(formData)).toString();
-					let url = 'eventApi/events?' + urlParams;
+					const urlParams = new URLSearchParams(Array.from(formData)).toString();
+					const url = 'eventApi/events?' + urlParams;
 
 					// Fetch
 					fetch(url, {
@@ -216,9 +216,9 @@ class VueTourList {
 					}).then(function (json) {
 						let take = self.getTake();
 
-						let url = new URL(window.location.href);
-						let urlParams = new URLSearchParams(url.search);
-						let href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
+						const url = new URL(window.location.href);
+						const urlParams = new URLSearchParams(url.search);
+						const href = window.location.protocol + '//' + window.location.hostname + window.location.pathname;
 
 						if (self.loadedItems > self.apiParams['limit']) {
 							take = self.loadedItems;
@@ -239,7 +239,7 @@ class VueTourList {
 						return json;
 
 					}).then(function (json) {
-						// Trigger oninsert callback
+						// Trigger on insert callback
 						if (self.callbackExists('oninsert')) {
 							self.callbacks.oninsert(self, json);
 						}
@@ -250,7 +250,7 @@ class VueTourList {
 
 				// Check if callback exists
 				callbackExists: function callbackExists(strCallback) {
-					let self = this;
+					const self = this;
 					return typeof self.callbacks !== "undefined" && typeof self.callbacks[strCallback] !== "undefined" && typeof self.callbacks[strCallback] === "function";
 				}
 			}
