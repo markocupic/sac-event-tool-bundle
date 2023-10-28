@@ -15,12 +15,10 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\ContentElement;
 
 use Contao\ContentModel;
-use Contao\Controller;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsContentElement;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\FrontendTemplate;
-use Contao\FrontendUser;
 use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Template;
@@ -31,9 +29,8 @@ use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Security;
 
-#[AsContentElement(UserPortraitListController::TYPE, category:'sac_event_tool_content_elements', template:'ce_user_portrait_list')]
+#[AsContentElement(UserPortraitListController::TYPE, category: 'sac_event_tool_content_elements', template: 'ce_user_portrait_list')]
 class UserPortraitListController extends AbstractContentElementController
 {
     public const TYPE = 'user_portrait_list';
@@ -41,7 +38,6 @@ class UserPortraitListController extends AbstractContentElementController
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly Connection $connection,
-        private readonly Security $security,
         private readonly Avatar $avatar,
         private readonly string $projectDir,
     ) {
@@ -59,9 +55,6 @@ class UserPortraitListController extends AbstractContentElementController
     {
         /** @var UserModel $userModelAdapter */
         $userModelAdapter = $this->framework->getAdapter(UserModel::class);
-
-        /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
@@ -81,7 +74,7 @@ class UserPortraitListController extends AbstractContentElementController
             $queryType = $model->userList_queryType;
 
             if (\count($arrSelectedRoles) > 0) {
-                $stmt = $this->connection->executeQuery('SELECT * FROM tl_user  WHERE disable = ? AND hideInFrontendListings = ? ORDER BY lastname ASC, firstname ASC', ['', '']);
+                $stmt = $this->connection->executeQuery('SELECT * FROM tl_user  WHERE disable = ? AND hideInFrontendListings = ? ORDER BY lastname, firstname', ['', '']);
 
                 if ('OR' === $queryType) {
                     while (false !== ($arrUser = $stmt->fetchAssociative())) {
@@ -153,7 +146,7 @@ class UserPortraitListController extends AbstractContentElementController
                         }
 
                         // Overwrite private address with role address
-                        // Be carefull to only aply this setting once per user
+                        // Be careful to only apply this setting once per user
                         $arrAddress = $stringUtilAdapter->deserialize($model->userList_replacePrivateAdressWithRoleAdress, true);
 
                         foreach ($arrAddress as $field) {
@@ -167,28 +160,15 @@ class UserPortraitListController extends AbstractContentElementController
                 $objTemplate->roleEmails = $arrRoleEmails;
                 $objTemplate->roles = $arrRoles;
 
-                // Get users avatar file path.
+                // Get user profile picture
                 $strAvatarSRC = $this->avatar->getAvatarResourcePath($objUser->current());
 
-                // Add an image to the template
+                // Add the user profile picture
                 if (\strlen($strAvatarSRC)) {
                     if (is_file($this->projectDir.'/'.$strAvatarSRC)) {
-                        // Create partial object
-                        $objPartial = new \stdClass();
-
-                        if ('' !== $model->imgSize) {
-                            $size = $stringUtilAdapter->deserialize($model->imgSize);
-
-                            if ($size[0] > 0 || $size[1] > 0 || is_numeric($size[2])) {
-                                $objPartial->size = $model->imgSize;
-                            }
-                        }
-
-                        $objPartial->singleSRC = $strAvatarSRC;
-                        $arrUser = (array) $objPartial;
                         $objTemplate->addImage = true;
-
-                        $controllerAdapter->addImageToTemplate($objTemplate, $arrUser);
+                        $objTemplate->imgSize = $model->imgSize;
+                        $objTemplate->singleSRC = $strAvatarSRC;
                     }
                 }
                 $strItems .= $objTemplate->parse();
@@ -196,9 +176,6 @@ class UserPortraitListController extends AbstractContentElementController
             $template->items = $strItems;
         }
 
-        $user = $this->security->getUser();
-
-        $template->hasLoggedInFrontendUser = $user instanceof FrontendUser;
         $template->hasMultiple = $itemCount > 1;
         $template->itemCount = $itemCount;
 

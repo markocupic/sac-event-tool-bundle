@@ -1,0 +1,22 @@
+{% if not hasMultiple|default(false) %}
+    {% set class = class ~ ' col-12 col-md-6 col-xl-4 mb-4' %}
+{% endif %}
+
+<div class="{{ class }} block" {{ cssID }}>
+    {% block headline %}
+    {% if headline|default %}
+    <{{ hl }}>{{ headline }}</{{ hl }}>
+    {% endif %}
+    {% endblock %}
+
+    {% if items|default %}
+    {% if hasMultiple|default(false) %}
+    <div class="row">
+    {% endif %}
+        {{ items|raw }}
+    {% if hasMultiple|default(false) %}
+    </div>
+    {% endif %}
+
+{% endif %}
+</div>
