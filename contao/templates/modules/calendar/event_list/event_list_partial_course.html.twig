@@ -31,7 +31,7 @@
                             <div class="detail-item small mb-2 d-flex align-items-start">
                                 <i class="fa fa-fw fa-stairs mt-1 me-1"></i><span>Kursstufe: [[ row.courseLevelName ]]</span>
                             </div>
-                            <div class="detail-item small mb-2 d-flex align-items-start">
+                            <div class="detail-item small mb-2 d-flex flex-wrap align-items-start">
                                 <i class="fa fa-fw fa-calendar-alt mt-1 me-1"></i><span class="me-1 small" v-html="row.eventPeriodLgInline"></span><span class="text-muted" v-html="'(Dauer: ' + row.eventDuration + ')'"></span>
                             </div>
                             {# if the event has been rescheduled #}
