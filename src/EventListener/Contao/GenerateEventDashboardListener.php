@@ -92,6 +92,7 @@ class GenerateEventDashboardListener
                 ->setLinkAttribute('target', '_blank')
                 ->setLinkAttribute('accesskey', 'p')
                 ->setLinkAttribute('title', 'Vorschau anzeigen [ALT + p]')
+                ->setLinkAttribute('onclick', 'return confirm(\'Wollen Sie diese Seite wirklich verlassen? Eventuell gemachte Änderungen am Event werden NICHT gespeichert.\')')
             ;
         }
 
