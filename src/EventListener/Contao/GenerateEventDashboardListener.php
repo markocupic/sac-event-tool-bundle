@@ -49,9 +49,8 @@ class GenerateEventDashboardListener
         $calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $request = $this->requestStack->getCurrentRequest();
         $user = $this->security->getUser();
-
         $eventId = $objEvent->id;
-        $calendarId = $objEvent->getRelated('pid');
+        $calendarId = $objEvent->getRelated('pid')->id;
         $strBackendModule = $request->query->get('do');
         $requestToken = $this->contaoCsrfTokenManager->getDefaultTokenValue();
         $refererId = $request->attributes->get('_contao_referer_id');
@@ -73,7 +72,7 @@ class GenerateEventDashboardListener
         // "Go to event-list" button
         $href = $this->router->generate(
             'contao_backend',
-            ['do' => $strBackendModule, 'table' => 'tl_calendar_events', 'id' => $calendarId, 'rt' => $requestToken, 'ref' => $refererId],
+            ['do' => $strBackendModule, 'id' => $calendarId, 'table' => 'tl_calendar_events', 'rt' => $requestToken, 'ref' => $refererId],
         );
 
         $menu->addChild('Eventliste', ['uri' => $href])
