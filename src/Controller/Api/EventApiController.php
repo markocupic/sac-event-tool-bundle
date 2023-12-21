@@ -62,7 +62,7 @@ class EventApiController extends AbstractController
      * @throws Exception
      * @throws \Exception
      */
-    #[Route('/eventApi/events', name: 'sac_event_tool_api_event_api_get_events', methods: ["GET"], defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    #[Route('/eventApi/events', name: 'sac_event_tool_api_event_api_get_events', methods: ['GET'], defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function getEventList(): JsonResponse
     {
         $this->framework->initialize();
@@ -391,7 +391,7 @@ class EventApiController extends AbstractController
      *
      * @throws \Exception
      */
-    #[Route('/eventApi/getEventById', name: 'sac_event_tool_api_event_api_get_event_by_id', methods: ["GET"], defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    #[Route('/eventApi/getEventById', name: 'sac_event_tool_api_event_api_get_event_by_id', methods: ['GET'], defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function getEventById(): JsonResponse
     {
         $this->framework->initialize();

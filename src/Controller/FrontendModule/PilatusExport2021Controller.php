@@ -141,6 +141,9 @@ class PilatusExport2021Controller extends AbstractPrintExportController
         $arrRange[4] = date('Y-m-01', strtotime($year.'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-09-01'));
         $arrRange[5] = date('Y-m-01', strtotime($year.'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime($year.'-12-01'));
         $arrRange[6] = date('Y-m-01', strtotime(($year + 1).'-01-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-03-01'));
+        $arrRange[7] = date('Y-m-01', strtotime(($year + 1).'-04-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-06-01'));
+        $arrRange[8] = date('Y-m-01', strtotime(($year + 1).'-07-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-09-01'));
+        $arrRange[9] = date('Y-m-01', strtotime(($year + 1).'-10-01')).' - '.$dateAdapter->parse('Y-m-t', strtotime(($year + 1).'-12-01'));
 
         $range = [];
 
