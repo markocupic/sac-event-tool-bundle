@@ -446,7 +446,6 @@ class EventApiController extends AbstractController
             $varValue = array_map(fn ($v) => $this->prepareValue($v), $varValue);
         }
 
-        $varValue = !empty($tmp) && \is_array($tmp) ? $tmp : $varValue;
         $varValue = \is_string($varValue) && $this->validator->isBinaryUuid($varValue) ? $this->stringUtil->binToUuid($varValue) : $varValue;
         $varValue = \is_string($varValue) ? $this->stringUtil->decodeEntities($varValue) : $varValue;
 
