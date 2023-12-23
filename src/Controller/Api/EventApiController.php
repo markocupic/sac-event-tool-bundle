@@ -18,7 +18,6 @@ use Contao\CalendarEventsModel;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
-use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
@@ -37,12 +36,8 @@ class EventApiController extends AbstractController
     private readonly Adapter $calendarEventsHelper;
     private readonly Adapter $calendarEventsModel;
     private readonly Adapter $stringUtil;
-    private readonly Adapter $userModel;
     private readonly Adapter $validator;
 
-    /**
-     * Get event data from JSON.
-     */
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly RequestStack $requestStack,
@@ -51,7 +46,6 @@ class EventApiController extends AbstractController
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
-        $this->userModel = $this->framework->getAdapter(UserModel::class);
         $this->validator = $this->framework->getAdapter(Validator::class);
     }
 
@@ -62,7 +56,7 @@ class EventApiController extends AbstractController
      * @throws Exception
      * @throws \Exception
      */
-    #[Route('/eventApi/events', name: 'sac_event_tool_api_event_api_get_events', methods: ['GET'], defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    #[Route('/eventApi/events', name: 'sac_event_tool_api_event_api_get_events', defaults: ['_scope' => 'frontend', '_token_check' => false], methods: ['GET'])]
     public function getEventList(): JsonResponse
     {
         $this->framework->initialize();
@@ -145,10 +139,12 @@ class EventApiController extends AbstractController
 
         // Filter by a certain instructor $_GET['username']
         if (!empty($param['username'])) {
-            if (null !== ($user = $this->userModel->findOneBy('username', $param['username']))) {
-                $userId = (int) $user->id;
-            } else {
-                // Do not show any events if username does not exist
+            $userId = $this->connection->fetchOne(
+                'SELECT id FROM tl_user WHERE username = ?',
+                [$param['username']],
+            );
+
+            if (!$userId) {
                 $userId = 0;
             }
 
@@ -386,12 +382,12 @@ class EventApiController extends AbstractController
     }
 
     /**
-     * This route is used for the "pilatus" export, where events are loaded by xhr when the modal windows opens
+     * This route is used for the "pilatus" export, where events are loaded by xhr when the modal window opens
      * $_POST['id'], $_POST['fields'] as comma separated string is optional.
      *
      * @throws \Exception
      */
-    #[Route('/eventApi/getEventById', name: 'sac_event_tool_api_event_api_get_event_by_id', methods: ['GET'], defaults: ['_scope' => 'frontend', '_token_check' => false])]
+    #[Route('/eventApi/getEventById', name: 'sac_event_tool_api_event_api_get_event_by_id', defaults: ['_scope' => 'frontend', '_token_check' => false], methods: ['GET'])]
     public function getEventById(): JsonResponse
     {
         $this->framework->initialize();
@@ -408,12 +404,11 @@ class EventApiController extends AbstractController
             'arrFields' => $arrFields,
         ];
 
-        if (null !== ($objEvent = $this->calendarEventsModel->findOneById($eventId))) {
-            $arrEvent = $objEvent->row();
+        if (null !== ($objEvent = $this->calendarEventsModel->findByPk($eventId))) {
             $arrJSON['status'] = 'success';
-            $aEvent = [];
+            $arrEvent = [];
 
-            foreach (array_keys($arrEvent) as $k) {
+            foreach (array_keys($objEvent->row()) as $k) {
                 // If $arrFields is empty send all properties
                 if (!empty($arrFields)) {
                     if (!\in_array($k, $arrFields, true)) {
@@ -421,9 +416,9 @@ class EventApiController extends AbstractController
                     }
                 }
 
-                $aEvent[$k] = $this->prepareValue($this->calendarEventsHelper->getEventData($objEvent, $k));
+                $arrEvent[$k] = $this->prepareValue($this->calendarEventsHelper->getEventData($objEvent, $k));
             }
-            $arrJSON['arrEventData'] = $aEvent;
+            $arrJSON['arrEventData'] = $arrEvent;
         }
 
         // Allow cross domain requests
