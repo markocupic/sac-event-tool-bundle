@@ -15,17 +15,17 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\Api;
 
 use Contao\CalendarEventsModel;
-use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
 use Contao\Validator;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -33,20 +33,10 @@ class EventApiController extends AbstractController
 {
     public const CACHE_MAX_AGE = 300;
 
-    private readonly Adapter $calendarEventsHelper;
-    private readonly Adapter $calendarEventsModel;
-    private readonly Adapter $stringUtil;
-    private readonly Adapter $validator;
-
     public function __construct(
         private readonly ContaoFramework $framework,
-        private readonly RequestStack $requestStack,
         private readonly Connection $connection,
     ) {
-        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
-        $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
-        $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
-        $this->validator = $this->framework->getAdapter(Validator::class);
     }
 
     /**
@@ -57,255 +47,27 @@ class EventApiController extends AbstractController
      * @throws \Exception
      */
     #[Route('/eventApi/events', name: 'sac_event_tool_api_event_api_get_events', defaults: ['_scope' => 'frontend', '_token_check' => false], methods: ['GET'])]
-    public function getEventList(): JsonResponse
+    public function getEventList(Request $request): JsonResponse
     {
         $this->framework->initialize();
 
-        $request = $this->requestStack->getCurrentRequest();
+        $calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+        $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
 
-        $param = [
-            // Arrays
-            'organizers' => $request->get('organizers'),
-            'eventType' => $request->get('eventType'),
-            'calendarIds' => $request->get('calendarIds'),
-            'fields' => $request->get('fields'),
-            'arrIds' => $request->get('arrIds'),
-            // Integers
-            'offset' => empty($request->get('offset')) ? 0 : (int) $request->get('offset'),
-            'limit' => empty($request->get('limit')) ? 0 : (int) $request->get('limit'),
-            'tourType' => (int) $request->get('tourType'),
-            'courseType' => (int) $request->get('courseType'),
-            'year' => (int) $request->get('year'),
-            // Strings
-            'courseId' => $request->get('courseId'),
-            'eventId' => $request->get('eventId'),
-            'dateStart' => $request->get('dateStart'),
-            'dateEnd' => $request->get('dateEnd'),
-            'textSearch' => $request->get('textSearch'),
-            'username' => $request->get('username'),
-            'suitableForBeginners' => $request->get('suitableForBeginners') ? '1' : '',
-            'publicTransportEvent' => $request->get('publicTransportEvent') ? '1' : '',
-        ];
+        // Get query filter params from request
+        $params = $this->getQueryParamsFromRequest($request);
 
         $stopwatch = new Stopwatch();
         $stopwatch->start('event list api query time');
 
-        // Ignore date range, ff certain query params were set
-        $blnIgnoreDate = false;
-
-        $qb = $this->connection->createQueryBuilder();
-        $qb->select('id')
-            ->from('tl_calendar_events', 't')
-            ->where('t.published = :published')
-            ->setParameter('published', '1')
-        ;
-
-        // Filter by calendar ids tl_calendar.id
-        if (!empty($param['calendarIds'])) {
-            $qb->andWhere($qb->expr()->in('t.pid', ':calendarIds'));
-            $qb->setParameter('calendarIds', $param['calendarIds'], ArrayParameterType::INTEGER);
-        }
-
-        // Filter by event ids tl_calendar_events.id
-        if (!empty($param['arrIds'])) {
-            $qb->andWhere($qb->expr()->in('t.id', ':arrIds'));
-            $qb->setParameter('arrIds', $param['arrIds'], ArrayParameterType::INTEGER);
-        }
-
-        // Filter by event types "tour","course","generalEvent","lastMinuteTour"
-        if (!empty($param['eventType'])) {
-            $qb->andWhere($qb->expr()->in('t.eventType', ':eventType'));
-            $qb->setParameter('eventType', $param['eventType'], ArrayParameterType::INTEGER);
-        }
-
-        // Filter by suitableForBeginners
-        if ('1' === $param['suitableForBeginners']) {
-            $qb->andWhere('t.suitableForBeginners = :suitableForBeginners');
-            $qb->setParameter('suitableForBeginners', '1');
-        }
-
-        // Filter by publicTransportEvent
-        if ('1' === $param['publicTransportEvent']) {
-            $idPublicTransportJourney = $this->connection->fetchOne(
-                'SELECT id from tl_calendar_events_journey WHERE alias = ?',
-                ['public-transport'],
-            );
-
-            if ($idPublicTransportJourney) {
-                $qb->andWhere('t.journey = :publicTransportEvent');
-                $qb->setParameter('publicTransportEvent', (int) $idPublicTransportJourney);
-            }
-        }
-
-        // Filter by a certain instructor $_GET['username']
-        if (!empty($param['username'])) {
-            $userId = $this->connection->fetchOne(
-                'SELECT id FROM tl_user WHERE username = ?',
-                [$param['username']],
-            );
-
-            if (!$userId) {
-                $userId = 0;
-            }
-
-            $qb2 = $this->connection->createQueryBuilder();
-            $qb2->select('pid')
-                ->from('tl_calendar_events_instructor', 't')
-                ->where('t.userId = :instructorId')
-                ->setParameter('instructorId', $userId)
-            ;
-
-            $arrEvents = $qb2->fetchFirstColumn();
-
-            $qb->andWhere($qb->expr()->in('t.id', ':arrEvents'));
-            $qb->setParameter('arrEvents', $arrEvents, ArrayParameterType::INTEGER);
-        }
-
-        // Search term (search for expression in tl_calendar_events.title and tl_calendar_events.teaser
-        if (!empty($param['textSearch'])) {
-            $arrOrExpr = [];
-
-            // Support multiple search expressions
-            foreach (explode(' ', $param['textSearch']) as $strNeedle) {
-                if (empty(trim($strNeedle))) {
-                    continue;
-                }
-
-                $strNeedle = trim($strNeedle);
-
-                // Search expression in title & teaser
-                $arrOrExpr[] = $qb->expr()->like('t.title', $qb->expr()->literal('%'.$strNeedle.'%'));
-                $arrOrExpr[] = $qb->expr()->like('t.teaser', $qb->expr()->literal('%'.$strNeedle.'%'));
-
-                // Check if search expression is the name of an instructor
-                $qbSt = $this->connection->createQueryBuilder();
-                $qbSt->select('id')
-                    ->from('tl_user', 'u')
-                    ->where($qbSt->expr()->like('u.name', $qbSt->expr()->literal('%'.$strNeedle.'%')))
-                ;
-
-                $arrInst = $qbSt->fetchFirstColumn();
-
-                // Check if instructor is the instructor in this event
-                foreach ($arrInst as $instrId) {
-                    $arrOrExpr[] = $qb->expr()->in(
-                        't.id',
-                        $this->connection->createQueryBuilder()
-                            ->select('pid')
-                            ->from('tl_calendar_events_instructor', 't2')
-                            ->where('t2.userId = :qbStInstructorId'.$instrId)
-                            ->getSQL()
-                    );
-                    $qb->setParameter('qbStInstructorId'.$instrId, $instrId);
-                }
-            }
-
-            if (!empty($arrOrExpr)) {
-                $qb->andWhere($qb->expr()->or(...$arrOrExpr));
-            }
-        }
-
-        // Filter by organizers
-        if (!empty($param['organizers']) && \is_array($param['organizers'])) {
-            $qbEvtOrg = $this->connection->createQueryBuilder();
-            $qbEvtOrg->select('id')
-                ->from('tl_event_organizer', 'o')
-                ->where('o.ignoreFilterInEventList = :true')
-                ->setParameter('true', '1')
-            ;
-
-            $arrIgnoredOrganizer = $qbEvtOrg->fetchFirstColumn();
-
-            $arrOrExpr = [];
-
-            // Show event if it has an organizer with the flag ignoreFilterInEventList=true
-            if (!empty($arrIgnoredOrganizer)) {
-                foreach ($arrIgnoredOrganizer as $orgId) {
-                    $arrOrExpr[] = $qb->expr()->like('t.organizers', $qb->expr()->literal('%:"'.$orgId.'";%'));
-                }
-            }
-
-            // Show event if its organizer is in the search param
-            foreach ($param['organizers'] as $orgId) {
-                if (!\in_array($orgId, $arrIgnoredOrganizer, false)) {
-                    $arrOrExpr[] = $qb->expr()->like('t.organizers', $qb->expr()->literal('%:"'.$orgId.'";%'));
-                }
-            }
-
-            if (!empty($arrOrExpr)) {
-                $qb->andWhere($qb->expr()->or(...$arrOrExpr));
-            }
-        }
-
-        // Filter by tour type
-        if (!empty($param['tourType']) && $param['tourType'] > 0) {
-            $qb->andWhere($qb->expr()->like('t.tourType', $qb->expr()->literal('%:"'.$param['tourType'].'";%')));
-        }
-
-        // Filter by course type
-        if (!empty($param['courseType']) && $param['courseType'] > 0) {
-            $qb->andWhere('t.courseTypeLevel1 = :courseType');
-            $qb->setParameter('courseType', $param['courseType']);
-        }
-
-        // Filter by course id
-        if (!empty($param['courseId'])) {
-            $strId = preg_replace('/\s/', '', $param['courseId']);
-
-            if (!empty($strId)) {
-                $qb->andWhere($qb->expr()->like('t.courseId', $qb->expr()->literal('%'.$strId.'%')));
-                $blnIgnoreDate = true;
-            }
-        }
-
-        // Filter by event id
-        if (!empty($param['eventId'])) {
-            $strId = preg_replace('/\s/', '', $param['eventId']);
-            $arrChunk = explode('-', $strId);
-
-            $eventId = $arrChunk[1] ?? $strId;
-
-            $qb->andWhere('t.id = :eventId');
-            $qb->setParameter('eventId', $eventId);
-            $blnIgnoreDate = true;
-        }
-
-        if (!$blnIgnoreDate) {
-            if (!empty($param['dateStart']) && (false !== ($tstampStart = strtotime($param['dateStart'])))) {
-                // event filter: date start filter
-                $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
-                $qb->setParameter('tstampStart', $tstampStart);
-            } elseif ((int) $param['year'] > 2000) {
-                // event filter: year filter
-                $year = (int) $param['year'];
-                $tstampStart = strtotime($year.'-01-01');
-                $tstampStop = (int) (strtotime('31-12-'.$year) + 24 * 3600 - 1);
-                $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
-                $qb->andWhere($qb->expr()->lte('t.endDate', ':tstampStop'));
-                $qb->setParameter('tstampStart', $tstampStart);
-                $qb->setParameter('tstampStop', $tstampStop);
-            } else {
-                // event filter: upcoming events
-                $tstampStart = strtotime(date('Y-m-d', time()));
-                $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
-                $qb->setParameter('tstampStart', $tstampStart);
-            }
-
-            // event filter: date stop filter
-            if (!empty($param['dateEnd']) && (false !== ($dateEnd = strtotime($param['dateEnd'])))) {
-                $qb->andWhere($qb->expr()->lte('t.endDate', ':tstampStop'));
-                $qb->setParameter('tstampStop', $dateEnd);
-            }
-        }
-
-        // Order by startDate ASC
-        $qb->orderBy('t.startDate', 'ASC');
+        // Build the first query
+        $qb = $this->buildQuery($this->connection, $params);
 
         /** @var array<int> $arrIds */
         $arrIds = $qb->fetchFirstColumn();
 
         // Now we have all the ids, let's prepare the second query
-        $arrFields = empty($param['fields']) ? [] : $param['fields'];
+        $arrFields = empty($params['fields']) ? [] : $params['fields'];
 
         $arrJSON = [
             'meta' => [
@@ -330,13 +92,13 @@ class EventApiController extends AbstractController
             ;
 
             // Offset
-            if ($param['offset'] > 0) {
-                $qb->setFirstResult($param['offset']);
+            if ($params['offset'] > 0) {
+                $qb->setFirstResult($params['offset']);
             }
 
             // Limit
-            if ($param['limit'] > 0) {
-                $qb->setMaxResults($param['limit']);
+            if ($params['limit'] > 0) {
+                $qb->setMaxResults($params['limit']);
             }
 
             $results = $qb->executeQuery();
@@ -346,7 +108,7 @@ class EventApiController extends AbstractController
                 $oData = null;
 
                 /** @var CalendarEventsModel $objEvent */
-                $objEvent = $this->calendarEventsModel->findByPk($arrEvent['id']);
+                $objEvent = $calendarEventsModel->findByPk($arrEvent['id']);
 
                 if (null !== $objEvent) {
                     $arrJSON['meta']['arrEventIds'][] = $arrEvent['id'];
@@ -355,7 +117,7 @@ class EventApiController extends AbstractController
                         $oData = new \stdClass();
 
                         foreach ($arrFields as $field) {
-                            $v = $this->calendarEventsHelper->getEventData($objEvent, $field);
+                            $v = $calendarEventsHelper->getEventData($objEvent, $field);
                             $aField = explode('||', $field);
                             $field = $aField[0];
                             $oData->{$field} = $this->prepareValue($v);
@@ -388,11 +150,11 @@ class EventApiController extends AbstractController
      * @throws \Exception
      */
     #[Route('/eventApi/getEventById', name: 'sac_event_tool_api_event_api_get_event_by_id', defaults: ['_scope' => 'frontend', '_token_check' => false], methods: ['GET'])]
-    public function getEventById(): JsonResponse
+    public function getEventById(Request $request): JsonResponse
     {
         $this->framework->initialize();
 
-        $request = $this->requestStack->getCurrentRequest();
+        $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
 
         $eventId = (int) $request->request->get('id');
         $arrFields = '' !== $request->get('fields') ? explode(',', $request->get('fields')) : [];
@@ -404,7 +166,7 @@ class EventApiController extends AbstractController
             'arrFields' => $arrFields,
         ];
 
-        if (null !== ($objEvent = $this->calendarEventsModel->findByPk($eventId))) {
+        if (null !== ($objEvent = $calendarEventsModel->findByPk($eventId))) {
             $arrJSON['status'] = 'success';
             $arrEvent = [];
 
@@ -425,25 +187,273 @@ class EventApiController extends AbstractController
         return new JsonResponse($arrJSON, 200, ['Access-Control-Allow-Origin' => '*']);
     }
 
+    private function getQueryParamsFromRequest(Request $request): array
+    {
+        return [
+            // Arrays
+            'organizers' => $request->get('organizers'),
+            'eventType' => $request->get('eventType'),
+            'calendarIds' => $request->get('calendarIds'),
+            'fields' => $request->get('fields'),
+            'arrIds' => $request->get('arrIds'),
+            // Integers
+            'offset' => empty($request->get('offset')) ? 0 : (int) $request->get('offset'),
+            'limit' => empty($request->get('limit')) ? 0 : (int) $request->get('limit'),
+            'tourType' => (int) $request->get('tourType'),
+            'courseType' => (int) $request->get('courseType'),
+            'year' => (int) $request->get('year'),
+            // Strings
+            'courseId' => $request->get('courseId'),
+            'eventId' => $request->get('eventId'),
+            'dateStart' => $request->get('dateStart'),
+            'dateEnd' => $request->get('dateEnd'),
+            'textSearch' => $request->get('textSearch'),
+            'username' => $request->get('username'),
+            'suitableForBeginners' => $request->get('suitableForBeginners') ? '1' : '',
+            'publicTransportEvent' => $request->get('publicTransportEvent') ? '1' : '',
+        ];
+    }
+
     /**
      * Deserialize arrays, convert binary uuids and clean strings from illegal characters.
      */
     private function prepareValue(mixed $varValue): mixed
     {
+        $stringUtil = $this->framework->getAdapter(StringUtil::class);
+        $validator = $this->framework->getAdapter(Validator::class);
+
         // Transform bin uuids
-        $varValue = $this->validator->isBinaryUuid($varValue) ? $this->stringUtil->binToUuid($varValue) : $varValue;
+        $varValue = $validator->isBinaryUuid($varValue) ? $stringUtil->binToUuid($varValue) : $varValue;
 
         // Deserialize arrays
-        $varValue = $this->stringUtil->deserialize($varValue);
+        $varValue = $stringUtil->deserialize($varValue);
 
         // Clean arrays recursively
         if (!empty($varValue) && \is_array($varValue)) {
             $varValue = array_map(fn ($v) => $this->prepareValue($v), $varValue);
         }
 
-        $varValue = \is_string($varValue) && $this->validator->isBinaryUuid($varValue) ? $this->stringUtil->binToUuid($varValue) : $varValue;
-        $varValue = \is_string($varValue) ? $this->stringUtil->decodeEntities($varValue) : $varValue;
+        $varValue = \is_string($varValue) && $validator->isBinaryUuid($varValue) ? $stringUtil->binToUuid($varValue) : $varValue;
+        $varValue = \is_string($varValue) ? $stringUtil->decodeEntities($varValue) : $varValue;
 
         return \is_string($varValue) || \is_array($varValue) ? mb_convert_encoding($varValue, 'UTF-8', 'UTF-8') : $varValue;
+    }
+
+    private function buildQuery(Connection $connection, array $params): QueryBuilder
+    {
+        // Ignore date range, if certain query params were set
+        $blnIgnoreDate = false;
+
+        $qb = $connection->createQueryBuilder();
+
+        $qb->select('id')
+            ->from('tl_calendar_events', 't')
+            ->where('t.published = :published')
+            ->setParameter('published', '1')
+        ;
+
+        // Filter by calendar ids tl_calendar.id
+        if (!empty($params['calendarIds'])) {
+            $qb->andWhere($qb->expr()->in('t.pid', ':calendarIds'));
+            $qb->setParameter('calendarIds', $params['calendarIds'], ArrayParameterType::INTEGER);
+        }
+
+        // Filter by event ids tl_calendar_events.id
+        if (!empty($params['arrIds'])) {
+            $qb->andWhere($qb->expr()->in('t.id', ':arrIds'));
+            $qb->setParameter('arrIds', $params['arrIds'], ArrayParameterType::INTEGER);
+        }
+
+        // Filter by event types "tour","course","generalEvent","lastMinuteTour"
+        if (!empty($params['eventType'])) {
+            $qb->andWhere($qb->expr()->in('t.eventType', ':eventType'));
+            $qb->setParameter('eventType', $params['eventType'], ArrayParameterType::INTEGER);
+        }
+
+        // Filter by suitableForBeginners
+        if ('1' === $params['suitableForBeginners']) {
+            $qb->andWhere('t.suitableForBeginners = :suitableForBeginners');
+            $qb->setParameter('suitableForBeginners', '1');
+        }
+
+        // Filter by publicTransportEvent
+        if ('1' === $params['publicTransportEvent']) {
+            $idPublicTransportJourney = $connection->fetchOne(
+                'SELECT id from tl_calendar_events_journey WHERE alias = ?',
+                ['public-transport'],
+            );
+
+            if ($idPublicTransportJourney) {
+                $qb->andWhere('t.journey = :publicTransportEvent');
+                $qb->setParameter('publicTransportEvent', (int) $idPublicTransportJourney);
+            }
+        }
+
+        // Filter by a certain instructor $_GET['username']
+        if (!empty($params['username'])) {
+            $userId = $connection->fetchOne(
+                'SELECT id FROM tl_user WHERE username = ?',
+                [$params['username']],
+            );
+
+            if (!$userId) {
+                $userId = 0;
+            }
+
+            $qb2 = $connection->createQueryBuilder();
+
+            $qb2->select('pid')
+                ->from('tl_calendar_events_instructor', 't')
+                ->where('t.userId = :instructorId')
+                ->setParameter('instructorId', $userId)
+            ;
+
+            $arrEvents = $qb2->fetchFirstColumn();
+
+            $qb->andWhere($qb->expr()->in('t.id', ':arrEvents'));
+            $qb->setParameter('arrEvents', $arrEvents, ArrayParameterType::INTEGER);
+        }
+
+        // Search term (search for expression in tl_calendar_events.title and tl_calendar_events.teaser
+        if (!empty($params['textSearch'])) {
+            $arrOrExpr = [];
+
+            // Support multiple search expressions
+            foreach (explode(' ', $params['textSearch']) as $strNeedle) {
+                if (empty(trim($strNeedle))) {
+                    continue;
+                }
+
+                $strNeedle = trim($strNeedle);
+
+                // Search expression in title & teaser
+                $arrOrExpr[] = $qb->expr()->like('t.title', $qb->expr()->literal('%'.$strNeedle.'%'));
+                $arrOrExpr[] = $qb->expr()->like('t.teaser', $qb->expr()->literal('%'.$strNeedle.'%'));
+
+                // Check if search expression is the name of an instructor
+                $qbSt = $connection->createQueryBuilder();
+                $qbSt->select('id')
+                    ->from('tl_user', 'u')
+                    ->where($qbSt->expr()->like('u.name', $qbSt->expr()->literal('%'.$strNeedle.'%')))
+                ;
+
+                $arrInst = $qbSt->fetchFirstColumn();
+
+                // Check if instructor is the instructor in this event
+                foreach ($arrInst as $instrId) {
+                    $arrOrExpr[] = $qb->expr()->in(
+                        't.id',
+                        $connection->createQueryBuilder()
+                            ->select('pid')
+                            ->from('tl_calendar_events_instructor', 't2')
+                            ->where('t2.userId = :qbStInstructorId'.$instrId)
+                            ->getSQL()
+                    );
+                    $qb->setParameter('qbStInstructorId'.$instrId, $instrId);
+                }
+            }
+
+            if (!empty($arrOrExpr)) {
+                $qb->andWhere($qb->expr()->or(...$arrOrExpr));
+            }
+        }
+
+        // Filter by organizers
+        if (!empty($params['organizers']) && \is_array($params['organizers'])) {
+            $qbEvtOrg = $connection->createQueryBuilder();
+            $qbEvtOrg->select('id')
+                ->from('tl_event_organizer', 'o')
+                ->where('o.ignoreFilterInEventList = :true')
+                ->setParameter('true', '1')
+            ;
+
+            $arrIgnoredOrganizer = $qbEvtOrg->fetchFirstColumn();
+
+            $arrOrExpr = [];
+
+            // Show event if it has an organizer with the flag ignoreFilterInEventList=true
+            if (!empty($arrIgnoredOrganizer)) {
+                foreach ($arrIgnoredOrganizer as $orgId) {
+                    $arrOrExpr[] = $qb->expr()->like('t.organizers', $qb->expr()->literal('%:"'.$orgId.'";%'));
+                }
+            }
+
+            // Show event if its organizer is in the search param
+            foreach ($params['organizers'] as $orgId) {
+                if (!\in_array($orgId, $arrIgnoredOrganizer, false)) {
+                    $arrOrExpr[] = $qb->expr()->like('t.organizers', $qb->expr()->literal('%:"'.$orgId.'";%'));
+                }
+            }
+
+            if (!empty($arrOrExpr)) {
+                $qb->andWhere($qb->expr()->or(...$arrOrExpr));
+            }
+        }
+
+        // Filter by tour type
+        if (!empty($params['tourType']) && $params['tourType'] > 0) {
+            $qb->andWhere($qb->expr()->like('t.tourType', $qb->expr()->literal('%:"'.$params['tourType'].'";%')));
+        }
+
+        // Filter by course type
+        if (!empty($params['courseType']) && $params['courseType'] > 0) {
+            $qb->andWhere('t.courseTypeLevel1 = :courseType');
+            $qb->setParameter('courseType', $params['courseType']);
+        }
+
+        // Filter by course id
+        if (!empty($params['courseId'])) {
+            $strId = preg_replace('/\s/', '', $params['courseId']);
+
+            if (!empty($strId)) {
+                $qb->andWhere($qb->expr()->like('t.courseId', $qb->expr()->literal('%'.$strId.'%')));
+                $blnIgnoreDate = true;
+            }
+        }
+
+        // Filter by event id
+        if (!empty($params['eventId'])) {
+            $strId = preg_replace('/\s/', '', $params['eventId']);
+            $arrChunk = explode('-', $strId);
+
+            $eventId = $arrChunk[1] ?? $strId;
+
+            $qb->andWhere('t.id = :eventId');
+            $qb->setParameter('eventId', $eventId);
+            $blnIgnoreDate = true;
+        }
+
+        if (!$blnIgnoreDate) {
+            if (!empty($params['dateStart']) && (false !== ($tstampStart = strtotime($params['dateStart'])))) {
+                // event filter: date start filter
+                $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
+                $qb->setParameter('tstampStart', $tstampStart);
+            } elseif ((int) $params['year'] > 2000) {
+                // event filter: year filter
+                $year = (int) $params['year'];
+                $tstampStart = strtotime($year.'-01-01');
+                $tstampStop = (int) (strtotime('31-12-'.$year) + 24 * 3600 - 1);
+                $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
+                $qb->andWhere($qb->expr()->lte('t.endDate', ':tstampStop'));
+                $qb->setParameter('tstampStart', $tstampStart);
+                $qb->setParameter('tstampStop', $tstampStop);
+            } else {
+                // event filter: upcoming events
+                $tstampStart = strtotime(date('Y-m-d', time()));
+                $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
+                $qb->setParameter('tstampStart', $tstampStart);
+            }
+
+            // event filter: date stop filter
+            if (!empty($params['dateEnd']) && (false !== ($dateEnd = strtotime($params['dateEnd'])))) {
+                $qb->andWhere($qb->expr()->lte('t.endDate', ':tstampStop'));
+                $qb->setParameter('tstampStop', $dateEnd);
+            }
+        }
+
+        // Order by startDate ASC
+        $qb->orderBy('t.startDate', 'ASC');
+
+        return $qb;
     }
 }
