@@ -7,7 +7,7 @@ Leider kann ich dir für den Kurs <?php if ('' != $this->courseId): ?><?= $this-
 Leider kann ich dir für den Event "<?= $this->eventName ?>" im Moment noch keine Zusage erteilen. Du wirst auf die Warteliste gesetzt und sollte ein Platz frei werden, wieder kontaktiert.
 <?php endif; ?>
 
-Falls du zwischenzeitlich andere Pläne machst, dann melde dich bitte bei diesem Event wieder ab.
+Sollten sich zwischenzeitlich deine Pläne geändert haben, und du nicht am Event teilnehmen kannst, dann melde dich bitte wieder ab.
 
 Bitte antworte nicht auf diese Nachricht, sondern nutze für Rückfragen bitte folgende E-Mail-Adresse:
 
