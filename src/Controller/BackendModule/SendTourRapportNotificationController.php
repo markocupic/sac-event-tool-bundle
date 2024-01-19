@@ -18,6 +18,7 @@ use CloudConvert\Exceptions\HttpClientException;
 use Codefog\HasteBundle\Form\Form;
 use Contao\BackendTemplate;
 use Contao\CalendarEventsModel;
+use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\Framework\Adapter;
@@ -71,6 +72,7 @@ class SendTourRapportNotificationController extends AbstractController
     private Adapter $message;
     private Adapter $system;
     private Adapter $events;
+    private Adapter $config;
 
     public function __construct(
         private readonly ContaoFramework $framework,
@@ -92,6 +94,7 @@ class SendTourRapportNotificationController extends AbstractController
         $this->message = $this->framework->getAdapter(Message::class);
         $this->system = $this->framework->getAdapter(System::class);
         $this->events = $this->framework->getAdapter(Events::class);
+        $this->config = $this->framework->getAdapter(Config::class);
     }
 
     public function __invoke(int $rapport_id, string $sid, string $rt, Request $request, string $action = ''): Response
@@ -155,10 +158,16 @@ class SendTourRapportNotificationController extends AbstractController
                     $this->sacevtEventTourRapportFileNamePattern,
                 )
                 ;
+
+            if (false === $rapportFile->getSize() || 5000 > $rapportFile->getSize()) {
+                throw new \Exception(sprintf('File conversion failed. File size of the converted file "%s" is too small. File size: %d bytes!', $rapportFile->getFilename(), $rapportFile->getSize()));
+            }
         } catch (HttpClientException $e) {
             $pdfConversionError = $this->translator->trans('ERR.evt_strn_cloudconvConversionCreditUsedUp', ['Tourrapport'], 'contao_default');
+            $this->notifyAdminOnError($e);
         } catch (\Exception $e) {
             $pdfConversionError = $this->translator->trans('ERR.evt_strn_cloudconvUnexpectedError', ['Tourrapport'], 'contao_default');
+            $this->notifyAdminOnError($e);
         }
 
         if (!empty($pdfConversionError)) {
@@ -179,10 +188,16 @@ class SendTourRapportNotificationController extends AbstractController
                     $this->sacevtEventTourInvoiceFileNamePattern,
                 )
                 ;
+
+            if (false === $invoiceFile->getSize() || 5000 > $invoiceFile->getSize()) {
+                throw new \Exception(sprintf('File conversion failed. File size of the converted file "%s" is too small. File size: %d bytes!', $invoiceFile->getFilename(), $invoiceFile->getSize()));
+            }
         } catch (HttpClientException $e) {
             $pdfConversionError = $this->translator->trans('ERR.evt_strn_cloudconvConversionCreditUsedUp', ['Vergütungsformular'], 'contao_default');
+            $this->notifyAdminOnError($e);
         } catch (\Exception $e) {
             $pdfConversionError = $this->translator->trans('ERR.evt_strn_cloudconvUnexpectedError', ['Vergütungsformular'], 'contao_default');
+            $this->notifyAdminOnError($e);
         }
 
         if (!empty($pdfConversionError)) {
@@ -526,5 +541,20 @@ class SendTourRapportNotificationController extends AbstractController
         $bagAll = array_values($bagAll);
 
         $session->set(self::SESSION_BAG_KEY, $bagAll);
+    }
+
+    protected function notifyAdminOnError(\Exception $e): void
+    {
+        $adminName = $this->config->get('adminName') ?? 'Administrator';
+        $adminEmail = $this->config->get('adminEmail');
+
+        if ($adminEmail && $adminName) {
+            $email = new Email();
+            $email->subject = 'Could not send tour report notification due to an error.';
+            $email->text = 'Error message: '.$e->getMessage()."\r\n".'Line: '.$e->getLine()."\r\n".'Stack trace: '."\r\n".$e->getTraceAsString();
+            $email->fromName = $adminName;
+            $email->from = $adminEmail;
+            $email->sendTo($adminEmail);
+        }
     }
 }
