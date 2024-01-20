@@ -20,6 +20,7 @@ use Contao\Controller;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\DataContainer;
 use Contao\Image;
@@ -131,19 +132,18 @@ readonly class CalendarEventsInstructorInvoice
             case 'overrideAll':
                 Message::addError($this->translator->trans('ERR.actionNotSupported', [], 'contao_default'));
                 Controller::redirect(System::getReferer());
-                // no break
+            // no break
             case 'edit':
             case 'delete':
+                // A common user should not be allowed to edit another user's report
+                if (!$this->security->isGranted('ROLE_ADMIN')) {
+                    $id = $this->requestStack->getCurrentRequest()->query->get('id');
+                    $userPid = (int) $this->connection->fetchOne('SELECT userPid FROM tl_calendar_events_instructor_invoice WHERE id = ?', [$id]);
 
-            // A common user should not be allowed to edit another user's report
-            if (!$this->security->isGranted('ROLE_ADMIN')) {
-                $id = $this->requestStack->getCurrentRequest()->query->get('id');
-                $userPid = (int) $this->connection->fetchOne('SELECT userPid FROM tl_calendar_events_instructor_invoice WHERE id = ?', [$id]);
-
-                if ((int) $user->id !== $userPid) {
-                    throw new AccessDeniedException('Not enough permissions to '.$act.' data record ID '.$id.'.');
+                    if ((int) $user->id !== $userPid) {
+                        throw new AccessDeniedException('Not enough permissions to '.$act.' data record ID '.$id.'.');
+                    }
                 }
-            }
         }
     }
 
@@ -168,19 +168,19 @@ readonly class CalendarEventsInstructorInvoice
                 $objTemplator = $this->tourRapportGenerator;
 
                 if ('generateInvoiceDocx' === $request->query->get('action')) {
-                    $objTemplator->download('invoice', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
+                    throw new ResponseException($objTemplator->download('invoice', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern));
                 }
 
                 if ('generateInvoicePdf' === $request->query->get('action')) {
-                    $objTemplator->download('invoice', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern);
+                    throw new ResponseException($objTemplator->download('invoice', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourInvoice, $this->sacevtEventTourInvoiceFileNamePattern));
                 }
 
                 if ('generateTourRapportDocx' === $request->query->get('action')) {
-                    $objTemplator->download('rapport', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
+                    throw new ResponseException($objTemplator->download('rapport', $objEventInvoice, 'docx', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern));
                 }
 
                 if ('generateTourRapportPdf' === $request->query->get('action')) {
-                    $objTemplator->download('rapport', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern);
+                    throw new ResponseException($objTemplator->download('rapport', $objEventInvoice, 'pdf', $this->sacevtEventTemplateTourRapport, $this->sacevtEventTourRapportFileNamePattern));
                 }
             }
         }

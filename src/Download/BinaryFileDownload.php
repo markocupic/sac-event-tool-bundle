@@ -14,34 +14,27 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Download;
 
-use Contao\CoreBundle\Exception\ResponseException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\String\UnicodeString;
 
 class BinaryFileDownload
 {
-    public function sendFileToBrowser(string $filePath, string $filename = '', bool $inline = false, bool $deleteFileAfterSend = false): BinaryFileResponse
+    /**
+     * Returns a BinaryFileResponse object with original or customized file name and disposition header.
+     */
+    public function sendFileToBrowser(string $filePath, string $fileName = '', bool $inline = false, bool $deleteFileAfterSend = false): BinaryFileResponse
     {
         $response = new BinaryFileResponse($filePath);
-        $response->setPrivate(); // public by default
-        $response->setAutoEtag();
 
         $response->setContentDisposition(
             $inline ? ResponseHeaderBag::DISPOSITION_INLINE : ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $filename,
-            (new UnicodeString(basename($filePath)))->ascii()->toString()
+            $fileName,
+            (new UnicodeString(basename($filePath)))->ascii()->toString(),
         );
 
-        $mimeTypes = new MimeTypes();
-        $mimeType = $mimeTypes->guessMimeType($filePath);
-
-        $response->headers->addCacheControlDirective('must-revalidate');
-        $response->headers->set('Connection', 'close');
-        $response->headers->set('Content-Type', $mimeType);
         $response->deleteFileAfterSend($deleteFileAfterSend);
 
-        throw new ResponseException($response);
+        return $response;
     }
 }

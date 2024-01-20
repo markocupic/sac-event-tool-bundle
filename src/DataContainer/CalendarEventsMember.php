@@ -23,6 +23,7 @@ use Contao\Controller;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -59,7 +60,6 @@ use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -256,23 +256,21 @@ class CalendarEventsMember
      * @throws CreateTemporaryFileException
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
-    public function exportMemberList(DataContainer $dc): Response|null
+    public function exportMemberList(DataContainer $dc): void
     {
         $request = $this->requestStack->getCurrentRequest();
 
         if ($request->query->has('id') && null !== ($objEvent = $this->calendarEvents->findByPk($request->query->get('id')))) {
             // Download the registration list as a docx file
             if ('downloadEventRegistrationListDocx' === $request->query->get('action')) {
-                return $this->registrationListGeneratorDocx->generate($objEvent, 'docx');
+                throw new ResponseException($this->registrationListGeneratorDocx->generate($objEvent, 'docx'));
             }
 
             // Download the registration list as a csv file
             if ('downloadEventRegistrationListCsv' === $request->query->get('action')) {
-                return $this->registrationListGeneratorCsv->generate($objEvent);
+                throw new ResponseException($this->registrationListGeneratorCsv->generate($objEvent));
             }
         }
-
-        return null;
     }
 
     /**

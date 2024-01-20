@@ -64,7 +64,7 @@ class TourRapportGenerator
      * the event report or the invoice/reimbursement form
      * as a file on the file system.
      */
-    public function generate(string $documentType, CalendarEventsInstructorInvoiceModel $eventInvoice, string $outputType, string $templateSRC, string $strFilenamePattern): \SplFileObject
+    public function generate(string $documentType, CalendarEventsInstructorInvoiceModel $eventInvoice, string $outputType, string $docxTemplateSrc, string $strFilenamePattern): \SplFileObject
     {
         $event = $this->calendarEventsModel->findByPk($eventInvoice->pid);
 
@@ -91,64 +91,57 @@ class TourRapportGenerator
             throw new \Exception(sprintf('User with ID %d not found.', $eventInvoice->userPid));
         }
 
+        $docxTemplateSrc = Path::makeAbsolute($docxTemplateSrc, $this->projectDir);
+
         $fileName = sprintf($strFilenamePattern, $event->id.'_'.$eventInvoice->userPid, 'docx');
-        $targetPathDocx = $this->projectDir.'/'.$this->sacevtTempDir.'/'.$fileName;
+        $targetPathDocx = Path::makeAbsolute($this->sacevtTempDir.'/'.$fileName, $this->projectDir);
         $targetPathPdf = str_replace('.docx', '.pdf', $targetPathDocx);
 
-        $phpWord = new MsWordTemplateProcessor($templateSRC, Path::makeRelative($targetPathDocx, $this->projectDir));
+        $objPhpWord = new MsWordTemplateProcessor($docxTemplateSrc, $targetPathDocx);
 
         // Page #1
         // Tour rapport
-        $this->docxEventHelper->setTourRapportData($phpWord, $event, $eventInvoice, $beneficiary);
+        $this->docxEventHelper->setTourRapportData($objPhpWord, $event, $eventInvoice, $beneficiary);
 
         // Page #1 + #2
         // Event data
-        $this->docxEventHelper->setEventData($phpWord, $event);
+        $this->docxEventHelper->setEventData($objPhpWord, $event);
 
         // Page #2
         // Member list
         if (self::DOCUMENT_TYPE_RAPPORT === $documentType) {
-            $this->docxEventMemberHelper->setEventMemberData($phpWord, $event, $this->docxEventMemberHelper->getParticipatedEventMembers($event));
+            $this->docxEventMemberHelper->setEventMemberData($objPhpWord, $event, $this->docxEventMemberHelper->getParticipatedEventMembers($event));
         }
 
         if (self::OUTPUT_TYPE_PDF === $outputType) {
             // Use the cached version of the PDF file, if...
             // - data has not been changed and
             // - no changes have been made to the template
-            $hashCode = hash('md5', json_encode($phpWord->getData()).hash_file('md5', $this->projectDir.'/'.$templateSRC));
+            $hashCode = hash('md5', json_encode($objPhpWord->getData()).hash_file('md5', $docxTemplateSrc));
 
             // Generate DOCX file from template;
-            $phpWord->generateUncached(true)
-                ->generate()
-            ;
+            $objSplFileDocx = $objPhpWord->generate();
 
             // Generate the PDF document
-            $this->convertFile
-                ->sendToBrowser(false, false, true)
-                ->file($targetPathDocx)
+            return $this->convertFile
+                ->file($objSplFileDocx->getRealPath())
                 ->uncached(false)
                 ->setCacheHashCode($hashCode)
                 ->convertTo(self::OUTPUT_TYPE_PDF, $targetPathPdf)
                 ;
-
-            return new \SplFileObject($targetPathPdf);
         }
 
         if (self::OUTPUT_TYPE_DOCX === $outputType) {
             // Generate the DOCX version
-            $phpWord->generateUncached(true)
-                ->generate()
-                ;
-
-            return new \SplFileObject($targetPathDocx);
+            return $objPhpWord->generate();
         }
 
         throw new \LogicException(sprintf('Invalid output Type "%s". Type must be "%s" or "%s".', self::OUTPUT_TYPE_DOCX, self::OUTPUT_TYPE_PDF, $outputType));
     }
 
-    public function download(string $documentType, CalendarEventsInstructorInvoiceModel $eventInvoice, string $outputType, string $templateSRC, string $strFilenamePattern): BinaryFileResponse
+    public function download(string $documentType, CalendarEventsInstructorInvoiceModel $eventInvoice, string $outputType, string $docxTemplateSrc, string $strFilenamePattern): BinaryFileResponse
     {
-        $splFileObject = $this->generate($documentType, $eventInvoice, $outputType, $templateSRC, $strFilenamePattern);
+        $splFileObject = $this->generate($documentType, $eventInvoice, $outputType, $docxTemplateSrc, $strFilenamePattern);
 
         return $this->binaryFileDownload->sendFileToBrowser($splFileObject->getRealPath(), '', false, true);
     }

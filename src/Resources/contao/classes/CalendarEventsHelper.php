@@ -51,7 +51,6 @@ use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Markocupic\SacEventToolBundle\Model\TourTypeModel;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\UriSigner;
 
 class CalendarEventsHelper
@@ -1036,9 +1035,6 @@ class CalendarEventsHelper
         /** @var UriSigner $uriSigner */
         $uriSigner = System::getContainer()->get('uri_signer');
 
-        /** @var Request $request */
-        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
-
         /** @var UrlParser $urlParser */
         $urlParser = System::getContainer()->get(UrlParser::class);
 
@@ -1054,8 +1050,9 @@ class CalendarEventsHelper
                     if ($objPage instanceof PageModel) {
                         $params = (Config::get('useAutoItem') ? '/' : '/events/').($objEvent->alias ?: $objEvent->id);
                         $strUrl = StringUtil::ampersand($objPage->getFrontendUrl($params));
+
                         $strUrl = $urlParser->addQueryString('event_preview=true', $strUrl);
-                        $strUrl = $uriSigner->sign($request->getSchemeAndHttpHost().'/'.$strUrl);
+                        $strUrl = $uriSigner->sign($strUrl);
                     }
                 }
             }

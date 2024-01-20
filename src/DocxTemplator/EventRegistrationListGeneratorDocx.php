@@ -25,10 +25,10 @@ use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\Event;
 use Markocupic\SacEventToolBundle\DocxTemplator\Helper\EventMember;
+use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
-use PhpOffice\PhpWord\Exception\CopyFileException;
-use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Filesystem\Path;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class EventRegistrationListGeneratorDocx
 {
@@ -39,6 +39,7 @@ class EventRegistrationListGeneratorDocx
 
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly BinaryFileDownload $binaryFileDownload,
         private readonly Event $eventHelper,
         private readonly EventMember $eventMemberHelper,
         private readonly ConvertFile $convertFile,
@@ -56,11 +57,7 @@ class EventRegistrationListGeneratorDocx
         $this->framework->initialize();
     }
 
-    /**
-     * @throws CopyFileException
-     * @throws CreateTemporaryFileException
-     */
-    public function generate(CalendarEventsModel $objEvent, string $outputType = 'docx'): Response
+    public function generate(CalendarEventsModel $objEvent, string $outputType = 'docx'): BinaryFileResponse
     {
         $objEventMember = $this->calendarEventsMemberModelAdapter->findBy(
             [
@@ -82,9 +79,13 @@ class EventRegistrationListGeneratorDocx
             $this->controllerAdapter->redirect(System::getReferer());
         }
 
-        // Create phpWord instance
+        $docxTemplateSrc = Path::makeAbsolute($this->sacevtEventTemplateMemberList, $this->projectDir);
+
         $targetFilePath = $this->sacevtTempDir.'/'.sprintf($this->sacevtEventMemberListFileNamePattern, time(), 'docx');
-        $objPhpWord = new MsWordTemplateProcessor($this->sacevtEventTemplateMemberList, $targetFilePath);
+        $targetFilePath = Path::makeAbsolute($targetFilePath, $this->projectDir);
+
+        // Create PhpWord instance
+        $objPhpWord = new MsWordTemplateProcessor($docxTemplateSrc, $targetFilePath);
 
         // Get event data
         $this->eventHelper->setEventData($objPhpWord, $objEvent);
@@ -94,26 +95,23 @@ class EventRegistrationListGeneratorDocx
 
         if ('pdf' === $outputType) {
             // Generate Docx file from template;
-            $objPhpWord->generateUncached(true)
-                ->sendToBrowser(false, true)
-                ->generate()
-            ;
+            $objSplFileDocx = $objPhpWord->generate();
 
             // Generate pdf
-            return $this->convertFile
-                ->file($this->projectDir.'/'.$targetFilePath)
-                ->sendToBrowser(true, true, true)
+            $objSplFilePdf = $this->convertFile
+                ->file($objSplFileDocx->getRealPath())
                 ->uncached(true)
                 ->convertTo('pdf')
-                ;
+            ;
+
+            return $this->binaryFileDownload->sendFileToBrowser($objSplFilePdf->getRealPath(), '', true, true);
         }
 
         if ('docx' === $outputType) {
             // Generate Docx file from template;
-            return $objPhpWord->generateUncached(true)
-                ->sendToBrowser(true)
-                ->generate()
-            ;
+            $objSplFileDocx = $objPhpWord->generate();
+
+            return $this->binaryFileDownload->sendFileToBrowser($objSplFileDocx->getRealPath(), '', true, true);
         }
 
         throw new \LogicException('No output type defined. Please define the output type either "docx" or "pdf".');

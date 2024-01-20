@@ -18,6 +18,7 @@ use Codefog\HasteBundle\Form\Form;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\Environment;
@@ -36,6 +37,7 @@ use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\Download\BinaryFileDownload;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
 use Markocupic\SacEventToolBundle\String\PhoneNumber;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -138,7 +140,8 @@ class CsvUserExportController extends AbstractFrontendModuleController
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'leiterQualifikation', 'lastLogin', 'userRole'];
                     $strGroupFieldName = 'userRole';
                     $result = $this->connection->executeQuery('SELECT * FROM tl_user ORDER BY lastname, firstname');
-                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, UserRoleModel::class, $blnKeepGroupsInOneLine);
+
+                    throw new ResponseException($this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, UserRoleModel::class, $blnKeepGroupsInOneLine));
                 }
 
                 if ('user-group-export' === $request->request->get('export-type')) {
@@ -146,7 +149,8 @@ class CsvUserExportController extends AbstractFrontendModuleController
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'sacMemberId', 'disable', 'rescissionCause', 'admin', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
                     $result = $this->connection->executeQuery('SELECT * FROM tl_user ORDER BY lastname, firstname');
-                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, UserGroupModel::class, $blnKeepGroupsInOneLine);
+
+                    throw new ResponseException($this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, UserGroupModel::class, $blnKeepGroupsInOneLine));
                 }
 
                 if ('member-group-export' === $request->request->get('export-type')) {
@@ -154,7 +158,8 @@ class CsvUserExportController extends AbstractFrontendModuleController
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
                     $result = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember=? ORDER BY lastname, firstname', ['1']);
-                    $this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, MemberGroupModel::class, $blnKeepGroupsInOneLine);
+
+                    throw new ResponseException($this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, MemberGroupModel::class, $blnKeepGroupsInOneLine));
                 }
             }
         }
@@ -169,7 +174,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
      * @throws \Doctrine\DBAL\Exception
      * @throws InvalidArgument
      */
-    private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $result, string $GroupModelClassName, bool $blnKeepGroupsInOneLine = false): Response
+    private function exportTable(string $type, string $strTable, array $arrFields, string $strGroupFieldName, Result $result, string $GroupModelClassName, bool $blnKeepGroupsInOneLine = false): BinaryFileResponse
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -334,7 +339,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
      * @throws Exception
      * @throws InvalidArgument
      */
-    private function sendToBrowser(array $arrData, string $filename): Response
+    private function sendToBrowser(array $arrData, string $filename): BinaryFileResponse
     {
         /** @var Writer $writerAdapter */
         $writerAdapter = $this->framework->getAdapter(Writer::class);

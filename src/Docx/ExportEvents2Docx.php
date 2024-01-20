@@ -35,7 +35,7 @@ use PhpOffice\PhpWord\Exception\Exception;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use Safe\DateTime;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ExportEvents2Docx
 {
@@ -55,7 +55,7 @@ class ExportEvents2Docx
     /**
      * @throws Exception
      */
-    public function generate(int $year, string $eventId = null): Response
+    public function generate(int $year, string $eventId = null): BinaryFileResponse
     {
         $this->strTable = 'tl_calendar_events';
         Controller::loadDataContainer('tl_calendar_events');

@@ -36,8 +36,10 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Security\Core\Security;
 
@@ -191,11 +193,14 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     // Log
                     $systemAdapter->log(sprintf('New event confirmation download. SAC-User-ID: %d. Event-ID: %s.', $objMember->sacMemberId, $objEvent->id), __FILE__.' Line: '.__LINE__, Log::DOWNLOAD_CERTIFICATE_OF_ATTENDANCE);
 
-                    // Create phpWord instance
                     $filenamePattern = str_replace('%%d', '%d', $this->sacevtEventCourseConfirmationFileNamePattern);
                     $filename = sprintf($filenamePattern, $objMember->sacMemberId, $objRegistration->id, 'docx');
-                    $destFilename = $this->sacevtTempDir.'/'.$filename;
-                    $objPhpWord = new MsWordTemplateProcessor($this->sacevtEventTemplateCourseConfirmation, $destFilename);
+                    $destFilename = Path::makeAbsolute($this->sacevtTempDir.'/'.$filename, $this->projectDir);
+
+                    $docxTemplateSrc = Path::makeAbsolute($this->sacevtEventTemplateCourseConfirmation, $this->projectDir);
+
+                    // Create PhpWord instance
+                    $objPhpWord = new MsWordTemplateProcessor($docxTemplateSrc, $destFilename);
 
                     // Replace template vars
                     $objPhpWord->replace('eventDates', implode(', ', $arrDates));
@@ -209,18 +214,16 @@ class MemberDashboardPastEventsController extends AbstractFrontendModuleControll
                     $objPhpWord->replace('courseId', $courseId);
 
                     // Generate MS Word file and send it to the browser
-                    $objPhpWord->generateUncached(false)
-                        ->sendToBrowser(false)
-                        ->generate()
-                    ;
+                    $objSplFileDocx = $objPhpWord->generate();
 
                     // Generate pdf
-                    return $this->convertFile
-                        ->file($this->projectDir.'/'.$destFilename)
+                    $objSplFilePdf = $this->convertFile
+                        ->file($objSplFileDocx->getRealPath())
                         ->uncached(false)
-                        ->sendToBrowser(true, true)
                         ->convertTo('pdf')
                         ;
+
+                    return $this->file($objSplFilePdf->getRealPath(), null, ResponseHeaderBag::DISPOSITION_INLINE);
                 }
 
                 throw new \Exception('There was an error while trying to generate the course confirmation.');
