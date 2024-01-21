@@ -21,8 +21,8 @@
     {% if passedConfirmation is same as false %}
         <div class="alert alert-dark flex-column" role="alert">
             Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten unwiderruflich gelöscht.
-            Deine Tourhistory ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.
-            Dieser Vorgang kann allerdings nur durchgeführt werden, wenn du keine hängigen Tourenbuchungen hast.
+            Deine Tour-History ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.
+            Bitte beachte, dass dieser Vorgang nur ausgeführt werden, wenn du keine hängigen Tour-Buchungen hast.
             <br><br>
             <div class="d-block">
                 <a href="{{ '{{env::request}}' }}?action=clear-profile" class="clear-profile-link btn btn-danger">Mein Profil löschen</a>
@@ -33,8 +33,8 @@
     {% if passedConfirmation is same as true %}
         <div class="alert alert-dark" id="lastWarningAlert" role="alert">
             Falls du dich entscheidest, dein Profil zu löschen, werden alle deine persönlichen Daten unwiderruflich gelöscht.
-            Deine Tourhistory ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.
-            Dieser Vorgang kann allerdings nur durchgeführt werden, wenn du keine noch hängigen Tourenbuchungen hast.
+            Deine Tour-History ist danach nicht mehr aufrufbar und dein Konto wird deaktiviert und du wirst ausgeloggt.
+            Bitte beachte, dass dieser Vorgang nur ausgeführt werden, wenn du keine hängigen Tour-Buchungen hast.
         </div>
 
         <br>
@@ -63,6 +63,3 @@
     {% endif %}
 
 {% endblock %}
-
-
-
