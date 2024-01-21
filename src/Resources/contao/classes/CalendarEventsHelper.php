@@ -488,7 +488,7 @@ class CalendarEventsHelper
         return sprintf(
             '<img src="%s/icons/event_states/%s.svg" title="%s">',
             Bundle::ASSET_DIR,
-			$strState,
+            $strState,
             $strLabel,
         );
     }

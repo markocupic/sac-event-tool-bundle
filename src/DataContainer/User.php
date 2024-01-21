@@ -68,7 +68,7 @@ class User
         $request = $this->requestStack->getCurrentRequest();
 
         if ('user' === $request->query->get('do') && 'edit' === $request->query->get('act') && '' !== $request->query->get('ref')) {
-            $GLOBALS['TL_JAVASCRIPT'][] = Bundle::ASSET_DIR . '/js/backend_member_autocomplete.js';
+            $GLOBALS['TL_JAVASCRIPT'][] = Bundle::ASSET_DIR.'/js/backend_member_autocomplete.js';
         }
     }
 
