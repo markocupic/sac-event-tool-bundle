@@ -19,7 +19,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Docx\ExportEvents2Docx;
-use Markocupic\SacEventToolBundle\Ical\SendEventIcal;
+use Markocupic\SacEventToolBundle\ICal\EventICal;
 use Markocupic\SacEventToolBundle\Pdf\WorkshopBookletGenerator;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,7 +32,7 @@ class DownloadController extends AbstractController
         private readonly ContaoFramework $framework,
         private readonly WorkshopBookletGenerator $workshopBookletGenerator,
         private readonly ExportEvents2Docx $exportEvents2Docx,
-        private readonly SendEventIcal $sendEventIcal,
+        private readonly EventICal $eventICal,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
         $this->framework->initialize();
@@ -113,7 +113,7 @@ class DownloadController extends AbstractController
      * Send ICal to the browser.
      */
     #[Route('/_download/download_event_ical/{eventId}', name: 'sac_event_tool_download_event_ical', defaults: ['_scope' => 'frontend', '_token_check' => false])]
-    public function downloadEventIcalAction(int $eventId): Response
+    public function downloadEventICalAction(int $eventId): Response
     {
         /** @var CalendarEventsModel $calendarEventsModelAdapter */
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
@@ -121,7 +121,7 @@ class DownloadController extends AbstractController
         $objEvent = $calendarEventsModelAdapter->findByPk($eventId);
 
         if (null !== $objEvent) {
-            return $this->sendEventIcal->downloadICal($objEvent);
+            return $this->eventICal->download($objEvent);
         }
 
         return new Response('ICal download failed. Please check if the event id is valid.', Response::HTTP_BAD_REQUEST);
