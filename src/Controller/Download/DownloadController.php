@@ -110,7 +110,7 @@ class DownloadController extends AbstractController
     }
 
     /**
-     * Send ical to the browser.
+     * Send ICal to the browser.
      */
     #[Route('/_download/download_event_ical/{eventId}', name: 'sac_event_tool_download_event_ical', defaults: ['_scope' => 'frontend', '_token_check' => false])]
     public function downloadEventIcalAction(int $eventId): Response
@@ -121,10 +121,10 @@ class DownloadController extends AbstractController
         $objEvent = $calendarEventsModelAdapter->findByPk($eventId);
 
         if (null !== $objEvent) {
-            $this->sendEventIcal->sendEventIcalToBrowser($objEvent);
+            return $this->sendEventIcal->downloadICal($objEvent);
         }
 
-        return new Response('Ical download failed. Please check if the event id is valid.', Response::HTTP_BAD_REQUEST);
+        return new Response('ICal download failed. Please check if the event id is valid.', Response::HTTP_BAD_REQUEST);
     }
 
     /**

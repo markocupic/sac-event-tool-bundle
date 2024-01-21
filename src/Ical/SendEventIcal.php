@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Ical;
 
 use Contao\CalendarEventsModel;
-use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\InsertTag\InsertTagParser;
@@ -28,7 +27,6 @@ use Eluceo\iCal\Domain\ValueObject\SingleDay;
 use Eluceo\iCal\Domain\ValueObject\Uri;
 use Eluceo\iCal\Presentation\Factory\CalendarFactory;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class SendEventIcal
@@ -38,17 +36,13 @@ class SendEventIcal
 
     public function __construct(
         private readonly ContaoFramework $framework,
-        private readonly RequestStack $requestStack,
         private readonly InsertTagParser $insertTagParser,
     ) {
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->events = $this->framework->getAdapter(Events::class);
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function sendEventIcalToBrowser(CalendarEventsModel $objEvent): void
+    public function downloadICal(CalendarEventsModel $objEvent): Response
     {
         $dateFormat = 'd.m.Y';
 
@@ -60,8 +54,8 @@ class SendEventIcal
         $location = strip_tags(html_entity_decode((string) $objEvent->location));
         $location = $this->insertTagParser->replaceInline($location);
 
-        // Get url
-        $url = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost().'/'.$this->events->generateEventUrl($objEvent);
+        // Get the url
+        $url = $this->events->generateEventUrl($objEvent, true);
 
         $arrEvents = [];
         $arrEventTstamps = $this->calendarEventsHelper->getEventTimestamps($objEvent);
@@ -76,6 +70,7 @@ class SendEventIcal
                 ->setUrl(new Uri($url))
                 ->setOccurrence($occurrence)
                      ;
+
             $arrEvents[] = $vEvent;
         }
 
@@ -87,6 +82,6 @@ class SendEventIcal
         $response->headers->set('Content-Type', 'text/calendar; charset=utf-8');
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$objEvent->alias.'.ics"');
 
-        throw new ResponseException($response);
+        return $response;
     }
 }
