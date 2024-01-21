@@ -16,6 +16,7 @@ namespace Markocupic\SacEventToolBundle\Download;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\String\UnicodeString;
 
 class BinaryFileDownload
@@ -26,12 +27,21 @@ class BinaryFileDownload
     public function sendFileToBrowser(string $filePath, string $fileName = '', bool $inline = false, bool $deleteFileAfterSend = false): BinaryFileResponse
     {
         $response = new BinaryFileResponse($filePath);
+        $response->setPrivate(); // public by default
+        $response->setAutoEtag();
 
         $response->setContentDisposition(
             $inline ? ResponseHeaderBag::DISPOSITION_INLINE : ResponseHeaderBag::DISPOSITION_ATTACHMENT,
             $fileName,
             (new UnicodeString(basename($filePath)))->ascii()->toString(),
         );
+
+        $mimeTypes = new MimeTypes();
+        $mimeType = $mimeTypes->guessMimeType($filePath);
+
+        $response->headers->addCacheControlDirective('must-revalidate');
+        $response->headers->set('Connection', 'close');
+        $response->headers->set('Content-Type', $mimeType);
 
         $response->deleteFileAfterSend($deleteFileAfterSend);
 
