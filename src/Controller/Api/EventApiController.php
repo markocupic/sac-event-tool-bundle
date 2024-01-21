@@ -155,6 +155,7 @@ class EventApiController extends AbstractController
         $this->framework->initialize();
 
         $calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
+        $calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
 
         $eventId = (int) $request->request->get('id');
         $arrFields = '' !== $request->get('fields') ? explode(',', $request->get('fields')) : [];
@@ -178,7 +179,7 @@ class EventApiController extends AbstractController
                     }
                 }
 
-                $arrEvent[$k] = $this->prepareValue($this->calendarEventsHelper->getEventData($objEvent, $k));
+                $arrEvent[$k] = $this->prepareValue($calendarEventsHelper->getEventData($objEvent, $k));
             }
             $arrJSON['arrEventData'] = $arrEvent;
         }
