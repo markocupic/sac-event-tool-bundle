@@ -58,7 +58,7 @@ class SyncSacMemberDatabase
         private readonly Connection $connection,
         private readonly PasswordHasherFactory $passwordHasherFactory,
         private readonly Util $util,
-        #[SensitiveParameter]
+        #[\SensitiveParameter]
         private readonly array $sacevtMemberSyncCredentials,
         private readonly string $projectDir,
         private readonly string $sacevtLocale,
