@@ -18,6 +18,7 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\Date;
 use Contao\Input;
 use Contao\System;
+use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventMountainGuide;
 use Markocupic\SacEventToolBundle\Config\EventState;
@@ -165,7 +166,7 @@ PaletteManipulator::create()
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year'] = [
     'href'                   => 'transformDates=+52weeks',
     'class'                  => 'global_op_icon_class',
-    'icon'                   => 'bundles/markocupicsaceventtool/icons/fontawesome/default/calendar-plus-regular.svg',
+    'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/calendar-plus-regular.svg',
     'attributes'             => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()" accesskey="e"',
     'custom_glob_op'         => true,
     'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => 10],
@@ -174,7 +175,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year'] = [
     'href'                   => 'transformDates=-52weeks',
     'class'                  => 'global_op_icon_class',
-    'icon'                   => 'bundles/markocupicsaceventtool/icons/fontawesome/default/calendar-minus-regular.svg',
+    'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/calendar-minus-regular.svg',
     'attributes'             => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()" accesskey="e"',
     'custom_glob_op'         => true,
     'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => 8],
@@ -183,7 +184,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
     'href'                   => 'action=onloadCallbackExportCalendar',
     'class'                  => 'header_icon',
-    'icon'                   => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-excel-regular.svg',
+    'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/file-excel-regular.svg',
     'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
     'custom_glob_op'         => true,
     'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
@@ -192,7 +193,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCal
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
     'href'                   => 'action=onloadCallbackExportCalendar',
     'class'                  => 'header_icon',
-    'icon'                   => 'bundles/markocupicsaceventtool/icons/fontawesome/default/file-excel-regular.svg',
+    'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/file-excel-regular.svg',
     'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
     'custom_glob_op'         => true,
     'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
@@ -204,22 +205,22 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle']['showIn
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['preview'] = [
     'href'       => 'action=preview', // use a button callback to generate the url
     'attributes' => 'target="_blank"',
-    'icon'       => 'bundles/markocupicsaceventtool/icons/fontawesome/default/presentation-screen-solid.svg',
+    'icon'       => Bundle::ASSET_DIR . '/icons/fontawesome/default/presentation-screen-solid.svg',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = [
     'href' => 'table=tl_calendar_events_member',
-    'icon' => 'bundles/markocupicsaceventtool/icons/fontawesome/default/people-group-regular.svg',
+    'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/people-group-regular.svg',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelPrev'] = [
     'href' => 'action=releaseLevelPrev', // use a button callback to generate the url
-    'icon' => 'bundles/markocupicsaceventtool/icons/fontawesome/default/square-arrow-down-solid.svg',
+    'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/square-arrow-down-solid.svg',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelNext'] = [
     'href' => 'action=releaseLevelNext', // use a button callback to generate the url
-    'icon' => 'bundles/markocupicsaceventtool/icons/fontawesome/default/square-arrow-up-solid.svg',
+    'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/square-arrow-up-solid.svg',
 ];
 
 // alias

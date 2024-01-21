@@ -1,5 +1,5 @@
 {% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.global.prod.js?3.3.4') %}
-{% do addJavascriptResource('bundles/markocupicsaceventtool/js/eventlist_vue.js|static') %}
+{% do addJavascriptResource(sacevt_asset_dir()~'/js/eventlist_vue.js|static') %}
 
 <div id="course-list" v-cloak>
     <span v-if="itemsTotal > 0" class="text-muted mb-3"><small>Zu deiner Suchanfrage wurden [[ itemsTotal ]] Events gefunden. </small></span>

@@ -38,6 +38,7 @@ use Contao\Template;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
+use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\EventType;
@@ -485,8 +486,9 @@ class CalendarEventsHelper
         $strLabel = $GLOBALS['TL_LANG']['MSC']['calendar_events'][$strState] ?? $strState;
 
         return sprintf(
-            '<img src="bundles/markocupicsaceventtool/icons/event_states/%s.svg" title="%s">',
-            $strState,
+            '<img src="%s/icons/event_states/%s.svg" title="%s">',
+            Bundle::ASSET_DIR,
+			$strState,
             $strLabel,
         );
     }

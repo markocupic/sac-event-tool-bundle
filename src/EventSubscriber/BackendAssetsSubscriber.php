@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\EventSubscriber;
 
 use Contao\CoreBundle\Routing\ScopeMatcher;
+use Markocupic\SacEventToolBundle\Config\Bundle;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -37,10 +38,10 @@ class BackendAssetsSubscriber implements EventSubscriberInterface
 
         if ($this->scopeMatcher->isBackendRequest($request)) {
             // Add Backend CSS
-            $GLOBALS['TL_CSS'][] = 'bundles/markocupicsaceventtool/css/be_stylesheet.css|static';
+            $GLOBALS['TL_CSS'][] = Bundle::ASSET_DIR . '/css/be_stylesheet.css|static';
 
             // Add Backend javascript
-            $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupicsaceventtool/js/backend_edit_all_navbar_helper.js';
+            $GLOBALS['TL_JAVASCRIPT'][] = Bundle::ASSET_DIR . '/js/backend_edit_all_navbar_helper.js';
 
             // Load Font Awesome key from configuration
             $GLOBALS['TL_HEAD'][] = '<script src="assets/contaocomponent-fontawesome-free/fontawesomefree/js/all.js"></script>';
