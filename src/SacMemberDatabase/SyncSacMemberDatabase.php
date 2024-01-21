@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\SacMemberDatabase;
 
-use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\FrontendUser;
 use Doctrine\DBAL\Connection;
@@ -25,6 +24,7 @@ use Markocupic\SacEventToolBundle\DataContainer\Util;
 use Markocupic\SacEventToolBundle\String\PhoneNumber;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -55,10 +55,10 @@ class SyncSacMemberDatabase
     ];
 
     public function __construct(
-        private readonly ContaoFramework $framework,
         private readonly Connection $connection,
         private readonly PasswordHasherFactory $passwordHasherFactory,
         private readonly Util $util,
+        #[SensitiveParameter]
         private readonly array $sacevtMemberSyncCredentials,
         private readonly string $projectDir,
         private readonly string $sacevtLocale,
@@ -140,7 +140,7 @@ class SyncSacMemberDatabase
      */
     private function fetchFilesFromFtp(): void
     {
-        $this->connection->executeStatement('DELETE FROM tl_log WHERE text LIKE "Update SAC-member%"');
+        $fs = new Filesystem();
 
         // Open FTP connection
         $connId = $this->openFtpConnection();
@@ -152,8 +152,8 @@ class SyncSacMemberDatabase
             $remoteFile = basename($localFile);
 
             // Delete old file
-            if (is_file($localFile)) {
-                unlink($localFile);
+            if ($fs->exists($localFile)) {
+                $fs->remove($localFile);
             }
 
             // Fetch file
@@ -203,7 +203,7 @@ class SyncSacMemberDatabase
             $arrDisabledMemberIDS = $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member WHERE isSacMember = ?', ['']);
             $arrDisabledMemberIDS = array_map('intval', $arrDisabledMemberIDS);
 
-            $arrAllMemberRemote = [];
+            $arrAllMembersRemote = [];
 
             $arrSectionIds = $this->connection->fetchFirstColumn('SELECT sectionId FROM tl_sac_section', []);
 
@@ -269,10 +269,10 @@ class SyncSacMemberDatabase
                             );
 
                             // Check if member is already in the array (allow multi membership)
-                            if (isset($arrAllMemberRemote[$setRemote['sacMemberId']])) {
-                                $arrAllMemberRemote[$setRemote['sacMemberId']]['sectionId'] = array_merge($arrAllMemberRemote[$setRemote['sacMemberId']]['sectionId'], $setRemote['sectionId']);
+                            if (isset($arrAllMembersRemote[$setRemote['sacMemberId']])) {
+                                $arrAllMembersRemote[$setRemote['sacMemberId']]['sectionId'] = array_merge($arrAllMembersRemote[$setRemote['sacMemberId']]['sectionId'], $setRemote['sectionId']);
                             } else {
-                                $arrAllMemberRemote[$setRemote['sacMemberId']] = $setRemote;
+                                $arrAllMembersRemote[$setRemote['sacMemberId']] = $setRemote;
                             }
                         }
                     }
@@ -280,41 +280,38 @@ class SyncSacMemberDatabase
                 }
             }
 
-            // Disable all records
+            // Disable all members
             $this->connection->executeStatement("UPDATE tl_member SET login = '', disable = '1', isSacMember = ''");
 
-            // Enable authorized members again
-            foreach (array_keys($arrAllMemberRemote) as $sacMemberId) {
-                $this->connection->executeStatement("UPDATE tl_member SET login = '', disable = '1', isSacMember = '' WHERE sacMemberId = ?", [$sacMemberId]);
-            }
-
+            // Insert new and activate existing members again
             $countInserts = 0;
             $countUpdates = 0;
             $i = 0;
 
-            foreach ($arrAllMemberRemote as $sacMemberId => $arrValuesRemote) {
+            foreach ($arrAllMembersRemote as $sacMemberId => $arrDataRemote) {
                 // Set the correct order and set the right indices,
                 // because we don't want the subsequent code
                 // to update the whole database every time.
-                $arrValuesRemote['sectionId'] = serialize($this->formatSectionId($arrValuesRemote['sectionId']));
+                $arrDataRemote['sectionId'] = serialize($this->formatSectionId($arrDataRemote['sectionId']));
 
+                // Insert new member
                 if (!\in_array($sacMemberId, $arrAllMemberIDS, true)) {
-                    $arrValuesRemote['dateAdded'] = time();
-                    $arrValuesRemote['tstamp'] = time();
-                    $arrValuesRemote['isSacMember'] = '1';
-                    $arrValuesRemote['login'] = '1';
-                    $arrValuesRemote['disable'] = '';
+                    $arrDataRemote['dateAdded'] = time();
+                    $arrDataRemote['tstamp'] = time();
+                    $arrDataRemote['isSacMember'] = '1';
+                    $arrDataRemote['login'] = '1';
+                    $arrDataRemote['disable'] = '';
 
                     // Insert new member
-                    if ($this->connection->insert('tl_member', $arrValuesRemote)) {
+                    if ($this->connection->insert('tl_member', $arrDataRemote)) {
                         // Log
-                        $msg = sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrValuesRemote['firstname'], $arrValuesRemote['lastname'], $arrValuesRemote['sacMemberId']);
+                        $msg = sprintf('Insert new SAC-member "%s %s" with SAC-User-ID: %s to tl_member.', $arrDataRemote['firstname'], $arrDataRemote['lastname'], $arrDataRemote['sacMemberId']);
 
                         $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_INSERT_NEW_MEMBER);
                         ++$countInserts;
                     }
                 } else {
-                    // Activate account again
+                    // Activate member account again
                     $set = [
                         'login' => '1',
                         'disable' => '',
@@ -324,14 +321,14 @@ class SyncSacMemberDatabase
                     $this->connection->update('tl_member', $set, ['sacMemberId' => $sacMemberId]);
 
                     // Update/sync data record, but only if there was a change
-                    if ($this->connection->update('tl_member', $arrValuesRemote, ['sacMemberId' => $sacMemberId])) {
+                    if ($this->connection->update('tl_member', $arrDataRemote, ['sacMemberId' => $sacMemberId])) {
                         $set = [
                             'tstamp' => time(),
                         ];
 
                         $this->connection->update('tl_member', $set, ['sacMemberId' => $sacMemberId]);
 
-                        $msg = sprintf('Update SAC-member "%s %s" with SAC-User-ID: %s in tl_member.', $arrValuesRemote['firstname'], $arrValuesRemote['lastname'], $arrValuesRemote['sacMemberId']);
+                        $msg = sprintf('Update SAC-member "%s %s" with SAC-User-ID: %s in tl_member.', $arrDataRemote['firstname'], $arrDataRemote['lastname'], $arrDataRemote['sacMemberId']);
                         $this->log(LogLevel::INFO, $msg, __METHOD__, Log::MEMBER_DATABASE_SYNC_UPDATE_NEW_MEMBER);
 
                         ++$countUpdates;
@@ -390,7 +387,7 @@ class SyncSacMemberDatabase
             }
         }
 
-        if ($i === \count($arrAllMemberRemote)) {
+        if ($i === \count($arrAllMembersRemote)) {
             $this->syncLog['processed'] = $i;
             $this->syncLog['inserts'] = $countInserts;
             $this->syncLog['updates'] = $countUpdates;
