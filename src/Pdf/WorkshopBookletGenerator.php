@@ -222,7 +222,7 @@ class WorkshopBookletGenerator
             $this->pdf->Output($path, 'F');
 
             // Send file to the browser
-            return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), false, true);
+            return $this->binaryFileDownload->sendFileToBrowser($path, basename($path), false, false);
         }
 
         $this->pdf->setTitle(basename($path));
@@ -254,8 +254,6 @@ class WorkshopBookletGenerator
                 }
                 $strDates = implode(', ', $arrValue);
                 $strDates = str_replace(', und ', ' und ', $strDates);
-            } else {
-                $strDates = Date::parse('d.m.Y', $arr[0]);
             }
         }
 
