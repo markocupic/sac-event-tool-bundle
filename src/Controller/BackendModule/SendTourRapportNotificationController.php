@@ -157,17 +157,17 @@ class SendTourRapportNotificationController extends AbstractController
                     $this->sacevtEventTemplateTourRapport,
                     $this->sacevtEventTourRapportFileNamePattern,
                 )
-                ;
+            ;
 
             if (false === $rapportFile->getSize() || 5000 > $rapportFile->getSize()) {
                 throw new \Exception(sprintf('File conversion failed. File size of the converted file "%s" is too small. File size: %d bytes!', $rapportFile->getFilename(), $rapportFile->getSize()));
             }
         } catch (HttpClientException $e) {
             $pdfConversionError = $this->translator->trans('ERR.evt_strn_cloudconvConversionCreditUsedUp', ['Tourrapport'], 'contao_default');
-            $this->notifyAdminOnError($e);
+            $this->notifyAdminOnError($e, $rapport_id);
         } catch (\Exception $e) {
             $pdfConversionError = $this->translator->trans('ERR.evt_strn_cloudconvUnexpectedError', ['Tourrapport'], 'contao_default');
-            $this->notifyAdminOnError($e);
+            $this->notifyAdminOnError($e, $rapport_id);
         }
 
         if (!empty($pdfConversionError)) {
@@ -187,17 +187,17 @@ class SendTourRapportNotificationController extends AbstractController
                     $this->sacevtEventTemplateTourInvoice,
                     $this->sacevtEventTourInvoiceFileNamePattern,
                 )
-                ;
+            ;
 
             if (false === $invoiceFile->getSize() || 5000 > $invoiceFile->getSize()) {
                 throw new \Exception(sprintf('File conversion failed. File size of the converted file "%s" is too small. File size: %d bytes!', $invoiceFile->getFilename(), $invoiceFile->getSize()));
             }
         } catch (HttpClientException $e) {
             $pdfConversionError = $this->translator->trans('ERR.evt_strn_cloudconvConversionCreditUsedUp', ['Vergütungsformular'], 'contao_default');
-            $this->notifyAdminOnError($e);
+            $this->notifyAdminOnError($e, $rapport_id);
         } catch (\Exception $e) {
             $pdfConversionError = $this->translator->trans('ERR.evt_strn_cloudconvUnexpectedError', ['Vergütungsformular'], 'contao_default');
-            $this->notifyAdminOnError($e);
+            $this->notifyAdminOnError($e, $rapport_id);
         }
 
         if (!empty($pdfConversionError)) {
@@ -216,6 +216,7 @@ class SendTourRapportNotificationController extends AbstractController
         } catch (\Exception $e) {
             $msg = $this->translator->trans('ERR.evt_strn_sendNotificationFailed', [$strRecipients], 'contao_default');
             $this->message->addError($msg);
+
             // IV. Redirect back to the referer page
             return $this->redirectBackToRefererPage($request);
         }
@@ -233,6 +234,7 @@ class SendTourRapportNotificationController extends AbstractController
             $msg = $this->translator->trans('ERR.evt_strn_sendNotificationFailed', [$strRecipients], 'contao_default');
             $this->message->addError($msg);
         }
+
         // IV. Redirect back to the referer page
         return $this->redirectBackToRefererPage($request);
     }
@@ -295,6 +297,7 @@ class SendTourRapportNotificationController extends AbstractController
     {
         $invoice = $this->getInvoice($id);
 
+        /** @var CalendarEventsModel $event */
         $event = $invoice->getRelated('pid');
 
         if (null === $event) {
@@ -457,7 +460,7 @@ class SendTourRapportNotificationController extends AbstractController
 
         try {
             $blnSend = $objEmail->sendTo(...$arrRecipients);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $blnSend = false;
         }
 
@@ -543,15 +546,25 @@ class SendTourRapportNotificationController extends AbstractController
         $session->set(self::SESSION_BAG_KEY, $bagAll);
     }
 
-    protected function notifyAdminOnError(\Exception $e): void
+    protected function notifyAdminOnError(\Exception $e, int $rapport_id): void
     {
         $adminName = $this->config->get('adminName') ?? 'Administrator';
         $adminEmail = $this->config->get('adminEmail');
 
         if ($adminEmail && $adminName) {
+            $security = System::getContainer()->get('security.helper');
+
             $email = new Email();
             $email->subject = 'Could not send tour report notification due to an error.';
-            $email->text = 'Error message: '.$e->getMessage()."\r\n".'Line: '.$e->getLine()."\r\n".'Stack trace: '."\r\n".$e->getTraceAsString();
+            $email->text = implode("\r\n\r\n", [
+                'Backend User: '.$security->getUser()->username,
+                'Rapport ID: '.(string) $rapport_id,
+                'Error message: '.$e->getMessage(),
+                'Instance of: '.\get_class($e),
+                'Code: '.$e->getCode(),
+                'Line: '.$e->getLine(),
+                'Stack trace: '."\r\n".$e->getTraceAsString(),
+            ]);
             $email->fromName = $adminName;
             $email->from = $adminEmail;
             $email->sendTo($adminEmail);
