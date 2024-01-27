@@ -191,8 +191,8 @@ class Event
 
         $transport = $calendarEventsJourneyModel->findByPk($objEvent->journey)->title ?? 'keine Angabe';
         $objPhpWord->replace('eventTransport', $this->prepareString($transport));
-        $objPhpWord->replace('eventCanceled', EventState::STATE_CANCELED === $objEvent->eventState || EventExecutionState::STATE_CANCELED === $objEvent->executionState ? 'Ja' : 'Nein');
-        $objPhpWord->replace('eventHasExecuted', EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED === $objEvent->executionState ? 'Ja' : 'Nein');
+        $objPhpWord->replace('eventCanceled', EventState::STATE_CANCELED === $objEvent->eventState ? 'Ja' : 'Nein');
+        $objPhpWord->replace('eventHasExecutedLikePredicted', EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED === $objEvent->executionState ? 'Ja' : 'Nein');
         $substitutionText = '' !== $objEvent->eventSubstitutionText ? $objEvent->eventSubstitutionText : '---';
         $objPhpWord->replace('eventSubstitutionText', $this->prepareString($substitutionText));
         $objPhpWord->replace('eventDuration', $this->prepareString($objEventInvoice->eventDuration));

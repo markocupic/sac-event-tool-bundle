@@ -121,6 +121,65 @@ class CalendarEvents
     }
 
     /**
+     * Jan 2024 Release
+	 * @see https://github.com/jonasmueller1/sac-pilatus-website/issues/115
+	 * @todo remove this after jan 2024 migration has been completed
+     */
+    #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 9990)]
+    public function migrate(DataContainer $dc): void
+    {
+        if (!Database::getInstance()->tableExists('tl_calendar_events')) {
+            die('DB tl_calendar_events existiert nicht!');
+        }
+
+        if (!Database::getInstance()->fieldExists('executionState_bak', 'tl_calendar_events')) {
+            die('Feld tl_calendar_events.executionState_bak existiert nicht!');
+        }
+
+        if (!Database::getInstance()->fieldExists('migration', 'tl_calendar_events')) {
+            die('Feld tl_calendar_events.migration existiert nicht!');
+        }
+
+        $events = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events', []);
+
+        foreach ($events as $event) {
+            $set = [];
+
+            if (!$event['migration']) {
+                $set['executionState_bak'] = $event['executionState'];
+                $set['migration'] = '1';
+                $set['executionState'] = '';
+
+                $this->connection->update('tl_calendar_events', $set, ['id' => (int) $event['id']]);
+
+                if ('event_canceled' === $event['executionState']) {
+                    $set['eventState'] = EventState::STATE_CANCELED;
+                    $set['executionState'] = EventExecutionState::STATE_NOT_EXECUTED_LIKE_PREDICTED;
+                    $this->connection->update('tl_calendar_events', $set, ['id' => (int) $event['id']]);
+                }
+
+                if ('event_rescheduled' === $event['executionState']) {
+                    $set['eventState'] = EventState::STATE_RESCHEDULED;
+                    $set['executionState'] = EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED;
+                    $this->connection->update('tl_calendar_events', $set, ['id' => (int) $event['id']]);
+                }
+
+                if (EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED === $event['executionState']) {
+                    $set['eventState'] = '';
+                    $set['executionState'] = EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED;
+                    $this->connection->update('tl_calendar_events', $set, ['id' => (int) $event['id']]);
+                }
+
+                if ('event_adapted' === $event['executionState']) {
+                    $set['eventState'] = '';
+                    $set['executionState'] = EventExecutionState::STATE_NOT_EXECUTED_LIKE_PREDICTED;
+                    $this->connection->update('tl_calendar_events', $set, ['id' => (int) $event['id']]);
+                }
+            }
+        }
+    }
+
+    /**
      * Set the "on create new" palette.
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 90)]
@@ -135,17 +194,6 @@ class CalendarEvents
                 if (0 === (int) $objCalendarEventsModel->tstamp && empty($objCalendarEventsModel->eventType)) {
                     $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = 'eventType';
                 }
-            }
-
-            // If event has been deferred
-            if (EventState::STATE_RESCHEDULED === $objCalendarEventsModel->eventState) {
-                PaletteManipulator::create()
-                    ->applyToPalette('default', 'tl_calendar_events')
-                    ->applyToPalette(EventType::TOUR, 'tl_calendar_events')
-                    ->applyToPalette(EventType::LAST_MINUTE_TOUR, 'tl_calendar_events')
-                    ->applyToPalette(EventType::GENERAL_EVENT, 'tl_calendar_events')
-                    ->applyToPalette(EventType::COURSE, 'tl_calendar_events')
-                ;
             }
         }
     }
@@ -405,14 +453,14 @@ class CalendarEvents
             }
 
             // Remove the field "rescheduledEventDate" if the event has not been rescheduled
-            if (null !== $objCalendarEventsModel && EventExecutionState::STATE_RESCHEDULED !== $objCalendarEventsModel->eventState) {
+            if (null !== $objCalendarEventsModel && EventState::STATE_RESCHEDULED !== $objCalendarEventsModel->eventState) {
                 $palettes = ['default', 'tour', 'lastMinuteTour', 'course', 'generalEvent', 'tour_report'];
 
                 foreach ($palettes as $strPaletteName) {
                     PaletteManipulator::create()
                         ->removeField('rescheduledEventDate')
                         ->applyToPalette($strPaletteName, 'tl_calendar_events')
-                        ;
+                    ;
                 }
             }
         }
@@ -948,7 +996,7 @@ class CalendarEvents
         if ($arrDcaFields[$fieldName]['eval']['encrypt'] ?? null) {
             $passwordHasherFactory = $this->passwordHasherFactory
                 ->getPasswordHasher(User::class)
-                ;
+            ;
             $varFieldValue = $passwordHasherFactory->hash($varFieldValue);
         }
 
@@ -1614,7 +1662,7 @@ class CalendarEvents
 
         if (!empty($arrValue)) {
             foreach ($arrValue as $i => $tourTechDiff) {
-                if (isset($tourTechDiff['tourTechDifficultyMin'],$tourTechDiff['tourTechDifficultyMax']) && $tourTechDiff['tourTechDifficultyMin'] === $tourTechDiff['tourTechDifficultyMax']) {
+                if (isset($tourTechDiff['tourTechDifficultyMin'], $tourTechDiff['tourTechDifficultyMax']) && $tourTechDiff['tourTechDifficultyMin'] === $tourTechDiff['tourTechDifficultyMax']) {
                     $arrValue[$i]['tourTechDifficultyMax'] = '';
                     $hasUpdate = true;
                 }

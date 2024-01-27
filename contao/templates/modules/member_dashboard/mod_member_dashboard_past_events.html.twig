@@ -34,13 +34,13 @@
 
                 {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::TOUR') == event.objEvent.eventType|default or constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::LAST_MINUTE_TOUR') == event.objEvent.eventType|default %}
                     <tr>
-                        <td>{{ event.dateSpan|raw }}</td>
+                        <td style="min-width:180px">{{ event.dateSpan|raw }}</td>
                         <td>
                             {{ event.objEvent.title }}
                             {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventType::LAST_MINUTE_TOUR') == event.objEvent.eventType|default %}
                                 <span style="color:green">&nbsp;(Last Minute)</span>
                             {% endif %}
-                            {% if constant('\\Markocupic\\SacEventToolBundle\\Config\\EventExecutionState::STATE_ADAPTED') == event.objEvent.executionState|default %}
+                            {% if event.objEvent.executionState is not empty and constant('\\Markocupic\\SacEventToolBundle\\Config\\EventExecutionState::STATE_NOT_EXECUTED_LIKE_PREDICTED') == event.objEvent.executionState|default %}
                                 <br>
                                 <small><span style="color:red">Ausweichtour: {{ event.objEvent.eventSubstitutionText }}</span></small>
                             {% endif %}

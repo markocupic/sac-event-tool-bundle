@@ -166,7 +166,7 @@ PaletteManipulator::create()
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year'] = [
     'href'                   => 'transformDates=+52weeks',
     'class'                  => 'global_op_icon_class',
-    'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/calendar-plus-regular.svg',
+    'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/calendar-plus-regular.svg',
     'attributes'             => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['plus1yearConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()" accesskey="e"',
     'custom_glob_op'         => true,
     'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => 10],
@@ -175,7 +175,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year'] = [
     'href'                   => 'transformDates=-52weeks',
     'class'                  => 'global_op_icon_class',
-    'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/calendar-minus-regular.svg',
+    'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/calendar-minus-regular.svg',
     'attributes'             => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['minus1yearConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()" accesskey="e"',
     'custom_glob_op'         => true,
     'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => 8],
@@ -184,7 +184,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1yea
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
     'href'                   => 'action=onloadCallbackExportCalendar',
     'class'                  => 'header_icon',
-    'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/file-excel-regular.svg',
+    'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/file-excel-regular.svg',
     'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
     'custom_glob_op'         => true,
     'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
@@ -193,7 +193,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCal
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['onloadCallbackExportCalendar'] = [
     'href'                   => 'action=onloadCallbackExportCalendar',
     'class'                  => 'header_icon',
-    'icon'                   => Bundle::ASSET_DIR . '/icons/fontawesome/default/file-excel-regular.svg',
+    'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/file-excel-regular.svg',
     'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
     'custom_glob_op'         => true,
     'custom_glob_op_options' => ['add_to_menu_group' => 'super', 'sorting' => -10],
@@ -205,22 +205,22 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['toggle']['showIn
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['preview'] = [
     'href'       => 'action=preview', // use a button callback to generate the url
     'attributes' => 'target="_blank"',
-    'icon'       => Bundle::ASSET_DIR . '/icons/fontawesome/default/presentation-screen-solid.svg',
+    'icon'       => Bundle::ASSET_DIR.'/icons/fontawesome/default/presentation-screen-solid.svg',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = [
     'href' => 'table=tl_calendar_events_member',
-    'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/people-group-regular.svg',
+    'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/people-group-regular.svg',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelPrev'] = [
     'href' => 'action=releaseLevelPrev', // use a button callback to generate the url
-    'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/square-arrow-down-solid.svg',
+    'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/square-arrow-down-solid.svg',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelNext'] = [
     'href' => 'action=releaseLevelNext', // use a button callback to generate the url
-    'icon' => Bundle::ASSET_DIR . '/icons/fontawesome/default/square-arrow-up-solid.svg',
+    'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/square-arrow-up-solid.svg',
 ];
 
 // alias
@@ -514,7 +514,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
     'inputType' => 'select',
     'options'   => EventState::ALL,
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => false, 'tl_class' => 'clr w50', 'mandatory' => false],
+    'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'], 'doNotShow' => false, 'tl_class' => 'clr w50', 'mandatory' => false],
     'sql'       => "varchar(32) NOT NULL default ''",
 ];
 
@@ -797,7 +797,23 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
     'options'   => EventExecutionState::ALL,
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
     'eval'      => ['includeBlankOption' => true, 'doNotShow' => true, 'tl_class' => 'clr m12', 'mandatory' => true],
-    'sql'       => "varchar(32) NOT NULL default ''",
+    'sql'       => "varchar(64) NOT NULL default ''",
+];
+
+// @todo remove this after jan 2024 migration has been completed
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState_bak'] = [
+    'exclude'   => true,
+    'filter'    => true,
+    'inputType' => 'select',
+    'options'   => EventExecutionState::ALL,
+    'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
+    'eval'      => ['includeBlankOption' => true, 'doNotShow' => true, 'tl_class' => 'clr m12', 'mandatory' => true],
+    'sql'       => "varchar(64) NOT NULL default ''",
+];
+
+// @todo remove this after jan 2024 migration has been completed
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['migration'] = [
+    'sql' => "char(1) NOT NULL default ''",
 ];
 
 // coordsCH1903
