@@ -121,9 +121,11 @@ class CalendarEvents
     }
 
     /**
-     * Jan 2024 Release
-	 * @see https://github.com/jonasmueller1/sac-pilatus-website/issues/115
-	 * @todo remove this after jan 2024 migration has been completed
+     * Jan 2024 Release.
+     *
+     * @see https://github.com/jonasmueller1/sac-pilatus-website/issues/115
+     *
+     * @todo remove this after jan 2024 migration has been completed
      */
     #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 9990)]
     public function migrate(DataContainer $dc): void

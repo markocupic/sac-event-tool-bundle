@@ -28,15 +28,15 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelPrev'] = ['Freigabestufe 
 
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar_events']['title_legend'] = 'Basis-Einstellungen';
+$GLOBALS['TL_LANG']['tl_calendar_events']['tech_difficulty_legend'] = 'Technisch-/konditionelle Schwierigkeiten';
 $GLOBALS['TL_LANG']['tl_calendar_events']['broschuere_legend'] = 'Einstellungen SAC Kursprogramm PDF Broschüre';
 $GLOBALS['TL_LANG']['tl_calendar_events']['deregistration_legend'] = 'Einstellungen für Event-Abmeldungen';
 $GLOBALS['TL_LANG']['tl_calendar_events']['sign_up_form_legend'] = 'Einstellungen für Anmeldeformular';
 $GLOBALS['TL_LANG']['tl_calendar_events']['gallery_legend'] = 'Einstellungen für die Bildergalerie';
 $GLOBALS['TL_LANG']['tl_calendar_events']['registration_legend'] = 'Anmelde-Einstellungen';
 $GLOBALS['TL_LANG']['tl_calendar_events']['tour_report_legend'] = 'Tourrapport';
-$GLOBALS['TL_LANG']['tl_calendar_events']['min_max_member_legend'] = 'Teilnehmerzahl Einstellungen';
-$GLOBALS['TL_LANG']['tl_calendar_events']['event_type_legend'] = 'Event-Art Einstellungen';
-$GLOBALS['TL_LANG']['tl_calendar_events']['journey_legend'] = 'Event-Art Einstellungen';
+$GLOBALS['TL_LANG']['tl_calendar_events']['min_max_member_legend'] = 'Teilnehmerzahl';
+$GLOBALS['TL_LANG']['tl_calendar_events']['event_type_legend'] = 'Event-Typ';
 $GLOBALS['TL_LANG']['tl_calendar_events']['event_registration_confirmation_legend'] = 'E-Mail-Anmeldebestätigung individualisieren';
 
 // Fields
