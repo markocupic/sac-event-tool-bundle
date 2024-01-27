@@ -48,7 +48,6 @@ use League\Csv\CharsetConverter;
 use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
-use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
@@ -118,67 +117,6 @@ class CalendarEvents
     public function setCorrectReferer(): void
     {
         $this->util->setCorrectReferer();
-    }
-
-    /**
-     * Jan 2024 Release.
-     *
-     * @see https://github.com/jonasmueller1/sac-pilatus-website/issues/115
-     *
-     * @todo remove this after jan 2024 migration has been completed
-     */
-    #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 9990)]
-    public function migrate(DataContainer $dc): void
-    {
-        if (!Database::getInstance()->tableExists('tl_calendar_events')) {
-            throw new \Exception('Table tl_calendar_events existiert nicht!');
-        }
-
-        if (!Database::getInstance()->fieldExists('executionState_bak', 'tl_calendar_events')) {
-			throw new \Exception('Feld tl_calendar_events.executionState_bak existiert nicht!');
-        }
-
-        if (!Database::getInstance()->fieldExists('migrated', 'tl_calendar_events')) {
-			throw new \Exception('Feld tl_calendar_events.migrated existiert nicht!');
-        }
-
-        $events = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events', []);
-
-        foreach ($events as $event) {
-            $set = [];
-
-            if (!$event['migrated']) {
-                $set['executionState_bak'] = $event['executionState'];
-                $set['migrated'] = '1';
-                $set['executionState'] = '';
-
-                $this->connection->update('tl_calendar_events', $set, ['id' => (int) $event['id']]);
-
-                if ('event_canceled' === $event['executionState']) {
-                    $set['eventState'] = EventState::STATE_CANCELED;
-                    $set['executionState'] = EventExecutionState::STATE_NOT_EXECUTED_LIKE_PREDICTED;
-                    $this->connection->update('tl_calendar_events', $set, ['id' => (int) $event['id']]);
-                }
-
-                if ('event_rescheduled' === $event['executionState']) {
-                    $set['eventState'] = EventState::STATE_RESCHEDULED;
-                    $set['executionState'] = EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED;
-                    $this->connection->update('tl_calendar_events', $set, ['id' => (int) $event['id']]);
-                }
-
-                if (EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED === $event['executionState']) {
-                    $set['eventState'] = '';
-                    $set['executionState'] = EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED;
-                    $this->connection->update('tl_calendar_events', $set, ['id' => (int) $event['id']]);
-                }
-
-                if ('event_adapted' === $event['executionState']) {
-                    $set['eventState'] = '';
-                    $set['executionState'] = EventExecutionState::STATE_NOT_EXECUTED_LIKE_PREDICTED;
-                    $this->connection->update('tl_calendar_events', $set, ['id' => (int) $event['id']]);
-                }
-            }
-        }
     }
 
     /**
