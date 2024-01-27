@@ -131,15 +131,15 @@ class CalendarEvents
     public function migrate(DataContainer $dc): void
     {
         if (!Database::getInstance()->tableExists('tl_calendar_events')) {
-            die('DB tl_calendar_events existiert nicht!');
+            throw new \Exception('Table tl_calendar_events existiert nicht!');
         }
 
         if (!Database::getInstance()->fieldExists('executionState_bak', 'tl_calendar_events')) {
-            die('Feld tl_calendar_events.executionState_bak existiert nicht!');
+			throw new \Exception('Feld tl_calendar_events.executionState_bak existiert nicht!');
         }
 
-        if (!Database::getInstance()->fieldExists('migration', 'tl_calendar_events')) {
-            die('Feld tl_calendar_events.migration existiert nicht!');
+        if (!Database::getInstance()->fieldExists('migrated', 'tl_calendar_events')) {
+			throw new \Exception('Feld tl_calendar_events.migrated existiert nicht!');
         }
 
         $events = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events', []);
@@ -147,9 +147,9 @@ class CalendarEvents
         foreach ($events as $event) {
             $set = [];
 
-            if (!$event['migration']) {
+            if (!$event['migrated']) {
                 $set['executionState_bak'] = $event['executionState'];
-                $set['migration'] = '1';
+                $set['migrated'] = '1';
                 $set['executionState'] = '';
 
                 $this->connection->update('tl_calendar_events', $set, ['id' => (int) $event['id']]);

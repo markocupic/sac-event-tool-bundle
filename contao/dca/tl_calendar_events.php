@@ -819,7 +819,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState_bak'] = [
 ];
 
 // @todo remove this after jan 2024 migration has been completed
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['migration'] = [
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['migrated'] = [
     'sql' => "char(1) NOT NULL default ''",
 ];
 
