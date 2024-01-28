@@ -30,7 +30,7 @@ class CleanupTourreport extends AbstractMigration
 
     public function getName(): string
     {
-        return 'Cleanup Tourreport Migration Jan 2024 and redefine tl_calendar_events.executionState';
+        return 'Cleanup Tourreport Migration Jan 2024 and redefine the function of tl_calendar_events.executionState';
     }
 
     /**
@@ -46,11 +46,11 @@ class CleanupTourreport extends AbstractMigration
 
         $columns = $schemaManager->listTableColumns('tl_calendar_events');
 
-        if (!isset($columns['migrated']) || !isset($columns['executionstate']) || !isset($columns['eventstate']) || !isset($columns['executionstate_bak'])) {
+        if (!isset($columns['_migrated']) || !isset($columns['executionstate']) || !isset($columns['eventstate']) || !isset($columns['_executionstate_bak']) || !isset($columns['_eventstate_bak'])) {
             return false;
         }
 
-        $result = $this->connection->fetchOne('SELECT * FROM tl_calendar_events WHERE migrated = ?', ['']);
+        $result = $this->connection->fetchOne('SELECT * FROM tl_calendar_events WHERE _migrated = ?', ['']);
 
         if ($result) {
             return true;
@@ -67,14 +67,15 @@ class CleanupTourreport extends AbstractMigration
         try {
             $this->connection->beginTransaction();
 
-            $events = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events WHERE migrated = ?', ['']);
+            $events = $this->connection->fetchAllAssociative('SELECT * FROM tl_calendar_events WHERE _migrated = ?', ['']);
 
             foreach ($events as $event) {
                 $set = [];
 
-                if (!$event['migrated']) {
-                    $set['executionState_bak'] = $event['executionState'];
-                    $set['migrated'] = '1';
+                if (!$event['_migrated']) {
+                    $set['_executionState_bak'] = $event['executionState'];
+                    $set['_eventState_bak'] = $event['executionState'];
+                    $set['_migrated'] = '1';
                     $set['executionState'] = '';
 
                     $this->connection->update('tl_calendar_events', $set, ['id' => (int) $event['id']]);

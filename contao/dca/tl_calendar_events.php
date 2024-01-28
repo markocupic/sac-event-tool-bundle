@@ -517,7 +517,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
     'options'   => EventState::ALL,
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
     'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'], 'doNotShow' => false, 'tl_class' => 'm12 clr', 'mandatory' => false],
-    'sql'       => "varchar(32) NOT NULL default ''",
+    'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
 // Add new field rescheduledEventDate
@@ -808,18 +808,17 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
 ];
 
 // @todo remove this after jan 2024 migration has been completed
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState_bak'] = [
-    'exclude'   => true,
-    'filter'    => true,
-    'inputType' => 'select',
-    'options'   => EventExecutionState::ALL,
-    'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval'      => ['includeBlankOption' => true, 'doNotShow' => true, 'tl_class' => 'm12 clr', 'mandatory' => true],
-    'sql'       => "varchar(64) NOT NULL default ''",
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['_executionState_bak'] = [
+    'sql' => "varchar(64) NOT NULL default ''",
 ];
 
 // @todo remove this after jan 2024 migration has been completed
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['migrated'] = [
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['_eventState_bak'] = [
+    'sql' => "varchar(64) NOT NULL default ''",
+];
+
+// @todo remove this after jan 2024 migration has been completed
+$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['_migrated'] = [
     'sql' => "char(1) NOT NULL default ''",
 ];
 
