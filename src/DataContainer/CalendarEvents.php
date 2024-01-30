@@ -48,6 +48,7 @@ use League\Csv\CharsetConverter;
 use League\Csv\InvalidArgument;
 use League\Csv\Writer;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
+use Markocupic\SacEventToolBundle\Config\EventExecutionState;
 use Markocupic\SacEventToolBundle\Config\EventState;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsJourneyModel;
@@ -372,37 +373,50 @@ class CalendarEvents
     {
         $request = $this->requestStack->getCurrentRequest();
 
+        if (!$dc->id) {
+            return;
+        }
+
         if ('editAll' === $request->query->get('act') || 'overrideAll' === $request->query->get('act')) {
             return;
         }
 
-        if ($dc->id > 0) {
-            if ('writeTourReport' === $request->query->get('call')) {
-                $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour_report'];
+        $objCalendarEventsModel = $this->calendarEventsModel->findByPk($dc->id);
 
-                return;
+        if (null === $objCalendarEventsModel) {
+            return;
+        }
+
+        // Set palette for tour and course
+        if (isset($GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][$objCalendarEventsModel->eventType])) {
+            $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][$objCalendarEventsModel->eventType];
+        }
+
+        // Remove the field "rescheduledEventDate" if the event has not been rescheduled
+        if (EventState::STATE_RESCHEDULED !== $objCalendarEventsModel->eventState) {
+            $palettes = ['default', 'tour', 'lastMinuteTour', 'course', 'generalEvent', 'tour_report'];
+
+            foreach ($palettes as $palette) {
+                PaletteManipulator::create()
+                    ->removeField('rescheduledEventDate')
+                    ->applyToPalette($palette, 'tl_calendar_events')
+                ;
             }
+        }
 
-            // Set palette for tour and course
-            $objCalendarEventsModel = $this->calendarEventsModel->findByPk($dc->id);
+        // Remove the field "eventSubstitutionText" if the event has been executed like predicted
+        if (EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED === $objCalendarEventsModel->executionState) {
+            $palette = 'tour_report';
 
-            if (null !== $objCalendarEventsModel) {
-                if (isset($GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][$objCalendarEventsModel->eventType])) {
-                    $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events']['palettes'][$objCalendarEventsModel->eventType];
-                }
-            }
+            PaletteManipulator::create()
+                ->removeField('eventSubstitutionText', 'tour_report_legend')
+                ->applyToPalette($palette, 'tl_calendar_events')
+            ;
+        }
 
-            // Remove the field "rescheduledEventDate" if the event has not been rescheduled
-            if (null !== $objCalendarEventsModel && EventState::STATE_RESCHEDULED !== $objCalendarEventsModel->eventState) {
-                $palettes = ['default', 'tour', 'lastMinuteTour', 'course', 'generalEvent', 'tour_report'];
-
-                foreach ($palettes as $strPaletteName) {
-                    PaletteManipulator::create()
-                        ->removeField('rescheduledEventDate')
-                        ->applyToPalette($strPaletteName, 'tl_calendar_events')
-                    ;
-                }
-            }
+        // Apply a custom palette for the tour report
+        if ('writeTourReport' === $request->query->get('call')) {
+            $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour_report'];
         }
     }
 
@@ -494,7 +508,7 @@ class CalendarEvents
                         } elseif ('courseTypeLevel1' === $field) {
                             $arrRow[] = empty($objEvent->{$field}) ? '' : (string) $this->connection->fetchOne('SELECT name FROM tl_course_sub_type WHERE id = ?', [$objEvent->{$field}]);
                         } elseif ('executionState' === $field) {
-                            $arrRow[] = empty($objEvent->{$field}) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->{$field}][0] ?? $objEvent->{$field};
+                            $arrRow[] = empty($objEvent->{$field}) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->{$field}] ?? $objEvent->{$field};
                         } elseif ('eventState' === $field) {
                             $arrRow[] = empty($objEvent->{$field}) ? '' : $GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->{$field}][0] ?? $objEvent->{$field};
                         } elseif (\in_array($field, ['teaser', 'tourDetailText', 'requirements'], true)) {

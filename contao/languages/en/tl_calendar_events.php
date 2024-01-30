@@ -112,11 +112,9 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = ['Zeitbeda
 $GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'] = ['Hinterlegte Kontaktdaten immer anzeigen', '<strong class="notice">!!! Wichtig, falls Online-Anmeldung deaktiviert ist !!!</strong> Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung individualisieren.', 'Hier können Sie den Text für die E-Mail-Anmeldebestätigung individualisieren.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung', 'Nutzen Sie dieses Feld, um eine individualisierte E-Mail-Bestätigungs für den Event zu erstellen. Fahren Sie mit der Maus über diesen Text, um mehr zu erfahren. Die Tags dienen als Platzhalter für eventspezifische Informationen.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['eventDurationInDays'] = ['Event-Dauer in Tagen', 'Geben Sie die Event-Dauer in Tagen an.'];
 
 // References
-// Blank option label for tl_calendar_events.eventState
-$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'] = 'Normal/kein spezieller Status';
-
 // Tech difficulties main categories
 $GLOBALS['TL_LANG']['tl_calendar_events']['skiTour'] = ['Skitour'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['hiking'] = ['Wandern'];
@@ -135,9 +133,12 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMounta
 $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMountainGuide::WITH_MOUNTAIN_GUIDE] = '«mit Bergführer/in» und «ohne Bergführerangebot»';
 $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER] = '«mit Bergführer/in» und «mit Bergführerangebot»';
 
+// Blank option label for tl_calendar_events.eventState
+$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'] = 'Findet statt/hat stattgefunden';
+
 // Use these states for the report
-$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED] = ['Ja'];
-$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_NOT_EXECUTED_LIKE_PREDICTED] = ['Nein'];
+$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED] = 'Ja';
+$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_NOT_EXECUTED_LIKE_PREDICTED] = 'Nein';
 
 $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_0'] = ['Keine Lawinengefahr'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_1'] = ['Geringe Lawinengefahr'];

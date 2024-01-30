@@ -125,6 +125,7 @@ $GLOBALS['TL_LANG']['MSC']['bhs_dashb_registrationList'] = 'Event Registrierunge
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_sendEmail'] = 'E-Mail versenden';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_sendEmailDisabled'] = 'E-Mail versenden nicht verfügbar';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReport'] = 'Tourrapport erfassen';
+$GLOBALS['TL_LANG']['MSC']['bhs_dashb_editReport'] = 'Tourrapport bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_writeReportDisabled'] = 'Tourrapport erfassen nicht verfügbar';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorials'] = 'Anleitungen und Tutorials';
 $GLOBALS['TL_LANG']['MSC']['bhs_dashb_guidesAndTutorialsText'] = 'Die Seite "Anleitungen und Tutorials" beim Menüpunkt "Service" im Frontend/Website unterstützt Sie bei der Verwendung des SAC Event-Tools (Backend/Contao).';

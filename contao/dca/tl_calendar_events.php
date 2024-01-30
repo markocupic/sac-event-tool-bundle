@@ -161,7 +161,7 @@ PaletteManipulator::create()
 
 // Tour report palette
 PaletteManipulator::create()
-    ->addField(['executionState', 'eventState', 'eventSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents', 'eventReportAdditionalNotices'], 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['eventState', 'executionState', 'rescheduledEventDate', 'eventSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents', 'eventReportAdditionalNotices'], 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('tour_report', 'tl_calendar_events');
 
 // Global operations
@@ -516,7 +516,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventState'] = [
     'inputType' => 'select',
     'options'   => EventState::ALL,
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'], 'doNotShow' => false, 'tl_class' => 'm12 clr', 'mandatory' => false],
+    'eval'      => ['mandatory' => false, 'submitOnChange' => true, 'includeBlankOption' => true, 'blankOptionLabel' => &$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'], 'doNotShow' => false, 'tl_class' => 'm12 clr'],
     'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
@@ -803,7 +803,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
     'inputType' => 'select',
     'options'   => EventExecutionState::ALL,
     'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events'],
-    'eval'      => ['includeBlankOption' => true, 'doNotShow' => true, 'tl_class' => 'm12 clr', 'mandatory' => true],
+    'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'doNotShow' => true, 'tl_class' => 'm12 clr', 'mandatory' => true],
     'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
@@ -857,7 +857,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['linkSacRoutePortal'] = [
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventSubstitutionText'] = [
     'exclude'   => true,
     'inputType' => 'textarea',
-    'eval'      => ['mandatory' => false, 'tl_class' => 'm12 clr'],
+    'eval'      => ['tl_class' => 'm12 clr'],
     'sql'       => 'text NULL',
 ];
 
