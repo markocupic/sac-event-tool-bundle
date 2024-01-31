@@ -161,7 +161,7 @@ PaletteManipulator::create()
 
 // Tour report palette
 PaletteManipulator::create()
-    ->addField(['eventState', 'executionState', 'rescheduledEventDate', 'eventSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents', 'eventReportAdditionalNotices'], 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField(['eventState', 'rescheduledEventDate', 'executionState', 'eventSubstitutionText', 'tourWeatherConditions', 'tourAvalancheConditions', 'tourSpecialIncidents', 'eventReportAdditionalNotices'], 'tour_report_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('tour_report', 'tl_calendar_events');
 
 // Global operations

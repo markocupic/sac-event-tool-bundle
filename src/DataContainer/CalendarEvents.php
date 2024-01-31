@@ -404,16 +404,6 @@ class CalendarEvents
             }
         }
 
-        // Remove the field "eventSubstitutionText" if the event has been executed like predicted
-        if (EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED === $objCalendarEventsModel->executionState) {
-            $palette = 'tour_report';
-
-            PaletteManipulator::create()
-                ->removeField('eventSubstitutionText', 'tour_report_legend')
-                ->applyToPalette($palette, 'tl_calendar_events')
-            ;
-        }
-
         // Apply a custom palette for the tour report
         if ('writeTourReport' === $request->query->get('call')) {
             $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['tour_report'];
