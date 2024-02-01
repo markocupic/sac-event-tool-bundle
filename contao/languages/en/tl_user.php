@@ -64,3 +64,12 @@ $GLOBALS['TL_LANG']['tl_user']['section']['4254'] = 'SAC PILATUS RIGI';
 $GLOBALS['TL_LANG']['tl_user']['rescissionCauseOptions']['deceased'] = 'Verstorben';
 $GLOBALS['TL_LANG']['tl_user']['rescissionCauseOptions']['recission'] = 'Rücktritt';
 $GLOBALS['TL_LANG']['tl_user']['rescissionCauseOptions']['leaving'] = 'Vereins-Austritt';
+
+$GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][1] = 'Tourenleiter/in SAC';
+$GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][2] = 'Bergführer/in IVBV';
+$GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][3] = 'Psychologe/in FSP';
+$GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][4] = 'Scheesportlehrer/in';
+$GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][5] = 'Dr. med.';
+$GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][6] = 'J+S Leiter/in';
+$GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][7] = 'Wanderleiter/in';
+$GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][8] = 'IGKA Instruktor/in';

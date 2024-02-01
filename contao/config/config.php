@@ -146,20 +146,6 @@ $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['SAC-EVENT-TOOL-AVALANCHE-LEVEL']
 ];
 
 /*
- * Tourguide qualifications
- */
-$GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'] = [
-    1 => 'Tourenleiter/in SAC',
-    2 => 'Bergführer/in IVBV',
-    3 => 'Psychologe/in FSP',
-    4 => 'Scheesportlehrer/in',
-    5 => 'Dr. med.',
-    6 => 'J+S Leiter/in',
-    7 => 'Wanderleiter/in',
-    8 => 'IGKA Instruktor/in',
-];
-
-/*
  * Backend user rescission/retirement cause
  */
 $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['userRescissionCause'] = [
