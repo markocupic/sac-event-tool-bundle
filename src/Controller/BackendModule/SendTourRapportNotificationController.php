@@ -351,8 +351,18 @@ class SendTourRapportNotificationController extends AbstractController
         $organizer = $this->getOrganizers($event);
 
         if (null !== $organizer) {
+            $i = 0;
+
             while ($organizer->next()) {
                 if ($organizer->enableRapportNotification) {
+                    ++$i;
+
+                    // We let the user enter the recipients manually
+                    // because we don't want an event to be billed multiple times
+                    if ($i > 1 && !empty($organizer->eventRapportNotificationRecipients)) {
+                        return [];
+                    }
+
                     $arrRecipients = array_merge($arrRecipients, explode(',', $organizer->eventRapportNotificationRecipients));
                 }
             }
@@ -373,7 +383,7 @@ class SendTourRapportNotificationController extends AbstractController
         $form->addFormField('recipients', [
             'label' => $this->translator->trans('MSC.evt_strn_emailRecipients', [], 'contao_default'),
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'emails', 'readonly' => false, 'class' => 'clr', 'mandatory' => true],
+            'eval' => ['rgxp' => 'emails', 'readonly' => false, 'placeholder' => $this->translator->trans('MSC.evt_strn_emailRecipientsPlaceholder', [], 'contao_default'), 'class' => 'clr', 'mandatory' => true],
         ]);
 
         $form->addFormField('subject', [
