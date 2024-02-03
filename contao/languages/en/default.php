@@ -222,3 +222,4 @@ $GLOBALS['TL_LANG']['MSC']['evt_epe_emailSentToEventMembers'] = 'Ihre E-Mail wur
 $GLOBALS['TL_LANG']['MSC']['evt_epe_fileUploadedSuccessful'] = 'Datei erfolgreich hochgeladen.';
 $GLOBALS['TL_LANG']['MSC']['evt_epe_selectAll'] = 'alle anwählen';
 $GLOBALS['TL_LANG']['MSC']['evt_epe_unselectAll'] = 'alle abwählen';
+$GLOBALS['TL_LANG']['MSC']['evt_epe_youWillReceiveACopyOfThisMessage'] = 'Sie erhalten automatisch eine Kopie dieser Nachricht.';

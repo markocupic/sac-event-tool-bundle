@@ -289,6 +289,13 @@ class EventParticipantEmailController extends AbstractController
         $objEmail->subject = html_entity_decode((string) $request->request->get('subject'));
         $objEmail->text = html_entity_decode((string) $request->request->get('text'));
 
+        // Send a copy of the message to the logged-in user
+        $user = $this->security->getUser();
+
+        if ($user instanceof BackendUser && '' !== $user->email) {
+            $objEmail->sendCc($user->email);
+        }
+
         // Handle file attachments
         $fs = new Filesystem();
 

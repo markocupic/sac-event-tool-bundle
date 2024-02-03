@@ -503,6 +503,16 @@ div.tl_header_tour_rapport table td {
 	animation: blinker 1s linear infinite;
 }
 
+#eventParticipantEmail .cc-info {
+	margin: 32px 0 16px 0;
+	color: green;
+}
+
+#eventParticipantEmail p.error {
+	margin: 16px 0;
+	color: red;
+}
+
 @keyframes blinker {
 	50% {
 		opacity: 0;
