@@ -63,16 +63,16 @@
                                     <i class="fa-solid fa-fw fa-at"></i>
                                 </a>
                             {% else %}
-                                <i class="fa-solid fa-fw fa-at brightened" title="{{ 'MSC.bhs_dashb_sendEmailDisabled'|trans({}, 'contao_default') }}"></i>
+                                <i class="fa-solid fa-fw fa-at filter-brightened" title="{{ 'MSC.bhs_dashb_sendEmailDisabled'|trans({}, 'contao_default') }}"></i>
                             {% endif %}
                         </td>
                         <td class="my-events-icon-col text-align-center">
                             {% if event.href_report is not empty %}
-                                <a href="{{ event.href_report }}" title="{{ 'MSC.bhs_dashb_writeReport'|trans({}, 'contao_default') }}">
-                                    <i class="fa-solid fa-fw fa-comment-pen"></i>
+                                <a href="{{ event.href_report }}" title="{% if event.has_filled_in_tour_report|default %}{{ 'MSC.bhs_dashb_writeReport'|trans({}, 'contao_default') }}{% else %}{{ 'MSC.bhs_dashb_editReport'|trans({}, 'contao_default') }}{% endif %}">
+                                    <i class="fa-solid fa-fw fa-comment-pen{% if event.has_filled_in_tour_report|default %} filter-green{% else %} filter-red{% endif %}"></i>
                                 </a>
                             {% else %}
-                                <i class="fa-solid fa-fw fa-comment-pen brightened" title="{{ 'MSC.bhs_dashb_writeReportDisabled'|trans({}, 'contao_default') }}"></i>
+                                <i class="fa-solid fa-fw fa-comment-pen filter-brightened" title="{{ 'MSC.bhs_dashb_writeReportDisabled'|trans({}, 'contao_default') }}"></i>
                             {% endif %}
                         </td>
                         <td class="my-events-icon-col text-align-center">
@@ -81,7 +81,7 @@
                                     <i class="fa-solid fa-fw fa-print"></i>
                                 </a>
                             {% else %}
-                                <i class="fa-solid fa-fw fa-print brightened" title="{{ 'MSC.bhs_dashb_printReportDisabled'|trans({}, 'contao_default') }}"></i>
+                                <i class="fa-solid fa-fw fa-print filter-brightened" title="{{ 'MSC.bhs_dashb_printReportDisabled'|trans({}, 'contao_default') }}"></i>
                             {% endif %}
                         </td>
                     </tr>

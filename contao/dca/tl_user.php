@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\DataContainer;
+use Markocupic\SacEventToolBundle\Config\TourguideQualification;
 
 // Add tl_user.sacMemberId to index
 $GLOBALS['TL_DCA']['tl_user']['config']['sql']['keys']['sacMemberId'] = 'index';
@@ -329,7 +330,8 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['leiterQualifikation'] = [
 	'search'    => true,
 	'filter'    => true,
 	'inputType' => 'checkboxWizard',
-	'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'],
+	'reference' => &$GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'],
+	'options'   => TourguideQualification::ALL,
 	'eval'      => ['tl_class' => 'clr', 'multiple' => true, 'orderField' => 'orderLeiterQualifikation'],
 	'sql'       => 'blob NULL',
 ];

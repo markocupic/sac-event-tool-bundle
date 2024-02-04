@@ -314,8 +314,19 @@ div.tl_header_tour_rapport table td {
 	color: #000000;
 }
 
-#tl_backend_home_screen_my_events_inner td .brightened {
+/** https://isotropic.co/tool/hex-color-to-css-filter/ */
+#tl_backend_home_screen_my_events_inner td .filter-brightened {
 	filter: opacity(0.20);
+}
+
+/** https://isotropic.co/tool/hex-color-to-css-filter/ */
+#tl_backend_home_screen_my_events_inner td .filter-green {
+	filter: invert(59%) sepia(20%) saturate(1169%) hue-rotate(94deg) brightness(96%) contrast(93%);
+}
+
+/** https://isotropic.co/tool/hex-color-to-css-filter/ */
+#tl_backend_home_screen_my_events_inner td .filter-red {
+	filter: invert(31%) sepia(93%) saturate(7446%) hue-rotate(356deg) brightness(103%) contrast(121%);
 }
 
 #tl_backend_home_screen_my_events_inner .subscription-badge {
@@ -490,6 +501,16 @@ div.tl_header_tour_rapport table td {
 
 #eventParticipantEmail .blink {
 	animation: blinker 1s linear infinite;
+}
+
+#eventParticipantEmail .cc-info {
+	margin: 32px 0 16px 0;
+	color: green;
+}
+
+#eventParticipantEmail p.error {
+	margin: 16px 0;
+	color: red;
 }
 
 @keyframes blinker {

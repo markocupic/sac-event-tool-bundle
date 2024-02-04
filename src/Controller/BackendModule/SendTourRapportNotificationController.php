@@ -26,6 +26,7 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Util\UrlUtil;
 use Contao\Email;
 use Contao\Events;
+use Contao\Input;
 use Contao\Message;
 use Contao\Model\Collection;
 use Contao\StringUtil;
@@ -123,7 +124,7 @@ class SendTourRapportNotificationController extends AbstractController
 
         $form = $this->createAndValidateForm($request, $event, $biller);
 
-        if (!$form->isSubmitted()) {
+        if (true !== $form->isSubmitted()) {
             // Display the email form
             $template = new BackendTemplate('be_send_tour_rapport_notification');
             $template->request_token = $rt;
@@ -351,9 +352,20 @@ class SendTourRapportNotificationController extends AbstractController
         $organizer = $this->getOrganizers($event);
 
         if (null !== $organizer) {
+            $i = 0;
+
             while ($organizer->next()) {
                 if ($organizer->enableRapportNotification) {
-                    $arrRecipients = array_merge($arrRecipients, explode(',', $organizer->eventRapportNotificationRecipients));
+                    ++$i;
+
+                    // We let the user enter the recipients manually,
+                    // if the event belongs to more than one organizer,
+                    // because we don't want an event to be billed multiple times
+                    if ($i > 1 && !empty($organizer->eventRapportNotificationRecipients) && !empty($arrRecipients)) {
+                        return [];
+                    }
+
+                    $arrRecipients = array_filter(array_unique(array_merge($arrRecipients, explode(',', $organizer->eventRapportNotificationRecipients))));
                 }
             }
         }
@@ -373,7 +385,7 @@ class SendTourRapportNotificationController extends AbstractController
         $form->addFormField('recipients', [
             'label' => $this->translator->trans('MSC.evt_strn_emailRecipients', [], 'contao_default'),
             'inputType' => 'text',
-            'eval' => ['rgxp' => 'emails', 'readonly' => false, 'class' => 'clr', 'mandatory' => true],
+            'eval' => ['rgxp' => 'emails', 'readonly' => false, 'placeholder' => $this->translator->trans('MSC.evt_strn_emailRecipientsPlaceholder', [], 'contao_default'), 'class' => 'clr', 'mandatory' => true],
         ]);
 
         $form->addFormField('subject', [
@@ -393,6 +405,17 @@ class SendTourRapportNotificationController extends AbstractController
             'inputType' => 'submit',
         ]);
 
+        // Sanitize email input
+        if ($form->getFormId() === $request->request->get('FORM_SUBMIT')) {
+            $input = $this->framework->getAdapter(Input::class);
+
+            $recipients = (string) $input->post('recipients');
+            $recipients = str_replace([' ', ';'], ['', ','], $recipients);
+            $recipients = trim($recipients, ',');
+
+            $input->setPost('recipients', $recipients);
+        }
+
         if ($form->validate()) {
             $recipients = $form->getWidget('recipients')->value;
             $form->getWidget('recipients')->value = str_replace(' ', '', $recipients);
@@ -402,8 +425,12 @@ class SendTourRapportNotificationController extends AbstractController
             return $form;
         }
 
+        // !important otherwise the docx files will be converted
+        // and Contao will try to send the email
+        $form->setIsSubmitted(false);
+
         // Preset input fields "subject" and "text" with a default text
-        if ('email_app_form' !== $request->request->get('FORM_SUBMIT')) {
+        if ('send_tour_rapport_notification_form' !== $request->request->get('FORM_SUBMIT')) {
             if (empty($form->getWidget('recipients')->value) && empty($form->getWidget('text')->value) && empty($form->getWidget('subject')->value)) {
                 $form->getWidget('recipients')->value = implode(',', $this->getRecipients($event));
 

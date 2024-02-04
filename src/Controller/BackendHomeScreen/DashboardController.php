@@ -189,6 +189,7 @@ class DashboardController
             $event['href_print_report'] = $this->generatePrintReportHref($eventModel);
             $event['href_registrations'] = $hrefRegistrations;
             $event['href_report'] = $this->generateReportHref($eventModel);
+            $event['has_filled_in_tour_report'] = $eventModel->filledInEventReportForm;
 
             $events[] = $event;
         }

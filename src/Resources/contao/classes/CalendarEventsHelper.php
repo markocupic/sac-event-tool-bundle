@@ -618,7 +618,7 @@ class CalendarEventsHelper
         $arrQuali = StringUtil::deserialize($objUser->leiterQualifikation, true);
 
         if (!empty($arrQuali[0])) {
-            $strQuali = $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'][$arrQuali[0]];
+            $strQuali = $GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][(int) $arrQuali[0]] ?? 'undefined';
         }
 
         return $strQuali;

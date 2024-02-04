@@ -306,6 +306,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
 
     private function getField(string $fieldName, array $arrUser): string
     {
+        $controllerAdapter = $this->framework->getAdapter(Controller::class);
         $dateAdapter = $this->framework->getAdapter(Date::class);
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
@@ -322,8 +323,9 @@ class CsvUserExportController extends AbstractFrontendModuleController
         }
 
         if ('leiterQualifikation' === $fieldName) {
+            $controllerAdapter->loadLanguageFile('tl_user');
             $arrQuali = $stringUtilAdapter->deserialize($arrUser['leiterQualifikation'] ?? [], true);
-            $arrQuali = array_map(static fn ($item) => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['leiterQualifikation'][$item] ?? $item, $arrQuali);
+            $arrQuali = array_map(static fn ($item) => $GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][(int) $item] ?? $item, $arrQuali);
 
             return implode(', ', $arrQuali);
         }

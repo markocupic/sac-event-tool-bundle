@@ -28,15 +28,15 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['releaseLevelPrev'] = ['Freigabestufe 
 
 // Legends
 $GLOBALS['TL_LANG']['tl_calendar_events']['title_legend'] = 'Basis-Einstellungen';
+$GLOBALS['TL_LANG']['tl_calendar_events']['tech_difficulty_legend'] = 'Technisch-/konditionelle Schwierigkeiten';
 $GLOBALS['TL_LANG']['tl_calendar_events']['broschuere_legend'] = 'Einstellungen SAC Kursprogramm PDF Broschüre';
 $GLOBALS['TL_LANG']['tl_calendar_events']['deregistration_legend'] = 'Einstellungen für Event-Abmeldungen';
 $GLOBALS['TL_LANG']['tl_calendar_events']['sign_up_form_legend'] = 'Einstellungen für Anmeldeformular';
 $GLOBALS['TL_LANG']['tl_calendar_events']['gallery_legend'] = 'Einstellungen für die Bildergalerie';
 $GLOBALS['TL_LANG']['tl_calendar_events']['registration_legend'] = 'Anmelde-Einstellungen';
 $GLOBALS['TL_LANG']['tl_calendar_events']['tour_report_legend'] = 'Tourrapport';
-$GLOBALS['TL_LANG']['tl_calendar_events']['min_max_member_legend'] = 'Teilnehmerzahl Einstellungen';
-$GLOBALS['TL_LANG']['tl_calendar_events']['event_type_legend'] = 'Event-Art Einstellungen';
-$GLOBALS['TL_LANG']['tl_calendar_events']['journey_legend'] = 'Event-Art Einstellungen';
+$GLOBALS['TL_LANG']['tl_calendar_events']['min_max_member_legend'] = 'Teilnehmerzahl';
+$GLOBALS['TL_LANG']['tl_calendar_events']['event_type_legend'] = 'Event-Typ';
 $GLOBALS['TL_LANG']['tl_calendar_events']['event_registration_confirmation_legend'] = 'E-Mail-Anmeldebestätigung individualisieren';
 
 // Fields
@@ -97,7 +97,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMin'] = ['Schwierig
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourTechDifficultyMax'] = ['Schwierigkeiten Maximum (optional)', 'Definieren Sie hier optional den maximalen technischen Schwierigkeitsgrad.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourDetailText'] = ['Details zur Tour/Route/Wegpunkte', 'Geben Sie hier weitere Details zur Tour an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['generalEventDetailText'] = ['Details zum Anlass', 'Geben Sie hier weitere Details zum Anlass an.'];
-$GLOBALS['TL_LANG']['tl_calendar_events']['executionState'] = ['Durchführungsstatus', 'Geben Sie an, ob der Event durchgeführt werden konnte.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['executionState'] = ['Anlass wie ausgeschrieben durchgeführt?', 'Geben Sie an, ob der Anlass wie ausgeschrieben durchgeführt werden konnte.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['eventSubstitutionText'] = ['Ersatz-/Ausweichtour, falls die Tour nicht wie ausgeschrieben durchgeführt wurde', 'Geben Sie, falls nötig Informationen zur Ersatz-/Ausweichtour an.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourWeatherConditions'] = ['Angaben zum Wetter', 'Geben Sie hier Angaben zum Wetter ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['tourAvalancheConditions'] = ['Lawinensituation', 'Geben Sie hier Angaben zur Lawinensituation ein.'];
@@ -112,6 +112,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['tourProfileDescentTime'] = ['Zeitbeda
 $GLOBALS['TL_LANG']['tl_calendar_events']['generateMainInstructorContactDataFromDb'] = ['Hinterlegte Kontaktdaten immer anzeigen', '<strong class="notice">!!! Wichtig, falls Online-Anmeldung deaktiviert ist !!!</strong> Die Kontaktdaten werden im Frontend im Feld "Anmeldungen" (auch für nicht eingeloggte Mitglieder) ausgegeben.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['customizeEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung individualisieren.', 'Hier können Sie den Text für die E-Mail-Anmeldebestätigung individualisieren.'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['customEventRegistrationConfirmationEmailText'] = ['E-Mail-Text für Anmeldebestätigung', 'Nutzen Sie dieses Feld, um eine individualisierte E-Mail-Bestätigungs für den Event zu erstellen. Fahren Sie mit der Maus über diesen Text, um mehr zu erfahren. Die Tags dienen als Platzhalter für eventspezifische Informationen.'];
+$GLOBALS['TL_LANG']['tl_calendar_events']['eventDurationInDays'] = ['Event-Dauer in Tagen', 'Geben Sie die Event-Dauer in Tagen an.'];
 
 // References
 // Tech difficulties main categories
@@ -132,12 +133,12 @@ $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMounta
 $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMountainGuide::WITH_MOUNTAIN_GUIDE] = '«mit Bergführer/in» und «ohne Bergführerangebot»';
 $GLOBALS['TL_LANG']['tl_calendar_events']['mountainguide_reference'][EventMountainGuide::WITH_MOUNTAIN_GUIDE_OFFER] = '«mit Bergführer/in» und «mit Bergführerangebot»';
 
+// Blank option label for tl_calendar_events.eventState
+$GLOBALS['TL_LANG']['tl_calendar_events']['noSpecificEventState'] = 'Findet statt/hat stattgefunden';
+
 // Use these states for the report
-$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED] = ['Event wie ausgeschrieben durchgeführt.'];
-$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_ADAPTED] = ['Ausweichtour-/event'];
-// These states are already transated by EventState::STATE_CANCELED and EventState::STATE_RESCHEDULED
-//$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_CANCELED] = ['Event abgesagt'];
-//$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_RESCHEDULED] = ['Event verschoben'];
+$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_EXECUTED_LIKE_PREDICTED] = 'Ja';
+$GLOBALS['TL_LANG']['tl_calendar_events'][EventExecutionState::STATE_NOT_EXECUTED_LIKE_PREDICTED] = 'Nein';
 
 $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_0'] = ['Keine Lawinengefahr'];
 $GLOBALS['TL_LANG']['tl_calendar_events']['avalanche_level_1'] = ['Geringe Lawinengefahr'];
