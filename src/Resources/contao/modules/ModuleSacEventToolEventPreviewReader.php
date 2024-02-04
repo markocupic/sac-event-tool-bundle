@@ -36,6 +36,7 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\UriSigner;
 
 /**
@@ -64,6 +65,7 @@ class ModuleSacEventToolEventPreviewReader extends Events
      */
     public function generate()
     {
+        /** @var Request $request */
         $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
         if ($request && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest($request)) {

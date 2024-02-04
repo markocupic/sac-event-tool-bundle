@@ -1040,7 +1040,7 @@ class CalendarEventsHelper
         /** @var UrlParser $urlParser */
         $urlParser = System::getContainer()->get(UrlParser::class);
 
-        $strUrl = '';
+        $eventPreviewUrl = '';
 
         if ('' !== $objEvent->eventType) {
             $objEventType = EventTypeModel::findOneBy('alias', $objEvent->eventType);
@@ -1051,16 +1051,16 @@ class CalendarEventsHelper
 
                     if ($objPage instanceof PageModel) {
                         $params = (Config::get('useAutoItem') ? '/' : '/events/').($objEvent->alias ?: $objEvent->id);
-                        $strUrl = StringUtil::ampersand($objPage->getFrontendUrl($params));
 
-                        $strUrl = $urlParser->addQueryString('event_preview=true', $strUrl);
-                        $strUrl = $uriSigner->sign($strUrl);
+                        $eventPreviewUrl = $urlParser->addQueryString('event_preview=true', $objPage->getAbsoluteUrl($params));
+                        $eventPreviewUrl = StringUtil::ampersand($eventPreviewUrl);
+                        $eventPreviewUrl = $uriSigner->sign($eventPreviewUrl);
                     }
                 }
             }
         }
 
-        return $strUrl;
+        return $eventPreviewUrl;
     }
 
     public static function getTourProfileAsArray(CalendarEventsModel $objEvent): array
