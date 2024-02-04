@@ -807,21 +807,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['executionState'] = [
     'sql'       => "varchar(64) NOT NULL default ''",
 ];
 
-// @todo remove this after jan 2024 migration has been completed
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['_executionState_bak'] = [
-    'sql' => "varchar(64) NOT NULL default ''",
-];
-
-// @todo remove this after jan 2024 migration has been completed
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['_eventState_bak'] = [
-    'sql' => "varchar(64) NOT NULL default ''",
-];
-
-// @todo remove this after jan 2024 migration has been completed
-$GLOBALS['TL_DCA']['tl_calendar_events']['fields']['_migrated'] = [
-    'sql' => "char(1) NOT NULL default ''",
-];
-
 // Add new field coordsCH1903
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['coordsCH1903'] = [
     'exclude'   => true,
