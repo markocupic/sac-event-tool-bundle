@@ -168,8 +168,8 @@ $GLOBALS['TL_LANG']['FORM']['evt_reg_submit'] = 'Für Event anmelden';
 // Send tour rapport notification module
 $GLOBALS['TL_LANG']['MSC']['evt_strn_successfullySendNotification'] = 'Tourrapport und Vergütungsformular erfolgreich versandt an: "%s" CC: "%s".';
 $GLOBALS['TL_LANG']['MSC']['evt_strn_title'] = 'Versand Tourrapport & Vergütungsformular';
-$GLOBALS['TL_LANG']['MSC']['evt_strn_emailRecipients'] = 'E-Mail-Empfänger';
-$GLOBALS['TL_LANG']['MSC']['evt_strn_emailRecipientsPlaceholder'] = 'E-Mail-Adressen der Empfänger (Kasse und Tourenchef) kommagetrennt eingeben.';
+$GLOBALS['TL_LANG']['MSC']['evt_strn_emailRecipients'] = 'E-Mail-Empfänger (kommasepariert)';
+$GLOBALS['TL_LANG']['MSC']['evt_strn_emailRecipientsPlaceholder'] = 'E-Mail-Adressen der Empfänger (Kasse und Tourenchef) kommasepariert eingeben.';
 $GLOBALS['TL_LANG']['MSC']['evt_strn_emailSubject'] = 'Betreff';
 $GLOBALS['TL_LANG']['MSC']['evt_strn_emailText'] = 'Text';
 $GLOBALS['TL_LANG']['MSC']['evt_strn_sendEmail'] = 'E-Mail absenden';
