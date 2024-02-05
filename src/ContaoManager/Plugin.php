@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\ContaoManager;
 
+use Code4Nix\UriSigner\Code4NixUriSigner;
 use Contao\CalendarBundle\ContaoCalendarBundle;
 use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
@@ -34,9 +35,11 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     public function getBundles(ParserInterface $parser): array
     {
         return [
-            BundleConfig::create(MarkocupicRssFeedGeneratorBundle::class),
+			BundleConfig::create(Code4NixUriSigner::class),
+			BundleConfig::create(MarkocupicRssFeedGeneratorBundle::class),
             BundleConfig::create(MarkocupicSacEventToolBundle::class)
                 ->setLoadAfter([
+					Code4NixUriSigner::class,
                     MarkocupicRssFeedGeneratorBundle::class,
                     ContaoCoreBundle::class,
                     ContaoCalendarBundle::class,
