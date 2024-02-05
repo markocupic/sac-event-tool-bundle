@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle;
 
+use Code4Nix\UriSigner\UriSigner;
 use Contao\ArticleModel;
 use Contao\BackendTemplate;
 use Contao\Calendar;
@@ -37,7 +38,6 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\UserModel;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\UriSigner;
 
 /**
  * Front end module "event reader".
@@ -98,7 +98,7 @@ class ModuleSacEventToolEventPreviewReader extends Events
         }
 
         /** @var UriSigner $uriSigner */
-        $uriSigner = System::getContainer()->get('uri_signer');
+        $uriSigner = System::getContainer()->get('code4nix_uri_signer.uri_signer');
 
         if (!$uriSigner->checkRequest($request)) {
             throw new AccessDeniedException('Denied access to this resource.');
