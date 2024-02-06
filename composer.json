@@ -19,7 +19,7 @@
         "codefog/contao-haste": "^5.0",
         "eluceo/ical": "^2.5",
         "league/csv": "^9.7",
-        "code4nix/uri-signer": "*",
+        "code4nix/uri-signer": "^1.0",
         "markocupic/cloudconvert-bundle": "^2.0",
         "markocupic/contao-component-fontawesome-free": "^6.0",
         "markocupic/contao-component-vue-js": "^3.3",

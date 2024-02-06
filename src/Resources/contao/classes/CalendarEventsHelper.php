@@ -1055,7 +1055,7 @@ class CalendarEventsHelper
 
                         $eventPreviewUrl = $urlParser->addQueryString('event_preview=true', $objPage->getAbsoluteUrl($params));
                         $eventPreviewUrl = StringUtil::ampersand($eventPreviewUrl);
-                        $eventPreviewUrl = $uriSigner->sign($eventPreviewUrl, 86400);
+                        $eventPreviewUrl = $uriSigner->sign($eventPreviewUrl,86400);
                     }
                 }
             }
