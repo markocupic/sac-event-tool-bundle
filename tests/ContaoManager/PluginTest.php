@@ -55,7 +55,7 @@ class PluginTest extends ContaoTestCase
                 ContaoCoreBundle::class,
                 MarkocupicRssFeedGeneratorBundle::class,
             ],
-            $bundles[1]->getLoadAfter()
+            $bundles[2]->getLoadAfter()
         );
     }
 }
