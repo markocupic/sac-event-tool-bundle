@@ -306,7 +306,7 @@ readonly class CalendarEventsInstructorInvoice
         }
 
         // Generate a signed url
-        $href = System::getContainer()->get('uri_signer')->sign(System::getContainer()->get('router')->generate(SendTourRapportNotificationController::class, [
+        $href = System::getContainer()->get('code4nix_uri_signer.uri_signer')->sign(System::getContainer()->get('router')->generate(SendTourRapportNotificationController::class, [
             'rapport_id' => $row['id'],
             'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
             'sid' => uniqid(),

@@ -634,7 +634,7 @@ class CalendarEventsMember
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        $url = System::getContainer()->get('uri_signer')->sign(System::getContainer()->get('router')->generate(EventParticipantEmailController::class, [
+        $url = System::getContainer()->get('code4nix_uri_signer.uri_signer')->sign(System::getContainer()->get('router')->generate(EventParticipantEmailController::class, [
             'event_id' => $request->query->get('id'),
             'rt' => $request->query->get('rt'),
             'sid' => uniqid(),

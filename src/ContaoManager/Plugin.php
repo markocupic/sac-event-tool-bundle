@@ -35,11 +35,11 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     public function getBundles(ParserInterface $parser): array
     {
         return [
-			BundleConfig::create(Code4NixUriSigner::class),
-			BundleConfig::create(MarkocupicRssFeedGeneratorBundle::class),
+            BundleConfig::create(Code4NixUriSigner::class),
+            BundleConfig::create(MarkocupicRssFeedGeneratorBundle::class),
             BundleConfig::create(MarkocupicSacEventToolBundle::class)
                 ->setLoadAfter([
-					Code4NixUriSigner::class,
+                    Code4NixUriSigner::class,
                     MarkocupicRssFeedGeneratorBundle::class,
                     ContaoCoreBundle::class,
                     ContaoCalendarBundle::class,

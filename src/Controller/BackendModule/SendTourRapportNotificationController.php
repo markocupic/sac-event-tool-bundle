@@ -102,7 +102,7 @@ class SendTourRapportNotificationController extends AbstractController
     {
         $this->framework->initialize();
         $this->sid = $sid;
-        $uriSigner = $this->system->getContainer()->get('uri_signer');
+        $uriSigner = $this->system->getContainer()->get('code4nix_uri_signer.uri_signer');
         $router = $this->system->getContainer()->get('router');
 
         // Do some checks

@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle;
 
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Code4Nix\UriSigner\UriSigner;
 use Codefog\HasteBundle\UrlParser;
 use Contao\Calendar;
@@ -51,8 +53,6 @@ use Markocupic\SacEventToolBundle\Model\EventTypeModel;
 use Markocupic\SacEventToolBundle\Model\TourDifficultyModel;
 use Markocupic\SacEventToolBundle\Model\TourTypeModel;
 use Symfony\Component\Filesystem\Path;
-use chillerlan\QRCode\QRCode;
-use chillerlan\QRCode\QROptions;
 
 class CalendarEventsHelper
 {
@@ -1035,10 +1035,9 @@ class CalendarEventsHelper
     public static function generateEventPreviewUrl(CalendarEventsModel $objEvent): string
     {
         /** @var UriSigner $uriSigner */
-		$uriSigner = System::getContainer()->get('code4nix_uri_signer.uri_signer');
+        $uriSigner = System::getContainer()->get('code4nix_uri_signer.uri_signer');
 
-
-		/** @var UrlParser $urlParser */
+        /** @var UrlParser $urlParser */
         $urlParser = System::getContainer()->get(UrlParser::class);
 
         $eventPreviewUrl = '';
@@ -1055,7 +1054,7 @@ class CalendarEventsHelper
 
                         $eventPreviewUrl = $urlParser->addQueryString('event_preview=true', $objPage->getAbsoluteUrl($params));
                         $eventPreviewUrl = StringUtil::ampersand($eventPreviewUrl);
-                        $eventPreviewUrl = $uriSigner->sign($eventPreviewUrl,86400);
+                        $eventPreviewUrl = $uriSigner->sign($eventPreviewUrl, 86400);
                     }
                 }
             }

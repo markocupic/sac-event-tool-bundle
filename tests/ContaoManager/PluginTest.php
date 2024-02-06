@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\Tests\ContaoManager;
 
+use Code4Nix\UriSigner\Code4NixUriSigner;
 use Contao\CalendarBundle\ContaoCalendarBundle;
 use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
@@ -37,15 +38,20 @@ class PluginTest extends ContaoTestCase
         /** @var array $bundles */
         $bundles = $plugin->getBundles(new DelegatingParser());
 
-        $this->assertCount(2, $bundles);
-        $this->assertInstanceOf(BundleConfig::class, $bundles[0]);
-        $this->assertSame(MarkocupicRssFeedGeneratorBundle::class, $bundles[0]->getName());
+        $this->assertCount(3, $bundles);
+
+		$this->assertInstanceOf(BundleConfig::class, $bundles[0]);
+		$this->assertSame(Code4NixUriSigner::class, $bundles[0]->getName());
 
         $this->assertInstanceOf(BundleConfig::class, $bundles[1]);
-        $this->assertSame(MarkocupicSacEventToolBundle::class, $bundles[1]->getName());
+        $this->assertSame(MarkocupicRssFeedGeneratorBundle::class, $bundles[1]->getName());
+
+        $this->assertInstanceOf(BundleConfig::class, $bundles[2]);
+        $this->assertSame(MarkocupicSacEventToolBundle::class, $bundles[2]->getName());
         $this->assertSame(
             [
-                ContaoCalendarBundle::class,
+				Code4NixUriSigner::class,
+				ContaoCalendarBundle::class,
                 ContaoCoreBundle::class,
                 MarkocupicRssFeedGeneratorBundle::class,
             ],

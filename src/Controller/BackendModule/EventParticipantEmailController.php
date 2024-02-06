@@ -106,7 +106,7 @@ class EventParticipantEmailController extends AbstractController
     {
         $this->initialize($event_id, $sid);
 
-        $uriSigner = $this->system->getContainer()->get('uri_signer');
+        $uriSigner = $this->system->getContainer()->get('code4nix_uri_signer.uri_signer');
 
         if (!$uriSigner->check($this->requestStack->getCurrentRequest()->getRequestUri())) {
             $this->message->addError($this->translator->trans('MSC.evt_epe_accessDenied', [], 'contao_default'));

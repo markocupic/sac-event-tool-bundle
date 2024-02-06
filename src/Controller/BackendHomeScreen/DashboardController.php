@@ -205,7 +205,7 @@ class DashboardController
         $regId = $this->connection->fetchOne('SELECT id FROM tl_calendar_events_member WHERE eventId = ?', [$eventModel->id]);
 
         if ($regId) {
-            return System::getContainer()->get('uri_signer')->sign(System::getContainer()->get('router')->generate(EventParticipantEmailController::class, [
+            return System::getContainer()->get('code4nix_uri_signer.uri_signer')->sign(System::getContainer()->get('router')->generate(EventParticipantEmailController::class, [
                 'event_id' => $eventModel->id,
                 'rt' => $this->contaoCsrfTokenManager->getDefaultTokenValue(),
                 'sid' => uniqid(),
