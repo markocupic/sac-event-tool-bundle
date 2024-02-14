@@ -618,6 +618,7 @@ class CalendarEventsHelper
         $arrQuali = StringUtil::deserialize($objUser->leiterQualifikation, true);
 
         if (!empty($arrQuali[0])) {
+            Controller::loadLanguageFile('tl_user');
             $strQuali = $GLOBALS['TL_LANG']['tl_user']['refLeiterQualifikation'][(int) $arrQuali[0]] ?? 'undefined';
         }
 
