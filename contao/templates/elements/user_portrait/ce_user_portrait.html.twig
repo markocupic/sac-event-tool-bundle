@@ -3,14 +3,14 @@
 {% block content %}
 
     <!-- indexer::stop -->
-    {{ '{{link::back}}' }}
+    {{ insert_tag('link::back')|raw }}
     <br>
     <br>
     <!-- indexer::continue -->
 
     <div class="row">
         <div class="image_container portrait col-sm-4 col-lg-3">
-            {{ '{{picture::'~getAvatarResourcePath(userModel)~'?size=18}}' }}
+            {{ insert_tag('picture::'~getAvatarResourcePath(userModel)~'?size=18')|raw }}
         </div>
 
         <div class="col-sm-8 col-lg-9">
@@ -51,7 +51,7 @@
 
                 {% if not user.email is empty %}
                     <div class="ce_user_portrait_email">
-                        {{ '{{email::'~user.email~'}}' }}
+                        {{ insert_tag('email::'~user.email)|raw }}
                     </div>
                 {% endif %}
 

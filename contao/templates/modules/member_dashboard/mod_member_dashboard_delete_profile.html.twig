@@ -25,7 +25,7 @@
             Bitte beachte, dass dieser Vorgang nur ausgeführt werden, wenn du keine hängigen Tour-Buchungen hast.
             <br><br>
             <div class="d-block">
-                <a href="{{ '{{env::request}}' }}?action=clear-profile" class="clear-profile-link btn btn-danger">Mein Profil löschen</a>
+                <a href="{{ insert_tag('env::request') }}?action=clear-profile" class="clear-profile-link btn btn-danger">Mein Profil löschen</a>
             </div>
         </div>
     {% endif %}

@@ -19,14 +19,14 @@
                 {% if city|default %}{{ city }}<br>{% endif %}
                 {% if phone|default %}P: {{ phone }}<br>{% endif %}
                 {% if mobile|default %}M: {{ mobile }}<br>{% endif %}
-                {% if email|default %}{{ '{{email_open::'~email~'}}' }}{{ email }}</a><br>{% endif %}
+                {% if email|default %}{{ insert_tag('email_open::'~email)|raw }}{{ email }}</a><br>{% endif %}
             {% else %}
                 {% if street|default and 'street' in showFieldsToGuests %}{{ street }}<br>{% endif %}
                 {% if postal|default and 'postal' in showFieldsToGuests %}{{ postal }}&nbsp;{% endif %}
                 {% if city|default and 'city' in showFieldsToGuests %}{{ city }}<br>{% endif %}
                 {% if phone|default and 'phone' in showFieldsToGuests %}P: {{ phone }}<br>{% endif %}
                 {% if mobile|default and 'mobile' in showFieldsToGuests %}M: {{ mobile }}<br>{% endif %}
-                {% if email|default and 'email' in showFieldsToGuests %}{{ '{{email_open::'~ email~'}}' }}{{ email }}</a><br>{% endif %}
+                {% if email|default and 'email' in showFieldsToGuests %}{{ insert_tag('email_open::'~ email)|raw }}{{ email }}</a><br>{% endif %}
             {% endif %}
         </small>
     </div>

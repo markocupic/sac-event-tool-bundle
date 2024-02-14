@@ -21,7 +21,7 @@
             <div class="box-layout-transparent">
                 <div class="teaser-image-course-detail">
                     {% set image_src = get_event_data(model, 'eventImagePath')|raw ~ '?size=20&alt=' ~ get_event_data(model, 'title')|replace({'&': 'und','?': '','[&]': 'und','&amp;': 'und','=': '',})|escape %}
-                    {{ '{{picture::'~image_src~'}}' }}
+                    {{ insert_tag('picture::'~image_src)|raw }}
                 </div>
             </div>
         </div>
@@ -170,7 +170,7 @@
                         {% if not get_event_data(model, 'disableOnlineRegistration') %}
                             <div class="me-2 mt-3 mb-3">
                                 {# book event button #}
-                                {{ '{{insert_module::408}}' }}
+                                {{ insert_tag('insert_module::408')|raw }}
                             </div>
                         {% endif %}
 

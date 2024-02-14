@@ -22,9 +22,9 @@
         </div>
         <div class="col-6 col-sm-3">
             <figure class="member-dashboard-avatar d-flex justify-content-end mt-3 responsive thumbnail image_container">
-                {{ '{{image::'~getAvatarResourcePath(userModel)~'?width=300}}' }}
+                {{ insert_tag('image::'~getAvatarResourcePath(userModel)~'?width=300')|raw }}
                 {% if avatar|default %}
-                    <a href="{{ '{{env::request}}' }}?do=rotate-image&fileId={{ avatar.id }}" class="member-dashboard-rotate-image-button" title="Bild im UZS um 90° drehen"><i class="fa-solid fa-rotate-right turn-image"></i></a>
+                    <a href="{{ insert_tag('env::request') }}?do=rotate-image&fileId={{ avatar.id }}" class="member-dashboard-rotate-image-button" title="Bild im UZS um 90° drehen"><i class="fa-solid fa-rotate-right turn-image"></i></a>
                 {% endif %}
             </figure>
             {% if user.hasAvatar is same as true %}

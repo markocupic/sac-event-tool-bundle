@@ -28,7 +28,7 @@
 
         <!-- Login form -->
         <div class="mt-5 mb-4">
-            {{ '{{insert_module::' ~ moduleModel.eventRegLoginModule ~ '}}' }}
+            {{ insert_tag('insert_module::' ~ moduleModel.eventRegLoginModule)|raw }}
         </div>
 
     {% elseif constant('CHECKOUT_STEP_CONFIRM', controller) == currentStep %}
