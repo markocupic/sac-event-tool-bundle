@@ -22,6 +22,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -250,7 +251,7 @@ class EventApiController extends AbstractController
         $qb->select('id')
             ->from('tl_calendar_events', 't')
             ->where('t.published = :published')
-            ->setParameter('published', '1')
+            ->setParameter('published', '1', Types::STRING)
         ;
 
         // Filter by calendar ids tl_calendar.id
@@ -274,27 +275,29 @@ class EventApiController extends AbstractController
         // Filter by suitableForBeginners
         if ('1' === $params['suitableForBeginners']) {
             $qb->andWhere('t.suitableForBeginners = :suitableForBeginners');
-            $qb->setParameter('suitableForBeginners', '1');
+            $qb->setParameter('suitableForBeginners', '1', Types::STRING);
         }
 
         // Filter by publicTransportEvent
         if ('1' === $params['publicTransportEvent']) {
             $idPublicTransportJourney = $connection->fetchOne(
-                'SELECT id from tl_calendar_events_journey WHERE alias = ?',
-                ['public-transport'],
+                'SELECT id from tl_calendar_events_journey WHERE alias = :alias',
+                ['alias' => 'public-transport'],
+                ['alias' => Types::STRING],
             );
 
             if ($idPublicTransportJourney) {
                 $qb->andWhere('t.journey = :publicTransportEvent');
-                $qb->setParameter('publicTransportEvent', (int) $idPublicTransportJourney);
+                $qb->setParameter('publicTransportEvent', (int) $idPublicTransportJourney, Types::INTEGER);
             }
         }
 
         // Filter by a certain instructor $_GET['username']
         if (!empty($params['username'])) {
             $userId = $connection->fetchOne(
-                'SELECT id FROM tl_user WHERE username = ?',
-                [$params['username']],
+                'SELECT id FROM tl_user WHERE username = :username',
+                ['username' => $params['username']],
+                ['username' => Types::STRING],
             );
 
             if (!$userId) {
@@ -306,7 +309,7 @@ class EventApiController extends AbstractController
             $qb2->select('pid')
                 ->from('tl_calendar_events_instructor', 't')
                 ->where('t.userId = :instructorId')
-                ->setParameter('instructorId', $userId)
+                ->setParameter('instructorId', $userId, Types::INTEGER)
             ;
 
             $arrEvents = $qb2->fetchFirstColumn();
@@ -350,7 +353,7 @@ class EventApiController extends AbstractController
                             ->where('t2.userId = :qbStInstructorId'.$instrId)
                             ->getSQL()
                     );
-                    $qb->setParameter('qbStInstructorId'.$instrId, $instrId);
+                    $qb->setParameter('qbStInstructorId'.$instrId, $instrId, Types::INTEGER);
                 }
             }
 
@@ -365,7 +368,7 @@ class EventApiController extends AbstractController
             $qbEvtOrg->select('id')
                 ->from('tl_event_organizer', 'o')
                 ->where('o.ignoreFilterInEventList = :true')
-                ->setParameter('true', '1')
+                ->setParameter('true', '1', Types::STRING)
             ;
 
             $arrIgnoredOrganizer = $qbEvtOrg->fetchFirstColumn();
@@ -399,7 +402,7 @@ class EventApiController extends AbstractController
         // Filter by course type
         if (!empty($params['courseType']) && $params['courseType'] > 0) {
             $qb->andWhere('t.courseTypeLevel1 = :courseType');
-            $qb->setParameter('courseType', $params['courseType']);
+            $qb->setParameter('courseType', $params['courseType'], Types::INTEGER);
         }
 
         // Filter by course id
@@ -420,7 +423,7 @@ class EventApiController extends AbstractController
             $eventId = $arrChunk[1] ?? $strId;
 
             $qb->andWhere('t.id = :eventId');
-            $qb->setParameter('eventId', $eventId);
+            $qb->setParameter('eventId', $eventId, Types::STRING);
             $blnIgnoreDate = true;
         }
 
@@ -428,7 +431,7 @@ class EventApiController extends AbstractController
             if (!empty($params['dateStart']) && (false !== ($tstampStart = strtotime($params['dateStart'])))) {
                 // event filter: date start filter
                 $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
-                $qb->setParameter('tstampStart', $tstampStart);
+                $qb->setParameter('tstampStart', $tstampStart, Types::INTEGER);
             } elseif ((int) $params['year'] > 2000) {
                 // event filter: year filter
                 $year = (int) $params['year'];
@@ -436,19 +439,19 @@ class EventApiController extends AbstractController
                 $tstampStop = (int) (strtotime('31-12-'.$year) + 24 * 3600 - 1);
                 $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
                 $qb->andWhere($qb->expr()->lte('t.endDate', ':tstampStop'));
-                $qb->setParameter('tstampStart', $tstampStart);
-                $qb->setParameter('tstampStop', $tstampStop);
+                $qb->setParameter('tstampStart', $tstampStart, Types::INTEGER);
+                $qb->setParameter('tstampStop', $tstampStop, Types::INTEGER);
             } else {
                 // event filter: upcoming events
                 $tstampStart = strtotime(date('Y-m-d', time()));
                 $qb->andWhere($qb->expr()->gte('t.endDate', ':tstampStart'));
-                $qb->setParameter('tstampStart', $tstampStart);
+                $qb->setParameter('tstampStart', $tstampStart, Types::INTEGER);
             }
 
             // event filter: date stop filter
             if (!empty($params['dateEnd']) && (false !== ($dateEnd = strtotime($params['dateEnd'])))) {
                 $qb->andWhere($qb->expr()->lte('t.endDate', ':tstampStop'));
-                $qb->setParameter('tstampStop', $dateEnd);
+                $qb->setParameter('tstampStop', $dateEnd, Types::INTEGER);
             }
         }
 
