@@ -16,11 +16,9 @@ namespace Markocupic\SacEventToolBundle\Controller\BackendModule;
 
 use CloudConvert\Exceptions\HttpClientException;
 use Codefog\HasteBundle\Form\Form;
-use Contao\BackendTemplate;
 use Contao\CalendarEventsModel;
 use Contao\Config;
 use Contao\Controller;
-use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\CoreBundle\Controller\AbstractBackendController;
 use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
 use Contao\CoreBundle\Framework\Adapter;
@@ -37,7 +35,6 @@ use Contao\UserModel;
 use Markocupic\SacEventToolBundle\DocxTemplator\TourRapportGenerator;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\EventOrganizerModel;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -128,21 +125,21 @@ class SendTourRapportNotificationController extends AbstractBackendController
 
         if (true !== $form->isSubmitted()) {
             // Display the email form
-			$view = [];
+            $view = [];
 
-           $view['request_token'] = $rt;
-           $view['event'] = $event;
-           $view['back'] = $this->getBackUri($request);
-           $view['form'] = $form->generate();
-           $view['download_tour_rapport_uri'] = $uriSigner->sign($router->generate(self::class, ['rapport_id' => $rapport_id, 'sid' => $sid, 'rt' => $rt, 'action' => 'download_tour_rapport']));
-           $view['download_invoice_uri'] = $uriSigner->sign($router->generate(self::class, ['rapport_id' => $rapport_id, 'sid' => $sid, 'rt' => $rt, 'action' => 'download_invoice']));
+            $view['request_token'] = $rt;
+            $view['event'] = $event;
+            $view['back'] = $this->getBackUri($request);
+            $view['form'] = $form->generate();
+            $view['download_tour_rapport_uri'] = $uriSigner->sign($router->generate(self::class, ['rapport_id' => $rapport_id, 'sid' => $sid, 'rt' => $rt, 'action' => 'download_tour_rapport']));
+            $view['download_invoice_uri'] = $uriSigner->sign($router->generate(self::class, ['rapport_id' => $rapport_id, 'sid' => $sid, 'rt' => $rt, 'action' => 'download_invoice']));
 
             if ($invoice->countNotifications) {
                 // Protect the user from submitting the form multiple times.
-               $view['info'] = $this->translator->trans('MSC.evt_strn_multiFormSubmitWarning', [$invoice->countNotifications, date('d.m.Y H:i', (int) $invoice->notificationSentOn)], 'contao_default');
+                $view['info'] = $this->translator->trans('MSC.evt_strn_multiFormSubmitWarning', [$invoice->countNotifications, date('d.m.Y H:i', (int) $invoice->notificationSentOn)], 'contao_default');
             }
 
-			return $this->render('@MarkocupicSacEventTool/CalendarEventsInstructorInvoice/be_send_tour_rapport_notification.html.twig',$view);
+            return $this->render('@MarkocupicSacEventTool/CalendarEventsInstructorInvoice/be_send_tour_rapport_notification.html.twig', $view);
         }
 
         // Form inputs have passed validation:

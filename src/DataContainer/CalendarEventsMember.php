@@ -28,9 +28,7 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\DataContainer;
-use Contao\Environment;
 use Contao\Events;
-use Contao\FilesModel;
 use Contao\Image;
 use Contao\MemberModel;
 use Contao\Message;
@@ -40,6 +38,7 @@ use Contao\UserModel;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Types\Types;
 use League\Csv\CannotInsertRecord;
 use League\Csv\InvalidArgument;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
@@ -53,15 +52,14 @@ use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventParticipan
 use Markocupic\SacEventToolBundle\Csv\EventRegistrationListGeneratorCsv;
 use Markocupic\SacEventToolBundle\DocxTemplator\EventRegistrationListGeneratorDocx;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
+use Markocupic\SacEventToolBundle\NotificationType\SubscriptionStateChangeNotificationType;
 use Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsVoter;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
-use NotificationCenter\Model\Notification;
-use PhpOffice\PhpWord\Exception\CopyFileException;
-use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Terminal42\NotificationCenterBundle\NotificationCenter;
 
 class CalendarEventsMember
 {
@@ -73,15 +71,11 @@ class CalendarEventsMember
     private Adapter $calendarEventsHelper;
     private Adapter $calendarEventsMember;
     private Adapter $controller;
-    private Adapter $environment;
     private Adapter $events;
-    private Adapter $files;
     private Adapter $image;
     private Adapter $member;
     private Adapter $message;
-    private Adapter $notification;
     private Adapter $stringUtil;
-    private Adapter $user;
     private Adapter $validator;
 
     public function __construct(
@@ -96,9 +90,7 @@ class CalendarEventsMember
         private readonly TranslatorInterface $translator,
         private readonly UrlParser $urlParser,
         private readonly Util $util,
-        private readonly string $projectDir,
-        private readonly string $sacevtEventAdminName,
-        private readonly string $sacevtEventAdminEmail,
+        private readonly NotificationCenter $notificationCenter,
         private readonly string $sacevtLocale,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
@@ -109,12 +101,9 @@ class CalendarEventsMember
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->calendarEventsMember = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
-        $this->environment = $this->framework->getAdapter(Environment::class);
         $this->events = $this->framework->getAdapter(Events::class);
-        $this->files = $this->framework->getAdapter(FilesModel::class);
         $this->member = $this->framework->getAdapter(MemberModel::class);
         $this->message = $this->framework->getAdapter(Message::class);
-        $this->notification = $this->framework->getAdapter(Notification::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->user = $this->framework->getAdapter(UserModel::class);
         $this->validator = $this->framework->getAdapter(Validator::class);
@@ -247,13 +236,13 @@ class CalendarEventsMember
     }
 
     /**
-     * Download registration list as a DOCX or CSV file.
+     * Download registration list as a DOCX or CSV file. *.
      *
-     * @throws Exception
+     * @param DataContainer $dc
+     *
      * @throws CannotInsertRecord
+     * @throws Exception
      * @throws InvalidArgument
-     * @throws CopyFileException
-     * @throws CreateTemporaryFileException
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
     public function exportMemberList(DataContainer $dc): void
@@ -323,8 +312,7 @@ class CalendarEventsMember
     #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.sectionId.options', priority: 100)]
     public function listSections(): array
     {
-        return $this->connection->fetchAllKeyValue('SELECT sectionId, name FROM tl_sac_section')
-        ;
+        return $this->connection->fetchAllKeyValue('SELECT sectionId, name FROM tl_sac_section');
     }
 
     #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.stateOfSubscription.options', priority: 100)]
@@ -348,9 +336,6 @@ class CalendarEventsMember
         return array_values($arrEventSubscriptionStates);
     }
 
-    /**
-     * @return mixed|string|null
-     */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.stateOfSubscription.save', priority: 100)]
     public function saveCallbackStateOfSubscription($varValue, DataContainer $dc): mixed
     {
@@ -376,10 +361,9 @@ class CalendarEventsMember
                     $this->message->addError('Es ist ein Fehler aufgetreten. Der Teilnehmer kann nicht angemeldet werden, weil er zu dieser Zeit bereits an einem anderen Event bestätigt wurde. Wenn Sie das trotzdem erlauben möchten, dann setzen Sie das Flag "Mehrfachbuchung zulassen".');
                     $varValue = $objEventMemberModel->stateOfSubscription;
                 } elseif ($this->validator->isEmail($objEventMemberModel->email)) {
-                    // Use terminal42/notification_center
-                    $objNotification = $this->notification->findOneByType('onchange_state_of_subscription');
+                    $notificationId = $this->connection->fetchOne('SELECT id FROM tl_nc_notification WHERE type = :type', ['type' => SubscriptionStateChangeNotificationType::NAME], ['type' => Types::STRING]);
 
-                    if (null !== $objNotification) {
+                    if ($notificationId) {
                         $arrTokens = [
                             'participant_state_of_subscription' => html_entity_decode((string) $GLOBALS['TL_LANG']['MSC'][$varValue]),
                             'event_name' => html_entity_decode($objEvent->title),
@@ -389,7 +373,7 @@ class CalendarEventsMember
                             'event_link_detail' => $this->events->generateEventUrl($objEvent, true),
                         ];
 
-                        $objNotification->send($arrTokens, $this->sacevtLocale);
+                        $this->notificationCenter->sendNotification($notificationId, $arrTokens, $this->sacevtLocale);
                     }
                 }
             }
@@ -634,11 +618,13 @@ class CalendarEventsMember
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        $url = System::getContainer()->get('code4nix_uri_signer.uri_signer')->sign(System::getContainer()->get('router')->generate(EventParticipantEmailController::class, [
-            'event_id' => $request->query->get('id'),
-            'rt' => $request->query->get('rt'),
-            'sid' => uniqid(),
-        ]));
+        $url = System::getContainer()->get('code4nix_uri_signer.uri_signer')->sign(
+            System::getContainer()->get('router')->generate(EventParticipantEmailController::class, [
+                'event_id' => $request->query->get('id'),
+                'rt' => $request->query->get('rt'),
+                'sid' => uniqid(),
+            ])
+        );
 
         return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->ampersand($url), $class, $title, $attributes, $label);
     }
@@ -654,12 +640,12 @@ class CalendarEventsMember
     /**
      * Return the delete user button.
      *
-     * @param array  $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
+     * @param array       $row
+     * @param string|null $href
+     * @param string      $label
+     * @param string      $title
+     * @param string|null $icon
+     * @param string      $attributes
      *
      * @return string
      */

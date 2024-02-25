@@ -33,10 +33,10 @@ use Contao\PageModel;
 use Contao\Template;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Image\RotateImage;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\Security\Core\Security;
 
 #[AsFrontendModule(MemberDashboardAvatarUploadController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_avatar_upload')]
 class MemberDashboardAvatarUploadController extends AbstractFrontendModuleController

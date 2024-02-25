@@ -39,9 +39,9 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
             BundleConfig::create(MarkocupicRssFeedGeneratorBundle::class),
             BundleConfig::create(MarkocupicSacEventToolBundle::class)
                 ->setLoadAfter([
-					ContaoCoreBundle::class,
-					ContaoCalendarBundle::class,
-					Code4NixUriSigner::class,
+                    ContaoCoreBundle::class,
+                    ContaoCalendarBundle::class,
+                    Code4NixUriSigner::class,
                     MarkocupicRssFeedGeneratorBundle::class,
                 ]),
         ];

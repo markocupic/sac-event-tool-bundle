@@ -33,14 +33,14 @@ use Contao\Validator;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
-use NotificationCenter\Model\Notification;
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\Security\Core\Security;
+use Terminal42\NotificationCenterBundle\NotificationCenter;
 
-#[AsFrontendModule(MemberDashboardUpcomingEventsController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_upcoming_events')]
+#[AsFrontendModule(MemberDashboardUpcomingEventsController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_member_dashboard_upcoming_events')]
 class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleController
 {
     public const TYPE = 'member_dashboard_upcoming_events';
@@ -51,6 +51,7 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
     public function __construct(
         private readonly ContaoFramework $framework,
         private readonly Security $security,
+        private readonly NotificationCenter $notificationCenter,
         private readonly string $sacevtLocale,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
@@ -122,7 +123,6 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
     {
         // Set adapters
         $messageAdapter = $this->framework->getAdapter(Message::class);
-        $notificationAdapter = $this->framework->getAdapter(Notification::class);
         $calendarEventsMemberModelAdapter = $this->framework->getAdapter(CalendarEventsMemberModel::class);
         $validatorAdapter = $this->framework->getAdapter(Validator::class);
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
@@ -146,104 +146,99 @@ class MemberDashboardUpcomingEventsController extends AbstractFrontendModuleCont
             return;
         }
 
-        // Use terminal42/notification_center
-        $objNotification = $notificationAdapter->findByPk($notificationId);
+        $objEvent = $objEventRegistration->getRelated('eventId');
 
-        if (null !== $objNotification) {
-            $objEvent = $objEventRegistration->getRelated('eventId');
+        if (null !== $objEvent) {
+            $objInstructor = $objEvent->getRelated('mainInstructor');
 
-            if (null !== $objEvent) {
-                $objInstructor = $objEvent->getRelated('mainInstructor');
+            if (EventSubscriptionState::SUBSCRIPTION_REFUSED === $objEventRegistration->stateOfSubscription) {
+                $objEventRegistration->delete();
 
-                if (EventSubscriptionState::SUBSCRIPTION_REFUSED === $objEventRegistration->stateOfSubscription) {
-                    $objEventRegistration->delete();
+                $this->contaoGeneralLogger?->info(
+                    sprintf(
+                        'User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")',
+                        $objEventRegistration->sacMemberId,
+                        $objEventRegistration->eventId,
+                        $objEventRegistration->eventName
+                    ),
+                    ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)]
+                );
 
-                    $this->contaoGeneralLogger?->info(
-                        sprintf(
-                            'User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")',
-                            $objEventRegistration->sacMemberId,
-                            $objEventRegistration->eventId,
-                            $objEventRegistration->eventName
-                        ),
-                        ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)]
-                    );
+                return;
+            }
 
-                    return;
-                }
+            if (EventSubscriptionState::USER_HAS_UNSUBSCRIBED === $objEventRegistration->stateOfSubscription) {
+                $errorMsg = 'Abmeldung fehlgeschlagen! Du hast dich vom Event "'.$objEvent->title.'" bereits abgemeldet.';
+            } elseif (EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED === $objEventRegistration->stateOfSubscription || EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST === $objEventRegistration->stateOfSubscription) {
+                // allow unregistering if member is not confirmed on the event
+                // or member is on the waiting list for this event
+                $blnHasError = false;
+            } elseif (!$objEvent->allowDeregistration) {
+                $errorMsg = 'Du kannst dich vom Event "'.$objEvent->title.'" nicht abmelden. Die Anmeldung ist definitiv. Nimm Kontakt mit dem Event-Organisator auf.';
+            } elseif ($objEvent->startDate < time()) {
+                $errorMsg = 'Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden, da der Event bereits vorbei ist.';
+            } elseif ($objEvent->allowDeregistration && ($objEvent->startDate < (time() + $objEvent->deregistrationLimit * 25 * 3600))) {
+                $errorMsg = 'Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden, da die Abmeldefrist von '.$objEvent->deregistrationLimit.' Tag(en) abgelaufen ist. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
+            } elseif (empty($this->user->email) || !$validatorAdapter->isEmail($this->user->email)) {
+                $errorMsg = 'Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
+            } elseif ((int) $objEventRegistration->sacMemberId !== (int) $this->user->sacMemberId) {
+                $errorMsg = 'Du hast nicht die nötigen Benutzerrechte um dich vom Event "'.$objEvent->title.'" abzumelden.';
+            } elseif (null !== $objInstructor) {
+                // unregister from event
+                $blnHasError = false;
+            } else {
+                $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
+            }
 
-                if (EventSubscriptionState::USER_HAS_UNSUBSCRIBED === $objEventRegistration->stateOfSubscription) {
-                    $errorMsg = 'Abmeldung fehlgeschlagen! Du hast dich vom Event "'.$objEvent->title.'" bereits abgemeldet.';
-                } elseif (EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED === $objEventRegistration->stateOfSubscription || EventSubscriptionState::SUBSCRIPTION_ON_WAITING_LIST === $objEventRegistration->stateOfSubscription) {
-                    // allow unregistering if member is not confirmed on the event
-                    // or member is on the waiting list for this event
-                    $blnHasError = false;
-                } elseif (!$objEvent->allowDeregistration) {
-                    $errorMsg = 'Du kannst dich vom Event "'.$objEvent->title.'" nicht abmelden. Die Anmeldung ist definitiv. Nimm Kontakt mit dem Event-Organisator auf.';
-                } elseif ($objEvent->startDate < time()) {
-                    $errorMsg = 'Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden, da der Event bereits vorbei ist.';
-                } elseif ($objEvent->allowDeregistration && ($objEvent->startDate < (time() + $objEvent->deregistrationLimit * 25 * 3600))) {
-                    $errorMsg = 'Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden, da die Abmeldefrist von '.$objEvent->deregistrationLimit.' Tag(en) abgelaufen ist. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
-                } elseif (empty($this->user->email) || !$validatorAdapter->isEmail($this->user->email)) {
-                    $errorMsg = 'Leider wurde für dieses Konto in der Datenbank keine E-Mail-Adresse gefunden. Daher stehen einige Funktionen nur eingeschränkt zur Verfügung. Bitte hinterlegen Sie auf der Internetseite des Zentralverbands Ihre E-Mail-Adresse.';
-                } elseif ((int) $objEventRegistration->sacMemberId !== (int) $this->user->sacMemberId) {
-                    $errorMsg = 'Du hast nicht die nötigen Benutzerrechte um dich vom Event "'.$objEvent->title.'" abzumelden.';
-                } elseif (null !== $objInstructor) {
-                    // unregister from event
-                    $blnHasError = false;
-                } else {
-                    $errorMsg = 'Es ist ein Fehler aufgetreten. Du konntest nicht vom Event "'.$objEvent->title.'" abgemeldet werden. Nimm, falls nötig, Kontakt mit dem Event-Organisator auf.';
-                }
+            // Unregister from event
+            if (!$blnHasError) {
+                $objEventRegistration->stateOfSubscription = EventSubscriptionState::USER_HAS_UNSUBSCRIBED;
 
-                // Unregister from event
-                if (!$blnHasError) {
-                    $objEventRegistration->stateOfSubscription = EventSubscriptionState::USER_HAS_UNSUBSCRIBED;
+                // Save data record in tl_calendar_events_member
+                $objEventRegistration->save();
 
-                    // Save data record in tl_calendar_events_member
-                    $objEventRegistration->save();
+                // Load language file
+                $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
 
-                    // Load language file
-                    $controllerAdapter->loadLanguageFile('tl_calendar_events_member');
+                $arrTokens = [
+                    'state_of_subscription' => $GLOBALS['TL_LANG']['MSC'][$objEventRegistration->stateOfSubscription],
+                    'event_course_id' => $objEvent->courseId,
+                    'event_name' => $objEvent->title,
+                    'event_type' => $objEvent->eventType,
+                    'instructor_name' => $objInstructor->name,
+                    'instructor_email' => $objInstructor->email,
+                    'participant_name' => $objEventRegistration->firstname.' '.$objEventRegistration->lastname,
+                    'participant_email' => $objEventRegistration->email,
+                    'event_link_detail' => $environmentAdapter->get('url').'/'.$eventsAdapter->generateEventUrl($objEvent),
+                    'sac_member_id' => !empty($objEventRegistration->sacMemberId) ? $objEventRegistration->sacMemberId : 'keine',
+                ];
 
-                    $arrTokens = [
-                        'state_of_subscription' => $GLOBALS['TL_LANG']['MSC'][$objEventRegistration->stateOfSubscription],
-                        'event_course_id' => $objEvent->courseId,
-                        'event_name' => $objEvent->title,
-                        'event_type' => $objEvent->eventType,
-                        'instructor_name' => $objInstructor->name,
-                        'instructor_email' => $objInstructor->email,
-                        'participant_name' => $objEventRegistration->firstname.' '.$objEventRegistration->lastname,
-                        'participant_email' => $objEventRegistration->email,
-                        'event_link_detail' => $environmentAdapter->get('url').'/'.$eventsAdapter->generateEventUrl($objEvent),
-                        'sac_member_id' => !empty($objEventRegistration->sacMemberId) ? $objEventRegistration->sacMemberId : 'keine',
-                    ];
+                if ($objEvent->registrationGoesTo > 0) {
+                    $objUser = $userModelAdapter->findByPk($objEvent->registrationGoesTo);
 
-                    if ($objEvent->registrationGoesTo > 0) {
-                        $objUser = $userModelAdapter->findByPk($objEvent->registrationGoesTo);
-
-                        if (null !== $objUser) {
-                            if ('' !== $objUser->email) {
-                                if ($validatorAdapter->isEmail($objUser->email)) {
-                                    $arrTokens['instructor_name'] = $objUser->name;
-                                    $arrTokens['instructor_email'] = $objUser->email;
-                                }
+                    if (null !== $objUser) {
+                        if ('' !== $objUser->email) {
+                            if ($validatorAdapter->isEmail($objUser->email)) {
+                                $arrTokens['instructor_name'] = $objUser->name;
+                                $arrTokens['instructor_email'] = $objUser->email;
                             }
                         }
                     }
-
-                    $messageAdapter->addInfo('Du hast dich vom Event "'.$objEventRegistration->eventName.'" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.');
-
-                    $this->contaoGeneralLogger?->info(
-                        sprintf(
-                            'User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")',
-                            $objEventRegistration->sacMemberId,
-                            $objEventRegistration->eventId,
-                            $objEventRegistration->eventName
-                        ),
-                        ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)]
-                    );
-
-                    $objNotification->send($arrTokens, $this->sacevtLocale);
                 }
+
+                $messageAdapter->addInfo('Du hast dich vom Event "'.$objEventRegistration->eventName.'" abgemeldet. Der Leiter wurde per E-Mail informiert. Zur Bestätigung findest du in deinem Postfach eine Kopie dieser Nachricht.');
+
+                $this->contaoGeneralLogger?->info(
+                    sprintf(
+                        'User with SAC-User-ID %d has unsubscribed himself from event with ID: %d ("%s")',
+                        $objEventRegistration->sacMemberId,
+                        $objEventRegistration->eventId,
+                        $objEventRegistration->eventName
+                    ),
+                    ['contao' => new ContaoContext(__METHOD__, Log::EVENT_UNSUBSCRIPTION)]
+                );
+
+                $this->notificationCenter->sendNotification($notificationId, $arrTokens, $this->sacevtLocale);
             }
         }
 

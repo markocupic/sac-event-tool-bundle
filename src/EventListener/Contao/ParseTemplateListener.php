@@ -19,8 +19,8 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\Template;
 use Markocupic\SacEventToolBundle\Controller\BackendHomeScreen\DashboardController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Security;
 
 class ParseTemplateListener
 {

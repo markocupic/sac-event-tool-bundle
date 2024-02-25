@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Markocupic\SacEventToolBundle\Controller\BackendModule;
 
 use Codefog\HasteBundle\Form\Form;
-use Contao\BackendTemplate;
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
@@ -35,6 +34,7 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -42,7 +42,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment as Twig;
 
@@ -135,7 +134,7 @@ class EventParticipantEmailController extends AbstractBackendController
             throw new AccessDeniedException('Access denied. Please use a valid "action" parameter.');
         }
 
-		$view = [];
+        $view = [];
         $view['event'] = $this->event;
         $view['allowed_extensions'] = self::ALLOWED_EXTENSIONS;
         $view['back'] = $this->getBackUri();
@@ -147,8 +146,7 @@ class EventParticipantEmailController extends AbstractBackendController
             $view['error'] = $this->message->generateUnwrapped();
         }
 
-		return $this->render('@MarkocupicSacEventTool/BackendEventParticipantEmail/be_event_participant_email.html.twig', $view);
-
+        return $this->render('@MarkocupicSacEventTool/BackendEventParticipantEmail/be_event_participant_email.html.twig', $view);
     }
 
     private function initialize(int $eventId, string $sid): void

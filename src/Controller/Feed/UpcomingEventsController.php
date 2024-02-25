@@ -47,7 +47,7 @@ class UpcomingEventsController extends AbstractController
         private readonly FeedFactory $feedFactory,
         private readonly Connection $connection,
         private readonly string $sacevtLocale,
-		private readonly string $projectDir,
+        private readonly string $projectDir,
     ) {
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);

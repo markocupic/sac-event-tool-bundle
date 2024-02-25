@@ -27,9 +27,9 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Template;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Security;
 
 #[AsFrontendModule(MemberDashboardAvatarController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_avatar')]
 class MemberDashboardAvatarController extends AbstractFrontendModuleController

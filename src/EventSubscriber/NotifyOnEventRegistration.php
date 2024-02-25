@@ -24,8 +24,8 @@ use Contao\UserModel;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Event\EventRegistrationEvent;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
-use NotificationCenter\Model\Notification;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Terminal42\NotificationCenterBundle\NotificationCenter;
 
 final class NotifyOnEventRegistration implements EventSubscriberInterface
 {
@@ -33,7 +33,6 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
 
     private Adapter $calendarEventsHelperAdapter;
     private Adapter $eventsAdapter;
-    private Adapter $notificationAdapter;
     private Adapter $userModelAdapter;
 
     private array $arrData = [];
@@ -44,11 +43,11 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
 
     public function __construct(
         private readonly ContaoFramework $framework,
+        private readonly NotificationCenter $notificationCenter,
         private readonly string $sacevtLocale,
     ) {
         $this->calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->eventsAdapter = $this->framework->getAdapter(Events::class);
-        $this->notificationAdapter = $this->framework->getAdapter(Notification::class);
         $this->userModelAdapter = $this->framework->getAdapter(UserModel::class);
     }
 
@@ -63,8 +62,7 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
     {
         $this->initialize($event);
 
-        /** @var Notification $objNotification */
-        $objNotification = $this->notificationAdapter->findByPk($this->moduleModel->receiptEventRegistrationNotificationId);
+        $notificationId = $this->moduleModel->receiptEventRegistrationNotificationId;
 
         /** @var UserModel $objInstructor */
         $objInstructor = $this->userModelAdapter->findByPk($this->eventModel->mainInstructor);
@@ -91,7 +89,7 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
         }
 
         // Use terminal42/notification_center
-        if (null !== $objNotification) {
+        if ($notificationId) {
             // Get the event type
             $eventType = \strlen($GLOBALS['TL_LANG']['MSC'][$this->eventModel->eventType]) ? $GLOBALS['TL_LANG']['MSC'][$this->eventModel->eventType].': ' : '';
 
@@ -127,7 +125,7 @@ final class NotifyOnEventRegistration implements EventSubscriberInterface
                 'participant_street' => html_entity_decode($this->memberModel->street),
             ];
 
-            $objNotification->send($arrTokens, $this->sacevtLocale);
+            $this->notificationCenter->sendNotification($notificationId, $arrTokens, $this->sacevtLocale);
         }
     }
 

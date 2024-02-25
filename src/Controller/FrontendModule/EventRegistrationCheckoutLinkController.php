@@ -46,14 +46,10 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
         $inputAdapter = $this->framework->getAdapter(Input::class);
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
-        $configAdapter = $this->framework->getAdapter(Config::class);
 
-        // Set the item from the auto_item parameter
-        if (!isset($_GET['events']) && $configAdapter->get('useAutoItem') && isset($_GET['auto_item'])) {
-            $inputAdapter->setGet('events', $inputAdapter->get('auto_item'));
-        }
+        $eventAlias = $inputAdapter->get('auto_item');
 
-        $this->objEvent = $calendarEventsModelAdapter->findByIdOrAlias($inputAdapter->get('events'));
+        $this->objEvent = $calendarEventsModelAdapter->findByIdOrAlias($eventAlias);
         $this->objJumpTo = $pageModelAdapter->findPublishedById($model->eventRegCheckoutLinkPage);
 
         if ($this->scopeMatcher->isFrontendRequest($request) && (!$this->objEvent || !$this->objJumpTo)) {

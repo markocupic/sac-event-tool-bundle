@@ -28,10 +28,10 @@ use Contao\PageModel;
 use Contao\Template;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsFrontendModule(MemberDashboardEditProfileController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_edit_profile')]

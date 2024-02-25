@@ -247,7 +247,12 @@
                                         // Save the vue instance to the local storage.
                                         // That will prevent a time-consuming request,
                                         // if the user clicks back from the detail module to the listing module.
-                                        localStorage.setItem(btoa(nextURL + '&modId=' + vue.modId), JSON.stringify(vueInstance));
+                                        window.localStorage.clear();
+                                        try {
+                                            window.localStorage.setItem(btoa(nextURL + '&modId=' + vue.modId), JSON.stringify(vueInstance));
+                                        } catch (e) {
+                                            console.error('Local storage is full.')
+                                        }
 
                                         // Redirect to detail page
                                         window.location.href = link;

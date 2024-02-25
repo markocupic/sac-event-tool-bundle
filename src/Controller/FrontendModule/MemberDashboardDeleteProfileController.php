@@ -26,10 +26,10 @@ use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\Template;
 use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\Security\Core\Security;
 
 #[AsFrontendModule(MemberDashboardDeleteProfileController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_member_dashboard_delete_profile')]
 class MemberDashboardDeleteProfileController extends AbstractFrontendModuleController

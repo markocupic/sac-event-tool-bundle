@@ -19,7 +19,7 @@ use Contao\BackendUser;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\Image;
 use Contao\StringUtil;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class EventReleaseLevelPolicyPackage
 {

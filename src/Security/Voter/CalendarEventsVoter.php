@@ -21,9 +21,9 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\StringUtil;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Model\EventReleaseLevelPolicyModel;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\Security;
 
 class CalendarEventsVoter extends Voter
 {
