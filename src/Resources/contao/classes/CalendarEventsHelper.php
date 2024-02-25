@@ -1162,7 +1162,7 @@ class CalendarEventsHelper
 
         // Symlink
         $projectDir = System::getContainer()->getParameter('kernel.project_dir');
-        $webDir = System::getContainer()->getParameter('contao.web_dir');
+        $webDir = Path::join($projectDir, 'public');
         $relWebDir = Path::makeRelative($webDir, $projectDir); // public
 
         // Symlink (target: 'system/qrcodes', link: 'public/system/qrcodes')

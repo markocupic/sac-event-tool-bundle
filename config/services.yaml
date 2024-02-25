@@ -4,7 +4,6 @@ services:
         autoconfigure: true
         public: false
         bind:
-            $webDir: '%contao.web_dir%' # '%kernel.project_dir%/public'
             $passwordHasherFactory: '@security.password_hasher_factory'
             $projectDir: '%kernel.project_dir%'
             $sacevtSectionName: '%sacevt.section_name%'

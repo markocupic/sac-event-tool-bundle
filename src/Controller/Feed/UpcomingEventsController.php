@@ -30,6 +30,7 @@ use Markocupic\RssFeedGeneratorBundle\Item\ItemGroup;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -46,7 +47,7 @@ class UpcomingEventsController extends AbstractController
         private readonly FeedFactory $feedFactory,
         private readonly Connection $connection,
         private readonly string $sacevtLocale,
-        private readonly string $webDir,
+		private readonly string $projectDir,
     ) {
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
@@ -167,7 +168,7 @@ class UpcomingEventsController extends AbstractController
             );
         }
 
-        return $rss->render($this->webDir.'/'.$filePath);
+        return $rss->render(Path::join($this->projectDir, 'public').'/'.$filePath);
     }
 
     /**
