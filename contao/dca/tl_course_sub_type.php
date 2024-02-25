@@ -12,9 +12,12 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\DC_Table;
+use Contao\DataContainer;
+
 $GLOBALS['TL_DCA']['tl_course_sub_type'] = [
 	'config'   => [
-		'dataContainer'    => 'Table',
+		'dataContainer'    => DC_Table::class,
 		'doNotCopyRecords' => true,
 		'enableVersioning' => true,
 		'switchToEdit'     => true,
@@ -28,9 +31,9 @@ $GLOBALS['TL_DCA']['tl_course_sub_type'] = [
 	],
 	'list'     => [
 		'sorting'           => [
-			'mode'        => 2,
+			'mode'        => DataContainer::MODE_SORTABLE,
 			'fields'      => ['code ASC'],
-			'flag'        => 1,
+			'flag'        => DataContainer::MODE_SORTED,
 			'panelLayout' => 'filter;sort,search,limit',
 		],
 		'label'             => [
@@ -80,7 +83,7 @@ $GLOBALS['TL_DCA']['tl_course_sub_type'] = [
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 		],
 		'tstamp' => [
-			'flag' => 6,
+			'flag' => DataContainer::SORT_DAY_DESC,
 			'sql'  => "int(10) unsigned NOT NULL default '0'",
 		],
 		'code'   => [

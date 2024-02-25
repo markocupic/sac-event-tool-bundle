@@ -12,9 +12,12 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\DC_Table;
+use Contao\DataContainer;
+
 $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
 	'config'   => [
-		'dataContainer'    => 'Table',
+		'dataContainer'    => DC_Table::class,
 		'ctable'           => ['tl_event_release_level_policy'],
 		'switchToEdit'     => true,
 		'enableVersioning' => true,
@@ -26,9 +29,9 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
 	],
 	'list'     => [
 		'sorting'           => [
-			'mode'        => 1,
+			'mode'        => DataContainer::MODE_SORTED,
 			'fields'      => ['title'],
-			'flag'        => 1,
+			'flag'        => DataContainer::SORT_INITIAL_LETTER_ASC,
 			'panelLayout' => 'filter;search,limit',
 		],
 		'label'             => [
@@ -43,13 +46,13 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
 			],
 		],
 		'operations'        => [
-			'edit'       => [
-				'href' => 'table=tl_event_release_level_policy',
-				'icon' => 'edit.svg',
-			],
 			'editheader' => [
 				'href' => 'table=tl_event_release_level_policy_package&amp;act=edit',
-				'icon' => 'header.svg',
+				'icon' => 'edit.svg',
+			],
+			'edit'       => [
+				'href' => 'table=tl_event_release_level_policy',
+				'icon' => 'children.svg',
 			],
 			'copy'       => [
 				'href' => 'act=paste&amp;mode=copy',
@@ -80,7 +83,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
 			'inputType' => 'text',
 			'exclude'   => true,
 			'search'    => true,
-			'flag'      => 1,
+			'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
 			'eval'      => ['mandatory' => true, 'rgxp' => 'alnum', 'maxlength' => 64, 'tl_class' => 'w50'],
 			'sql'       => 'varchar(64) NULL',
 		],

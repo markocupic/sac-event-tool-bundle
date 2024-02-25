@@ -12,12 +12,15 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\DC_Table;
+use Contao\DataContainer;
+
 $GLOBALS['TL_DCA']['tl_event_filter_form'] = [
 	'config' => [
 		// This table is only a fake.
 		// The dca structure is used to generate form fields
 		// with the form class of contao haste.
-		'dataContainer' => 'Table',
+		'dataContainer' => DC_Table::class,
 	],
 	'fields' => [
 		'year'                 => [

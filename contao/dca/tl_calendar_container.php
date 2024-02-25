@@ -12,10 +12,13 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\DC_Table;
+use Contao\DataContainer;
+
 $GLOBALS['TL_DCA']['tl_calendar_container'] = [
 	// Config
 	'config'   => [
-		'dataContainer'    => 'Table',
+		'dataContainer'    => DC_Table::class,
 		'ctable'           => ['tl_calendar'],
 		'switchToEdit'     => true,
 		'enableVersioning' => true,
@@ -28,9 +31,9 @@ $GLOBALS['TL_DCA']['tl_calendar_container'] = [
 	// List
 	'list'     => [
 		'sorting'           => [
-			'mode'            => 1,
+			'mode'            => DataContainer::MODE_SORTED,
 			'fields'          => ['title'],
-			'flag'            => 2,
+			'flag'            => DataContainer::SORT_INITIAL_LETTER_DESC,
 			'panelLayout'     => 'filter;search,limit',
 			'disableGrouping' => true,
 		],
@@ -47,15 +50,15 @@ $GLOBALS['TL_DCA']['tl_calendar_container'] = [
 			],
 		],
 		'operations'        => [
-			'edit'       => [
-				'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['edit'],
-				'href'  => 'table=tl_calendar',
-				'icon'  => 'edit.svg',
-			],
 			'editheader' => [
 				'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['editheader'],
 				'href'  => 'act=edit',
-				'icon'  => 'header.svg',
+				'icon'  => 'edit.svg',
+			],
+			'edit'       => [
+				'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['edit'],
+				'href'  => 'table=tl_calendar',
+				'icon'  => 'children.svg',
 			],
 			'copy'       => [
 				'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['copy'],

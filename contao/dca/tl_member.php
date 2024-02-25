@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 use Contao\BackendUser;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Contao\DataContainer;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -69,7 +70,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = [
 	'exclude'   => true,
 	'search'    => true,
 	'sorting'   => true,
-	'flag'      => 1,
+	'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
 	'inputType' => 'text',
 	'eval'      => ['doNotCopy' => true, 'readonly' => true, 'mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50', 'rgxp' => 'natural'],
 	'sql'       => "int(10) unsigned NOT NULL default 0",
@@ -110,7 +111,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['profession'] = [
 	'exclude'   => true,
 	'search'    => true,
 	'sorting'   => true,
-	'flag'      => 1,
+	'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
 	'inputType' => 'text',
 	'eval'      => ['maxlength' => 255, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
 	'sql'       => "varchar(255) NOT NULL default ''",

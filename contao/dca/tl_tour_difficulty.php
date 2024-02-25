@@ -12,9 +12,12 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\DC_Table;
+use Contao\DataContainer;
+
 $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
 	'config'   => [
-		'dataContainer'      => 'Table',
+		'dataContainer'      => DC_Table::class,
 		'ptable'             => 'tl_tour_difficulty_category',
 		'doNotCopyRecords'   => true,
 		'enableVersioning'   => true,
@@ -28,9 +31,9 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
 	],
 	'list'     => [
 		'sorting'           => [
-			'mode'            => 4,
+			'mode'            => DataContainer::MODE_PARENT,
 			'fields'          => ['code ASC'],
-			'flag'            => 1,
+			'flag'            => DataContainer::SORT_INITIAL_LETTER_ASC,
 			'panelLayout'     => 'filter;sort,search,limit',
 			'headerFields'    => ['level', 'title'],
 			'disableGrouping' => true,

@@ -15,21 +15,23 @@ declare(strict_types=1);
 use Contao\BackendUser;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Markocupic\SacEventToolBundle\Config\EventType;
+use Contao\DataContainer;
 
 // Table config
 $GLOBALS['TL_DCA']['tl_calendar']['config']['ptable'] = 'tl_calendar_container';
 
 // List
-$GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['mode'] = 4;
+$GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['mode'] = DataContainer::MODE_PARENT;
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['headerFields'] = ['title'];
 $GLOBALS['TL_DCA']['tl_calendar']['list']['sorting']['disableGrouping'] = true;
 
 if (BackendUser::getInstance()->admin) {
-	$GLOBALS['TL_DCA']['tl_calendar']['list']['operations']['cut'] = [
-		'label' => &$GLOBALS['TL_LANG']['tl_calendar']['cut'],
-		'href'  => 'act=paste&amp;mode=cut',
-		'icon'  => 'cut.svg',
-	];
+	/**
+	 * $GLOBALS['TL_DCA']['tl_calendar']['list']['operations']['cut'] = [
+	 * 'label' => &$GLOBALS['TL_LANG']['tl_calendar']['cut'],
+	 * 'href'  => 'act=paste&amp;mode=cut',
+	 * 'icon'  => 'cut.svg',
+	 * ];**/
 }
 
 // Palettes

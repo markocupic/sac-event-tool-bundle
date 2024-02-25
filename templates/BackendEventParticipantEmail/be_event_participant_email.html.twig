@@ -1,4 +1,4 @@
-{% extends "@Contao/be_main.html5" %}
+{% extends "@Contao/be_main" %}
 
 {% block headline %}
     {{ 'MSC.evt_epe_appTitle'|trans({'%s': event.title}, 'contao_default') }}
@@ -8,7 +8,7 @@
         {{ error|raw }}
     {% endif %}{% endblock %}
 
-{% block main %}
+{% block main_content %}
     <script src="assets/contao-component-vue-js/vue/dist/vue.global.prod.js?3.3.4"></script>
     <div id="eventParticipantEmail">
         <div id="tl_buttons">

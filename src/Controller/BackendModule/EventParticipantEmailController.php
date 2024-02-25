@@ -19,6 +19,7 @@ use Contao\BackendTemplate;
 use Contao\BackendUser;
 use Contao\CalendarEventsModel;
 use Contao\Controller;
+use Contao\CoreBundle\Controller\AbstractBackendController;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -34,7 +35,6 @@ use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventSubscriptionState;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsMemberModel;
 use Markocupic\SacEventToolBundle\Util\EventRegistrationUtil;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -57,7 +57,7 @@ use Twig\Environment as Twig;
  * vendor/markocupic/sac-event-tool-bundle/public/css/be_stylesheet.css
  */
 #[Route('/contao/event_participant_email/{event_id}/{sid}/{rt}', name: EventParticipantEmailController::class, defaults: ['_scope' => 'backend', '_token_check' => true])]
-class EventParticipantEmailController extends AbstractController
+class EventParticipantEmailController extends AbstractBackendController
 {
     public const SESSION_BAG_KEY = 'sacevt_event_participant_email';
     public const MAX_FILE_SIZE = 4000000;
@@ -135,19 +135,20 @@ class EventParticipantEmailController extends AbstractController
             throw new AccessDeniedException('Access denied. Please use a valid "action" parameter.');
         }
 
-        $template = new BackendTemplate('be_event_participant_email');
-        $template->event = $this->event;
-        $template->allowed_extensions = self::ALLOWED_EXTENSIONS;
-        $template->back = $this->getBackUri();
-        $template->form = $this->createAndValidateForm()->generate();
-        $template->max_filesize = self::MAX_FILE_SIZE;
-        $template->request_token = $rt;
+		$view = [];
+        $view['event'] = $this->event;
+        $view['allowed_extensions'] = self::ALLOWED_EXTENSIONS;
+        $view['back'] = $this->getBackUri();
+        $view['form'] = $this->createAndValidateForm()->generate();
+        $view['max_filesize'] = self::MAX_FILE_SIZE;
+        $view['request_token'] = $rt;
 
         if ($this->message->hasError()) {
-            $template->error = $this->message->generateUnwrapped();
+            $view['error'] = $this->message->generateUnwrapped();
         }
 
-        return new Response($template->parse());
+		return $this->render('@MarkocupicSacEventTool/BackendEventParticipantEmail/be_event_participant_email.html.twig', $view);
+
     }
 
     private function initialize(int $eventId, string $sid): void

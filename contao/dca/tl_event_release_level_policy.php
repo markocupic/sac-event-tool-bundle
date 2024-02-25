@@ -12,9 +12,12 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\DC_Table;
+use Contao\DataContainer;
+
 $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 	'config'   => [
-		'dataContainer'    => 'Table',
+		'dataContainer'    => DC_Table::class,
 		'ptable'           => 'tl_event_release_level_policy_package',
 		'doNotCopyRecords' => true,
 		'enableVersioning' => true,
@@ -27,7 +30,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 	],
 	'list'     => [
 		'sorting'           => [
-			'mode'            => 4,
+			'mode'            => DataContainer::MODE_PARENT,
 			'fields'          => ['level'],
 			'panelLayout'     => 'filter;search,limit',
 			'headerFields'    => ['level', 'title'],

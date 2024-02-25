@@ -12,12 +12,15 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/sac-event-tool-bundle
  */
 
+use Contao\DC_Table;
+use Contao\DataContainer;
+
 /*
  * Table tl_calendar_events_instructor
  */
 $GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = [
 	'config' => [
-		'dataContainer'     => 'Table',
+		'dataContainer'     => DC_Table::class,
 		'notCopyable'       => true,
 		'ptable'            => 'tl_calendar_events',
 		// Do not copy nor delete records, if an item has been deleted!

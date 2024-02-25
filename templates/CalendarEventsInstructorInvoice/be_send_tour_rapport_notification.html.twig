@@ -8,7 +8,7 @@
     {{ error|raw }}
 {% endif %}{% endblock %}
 
-{% block main %}
+{% block main_content %}
     {% if info|default %}
         <div class="tl_message">
             <p class="tl_info">{{ info }}</p>
@@ -103,4 +103,4 @@
             });
         });
     </script>
-{% endblock main %}
+{% endblock main_content %}

@@ -13,6 +13,8 @@ declare(strict_types=1);
  */
 
 use Contao\BackendUser;
+use Contao\DC_Table;
+use Contao\DataContainer;
 use Contao\Input;
 use Contao\System;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
