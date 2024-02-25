@@ -169,7 +169,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'eval'      => ['isBoolean' => true],
-			'sql'       => "char(1) NOT NULL default ''",
+			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 		'groupReleaseLevelPerm'          => [
 			'exclude'   => true,
