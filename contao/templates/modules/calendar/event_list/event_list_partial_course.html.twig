@@ -223,7 +223,14 @@
                                     // Save the vue instance to the local storage.
                                     // That will prevent a time-consuming request,
                                     // if the user clicks backs from the detail module to the listing module.
-                                    localStorage.setItem(btoa(nextURL + '&modId=' + vue.modId), JSON.stringify(vueInstance));
+                                    const key = btoa(nextURL + '&modId=' + vue.modId);
+
+                                    try {
+                                        // @todo: try to distribute data on multiole keys
+                                        localStorage.setItem(key, JSON.stringify(vueInstance));
+                                    } catch (e) {
+                                        console.error('Storage: Setting the value of ' + key + ' exceeded the quota.');
+                                    }
 
                                     // Redirect to detail page
                                     window.location.href = link;
