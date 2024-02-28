@@ -54,7 +54,8 @@ $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['cableCarTaxesText'
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['roadTaxes'] = ['Park-/Strassen-/Tunnelgebühren pro Auto in CHF', 'Geben Sie die Park-/Strassen-/Tunnelgebühren pro Auto ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['carTaxesKm'] = ['Anzahl mit PW zurückgelegte Kilometer pro Fahrzeug', 'Geben Sie die Anzahl Kilometer ein, welche pro Fahrzeug zurückgelegt wurde. Wird für die Kilometerabrechnung benötigt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['countCars'] = ['Anzahl PW', "Geben Sie die Anzahl PW's ein. Wird für die Kilometerabrechnung benötigt."];
-$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['phoneTaxes'] = ['Telefon/Porti in CHF (pauschal CHF 10.00/Tag)', 'Geben Sie die Telefon-/Portokosten ein.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['expenseReimbursement'] = ['Spesenentschädigung in CHF (pauschal 10.-- pro Tag/Abend)', 'Geben Sie die angefallenen Spesen ein.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['organizationalFlatRate'] = ['Organisationspauschale in CHF: pauschal 10.-- pro Tag/Abend (auch bei Absage möglich)', 'Geben Sie die Organisationspauschale ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['iban'] = ['IBAN Nummer', 'Geben Sie Ihre IBAN Nummer ein. Wird für die Überweisung auf Ihr Bankkonto benötigt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['notice'] = ['Weitere Anmerkungen', 'Geben Sie weitere Anmerkungen ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['eventDuration'] = ['Event Dauer in Tagen', 'Geben Sie die Event-Dauer in Tagen an.'];

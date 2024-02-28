@@ -210,7 +210,7 @@ class Event
         $objPhpWord->replace('avalancheConditions', $this->prepareString($GLOBALS['TL_LANG']['tl_calendar_events'][$objEvent->tourAvalancheConditions][0]));
         $objPhpWord->replace('specialIncidents', $this->prepareString($objEvent->tourSpecialIncidents));
 
-        $arrFields = ['sleepingTaxes', 'sleepingTaxesText', 'miscTaxes', 'miscTaxesText', 'privateArrival', 'railwTaxes', 'railwTaxesText', 'cableCarTaxes', 'cableCarTaxesText', 'roadTaxes', 'carTaxesKm', 'countCars', 'phoneTaxes'];
+        $arrFields = ['sleepingTaxes', 'sleepingTaxesText', 'miscTaxes', 'miscTaxesText', 'privateArrival', 'railwTaxes', 'railwTaxesText', 'cableCarTaxes', 'cableCarTaxesText', 'roadTaxes', 'carTaxesKm', 'countCars', 'expenseReimbursement', 'organizationalFlatRate'];
 
         foreach ($arrFields as $field) {
             $objPhpWord->replace($field, $this->prepareString($objEventInvoice->{$field}));
@@ -233,7 +233,7 @@ class Event
         }
 
         $objPhpWord->replace('carTaxes', $this->prepareString(round($carTaxes, 2)));
-        $totalCosts = $objEventInvoice->sleepingTaxes + $objEventInvoice->miscTaxes + $objEventInvoice->railwTaxes + $objEventInvoice->cableCarTaxes + $objEventInvoice->phoneTaxes + $carTaxes;
+        $totalCosts = $objEventInvoice->sleepingTaxes + $objEventInvoice->miscTaxes + $objEventInvoice->railwTaxes + $objEventInvoice->cableCarTaxes + $objEventInvoice->expenseReimbursement + $objEventInvoice->organizationalFlatRate + $carTaxes;
         $objPhpWord->replace('totalCosts', $this->prepareString(ceil($totalCosts)));
 
         // Notice
