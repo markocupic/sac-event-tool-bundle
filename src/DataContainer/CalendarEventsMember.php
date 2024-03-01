@@ -178,7 +178,7 @@ class CalendarEventsMember
             }
         }
 
-		// @todo: if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->id)) {
+        // @todo: if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->id)) {
         if ($this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $dc->currentPid)) {
             // Grant write access to the event registration table if the user is member of an allowed group.
             return;

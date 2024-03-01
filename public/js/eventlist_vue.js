@@ -98,33 +98,66 @@ if (typeof VueTourList !== 'function') {
 						return null === take ? null : parseInt(take);
 					},
 
-					// Load items from server
-					fetchItems: function fetchItems() {
+					// Load items from server or indexed database
+					fetchItems: async function fetchItems() {
 						const self = this;
 
-						// Try to retrieve data from storage
-						const storageData = localStorage.getItem(btoa(window.location.href + '&modId=' + self.modId));
+						// Initialize indexedDB
+						const db = new Dexie('SacEventToolEventListing');
+						db.version(1).stores({
+							eventStore: '++id, path, expires'
+						});
 
-						if (storageData) {
-							localStorage.removeItem(btoa(window.location.href + '&modId=' + self.modId));
-							const storageObject = JSON.parse(storageData);
+						// Delete expired data
+						await db.eventStore.where("expires")
+						.below(Math.round(+new Date() / 1000))
+						.delete()
+						;
+
+						const eventStoreData = await db.eventStore
+							.where("path")
+							.equals(btoa(window.location.href + '&modId=' + self.modId))
+							.first()
+						;
+
+						if (eventStoreData && eventStoreData.path && eventStoreData.vueDataSerialized) {
+
+							// Delete data from indexed database
+							await db.eventStore.delete(eventStoreData.id);
+
+							const vueData = JSON.parse(eventStoreData.vueDataSerialized);
 
 							// Return if storage data is outdated
-							if (storageObject.expiry < Date.now()) {
+							if (vueData.expiry < Date.now()) {
 								return;
 							}
 
-							self.rows = storageObject.rows;
-							self.arrEventIds = storageObject.arrEventIds;
-							self.itemsTotal = storageObject.itemsTotal;
-							self.loadedItems = storageObject.loadedItems;
-							self.blnAllEventsLoaded = storageObject.blnAllEventsLoaded;
+							console.log('Loaded events from the indexed database.');
+
+							self.rows = vueData.rows;
+							self.arrEventIds = vueData.arrEventIds;
+							self.itemsTotal = vueData.itemsTotal;
+							self.loadedItems = vueData.loadedItems;
+							self.blnAllEventsLoaded = vueData.blnAllEventsLoaded;
 							self.blnIsBusy = false;
 
 							// Trigger on insert callback
-							if (self.callbackExists('oninsert')) {
-								self.callbacks.oninsert(self, null);
-							}
+							await self.$nextTick();
+							(() => {
+								if (self.callbackExists('oninsert')) {
+									self.callbacks.oninsert(self, null);
+								}
+							})();
+
+							// Scroll to last mouse click position
+							(() => {
+								const scrollToSelector = eventStoreData.selector;
+								const elScrollTo = document.querySelector('[data-selector="' + scrollToSelector + '"]');
+
+								if (elScrollTo) {
+									elScrollTo.scrollIntoView({behavior: "instant"});
+								}
+							})();
 
 							const url = new URL(window.location.href);
 							const urlParams = new URLSearchParams(url.search);
@@ -146,7 +179,6 @@ if (typeof VueTourList !== 'function') {
 						}
 
 						if (self.blnAllEventsLoaded === true) {
-
 							return;
 						}
 
@@ -198,6 +230,7 @@ if (typeof VueTourList !== 'function') {
 							self.itemsTotal = parseInt(json['meta']['itemsTotal']);
 							for (const row of json['data']) {
 								i++;
+								row.selector = self.modId + '-' + row.id;
 								self.rows.push(row);
 								self.loadedItems++;
 							}

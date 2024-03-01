@@ -1,12 +1,13 @@
+{% do addJavascriptResource(sacevt_asset_dir()~'/js/dexie/dexie.min.js', null, true) %}
 {% do addJavascriptResource('assets/contao-component-vue-js/vue/dist/vue.global.prod.js?3.3.4') %}
-{% do addJavascriptResource(sacevt_asset_dir()~'/js/eventlist_vue.js|static') %}
+{% do addJavascriptResource(sacevt_asset_dir()~'/js/eventlist_vue.js', null, true) %}
 
-<div id="course-list" v-cloak>
+<div id="course-list" data-moduleid="{{ id|default }}" v-cloak>
     <span v-if="itemsTotal > 0" class="text-muted mb-3"><small>Zu deiner Suchanfrage wurden [[ itemsTotal ]] Events gefunden. </small></span>
     <span v-if="blnIsBusy === true" class="ms-2 text-success"><small>Lade events...</small></span>
     <div class="event-container row g-3">
 
-        <div v-for="(row, index) of rows" class="col-xs-12 col-md-6 event-item event-item-course event layout_upcoming" data-aos="fade-down" data-aos-duration="600" data-aos-once="true" data-aos-anchor-placement="top-bottom" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
+        <div v-for="(row, index) of rows" class="col-xs-12 col-md-6 event-item event-item-course event layout_upcoming" data-aos="fade-down" data-aos-duration="600" data-aos-once="true" data-aos-anchor-placement="top-bottom" v-bind:data-selector="row.selector" v-bind:data-id="row.id" v-bind:data-event-type="row.courseTypeLevel1">
             <div class="course-list-inner-box bg-white">
                 <div class="row gx-0">
                     <!-- Start left col -->
@@ -126,7 +127,7 @@
             'oninsert': async function (vue, json) {
 
                 // Async await stack with auto invocation (See: https://gist.github.com/markocupic/0f49df91b8968ef471b78865707a43d2)
-                (async () => {
+                await (async () => {
 
                     // Wait until DOM is ready
                     await (() => {
@@ -136,7 +137,7 @@
                     await (() => {
                         return new Promise((resolve, reject) => {
                             const el = document.querySelectorAll(vue.elId + ' [data-bs-toggle="tooltip"]');
-                            if (typeof el !== 'undefinded' && el.length > 0) {
+                            if (typeof el !== 'undefined' && el.length > 0) {
 
                                 for (let i = 0; i < el.length; ++i) {
                                     let title = '';
@@ -180,19 +181,20 @@
                         });
                     })();
 
-                    // Cache the event list object in the browsers local storage
+                    // Cache the event list object in the browsers indexed DB
                     // before we redirect to the detail page.
                     await (() => {
                         return new Promise((resolve, reject) => {
                             const buttons = document.querySelectorAll(vue.elId + ' [data-has-event-href="true"]');
                             for (const button of buttons) {
-                                button.addEventListener('click', (event) => {
+                                button.addEventListener('click', async (event) => {
                                     event.stopPropagation();
                                     event.preventDefault();
                                     const link = button.getAttribute('data-href');
 
                                     const eventBox = button.closest('.event-item');
                                     const eventId = eventBox.dataset.id;
+                                    const selector = eventBox.dataset.selector;
 
                                     const url = new URL(window.location.href);
                                     const urlParams = new URLSearchParams(url.search);
@@ -211,7 +213,7 @@
                                     // This will create a new entry in the browser's history, without reloading.
                                     window.history.replaceState({}, nextTitle, nextURL);
 
-                                    const vueInstance = {
+                                    const vueData = {
                                         'rows': vue.rows,
                                         'arrEventIds': vue.arrEventIds,
                                         'itemsTotal': vue.itemsTotal,
@@ -220,21 +222,42 @@
                                         'expiry': Date.now() + 5 * 60 * 1000,
                                     }
 
-                                    // Save the vue instance to the local storage.
+                                    // Save the vue instance to the indexed DB.
                                     // That will prevent a time-consuming request,
-                                    // if the user clicks backs from the detail module to the listing module.
-                                    window.localStorage.clear();
+                                    // if the user clicks back from the detail module to the listing module.
                                     try {
-                                        window.localStorage.setItem(btoa(nextURL + '&modId=' + vue.modId), JSON.stringify(vueInstance));
+                                        const db = new Dexie('SacEventToolEventListing');
+                                        await db.version(1).stores({
+                                            eventStore: '++id, path, expires'
+                                        });
+
+                                        await db.eventStore
+                                        .where("path")
+                                        .equals(btoa(nextURL + '&modId=' + vue.modId))
+                                        .delete()
+                                        ;
+
+                                        db.eventStore.put(
+                                            {
+                                                path: btoa(nextURL + '&modId=' + vue.modId),
+                                                eventId: eventId,
+                                                selector: selector,
+                                                vueDataSerialized:
+                                                    JSON.stringify(vueData),
+                                                expires:
+                                                    Math.round(+new Date() / 1000) + 24 * 3600,
+                                            }
+                                        )
+                                        ;
                                     } catch (e) {
-                                        console.error('Local storage is full.')
+                                        console.error('Something went wrong while trying to save the Vue instance in the indexed DB.')
                                     }
 
                                     // Redirect to detail page
                                     window.location.href = link;
                                 });
                             }
-                            resolve('Cached the event list object to the localStorage!');
+                            resolve('Cached the event list object in the indexed DB!');
                         });
                     })();
                 })();
