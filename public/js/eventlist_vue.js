@@ -35,11 +35,6 @@ if (typeof VueTourList !== 'function') {
 					'offset': '0',
 				},
 				'fields': [],
-				'callbacks': {
-					'oninsert': function (vue, json) {
-						//
-					}
-				}
 			};
 
 			// Merge options and defaults
@@ -59,8 +54,6 @@ if (typeof VueTourList !== 'function') {
 						apiParams: params.apiParams,
 						// Fields array
 						fields: (params.fields && Array.isArray(params.fields)) ? params.fields : null,
-						// Callbacks
-						callbacks: params.callbacks,
 						// Result row
 						rows: [],
 						// Loaded events (ids)
@@ -71,7 +64,7 @@ if (typeof VueTourList !== 'function') {
 						itemsTotal: 0,
 						// already loaded items
 						loadedItems: 0,
-						// all events loades bool
+						// all events loaded bool
 						blnAllEventsLoaded: false,
 					};
 				},
@@ -120,6 +113,7 @@ if (typeof VueTourList !== 'function') {
 							.first()
 						;
 
+						// Search data in forward backend (indexed database) cache
 						if (eventStoreData && eventStoreData.path && eventStoreData.vueDataSerialized) {
 
 							// Delete data from indexed database
@@ -141,13 +135,18 @@ if (typeof VueTourList !== 'function') {
 							self.blnAllEventsLoaded = vueData.blnAllEventsLoaded;
 							self.blnIsBusy = false;
 
-							// Trigger on insert callback
 							await self.$nextTick();
-							(() => {
-								if (self.callbackExists('oninsert')) {
-									self.callbacks.oninsert(self, null);
-								}
-							})();
+
+							// Create the on insert event
+							const onInsertEvent = new CustomEvent("sac_evt.event_list.insert", {
+								detail: {
+									'vueInstance': self,
+									'json': null,
+								},
+							});
+
+							// Dispatch the on insert event
+							document.querySelector(self.elId).dispatchEvent(onInsertEvent);
 
 							// Scroll to last mouse click position
 							(() => {
@@ -274,20 +273,18 @@ if (typeof VueTourList !== 'function') {
 							return json;
 
 						}).then(function (json) {
-							// Trigger on insert callback
-							if (self.callbackExists('oninsert')) {
-								self.callbacks.oninsert(self, json);
-							}
+							const onInsertEvent = new CustomEvent("sac_evt.event_list.insert", {
+								detail: {
+									vueInstance: self,
+									'json': json,
+								},
+							});
+
+							document.querySelector(self.elId).dispatchEvent(onInsertEvent);
 							return json;
 						});
 
 					},
-
-					// Check if callback exists
-					callbackExists: function callbackExists(strCallback) {
-						const self = this;
-						return typeof self.callbacks !== "undefined" && typeof self.callbacks[strCallback] !== "undefined" && typeof self.callbacks[strCallback] === "function";
-					}
 				}
 			});
 			app.config.compilerOptions.delimiters = ['[[ ', ' ]]'];
