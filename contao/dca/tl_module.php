@@ -117,6 +117,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['eventBlogOrganizers'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = [
+	'exclude'    => true,
 	'inputType' => 'select',
 	'options'   => EventType::ALL,
 	'eval'      => ['mandatory' => false, 'multiple' => true, 'chosen' => true, 'tl_class' => 'clr'],
@@ -124,6 +125,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['print_export_allowedEventTypes'] = [
 ];
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventFilterBoardFields'] = [
+	'exclude'    => true,
 	'inputType' => 'checkboxWizard',
 	'eval'      => ['mandatory' => false, 'multiple' => true, 'ooorderField' => 'orderSRC', 'tl_class' => 'clr'],
 	'sql'       => 'blob NULL',
