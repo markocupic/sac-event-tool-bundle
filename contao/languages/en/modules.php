@@ -31,7 +31,7 @@ use Markocupic\SacEventToolBundle\Controller\FrontendModule\TourDifficultyListCo
 
 // Backend Modules
 $GLOBALS['TL_LANG']['MOD']['sac_be_modules'] = ['SAC Module'];
-$GLOBALS['TL_LANG']['MOD']['sac_calendar_events_tool'] = ['SAC Event-Tool'];
+$GLOBALS['TL_LANG']['MOD']['calendar'] = ['SAC Event-Tool'];
 $GLOBALS['TL_LANG']['MOD']['sac_course_main_types_tool'] = ['Kurs-Hauptkategorien'];
 $GLOBALS['TL_LANG']['MOD']['sac_course_sub_types_tool'] = ['Kurs-Unterkategorien'];
 $GLOBALS['TL_LANG']['MOD']['sac_event_journey_tool'] = ['Event Anreise-Art-Tool'];

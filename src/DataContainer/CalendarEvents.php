@@ -74,7 +74,6 @@ class CalendarEvents
     private Adapter $config;
     private Adapter $controller;
     private Adapter $date;
-    private Adapter $dcaExtractor;
     private Adapter $filesModel;
     private Adapter $idna;
     private Adapter $message;
@@ -86,7 +85,6 @@ class CalendarEvents
         private readonly ContaoFramework $framework,
         private readonly RequestStack $requestStack,
         private readonly Connection $connection,
-        private readonly Util $util,
         private readonly Security $security,
         private readonly PasswordHasherFactoryInterface $passwordHasherFactory,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
@@ -101,22 +99,12 @@ class CalendarEvents
         $this->config = $this->framework->getAdapter(Config::class);
         $this->controller = $this->framework->getAdapter(Controller::class);
         $this->date = $this->framework->getAdapter(Date::class);
-        $this->dcaExtractor = $this->framework->getAdapter(DcaExtractor::class);
         $this->filesModel = $this->framework->getAdapter(FilesModel::class);
         $this->idna = $this->framework->getAdapter(Idna::class);
         $this->message = $this->framework->getAdapter(Message::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
         $this->system = $this->framework->getAdapter(System::class);
         $this->userModel = $this->framework->getAdapter(UserModel::class);
-    }
-
-    /**
-     * Set the correct referer.
-     */
-    #[AsCallback(table: 'tl_calendar_events', target: 'config.onload', priority: 100)]
-    public function setCorrectReferer(): void
-    {
-        $this->util->setCorrectReferer();
     }
 
     /**
@@ -236,7 +224,7 @@ class CalendarEvents
             $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['show'],
             $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['plus1year'],
             $GLOBALS['TL_DCA']['tl_calendar_events']['list']['global_operations']['minus1year'],
-            $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['edit'],
+            $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['children'],
         );
 
         // Prevent unauthorized deletion
@@ -526,7 +514,7 @@ class CalendarEvents
 
     /**
      * Shift all event dates of a certain calendar by +/- 1 year
-     * contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=21&transformDate=+52weeks.
+     * contao?do=calendar&table=tl_calendar_events&id=21&transformDate=+52weeks.
      *
      * @throws Exception
      */
@@ -917,10 +905,6 @@ class CalendarEvents
             return '';
         }
 
-        // Get the order fields
-        $objDcaExtractor = $this->dcaExtractor->getInstance($strTable);
-
-        $arrOrder = $objDcaExtractor->getOrderFields();
         $arrDcaFields = \is_array($GLOBALS['TL_DCA'][$strTable]['fields'] ?? []) ? $GLOBALS['TL_DCA'][$strTable]['fields'] : [];
         $allowedFields = array_unique(array_merge(['id', 'pid', 'sorting', 'tstamp'], array_keys($arrDcaFields)));
 
@@ -1047,7 +1031,7 @@ class CalendarEvents
             }
 
             $varFieldValue = implode(', ', $temp);
-        } elseif (($arrDcaFields[$fieldName]['inputType'] ?? null) === 'fileTree' || \in_array($fieldName, $arrOrder, true)) {
+        } elseif (($arrDcaFields[$fieldName]['inputType'] ?? null) === 'fileTree') {
             if (\is_array($varFieldValue)) {
                 foreach ($varFieldValue as $kk => $vv) {
                     if (($objFile = $this->filesModel->findByUuid($vv)) instanceof FilesModel) {

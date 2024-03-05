@@ -14,17 +14,13 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
-use Contao\Backend;
-use Contao\BackendUser;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
-use Contao\CoreBundle\Exception\AccessDeniedException;
-use Contao\Image;
+use Contao\Database;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CalendarContainer
 {
@@ -34,179 +30,94 @@ class CalendarContainer
     public function __construct(
         private readonly RequestStack $requestStack,
         private readonly Connection $connection,
-        private readonly Util $util,
         private readonly Security $security,
     ) {
     }
 
-    #[AsCallback(table: 'tl_calendar_container', target: 'config.onload')]
-    public function setCorrectReferer(): void
-    {
-        $this->util->setCorrectReferer();
-    }
-
     /**
-     * Check permissions to edit table tl_calendar.
+     * Check permissions to edit table tl_calendar_container.
      */
     #[AsCallback(table: 'tl_calendar_container', target: 'config.onload')]
-    public function checkPermission(): void
+    public function adjustPermissions(): void
     {
-        $request = $this->requestStack->getCurrentRequest();
+		// The oncreate_callback passes $insertId as second argument
+		if (func_num_args() == 4)
+		{
+			$insertId = func_get_arg(1);
+		}
 
-        /** @var BackendUser $user */
-        $user = $this->security->getUser();
+		if ($this->security->isGranted('ROLE_ADMIN'))
+		{
+			return;
+		}
 
-        if ($user->admin) {
-            return;
-        }
+		$user = $this->security->getUser();
 
-        // Set root IDs
-        if (!\is_array($user->calendar_containers) || empty($user->calendar_containers)) {
-            $root = [0];
-        } else {
-            $root = $user->calendar_containers;
-        }
+		// Set root IDs
+		if (empty($user->calendar_containers) || !is_array($user->calendar_containers))
+		{
+			$root = array(0);
+		}
+		else
+		{
+			$root = $user->calendar_containers;
+		}
 
-        $GLOBALS['TL_DCA']['tl_calendar_container']['list']['sorting']['root'] = $root;
+		// The calendar is enabled already
+		if (isset($insertId) && in_array($insertId, $root))
+		{
+			return;
+		}
 
-        // Check permissions to add calendar_containers
-        if (!$user->hasAccess('create', 'calendar_containerp')) {
-            $GLOBALS['TL_DCA']['tl_calendar_container']['config']['closed'] = true;
-        }
+		/** @var AttributeBagInterface $objSessionBag */
+		$objSessionBag = $this->requestStack->getSession()->getBag('contao_backend');
+		$arrNew = $objSessionBag->get('new_records');
 
-        /** @var SessionInterface $session */
-        $session = $request->getSession();
+		if (isset($insertId) && !empty($arrNew['tl_calendar_container']) && is_array($arrNew['tl_calendar_container']) && in_array($insertId, $arrNew['tl_calendar_container']))
+		{
+			$db = Database::getInstance();
 
-        // Check current action
-        switch ($request->query->get('act')) {
-            case 'create':
-            case 'select':
-                // Allow
-                break;
+			// Add the permissions on group level
+			if ($user->inherit != 'custom')
+			{
+				$objGroup = $db->execute("SELECT id, calendar_containers, calendar_containerp FROM tl_user_group WHERE id IN(" . implode(',', array_map('\intval', $user->groups)) . ")");
 
-            case 'edit':
-                // Dynamically add the record to the user profile
-                if (!\in_array($request->query->get('id'), $root, false)) {
-                    /** @var AttributeBagInterface $bag */
-                    $bag = $session->getBag('contao_backend');
+				while ($objGroup->next())
+				{
+					$arrCalendarContainerp = StringUtil::deserialize($objGroup->calendar_containerp);
 
-                    $arrNew = $bag->get('new_records');
+					if (is_array($arrCalendarContainerp) && in_array('create', $arrCalendarContainerp))
+					{
+						$arrCalendarContainers = StringUtil::deserialize($objGroup->calendar_containers, true);
+						$arrCalendarContainers[] = $insertId;
 
-                    if (\is_array($arrNew['tl_calendar_container']) && \in_array($request->query->get('id'), $arrNew['tl_calendar_container'], false)) {
-                        // Add the permissions on group level
-                        if ('custom' !== $user->inherit) {
-                            $stmt = $this->connection
-                                ->executeQuery(
-                                    'SELECT * FROM tl_user_group WHERE id IN('.implode(',', array_map('intval', $user->groups)).')'
-                                )
-                            ;
+						$db->prepare("UPDATE tl_user_group SET calendar_containers=? WHERE id=?")->execute(serialize($arrCalendarContainers), $objGroup->id);
+					}
+				}
+			}
 
-                            while (false !== ($arrGroup = $stmt->fetchAssociative())) {
-                                $arrCalendarContainerp = StringUtil::deserialize($arrGroup['calendar_containerp']);
+			// Add the permissions on user level
+			if ($user->inherit != 'group')
+			{
+				$objUser = $db
+					->prepare("SELECT calendar_containers, calendar_containerp FROM tl_user WHERE id=?")
+					->limit(1)
+					->execute($user->id);
 
-                                if (\is_array($arrCalendarContainerp) && \in_array('create', $arrCalendarContainerp, true)) {
-                                    $arrCalendarContainers = StringUtil::deserialize($arrGroup['calendar_containers'], true);
-                                    $arrCalendarContainers[] = $request->query->get('id');
+				$arrCalendarContainerp = StringUtil::deserialize($objUser->calendar_containerp);
 
-                                    $this->connection->executeStatement(
-                                        'UPDATE tl_user_group SET calendar_containers = ? WHERE id = ?',
-                                        [
-                                            serialize($arrCalendarContainers),
-                                            $arrGroup['id'],
-                                        ]
-                                    );
-                                }
-                            }
-                        }
+				if (is_array($arrCalendarContainerp) && in_array('create', $arrCalendarContainerp))
+				{
+					$arrCalendarContainers = StringUtil::deserialize($objUser->calendar_containers, true);
+					$arrCalendarContainers[] = $insertId;
 
-                        // Add the permissions on user level
-                        if ('group' !== $user->inherit) {
-                            $arrCalendarContainerp = StringUtil::deserialize($arrGroup['calendar_containerp']);
+					$db->prepare("UPDATE tl_user SET calendar_containers=? WHERE id=?")->execute(serialize($arrCalendarContainers), $user->id);
+				}
+			}
 
-                            if (\is_array($arrCalendarContainerp) && \in_array('create', $arrCalendarContainerp, true)) {
-                                $arrCalendarContainers = StringUtil::deserialize($arrGroup['calendar_containers'], true);
-
-                                $arrCalendarContainers[] = $request->query->get('id');
-
-                                $this->connection->executeStatement(
-                                    'UPDATE tl_user SET calendar_containers = ? WHERE id = ?',
-                                    [
-                                        serialize($arrCalendarContainers),
-                                        $user->id,
-                                    ]
-                                );
-                            }
-                        }
-
-                        // Add the new element to the user object
-                        $root[] = $request->query->get('id');
-                        $user->calendar_containers = $root;
-                    }
-                }
-            // no break;
-
-            case 'copy':
-            case 'delete':
-            case 'show':
-                if (!\in_array($request->query->get('id'), $root, false) || ('delete' === $request->query->get('act') && !$user->hasAccess('delete', 'calendar_containerp'))) {
-                    throw new AccessDeniedException('Not enough permissions to '.$request->query->get('act').' calendar ID '.$request->query->get('id').'.');
-                }
-                break;
-
-            case 'editAll':
-            case 'deleteAll':
-            case 'overrideAll':
-                $arrSession = $session->all();
-
-                if ('deleteAll' === $request->query->get('act') && !$user->hasAccess('delete', 'calendar_containerp')) {
-                    $arrSession['CURRENT']['IDS'] = [];
-                } else {
-                    $arrSession['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $root);
-                }
-                $session->replace($arrSession);
-                break;
-
-            default:
-                if (\strlen((string) $request->query->get('act'))) {
-                    throw new AccessDeniedException('Not enough permissions to '.$request->query->get('act').' calendar_containers.');
-                }
-                break;
-        }
-    }
-
-    /**
-     * Return the edit header button.
-     */
-    #[AsCallback(table: 'tl_calendar_container', target: 'operations.editheader.button')]
-    public function editHeaderButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
-    {
-        /** @var BackendUser $user */
-        $user = $this->security->getUser();
-
-        return $user->canEditFieldsOf('tl_calendar_container') ? '<a href="'.Backend::addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
-    }
-
-    /**
-     * Return the copy calendar button.
-     */
-    #[AsCallback(table: 'tl_calendar_container', target: 'operations.copy.button')]
-    public function copyButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
-    {
-        /** @var BackendUser $user */
-        $user = $this->security->getUser();
-
-        return $user->hasAccess('create', 'calendar_containerp') ? '<a href="'.Backend::addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
-    }
-
-    /**
-     * Return the delete calendar button.
-     */
-    #[AsCallback(table: 'tl_calendar_container', target: 'operations.delete.button')]
-    public function deleteButton(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
-    {
-        /** @var BackendUser $user */
-        $user = $this->security->getUser();
-
-        return $user->hasAccess('delete', 'calendar_containerp') ? '<a href="'.Backend::addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ' : Image::getHtml(preg_replace('/\.svg/i', '_.svg', $icon)).' ';
+			// Add the new element to the user object
+			$root[] = $insertId;
+			$user->calendar_containers = $root;
+		}
     }
 }

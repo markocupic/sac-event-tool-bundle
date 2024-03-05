@@ -36,6 +36,18 @@ services:
         resource: ../src/
         exclude: ../src/{ContaoManager,Session,Config,Event,DependencyInjection,Resources,Model}
 
+    Markocupic\SacEventToolBundle\Security\Voter\CalendarContainerAccessVoter:
+        tags:
+            - { name: security.voter, priority: 10 }
+
+    Markocupic\SacEventToolBundle\Security\Voter\CalendarAccessVoter:
+        tags:
+            - { name: security.voter, priority: 10 }
+
+    Markocupic\SacEventToolBundle\Security\Voter\CalendarEventsAccessVoter:
+        tags:
+            - { name: security.voter, priority: 10 }
+
     # Add a session bag
     Markocupic\SacEventToolBundle\Session\Attribute\ArrayAttributeBag:
         arguments:

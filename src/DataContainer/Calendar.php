@@ -18,19 +18,6 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 
 class Calendar
 {
-    public function __construct(
-        private readonly Util $util,
-    ) {
-    }
-
-    /**
-     * Set the correct referer.
-     */
-    #[AsCallback(table: 'tl_calendar', target: 'config.onload', priority: 100)]
-    public function setCorrectReferer(): void
-    {
-        $this->util->setCorrectReferer();
-    }
 
     #[AsCallback(table: 'tl_calendar', target: 'list.sorting.child_record')]
     public function listCalendars(array $arrRow): string

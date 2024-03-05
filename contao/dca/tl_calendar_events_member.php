@@ -58,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			],
 			'backToEventSettings'               => [
 				'label'                  => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
-				'href'                   => 'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
+				'href'                   => 'contao?do=calendar&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
 				'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/left-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 				'custom_glob_op'         => true,
@@ -154,18 +154,21 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sql' => "int(10) unsigned NOT NULL default '0'",
 		],
 		'uuid'                        => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'default'   => Uuid::uuid4()->toString(),
 			'eval'      => ['unique' => true, 'doNotCopy' => true],
 			'sql'       => "char(36) NOT NULL default ''",
 		],
 		'contaoMemberId'              => [
+			'exclude'    => true,
 			'foreignKey' => "tl_member.CONCAT(firstname, ' ', lastname)",
 			'sql'        => "int(10) unsigned NOT NULL default '0'",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 			'eval'       => ['readonly' => true],
 		],
 		'eventId'                     => [
+			'exclude'    => true,
 			'foreignKey' => 'tl_calendar_events.title',
 			'default'    => Input::get('id'),
 			'sql'        => "int(10) unsigned NOT NULL default '0'",
@@ -173,11 +176,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'eval'       => ['doNotShow' => true, 'readonly' => true],
 		],
 		'eventName'                   => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'dateAdded'                   => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'flag'      => DataContainer::SORT_DAY_ASC,
 			'sorting'   => true,
@@ -185,6 +190,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sql'       => "bigint(20) unsigned NOT NULL default 0",
 		],
 		'stateOfSubscription'         => [
+			'exclude'   => true,
 			'filter'    => true,
 			'sorting'   => true,
 			'inputType' => 'select',
@@ -193,6 +199,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sql'       => "varchar(255) NOT NULL default '".EventSubscriptionState::SUBSCRIPTION_NOT_CONFIRMED."'",
 		],
 		'gender'                      => [
+			'exclude'   => true,
 			'inputType' => 'select',
 			'sorting'   => true,
 			'options'   => ['male', 'female'],
@@ -201,16 +208,19 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sql'       => "varchar(32) NOT NULL default ''",
 		],
 		'firstname'                   => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'lastname'                    => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'dateOfBirth'                 => [
+			'exclude'   => true,
 			'sorting'   => true,
 			'flag'      => DataContainer::SORT_DAY_ASC,
 			'inputType' => 'text',
@@ -218,26 +228,31 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sql'       => "varchar(11) NOT NULL default ''",
 		],
 		'street'                      => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'postal'                      => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'maxlength' => 32, 'tl_class' => 'w50'],
 			'sql'       => "varchar(32) NOT NULL default ''",
 		],
 		'city'                        => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'email'                       => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => false, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => false, 'decodeEntities' => true, 'feGroup' => 'contact', 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'mobile'                      => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => false, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
 			'sql'       => "varchar(64) NOT NULL default ''",
@@ -250,6 +265,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sql'       => 'blob NULL',
 		],
 		'sacMemberId'                 => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'sacMemberId', 'maxlength' => 255, 'tl_class' => 'clr'],
 			'sql'       => "varchar(255) NOT NULL default ''",
@@ -261,11 +277,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sql'       => 'text NULL',
 		],
 		'emergencyPhone'              => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
 			'sql'       => "varchar(64) NOT NULL default ''",
 		],
 		'emergencyPhoneName'          => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'maxlength' => 255, 'decodeEntities' => true, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
@@ -303,6 +321,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sql'       => "char(1) NOT NULL default ''",
 		],
 		'ahvNumber'                   => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => false, 'maxlength' => 16, 'unique' => false, 'decodeEntities' => true, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
@@ -315,18 +334,21 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sql'       => 'text NULL',
 		],
 		'ticketInfo'                  => [
+			'exclude'   => true,
 			'inputType' => 'select',
 			'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['ticketInfo'],
 			'eval'      => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'carInfo'                     => [
+			'exclude'   => true,
 			'inputType' => 'select',
 			'options'   => $GLOBALS['TL_CONFIG']['SAC-EVENT-TOOL-CONFIG']['carSeatsInfo'],
 			'eval'      => ['includeBlankOption' => true, 'doNotShow' => false, 'doNotCopy' => true],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'hasParticipated'             => [
+			'exclude'   => true,
 			'inputType' => 'checkbox',
 			'eval'      => ['doNotShow' => false, 'submitOnChange' => true, 'doNotCopy' => true],
 			'sql'       => "char(1) NOT NULL default ''",
@@ -355,16 +377,19 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sql'       => "varchar(255) NOT NULL default '".BookingType::MANUALLY."'",
 		],
 		'allowMultiSignUp'            => [
+			'exclude'   => true,
 			'inputType' => 'checkbox',
 			'eval'      => ['submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'long clr'],
 			'sql'       => "char(1) NOT NULL default ''",
 		],
 		'anonymized'                  => [
+			'exclude'   => true,
 			'inputType' => 'checkbox',
 			'eval'      => ['doNotShow' => true, 'doNotCopy' => true],
 			'sql'       => "char(1) NOT NULL default ''",
 		],
 		'dashboard'                   => [
+			'exclude'   => true,
 			'inputType' => 'text',
 			'eval'      => ['doNotShow' => true, 'mandatory' => false, 'maxlength' => 255, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",

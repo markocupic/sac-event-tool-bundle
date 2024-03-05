@@ -52,7 +52,6 @@ readonly class CalendarEventsInstructorInvoice
         private ContaoFramework $framework,
         private RequestStack $requestStack,
         private Connection $connection,
-        private Util $util,
         private TranslatorInterface $translator,
         private Security $security,
         private ContaoCsrfTokenManager $contaoCsrfTokenManager,
@@ -63,15 +62,6 @@ readonly class CalendarEventsInstructorInvoice
         private string $sacevtEventTourInvoiceFileNamePattern,
         private string $sacevtEventTourRapportFileNamePattern,
     ) {
-    }
-
-    /**
-     * Set the correct referer.
-     */
-    #[AsCallback(table: 'tl_calendar_events_instructor_invoice', target: 'config.onload', priority: 100)]
-    public function setCorrectReferer(): void
-    {
-        $this->util->setCorrectReferer();
     }
 
     /**

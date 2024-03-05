@@ -53,7 +53,7 @@ class ParseBackendTemplateListener
 
         if ('be_main' === $strTemplate) {
             // Add icon explanation legend to tl_calendar_events_member
-            if ('sac_calendar_events_tool' === $inputAdapter->get('do') && 'tl_calendar_events' === $inputAdapter->get('table') && 'edit' === $inputAdapter->get('act')) {
+            if ('calendar' === $inputAdapter->get('do') && 'tl_calendar_events' === $inputAdapter->get('table') && 'edit' === $inputAdapter->get('act')) {
                 if (preg_match('/<div class="tl_formbody_edit">/sU', $strBuffer, $matches)) {
                     $strDashboard = $this->_generateEventDashboard();
                     $strBuffer = preg_replace('/<div class="tl_formbody_edit">/sU', $matches[0].$strDashboard, $strBuffer);
@@ -61,7 +61,7 @@ class ParseBackendTemplateListener
             }
 
             // Add icon explanation legend to tl_calendar_events_member
-            if ('sac_calendar_events_tool' === $inputAdapter->get('do') && 'tl_calendar_events_member' === $inputAdapter->get('table')) {
+            if ('calendar' === $inputAdapter->get('do') && 'tl_calendar_events_member' === $inputAdapter->get('table')) {
                 $objEvent = $calendarEventsModelAdapter->findByPk($inputAdapter->get('id'));
 
                 if (null !== $objEvent) {

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
+use Contao\CalendarBundle\Security\ContaoCalendarPermissions;
 use Contao\CoreBundle\Controller\BackendController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Security\ContaoCorePermissions;
@@ -50,7 +51,7 @@ class ParseTemplateListener
             return;
         }
 
-        if (!$this->security->isGranted('ROLE_ADMIN') && !$this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, 'sac_calendar_events_tool')) {
+        if (!$this->security->isGranted('ROLE_ADMIN') && !$this->security->isGranted(ContaoCorePermissions::USER_CAN_ACCESS_MODULE, 'calendar')) {
             return;
         }
 

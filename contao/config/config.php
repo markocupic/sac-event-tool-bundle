@@ -35,16 +35,16 @@ use Markocupic\SacEventToolBundle\Model\TourTypeModel;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
 use Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader;
 
-/*
- * Contao backend modules
- */
-$GLOBALS['BE_MOD']['content']['calendar']['tables'] = ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'];
 
+// Remove the calendar module from the content list
+unset($GLOBALS['BE_MOD']['content']['calendar']);
+
+// Back end modules
 $GLOBALS['BE_MOD']['sac_be_modules'] = [
     'sac_section_tool' => [
         'tables' => ['tl_sac_section'],
     ],
-    'sac_calendar_events_tool' => [
+    'calendar' => [
         'tables' => ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'],
         'table' => [BackendCsvImportController::class, 'importTableWizardAction'],
         'list' => [BackendCsvImportController::class, 'importListWizardAction'],

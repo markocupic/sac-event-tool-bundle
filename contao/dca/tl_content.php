@@ -20,8 +20,9 @@ use Contao\System;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitController;
 use Markocupic\SacEventToolBundle\Controller\ContentElement\UserPortraitListController;
 
+// @todo renaming sacevt
 if ('sac_calendar_events_tool' === Input::get('do')) {
-	$GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_calendar_events';
+	//$GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_calendar_events';
 }
 
 // Palettes

@@ -42,40 +42,7 @@ $GLOBALS['TL_DCA']['tl_calendar_container'] = [
 			'format' => '%s',
 		],
 		'global_operations' => [
-			'all' => [
-				'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
-				'href'       => 'act=select',
-				'class'      => 'header_edit_all',
-				'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-			],
-		],
-		'operations'        => [
-			'editheader' => [
-				'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['editheader'],
-				'href'  => 'act=edit',
-				'icon'  => 'edit.svg',
-			],
-			'edit'       => [
-				'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['edit'],
-				'href'  => 'table=tl_calendar',
-				'icon'  => 'children.svg',
-			],
-			'copy'       => [
-				'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['copy'],
-				'href'  => 'act=copy',
-				'icon'  => 'copy.svg',
-			],
-			'delete'     => [
-				'label'      => &$GLOBALS['TL_LANG']['tl_calendar_container']['delete'],
-				'href'       => 'act=delete',
-				'icon'       => 'delete.svg',
-				'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
-			],
-			'show'       => [
-				'label' => &$GLOBALS['TL_LANG']['tl_calendar_container']['show'],
-				'href'  => 'act=show',
-				'icon'  => 'show.svg',
-			],
+			'all',
 		],
 	],
 	'palettes' => [

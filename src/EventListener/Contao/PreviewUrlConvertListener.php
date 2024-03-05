@@ -53,7 +53,7 @@ class PreviewUrlConvertListener
     private function getEventModel(Request $request): CalendarEventsModel|null
     {
         //#1: if (!$request->query->has('calendar')) {
-        if (!$request->query->has('sac_calendar_events_tool')) {
+        if (!$request->query->has('calendar')) {
             return null;
         }
 
@@ -61,6 +61,6 @@ class PreviewUrlConvertListener
         $adapter = $this->framework->getAdapter(CalendarEventsModel::class);
 
         //#2: return $adapter->findByPk($request->query->get('calendar'));
-        return $adapter->findByPk($request->query->get('sac_calendar_events_tool'));
+        return $adapter->findByPk($request->query->get('calendar'));
     }
 }

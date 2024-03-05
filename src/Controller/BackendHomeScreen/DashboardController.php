@@ -155,21 +155,21 @@ class DashboardController
             $title = $this->stringUtilAdapter->restoreBasicEntities($title);
 
             $hrefEvent = sprintf(
-                'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
+                'contao?do=calendar&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
                 $eventModel->id,
                 $rt,
                 $refId,
             );
 
             $hrefRegistrations = sprintf(
-                'contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s',
+                'contao?do=calendar&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s',
                 $eventModel->id,
                 $rt,
                 $refId,
             );
 
             $hrefEventListing = sprintf(
-                'contao?do=sac_calendar_events_tool&table=tl_calendar_events&id=%d&rt=%s&ref=%s',
+                'contao?do=calendar&table=tl_calendar_events&id=%d&rt=%s&ref=%s',
                 $eventModel->pid,
                 $rt,
                 $refId,
@@ -221,7 +221,7 @@ class DashboardController
         $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
         if (EventType::TOUR === $eventModel->eventType || EventType::LAST_MINUTE_TOUR === $eventModel->eventType) {
-            return sprintf('contao?act=edit&do=sac_calendar_events_tool&table=tl_calendar_events&id=%d&call=writeTourReport&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
+            return sprintf('contao?act=edit&do=calendar&table=tl_calendar_events&id=%d&call=writeTourReport&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
         }
 
         return null;
@@ -233,7 +233,7 @@ class DashboardController
         $refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
         if (EventType::TOUR === $eventModel->eventType || EventType::LAST_MINUTE_TOUR === $eventModel->eventType) {
-            return sprintf('contao?do=sac_calendar_events_tool&table=tl_calendar_events_instructor_invoice&id=%d&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
+            return sprintf('contao?do=calendar&table=tl_calendar_events_instructor_invoice&id=%d&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
         }
 
         return null;

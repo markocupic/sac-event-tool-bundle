@@ -59,4 +59,3 @@ $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['organizationalFlat
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['iban'] = ['IBAN Nummer', 'Geben Sie Ihre IBAN Nummer ein. Wird für die Überweisung auf Ihr Bankkonto benötigt.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['notice'] = ['Weitere Anmerkungen', 'Geben Sie weitere Anmerkungen ein.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_instructor_invoice']['eventDuration'] = ['Event Dauer in Tagen', 'Geben Sie die Event-Dauer in Tagen an.'];
-

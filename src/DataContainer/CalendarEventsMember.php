@@ -110,15 +110,6 @@ class CalendarEventsMember
     }
 
     /**
-     * Set the correct referer.
-     */
-    #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
-    public function setCorrectReferer(): void
-    {
-        $this->util->setCorrectReferer();
-    }
-
-    /**
      * Load backend assets.
      */
     #[AsCallback(table: 'tl_calendar_events_member', target: 'config.onload', priority: 100)]
@@ -126,7 +117,7 @@ class CalendarEventsMember
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if (('calendar' === $request->query->get('do') || 'sac_calendar_events_tool' === $request->query->get('do')) && '' !== $request->query->get('ref')) {
+        if ('calendar' === $request->query->get('do') && '' !== $request->query->get('ref')) {
             $GLOBALS['TL_JAVASCRIPT'][] = Bundle::ASSET_DIR.'/js/backend_member_autocomplete.js';
         }
     }
@@ -230,7 +221,7 @@ class CalendarEventsMember
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notDeletable'] = true;
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCopyable'] = true;
                     $this->message->addError($this->translator->trans('ERR.accessDenied', [], 'contao_default'));
-                    $this->controller->redirect('contao?do=sac_calendar_events_tool&table=tl_calendar_events_member&id='.$objEvent->id);
+                    $this->controller->redirect('contao?do=calendar&table=tl_calendar_events_member&id='.$objEvent->id);
                 }
             }
         }

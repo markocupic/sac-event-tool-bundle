@@ -34,7 +34,7 @@ class PreviewUrlCreateListener
     public function onPreviewUrlCreate(PreviewUrlCreateEvent $event): void
     {
         //#1: if (!$this->framework->isInitialized() || 'calendar' !== $event->getKey()) {
-        if (!$this->framework->isInitialized() || 'sac_calendar_events_tool' !== $event->getKey()) {
+        if (!$this->framework->isInitialized() || 'calendar' !== $event->getKey()) {
             return;
         }
 
