@@ -23,9 +23,6 @@ use Ramsey\Uuid\Uuid;
 
 System::loadLanguageFile('tl_member');
 
-/*
- * Table tl_calendar_events_member
- */
 $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 	'config'      => [
 		'dataContainer'    => DC_Table::class,
@@ -51,11 +48,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'showColumns' => true,
 		],
 		'global_operations' => [
-			'all'                               => [
-				'href'       => 'act=select',
-				'class'      => 'header_edit_all',
-				'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-			],
+			'all',
 			'backToEventSettings'               => [
 				'label'                  => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
 				'href'                   => 'contao?do=calendar&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
@@ -106,15 +99,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			],
 		],
 		'operations'        => [
-			'edit'                       => [
-				'href' => 'act=edit',
-				'icon' => 'edit.svg',
-			],
-			'delete'                     => [
-				'href'       => 'act=delete',
-				'icon'       => 'delete.svg',
-				'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
-			],
+			'edit',
+			'delete',
+			'show',
 			// Regular "toggle" operation but without "icon" and with the haste specific params
 			'toggleStateOfParticipation' => [
 				'attributes'           => 'onclick="Backend.getScrollOffset();"',
@@ -131,10 +118,6 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 						],
 					],
 				],
-			],
-			'show'                       => [
-				'href' => 'act=show',
-				'icon' => 'show.svg',
 			],
 		],
 	],

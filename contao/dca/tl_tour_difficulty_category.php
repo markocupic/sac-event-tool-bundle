@@ -40,30 +40,7 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty_category'] = [
 			'showColumns' => true,
 		],
 		'global_operations' => [
-			'all' => [
-				'href'       => 'act=select',
-				'class'      => 'header_edit_all',
-				'attributes' => 'onclick="Backend.getScrollOffset();"',
-			],
-		],
-		'operations'        => [
-			'editheader' => [
-				'href' => 'table=tl_tour_difficulty_category&amp;act=edit',
-				'icon' => 'edit.svg',
-			],
-			'edit'       => [
-				'href' => 'table=tl_tour_difficulty',
-				'icon' => 'children.svg',
-			],
-			'copy'       => [
-				'href' => 'act=copy',
-				'icon' => 'copy.svg',
-			],
-			'delete'     => [
-				'href'       => 'act=delete',
-				'icon'       => 'delete.svg',
-				'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
-			],
+			'all',
 		],
 	],
 	'palettes' => [

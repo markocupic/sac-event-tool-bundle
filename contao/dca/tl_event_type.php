@@ -38,30 +38,7 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
 			'format' => '%s',
 		],
 		'global_operations' => [
-			'all' => [
-				'href'       => 'act=select',
-				'class'      => 'header_edit_all',
-				'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-			],
-		],
-		'operations'        => [
-			'edit'   => [
-				'href' => 'act=edit',
-				'icon' => 'edit.svg',
-			],
-			'copy'   => [
-				'href' => 'act=paste&amp;mode=copy',
-				'icon' => 'copy.svg',
-			],
-			'delete' => [
-				'href'       => 'act=delete',
-				'icon'       => 'delete.svg',
-				'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
-			],
-			'show'   => [
-				'href' => 'act=show',
-				'icon' => 'show.svg',
-			],
+			'all',
 		],
 	],
 	'palettes' => [

@@ -15,9 +15,6 @@ declare(strict_types=1);
 use Contao\DC_Table;
 use Contao\DataContainer;
 
-/*
- * Table tl_calendar_events_instructor
- */
 $GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = [
 	'config' => [
 		'dataContainer'     => DC_Table::class,
@@ -35,27 +32,19 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = [
 			],
 		],
 	],
-	// List
 	'list'   => [
-		'sorting'           => [],
-		'label'             => [],
-		'global_operations' => [
-			'all' => [
-				'href'       => 'act=select',
-				'class'      => 'header_edit_all',
-				'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
-			],
+		'sorting'           => [
+			'mode'        => DataContainer::MODE_SORTABLE,
+			'fields'      => ['userId ASC'],
+			'flag'        => DataContainer::SORT_INITIAL_LETTER_ASC,
+			'panelLayout' => 'filter;sort,search,limit',
 		],
-		'operations'        => [
-			'edit'   => [
-				'href' => 'act=edit',
-				'icon' => 'edit.svg',
-			],
-			'delete' => [
-				'href'       => 'act=delete',
-				'icon'       => 'delete.svg',
-				'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
-			],
+		'label'             => [
+			'fields'      => ['userId'],
+			'showColumns' => true,
+		],
+		'global_operations' => [
+			'all',
 		],
 	],
 	'fields' => [

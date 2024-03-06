@@ -243,7 +243,7 @@ readonly class CalendarEventsInstructorInvoice
 
         $user = $this->security->getUser();
 
-        // A common user should not be allowed to edit another user's report
+        // A common user should not be allowed to edit or delete another user's report
         if ($this->security->isGranted('ROLE_ADMIN')) {
             $blnAllow = true;
         } elseif ((int) $row['userPid'] !== (int) $user->id) {

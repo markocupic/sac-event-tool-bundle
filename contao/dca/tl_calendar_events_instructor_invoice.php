@@ -45,26 +45,12 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'showColumns' => true,
 		],
 		'global_operations' => [
-			'all' => [
-				'href'       => 'act=select',
-				'class'      => 'header_edit_all',
-				'attributes' => 'onclick="Backend.getScrollOffset();"',
-			],
+			'all',
 		],
 		'operations'        => [
-			'edit'                    => [
-				'href' => 'act=edit',
-				'icon' => 'edit.svg',
-			],
-			'delete'                  => [
-				'href'       => 'act=delete',
-				'icon'       => 'delete.svg',
-				'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
-			],
-			'show'                    => [
-				'href' => 'act=show',
-				'icon' => 'show.svg',
-			],
+			'edit',
+			'delete',
+			'show',
 			'generateInvoicePdf'      => [
 				'href'       => 'action=generateInvoicePdf&key=noref', // Adding the "key" param to the url will prevent Contao of saving the url in the referer list: https://github.com/contao/contao/blob/178b1daf7a090fcb36351502705f4ce8ac57add6/core-bundle/src/EventListener/StoreRefererListener.php#L88C1-L88C1
 				'icon'       => Bundle::ASSET_DIR.'/icons/fontawesome/default/file-pdf-regular.svg',

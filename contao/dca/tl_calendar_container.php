@@ -28,7 +28,6 @@ $GLOBALS['TL_DCA']['tl_calendar_container'] = [
 			],
 		],
 	],
-	// List
 	'list'     => [
 		'sorting'           => [
 			'mode'            => DataContainer::MODE_SORTED,

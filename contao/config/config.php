@@ -35,7 +35,6 @@ use Markocupic\SacEventToolBundle\Model\TourTypeModel;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
 use Markocupic\SacEventToolBundle\ModuleSacEventToolEventPreviewReader;
 
-
 // Remove the calendar module from the content list
 unset($GLOBALS['BE_MOD']['content']['calendar']);
 
