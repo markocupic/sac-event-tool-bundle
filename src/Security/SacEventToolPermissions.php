@@ -16,7 +16,6 @@ namespace Markocupic\SacEventToolBundle\Security;
 
 final class SacEventToolPermissions
 {
-
     public const USER_CAN_EDIT_CALENDAR_CONTAINERS = 'contao_user.calendar_containers';
 
     public const USER_CAN_CREATE_CALENDAR_CONTAINERS = 'contao_user.calendar_containerp.create';

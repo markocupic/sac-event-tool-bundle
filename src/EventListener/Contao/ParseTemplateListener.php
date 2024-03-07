@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\EventListener\Contao;
 
-use Contao\CalendarBundle\Security\ContaoCalendarPermissions;
 use Contao\CoreBundle\Controller\BackendController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Security\ContaoCorePermissions;

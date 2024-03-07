@@ -18,7 +18,6 @@ use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 
 class Calendar
 {
-
     #[AsCallback(table: 'tl_calendar', target: 'list.sorting.child_record')]
     public function listCalendars(array $arrRow): string
     {

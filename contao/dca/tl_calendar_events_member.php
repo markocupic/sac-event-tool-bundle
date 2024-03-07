@@ -102,22 +102,9 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'edit',
 			'delete',
 			'show',
-			// Regular "toggle" operation but without "icon" and with the haste specific params
-			'toggleStateOfParticipation' => [
-				'attributes'           => 'onclick="Backend.getScrollOffset();"',
-				'haste_ajax_operation' => [
-					'field'   => 'hasParticipated',
-					'options' => [
-						[
-							'value' => '',
-							'icon'  => Bundle::ASSET_DIR.'/icons/fontawesome/default/square-regular.svg',
-						],
-						[
-							'value' => '1',
-							'icon'  => Bundle::ASSET_DIR.'/icons/fontawesome/default/square-check-regular.svg',
-						],
-					],
-				],
+			'toggleParticipationState' => [
+				'href' => 'act=toggle&amp;field=hasParticipated',
+				'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/square-check-regular.svg',
 			],
 		],
 	],
@@ -332,6 +319,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		],
 		'hasParticipated'             => [
 			'exclude'   => true,
+			'toggle'    => true,
 			'inputType' => 'checkbox',
 			'eval'      => ['doNotShow' => false, 'submitOnChange' => true, 'doNotCopy' => true],
 			'sql'       => "char(1) NOT NULL default ''",

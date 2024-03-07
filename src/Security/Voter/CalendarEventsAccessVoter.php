@@ -21,7 +21,6 @@ use Contao\CoreBundle\Security\DataContainer\ReadAction;
 use Contao\CoreBundle\Security\DataContainer\UpdateAction;
 use Contao\CoreBundle\Security\Voter\DataContainer\AbstractDataContainerVoter;
 use Contao\CoreBundle\Security\Voter\DataContainer\ParentAccessTrait;
-use Markocupic\SacEventToolBundle\Security\SacEventToolPermissions;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -29,18 +28,16 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class CalendarEventsAccessVoter extends AbstractDataContainerVoter
 {
-	use ParentAccessTrait;
+    use ParentAccessTrait;
 
-	protected function getTable(): string
-	{
-		return 'tl_calendar_events';
-	}
+    protected function getTable(): string
+    {
+        return 'tl_calendar_events';
+    }
 
-
-	protected function hasAccess(TokenInterface $token, CreateAction|DeleteAction|ReadAction|UpdateAction $action): bool
-	{
-		return $this->accessDecisionManager->decide($token, [ContaoCalendarPermissions::USER_CAN_ACCESS_MODULE])
-			&& $this->hasAccessToParent($token, ContaoCalendarPermissions::USER_CAN_EDIT_CALENDAR, $action);
-	}
+    protected function hasAccess(TokenInterface $token, CreateAction|DeleteAction|ReadAction|UpdateAction $action): bool
+    {
+        return $this->accessDecisionManager->decide($token, [ContaoCalendarPermissions::USER_CAN_ACCESS_MODULE])
+            && $this->hasAccessToParent($token, ContaoCalendarPermissions::USER_CAN_EDIT_CALENDAR, $action);
+    }
 }
-

@@ -30,7 +30,6 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Date;
-use Contao\DcaExtractor;
 use Contao\FilesModel;
 use Contao\Idna;
 use Contao\Image;

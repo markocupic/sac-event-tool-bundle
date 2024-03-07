@@ -190,7 +190,7 @@ class CalendarEventsMember
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notDeletable'] = true;
                     $GLOBALS['TL_DCA']['tl_calendar_events_member']['config']['notCopyable'] = true;
 
-                    unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['all'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['downloadEventMemberList'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['operations']['edit'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['operations']['delete'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['operations']['toggleStateOfParticipation']);
+                    unset($GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['all'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['downloadEventMemberList'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['global_operations']['sendEmail'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['operations']['edit'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['operations']['delete'], $GLOBALS['TL_DCA']['tl_calendar_events_member']['list']['operations']['toggleParticipationState']);
                 }
             }
         }
@@ -377,9 +377,7 @@ class CalendarEventsMember
     #[AsCallback(table: 'tl_calendar_events_member', target: 'fields.hasParticipated.save', priority: 100)]
     public function saveCallbackHasParticipated(string $varValue, DataContainer $dc): string
     {
-        $request = $this->requestStack->getCurrentRequest();
-
-        if ($dc->id && 'hasteAjaxOperation' === $request->request->get('action')) {
+        if ($dc->id) {
             $registration = $this->calendarEventsMember->findByPk($dc->id);
 
             if (null !== $registration) {

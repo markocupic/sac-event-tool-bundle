@@ -26,7 +26,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_member']['sendEmail'] = 'E-Mail';
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['new'] = ['Teilnehmer hinzufügen', 'Fügen Sie hier manuell einen neuen Teilnehmer hinzu.'];
 
 // Operations
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['toggleStateOfParticipation'] = ['Status der Registrierung ändern', 'Ändern Sie hier den Teilnahmestatus des Teilnehmers mit ID %s.'];
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['toggleParticipationState'] = ['Status der Registrierung ändern', 'Ändern Sie hier den Teilnahmestatus des Teilnehmers mit ID %s.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['edit'] = ['Registrierung bearbeiten', 'Registrierung mit ID %s bearbeiten.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['delete'] = ['Registrierung löschen', 'Löschen der Registrierung mit ID %s.'];
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['show'] = ['Details der Registrierung ansehen', 'Details der Registrierung mit ID %s anzeigen.'];
