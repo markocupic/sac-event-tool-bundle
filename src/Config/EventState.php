@@ -16,12 +16,12 @@ namespace Markocupic\SacEventToolBundle\Config;
 
 class EventState
 {
-    public const STATE_FULLY_BOOKED = 'event_fully_booked';
-    public const STATE_CANCELED = 'event_canceled';
-    public const STATE_RESCHEDULED = 'event_rescheduled';
-    public const ALL = [
-        self::STATE_FULLY_BOOKED,
-        self::STATE_CANCELED,
-        self::STATE_RESCHEDULED,
-    ];
+	public const STATE_FULLY_BOOKED = 'event_fully_booked';
+	public const STATE_CANCELED = 'event_canceled';
+	public const STATE_RESCHEDULED = 'event_rescheduled';
+	public const ALL = [
+		self::STATE_FULLY_BOOKED,
+		self::STATE_CANCELED,
+		self::STATE_RESCHEDULED,
+	];
 }

@@ -24,25 +24,25 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventRegistrationUtil
 {
-    private Adapter $stringUtilAdapter;
-    private Adapter $imageAdapter;
+	private Adapter $stringUtilAdapter;
+	private Adapter $imageAdapter;
 
-    public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly TranslatorInterface $translator,
-    ) {
-        $this->stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-        $this->imageAdapter = $this->framework->getAdapter(Image::class);
-    }
+	public function __construct(
+		private readonly ContaoFramework $framework,
+		private readonly TranslatorInterface $translator,
+	) {
+		$this->stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+		$this->imageAdapter = $this->framework->getAdapter(Image::class);
+	}
 
-    public function getSubscriptionStateIcon(CalendarEventsMemberModel $registrationModel): string
-    {
-        $icon = sprintf('%s/icons/subscription-states/%s.svg', Bundle::ASSET_DIR, $registrationModel->stateOfSubscription);
-        $state = $this->translator->trans('MSC.'.$registrationModel->stateOfSubscription, [], 'contao_default');
+	public function getSubscriptionStateIcon(CalendarEventsMemberModel $registrationModel): string
+	{
+		$icon = sprintf('%s/icons/subscription-states/%s.svg', Bundle::ASSET_DIR, $registrationModel->stateOfSubscription);
+		$state = $this->translator->trans('MSC.'.$registrationModel->stateOfSubscription, [], 'contao_default');
 
-        $strAlt = $state;
-        $strAttributes = sprintf('title="%s"', $this->stringUtilAdapter->specialchars($state));
+		$strAlt = $state;
+		$strAttributes = sprintf('title="%s"', $this->stringUtilAdapter->specialchars($state));
 
-        return $this->imageAdapter->getHtml($icon, $strAlt, $strAttributes);
-    }
+		return $this->imageAdapter->getHtml($icon, $strAlt, $strAttributes);
+	}
 }

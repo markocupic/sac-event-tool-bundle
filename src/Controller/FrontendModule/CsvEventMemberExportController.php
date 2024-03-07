@@ -135,7 +135,6 @@ class CsvEventMemberExportController extends AbstractFrontendModuleController
                         }
                     }
 
-                    // Set tl_member.disable to true if member was not found in the csv-file
                     $statement2 = $this->connection->executeQuery('SELECT * FROM tl_calendar_events_member WHERE eventId=? ORDER BY lastname', [$arrEvent['id']]);
 
                     while (false !== ($arrEventMember = $statement2->fetchAssociative())) {

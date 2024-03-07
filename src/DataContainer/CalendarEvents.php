@@ -816,7 +816,7 @@ class CalendarEvents
         // Set filledInEventReportForm, now the invoice form can be printed in tl_calendar_events_instructor_invoice
         if ('writeTourReport' === $request->query->get('call')) {
             $set = [
-                'filledInEventReportForm' => '1',
+                'filledInEventReportForm' => 1,
             ];
 
             $this->connection->update('tl_calendar_events', $set, ['id' => $dc->activeRecord->id]);
@@ -1210,7 +1210,7 @@ class CalendarEvents
     public function listInstructors(): array
     {
         $options = [];
-        $stmt = $this->connection->executeQuery('SELECT id,firstname,lastname,city FROM tl_user WHERE disable = ? && lastname != ? && firstname != ? ORDER BY lastname', ['', '', '']);
+        $stmt = $this->connection->executeQuery('SELECT id,firstname,lastname,city FROM tl_user WHERE disable = ? && lastname != ? && firstname != ? ORDER BY lastname', [0, '', '']);
 
         while (false !== ($row = $stmt->fetchAssociative())) {
             $options[$row['id']] = $row['lastname'].' '.$row['firstname'].', '.$row['city'];
@@ -1534,7 +1534,7 @@ class CalendarEvents
                     'pid' => $dc->id,
                     'userId' => $arrInstructor['instructorId'],
                     'tstamp' => time(),
-                    'isMainInstructor' => $i < 1 ? '1' : '',
+                    'isMainInstructor' => $i < 1 ? 1 : 0,
                 ];
 
                 $this->connection->insert('tl_calendar_events_instructor', $set);
@@ -1772,7 +1772,7 @@ class CalendarEvents
                     $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['publishedEvent'], $objEvent->id));
                 }
 
-                $objEvent->published = '1';
+                $objEvent->published = 1;
                 $objEvent->save();
 
                 // HOOK: publishEvent, f.ex notify the tour guide
@@ -1803,7 +1803,7 @@ class CalendarEvents
                     $this->message->addInfo(sprintf($GLOBALS['TL_LANG']['MSC']['unpublishedEvent'], $objEvent->id));
                 }
 
-                $objEvent->published = '';
+                $objEvent->published = 0;
                 $objEvent->save();
             }
 

@@ -23,35 +23,35 @@ use Twig\TwigFunction;
 
 class TwigEventDataManager extends AbstractExtension
 {
-    private Adapter $calendarEventsHelper;
-    private Adapter $calendarEventsModel;
+	private Adapter $calendarEventsHelper;
+	private Adapter $calendarEventsModel;
 
-    public function __construct(
-        private readonly ContaoFramework $framework,
-    ) {
-        $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
-        $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
-    }
+	public function __construct(
+		private readonly ContaoFramework $framework,
+	) {
+		$this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
+		$this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
+	}
 
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('get_event_by_pk', [$this, 'getEventByPk']),
-            new TwigFunction('get_event_data', [$this, 'getEventData']),
-        ];
-    }
+	public function getFunctions(): array
+	{
+		return [
+			new TwigFunction('get_event_by_pk', [$this, 'getEventByPk']),
+			new TwigFunction('get_event_data', [$this, 'getEventData']),
+		];
+	}
 
-    public function getEventData(CalendarEventsModel $model, string $prop): mixed
-    {
-        $this->framework->initialize();
+	public function getEventData(CalendarEventsModel $model, string $prop): mixed
+	{
+		$this->framework->initialize();
 
-        return $this->calendarEventsHelper->getEventData($model, $prop);
-    }
+		return $this->calendarEventsHelper->getEventData($model, $prop);
+	}
 
-    public function getEventByPk($id): CalendarEventsModel|null
-    {
-        $this->framework->initialize();
+	public function getEventByPk($id): CalendarEventsModel|null
+	{
+		$this->framework->initialize();
 
-        return $this->calendarEventsModel->findByPk($id);
-    }
+		return $this->calendarEventsModel->findByPk($id);
+	}
 }

@@ -18,10 +18,10 @@ use Contao\Model;
 
 class TourDifficultyModel extends Model
 {
-    /**
-     * Table name.
-     *
-     * @var string
-     */
-    protected static $strTable = 'tl_tour_difficulty';
+	/**
+	 * Table name.
+	 *
+	 * @var string
+	 */
+	protected static $strTable = 'tl_tour_difficulty';
 }

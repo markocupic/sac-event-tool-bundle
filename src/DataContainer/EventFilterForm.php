@@ -17,6 +17,7 @@ namespace Markocupic\SacEventToolBundle\DataContainer;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Model\CourseMainTypeModel;
 use Markocupic\SacEventToolBundle\Model\CourseSubTypeModel;
 
@@ -54,7 +55,7 @@ class EventFilterForm
     {
         $arrOptions = [];
 
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_event_organizer WHERE hideInEventFilter = ? ORDER BY sorting', ['']);
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_event_organizer WHERE hideInEventFilter = ? ORDER BY sorting', [0], [Types::INTEGER]);
 
         while (false !== ($arrOrganizer = $stmt->fetchAssociative())) {
             $arrOptions[$arrOrganizer['id']] = $arrOrganizer['title'];

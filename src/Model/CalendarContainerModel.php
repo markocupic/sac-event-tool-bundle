@@ -18,10 +18,10 @@ use Contao\Model;
 
 class CalendarContainerModel extends Model
 {
-    /**
-     * Table name.
-     *
-     * @var string
-     */
-    protected static $strTable = 'tl_calendar_container';
+	/**
+	 * Table name.
+	 *
+	 * @var string
+	 */
+	protected static $strTable = 'tl_calendar_container';
 }

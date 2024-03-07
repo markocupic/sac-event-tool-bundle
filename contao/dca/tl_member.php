@@ -62,8 +62,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['isSacMember'] = [
 	'exclude'   => true,
 	'filter'    => true,
 	'inputType' => 'checkbox',
-	'eval'      => ['submitOnChange' => false],
-	'sql'       => "char(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['sacMemberId'] = [
@@ -81,7 +80,7 @@ $GLOBALS['TL_DCA']['tl_member']['fields']['hasLeadClimbingEducation'] = [
 	'filter'    => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['submitOnChange' => true],
-	'sql'       => "char(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 $GLOBALS['TL_DCA']['tl_member']['fields']['dateOfLeadClimbingEducation'] = [

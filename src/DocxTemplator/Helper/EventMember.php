@@ -198,7 +198,7 @@ class EventMember
 
         return $calendarEventsMemberModelAdapter->findBy(
             ['tl_calendar_events_member.eventId=?', 'tl_calendar_events_member.hasParticipated=?'],
-            [$objEvent->id, '1']
+            [$objEvent->id, 1]
         );
     }
 

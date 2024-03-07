@@ -20,15 +20,15 @@ use Twig\TwigFunction;
 
 class TwigBundleConfigManager extends AbstractExtension
 {
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('sacevt_asset_dir', [$this, 'getBundleAssetDir']),
-        ];
-    }
+	public function getFunctions(): array
+	{
+		return [
+			new TwigFunction('sacevt_asset_dir', [$this, 'getBundleAssetDir']),
+		];
+	}
 
-    public function getBundleAssetDir(): string
-    {
-        return Bundle::ASSET_DIR;
-    }
+	public function getBundleAssetDir(): string
+	{
+		return Bundle::ASSET_DIR;
+	}
 }

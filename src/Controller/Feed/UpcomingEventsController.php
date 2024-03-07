@@ -24,6 +24,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Types\Types;
 use Markocupic\RssFeedGeneratorBundle\Feed\FeedFactory;
 use Markocupic\RssFeedGeneratorBundle\Item\Item;
 use Markocupic\RssFeedGeneratorBundle\Item\ItemGroup;
@@ -194,8 +195,8 @@ class UpcomingEventsController extends AbstractController
             ->where('t.published = :published')
             ->andWhere('t.startDate > :startDate')
             ->andWhere($qb->expr()->in('t.eventType', ':eventTypes'))
-            ->setParameter('published', '1')
-            ->setParameter('startDate', time())
+            ->setParameter('published', 1, Types::INTEGER)
+            ->setParameter('startDate', time(), Types::INTEGER)
             ->setParameter('eventTypes', EventType::ALL, ArrayParameterType::STRING)
         ;
 

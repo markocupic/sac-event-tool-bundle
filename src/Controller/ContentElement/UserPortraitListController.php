@@ -25,6 +25,7 @@ use Contao\Template;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Avatar\Avatar;
 use Markocupic\SacEventToolBundle\Model\UserRoleModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -74,7 +75,7 @@ class UserPortraitListController extends AbstractContentElementController
             $queryType = $model->userList_queryType;
 
             if (\count($arrSelectedRoles) > 0) {
-                $stmt = $this->connection->executeQuery('SELECT * FROM tl_user  WHERE disable = ? AND hideInFrontendListings = ? ORDER BY lastname, firstname', ['', '']);
+                $stmt = $this->connection->executeQuery('SELECT * FROM tl_user  WHERE disable = ? AND hideInFrontendListings = ? ORDER BY lastname, firstname', [0, 0],[Types::INTEGER, Types::INTEGER]);
 
                 if ('OR' === $queryType) {
                     while (false !== ($arrUser = $stmt->fetchAssociative())) {

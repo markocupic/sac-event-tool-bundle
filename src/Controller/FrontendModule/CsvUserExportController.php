@@ -30,6 +30,7 @@ use Contao\Template;
 use Contao\UserGroupModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Types\Types;
 use League\Csv\Exception;
 use League\Csv\InvalidArgument;
 use League\Csv\Reader;
@@ -157,7 +158,7 @@ class CsvUserExportController extends AbstractFrontendModuleController
                     $strTable = 'tl_member';
                     $arrFields = ['id', 'lastname', 'firstname', 'gender', 'street', 'postal', 'city', 'phone', 'mobile', 'email', 'isSacMember', 'disable', 'sacMemberId', 'login', 'lastLogin', 'groups'];
                     $strGroupFieldName = 'groups';
-                    $result = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember=? ORDER BY lastname, firstname', ['1']);
+                    $result = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember = ? ORDER BY lastname, firstname', [1],[Types::INTEGER]);
 
                     throw new ResponseException($this->exportTable($exportType, $strTable, $arrFields, $strGroupFieldName, $result, MemberGroupModel::class, $blnKeepGroupsInOneLine));
                 }

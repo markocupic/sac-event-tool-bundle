@@ -251,7 +251,7 @@ class EventApiController extends AbstractController
         $qb->select('id')
             ->from('tl_calendar_events', 't')
             ->where('t.published = :published')
-            ->setParameter('published', '1', Types::STRING)
+            ->setParameter('published', 1, Types::INTEGER)
         ;
 
         // Filter by calendar ids tl_calendar.id
@@ -275,7 +275,7 @@ class EventApiController extends AbstractController
         // Filter by suitableForBeginners
         if ('1' === $params['suitableForBeginners']) {
             $qb->andWhere('t.suitableForBeginners = :suitableForBeginners');
-            $qb->setParameter('suitableForBeginners', '1', Types::STRING);
+            $qb->setParameter('suitableForBeginners', 1, Types::INTEGER);
         }
 
         // Filter by publicTransportEvent
@@ -368,7 +368,7 @@ class EventApiController extends AbstractController
             $qbEvtOrg->select('id')
                 ->from('tl_event_organizer', 'o')
                 ->where('o.ignoreFilterInEventList = :true')
-                ->setParameter('true', '1', Types::STRING)
+                ->setParameter('true', 1, Types::INTEGER)
             ;
 
             $arrIgnoredOrganizer = $qbEvtOrg->fetchFirstColumn();

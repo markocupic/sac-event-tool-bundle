@@ -514,7 +514,7 @@ class CalendarEventsHelper
         $objInstructor = Database::getInstance()
             ->prepare('SELECT * FROM tl_calendar_events_instructor WHERE pid = ? AND isMainInstructor = ?')
             ->limit(1)
-            ->execute($objEvent->id, '1')
+            ->execute($objEvent->id, 1)
         ;
 
         if ($objInstructor->numRows) {
@@ -1008,7 +1008,7 @@ class CalendarEventsHelper
         // Get all future events of the member
         $objMemberEvents = Database::getInstance()
             ->prepare('SELECT * FROM tl_calendar_events_member WHERE eventId != ? AND contaoMemberId = ? AND stateOfSubscription = ? AND hasParticipated = ?')
-            ->execute($objEvent->id, $objMember->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED, '')
+            ->execute($objEvent->id, $objMember->id, EventSubscriptionState::SUBSCRIPTION_ACCEPTED, 0)
         ;
 
         while ($objMemberEvents->next()) {

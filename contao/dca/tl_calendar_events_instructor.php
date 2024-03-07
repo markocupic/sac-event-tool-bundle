@@ -63,7 +63,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor'] = [
 			'sql' => 'int(10) unsigned NOT NULL default 0',
 		],
 		'isMainInstructor' => [
-			'sql' => "char(1) NOT NULL default ''",
+			'sql' => ['type' => 'boolean', 'default' => false],
 		],
 	],
 ];

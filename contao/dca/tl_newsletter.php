@@ -32,7 +32,7 @@ $GLOBALS['TL_DCA']['tl_newsletter']['fields']['enableSendAndDeleteCron'] = [
 	'sorting'   => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['tl_class' => 'clr m12', 'doNotCopy' => true, 'submitOnChange' => true, 'boolean' => true],
-	'sql'       => "char(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 $GLOBALS['TL_DCA']['tl_newsletter']['fields']['sendPerMinute'] = [

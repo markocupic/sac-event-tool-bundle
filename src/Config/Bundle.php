@@ -16,5 +16,5 @@ namespace Markocupic\SacEventToolBundle\Config;
 
 class Bundle
 {
-    public const ASSET_DIR = 'bundles/markocupicsaceventtool';
+	public const ASSET_DIR = 'bundles/markocupicsaceventtool';
 }

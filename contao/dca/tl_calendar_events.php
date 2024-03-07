@@ -258,7 +258,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['suitableForBeginners'] = [
 	'filter'    => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['tl_class' => 'm12 clr'],
-	'sql'       => "char(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field isRecurringEvent
@@ -267,7 +267,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['isRecurringEvent'] = [
 	'filter'    => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['tl_class' => 'm12 clr'],
-	'sql'       => "char(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field eventType
@@ -288,7 +288,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mountainguide'] = [
 	'inputType' => 'select',
 	'eval'      => ['tl_class' => 'm12 clr'],
 	'options'   => EventMountainGuide::ALL,
-	'sql'       => "int(1) unsigned NOT NULL default '0'",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field mainInstructor
@@ -434,7 +434,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addMinAndMaxMembers'] = [
 	'filter'    => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['submitOnChange' => true, 'tl_class' => 'm12 clr'],
-	'sql'       => "char(1) NOT NULL default '1'",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field minMembers
@@ -477,7 +477,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addIban'] = [
 	'filter'    => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['submitOnChange' => true, 'mandatory' => false, 'tl_class' => 'm12 clr'],
-	'sql'       => "char(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field iban
@@ -551,7 +551,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['askForAhvNumber'] = [
 	'filter'    => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['tl_class' => 'm12 clr'],
-	'sql'       => "char(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field generateMainInstructorContactDataFromDb
@@ -561,8 +561,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['generateMainInstructorContac
 	'exclude'   => true,
 	'default'   => BackendUser::getInstance()->generateMainInstructorContactDataFromDb,
 	'inputType' => 'checkbox',
-	'eval'      => ['submitOnChange' => false, 'tl_class' => 'm12 clr'],
-	'sql'       => "char(1) NOT NULL default ''",
+	'eval'      => ['tl_class' => 'm12 clr'],
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field disableOnlineRegistration
@@ -570,10 +570,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration'] 
 	'filter'    => true,
 	'sorting'   => true,
 	'exclude'   => true,
-	'default'   => BackendUser::getInstance()->disableOnlineRegistration,
+	'default'   => (int)BackendUser::getInstance()->disableOnlineRegistration,
 	'inputType' => 'checkbox',
-	'eval'      => ['submitOnChange' => false, 'tl_class' => 'm12 clr'],
-	'sql'       => "char(1) NOT NULL default ''",
+	'eval'      => ['tl_class' => 'm12 clr'],
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field registrationGoesTo
@@ -592,7 +592,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['setRegistrationPeriod'] = [
 	'exclude'   => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['submitOnChange' => true, 'tl_class' => 'm12 clr'],
-	'sql'       => "char(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field registrationStartDate
@@ -619,7 +619,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['allowDeregistration'] = [
 	'filter'    => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['submitOnChange' => true, 'tl_class' => 'm12 clr'],
-	'sql'       => "char(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field deregistrationLimit
@@ -638,7 +638,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addGallery'] = [
 	'filter'    => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['submitOnChange' => true, 'tl_class' => 'm12 clr'],
-	'sql'       => "char(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field multiSRC
@@ -776,7 +776,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customizeEventRegistrationCo
 	'filter'    => false,
 	'inputType' => 'checkbox',
 	'eval'      => ['submitOnChange' => true, 'tl_class' => 'm12 clr'],
-	'sql'       => "char(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field customEventRegistrationConfirmationEmailText
@@ -794,7 +794,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['customEventRegistrationConfi
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['filledInEventReportForm'] = [
 	'exclude' => false,
 	'eval'    => ['doNotShow' => true, 'tl_class' => 'm12 clr'],
-	'sql'     => "char(1) NOT NULL default ''",
+	'sql'     => ['type' => 'boolean', 'default' => false],
 ];
 
 // Add new field executionState

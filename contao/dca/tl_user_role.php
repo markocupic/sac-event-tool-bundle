@@ -78,7 +78,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
 			'sorting'   => true,
 			'inputType' => 'checkbox',
 			'eval'      => ['mandatory' => false, 'tl_class' => 'clr'],
-			'sql'       => "char(1) NOT NULL default ''",
+			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 		'belongsToBeauftragteStammsektion' => [
 			'exclude'   => true,
@@ -86,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
 			'sorting'   => true,
 			'inputType' => 'checkbox',
 			'eval'      => ['mandatory' => false, 'tl_class' => 'clr'],
-			'sql'       => "char(1) NOT NULL default ''",
+			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 		'email'                            => [
 			'exclude'   => true,

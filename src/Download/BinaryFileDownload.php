@@ -21,30 +21,30 @@ use Symfony\Component\String\UnicodeString;
 
 class BinaryFileDownload
 {
-    /**
-     * Returns a BinaryFileResponse object with original or customized file name and disposition header.
-     */
-    public function sendFileToBrowser(string $filePath, string $fileName = '', bool $inline = false, bool $deleteFileAfterSend = false): BinaryFileResponse
-    {
-        $response = new BinaryFileResponse($filePath);
-        $response->setPrivate(); // public by default
-        $response->setAutoEtag();
+	/**
+	 * Returns a BinaryFileResponse object with original or customized file name and disposition header.
+	 */
+	public function sendFileToBrowser(string $filePath, string $fileName = '', bool $inline = false, bool $deleteFileAfterSend = false): BinaryFileResponse
+	{
+		$response = new BinaryFileResponse($filePath);
+		$response->setPrivate(); // public by default
+		$response->setAutoEtag();
 
-        $response->setContentDisposition(
-            $inline ? ResponseHeaderBag::DISPOSITION_INLINE : ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $fileName,
-            (new UnicodeString(basename($filePath)))->ascii()->toString(),
-        );
+		$response->setContentDisposition(
+			$inline ? ResponseHeaderBag::DISPOSITION_INLINE : ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+			$fileName,
+			(new UnicodeString(basename($filePath)))->ascii()->toString(),
+		);
 
-        $mimeTypes = new MimeTypes();
-        $mimeType = $mimeTypes->guessMimeType($filePath);
+		$mimeTypes = new MimeTypes();
+		$mimeType = $mimeTypes->guessMimeType($filePath);
 
-        $response->headers->addCacheControlDirective('must-revalidate');
-        $response->headers->set('Connection', 'close');
-        $response->headers->set('Content-Type', $mimeType);
+		$response->headers->addCacheControlDirective('must-revalidate');
+		$response->headers->set('Connection', 'close');
+		$response->headers->set('Content-Type', $mimeType);
 
-        $response->deleteFileAfterSend($deleteFileAfterSend);
+		$response->deleteFileAfterSend($deleteFileAfterSend);
 
-        return $response;
-    }
+		return $response;
+	}
 }

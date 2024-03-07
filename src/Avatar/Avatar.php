@@ -22,36 +22,36 @@ use Contao\UserModel;
 
 class Avatar
 {
-    private Adapter $filesModelAdapter;
+	private Adapter $filesModelAdapter;
 
-    public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly string $projectDir,
-        private readonly string $sacevtAvatarFemale,
-        private readonly string $sacevtAvatarMale,
-    ) {
-        $this->filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
-    }
+	public function __construct(
+		private readonly ContaoFramework $framework,
+		private readonly string $projectDir,
+		private readonly string $sacevtAvatarFemale,
+		private readonly string $sacevtAvatarMale,
+	) {
+		$this->filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
+	}
 
-    /**
-     * @todo Provide an avatar if gender === 'other'
-     */
-    public function getAvatarResourcePath(MemberModel|UserModel $userModel): string
-    {
-        if (!empty($userModel->avatar)) {
-            $objFiles = $this->filesModelAdapter->findByUuid($userModel->avatar);
+	/**
+	 * @todo Provide an avatar if gender === 'other'
+	 */
+	public function getAvatarResourcePath(MemberModel|UserModel $userModel): string
+	{
+		if (!empty($userModel->avatar)) {
+			$objFiles = $this->filesModelAdapter->findByUuid($userModel->avatar);
 
-            if (null !== $objFiles) {
-                if (is_file($this->projectDir.'/'.$objFiles->path)) {
-                    return $objFiles->path;
-                }
-            }
-        }
+			if (null !== $objFiles) {
+				if (is_file($this->projectDir.'/'.$objFiles->path)) {
+					return $objFiles->path;
+				}
+			}
+		}
 
-        if ('female' === $userModel->gender) {
-            return $this->sacevtAvatarFemale;
-        }
+		if ('female' === $userModel->gender) {
+			return $this->sacevtAvatarFemale;
+		}
 
-        return $this->sacevtAvatarMale;
-    }
+		return $this->sacevtAvatarMale;
+	}
 }

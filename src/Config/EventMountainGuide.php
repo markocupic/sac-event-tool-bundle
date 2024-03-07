@@ -16,12 +16,12 @@ namespace Markocupic\SacEventToolBundle\Config;
 
 class EventMountainGuide
 {
-    public const NO_MOUNTAIN_GUIDE = 0;
-    public const WITH_MOUNTAIN_GUIDE = 1;
-    public const WITH_MOUNTAIN_GUIDE_OFFER = 2;
-    public const ALL = [
-        self::NO_MOUNTAIN_GUIDE,
-        self::WITH_MOUNTAIN_GUIDE,
-        self::WITH_MOUNTAIN_GUIDE_OFFER,
-    ];
+	public const NO_MOUNTAIN_GUIDE = 0;
+	public const WITH_MOUNTAIN_GUIDE = 1;
+	public const WITH_MOUNTAIN_GUIDE_OFFER = 2;
+	public const ALL = [
+		self::NO_MOUNTAIN_GUIDE,
+		self::WITH_MOUNTAIN_GUIDE,
+		self::WITH_MOUNTAIN_GUIDE_OFFER,
+	];
 }

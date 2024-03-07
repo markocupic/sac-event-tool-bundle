@@ -137,7 +137,7 @@ class ClearFrontendUserData
             $objCalendarEventsMember->notes = 'Benutzerdaten anonymisiert am '.$dateAdapter->parse('d.m.Y', time());
             $objCalendarEventsMember->emergencyPhone = '999 99 99';
             $objCalendarEventsMember->emergencyPhoneName = ' [anonymisiert]';
-            $objCalendarEventsMember->anonymized = '1';
+            $objCalendarEventsMember->anonymized = 1;
             $objCalendarEventsMember->save();
 
             return true;
@@ -165,7 +165,7 @@ class ClearFrontendUserData
                 ['contao' => new ContaoContext(__METHOD__, Log::DISABLE_FRONTEND_USER_LOGIN)]
             );
 
-            $objMember->login = '';
+            $objMember->login = 0;
             $objMember->password = '';
             $objMember->save();
         }

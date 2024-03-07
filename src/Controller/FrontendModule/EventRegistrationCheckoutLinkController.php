@@ -47,13 +47,18 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
 
-        $eventAlias = $inputAdapter->get('auto_item');
+		// Get the alias from auto_item
+        $eventAlias = $inputAdapter->get('events');
+
+		if ($this->scopeMatcher->isFrontendRequest($request) && empty($eventAlias)) {
+			return new Response('', Response::HTTP_NO_CONTENT);
+		}
 
         $this->objEvent = $calendarEventsModelAdapter->findByIdOrAlias($eventAlias);
         $this->objJumpTo = $pageModelAdapter->findPublishedById($model->eventRegCheckoutLinkPage);
 
-        if ($this->scopeMatcher->isFrontendRequest($request) && (!$this->objEvent || !$this->objJumpTo)) {
-            return new Response('', Response::HTTP_NO_CONTENT);
+        if ($this->scopeMatcher->isFrontendRequest($request) && (null === $this->objEvent || null === $this->objJumpTo)) {
+			return new Response('', Response::HTTP_NO_CONTENT);
         }
 
         // Call the parent method

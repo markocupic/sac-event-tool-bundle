@@ -22,29 +22,29 @@ use Twig\TwigFunction;
 
 class TwigAvatarManager extends AbstractExtension
 {
-    public function __construct(
-        private readonly Avatar $avatar,
-    ) {
-    }
+	public function __construct(
+		private readonly Avatar $avatar,
+	) {
+	}
 
-    public function getFunctions(): array
-    {
-        return [
-            new TwigFunction('getAvatarResourcePath', [$this, 'getAvatarResourcePath']),
-        ];
-    }
+	public function getFunctions(): array
+	{
+		return [
+			new TwigFunction('getAvatarResourcePath', [$this, 'getAvatarResourcePath']),
+		];
+	}
 
-    /**
-     * Get the resource path to the avatar inside your Twig template.
-     *
-     * Inside your Twig template:
-     * #user# -> \Contao\UserModel or \Contao\MemberModel
-     * {{ getAvatarResourcePath(#user#) }}.
-     *
-     * @see: https://docs.contao.org/dev/framework/asset-management.
-     */
-    public function getAvatarResourcePath(MemberModel|UserModel $userModel): string
-    {
-        return $this->avatar->getAvatarResourcePath($userModel);
-    }
+	/**
+	 * Get the resource path to the avatar inside your Twig template.
+	 *
+	 * Inside your Twig template:
+	 * #user# -> \Contao\UserModel or \Contao\MemberModel
+	 * {{ getAvatarResourcePath(#user#) }}.
+	 *
+	 * @see: https://docs.contao.org/dev/framework/asset-management.
+	 */
+	public function getAvatarResourcePath(MemberModel|UserModel $userModel): string
+	{
+		return $this->avatar->getAvatarResourcePath($userModel);
+	}
 }

@@ -20,28 +20,28 @@ use Contao\Model\Collection;
 
 class SacSectionModel extends Model
 {
-    /**
-     * Table name.
-     *
-     * @var string
-     */
-    protected static $strTable = 'tl_sac_section';
+	/**
+	 * Table name.
+	 *
+	 * @var string
+	 */
+	protected static $strTable = 'tl_sac_section';
 
-    /**
-     * Find multiple sections by their section ids.
-     */
-    public static function findMultipleBySectionIds($arrSectionsIds, array $arrOptions = []): Collection|array|null
-    {
-        if (empty($arrSectionsIds) || !\is_array($arrSectionsIds)) {
-            return null;
-        }
+	/**
+	 * Find multiple sections by their section ids.
+	 */
+	public static function findMultipleBySectionIds($arrSectionsIds, array $arrOptions = []): Collection|array|null
+	{
+		if (empty($arrSectionsIds) || !\is_array($arrSectionsIds)) {
+			return null;
+		}
 
-        $t = static::$strTable;
+		$t = static::$strTable;
 
-        if (!isset($arrOptions['order'])) {
-            $arrOptions['order'] = Database::getInstance()->findInSet("$t.sectionId", $arrSectionsIds);
-        }
+		if (!isset($arrOptions['order'])) {
+			$arrOptions['order'] = Database::getInstance()->findInSet("$t.sectionId", $arrSectionsIds);
+		}
 
-        return static::findBy(["$t.sectionId IN(".implode(',', array_fill(0, \count($arrSectionsIds), '?')).')'], $arrSectionsIds, $arrOptions);
-    }
+		return static::findBy(["$t.sectionId IN(".implode(',', array_fill(0, \count($arrSectionsIds), '?')).')'], $arrSectionsIds, $arrOptions);
+	}
 }

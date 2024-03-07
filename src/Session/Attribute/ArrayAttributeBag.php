@@ -21,23 +21,23 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
  */
 class ArrayAttributeBag extends AttributeBag implements \ArrayAccess
 {
-    public function offsetExists($offset): bool
-    {
-        return $this->has($offset);
-    }
+	public function offsetExists($offset): bool
+	{
+		return $this->has($offset);
+	}
 
-    public function &offsetGet($offset): mixed
-    {
-        return $this->attributes[$offset];
-    }
+	public function &offsetGet($offset): mixed
+	{
+		return $this->attributes[$offset];
+	}
 
-    public function offsetSet($offset, $value): void
-    {
-        $this->set($offset, $value);
-    }
+	public function offsetSet($offset, $value): void
+	{
+		$this->set($offset, $value);
+	}
 
-    public function offsetUnset($offset): void
-    {
-        $this->remove($offset);
-    }
+	public function offsetUnset($offset): void
+	{
+		$this->remove($offset);
+	}
 }

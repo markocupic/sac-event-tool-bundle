@@ -18,6 +18,7 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\FrontendUser;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Types\Types;
 use FTP\Connection as FtpConnection;
 use Markocupic\SacEventToolBundle\Config\Log;
 use Markocupic\SacEventToolBundle\DataContainer\Util;
@@ -200,7 +201,7 @@ class SyncSacMemberDatabase
             $arrAllMemberIDS = array_map('intval', $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member'));
 
             // Members only
-            $arrDisabledMemberIDS = $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member WHERE isSacMember = ?', ['']);
+            $arrDisabledMemberIDS = $this->connection->fetchFirstColumn('SELECT sacMemberId FROM tl_member WHERE isSacMember = ?', [0], [Types::INTEGER]);
             $arrDisabledMemberIDS = array_map('intval', $arrDisabledMemberIDS);
 
             $arrAllMembersRemote = [];
@@ -281,7 +282,7 @@ class SyncSacMemberDatabase
             }
 
             // Disable all members
-            $this->connection->executeStatement("UPDATE tl_member SET login = '', disable = '1', isSacMember = ''");
+            $this->connection->executeStatement("UPDATE tl_member SET login = 0, disable = 1, isSacMember = 0");
 
             // Insert new and activate existing members again
             $countInserts = 0;
@@ -298,9 +299,9 @@ class SyncSacMemberDatabase
                 if (!\in_array($sacMemberId, $arrAllMemberIDS, true)) {
                     $arrDataRemote['dateAdded'] = time();
                     $arrDataRemote['tstamp'] = time();
-                    $arrDataRemote['isSacMember'] = '1';
-                    $arrDataRemote['login'] = '1';
-                    $arrDataRemote['disable'] = '';
+                    $arrDataRemote['isSacMember'] = 1;
+                    $arrDataRemote['login'] = 1;
+                    $arrDataRemote['disable'] = 0;
 
                     // Insert new member
                     if ($this->connection->insert('tl_member', $arrDataRemote)) {
@@ -313,9 +314,9 @@ class SyncSacMemberDatabase
                 } else {
                     // Activate member account again
                     $set = [
-                        'login' => '1',
-                        'disable' => '',
-                        'isSacMember' => '1',
+                        'login' => 1,
+                        'disable' => 0,
+                        'isSacMember' => 1,
                     ];
 
                     $this->connection->update('tl_member', $set, ['sacMemberId' => $sacMemberId]);
@@ -356,21 +357,21 @@ class SyncSacMemberDatabase
         }
 
         // Set tl_member.disable to true if member was not found in the csv-file (is no more a valid SAC member)
-        $stmt = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember = ?', ['']);
+        $stmt = $this->connection->executeQuery('SELECT * FROM tl_member WHERE isSacMember = ?', [0], [Types::INTEGER]);
 
         while (false !== ($rowDisabledMember = $stmt->fetchAssociative())) {
             $rowDisabledMember['sacMemberId'] = (int) ($rowDisabledMember['sacMemberId']);
 
             $set = [
                 'tstamp' => time(),
-                'disable' => '1',
-                'isSacMember' => '',
-                'login' => '',
+                'disable' => 0,
+                'isSacMember' => 0,
+                'login' => 0,
             ];
 
             $id = $rowDisabledMember['id'];
 
-            $this->connection->update('tl_member', $set, ['id' => $id]);
+            $this->connection->update('tl_member', $set, ['id' => $id], [Types::INTEGER]);
 
             // Log if user has been disabled
             if (!\in_array($rowDisabledMember['sacMemberId'], $arrDisabledMemberIDS, true)) {

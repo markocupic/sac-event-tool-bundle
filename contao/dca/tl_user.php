@@ -216,7 +216,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['hideInFrontendListings'] = [
 	'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
 	'inputType' => 'checkbox',
 	'eval'      => ['mandatory' => false, 'tl_class' => 'clr'],
-	'sql'       => "varchar(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['gender'] = [
@@ -362,7 +362,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['disableOnlineRegistration'] = [
 	'sorting'   => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['tl_class' => 'clr'],
-	'sql'       => "varchar(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['generateMainInstructorContactDataFromDb'] = [
@@ -371,7 +371,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['generateMainInstructorContactDataFromDb
 	'exclude'   => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['tl_class' => 'clr'],
-	'sql'       => "char(1) NOT NULL default ''",
+	'sql'       => ['type' => 'boolean', 'default' => false],
 ];
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['rescissionCause'] = [

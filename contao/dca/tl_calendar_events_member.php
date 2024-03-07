@@ -270,7 +270,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sorting'   => true,
 			'inputType' => 'checkbox',
 			'eval'      => ['submitOnChange' => true],
-			'sql'       => "char(1) NOT NULL default ''",
+			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 		'dateOfLeadClimbingEducation' => [
 			'exclude'   => true,
@@ -282,13 +282,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'inputType' => 'checkbox',
 			'exclude'   => true,
 			'eval'      => ['doNotShow' => false, 'doNotCopy' => true],
-			'sql'       => "char(1) NOT NULL default ''",
+			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 		'hasAcceptedPrivacyRules'     => [
 			'inputType' => 'checkbox',
 			'exclude'   => true,
 			'eval'      => ['doNotShow' => false, 'doNotCopy' => true],
-			'sql'       => "char(1) NOT NULL default ''",
+			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 		'ahvNumber'                   => [
 			'exclude'   => true,
@@ -322,14 +322,14 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'toggle'    => true,
 			'inputType' => 'checkbox',
 			'eval'      => ['doNotShow' => false, 'submitOnChange' => true, 'doNotCopy' => true],
-			'sql'       => "char(1) NOT NULL default ''",
+			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 		'hasPaid'                     => [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
 			'eval'      => ['submitOnChange' => true, 'tl_class' => 'clr m12', 'mandatory' => false],
-			'sql'       => "char(1) NOT NULL default ''",
+			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 		'paymentMethod'               => [
 			'reference' => &$GLOBALS['TL_LANG']['tl_calendar_events_member'],
@@ -351,13 +351,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'exclude'   => true,
 			'inputType' => 'checkbox',
 			'eval'      => ['submitOnChange' => true, 'doNotShow' => false, 'doNotCopy' => true, 'tl_class' => 'long clr'],
-			'sql'       => "char(1) NOT NULL default ''",
+			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 		'anonymized'                  => [
 			'exclude'   => true,
 			'inputType' => 'checkbox',
 			'eval'      => ['doNotShow' => true, 'doNotCopy' => true],
-			'sql'       => "char(1) NOT NULL default ''",
+			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 		'dashboard'                   => [
 			'exclude'   => true,

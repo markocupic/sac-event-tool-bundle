@@ -25,6 +25,7 @@ use Contao\UserModel;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Types\Types;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Markocupic\SacEventToolBundle\CalendarEventsHelper;
 use Markocupic\SacEventToolBundle\Config\EventExecutionState;
@@ -220,7 +221,7 @@ class Event
         $carTaxes = 0;
 
         if ($objEventInvoice->countCars > 0 && $objEventInvoice->carTaxesKm > 0) {
-            $resEventMember = $this->connection->fetchOne('SELECT * FROM tl_calendar_events_member WHERE eventId = ? AND hasParticipated = ?', [$objEvent->id, '1']);
+            $resEventMember = $this->connection->fetchOne('SELECT * FROM tl_calendar_events_member WHERE eventId = ? AND hasParticipated = ?', [$objEvent->id, 1], [Types::INTEGER, Types::INTEGER]);
 
             if (false !== $resEventMember) {
                 // ((CHF 0.60 x AnzKm + Park-/Strassen-/Tunnelgebühren) x AnzAutos) : AnzPersonen

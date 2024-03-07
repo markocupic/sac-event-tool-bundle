@@ -18,10 +18,10 @@ use Contao\Model;
 
 class CalendarEventsInstructorInvoiceModel extends Model
 {
-    /**
-     * Table name.
-     *
-     * @var string
-     */
-    protected static $strTable = 'tl_calendar_events_instructor_invoice';
+	/**
+	 * Table name.
+	 *
+	 * @var string
+	 */
+	protected static $strTable = 'tl_calendar_events_instructor_invoice';
 }

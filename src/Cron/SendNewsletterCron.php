@@ -196,7 +196,7 @@ readonly class SendNewsletterCron
                 'tl_newsletter.enableSendAndDeleteCron=? AND tl_newsletter.sent=? AND (tl_newsletter.cronJobStart=? OR tl_newsletter.cronJobStart<?)',
             ],
             [
-                '1',
+                1,
                 '',
                 '',
                 time(),
