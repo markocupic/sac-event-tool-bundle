@@ -367,23 +367,25 @@ div.tl_header_tour_rapport table td {
 	color: red !important;
 }
 
-
 /** event dashboard buttons **/
-.event-dashboard .tl_submit_container ul {
-	display: flex;
-	flex-wrap: wrap;
-}
+.event-dashboard .tl_submit_container {
+	& ul {
+		display: flex;
+		flex-wrap: wrap;
+		list-style: none;
+		padding-left: 0;
 
-.event-dashboard .tl_submit_container ul li {
-
-	margin: 2px 4px 2px 2px;
+		& li {
+			margin: 2px 4px 2px 2px;
+		}
+	}
 }
 
 
 /** Stick navigation to the bottom for large screens **/
 @media (min-width: 1160px) {
 	#main {
-		padding-bottom: 50px;
+		padding-bottom: 80px;
 	}
 
 	.event-dashboard {
@@ -391,13 +393,16 @@ div.tl_header_tour_rapport table td {
 		bottom: 0;
 		z-index: 900;
 		width: 100%;
-		max-width: 1198px;
 	}
 
-	.event-dashboard .tl_submit_container {
-		background-color: #172b3b !important;
+	.event-dashboard {
+		& .tl_submit_container {
+			background-color: #172b3b !important;
+		}
 	}
 }
+
+/** End event dashboard buttons **/
 
 
 /** tl_help additions **/
