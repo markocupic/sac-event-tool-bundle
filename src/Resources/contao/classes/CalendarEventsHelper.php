@@ -332,13 +332,12 @@ class CalendarEventsHelper
 
             case 'gallery':
                 $value = static::getGallery([
-                    'multiSRC' => $objEvent->multiSRC,
+					'multiSRC' => $objEvent->multiSRC,
                     'orderSRC' => $objEvent->orderSRC,
                     'sortBy' => 'custom',
                     'perRow' => 4,
                     'size' => serialize([400, 400, 'center_center', 'proportional']),
                     'fullsize' => true,
-                    'galleryTpl' => 'gallery_bootstrap_col-4',
                 ]);
                 break;
 
@@ -628,28 +627,16 @@ class CalendarEventsHelper
     public static function getGallery(array $arrData): string
     {
         $arrData['type'] = 'gallery';
-        $arrData['tstamp'] = time();
+        $arrData['tstamp'] = 0;
 
-        if (!isset($arrData['perRow']) || $arrData['perRow'] < 1) {
-            $arrData['perRow'] = 1;
+        if (empty($arrData['perRow'])) {
+            $arrData['perRow'] = 4;
         }
 
         $objModel = new ContentModel();
         $objModel->setRow($arrData);
 
-        $objGallery = new ContentGallery($objModel, 'main');
-        $strBuffer = $objGallery->generate();
-
-        $objModel->delete();
-
-        // HOOK: add custom logic
-        if (isset($GLOBALS['TL_HOOKS']['getContentElement']) && \is_array($GLOBALS['TL_HOOKS']['getContentElement'])) {
-            foreach ($GLOBALS['TL_HOOKS']['getContentElement'] as $callback) {
-                $strBuffer = System::importStatic($callback[0])->{$callback[1]}($objModel, $strBuffer, $objGallery);
-            }
-        }
-
-        return $strBuffer;
+        return Controller::getContentElement($objModel);
     }
 
     public static function getEventImagePath(CalendarEventsModel $objEvent): string
@@ -1051,7 +1038,7 @@ class CalendarEventsHelper
                     $objPage = PageModel::findByPk($objEventType->previewPage);
 
                     if ($objPage instanceof PageModel) {
-                        $params = (Config::get('useAutoItem') ? '/' : '/events/').($objEvent->alias ?: $objEvent->id);
+                        $params = sprintf('/%s',!empty($objEvent->alias) ? $objEvent->alias : $objEvent->id);
 
                         $eventPreviewUrl = $urlParser->addQueryString('event_preview=true', $objPage->getAbsoluteUrl($params));
                         $eventPreviewUrl = StringUtil::ampersand($eventPreviewUrl);
