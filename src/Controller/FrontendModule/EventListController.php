@@ -69,8 +69,10 @@ class EventListController extends AbstractFrontendModuleController
 
         $ApiParam = [];
 
+		$requestQueryAll = $request->query->all();
+
         foreach ($arrKeys as $key) {
-            $ApiParam[$key] = $this->getApiParam($key, $request->query->get($key));
+            $ApiParam[$key] = $this->getApiParam($key, $requestQueryAll[$key] ?? null);
         }
 
         // Get picture id
