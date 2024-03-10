@@ -25,62 +25,85 @@ use Doctrine\DBAL\Types\Types;
  */
 class ContentElementMigration extends AbstractMigration
 {
-    public function __construct(
-        private readonly Connection $connection,
-        private readonly ContaoFramework $framework,
-    ) {
-    }
+	public function __construct(
+		private readonly Connection $connection,
+	) {
+	}
 
-    public function shouldRun(): bool
-    {
-        $schemaManager = $this->connection->createSchemaManager();
+	public function shouldRun(): bool
+	{
+		$schemaManager = $this->connection->createSchemaManager();
 
-        if (!$schemaManager->tablesExist(['tl_content'])) {
-            return false;
-        }
+		if (!$schemaManager->tablesExist(['tl_content'])) {
+			return false;
+		}
 
-        $columns = $schemaManager->listTableColumns('tl_content');
+		$columns = $schemaManager->listTableColumns('tl_content');
 
-        if (!isset($columns['customtpl'])) {
-            return false;
-        }
+		if (!isset($columns['customtpl']) || !isset($columns['gallerytpl'])) {
+			return false;
+		}
 
-        $runMigration = false;
+		$runMigration = false;
 
-        $hasOneA = $this->connection->fetchOne(
-            'SELECT id FROM tl_content WHERE customTpl = :template_name',
-            [
-                'template_name' => 'ce_hyperlink_bootstrap_button',
-            ],
-            [
-                'template_name' => Types::STRING,
-            ]
-        );
+		$hasOneA = $this->connection->fetchOne(
+			'SELECT id FROM tl_content WHERE customTpl = "ce_hyperlink_bootstrap_button"',
+		);
 
-        if ($hasOneA) {
-            $runMigration = true;
-        }
+		$hasOneB = $this->connection->fetchOne(
+			'SELECT id FROM tl_content WHERE galleryTpl = "gallery_bootstrap_col-4-figure-caption"',
+		);
 
-        return $runMigration;
-    }
+		$hasOneC = $this->connection->fetchOne(
+			'SELECT id FROM tl_content WHERE galleryTpl = "gallery_bootstrap_col-4"',
+		);
 
-    public function run(): MigrationResult
-    {
-        $this->swapTemplate('tl_content', 'customTpl', 'ce_hyperlink_bootstrap_button', 'content_element/hyperlink/bootstrap_button');
+		if ($hasOneA || $hasOneB || $hasOneC) {
+			$runMigration = true;
+		}
 
-        return $this->createResult(true);
-    }
+		return $runMigration;
+	}
 
-    protected function swapTemplate(string $table_name, string $field_name, string $old, string $new): int|string
-    {
-        return $this->connection->executeStatement(
-            "UPDATE $table_name SET $field_name = '$new' WHERE $field_name = :template_name",
-            [
-                'template_name' => $old,
-            ],
-            [
-                'template_name' => Types::STRING,
-            ]
-        );
-    }
+	public function run(): MigrationResult
+	{
+		// hasOneA
+		$this->swapTemplate('tl_content', 'customTpl', 'ce_hyperlink_bootstrap_button', 'content_element/hyperlink/bootstrap_button');
+
+		// hasOneB: Migrate galleries
+		$this->migrateGalleriesWithCaption();
+
+		// hasOneC: Migrate galleries without caption
+		$this->migrateGalleriesWithoutCaption();
+
+		return $this->createResult(true);
+	}
+
+	protected function swapTemplate(string $table_name, string $field_name, string $old, string $new): int|string
+	{
+		return $this->connection->executeStatement(
+			"UPDATE $table_name SET $field_name = '$new' WHERE $field_name = :template_name",
+			[
+				'template_name' => $old,
+			],
+			[
+				'template_name' => Types::STRING,
+			]
+		);
+	}
+
+	protected function migrateGalleriesWithCaption(): int|string
+	{
+		return $this->connection->executeStatement(
+			"UPDATE tl_content SET galleryTpl = '', customTpl = 'content_element/gallery/col_4_with_caption' WHERE galleryTpl = 'gallery_bootstrap_col-4-figure-caption'",
+		);
+	}
+
+	protected function migrateGalleriesWithoutCaption(): int|string
+	{
+		return $this->connection->executeStatement(
+			"UPDATE tl_content SET galleryTpl = '', customTpl = 'content_element/gallery/col_4' WHERE galleryTpl = 'gallery_bootstrap_col-4'",
+		);
+	}
+
 }
