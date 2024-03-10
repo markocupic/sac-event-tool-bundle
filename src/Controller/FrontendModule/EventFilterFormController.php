@@ -20,184 +20,170 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\Date;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Environment;
-use Contao\Input;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsFrontendModule(EventFilterFormController::TYPE, category:'sac_event_tool_frontend_modules', template:'mod_event_filter_form')]
+#[AsFrontendModule(EventFilterFormController::TYPE, category: 'sac_event_tool_frontend_modules', template: 'mod_event_filter_form')]
 class EventFilterFormController extends AbstractFrontendModuleController
 {
-    public const TYPE = 'event_filter_form';
+	public const TYPE = 'event_filter_form';
 
-    private array|null $arrAllowedFields = null;
-    private PageModel|null $objPage = null;
+	private array|null $arrAllowedFields = null;
+	private PageModel|null $objPage = null;
 
-    public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly TranslatorInterface $translator,
-        private readonly UrlParser $urlParser,
-        private readonly string $sacevtLocale,
-    ) {
-    }
+	public function __construct(
+		private readonly ContaoFramework $framework,
+		private readonly TranslatorInterface $translator,
+		private readonly UrlParser $urlParser,
+		private readonly string $sacevtLocale,
+	) {
+	}
 
-    public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
-    {
-        $this->objPage = $page;
+	public function __invoke(Request $request, ModuleModel $model, string $section, array $classes = null, PageModel $page = null): Response
+	{
+		$this->objPage = $page;
 
-        // Call the parent method
-        return parent::__invoke($request, $model, $section, $classes);
-    }
+		// Call the parent method
+		return parent::__invoke($request, $model, $section, $classes);
+	}
 
-    protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
-    {
-        // Set adapters
-        /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+	protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
+	{
 
-        /** @var Environment $environmentAdapter */
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
+		/** @var Controller $controllerAdapter */
+		$controllerAdapter = $this->framework->getAdapter(Controller::class);
 
-        /** @var Input $inputAdapter */
-        $inputAdapter = $this->framework->getAdapter(Input::class);
+		/** @var Environment $environmentAdapter */
+		$environmentAdapter = $this->framework->getAdapter(Environment::class);
 
-        /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+		/** @var StringUtil $stringUtilAdapter */
+		$stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->framework->getAdapter(Date::class);
+		$this->arrAllowedFields = $stringUtilAdapter->deserialize($model->eventFilterBoardFields, true);
 
-        $this->arrAllowedFields = $stringUtilAdapter->deserialize($model->eventFilterBoardFields, true);
+		if ($environmentAdapter->get('isAjaxRequest')) {
+			// Clean the url query from the param "dateStart" and redirect
+			if ($request->query->get('year') > 0 && $request->query->has('dateStart')) {
+				if ($request->query->get('year') !== date('Y', strtotime($request->query->get('dateStart')))) {
+					$url = $this->urlParser->removeQueryString(['dateStart']);
+					$controllerAdapter->redirect($url);
+				}
+			}
 
-        if ($environmentAdapter->get('isAjaxRequest')) {
-            // Clean url dateStart url param & redirect
-            if ($inputAdapter->get('year') > 0 && '' !== $inputAdapter->get('dateStart')) {
-                if ($inputAdapter->get('year') !== $dateAdapter->parse('Y', strtotime($inputAdapter->get('dateStart')))) {
-                    $url = $this->urlParser->removeQueryString(['dateStart']);
-                    $controllerAdapter->redirect($url);
-                }
-            }
-            // Clean url dateStart url param & redirect
-            if (empty($inputAdapter->get('year')) && !empty($inputAdapter->get('dateStart'))) {
-                if ($dateAdapter->parse('Y') !== $dateAdapter->parse('Y', strtotime($inputAdapter->get('dateStart')))) {
-                    $url = $this->urlParser->removeQueryString(['dateStart']);
-                    $controllerAdapter->redirect($url);
-                }
-            }
-        }
+			// Clean the url query from the param "dateStart" and redirect
+			if (!$request->query->has('year') && $request->query->has('dateStart')) {
+				if (date('Y') !== date('Y', strtotime($request->query->get('dateStart')))) {
+					$url = $this->urlParser->removeQueryString(['dateStart']);
+					$controllerAdapter->redirect($url);
+				}
+			}
+		}
 
-        $template->fields = $this->arrAllowedFields;
+		$template->set('fields', $this->arrAllowedFields);
 
-        // Get the form
-        $template->form = $this->generateForm();
+		// Get the form
+		$template->set('form', $this->generateForm($request));
 
-        // Datepicker
-        $template->sacevt_locale = $this->sacevtLocale;
+		// Datepicker
+		$template->set('sacevt_locale', $this->sacevtLocale);
 
-        return $template->getResponse();
-    }
+		return $template->getResponse();
+	}
 
-    /**
-     * Generate filter form.
-     */
-    protected function generateForm(): Form
-    {
-        // Set adapters
-        /** @var Input $inputAdapter */
-        $inputAdapter = $this->framework->getAdapter(Input::class);
 
-        /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+	protected function generateForm(Request $request): Form
+	{
 
-        /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
+		/** @var StringUtil $stringUtilAdapter */
+		$stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        $controllerAdapter->loadLanguageFile('tl_event_filter_form');
+		/** @var Controller $controllerAdapter */
+		$controllerAdapter = $this->framework->getAdapter(Controller::class);
 
-        // Generate form
-        $objForm = new Form(
-            'event-filter-board-form',
-            'GET',
-            function () {
-                /** @var Input $inputAdapter */
-                $inputAdapter = $this->framework->getAdapter(Input::class);
+		$controllerAdapter->loadLanguageFile('tl_event_filter_form');
 
-                return 'eventFilter' === $inputAdapter->get('eventFilter');
-            }
-        );
+		// Generate form
+		$objForm = new Form(
+			'event-filter-board-form',
+			Request::METHOD_GET,
+		);
 
-        // Action
-        $url = $this->objPage->getFrontendUrl();
-        $objForm->setAction($url);
+		// Set the action attribute
+		$url = $this->objPage->getFrontendUrl();
+		$objForm->setAction($url);
 
-        $objForm->addFieldsFromDca(
-            'tl_event_filter_form',
-            function (&$strField, &$arrDca) {
-                // Make sure to skip elements without inputType otherwise this will throw an exception
-                if (!isset($arrDca['inputType'])) {
-                    return false;
-                }
+		$objForm->addFieldsFromDca(
+			'tl_event_filter_form',
+			function ($strField, $arrDca) {
+				// Make sure to skip elements without an input type
+				// otherwise we will run into an exception
+				if (!isset($arrDca['inputType'])) {
+					return false;
+				}
 
-                if (!\in_array($strField, $this->arrAllowedFields, true)) {
-                    return false;
-                }
+				if (!\in_array($strField, $this->arrAllowedFields, true)) {
+					return false;
+				}
 
-                // You must return true otherwise the field will be skipped
-                return true;
-            }
-        );
+				// You must return true
+				// otherwise the field will be skipped
+				return true;
+			}
+		);
 
-        // Let's add  a submit button
-        $objForm->addFormField('submit', [
-            'label' => $this->translator->trans('tl_event_filter_form.submitBtn', [], 'contao_default'),
-            'inputType' => 'submit',
-        ]);
+		// Let's add  a submit button
+		$objForm->addFormField('submit', [
+			'label' => $this->translator->trans('tl_event_filter_form.submitBtn', [], 'contao_default'),
+			'inputType' => 'submit',
+		]);
 
-        // Set form field value from $_GET
-        if (isset($_GET) && !empty($this->arrAllowedFields) && \is_array($this->arrAllowedFields)) {
-            foreach ($this->arrAllowedFields as $k) {
-                if ('' !== $inputAdapter->get($k)) {
-                    if ($objForm->hasFormField($k)) {
-                        $objWidget = $objForm->getWidget($k);
+		// Set form field value from $_GET
+		if (!empty($this->arrAllowedFields) && \is_array($this->arrAllowedFields)) {
+			foreach ($this->arrAllowedFields as $k) {
+				if ($request->query->has($k)) {
+					if ($objForm->hasFormField($k)) {
+						$objWidget = $objForm->getWidget($k);
 
-                        if ('organizers' === $objWidget->name) {
-                            // The organizers GET param can be transmitted like this: organizers=5
-                            if (\is_array($inputAdapter->get('organizers'))) {
-                                $arrOrganizers = $inputAdapter->get('organizers');
-                            } elseif (is_numeric($inputAdapter->get('organizers'))) {
-                                $arrOrganizers = [$inputAdapter->get('organizers')];
-                            }
-                            // Or the organizers GET param can be transmitted like this: organizers=5,7,3
-                            elseif (!empty($inputAdapter->get('organizers')) && strpos($inputAdapter->get('organizers'), ',', 1)) {
-                                $arrOrganizers = explode(',', $inputAdapter->get('organizers'));
-                            } else {
-                                // Or the organizers GET param can be transmitted like this: organizers[]=5&organizers[]=7&organizers[]=3
-                                $arrOrganizers = $stringUtilAdapter->deserialize($inputAdapter->get('organizers'), true);
-                            }
+						if ('organizers' === $objWidget->name) {
+							// As of Symfony 6, non-scalar values are no longer supported
+							// we must use $request->query->all()['organizers']
+							$organizers = $request->query->all()['organizers'] ?? [];
 
-                            $objWidget->value = !empty($arrOrganizers) ? $arrOrganizers : '';
-                        } else {
-                            $objWidget->value = $inputAdapter->get($k);
-                        }
-                    }
-                }
-            }
-        }
+							// The organizers GET param can be transmitted like this:
+							// organizers=5 or organizers[]=5&organizers[]=6 or organizers=5,6
+							if (is_scalar($organizers)) {
+								$organizers = [$organizers];
+							}elseif (!empty($organizers) && str_contains($organizers, ',')) {
+								$organizers = explode(',', $organizers);
+							} elseif(is_array($organizers)) {
+								// Do nothing if the value is an array
+							}else{
+								$organizers = $stringUtilAdapter->deserialize($organizers, true);
+							}
 
-        if ($objForm->hasFormField('suitableForBeginners')) {
-            $objForm->getWidget('suitableForBeginners')->template = 'form_bs_switch';
-        }
+							$objWidget->value = !empty($organizers) ? $organizers : '';
+						} else {
+							$objWidget->value = $request->query->all()[$k];
+						}
+					}
+				}
+			}
+		}
 
-        if ($objForm->hasFormField('publicTransportEvent')) {
-            $objForm->getWidget('publicTransportEvent')->template = 'form_bs_switch';
-        }
+		if ($objForm->hasFormField('suitableForBeginners')) {
+			$objForm->getWidget('suitableForBeginners')->template = 'form_bs_switch';
+		}
 
-        return $objForm;
-    }
+		if ($objForm->hasFormField('publicTransportEvent')) {
+			$objForm->getWidget('publicTransportEvent')->template = 'form_bs_switch';
+		}
+
+		return $objForm;
+	}
 }
