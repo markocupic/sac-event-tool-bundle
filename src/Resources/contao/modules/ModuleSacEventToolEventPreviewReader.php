@@ -21,7 +21,6 @@ use Contao\Calendar;
 use Contao\CalendarEventsModel;
 use Contao\CalendarModel;
 use Contao\Comments;
-use Contao\Config;
 use Contao\ContentModel;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\InternalServerErrorException;
@@ -79,22 +78,16 @@ class ModuleSacEventToolEventPreviewReader extends Events
             return $objTemplate->parse();
         }
 
-        // Set the item from the auto_item parameter
-        if (!isset($_GET['events']) && isset($_GET['auto_item']) && Config::get('useAutoItem')) {
-            Input::setGet('events', Input::get('auto_item'));
-        }
+        $eventId = Input::get('auto_item');
 
-        /* Start Hack Marko Cupic */
-        // Return an empty string if "events" is not set (to combine list and reader on same page)
-
-        if (!Input::get('events')) {
-            return '';
-        }
-
-        $objEvent = CalendarEventsModel::findByIdOrAlias(Input::get('events'));
+		try{
+			$objEvent = CalendarEventsModel::findByIdOrAlias($eventId);
+		}catch (\Exception $e){
+			throw new InternalServerErrorException('Could not find a valid event id/alias in the url.');
+		}
 
         if (null === $objEvent) {
-            throw new InternalServerErrorException('Event "'.Input::get('events').'" not found.');
+            throw new InternalServerErrorException('Event "'.$eventId.'" not found.');
         }
 
         /** @var UriSigner $uriSigner */
@@ -120,7 +113,9 @@ class ModuleSacEventToolEventPreviewReader extends Events
 
         $this->Template->event = '';
 
-        if ($this->overviewPage) {
+	    $eventId = Input::get('auto_item');
+
+	    if ($this->overviewPage) {
             $this->Template->referer = PageModel::findById($this->overviewPage)->getFrontendUrl();
             $this->Template->back = $this->customLabel ?: $GLOBALS['TL_LANG']['MSC']['eventOverview'];
         } else {
@@ -133,7 +128,7 @@ class ModuleSacEventToolEventPreviewReader extends Events
         // Hack by marko Cupic: Get the current event
         // Get the current event
         // $objEvent = CalendarEventsModel::findPublishedByParentAndIdOrAlias(Input::get('events'), $this->cal_calendar); // Hack Marko Cupic
-        $objEvent = CalendarEventsModel::findByIdOrAlias(Input::get('events')); // Hack Marko Cupic
+        $objEvent = CalendarEventsModel::findByIdOrAlias($eventId); // Hack Marko Cupic
         $objEvent->pid = $this->cal_calendar[0]; // Hack Marko Cupic
         $objEvent->source = 'default'; // Hack Marko Cupic
 

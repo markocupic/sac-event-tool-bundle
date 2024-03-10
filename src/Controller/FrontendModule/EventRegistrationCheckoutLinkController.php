@@ -47,18 +47,18 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
         $calendarEventsModelAdapter = $this->framework->getAdapter(CalendarEventsModel::class);
         $pageModelAdapter = $this->framework->getAdapter(PageModel::class);
 
-		// Get the alias from auto_item
-        $eventAlias = $inputAdapter->get('events');
+        // Get the alias from auto_item
+        $eventAlias = $inputAdapter->get('auto_item');
 
-		if ($this->scopeMatcher->isFrontendRequest($request) && empty($eventAlias)) {
-			return new Response('', Response::HTTP_NO_CONTENT);
-		}
+        if ($this->scopeMatcher->isFrontendRequest($request) && empty($eventAlias)) {
+            return new Response('', Response::HTTP_NO_CONTENT);
+        }
 
         $this->objEvent = $calendarEventsModelAdapter->findByIdOrAlias($eventAlias);
         $this->objJumpTo = $pageModelAdapter->findPublishedById($model->eventRegCheckoutLinkPage);
 
         if ($this->scopeMatcher->isFrontendRequest($request) && (null === $this->objEvent || null === $this->objJumpTo)) {
-			return new Response('', Response::HTTP_NO_CONTENT);
+            return new Response('', Response::HTTP_NO_CONTENT);
         }
 
         // Call the parent method
@@ -67,9 +67,7 @@ class EventRegistrationCheckoutLinkController extends AbstractFrontendModuleCont
 
     protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
     {
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
-        $params = '/'.($configAdapter->get('useAutoItem') ? '' : 'events/').$this->objEvent->alias;
+        $params = '/'.$this->objEvent->alias;
 
         $template->jumpTo = $this->objJumpTo->getFrontendUrl($params);
         $template->btnLbl = $model->eventRegCheckoutLinkLabel;

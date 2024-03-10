@@ -21,6 +21,7 @@ use Contao\Config;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsFrontendModule;
+use Contao\CoreBundle\Exception\InternalServerErrorException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -127,13 +128,14 @@ class EventRegistrationController extends AbstractFrontendModuleController
                 $this->memberModel = MemberModel::findByPk($objUser->id);
             }
 
-            // Set the item from the auto_item parameter
-            if (!isset($_GET['events']) && $this->configAdapter->get('useAutoItem') && isset($_GET['auto_item'])) {
-                $this->inputAdapter->setGet('events', $this->inputAdapter->get('auto_item'));
-            }
+            $eventId = $this->inputAdapter->get('auto_item');
 
             // Get the event model from url query.
-            $this->eventModel = $this->calendarEventsModelAdapter->findByIdOrAlias($this->inputAdapter->get('events'));
+	        try{
+		        $this->eventModel = $this->calendarEventsModelAdapter->findByIdOrAlias($eventId);
+	        }catch (\Exception $e){
+		        throw new InternalServerErrorException('Could not find a valid event id/alias in the url.');
+	        }
 
             // Get the main instructor object.
             $this->mainInstructorModel = $this->userModelAdapter->findByPk($this->eventModel->mainInstructor);
@@ -230,7 +232,7 @@ class EventRegistrationController extends AbstractFrontendModuleController
     {
         if (null === $this->eventModel) {
             // Check if event entity exists.
-            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventNotFound', [$this->inputAdapter->get('events') ?? 'NULL'], 'contao_default'));
+            $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventNotFound', [$this->inputAdapter->get('auto_item') ?? 'NULL'], 'contao_default'));
         } elseif (!$this->eventModel->published) {
             // Check if event is published.
             $this->messageAdapter->addInfo($this->translator->trans('ERR.evt_reg_eventNotPublishedYet', [$this->eventModel->title], 'contao_default'));
