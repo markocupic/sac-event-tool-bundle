@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Code4Nix\UriSigner\UriSigner;
 use Codefog\HasteBundle\UrlParser;
 use Contao\Backend;
 use Contao\BackendTemplate;
@@ -90,6 +91,7 @@ class CalendarEventsMember
         private readonly TranslatorInterface $translator,
         private readonly UrlParser $urlParser,
         private readonly Util $util,
+		private readonly UriSigner $uriSigner,
         private readonly NotificationCenter $notificationCenter,
         private readonly string $sacevtLocale,
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
@@ -615,6 +617,12 @@ class CalendarEventsMember
                 'sid' => uniqid(),
             ])
         );
+
+	    $url = System::getContainer()->get('router')->generate(EventParticipantEmailController::class);
+	    $url = $this->urlParser->addQueryString('eventId='.$request->query->get('id'), $url);
+	    $url = $this->urlParser->addQueryString('rt='.$this->contaoCsrfTokenManager->getDefaultTokenValue(), $url);
+	    $url = $this->urlParser->addQueryString('sid='.uniqid(), $url);
+	    $url = $this->uriSigner->sign($url);
 
         return sprintf(' <a href="%s" class="%s" title="%s" %s>%s</a>', $this->stringUtil->ampersand($url), $class, $title, $attributes, $label);
     }
