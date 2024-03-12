@@ -3,6 +3,11 @@
 	text-decoration: underline;
 }
 
+/** improve the readability of textareas in the backend **/
+.tl_form.tl_edit_form .tl_textarea {
+	line-height: 2;
+}
+
 /** multicolumn wizard fix: Fix cutted of sentences issue on small screens in the bottom-/tooltip section */
 [class*="mcwColumnCount_"] .tl_help.tl_tip {
 	height: auto !important;
