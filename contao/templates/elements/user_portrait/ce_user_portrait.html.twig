@@ -14,7 +14,7 @@
         </div>
 
         <div class="col-sm-8 col-lg-9">
-            <h5 class="ce_headline mt-sm-0">{{ user.lastname }} {{ user.firstname }}</h5>
+            <h5 class="content-headline mt-sm-0">{{ user.lastname }} {{ user.firstname }}</h5>
             <div class="ce_user_portrait_qualification">
                 {{ user.mainQualification }}
             </div>
@@ -57,13 +57,13 @@
 
                 {% if not user.hobbies is empty %}
                     <div class="ce_user_portrait_hobbies">
-                        <h5 class="ce_headline">Hobbys</h5>
+                        <h5 class="content-headline">Hobbys</h5>
                         {{ user.hobbies|nl2br }}
                     </div>
                 {% endif %}
 
                 {% if not user.introducing is empty %}
-                    <h5 class="ce_headline">Selbstportrait</h5>
+                    <h5 class="content-headline">Selbstportrait</h5>
                     <div class="ce_user_portrait_introducing">
                         {{ user.introducing|nl2br }}
                     </div>

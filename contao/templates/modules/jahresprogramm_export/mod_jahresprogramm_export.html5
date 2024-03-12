@@ -14,9 +14,9 @@
   flatpickr('#ctrl_endDate', opt);
 </script>
 
-<h3 class="ce_headline">Jahresprogramm</h3>
-<h4 class="ce_headline">Event-Art: <?= $this->eventTypeLabel ?></h4>
-<h4 class="ce_headline">Organisierende Gruppe: <?= $this->organizer ?></h4>
+<h3 class="content-headline">Jahresprogramm</h3>
+<h4 class="content-headline">Event-Art: <?= $this->eventTypeLabel ?></h4>
+<h4 class="content-headline">Organisierende Gruppe: <?= $this->organizer ?></h4>
 
 <?php if (!$this->events): ?>
 <p>Zu dieser Anfrage wurden keine Events gefunden!</p>

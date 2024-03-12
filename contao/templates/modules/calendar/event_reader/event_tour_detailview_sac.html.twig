@@ -11,11 +11,11 @@
     {% endif %}
 
     <!-- indexer::continue -->
-    <h1 class="ce_headline mt-3">{{ get_event_data(model, 'title') }}</h1>
+    <h1 class="content-headline mt-3">{{ get_event_data(model, 'title') }}</h1>
     <!-- indexer::stop -->
 
     {% if  get_event_data(model, 'eventType') == 'lastMinuteTour' %}
-        <h4 class="ce_headline last-minute-tour">Last minute tour (Spontantour)</h4>
+        <h4 class="content-headline last-minute-tour">Last minute tour (Spontantour)</h4>
     {% endif %}
 
     <div class="row gx-3">

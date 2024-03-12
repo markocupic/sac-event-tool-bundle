@@ -22,7 +22,7 @@
 -->
 
 <!-- course table -->
-<h3 class="ce_headline">Quartalsprogramm Kurse</h3>
+<h3 class="content-headline">Quartalsprogramm Kurse</h3>
 <?php if (!$this->htmlCourseTable): ?>
 <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
 <?php endif; ?>
@@ -155,7 +155,7 @@
 <?php endif; ?>
 
 
-<h3 class="ce_headline">Quartalsprogramm Touren</h3>
+<h3 class="content-headline">Quartalsprogramm Touren</h3>
 <?php if (!$this->htmlTourTable): ?>
 <p>Zu dieser Anfrage wurden keine Events gefunden!</p>
 <?php endif; ?>
@@ -169,10 +169,10 @@
 <?php foreach ($arrTypes as $type): ?>
 <?php if (isset($this->events[$type])): ?>
 <?php if ('tours' === $type): ?>
-<h3 class="ce_headline">Monatsprogramm Touren</h3>
+<h3 class="content-headline">Monatsprogramm Touren</h3>
 <?php endif; ?>
 <?php if ('generalEvents' === $type): ?>
-<h3 class="ce_headline">Monatsprogramm allgemeine Anlässe</h3>
+<h3 class="content-headline">Monatsprogramm allgemeine Anlässe</h3>
 <?php endif; ?>
 <table class="event-export-table event-export-table-courses table table-sm">
 
