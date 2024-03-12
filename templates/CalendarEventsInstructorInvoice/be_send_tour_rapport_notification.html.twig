@@ -1,9 +1,5 @@
 {% extends "@Contao/be_main" %}
 
-{% block headline %}
-    {{ 'MSC.evt_strn_title'|trans({}, 'contao_default') }}
-{% endblock %}
-
 {% block error %}{% if error|default %}
     {{ error|raw }}
 {% endif %}{% endblock %}

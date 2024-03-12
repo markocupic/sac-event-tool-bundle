@@ -1,15 +1,12 @@
 {% extends "@Contao/be_main" %}
 
-{% block headline %}
-    {{ 'MSC.evt_epe_appTitle'|trans({'%s': event.title}, 'contao_default') }}
+{% block error %}
+    {% if error|default %}
+        {{ error|raw }}
+    {% endif %}
 {% endblock %}
 
-    {% block error %}{% if error|default %}
-        {{ error|raw }}
-    {% endif %}{% endblock %}
-
 {% block main_content %}
-    <script src="assets/contao-component-vue-js/vue/dist/vue.global.prod.js?3.3.4"></script>
     <div id="eventParticipantEmail">
         <div id="tl_buttons">
             <a href="{{ back }}" class="header_back" title="" accesskey="b" onclick="Backend.getScrollOffset()">{{ 'MSC.backBTTitle'|trans({}, 'contao_default') }}</a>
@@ -50,6 +47,7 @@
 
     </div>
 
+    <script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() }}/assets/contao-component-vue-js/vue/dist/vue.global.prod.js"></script>
     <script>
         window.addEventListener('DOMContentLoaded', (event) => {
 

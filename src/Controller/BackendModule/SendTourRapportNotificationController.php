@@ -127,6 +127,7 @@ class SendTourRapportNotificationController extends AbstractBackendController
             // Display the email form
             $view = [];
 
+			$view['headline'] = $this->translator->trans('MSC.evt_strn_title',[], 'contao_default');
             $view['request_token'] = $rt;
             $view['event'] = $event;
             $view['back'] = $this->getBackUri($request);
