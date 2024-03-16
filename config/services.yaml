@@ -24,7 +24,7 @@ services:
             $sacevtMemberSyncCredentials: '%sacevt.member_sync_credentials%'
             $sacevtTempDir: '%sacevt.temp_dir%'
             $sacevtUserBackendHomeDir: '%sacevt.user.backend.home_dir%'
-            $sacevtUserBackendResetUserRightsOnSsoLogin: '%sacevt.user.backend.reset_user_rights_on_sso_login%'
+            $sacevtUserBackendResetPermissionsOnLogin: '%sacevt.user.backend.reset_permissions_on_login%'
             $sacevtUserFrontendAvatarDir: '%sacevt.user.frontend.avatar_dir%'
 
     _instanceof:
