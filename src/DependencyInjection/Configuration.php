@@ -61,7 +61,7 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->scalarNode('home_dir')->defaultValue('files/sektion/be_user_home_directories')->end()
-                                ->booleanNode('reset_user_rights_on_sso_login')->defaultFalse()->end()
+                                ->booleanNode('reset_permissions_on_login')->defaultFalse()->end()
                             ->end()
                         ->end()
                         ->arrayNode('frontend')

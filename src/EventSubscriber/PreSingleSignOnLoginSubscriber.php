@@ -26,7 +26,7 @@ final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
     public function __construct(
         private readonly Connection $connection,
         private readonly MaintainBackendUserPermissions $maintainBackendUserPermissions,
-        private readonly bool $sacevtUserBackendResetUserRightsOnSsoLogin,
+        private readonly bool $sacevtUserBackendResetPermissionsOnLogin,
     ) {
     }
 
@@ -45,7 +45,7 @@ final class PreSingleSignOnLoginSubscriber implements EventSubscriberInterface
      */
     public function resetBackendUserPermissions(PreInteractiveLoginEvent $event): void
     {
-        if (false === $this->sacevtUserBackendResetUserRightsOnSsoLogin) {
+        if (false === $this->sacevtUserBackendResetPermissionsOnLogin) {
             return;
         }
 
