@@ -32,6 +32,7 @@ use Markocupic\SacEventToolBundle\Controller\BackendModule\EventParticipantEmail
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment as Twig;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -53,6 +54,7 @@ class DashboardController
 		private readonly ContaoCsrfTokenManager $contaoCsrfTokenManager,
 		private readonly UrlParser $urlParser,
 		private readonly UriSigner $uriSigner,
+		private readonly RouterInterface $router,
 	) {
 		// Adapters
 		$this->calendarEventsHelperAdapter = $this->framework->getAdapter(CalendarEventsHelper::class);
@@ -88,9 +90,9 @@ class DashboardController
 			$html = $this->twig->render(
 				'@MarkocupicSacEventTool/BackendHomeScreen/dashboard.html.twig',
 				[
-					'events' => $events,
+					'events'              => $events,
 					'has_upcoming_events' => !empty($upcomingEvents),
-					'has_past_events' => !empty($pastEvents),
+					'has_past_events'     => !empty($pastEvents),
 				]
 			);
 		}
@@ -158,26 +160,30 @@ class DashboardController
 			$title = $this->stringUtilAdapter->decodeEntities($eventModel->title);
 			$title = $this->stringUtilAdapter->restoreBasicEntities($title);
 
-			$hrefEvent = sprintf(
-				'contao?do=calendar&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
-				$eventModel->id,
-				$rt,
-				$refId,
-			);
+			$hrefEvent = $this->router->generate('contao_backend', [
+				'do'    => 'calendar',
+				'table' => 'tl_calendar_events',
+				'id'    => $eventModel->id,
+				'act'   => 'edit',
+				'rt'    => $rt,
+				'ref'   => $refId,
+			]);
 
-			$hrefRegistrations = sprintf(
-				'contao?do=calendar&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s',
-				$eventModel->id,
-				$rt,
-				$refId,
-			);
+			$hrefRegistrations = $this->router->generate('contao_backend', [
+				'do'    => 'calendar',
+				'table' => 'tl_calendar_events_member',
+				'id'    => $eventModel->id,
+				'rt'    => $rt,
+				'ref'   => $refId,
+			]);
 
-			$hrefEventListing = sprintf(
-				'contao?do=calendar&table=tl_calendar_events&id=%d&rt=%s&ref=%s',
-				$eventModel->pid,
-				$rt,
-				$refId,
-			);
+			$hrefEventListing = $this->router->generate('contao_backend', [
+				'do'    => 'calendar',
+				'table' => 'tl_calendar_events',
+				'id'    => $eventModel->pid,
+				'rt'    => $rt,
+				'ref'   => $refId,
+			]);
 
 			$event = [];
 			$event['row_class'] = $rowClass;
@@ -227,7 +233,15 @@ class DashboardController
 		$refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
 		if (EventType::TOUR === $eventModel->eventType || EventType::LAST_MINUTE_TOUR === $eventModel->eventType) {
-			return sprintf('contao?act=edit&do=calendar&table=tl_calendar_events&id=%d&call=writeTourReport&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
+			return $this->router->generate('contao_backend', [
+				'do'    => 'calendar',
+				'table' => 'tl_calendar_events',
+				'act'   => 'edit',
+				'call'  => 'writeTourReport',
+				'id'    => $eventModel->id,
+				'rt'    => $rt,
+				'ref'   => $refId,
+			]);
 		}
 
 		return null;
@@ -239,7 +253,13 @@ class DashboardController
 		$refId = $this->requestStack->getCurrentRequest()->attributes->get('_contao_referer_id');
 
 		if (EventType::TOUR === $eventModel->eventType || EventType::LAST_MINUTE_TOUR === $eventModel->eventType) {
-			return sprintf('contao?do=calendar&table=tl_calendar_events_instructor_invoice&id=%d&rt=%s&ref=%s', $eventModel->id, $rt, $refId);
+			return $this->router->generate('contao_backend', [
+				'do'    => 'calendar',
+				'table' => 'tl_calendar_events_instructor_invoice',
+				'id'    => $eventModel->id,
+				'rt'    => $rt,
+				'ref'   => $refId,
+			]);
 		}
 
 		return null;

@@ -21,7 +21,6 @@ use Codefog\HasteBundle\UrlParser;
 use Contao\Calendar;
 use Contao\CalendarEventsModel;
 use Contao\Config;
-use Contao\ContentGallery;
 use Contao\ContentModel;
 use Contao\Controller;
 use Contao\CoreBundle\Util\SymlinkUtil;
@@ -332,7 +331,7 @@ class CalendarEventsHelper
 
             case 'gallery':
                 $value = static::getGallery([
-					'multiSRC' => $objEvent->multiSRC,
+                    'multiSRC' => $objEvent->multiSRC,
                     'orderSRC' => $objEvent->orderSRC,
                     'sortBy' => 'custom',
                     'perRow' => 4,
@@ -928,10 +927,17 @@ class CalendarEventsHelper
                     ++$intUnsubscribedUser;
                 }
             }
-            $refererId = System::getContainer()->get('request_stack')->getCurrentRequest()->attributes->get('_contao_referer_id');
-            $requestToken = System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue();
 
-            $href = sprintf("'contao?do=calendar&table=tl_calendar_events_member&id=%s&rt=%s&ref=%s'", $objEvent->id, $requestToken, $refererId);
+			// Generate the href
+			$router = System::getContainer()->get('router');
+
+			$href = $router->generate('contao_backend', [
+				'do' => 'calendar',
+				'table' => 'tl_calendar_events_member',
+				'id' => $objEvent->id,
+				'rt' => System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
+				'ref' => System::getContainer()->get('request_stack')->getCurrentRequest()->attributes->get('_contao_referer_id'),
+				]);
 
             if ($intNotConfirmed > 0) {
                 $strRegistrationsBadges .= sprintf('<span class="subscription-badge not-confirmed blink" data-title="%s unbeantwortete Anmeldeanfragen" role="button" onclick="window.location.href=%s">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
@@ -1038,7 +1044,7 @@ class CalendarEventsHelper
                     $objPage = PageModel::findByPk($objEventType->previewPage);
 
                     if ($objPage instanceof PageModel) {
-                        $params = sprintf('/%s',!empty($objEvent->alias) ? $objEvent->alias : $objEvent->id);
+                        $params = sprintf('/%s', !empty($objEvent->alias) ? $objEvent->alias : $objEvent->id);
 
                         $eventPreviewUrl = $urlParser->addQueryString('event_preview=true', $objPage->getAbsoluteUrl($params));
                         $eventPreviewUrl = StringUtil::ampersand($eventPreviewUrl);

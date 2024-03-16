@@ -51,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'all',
 			'backToEventSettings'               => [
 				'label'                  => &$GLOBALS['TL_LANG']['MSC']['backToEvent'],
-				'href'                   => 'contao?do=calendar&table=tl_calendar_events&id=%s&act=edit&rt=%s&ref=%s',
+				'href'                   => System::getContainer()->get('router')->generate('contao_backend', ['do' => 'calendar', 'table' => 'tl_calendar_events', 'id' => '%s', 'act' => 'edit', 'rt' => '%s', 'ref' => '%s']),
 				'icon'                   => Bundle::ASSET_DIR.'/icons/fontawesome/default/left-regular.svg',
 				'attributes'             => 'onclick="Backend.getScrollOffset()" accesskey="e"',
 				'custom_glob_op'         => true,

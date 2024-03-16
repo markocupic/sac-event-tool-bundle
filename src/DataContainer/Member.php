@@ -21,6 +21,7 @@ use Contao\Message;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\User\FrontendUser\ClearFrontendUserData;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Member
@@ -32,13 +33,14 @@ class Member
         private readonly Util $util,
         private readonly TranslatorInterface $translator,
         private readonly ClearFrontendUserData $clearFrontendUserData,
+        private readonly RouterInterface $router,
     ) {
     }
 
     /**
      * @throws \Exception
      */
-    #[AsCallback(table: 'tl_member', target: 'config.delete', priority: 100)]
+    #[AsCallback(table: 'tl_member', target: 'config.ondelete', priority: 100)]
     public function clearMemberProfile(DataContainer $dc): void
     {
         // Clear personal data f.ex.
@@ -53,7 +55,7 @@ class Member
             $arrErrorMsg = $this->translator->trans('ERR.clearMemberProfile', [$dc->id], 'contao_default');
             Message::addError($arrErrorMsg);
 
-            Controller::redirect('contao?do=member');
+            Controller::redirect($this->router->generate('contao_backend', ['do' => 'member']));
         }
     }
 
