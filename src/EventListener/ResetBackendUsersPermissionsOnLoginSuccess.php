@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\EventListener;
 
+use Contao\BackendUser;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
 use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUserPermissions;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
@@ -34,32 +34,41 @@ final readonly class ResetBackendUsersPermissionsOnLoginSuccess
      * Clear user properties of the logged in Contao backend user,
      * who inherit rights from one or more group policies.
      * This way we can prevent a policy mess.
-     *
-     * @throws Exception
      */
     public function __invoke(LoginSuccessEvent $event): void
+    {
+        $this->maintainBackendUserPermissions($event);
+    }
+
+    public function maintainBackendUserPermissions(LoginSuccessEvent $event): void
     {
         if (false === $this->sacevtUserBackendResetPermissionsOnLogin) {
             return;
         }
 
-        $userIdentifier = $event->getUser()->getUserIdentifier();
+        $token = $event->getAuthenticatedToken();
 
-        if ('contao_backend' === $event->getFirewallName()) {
-            $userId = $this->connection
-                ->fetchOne(
-                    'SELECT id FROM tl_user WHERE username = ? AND admin = ? AND inherit = ?',
-                    [
-                        $userIdentifier,
-                        0,
-                        'extend',
-                    ],
-                )
+        $user = $token->getUser();
+
+        if (!$user instanceof BackendUser) {
+            return;
+        }
+
+        $userIdentifier = $user->getUserIdentifier();
+
+        $userId = $this->connection
+            ->fetchOne(
+                'SELECT id FROM tl_user WHERE username = ? AND admin = ? AND inherit = ?',
+                [
+                    $userIdentifier,
+                    0,
+                    'extend',
+                ],
+            )
             ;
 
-            if (false !== $userId) {
-                $this->maintainBackendUserPermissions->resetBackendUserPermissions($userIdentifier, [], true);
-            }
+        if (false !== $userId) {
+            $this->maintainBackendUserPermissions->resetBackendUserPermissions($userIdentifier, [], true);
         }
     }
 }
