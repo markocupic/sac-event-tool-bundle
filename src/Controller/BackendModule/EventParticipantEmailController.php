@@ -156,9 +156,9 @@ class EventParticipantEmailController extends AbstractBackendController
 
     private function initialize(int $eventId, string $sid): void
     {
-	    $this->controller->loadLanguageFile('modules');
+        $this->controller->loadLanguageFile('modules');
 
-		// Set a unique security ID (used for the session bag)
+        // Set a unique security ID (used for the session bag)
         $this->sid = $sid;
 
         // Get the event

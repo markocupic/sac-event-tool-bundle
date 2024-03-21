@@ -337,6 +337,7 @@ class CalendarEventsHelper
                     'perRow' => 4,
                     'size' => serialize([400, 400, 'center_center', 'proportional']),
                     'fullsize' => true,
+	                'customTpl' => 'content_element/gallery/col_4_with_caption',
                 ]);
                 break;
 
