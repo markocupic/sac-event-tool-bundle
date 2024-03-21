@@ -12,6 +12,7 @@
     "require": {
         "php": "^8.2",
         "ext-pdo": "*",
+        "ext-ftp": "*",
         "contao/core-bundle": "^5.3",
         "contao/newsletter-bundle": "^5.3",
         "contao/calendar-bundle": "^5.3",

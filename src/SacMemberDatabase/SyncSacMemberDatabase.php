@@ -129,7 +129,7 @@ class SyncSacMemberDatabase
         return $this->syncLog;
     }
 
-    private function prepare(): void
+    protected function prepare(): void
     {
         $this->ftp_hostname = (string) $this->sacevtMemberSyncCredentials['hostname'];
         $this->ftp_username = (string) $this->sacevtMemberSyncCredentials['username'];
@@ -139,7 +139,7 @@ class SyncSacMemberDatabase
     /**
      * @throws Exception
      */
-    private function fetchFilesFromFtp(): void
+    protected function fetchFilesFromFtp(): void
     {
         $fs = new Filesystem();
 
@@ -172,7 +172,7 @@ class SyncSacMemberDatabase
     /**
      * @throws \Exception
      */
-    private function openFtpConnection(): FtpConnection
+    protected function openFtpConnection(): FtpConnection
     {
         $connId = ftp_connect($this->ftp_hostname);
 
@@ -191,7 +191,7 @@ class SyncSacMemberDatabase
      *
      * @throws Exception
      */
-    private function syncContaoDatabase(): void
+    protected function syncContaoDatabase(): void
     {
         try {
             $this->connection->executeStatement('LOCK TABLES tl_member WRITE, tl_sac_section WRITE;');
@@ -237,7 +237,7 @@ class SyncSacMemberDatabase
                             $setRemote['streetExtra'] = $arrLine[6]; // string
                             $setRemote['postal'] = $arrLine[7]; // string
                             $setRemote['city'] = $arrLine[8]; // string
-                            $setRemote['country'] = empty(strtolower($arrLine[9])) ? 'ch' : strtolower($arrLine[9]); // string
+                            $setRemote['country'] = empty($arrLine[9]) ? 'CH' : strtoupper($arrLine[9]); // string
                             $setRemote['dateOfBirth'] = (string) strtotime($arrLine[10]); // string!
                             $setRemote['phoneBusiness'] = PhoneNumber::beautify($arrLine[11]); // string
                             $setRemote['phone'] = PhoneNumber::beautify($arrLine[12]); // string
@@ -258,13 +258,11 @@ class SyncSacMemberDatabase
 
                             $setRemote = array_map(
                                 static function ($value) {
-                                    if (!\is_array($value)) {
-                                        $value = \is_string($value) ? trim((string) $value) : $value;
-
-                                        return \is_string($value) ? utf8_encode($value) : $value;
+                                    if (empty($value) || is_numeric($value) || is_array($value)) {
+                                        return $value;
                                     }
 
-                                    return $value;
+	                                return utf8_encode(trim($value));
                                 },
                                 $setRemote
                             );
@@ -282,7 +280,7 @@ class SyncSacMemberDatabase
             }
 
             // Disable all members
-            $this->connection->executeStatement("UPDATE tl_member SET login = 0, disable = 1, isSacMember = 0");
+            $this->connection->executeStatement('UPDATE tl_member SET login = 0, disable = 1, isSacMember = 0');
 
             // Insert new and activate existing members again
             $countInserts = 0;
@@ -364,7 +362,7 @@ class SyncSacMemberDatabase
 
             $set = [
                 'tstamp' => time(),
-                'disable' => 0,
+                'disable' => 1,
                 'isSacMember' => 0,
                 'login' => 0,
             ];
@@ -395,7 +393,7 @@ class SyncSacMemberDatabase
         }
     }
 
-    private function log(string $strLogLevel, string $strText, string $strMethod, string $strCategory): void
+    protected function log(string $strLogLevel, string $strText, string $strMethod, string $strCategory): void
     {
         $this->syncLog['log'][] = $strText;
 
@@ -406,7 +404,7 @@ class SyncSacMemberDatabase
         );
     }
 
-    private function resetSyncLog(): void
+    protected function resetSyncLog(): void
     {
         // Reset sync log
         $this->syncLog = [
@@ -426,7 +424,7 @@ class SyncSacMemberDatabase
      * e.g. [0 => '4250', 2 => '4252']
      * -> user is member of two SAC Sektionen/Ortsgruppen.
      */
-    private function formatSectionId(array $arrValue): array
+    protected function formatSectionId(array $arrValue): array
     {
         $arrAll = array_map('strval', array_keys($this->util->listSacSections()));
 
