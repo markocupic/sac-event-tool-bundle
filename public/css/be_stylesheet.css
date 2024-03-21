@@ -4,8 +4,10 @@
 }
 
 /** improve the readability of textareas in the backend **/
-.tl_form.tl_edit_form .tl_textarea {
-	line-height: 2;
+.be_main {
+	.tl_textarea, .textarea {
+		line-height: 2;
+	}
 }
 
 /** multicolumn wizard fix: Fix cutted of sentences issue on small screens in the bottom-/tooltip section */
