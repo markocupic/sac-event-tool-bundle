@@ -99,7 +99,12 @@ class SendTourRapportNotificationController extends AbstractBackendController
 
     public function __invoke(int $rapport_id, string $sid, string $rt, Request $request, string $action = ''): Response
     {
-        $this->framework->initialize();
+        // Initialize Contao framework
+		$this->framework->initialize();
+
+	    // Load Contao language file
+		$this->controller->loadLanguageFile('modules');
+
         $this->sid = $sid;
         $uriSigner = $this->system->getContainer()->get('code4nix_uri_signer.uri_signer');
         $router = $this->system->getContainer()->get('router');
@@ -127,7 +132,8 @@ class SendTourRapportNotificationController extends AbstractBackendController
             // Display the email form
             $view = [];
 
-			$view['headline'] = $this->translator->trans('MSC.evt_strn_title',[], 'contao_default');
+            $view['title'] = $this->translator->trans('MOD.calendar.0', [], 'contao_default');
+            $view['headline'] = $this->translator->trans('MSC.evt_strn_title', [], 'contao_default');
             $view['request_token'] = $rt;
             $view['event'] = $event;
             $view['back'] = $this->getBackUri($request);
