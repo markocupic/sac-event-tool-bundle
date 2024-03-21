@@ -928,35 +928,35 @@ class CalendarEventsHelper
                 }
             }
 
-			// Generate the href
-			$router = System::getContainer()->get('router');
+            // Generate the href
+            $router = System::getContainer()->get('router');
 
-			$href = $router->generate('contao_backend', [
-				'do' => 'calendar',
-				'table' => 'tl_calendar_events_member',
-				'id' => $objEvent->id,
-				'rt' => System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
-				'ref' => System::getContainer()->get('request_stack')->getCurrentRequest()->attributes->get('_contao_referer_id'),
-				]);
+            $href = $router->generate('contao_backend', [
+                'do' => 'calendar',
+                'table' => 'tl_calendar_events_member',
+                'id' => $objEvent->id,
+                'rt' => System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue(),
+                'ref' => System::getContainer()->get('request_stack')->getCurrentRequest()->attributes->get('_contao_referer_id'),
+            ]);
 
             if ($intNotConfirmed > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge not-confirmed blink" data-title="%s unbeantwortete Anmeldeanfragen" role="button" onclick="window.location.href=%s">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge not-confirmed blink" data-title="%s unbeantwortete Anmeldeanfragen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intNotConfirmed, $href, $intNotConfirmed);
             }
 
             if ($intAccepted > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge accepted" data-title="%s bestätigte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intAccepted, $href, $intAccepted);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge accepted" data-title="%s bestätigte Anmeldungen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intAccepted, $href, $intAccepted);
             }
 
             if ($intRefused > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge refused" data-title="%s abgelehnte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intRefused, $href, $intRefused);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge refused" data-title="%s abgelehnte Anmeldungen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intRefused, $href, $intRefused);
             }
 
             if ($intWaitlisted > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge on-waiting-list" data-title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=%s">%s</span>', $intWaitlisted, $href, $intWaitlisted);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge on-waiting-list" data-title="%s Anmeldungen auf Warteliste" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intWaitlisted, $href, $intWaitlisted);
             }
 
             if ($intUnsubscribedUser > 0) {
-                $strRegistrationsBadges .= sprintf('<span class="subscription-badge unsubscribed-user" data-title="%s stornierte Anmeldungen" role="button" onclick="window.location.href=%s">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
+                $strRegistrationsBadges .= sprintf('<span class="subscription-badge unsubscribed-user" data-title="%s stornierte Anmeldungen" role="button" onclick="window.location.href=\'%s\'">%s</span>', $intUnsubscribedUser, $href, $intUnsubscribedUser);
             }
         }
 
