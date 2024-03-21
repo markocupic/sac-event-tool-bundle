@@ -288,7 +288,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mountainguide'] = [
 	'inputType' => 'select',
 	'eval'      => ['tl_class' => 'm12 clr'],
 	'options'   => EventMountainGuide::ALL,
-	'sql'       => ['type' => 'boolean', 'default' => false],
+	// Attention! This field is not of type boolean
+	'sql'       => "int(1) unsigned NOT NULL default 0",
 ];
 
 // Add new field mainInstructor
