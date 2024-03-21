@@ -16,7 +16,7 @@ use Contao\CoreBundle\Controller\BackendCsvImportController;
 use Contao\ListWizard;
 use Contao\TableWizard;
 use Markocupic\SacEventToolBundle\ContaoBackendMaintenance\MaintainBackendUser;
-use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventParticipantController;
+use Markocupic\SacEventToolBundle\Controller\BackendModule\NotifyEventRegistrationStateController;
 use Markocupic\SacEventToolBundle\Model\CalendarContainerModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorInvoiceModel;
 use Markocupic\SacEventToolBundle\Model\CalendarEventsInstructorModel;
@@ -47,7 +47,7 @@ $GLOBALS['BE_MOD']['sac_be_modules'] = [
         'tables' => ['tl_calendar_container', 'tl_calendar', 'tl_calendar_events', 'tl_calendar_events_instructor_invoice', 'tl_calendar_feed', 'tl_content', 'tl_calendar_events_member'],
         'table' => [BackendCsvImportController::class, 'importTableWizardAction'],
         'list' => [BackendCsvImportController::class, 'importListWizardAction'],
-        NotifyEventParticipantController::PARAM_KEY => [NotifyEventParticipantController::class, 'generate'],
+        NotifyEventRegistrationStateController::PARAM_KEY => [NotifyEventRegistrationStateController::class, 'generate'],
     ],
     'sac_course_main_types_tool' => [
         'tables' => ['tl_course_main_type'],

@@ -15,7 +15,7 @@ declare(strict_types=1);
 use Markocupic\SacEventToolBundle\Config\BookingType;
 
 // Main headline label
-$GLOBALS['TL_LANG']['tl_calendar_events_member']['notify_event_participant'] = ['Teilnehmer benachrichtigen', 'Teilnehmer benachrichtigen'];
+$GLOBALS['TL_LANG']['tl_calendar_events_member']['notify_event_registration_state'] = ['Teilnehmer benachrichtigen', 'Teilnehmer benachrichtigen'];
 
 // Global operations
 $GLOBALS['TL_LANG']['tl_calendar_events_member']['writeTourReport'] = 'Tourrapport bearbeiten';

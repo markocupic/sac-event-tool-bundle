@@ -35,10 +35,10 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class NotifyEventParticipantController
+class NotifyEventRegistrationStateController
 {
     // query key assigned to the controller
-    public const PARAM_KEY = 'notify_event_participant';
+    public const PARAM_KEY = 'notify_event_registration_state';
 
     // Actions
     public const ACCEPT_WITH_EMAIL_ACTION = 'accept_with_email';
@@ -94,7 +94,7 @@ class NotifyEventParticipantController
     {
         $this->initialize();
 
-        $template = new BackendTemplate('be_notify_event_participant');
+        $template = new BackendTemplate('be_notify_event_registration_state');
         $template->headline = $this->configuration['headline'];
         $template->form = $this->createAndValidateForm()->generate();
         $template->back = $this->getBackUri();
