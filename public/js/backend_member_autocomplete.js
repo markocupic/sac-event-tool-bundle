@@ -10,94 +10,125 @@
 
 "use strict";
 
-window.addEvent('domready', function () {
-  var globalTimeout = null;
-  if (!$$('input[name="sacMemberId"]')[0]) {
-    return;
-  }
+document.addEventListener('DOMContentLoaded', () => {
 
-  $$('input[name="sacMemberId"]')[0].addEvent('keyup', function (event) {
-	  if (globalTimeout != null) {
-      clearTimeout(globalTimeout);
-    }
-    globalTimeout = setTimeout(function () {
-      globalTimeout = null;
-      // Get value from input field
-      let sacMemberId = $$('input[name="sacMemberId"]')[0].get('value');
-      if (sacMemberId.length > 5) {
-        new Request.JSON({
-          url: window.location.href,
-          onSuccess: function (json, txt) {
-            if (json['status'] === 'success' && json['sacMemberId'] == sacMemberId) {
+	let globalTimeout = null;
+	if (!document.querySelector('input[name="sacMemberId"]')) {
+		return;
+	}
 
-              if ($('acceptAutocompleteBox') !== null) {
-                $('acceptAutocompleteBox').destroy();
-              }
+	document.querySelector('input[name="sacMemberId"]').addEventListener('keyup', () => {
+		if (globalTimeout !== null) {
+			clearTimeout(globalTimeout);
+		}
 
-              if ($('ctrl_sacMemberId') !== null) {
-                $('ctrl_sacMemberId').hide();
-              }
+		globalTimeout = setTimeout(() => {
+			globalTimeout = null;
+			// Get the value from input field
+			let sacMemberId = document.querySelector('input[name="sacMemberId"]').value;
 
-              // Inject html
-              var acceptAutocomplete = new Element('div', {id: 'acceptAutocompleteBox'});
-              acceptAutocomplete.inject($('ctrl_sacMemberId'), 'before');
-              acceptAutocomplete.appendHTML(' <p class="autocompleteInfo">In der Datenbank wurde zur Mitgliednummer <strong>' + sacMemberId + '</strong> folgendes Mitglied gefunden:</p>');
-              acceptAutocomplete.appendHTML(' <p class="autocompleteInfo"><strong>' + json['firstname'] + ' ' + json['lastname'] + ', ' + json['street'] + ', ' + json['postal'] + ' ' + json['city'] + '</strong></p>');
-              acceptAutocomplete.appendHTML(' <button id="btnAcceptAutocomplete" class="tl_submit autocomleteBtn">Übernehmen</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id="btnRefuseAutocomplete" class="tl_submit autocomleteBtn">Nein</button>');
+			if (sacMemberId.length > 5) {
 
-              // Autofill form inputs
-              $('btnAcceptAutocomplete').addEvent('click', function (event) {
-                var fields = ['gender', 'name', 'username', 'firstname', 'lastname', 'street', 'postal', 'city', 'mobile', 'phone', 'email', 'dateOfBirth', 'foodHabits', 'emergencyPhone', 'emergencyPhoneName', 'sectionId'];
-                fields.each(function (field) {
-                  if ($('ctrl_' + field)) {
-                    // Special handling for arrays
-                    if (field === 'sectionId') {
-                      let arrSections = json[field];
-                      let options = document.querySelectorAll('select#ctrl_' + field + ' option');
-                      let i;
-                      if (options) {
-                        // First reset select field
-                        for (i = 0; i < options.length; i++) {
-                          options[i].selected = false;
-                        }
-                      }
+				const formData = new FormData();
+				formData.append('action', 'autocompleterLoadMemberDataFromSacMemberId');
+				formData.append('sacMemberId', sacMemberId);
+				formData.append('REQUEST_TOKEN', Contao.request_token);
 
-                      // Then add new entries
-                      if (arrSections.length) {
-                        let i;
-                        for (i = 0; i < arrSections.length; i++) {
-                          let sectionId = arrSections[i];
-                          let option = document.querySelector('select#ctrl_' + field + ' option[value="' + sectionId + '"]')
-                          if (option) {
-                            option.selected = true;
-                          }
-                        }
-                        // Update chosen
-                        if (document.querySelector('#ctrl_' + field + '_chzn')) {
-                          // Mootools
-                          $('ctrl_' + field).fireEvent("liszt:updated");
-                        }
-                      }
-                    } else if (json[field] !== null) {
-                      $('ctrl_' + field).set('value', json[field]);
-                    }
-                  }
-                });
-                acceptAutocomplete.destroy();
-                $('ctrl_sacMemberId').show();
-              });
-              $('btnRefuseAutocomplete').addEvent('click', function (event) {
-                acceptAutocomplete.destroy();
-                $('ctrl_sacMemberId').show();
-              });
-            }
-          }
-        }).post({
-          'action': 'autocompleterLoadMemberDataFromSacMemberId',
-          'sacMemberId': sacMemberId,
-          'REQUEST_TOKEN': Contao.request_token
-        });
-      }
-    }, 400);
-  });
+				fetch(window.location.href, {
+					method: 'POST',
+					body: formData,
+					headers: {
+						'x-requested-with': 'XMLHttpRequest',
+					},
+				}).then(response => {
+					if (response.ok) {
+						return response.json();
+					}
+				}).then(json => {
+					if (json['status'] === 'success' && parseInt(json['sacMemberId']) === parseInt(sacMemberId)) {
+						// Append the button markup to the body
+						if (document.getElementById('acceptAutocompleteBox')) {
+							document.getElementById('acceptAutocompleteBox').remove();
+						}
+
+						if (document.getElementById('ctrl_sacMemberId')) {
+							document.getElementById('ctrl_sacMemberId').style.display = 'none';
+						}
+
+						// Inject html
+						let acceptAutocomplete = document.createElement('div');
+						acceptAutocomplete.setAttribute('id', 'acceptAutocompleteBox');
+						document.getElementById('ctrl_sacMemberId').before(acceptAutocomplete);
+
+						const firstname = json['firstname'];
+						const lastname = json['lastname'];
+						const street = json['street'];
+						const postal = json['postal'];
+						const city = json['city'];
+
+						let markup = [];
+						markup.push(` <p class="autocompleteInfo">In der Datenbank wurde zur Mitgliednummer <strong>${sacMemberId}</strong> folgendes Mitglied gefunden:</p>`);
+						markup.push(` <p class="autocompleteInfo"><strong>${firstname} ${lastname}, ${street}, ${postal} ${city}</strong><br></p>`);
+						markup.push(` <button id="btnAcceptAutocomplete" class="tl_submit autocompleteBtn">Übernehmen</button>`);
+						markup.push(` <button id="btnRefuseAutocomplete" class="tl_submit autocompleteBtn">Nein</button>`);
+						markup = markup.join('');
+
+						acceptAutocomplete.insertAdjacentHTML('afterbegin', markup);
+
+
+						// Autofill form inputs
+						acceptAutocomplete.addEventListener('click', () => {
+							const fields = ['gender', 'name', 'username', 'firstname', 'lastname', 'street', 'postal', 'city', 'mobile', 'phone', 'email', 'dateOfBirth', 'foodHabits', 'emergencyPhone', 'emergencyPhoneName', 'sectionId'];
+							for (const fieldname of fields) {
+
+								const currField = document.getElementById('ctrl_' + fieldname);
+								if (currField) {
+									// Special handling for arrays (select inputs)
+									if (fieldname === 'sectionId') {
+										const arrSections = json[fieldname];
+										const options = document.querySelectorAll('select#ctrl_' + fieldname + ' option');
+										// First reset select field
+										for (const option of options) {
+											option.selected = false;
+										}
+
+										// Then add new entries
+										if (arrSections.length) {
+											for (const sectionId of arrSections) {
+												const option = document.querySelector('select#ctrl_' + fieldname + ' option[value="' + sectionId + '"]')
+												if (option) {
+													console.log(option.textContent);
+													option.selected = true;
+												}
+											}
+										}
+									} else if (json[fieldname] !== null) {
+										document.getElementById('ctrl_' + fieldname).value = json[fieldname];
+									}
+
+									// Update chosen
+									if (currField.classList.contains('tl_chosen')) {
+										// Element.fireEvent() is the Mootools implementation for Element.dispatchEvent()
+										currField.fireEvent("liszt:updated");
+										// currField.dispatchEvent(new Event("liszt:updated"));
+										// Vanilla Script only implementation won't work! Why? I don't know :-(
+									}
+								}
+							}
+
+							acceptAutocomplete.remove();
+							document.getElementById('ctrl_sacMemberId').removeAttribute('style');
+						});
+
+						document.getElementById('btnRefuseAutocomplete').addEventListener('click', () => {
+							acceptAutocomplete.remove();
+							document.getElementById('ctrl_sacMemberId').removeAttribute('style');
+						});
+					}
+				}).catch(error => {
+					console.error(error.message);
+				})
+			}
+		}, 400);
+	});
 });

@@ -28,10 +28,11 @@
 /** editAll & overrideAll navbar */
 #editAllNavbarHelper {
 	position: fixed;
-	bottom: 0;
+	bottom: 3rem;
 	right: 0;
 	background-color: #f47c00;
 	z-index: 2000;
+	font-family: -apple-system, system-ui, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif;
 }
 
 #editAllNavbarHelper ul {
@@ -151,7 +152,7 @@ div.legend-box {
 	padding: 15px 0;
 }
 
-#acceptAutocompleteBox button {
+#acceptAutocompleteBox .autocompleteBtn {
 	margin-right: 20px;
 }
 

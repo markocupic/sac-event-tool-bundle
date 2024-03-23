@@ -1,108 +1,147 @@
+"use strict";
+
 /**
- * When using the editAll or overrideAll mode in the Contao backend
- * selected checkboxes can be save in the users session
- *
- * @type {{sessionData: null, initialize: EditAllNavbarHelper.initialize, getSessionData: EditAllNavbarHelper.getSessionData, saveSessionData: EditAllNavbarHelper.saveSessionData}}
+ * Selected checkboxes can be saved in the users session,
+ * when using the Contao backend in the "editAll" or "overrideAll" mode.
  */
-var EditAllNavbarHelper = {
-  /**
-   * sessionData
-   */
-  sessionData: null,
+document.addEventListener('DOMContentLoaded', () => {
+	const urlParams = new URLSearchParams(window.location.search);
+	if (urlParams.has('do') && urlParams.has('act')) {
+		if (urlParams.get('act') === 'overrideAll' || urlParams.get('act') === 'editAll') {
+			new EditAllNavbarHelper();
+		}
+	}
+});
 
-  /**
-   * initialize
-   */
-  initialize: function () {
-    var self = this;
-    new Request.JSON({
-      url: window.location.href,
-      onSuccess: function (json, txt) {
-        if (json['status'] === 'success') {
-          $$('body').appendHTML(json['navbar']);
-          $('editAllNavbarHelperGetSettings').addEvent('click', function () {
-            self.getSessionData();
-          });
-          $('editAllNavbarHelperSaveSettings').addEvent('click', function () {
-            self.saveSessionData();
-          });
-        }
-      }
-    }).post({
-      'action': 'editAllNavbarHandler',
-      'subaction': 'loadNavbar',
-      'REQUEST_TOKEN': Contao.request_token
-    });
-  },
+class EditAllNavbarHelper {
 
-  /**
-   * get session data
-   */
-  getSessionData: function () {
-    var self = this;
-    new Request.JSON({
-      url: window.location.href,
-      onSuccess: function (json, txt) {
-        if (json['status'] === 'success') {
-          self.sessionData = json['sessionData'];
+	#itemsChecked = {};
 
-          // uncheck all checkboxes
-          var nodeList = document.querySelectorAll('.tl_checkbox_container input[name="all_fields[]"]');
-          var checkedItems = [];
-          for (i = 0; i < nodeList.length; ++i) {
-            nodeList[i].checked = false;
-          }
+	constructor() {
+		this.#initialize();
+	}
 
-          // Check checkboxes from session
-          if (self.sessionData.length) {
-            for (i = 0; i < self.sessionData.length; ++i) {
-              $(self.sessionData[i]).checked = true;
-            }
-          }
-        }
-      }
-    }).post({
-      'action': 'editAllNavbarHandler',
-      'subaction': 'getSessionData',
-      'REQUEST_TOKEN': Contao.request_token
-    });
-  },
+	/**
+	 * initialize
+	 */
+	#initialize() {
+		const self = this;
 
-  /**
-   * save checkbox settings to tl_user.session
-   */
-  saveSessionData: function () {
+		const formData = new FormData();
+		formData.append('action', 'editAllNavbarHandler');
+		formData.append('subaction', 'loadNavbar');
+		formData.append('REQUEST_TOKEN', Contao.request_token);
 
-    var nodeList = document.querySelectorAll('.tl_checkbox_container input[name="all_fields[]"]');
-    var checkedItems = [];
-    for (i = 0; i < nodeList.length; ++i) {
-      if (nodeList[i].checked) {
-        checkedItems.push(nodeList[i].id);
-      }
-    }
+		fetch(window.location.href, {
+			method: 'POST',
+			body: formData,
+			headers: {
+				'x-requested-with': 'XMLHttpRequest',
+			},
+		}).then(response => {
+			if (response.ok) {
+				return response.json();
+			}
+		}).then(json => {
+			if (json['status'] === 'success') {
+				// Append the button markup to the body
+				document.querySelector('body').insertAdjacentHTML('afterend', json['navbar']);
 
-    var self = this;
-    new Request.JSON({
-      url: window.location.href,
-      onSuccess: function (json, txt) {
-        if (json['status'] === 'success') {
-          self.sessionData = json['sessionData'];
-        }
-      }
-    }).post({
-      'action': 'editAllNavbarHandler',
-      'subaction': 'saveSessionData',
-      'checkedItems': checkedItems,
-      'REQUEST_TOKEN': Contao.request_token
-    });
-  }
+				// Add event listener to the get button
+				document.querySelector('#editAllNavbarHelperGetSettings').addEventListener('click', () => {
+					self.#getSessionData();
+				});
+
+				// Add event listener to the set button
+				document.querySelector('#editAllNavbarHelperSaveSettings').addEventListener('click', () => {
+					self.#saveSessionData();
+				});
+			}
+		}).catch(error => {
+			console.error(error.message);
+		})
+	}
+
+	/**
+	 * Retrieve data from session
+	 */
+	#getSessionData() {
+		const self = this;
+
+		const formData = new FormData();
+		formData.append('action', 'editAllNavbarHandler');
+		formData.append('subaction', 'getSessionData');
+		formData.append('REQUEST_TOKEN', Contao.request_token);
+
+		fetch(window.location.href, {
+			method: 'POST',
+			body: formData,
+			headers: {
+				'x-requested-with': 'XMLHttpRequest',
+			},
+		}).then(response => {
+			if (response.ok) {
+				return response.json();
+			}
+		}).then(json => {
+			if (json['status'] === 'success') {
+				self.#itemsChecked = JSON.parse(json['itemsChecked']);
+
+				// First unselect all checkboxes
+				const nodeList = document.querySelectorAll('#check_all, .tl_checkbox_container input[name="all_fields[]"]');
+				for (const cboxItem of nodeList) {
+					cboxItem.checked = false;
+				}
+
+				// Select checkboxes from session
+				for (const cboxId of self.#itemsChecked) {
+					if (document.getElementById(cboxId)) {
+						document.getElementById(cboxId).checked = true;
+					}
+				}
+			}
+		}).catch(error => {
+			console.error(error.message);
+		})
+	}
+
+	/**
+	 * Write checked checkbox to the session
+	 */
+	#saveSessionData() {
+		const self = this;
+
+		const nodeList = document.querySelectorAll('.tl_checkbox_container input[name="all_fields[]"]');
+		let checkedItems = [];
+		for (const cbox of nodeList) {
+			if (cbox.checked) {
+				checkedItems.push(cbox.id);
+			}
+		}
+
+		const formData = new FormData();
+		formData.append('action', 'editAllNavbarHandler');
+		formData.append('subaction', 'saveSessionData');
+		formData.append('checkedItems', JSON.stringify(checkedItems));
+		formData.append('REQUEST_TOKEN', Contao.request_token);
+
+		fetch(window.location.href, {
+			method: 'POST',
+			body: formData,
+			headers: {
+				'x-requested-with': 'XMLHttpRequest',
+			},
+		}).then(response => {
+			if (response.ok) {
+				return response.json();
+			}
+		}).then(json => {
+			if (json['status'] === 'success') {
+				self.#itemsChecked = JSON.parse(json['itemsChecked']);
+			}
+		}).catch(error => {
+			console.error(error.message);
+		})
+	}
 }
 
-window.addEvent('domready', function () {
-  var urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.has('do') && urlParams.has('act')) {
-    if (urlParams.get('act') === 'overrideAll' || urlParams.get('act') === 'editAll') {
-      EditAllNavbarHelper.initialize();
-    }
-  }
-});
