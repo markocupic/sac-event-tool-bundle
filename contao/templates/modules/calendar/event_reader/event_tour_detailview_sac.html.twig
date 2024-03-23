@@ -173,7 +173,7 @@
                     <div class="d-flex flex-wrap">
                         <div class="me-2 mt-3 mb-3">
                             <a href="{{ path('sac_event_tool_download_event_ical', {'eventId': get_event_data(model, 'id')}) }}" title="Event in Kalender importieren" class="btn btn-block btn-outline-primary">
-                                <i class="fal fa-calendar-plus"></i> iCal download
+                                <i class="fa-light fa-calendar-plus"></i> iCal download
                             </a>
                         </div>
 
@@ -291,14 +291,14 @@
                         {% if not get_event_data(model, 'linkSacRoutePortal') is empty %}
                             <div class="me-2 mt-3 mb-3">
                                 <a href="{{ get_event_data(model, 'linkSacRoutePortal') }}" target="_blank" title="Routen-Details auf SAC-Tourenportal" class="btn btn-block btn-primary">
-                                    <i class="fal fa-compass"></i> Route auf SAC-Tourenportal
+                                    <i class="fa-light fa-compass"></i> Route auf SAC-Tourenportal
                                 </a>
                             </div>
                         {% endif %}
 
                         <div class="me-2 mt-3 mb-3">
                             <a href="{{ insert_tag('link_url::ausruestungslisten') }}" target="_blank" title="Hier geht es zur Ausrüstungsempfehlung unserer SAC-Tourenleitenden" class="btn btn-block btn-outline-primary">
-                                <i class="fal fa-gear"></i> Ausrüstungsempfehlung
+                                <i class="fa-light fa-gear"></i> Ausrüstungsempfehlung
                             </a>
                         </div>
                     </div>

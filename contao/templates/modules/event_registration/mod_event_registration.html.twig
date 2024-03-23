@@ -6,14 +6,14 @@
 
         {% if errorMessage|default %}
             <div class="alert alert-danger" role="alert">
-                <i class="fas fa-exclamation-circle"></i>
+                <i class="fa-solid fa-exclamation-circle"></i>
                 <div>{{ errorMessage|raw }}</div>
             </div>
         {% endif %}
 
         {% if infoMessage|default %}
             <div class="alert alert-info" role="alert">
-                <i class="fas fa-info-circle me-2"></i>
+                <i class="fa-solid fa-info-circle me-2"></i>
                 <div>{{ infoMessage|raw }}</div>
             </div>
         {% endif %}
@@ -22,7 +22,7 @@
 
         {{ stepIndicator|raw }}
         <div class="alert alert-info" role="alert">
-            <i class="fas fa-info-circle"></i>
+            <i class="fa-solid fa-info-circle"></i>
             <div>Bitte logge dich ein, um dich zu einem Event anzumelden.</div>
         </div>
 
@@ -42,7 +42,7 @@
 
         {% if eventFullyBooked|default is same as(true) %}
             <div class="alert alert-info" role="alert">
-                <i class="fas fa-info-circle"></i>
+                <i class="fa-solid fa-info-circle"></i>
                 <div>{{ 'ERR.evt_reg_bookingLimitReaches'|trans({}, 'contao_default') }}</div>
             </div>
         {% endif %}
@@ -51,7 +51,7 @@
 
         {% if eventModel.addIban %}
             <div class="alert alert-info" role="alert">
-                <i class="fas fa-info-circle"></i>
+                <i class="fa-solid fa-info-circle"></i>
                 <div>
                     {{ 'FORM.evt_reg_ibanText'|trans({}, 'contao_default') }}
                     <br>
@@ -99,7 +99,7 @@
                                 {{ form.getWidget('mobile').parse()|raw }}
                                 <div data-ffield-explanation="mobile">
                                     <div class="alert alert-success" role="alert">
-                                        <i class="fas fa-check-circle"></i>
+                                        <i class="fa-solid fa-check-circle"></i>
                                         <div>
                                             {{ 'FORM.evt_reg_ffield_expl_mobile'|trans({}, 'contao_default')|raw }}
                                         </div>
@@ -125,7 +125,7 @@
                                 {{ form.getWidget('notes').parse()|raw }}
                                 <div data-ffield-explanation="notes">
                                     <div class="alert alert-success" role="alert">
-                                        <i class="fas fa-check-circle"></i>
+                                        <i class="fa-solid fa-check-circle"></i>
                                         <div>
                                             {{ 'FORM.evt_reg_ffield_expl_notes'|trans({}, 'contao_default')|raw }}
                                         </div>
@@ -139,7 +139,7 @@
                                 {{ form.getWidget('ahvNumber').parse()|raw }}
                                 <div data-ffield-explanation="ahvNumber">
                                     <div class="alert alert-success" role="alert">
-                                        <i class="fas fa-check-circle"></i>
+                                        <i class="fa-solid fa-check-circle"></i>
                                         <div>
                                             {{ 'FORM.evt_reg_ffield_expl_ahvNumber'|trans({}, 'contao_default')|raw }}
                                         </div>
