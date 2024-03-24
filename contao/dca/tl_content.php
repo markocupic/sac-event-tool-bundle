@@ -22,12 +22,13 @@ $GLOBALS['TL_DCA']['tl_content']['palettes'][UserPortraitListController::TYPE] =
 $GLOBALS['TL_DCA']['tl_content']['palettes'][UserPortraitController::TYPE] = 'name,type,headline;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['jumpTo'] = [
-	'exclude'   => true,
-	'search'    => true,
-	'inputType' => 'text',
-	'eval'      => ['mandatory' => true, 'rgxp' => 'url', 'decodeEntities' => true, 'maxlength' => 255, 'fieldType' => 'radio', 'filesOnly' => true, 'tl_class' => 'w50 wizard'],
-	'wizard'    => [['tl_content', 'pagePicker']],
-	'sql'       => "varchar(255) NOT NULL default ''",
+	'exclude'    => true,
+	'search'     => true,
+	'inputType'  => 'pageTree',
+	'foreignKey' => 'tl_page.title',
+	'eval'       => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'w50 wizard'],
+	'sql'        => "int(10) unsigned NOT NULL default 0",
+	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 ];
 
 $GLOBALS['TL_DCA']['tl_content']['fields']['userList_selectMode'] = [
@@ -105,6 +106,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['imgSize'] = [
 	'inputType'        => 'imageSize',
 	'reference'        => &$GLOBALS['TL_LANG']['MSC'],
 	'eval'             => ['rgxp' => 'natural', 'includeBlankOption' => true, 'nospace' => true, 'helpwizard' => true, 'tl_class' => 'w50'],
-	'options_callback' => static fn() => System::getContainer()->get('contao.image.image_sizes')->getOptionsForUser(BackendUser::getInstance()),
+	'options_callback' => static fn() => System::getContainer()->get('contao.image.sizes')->getAllOptions(),
 	'sql'              => "varchar(64) NOT NULL default ''",
 ];
