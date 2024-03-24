@@ -78,6 +78,7 @@ class CalendarEventsMember
     private Adapter $member;
     private Adapter $message;
     private Adapter $stringUtil;
+	private Adapter $user;
     private Adapter $validator;
 
     public function __construct(

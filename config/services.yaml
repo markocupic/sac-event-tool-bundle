@@ -36,6 +36,15 @@ services:
         resource: ../src/
         exclude: ../src/{ContaoManager,Session,Config,Event,DependencyInjection,Resources,Model}
 
+    # Override the Contao Backend User Provider
+    # to enable login with the SAC member id
+    contao.security.backend_user_provider:
+        class: Markocupic\SacEventToolBundle\Security\User\CustomContaoUserProvider
+        arguments:
+            - '@database_connection'
+            - '@contao.framework'
+            - Contao\BackendUser
+
     Markocupic\SacEventToolBundle\Security\Voter\CalendarContainerAccessVoter:
         tags:
             - { name: security.voter, priority: 10 }
