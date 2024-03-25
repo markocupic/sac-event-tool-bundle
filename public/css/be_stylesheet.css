@@ -169,18 +169,27 @@ div.legend-box {
 	margin: 0 15px;
 	position: relative;
 	width: calc(100% - 30px);
-}
 
-.tl_formbody_edit div.readonly .field-content-box {
-	border: 1px solid #aaa;
-	padding: 8px 5px;
-	background-color: lightgray;
-	box-sizing: border-box;
-	border: 1px solid #aaa;
-	border-radius: 2px;
-	width: 100%;
-	line-height: 1.4;
-	min-height: 37px;
+	& .field-content-box {
+		padding: 8px 5px;
+		background-color: lightgray;
+		box-sizing: border-box;
+		border: 1px solid var(--form-border);
+		border-radius: 2px;
+		width: 100%;
+		line-height: 1.4;
+		min-height: 37px;
+	}
+}
+/** Dark mode */
+html[data-color-scheme="dark"] {
+	& .tl_formbody_edit div.readonly {
+		& .field-content-box {
+			border: 1px solid var(--form-border);
+			background-color: #151619;
+			color: #ffffff;
+		}
+	}
 }
 
 /**
@@ -285,72 +294,70 @@ div.tl_header_tour_rapport table td {
 #tl_backend_home_screen_my_events_inner {
 	width: auto;
 	min-width: 700px;
+
+	& td.separator {
+		padding-top: 2rem;
+		font-weight: 600;
+		color: #222;
+	}
+
+	& td.text-align-left {
+		text-align: left;
+	}
+
+	& td.text-align-center {
+		text-align: center;
+	}
+
+	& td.my-events-badge-col {
+		width: 130px;
+	}
+
+	& td.my-events-date-col {
+		width: 68px;
+	}
+
+	& td.my-events-state-col {
+		width: 16px;
+		padding: 0;
+	}
+
+	& td.my-events-icon-col {
+		width: 18px;
+	}
+
+	& td.my-events-icon-col > * {
+		color: #1A6B99;
+	}
+
+	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
+
+	& td .filter-brightened {
+		filter: opacity(0.30);
+	}
+
+	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
+
+	& td .filter-green {
+		filter: invert(59%) sepia(20%) saturate(1169%) hue-rotate(94deg) brightness(96%) contrast(93%);
+	}
+
+	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
+
+	& td .filter-red {
+		filter: invert(31%) sepia(93%) saturate(7446%) hue-rotate(356deg) brightness(103%) contrast(121%);
+	}
+
+	& .subscription-badge {
+		margin-left: 4px !important;
+	}
+
+	& td, & th {
+		/**border-bottom: 1px solid #e9e9e9;**/
+		padding: 10px 6px;
+	}
 }
 
-#tl_backend_home_screen_my_events_inner td.separator {
-	padding-top: 2rem;
-	font-weight: 600;
-	color: #222;
-}
-
-#tl_backend_home_screen_my_events_inner th {
-	/**background: #f6f6f8;**/
-	padding: 6px;
-	/*border-top: 1px solid #e9e9e9;*/
-}
-
-#tl_backend_home_screen_my_events_inner td.text-align-left {
-	text-align: left;
-}
-
-#tl_backend_home_screen_my_events_inner td.text-align-center {
-	text-align: center;
-}
-
-#tl_backend_home_screen_my_events_inner td.my-events-badge-col {
-	width: 130px;
-}
-
-#tl_backend_home_screen_my_events_inner td.my-events-date-col {
-	width: 68px;
-}
-
-#tl_backend_home_screen_my_events_inner td.my-events-state-col {
-	width: 16px;
-	padding: 0;
-}
-
-#tl_backend_home_screen_my_events_inner td.my-events-icon-col {
-	width: 18px;
-}
-
-#tl_backend_home_screen_my_events_inner td.my-events-icon-col > * {
-	color: #6e6e6e;
-}
-
-/** https://isotropic.co/tool/hex-color-to-css-filter/ */
-#tl_backend_home_screen_my_events_inner td .filter-brightened {
-	filter: opacity(0.30);
-}
-
-/** https://isotropic.co/tool/hex-color-to-css-filter/ */
-#tl_backend_home_screen_my_events_inner td .filter-green {
-	filter: invert(59%) sepia(20%) saturate(1169%) hue-rotate(94deg) brightness(96%) contrast(93%);
-}
-
-/** https://isotropic.co/tool/hex-color-to-css-filter/ */
-#tl_backend_home_screen_my_events_inner td .filter-red {
-	filter: invert(31%) sepia(93%) saturate(7446%) hue-rotate(356deg) brightness(103%) contrast(121%);
-}
-
-#tl_backend_home_screen_my_events_inner .subscription-badge {
-	margin-left: 4px !important;
-}
-
-#tl_backend_home_screen_my_events_inner td {
-	/**border-bottom: 1px solid #e9e9e9;**/
-	padding: 6px 6px;
-}
 
 /** backend home screen - end */
 
