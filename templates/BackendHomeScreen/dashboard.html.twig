@@ -3,29 +3,29 @@
 
         <h2><i class="fa-solid fa-mountain-sun"></i> {{ 'MSC.bhs_dashb_sacEvents'|trans({}, 'contao_default') }}</h2>
 
-        <table class="tl_listing">
+        <table class="tl_listing with-border">
             {% set index = 0 %}
             {% for event in events %}
                 {% if event.separator is defined %}
                     {% if event.separator == 'upcoming-events' %}
                         {% set index = 0 %}
                         <tr>
-                            <td colspan="10" class="separator">{{ 'MSC.bhs_dashb_yourUpcomingEvents'|trans({}, 'contao_default') }}</td>
+                            <th colspan="10" class="separator">{{ 'MSC.bhs_dashb_yourUpcomingEvents'|trans({}, 'contao_default') }}</th>
                         </tr>
                         {% if has_upcoming_events is same as(false) %}
                             <tr class="even">
-                                <td colspan="10">{{ 'MSC.bhs_dashb_noUpcomingEventsDetected'|trans({}, 'contao_default') }}</td>
+                                <th colspan="10">{{ 'MSC.bhs_dashb_noUpcomingEventsDetected'|trans({}, 'contao_default') }}</th>
                             </tr>
                         {% endif %}
                     {% endif %}
                     {% if event.separator == 'past-events' %}
                         {% set index = 0 %}
                         <tr>
-                            <td colspan="10" class="separator">{{ 'MSC.bhs_dashb_yourPastEvents'|trans({}, 'contao_default') }}</td>
+                            <th colspan="10" class="separator">{{ 'MSC.bhs_dashb_yourPastEvents'|trans({}, 'contao_default') }}</th>
                         </tr>
                         {% if has_past_events is same as(false) %}
                             <tr class="even">
-                                <td colspan="10">{{ 'MSC.bhs_dashb_noPastEventsDetected'|trans({}, 'contao_default') }}</td>
+                                <th colspan="10">{{ 'MSC.bhs_dashb_noPastEventsDetected'|trans({}, 'contao_default') }}</th>
                             </tr>
                         {% endif %}
                     {% endif %}
