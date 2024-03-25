@@ -52,24 +52,18 @@ class CustomContaoUserProvider extends ContaoUserProvider
     {
         $this->framework->initialize();
 
-        /** @var Adapter<User> $adapter */
-        $adapter = $this->framework->getAdapter($this->userClass);
-        $user = $adapter->loadUserByIdentifier($identifier);
-
-        if (is_a($user, $this->userClass)) {
-            return $user;
-        }
-
-        if (BackendUser::class === $this->userClass && is_numeric($identifier) && 6 === \strlen(trim((string) $identifier))) {
-            $sacMemberId = (int) $identifier;
+        if (BackendUser::class === $this->userClass && is_numeric($identifier) && 6 === \strlen(trim($identifier))) {
             $username = $this->connection->fetchOne(
-                'SELECT username FROM tl_user WHERE sacMemberId = :sacMemberId',
-                ['sacMemberId' => $sacMemberId],
-                ['sacMemberId' => Types::INTEGER],
+                'SELECT username FROM tl_user WHERE sacMemberId = :identifier',
+                ['identifier' => (int) $identifier],
+                ['identifier' => Types::INTEGER],
             );
 
             if (false !== $username) {
-                $user = $adapter->loadUserByIdentifier($username);
+				/** @var User $adapter */
+	            $adapter = $this->framework->getAdapter($this->userClass);
+
+	            $user = $adapter->loadUserByIdentifier($username);
 
                 if (is_a($user, $this->userClass)) {
                     return $user;
@@ -77,6 +71,7 @@ class CustomContaoUserProvider extends ContaoUserProvider
             }
         }
 
-        throw new UserNotFoundException(sprintf('Could not find user "%s"', $identifier));
+		// Call the parent user provider from the Contao Core
+		return parent::loadUserByIdentifier($identifier);
     }
 }
