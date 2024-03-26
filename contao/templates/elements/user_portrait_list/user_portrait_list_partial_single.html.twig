@@ -1,11 +1,15 @@
 <div class="row">
     <div class="col-5 col-sm-5 col-md-5 col-xl-6">
         {% if addImage|default %}
-            <a href="{{ jumpTo }}?username={{ username }}" title="{{ lastname ~ ' ' ~ firstname|trim }}">
-                {{ contao_figure(singleSRC, imgSize, {
-                    metadata: { alt: lastname~' '~firstname|trim }
-                }) }}
-            </a>
+            {% if jumpTo|default %}
+                <a href="{{ insert_tag('link_url::' ~ jumpTo) }}?username={{ username }}" title="{{ lastname ~ ' ' ~ firstname|trim }}">
+            {% endif %}
+            {{ contao_figure(singleSRC, imgSize, {
+                metadata: { alt: lastname~' '~firstname|trim }
+            }) }}
+            {% if jumpTo|default %}
+                </a>
+            {% endif %}
         {% endif %}
     </div>
     <div class="col-7 col-sm-7 col-md-7 col-xl-6 ">
