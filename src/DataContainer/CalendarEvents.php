@@ -1175,6 +1175,15 @@ class CalendarEvents
         return $this->connection->fetchAllKeyValue('SELECT id,name FROM tl_course_main_type ORDER BY code');
     }
 
+    #[AsCallback(table: 'tl_calendar_events', target: 'fields.registrationGoesTo.options', priority: 90)]
+    public function getBackendUsers(): array
+    {
+        return $this->connection->fetchAllKeyValue(
+            'SELECT id, CONCAT(name, ", ", city) FROM tl_user WHERE disable = ? ORDER BY name',
+            [0],
+        );
+    }
+
     /**
      * Options callback for Multi Column Wizard field tl_calendar_events.tourTechDifficulty.
      *

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Markocupic\SacEventToolBundle\DataContainer;
 
+use Contao\BackendUser;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Intl\Countries;
@@ -22,8 +23,10 @@ use Contao\Message;
 use Contao\UserModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Types\Types;
 use Markocupic\SacEventToolBundle\Config\Bundle;
 use Markocupic\SacEventToolBundle\User\BackendUser\MaintainBackendUsersHomeDirectory;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -38,6 +41,7 @@ class User
         private readonly Connection $connection,
         private readonly TranslatorInterface $translator,
         private readonly Countries $countries,
+        private readonly Security $security,
         private readonly MaintainBackendUsersHomeDirectory $maintainBackendUsersHomeDirectory,
     ) {
     }
@@ -73,58 +77,47 @@ class User
     }
 
     /**
-     * Make fields readonly in the user profile section of the Contao backend.
+     * Make fields readonly in backend users profile.
      *
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception
      */
     #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
-    public function addReadonlyAttributeToSyncedFields(DataContainer $dc): void
+    public function makeFieldsReadonlyInUsersProfile(DataContainer $dc): void
     {
-        if ($dc->id > 0) {
-            $stmt = $this->connection->executeQuery('SELECT * FROM tl_user WHERE id = ?', [$dc->id]);
+        $user = $this->security->getUser();
 
-            if (false !== ($arrUser = $stmt->fetchAssociative())) {
-                if (!$arrUser['admin']) {
-                    if ((int) $arrUser['sacMemberId'] > 0) {
-                        $stmt = $this->connection->executeQuery(
-                            'SELECT * FROM tl_member WHERE sacMemberId = ?',
-                            [$arrUser['sacMemberId']],
-                        );
-
-                        if (false !== ($arrMember = $stmt->fetchAssociative())) {
-                            if (!$arrMember['disable']) {
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['gender']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['firstname']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['lastname']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['name']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['email']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['phone']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['mobile']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['street']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['postal']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['city']['eval']['readonly'] = true;
-                                $GLOBALS['TL_DCA']['tl_user']['fields']['dateOfBirth']['eval']['readonly'] = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Show message in the user profile section of the Contao backend.
-     */
-    #[AsCallback(table: 'tl_user', target: 'config.onload', priority: 100)]
-    public function showReadonlyFieldsInfoMessage(DataContainer $dc): void
-    {
-        $request = $this->requestStack->getCurrentRequest();
-
-        if (!$dc->id || 'login' !== $request->query->get('do')) {
+        if (!$user instanceof BackendUser) {
             return;
         }
 
+        if (empty($user->sacMemberId)) {
+            return;
+        }
+
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$dc->id > 0 || 'login' !== $request->get('do') || 'edit' !== $request->get('act')) {
+            return;
+        }
+
+        $arrMember = $this->connection->fetchAssociative(
+            'SELECT * FROM tl_member WHERE sacMemberId = :sacMemberId',
+            ['sacMemberId' => $user->sacMemberId],
+            ['sacMemberId' => Types::INTEGER],
+        );
+
+        if (false === $arrMember || $arrMember['disable']) {
+            return;
+        }
+
+        $arrReadonlyFields = ['gender', 'firstname', 'lastname', 'name', 'email', 'phone', 'mobile', 'street', 'postal', 'city', 'dateOfBirth'];
+
+        foreach ($arrReadonlyFields as $fieldName) {
+            $GLOBALS['TL_DCA']['tl_user']['fields'][$fieldName]['eval']['readonly'] = true;
+        }
+
+        // Display a message
         $messageAdapter = $this->framework->getAdapter(Message::class);
 
         $messageAdapter->addInfo(
@@ -161,7 +154,7 @@ class User
 
                 $set = [
                     'inherit' => 'extend',
-                    'pwChange' => '1',
+                    'pwChange' => true,
                     'password' => password_hash($randomPassword, PASSWORD_DEFAULT),
                     'tstamp' => 0,
                 ];

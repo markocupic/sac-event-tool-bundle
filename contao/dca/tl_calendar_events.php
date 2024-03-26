@@ -213,7 +213,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['preview'] = [
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['registrations'] = [
 	'href' => 'table=tl_calendar_events_member',
-	'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/people-group-regular.svg',
+	'icon' => Bundle::ASSET_DIR.'/icons/fontawesome/default/people-group-solid.svg',
 ];
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['releaseLevelPrev'] = [
@@ -435,7 +435,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['addMinAndMaxMembers'] = [
 	'filter'    => true,
 	'inputType' => 'checkbox',
 	'eval'      => ['submitOnChange' => true, 'tl_class' => 'm12 clr'],
-	'sql'       => ['type' => 'boolean', 'default' => false],
+	'sql'       => ['type' => 'boolean', 'default' => true],
 ];
 
 // Add new field minMembers
@@ -579,13 +579,11 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['disableOnlineRegistration'] 
 
 // Add new field registrationGoesTo
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationGoesTo'] = [
-	'exclude'    => true,
-	'filter'     => true,
-	'inputType'  => 'select',
-	'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
-	'foreignKey' => 'tl_user.CONCAT(name,", ",city)',
-	'eval'       => ['multiple' => false, 'chosen' => false, 'includeBlankOption' => true, 'tl_class' => 'm12 clr'],
-	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'exclude'   => true,
+	'filter'    => true,
+	'inputType' => 'select',
+	'eval'      => ['multiple' => false, 'chosen' => false, 'includeBlankOption' => true, 'tl_class' => 'm12 clr'],
+	'sql'       => "int(10) unsigned NOT NULL default '0'",
 ];
 
 // Add new field setRegistrationPeriod

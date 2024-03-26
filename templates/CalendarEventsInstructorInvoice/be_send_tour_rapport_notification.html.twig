@@ -36,7 +36,7 @@
 
     <style type='text/css'>
         .send_tour_rapport_notification_form {
-            border-top: 1px solid #e6e6e8;
+            border-top: 1px solid var(--border);
         }
 
         .send_tour_rapport_notification_form .headline {
@@ -54,6 +54,8 @@
         .send_tour_rapport_notification_form input.text, .send_tour_rapport_notification_form textarea {
             width: 100%;
             padding: 4px;
+            border: 1px solid var(--form-border);
+            background-color: var(--form-bg);
         }
 
         .send_tour_rapport_notification_form label {
@@ -64,11 +66,11 @@
 
         .send_tour_rapport_notification_form .submit {
             padding: 7px 12px;
-            border: 1px solid #aaa;
             border-radius: 2px;
             box-sizing: border-box;
             cursor: pointer;
-            background: #eee;
+            border: 1px solid var(--form-border);
+            background-color: var(--form-bg);
             transition: background .2s ease;
         }
 
