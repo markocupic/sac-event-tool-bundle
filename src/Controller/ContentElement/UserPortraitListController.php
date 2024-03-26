@@ -75,7 +75,11 @@ class UserPortraitListController extends AbstractContentElementController
             $queryType = $model->userList_queryType;
 
             if (\count($arrSelectedRoles) > 0) {
-                $stmt = $this->connection->executeQuery('SELECT * FROM tl_user  WHERE disable = ? AND hideInFrontendListings = ? ORDER BY lastname, firstname', [0, 0],[Types::INTEGER, Types::INTEGER]);
+                $stmt = $this->connection->executeQuery(
+					'SELECT * FROM tl_user  WHERE disable = ? AND hideInFrontendListings = ? ORDER BY lastname, firstname',
+					[0, 0],
+					[Types::INTEGER, Types::INTEGER],
+                );
 
                 if ('OR' === $queryType) {
                     while (false !== ($arrUser = $stmt->fetchAssociative())) {

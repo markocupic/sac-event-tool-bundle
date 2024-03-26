@@ -84,11 +84,11 @@ class ContentElementMigration extends AbstractMigration
             "UPDATE $table_name SET $field_name = '$template_new' WHERE $content_element_type = :content_element_type AND $field_name = :template_old",
             [
                 'content_element_type' => $content_element_type,
-				'template_old' => $template_old,
+                'template_old' => $template_old,
             ],
             [
-	            'content_element_type' => Types::STRING,
-	            'template_name' => Types::STRING,
+                'content_element_type' => Types::STRING,
+                'template_name' => Types::STRING,
             ]
         );
     }
