@@ -45,7 +45,7 @@ PaletteManipulator::create()
 // Fields
 $GLOBALS['TL_DCA']['tl_calendar']['fields']['pid'] = [
 	'foreignKey' => 'tl_calendar_container.title',
-	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'sql'        => "int(10) unsigned NOT NULL default 0",
 	'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 ];
 

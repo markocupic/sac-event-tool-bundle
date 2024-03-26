@@ -52,7 +52,7 @@ $GLOBALS['TL_DCA']['tl_course_main_type'] = [
 		'tstamp' => [
 			'label' => &$GLOBALS['TL_LANG']['tl_course_main_type']['tstamp'],
 			'flag'  => DataContainer::SORT_DAY_DESC,
-			'sql'   => "int(10) unsigned NOT NULL default '0'",
+			'sql'   => "int(10) unsigned NOT NULL default 0",
 		],
 		'code'   => [
 			'exclude'   => true,
@@ -61,7 +61,7 @@ $GLOBALS['TL_DCA']['tl_course_main_type'] = [
 			'inputType' => 'select',
 			'options'   => range(1, 10),
 			'eval'      => ['mandatory' => true, 'unique' => true],
-			'sql'       => "int(10) unsigned NOT NULL default '0'",
+			'sql'       => "int(10) unsigned NOT NULL default 0",
 		],
 		'name'   => [
 			'exclude'   => true,

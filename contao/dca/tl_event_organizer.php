@@ -64,7 +64,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
 		'tstamp'                             => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'title'                              => [
 			'exclude'   => true,
@@ -91,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_event_organizer'] = [
 			'sorting'   => true,
 			'inputType' => 'text',
 			'eval'      => ['rgxp' => 'digit', 'mandatory' => true, 'maxlength' => 255],
-			'sql'       => "int(10) unsigned NOT NULL default '0'",
+			'sql'       => "int(10) unsigned NOT NULL default 0",
 		],
 		'belongsToOrganization'              => [
 			'exclude'   => true,

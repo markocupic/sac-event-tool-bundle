@@ -110,7 +110,18 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 	],
 	'palettes'    => [
 		'__selector__' => ['addEmailAttachment', 'hasLeadClimbingEducation', 'hasPaid'],
-		'default'      => '{stateOfSubscription_legend},dashboard,stateOfSubscription,dateAdded,allowMultiSignUp,hasPaid;{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;{sac_member_id_legend},sacMemberId;{personal_legend},firstname,lastname,gender,dateOfBirth,sectionId,ahvNumber;{address_legend:hide},street,postal,city;{contact_legend},mobile,email;{education_legend},hasLeadClimbingEducation;{emergency_phone_legend},emergencyPhone,emergencyPhoneName;{stateOfParticipation_legend},hasParticipated;{agb_legend},agb,hasAcceptedPrivacyRules',
+		'default'      => '
+		{stateOfSubscription_legend},dashboard,stateOfSubscription,dateAdded,allowMultiSignUp,hasPaid;
+		{notes_legend},carInfo,ticketInfo,foodHabits,notes,instructorNotes,bookingType;
+		{sac_member_id_legend},sacMemberId;
+		{personal_legend},firstname,lastname,gender,dateOfBirth,sectionId,ahvNumber;
+		{address_legend:hide},street,postal,city;
+		{contact_legend},mobile,email;
+		{education_legend},hasLeadClimbingEducation;
+		{emergency_phone_legend},emergencyPhone,emergencyPhoneName;
+		{stateOfParticipation_legend},hasParticipated;
+		{agb_legend},agb,hasAcceptedPrivacyRules
+		',
 	],
 	'subpalettes' => [
 		'hasLeadClimbingEducation' => 'dateOfLeadClimbingEducation',
@@ -121,7 +132,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
 		'tstamp'                      => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'uuid'                        => [
 			'exclude'   => true,
@@ -133,7 +144,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 		'contaoMemberId'              => [
 			'exclude'    => true,
 			'foreignKey' => "tl_member.CONCAT(firstname, ' ', lastname)",
-			'sql'        => "int(10) unsigned NOT NULL default '0'",
+			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 			'eval'       => ['readonly' => true],
 		],
@@ -141,7 +152,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_member'] = [
 			'exclude'    => true,
 			'foreignKey' => 'tl_calendar_events.title',
 			'default'    => Input::get('id'),
-			'sql'        => "int(10) unsigned NOT NULL default '0'",
+			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 			'eval'       => ['doNotShow' => true, 'readonly' => true],
 		],

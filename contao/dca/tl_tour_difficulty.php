@@ -58,14 +58,14 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty'] = [
 		],
 		'pid'         => [
 			'foreignKey' => 'tl_tour_difficulty_category.title',
-			'sql'        => "int(10) unsigned NOT NULL default '0'",
+			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 		],
 		'sorting'     => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'tstamp'      => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'shortcut'    => [
 			'exclude'   => true,

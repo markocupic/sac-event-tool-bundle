@@ -51,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
 		'pid'                              => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'sorting'                          => [
 			'exclude'   => true,
@@ -59,10 +59,10 @@ $GLOBALS['TL_DCA']['tl_user_role'] = [
 			'sorting'   => true,
 			'inputType' => 'text',
 			'eval'      => ['mandatory' => true, 'rgxp' => 'natural', 'maxlength' => 10],
-			'sql'       => "int(10) unsigned NOT NULL default '0'",
+			'sql'       => "int(10) unsigned NOT NULL default 0",
 		],
 		'tstamp'                           => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'title'                            => [
 			'exclude'   => true,

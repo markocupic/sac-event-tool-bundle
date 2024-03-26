@@ -57,11 +57,11 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 		],
 		'pid'                            => [
 			'foreignKey' => 'tl_event_release_level_policy_package.title',
-			'sql'        => "int(10) unsigned NOT NULL default '0'",
+			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 		],
 		'tstamp'                         => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'level'                          => [
 			'exclude'   => true,

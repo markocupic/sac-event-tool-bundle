@@ -60,12 +60,12 @@ $GLOBALS['TL_DCA']['tl_course_sub_type'] = [
 			'sorting'    => true,
 			'filter'     => true,
 			'foreignKey' => 'tl_course_main_type.name',
-			'sql'        => "int(10) unsigned NOT NULL default '0'",
+			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 		],
 		'tstamp' => [
 			'flag' => DataContainer::SORT_DAY_DESC,
-			'sql'  => "int(10) unsigned NOT NULL default '0'",
+			'sql'  => "int(10) unsigned NOT NULL default 0",
 		],
 		'code'   => [
 			'exclude'   => true,

@@ -303,7 +303,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['mainInstructor'] = [
 	'flag'       => DataContainer::SORT_ASC,
 	'foreignKey' => 'tl_user.name',
 	'eval'       => ['mandatory' => true, 'includeBlankOption' => true, 'tl_class' => 'clr'],
-	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'sql'        => "int(10) unsigned NOT NULL default 0",
 	'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
 ];
 
@@ -383,7 +383,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel0'] = [
 	'filter'    => true,
 	'inputType' => 'select',
 	'eval'      => ['submitOnChange' => true, 'includeBlankOption' => true, 'multiple' => false, 'mandatory' => true, 'tl_class' => 'm12 clr'],
-	'sql'       => "int(10) unsigned NOT NULL default '0'",
+	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
 // Add new field courseTypeLevel1
@@ -395,7 +395,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['courseTypeLevel1'] = [
 	'foreignKey' => 'tl_course_sub_type.name',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 	'eval'       => ['multiple' => false, 'mandatory' => true, 'tl_class' => 'm12 clr'],
-	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'sql'        => "int(10) unsigned NOT NULL default 0",
 ];
 
 // Add new field organizers
@@ -583,7 +583,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['registrationGoesTo'] = [
 	'filter'    => true,
 	'inputType' => 'select',
 	'eval'      => ['multiple' => false, 'chosen' => false, 'includeBlankOption' => true, 'tl_class' => 'm12 clr'],
-	'sql'       => "int(10) unsigned NOT NULL default '0'",
+	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
 // Add new field setRegistrationPeriod
@@ -628,7 +628,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['deregistrationLimit'] = [
 	'inputType' => 'select',
 	'options'   => range(1, 720),
 	'eval'      => ['rgxp' => 'natural', 'nospace' => true, 'tl_class' => 'm12 clr'],
-	'sql'       => "int(10) unsigned NOT NULL default '0'",
+	'sql'       => "int(10) unsigned NOT NULL default 0",
 ];
 
 // Add new field addGallery
@@ -761,7 +761,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['eventReleaseLevel'] = [
 	'foreignKey' => 'tl_event_release_level_policy.title',
 	'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 	'eval'       => ['mandatory' => true, 'tl_class' => 'm12 clr'],
-	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'sql'        => "int(10) unsigned NOT NULL default 0",
 ];
 
 if (!Input::get('act') || 'select' === Input::get('act')) {

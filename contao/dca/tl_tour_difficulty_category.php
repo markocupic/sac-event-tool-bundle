@@ -51,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_tour_difficulty_category'] = [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
 		'tstamp' => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'title'  => [
 			'exclude'   => true,

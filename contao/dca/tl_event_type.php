@@ -49,7 +49,7 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
 		'tstamp'                       => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'alias'                        => [
 			'inputType' => 'text',
@@ -72,7 +72,7 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
 			'inputType'  => 'select',
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 			'foreignKey' => 'tl_event_release_level_policy_package.title',
-			'sql'        => "int(10) unsigned NOT NULL default '0'",
+			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'eval'       => ['includeBlankOption' => true, 'mandatory' => true, 'tl_class' => 'clr'],
 		],
 		'previewPage'                  => [
@@ -80,7 +80,7 @@ $GLOBALS['TL_DCA']['tl_event_type'] = [
 			'inputType'  => 'pageTree',
 			'foreignKey' => 'tl_page.title',
 			'eval'       => ['mandatory' => true, 'fieldType' => 'radio', 'tl_class' => 'clr'],
-			'sql'        => "int(10) unsigned NOT NULL default '0'",
+			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'hasOne', 'load' => 'lazy'],
 		],
 	],

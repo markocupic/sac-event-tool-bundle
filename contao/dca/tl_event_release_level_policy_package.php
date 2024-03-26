@@ -50,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy_package'] = [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
 		'tstamp' => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'title'  => [
 			'inputType' => 'text',

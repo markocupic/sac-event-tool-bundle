@@ -51,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_sac_section'] = [
 			'sql' => 'int(10) unsigned NOT NULL auto_increment',
 		],
 		'tstamp'    => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'sectionId' => [
 			'exclude'   => true,

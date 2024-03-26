@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 		],
 		'pid'                    => [
 			'foreignKey' => 'tl_calendar_events.title',
-			'sql'        => "int(10) unsigned NOT NULL default '0'",
+			'sql'        => "int(10) unsigned NOT NULL default 0",
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 		],
 		'userPid'                => [
@@ -104,10 +104,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'inputType'  => 'select',
 			'relation'   => ['type' => 'belongsTo', 'load' => 'eager'],
 			'eval'       => ['submitOnChange' => true, 'mandatory' => true, 'readonly' => true, 'multiple' => false, 'class' => 'clr'],
-			'sql'        => "int(10) unsigned NOT NULL default '0'",
+			'sql'        => "int(10) unsigned NOT NULL default 0",
 		],
 		'tstamp'                 => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'eventDuration'          => [
 			'exclude'   => true,
@@ -154,7 +154,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'inputType' => 'select',
 			'options'   => range(0, 20),
 			'eval'      => ['multiple' => false, 'mandatory' => true, 'doNotCopy' => true, 'tl_class' => 'clr m12'],
-			'sql'       => "int(10) unsigned NOT NULL default '0'",
+			'sql'       => "int(10) unsigned NOT NULL default 0",
 		],
 		'railwTaxes'             => [
 			'exclude'   => true,
@@ -225,10 +225,10 @@ $GLOBALS['TL_DCA']['tl_calendar_events_instructor_invoice'] = [
 			'sql'       => 'text NULL',
 		],
 		'countNotifications'     => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 		'notificationSentOn'     => [
-			'sql' => "int(10) unsigned NOT NULL default '0'",
+			'sql' => "int(10) unsigned NOT NULL default 0",
 		],
 	],
 ];
