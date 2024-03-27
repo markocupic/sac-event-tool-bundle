@@ -37,6 +37,8 @@ $GLOBALS['TL_LANG']['tl_event_release_level_policy']['group'] = ['Backend-Gruppe
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissions'] = ['Rechte', 'Wählen Sie die Rechte aus, die Mitgliedern der Gruppe zugewiesen werden.'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowWriteAccessToAuthor'] = ['Dem Event-Autor Schreibzugriff auf diesem Level gewähren.', 'Mit dieser Einstellung gewähren Sie auf diesem Level dem Autor Schreibzugriff.'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowWriteAccessToInstructors'] = ['Den Event-Leitern Schreibzugriff auf diesem Level gewähren.', 'Mit dieser Einstellung gewähren Sie auf diesem Level den Event-Leitern Schreibzugriff.'];
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowCutAccessToAuthor'] = ['Dem Event-Autor das Verschieben auf diesem Level gewähren.', 'Mit dieser Einstellung ermöglichen Sie auf diesem Level dem Event-Autor das Verschieben eines Events in einen anderen Container.'];
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowCutAccessToInstructors'] = ['Den Event-Leitern das Verschieben auf diesem Level gewähren.', 'Mit dieser Einstellung ermöglichen Sie auf diesem Level den Event-Leitern das Verschieben eines Events in einen anderen Container.'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowDeleteAccessToAuthor'] = ['Dem Event-Autor Löschzugriff auf diesem Level gewähren.', 'Mit dieser Einstellung gewähren Sie auf diesem Level dem Autor Löschzugriff.'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowDeleteAccessToInstructors'] = ['Den Event-Leitern Löschzugriff auf diesem Level gewähren.', 'Mit dieser Einstellung gewähren Sie auf diesem Level den Event-Leitern Löschzugriff.'];
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowSwitchingToPrevLevel'] = ['Dem Event-Besitzer und dem Event-Leiter das Herabstufen erlauben', 'Dem Event-Besitzer (Autor) und dem Event-Leiter das Herabstufen erlauben.'];
@@ -46,5 +48,6 @@ $GLOBALS['TL_LANG']['tl_event_release_level_policy']['allowRegistration'] = ['On
 // References
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['canWriteEvent'] = 'Event bearbeiten';
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['canDeleteEvent'] = 'Event löschen';
+$GLOBALS['TL_LANG']['tl_event_release_level_policy']['canCutEvent'] = 'Event verschieben';
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['canRelLevelUp'] = 'Freigabestufe hochstufen';
 $GLOBALS['TL_LANG']['tl_event_release_level_policy']['canRelLevelDown'] = 'Freigabestufe herabstufen';

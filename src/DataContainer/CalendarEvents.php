@@ -64,6 +64,7 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 class CalendarEvents
 {
     // Adapters
+    private Adapter $image;
     private Adapter $arrayUtil;
     private Adapter $backend;
     private Adapter $calendarEventsHelper;
@@ -89,8 +90,9 @@ class CalendarEvents
         private readonly LoggerInterface|null $contaoGeneralLogger = null,
     ) {
         // Adapters
-        $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);
         $this->backend = $this->framework->getAdapter(Backend::class);
+        $this->image = $this->framework->getAdapter(Image::class);
+        $this->arrayUtil = $this->framework->getAdapter(ArrayUtil::class);
         $this->calendarEventsHelper = $this->framework->getAdapter(CalendarEventsHelper::class);
         $this->calendarEventsJourneyModel = $this->framework->getAdapter(CalendarEventsJourneyModel::class);
         $this->calendarEventsModel = $this->framework->getAdapter(CalendarEventsModel::class);
@@ -212,9 +214,6 @@ class CalendarEvents
 
         $request = $this->requestStack->getCurrentRequest();
 
-        /** @var BackendUser $user */
-        $user = $this->security->getUser();
-
         // Minimize header fields for default users
         $GLOBALS['TL_DCA']['tl_calendar_events']['list']['sorting']['headerFields'] = ['title'];
 
@@ -251,43 +250,121 @@ class CalendarEvents
 
         // Prevent unauthorized editing
         if ('edit' === $request->query->get('act')) {
-            $objEventsModel = $this->calendarEventsModel->findByPk($request->query->get('id'));
+            // An anonymous function increases the readability of the code
+            (
+                function (): void {
+                    $request = $this->requestStack->getCurrentRequest();
 
-            if (null !== $objEventsModel) {
-                if (null !== EventReleaseLevelPolicyModel::findByPk($objEventsModel->eventReleaseLevel)) {
-                    if (false === $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEventsModel->id) && $user->id !== $objEventsModel->registrationGoesTo) {
+                    $objEventsModel = $this->calendarEventsModel->findByPk($request->query->get('id'));
+
+                    if (null === $objEventsModel) {
+                        return;
+                    }
+
+                    if (null === EventReleaseLevelPolicyModel::findByPk($objEventsModel->eventReleaseLevel)) {
+                        return;
+                    }
+
+                    /** @var BackendUser $user */
+                    $user = $this->security->getUser();
+
+                    if ($user->id !== $objEventsModel->registrationGoesTo && !$this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $objEventsModel->id)) {
                         // User has no write access to the data record, that's why we display field values without a form input
-                        foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $field) {
-                            $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$field]['input_field_callback'] = [self::class, 'showFieldValue'];
+                        foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldName) {
+                            $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [self::class, 'showFieldValue'];
                         }
 
+                        // User is not allowed to submit any data!
                         if ('tl_calendar_events' === $request->request->get('FORM_SUBMIT')) {
                             $this->message->addError(sprintf($GLOBALS['TL_LANG']['MSC']['missingPermissionsToEditEvent'], $objEventsModel->id));
                             $this->controller->redirect($this->system->getReferer());
                         }
                     } else {
-                        // Protect fields with $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEditingOnFirstReleaseLevelOnly'] === true,
-                        // if the event is on the first release level
+                        // User has write access to all fields on the first e.r.level.
+                        // If the e.r.level is > 1 ...
+                        // fields with the flag $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] === true,
+                        // are readonly
                         $objEventReleaseLevelPolicyPackageModel = EventReleaseLevelPolicyPackageModel::findReleaseLevelPolicyPackageModelByEventId($objEventsModel->id);
 
-                        if (null !== $objEventReleaseLevelPolicyPackageModel) {
-                            if ($objEventsModel->eventReleaseLevel > 0) {
-                                $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEventsModel->id);
+                        // The event belongs not to an e.r.l.package
+                        if (null === $objEventReleaseLevelPolicyPackageModel) {
+                            return;
+                        }
 
-                                if (null !== $objEventReleaseLevelPolicyModel) {
-                                    if ($objEventReleaseLevelPolicyModel->id !== $objEventsModel->eventReleaseLevel) {
-                                        foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldname) {
-                                            if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['allowEditingOnFirstReleaseLevelOnly'] ?? false) && isset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['inputType'])) {
-                                                $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldname]['input_field_callback'] = [self::class, 'showFieldValue'];
-                                            }
-                                        }
-                                    }
+                        // The event has no e.r.level
+                        if (empty($objEventsModel->eventReleaseLevel)) {
+                            return;
+                        }
+
+                        // Get the first e.r.level of the e.r.l.package the event belongs to
+                        $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEventsModel->id);
+
+                        if (null === $objEventReleaseLevelPolicyModel) {
+                            return;
+                        }
+
+                        if ($objEventReleaseLevelPolicyModel->id !== $objEventsModel->eventReleaseLevel) {
+                            foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldName) {
+                                if (empty($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['inputType'])) {
+                                    continue;
+                                }
+
+                                if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
+                                    $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [self::class, 'showFieldValue'];
                                 }
                             }
                         }
                     }
                 }
+            )();
+        }
+        // End prevent unauthorized editing
+
+        // Check if user has the permission to cut events
+        if ('paste' === $request->query->get('act') && 'cut' === $request->query->get('mode') && $request->query->has('id')) {
+            $eventId = $request->query->get('id');
+            $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_CUT_EVENT, $eventId);
+
+            if (!$blnAllow) {
+                $this->message->addInfo(sprintf('Du hast keine Berechtigung den Event mit ID %d zu verschieben', $eventId));
+                $this->controller->redirect($this->system->getReferer());
             }
+        }
+		
+        // Check if user has the permission to cut events in the select all mode
+        if ('cutAll' === $request->query->get('act')) {
+            // An anonymous function increases the readability of the code
+            (
+                function (): void {
+                    $session = $this->requestStack->getSession()->get('CURRENT');
+                    $arrIDS = $session['IDS'];
+
+                    if (empty($arrIDS) || !\is_array($arrIDS)) {
+                        return;
+                    }
+
+                    $blnAllow = true;
+
+                    foreach ($arrIDS as $id) {
+                        $objEventsModel = $this->calendarEventsModel->findByPk($id);
+
+                        if (null === $objEventsModel) {
+                            $blnAllow = false;
+                            break;
+                        }
+
+                        if (!$this->security->isGranted(CalendarEventsVoter::CAN_CUT_EVENT, $id)) {
+                            $blnAllow = false;
+                            break;
+                        }
+                    }
+
+                    if (!$blnAllow) {
+                        $this->message->addError(sprintf('Keine Berechtigung die Events mit IDS %s zu verschieben.', implode(', ', $arrIDS)));
+                        $this->controller->redirect($this->system->getReferer());
+                    }
+                }
+            )();
         }
 
         // Allow select mode only, if an eventReleaseLevel filter is set
@@ -322,32 +399,49 @@ class CalendarEvents
         // Do not allow editing write-protected fields in editAll mode
         // Use input_field_callback to only display the field values without the form input field
         if ('editAll' === $request->query->get('act') || 'overrideAll' === $request->query->get('act')) {
-            $session = $request->getSession()->get('CURRENT');
-            $arrIDS = $session['IDS'];
+            // An anonymous function increases the readability of the code
+            (
+                function (): void {
+                    $session = $this->requestStack->getSession()->get('CURRENT');
+                    $arrIDS = $session['IDS'];
 
-            if (!empty($arrIDS) && \is_array($arrIDS)) {
-                $objEventsModel = $this->calendarEventsModel->findByPk($arrIDS[0]);
+                    if (empty($arrIDS) || !\is_array($arrIDS)) {
+                        return;
+                    }
 
-                if (null !== $objEventsModel) {
-                    if ($objEventsModel->eventReleaseLevel > 0) {
-                        $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEventsModel->id);
+                    $objEventsModel = $this->calendarEventsModel->findByPk($arrIDS[0]);
 
-                        if (null !== $objEventReleaseLevelPolicyModel) {
-                            if ($objEventReleaseLevelPolicyModel->id !== $objEventsModel->eventReleaseLevel) {
-                                foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields']) as $fieldName) {
-                                    if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
-                                        if ('editAll' === $request->query->get('act')) {
-                                            $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [self::class, 'showFieldValue'];
-                                        } else {
-                                            unset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]);
-                                        }
-                                    }
-                                }
+                    if (null === $objEventsModel) {
+                        return;
+                    }
+
+                    if (empty($objEventsModel->eventReleaseLevel)) {
+                        return;
+                    }
+
+                    $objEventReleaseLevelPolicyModel = EventReleaseLevelPolicyModel::findFirstLevelByEventId($objEventsModel->id);
+
+                    if (null === $objEventReleaseLevelPolicyModel) {
+                        return;
+                    }
+
+                    if ($objEventReleaseLevelPolicyModel->id === $objEventsModel->eventReleaseLevel) {
+                        return;
+                    }
+
+                    $request = $this->requestStack->getCurrentRequest();
+
+                    foreach (array_keys($GLOBALS['TL_DCA']['tl_calendar_events']['fields'] ?? []) as $fieldName) {
+                        if (true === ($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['allowEditingOnFirstReleaseLevelOnly'] ?? false)) {
+                            if ('editAll' === $request->query->get('act')) {
+                                $GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]['input_field_callback'] = [self::class, 'showFieldValue'];
+                            } else {
+                                unset($GLOBALS['TL_DCA']['tl_calendar_events']['fields'][$fieldName]);
                             }
                         }
                     }
                 }
-            }
+            )();
         }
     }
 
@@ -1398,9 +1492,9 @@ class CalendarEvents
 
         // Add icon
         if ($arrRow['published']) {
-            $icon = Image::getHtml('visible.svg', $GLOBALS['TL_LANG']['MSC']['published'], 'title="'.$GLOBALS['TL_LANG']['MSC']['published'].'"');
+            $icon = $this->image->getHtml('visible.svg', $GLOBALS['TL_LANG']['MSC']['published'], 'title="'.$GLOBALS['TL_LANG']['MSC']['published'].'"');
         } else {
-            $icon = Image::getHtml('invisible.svg', $GLOBALS['TL_LANG']['MSC']['unpublished'], 'title="'.$GLOBALS['TL_LANG']['MSC']['unpublished'].'"');
+            $icon = $this->image->getHtml('invisible.svg', $GLOBALS['TL_LANG']['MSC']['unpublished'], 'title="'.$GLOBALS['TL_LANG']['MSC']['unpublished'].'"');
         }
 
         // Add main instructor
@@ -1453,7 +1547,7 @@ class CalendarEvents
 
         $strDirection = 'up';
 
-        $canPushToNextReleaseLevel = false;
+        $blnAllow = false;
         $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
         $nextReleaseLevel = null;
 
@@ -1510,14 +1604,16 @@ class CalendarEvents
         }
 
         if (true === $this->security->isGranted(CalendarEventsVoter::CAN_UPGRADE_EVENT_RELEASE_LEVEL, $row['id']) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $nextReleaseLevel)) {
-            $canPushToNextReleaseLevel = true;
+            $blnAllow = true;
         }
 
-        if (false === $canPushToNextReleaseLevel) {
-            return Image::getHtml(str_replace('default', 'brightened', $icon), $label).' ';
+        if (!$blnAllow) {
+            $icon = str_replace('default', 'disabled', $icon);
+
+            return $this->image->getHtml($icon, $label).' ';
         }
 
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 
     /**
@@ -1657,7 +1753,7 @@ class CalendarEvents
 
         $strDirection = 'down';
 
-        $canPushToNextReleaseLevel = false;
+        $blnAllow = false;
         $prevReleaseLevel = null;
         $objReleaseLevelModel = EventReleaseLevelPolicyModel::findByPk($row['eventReleaseLevel']);
 
@@ -1714,14 +1810,16 @@ class CalendarEvents
         }
 
         if (true === $this->security->isGranted(CalendarEventsVoter::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL, $row['id']) && true === EventReleaseLevelPolicyModel::levelExists($row['id'], $prevReleaseLevel)) {
-            $canPushToNextReleaseLevel = true;
+            $blnAllow = true;
         }
 
-        if (false === $canPushToNextReleaseLevel) {
-            return Image::getHtml(str_replace('default', 'brightened', $icon), $label).' ';
+        if (!$blnAllow) {
+            $icon = str_replace('default', 'disabled', $icon);
+
+            return $this->image->getHtml($icon, $label).' ';
         }
 
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;eventId='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.delete.button', priority: 80)]
@@ -1730,10 +1828,26 @@ class CalendarEvents
         $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_DELETE_EVENT, $row['id']);
 
         if (!$blnAllow) {
-            return Image::getHtml($icon, $label).' ';
+            $icon = str_replace('.svg', '--disabled.svg', $icon);
+
+            return $this->image->getHtml($icon, $label).' ';
         }
 
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
+    }
+
+    #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.cut.button', priority: 70)]
+    public function cutIcon(array $row, string|null $href, string $label, string $title, string|null $icon, string $attributes): string
+    {
+        $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_CUT_EVENT, $row['id']);
+
+        if (!$blnAllow) {
+            $icon = str_replace('.svg', '--disabled.svg', $icon);
+
+            return $this->image->getHtml($icon, $label).' ';
+        }
+
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.copy.button', priority: 70)]
@@ -1742,10 +1856,12 @@ class CalendarEvents
         $blnAllow = $this->security->isGranted(CalendarEventsVoter::CAN_WRITE_EVENT, $row['id']);
 
         if (!$blnAllow) {
-            return '';
+            $icon = str_replace('.svg', '--disabled.svg', $icon);
+
+            return $this->image->getHtml($icon, $label).' ';
         }
 
-        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 
     #[AsCallback(table: 'tl_calendar_events', target: 'list.operations.preview.button', priority: 70)]
@@ -1755,7 +1871,7 @@ class CalendarEvents
 
         $href = $this->calendarEventsHelper->generateEventPreviewUrl($eventModel);
 
-        return '<a href="'.$href.'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
+        return '<a href="'.$href.'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 
     /**

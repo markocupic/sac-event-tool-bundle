@@ -29,8 +29,17 @@ class CalendarEventsVoter extends Voter
 {
     public const CAN_DELETE_EVENT = 'sacevt_can_delete_event';
     public const CAN_WRITE_EVENT = 'sacevt_can_write_event';
+    public const CAN_CUT_EVENT = 'sacevt_can_cut_event';
     public const CAN_UPGRADE_EVENT_RELEASE_LEVEL = 'sacevt_can_upgrade_event_release_level';
     public const CAN_DOWNGRADE_EVENT_RELEASE_LEVEL = 'sacevt_can_downgrade_event_release_level';
+
+    private const EVENT_PERMISSIONS_ALL = [
+        self::CAN_DELETE_EVENT,
+        self::CAN_WRITE_EVENT,
+        self::CAN_CUT_EVENT,
+        self::CAN_UPGRADE_EVENT_RELEASE_LEVEL,
+        self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL,
+    ];
 
     // Adapters
     private Adapter $calendarEvent;
@@ -132,13 +141,8 @@ class CalendarEventsVoter extends Voter
     {
         return \in_array(
             $attribute,
-            [
-                self::CAN_WRITE_EVENT,
-                self::CAN_DELETE_EVENT,
-                self::CAN_UPGRADE_EVENT_RELEASE_LEVEL,
-                self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL,
-            ],
-            true
+            self::EVENT_PERMISSIONS_ALL,
+            true,
         );
     }
 
@@ -162,19 +166,13 @@ class CalendarEventsVoter extends Voter
             return false;
         }
 
-        switch ($attribute) {
-            case self::CAN_DELETE_EVENT:
-                return $this->canDeleteEvent();
-
-            case self::CAN_WRITE_EVENT:
-                return $this->canWriteEvent();
-
-            case self::CAN_UPGRADE_EVENT_RELEASE_LEVEL:
-            case self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL:
-                return $this->canSwitchReleaseLevel($attribute);
-        }
-
-        throw new \LogicException('This code should not be reached!');
+        return match ($attribute) {
+            self::CAN_DELETE_EVENT => $this->canDeleteEvent(),
+            self::CAN_WRITE_EVENT => $this->canWriteEvent(),
+            self::CAN_CUT_EVENT => $this->canCutEvent(),
+            self::CAN_UPGRADE_EVENT_RELEASE_LEVEL, self::CAN_DOWNGRADE_EVENT_RELEASE_LEVEL => $this->canSwitchReleaseLevel($attribute),
+            default => throw new \LogicException(sprintf('You vote on a unsupported attribute "%s"!', $attribute)),
+        };
     }
 
     /**
@@ -239,6 +237,76 @@ class CalendarEventsVoter extends Voter
 
                 if (\in_array('canDeleteEvent', $arrPerm, true)) {
                     // Grant delete-access to "super-users"
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Grant cut-access...
+     * - to all users, if there is no release package assigned to the calendar (tl_calendar).
+     * - to admins
+     * - to permitted event-authors (-> tl_event_release_level_policy.allowCutAccessToAuthor
+     * - to permitted event-instructors (-> tl_event_release_level_policy.allowCutAccessToInstructors
+     * - to "super-users" (-> tl_event_release_level_policy.groupEventPerm).
+     *
+     * @throws \Exception
+     */
+    private function canCutEvent(): bool
+    {
+        if (!empty($this->event->eventReleaseLevel)) {
+            $releaseLevelPolicy = $this->eventReleaseLevelPolicy->findByPk($this->event->eventReleaseLevel);
+
+            if (null === $releaseLevelPolicy) {
+                $msg = 'Release-level model not found for tl_calendar_events with ID %d.';
+
+                throw new \Exception(sprintf($msg, $this->event->id));
+            }
+        } else {
+            // Grant cut-access if the event is not assigned to a release level.
+            return true;
+        }
+
+        // Allow cut event to admins.
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return true;
+        }
+
+        if ($releaseLevelPolicy->allowCutAccessToAuthor) {
+            if ((int) $this->user->id === (int) $this->event->author) {
+                // Grant cut-access if...
+                // authors have cut-access
+                // and
+                // the user has the role "author" on the current event
+                return true;
+            }
+        }
+
+        $arrEventInstructors = $this->calendarEventsHelper->getInstructorsAsArray($this->event);
+
+        if ($releaseLevelPolicy->allowCutAccessToInstructors) {
+            if (\in_array($this->user->id, $arrEventInstructors, false)) {
+                // Grant cut-access if...
+                // instructors have cut-access
+                // and
+                // the user has the role "instructor" on the current event
+                return true;
+            }
+        }
+
+        // Check if the user is member in an allowed group
+        $arrAllowedGroups = $this->stringUtil->deserialize($releaseLevelPolicy->groupEventPerm, true);
+        $arrUserGroups = $this->stringUtil->deserialize($this->user->groups, true);
+
+        foreach ($arrAllowedGroups as $v) {
+            if (!empty($v['group']) && \in_array($v['group'], $arrUserGroups, false)) {
+                $arrPerm = isset($v['permissions']) && \is_array($v['permissions']) ? $v['permissions'] : [];
+
+                if (\in_array('canCutEvent', $arrPerm, true)) {
+                    // Grant cut-access to "super-users"
                     return true;
                 }
             }

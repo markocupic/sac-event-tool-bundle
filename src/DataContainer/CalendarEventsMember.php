@@ -78,7 +78,7 @@ class CalendarEventsMember
     private Adapter $member;
     private Adapter $message;
     private Adapter $stringUtil;
-	private Adapter $user;
+    private Adapter $user;
     private Adapter $validator;
 
     public function __construct(
@@ -669,6 +669,11 @@ class CalendarEventsMember
             $allowDeletion = true;
         }
 
-        return $allowDeletion ? '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ' : $this->image->getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
+		if(!$allowDeletion){
+			$icon = str_replace('.svg', '--disabled.svg', $icon);
+			return $this->image->getHtml($icon).' ';
+		}
+
+        return '<a href="'.$this->backend->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$this->stringUtil->specialchars($title).'"'.$attributes.'>'.$this->image->getHtml($icon, $label).'</a> ';
     }
 }

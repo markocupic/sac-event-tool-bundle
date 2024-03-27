@@ -47,7 +47,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 	'palettes' => [
 		'default' => '
 		{title_legend},level,title,description;
-		{event_grants_legend},allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowDeleteAccessToAuthor,allowDeleteAccessToInstructors,groupEventPerm;
+		{event_grants_legend},allowWriteAccessToAuthor,allowWriteAccessToInstructors,allowDeleteAccessToAuthor,allowDeleteAccessToInstructors,allowCutAccessToAuthor,allowCutAccessToInstructors,groupEventPerm;
 		{event_release_level_grants_legend},allowSwitchingToPrevLevel,allowSwitchingToNextLevel,groupReleaseLevelPerm;
 		{event_registrations_grants_legend},allowRegistration',
 	],
@@ -68,7 +68,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 			'inputType' => 'select',
 			'options'   => range(1, 10),
 			'eval'      => ['mandatory' => true, 'tl_class' => 'clr'],
-			'sql'       => "smallint(2) unsigned NOT NULL default '0'",
+			'sql'       => "smallint(2) unsigned NOT NULL default 0",
 		],
 		'title'                          => [
 			'exclude'   => true,
@@ -116,7 +116,19 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 			'exclude'   => true,
 			'filter'    => true,
 			'inputType' => 'checkbox',
-			'sql'       => ['type' => 'boolean', 'default' => true],
+			'sql'       => ['type' => 'boolean', 'default' => false],
+		],
+		'allowCutAccessToAuthor'         => [
+			'exclude'   => true,
+			'filter'    => true,
+			'inputType' => 'checkbox',
+			'sql'       => ['type' => 'boolean', 'default' => false],
+		],
+		'allowCutAccessToInstructors'    => [
+			'exclude'   => true,
+			'filter'    => true,
+			'inputType' => 'checkbox',
+			'sql'       => ['type' => 'boolean', 'default' => false],
 		],
 		'groupEventPerm'                 => [
 			'exclude'   => true,
@@ -137,7 +149,7 @@ $GLOBALS['TL_DCA']['tl_event_release_level_policy'] = [
 						'label'     => &$GLOBALS['TL_LANG']['tl_event_release_level_policy']['permissions'],
 						'exclude'   => true,
 						'inputType' => 'select',
-						'options'   => ['canWriteEvent', 'canDeleteEvent'],
+						'options'   => ['canWriteEvent', 'canDeleteEvent', 'canCutEvent'],
 						'reference' => &$GLOBALS['TL_LANG']['tl_event_release_level_policy'],
 						'eval'      => ['style' => 'width: 80%', 'multiple' => true, 'chosen' => true, 'mandatory' => false],
 					],

@@ -292,7 +292,7 @@ readonly class CalendarEventsInstructorInvoice
         }
 
         if (false === $blnAllow) {
-            return Image::getHtml(str_replace('default', 'brightened', $icon), $label).' ';
+            return Image::getHtml(str_replace('default', 'disabled', $icon), $label).' ';
         }
 
         // Generate a signed url

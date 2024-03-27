@@ -186,25 +186,16 @@ div.legend-box {
 
 	& .field-content-box {
 		margin-top: 3px;
+		margin-bottom: 3px;
 		padding: 8px 5px;
-		background-color: lightgray;
+		background-color: var(--form-bg-disabled);
 		box-sizing: border-box;
-		border: 1px solid var(--form-border);
+		border: 1px solid var(--form-border-disabled);
 		border-radius: 2px;
 		width: 100%;
 		line-height: 1.4;
 		min-height: 37px;
-	}
-}
-
-/** Dark mode */
-html[data-color-scheme="dark"] {
-	& .tl_formbody_edit div.readonly {
-		& .field-content-box {
-			border: 1px solid var(--form-border);
-			background-color: var(--form-bg);
-			color: #ffffff;
-		}
+		color: var(--form-text-disabled);
 	}
 }
 
@@ -346,16 +337,19 @@ div.tl_header_tour_rapport table td {
 	}
 
 	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
+
 	& td .filter-brightened {
 		filter: opacity(0.30);
 	}
 
 	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
+
 	& td .filter-green {
 		filter: invert(59%) sepia(20%) saturate(1169%) hue-rotate(94deg) brightness(96%) contrast(93%);
 	}
 
 	/** https://isotropic.co/tool/hex-color-to-css-filter/ */
+
 	& td .filter-red {
 		filter: invert(31%) sepia(93%) saturate(7446%) hue-rotate(356deg) brightness(103%) contrast(121%);
 	}
@@ -398,6 +392,7 @@ div.tl_header_tour_rapport table td {
 	font-weight: bold;
 	color: red !important;
 }
+
 /** alerts **/
 /** alerts **/
 
